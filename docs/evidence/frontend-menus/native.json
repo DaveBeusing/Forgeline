@@ -1,0 +1,2062 @@
+{
+  "visualAcceptance": "pending",
+  "totalCases": 80,
+  "readbacks": 160,
+  "warmups": 3,
+  "samples": 8,
+  "profile": "Low",
+  "reports": [
+    {
+      "source": "5ce4553ad484ab966dcc682523193cfdf2e8f041",
+      "build": "0.1.371-dev+5ce4553ad484ab966dcc682523193cfdf2e8f041",
+      "manifestSha256": "40a819a6b4aea2dcde57e927daa5f6889b2344d4507a16ada717bb7c47fb0b7a",
+      "runtime": ".NET 10.0.12",
+      "environment": {
+        "os": "Microsoft Windows 10.0.26300",
+        "architecture": "X64",
+        "logicalProcessors": 24,
+        "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+        "configuration": "Release"
+      },
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "runtimeFingerprint": "FECD02BDD6C6EA108D3D08974F3F93A768E1A3A5C76AB188E9418814B85DD149",
+      "hostWindowDpi": 240,
+      "clientAssemblySha256": "AF5FABD78D55F65B7B0B4112E9441532719499776D40D60640F73D5D8ABCC280",
+      "presentationAssemblySha256": "18DE801FAF00052D80E1918E62225BD35D8F6A263D840274A5C7C266FE11ED0C",
+      "cases": [
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiMenu-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiMenu-Scale1.00.png",
+          "imageSha256": "2803AC75FB85F0D1246630340A2C1F7097A871FE7C7F8B0DAB25B3B71EEE59B3",
+          "pixelSha256": "7D9319E942078AF08711905761ADF3A3C6A09BFF7F8F6FBCDF41784DA0CB70E7",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiMenu-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiMenu-Scale2.00.png",
+          "imageSha256": "529F88CD17F52037F982CA32DC301A6054341B1FD20D1ADAA270C22C70382648",
+          "pixelSha256": "714AF1D73667483EBA102B6357F8B45B32712C5B7DB917165A60E443A243666E",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiControls-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiControls-Scale1.00.png",
+          "imageSha256": "4046342D1C8D2B0666B39DC07E915B61D192E81AF05EC0BC1347CA399A9BF301",
+          "pixelSha256": "6CC96A442752885050E5337C360CFB57D57C6F3814F1DA355089F19FDE005A1D",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 179,
+            "vertices": 1074,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 34368,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiControls-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiControls-Scale2.00.png",
+          "imageSha256": "5CE5B8F9E07DD34A3951F87F5EC61DB2855CF17BDD7556D37AFD65C11C5B9DCB",
+          "pixelSha256": "A146A140756201D220693A47E50F59ACB02397A120A2C32D96D48F98D52F35EB",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiCredits-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiCredits-Scale1.00.png",
+          "imageSha256": "AB2F18FAA89338E53C9D99C2B229F8EA579A1ED8A3163B919FF0AC5CE4686A40",
+          "pixelSha256": "711839A77AAB03DB77C1FB3A33F6B3B8FCCCBA90B3B0E65A1C45E5E4BD21BB05",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiCredits-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiCredits-Scale2.00.png",
+          "imageSha256": "F28DDC431E89C618CF821C57279DDBAD580662BCC848CD98163EF4B2F2BCFA25",
+          "pixelSha256": "39E324E187F824A1709C178B92548C28AF2711978D1939EFC5028ACADEA01F97",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00.png",
+          "imageSha256": "81746755FB7F6A7BEC5AB6861ECF6F7524EF9AA4865E7688F538353BD6F38A51",
+          "pixelSha256": "5F72E6752671BE762A36DB5C0BF4D2A4023CC50BF7BF0F71288E69400D0D822D",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale2.00.png",
+          "imageSha256": "70B139302B64FBEA77FEAA60D3551B16A0C401D37A57076DC075DC1E508E73BD",
+          "pixelSha256": "E0E3BC1A6D912CD06F2D1CFFE5981A72F31A5BCF9D8E3ED718DACDAB1BE19527",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00.png",
+          "imageSha256": "D3130090CB06CBA149C504A37B01163F652D94FDC51CF5CB5E90D48C8758BEF5",
+          "pixelSha256": "4FC851A6AE9EFC834AEB216DB47EFE78B5685B943814D587537C396F0C5605D0",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 296,
+            "vertices": 1776,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 56832,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale2.00.png",
+          "imageSha256": "229BC56858CE6FD33D3BEF097C156E78E5874246F2898AC2A5A457694F656202",
+          "pixelSha256": "44787BF7406B09BA4205DCA0166FE107293CF12AB513A3C6C642CDF367A3F888",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiMenu-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiMenu-Scale1.00.png",
+          "imageSha256": "AB9EBE2BEF2ED9440ABFA8E3E0F490A54F8C2F9BBB998579A7AE6683F2F1ED0B",
+          "pixelSha256": "7AFBA18072324E820F8BA8643A1A99F81402209B0D97EE902CEA101A544E059A",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiMenu-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiMenu-Scale2.00.png",
+          "imageSha256": "41C2933E03AD00245823B7F45DE4CBA72DC8CD70F456AE96B46B71AEC426BAE7",
+          "pixelSha256": "46D869243BB4D2533F96957A110F16A0867880E50C98207DCF2AB41EEDDE1576",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiControls-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiControls-Scale1.00.png",
+          "imageSha256": "004FA8D11237A4C0AF45C248D9B6A150091F49ACAB2F6BB56C22AAD6EA93500A",
+          "pixelSha256": "FE6230CF57DD23F7B7FF5F89B48F4AEE355BDD2620B7FD650D89107E277E012A",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 179,
+            "vertices": 1074,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 34368,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiControls-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiControls-Scale2.00.png",
+          "imageSha256": "7C6DFE827D71837B603F47751D6F33FC7071D9175BA4F9319A6D1AE1F62956A7",
+          "pixelSha256": "FB06CC62ACAAC2A00A56E748768B76D1802FEB03D8A023146B5560BBFFFC83B7",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiCredits-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiCredits-Scale1.00.png",
+          "imageSha256": "9F72FB104745C90A8BB93774F8A9250A9993FB69B5624F11C139EF1150B9BCFB",
+          "pixelSha256": "D43D8435F9E51E76756ADDC0FD0968A5CD3637D401D169089E236D453CBFF46B",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiCredits-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiCredits-Scale2.00.png",
+          "imageSha256": "8B4751ECB3D0B49C6231C3B5238518D35AAAA7D33FB264A6776B502BDD9BF733",
+          "pixelSha256": "BEF6FE9E3A45D8355BCD8F80114512D298C253CD83FBF443CA0F54DB4F88B0E9",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00.png",
+          "imageSha256": "BC80561DE74DFC263874E1619309356AB35410FF62DEAFFA771B10C326606413",
+          "pixelSha256": "6A694BF9B4F5C6A6425D8E5A4B2117FE10DC2A02E25D1F829DD779674EE8BE0B",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale2.00.png",
+          "imageSha256": "B3CB7E0CB491AEFCC0B47E99465D2DAFF28090804D64961D1692618A2857E870",
+          "pixelSha256": "2EB91C4E860BC0F9B35E24B2216ED3E1DC2A1E1A3A299F171698E8419C821720",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00.png",
+          "imageSha256": "363662F72E2203B3A431764F2C75C75456096F025781E059E1FE6A1F12B508B3",
+          "pixelSha256": "7D3B95EC2A8215AF88B2F2B613E58A3E3ED1A2B1BD06735AC902A452E4032DA4",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 296,
+            "vertices": 1776,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 56832,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale2.00.png",
+          "imageSha256": "F7303A97A838F561E96D5DF63DA75F36C54F51B627410DA86146E06D9F8CE5CA",
+          "pixelSha256": "FF89E26B9900B984A0DC23A7C0AEE9EDC33C447B4138734D56B1EA086A9BD8F8",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiMenu-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiMenu-Scale1.00.png",
+          "imageSha256": "8BBC1F1E9648C2D8A41D43C21975BF80CF625B665534C9E8B75197AABA07D855",
+          "pixelSha256": "5890E6D41EC69E7A1DEBEB5EBC77D268F9E0A7F9A5F8CB955847DF1B58B37E24",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiMenu-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiMenu-Scale2.00.png",
+          "imageSha256": "79C25AEF8CA7D6DF767AEDA44E2E2E7ACE35B9C8B831510C475B55EE2C520C9F",
+          "pixelSha256": "C3D38EBF0C4E1E3467AFEF737CC246F0FD8A3EA4431DBBA3C2C3457114561EF1",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiControls-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiControls-Scale1.00.png",
+          "imageSha256": "EA0491A6C192C60F5AB19FCA38498D29202FD88170DFB1B5B0DD04A292F02AEC",
+          "pixelSha256": "D264792CD90296237D4019E9DA162D454A815D4F960CE84157ED0A657BEF2B58",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 179,
+            "vertices": 1074,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 34368,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiControls-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiControls-Scale2.00.png",
+          "imageSha256": "01A390801089EE5A9C3D07DA287EC641BC04B66FE02BC276FB251F930517121D",
+          "pixelSha256": "0A34315C31C35CE5E8C4DC778E253E375B46BC02D99CF906EAD909E785C854F0",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiCredits-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiCredits-Scale1.00.png",
+          "imageSha256": "DFC622654D090C1FFDC1118C3ECB49C2C349962710CD901759BF68CEDAAA2C3E",
+          "pixelSha256": "680E318AF67B82F51ACC6D46EE0E667E0BF9BC3942CB8DD3CF45CE442F947B7B",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiCredits-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiCredits-Scale2.00.png",
+          "imageSha256": "807B071EFF7E271C4F4271B2065598A7B2680557C1EE79618943306D24EFDCF5",
+          "pixelSha256": "7BC96FC58A8EEC5998B146393C6AA537A397EA48DB9EE1FE2B752BF2AFD77234",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00.png",
+          "imageSha256": "A931B3A9098FF59D55A87B92F7AC10773D1DA303DB0C167665EA569CE2251D3F",
+          "pixelSha256": "6313AF82A00A2B9B97A9FB2C704EAF561ABADBF25F7252043102C701124465EC",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale2.00.png",
+          "imageSha256": "549A689346A3A11B22F2C1A8CA3D303B21AB17560AF8288873E9D3D8AED6CE70",
+          "pixelSha256": "8C1E48AEC07B40C69667821D283986D795B1EFADA0E4EBB5F3A707B0A90BEB7E",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00.png",
+          "imageSha256": "17151DD17B4392AA79879D0ACBAE03B2D7545C94199317FFE074873017966E55",
+          "pixelSha256": "A52F8E57BEB408736F300DB028BFF2A9D61467A9877F3F43A67AC927D7FA3B7F",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 296,
+            "vertices": 1776,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 56832,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale2.00.png",
+          "imageSha256": "643E6911A5DE5055A01F8994245CDAB63D5E7714BE782D5D77844E189650D3F5",
+          "pixelSha256": "F908758DFEC3BD3184C40B136DD4BBB5C780015CEBA0F13F21F3A1C4D8922318",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiMenu-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiMenu-Scale1.00.png",
+          "imageSha256": "933B8C6515DE90FBFF1E6D3653BD2E1B4328BCDD597A764D679B60F6817A5C66",
+          "pixelSha256": "C0EAA8E1C1659B5A0B10790A621FD668B39AED6B1B9F0C22F021322145E41617",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiMenu-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiMenu-Scale2.00.png",
+          "imageSha256": "B5EFE0285847D20A7DA12B985E46626FEA7998662B14E09ECDB354151750660E",
+          "pixelSha256": "226A32F7696315182F73BB687DF9D8A3929E674A9AA7A2451D93227750A9E35F",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiControls-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiControls-Scale1.00.png",
+          "imageSha256": "D63CD4436392D0361E940DBCF291326CA4296924CD7C0BFB14CE06716E3E92CC",
+          "pixelSha256": "10D1DD4581F9131046FCD15B436066439C2C14338A0B659A1DDF05392EE1F432",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 179,
+            "vertices": 1074,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 34368,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiControls-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiControls-Scale2.00.png",
+          "imageSha256": "1D3B668232FF3E358C4E733464E438AC343F2F46F0B75A7A5519B627AC118C71",
+          "pixelSha256": "C689414A7FF12EB0923F12F3CEE701015D2331BC77614D7DB99B6ED6AE387F8E",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiCredits-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiCredits-Scale1.00.png",
+          "imageSha256": "2300034E6B8E1D8F063CD8BC76828A2656D654DFA5F97DAC6A3F45C41809B0B7",
+          "pixelSha256": "0F1CF3168AB2E5320A5871A722B9AC1A48419FA3FD0519341FBF0C79850AC312",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiCredits-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiCredits-Scale2.00.png",
+          "imageSha256": "A6CF67598093E6D1C3DA6834789A5E8D4100D2BBA9074CA2CE768AFF7A66B44C",
+          "pixelSha256": "9BE040B901C5401EBCF1BAF55E008A0702C0BDC7CA0C1ACDEAC724ED54D7693E",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00.png",
+          "imageSha256": "83CA76A7955B090614B1EFA340FE60A6815DC899FC9E78B1405574FFEAE55BD7",
+          "pixelSha256": "9ECA7D6AE0AD0248A0BA054A8CA8B8DC5019BF2E0812C35C5A5F489BC3E21151",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiSettingsAudio-Scale2.00.png",
+          "imageSha256": "CB3C0E3134F21B68C2017AABA506E9CC4BDDA33C721650925F54AFC0564B10CB",
+          "pixelSha256": "6CDF1BB50A0B532D911E8E1D3CE2F03A483882985A8BAAA8BB2337E901659981",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00.png",
+          "imageSha256": "E08EA8E6780C3F0E30869E250FE4E99CC8179821A3FC75229AAA7DF1C01B736F",
+          "pixelSha256": "4A1A0A8C29593247757D4187EBDE71FF86155B16B1A06D48F05CBF26D886208F",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 296,
+            "vertices": 1776,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 56832,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi96-UiSettingsGraphics-Scale2.00.png",
+          "imageSha256": "2E2A605820C4BB70C58DD54EE72E5F96A50E30A4E565F80D59BEC9A396D0D685",
+          "pixelSha256": "D34EFFE93F4900E62ECD4C8D4C38FD98C5A889566014B3BDAFD41469C031352F",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 96,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        }
+      ]
+    },
+    {
+      "source": "5ce4553ad484ab966dcc682523193cfdf2e8f041",
+      "build": "0.1.371-dev+5ce4553ad484ab966dcc682523193cfdf2e8f041",
+      "manifestSha256": "69bd8efcef6716ac72725f961cc3821257d2653a8e1ef6f60bab1f775a03471b",
+      "runtime": ".NET 10.0.12",
+      "environment": {
+        "os": "Microsoft Windows 10.0.26300",
+        "architecture": "X64",
+        "logicalProcessors": 24,
+        "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+        "configuration": "Release"
+      },
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "runtimeFingerprint": "FECD02BDD6C6EA108D3D08974F3F93A768E1A3A5C76AB188E9418814B85DD149",
+      "hostWindowDpi": 240,
+      "clientAssemblySha256": "AF5FABD78D55F65B7B0B4112E9441532719499776D40D60640F73D5D8ABCC280",
+      "presentationAssemblySha256": "18DE801FAF00052D80E1918E62225BD35D8F6A263D840274A5C7C266FE11ED0C",
+      "cases": [
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiMenu-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiMenu-Scale1.00.png",
+          "imageSha256": "529F88CD17F52037F982CA32DC301A6054341B1FD20D1ADAA270C22C70382648",
+          "pixelSha256": "714AF1D73667483EBA102B6357F8B45B32712C5B7DB917165A60E443A243666E",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiMenu-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiMenu-Scale2.00.png",
+          "imageSha256": "529F88CD17F52037F982CA32DC301A6054341B1FD20D1ADAA270C22C70382648",
+          "pixelSha256": "714AF1D73667483EBA102B6357F8B45B32712C5B7DB917165A60E443A243666E",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiControls-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiControls-Scale1.00.png",
+          "imageSha256": "5CE5B8F9E07DD34A3951F87F5EC61DB2855CF17BDD7556D37AFD65C11C5B9DCB",
+          "pixelSha256": "A146A140756201D220693A47E50F59ACB02397A120A2C32D96D48F98D52F35EB",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiControls-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+          "imageSha256": "5CE5B8F9E07DD34A3951F87F5EC61DB2855CF17BDD7556D37AFD65C11C5B9DCB",
+          "pixelSha256": "A146A140756201D220693A47E50F59ACB02397A120A2C32D96D48F98D52F35EB",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiCredits-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiCredits-Scale1.00.png",
+          "imageSha256": "F28DDC431E89C618CF821C57279DDBAD580662BCC848CD98163EF4B2F2BCFA25",
+          "pixelSha256": "39E324E187F824A1709C178B92548C28AF2711978D1939EFC5028ACADEA01F97",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiCredits-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiCredits-Scale2.00.png",
+          "imageSha256": "F28DDC431E89C618CF821C57279DDBAD580662BCC848CD98163EF4B2F2BCFA25",
+          "pixelSha256": "39E324E187F824A1709C178B92548C28AF2711978D1939EFC5028ACADEA01F97",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale1.00.png",
+          "imageSha256": "70B139302B64FBEA77FEAA60D3551B16A0C401D37A57076DC075DC1E508E73BD",
+          "pixelSha256": "E0E3BC1A6D912CD06F2D1CFFE5981A72F31A5BCF9D8E3ED718DACDAB1BE19527",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale2.00.png",
+          "imageSha256": "70B139302B64FBEA77FEAA60D3551B16A0C401D37A57076DC075DC1E508E73BD",
+          "pixelSha256": "E0E3BC1A6D912CD06F2D1CFFE5981A72F31A5BCF9D8E3ED718DACDAB1BE19527",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale1.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale1.00.png",
+          "imageSha256": "229BC56858CE6FD33D3BEF097C156E78E5874246F2898AC2A5A457694F656202",
+          "pixelSha256": "44787BF7406B09BA4205DCA0166FE107293CF12AB513A3C6C642CDF367A3F888",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00",
+          "image": "BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+          "imageSha256": "229BC56858CE6FD33D3BEF097C156E78E5874246F2898AC2A5A457694F656202",
+          "pixelSha256": "44787BF7406B09BA4205DCA0166FE107293CF12AB513A3C6C642CDF367A3F888",
+          "requestedDisplay": {
+            "width": 1280,
+            "height": 720
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiMenu-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiMenu-Scale1.00.png",
+          "imageSha256": "41C2933E03AD00245823B7F45DE4CBA72DC8CD70F456AE96B46B71AEC426BAE7",
+          "pixelSha256": "46D869243BB4D2533F96957A110F16A0867880E50C98207DCF2AB41EEDDE1576",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiMenu-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiMenu-Scale2.00.png",
+          "imageSha256": "41C2933E03AD00245823B7F45DE4CBA72DC8CD70F456AE96B46B71AEC426BAE7",
+          "pixelSha256": "46D869243BB4D2533F96957A110F16A0867880E50C98207DCF2AB41EEDDE1576",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiControls-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiControls-Scale1.00.png",
+          "imageSha256": "7C6DFE827D71837B603F47751D6F33FC7071D9175BA4F9319A6D1AE1F62956A7",
+          "pixelSha256": "FB06CC62ACAAC2A00A56E748768B76D1802FEB03D8A023146B5560BBFFFC83B7",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiControls-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+          "imageSha256": "7C6DFE827D71837B603F47751D6F33FC7071D9175BA4F9319A6D1AE1F62956A7",
+          "pixelSha256": "FB06CC62ACAAC2A00A56E748768B76D1802FEB03D8A023146B5560BBFFFC83B7",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiCredits-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiCredits-Scale1.00.png",
+          "imageSha256": "8B4751ECB3D0B49C6231C3B5238518D35AAAA7D33FB264A6776B502BDD9BF733",
+          "pixelSha256": "BEF6FE9E3A45D8355BCD8F80114512D298C253CD83FBF443CA0F54DB4F88B0E9",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiCredits-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiCredits-Scale2.00.png",
+          "imageSha256": "8B4751ECB3D0B49C6231C3B5238518D35AAAA7D33FB264A6776B502BDD9BF733",
+          "pixelSha256": "BEF6FE9E3A45D8355BCD8F80114512D298C253CD83FBF443CA0F54DB4F88B0E9",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale1.00.png",
+          "imageSha256": "B3CB7E0CB491AEFCC0B47E99465D2DAFF28090804D64961D1692618A2857E870",
+          "pixelSha256": "2EB91C4E860BC0F9B35E24B2216ED3E1DC2A1E1A3A299F171698E8419C821720",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale2.00.png",
+          "imageSha256": "B3CB7E0CB491AEFCC0B47E99465D2DAFF28090804D64961D1692618A2857E870",
+          "pixelSha256": "2EB91C4E860BC0F9B35E24B2216ED3E1DC2A1E1A3A299F171698E8419C821720",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale1.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale1.00.png",
+          "imageSha256": "F7303A97A838F561E96D5DF63DA75F36C54F51B627410DA86146E06D9F8CE5CA",
+          "pixelSha256": "FF89E26B9900B984A0DC23A7C0AEE9EDC33C447B4138734D56B1EA086A9BD8F8",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00",
+          "image": "BattlefieldCombat-1920x1080-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+          "imageSha256": "F7303A97A838F561E96D5DF63DA75F36C54F51B627410DA86146E06D9F8CE5CA",
+          "pixelSha256": "FF89E26B9900B984A0DC23A7C0AEE9EDC33C447B4138734D56B1EA086A9BD8F8",
+          "requestedDisplay": {
+            "width": 1920,
+            "height": 1080
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiMenu-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiMenu-Scale1.00.png",
+          "imageSha256": "79C25AEF8CA7D6DF767AEDA44E2E2E7ACE35B9C8B831510C475B55EE2C520C9F",
+          "pixelSha256": "C3D38EBF0C4E1E3467AFEF737CC246F0FD8A3EA4431DBBA3C2C3457114561EF1",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiMenu-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiMenu-Scale2.00.png",
+          "imageSha256": "79C25AEF8CA7D6DF767AEDA44E2E2E7ACE35B9C8B831510C475B55EE2C520C9F",
+          "pixelSha256": "C3D38EBF0C4E1E3467AFEF737CC246F0FD8A3EA4431DBBA3C2C3457114561EF1",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiControls-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiControls-Scale1.00.png",
+          "imageSha256": "01A390801089EE5A9C3D07DA287EC641BC04B66FE02BC276FB251F930517121D",
+          "pixelSha256": "0A34315C31C35CE5E8C4DC778E253E375B46BC02D99CF906EAD909E785C854F0",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiControls-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+          "imageSha256": "01A390801089EE5A9C3D07DA287EC641BC04B66FE02BC276FB251F930517121D",
+          "pixelSha256": "0A34315C31C35CE5E8C4DC778E253E375B46BC02D99CF906EAD909E785C854F0",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiCredits-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiCredits-Scale1.00.png",
+          "imageSha256": "807B071EFF7E271C4F4271B2065598A7B2680557C1EE79618943306D24EFDCF5",
+          "pixelSha256": "7BC96FC58A8EEC5998B146393C6AA537A397EA48DB9EE1FE2B752BF2AFD77234",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiCredits-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiCredits-Scale2.00.png",
+          "imageSha256": "807B071EFF7E271C4F4271B2065598A7B2680557C1EE79618943306D24EFDCF5",
+          "pixelSha256": "7BC96FC58A8EEC5998B146393C6AA537A397EA48DB9EE1FE2B752BF2AFD77234",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale1.00.png",
+          "imageSha256": "549A689346A3A11B22F2C1A8CA3D303B21AB17560AF8288873E9D3D8AED6CE70",
+          "pixelSha256": "8C1E48AEC07B40C69667821D283986D795B1EFADA0E4EBB5F3A707B0A90BEB7E",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale2.00.png",
+          "imageSha256": "549A689346A3A11B22F2C1A8CA3D303B21AB17560AF8288873E9D3D8AED6CE70",
+          "pixelSha256": "8C1E48AEC07B40C69667821D283986D795B1EFADA0E4EBB5F3A707B0A90BEB7E",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale1.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale1.00.png",
+          "imageSha256": "643E6911A5DE5055A01F8994245CDAB63D5E7714BE782D5D77844E189650D3F5",
+          "pixelSha256": "F908758DFEC3BD3184C40B136DD4BBB5C780015CEBA0F13F21F3A1C4D8922318",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00",
+          "image": "BattlefieldCombat-3440x1440-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+          "imageSha256": "643E6911A5DE5055A01F8994245CDAB63D5E7714BE782D5D77844E189650D3F5",
+          "pixelSha256": "F908758DFEC3BD3184C40B136DD4BBB5C780015CEBA0F13F21F3A1C4D8922318",
+          "requestedDisplay": {
+            "width": 3440,
+            "height": 1440
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiMenu-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiMenu-Scale1.00.png",
+          "imageSha256": "B5EFE0285847D20A7DA12B985E46626FEA7998662B14E09ECDB354151750660E",
+          "pixelSha256": "226A32F7696315182F73BB687DF9D8A3929E674A9AA7A2451D93227750A9E35F",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiMenu-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiMenu-Scale2.00.png",
+          "imageSha256": "B5EFE0285847D20A7DA12B985E46626FEA7998662B14E09ECDB354151750660E",
+          "pixelSha256": "226A32F7696315182F73BB687DF9D8A3929E674A9AA7A2451D93227750A9E35F",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 173,
+            "vertices": 1038,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33216,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiControls-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiControls-Scale1.00.png",
+          "imageSha256": "1D3B668232FF3E358C4E733464E438AC343F2F46F0B75A7A5519B627AC118C71",
+          "pixelSha256": "C689414A7FF12EB0923F12F3CEE701015D2331BC77614D7DB99B6ED6AE387F8E",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiControls-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+          "imageSha256": "1D3B668232FF3E358C4E733464E438AC343F2F46F0B75A7A5519B627AC118C71",
+          "pixelSha256": "C689414A7FF12EB0923F12F3CEE701015D2331BC77614D7DB99B6ED6AE387F8E",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 159,
+            "vertices": 954,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 30528,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiCredits-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiCredits-Scale1.00.png",
+          "imageSha256": "A6CF67598093E6D1C3DA6834789A5E8D4100D2BBA9074CA2CE768AFF7A66B44C",
+          "pixelSha256": "9BE040B901C5401EBCF1BAF55E008A0702C0BDC7CA0C1ACDEAC724ED54D7693E",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiCredits-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiCredits-Scale2.00.png",
+          "imageSha256": "A6CF67598093E6D1C3DA6834789A5E8D4100D2BBA9074CA2CE768AFF7A66B44C",
+          "pixelSha256": "9BE040B901C5401EBCF1BAF55E008A0702C0BDC7CA0C1ACDEAC724ED54D7693E",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 120,
+            "vertices": 720,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 23040,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale1.00.png",
+          "imageSha256": "CB3C0E3134F21B68C2017AABA506E9CC4BDDA33C721650925F54AFC0564B10CB",
+          "pixelSha256": "6CDF1BB50A0B532D911E8E1D3CE2F03A483882985A8BAAA8BB2337E901659981",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiSettingsAudio-Scale2.00.png",
+          "imageSha256": "CB3C0E3134F21B68C2017AABA506E9CC4BDDA33C721650925F54AFC0564B10CB",
+          "pixelSha256": "6CDF1BB50A0B532D911E8E1D3CE2F03A483882985A8BAAA8BB2337E901659981",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 172,
+            "vertices": 1032,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 33024,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale1.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale1.00.png",
+          "imageSha256": "2E2A605820C4BB70C58DD54EE72E5F96A50E30A4E565F80D59BEC9A396D0D685",
+          "pixelSha256": "D34EFFE93F4900E62ECD4C8D4C38FD98C5A889566014B3BDAFD41469C031352F",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 1,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        },
+        {
+          "key": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00",
+          "image": "BattlefieldCombat-3840x2160-Low-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+          "imageSha256": "2E2A605820C4BB70C58DD54EE72E5F96A50E30A4E565F80D59BEC9A396D0D685",
+          "pixelSha256": "D34EFFE93F4900E62ECD4C8D4C38FD98C5A889566014B3BDAFD41469C031352F",
+          "requestedDisplay": {
+            "width": 3840,
+            "height": 2160
+          },
+          "rasterDpi": 192,
+          "uiScale": 2,
+          "hostWindowDpi": 240,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "hudVertices": 0,
+          "text": {
+            "glyphs": 261,
+            "vertices": 1566,
+            "missingGlyphs": 0,
+            "droppedGlyphs": 0,
+            "uploadBytes": 50112,
+            "atlasReady": true,
+            "failureReason": null
+          }
+        }
+      ]
+    }
+  ],
+  "fullscreenStartup": {
+    "BuildVersion": "0.1.371-dev+5ce4553ad484ab966dcc682523193cfdf2e8f041",
+    "SourceRevision": "5ce4553ad484ab966dcc682523193cfdf2e8f041",
+    "ApplicationReadiness": "Ready",
+    "SessionReadiness": "NotRequested",
+    "Runtime": ".NET 10.0.12",
+    "OS": "Microsoft Windows 10.0.26300",
+    "mode": "BorderlessFullscreen",
+    "clientWidth": 3840,
+    "clientHeight": 2400,
+    "dpi": 240
+  }
+}
