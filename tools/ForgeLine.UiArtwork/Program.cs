@@ -80,7 +80,7 @@ internal static class Program
             var buffer = new PresentationSnapshotBuffer();
             buffer.Publish(new PresentationSnapshot(new SimulationTick(32), TimeSpan.FromMilliseconds(50), 1, new[] { identity.Instance }));
             var world = new RenderWorld(); world.Update(buffer);
-            foreach (int size in new[] { 64, 128, 256 })
+            foreach (int size in new[] { 48, 64, 96, 128, 256 })
             {
                 graphics.WaitForIdle(); graphics.Resize(size, size);
                 Action<IGraphicsCommandContext> record = context => meshes.Render(context, camera, world, 1, 0);
