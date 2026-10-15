@@ -27,7 +27,7 @@ text atlas. Shared geometry is `FrontendGeometry` in Presentation; interaction i
 
 | Surface / actual states | Render owner / existing graphics | Layout and hit geometry | Required production family / migration |
 | --- | --- | --- | --- |
-| Studio splash, regular/bootstrap/fade | `StudioSplashRenderer`; canonical embedded mark | Frontend splash composition; noninteractive | retain canonical mark; bootstrap remains independent |
+| Studio splash, regular/bootstrap/fade | `ForgeLine.Client/StudioSplashVideoRenderer`, `UndefinedBehaviorStudioSplash`; existing video/embedded fallback mark | Frontend splash composition; noninteractive | retain canonical mark; bootstrap remains independent |
 | Main menu backdrop, ready/loading/missing | `FrontendOverlayRenderer`, `FrontendMenuBackground`; compiled `branding.forgeline.menu.directorate`, procedural schematic fallback | `Background`, `MenuArtwork` | retain image; panel.primary for navigation shell |
 | Product mark, tagline, version/footer | `FrontendOverlayRenderer`, `FrontendBrandMark`; embedded canonical wordmark | `Header`, `Footer` | retain marks/live text; control.separator |
 | Main menu entries, focus/disabled/hover/press | `FrontendOverlayRenderer`; geometric rows | `Navigation`, `MenuRow`, `MainMenuModel` | control.button, shared overlays |
@@ -69,8 +69,8 @@ runtime classes.
 | FPS/TPS and expanded runtime diagnostics | `ResourcePowerHudSurface`; independent text/quads | `GameplayHudLayout.RuntimeMetrics` | retain independent diagnostic path |
 | Empty selection, single owned unit/building, permitted enemy/contact | `SelectionInspectorHudSurface`; semantic glyph and geometric header | `GameplayHudLayout.SelectionInspector`, `HudInformationLayout.InspectorScale` | panel.primary, panel.portrait; real identity portraits separate; HUD |
 | Health, ammunition, fuel, supply/readiness, copied work | `SelectionInspectorHudSurface`; live quads/text | inspector internal fitted bounds | progress.*, panel.inset; live quantities and permitted facts; HUD |
-| Multi-selection filters/summaries, damaged/critical focus, cycling | `SelectionInspectorHudSurface`; geometric controls | `SelectionInspectorHudModel` and `RtsUiLayout` | control.row, control.button_compact, shared overlays; HUD |
-| Formation controls | `SelectionInspectorHudSurface`; geometric actions | `SelectionInspectorHudModel` and `RtsUiLayout` | control.button_compact, selected/focus layers; HUD |
+| Multi-selection filters/summaries, damaged/critical focus, cycling | `SelectionInspectorHudSurface`; geometric controls | `CombatGroupCardLayout.Control` | control.row, control.button_compact, shared overlays; HUD |
+| Formation controls | `SelectionInspectorHudSurface`; geometric actions | `CombatGroupCardLayout.Control` | control.button_compact, selected/focus layers; HUD |
 | Primary RTS commands/targeting availability | `PlayerActionDockHudSurface`; existing command glyphs/quads | `GameplayHudLayout.PrimaryCommands`, `PlayerActionDockInteractionLayout` | control.button, shared overlays; HUD shell / tactical content |
 | Dock closed/collapsed/open; compact/scroll | `PlayerActionDockHudSurface`; geometric shell | `ActionDock`, `GetCollapsedRect`, `GetCardsRect`, `FirstVisibleItem` | panel.primary/compact, control.row_compact; HUD shell |
 | Mode tabs: Construction, Production, UnitProduction, Logistics, Supply, Tactical, Technology | `PlayerActionDockHudSurface`; geometric tabs | `GetModeBarRect`, `GetModeButtonRect` | control.tab, selected/focus layers; HUD shell |
@@ -86,7 +86,7 @@ runtime classes.
 | Minimap frame and selectors/legend | `RtsInformationHudSurface` / `RtsInformationOverlayRenderer`; quads/glyphs | `GameplayHudLayout.Minimap`, `RtsMinimapInteractionLayout` | panel.minimap, control.tab/row_compact; tactical |
 | Minimap terrain, fog, permitted contacts, objectives, camera footprint | same information owner; dynamic colored geometry | `RtsMinimapInteractionLayout.MapWorldToPointer` / minimap layout | retain live geometry; semantic markers separate; tactical |
 | Strategic information-layer tabs/legend | same information owner; live layer view | `GameplayHudLayout.SecondaryView`, information controls | control.tab, panel.compact; tactical |
-| Combat groups empty/selected/mixed, shortcuts | same information owner; live group glyphs/text | `CombatGroupCardLayout` | control.button_compact, selected/focus; HUD |
+| Combat-group overview assigned/selected/mixed, empty omitted, keyboard shortcuts | same information owner; live group glyphs/text | `SecondaryView`, `GameplayGuidanceLayout.Remaining`; group keyboard controller | control.button_compact, selected/focus; HUD |
 | Match setup/pause/terminal result/restart | same information owner; live `PreAlphaUxView` and match result | `EmitSystemPanel` fitted viewport bounds | panel.dialog, control.button; HUD |
 | Legacy help renderer (currently unreachable from F1) | same information owner; procedural help text | `EmitHelpPanel` fitted bounds | retain dormant compatibility path; no new help page |
 | Onboarding objective/context/hint/dismiss | same information owner; `EarlyGameGuidance` | `GameplayGuidanceLayout.Resolve`, secondary bounds | panel.tooltip, control.button_compact; HUD |

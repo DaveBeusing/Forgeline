@@ -27,7 +27,7 @@ The inventory's pending migration states are intentional scope boundaries.
 | Package guard contracts | Passed: 7/7, including corrupt/missing/duplicate payloads, source leakage and escaping paths |
 | Project-reference boundary validation | Passed: 42 projects; no cycles or boundary violations |
 | Canonical runtime compilation | Passed: 530 assets, including all 37 skin textures; no references |
-| Source-less reproducible package | In progress |
+| Source-less reproducible package | Passed: two publish trees identical; package guard passes; isolated packaged application and session both Ready |
 | Full solution tests | Passed: 2,004 passed, 9 existing opt-in skipped, 0 failed; 2,013 total, 6m23s |
 | Required current-head build-test CI | Pending |
 | Human art/accessibility/physical-monitor acceptance | Review pending; no reviewer decision recorded |
@@ -42,7 +42,8 @@ dotnet test --project tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj
 pwsh ./build/Validate-ProjectReferences.ps1
 pwsh ./build/Build-RuntimeAssets.ps1 -Mode development -NoBuild
 dotnet test --solution ForgeLine.sln --configuration Release --no-build
-pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible
+pwsh ./build/Test-UiSkinPackage.ps1
+pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible -RuntimeAssetRoot assets/runtime -OutputRoot artifacts/directorate-ui-skin-package
 ```
 
 No test assertions or required workflow gates are disabled. The prior planning
@@ -75,3 +76,26 @@ Nine existing opt-in skips cover two GPU-lifetime cases and seven isolated
 Presentation hardware/performance cases. They are not new tests skipped to clear
 this change. The current local complete suite passed; the historical allocation
 and shutdown findings are not reported as failures of this run.
+
+## Source-less player verification
+
+Package source revision: `c98652741c8a2786373729a194794b33c10e5e76`, clean tree, SDK 10.0.401.
+Two publish trees passed the existing reproducibility comparison. The package
+validator confirmed all 37 runtime skin records and payload hashes and excluded
+reference boards, source PNG/SVG/TTF files, asset definitions and the compiler.
+
+Archive: `FORGELINE-0.1.373-dev-win-x64.zip`; 36,198,055 bytes.
+SHA-256: `015e80a749522f488f52eb1b16328a8204452386223a22e15929232f347bdea1`.
+[Durable package verification](qualification/directorate-ui-skin/package-verification.json)
+records identity/readiness; full local outputs remain in the ignored immutable
+`artifacts/directorate-ui-skin-package/` root.
+
+The packaged player was launched from its publish directory using
+`--smoke-test --skip-splash --settings-root <isolated-directory> --startup-diagnostics-output <report.json>`.
+ApplicationReadiness and SessionReadiness are both Ready. No existing user
+settings were deleted. This smoke proves startup/session operation with compiled
+assets; the new skin has no live consumers yet and receives no native integration
+or human acceptance claim from that launch.
+
+Current-head required build-test CI and human art review remain pending. Keep
+PR draft. No merge, auto-merge, tag or release is performed.

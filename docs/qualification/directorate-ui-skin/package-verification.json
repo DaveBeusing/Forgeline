@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "c98652741c8a2786373729a194794b33c10e5e76",
+  "sourceTreeClean": true,
+  "productVersion": "0.1.373",
+  "runtimeContentSignature": "c7fe53eb349cb4b93e36e4c2bec1f324bc39f3a59bcf96aa617984357eb10df9",
+  "archiveName": "FORGELINE-0.1.373-dev-win-x64.zip",
+  "archiveBytes": 36198055,
+  "archiveSha256": "015e80a749522f488f52eb1b16328a8204452386223a22e15929232f347bdea1",
+  "reproduciblePublish": true,
+  "skinPayloadCount": 37,
+  "authoringFilesExcluded": true,
+  "applicationReadiness": "Ready",
+  "sessionReadiness": "Ready",
+  "startupReportSha256": "d179673b78d24eb0e8da2d054ea543f04b8c98bd8136ec72ad9936f2e15cec71",
+  "humanReview": "pending"
+}
