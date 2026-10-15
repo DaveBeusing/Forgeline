@@ -84,12 +84,14 @@ clipping adjusts UVs; commands also apply scissor rectangles. Only contiguous
 commands sharing page and clip merge. There is no global texture sort. `Flush`
 submits pending commands and restores the full output scissor. Flush before
 external text/geometry, render that layer with the existing `UiTextBatch`, then
-continue adding sprites without another Begin. Upload ranges are append-only
-within the frame, so a later flush cannot overwrite vertices already submitted
-to the GPU. Callers owning another clip must explicitly restore it afterwards.
+continue adding sprites without another Begin. Each flush uses a distinct preallocated upload buffer, preserving the native
+whole-resource write guard. Configure `maximumFlushes` during construction for
+text/sprite interleaving (default one, maximum eight). Exceeding that bound fails
+without allocating or overwriting a recorded resource. Callers owning another clip must explicitly restore it afterwards.
 
 Each batch allocates a fixed 4,096-quad CPU array, a bounded command array and
-four 786,432-byte upload buffers during construction. There is no per-frame file
+four 786,432-byte upload buffers per configured flush during construction
+(3 MiB default; 6 MiB for the two-flush fixture core). There is no per-frame file
 read, decoder, texture/pipeline/buffer creation or unbounded geometry growth.
 Excess quads increment diagnostics rather than grow buffers. Warm production
 geometry has an allocation test; readback/fixture reports are not hot-path timing.
@@ -118,7 +120,7 @@ additional and separate from the 32 MiB page ceiling.
 
 `UiSkinDiagnostics` exposes group residency, texture count, shared leases,
 cumulative group texture uploads, frame draws/vertices/upload bytes, dropped
-quads, missing required sprites and four buffer slots. The creating device's
+quads, missing required sprites and the configured frame/flush buffer count. The creating device's
 existing `GraphicsResourceDiagnostics` reports actual descriptor use, texture
 uploads/releases and binding failures. `RuntimeAssetQualificationReport` includes
 skin metadata count/bytes separately from page texture bytes. Missing required

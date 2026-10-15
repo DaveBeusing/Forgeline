@@ -21,7 +21,7 @@ public sealed class UiSkinFixtureRenderer : IDisposable
     {
         try
         {
-            for (int i=0;i<3;i++) { _resources[i]=new(device,catalog,(UiSkinGroup)i); _batches[i]=new(device,_resources[i]); }
+            for (int i=0;i<3;i++) { _resources[i]=new(device,catalog,(UiSkinGroup)i); _batches[i]=new(device,_resources[i],i==0?2:1); }
             for (int i=1;i<3;i++) _samples[i-1]=_resources[i].Data.Sprites.Where(s=>_resources[i].Data.Pages[s.Page].Group==(UiSkinGroup)i && s.Width==(i==1?32:48)).Take(i==1?18:8).ToArray();
             _labels=new(device); _modal=new(device);
             if (!_labels.Ready || !_modal.Ready) throw new InvalidDataException("Required fixture font unavailable.");

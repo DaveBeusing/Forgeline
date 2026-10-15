@@ -44,3 +44,19 @@ Run compilation/build/packaging sequentially where they share compiler binaries;
 capture and package output roots must be empty. Preserve failed attempts rather
 than overwriting accepted evidence. Native structural results, local regression,
 package integrity, remote required CI and human approval are distinct gates.
+
+## Qualification findings repaired
+
+The first hardware fixture correctly rejected writing a second flush into a
+buffer already recorded for that frame. Native whole-resource write guards are
+preserved: each configured flush now owns a distinct preallocated frame buffer.
+The default single-flush batch reserves 3 MiB; the two-flush core fixture reserves
+6 MiB. Capacity is configured during preparation (maximum eight), with explicit
+failure on excess flushes, no new frame allocations and no per-control GPU wait.
+The native straight-alpha test now exercises two flushes on the same frame.
+
+The first broad run completed 2,023 passed / 2 failed / 9 existing opt-in skips
+(2,034 total). It overlapped canonical compilation; the menu test read the
+previous manifest before the new skin generation was published. An unchanged
+world-renderer allocation assertion observed 480 bytes. These failed results are
+retained; final sequential qualification must establish its own outcome.

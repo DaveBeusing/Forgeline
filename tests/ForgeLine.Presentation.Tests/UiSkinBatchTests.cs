@@ -43,7 +43,7 @@ public sealed class UiSkinBatchTests
     public void ContiguousBatchingPreservesPageOrderClipAndExternalTextBarriers()
     {
         using var fixture=new Fixture();using var device=new Device();using var resources=new UiSkinResources(device,fixture.Catalog,cancellationToken:TestContext.Current.CancellationToken);
-        using var batch=new UiSkinBatch(device,resources);var context=new Context();
+        using var batch=new UiSkinBatch(device,resources,maximumFlushes:2);var context=new Context();
         batch.Begin(200,100,0);
         batch.Draw("ui.sprite.a",new(0,0,20,20),Vector4.One);
         batch.Draw("ui.sprite.a",new(20,0,20,20),Vector4.One);
@@ -55,7 +55,9 @@ public sealed class UiSkinBatchTests
         context.Events.Add("text");
         batch.Draw("ui.sprite.a",new(80,0,20,20),Vector4.One);batch.Flush(context);
         Assert.Equal(Order,context.Events);
-        Assert.Equal(24,context.Draws[3].Start); // Previous GPU-visible upload range is not overwritten.
+        Assert.Equal(0,context.Draws[3].Start);
+        Assert.Equal(24*32,device.Buffers[0].Bytes.Length);
+        Assert.Equal(6*32,device.Buffers[1].Bytes.Length); // Distinct buffers preserve native whole-resource write guards.
         Assert.Equal(4,batch.Diagnostics.Draws);Assert.Equal(30,batch.Diagnostics.Vertices);
         Assert.Equal(30*32,batch.Diagnostics.VertexUploadBytes);
         Assert.Equal((0,0,200,100),context.Scissors[^1]);
@@ -86,6 +88,11 @@ public sealed class UiSkinBatchTests
         batch.Begin(200,100,0);for(int i=0;i<UiSkinBatch.MaximumQuads+1;i++)batch.Draw("ui.sprite.a",new(0,0,20,20),Vector4.One);
         Assert.Equal(UiSkinBatch.MaximumQuads*6,batch.Diagnostics.Vertices);Assert.Equal(1,batch.Diagnostics.DroppedQuads);
         Assert.Equal(4,device.Buffers.Count);
+        batch.Begin(200,100,0);var context=new Context();
+        batch.Draw("ui.sprite.a",new(0,0,20,20),Vector4.One);batch.Flush(context);
+        batch.Draw("ui.sprite.a",new(20,0,20,20),Vector4.One);
+        Assert.Throws<InvalidOperationException>(()=>batch.Flush(context));
+        Assert.Equal(4,device.Buffers.Count);
     }
     [Fact]
     public void NativeStraightAlphaIsAppliedOnceOverDarkAndBrightOutput()
@@ -94,10 +101,10 @@ public sealed class UiSkinBatchTests
         using IWindow window=platform.CreateWindow(new("FORGELINE skin alpha",1280,720));
         using var device=GraphicsDeviceFactory.CreateForWindow(window,new(){ForceSoftwareAdapter=true,EnableVSync=false,EnableDebugLayer=true});
         using(var resources=new UiSkinResources(device,fixture.Catalog,cancellationToken:TestContext.Current.CancellationToken))
-        using(var batch=new UiSkinBatch(device,resources))
+        using(var batch=new UiSkinBatch(device,resources,maximumFlushes:2))
         {
             byte[] Capture(float clear)=>device.CaptureFrame(new(clear,clear,clear,1),c=>
-            {c.BeginPass(GraphicsFramePass.Overlay);batch.Begin(c.Width,c.Height,c.FrameIndex);batch.Draw("ui.sprite.a",new(8,8,64,64),Vector4.One);batch.Flush(c);});
+            {c.BeginPass(GraphicsFramePass.Overlay);batch.Begin(c.Width,c.Height,c.FrameIndex);batch.Draw("ui.sprite.a",new(8,8,64,64),Vector4.One);batch.Flush(c);batch.Draw("ui.sprite.b",new(80,8,64,64),Vector4.One);batch.Flush(c);});
             var dark=Capture(0);var bright=Capture(1);int pixel=(32*1280+32)*4;
             Assert.InRange(dark[pixel],118,122);Assert.InRange(dark[pixel+1],58,62);Assert.InRange(dark[pixel+2],28,32);
             Assert.InRange(bright[pixel],245,249);Assert.InRange(bright[pixel+1],185,189);Assert.InRange(bright[pixel+2],155,159);

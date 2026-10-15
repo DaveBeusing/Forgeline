@@ -10,14 +10,16 @@ public readonly record struct UiSkinRect(float X, float Y, float Width, float He
 public readonly record struct UiSkinDiagnostics(long PageBytes, int Textures, int SharedLeases, int Uploads,
     int Draws, int Vertices, long VertexUploadBytes, int DroppedQuads, int MissingAssets, int BufferCount);
 
-/// <summary>Ordered, clipped draws. Flush before external text/geometry, then continue without reusing upload ranges.</summary>
+/// <summary>Ordered, clipped draws. Flush before external text/geometry, then continue on a separately prepared upload buffer.</summary>
 public sealed class UiSkinBatch : IDisposable
 {
     public const int MaximumQuads = 4096;
     private const int Stride = 32;
     private readonly UiSkinResources _resources;
     private readonly IGraphicsPipeline _pipeline;
-    private readonly IGraphicsBuffer[] _buffers = new IGraphicsBuffer[4];
+    private readonly IGraphicsBuffer[] _buffers;
+    private readonly int _maximumFlushes;
+    private int _flushes;
     private readonly Vertex[] _vertices = new Vertex[MaximumQuads * 6];
     private readonly Command[] _commands = new Command[MaximumQuads];
     private int _count, _uploaded, _commandCount, _draws, _dropped, _missing, _width, _height, _frame;
@@ -27,9 +29,13 @@ public sealed class UiSkinBatch : IDisposable
     public UiSkinDiagnostics Diagnostics => new(_resources.PageBytes, _resources.TextureCount, _resources.LeaseCount, _resources.Uploads,
         _draws, _count, _uploaded * (long)Stride, _dropped, _missing, _buffers.Length);
 
-    public UiSkinBatch(IGraphicsDevice graphics, UiSkinResources resources)
+    public UiSkinBatch(IGraphicsDevice graphics, UiSkinResources resources, int maximumFlushes = 1)
     {
         ArgumentNullException.ThrowIfNull(graphics); ArgumentNullException.ThrowIfNull(resources);
+        ArgumentOutOfRangeException.ThrowIfLessThan(maximumFlushes, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(maximumFlushes, 8);
+        _maximumFlushes = maximumFlushes;
+        _buffers = new IGraphicsBuffer[4 * maximumFlushes];
         resources.ValidateDevice(graphics);
         _resources = resources;
         var compiler = new DxcShaderCompiler();
@@ -49,7 +55,7 @@ public sealed class UiSkinBatch : IDisposable
         CheckThread();
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width); ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
         ArgumentOutOfRangeException.ThrowIfNegative(frameIndex); ArgumentOutOfRangeException.ThrowIfGreaterThan(frameIndex, 3);
-        _width = width; _height = height; _frame = frameIndex; _count = _uploaded = _commandCount = _draws = _dropped = _missing = 0;
+        _width = width; _height = height; _frame = frameIndex; _count = _uploaded = _commandCount = _draws = _dropped = _missing = _flushes = 0;
         _clip = new(0, 0, width, height);
     }
     public void SetClip(UiSkinRect clip)
@@ -134,14 +140,15 @@ public sealed class UiSkinBatch : IDisposable
         Check();
         if (context.Width != _width || context.Height != _height || context.FrameIndex != _frame) throw new InvalidOperationException("UI batch and output frame must match.");
         if (_count == _uploaded) return;
-        var buffer = _buffers[_frame];
-        buffer.SetData<Vertex>(_vertices.AsSpan(_uploaded, _count - _uploaded), _uploaded * Stride);
+        if (_flushes == _maximumFlushes) throw new InvalidOperationException("UI flush capacity exceeded. Prepare additional flush buffers outside frame recording.");
+        var buffer = _buffers[_frame * _maximumFlushes + _flushes++];
+        buffer.SetData<Vertex>(_vertices.AsSpan(_uploaded, _count - _uploaded));
         context.SetPipeline(_pipeline); context.SetVertexBuffer(buffer, Stride);
         for (int i = 0; i < _commandCount; i++)
         {
             var c = _commands[i];
             context.SetScissor((int)MathF.Floor(c.Clip.X), (int)MathF.Floor(c.Clip.Y), (int)MathF.Ceiling(c.Clip.X+c.Clip.Width), (int)MathF.Ceiling(c.Clip.Y+c.Clip.Height));
-            context.SetPixelTexture(0, _resources.Texture(c.Page)); context.Draw(c.Count, c.Start); _draws++;
+            context.SetPixelTexture(0, _resources.Texture(c.Page)); context.Draw(c.Count, c.Start - _uploaded); _draws++;
         }
         context.SetScissor(0, 0, _width, _height); _uploaded = _count; _commandCount = 0;
     }
