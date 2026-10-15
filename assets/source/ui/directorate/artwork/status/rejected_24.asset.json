@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.rejected.p24",
+  "type": "texture",
+  "source": "rejected_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

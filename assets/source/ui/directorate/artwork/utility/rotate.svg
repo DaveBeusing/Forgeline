@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<polyline points="12,26 16,15 30,10 45,15 51,26" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="6" stroke-linecap="square"/>
+<polyline points="12,26 16,15 30,10 45,15 51,26" fill="none" stroke="rgb(237, 245, 242)" stroke-opacity="1.00000000" stroke-width="3" stroke-linecap="square"/>
+<polygon points="43,24 56,26 53,13" fill="rgb(237, 245, 242)" fill-opacity="1.00000000"/>
+<polyline points="43,24 56,26 53,13 43,24" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="2" stroke-linecap="square"/>
+<polyline points="52,38 48,49 34,54 19,49 13,38" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="6" stroke-linecap="square"/>
+<polyline points="52,38 48,49 34,54 19,49 13,38" fill="none" stroke="rgb(237, 245, 242)" stroke-opacity="1.00000000" stroke-width="3" stroke-linecap="square"/>
+<polygon points="21,40 8,38 11,51" fill="rgb(237, 245, 242)" fill-opacity="1.00000000"/>
+<polyline points="21,40 8,38 11,51 21,40" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="2" stroke-linecap="square"/>
+</svg>

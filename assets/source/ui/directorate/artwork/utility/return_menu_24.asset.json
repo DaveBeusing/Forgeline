@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.return_menu.p24",
+  "type": "texture",
+  "source": "return_menu_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

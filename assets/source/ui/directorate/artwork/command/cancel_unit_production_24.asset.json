@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.cancel_unit_production.p24",
+  "type": "texture",
+  "source": "cancel_unit_production_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

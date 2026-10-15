@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<polyline points="47,32 47,34 46,37 45,39 44,41 43,43 41,44 39,45 37,46 34,47 32,47 30,47 27,46 25,45 23,44 21,43 20,41 19,39 18,37 17,34 17,32 17,30 18,27 19,25 20,23 21,21 23,20 25,19 27,18 30,17 32,17 34,17 37,18 39,19 41,20 43,21 44,23 45,25 46,27 47,30 47,32" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="6" stroke-linecap="square"/>
+<polyline points="47,32 47,34 46,37 45,39 44,41 43,43 41,44 39,45 37,46 34,47 32,47 30,47 27,46 25,45 23,44 21,43 20,41 19,39 18,37 17,34 17,32 17,30 18,27 19,25 20,23 21,21 23,20 25,19 27,18 30,17 32,17 34,17 37,18 39,19 41,20 43,21 44,23 45,25 46,27 47,30 47,32" fill="none" stroke="rgb(237, 245, 242)" stroke-opacity="1.00000000" stroke-width="3" stroke-linecap="square"/>
+<polyline points="32,6 32,22" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="6" stroke-linecap="square"/>
+<polyline points="32,6 32,22" fill="none" stroke="rgb(237, 245, 242)" stroke-opacity="1.00000000" stroke-width="3" stroke-linecap="square"/>
+<polyline points="32,42 32,58" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="6" stroke-linecap="square"/>
+<polyline points="32,42 32,58" fill="none" stroke="rgb(237, 245, 242)" stroke-opacity="1.00000000" stroke-width="3" stroke-linecap="square"/>
+<polyline points="6,32 22,32" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="6" stroke-linecap="square"/>
+<polyline points="6,32 22,32" fill="none" stroke="rgb(237, 245, 242)" stroke-opacity="1.00000000" stroke-width="3" stroke-linecap="square"/>
+<polyline points="42,32 58,32" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="6" stroke-linecap="square"/>
+<polyline points="42,32 58,32" fill="none" stroke="rgb(237, 245, 242)" stroke-opacity="1.00000000" stroke-width="3" stroke-linecap="square"/>
+</svg>

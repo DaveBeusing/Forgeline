@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.cancel.p16",
+  "type": "texture",
+  "source": "cancel_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

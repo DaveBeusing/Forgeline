@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.new_game.p48",
+  "type": "texture",
+  "source": "new_game_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

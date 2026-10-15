@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.back.p16",
+  "type": "texture",
+  "source": "back_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

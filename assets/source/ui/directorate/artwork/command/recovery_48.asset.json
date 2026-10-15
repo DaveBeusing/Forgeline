@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.recovery.p48",
+  "type": "texture",
+  "source": "recovery_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

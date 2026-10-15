@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.collapse.p32",
+  "type": "texture",
+  "source": "collapse_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

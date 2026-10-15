@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.pause.p24",
+  "type": "texture",
+  "source": "pause_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

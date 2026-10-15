@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.supply.critical.p24",
+  "type": "texture",
+  "source": "critical_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

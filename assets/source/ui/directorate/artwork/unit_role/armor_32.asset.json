@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.unit_role.armor.p32",
+  "type": "texture",
+  "source": "armor_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

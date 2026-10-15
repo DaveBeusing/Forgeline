@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.invalid.p24",
+  "type": "texture",
+  "source": "invalid_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

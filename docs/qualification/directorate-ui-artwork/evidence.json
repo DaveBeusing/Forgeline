@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "purpose": "source-artwork-inspection",
+  "nativeCaptureSource": "f89423b9077b2b0e868a3e0efcc4cbbf69488b5f",
+  "caseCount": 100,
+  "portraitSizes": [
+    48,
+    64,
+    96,
+    128,
+    256
+  ],
+  "iconSizes": [
+    16,
+    24,
+    32,
+    48,
+    64
+  ],
+  "files": [
+    {
+      "file": "building_role.png",
+      "bytes": 86646,
+      "sha256": "2a380ec73a52a4832e3796dd07519c7890ed45a80b3730fd2611b4c523036172"
+    },
+    {
+      "file": "command.png",
+      "bytes": 279194,
+      "sha256": "f6dfa4bf8d1afaaf1c0f05a6a4506572f0e167eb01f2307f62e032354071dab5"
+    },
+    {
+      "file": "cursor.png",
+      "bytes": 138820,
+      "sha256": "2193b722e4888aeb5013606f1cc1a65cfedb23405a09097cb68fa1cc10ff1574"
+    },
+    {
+      "file": "marker-blue-green-reduced.png",
+      "bytes": 102170,
+      "sha256": "fbdc51062e34027fb4519f49585495b846225651a1413e1f99a2f6148ffa1205"
+    },
+    {
+      "file": "marker-grayscale.png",
+      "bytes": 46425,
+      "sha256": "ebfd38e7b89198b05928d8f8eebdbc17a94e64af99bd2d8c5af6bce6182f1ac1"
+    },
+    {
+      "file": "marker-red-green-reduced.png",
+      "bytes": 101913,
+      "sha256": "9765433e4a40de9d561644cf6a8b2dc4ed5d747be1bbbea3d8433897de02d118"
+    },
+    {
+      "file": "marker.png",
+      "bytes": 104208,
+      "sha256": "96b69dcf53de99542a537feb53c789b7730238d3cc1a36bea7e185159603de1b"
+    },
+    {
+      "file": "minimap.png",
+      "bytes": 103863,
+      "sha256": "8e490d91a71573d6c4c7422f34a5d7a91863f65f93d57391750c7fd60ee0b7e9"
+    },
+    {
+      "file": "portrait-page-1.png",
+      "bytes": 221808,
+      "sha256": "dde406bbde22be1bcf6e167d28ee04cfc52ae68acbfe744a9fc0a49af3eb36f5"
+    },
+    {
+      "file": "portrait-page-2.png",
+      "bytes": 207188,
+      "sha256": "41bb4435174f0bb9b6f714ea109b79169baefdd97b6cedff5ca4b77fcbcac599"
+    },
+    {
+      "file": "portrait-page-3.png",
+      "bytes": 214285,
+      "sha256": "f9f38cb79a54eed5ea441ce493bc3987f8584cd4b212b15415568fb45f2f65e4"
+    },
+    {
+      "file": "portrait-page-4.png",
+      "bytes": 214635,
+      "sha256": "950eba18a662e8188f296db954d88c9b45809c7a95dc60f0843c02182685c605"
+    },
+    {
+      "file": "resource.png",
+      "bytes": 96097,
+      "sha256": "363860e70bc7349e86c4ad1e40c610d5f43fa5cee5661aee7e11b39a8c770dfd"
+    },
+    {
+      "file": "semantic-coverage.csv",
+      "bytes": 13435,
+      "sha256": "18e1888cce650cd2e430c272d6820bcb9ba081c079b0f8c767d6f3fcb2482929"
+    },
+    {
+      "file": "status-blue-green-reduced.png",
+      "bytes": 325760,
+      "sha256": "30e74f08b98458779e06c1d63663066df2a8d17632b07a75bf74c5a05c63cd52"
+    },
+    {
+      "file": "status-grayscale.png",
+      "bytes": 139750,
+      "sha256": "460f5bd031d73d46c462841520eb5c7b01fc03ee99857fc4c70478c1f8b936d8"
+    },
+    {
+      "file": "status-red-green-reduced.png",
+      "bytes": 325336,
+      "sha256": "937ae4dc6e28729086368ece00b34a800d7aabe56db1bb8a5e1d2f832348d256"
+    },
+    {
+      "file": "status.png",
+      "bytes": 332031,
+      "sha256": "5860f9503437fe829cf89ef5ceb776cce7bceebcd9aab5e60e89d99be699e876"
+    },
+    {
+      "file": "supply.png",
+      "bytes": 54827,
+      "sha256": "99b13e1b8c0a642819b5fb85c541f633aa7a14b8e4df84f579afeae86c2cb914"
+    },
+    {
+      "file": "unit_role.png",
+      "bytes": 71686,
+      "sha256": "1b16732e5e251ede4573ec7f4f4011a73bdecfe3277f23c678020ddd5c4c33b1"
+    },
+    {
+      "file": "utility.png",
+      "bytes": 379136,
+      "sha256": "b7839ff0b96be3beab0af0e2c512c26da13046b8ad9a0415d63cbd18b201f1ce"
+    },
+    {
+      "file": "world.png",
+      "bytes": 51947,
+      "sha256": "70a7d42f05f601dd957b5cf3f3ab9c84d8159c3154b6cd0d78c8fbc820ced4b8"
+    }
+  ],
+  "humanReview": "pending",
+  "colorVisionAids": "Grayscale and diagnostic channel-loss proxies; no calibrated human color-vision acceptance.",
+  "sourcePixelInspection": "Source families inspected at declared raster sizes; 16-pixel cursor badges excluded from intended use."
+}

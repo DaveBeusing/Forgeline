@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.rotate.p32",
+  "type": "texture",
+  "source": "rotate_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

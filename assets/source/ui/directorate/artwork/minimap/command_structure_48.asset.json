@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.minimap.command_structure.p48",
+  "type": "texture",
+  "source": "command_structure_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -7,7 +7,7 @@ $runtime = Join-Path $output 'assets/runtime'
 New-Item -ItemType Directory -Path $runtime -Force | Out-Null
 $original = Get-Content -LiteralPath (Join-Path $RuntimeRoot 'manifest.json') -Raw
 $manifest = $original | ConvertFrom-Json
-$skin = @($manifest.assets | Where-Object { $_.id.StartsWith('ui.skin.directorate.', [StringComparison]::Ordinal) })
+$skin = @($manifest.assets | Where-Object { $_.id.StartsWith('ui.skin.directorate.', [StringComparison]::Ordinal) -or $_.id.StartsWith('ui.artwork.directorate.', [StringComparison]::Ordinal) })
 foreach ($record in $skin) {
     $target = Join-Path $runtime $record.runtimePath
     New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
@@ -53,6 +53,16 @@ $mutated = $original | ConvertFrom-Json
 ($mutated.assets | Where-Object id -CEQ $skin[0].id).runtimePath = '../escaped.flasset'
 $mutated | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $manifestPath -Encoding utf8NoBOM
 Test-Case 'escaping_runtime_path' $false
+$mutated = $original | ConvertFrom-Json
+$extra = $skin[0] | ConvertTo-Json -Depth 30 | ConvertFrom-Json
+$extra.id = 'ui.artwork.directorate.command.patrol.p32'
+$mutated.assets = @($mutated.assets) + @($extra)
+$mutated | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $manifestPath -Encoding utf8NoBOM
+Test-Case 'unavailable_role_registered' $false
+$unexpected = Join-Path $output 'ForgeLine.UiArtwork.dll'
+[IO.File]::WriteAllBytes($unexpected, [byte[]]@(1))
+Test-Case 'authoring_tool_packaged' $false
+Remove-Item -LiteralPath $unexpected
 @{ caseCount = $results.Count; results = $results; fixtureRoot = $output } |
     ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $repository 'artifacts/ui-skin-package-contract.json') -Encoding utf8NoBOM
 Write-Output "$($results.Count) skin package integrity and source-exclusion contracts passed."

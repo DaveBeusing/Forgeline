@@ -4,3 +4,9 @@ assets/source/ui/fonts/metrics.json text eol=lf
 assets/source/ui/fonts/*.ttf binary
 assets/source/ui/fonts/*.gz binary
 assets/source/ui/fonts/*.png binary
+
+# Editable vector identities must match the Git blobs on every checkout.
+assets/source/ui/directorate/**/*.svg text eol=lf
+docs/qualification/directorate-ui-artwork/*.csv text eol=lf
+docs/qualification/directorate-ui-artwork/**/*.json text eol=lf
+docs/qualification/directorate-ui-artwork/terrain/native-manifest.json -text

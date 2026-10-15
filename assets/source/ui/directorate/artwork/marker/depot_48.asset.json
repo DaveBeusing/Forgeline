@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.marker.depot.p48",
+  "type": "texture",
+  "source": "depot_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

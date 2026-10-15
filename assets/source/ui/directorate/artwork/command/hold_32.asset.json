@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.hold.p32",
+  "type": "texture",
+  "source": "hold_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.marker.attack_notification.p48",
+  "type": "texture",
+  "source": "attack_notification_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

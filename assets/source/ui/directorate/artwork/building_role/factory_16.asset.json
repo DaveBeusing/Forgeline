@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.building_role.factory.p16",
+  "type": "texture",
+  "source": "factory_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

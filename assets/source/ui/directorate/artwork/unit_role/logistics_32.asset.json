@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.unit_role.logistics.p32",
+  "type": "texture",
+  "source": "logistics_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

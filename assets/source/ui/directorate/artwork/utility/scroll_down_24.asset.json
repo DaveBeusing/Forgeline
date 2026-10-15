@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.scroll_down.p24",
+  "type": "texture",
+  "source": "scroll_down_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.cursor.default.p32",
+  "type": "texture",
+  "source": "default_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

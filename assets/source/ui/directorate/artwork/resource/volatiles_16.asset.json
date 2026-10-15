@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.resource.volatiles.p16",
+  "type": "texture",
+  "source": "volatiles_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.critical.p16",
+  "type": "texture",
+  "source": "critical_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.portrait.building_3.p48",
+  "type": "texture",
+  "source": "building_3_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

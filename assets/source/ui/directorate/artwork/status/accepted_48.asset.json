@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.accepted.p48",
+  "type": "texture",
+  "source": "accepted_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

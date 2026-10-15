@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.attack_move.p48",
+  "type": "texture",
+  "source": "attack_move_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

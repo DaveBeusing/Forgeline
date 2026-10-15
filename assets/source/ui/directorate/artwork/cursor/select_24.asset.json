@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.cursor.select.p24",
+  "type": "texture",
+  "source": "select_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

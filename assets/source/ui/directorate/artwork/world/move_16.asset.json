@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.world.move.p16",
+  "type": "texture",
+  "source": "move_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

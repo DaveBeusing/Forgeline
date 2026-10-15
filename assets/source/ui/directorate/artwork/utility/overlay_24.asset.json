@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.overlay.p24",
+  "type": "texture",
+  "source": "overlay_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,5 +1,11 @@
 # Runtime content notices
 
+Directorate semantic UI glyphs are independent geometric drawings. Roster portraits
+are unmodified native captures of existing production models/materials. No reference
+board pixels, labels, example gameplay values or sample insignia are incorporated.
+See `docs/UiIconArtwork.md` and the source artwork catalog for relationships and
+recorded rights status. This notice grants no additional license or permissions.
+
 The Directorate UI skin primitives are repository-authored geometric redraws.
 Their editable SVGs and PNGs copy no reference-board pixels, marks or labels.
 Reference boards remain outside player assets; their recorded rights evidence

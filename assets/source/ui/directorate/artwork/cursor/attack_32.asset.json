@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.cursor.attack.p32",
+  "type": "texture",
+  "source": "attack_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

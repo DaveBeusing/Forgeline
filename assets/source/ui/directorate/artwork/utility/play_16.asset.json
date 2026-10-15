@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.play.p16",
+  "type": "texture",
+  "source": "play_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

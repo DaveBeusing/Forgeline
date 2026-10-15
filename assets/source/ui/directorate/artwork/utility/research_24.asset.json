@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.research.p24",
+  "type": "texture",
+  "source": "research_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

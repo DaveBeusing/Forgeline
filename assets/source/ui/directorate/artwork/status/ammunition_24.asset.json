@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.ammunition.p24",
+  "type": "texture",
+  "source": "ammunition_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

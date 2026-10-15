@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.remove_stock.p24",
+  "type": "texture",
+  "source": "remove_stock_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

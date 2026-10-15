@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "c8bdbebfd56b109d34fdb92dc41c715fd463b189",
+  "version": "0.1.374-dev",
+  "sdk": "10.0.401",
+  "sourceTreeClean": true,
+  "runtimeAssetSignature": "e62d83a106f8a2e88c3a2a1f5acb7794ed8bc7fb683e40adc91c5cd404753aa5",
+  "archive": {
+    "file": "FORGELINE-0.1.374-dev-win-x64.zip",
+    "bytes": 38379103,
+    "sha256": "af6f7f371014425ffe0b10ec853c9ab0b3f2892e08b83a28defd9e2d73f466ee"
+  },
+  "reproduciblePublishTrees": "passed",
+  "packageGuardContracts": {
+    "passed": 9
+  },
+  "solutionTests": {
+    "total": 2018,
+    "passed": 2009,
+    "failed": 0,
+    "skippedExistingOptIn": 9,
+    "durationMilliseconds": 447959
+  },
+  "startup": {
+    "applicationReadiness": "Ready",
+    "sessionReadiness": "Ready",
+    "droppedEvents": 0,
+    "reportSha256": "7bc4defe8de0421b630f018a2c525005f4f2e89cda435bb900b162e86b65852e",
+    "settings": "isolated"
+  },
+  "humanAcceptance": "pending",
+  "finalHeadRequiredCi": "separate_merge_gate"
+}

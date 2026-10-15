@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.alert.p16",
+  "type": "texture",
+  "source": "alert_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.invalid.p32",
+  "type": "texture",
+  "source": "invalid_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

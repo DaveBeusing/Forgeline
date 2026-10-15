@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.world.ring_segment.p64",
+  "type": "texture",
+  "source": "ring_segment_64.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.portrait.unit_3.p256",
+  "type": "texture",
+  "source": "unit_3_256.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

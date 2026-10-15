@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.unavailable.p48",
+  "type": "texture",
+  "source": "unavailable_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

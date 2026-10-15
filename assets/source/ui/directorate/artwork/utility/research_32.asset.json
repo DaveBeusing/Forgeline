@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.research.p32",
+  "type": "texture",
+  "source": "research_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.minimap.depot.p32",
+  "type": "texture",
+  "source": "depot_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

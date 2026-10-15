@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.resource.ferrous_ore.p32",
+  "type": "texture",
+  "source": "ferrous_ore_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

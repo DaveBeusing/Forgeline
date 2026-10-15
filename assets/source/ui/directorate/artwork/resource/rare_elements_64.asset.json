@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.resource.rare_elements.p64",
+  "type": "texture",
+  "source": "rare_elements_64.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

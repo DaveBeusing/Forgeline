@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.credits.p16",
+  "type": "texture",
+  "source": "credits_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

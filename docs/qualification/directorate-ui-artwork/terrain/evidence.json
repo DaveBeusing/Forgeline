@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "method": "Source sprite compositing over unchanged native-size terrain crops; inspection only.",
+  "sourceCommit": "c8bdbebfd56b109d34fdb92dc41c715fd463b189",
+  "runtimeFingerprint": "CC297DBD5E3531CE972D2B78729DE86573F1BAD56E0D477446FFA108A95EC1D9",
+  "nativeCase": "BattlefieldCombat-1920x1080-Medium-CloseTactical-Dpi96",
+  "nativeManifestSha256": "9d0298792f809fe799c79eac8e2abdbc031c547823e12d00ab75c798525df74b",
+  "regions": [
+    [
+      "bright-ground",
+      [
+        220,
+        70,
+        296,
+        146
+      ]
+    ],
+    [
+      "shadow-ground",
+      [
+        628,
+        344,
+        704,
+        420
+      ]
+    ]
+  ],
+  "files": [
+    {
+      "file": "bright-ground.png",
+      "sha256": "cc1ecb085aba501a4449f344ccd4d5374776f0a05a4f55309f0dda152eba0d2a",
+      "bytes": 6906
+    },
+    {
+      "file": "building_role.png",
+      "sha256": "947418a222f05b674494291a5606aa7baf37d271a7a745eece9f1068982fd10e",
+      "bytes": 207225
+    },
+    {
+      "file": "command.png",
+      "sha256": "cfc851126348d071614e67995a97a596cc291954a769cec0180a7fc4d2763aed",
+      "bytes": 697733
+    },
+    {
+      "file": "cursor.png",
+      "sha256": "418623548d5658ee1936f911931f9a55a0173732f4d52012c7ae1e5197549a60",
+      "bytes": 334678
+    },
+    {
+      "file": "marker.png",
+      "sha256": "7ea464fa4903aef0ecb80379687ede6b243b95c2f8ea69c5ff042cce35847f05",
+      "bytes": 281899
+    },
+    {
+      "file": "minimap.png",
+      "sha256": "c3458fd715acf6d81ce982d89c98658d414efd804b38d784bbf95f9f98c1daeb",
+      "bytes": 281550
+    },
+    {
+      "file": "native-background.png",
+      "sha256": "013fa846ea7146d3759952ec13ee47c7e9e1204ae77ad453d6ba960b83b48b07",
+      "bytes": 4088627
+    },
+    {
+      "file": "resource.png",
+      "sha256": "2bf38998e9cc54347165fb975121f26cf4bf953a9baafc85f68dba58da1639a4",
+      "bytes": 238193
+    },
+    {
+      "file": "shadow-ground.png",
+      "sha256": "9bf140e8cdcb18a9b7e8608391b2d4262037ed2bc8fe8d89ac09ac4ecd5aad71",
+      "bytes": 7229
+    },
+    {
+      "file": "status.png",
+      "sha256": "0b22cc3aed485e9ca3234b25803c8b0828e4f32a32acf56404c6e17041d09394",
+      "bytes": 744585
+    },
+    {
+      "file": "supply.png",
+      "sha256": "e98f3b10c199b18f518c98e19999943f7443e2faa40f91644c663ce2d2dbc8a9",
+      "bytes": 129139
+    },
+    {
+      "file": "unit_role.png",
+      "sha256": "d3e451ac094c104d0ea437fb9ef5d79970caa2a331b3d5b3f512a9eeaa39e920",
+      "bytes": 181373
+    },
+    {
+      "file": "utility.png",
+      "sha256": "06905f477ca1924fff6aa6170052bc83272feeb159dcb3f1b26ab50bb7713229",
+      "bytes": 971081
+    },
+    {
+      "file": "world.png",
+      "sha256": "4862f05de231298473ab4b31ac0ce38f7d3d2fa0b3670ba5318338ba4c3d7d76",
+      "bytes": 142306
+    }
+  ],
+  "humanReview": "pending",
+  "integratedGpuUiAcceptance": "not_in_scope",
+  "exceptions": "Patrol remains unavailable; 16-pixel cursors remain inspection-only."
+}

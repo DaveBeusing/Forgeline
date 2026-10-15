@@ -22,6 +22,9 @@ public sealed class ProductionAssetMaterialCompletenessTests
             if (root.GetProperty("type").GetString() != "texture") continue;
             string source = root.GetProperty("source").GetString()!;
             if (!source.Contains("production", StringComparison.Ordinal)) continue;
+            // UI action names such as production_pause are display images,
+            // not the physical material masters qualified by this contract.
+            if (string.Equals(root.GetProperty("textureUsage").GetString(), "displayImage", StringComparison.OrdinalIgnoreCase)) continue;
             using var file = File.OpenRead(Path.Combine(Path.GetDirectoryName(path)!, source));
             file.ReadExactly(header);
             Assert.Equal(4096, System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(header[16..20]));
@@ -72,6 +75,7 @@ public sealed class ProductionAssetMaterialCompletenessTests
                 var definition = json.RootElement;
                 if (definition.GetProperty("type").GetString() != "texture" ||
                     !definition.GetProperty("source").GetString()!.Contains("production", StringComparison.Ordinal)) continue;
+                if (string.Equals(definition.GetProperty("textureUsage").GetString(), "displayImage", StringComparison.OrdinalIgnoreCase)) continue;
                 var texture = RuntimeTextureData.FromPayload(catalog.Read(
                     AssetId.Parse(definition.GetProperty("id").GetString()!)).Payload);
                 productionResidentBytes += texture.ResidentByteCount;

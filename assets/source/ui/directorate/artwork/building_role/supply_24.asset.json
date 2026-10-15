@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.building_role.supply.p24",
+  "type": "texture",
+  "source": "supply_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}
