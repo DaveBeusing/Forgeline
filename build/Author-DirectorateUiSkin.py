@@ -251,7 +251,7 @@ def main():
         (OUT / f"{stem}.asset.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
         entries.append({"id": asset_id, "file": png.name, "editableSource": svg.name,
                         "width": width, "height": height, "insets": [inset] * 4,
-                        "contentPadding": [max(inset, 6)] * 4,
+                        "contentPadding": [0] * 4 if name in ("separator", "progress_fill") else [max(inset, 6)] * 4,
                         "minimumSize": [min_w, min_h],
                         "scaling": "fixed" if inset == 0 else "nine_slice",
                         "edgePolicy": "stretch", "centerPolicy": "stretch",
