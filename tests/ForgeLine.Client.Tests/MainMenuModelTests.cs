@@ -14,8 +14,8 @@ public sealed class MainMenuModelTests
         var bindings = new RtsCameraBindings { PanLeft = ForgeLine.Platform.PlatformKey.H };
         var view = FrontendPresentationAdapter.Controls(bindings, edgeScrollEnabled: false);
         Assert.Equal(FrontendSurfaceKind.Controls, view.Kind);
-        Assert.Contains("W/H/S/D", view.DetailLines[0].Value);
-        Assert.Contains("EDGE PAN DISABLED", view.DetailLines[1].Value);
+        Assert.Contains(view.DetailLines, line => line.Label == "PAN LEFT" && line.Value == "H / LEFT");
+        Assert.Contains(view.DetailLines, line => line.Label == "EDGE SCROLL" && line.Value == "DISABLED");
     }
 
     [Fact]
@@ -72,68 +72,16 @@ public sealed class MainMenuModelTests
             FrontendPresentationAdapter.Controls(
                 new RtsCameraBindings());
 
-        Assert.Equal(
-            "CONTROLS",
-            view.Title);
-        Assert.Equal(
-            12,
-            view.DetailLines.Count);
-        Assert.Equal("OPTIONAL GUIDE", view.DetailLines[^2].Label);
-        Assert.Contains("SHIFT+F12 SHOW / HIDE", view.DetailLines[^2].Value);
-        Assert.Contains("ONBOARDING SETTING", view.DetailLines[^2].Value);
-        Assert.Contains("HOME BASE FOCUS", view.DetailLines[1].Value);
-        Assert.Contains("DOUBLE LEFT SAME-TYPE VISIBLE UNITS", view.DetailLines[2].Value);
-        Assert.Equal("CONTROL GROUPS", view.DetailLines[8].Label);
-        Assert.Contains("DOUBLE DIGIT FOCUS", view.DetailLines[8].Value);
-        Assert.Contains("SHIFT+CLICK REPEAT AFTER ACCEPTANCE", view.DetailLines[6].Value);
-        Assert.Contains(
-            "W/A/S/D",
-            view.DetailLines[0].Value);
-        Assert.Contains(
-            "UP/LEFT/DOWN/RIGHT",
-            view.DetailLines[0].Value);
-        Assert.Equal(
-            "CONTROLS / WORLD / FORMATION",
-            view.DetailLines[4].Label);
-        Assert.Contains(
-            "CONTROLS",
-            view.DetailLines[4].Value);
-        Assert.Contains(
-            "WORLD DEBUG",
-            view.DetailLines[4].Value);
-        Assert.Contains(
-            "FORMATION",
-            view.DetailLines[4].Value);
-        Assert.Contains(
-            "COMMAND CORE",
-            view.DetailLines[5].Value);
-        Assert.Contains(
-            "POWER PLANT",
-            view.DetailLines[5].Value);
-        Assert.Contains(
-            "EXTRACTOR",
-            view.DetailLines[5].Value);
-        Assert.Contains(
-            "STORAGE DEPOT",
-            view.DetailLines[6].Value);
-        Assert.Contains(
-            "SMELTER",
-            view.DetailLines[6].Value);
-        Assert.Contains(
-            "ROTATE BUILDING",
-            view.DetailLines[6].Value);
-        Assert.Contains(
-            "STRATEGIC OVERLAY",
-            view.DetailLines[^1].Value);
-        Assert.Contains(
-            "MINIMAP",
-            view.DetailLines[^1].Value);
-        Assert.Contains(
-            "CONTROLS",
-            view.DetailLines[^1].Value);
-        Assert.Contains(
-            "ESC/SPACE PAUSE",
-            view.DetailLines[^1].Value);
+        Assert.Equal("CONTROLS", view.Title);
+        Assert.Equal(24 + GameplayBindingRegistry.Definitions.Count, view.DetailLines.Count);
+        Assert.Equal(view.DetailLines.Count, view.DetailLines.Select(line => line.Label).Distinct().Count());
+        foreach (var definition in GameplayBindingRegistry.Definitions)
+            Assert.Contains(view.DetailLines, line => line.Label == definition.Label &&
+                line.Value == GameplayBindingRegistry.Default.Prompt(definition.Action));
+        Assert.Contains(view.DetailLines, line => line.Label == "DETAILED STATS" && line.Value == "SHIFT + F1");
+        Assert.Contains(view.DetailLines, line => line.Label == "OPTIONAL GUIDE" && line.Value == "SHIFT + F12");
+        Assert.Contains(view.DetailLines, line => line.Label == "FOCUS CONTROL GROUP" && line.Value == "DOUBLE DIGIT");
+        Assert.All(view.DetailLines, line => Assert.DoesNotContain(';', line.Value));
     }
 
     [Fact]

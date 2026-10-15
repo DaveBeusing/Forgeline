@@ -74,7 +74,7 @@ public sealed class FrontendInteractionTests
         interaction.MovePrevious();
 
         Assert.Equal(
-            FrontendSettingsField.UiSoundVolume,
+            FrontendSettingsField.ReducedUiMotion,
             interaction.FocusedField);
         Assert.Equal(FrontendSettingsField.OutputResolution, interaction.MoveNext());
     }

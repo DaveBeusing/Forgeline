@@ -76,3 +76,32 @@ Use `ForgeLine.Client.exe --frontend-layout-capture <empty-output-directory>` fo
 native captures of all seven screens across the complete matrix, real windowed/borderless
 DPI/size sampling and zero-size GPU-surface restore. Capture warms resized surfaces before
 readback. It uses shipped resources only and does not compile/import assets.
+
+
+## Menu sections and full-screen presentation
+
+Settings has visible General, Graphics, Audio and Bindings tabs. Click a tab or
+use Tab / Shift+Tab, then Up/Down to choose a row and Left/Right to adjust it.
+Audio exposes the implemented interface-sound enable and volume controls;
+these persist and apply on save, including Pause Settings. They do not claim
+music or battlefield-audio channels that the engine does not implement.
+Tab changes consume the gesture and retain unsaved values across sections.
+Graphics retain next-match application and display trials remain reversible.
+
+Controls is an Action / Input table with one action per row. Camera and gameplay
+bindings use the current mapping. Up/Down or the mouse wheel scrolls the list.
+Compact table rows replace the former three-line paragraphs.
+
+The title background covers the entire native viewport, including ultrawide and
+borderless outputs. Content uses edge margins instead of a centered 16:9 canvas.
+The navigation backplate sits over the artwork; no image can cover input labels.
+Missing optional artwork retains a full-viewport rendered fallback.
+
+The menu header draws embedded vector artwork from
+`assets/source/branding/forgeline/menu/wordmark.svg` through the existing overlay
+batch. It uses no runtime font, bitmap enlargement, texture upload or optional
+runtime asset. The application icon and studio splash remain separate.
+
+Credits shows only Undefined Behavior Studios, lead developer Dave Beusing,
+the product version from the built client, and ForgeLine Engine. It does not list
+platforms, libraries, the tagline or optional title artwork.

@@ -68,6 +68,7 @@ internal sealed class PausedSettingsController : IDisposable
         if (!_window.IsFocused || _window.IsMinimized) return null;
         if (!_display.Active)
         {
+            if (Interaction.HandleSectionInput(input, layout.Geometry)) return null;
             if (input.WasKeyPressed(PlatformKey.Up) || input.WheelDelta > 0) Interaction.MovePrevious();
             if (input.WasKeyPressed(PlatformKey.Down) || input.WheelDelta < 0) Interaction.MoveNext();
             if (input.WasKeyPressed(PlatformKey.Left)) Interaction.Adjust(Model, -1);

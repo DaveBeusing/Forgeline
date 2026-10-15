@@ -3305,6 +3305,7 @@ internal sealed class ClientApplication
             {
                 if (!displayPreview.Active)
                 {
+                    settingsInteraction.HandleSectionInput(input, frontendLayout.Geometry);
                     if (input.HasPointerPosition && FrontendHitTesting.DetailRow(input.PointerPosition.X,
                         input.PointerPosition.Y, frontendLayout, settingsInteraction.VisibleRowCount) is int settingsRow)
                     {

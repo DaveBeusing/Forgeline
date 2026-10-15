@@ -28,3 +28,13 @@ Source PNG SHA-256: `1b70997ffa4d7a7e7cedacfa27474c3747a9c51c7e22dc9ac1ba0a7e394
 The source faithfully uses the current production meshes. It does not claim new high-detail
 Directorate models or final film-quality asset fidelity. High-detail art replacement remains a
 separate content review; geometry, interaction and fallback do not depend on such replacement.
+
+
+## Menu wordmark
+
+`wordmark.svg` is repository-authored scalable vector menu artwork. Its stencil
+letters and accent mark are convex polygon/rectangle paths, with no embedded
+font, external image or third-party dependency. The Presentation assembly embeds
+the source and caches its triangle geometry once; the normal overlay batch
+draws it at native layout scale, independently of optional title artwork.
+The existing Windows application icon is not replaced or reinterpreted.

@@ -6,15 +6,14 @@ namespace ForgeLine.Client.Tests;
 public sealed class FrontendLifecycleTests
 {
     [Fact]
-    public void CreditsExposeProductIdentityAndTechnology()
+    public void CreditsExposeOnlyStudioLeadAndEngineIdentity()
     {
         Assert.Equal("FORGELINE", CreditsModel.ProductName);
         Assert.Equal("Build. Supply. Conquer.", CreditsModel.Tagline);
-        Assert.Contains(
-            CreditsModel.Sections,
-            section =>
-                section.Heading == "Technology" &&
-                section.Lines.Contains("Direct3D 12"));
+        Assert.Equal("Undefined Behavior Studios", CreditsModel.Studio);
+        Assert.Equal("Dave Beusing", CreditsModel.LeadDeveloper);
+        Assert.Equal("ForgeLine Engine", CreditsModel.Engine);
+        Assert.Equal(3, CreditsModel.Sections.Count);
     }
 
     [Fact]
