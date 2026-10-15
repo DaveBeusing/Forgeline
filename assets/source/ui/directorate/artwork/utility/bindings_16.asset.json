@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.bindings.p16",
+  "type": "texture",
+  "source": "bindings_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

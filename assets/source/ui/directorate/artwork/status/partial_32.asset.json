@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.partial.p32",
+  "type": "texture",
+  "source": "partial_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

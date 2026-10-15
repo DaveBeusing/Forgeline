@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.rejected.p32",
+  "type": "texture",
+  "source": "rejected_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

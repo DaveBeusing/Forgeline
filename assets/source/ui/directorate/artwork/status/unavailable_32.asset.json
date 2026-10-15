@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.unavailable.p32",
+  "type": "texture",
+  "source": "unavailable_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

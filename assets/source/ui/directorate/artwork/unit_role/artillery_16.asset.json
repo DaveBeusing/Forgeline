@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.unit_role.artillery.p16",
+  "type": "texture",
+  "source": "artillery_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

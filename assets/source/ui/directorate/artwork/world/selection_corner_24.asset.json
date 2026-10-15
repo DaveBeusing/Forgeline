@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.world.selection_corner.p24",
+  "type": "texture",
+  "source": "selection_corner_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

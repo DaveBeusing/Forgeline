@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.cancel_research.p32",
+  "type": "texture",
+  "source": "cancel_research_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

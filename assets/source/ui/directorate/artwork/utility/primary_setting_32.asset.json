@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.primary_setting.p32",
+  "type": "texture",
+  "source": "primary_setting_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

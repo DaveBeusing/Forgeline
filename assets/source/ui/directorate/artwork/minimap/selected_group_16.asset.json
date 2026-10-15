@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.minimap.selected_group.p16",
+  "type": "texture",
+  "source": "selected_group_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

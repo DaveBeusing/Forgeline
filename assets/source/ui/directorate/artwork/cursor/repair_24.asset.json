@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.cursor.repair.p24",
+  "type": "texture",
+  "source": "repair_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

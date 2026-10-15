@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.portrait.unit_4.p128",
+  "type": "texture",
+  "source": "unit_4_128.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

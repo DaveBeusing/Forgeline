@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.marker.friendly_unit.p32",
+  "type": "texture",
+  "source": "friendly_unit_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.activate.p32",
+  "type": "texture",
+  "source": "activate_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

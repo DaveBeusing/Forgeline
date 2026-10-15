@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.unit_production.p24",
+  "type": "texture",
+  "source": "unit_production_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

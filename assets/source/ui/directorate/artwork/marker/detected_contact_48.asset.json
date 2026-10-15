@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.marker.detected_contact.p48",
+  "type": "texture",
+  "source": "detected_contact_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

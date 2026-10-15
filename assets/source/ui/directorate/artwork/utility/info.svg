@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<polyline points="56,32 56,36 55,39 53,43 51,46 49,49 46,51 43,53 39,55 36,56 32,56 28,56 25,55 21,53 18,51 15,49 13,46 11,43 9,39 8,36 8,32 8,28 9,25 11,21 13,18 15,15 18,13 21,11 25,9 28,8 32,8 36,8 39,9 43,11 46,13 49,15 51,18 53,21 55,25 56,28 56,32" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="6" stroke-linecap="square"/>
+<polyline points="56,32 56,36 55,39 53,43 51,46 49,49 46,51 43,53 39,55 36,56 32,56 28,56 25,55 21,53 18,51 15,49 13,46 11,43 9,39 8,36 8,32 8,28 9,25 11,21 13,18 15,15 18,13 21,11 25,9 28,8 32,8 36,8 39,9 43,11 46,13 49,15 51,18 53,21 55,25 56,28 56,32" fill="none" stroke="rgb(237, 245, 242)" stroke-opacity="1.00000000" stroke-width="3" stroke-linecap="square"/>
+<polygon points="29,27 35,27 35,48 29,48" fill="rgb(237, 245, 242)" fill-opacity="1.00000000"/>
+<polyline points="29,27 35,27 35,48 29,48 29,27" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="2" stroke-linecap="square"/>
+<polygon points="29,15 35,15 35,21 29,21" fill="rgb(237, 245, 242)" fill-opacity="1.00000000"/>
+<polyline points="29,15 35,15 35,21 29,21 29,15" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="2" stroke-linecap="square"/>
+</svg>

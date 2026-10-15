@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.minimap.attack_notification.p24",
+  "type": "texture",
+  "source": "attack_notification_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

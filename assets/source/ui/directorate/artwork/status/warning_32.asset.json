@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.warning.p32",
+  "type": "texture",
+  "source": "warning_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

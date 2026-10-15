@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.construction.p64",
+  "type": "texture",
+  "source": "construction_64.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

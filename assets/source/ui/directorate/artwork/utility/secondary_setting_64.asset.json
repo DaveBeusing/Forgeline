@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.secondary_setting.p64",
+  "type": "texture",
+  "source": "secondary_setting_64.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

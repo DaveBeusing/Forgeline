@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.priority.p48",
+  "type": "texture",
+  "source": "priority_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

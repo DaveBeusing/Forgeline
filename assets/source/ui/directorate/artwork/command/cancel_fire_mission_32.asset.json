@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.cancel_fire_mission.p32",
+  "type": "texture",
+  "source": "cancel_fire_mission_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

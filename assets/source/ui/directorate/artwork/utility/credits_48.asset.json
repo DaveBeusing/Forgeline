@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.credits.p48",
+  "type": "texture",
+  "source": "credits_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

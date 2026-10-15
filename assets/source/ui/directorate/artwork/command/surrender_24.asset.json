@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.surrender.p24",
+  "type": "texture",
+  "source": "surrender_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

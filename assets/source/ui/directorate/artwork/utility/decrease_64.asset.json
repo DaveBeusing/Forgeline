@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.decrease.p64",
+  "type": "texture",
+  "source": "decrease_64.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

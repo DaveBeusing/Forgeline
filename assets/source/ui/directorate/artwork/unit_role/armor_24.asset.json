@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.unit_role.armor.p24",
+  "type": "texture",
+  "source": "armor_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.resource.silicates.p32",
+  "type": "texture",
+  "source": "silicates_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

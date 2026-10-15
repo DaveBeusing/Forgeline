@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.general.p16",
+  "type": "texture",
+  "source": "general_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

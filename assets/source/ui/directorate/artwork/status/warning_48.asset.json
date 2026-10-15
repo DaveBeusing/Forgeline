@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.warning.p48",
+  "type": "texture",
+  "source": "warning_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

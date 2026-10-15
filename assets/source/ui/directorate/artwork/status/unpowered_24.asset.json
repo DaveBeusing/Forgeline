@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.unpowered.p24",
+  "type": "texture",
+  "source": "unpowered_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.unit_role.infantry.p64",
+  "type": "texture",
+  "source": "infantry_64.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

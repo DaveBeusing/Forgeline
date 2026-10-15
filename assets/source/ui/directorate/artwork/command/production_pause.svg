@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<polygon points="8,54 8,25 23,15 23,25 38,15 38,30 51,30 51,54" fill="rgb(237, 245, 242)" fill-opacity="1.00000000"/>
+<polyline points="8,54 8,25 23,15 23,25 38,15 38,30 51,30 51,54 8,54" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="2" stroke-linecap="square"/>
+<polygon points="45,8 54,8 54,31 45,31" fill="rgb(237, 245, 242)" fill-opacity="1.00000000"/>
+<polyline points="45,8 54,8 54,31 45,31 45,8" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="2" stroke-linecap="square"/>
+<polygon points="17,39 22,39 22,46 17,46" fill="rgb(4, 6, 8)" fill-opacity="1.00000000"/>
+<polyline points="17,39 22,39 22,46 17,46 17,39" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="2" stroke-linecap="square"/>
+<polygon points="30,39 35,39 35,46 30,46" fill="rgb(4, 6, 8)" fill-opacity="1.00000000"/>
+<polyline points="30,39 35,39 35,46 30,46 30,39" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="2" stroke-linecap="square"/>
+<polygon points="43,39 48,39 48,46 43,46" fill="rgb(4, 6, 8)" fill-opacity="1.00000000"/>
+<polyline points="43,39 48,39 48,46 43,46 43,39" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="2" stroke-linecap="square"/>
+<polygon points="40,38 46,38 46,58 40,58" fill="rgb(237, 245, 242)" fill-opacity="1.00000000"/>
+<polyline points="40,38 46,38 46,58 40,58 40,38" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="1" stroke-linecap="square"/>
+<polygon points="50,38 56,38 56,58 50,58" fill="rgb(237, 245, 242)" fill-opacity="1.00000000"/>
+<polyline points="50,38 56,38 56,58 50,58 50,38" fill="none" stroke="rgb(4, 6, 8)" stroke-opacity="1.00000000" stroke-width="1" stroke-linecap="square"/>
+</svg>

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.fire_mission.p32",
+  "type": "texture",
+  "source": "fire_mission_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.new_game.p24",
+  "type": "texture",
+  "source": "new_game_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

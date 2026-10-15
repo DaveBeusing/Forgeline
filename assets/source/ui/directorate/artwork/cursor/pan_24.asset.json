@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.cursor.pan.p24",
+  "type": "texture",
+  "source": "pan_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

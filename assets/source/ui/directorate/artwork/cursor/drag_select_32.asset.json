@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.cursor.drag_select.p32",
+  "type": "texture",
+  "source": "drag_select_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

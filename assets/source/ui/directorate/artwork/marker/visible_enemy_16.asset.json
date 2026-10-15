@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.marker.visible_enemy.p16",
+  "type": "texture",
+  "source": "visible_enemy_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

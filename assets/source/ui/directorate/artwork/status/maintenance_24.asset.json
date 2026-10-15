@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.maintenance.p24",
+  "type": "texture",
+  "source": "maintenance_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

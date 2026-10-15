@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.building_role.command.p48",
+  "type": "texture",
+  "source": "command_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

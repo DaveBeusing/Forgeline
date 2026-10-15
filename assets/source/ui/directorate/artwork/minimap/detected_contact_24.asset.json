@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.minimap.detected_contact.p24",
+  "type": "texture",
+  "source": "detected_contact_24.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

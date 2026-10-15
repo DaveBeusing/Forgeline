@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.marker.objective.p32",
+  "type": "texture",
+  "source": "objective_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

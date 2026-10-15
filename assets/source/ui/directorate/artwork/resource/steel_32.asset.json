@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.resource.steel.p32",
+  "type": "texture",
+  "source": "steel_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

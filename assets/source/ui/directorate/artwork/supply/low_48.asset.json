@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.supply.low.p48",
+  "type": "texture",
+  "source": "low_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.operational.p32",
+  "type": "texture",
+  "source": "operational_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.building_role.extraction.p32",
+  "type": "texture",
+  "source": "extraction_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.pending.p32",
+  "type": "texture",
+  "source": "pending_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

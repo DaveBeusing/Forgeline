@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.save.p32",
+  "type": "texture",
+  "source": "save_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

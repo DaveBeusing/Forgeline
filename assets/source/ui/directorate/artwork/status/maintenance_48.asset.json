@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.maintenance.p48",
+  "type": "texture",
+  "source": "maintenance_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

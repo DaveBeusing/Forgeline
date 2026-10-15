@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.formation.p32",
+  "type": "texture",
+  "source": "formation_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

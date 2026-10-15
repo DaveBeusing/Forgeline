@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.resource.rare_elements.p16",
+  "type": "texture",
+  "source": "rare_elements_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

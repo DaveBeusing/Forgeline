@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.cancel_production.p32",
+  "type": "texture",
+  "source": "cancel_production_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

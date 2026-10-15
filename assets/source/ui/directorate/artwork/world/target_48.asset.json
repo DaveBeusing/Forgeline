@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.world.target.p48",
+  "type": "texture",
+  "source": "target_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

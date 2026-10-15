@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.status.operational.p16",
+  "type": "texture",
+  "source": "operational_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

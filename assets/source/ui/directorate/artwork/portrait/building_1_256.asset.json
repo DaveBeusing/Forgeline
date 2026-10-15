@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.portrait.building_1.p256",
+  "type": "texture",
+  "source": "building_1_256.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

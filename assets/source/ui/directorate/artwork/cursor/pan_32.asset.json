@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.cursor.pan.p32",
+  "type": "texture",
+  "source": "pan_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

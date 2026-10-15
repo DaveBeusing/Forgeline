@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.supply.supplied.p48",
+  "type": "texture",
+  "source": "supplied_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

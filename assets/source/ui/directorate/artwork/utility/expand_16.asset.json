@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.expand.p16",
+  "type": "texture",
+  "source": "expand_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

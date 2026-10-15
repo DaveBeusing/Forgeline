@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.unit_production.p16",
+  "type": "texture",
+  "source": "unit_production_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

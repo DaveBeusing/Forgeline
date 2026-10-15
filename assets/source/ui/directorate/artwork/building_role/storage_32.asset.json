@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.building_role.storage.p32",
+  "type": "texture",
+  "source": "storage_32.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

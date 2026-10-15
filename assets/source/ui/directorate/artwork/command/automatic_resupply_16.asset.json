@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.command.automatic_resupply.p16",
+  "type": "texture",
+  "source": "automatic_resupply_16.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

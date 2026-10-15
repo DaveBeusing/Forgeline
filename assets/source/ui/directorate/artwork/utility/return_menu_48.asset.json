@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.utility.return_menu.p48",
+  "type": "texture",
+  "source": "return_menu_48.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

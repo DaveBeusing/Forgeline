@@ -1,0 +1,9 @@
+{
+  "id": "ui.artwork.directorate.portrait.unit_5.p64",
+  "type": "texture",
+  "source": "unit_5_64.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}
