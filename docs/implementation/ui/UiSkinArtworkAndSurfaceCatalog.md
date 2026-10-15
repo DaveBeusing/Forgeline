@@ -6,11 +6,11 @@ Implement a complete, reusable Directorate skin-art foundation for every existin
 
 ## Current situation
 
-Planning inspected `master` at `563f8c79641cb6f227ae009cc3213e012c4e7fed` on 2026-10-15. This is evidence context, not permission to start from an old revision. `FrontendOverlayRenderer` mixes geometric panels with `FrontendMenuBackground` and `UiTextBatch`; `GameplayHudRenderer` composes separate resource, selection, action, information, tooltip and operations surfaces. Five reference boards are inventoried in `assets/reference/ui/directorate/catalog.json`, but their binary import is currently pending. Their labels, numbers and example gameplay are not canonical requirements.
+Planning inspected `master` at `563f8c79641cb6f227ae009cc3213e012c4e7fed` on 2026-10-15. This is evidence context, not permission to start from an old revision. `FrontendOverlayRenderer` mixes geometric panels with `FrontendMenuBackground` and `UiTextBatch`; `GameplayHudRenderer` composes separate resource, selection, action, information, tooltip and operations surfaces. Five original reference boards are imported and remotely verified in `assets/reference/ui/directorate/catalog.json`; revalidate that evidence at implementation start. Their labels, numbers and example gameplay are not canonical requirements.
 
 ## Scope
 
-Complete the original PNG import, inventory existing surfaces, define the shared visual contract and author reusable panel/control artwork. Cover frame corners and edges, quiet panel fills, buttons, tabs, row backgrounds, input fields, checkboxes, toggles, sliders, scrollbars, dropdowns, dialogs, tooltips, progress tracks/fills, portrait frames and state overlays. Include frontend controls absent from the reference boards by extending the same visual language.
+Revalidate the imported original PNGs, inventory existing surfaces, define the shared visual contract and author reusable panel/control artwork. Cover frame corners and edges, quiet panel fills, buttons, tabs, row backgrounds, input fields, checkboxes, toggles, sliders, scrollbars, dropdowns, dialogs, tooltips, progress tracks/fills, portrait frames and state overlays. Include frontend controls absent from the reference boards by extending the same visual language.
 
 ## Non-goals
 
@@ -18,7 +18,7 @@ Do not migrate live frontend/HUD consumers, implement new gameplay, redesign app
 
 ## Prerequisites and dependencies
 
-The original five PNGs must be imported and verified before derivative art can be declared complete. Import is part of this scope. If any original remains inaccessible, identify it, continue independent inventory work, and leave artwork completion blocked rather than substitute a different illustration. Subsequent icon/portrait production uses this surface catalog and art direction; the atlas renderer consumes the production outputs.
+The original five PNGs have been imported and remotely verified. Revalidation of their recorded identities is part of this scope; do not duplicate the completed import. If any original remains inaccessible, identify it, continue independent inventory work, and leave artwork completion blocked rather than substitute a different illustration. Subsequent icon/portrait production uses this surface catalog and art direction; the atlas renderer consumes the production outputs.
 
 ## Mandatory repository pre-check
 
@@ -30,7 +30,7 @@ Read `docs/ProjectContext.md`, `docs/AssetPipeline.md`, `docs/CommandInterfaceVi
 
 ## Concrete implementation tasks
 
-1. Import the five unchanged originals using the inventory destination names. Decode each PNG; record actual dimensions, alpha behavior, byte count, SHA-256 and Git blob identity. Read back remote bytes and compare. Only then mark import complete. Preserve originals permanently; cleanup uses separate derivatives.
+1. Verify the five unchanged originals and completed import metadata against the current repository. Decode each PNG and compare dimensions, alpha behavior, byte count, SHA-256 and Git blob identity. Reuse the completed import. If verification fails, report the exact mismatch and repair only from the authentic originals; never replace them with new illustrations. Cleanup uses separate derivatives.
 2. Trace `FrontendOverlayRenderer.cs`, `GameplayHudRenderer.cs` and its six surface implementations. Add a surface inventory under `docs/` with owner, screen, current rendering path, interaction geometry, existing asset use, required sprites/states, migration owner and evidence status. Cover all current screens and menus, not only modules shown on the boards.
 3. Translate the reference styling into semantic colors, spacing, corner treatment, border widths, fill opacity and state precedence. Keep `ForgeLineUiPalette` as the semantic authority. Retain the canonical tagline and existing marks. Treat the illustrated population cap, vehicle names, tiers and prices as non-authoritative.
 4. Author separate, text-free PNG production sprites, with editable source where useful. Extract only sufficiently clean portions; redraw borders and controls where embedded labels, tiny resolution or merged shadows make cropping unsuitable. No stretched complete panel screenshots and no claimed detail gain from upscaling.

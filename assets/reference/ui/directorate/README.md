@@ -2,21 +2,26 @@
 
 ## Import status
 
-**The five reference PNGs have not been imported into this branch.** This directory currently contains the reference inventory and handling requirements only. The original files exist outside the repository, but their binary transfer was not completed. Null hashes in `catalog.json` are missing evidence, not valid content hashes. No runtime graphics have been added by this preparation change.
+All five original PNGs are present in this branch. The remote directory and every
+Git blob were read back at `b4a462c7514ff8a86eb8e123e16f28c139d058bb` and compared with the original
+SHA-256, byte count, PNG dimensions and Git blob identity. `catalog.json` records
+this verification. The master board is RGB; the four other sheets are RGBA with
+actual alpha. No images were resized, recreated or recompressed.
 
-Preserve this distinction in review and subsequent implementation. Do not claim that the artwork is checked in until all five PNG files are present and their bytes have been read back from the remote branch.
+This completes reference import only. It does not implement the graphical UI,
+create runtime assets, establish redistribution rights or approve final art quality.
 
-## Expected originals
+## Original reference sheets
 
 | Repository filename | Reference content |
 | --- | --- |
-| `ui_visual_language.png` | Master Directorate visual-language board, panel hierarchy, material direction and sample iconography. |
-| `hud_panel_reference.png` | Resource strip, selection/building panels, command slots, production queue, build menu, alerts, supply, minimap and auxiliary panels. |
-| `resource_status_reference.png` | Resource pictograms and operational-state icon families. |
-| `command_cursor_reference.png` | Command pictograms, cursor concepts, selection graphics and order markers. |
-| `strategic_marker_reference.png` | Minimap contacts, infrastructure markers and strategic-overlay legend references. |
+| [`ui_visual_language.png`](ui_visual_language.png) | Master Directorate visual-language board, panel hierarchy, material direction and sample iconography. |
+| [`hud_panel_reference.png`](hud_panel_reference.png) | Resource strip, selection/building panels, command slots, production queue, build menu, alerts, supply, minimap and auxiliary panels. |
+| [`resource_status_reference.png`](resource_status_reference.png) | Resource pictograms and operational-state icon families. |
+| [`command_cursor_reference.png`](command_cursor_reference.png) | Command pictograms, cursor concepts, selection graphics and order markers. |
+| [`strategic_marker_reference.png`](strategic_marker_reference.png) | Minimap contacts, infrastructure markers and strategic-overlay legend references. |
 
-The filenames above are destination names. They do not establish that a matching file has already been uploaded. Import the existing original images, not newly substituted illustrations.
+The filenames above identify the original files in this directory. Preserve their bytes and recorded hashes; author production derivatives separately.
 
 ## Meaning of the references
 

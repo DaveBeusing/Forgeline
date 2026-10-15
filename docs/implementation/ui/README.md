@@ -4,7 +4,7 @@
 
 This directory contains eight independently scoped implementation requests for the Directorate graphical interface migration. They are plans to execute, not completed game features.
 
-**Original artwork import remains incomplete.** The five expected PNGs are recorded in the [reference inventory](../../../assets/reference/ui/directorate/README.md), but the images themselves have not been committed. Binary transfer was not completed. `catalog.json` intentionally retains `pending_binary_import` and null hashes. Do not report the artwork as present or begin dependent production work on the assumption that inventory entries are real files.
+**Original artwork import is complete.** All five original PNGs are present in the [reference inventory](../../../assets/reference/ui/directorate/README.md). Remote bytes were verified at `b4a462c7514ff8a86eb8e123e16f28c139d058bb`; `catalog.json` contains their hashes and actual metadata. These reference sheets are not production sprites or runtime atlases.
 
 No UI, renderer or gameplay implementation is changed by this preparation. The current visual direction is selected; final production quality and native acceptance are not established.
 
@@ -14,7 +14,7 @@ Use each document as a complete implementation request. Follow capability depend
 
 | Request | Complete scope | Prerequisite capability |
 | --- | --- | --- |
-| [UI Skin Artwork and Surface Catalog](UiSkinArtworkAndSurfaceCatalog.md) | Verify/import original PNGs, audit every existing surface and produce clean panel/control/state artwork. | Existing originals; import is explicitly part of this scope. |
+| [UI Skin Artwork and Surface Catalog](UiSkinArtworkAndSurfaceCatalog.md) | Revalidate the imported originals, audit every existing surface and produce clean panel/control/state artwork. | Verified originals and the existing reference catalog. |
 | [UI Icon, Portrait and Marker Artwork](UiIconPortraitAndMarkerArtwork.md) | Actual resource/status/action families, real-roster portraits, tactical glyphs and cursor sources. | Verified originals, surface inventory and skin direction. |
 | [UI Atlas Pipeline and Skin Renderer](UiAtlasPipelineAndSkinRenderer.md) | Compiler/runtime metadata, shared texture ownership, nine-slice skinning, sprite states, clipping and diagnostics. | Production artwork and semantic mappings. |
 | [Graphical Frontend Interface](FrontendGraphicalInterface.md) | All existing menus, Settings, Controls, save/load states, loading, pause, dialogs and errors. | Completed shared skin renderer and assets. |

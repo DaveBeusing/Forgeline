@@ -1,15 +1,93 @@
 {
   "schemaVersion": 1,
   "purpose": "visual-reference-inventory",
-  "importStatus": "pending_binary_import",
+  "importStatus": "complete",
   "runtimeEligible": false,
   "baselineCommit": "563f8c79641cb6f227ae009cc3213e012c4e7fed",
   "rightsEvidence": "not_recorded",
   "references": [
-    { "id": "reference.ui.directorate.visual_language", "file": "ui_visual_language.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null },
-    { "id": "reference.ui.directorate.hud_panels", "file": "hud_panel_reference.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null },
-    { "id": "reference.ui.directorate.resource_status", "file": "resource_status_reference.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null },
-    { "id": "reference.ui.directorate.command_cursor", "file": "command_cursor_reference.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null },
-    { "id": "reference.ui.directorate.strategic_markers", "file": "strategic_marker_reference.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null }
-  ]
+    {
+      "id": "reference.ui.directorate.visual_language",
+      "file": "ui_visual_language.png",
+      "status": "reference_only",
+      "bytes": 2220368,
+      "width": 1672,
+      "height": 941,
+      "sha256": "57d51455045aca0c222fa836ae10d10829556f2acc5c2480db3215a1ec0f2a04",
+      "gitBlobSha": "87d8be1907487ff1178ad11e4ec69247fc437172",
+      "colorMode": "RGB",
+      "hasAlphaChannel": false,
+      "alphaExtrema": null
+    },
+    {
+      "id": "reference.ui.directorate.hud_panels",
+      "file": "hud_panel_reference.png",
+      "status": "reference_only",
+      "bytes": 2144766,
+      "width": 1448,
+      "height": 1086,
+      "sha256": "187f22dda7fe420a85cbc51c8e0b823160ee2249b157ebe0c8b049a252edce21",
+      "gitBlobSha": "95f82080ca5ea537dac8bc5616a2d283a4937b24",
+      "colorMode": "RGBA",
+      "hasAlphaChannel": true,
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "reference.ui.directorate.resource_status",
+      "file": "resource_status_reference.png",
+      "status": "reference_only",
+      "bytes": 1341685,
+      "width": 1448,
+      "height": 1086,
+      "sha256": "2a02bc2897c84a29d6dbd9918ea0771e1ca665368af3f18075edba5ebcdc3458",
+      "gitBlobSha": "c9a76a3136828af65de94e7a8a6423d815814abb",
+      "colorMode": "RGBA",
+      "hasAlphaChannel": true,
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "reference.ui.directorate.command_cursor",
+      "file": "command_cursor_reference.png",
+      "status": "reference_only",
+      "bytes": 1813832,
+      "width": 1448,
+      "height": 1086,
+      "sha256": "f1c87d16ad06fc91eba53c8742f0b28353d906a802ebaa270942d86d2a4398d1",
+      "gitBlobSha": "bd75162cfbdebd4f8c51b7292e222a8e6e792f0a",
+      "colorMode": "RGBA",
+      "hasAlphaChannel": true,
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "reference.ui.directorate.strategic_markers",
+      "file": "strategic_marker_reference.png",
+      "status": "reference_only",
+      "bytes": 1451740,
+      "width": 1448,
+      "height": 1086,
+      "sha256": "1e5845f4a5b0df70fab834efca2cf5a6d8067ab11ea88f66f3c6639c0dbeba5e",
+      "gitBlobSha": "a1e2f7266426d2d3b613d78b122d51ac019c7cfa",
+      "colorMode": "RGBA",
+      "hasAlphaChannel": true,
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    }
+  ],
+  "verification": {
+    "method": "github_git_blob_readback",
+    "commit": "b4a462c7514ff8a86eb8e123e16f28c139d058bb",
+    "verifiedUtc": "2026-10-15T16:38:40.875166+00:00",
+    "fileCount": 5
+  }
 }
