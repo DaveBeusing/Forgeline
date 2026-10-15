@@ -39,7 +39,7 @@ Percentiles use sorted observations: p50 is the lower median; p95/p99 use neares
 ```powershell
 pwsh ./build/Compare-ReferencePerformance.ps1 -CurrentRoot artifacts/new/run-2 -BaselineRoot artifacts/accepted/run-2
 pwsh ./build/Compare-ReferencePerformance.ps1 -CurrentRoot artifacts/new/run-2 -BaselineRoot artifacts/accepted/run-2 -GatePerformance -MaximumRegressionPercent 15 -ReportPath artifacts/new/performance-gate.json
-pwsh ./build/Compare-VisualReferenceEvidence.ps1 -CurrentRoot artifacts/new/run-2 -BaselineRoot artifacts/accepted/run-2 -GateImages -ReportPath artifacts/new/pixel-gate.json
+pwsh ./build/Compare-VisualReferenceEvidence.ps1 -CurrentRoot artifacts/new/run-2 -BaselineRoot artifacts/accepted/run-2 -GateImages -ApprovalPath artifacts/accepted/run-2.review.json -ReportPath artifacts/new/pixel-gate.json
 ```
 
 Performance comparison requires complete structurally qualified evidence and matched case keys, hardware/environment, driver, camera/path version and density, warmup policy, resolution, quality settings, lighting, DPI and UI scale. Software is functional evidence only. Missing GPU timings, mismatched matrices/settings/hardware and zero denominators cannot satisfy an explicit performance gate. Changed asset payloads are disclosed. Default comparisons are advisory; -GatePerformance returns failure for unavailable/unqualified cases or mean/p50/p95/p99 increases above the declared threshold. A single paired delta is variance, not proof of a causal regression or improvement. Reproduce on additional matched cohorts before attributing changes.

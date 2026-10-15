@@ -18,6 +18,14 @@ The authored fixtures are reproducible but omit live simulation cost, natural ev
 
 ## Re-evaluation
 
+Named frontend/HUD states reuse this lane and its exact native readback. Baseline
+approval is an external reviewer record bound to the immutable manifest and image
+hashes, with rationale and explicit rubric decisions; capture never grants art
+acceptance. Source/build/runtime/device changes reject automatic inheritance.
+Thread-owned execution requirements apply only during explicit capture. Progress
+metadata is atomically replaced, and a retained failure marker rejects qualification.
+See [UI review](../UiVisualReview.md) and [qualification](../UiVisualQualification.md).
+
 Frame-resource investigation found a High shadow-edge variance with identical CPU upload fingerprints. A diagnostic depth copy changed the observation, but alternate read states, an extra receiver texture and fine derivatives did not establish invariance under broader reuse. Extra renderer resources/copies were rejected because they did not justify their cost. The cause remains unresolved. Optional CPU depth readback and upload hashing stay explicit capture diagnostics, while ordinary rendering retains its existing bounded resources. A capture-only layout change must not hide a difference from ordinary frames.
 
 An explicit collection mode may finish the bounded matrix after a pixel mismatch, preserving every requested scene and diagnostic pair. It still marks failed rows, writes a structurally failed final manifest/failure report, returns nonzero and cannot produce a passing baseline comparison. Strict mode aborts on the first mismatch. No tolerance or golden acceptance is inferred in either mode.

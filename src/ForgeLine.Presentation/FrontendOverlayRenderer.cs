@@ -87,8 +87,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
         }
         if (view.Kind == FrontendSurfaceKind.PauseMenu)
         {
-            Panel(layout.Header with { Width = layout.Navigation.Width }, ForgeLineUiPalette.Surface);
-            Panel(layout.Title with { Width = layout.Navigation.Width }, ForgeLineUiPalette.Surface);
+            Panel(layout.PauseBackdrop, ForgeLineUiPalette.Surface);
             Panel(layout.Footer, ForgeLineUiPalette.Surface);
             if (!string.IsNullOrEmpty(view.Feedback)) Panel(layout.Feedback, ForgeLineUiPalette.Surface);
         }

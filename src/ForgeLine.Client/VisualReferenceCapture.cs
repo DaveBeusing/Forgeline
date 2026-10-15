@@ -30,6 +30,9 @@ internal sealed record VisualReferenceCaptureRequest
     public float InspectionDistanceMeters { get; init; }
     public ReferenceRunProfile RunProfile { get; init; }
     public ReferenceCameraPath CameraPath { get; init; }
+    public UiReferenceScenario[] UiScenarios { get; init; } = [UiReferenceScenario.World];
+    public float[] UiScales { get; init; } = [1];
+    public bool CinematicFrontend { get; init; }
     public VisualReferenceSceneKind[] Scenes { get; init; } =
     [
         VisualReferenceSceneKind.DaylightTerrain, VisualReferenceSceneKind.IndustrialBase,
@@ -50,6 +53,14 @@ internal sealed record VisualReferenceCaptureRequest
         _ = new TerrainSurfaceMarks(SurfaceMarks);
         ArgumentException.ThrowIfNullOrWhiteSpace(OutputRoot);
         ArgumentException.ThrowIfNullOrWhiteSpace(RuntimeRoot);
+        if (UiScenarios is null || UiScenarios.Length is < 1 or > 30 || UiScenarios.Any(x => !Enum.IsDefined(x)) ||
+            UiScenarios.Distinct().Count() != UiScenarios.Length || UiScales is null || UiScales.Length is < 1 or > 3 ||
+            UiScales.Any(x => x is not (.75f or 1f or 2f)) || UiScales.Distinct().Count() != UiScales.Length)
+            throw new ArgumentException("Unsupported or duplicate UI scenario/scale.");
+        bool ui = UiScenarios.Any(x => x != UiReferenceScenario.World);
+        if (ui && (Scenes is null || Scenes.Length != 1 || Scenes[0] != VisualReferenceSceneKind.BattlefieldCombat ||
+            Zooms is null || Zooms.Length != 1 || Zooms[0] != RtsReferenceZoom.NormalGameplay || CameraPath != ReferenceCameraPath.Fixed))
+            throw new ArgumentException("Named UI states require the fixed BattlefieldCombat normal-zoom fixture.");
         if (!Enum.IsDefined(RunProfile) || !Enum.IsDefined(CameraPath)) throw new ArgumentException("Unsupported performance profile or camera path.");
         if (Commit is null || Commit.Length != 40 || Commit.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("Capture requires a complete source commit.");
         if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
@@ -59,9 +70,9 @@ internal sealed record VisualReferenceCaptureRequest
             throw new ArgumentOutOfRangeException(nameof(InspectionDistanceMeters));
         if (!float.IsFinite(YawDegrees) || YawDegrees is < 0 or > 360) throw new ArgumentOutOfRangeException(nameof(YawDegrees));
         if (Scenes is null || Profiles is null || Displays is null || Zooms is null ||
-            Scenes.Length is < 1 or > 14 || Profiles.Length is < 1 or > 4 || Displays.Length is < 1 or > 4 || Zooms.Length is < 1 or > 3 ||
+            Scenes.Length is < 1 or > 14 || Profiles.Length is < 1 or > 4 || Displays.Length is < 1 or > 5 || Zooms.Length is < 1 or > 3 ||
             Scenes.Any(x => !Enum.IsDefined(x)) || Profiles.Any(x => !Enum.IsDefined(x)) || Zooms.Any(x => !Enum.IsDefined(x)) ||
-            Displays.Any(x => !RtsVisualReference.Displays.Contains(x) && !(Software && x == new RtsReferenceDisplay(640, 360))) ||
+            Displays.Any(x => !RtsVisualReference.Displays.Contains(x) && !(ui && x == new RtsReferenceDisplay(1280, 720)) && !(Software && x == new RtsReferenceDisplay(640, 360))) ||
             Scenes.Distinct().Count() != Scenes.Length || Profiles.Distinct().Count() != Profiles.Length ||
             Zooms.Distinct().Count() != Zooms.Length || Displays.Distinct().Count() != Displays.Length)
             throw new ArgumentException("Capture matrix contains an unsupported or duplicated entry.");
@@ -81,6 +92,8 @@ internal static class VisualReferenceCapture
         var captures = new List<object>();
         var captureInputs = new List<object>();
         var failedCaptures = new List<string>();
+        var uiPixelHashes = new Dictionary<string, string>(StringComparer.Ordinal);
+        object? captureState = null;
         long startupStart = Stopwatch.GetTimestamp();
         long startupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
         try
@@ -99,6 +112,7 @@ internal static class VisualReferenceCapture
             var catalog = RuntimeAssetCatalog.Load(request.RuntimeRoot);
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
             var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain, runtimeAssets: catalog)).ToArray();
+            using var capturePower = new ReferenceCapturePowerLease();
             using var platform = new WindowsPlatform();
             using IWindow window = platform.CreateWindow(new("FORGELINE Reference Capture", 1280, 720));
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new()
@@ -128,6 +142,8 @@ internal static class VisualReferenceCapture
                 graphics.ConfigurePostProcessing(profile.PostProcessing);
                 foreach (var fixture in fixtures)
                 foreach (var zoom in request.Zooms)
+                foreach (var uiScenario in request.UiScenarios)
+                foreach (float uiScale in request.UiScales)
                 {
                     graphics.WaitForIdle();
                     long setupStart = Stopwatch.GetTimestamp();
@@ -143,6 +159,14 @@ internal static class VisualReferenceCapture
                         environment: profile.Environment, vegetation: profile.Vegetation);
                     using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles, lighting);
                     using var hud = new GameplayHudRenderer(graphics, catalog);
+                    using var frontend = UiReferenceStates.IsFrontend(uiScenario) ? new FrontendOverlayRenderer(graphics) : null;
+                    if (frontend is not null && request.CinematicFrontend)
+                    {
+                        var deadline = Stopwatch.StartNew();
+                        do { frontend.PrepareBackground(catalog, quality); Thread.Sleep(1); }
+                        while (frontend.BackgroundDiagnostics.State == "Loading" && deadline.Elapsed < TimeSpan.FromSeconds(15));
+                        if (frontend.BackgroundDiagnostics.State != "Ready") throw new InvalidDataException("Requested cinematic background is unavailable.");
+                    }
                     using var selection = new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 3);
                     using var materialReference = fixture.Kind == VisualReferenceSceneKind.MaterialFoundation ? new MaterialReferenceRenderer(graphics, lighting) : null;
                     if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
@@ -152,12 +176,19 @@ internal static class VisualReferenceCapture
                     if (request.InspectionDistanceMeters != 0) key += $"-Inspection{request.InspectionDistanceMeters.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
                     if (request.RunProfile != ReferenceRunProfile.Warm) key += $"-{request.RunProfile}";
                     if (request.CameraPath != ReferenceCameraPath.Fixed) key += $"-{request.CameraPath}";
+                    if (uiScenario != UiReferenceScenario.World || uiScale != 1)
+                        key += FormattableString.Invariant($"-Ui{uiScenario}-Scale{uiScale:0.00}");
                     Console.WriteLine($"[reference:capture] {key}");
-                    var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom) with
+                    var effectiveZoom = uiScenario == UiReferenceScenario.MinimapStrategic ? RtsReferenceZoom.Strategic : zoom;
+                    var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, effectiveZoom) with
                         { InitialYawRadians = request.YawDegrees == 45 ? RtsVisualReference.YawRadians : request.YawDegrees * MathF.PI / 180,
-                          InitialDistance = request.InspectionDistanceMeters == 0 ? RtsVisualReference.GetDistance(zoom) : request.InspectionDistanceMeters });
+                          InitialDistance = request.InspectionDistanceMeters == 0 ? RtsVisualReference.GetDistance(effectiveZoom) : request.InspectionDistanceMeters });
                     double captureVisualSeconds = fixture.Snapshot.Tick.Value * fixture.Snapshot.TickDuration.TotalSeconds;
-                    var buffer = new PresentationSnapshotBuffer(); buffer.Publish(fixture.Snapshot);
+                    uint rasterDpi = request.RasterDpi != 0 ? request.RasterDpi :
+                        display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;
+                    var (snapshot, panel) = UiReferenceStates.Hud(fixture.Snapshot, uiScenario, display.Width, display.Height, rasterDpi, uiScale);
+                    FrontendSurfaceView? frontendView = frontend is null ? null : UiReferenceStates.Frontend(uiScenario, display.Width, display.Height, rasterDpi, uiScale);
+                    var buffer = new PresentationSnapshotBuffer(); buffer.Publish(snapshot);
                     var world = new RenderWorld(); world.Update(buffer);
                     particles.Prepare(world, camera, display.Width, display.Height, 0);
                     particles.Prepare(world, camera, display.Width, display.Height, .1);
@@ -171,14 +202,20 @@ internal static class VisualReferenceCapture
                         else
                             indicators.Circle(instance.Transform.Position + Vector3.UnitY, 5, new(0, .8f, .2f, 1));
                     }
-                    var information = RtsInformationLayerView.Empty with { SelectedEntities = selected };
-                    uint rasterDpi = request.RasterDpi != 0 ? request.RasterDpi :
-                        display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;
+                    var information = RtsInformationLayerView.Empty with { SelectedEntities = selected,
+                        Cursor = uiScenario == UiReferenceScenario.Targeting ? RtsCursorKind.Attack : RtsCursorKind.Default,
+                        HasPointer = uiScenario == UiReferenceScenario.Targeting, PointerPosition = new(display.Width * .5f, display.Height * .5f) };
+                    var targeting = uiScenario == UiReferenceScenario.Targeting ? new TacticalTargetingView(TacticalTargetingMode.Attack, 2, 1, 1, 0)
+                    { HasPointerTarget = true, PointerTargetValid = true, PointerWorldTarget = fixture.Target } : default;
                     int recordFrameIndex = -1;
                     captureInputs.Clear();
                     Action<IGraphicsCommandContext> record = context =>
                     {
                         recordFrameIndex = context.FrameIndex;
+                        if (frontend is not null && frontendView is { Kind: not FrontendSurfaceKind.PauseMenu } view)
+                        {
+                            context.BeginPass(GraphicsFramePass.Overlay); frontend.Render(context, view); return;
+                        }
                         if (materialReference is not null)
                         {
                             materialReference.Render(context, camera);
@@ -199,13 +236,19 @@ internal static class VisualReferenceCapture
                         particles.Render(context, camera);
                         context.BeginPass(GraphicsFramePass.Overlay);
                         selection.Render(context, camera, indicators);
-                        hud.Render(context, camera, fixture.Snapshot, terrain.WorldBounds, information, default, default,
-                            FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, rasterDpi, 1);
+                        hud.Render(context, camera, snapshot, terrain.WorldBounds, information, panel, targeting,
+                            FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, rasterDpi, uiScale);
+                        if (frontend is not null && frontendView is { Kind: FrontendSurfaceKind.PauseMenu } pause)
+                            frontend.Render(context, pause);
                     };
-                    void PrepareTerrain() => ground.Prepare(camera,
-                        Math.Max(1, (int)Math.Ceiling(display.Width * (double)profile.ResolutionScale)),
-                        Math.Max(1, (int)Math.Ceiling(display.Height * (double)profile.ResolutionScale)),
-                        profile.Shadows.Enabled ? DirectionalShadowProjection.Create(camera.CaptureState(), lighting, profile.Shadows) : null);
+                    void PrepareTerrain()
+                    {
+                        if (frontend is not null && frontendView?.Kind != FrontendSurfaceKind.PauseMenu) return;
+                        ground.Prepare(camera,
+                            Math.Max(1, (int)Math.Ceiling(display.Width * (double)profile.ResolutionScale)),
+                            Math.Max(1, (int)Math.Ceiling(display.Height * (double)profile.ResolutionScale)),
+                            profile.Shadows.Enabled ? DirectionalShadowProjection.Create(camera.CaptureState(), lighting, profile.Shadows) : null);
+                    }
                     PrepareTerrain();
                     double setupMilliseconds = Stopwatch.GetElapsedTime(setupStart).TotalMilliseconds;
                     long setupAllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - setupAllocationStart;
@@ -255,6 +298,7 @@ internal static class VisualReferenceCapture
                         measured.Health.SubmissionFaultCount != 0 || measured.Health.FailureReasonCode is not null ||
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
+                    captureState = new { key, stage = "first-readback", surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
                     byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                     bool repeatPixelsEqual = true;
                     var repeatFailures = new List<object>();
@@ -263,6 +307,7 @@ internal static class VisualReferenceCapture
                         shadowFingerprint = shadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(shadowDepth.Span)) });
                     for (int repetition = 1; repetition < request.RepeatCaptures; repetition++)
                     {
+                        captureState = new { key, stage = "repeat-readback", repetition, surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
                         byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                         captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
                             shadowFingerprint = graphics.CaptureShadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(graphics.CaptureShadowDepth.Span)) });
@@ -291,8 +336,10 @@ internal static class VisualReferenceCapture
                     if (!repeatPixelsEqual) failedCaptures.Add(key);
                     string image = key + ".png";
                     ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, image), display.Width, display.Height, rgba);
+                    if (uiScenario != UiReferenceScenario.World)
+                        UiReferenceStates.ConfirmDistinct(uiPixelHashes, FormattableString.Invariant($"{display.Width}x{display.Height}-{quality}-{rasterDpi}-{uiScale:0.00}-"), uiScenario, rgba);
                     var motionImages = new List<object>();
-                    if (display.Width == RtsVisualReference.Width && quality == RenderQuality.Medium && zoom == RtsReferenceZoom.NormalGameplay)
+                    if (uiScenario == UiReferenceScenario.World && display.Width == RtsVisualReference.Width && quality == RenderQuality.Medium && zoom == RtsReferenceZoom.NormalGameplay)
                     {
                         var original = camera.CaptureState();
                         for (int step = 0; step < 8; step++)
@@ -300,6 +347,7 @@ internal static class VisualReferenceCapture
                             camera.ApplyState(original with { Target = original.Target + new Vector3(step * .5f, 0, step * .5f), YawRadians = original.YawRadians + step * .005f });
                             PrepareTerrain();
                             string motionImage = $"{key}-motion-{step:D2}.png";
+                            captureState = new { key, stage = "camera-pose-readback", step, surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
                             byte[] motion = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                             ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, motionImage), display.Width, display.Height, motion);
                             motionImages.Add(new { image = motionImage, imageSha256 = FileHash(Path.Combine(request.OutputRoot, motionImage)), camera = camera.CaptureState() });
@@ -307,11 +355,22 @@ internal static class VisualReferenceCapture
                         camera.ApplyState(original);
                         PrepareTerrain();
                     }
+                    var text = frontend?.TextDiagnostics ?? hud.TextDiagnostics;
+                    if (uiScenario != UiReferenceScenario.World && (!text.AtlasReady || text.DroppedGlyphs != 0 || text.MissingGlyphs != 0))
+                        throw new InvalidDataException("Named UI state contains incomplete text.");
+                    object[] regions = uiScenario == UiReferenceScenario.World ? [] : UiReferenceStates.Regions(rgba, display.Width, display.Height,
+                        frontendView?.Layout, GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale));
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
-                        pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fixture.Fingerprint,
+                        pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fingerprint = fixture.Fingerprint,
+                        ui = new { scenario = uiScenario, fixtureVersion = 1, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",
+                            interaction = new { panel.Mode, panel.SelectedIndex, panel.HoveredIndex, panel.PointerPressed,
+                                panel.ContextualHoveredIndex, panel.ContextualPressed, panel.ContextualPending, targetingMode = targeting.Mode },
+                            captureOffset = uiScenario == UiReferenceScenario.MenuReveal ? "Authored half-reveal; live motion reviewed separately" : "Settled fixed state",
+                            regions, text, vertices = frontend?.LastRenderedVertexCount ?? hud.LastRenderedVertexCount,
+                            background = frontend?.BackgroundDiagnostics },
                         seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, captureVisualSeconds, camera = camera.CaptureState(),
-                        requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize,
-                        rasterDpi, uiScale = 1, requestedQuality = quality, profile, lighting,
+                        requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize, hostWindowDpi = window.Dpi,
+                        rasterDpi, uiScale, requestedQuality = quality, profile, lighting,
                         localHaze = graphics.Atmosphere.Enabled ? graphics.Atmosphere.LocalHaze : null, surfaceMarks = request.SurfaceMarks,
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
                         performance = performance.Report(measured),
@@ -332,11 +391,11 @@ internal static class VisualReferenceCapture
             string? aggregateFailure = failedCaptures.Count == 0 ? null : $"{failedCaptures.Count} fixed-state cases contain unequal native pixels.";
             WriteManifest(aggregateFailure is null ? "structural-pass" : "structural-failure", aggregateFailure);
             if (aggregateFailure is not null)
-                File.WriteAllText(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new
+                ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new
                 { status = "structural-failure", error = aggregateFailure, completedCaptures = captures.Count, failedCaptures }, JsonOptions));
             return aggregateFailure is null ? 0 : 1;
 
-            void WriteManifest(string status, string? error) => File.WriteAllText(Path.Combine(request.OutputRoot, "manifest.json"),
+            void WriteManifest(string status, string? error) => ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "manifest.json"),
                 JsonSerializer.Serialize(new { schemaVersion = 1, status, error, request.Commit, buildIdentity = identity,
                     runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
                     environment = new { os = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
@@ -344,6 +403,9 @@ internal static class VisualReferenceCapture
                         logicalProcessors = Environment.ProcessorCount, cpu = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER"),
                         configuration = typeof(Program).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>()?.Configuration },
                     runtimeFingerprint, request.Driver, software = request.Software, fixtureVersion = VisualReferenceScene.FixtureVersion,
+                    hostWindowDpi = window.Dpi, executionRequirement = "Thread-scoped display/system requirement during explicit capture; user sleep/lock and occlusion checks remain authoritative.",
+                    clientAssemblySha256 = FileHash(typeof(Program).Assembly.Location),
+                    presentationAssemblySha256 = FileHash(typeof(GameplayHudRenderer).Assembly.Location),
                     startupMilliseconds, startupAllocatedBytes,
                     capturePath = "D3D12 swap-chain backbuffer readback before Present; full-resolution native output, independent of host-window clamp",
                     method = "Immutable presentation states; completed extraction tick and frozen visual seconds recorded per case, VSync off, particle age.2s. CPU includes frame reuse/Present. Distinct completed GPU fences. Readbacks/PNG export excluded. No live gameplay or sustained-motion FPS claim.",
@@ -354,7 +416,7 @@ internal static class VisualReferenceCapture
             Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}");
             // Never overwrite an existing evidence directory after a rejected request.
             if (request is not null && outputCreated)
-                File.WriteAllText(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureInputs }, JsonOptions));
+                ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureState, captureInputs }, JsonOptions));
             return 1;
         }
     }

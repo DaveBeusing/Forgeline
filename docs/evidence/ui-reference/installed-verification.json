@@ -1,0 +1,88 @@
+{
+  "source": "dcdd5b81b8e076e3a0d80baff3fcd9306b302459",
+  "nativeStatus": "structural-pass",
+  "nativeCases": 8,
+  "hostWindowDpi": 144,
+  "executionRequirement": "Thread-scoped display/system requirement during explicit capture; user sleep/lock and occlusion checks remain authoritative.",
+  "startup": {
+    "ApplicationReadiness": "Ready",
+    "SessionReadiness": "NotRequested",
+    "BuildVersion": "0.1.369-dev+dcdd5b81b8e076e3a0d80baff3fcd9306b302459",
+    "SourceRevision": "dcdd5b81b8e076e3a0d80baff3fcd9306b302459",
+    "Runtime": ".NET 10.0.12",
+    "OS": "Microsoft Windows 10.0.26300"
+  },
+  "smokes": [
+    {
+      "mode": "window",
+      "metrics": {
+        "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+        "framesPerSecond": 4.375556200851096,
+        "frameMilliseconds": 228.54237360852284,
+        "cpuRenderMilliseconds": 225.10561251947826,
+        "gpuMilliseconds": 15.34192,
+        "surface": {
+          "width": 1600,
+          "height": 900,
+          "bufferCount": 3,
+          "frameIndex": 1,
+          "isSuspended": false,
+          "presentMode": "VSync",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 0,
+          "appliedResizeGeneration": 0,
+          "submittedFrameCount": 70,
+          "presentedFrameCount": 70
+        },
+        "visibleInstances": 938,
+        "totalInstances": 1551,
+        "runtimeMeshInstances": 15,
+        "fallbackMeshInstances": 924,
+        "textureBindingFailureCount": 0,
+        "materialBindingFailureCount": 0,
+        "gameplayHudState": 2,
+        "gameplayHudVertexCount": 57468,
+        "debugLayerEnabled": false
+      }
+    },
+    {
+      "mode": "borderless",
+      "metrics": {
+        "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+        "framesPerSecond": 3.3237694336872368,
+        "frameMilliseconds": 300.86322771512044,
+        "cpuRenderMilliseconds": 298.05683531422096,
+        "gpuMilliseconds": 34.595776,
+        "surface": {
+          "width": 5120,
+          "height": 2160,
+          "bufferCount": 3,
+          "frameIndex": 2,
+          "isSuspended": false,
+          "presentMode": "VSync",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 0,
+          "appliedResizeGeneration": 0,
+          "submittedFrameCount": 20,
+          "presentedFrameCount": 20
+        },
+        "visibleInstances": 950,
+        "totalInstances": 1551,
+        "runtimeMeshInstances": 17,
+        "fallbackMeshInstances": 934,
+        "textureBindingFailureCount": 0,
+        "materialBindingFailureCount": 0,
+        "gameplayHudState": 2,
+        "gameplayHudVertexCount": 57468,
+        "debugLayerEnabled": false
+      }
+    }
+  ],
+  "nativeLifetime": {
+    "withoutDebugLayer": "passed",
+    "withDebugLayer": "unavailable: requested D3D12 debug layer is not installed; test could not start"
+  },
+  "performanceAcceptance": "pending: observed stress throughput does not qualify sustained 60 FPS"
+}

@@ -1,0 +1,93 @@
+{
+  "matrixPackage": {
+    "configuration": "Release",
+    "runtimeIdentifier": "win-x64",
+    "runAttempt": null,
+    "repository": "https://github.com/DaveBeusing/Forgeline",
+    "runtimeAssetCompiler": "1.9.0",
+    "buildTimeUtc": "2026-10-14T23:23:47.9139225+00:00",
+    "runUrl": null,
+    "runId": null,
+    "targetFramework": "net10.0-windows",
+    "runtimeAssetSignature": "0c81429ed968e98759fd55f215e65dce606914e7c5f08f8bb19cf091792e9fe5",
+    "product": "FORGELINE",
+    "sourceRevision": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+    "informationalVersion": "0.1.369-dev+61f67dfa6f81031b9d798ea92c4410393f84763f",
+    "channel": "dev",
+    "sourceTreeClean": true,
+    "productVersion": "0.1.369",
+    "version": "0.1.369-dev",
+    "sdk": "10.0.401"
+  },
+  "archiveSha256": "8a2d9f7f399197035f44e2ea05c20168148cb1128f0777d3a62311dad6716fa5",
+  "images": [
+    {
+      "file": "menu.png",
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "sha256": "623b417d07fcdd15f0b535d3c2cdbabcd70f7769958d947893c6247515cbe70d",
+      "nativeWidth": 1280,
+      "nativeHeight": 720,
+      "method": "Original native PNG copied byte-for-byte; no image transformation."
+    },
+    {
+      "file": "pause-before.png",
+      "source": "8ba1892b1b4e2b276431694da0ff6063e58bfa87",
+      "sha256": "1588c9419395dec45df204cc48d61571ab3b0f4ffb529d59d0d2a80ee127a8f6",
+      "nativeWidth": 1280,
+      "nativeHeight": 720,
+      "method": "Original native PNG copied byte-for-byte; no image transformation."
+    },
+    {
+      "file": "pause-after.png",
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "sha256": "b70214c0e0d4b176a12fd641fd5e7fd0a0cfbbc6ea96af19bbe8d6d1f4a6ba12",
+      "nativeWidth": 1280,
+      "nativeHeight": 720,
+      "method": "Original native PNG copied byte-for-byte; no image transformation."
+    }
+  ],
+  "hardwareObservations": [
+    {
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "cohort": "ui-reference-stable-dpi96",
+      "observedUtc": "2026-10-14T23:51:00.3591690+00:00",
+      "hostWindowDpi": 144,
+      "method": "GetDpiForWindow on the active owned reference-capture window; raster DPI is an independent requested layout input"
+    },
+    {
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "cohort": "ui-reference-stable-dpi144",
+      "observedUtc": "2026-10-15T00:08:45.3854447+00:00",
+      "hostWindowDpi": 144,
+      "method": "GetDpiForWindow on the active owned reference-capture window; raster DPI is an independent requested layout input"
+    },
+    {
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "cohort": "ui-reference-stable-dpi192",
+      "observedUtc": "2026-10-15T00:20:15.2209792+00:00",
+      "hostWindowDpi": 144,
+      "method": "GetDpiForWindow on the active owned reference-capture window; raster DPI is an independent requested layout input"
+    }
+  ],
+  "retainedFailures": [
+    {
+      "root": "ui-reference-matrix-dpi96",
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "status": "structural-failure",
+      "completedCaptures": 397,
+      "reason": "Present occlusion",
+      "rawFailureSha256": "f4a5e98fc9d09f8f0ed98482450df2ac30e3e47ba192580087c6a9f16a0e4a26",
+      "includedInQualifiedMatrix": false
+    },
+    {
+      "root": "ui-reference-stable-dpi192",
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "status": "structural-failure",
+      "completedCaptures": 354,
+      "reason": "Manifest sharing violation from the progress observer",
+      "rawFailureSha256": "f714c0e1e9e0b929e689cff75b2d8046cd9196efb816064730969d2840e98389",
+      "includedInQualifiedMatrix": false
+    }
+  ],
+  "visualAcceptance": "pending"
+}
