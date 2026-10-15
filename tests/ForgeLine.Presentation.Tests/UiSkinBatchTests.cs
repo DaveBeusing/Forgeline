@@ -3,10 +3,13 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Graphics;
+using ForgeLine.Platform;
+using ForgeLine.Platform.Windows;
 using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
 
+[Collection("Native scene output")]
 public sealed class UiSkinBatchTests
 {
     private static readonly int[] Counts=[12,6,6];
@@ -84,6 +87,25 @@ public sealed class UiSkinBatchTests
         Assert.Equal(UiSkinBatch.MaximumQuads*6,batch.Diagnostics.Vertices);Assert.Equal(1,batch.Diagnostics.DroppedQuads);
         Assert.Equal(4,device.Buffers.Count);
     }
+    [Fact]
+    public void NativeStraightAlphaIsAppliedOnceOverDarkAndBrightOutput()
+    {
+        using var fixture=new Fixture();using var platform=new WindowsPlatform();
+        using IWindow window=platform.CreateWindow(new("FORGELINE skin alpha",1280,720));
+        using var device=GraphicsDeviceFactory.CreateForWindow(window,new(){ForceSoftwareAdapter=true,EnableVSync=false,EnableDebugLayer=true});
+        using(var resources=new UiSkinResources(device,fixture.Catalog,cancellationToken:TestContext.Current.CancellationToken))
+        using(var batch=new UiSkinBatch(device,resources))
+        {
+            byte[] Capture(float clear)=>device.CaptureFrame(new(clear,clear,clear,1),c=>
+            {c.BeginPass(GraphicsFramePass.Overlay);batch.Begin(c.Width,c.Height,c.FrameIndex);batch.Draw("ui.sprite.a",new(8,8,64,64),Vector4.One);batch.Flush(c);});
+            var dark=Capture(0);var bright=Capture(1);int pixel=(32*1280+32)*4;
+            Assert.InRange(dark[pixel],118,122);Assert.InRange(dark[pixel+1],58,62);Assert.InRange(dark[pixel+2],28,32);
+            Assert.InRange(bright[pixel],245,249);Assert.InRange(bright[pixel+1],185,189);Assert.InRange(bright[pixel+2],155,159);
+            Assert.Equal(dark,Capture(0));
+        }
+        device.WaitForIdle();Assert.Equal(0,device.Diagnostics.Resources.LoadedTextureCount);
+        Assert.Equal(0,device.Diagnostics.Health.SubmissionFaultCount);Assert.Equal(0,device.Diagnostics.Debug.ErrorCount);
+    }
     [StructLayout(LayoutKind.Sequential)] private readonly record struct Vertex(Vector2 P,Vector4 C,Vector2 U);
     private sealed class Fixture:IDisposable
     {
@@ -95,8 +117,9 @@ public sealed class UiSkinBatchTests
             var pages=new[]{new UiSkinPage("ui.page.a",32,32,UiSkinGroup.Core),new UiSkinPage("ui.page.b",32,32,UiSkinGroup.Core)};
             var skin=new RuntimeUiSkinData(pages,[new("ui.sprite.a",0,2,2,20,20,20,20,2,new(8,8,8,8),default,true),new("ui.sprite.b",1,2,2,20,20,20,20,2,default,default,false)]);
             var records=new List<RuntimeAssetRecord>();
-            Add("ui.page.a",RuntimeAssetType.Texture,"page-a.flasset",RuntimeTextureData.FromRgba8(32,32,new byte[4096],RuntimeTextureColorSpace.Linear,RuntimeTextureUsage.DisplayImage).ToPayload(),[]);
-            Add("ui.page.b",RuntimeAssetType.Texture,"page-b.flasset",RuntimeTextureData.FromRgba8(32,32,new byte[4096],RuntimeTextureColorSpace.Linear,RuntimeTextureUsage.DisplayImage).ToPayload(),[]);
+            byte[] pixels=new byte[4096];for(int i=0;i<pixels.Length;i+=4){pixels[i]=240;pixels[i+1]=120;pixels[i+2]=60;pixels[i+3]=128;}
+            Add("ui.page.a",RuntimeAssetType.Texture,"page-a.flasset",RuntimeTextureData.FromRgba8(32,32,pixels,RuntimeTextureColorSpace.Linear,RuntimeTextureUsage.DisplayImage).ToPayload(),[]);
+            Add("ui.page.b",RuntimeAssetType.Texture,"page-b.flasset",RuntimeTextureData.FromRgba8(32,32,pixels,RuntimeTextureColorSpace.Linear,RuntimeTextureUsage.DisplayImage).ToPayload(),[]);
             Add(UiSkinResources.AssetName,RuntimeAssetType.UiSkin,"skin.flasset",skin.ToPayload(),pages.Select(p=>p.Id).ToArray());
             var manifest=RuntimeAssetIntegrity.SealManifest(new(){CompilerVersion="test",Assets=records});
             File.WriteAllText(Path.Combine(Root,"manifest.json"),JsonSerializer.Serialize(manifest,RuntimeAssetCatalog.CreateJsonOptions()));
