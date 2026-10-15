@@ -129,6 +129,12 @@ jobs:
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.UiSkinBatchTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Graphical battlefield skin identity and native lifetime contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.BattlefieldProductionSkinTests ForgeLine.Presentation.Tests.ResourcePowerAlertHudTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Directorate skin package integrity and source exclusion
         shell: pwsh
         run: ./build/Test-UiSkinPackage.ps1

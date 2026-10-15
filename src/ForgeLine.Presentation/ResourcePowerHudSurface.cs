@@ -38,6 +38,7 @@ internal static class ResourcePowerHudModel
 
     public static string ResolvePowerStateLabel(
         in PlayerPowerSummary power) =>
+        !double.IsFinite(power.Generation) || !double.IsFinite(power.Demand) ? "UNAVAILABLE" :
         power.IsConstrained
             ? "CONSTRAINED"
             : "STABLE";
@@ -1064,16 +1065,12 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         return "";
     }
 
-    private static void AppendQuantity(
+    internal static void AppendQuantity(
         ref HudTextBuilder builder,
         double value)
     {
-        double normalized =
-            double.IsFinite(value)
-                ? Math.Max(
-                    0.0,
-                    value)
-                : 0.0;
+        if (!double.IsFinite(value)) { builder.Append("N/A"); return; }
+        double normalized = Math.Max(0.0, value);
 
         if (normalized >=
             1_000_000.0)

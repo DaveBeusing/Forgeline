@@ -6,6 +6,25 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class ResourcePowerAlertHudTests
 {
+    [Theory]
+    [InlineData(double.NaN, "N/A")]
+    [InlineData(double.PositiveInfinity, "N/A")]
+    [InlineData(double.NegativeInfinity, "N/A")]
+    [InlineData(0, "0")]
+    [InlineData(1200, "1.2K")]
+    public void UnknownQuantityCannotBePresentedAsARealZero(double value, string expected)
+    {
+        Span<char> buffer = stackalloc char[40];
+        var text = new HudTextBuilder(buffer);
+        ResourcePowerHudRenderer.AppendQuantity(ref text, value);
+        Assert.Equal(expected, text.Written.ToString());
+    }
+    [Fact]
+    public void UnknownPowerDoesNotClaimStableSupply()
+    {
+        Assert.Equal("UNAVAILABLE", ResourcePowerHudModel.ResolvePowerStateLabel(default(PlayerPowerSummary) with { Generation = double.NaN }));
+    }
+
     [Fact]
     public void ResourceMappingUsesOnlyAuthoritativePlayerSummaryResources()
     {

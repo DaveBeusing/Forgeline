@@ -15,7 +15,7 @@ internal enum UiReferenceScenario
     Technology, Contacts, DockFocus, DockHover, DockPressed, DockPending, DockAccepted,
     DockRejected, MinimapStrategic, Onboarding, SettingsAudio, SettingsGraphics, Controls,
     SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed,
-    SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary
+    SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary, ResourceUnknown
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -146,6 +146,10 @@ internal static class UiReferenceStates
             snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with { Selection = PlayerSelectionSummary.Empty });
         if (state == UiReferenceScenario.MissingPlayerData)
             snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances, snapshot.Intelligence, snapshot.SessionId);
+        if (state == UiReferenceScenario.ResourceUnknown)
+            snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
+            { Resources = new(double.NaN,double.NaN,double.NaN,double.NaN,double.NaN,double.NaN,double.NaN),
+                Power = snapshot.PlayerExperience.Value.Power with { Generation = double.NaN, Demand = double.NaN } });
         if (state == UiReferenceScenario.Onboarding)
             snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
                 snapshot.Intelligence, snapshot.SessionId, snapshot.PlayerExperience, playerActions: snapshot.PlayerActions,
