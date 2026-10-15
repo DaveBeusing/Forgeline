@@ -121,6 +121,14 @@ jobs:
         shell: pwsh
         run: ./build/Test-RuntimeAssetPipeline.ps1
 
+      - name: Compiled UI atlas and ordered skin contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Assets.Tests.UiSkinPipelineTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.UiSkinBatchTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Directorate skin package integrity and source exclusion
         shell: pwsh
         run: ./build/Test-UiSkinPackage.ps1
