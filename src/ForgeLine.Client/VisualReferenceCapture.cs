@@ -226,6 +226,11 @@ internal static class VisualReferenceCapture
                             IsActive = true, IsSelected = true, HasHealth = true, Health = .4, HasSupply = true,
                             SupplyStatus = BattlefieldSupplyStatus.Critical, Fuel = .12, Ammunition = .08,
                             HasReadiness = true, Readiness = .31, HasFormation = true, Formation = FormationTemplate.Wedge }], []) : CombatGroupOverviewView.Empty;
+                    if (uiScenario == UiReferenceScenario.SelectedGroup && SelectedCombatGroup.Resolve(snapshot) is { } groupMembers)
+                    {
+                        var selectedUnits = new SelectionSet(); selectedUnits.Replace(groupMembers.EligibleEntities);
+                        groups = new CombatGroupOverviewView([], [], SelectedCombatGroup.Create(groupMembers, selectedUnits));
+                    }
                     int recordFrameIndex = -1;
                     captureInputs.Clear();
                     Action<IGraphicsCommandContext> record = context =>

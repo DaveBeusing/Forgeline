@@ -15,7 +15,7 @@ internal enum UiReferenceScenario
     Technology, Contacts, DockFocus, DockHover, DockPressed, DockPending, DockAccepted,
     DockRejected, MinimapStrategic, Onboarding, SettingsAudio, SettingsGraphics, Controls,
     SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed,
-    SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary, ResourceUnknown
+    SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary, ResourceUnknown, SelectedGroup
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -154,6 +154,25 @@ internal static class UiReferenceStates
             snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
                 snapshot.Intelligence, snapshot.SessionId, snapshot.PlayerExperience, playerActions: snapshot.PlayerActions,
                 guidance: new PlayerGuidanceSummary(snapshot.SessionId, snapshot.Tick, snapshot.PlayerExperience!.Value.Player, default));
+        if (state == UiReferenceScenario.SelectedGroup)
+        {
+            var experience = snapshot.PlayerExperience!.Value;
+            var owned = snapshot.Instances.ToArray().Where(i => i.Selectable.Owner == experience.Player &&
+                i.Selectable.Category == ControllableEntityCategory.Unit).Take(3).ToArray();
+            if (owned.Length < 2) throw new InvalidDataException("Group fixture requires existing owned unit identities.");
+            var members = owned.Select((instance, index) => default(CombatGroupMemberReadModel) with
+            {
+                Entity = instance.Entity, Category = ControllableEntityCategory.Unit, Unit = instance.UnitFeature.Unit,
+                CombatEligible = true, HasHealth = true, HealthFraction = index == 0 ? .2 : .8,
+                HasSupply = true, SupplyStatus = index == 0 ? BattlefieldSupplyStatus.Critical : BattlefieldSupplyStatus.Supplied,
+                FuelFraction = .3, AmmunitionFraction = .4, HasReadiness = true, Readiness = .6
+            }).ToArray();
+            snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
+                snapshot.Intelligence, snapshot.SessionId, experience with { Selection = PlayerSelectionSummary.Empty with
+                { Count = members.Length, Kind = PlayerSelectionKind.Unit, DisplayName = "Selected combat group" } },
+                playerActions: snapshot.PlayerActions, vfxMetrics: snapshot.VfxMetrics,
+                combatGroups: new CombatGroupOperationalSnapshot(snapshot.Tick, members, snapshot.SessionId));
+        }
         return (snapshot, panel);
     }
 

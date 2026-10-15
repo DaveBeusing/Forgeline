@@ -328,8 +328,10 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             { text.Append(bindings.Prompt(GameplayAction.Formation)); text.Append(" "); text.Append(formation switch { FormationTemplate.Line => "LINE", FormationTemplate.Column => "COLUMN", FormationTemplate.Wedge => "WEDGE", _ => "COMPACT" }); text.Append(" NEXT"); enabled = group.CombatCount > 0; }
             else { text.Append("FOCUS GROUP"); enabled = group.LiveCount > 0; }
             if (!_skin.Control(rect, enabled)) EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? GameplayHudVisualStyle.PanelRaised : PanelColor, width, height);
-            EmitClippedText(text.Written, rect.X + _scale, rect.Y + _scale, rect.Right - _scale,
-                enabled ? TextColor : MutedTextColor, width, height);
+            if (!_text.Add(text.Written, rect.X + _scale, rect.Y + _scale, 9 * _scale,
+                enabled ? TextColor : MutedTextColor, width, height, rect.Width - 2 * _scale))
+                EmitClippedText(text.Written, rect.X + _scale, rect.Y + _scale, rect.Right - _scale,
+                    enabled ? TextColor : MutedTextColor, width, height);
         }
         text = new HudTextBuilder(buffer);
         text.Append("LAST CMD ");
@@ -346,9 +348,13 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         text.Append(value * 100, "F0"); text.Append("%("); text.Append(count); text.Append(")");
     }
 
-    private void GroupText(ReadOnlySpan<char> text, float offset, in HudRect region, Vector4 color, int width, int height) =>
-        EmitClippedText(text, region.X + 6 * _scale, region.Y + offset * _scale,
-            region.Right - 6 * _scale, color, width, height);
+    private void GroupText(ReadOnlySpan<char> text, float offset, in HudRect region, Vector4 color, int width, int height)
+    {
+        if (!_text.Add(text, region.X + 6 * _scale, region.Y + offset * _scale, 10 * _scale,
+            color, width, height, region.Width - 12 * _scale))
+            EmitClippedText(text, region.X + 6 * _scale, region.Y + offset * _scale,
+                region.Right - 6 * _scale, color, width, height);
+    }
 
     private void EmitInspector(
         in PlayerSelectionSummary selection,
