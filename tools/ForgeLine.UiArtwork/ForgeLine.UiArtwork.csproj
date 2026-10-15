@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/ForgeLine.Presentation/ForgeLine.Presentation.csproj" />
+    <ProjectReference Include="../../src/ForgeLine.Platform.Windows/ForgeLine.Platform.Windows.csproj" />
+    <Compile Include="../../src/ForgeLine.Client/ReferenceCaptureImage.cs" Link="ReferenceCaptureImage.cs" />
+  </ItemGroup>
+</Project>
