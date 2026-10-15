@@ -1,5 +1,8 @@
 # Native visual reference evidence
 
+The [native UI qualification record](UiVisualQualification.md) retains the full
+frontend/HUD matrix, exact sources, before/after evidence and explicit acceptance gaps.
+
 Named UI requests extend this same capture lane with `uiScenarios`, `uiScales` and
 `cinematicFrontend`. The default remains `World`; existing world fixture files and
 fingerprints are retained. UI requests use the fixed BattlefieldCombat normal-zoom

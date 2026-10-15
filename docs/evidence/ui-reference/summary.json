@@ -1,0 +1,337 @@
+{
+  "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+  "cases": 1305,
+  "cohorts": [
+    {
+      "name": "ui-reference-stable-dpi96",
+      "dpi": 96,
+      "cases": 435,
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "build": "0.1.369-dev+61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "runtimeFingerprint": "C50A837AD74D0A8F3F95EF00947499F69957D6CBA89185DEFA1E07FABD189B39",
+      "clientAssemblySha256": "8D3973135B1BDD6AB97B42D70C70967F48E79F00D6215B9AE0B045FA1CB7761D",
+      "presentationAssemblySha256": "F048321938730DE6E5BA8E1A1B3F667B34E2ABCA9854C81024F55BF85AE63988",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "device": {
+        "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+        "dedicatedVideoMemoryBytes": 25309478912,
+        "isSoftwareAdapter": false,
+        "featureLevel": "Level_12_1",
+        "debugLayerEnabled": false,
+        "advanced": {
+          "meshShaderQuerySucceeded": true,
+          "meshShadersSupported": true,
+          "raytracingQuerySucceeded": true,
+          "raytracingSupported": true
+        }
+      },
+      "environment": {
+        "os": "Microsoft Windows 10.0.26300",
+        "architecture": "X64",
+        "logicalProcessors": 24,
+        "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+        "configuration": "Release"
+      },
+      "rawManifestSha256": "4841caa7f5c5f96a178316ae6f7b1c22b594b754f70178f995c171c52ececb0a",
+      "software": false,
+      "warmups": 3,
+      "samples": 8,
+      "visualAcceptance": "pending",
+      "runtimeFramework": ".NET 10.0.12",
+      "fixtureVersion": 3,
+      "fixtureFingerprint": "5EB51829C2002B94B0CBAECA14DF3110AF566E01CF19688BFDD398AF6B08E723",
+      "seed": 2026,
+      "tick": 32,
+      "requestedQuality": "Medium",
+      "hostWindow": {
+        "width": 1280,
+        "height": 720,
+        "isEmpty": false
+      }
+    },
+    {
+      "name": "ui-reference-stable-dpi144",
+      "dpi": 144,
+      "cases": 435,
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "build": "0.1.369-dev+61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "runtimeFingerprint": "C50A837AD74D0A8F3F95EF00947499F69957D6CBA89185DEFA1E07FABD189B39",
+      "clientAssemblySha256": "8D3973135B1BDD6AB97B42D70C70967F48E79F00D6215B9AE0B045FA1CB7761D",
+      "presentationAssemblySha256": "F048321938730DE6E5BA8E1A1B3F667B34E2ABCA9854C81024F55BF85AE63988",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "device": {
+        "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+        "dedicatedVideoMemoryBytes": 25309478912,
+        "isSoftwareAdapter": false,
+        "featureLevel": "Level_12_1",
+        "debugLayerEnabled": false,
+        "advanced": {
+          "meshShaderQuerySucceeded": true,
+          "meshShadersSupported": true,
+          "raytracingQuerySucceeded": true,
+          "raytracingSupported": true
+        }
+      },
+      "environment": {
+        "os": "Microsoft Windows 10.0.26300",
+        "architecture": "X64",
+        "logicalProcessors": 24,
+        "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+        "configuration": "Release"
+      },
+      "rawManifestSha256": "00e948d13f8ad5731f2754f5bbacbd528510fce3b176e4687dd1473416d0c3d4",
+      "software": false,
+      "warmups": 3,
+      "samples": 8,
+      "visualAcceptance": "pending",
+      "runtimeFramework": ".NET 10.0.12",
+      "fixtureVersion": 3,
+      "fixtureFingerprint": "5EB51829C2002B94B0CBAECA14DF3110AF566E01CF19688BFDD398AF6B08E723",
+      "seed": 2026,
+      "tick": 32,
+      "requestedQuality": "Medium",
+      "hostWindow": {
+        "width": 1280,
+        "height": 720,
+        "isEmpty": false
+      }
+    },
+    {
+      "name": "ui-reference-dpi192-1280x720",
+      "dpi": 192,
+      "cases": 87,
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "build": "0.1.369-dev+61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "runtimeFingerprint": "C50A837AD74D0A8F3F95EF00947499F69957D6CBA89185DEFA1E07FABD189B39",
+      "clientAssemblySha256": "8D3973135B1BDD6AB97B42D70C70967F48E79F00D6215B9AE0B045FA1CB7761D",
+      "presentationAssemblySha256": "F048321938730DE6E5BA8E1A1B3F667B34E2ABCA9854C81024F55BF85AE63988",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "device": {
+        "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+        "dedicatedVideoMemoryBytes": 25309478912,
+        "isSoftwareAdapter": false,
+        "featureLevel": "Level_12_1",
+        "debugLayerEnabled": false,
+        "advanced": {
+          "meshShaderQuerySucceeded": true,
+          "meshShadersSupported": true,
+          "raytracingQuerySucceeded": true,
+          "raytracingSupported": true
+        }
+      },
+      "environment": {
+        "os": "Microsoft Windows 10.0.26300",
+        "architecture": "X64",
+        "logicalProcessors": 24,
+        "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+        "configuration": "Release"
+      },
+      "rawManifestSha256": "6334e82d7a5a47bb079545b39e4ec3482f876b6971d997279c9db6216607c59b",
+      "software": false,
+      "warmups": 3,
+      "samples": 8,
+      "visualAcceptance": "pending",
+      "runtimeFramework": ".NET 10.0.12",
+      "fixtureVersion": 3,
+      "fixtureFingerprint": "5EB51829C2002B94B0CBAECA14DF3110AF566E01CF19688BFDD398AF6B08E723",
+      "seed": 2026,
+      "tick": 32,
+      "requestedQuality": "Medium",
+      "hostWindow": {
+        "width": 1280,
+        "height": 720,
+        "isEmpty": false
+      }
+    },
+    {
+      "name": "ui-reference-dpi192-1920x1080",
+      "dpi": 192,
+      "cases": 87,
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "build": "0.1.369-dev+61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "runtimeFingerprint": "C50A837AD74D0A8F3F95EF00947499F69957D6CBA89185DEFA1E07FABD189B39",
+      "clientAssemblySha256": "8D3973135B1BDD6AB97B42D70C70967F48E79F00D6215B9AE0B045FA1CB7761D",
+      "presentationAssemblySha256": "F048321938730DE6E5BA8E1A1B3F667B34E2ABCA9854C81024F55BF85AE63988",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "device": {
+        "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+        "dedicatedVideoMemoryBytes": 25309478912,
+        "isSoftwareAdapter": false,
+        "featureLevel": "Level_12_1",
+        "debugLayerEnabled": false,
+        "advanced": {
+          "meshShaderQuerySucceeded": true,
+          "meshShadersSupported": true,
+          "raytracingQuerySucceeded": true,
+          "raytracingSupported": true
+        }
+      },
+      "environment": {
+        "os": "Microsoft Windows 10.0.26300",
+        "architecture": "X64",
+        "logicalProcessors": 24,
+        "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+        "configuration": "Release"
+      },
+      "rawManifestSha256": "08d178b90d641424ba07c601d7f595afa5b70b7a2f7d42f163f6b7ceaa6d9dbe",
+      "software": false,
+      "warmups": 3,
+      "samples": 8,
+      "visualAcceptance": "pending",
+      "runtimeFramework": ".NET 10.0.12",
+      "fixtureVersion": 3,
+      "fixtureFingerprint": "5EB51829C2002B94B0CBAECA14DF3110AF566E01CF19688BFDD398AF6B08E723",
+      "seed": 2026,
+      "tick": 32,
+      "requestedQuality": "Medium",
+      "hostWindow": {
+        "width": 1280,
+        "height": 720,
+        "isEmpty": false
+      }
+    },
+    {
+      "name": "ui-reference-dpi192-2560x1440",
+      "dpi": 192,
+      "cases": 87,
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "build": "0.1.369-dev+61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "runtimeFingerprint": "C50A837AD74D0A8F3F95EF00947499F69957D6CBA89185DEFA1E07FABD189B39",
+      "clientAssemblySha256": "8D3973135B1BDD6AB97B42D70C70967F48E79F00D6215B9AE0B045FA1CB7761D",
+      "presentationAssemblySha256": "F048321938730DE6E5BA8E1A1B3F667B34E2ABCA9854C81024F55BF85AE63988",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "device": {
+        "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+        "dedicatedVideoMemoryBytes": 25309478912,
+        "isSoftwareAdapter": false,
+        "featureLevel": "Level_12_1",
+        "debugLayerEnabled": false,
+        "advanced": {
+          "meshShaderQuerySucceeded": true,
+          "meshShadersSupported": true,
+          "raytracingQuerySucceeded": true,
+          "raytracingSupported": true
+        }
+      },
+      "environment": {
+        "os": "Microsoft Windows 10.0.26300",
+        "architecture": "X64",
+        "logicalProcessors": 24,
+        "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+        "configuration": "Release"
+      },
+      "rawManifestSha256": "6b9f92203912bdfcf5390452b81e768a085eda0cd27c3acd00d6bc40a0809334",
+      "software": false,
+      "warmups": 3,
+      "samples": 8,
+      "visualAcceptance": "pending",
+      "runtimeFramework": ".NET 10.0.12",
+      "fixtureVersion": 3,
+      "fixtureFingerprint": "5EB51829C2002B94B0CBAECA14DF3110AF566E01CF19688BFDD398AF6B08E723",
+      "seed": 2026,
+      "tick": 32,
+      "requestedQuality": "Medium",
+      "hostWindow": {
+        "width": 1280,
+        "height": 720,
+        "isEmpty": false
+      }
+    },
+    {
+      "name": "ui-reference-dpi192-3440x1440",
+      "dpi": 192,
+      "cases": 87,
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "build": "0.1.369-dev+61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "runtimeFingerprint": "C50A837AD74D0A8F3F95EF00947499F69957D6CBA89185DEFA1E07FABD189B39",
+      "clientAssemblySha256": "8D3973135B1BDD6AB97B42D70C70967F48E79F00D6215B9AE0B045FA1CB7761D",
+      "presentationAssemblySha256": "F048321938730DE6E5BA8E1A1B3F667B34E2ABCA9854C81024F55BF85AE63988",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "device": {
+        "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+        "dedicatedVideoMemoryBytes": 25309478912,
+        "isSoftwareAdapter": false,
+        "featureLevel": "Level_12_1",
+        "debugLayerEnabled": false,
+        "advanced": {
+          "meshShaderQuerySucceeded": true,
+          "meshShadersSupported": true,
+          "raytracingQuerySucceeded": true,
+          "raytracingSupported": true
+        }
+      },
+      "environment": {
+        "os": "Microsoft Windows 10.0.26300",
+        "architecture": "X64",
+        "logicalProcessors": 24,
+        "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+        "configuration": "Release"
+      },
+      "rawManifestSha256": "56ce87b545fc9017c398ca61dbc170f1cb352dd58221a9a64b6c69b78c47a4e8",
+      "software": false,
+      "warmups": 3,
+      "samples": 8,
+      "visualAcceptance": "pending",
+      "runtimeFramework": ".NET 10.0.12",
+      "fixtureVersion": 3,
+      "fixtureFingerprint": "5EB51829C2002B94B0CBAECA14DF3110AF566E01CF19688BFDD398AF6B08E723",
+      "seed": 2026,
+      "tick": 32,
+      "requestedQuality": "Medium",
+      "hostWindow": {
+        "width": 1280,
+        "height": 720,
+        "isEmpty": false
+      }
+    },
+    {
+      "name": "ui-reference-dpi192-3840x2160",
+      "dpi": 192,
+      "cases": 87,
+      "source": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "build": "0.1.369-dev+61f67dfa6f81031b9d798ea92c4410393f84763f",
+      "runtimeFingerprint": "C50A837AD74D0A8F3F95EF00947499F69957D6CBA89185DEFA1E07FABD189B39",
+      "clientAssemblySha256": "8D3973135B1BDD6AB97B42D70C70967F48E79F00D6215B9AE0B045FA1CB7761D",
+      "presentationAssemblySha256": "F048321938730DE6E5BA8E1A1B3F667B34E2ABCA9854C81024F55BF85AE63988",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "device": {
+        "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+        "dedicatedVideoMemoryBytes": 25309478912,
+        "isSoftwareAdapter": false,
+        "featureLevel": "Level_12_1",
+        "debugLayerEnabled": false,
+        "advanced": {
+          "meshShaderQuerySucceeded": true,
+          "meshShadersSupported": true,
+          "raytracingQuerySucceeded": true,
+          "raytracingSupported": true
+        }
+      },
+      "environment": {
+        "os": "Microsoft Windows 10.0.26300",
+        "architecture": "X64",
+        "logicalProcessors": 24,
+        "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+        "configuration": "Release"
+      },
+      "rawManifestSha256": "a0b38c697267cecfa7571352d597598466d6149c1324ae8d7599b72d4f6ca8e9",
+      "software": false,
+      "warmups": 3,
+      "samples": 8,
+      "visualAcceptance": "pending",
+      "runtimeFramework": ".NET 10.0.12",
+      "fixtureVersion": 3,
+      "fixtureFingerprint": "5EB51829C2002B94B0CBAECA14DF3110AF566E01CF19688BFDD398AF6B08E723",
+      "seed": 2026,
+      "tick": 32,
+      "requestedQuality": "Medium",
+      "hostWindow": {
+        "width": 1280,
+        "height": 720,
+        "isEmpty": false
+      }
+    }
+  ],
+  "visualAcceptance": "pending",
+  "method": "Original native RGBA/PNG hashes and measurements selected from completed manifests. No image transformation, golden approval, physical-monitor or sustained-performance acceptance."
+}

@@ -1,0 +1,55 @@
+{
+  "baselineCommit": "4f9d8605e4ef0ee1d716e7e9dfd048d209fbb157",
+  "visualAcceptance": "pending",
+  "captures": [
+    {
+      "cpuMeanMs": 15.017162500000001,
+      "sameRuntime": true,
+      "visualReview": "pending",
+      "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay",
+      "gpuMeanMs": 18.2891584,
+      "equivalentHardware": true,
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "sameSource": false,
+      "comparison": "exact-file-match",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -31.145462500000004
+    },
+    {
+      "cpuMeanMs": 27.445175,
+      "sameRuntime": true,
+      "visualReview": "pending",
+      "key": "BattlefieldCombat-3840x2160-Medium-NormalGameplay",
+      "gpuMeanMs": 37.228416,
+      "equivalentHardware": true,
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "sameSource": false,
+      "comparison": "exact-file-match",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -10.330012500000002
+    }
+  ],
+  "schemaVersion": 1,
+  "imageGateRequested": false,
+  "imageFailures": [],
+  "channelTolerance": 0,
+  "structural": "pass",
+  "maximumChangedPixelFraction": 0.0,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "pixelComparisonRequested": true,
+  "commit": "dcdd5b81b8e076e3a0d80baff3fcd9306b302459"
+}

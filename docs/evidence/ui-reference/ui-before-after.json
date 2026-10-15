@@ -1,0 +1,2231 @@
+{
+  "visualAcceptance": "pending",
+  "schemaVersion": 1,
+  "commit": "61f67dfa6f81031b9d798ea92c4410393f84763f",
+  "baselineCommit": "8ba1892b1b4e2b276431694da0ff6063e58bfa87",
+  "imageGateRequested": false,
+  "imageFailures": [],
+  "channelTolerance": 0,
+  "structural": "pass",
+  "maximumChangedPixelFraction": 0.0,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "pixelComparisonRequested": true,
+  "captures": [
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 2.1479625,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenu-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.2339136,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.945325,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenu-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.310816,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "details"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 1.1699375,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenu-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 163,
+        "MeanAbsoluteChannelDelta": 6.1658322482638885,
+        "ChangedPixels": 253146,
+        "ChangedPixelFraction": 0.2746809895833333,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -2.7479625,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.42934400000000006,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 32.682175,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenuFocus-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.2813653333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 2.6708375,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenuFocus-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.3914624,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "details"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 24.152562500000002,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenuFocus-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 163,
+        "MeanAbsoluteChannelDelta": 6.1658322482638885,
+        "ChangedPixels": 253146,
+        "ChangedPixelFraction": 0.2746809895833333,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": 22.0809375,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.2651733333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 2.33745,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenuDisabled-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.45802239999999994,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.3302375,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenuDisabled-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.533648,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "details"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 1.230975,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenuDisabled-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 163,
+        "MeanAbsoluteChannelDelta": 6.1658322482638885,
+        "ChangedPixels": 253146,
+        "ChangedPixelFraction": 0.2746809895833333,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -0.2837375000000002,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.343856,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.2405499999999998,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenuReveal-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.6643626666666668,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.1667125,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenuReveal-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.3540586666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "details"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 15.175862500000001,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMenuReveal-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 163,
+        "MeanAbsoluteChannelDelta": 6.1658322482638885,
+        "ChangedPixels": 253146,
+        "ChangedPixelFraction": 0.2746809895833333,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": 11.890037500000002,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.2862133333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.2366125000000001,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoading-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.405616,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.191575,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoading-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.6521173333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "details"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 1.3564625,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoading-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 170,
+        "MeanAbsoluteChannelDelta": 1.9879573567708333,
+        "ChangedPixels": 85212,
+        "ChangedPixelFraction": 0.0924609375,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": 0.01143749999999999,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.5846186666666666,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 60.93325,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadingError-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.34851733333333335,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.1874875,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadingError-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.422448,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "details"
+        },
+        {
+          "nonuniform": false,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": false,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": false,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 1.477975,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadingError-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 170,
+        "MeanAbsoluteChannelDelta": 1.9879573567708333,
+        "ChangedPixels": 85212,
+        "ChangedPixelFraction": 0.0924609375,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -0.02212499999999995,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.3901333333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 54.3422125,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiNewGame-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.675008,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.5157250000000002,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiNewGame-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.394528,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "details"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 100.1136375,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiNewGame-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 170,
+        "MeanAbsoluteChannelDelta": 1.9879573567708333,
+        "ChangedPixels": 85212,
+        "ChangedPixelFraction": 0.0924609375,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": 98.5585375,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.6568746666666666,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 33.884775,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadGame-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.6819573333333334,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.5361249999999997,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadGame-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.5204213333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "details"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 14.665500000000002,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadGame-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 170,
+        "MeanAbsoluteChannelDelta": 1.9879573567708333,
+        "ChangedPixels": 85212,
+        "ChangedPixelFraction": 0.0924609375,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": 11.980362500000002,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.29899733333333334,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.2333625,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadEmpty-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.5454880000000001,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 97.60612499999999,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadEmpty-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.4802133333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "details"
+        },
+        {
+          "nonuniform": false,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 26.937625,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadEmpty-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 170,
+        "MeanAbsoluteChannelDelta": 1.9879573567708333,
+        "ChangedPixels": 85212,
+        "ChangedPixelFraction": 0.0924609375,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": 24.8167,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.3784693333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.471125,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadBroken-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.24762133333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.6271875,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadBroken-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.6493226666666666,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "details"
+        },
+        {
+          "nonuniform": false,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 1.4655624999999999,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLoadBroken-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 170,
+        "MeanAbsoluteChannelDelta": 1.9879573567708333,
+        "ChangedPixels": 85212,
+        "ChangedPixelFraction": 0.0924609375,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -1.695125,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.6121120000000001,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 37.6439,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiSettingsLong-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.28989333333333334,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.6144124999999998,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiSettingsLong-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.9744586666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "details"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 1.3027125000000002,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiSettingsLong-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 170,
+        "MeanAbsoluteChannelDelta": 1.9879573567708333,
+        "ChangedPixels": 85212,
+        "ChangedPixelFraction": 0.0924609375,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -1.2071874999999999,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.3675466666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.3562,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiControlsLong-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.232464,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 18.2775875,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiControlsLong-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.4612213333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "details"
+        },
+        {
+          "nonuniform": false,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 2.1268375,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiControlsLong-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": 0.09345000000000026,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.5812053333333332,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 11.132912500000002,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiPause-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.091071999999999,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 9.00485,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiPause-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.439568,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "details"
+        },
+        {
+          "nonuniform": false,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 8.835325000000001,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiPause-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 223,
+        "MeanAbsoluteChannelDelta": 5.573161892361111,
+        "ChangedPixels": 185772,
+        "ChangedPixelFraction": 0.20157552083333333,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -7.004462499999999,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.784101333333332,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.304875,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiCredits-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.3631946666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 1.4077125000000001,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiCredits-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.43094933333333335,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "title"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "navigation"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "details"
+        },
+        {
+          "nonuniform": false,
+          "unchanged": true,
+          "name": "primary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "secondary-action"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "feedback"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 14.061687500000001,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiCredits-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 170,
+        "MeanAbsoluteChannelDelta": 1.9879573567708333,
+        "ChangedPixels": 85212,
+        "ChangedPixelFraction": 0.0924609375,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": 12.4891625,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 0.34399466666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 8.888625,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiResourcePressure-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.175653333333335,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 8.9294,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiResourcePressure-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.554890666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 8.840962500000002,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiResourcePressure-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": -2.903112499999997,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.92736,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 17.8336625,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLowPower-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.956170666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 9.2570875,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLowPower-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.119690666666665,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 14.201225,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiLowPower-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": -0.411487499999998,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 11.984538666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 9.007025,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiSupplyCritical-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.285098666666668,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 8.9674375,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiSupplyCritical-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.979551999999998,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 9.007225,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiSupplyCritical-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": -4.496099999999998,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.976890666666668,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 9.102712499999999,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMixedSelection-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.893221333333335,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 65.5629625,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMixedSelection-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.300211200000001,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 14.632337499999998,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMixedSelection-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": 1.523137499999999,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.096170666666666,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 8.9461875,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiTargeting-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.902938666666666,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 15.17475,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiTargeting-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 11.978975999999998,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 9.214224999999999,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiTargeting-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 231,
+        "MeanAbsoluteChannelDelta": 3.4378040907118055,
+        "ChangedPixels": 87721,
+        "ChangedPixelFraction": 0.09518337673611112,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -5.775562500000001,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 14.294981333333334,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 9.0234,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiQueueBlocked-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.91747733333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 8.8613125,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiQueueBlocked-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.882912,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 9.069275,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiQueueBlocked-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": -5.6867375,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 14.019344000000002,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 67.05817499999999,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiTechnology-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.705669333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 14.9736,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiTechnology-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.448879999999997,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 8.9665875,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiTechnology-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": -6.605762500000001,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.147013333333334,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 14.90935,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiContacts-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.685535999999999,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 8.0013875,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiContacts-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 11.811157333333334,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 8.807862499999999,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiContacts-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 230,
+        "MeanAbsoluteChannelDelta": 1.1525,
+        "ChangedPixels": 30766,
+        "ChangedPixelFraction": 0.03338324652777778,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -4.452537500000002,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.723776,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 8.969025,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockFocus-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.015834666666668,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 9.183462500000001,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockFocus-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.973946666666668,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 8.99225,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockFocus-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 230,
+        "MeanAbsoluteChannelDelta": 1.368771701388889,
+        "ChangedPixels": 33878,
+        "ChangedPixelFraction": 0.03675998263888889,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -4.1170375,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.176271999999999,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 16.0230125,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockHover-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.954421333333334,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 62.0922625,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockHover-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.726885333333334,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 44.103175,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockHover-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 230,
+        "MeanAbsoluteChannelDelta": 1.1742198350694444,
+        "ChangedPixels": 30235,
+        "ChangedPixelFraction": 0.032807074652777775,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": 30.334575,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.498122666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 8.905674999999999,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockPressed-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.675994666666666,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 14.5621625,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockPressed-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.636272,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": false,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 8.774312499999999,
+      "comparison": "pixels-require-human-review",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockPressed-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 230,
+        "MeanAbsoluteChannelDelta": 1.3147214084201388,
+        "ChangedPixels": 30765,
+        "ChangedPixelFraction": 0.03338216145833333,
+        "WithinTolerance": false
+      },
+      "cpuMeanDeltaMs": -0.770737500000001,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.689482666666668,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 9.291475,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockPending-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 14.193456,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 9.0775375,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockPending-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.241402666666668,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 8.7507625,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockPending-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": -3.7292875,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.558608000000001,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 8.604825,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockAccepted-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.26072,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 20.693875,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockAccepted-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.493482666666667,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 7.7803,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockAccepted-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": -7.469050000000001,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 12.097621333333334,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 23.3882125,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockRejected-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.733973333333333,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 9.6509375,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockRejected-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 13.635855999999999,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 16.593125,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiDockRejected-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": 8.9802625,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 11.65696,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 11.6275875,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMinimapStrategic-Scale0.75",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 17.773146666666666,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "cpuMeanMs": 14.988399999999999,
+      "comparison": "no-matched-baseline",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMinimapStrategic-Scale1.00",
+      "pixelComparison": null,
+      "cpuMeanDeltaMs": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 15.970176,
+      "sameRuntime": false
+    },
+    {
+      "regionChanges": [
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "resources"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "selection"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "action-dock"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "alerts"
+        },
+        {
+          "nonuniform": true,
+          "unchanged": true,
+          "name": "minimap"
+        }
+      ],
+      "sameSource": false,
+      "equivalentHardware": true,
+      "cpuMeanMs": 11.148187499999999,
+      "comparison": "exact-file-match",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiMinimapStrategic-Scale2.00",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanDeltaMs": 0.511362499999997,
+      "visualReview": "pending",
+      "structural": "pass",
+      "gpuMeanMs": 17.14095466666667,
+      "sameRuntime": false
+    }
+  ]
+}
