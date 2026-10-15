@@ -152,7 +152,7 @@ internal static class CommandDockCapture
         var logistics = new PlayerLogisticsActionReadModel(entity,
             [new(new(30,1), ResourceIds.Steel, "Steel", 12, 20, 100, 180, LogisticsStockPriority.Normal, true,
                 blocked ? PlayerDistributionActionState.Waiting : PlayerDistributionActionState.Traveling,
-                LogisticsTransportRequestFailureReason.None, LogisticsBottleneckReason.None, new(31,1))], null);
+                blocked ? LogisticsTransportRequestFailureReason.NoRoute : LogisticsTransportRequestFailureReason.None, LogisticsBottleneckReason.None, new(31,1))], null);
         var supply = new PlayerSupplyActionReadModel(entity, BattlefieldSupplyStatus.Critical, .15, .08, true, .4, .5,
             new(31,1), blocked ? PlayerSupplyProviderState.Blocked : PlayerSupplyProviderState.Traveling, 50, 40, default);
         var tactical = new PlayerTacticalActionReadModel([entity], 2, 1, 1, 1, 0, false, true, default, default,

@@ -15,7 +15,8 @@ internal enum UiReferenceScenario
     Technology, Contacts, DockFocus, DockHover, DockPressed, DockPending, DockAccepted,
     DockRejected, MinimapStrategic, Onboarding, SettingsAudio, SettingsGraphics, Controls,
     SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed,
-    SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary, ResourceUnknown, SelectedGroup
+    SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary, ResourceUnknown, SelectedGroup,
+    Operations, OperationsEmpty, OperationsMissing, ProductionQueue, LogisticsBlocked, SupplyPolicy, TechnologyBlocked, DockQueueTooltip, DockTechnologyTooltip
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -113,16 +114,20 @@ internal static class UiReferenceStates
         if (IsFrontend(state)) return (source, default);
         string dockState = state switch
         {
-            UiReferenceScenario.QueueBlocked => "Blocked", UiReferenceScenario.DockPending => "Pending",
+            UiReferenceScenario.QueueBlocked or UiReferenceScenario.LogisticsBlocked or UiReferenceScenario.SupplyPolicy or UiReferenceScenario.TechnologyBlocked or UiReferenceScenario.DockQueueTooltip => "Blocked", UiReferenceScenario.DockPending => "Pending",
             UiReferenceScenario.DockAccepted => "Accepted", UiReferenceScenario.DockRejected => "Rejected",
-            UiReferenceScenario.Technology => "Queue", _ => "Ready"
+            UiReferenceScenario.Technology or UiReferenceScenario.ProductionQueue or UiReferenceScenario.DockTechnologyTooltip => "Queue", _ => "Ready"
         };
-        var mode = state == UiReferenceScenario.Technology ? PlayerActionPanelMode.Technology :
+        var mode = state is UiReferenceScenario.Technology or UiReferenceScenario.TechnologyBlocked or UiReferenceScenario.DockTechnologyTooltip ? PlayerActionPanelMode.Technology :
+            state == UiReferenceScenario.ProductionQueue ? PlayerActionPanelMode.Production :
+            state == UiReferenceScenario.LogisticsBlocked ? PlayerActionPanelMode.Logistics :
+            state == UiReferenceScenario.SupplyPolicy ? PlayerActionPanelMode.Supply :
             state == UiReferenceScenario.Targeting ? PlayerActionPanelMode.Tactical :
             state is UiReferenceScenario.Contacts or UiReferenceScenario.DockFocus or UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed
                 ? PlayerActionPanelMode.Construction : PlayerActionPanelMode.UnitProduction;
         var (snapshot, panel) = CommandDockCapture.Fixture(source, mode, dockState, width, height, dpi, scale);
-        panel = panel with { SelectedIndex = state == UiReferenceScenario.DockFocus ? 1 : 0,
+        panel = panel with { SelectedIndex = state == UiReferenceScenario.DockFocus || state == UiReferenceScenario.ProductionQueue ? 1 :
+            state is UiReferenceScenario.QueueBlocked or UiReferenceScenario.DockQueueTooltip ? 2 : 0,
             HoveredIndex = state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed ? 1 : -1,
             PointerPressed = state == UiReferenceScenario.DockPressed };
         if (state is UiReferenceScenario.ResourcePressure or UiReferenceScenario.LowPower or UiReferenceScenario.SupplyCritical or UiReferenceScenario.MixedSelection)
@@ -172,6 +177,16 @@ internal static class UiReferenceStates
                 { Count = members.Length, Kind = PlayerSelectionKind.Unit, DisplayName = "Selected combat group" } },
                 playerActions: snapshot.PlayerActions, vfxMetrics: snapshot.VfxMetrics,
                 combatGroups: new CombatGroupOperationalSnapshot(snapshot.Tick, members, snapshot.SessionId));
+        }
+        if (state is UiReferenceScenario.Operations or UiReferenceScenario.OperationsEmpty or UiReferenceScenario.OperationsMissing)
+        {
+            snapshot = BattlefieldHudCapture.State(snapshot, "Production");
+            var data = snapshot.Operations!;
+            if (state != UiReferenceScenario.Operations)
+                snapshot = new(snapshot.Tick,snapshot.TickDuration,snapshot.SimulationEntityCount,snapshot.Instances,snapshot.Intelligence,snapshot.SessionId,
+                    snapshot.PlayerExperience,playerActions:snapshot.PlayerActions,vfxMetrics:snapshot.VfxMetrics,alerts:snapshot.Alerts,
+                    operations: state == UiReferenceScenario.OperationsMissing ? null : new(data.Session,data.Tick,data.Player,[],data.Resources,[],0,0));
+            panel = default;
         }
         return (snapshot, panel);
     }
