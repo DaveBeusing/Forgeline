@@ -180,6 +180,8 @@ else {
     Publish-Client -Destination $publishDirectory | Out-Null
 }
 
+& "$PSScriptRoot/Validate-UiSkinPackage.ps1" -PublishRoot $publishDirectory
+
 Compress-Archive -Path (Join-Path $publishDirectory "*") -DestinationPath $archivePath -CompressionLevel Optimal
 $archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
 "$archiveHash  $([System.IO.Path]::GetFileName($archivePath))" | Set-Content "$archivePath.sha256" -Encoding utf8NoBOM

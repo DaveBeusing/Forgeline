@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.panel.raised",
+  "type": "texture",
+  "source": "panel_raised.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -7,6 +7,11 @@ outputs through the normal compiler; see [environment composition](EnvironmentDr
 
 ## Purpose
 
+The text-free Directorate UI skin sources and editable vector masters use this
+same compiler boundary. See [skin artwork](UiSkinArtwork.md),
+[surface coverage](UiSurfaceCatalog.md) and [source qualification](UiSkinQualification.md).
+Reference boards stay outside source discovery and player packaging.
+
 The five Directorate industrial building kits are editable JSON component
 assemblies exported by `python build/Author-IndustrialBuildings.py`. Their glTF
 LOD/state/module sources pass through this same compiler and verified manifest;

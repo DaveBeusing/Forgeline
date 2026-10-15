@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.overlay.disabled",
+  "type": "texture",
+  "source": "overlay_disabled.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

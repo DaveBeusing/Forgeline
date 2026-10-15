@@ -121,6 +121,10 @@ jobs:
         shell: pwsh
         run: ./build/Test-RuntimeAssetPipeline.ps1
 
+      - name: Directorate skin package integrity and source exclusion
+        shell: pwsh
+        run: ./build/Test-UiSkinPackage.ps1
+
       - name: Cinematic menu image and native lifecycle contracts
         shell: pwsh
         run: |

@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.overlay.error",
+  "type": "texture",
+  "source": "overlay_error.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

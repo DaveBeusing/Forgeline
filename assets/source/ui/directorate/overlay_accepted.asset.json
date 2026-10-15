@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.overlay.accepted",
+  "type": "texture",
+  "source": "overlay_accepted.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

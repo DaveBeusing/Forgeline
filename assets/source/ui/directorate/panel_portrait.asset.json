@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.panel.portrait",
+  "type": "texture",
+  "source": "panel_portrait.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}
