@@ -209,8 +209,8 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
     {
         ThrowIfDisposed();
         _text.Begin();
-        if (graphics.Width > 0 && graphics.Height > 0) _skin.Begin(graphics);
         ArgumentNullException.ThrowIfNull(graphics);
+        if (graphics.Width > 0 && graphics.Height > 0) _skin.Begin(graphics);
         ArgumentNullException.ThrowIfNull(snapshot);
 
         if (graphics.Width <= 0 ||

@@ -68,9 +68,9 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     {
         ThrowIfDisposed();
         _text.Begin();
-        if (context.Width > 0 && context.Height > 0) _skin.Begin(context);
         _bindings = preAlphaUx.Bindings ?? GameplayBindingRegistry.Default;
         ArgumentNullException.ThrowIfNull(context);
+        if (context.Width > 0 && context.Height > 0) _skin.Begin(context);
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(combatGroups);
