@@ -31,6 +31,9 @@ public sealed record RuntimeAssetQualificationReport
 
     public required int MaterialCount { get; init; }
 
+    public int UiSkinCount { get; init; }
+    public long UiSkinRuntimeBytes { get; init; }
+
     public required long TotalRuntimeBytes { get; init; }
 
     public required long MeshRuntimeBytes { get; init; }
@@ -103,6 +106,8 @@ public static class RuntimeAssetQualification
         long textureBytes = 0;
         long studioSplashTextureBytes = 0;
         long materialBytes = 0;
+        long skinBytes = 0;
+        int skinCount = 0;
         int meshCount = 0;
         int textureCount = 0;
         int materialCount = 0;
@@ -155,6 +160,17 @@ public static class RuntimeAssetQualification
                         _ =
                             RuntimeTextureData.FromPayload(
                                 content.Payload);
+                        break;
+
+                    case RuntimeAssetType.UiSkin:
+                        var skin = RuntimeUiSkinData.FromPayload(content.Payload);
+                        foreach (var page in skin.Pages)
+                        {
+                            var pageId = AssetId.Parse(page.Id);
+                            if (!record.Dependencies.Contains(page.Id, StringComparer.Ordinal) || catalog.Get(pageId).Type != RuntimeAssetType.Texture)
+                                throw new InvalidDataException("UI page must be an explicit texture dependency.");
+                            RuntimeUiSkinData.ValidatePage(page, RuntimeTextureData.FromPayload(catalog.Read(pageId).Payload));
+                        }
                         break;
 
                     case RuntimeAssetType.Material:
@@ -214,6 +230,10 @@ public static class RuntimeAssetQualification
                     }
                     break;
 
+                case RuntimeAssetType.UiSkin:
+                    skinCount++; skinBytes = checked(skinBytes + runtimeBytes);
+                    break;
+
                 case RuntimeAssetType.Material:
                     materialCount++;
                     materialBytes =
@@ -233,6 +253,7 @@ public static class RuntimeAssetQualification
 
         return new RuntimeAssetQualificationReport
         {
+            UiSkinCount = skinCount, UiSkinRuntimeBytes = skinBytes,
             AssetCount =
                 catalog.Manifest.Assets.Count,
             MeshCount =

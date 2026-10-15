@@ -11,9 +11,8 @@ remain authoritative; the original import was completed in the preceding change.
 Production sources are in `assets/source/ui/directorate/`. Each sprite has an
 editable SVG, a native-size RGBA PNG and an ordinary texture `.asset.json`.
 `skin.catalog.json` is an **authoring contract**, not a new runtime format or
-loader. The existing compiler alone creates the runtime textures. The subsequent
-atlas/skin renderer must compile the slice/state mapping into its own validated
-contract and must not read this source JSON in the player.
+loader. The existing compiler alone creates the runtime textures. The [compiled atlas renderer](UiAtlasRendering.md) now consumes these sources
+through validated compiled mapping and never reads this source JSON in the player.
 
 ## Visual contract
 
@@ -113,6 +112,7 @@ are reported separately in [qualification](UiSkinQualification.md).
 ## Consumer handoff
 
 [Surface catalog](UiSurfaceCatalog.md) assigns existing owners and migration lanes.
-Atlas renderer, semantic icon/portrait production and all live integrations remain
-subsequent scopes. Bootstrap, diagnostics and failure paths must stay independent
+Semantic icon/portrait production and the compiled atlas renderer are implemented;
+only the representative first menu control is migrated. Remaining surfaces stay
+in their documented migration lanes. Bootstrap, diagnostics and failure paths must stay independent
 of skin availability. No simulation/headless dependency changes are necessary.

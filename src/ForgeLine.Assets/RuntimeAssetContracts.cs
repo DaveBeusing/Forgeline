@@ -5,6 +5,7 @@ public enum RuntimeAssetType
     Mesh = 1,
     Texture = 2,
     Material = 3,
+    UiSkin = 4,
 }
 
 public readonly record struct AssetBounds(

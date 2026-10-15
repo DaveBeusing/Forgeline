@@ -367,3 +367,12 @@ are verified before parsing, and GPU work remains with the render owner.
 Publish builds or validates runtime content before copying the exact qualified
 records. Simulation and headless dependencies are unchanged. See
 [Precompiled runtime asset integrity](adr/PrecompiledRuntimeAssetIntegrity.md).
+
+## Compiled UI ownership
+
+Assets owns the bounded binary UI skin/region contract and validates page semantics.
+AssetCompiler owns source JSON ingestion and authored-region/page validation.
+Presentation owns shared creating-thread page leases, ordered UiSkinBatch geometry
+and the representative menu control. Graphics retains device, descriptors and
+fence/resource retirement. UI retains input geometry and commands. No Simulation
+or Headless project references change. See [compiled UI atlases](UiAtlasRendering.md).

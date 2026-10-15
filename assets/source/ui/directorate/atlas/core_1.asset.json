@@ -1,0 +1,9 @@
+{
+  "id": "ui.atlas.directorate.core.p1",
+  "type": "texture",
+  "source": "core_1.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

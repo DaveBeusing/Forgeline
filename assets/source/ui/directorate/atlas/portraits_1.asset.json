@@ -1,0 +1,9 @@
+{
+  "id": "ui.atlas.directorate.portraits.p1",
+  "type": "texture",
+  "source": "portraits_1.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.atlas.directorate.icons.p2",
+  "type": "texture",
+  "source": "icons_2.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

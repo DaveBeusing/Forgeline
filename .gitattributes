@@ -10,3 +10,8 @@ assets/source/ui/directorate/**/*.svg text eol=lf
 docs/qualification/directorate-ui-artwork/*.csv text eol=lf
 docs/qualification/directorate-ui-artwork/**/*.json text eol=lf
 docs/qualification/directorate-ui-artwork/terrain/native-manifest.json -text
+assets/source/ui/directorate/atlas/*.json text eol=lf
+
+docs/qualification/directorate-ui-atlas/*.json text eol=lf
+docs/qualification/directorate-ui-atlas/native-manifest.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/qualification/directorate-ui-atlas/packaged-*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

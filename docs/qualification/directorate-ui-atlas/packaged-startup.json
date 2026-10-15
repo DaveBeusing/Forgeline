@@ -1,0 +1,407 @@
+{
+  "SchemaVersion": 1,
+  "ProcessId": "1e0f0f78-12ed-4f47-9be6-74cac5d2dfb9",
+  "LaunchId": 1,
+  "ProcessEntryTimestamp": 2993581362652,
+  "StopwatchFrequency": 10000000,
+  "ApplicationReadiness": "Ready",
+  "SessionReadiness": "Ready",
+  "DroppedEvents": 0,
+  "Events": [
+    {
+      "Sequence": 1,
+      "SessionId": 0,
+      "Phase": "ProcessEntered",
+      "Kind": "Milestone",
+      "Timestamp": 2993581362652,
+      "ElapsedMilliseconds": 0,
+      "DurationMilliseconds": null,
+      "Detail": "Managed entry; excludes runtime bootstrap"
+    },
+    {
+      "Sequence": 2,
+      "SessionId": 0,
+      "Phase": "Launch",
+      "Kind": "Started",
+      "Timestamp": 2993582850475,
+      "ElapsedMilliseconds": 148.7823,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 3,
+      "SessionId": 0,
+      "Phase": "Run",
+      "Kind": "Started",
+      "Timestamp": 2993582850487,
+      "ElapsedMilliseconds": 148.7835,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 4,
+      "SessionId": 0,
+      "Phase": "Window",
+      "Kind": "Started",
+      "Timestamp": 2993582854705,
+      "ElapsedMilliseconds": 149.2053,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 5,
+      "SessionId": 0,
+      "Phase": "Window",
+      "Kind": "Completed",
+      "Timestamp": 2993583656021,
+      "ElapsedMilliseconds": 229.3369,
+      "DurationMilliseconds": 80.1316,
+      "Detail": null
+    },
+    {
+      "Sequence": 6,
+      "SessionId": 0,
+      "Phase": "WindowVisible",
+      "Kind": "Milestone",
+      "Timestamp": 2993583656281,
+      "ElapsedMilliseconds": 229.3629,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 7,
+      "SessionId": 0,
+      "Phase": "Settings",
+      "Kind": "Started",
+      "Timestamp": 2993592867681,
+      "ElapsedMilliseconds": 1150.5029,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 8,
+      "SessionId": 0,
+      "Phase": "Settings",
+      "Kind": "Completed",
+      "Timestamp": 2993599623508,
+      "ElapsedMilliseconds": 1826.0856,
+      "DurationMilliseconds": 675.5827,
+      "Detail": null
+    },
+    {
+      "Sequence": 9,
+      "SessionId": 0,
+      "Phase": "BootRenderer",
+      "Kind": "Started",
+      "Timestamp": 2993603065907,
+      "ElapsedMilliseconds": 2170.3255,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 10,
+      "SessionId": 0,
+      "Phase": "RuntimeAssets",
+      "Kind": "Started",
+      "Timestamp": 2993603423442,
+      "ElapsedMilliseconds": 2206.079,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 11,
+      "SessionId": 0,
+      "Phase": "SaveCatalog",
+      "Kind": "Started",
+      "Timestamp": 2993603425079,
+      "ElapsedMilliseconds": 2206.2427,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 12,
+      "SessionId": 0,
+      "Phase": "SaveCatalog",
+      "Kind": "Completed",
+      "Timestamp": 2993603431249,
+      "ElapsedMilliseconds": 2206.8597,
+      "DurationMilliseconds": 0.617,
+      "Detail": null
+    },
+    {
+      "Sequence": 13,
+      "SessionId": 0,
+      "Phase": "StudioSplash",
+      "Kind": "Started",
+      "Timestamp": 2993603575626,
+      "ElapsedMilliseconds": 2221.2974,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 14,
+      "SessionId": 0,
+      "Phase": "StudioSplash",
+      "Kind": "Skipped",
+      "Timestamp": 2993603576480,
+      "ElapsedMilliseconds": 2221.3828,
+      "DurationMilliseconds": 0.0854,
+      "Detail": "SmokeMode"
+    },
+    {
+      "Sequence": 15,
+      "SessionId": 0,
+      "Phase": "RuntimeAssets",
+      "Kind": "Completed",
+      "Timestamp": 2993606464635,
+      "ElapsedMilliseconds": 2510.1983,
+      "DurationMilliseconds": 304.1193,
+      "Detail": null
+    },
+    {
+      "Sequence": 16,
+      "SessionId": 0,
+      "Phase": "RuntimeAssetsReady",
+      "Kind": "Milestone",
+      "Timestamp": 2993606464664,
+      "ElapsedMilliseconds": 2510.2012,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 17,
+      "SessionId": 0,
+      "Phase": "FrontendDependenciesReady",
+      "Kind": "Milestone",
+      "Timestamp": 2993606572585,
+      "ElapsedMilliseconds": 2520.9933,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 18,
+      "SessionId": 0,
+      "Phase": "BootRenderer",
+      "Kind": "Completed",
+      "Timestamp": 2993628895592,
+      "ElapsedMilliseconds": 4753.294,
+      "DurationMilliseconds": 2582.9685,
+      "Detail": null
+    },
+    {
+      "Sequence": 19,
+      "SessionId": 0,
+      "Phase": "GraphicsReady",
+      "Kind": "Milestone",
+      "Timestamp": 2993628895658,
+      "ElapsedMilliseconds": 4753.3006,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 20,
+      "SessionId": 0,
+      "Phase": "FirstPresentedFrame",
+      "Kind": "Milestone",
+      "Timestamp": 2993630402892,
+      "ElapsedMilliseconds": 4904.024,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 21,
+      "SessionId": 1,
+      "Phase": "SessionLoadRequested",
+      "Kind": "Milestone",
+      "Timestamp": 2993647870938,
+      "ElapsedMilliseconds": 6650.8286,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 22,
+      "SessionId": 1,
+      "Phase": "GameplayAssetsReady",
+      "Kind": "Milestone",
+      "Timestamp": 2993650262826,
+      "ElapsedMilliseconds": 6890.0174,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 23,
+      "SessionId": 1,
+      "Phase": "SessionReconstruction",
+      "Kind": "Started",
+      "Timestamp": 2993650262867,
+      "ElapsedMilliseconds": 6890.0215,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 24,
+      "SessionId": 1,
+      "Phase": "SessionConfiguration",
+      "Kind": "Started",
+      "Timestamp": 2993655310189,
+      "ElapsedMilliseconds": 7394.7537,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 25,
+      "SessionId": 1,
+      "Phase": "SessionConfiguration",
+      "Kind": "Completed",
+      "Timestamp": 2993655312234,
+      "ElapsedMilliseconds": 7394.9582,
+      "DurationMilliseconds": 0.2045,
+      "Detail": null
+    },
+    {
+      "Sequence": 26,
+      "SessionId": 1,
+      "Phase": "SessionAssembly",
+      "Kind": "Started",
+      "Timestamp": 2993655312246,
+      "ElapsedMilliseconds": 7394.9594,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 27,
+      "SessionId": 1,
+      "Phase": "SessionReconstruction",
+      "Kind": "Completed",
+      "Timestamp": 2993674375275,
+      "ElapsedMilliseconds": 9301.2623,
+      "DurationMilliseconds": 2411.2408,
+      "Detail": null
+    },
+    {
+      "Sequence": 28,
+      "SessionId": 1,
+      "Phase": "SessionAssembly",
+      "Kind": "Completed",
+      "Timestamp": 2993674375303,
+      "ElapsedMilliseconds": 9301.2651,
+      "DurationMilliseconds": 1906.3057,
+      "Detail": null
+    },
+    {
+      "Sequence": 29,
+      "SessionId": 1,
+      "Phase": "SessionRuntimeReady",
+      "Kind": "Milestone",
+      "Timestamp": 2993674466266,
+      "ElapsedMilliseconds": 9310.3614,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 30,
+      "SessionId": 1,
+      "Phase": "SessionPresentationBinding",
+      "Kind": "Started",
+      "Timestamp": 2993674466283,
+      "ElapsedMilliseconds": 9310.3631,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 31,
+      "SessionId": 1,
+      "Phase": "SessionPresentationBinding",
+      "Kind": "Completed",
+      "Timestamp": 2993678549649,
+      "ElapsedMilliseconds": 9718.6997,
+      "DurationMilliseconds": 408.3366,
+      "Detail": null
+    },
+    {
+      "Sequence": 32,
+      "SessionId": 1,
+      "Phase": "GameplayRenderer",
+      "Kind": "Started",
+      "Timestamp": 2993678549786,
+      "ElapsedMilliseconds": 9718.7134,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 33,
+      "SessionId": 1,
+      "Phase": "GameplayRenderer",
+      "Kind": "Completed",
+      "Timestamp": 2993687268800,
+      "ElapsedMilliseconds": 10590.6148,
+      "DurationMilliseconds": 871.9014,
+      "Detail": null
+    },
+    {
+      "Sequence": 34,
+      "SessionId": 1,
+      "Phase": "FirstGameplayFrame",
+      "Kind": "Milestone",
+      "Timestamp": 2993705428471,
+      "ElapsedMilliseconds": 12406.5819,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 35,
+      "SessionId": 1,
+      "Phase": "SessionReady",
+      "Kind": "Milestone",
+      "Timestamp": 2993705428492,
+      "ElapsedMilliseconds": 12406.584,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 36,
+      "SessionId": 0,
+      "Phase": "ApplicationReady",
+      "Kind": "Milestone",
+      "Timestamp": 2993705431867,
+      "ElapsedMilliseconds": 12406.9215,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 37,
+      "SessionId": 0,
+      "Phase": "Launch",
+      "Kind": "Completed",
+      "Timestamp": 2993705431912,
+      "ElapsedMilliseconds": 12406.926,
+      "DurationMilliseconds": 12258.1437,
+      "Detail": null
+    },
+    {
+      "Sequence": 38,
+      "SessionId": 1,
+      "Phase": "SessionRendererReady",
+      "Kind": "Milestone",
+      "Timestamp": 2993705558395,
+      "ElapsedMilliseconds": 12419.5743,
+      "DurationMilliseconds": null,
+      "Detail": null
+    },
+    {
+      "Sequence": 39,
+      "SessionId": 0,
+      "Phase": "Run",
+      "Kind": "Completed",
+      "Timestamp": 2993723979007,
+      "ElapsedMilliseconds": 14261.6355,
+      "DurationMilliseconds": 14112.852,
+      "Detail": null
+    }
+  ],
+  "OperatingSystemProcessId": 6768,
+  "BuildVersion": "0.1.375-dev\u002B935e3fccd7d52b3e3b9fa535249e837f512887d9",
+  "SourceRevision": "935e3fccd7d52b3e3b9fa535249e837f512887d9",
+  "Runtime": ".NET 10.0.12",
+  "OS": "Microsoft Windows 10.0.26300"
+}

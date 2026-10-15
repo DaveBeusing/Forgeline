@@ -112,3 +112,10 @@ review evidence, not automatic golden approval. See [HUD qualification](Battlefi
 Dock hierarchy: mode tabs, selected context, card title, availability/work status, captured quantities and progress, six rebound-key controls. Explicit operation labels replace ACT. LAST accepted/rejected feedback never promises production/delivery/research completion. Compact dock content fits its existing region without changing other HUD panels.
 
 See [dock qualification](CommandDockQualification.md) for before/after native images, reproducible matrix evidence and the distinction between reviewed candidates and human-accepted goldens.
+
+## Compiled skin foundation
+
+The [compiled skin path](UiAtlasRendering.md) prepares core pages and renders the
+first menu entry from the exact shared MenuRow(0) rectangle. Separate state art
+precedes existing live text. Other entries and HUD surfaces await their own
+migration; the presence of a source atlas is not full-surface visual acceptance.

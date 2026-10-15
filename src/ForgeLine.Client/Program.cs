@@ -26,6 +26,8 @@ internal static class Program
             return RunMenuAuthoring(args[1], args[2]);
         if (args.Length == 2 && args[0] == "--frontend-layout-capture")
             return RunLayoutCapture(args[1]);
+        if (args.Length == 3 && args[0] == "--ui-skin-capture")
+            return RunSkinCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--ui-typography-capture")
             return RunTypographyCapture(args[1], args[2]);
         if (args.Length == 2 && args[0] == "--reference-capture-request")
@@ -50,6 +52,9 @@ internal static class Program
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunLayoutCapture(string output) => FrontendLayoutCapture.Run(output);
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int RunSkinCapture(string output, string runtimeRoot) => UiSkinCapture.Run(output, runtimeRoot);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunTypographyCapture(string output, string runtimeRoot) => UiTypographyCapture.Run(output, runtimeRoot);

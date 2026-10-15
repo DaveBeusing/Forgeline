@@ -7,7 +7,7 @@ $runtime = Join-Path $output 'assets/runtime'
 New-Item -ItemType Directory -Path $runtime -Force | Out-Null
 $original = Get-Content -LiteralPath (Join-Path $RuntimeRoot 'manifest.json') -Raw
 $manifest = $original | ConvertFrom-Json
-$skin = @($manifest.assets | Where-Object { $_.id.StartsWith('ui.skin.directorate.', [StringComparison]::Ordinal) -or $_.id.StartsWith('ui.artwork.directorate.', [StringComparison]::Ordinal) })
+$skin = @($manifest.assets | Where-Object { $_.id.StartsWith('ui.skin.directorate.', [StringComparison]::Ordinal) -or $_.id.StartsWith('ui.artwork.directorate.', [StringComparison]::Ordinal) -or $_.id.StartsWith('ui.atlas.directorate.', [StringComparison]::Ordinal) })
 foreach ($record in $skin) {
     $target = Join-Path $runtime $record.runtimePath
     New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null

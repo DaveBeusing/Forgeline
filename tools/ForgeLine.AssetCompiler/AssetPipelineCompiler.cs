@@ -5,7 +5,7 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.9.0";
+    public const string CompilerVersion = "1.10.0";
     public const int RuntimeVersion = RuntimeAssetIntegrity.SupportedRuntimeVersion;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
@@ -126,7 +126,7 @@ public static class AssetPipelineCompiler
                     : "invalid-payload-or-path";
                 reporter.Report("asset", "rebuild", id: node.Id.Value, path: node.SourcePath,
                     detail: $"reason={rebuildReason} type={node.Definition.Type} format={node.Definition.TextureFormat} quality={node.Definition.TextureCompressionQuality}");
-                var imported = reporter.Measure("import", () => Import(node, normalizedSourceRoot, nodes, reporter), node.Id.Value, node.SourcePath);
+                var imported = reporter.Measure("import", () => Import(node, normalizedSourceRoot, nodes, recordsById, normalizedRuntimeRoot, reporter), node.Id.Value, node.SourcePath);
                 AddCompilationDiagnostic(
                     node,
                     imported,
@@ -318,6 +318,7 @@ public static class AssetPipelineCompiler
             RuntimeAssetType.Mesh => extension is ".gltf" or ".glb",
             RuntimeAssetType.Texture => extension is ".png" or ".tga",
             RuntimeAssetType.Material => extension == ".json",
+            RuntimeAssetType.UiSkin => extension == ".json",
             _ => false,
         };
 
@@ -542,6 +543,13 @@ public static class AssetPipelineCompiler
                     ownerId.Value,
                     ToRelativePath(sourceRoot, sourcePath)));
             }
+        }
+
+        if (definition.Type == RuntimeAssetType.UiSkin)
+        {
+            try { rawDependencies.AddRange(UiSkinImporter.Read(sourcePath).Pages.Select(p => p.Id)); }
+            catch (Exception e) when (e is IOException or JsonException or InvalidDataException or ArgumentException)
+            { diagnostics.Add(new("ASSET015", AssetCompilerDiagnosticSeverity.Error, e.Message, ownerId.Value)); }
         }
 
         var result = new SortedSet<AssetId>(Comparer<AssetId>.Create(
@@ -892,7 +900,7 @@ public static class AssetPipelineCompiler
     private static ImportedAssetPayload Import(
         AssetNode node,
         string sourceRoot,
-        IReadOnlyDictionary<AssetId, AssetNode> nodes, AssetCompilationReporter reporter)
+        IReadOnlyDictionary<AssetId, AssetNode> nodes, IReadOnlyDictionary<AssetId, RuntimeAssetRecord> records, string runtimeRoot, AssetCompilationReporter reporter)
     {
         if (node.Definition.Type == RuntimeAssetType.Mesh)
         {
@@ -922,6 +930,7 @@ public static class AssetPipelineCompiler
                 node.Definition.TextureFormat,
                 node.Definition.TextureCompressionQuality, reporter, node.Id.Value),
             RuntimeAssetType.Material => MaterialImporter.Import(node.SourcePath),
+            RuntimeAssetType.UiSkin => UiSkinImporter.Import(node.SourcePath, records, runtimeRoot),
             _ => throw new InvalidDataException(
                 $"Asset type '{node.Definition.Type}' is unsupported."),
         };
@@ -1043,6 +1052,7 @@ public static class AssetPipelineCompiler
             RuntimeAssetType.Mesh => "meshes",
             RuntimeAssetType.Texture => "textures",
             RuntimeAssetType.Material => "materials",
+            RuntimeAssetType.UiSkin => "ui-skins",
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
         };
 

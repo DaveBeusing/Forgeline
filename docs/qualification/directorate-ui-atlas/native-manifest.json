@@ -1,0 +1,929 @@
+{
+  "schemaVersion": 1,
+  "source": "0.1.375-dev\u002B935e3fccd7d52b3e3b9fa535249e837f512887d9",
+  "runtimeSignature": "b6cbe90cbbd4dfc780abb28f5d42f7bc3b469ae0cf4e663f594975a2bfd219d9",
+  "adapter": {
+    "AdapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+    "DedicatedVideoMemoryBytes": 25309478912,
+    "IsSoftwareAdapter": false,
+    "FeatureLevel": "Level_12_1",
+    "DebugLayerEnabled": false,
+    "Advanced": {
+      "MeshShaderQuerySucceeded": true,
+      "MeshShadersSupported": true,
+      "RaytracingQuerySucceeded": true,
+      "RaytracingSupported": true
+    }
+  },
+  "cases": [
+    {
+      "image": "fixture-0-1280x720-dark.png",
+      "sha256": "9e185c4de045cd1b1dcb35467e1f5c952efdacd92383a90a58abe699666c1a3f",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 8,
+        "TextureReleaseCount": 0
+      }
+    },
+    {
+      "image": "fixture-0-1280x720-bright.png",
+      "sha256": "04a8c44b13967f987ec36406a3e2ec26dfb47c14a34921087cdd7432e7a55573",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 8,
+        "TextureReleaseCount": 0
+      }
+    },
+    {
+      "image": "fixture-0-1920x1080-dark.png",
+      "sha256": "acc0dd11af85283b8e3ee12f365293cdc0a86aa9121d5812adf0481794ee1159",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 8,
+        "TextureReleaseCount": 0
+      }
+    },
+    {
+      "image": "fixture-0-1920x1080-bright.png",
+      "sha256": "d6642022b5db32a76ad838731e68266a888de66603a7b44613c5ee189e3eedc7",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 8,
+        "TextureReleaseCount": 0
+      }
+    },
+    {
+      "image": "fixture-1-1280x720-dark.png",
+      "sha256": "9e185c4de045cd1b1dcb35467e1f5c952efdacd92383a90a58abe699666c1a3f",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 16,
+        "TextureReleaseCount": 8
+      }
+    },
+    {
+      "image": "fixture-1-1280x720-bright.png",
+      "sha256": "04a8c44b13967f987ec36406a3e2ec26dfb47c14a34921087cdd7432e7a55573",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 16,
+        "TextureReleaseCount": 8
+      }
+    },
+    {
+      "image": "fixture-1-1920x1080-dark.png",
+      "sha256": "acc0dd11af85283b8e3ee12f365293cdc0a86aa9121d5812adf0481794ee1159",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 16,
+        "TextureReleaseCount": 8
+      }
+    },
+    {
+      "image": "fixture-1-1920x1080-bright.png",
+      "sha256": "d6642022b5db32a76ad838731e68266a888de66603a7b44613c5ee189e3eedc7",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 16,
+        "TextureReleaseCount": 8
+      }
+    },
+    {
+      "image": "fixture-2-1280x720-dark.png",
+      "sha256": "9e185c4de045cd1b1dcb35467e1f5c952efdacd92383a90a58abe699666c1a3f",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 24,
+        "TextureReleaseCount": 16
+      }
+    },
+    {
+      "image": "fixture-2-1280x720-bright.png",
+      "sha256": "04a8c44b13967f987ec36406a3e2ec26dfb47c14a34921087cdd7432e7a55573",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 24,
+        "TextureReleaseCount": 16
+      }
+    },
+    {
+      "image": "fixture-2-1920x1080-dark.png",
+      "sha256": "acc0dd11af85283b8e3ee12f365293cdc0a86aa9121d5812adf0481794ee1159",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 24,
+        "TextureReleaseCount": 16
+      }
+    },
+    {
+      "image": "fixture-2-1920x1080-bright.png",
+      "sha256": "d6642022b5db32a76ad838731e68266a888de66603a7b44613c5ee189e3eedc7",
+      "repeatPixelsEqual": true,
+      "core": {
+        "PageBytes": 4194304,
+        "Textures": 1,
+        "SharedLeases": 1,
+        "Uploads": 1,
+        "Draws": 11,
+        "Vertices": 1506,
+        "VertexUploadBytes": 48192,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 8
+      },
+      "icons": {
+        "PageBytes": 8388608,
+        "Textures": 2,
+        "SharedLeases": 1,
+        "Uploads": 2,
+        "Draws": 1,
+        "Vertices": 108,
+        "VertexUploadBytes": 3456,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "portraits": {
+        "PageBytes": 16777216,
+        "Textures": 4,
+        "SharedLeases": 1,
+        "Uploads": 4,
+        "Draws": 2,
+        "Vertices": 48,
+        "VertexUploadBytes": 1536,
+        "DroppedQuads": 0,
+        "MissingAssets": 0,
+        "BufferCount": 4
+      },
+      "text": {
+        "Glyphs": 81,
+        "Vertices": 486,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 15552,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "resources": {
+        "LoadedTextureCount": 8,
+        "ResidentTextureBytes": 37748736,
+        "ShaderResourceDescriptorsUsed": 8,
+        "ShaderResourceDescriptorCapacity": 4096,
+        "TextureBindingFailureCount": 0,
+        "PeakLoadedTextureCount": 8,
+        "PeakResidentTextureBytes": 37748736,
+        "PeakShaderResourceDescriptorsUsed": 8,
+        "TextureUploadCount": 24,
+        "TextureReleaseCount": 16
+      }
+    }
+  ],
+  "baseline": {
+    "LoadedTextureCount": 0,
+    "ResidentTextureBytes": 0,
+    "ShaderResourceDescriptorsUsed": 0,
+    "ShaderResourceDescriptorCapacity": 4096,
+    "TextureBindingFailureCount": 0,
+    "PeakLoadedTextureCount": 0,
+    "PeakResidentTextureBytes": 0,
+    "PeakShaderResourceDescriptorsUsed": 0,
+    "TextureUploadCount": 0,
+    "TextureReleaseCount": 0
+  },
+  "final": {
+    "Device": {
+      "AdapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+      "DedicatedVideoMemoryBytes": 25309478912,
+      "IsSoftwareAdapter": false,
+      "FeatureLevel": "Level_12_1",
+      "DebugLayerEnabled": false,
+      "Advanced": {
+        "MeshShaderQuerySucceeded": true,
+        "MeshShadersSupported": true,
+        "RaytracingQuerySucceeded": true,
+        "RaytracingSupported": true
+      }
+    },
+    "Surface": {
+      "Width": 1920,
+      "Height": 1080,
+      "BufferCount": 3,
+      "FrameIndex": 2,
+      "IsSuspended": false,
+      "PresentMode": "Immediate",
+      "IsOccluded": false,
+      "ResizePending": false,
+      "ResizeGeneration": 5,
+      "AppliedResizeGeneration": 5,
+      "SubmittedFrameCount": 61,
+      "PresentedFrameCount": 61
+    },
+    "PostProcessing": {
+      "Supported": true,
+      "Antialiasing": 0,
+      "ResolutionScale": 1,
+      "SceneTargets": 0,
+      "ScenePayloadBytes": 0,
+      "IntermediateTargets": 0,
+      "HistoryTargets": 0,
+      "MaximumSceneSamples": 0,
+      "GpuSubmissionFence": 119,
+      "GpuMilliseconds": null
+    },
+    "Frame": {
+      "Plan": {
+        "Output": {
+          "Width": 1920,
+          "Height": 1080,
+          "Format": 0,
+          "Lifetime": 0,
+          "ResourceCount": 3,
+          "PayloadBytes": 24883200
+        },
+        "Depth": {
+          "Width": 1920,
+          "Height": 1080,
+          "Format": 2,
+          "Lifetime": 1,
+          "ResourceCount": 1,
+          "PayloadBytes": 8294400
+        },
+        "OverlayDepth": null,
+        "DepthShaderReadable": false,
+        "Scene": null,
+        "Shadow": null,
+        "TransientPayloadBytes": 0
+      },
+      "CpuSubmission": 61,
+      "WorldCpuMilliseconds": 0.1661,
+      "OverlayCpuMilliseconds": 42.0003,
+      "GpuSubmissionFence": 119,
+      "WorldGpuMilliseconds": 0.04864,
+      "OverlayGpuMilliseconds": 0.223904,
+      "CompositeCpuMilliseconds": null,
+      "CompositeDrawCalls": 0,
+      "CompositeGpuMilliseconds": null,
+      "GpuTimingUnavailableReason": null,
+      "IntermediateUnavailableReason": "Linear scene composition is disabled."
+    },
+    "Particles": {
+      "DepthEnabled": false,
+      "GpuSubmissionFence": 0,
+      "UpdateAndRenderGpuMilliseconds": null,
+      "DepthDescriptors": 0
+    },
+    "DirectionalShadows": {
+      "Quality": 0,
+      "Resolution": 0,
+      "CascadeCount": 0,
+      "TexturePayloadBytes": 0,
+      "ShaderResourceDescriptors": 0,
+      "DrawCalls": 0,
+      "SubmittedCasters": 0,
+      "CpuMilliseconds": null,
+      "GpuSubmissionFence": 0,
+      "GpuMilliseconds": null,
+      "CpuSubmission": 61,
+      "ConstantUploadBytes": 0,
+      "MaximumPcfDepthSamples": 0
+    },
+    "Atmosphere": {
+      "Quality": 0,
+      "Applied": false,
+      "DepthDescriptors": 0,
+      "AdditionalTargetBytes": 0,
+      "EffectiveDensity": 0,
+      "CpuSubmission": 61,
+      "GpuSubmissionFence": 119,
+      "CompositionGpuMilliseconds": null,
+      "UnavailableReason": "Atmospheric fog is disabled.",
+      "RequiredScenePayloadBytes": 0,
+      "LocalHaze": null,
+      "MaximumLocalDensityEvaluations": 0
+    },
+    "Memory": {
+      "Available": true,
+      "LocalBudgetBytes": 24504172544,
+      "LocalUsageBytes": 80547840,
+      "NonLocalBudgetBytes": 50152030208,
+      "NonLocalUsageBytes": 60301312,
+      "FailureReason": null
+    },
+    "Health": {
+      "LiveResourceCount": 0,
+      "PendingRetirementCount": 0,
+      "PeakPendingRetirementCount": 3,
+      "ReleasedResourceCount": 219,
+      "FenceWaitCount": 28,
+      "SubmissionFaultCount": 0,
+      "FailureReasonCode": null
+    },
+    "Resources": {
+      "LoadedTextureCount": 0,
+      "ResidentTextureBytes": 0,
+      "ShaderResourceDescriptorsUsed": 0,
+      "ShaderResourceDescriptorCapacity": 4096,
+      "TextureBindingFailureCount": 0,
+      "PeakLoadedTextureCount": 8,
+      "PeakResidentTextureBytes": 37748736,
+      "PeakShaderResourceDescriptorsUsed": 8,
+      "TextureUploadCount": 26,
+      "TextureReleaseCount": 26
+    },
+    "GpuTimingAvailable": true,
+    "TimestampFrequencyHz": 1000000000,
+    "GpuFrameMilliseconds": 0.27264,
+    "Debug": {
+      "Enabled": false,
+      "WarningCount": 0,
+      "ErrorCount": 0
+    }
+  },
+  "menuImageSha256": "7fcb519de5027c511849554c7aa3e952fb04ef43ce37046cdccf8d08ab8549f2",
+  "status": "structural-pass",
+  "humanReview": "pending",
+  "limits": "Three repeated sessions, two output sizes, bright/dark native readback; no physical monitor or sustained frame-time acceptance."
+}

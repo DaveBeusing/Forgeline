@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "935e3fccd7d52b3e3b9fa535249e837f512887d9",
+  "runtimeSignature": "b6cbe90cbbd4dfc780abb28f5d42f7bc3b469ae0cf4e663f594975a2bfd219d9",
+  "nativeManifestSha256": "2b098a2ed25fa330cf0b912370099379f061ceb5e48635e450e6f1ec2db37a78",
+  "cases": 12,
+  "sessions": 3,
+  "outputs": [
+    "1280x720",
+    "1920x1080"
+  ],
+  "backgrounds": [
+    "bright",
+    "dark"
+  ],
+  "repeatPixelsEqual": true,
+  "residentPageBytes": 29360128,
+  "peakIncludingFontBytes": 37748736,
+  "peakTextureDescriptors": 8,
+  "finalTextureDescriptors": 0,
+  "textureUploads": 26,
+  "textureReleases": 26,
+  "debugLayerAvailable": false,
+  "humanAcceptance": "pending",
+  "timingAcceptance": "not_measured",
+  "files": [
+    {
+      "file": "fixture-0-1280x720-bright.png",
+      "bytes": 139857,
+      "sha256": "04a8c44b13967f987ec36406a3e2ec26dfb47c14a34921087cdd7432e7a55573"
+    },
+    {
+      "file": "fixture-0-1280x720-dark.png",
+      "bytes": 138010,
+      "sha256": "9e185c4de045cd1b1dcb35467e1f5c952efdacd92383a90a58abe699666c1a3f"
+    },
+    {
+      "file": "fixture-0-1920x1080-bright.png",
+      "bytes": 190024,
+      "sha256": "d6642022b5db32a76ad838731e68266a888de66603a7b44613c5ee189e3eedc7"
+    },
+    {
+      "file": "fixture-0-1920x1080-dark.png",
+      "bytes": 188088,
+      "sha256": "acc0dd11af85283b8e3ee12f365293cdc0a86aa9121d5812adf0481794ee1159"
+    },
+    {
+      "file": "fixture-1-1280x720-bright.png",
+      "bytes": 139857,
+      "sha256": "04a8c44b13967f987ec36406a3e2ec26dfb47c14a34921087cdd7432e7a55573"
+    },
+    {
+      "file": "fixture-1-1280x720-dark.png",
+      "bytes": 138010,
+      "sha256": "9e185c4de045cd1b1dcb35467e1f5c952efdacd92383a90a58abe699666c1a3f"
+    },
+    {
+      "file": "fixture-1-1920x1080-bright.png",
+      "bytes": 190024,
+      "sha256": "d6642022b5db32a76ad838731e68266a888de66603a7b44613c5ee189e3eedc7"
+    },
+    {
+      "file": "fixture-1-1920x1080-dark.png",
+      "bytes": 188088,
+      "sha256": "acc0dd11af85283b8e3ee12f365293cdc0a86aa9121d5812adf0481794ee1159"
+    },
+    {
+      "file": "fixture-2-1280x720-bright.png",
+      "bytes": 139857,
+      "sha256": "04a8c44b13967f987ec36406a3e2ec26dfb47c14a34921087cdd7432e7a55573"
+    },
+    {
+      "file": "fixture-2-1280x720-dark.png",
+      "bytes": 138010,
+      "sha256": "9e185c4de045cd1b1dcb35467e1f5c952efdacd92383a90a58abe699666c1a3f"
+    },
+    {
+      "file": "fixture-2-1920x1080-bright.png",
+      "bytes": 190024,
+      "sha256": "d6642022b5db32a76ad838731e68266a888de66603a7b44613c5ee189e3eedc7"
+    },
+    {
+      "file": "fixture-2-1920x1080-dark.png",
+      "bytes": 188088,
+      "sha256": "acc0dd11af85283b8e3ee12f365293cdc0a86aa9121d5812adf0481794ee1159"
+    },
+    {
+      "file": "menu-control.png",
+      "bytes": 132010,
+      "sha256": "7fcb519de5027c511849554c7aa3e952fb04ef43ce37046cdccf8d08ab8549f2"
+    }
+  ]
+}

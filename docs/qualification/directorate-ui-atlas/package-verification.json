@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "935e3fccd7d52b3e3b9fa535249e837f512887d9",
+  "sourceTreeClean": true,
+  "version": "0.1.375-dev",
+  "sdk": "10.0.401",
+  "runtimeSignature": "b6cbe90cbbd4dfc780abb28f5d42f7bc3b469ae0cf4e663f594975a2bfd219d9",
+  "archive": {
+    "file": "FORGELINE-0.1.375-dev-win-x64.zip",
+    "bytes": 39962628,
+    "sha256": "6886818cc84218cb637b7ee821b2852bc4ac52209a2fccedaf4edcc95963e47b",
+    "all1337PayloadHashes": "passed",
+    "sourceExclusions": "passed"
+  },
+  "reproduciblePublishTrees": "passed",
+  "startup": {
+    "applicationReadiness": "Ready",
+    "sessionReadiness": "Ready",
+    "droppedEvents": 0,
+    "isolatedSettings": true,
+    "reportSha256": "07d7a434c0d2f2853fb7e955823537e342cba73b4a893bc3e52cee862eb3fa59"
+  },
+  "packagedNative": {
+    "cases": 12,
+    "status": "structural-pass",
+    "allImagesIncludingMenuMatchDevelopmentBytes": true,
+    "manifestSha256": "ba79fa87a3c416d008e08c124a22198dc5ae7328f03d358a2bc5570c85ec7db8",
+    "casesVerified": [
+      {
+        "image": "fixture-0-1280x720-dark.png",
+        "sha256": "9e185c4de045cd1b1dcb35467e1f5c952efdacd92383a90a58abe699666c1a3f"
+      },
+      {
+        "image": "fixture-0-1280x720-bright.png",
+        "sha256": "04a8c44b13967f987ec36406a3e2ec26dfb47c14a34921087cdd7432e7a55573"
+      },
+      {
+        "image": "fixture-0-1920x1080-dark.png",
+        "sha256": "acc0dd11af85283b8e3ee12f365293cdc0a86aa9121d5812adf0481794ee1159"
+      },
+      {
+        "image": "fixture-0-1920x1080-bright.png",
+        "sha256": "d6642022b5db32a76ad838731e68266a888de66603a7b44613c5ee189e3eedc7"
+      },
+      {
+        "image": "fixture-1-1280x720-dark.png",
+        "sha256": "9e185c4de045cd1b1dcb35467e1f5c952efdacd92383a90a58abe699666c1a3f"
+      },
+      {
+        "image": "fixture-1-1280x720-bright.png",
+        "sha256": "04a8c44b13967f987ec36406a3e2ec26dfb47c14a34921087cdd7432e7a55573"
+      },
+      {
+        "image": "fixture-1-1920x1080-dark.png",
+        "sha256": "acc0dd11af85283b8e3ee12f365293cdc0a86aa9121d5812adf0481794ee1159"
+      },
+      {
+        "image": "fixture-1-1920x1080-bright.png",
+        "sha256": "d6642022b5db32a76ad838731e68266a888de66603a7b44613c5ee189e3eedc7"
+      },
+      {
+        "image": "fixture-2-1280x720-dark.png",
+        "sha256": "9e185c4de045cd1b1dcb35467e1f5c952efdacd92383a90a58abe699666c1a3f"
+      },
+      {
+        "image": "fixture-2-1280x720-bright.png",
+        "sha256": "04a8c44b13967f987ec36406a3e2ec26dfb47c14a34921087cdd7432e7a55573"
+      },
+      {
+        "image": "fixture-2-1920x1080-dark.png",
+        "sha256": "acc0dd11af85283b8e3ee12f365293cdc0a86aa9121d5812adf0481794ee1159"
+      },
+      {
+        "image": "fixture-2-1920x1080-bright.png",
+        "sha256": "d6642022b5db32a76ad838731e68266a888de66603a7b44613c5ee189e3eedc7"
+      }
+    ]
+  },
+  "humanAcceptance": "pending",
+  "requiredCi": "separate_current_head_gate",
+  "solutionTests": {
+    "sourceRevision": "935e3fccd7d52b3e3b9fa535249e837f512887d9",
+    "total": 2034,
+    "passed": 2025,
+    "failed": 0,
+    "skippedExistingOptIn": 9,
+    "durationMilliseconds": 404463
+  }
+}

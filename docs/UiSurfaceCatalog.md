@@ -12,7 +12,10 @@ remain authoritative for bounds; artwork never defines independent hit targets.
 live migration **pending**, human acceptance **pending**. Existing reference PNGs
 are direction, not preexisting runtime skin. Rows marked **retain** intentionally
 preserve data-driven geometry or asset-independent failure/diagnostic paths.
-No migrated or accepted status is inferred from this inventory.
+The [compiled atlas renderer](UiAtlasRendering.md) now draws the first main-menu
+entry from the shared MenuRow(0) rectangle, including focus/disabled overlays.
+Only that representative control is migrated; human acceptance is pending.
+No other migrated or accepted status is inferred from this inventory.
 
 Skin names below abbreviate `ui.skin.directorate.`. Shared control states are
 normal/base, hover, pressed, focus, selected, disabled and applicable semantic
@@ -30,7 +33,7 @@ text atlas. Shared geometry is `FrontendGeometry` in Presentation; interaction i
 | Studio splash, regular/bootstrap/fade | `ForgeLine.Client/StudioSplashVideoRenderer`, `UndefinedBehaviorStudioSplash`; existing video/embedded fallback mark | Frontend splash composition; noninteractive | retain canonical mark; bootstrap remains independent |
 | Main menu backdrop, ready/loading/missing | `FrontendOverlayRenderer`, `FrontendMenuBackground`; compiled `branding.forgeline.menu.directorate`, procedural schematic fallback | `Background`, `MenuArtwork` | retain image; panel.primary for navigation shell |
 | Product mark, tagline, version/footer | `FrontendOverlayRenderer`, `FrontendBrandMark`; embedded canonical wordmark | `Header`, `Footer` | retain marks/live text; control.separator |
-| Main menu entries, focus/disabled/hover/press | `FrontendOverlayRenderer`; geometric rows | `Navigation`, `MenuRow`, `MainMenuModel` | control.button, shared overlays |
+| Main menu entries, focus/disabled/hover/press | `FrontendOverlayRenderer`; first row compiled skin, remaining rows geometric | `Navigation`, `MenuRow`, `MainMenuModel` | control.button, shared overlays |
 | Loading progress, preparation, cancellation/error | `FrontendOverlayRenderer`; geometric track/fill | `Details`, `PrimaryAction`, `SecondaryAction`, `FrontendLoadingController` | panel.dialog, progress.*, control.button, overlay.error |
 | New game scenario/seed/options, start/back | `FrontendOverlayRenderer`; detail rows | `DetailRow`, `DetailValue`, `NewGameModel` | panel.primary, control.row, control.button |
 | Load game list, selected/valid/empty/broken/incompatible/error | `FrontendOverlayRenderer`; detail rows | `Details`, `DetailRow`, `LoadGameModel` | control.row, panel.inset, overlays.selected/error/disabled |
