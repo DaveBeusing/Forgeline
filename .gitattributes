@@ -15,3 +15,8 @@ assets/source/ui/directorate/atlas/*.json text eol=lf
 docs/qualification/directorate-ui-atlas/*.json text eol=lf
 docs/qualification/directorate-ui-atlas/native-manifest.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/qualification/directorate-ui-atlas/packaged-*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Immutable native qualification records keep their original byte hashes.
+docs/qualification/graphical-frontend/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/qualification/graphical-frontend/*.log -text -whitespace
+docs/qualification/graphical-frontend/evidence.json text eol=lf

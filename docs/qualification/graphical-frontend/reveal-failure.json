@@ -1,0 +1,37 @@
+{
+  "status": "structural-failure",
+  "error": "System.IO.InvalidDataException: UI states MenuReveal and Menu have identical native pixels in 1920x1080-Medium-96-1.00-.\r\n   at ForgeLine.Client.UiReferenceStates.ConfirmDistinct(Dictionary\u00602 hashes, String scope, UiReferenceScenario state, Byte[] rgba) in C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\src\\ForgeLine.Client\\UiReferenceScenario.cs:line 45\r\n   at ForgeLine.Client.VisualReferenceCapture.Run(String requestPath) in C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\src\\ForgeLine.Client\\VisualReferenceCapture.cs:line 352",
+  "completedCaptures": 10,
+  "captureState": {
+    "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuReveal-Scale1.00",
+    "stage": "repeat-readback",
+    "repetition": 1,
+    "surface": {
+      "width": 1920,
+      "height": 1080,
+      "bufferCount": 3,
+      "frameIndex": 2,
+      "isSuspended": false,
+      "presentMode": "Immediate",
+      "isOccluded": false,
+      "resizePending": false,
+      "resizeGeneration": 1,
+      "appliedResizeGeneration": 1,
+      "submittedFrameCount": 143,
+      "presentedFrameCount": 143
+    },
+    "hostWindowDpi": 144
+  },
+  "captureInputs": [
+    {
+      "frameIndex": 1,
+      "fingerprint": "9D158927167722CAB4F13A1AF854680AEB76A31FD6AD08F94012319D5B0248C4",
+      "shadowFingerprint": null
+    },
+    {
+      "frameIndex": 2,
+      "fingerprint": "9D158927167722CAB4F13A1AF854680AEB76A31FD6AD08F94012319D5B0248C4",
+      "shadowFingerprint": null
+    }
+  ]
+}

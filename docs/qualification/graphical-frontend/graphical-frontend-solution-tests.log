@@ -1,0 +1,241 @@
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64) erfolgreich (2s 118ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64) erfolgreich (8s 363ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64) erfolgreich (11s 811ms)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64) erfolgreich (13s 408ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64) erfolgreich (9s 521ms)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64) erfolgreich (6s 904ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64) erfolgreich (4s 743ms)
+übersprungen ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: False)
+  Set FORGELINE_GPU_LIFETIME_TESTS=1 for native lifetime qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: True)
+  Set FORGELINE_GPU_LIFETIME_TESTS=1 for native lifetime qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.ParticlePerformanceQualificationTests.MeasureBoundedProductionEffectsAtRtsViewpoints
+  Set FORGELINE_PARTICLE_QUALIFICATION_OUTPUT for isolated hardware qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64)
+fehlerhaft ForgeLine.Client.Tests.ClientSessionLoadingNativeTests.LoadingPresentationDoesNotActivateGameplayBeforeVerifiedSnapshotPresentation(diagnosticsEnabled: True) (48s 546ms)
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64)
+  Native session handoff timed out.
+    um ForgeLine.Client.Tests.ClientSessionLoadingNativeTests.<>c__DisplayClass1_0.<LoadingPresentationDoesNotActivateGameplayBeforeVerifiedSnapshotPresentation>g__Pump|1() in C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Client.Tests\ClientSessionLoadingNativeTests.cs:73
+    um ForgeLine.Client.Tests.ClientSessionLoadingNativeTests.LoadingPresentationDoesNotActivateGameplayBeforeVerifiedSnapshotPresentation(Boolean diagnosticsEnabled) in C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Client.Tests\ClientSessionLoadingNativeTests.cs:111
+    um System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    um System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64) erfolgreich (11s 812ms)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64) fehlerhaft mit 1 Fehler(n) (1m 02s 493ms)
+Exitcode: 2
+  Standardausgabe: [assets:runtime] launcherPid=41880 state=cancelled action=terminate-process-tree
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=640x360 buffers=3 present=VSync
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=640x360 buffers=3 present=VSync
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=VSync
+  [graphics:resize-request] requested=1600x900 generation=1 action=queued
+  [graphics:resize-apply] requested=1600x900 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=15
+  [graphics:resize-applied] size=1600x900 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=VSync
+  [graphics:resize-request] requested=1600x900 generation=1 action=queued
+  [graphics:resize-apply] requested=1600x900 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=16
+  [graphics:resize-applied] size=1600x900 generation=1 frameIndex=0 buffers=3
+  [render:frame] thread=56 tick=118 fps=0,1 size=640x360 instances=8/550 lod=8/0 runtimeMeshes=0 texturedRuntimeMeshes=0 fallbackMeshes=8 draws=6 debugLines=0 debugCpuMs=7,276 pendingRetirement=0 terrainSubmitMs=5,313 terrainTextures=13 light=1,10/0,52 exposure=1,15 tone=AcesFitted vfx=0/2048 vfxDropped=0 particles=0/2048 particleDropped=0 particleBytes=0 particleGpuMs= quality=Medium requestedQuality=Medium aa=Low scale=1,00 postGpuMs= qualityFallback=
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=640x360 buffers=3 present=VSync
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=640x360 buffers=3 present=VSync
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=Immediate
+  Fehlerausgabe: Unknown argument: --reference-capture-request
+  ForgeLine.Client [--smoke-test] [--render-stress <instances>] [--visual-qualification-output <report.json>] [--settings-root <directory>] [--skip-splash] [--startup-diagnostics-output <report.json>] [--startup-menu-smoke-test] [--reference-zoom <CloseTactical|NormalGameplay|Strategic>]
+  Standalone native evidence: ForgeLine.Client --reference-capture-request <request.json>
+  --reference-zoom requires CloseTactical, NormalGameplay or Strategic.
+  --reference-zoom requires CloseTactical, NormalGameplay or Strategic.
+  --reference-zoom requires CloseTactical, NormalGameplay or Strategic.
+  --reference-zoom requires CloseTactical, NormalGameplay or Strategic.
+  --reference-zoom requires CloseTactical, NormalGameplay or Strategic.
+  --reference-zoom requires CloseTactical, NormalGameplay or Strategic.
+  --reference-zoom requires CloseTactical, NormalGameplay or Strategic.
+  --settings-root requires a directory path.
+  [ui:audio:unavailable] DirectoryNotFoundException
+  [reference:failure] IOException: Evidence output must be empty; existing baselines are never overwritten.
+  [reference:failure] DirectoryNotFoundException: Could not find a part of the path 'C:\Users\david.beusing\AppData\Local\Temp\7fa78587481145f9b1ea1f2903aa7dcc\missing-runtime'.
+  [reference:failure] InvalidOperationException: Requested commit does not match the built client. Rebuild this revision.
+  --startup-diagnostics-output requires a file path.
+  --startup-diagnostics-output requires a file path.
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64) erfolgreich (9s 212ms)
+übersprungen ForgeLine.Presentation.Tests.AtmospherePerformanceQualificationTests.CompareEquivalentTerrainAcrossAtmosphericModesAndZooms
+  Set FORGELINE_ATMOSPHERE_BENCHMARK_OUTPUT for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.RenderQualityQualificationTests.CaptureProductionQualityProfilesWithTerrainEffectsAndSelectionOverlays
+  Set FORGELINE_QUALITY_QUALIFICATION_OUTPUT for isolated hardware qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.ScenePassPerformanceQualificationTests.CompareDirectAndLinearSceneOnEquivalentNativeWorkloads
+  Set FORGELINE_PASS_BENCHMARK_OUTPUT for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64) fehlerhaft (2m 59s 337ms)
+Exitcode: -1073741819
+  Standardausgabe: [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=640x400 generation=2 action=queued
+  [graphics:resize-apply] requested=640x400 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=11
+  [graphics:resize-applied] size=640x400 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=640x400 generation=2 action=queued
+  [graphics:resize-apply] requested=640x400 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=10
+  [graphics:resize-applied] size=640x400 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=Immediate
+  [platform:window-mode] previous=Windowed requested=BorderlessFullscreen result=BorderlessFullscreen monitor=0xCD0EEF monitorBounds=0,0,5120x2160 client=5120x2160 minimized=False resizeGeneration=0->1 resizeNotification=emitted
+  [graphics:resize-request] requested=5120x2160 generation=1 action=queued
+  [graphics:resize-apply] requested=5120x2160 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=2
+  [graphics:resize-applied] size=5120x2160 generation=1 frameIndex=0 buffers=3
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=5120x2160 generation=3 action=queued
+  [graphics:resize-apply] requested=5120x2160 generation=3 phase=synchronize
+  [graphics:resize-synchronized] generation=3 completedFence=4
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:resize-applied] size=5120x2160 generation=3 frameIndex=0 buffers=3
+  [platform:window-mode] previous=BorderlessFullscreen requested=Windowed result=Windowed monitor=0xCD0EEF monitorBounds=0,0,5120x2160 client=1280x720 minimized=False resizeGeneration=1->2 resizeNotification=emitted
+  [graphics:resize-request] requested=1280x720 generation=4 action=queued
+  [graphics:resize-apply] requested=1280x720 generation=4 phase=synchronize
+  [graphics:resize-synchronized] generation=4 completedFence=6
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:resize-applied] size=1280x720 generation=4 frameIndex=0 buffers=3
+  [platform:window-mode] previous=Windowed requested=BorderlessFullscreen result=BorderlessFullscreen monitor=0xCD0EEF monitorBounds=0,0,5120x2160 client=5120x2160 minimized=False resizeGeneration=2->3 resizeNotification=emitted
+  [graphics:resize-request] requested=5120x2160 generation=5 action=queued
+  [graphics:resize-apply] requested=5120x2160 generation=5 phase=synchronize
+  [graphics:resize-synchronized] generation=5 completedFence=8
+  [graphics:resize-applied] size=5120x2160 generation=5 frameIndex=0 buffers=3
+  [platform:window-mode] previous=BorderlessFullscreen requested=Windowed result=Windowed monitor=0xCD0EEF monitorBounds=0,0,5120x2160 client=1280x720 minimized=False resizeGeneration=3->4 resizeNotification=emitted
+  [graphics:resize-request] requested=1280x720 generation=6 action=queued
+  [graphics:resize-apply] requested=1280x720 generation=6 phase=synchronize
+  [graphics:resize-synchronized] generation=6 completedFence=10
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=176x120 buffers=3 present=Immediate
+  [graphics:resize-applied] size=1280x720 generation=6 frameIndex=0 buffers=3
+  [platform:window-mode] previous=Windowed requested=BorderlessFullscreen result=BorderlessFullscreen monitor=0xCD0EEF monitorBounds=0,0,5120x2160 client=5120x2160 minimized=False resizeGeneration=4->5 resizeNotification=emitted
+  [graphics:resize-request] requested=5120x2160 generation=7 action=queued
+  [graphics:resize-apply] requested=5120x2160 generation=7 phase=synchronize
+  [graphics:resize-synchronized] generation=7 completedFence=12
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=20
+  [graphics:resize-applied] size=5120x2160 generation=7 frameIndex=0 buffers=3
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [platform:window-mode] previous=BorderlessFullscreen requested=Windowed result=Windowed monitor=0xCD0EEF monitorBounds=0,0,5120x2160 client=1280x720 minimized=False resizeGeneration=5->6 resizeNotification=emitted
+  [graphics:resize-request] requested=1280x720 generation=8 action=queued
+  [graphics:resize-apply] requested=1280x720 generation=8 phase=synchronize
+  [graphics:resize-synchronized] generation=8 completedFence=14
+  [graphics:resize-applied] size=1280x720 generation=8 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=10
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=21
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=20
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=20
+  [graphics:device] adapter="NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU" featureLevel=Level_12_1 vramBytes=25309478912 software=False debugLayer=False
+  [graphics:surface] size=176x120 buffers=3 present=Immediate
+  Fehlerausgabe: [graphics:frame-failed] reason=graphics-failure message=An enabled shadow pass must precede all world and overlay draws exactly once.
+  [graphics:frame-failed] reason=graphics-failure message=Controlled recording failure.
+  [graphics:frame-failed] reason=graphics-failure message=The shadow or particle submission was not ended.
+  [graphics:frame-failed] reason=graphics-failure message=Controlled atmospheric recording failure.
+  [graphics:frame-failed] reason=graphics-failure message=World submission cannot follow the output-space overlay pass.
+  [graphics:shutdown-warning] type=GraphicsDeviceException message=GPU fence did not complete within ten seconds; restart the client session.
+übersprungen ForgeLine.Presentation.Tests.DirectionalShadowPerformanceTests.CompareEquivalentDenseWorkloadsAcrossQualityAndRtsZoom
+  Set FORGELINE_SHADOW_BENCHMARK_OUTPUT for isolated hardware shadow measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureProductionMaterialsAtFixedCentralDivideViewpoints
+  Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated production terrain measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureVegetationMotionWithIdenticalProductionBatches
+  Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated vegetation measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) erfolgreich (3m 34s 899ms)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64) erfolgreich (3m 21s 439ms)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64) erfolgreich (8m 25s 627ms)
+
+Testlaufzusammenfassung: Fehler!
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64) erfolgreich (4s 743ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64) erfolgreich (2s 118ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) erfolgreich (3m 34s 899ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64) erfolgreich (11s 812ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64) fehlerhaft (2m 59s 337ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64) erfolgreich (9s 212ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64) erfolgreich (8s 363ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64) fehlerhaft mit 1 Fehler(n) (1m 02s 493ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64) erfolgreich (13s 408ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64) erfolgreich (9s 521ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64) erfolgreich (6s 904ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64) erfolgreich (8m 25s 627ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64) erfolgreich (3m 21s 439ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64) erfolgreich (11s 811ms)
+
+  Fehler: 1
+
+  gesamt: 2029
+  fehlgeschlagen: 1
+  erfolgreich: 2019
+  übersprungen: 9
+  Dauer: 8m 28s 561ms
+Der Testlauf wurde mit einem nicht erfolgreichen Exitcode abgeschlossen: 1 (siehe: https://aka.ms/testingplatform/exitcodes)
