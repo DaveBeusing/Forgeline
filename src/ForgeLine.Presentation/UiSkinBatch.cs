@@ -22,6 +22,7 @@ public sealed class UiSkinBatch : IDisposable
     private readonly Command[] _commands = new Command[MaximumQuads];
     private int _count, _uploaded, _commandCount, _draws, _dropped, _missing, _width, _height, _frame;
     private bool _disposed;
+    private readonly int _thread = Environment.CurrentManagedThreadId;
     private UiSkinRect _clip;
     public UiSkinDiagnostics Diagnostics => new(_resources.PageBytes, _resources.TextureCount, _resources.LeaseCount, _resources.Uploads,
         _draws, _count, _uploaded * (long)Stride, _dropped, _missing, _buffers.Length);
@@ -45,6 +46,7 @@ public sealed class UiSkinBatch : IDisposable
     public void Begin(int width, int height, int frameIndex)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+        CheckThread();
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width); ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
         ArgumentOutOfRangeException.ThrowIfNegative(frameIndex); ArgumentOutOfRangeException.ThrowIfGreaterThan(frameIndex, 3);
         _width = width; _height = height; _frame = frameIndex; _count = _uploaded = _commandCount = _draws = _dropped = _missing = 0;
@@ -148,8 +150,9 @@ public sealed class UiSkinBatch : IDisposable
     private static bool Finite(Vector4 v) => float.IsFinite(v.X) && float.IsFinite(v.Y) && float.IsFinite(v.Z) && float.IsFinite(v.W);
     private static void Validate(UiSkinRect r)
     { if (!float.IsFinite(r.X) || !float.IsFinite(r.Y) || !float.IsFinite(r.Width) || !float.IsFinite(r.Height) || !float.IsFinite(r.X+r.Width) || !float.IsFinite(r.Y+r.Height)) throw new ArgumentException("Non-finite UI region."); }
-    private void Check() { ObjectDisposedException.ThrowIf(_disposed,this); if (_width == 0) throw new InvalidOperationException("Begin the UI batch first."); }
-    public void Dispose() { if (_disposed) return; _disposed = true; foreach (var buffer in _buffers) buffer.Dispose(); _pipeline.Dispose(); }
+    private void CheckThread() { if (_thread != Environment.CurrentManagedThreadId) throw new InvalidOperationException("UI batches belong to their graphics thread."); }
+    private void Check() { ObjectDisposedException.ThrowIf(_disposed,this); CheckThread(); if (_width == 0) throw new InvalidOperationException("Begin the UI batch first."); }
+    public void Dispose() { if (_disposed) return; CheckThread(); _disposed = true; foreach (var buffer in _buffers) buffer.Dispose(); _pipeline.Dispose(); }
     [StructLayout(LayoutKind.Sequential)] private readonly record struct Vertex(Vector2 Position, Vector4 Color, Vector2 Uv);
     private struct Command(int page, int start, int count, UiSkinRect clip)
     { public int Page = page, Start = start, Count = count; public UiSkinRect Clip = clip; }

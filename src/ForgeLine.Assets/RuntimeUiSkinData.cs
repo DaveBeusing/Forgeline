@@ -118,5 +118,6 @@ public sealed class RuntimeUiSkinData
             return new(pages, sprites);
         }
         catch (EndOfStreamException e) { throw new InvalidDataException("Truncated UI skin payload.", e); }
+        catch (FormatException e) { throw new InvalidDataException("Invalid UI skin string encoding.", e); }
     }
 }

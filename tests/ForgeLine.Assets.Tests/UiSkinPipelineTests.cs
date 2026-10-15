@@ -15,6 +15,8 @@ public sealed class UiSkinPipelineTests
         Assert.Equal(payload, round.ToPayload());
         Assert.Throws<InvalidDataException>(() => RuntimeUiSkinData.FromPayload(payload[..^1]));
         Assert.Throws<InvalidDataException>(() => RuntimeUiSkinData.FromPayload([.. payload, 0]));
+        var malformed = (byte[])payload.Clone(); malformed.AsSpan(12,5).Fill(255);
+        Assert.Throws<InvalidDataException>(() => RuntimeUiSkinData.FromPayload(malformed));
         payload[0] = 255;
         Assert.Throws<InvalidDataException>(() => RuntimeUiSkinData.FromPayload(payload));
     }

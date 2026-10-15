@@ -246,7 +246,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
             _skin.Flush(context);
         }
         _text.Render(context);
-        LastRenderedVertexCount = _vertexCount + _text.VertexCount + (imageDrawn || fullImage ? 6 : 0);
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount + (_skin?.Diagnostics.Vertices ?? 0) + (imageDrawn || fullImage ? 6 : 0);
     }
 
     public void Dispose()
