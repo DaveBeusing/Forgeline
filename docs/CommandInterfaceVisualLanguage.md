@@ -115,7 +115,7 @@ See [dock qualification](CommandDockQualification.md) for before/after native im
 
 ## Compiled skin foundation
 
-The [compiled skin path](UiAtlasRendering.md) prepares core pages and renders the
-first menu entry from the exact shared MenuRow(0) rectangle. Separate state art
-precedes existing live text. Other entries and HUD surfaces await their own
-migration; the presence of a source atlas is not full-surface visual acceptance.
+The [compiled skin path](UiAtlasRendering.md) prepares core pages. The
+[graphical frontend](GraphicalFrontend.md) now migrates every normal menu/settings
+surface with separate state art and existing live text. Battlefield HUD migration
+and human visual acceptance remain separate work.

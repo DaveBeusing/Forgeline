@@ -144,3 +144,11 @@ pixels and descriptor/texture return to baseline, then captures the real menu
 control. `UiSkinFixtureRenderer` is a qualification fixture, not another UI engine.
 See [qualification evidence](UiAtlasQualification.md) for exact outcomes and
 source identities; structural success is not human visual approval.
+
+## Frontend consumer update
+
+The [graphical frontend](GraphicalFrontend.md) extends the original single-control
+fixture to all normal frontend screens. The core group, binary contracts, device
+ownership, text metrics and page budgets remain unchanged. The first-control-only
+scope above records the original renderer integration; current frontend coverage
+is listed in the surface catalog. Battlefield HUD migration remains separate.

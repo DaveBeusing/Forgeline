@@ -105,3 +105,13 @@ runtime asset. The application icon and studio splash remain separate.
 Credits shows only Undefined Behavior Studios, lead developer Dave Beusing,
 the product version from the built client, and ForgeLine Engine. It does not list
 platforms, libraries, the tagline or optional title artwork.
+
+## Production skin integration
+
+All normal frontend screens now use the [compiled production skin](GraphicalFrontend.md).
+The geometry and hit rectangles above are unchanged. Typed value visuals keep the
+existing +/- and keyboard workflow; sliders introduce no additional hit targets.
+TotalDetailRows/DetailRowOffset publish the existing settings/save list window for
+scrollbar rendering. PauseContext extends the opaque menu backing to paused
+settings/controls while preserving visible battlefield space beside it. Bootstrap,
+studio and explicit failure paths remain independent and visibly diagnosable.

@@ -133,6 +133,14 @@ jobs:
         shell: pwsh
         run: ./build/Test-UiSkinPackage.ps1
 
+      - name: Graphical frontend skin and pointer contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GraphicalFrontendViewTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.FrontendProductionSkinTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Cinematic menu image and native lifecycle contracts
         shell: pwsh
         run: |

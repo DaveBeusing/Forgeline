@@ -8,14 +8,11 @@ All paths below are repository relative. Renderer owners are in
 remain authoritative for bounds; artwork never defines independent hit targets.
 `FrontendOverlayRenderer` and all six `GameplayHudRenderer` surfaces are covered.
 
-**Status for every migration row:** inventoried, source families available,
-live migration **pending**, human acceptance **pending**. Existing reference PNGs
-are direction, not preexisting runtime skin. Rows marked **retain** intentionally
-preserve data-driven geometry or asset-independent failure/diagnostic paths.
-The [compiled atlas renderer](UiAtlasRendering.md) now draws the first main-menu
-entry from the shared MenuRow(0) rectangle, including focus/disabled overlays.
-Only that representative control is migrated; human acceptance is pending.
-No other migrated or accepted status is inferred from this inventory.
+**Frontend status:** all normal frontend rows now use the compiled skin through
+[graphical frontend integration](GraphicalFrontend.md). Bootstrap/recovery and
+studio playback remain intentional independent paths. Human acceptance is pending.
+**Battlefield status:** source families are available; live HUD migration remains
+pending. Source availability never implies final visual approval.
 
 Skin names below abbreviate `ui.skin.directorate.`. Shared control states are
 normal/base, hover, pressed, focus, selected, disabled and applicable semantic
@@ -24,7 +21,7 @@ No additional widget behavior is implied by a source sprite.
 
 ## Frontend
 
-All ordinary frontend rows currently use geometric overlay quads and the bundled
+All ordinary frontend rows use compiled skin layers and the existing bundled
 text atlas. Shared geometry is `FrontendGeometry` in Presentation; interaction is
 `FrontendInteraction` in UI. The migration owner is the frontend integration lane.
 
@@ -33,21 +30,21 @@ text atlas. Shared geometry is `FrontendGeometry` in Presentation; interaction i
 | Studio splash, regular/bootstrap/fade | `ForgeLine.Client/StudioSplashVideoRenderer`, `UndefinedBehaviorStudioSplash`; existing video/embedded fallback mark | Frontend splash composition; noninteractive | retain canonical mark; bootstrap remains independent |
 | Main menu backdrop, ready/loading/missing | `FrontendOverlayRenderer`, `FrontendMenuBackground`; compiled `branding.forgeline.menu.directorate`, procedural schematic fallback | `Background`, `MenuArtwork` | retain image; panel.primary for navigation shell |
 | Product mark, tagline, version/footer | `FrontendOverlayRenderer`, `FrontendBrandMark`; embedded canonical wordmark | `Header`, `Footer` | retain marks/live text; control.separator |
-| Main menu entries, focus/disabled/hover/press | `FrontendOverlayRenderer`; first row compiled skin, remaining rows geometric | `Navigation`, `MenuRow`, `MainMenuModel` | control.button, shared overlays |
-| Loading progress, preparation, cancellation/error | `FrontendOverlayRenderer`; geometric track/fill | `Details`, `PrimaryAction`, `SecondaryAction`, `FrontendLoadingController` | panel.dialog, progress.*, control.button, overlay.error |
+| Main menu entries, focus/disabled/hover/press | `FrontendOverlayRenderer`; compiled skin cards and state layers | `Navigation`, `MenuRow`, `MainMenuModel` | control.button, shared overlays |
+| Loading progress, preparation, cancellation/error | `FrontendOverlayRenderer`; compiled progress and status skin | `Details`, `PrimaryAction`, `SecondaryAction`, `FrontendLoadingController` | panel.dialog, progress.*, control.button, overlay.error |
 | New game scenario/seed/options, start/back | `FrontendOverlayRenderer`; detail rows | `DetailRow`, `DetailValue`, `NewGameModel` | panel.primary, control.row, control.button |
 | Load game list, selected/valid/empty/broken/incompatible/error | `FrontendOverlayRenderer`; detail rows | `Details`, `DetailRow`, `LoadGameModel` | control.row, panel.inset, overlays.selected/error/disabled |
-| Settings section tabs: General/Graphics/Audio/Bindings | `FrontendOverlayRenderer`; geometric tabs | `SettingsTab`, `SettingsInteractionModel` | control.tab, overlays.selected/focus |
-| General: OutputResolution, BorderlessFullscreen, UiScale | `FrontendOverlayRenderer`; current row/stepper | `DetailLabel`, `DetailValue`, `Decrease`, `Increase` | control.row, control.button_compact; future dropdown/toggle/slider shells |
-| General: EdgeScroll, CameraSpeed, Onboarding, ReducedUiMotion | `FrontendOverlayRenderer`; current row/stepper | same shared detail regions | control.row, control.button_compact; future checkbox/toggle/slider |
-| Graphics: RenderQuality, ResolutionScale, Antialiasing, Shadows, Textures | `FrontendOverlayRenderer`; current row/stepper | same shared detail regions | control.row, control.button_compact; future dropdown/slider |
-| Graphics: ObjectDetail, SurfaceDetail, VegetationMotion, Atmosphere, Particles | `FrontendOverlayRenderer`; current row/stepper | same shared detail regions | control.row, control.button_compact; future dropdown/toggle |
-| Audio: UiSoundEnabled, UiSoundVolume | `FrontendOverlayRenderer`; current row/stepper | same shared detail regions | control.row, control.button_compact; future toggle/slider; no invented music/master channels |
-| Bindings: BindingAction, BindingKey, capture/conflict/cancel | `FrontendOverlayRenderer`; current row/stepper | same shared detail regions; `SettingsInteractionModel` | control.row, control.input, overlays.focus/error |
-| Settings apply/cancel, invalid/display rollback | `FrontendOverlayRenderer`; geometric actions/feedback | `PrimaryAction`, `SecondaryAction`, `Feedback`; Client display transaction | control.button, panel.banner, overlays.disabled/warning/error |
-| Controls Action/Input table, long list/scroll | `FrontendOverlayRenderer`; text table/row quads | `Details`, `DetailRow`, `DetailScroll`; Client controls scroll state and `FrontendHitTesting` | control.row, control.row_compact; scrollbar parts reserved for later visible scrollbar |
+| Settings section tabs: General/Graphics/Audio/Bindings | `FrontendOverlayRenderer`; compiled tabs | `SettingsTab`, `SettingsInteractionModel` | control.tab, overlays.selected/focus |
+| General: OutputResolution, BorderlessFullscreen, UiScale | `FrontendOverlayRenderer`; typed skin value / compiled stepper | `DetailLabel`, `DetailValue`, `Decrease`, `Increase` | control.row, control.button_compact; dropdown/toggle/slider shells |
+| General: EdgeScroll, CameraSpeed, Onboarding, ReducedUiMotion | `FrontendOverlayRenderer`; typed skin value / compiled stepper | same shared detail regions | control.row, control.button_compact; toggle/slider |
+| Graphics: RenderQuality, ResolutionScale, Antialiasing, Shadows, Textures | `FrontendOverlayRenderer`; typed skin value / compiled stepper | same shared detail regions | control.row, control.button_compact; dropdown/slider |
+| Graphics: ObjectDetail, SurfaceDetail, VegetationMotion, Atmosphere, Particles | `FrontendOverlayRenderer`; typed skin value / compiled stepper | same shared detail regions | control.row, control.button_compact; dropdown/toggle |
+| Audio: UiSoundEnabled, UiSoundVolume | `FrontendOverlayRenderer`; typed skin value / compiled stepper | same shared detail regions | control.row, control.button_compact; toggle/slider; no invented music/master channels |
+| Bindings: BindingAction, BindingKey, capture/conflict/cancel | `FrontendOverlayRenderer`; typed skin value / compiled stepper | same shared detail regions; `SettingsInteractionModel` | control.row, control.input, overlays.focus/error |
+| Settings apply/cancel, invalid/display rollback | `FrontendOverlayRenderer`; compiled actions/feedback | `PrimaryAction`, `SecondaryAction`, `Feedback`; Client display transaction | control.button, panel.banner, overlays.disabled/warning/error |
+| Controls Action/Input table, long list/scroll | `FrontendOverlayRenderer`; live text / compiled table rows | `Details`, `DetailRow`, `DetailScroll`; Client controls scroll state and `FrontendHitTesting` | control.row, control.row_compact; visible scrollbar from published list extent |
 | Credits studio/developer/version/engine | `FrontendOverlayRenderer`; live detail text | `Details`, `SecondaryAction` | panel.primary, control.button; no extra credit content |
-| Pause resume/save/settings/main-menu/exit; feedback | `FrontendOverlayRenderer`; pause quads over live world | `PauseBackdrop`, `MenuRow`, `PauseMenuModel` | panel.primary, control.button, panel.banner |
+| Pause resume/save/settings/main-menu/exit; feedback | `FrontendOverlayRenderer`; opaque backing and compiled skin over live world | `PauseBackdrop`, `MenuRow`, `PauseMenuModel` | panel.primary, control.button, panel.banner |
 | Settings opened from pause, all four sections | same frontend owners; current settings renderer | shared settings regions; UI return-state routing | same settings skin; keep world context/input suppression |
 | Detail primary/back actions and feedback | `FrontendOverlayRenderer`; control affordances | `PrimaryAction`, `SecondaryAction`, `Feedback` | control.button, panel.banner, shared overlays |
 | Scroll overflow, long values and disabled reasons | `FrontendOverlayRenderer`; fitted live text | `VisibleDetailRows`, `DetailScroll`, text clipping | control.row_compact, panel.tooltip; retain clipping/scroll semantics |
@@ -76,7 +73,7 @@ runtime classes.
 | Formation controls | `SelectionInspectorHudSurface`; geometric actions | `CombatGroupCardLayout.Control` | control.button_compact, selected/focus layers; HUD |
 | Primary RTS commands/targeting availability | `PlayerActionDockHudSurface`; existing command glyphs/quads | `GameplayHudLayout.PrimaryCommands`, `PlayerActionDockInteractionLayout` | control.button, shared overlays; HUD shell / tactical content |
 | Dock closed/collapsed/open; compact/scroll | `PlayerActionDockHudSurface`; geometric shell | `ActionDock`, `GetCollapsedRect`, `GetCardsRect`, `FirstVisibleItem` | panel.primary/compact, control.row_compact; HUD shell |
-| Mode tabs: Construction, Production, UnitProduction, Logistics, Supply, Tactical, Technology | `PlayerActionDockHudSurface`; geometric tabs | `GetModeBarRect`, `GetModeButtonRect` | control.tab, selected/focus layers; HUD shell |
+| Mode tabs: Construction, Production, UnitProduction, Logistics, Supply, Tactical, Technology | `PlayerActionDockHudSurface`; compiled tabs | `GetModeBarRect`, `GetModeButtonRect` | control.tab, selected/focus layers; HUD shell |
 | Construction cards, costs, placement availability | `PlayerActionDockHudSurface`; live card data and icons | `GetCardRect`, `GetHeaderRect` | control.row, panel.portrait, status overlays; production |
 | Production recipes, stock/blocked/current work | same dock owner; live recipe data | same card/header geometry | control.row, progress.*, status overlays; production |
 | UnitProduction roster/queue/cancel | same dock owner; live queue data | card/header/footer geometry | control.row, progress.*, control.button_compact; production |
