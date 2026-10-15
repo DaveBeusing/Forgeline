@@ -94,9 +94,10 @@ public sealed class FrontendSecondaryPresentationTests
             FrontendPresentationAdapter.Credits();
 
         Assert.Equal("CREDITS", view.Title);
-        Assert.Contains(
-            view.DetailLines,
-            line =>
-                line.Value == "ForgeLine Engine");
+        Assert.Equal(FrontendSurfaceKind.Credits, view.Kind);
+        Assert.Equal(4, view.DetailLines.Count);
+        Assert.Equal(new[] { "Undefined Behavior Studios", "Dave Beusing", ClientBuildIdentity.ProductVersion, "ForgeLine Engine" },
+            view.DetailLines.Select(line => line.Value));
+        Assert.Empty(view.ProductVersion);
     }
 }

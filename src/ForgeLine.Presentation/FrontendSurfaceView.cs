@@ -7,7 +7,8 @@ public enum FrontendSurfaceKind : byte
     Detail = 3,
     PauseMenu = 4,
     StudioSplash = 5,
-    Controls = 6
+    Controls = 6,
+    Credits = 7
 }
 
 public readonly record struct FrontendMenuEntryView(
@@ -49,6 +50,7 @@ public readonly record struct FrontendSurfaceView(
     float SplashMasterOpacity = 1f,
     bool SplashBootstrap = false)
 {
+    public IReadOnlyList<FrontendMenuEntryView>? SettingsTabs { get; init; }
     public RenderQuality BackgroundQuality { get; init; } = RenderQuality.Medium;
     public FrontendGeometry? Layout { get; init; }
     public int DetailScroll { get; init; }

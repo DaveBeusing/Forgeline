@@ -23,15 +23,15 @@ public sealed class GameplayBindingEditorTests
         Assert.Equal(PlatformKey.G, model.Bindings.Key(GameplayAction.Build));
         Assert.Equal(PlatformKey.W, model.Settings.CameraBindings.PanForward);
         var controls = FrontendPresentationAdapter.Controls(model.Settings.CameraBindings, gameplay: model.Bindings);
-        Assert.Contains(controls.DetailLines, line => line.Label == "COMMAND PANELS" && line.Value.StartsWith("G BUILD", StringComparison.Ordinal));
-        Assert.Equal(7, FrontendPresentationAdapter.Settings(model, editor).DetailLines.Count);
+        Assert.Contains(controls.DetailLines, line => line.Label == "BUILD" && line.Value == "G");
+        Assert.Equal(2, FrontendPresentationAdapter.Settings(model, editor).DetailLines.Count);
     }
     [Fact]
     public void ScrolledSettingsRowsRetainCorrectKeyboardAndPointerIdentity()
     {
         var editor = new SettingsInteractionModel(); editor.Focus(FrontendSettingsField.BindingKey);
-        Assert.Equal(1, editor.VisibleStart);
-        editor.FocusVisible(6);
+        Assert.Equal(0, editor.VisibleStart);
+        editor.FocusVisible(1);
         Assert.Equal(FrontendSettingsField.BindingKey, editor.FocusedField);
         editor.MovePrevious();
         Assert.Equal(FrontendSettingsField.BindingAction, editor.FocusedField);
@@ -44,8 +44,8 @@ public sealed class GameplayBindingEditorTests
         var camera = new RtsCameraBindings { PanForward = PlatformKey.Home };
         var bindings = new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.FocusBase, PlatformKey.G), camera);
         var controls = FrontendPresentationAdapter.Controls(camera, gameplay: bindings);
-        Assert.Contains(controls.DetailLines, line => line.Value.Contains("HOME USES CAMERA BINDING", StringComparison.Ordinal) &&
-            line.Value.Contains("G BASE FOCUS", StringComparison.Ordinal));
+        Assert.Contains(controls.DetailLines, line => line.Label == "HOME" && line.Value == "CAMERA BINDING");
+        Assert.Contains(controls.DetailLines, line => line.Label == "BASE FOCUS" && line.Value == "G");
     }
     [Fact]
     public void CandidateCyclingTraversesReservedUnknownEntryWithoutJumpingToDefault()

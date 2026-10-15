@@ -20,10 +20,24 @@ public enum FrontendSettingsField : byte
     SurfaceDetail = 14, VegetationMotion = 15, Atmosphere = 16, Particles = 17, ReducedUiMotion = 18, UiSoundEnabled = 19, UiSoundVolume = 20
 }
 
+public enum FrontendSettingsSection : byte { General, Graphics, Audio, Bindings }
+
 public sealed class SettingsInteractionModel
 {
-    private static readonly FrontendSettingsField[] s_fields =
-        Enum.GetValues<FrontendSettingsField>();
+    private static readonly FrontendSettingsField[][] s_sections =
+    [
+        [FrontendSettingsField.OutputResolution, FrontendSettingsField.BorderlessFullscreen, FrontendSettingsField.UiScale,
+         FrontendSettingsField.EdgeScroll, FrontendSettingsField.CameraSpeed, FrontendSettingsField.Onboarding, FrontendSettingsField.ReducedUiMotion],
+        [FrontendSettingsField.RenderQuality, FrontendSettingsField.ResolutionScale, FrontendSettingsField.Antialiasing,
+         FrontendSettingsField.Shadows, FrontendSettingsField.Textures, FrontendSettingsField.ObjectDetail,
+         FrontendSettingsField.SurfaceDetail, FrontendSettingsField.VegetationMotion, FrontendSettingsField.Atmosphere, FrontendSettingsField.Particles],
+        [FrontendSettingsField.UiSoundEnabled, FrontendSettingsField.UiSoundVolume],
+        [FrontendSettingsField.BindingAction, FrontendSettingsField.BindingKey]
+    ];
+    public FrontendSettingsSection Section { get; private set; }
+    private FrontendSettingsField[] Fields => s_sections[(int)Section];
+    public int FocusedSectionIndex => _index;
+    public IEnumerable<FrontendSettingsField> VisibleFields => Fields.Skip(VisibleStart).Take(VisibleRowCount);
     private int _index = 1;
     private static readonly PlatformKey[] Keys = Enum.GetValues<PlatformKey>();
     public bool CanApply { get; private set; } = true;
@@ -32,36 +46,66 @@ public sealed class SettingsInteractionModel
     public GameplayAction BindingAction { get; private set; }
     public string BindingFeedback { get; private set; } = string.Empty;
     public int VisibleCapacity { get; set; } = 7;
-    public int VisibleStart => Math.Max(0, (int)FocusedField - Math.Clamp(VisibleCapacity, 1, 7) + 1);
-    public int VisibleRowCount => Math.Min(Math.Clamp(VisibleCapacity, 1, 7), s_fields.Length - VisibleStart);
-    public void FocusVisible(int row) => Focus((FrontendSettingsField)(row + VisibleStart));
+    public int VisibleStart => Math.Max(0, _index - Math.Clamp(VisibleCapacity, 1, 7) + 1);
+    public int VisibleRowCount => Math.Min(Math.Clamp(VisibleCapacity, 1, 7), Fields.Length - VisibleStart);
+    public void FocusVisible(int row) => Focus(Fields[Math.Clamp(row, 0, VisibleRowCount - 1) + VisibleStart]);
 
     public FrontendSettingsField FocusedField =>
-        s_fields[_index];
+        Fields[_index];
 
     public FrontendSettingsField MoveNext()
     {
-        _index = (_index + 1) % s_fields.Length;
+        _index = (_index + 1) % Fields.Length;
         return FocusedField;
     }
 
     public FrontendSettingsField MovePrevious()
     {
         _index =
-            (_index - 1 + s_fields.Length) %
-            s_fields.Length;
+            (_index - 1 + Fields.Length) %
+            Fields.Length;
         return FocusedField;
     }
 
     public void Focus(FrontendSettingsField field)
     {
-        int index = Array.IndexOf(s_fields, field);
+        int section = Array.FindIndex(s_sections, fields => fields.Contains(field));
+        if (section < 0) throw new ArgumentOutOfRangeException(nameof(field));
+        Section = (FrontendSettingsSection)section;
+        int index = Array.IndexOf(Fields, field);
         if (index < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(field));
         }
 
         _index = index;
+    }
+
+    public void SelectSection(FrontendSettingsSection section)
+    {
+        if (!Enum.IsDefined(section)) throw new ArgumentOutOfRangeException(nameof(section));
+        Section = section;
+        _index = 0;
+    }
+
+    public bool HandleSectionInput(InputState input, FrontendGeometry layout)
+    {
+        if (input.WasKeyPressed(PlatformKey.Tab))
+        {
+            bool reverse = input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift);
+            SelectSection((FrontendSettingsSection)(((int)Section + (reverse ? 3 : 1)) % 4));
+            input.SuppressHeldInput();
+            return true;
+        }
+        if (input.TryGetMousePressPosition(PlatformMouseButton.Left, out var point))
+            for (int i = 0; i < 4; i++)
+                if (layout.SettingsTab(i).Contains(point.X, point.Y))
+                {
+                    SelectSection((FrontendSettingsSection)i);
+                    input.SuppressHeldInput();
+                    return true;
+                }
+        return false;
     }
 
     public void Adjust(

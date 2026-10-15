@@ -74,7 +74,7 @@ public sealed class FrontendInputLifetimeTests
             var interaction = new SettingsInteractionModel { VisibleCapacity = capacity };
             for (int i = 0; i < 18; i++)
             {
-                int focused = (int)interaction.FocusedField;
+                int focused = interaction.FocusedSectionIndex;
                 Assert.InRange(focused - interaction.VisibleStart, 0, interaction.VisibleRowCount - 1);
                 interaction.MoveNext();
             }

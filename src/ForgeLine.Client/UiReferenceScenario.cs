@@ -13,7 +13,7 @@ internal enum UiReferenceScenario
     NewGame, LoadGame, LoadEmpty, LoadBroken, SettingsLong, ControlsLong, Pause, Credits,
     ResourcePressure, LowPower, SupplyCritical, MixedSelection, Targeting, QueueBlocked,
     Technology, Contacts, DockFocus, DockHover, DockPressed, DockPending, DockAccepted,
-    DockRejected, MinimapStrategic, Onboarding
+    DockRejected, MinimapStrategic, Onboarding, SettingsAudio, SettingsGraphics, Controls
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -43,7 +43,8 @@ internal static class UiReferenceStates
         }
     }
 
-    internal static bool IsFrontend(UiReferenceScenario state) => state is >= UiReferenceScenario.Menu and <= UiReferenceScenario.Credits;
+    internal static bool IsFrontend(UiReferenceScenario state) => state is >= UiReferenceScenario.Menu and <= UiReferenceScenario.Credits or
+        UiReferenceScenario.SettingsAudio or UiReferenceScenario.SettingsGraphics or UiReferenceScenario.Controls;
 
     internal static FrontendSurfaceView Frontend(UiReferenceScenario state, int width, int height, uint dpi, float scale)
     {
@@ -66,9 +67,20 @@ internal static class UiReferenceStates
             { DetailLines = [new("TASTATUR / ÄÖÜ / " + new string('W', 120), "CTRL + SHIFT / " + new string('W', 160))] },
             UiReferenceScenario.Pause => FrontendPresentationAdapter.PauseMenu(new PauseMenuModel()),
             UiReferenceScenario.Credits => FrontendPresentationAdapter.Credits(),
+            UiReferenceScenario.Controls => FrontendPresentationAdapter.Controls(new RtsCameraBindings()),
+            UiReferenceScenario.SettingsAudio => Settings(FrontendSettingsSection.Audio),
+            UiReferenceScenario.SettingsGraphics => Settings(FrontendSettingsSection.Graphics),
             _ => throw new ArgumentOutOfRangeException(nameof(state))
         };
         return view with { Layout = FrontendGeometry.Resolve(width, height, scale, dpi, view.Kind == FrontendSurfaceKind.Controls) };
+    }
+
+    private static FrontendSurfaceView Settings(FrontendSettingsSection section)
+    {
+        var interaction = new SettingsInteractionModel();
+        interaction.SelectSection(section);
+        return FrontendPresentationAdapter.Settings(
+            new SettingsModel(ClientSettingsFrontendAdapter.ToSnapshot(new ClientUserSettings())), interaction);
     }
 
     internal static (PresentationSnapshot Snapshot, PlayerActionPanelView Panel) Hud(PresentationSnapshot source,

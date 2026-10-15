@@ -65,7 +65,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
         _vertexLimit = view.Kind switch
         {
             FrontendSurfaceKind.Controls => MaxControlsVertices,
-            FrontendSurfaceKind.Detail => MaxDetailVertices,
+            FrontendSurfaceKind.Detail or FrontendSurfaceKind.Credits => MaxDetailVertices,
             _ => MaxVertices
         };
         FrontendGeometry layout = view.Layout ?? FrontendGeometry.Resolve(context.Width, context.Height, userScale,
@@ -79,11 +79,13 @@ public sealed class FrontendOverlayRenderer : IDisposable
         float scale = layout.Scale;
         var motion = view.Motion ?? UiMotionView.Settled;
         int width = context.Width, height = context.Height;
+        bool fullImage = _background?.Ready == true && view.Kind == FrontendSurfaceKind.MainMenu;
+        if (fullImage) _background!.Render(context, layout.Background);
         if (view.Kind != FrontendSurfaceKind.PauseMenu)
         {
             for (int band = 0; band < 24; band++)
                 EmitPanel(new SurfaceRect(0, band * height / 24f, width, height / 24f + 1),
-                    Vector4.Lerp(ForgeLineUiPalette.BackgroundDeep, ForgeLineUiPalette.Background, band / 24f), width, height);
+                    WithOpacity(Vector4.Lerp(ForgeLineUiPalette.BackgroundDeep, ForgeLineUiPalette.Background, band / 24f), fullImage ? .3f : 1), width, height);
         }
         if (view.Kind == FrontendSurfaceKind.PauseMenu)
         {
@@ -91,13 +93,15 @@ public sealed class FrontendOverlayRenderer : IDisposable
             Panel(layout.Footer, ForgeLineUiPalette.Surface);
             if (!string.IsNullOrEmpty(view.Feedback)) Panel(layout.Feedback, ForgeLineUiPalette.Surface);
         }
+        else if (view.Kind == FrontendSurfaceKind.MainMenu)
+            Panel(layout.PauseBackdrop, ForgeLineUiPalette.Surface);
         else Panel(layout.SafeArea, ForgeLineUiPalette.Surface);
-        Text("FORGELINE", layout.Header, ForgeLineUiPalette.TextPrimary, view.Kind == FrontendSurfaceKind.PauseMenu ? 1.46f : 1.8f);
-        var tagline = layout.Header with { Y = layout.Header.Y + (view.Kind == FrontendSurfaceKind.PauseMenu ? 54 : 70) * scale };
-        Text("BUILD. SUPPLY. CONQUER.", tagline, ForgeLineUiPalette.TextSecondary, .75f);
+        EmitBrandMark(layout.Header, MathF.Min(480 * scale, layout.Navigation.Width - 24 * scale), width, height);
+        var tagline = layout.Header with { Y = layout.Header.Y + 72 * scale };
+        if (view.Kind != FrontendSurfaceKind.Credits) Text("BUILD. SUPPLY. CONQUER.", tagline, ForgeLineUiPalette.TextSecondary, .75f);
         Text(view.Title, layout.Title, ForgeLineUiPalette.Accent);
         // Decorations have their own visual-only rectangle and cannot enter a control slot.
-        if (layout.Decorative.Width > 180 * scale && view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.PauseMenu) && _background?.Ready != true)
+        if (layout.Decorative.Width > 180 * scale && view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.Credits or FrontendSurfaceKind.PauseMenu) && _background?.Ready != true)
         {
             var art = layout.Decorative;
             Panel(art, ForgeLineUiPalette.BackgroundRaised);
@@ -133,8 +137,23 @@ public sealed class FrontendOverlayRenderer : IDisposable
                         focused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextDisabled, .68f);
             }
         }
-        else if (view.Kind is FrontendSurfaceKind.Detail or FrontendSurfaceKind.Controls)
+        else if (view.Kind is FrontendSurfaceKind.Detail or FrontendSurfaceKind.Controls or FrontendSurfaceKind.Credits)
         {
+            if (view.SettingsTabs is { } tabs)
+                for (int i = 0; i < tabs.Count; i++)
+                {
+                    var tab = tabs[i]; var region = layout.SettingsTab(i);
+                    Panel(region, tab.IsFocused ? ForgeLineUiPalette.SurfaceActive : ForgeLineUiPalette.SurfaceRaised);
+                    if (tab.IsFocused) Panel(region with { Y = region.Bottom - 3 * scale, Height = 3 * scale }, ForgeLineUiPalette.Accent);
+                    Text(tab.Label, region with { X = region.X + 12 * scale, Y = region.Y + 10 * scale, Width = region.Width - 24 * scale },
+                        tab.IsFocused ? ForgeLineUiPalette.TextPrimary : ForgeLineUiPalette.TextSecondary, .85f);
+                }
+            if (layout.Controls)
+            {
+                var header = layout.DetailRow(0) with { Y = layout.Details.Y - 34 * scale, Height = 28 * scale };
+                Text("ACTION", header with { X = header.X + 20 * scale, Width = header.Width * .34f - 40 * scale }, ForgeLineUiPalette.TextMuted, .75f);
+                Text("INPUT", header with { X = header.X + header.Width * .36f, Width = header.Width * .62f }, ForgeLineUiPalette.TextMuted, .75f);
+            }
             int start = Math.Clamp(view.DetailScroll, 0, Math.Max(0, view.DetailLines.Count - layout.VisibleDetailRows));
             int count = Math.Min(layout.VisibleDetailRows, view.DetailLines.Count - start);
             for (int i = 0; i < count; i++)
@@ -146,13 +165,9 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 Text(line.Label, layout.DetailLabel(i), ForgeLineUiPalette.TextSecondary);
                 var valueSlot = layout.DetailValue(i, line.CanDecrease || line.CanIncrease);
                 Vector4 color = line.IsWarning ? ForgeLineUiPalette.Warning : line.IsFocused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextPrimary;
+                Text(line.Value, valueSlot, color, layout.Controls ? .9f : 1);
                 if (layout.Controls)
-                {
-                    var wrapped = Wrap(line.Value, valueSlot.Width / scale, 22);
-                    for (int lineIndex = 0; lineIndex < Math.Min(3, wrapped.Length); lineIndex++)
-                        Text(wrapped[lineIndex], valueSlot with { Y = valueSlot.Y + lineIndex * 27 * scale }, color);
-                }
-                else Text(line.Value, valueSlot, color);
+                    Panel(row with { X = row.X + row.Width * .35f, Width = scale }, ForgeLineUiPalette.BorderSubtle);
                 if (line.CanDecrease) Button("-", layout.Decrease(i));
                 if (line.CanIncrease) Button("+", layout.Increase(i));
             }
@@ -204,11 +219,11 @@ public sealed class FrontendOverlayRenderer : IDisposable
         context.SetVertexBuffer(buffer, VertexStride);
         context.Draw(_vertexCount);
         var imageRegion = view.Kind == FrontendSurfaceKind.MainMenu ? layout.MenuArtwork : layout.Decorative;
-        bool imageDrawn = _background?.Ready == true && imageRegion.Width > 0 && imageRegion.Height > 0 &&
-            view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.PauseMenu);
+        bool imageDrawn = !fullImage && _background?.Ready == true && imageRegion.Width > 0 && imageRegion.Height > 0 &&
+            view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.Credits or FrontendSurfaceKind.PauseMenu);
         if (imageDrawn) _background!.Render(context, imageRegion);
         _text.Render(context);
-        LastRenderedVertexCount = _vertexCount + _text.VertexCount + (imageDrawn ? 6 : 0);
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount + (imageDrawn || fullImage ? 6 : 0);
     }
 
     public void Dispose()
@@ -220,6 +235,24 @@ public sealed class FrontendOverlayRenderer : IDisposable
         _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
+    }
+
+    private static Vector4 WithOpacity(Vector4 color, float opacity) => new(color.X, color.Y, color.Z, opacity);
+
+    private void EmitBrandMark(FrontendRegion region, float maximumWidth, int width, int height)
+    {
+        float factor = MathF.Min(MathF.Min(region.Width, maximumWidth) / FrontendBrandMark.Width,
+            region.Height / FrontendBrandMark.Height);
+        if (factor <= 0) return;
+        var artwork = FrontendBrandMark.Triangles;
+        for (int i = 0; i < artwork.Length; i += 3)
+        {
+            Vector2 Position(FrontendBrandMark.Vertex vertex) =>
+                new((region.X + vertex.Position.X * factor) / width * 2 - 1,
+                    1 - (region.Y + vertex.Position.Y * factor) / height * 2);
+            var a = Position(artwork[i]); var b = Position(artwork[i+1]); var c = Position(artwork[i+2]);
+            EmitTriangle(a.X, a.Y, b.X, b.Y, c.X, c.Y, artwork[i].Color);
+        }
     }
 
     private string[] Wrap(string text, float width, float size)

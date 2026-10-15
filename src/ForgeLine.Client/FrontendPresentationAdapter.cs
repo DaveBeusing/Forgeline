@@ -144,17 +144,16 @@ internal static class FrontendPresentationAdapter
         FrontendSettingsSnapshot settings =
             model.Settings;
 
-        FrontendSettingsField? focused = interaction?.FocusedField;
+        interaction ??= new SettingsInteractionModel();
+        FrontendSettingsField? focused = interaction.FocusedField;
         var graphics = model.GraphicsSettings;
         var effective = graphics.Resolve(true, false, settings.WindowWidth, settings.WindowHeight, 3);
         string Choice<T>(T? requested, T active) where T : struct => requested?.ToString()?.ToUpperInvariant() ?? GraphicsSettingsText.Get("Profile") + " / " + active.ToString()?.ToUpperInvariant();
         string Toggle(bool? requested, bool active) => requested.HasValue ? GraphicsSettingsText.Get(requested.Value ? "On" : "Off") : GraphicsSettingsText.Get("Profile") + " / " + GraphicsSettingsText.Get(active ? "On" : "Off");
-        GameplayAction action = interaction?.BindingAction ?? GameplayAction.Build;
+        GameplayAction action = interaction.BindingAction;
         var registry = model.Bindings;
 
-        return FrontendSurfaceView.Detail(
-            "SETTINGS",
-            new FrontendDetailLineView[]
+        var lines = new FrontendDetailLineView[]
             {
                 new FrontendDetailLineView(
                     GraphicsSettingsText.Get("OutputResolution"),
@@ -196,7 +195,7 @@ internal static class FrontendPresentationAdapter
                     CanIncrease: true)
                 , new FrontendDetailLineView(GraphicsSettingsText.Get("BindingAction"), GameplayBindingRegistry.Definitions[(int)action].Label,
                     IsFocused: focused == FrontendSettingsField.BindingAction, CanDecrease: true, CanIncrease: true),
-                new FrontendDetailLineView(GraphicsSettingsText.Get("BindingKey"), interaction?.BindingCandidate is { } candidate ?
+                new FrontendDetailLineView(GraphicsSettingsText.Get("BindingKey"), interaction.BindingCandidate is { } candidate ?
                     GameplayBindingRegistry.KeyLabel(candidate) : registry.Prompt(action),
                     IsFocused: focused == FrontendSettingsField.BindingKey, CanDecrease: true, CanIncrease: true),
                 new FrontendDetailLineView(GraphicsSettingsText.Get("RenderQuality"), settings.RenderQuality.ToString().ToUpperInvariant(),
@@ -213,10 +212,17 @@ internal static class FrontendPresentationAdapter
                 new(GraphicsSettingsText.Get("ReducedUiMotion"), settings.FeedbackSettings.ReducedMotion ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.ReducedUiMotion, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("UiSoundEnabled"), settings.FeedbackSettings.SoundEnabled ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.UiSoundEnabled, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("UiSoundVolume"), $"{settings.FeedbackSettings.SoundVolume * 100:0}%", IsFocused: focused == FrontendSettingsField.UiSoundVolume, CanDecrease: settings.FeedbackSettings.SoundVolume > 0, CanIncrease: settings.FeedbackSettings.SoundVolume < 1)
-            }.Skip(interaction?.VisibleStart ?? 0).Take(interaction?.VisibleRowCount ?? 7).ToArray(),
-            displayFeedback ?? (string.IsNullOrEmpty(interaction?.BindingFeedback) ?
+            };
+        interaction ??= new SettingsInteractionModel();
+        var visible = interaction.VisibleFields.Select(field => lines[(int)field]).ToArray();
+        return FrontendSurfaceView.Detail("SETTINGS", visible,
+            displayFeedback ?? (string.IsNullOrEmpty(interaction.BindingFeedback) ?
                 focused is { } field && (field == FrontendSettingsField.OutputResolution || field >= FrontendSettingsField.RenderQuality) ? GraphicsSettingsText.Get(field + "Help") : GraphicsSettingsText.Get("Controls") : interaction.BindingFeedback),
-            interaction?.CanApply == false ? string.Empty : displayPreviewActive ? GraphicsSettingsText.Get("KeepDisplay") : "APPLY");
+            interaction.CanApply == false ? string.Empty : displayPreviewActive ? GraphicsSettingsText.Get("KeepDisplay") : "APPLY") with
+        {
+            SettingsTabs = Enum.GetValues<FrontendSettingsSection>().Select(section => new FrontendMenuEntryView(
+                section.ToString(), section.ToString().ToUpperInvariant(), true, section == interaction.Section)).ToArray()
+        };
     }
 
     internal static FrontendSurfaceView Controls(
@@ -227,83 +233,52 @@ internal static class FrontendPresentationAdapter
         ArgumentNullException.ThrowIfNull(bindings);
         gameplay ??= GameplayBindingRegistry.Default;
 
-        string primaryPan =
-            $"{bindings.PanForward.ToString().ToUpperInvariant()}/" +
-            $"{bindings.PanLeft.ToString().ToUpperInvariant()}/" +
-            $"{bindings.PanBackward.ToString().ToUpperInvariant()}/" +
-            bindings.PanRight.ToString().ToUpperInvariant();
-        string alternatePan =
-            $"{bindings.PanForwardAlternate.ToString().ToUpperInvariant()}/" +
-            $"{bindings.PanLeftAlternate.ToString().ToUpperInvariant()}/" +
-            $"{bindings.PanBackwardAlternate.ToString().ToUpperInvariant()}/" +
-            bindings.PanRightAlternate.ToString().ToUpperInvariant();
-
-        return FrontendSurfaceView.Detail(
-            "CONTROLS",
-            [
-                new FrontendDetailLineView(
-                    "CAMERA",
-                    $"{primaryPan} OR {alternatePan} PAN  " +
-                    $"{bindings.RotateLeft.ToString().ToUpperInvariant()}/" +
-                    $"{bindings.RotateRight.ToString().ToUpperInvariant()} ROTATE  " +
-                    $"{bindings.PitchUp.ToString().ToUpperInvariant()}/" +
-                    $"{bindings.PitchDown.ToString().ToUpperInvariant()} PITCH"),
-                new FrontendDetailLineView(
-                    "CAMERA MOUSE",
-                    $"WHEEL ZOOM  {bindings.DragPanButton.ToString().ToUpperInvariant()} DRAG  " +
-                    (edgeScrollEnabled ? "EDGE PAN" : "EDGE PAN DISABLED") +
-                    (RtsCameraFocusController.IsHomeCameraBinding(bindings) ? "  HOME USES CAMERA BINDING" : string.Empty) +
-                    $"  {gameplay.Prompt(GameplayAction.FocusBase)} BASE FOCUS"),
-                new FrontendDetailLineView(
-                    "SELECT / MOVE",
-                    "LEFT SELECT  DOUBLE LEFT SAME-TYPE VISIBLE UNITS  SHIFT+LEFT MULTI  RIGHT MOVE"),
-                new FrontendDetailLineView(
-                    "COMMAND PANELS",
-                    gameplay.PanelsHelpPrompt + "; " + gameplay.DockNavigationPrompt),
-                new FrontendDetailLineView(
-                    "CONTROLS / WORLD / FORMATION",
-                    "ESC CONTROLS  F2 WORLD DEBUG  " + gameplay.Prompt(GameplayAction.Formation) + " FORMATION"),
-                new FrontendDetailLineView(
-                    "PLACEMENT",
-                    gameplay.Prompt(GameplayAction.CorePlacement) + " COMMAND CORE  " + gameplay.Prompt(GameplayAction.PowerPlacement) + " POWER PLANT  " + gameplay.Prompt(GameplayAction.ExtractorPlacement) + " EXTRACTOR"),
-                new FrontendDetailLineView(
-                    "PLACEMENT / ROTATE",
-                    gameplay.Prompt(GameplayAction.StoragePlacement) + " STORAGE DEPOT  " + gameplay.Prompt(GameplayAction.SmelterPlacement) + " SMELTER  " + gameplay.Prompt(GameplayAction.RotatePlacement) + " ROTATE BUILDING  SHIFT+CLICK REPEAT AFTER ACCEPTANCE"),
-                new FrontendDetailLineView(
-                    "DEVELOPER METRICS",
-                    "SHIFT+F1 TOGGLE PERFORMANCE METRICS"),
-                new FrontendDetailLineView(
-                    "CONTROL GROUPS",
-                    "CTRL+DIGIT ASSIGN  DIGIT RECALL  DOUBLE DIGIT FOCUS  CTRL+SHIFT+DIGIT CLEAR"),
-                new FrontendDetailLineView(
-                    "OBJECTIVE",
-                    "DESTROY THE ENEMY COMMAND CORE"),
-                new FrontendDetailLineView(
-                    "OPTIONAL GUIDE",
-                    "SHIFT+F12 SHOW / HIDE  ONBOARDING SETTING CONTROLS DEFAULT"),
-                new FrontendDetailLineView(
-                    "MAP / HELP / PAUSE",
-                    gameplay.Prompt(GameplayAction.Overlay) + " STRATEGIC OVERLAY  " + gameplay.Prompt(GameplayAction.Minimap) + " MINIMAP  ESC CONTROLS  ESC/" + gameplay.Prompt(GameplayAction.Pause) + " PAUSE")
-            ],
-            footer) with { Kind = FrontendSurfaceKind.Controls };
+        string Key(ForgeLine.Platform.PlatformKey key) => GameplayBindingRegistry.KeyLabel(key);
+        var lines = new List<FrontendDetailLineView>
+        {
+            new("PAN FORWARD", $"{Key(bindings.PanForward)} / {Key(bindings.PanForwardAlternate)}"),
+            new("PAN LEFT", $"{Key(bindings.PanLeft)} / {Key(bindings.PanLeftAlternate)}"),
+            new("PAN BACKWARD", $"{Key(bindings.PanBackward)} / {Key(bindings.PanBackwardAlternate)}"),
+            new("PAN RIGHT", $"{Key(bindings.PanRight)} / {Key(bindings.PanRightAlternate)}"),
+            new("ROTATE LEFT", Key(bindings.RotateLeft)),
+            new("ROTATE RIGHT", Key(bindings.RotateRight)),
+            new("PITCH UP", Key(bindings.PitchUp)),
+            new("PITCH DOWN", Key(bindings.PitchDown)),
+            new("ZOOM", "MOUSE WHEEL"),
+            new("DRAG CAMERA", bindings.DragPanButton.ToString().ToUpperInvariant() + " MOUSE DRAG"),
+            new("EDGE SCROLL", edgeScrollEnabled ? "POINTER AT SCREEN EDGE" : "DISABLED"),
+            new("SELECT", "LEFT CLICK"),
+            new("SELECT VISIBLE SAME TYPE", "DOUBLE LEFT CLICK"),
+            new("EXTEND SELECTION", "SHIFT + LEFT CLICK"),
+            new("MOVE / TARGET", "RIGHT CLICK"),
+            new("CANCEL / PAUSE", "ESC"),
+            new("REPEAT BUILDING", "SHIFT + WORLD CLICK"),
+            new("ASSIGN CONTROL GROUP", "CTRL + DIGIT"),
+            new("RECALL CONTROL GROUP", "DIGIT"),
+            new("FOCUS CONTROL GROUP", "DOUBLE DIGIT"),
+            new("CLEAR CONTROL GROUP", "CTRL + SHIFT + DIGIT"),
+            new("DETAILED STATS", "SHIFT + F1"),
+            new("OPTIONAL GUIDE", "SHIFT + F12"),
+            new("WORLD DEBUG", "F2")
+        };
+        lines.AddRange(GameplayBindingRegistry.Definitions.Select(definition =>
+            new FrontendDetailLineView(definition.Label, gameplay.Prompt(definition.Action))));
+        if (RtsCameraFocusController.IsHomeCameraBinding(bindings))
+            lines.Add(new("HOME", "CAMERA BINDING"));
+        return FrontendSurfaceView.Detail("CONTROLS", lines,
+            "UP/DOWN / WHEEL SCROLL   " + footer) with { Kind = FrontendSurfaceKind.Controls };
     }
 
     internal static FrontendSurfaceView Credits()
     {
-        FrontendDetailLineView[] lines =
-            CreditsModel.Sections
-                .SelectMany(
-                    section =>
-                        section.Lines.Select(
-                            line =>
-                                new FrontendDetailLineView(
-                                    section.Heading,
-                                    line)))
-                .ToArray();
-
         return FrontendSurfaceView.Detail(
             "CREDITS",
-            lines,
-            "ESC  BACK");
+            [
+                new("STUDIO", CreditsModel.Studio),
+                new("LEAD DEVELOPER", CreditsModel.LeadDeveloper),
+                new("FORGELINE VERSION", ClientBuildIdentity.ProductVersion),
+                new("ENGINE", CreditsModel.Engine)
+            ],
+            "ESC  BACK") with { Kind = FrontendSurfaceKind.Credits };
     }
 }

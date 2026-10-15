@@ -17,6 +17,7 @@ public readonly record struct FrontendGeometry
     public float Scale { get; init; }
     public float Dpi { get; init; }
     public float UserScale { get; init; }
+    public FrontendRegion Background => new(0, 0, Width, Height);
     public FrontendRegion SafeArea { get; init; }
     public FrontendRegion Header { get; init; }
     public FrontendRegion Title { get; init; }
@@ -49,11 +50,13 @@ public readonly record struct FrontendGeometry
         ? Rect(Navigation.X, Navigation.Y + index * MenuStride * Scale, Navigation.Width, 52 * Scale, true) : default;
     public FrontendRegion DetailRow(int index) => index >= 0 && index < VisibleDetailRows && !IsEmpty
         ? Rect(Details.X, Details.Y + index * DetailStride * Scale, Details.Width, (DetailStride - 10) * Scale, true) : default;
-    public FrontendRegion DetailLabel(int index) { var r = DetailRow(index); return Rect(r.X + 20 * Scale, r.Y + 13 * Scale, (Controls ? r.Width : r.Width * .34f) - 40 * Scale, 28 * Scale); }
+    public FrontendRegion SettingsTab(int index) => index is >= 0 and < 4 && !IsEmpty
+        ? Rect(Details.X + index * Details.Width / 4, Details.Y - 54 * Scale, Details.Width / 4 - 4 * Scale, 42 * Scale, true) : default;
+    public FrontendRegion DetailLabel(int index) { var r = DetailRow(index); return Rect(r.X + 20 * Scale, r.Y + 13 * Scale, r.Width * .34f - 40 * Scale, 28 * Scale); }
     public FrontendRegion DetailValue(int index, bool adjustable)
     {
-        var r = DetailRow(index); float left = Controls ? r.X + 20 * Scale : r.X + r.Width * .36f;
-        return Rect(left, r.Y + (Controls ? 43 : 13) * Scale, (adjustable ? Decrease(index).X : r.Right - 20 * Scale) - left - 12 * Scale, 28 * Scale);
+        var r = DetailRow(index); float left = r.X + r.Width * .36f;
+        return Rect(left, r.Y + 13 * Scale, (adjustable ? Decrease(index).X : r.Right - 20 * Scale) - left - 12 * Scale, 28 * Scale);
     }
     public FrontendRegion Decrease(int index) { var r = DetailRow(index); return r.Width > 0 ? Rect(r.Right - 242 * Scale, r.Y, 72 * Scale, 42 * Scale, true) : default; }
     public FrontendRegion Increase(int index) { var r = DetailRow(index); return r.Width > 0 ? Rect(r.Right - 156 * Scale, r.Y, 72 * Scale, 42 * Scale, true) : default; }
@@ -67,16 +70,15 @@ public readonly record struct FrontendGeometry
         // Retain a readable minimum at supported sizes; compact header/art before shrinking commands.
         float scale = MathF.Min(MathF.Max(viewport * userScale * dpi / 96, MathF.Min(.75f, viewport)),
             MathF.Min(3, MathF.Min(height / 850, width / 1100)));
-        float canvas = MathF.Min(width, 1920 * viewport);
-        float left = (width - canvas) / 2 + 82 * viewport;
-        float right = (width + canvas) / 2 - 82 * viewport;
+        float left = 82 * viewport;
+        float right = width - 82 * viewport;
         float menuStride = height / scale >= 1000 ? 72 : 64;
         float menuHeight = (6 * menuStride + 52) * scale;
         float menuY = MathF.Min(338 * scale, height - 190 * scale - menuHeight);
         float detailY = MathF.Min(377 * scale, height * .35f);
         float actionY = height - 242 * scale;
         float detailWidth = controls ? right - left - 10 * scale : MathF.Min(right - left - 10 * scale, MathF.Max(980 * viewport, 950 * scale));
-        float stride = controls ? 150 : 58;
+        float stride = controls ? 52 : 58;
         int rows = Math.Clamp((int)((actionY - detailY - 6 * scale) / (stride * scale)), 1, 7);
         var result = new FrontendGeometry { Width = width, Height = height, Scale = scale, Dpi = dpi, UserScale = userScale };
         return result with

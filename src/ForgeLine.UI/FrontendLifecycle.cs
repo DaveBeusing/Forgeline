@@ -6,21 +6,14 @@ public readonly record struct CreditsSection(
 
 public sealed class CreditsModel
 {
+    public const string Studio = "Undefined Behavior Studios";
+    public const string LeadDeveloper = "Dave Beusing";
+    public const string Engine = "ForgeLine Engine";
     private static readonly CreditsSection[] s_sections =
     [
-        new CreditsSection(
-            "FORGELINE",
-            [
-                "Build. Supply. Conquer.",
-                "ForgeLine Engine"
-            ]),
-        new CreditsSection(
-            "Technology",
-            [
-                "C# / .NET",
-                "Direct3D 12",
-                "Windows x64"
-            ])
+        new("STUDIO", [Studio]),
+        new("LEAD DEVELOPER", [LeadDeveloper]),
+        new("ENGINE", [Engine])
     ];
 
     public static string ProductName =>
