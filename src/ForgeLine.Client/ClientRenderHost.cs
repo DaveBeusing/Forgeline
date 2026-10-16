@@ -674,6 +674,7 @@ internal sealed class ClientRenderHost : IDisposable
                 terrainRenderer.Prepare(renderCamera, Math.Max(1, (int)Math.Ceiling(width * (double)qualityProfile.ResolutionScale)),
                     Math.Max(1, (int)Math.Ceiling(height * (double)qualityProfile.ResolutionScale)),
                     shadowSettings.Enabled ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null);
+                ObjectActionRingView inputRing = default;
                 graphics.RenderFrame(
                     GraphicsColor.ForgeLineClear,
                     context =>
@@ -734,6 +735,7 @@ internal sealed class ClientRenderHost : IDisposable
                         occupied[7] = current.Operations.Open ? OperationsLayout.Panel(ringLayout) : OperationsLayout.Entry(ringLayout);
                         animatedPanel = animatedPanel with { Ring = animatedPanel.Ring.Project(renderWorld, renderCamera,
                             renderAlpha, snapshot, ringLayout, occupied) };
+                        inputRing = animatedPanel.Ring;
                         animatedPanel = animatedPanel with { Ring = ringMotion.Update(animatedPanel.Ring, uiNow,
                             current.MetricsActive && current.FeedbackSettings.Animate(qualityProfile.Active)) };
                         gameplayHudRenderer.Render(
@@ -774,7 +776,7 @@ internal sealed class ClientRenderHost : IDisposable
                     });
 
                 if (graphics.PresentedFrameCount > presentedBefore)
-                    lock (_frameGate) _latestActionRing = animatedPanel.Ring;
+                    lock (_frameGate) _latestActionRing = inputRing;
 
                 if (!_startupPresented && graphics.PresentedFrameCount > presentedBefore && current.Frontend is null &&
                     (!_expectedSession.HasValue || snapshot.SessionId == _expectedSession.Value))

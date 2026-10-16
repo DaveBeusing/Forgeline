@@ -30,10 +30,10 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
     public ObjectActionRingView Project(RenderWorld world, RtsCamera camera, float alpha,
         PresentationSnapshot snapshot, in GameplayHudLayout layout, ReadOnlySpan<HudRect> occupied)
     {
-        if (!Open) return this with { Geometry = default, Resolved = true };
+        if (!Open) return this with { Resolved = true };
         if (snapshot.SessionId != Session || snapshot.PlayerExperience is not { IsMatchComplete: false } experience ||
             !world.TryGetInterpolatedInstance(Entity, alpha, out var instance) ||
-            !instance.Selectable.IsSelectable || instance.Selectable.Owner != experience.Player)
+            (instance.Visibility & RenderVisibilityMask.World) == 0 || !instance.Selectable.IsSelectable || instance.Selectable.Owner != experience.Player)
             return this with { Geometry = default, Resolved = true };
         var projected = camera.WorldToScreen(instance.Transform.Position, layout.ViewportWidth, layout.ViewportHeight);
         if (!projected.IsVisible) return this with { Geometry = default, Resolved = true };

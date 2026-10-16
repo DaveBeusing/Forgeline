@@ -160,6 +160,7 @@ public sealed partial class PlayerActionPanelController
         _leftPressSequence = pressSequence;
         if (input.FocusLostThisFrame && !input.HasPointerPosition)
         {
+            if (_ringSingle) Close();
             Feedback = string.Empty;
             _pendingRequest = null;
             PointerCaptured = false;
@@ -253,6 +254,7 @@ public sealed partial class PlayerActionPanelController
             _ = Pressed(input, PlatformKey.Escape);
         }
 
+        SynchronizeRingParameter(actions);
         int itemCount =
             PlayerActionDockInteractionLayout.GetItemCount(
                 Mode,
@@ -277,6 +279,8 @@ public sealed partial class PlayerActionPanelController
                     itemCount;
                 _desiredStockQuantity = 0.0;
                 _stockResourceId = ResourceId.None;
+                _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions);
+                if (_ringSingle) { _ringPage = SelectedIndex / 4; _ringRevision++; _presentedRing = default; }
             }
             else
             {
@@ -287,10 +291,11 @@ public sealed partial class PlayerActionPanelController
         if (Mode != PlayerActionPanelMode.Closed && input.HasPointerPosition &&
             ContainsControl(input.PointerPosition, snapshot, layout) && input.WheelDelta != 0 && itemCount > 0)
         {
-            int capacity = PlayerActionDockInteractionLayout.MaximumVisibleItems(layout);
+            int capacity = _ringSingle ? 4 : PlayerActionDockInteractionLayout.MaximumVisibleItems(layout);
             SelectedIndex = Math.Clamp(SelectedIndex + (input.WheelDelta > 0 ? -capacity : capacity), 0, itemCount - 1);
             _desiredStockQuantity = 0.0;
             _stockResourceId = ResourceId.None;
+            if (_ringSingle) { _ringPage = SelectedIndex / 4; _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions); _ringRevision++; _presentedRing = default; }
         }
         SynchronizeStockEditor(actions);
         SynchronizeSupplyEditor(actions);
@@ -424,6 +429,7 @@ public sealed partial class PlayerActionPanelController
                 Mode, SelectedIndex, view, actions))
         {
             ActivateSelected(actions);
+            if (_ringSingle && _pendingRequest.HasValue) _contextualActivationTick = snapshot?.Tick;
         }
 
         bool cancel =
@@ -437,6 +443,7 @@ public sealed partial class PlayerActionPanelController
         if (cancel && !requestPending)
         {
             CancelSelected(actions);
+            if (_ringSingle && _pendingRequest.HasValue) _contextualActivationTick = snapshot?.Tick;
         }
         else
         {
@@ -557,7 +564,8 @@ public sealed partial class PlayerActionPanelController
         _desiredStockQuantity = 0.0;
         _stockResourceId = ResourceId.None;
         _supplyEntity = EntityId.Invalid;
-        if (_ringSingle) { _ringOpen = Mode != PlayerActionPanelMode.Closed; _ringLevel = ActionRingLevel.Items; _ringRevision++; _ringPage = 0; }
+        if (_ringSingle) { _ringOpen = Mode != PlayerActionPanelMode.Closed; _ringLevel = ActionRingLevel.Items; _ringRevision++; _ringPage = 0;
+            _presentedRing = default; _ringArmed = false; _itemSlotsPage = -1; }
     }
 
     private void ActivateSelected(

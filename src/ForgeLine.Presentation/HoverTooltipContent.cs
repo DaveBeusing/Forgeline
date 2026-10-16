@@ -88,7 +88,7 @@ internal static class HoverTooltipResolver
         string status = enabled ? "AVAILABLE AT CAPTURED TICK" :
             !state.CanActivate && control is PlayerActionDockControlKind.Item or PlayerActionDockControlKind.Activate
                 ? state.DisabledReason : "UNAVAILABLE IN CURRENT CONTEXT";
-        string hint = !enabled ? string.Empty : item ? "SELECT CARD / ENTER TO ACT" : "CLICK TO REQUEST";
+        string hint = !enabled ? string.Empty : item ? (panel.Ring.SingleOwned ? "CLICK TO ACT / PARAMETERS TO EDIT" : "SELECT CARD / ENTER TO ACT") : "CLICK TO REQUEST";
         IReadOnlyList<PlayerActionResourceAmount>? costs = null, outputs = null;
         uint? ticks = null;
         string requirement = string.Empty;

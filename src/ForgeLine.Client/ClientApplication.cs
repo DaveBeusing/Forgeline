@@ -1572,9 +1572,10 @@ internal sealed class ClientApplication
                     SelectedCombatGroup.Resolve(currentSnapshot),
                     selectionController.Selection);
 
+            transientMenus.SelectionCommitted(inputState, selectionController.Selection, actionPanel, operationsController, presentationInteraction);
             actionPanel.SynchronizeObjectRing(inputState, currentSnapshot, renderWorld, selectionController.Selection,
                 !hudInteraction.PointerCaptured && !buildingPlacementController.IsActive && !tacticalTargetingController.IsActive &&
-                window.IsFocused && !simulationPaused && !modalFrame);
+                window.IsFocused && !simulationPaused && !modalFrame, selectionResolved: true);
             PlayerActionPanelView actionPanelView =
                 actionPanel.CreateView(
                     window.ClientSize.Width,

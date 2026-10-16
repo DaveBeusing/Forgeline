@@ -32,11 +32,21 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
         if (!float.IsFinite(anchor.X) || !float.IsFinite(anchor.Y) || !float.IsFinite(footprintRadius) ||
             footprintRadius < 0 || !float.IsFinite(hud.Scale) || hud.Scale <= 0 || count is < 1 or > 8 ||
             !hud.SafeArea.Contains(anchor)) return default;
-        float scale = MathF.Min(hud.Scale, 1.75f);
-        float inner = Math.Clamp(footprintRadius + 10 * scale, 60 * scale, 100 * scale);
-        float outer = inner + 88 * scale;
-        var safe = hud.SafeArea;
-        // Do not shrink text to make an unusably small ring fit. Leave the global category bar available.
+        float preferred = Math.Clamp(hud.Scale, 1, 1.75f);
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            float scale = preferred + (1 - preferred) * attempt / 4;
+            float inner = Math.Clamp(footprintRadius + 10 * scale, 60 * scale, (100 - attempt * 10) * scale);
+            var fit = TryFit(anchor, inner, inner + 88 * scale, hud.SafeArea, occupied, count);
+            if (fit.IsValid) return fit;
+        }
+        return default;
+    }
+
+    private static RadialActionLayout TryFit(Vector2 anchor, float inner, float outer, in HudRect safe,
+        ReadOnlySpan<HudRect> occupied, int count)
+    {
+        // Bounded fallback stops at 14 physical-pixel labels; no unreadable shrinking.
         if (safe.Width < outer * 2 || safe.Height < outer * 2) return default;
         Vector2 best = default;
         float bestDistance = float.PositiveInfinity;

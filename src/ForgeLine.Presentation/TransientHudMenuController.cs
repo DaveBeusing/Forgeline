@@ -127,6 +127,15 @@ public sealed class TransientHudMenuController
         }
     }
 
+    public void SelectionCommitted(InputState input, SelectionSet selection, PlayerActionPanelController dock,
+        OperationsController operations, PresentationInteractionState interaction)
+    {
+        if (!ReferenceEquals(_selectionOwner, selection) || _selection != selection.Revision)
+            Dismiss(input, dock, operations, interaction);
+        _selectionOwner = selection;
+        _selection = selection.Revision;
+    }
+
     private static PlatformMouseButton Button(int index) => index switch
     { 0 => PlatformMouseButton.Left, 1 => PlatformMouseButton.Right, _ => PlatformMouseButton.Middle };
 }

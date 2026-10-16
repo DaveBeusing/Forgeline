@@ -12,6 +12,8 @@ internal static class Program
     public static int Main(string[] args)
     {
         long processEntryTimestamp = Stopwatch.GetTimestamp();
+        if (args.Length == 3 && args[0] == "--action-ring-capture")
+            return ObjectActionRingRuntimeCapture.Run(args[1],args[2]);
         if (args.Length == 3 && args[0] == "--onboarding-capture")
             return OnboardingCapture.Run(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--ui-feedback-capture")

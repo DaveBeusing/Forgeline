@@ -195,6 +195,8 @@ internal static class VisualReferenceCapture
                     FrontendSurfaceView? frontendView = frontend is null ? null : UiReferenceStates.Frontend(uiScenario, display.Width, display.Height, rasterDpi, uiScale);
                     var buffer = new PresentationSnapshotBuffer(); buffer.Publish(snapshot);
                     var world = new RenderWorld(); world.Update(buffer);
+                    if (ObjectActionRingCapture.IsRing(uiScenario))
+                        panel=ObjectActionRingCapture.View(snapshot,uiScenario,world,camera,GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale));
                     particles.Prepare(world, camera, display.Width, display.Height, 0);
                     particles.Prepare(world, camera, display.Width, display.Height, .1);
                     particles.Prepare(world, camera, display.Width, display.Height, .1);
@@ -227,6 +229,9 @@ internal static class VisualReferenceCapture
                         hover = new(snapshot.SessionId,default,default,new(display.Width * .65f,display.Height * .45f),true,display.Width,display.Height,
                             GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale).Scale,
                             DockMode:panel.Mode,DockControl:2,DockIndex:panel.SelectedIndex);
+                    if (uiScenario==UiReferenceScenario.RingTooltip && panel.Ring.Geometry.IsValid)
+                        hover=new(snapshot.SessionId,default,default,panel.Ring.Geometry.LabelCenter(0),true,display.Width,display.Height,
+                            GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale).Scale,panel.Mode,DockControl:2,DockIndex:0);
                     var operations = uiScenario == UiReferenceScenario.NotificationDetails
                         ? new OperationsView(true, Session: snapshot.SessionId, Notifications: true) : uiScenario is UiReferenceScenario.Operations or UiReferenceScenario.OperationsEmpty or UiReferenceScenario.OperationsMissing
                         ? new OperationsView(true,Session:snapshot.SessionId,Selected:snapshot.Operations is { Facilities.Count: > 0 } ops ? ops.Facilities[0].Entity : default) : default;
@@ -269,6 +274,13 @@ internal static class VisualReferenceCapture
                         particles.Render(context, camera);
                         context.BeginPass(GraphicsFramePass.Overlay);
                         selection.Render(context, camera, indicators);
+                        if (ObjectActionRingCapture.IsRing(uiScenario))
+                        {
+                            var ringLayout=GameplayHudLayout.Create(context.Width,context.Height,rasterDpi,uiScale);
+                            Span<HudRect> ringOccupied=stackalloc HudRect[6] { ringLayout.TopStatusBar,ringLayout.SelectionInspector,
+                                ringLayout.Minimap,ringLayout.VisibleActionDock(false),ringLayout.NotificationBounds(false),OperationsLayout.Entry(ringLayout) };
+                            panel=panel with { Ring=panel.Ring.Project(world,camera,1,snapshot,ringLayout,ringOccupied) };
+                        }
                         hud.Render(context, camera, snapshot, terrain.WorldBounds, information, panel, targeting,
                             FormationTemplate.Compact, groups, captureUx, rasterDpi, uiScale,
                             hoverTooltip: hover,

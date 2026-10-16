@@ -133,9 +133,9 @@ internal static class CommandDockCapture
     }
 
     internal static (PresentationSnapshot Snapshot, PlayerActionPanelView Panel) Fixture(PresentationSnapshot source,
-        PlayerActionPanelMode mode, string state, int width, int height, uint dpi, float scale)
+        PlayerActionPanelMode mode, string state, int width, int height, uint dpi, float scale, EntityId entityOverride = default)
     {
-        var entity = new EntityId(10, 1); var request = new EntityId(20, 1);
+        var entity = entityOverride.IsValid ? entityOverride : new EntityId(10, 1); var request = new EntityId(20, 1);
         bool blocked = state == "Blocked"; bool pending = state == "Pending"; bool empty = state == "Empty";
         PlayerActionResourceAmount[] cost = [new(ResourceIds.Steel, "Steel", 80, blocked ? 12 : 200), new(ResourceIds.Fuel, "Fuel", 20, 90)];
         var recipes = new[] { new PlayerProductionRecipeActionReadModel(RecipeIds.Steel, "Steel / Directorate industrial processing recipe", cost,

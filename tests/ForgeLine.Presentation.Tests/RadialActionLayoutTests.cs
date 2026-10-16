@@ -1,5 +1,8 @@
 using System.Numerics;
 using Xunit;
+using ForgeLine.Core;
+using ForgeLine.Game;
+using ForgeLine.Simulation;
 
 namespace ForgeLine.Presentation.Tests;
 
@@ -39,6 +42,14 @@ public sealed class RadialActionLayoutTests
         }
     }
     [Fact]
+    public void CompactHighDpiRingKeepsReadableLabelsAndAvoidsTheActualHud()
+    {
+        var hud=GameplayHudLayout.Create(1280,720,192,2);
+        var fit=RadialActionLayout.Fit(new(640,360),500,hud,[hud.TopStatusBar,hud.SelectionInspector,hud.Minimap,hud.VisibleActionDock(false),hud.NotificationBounds(false),OperationsLayout.Entry(hud)]);
+        Assert.True(fit.IsValid);
+        Assert.InRange((fit.OuterRadius-fit.InnerRadius)/88,1,1.75f);
+    }
+    [Fact]
     public void InvalidOrUnavailableGeometryNeverOwnsInput()
     {
         var hud = GameplayHudLayout.Create(1920,1080,96);
@@ -48,6 +59,28 @@ public sealed class RadialActionLayoutTests
         Assert.Equal(-1, new RadialActionLayout(default, default, 100, 90, 8).Hit(new(90,0)));
         Assert.Equal(-1, default(RadialActionLayout).Hit(default));
     }
+    [Fact]
+    public void ProjectUsesTheActualInterpolatedTransformAndRejectsForeignOrReusedEntities()
+    {
+        var entity=new EntityId(1,1); var session=new SimulationSessionId(1); var buffer=new PresentationSnapshotBuffer(); var world=new RenderWorld();
+        PresentationSnapshot Snapshot(ulong tick,Vector3 position,PlayerId owner) => new(new(tick),TimeSpan.FromMilliseconds(50),1,
+            [new RenderInstance(entity,RenderTransform.Identity with {Position=position},default,default,RenderVisibilityMask.World,
+                Selectable:new(owner,ControllableEntityCategory.Unit))],sessionId:session,
+            playerExperience:default(PlayerExperienceSnapshot) with {Player=new(1),Tick=new(tick)});
+        buffer.Publish(Snapshot(1,Vector3.Zero,new(1)));world.Update(buffer);
+        var current=Snapshot(2,new(20,0,0),new(1));buffer.Publish(current);world.Update(buffer);
+        var camera=new RtsCamera();camera.CenterOn(new(10,0,0));var layout=GameplayHudLayout.Create(1920,1080,96);
+        var ring=new ObjectActionRingView(entity,session,1,1,true,true);
+        var projected=ring.Project(world,camera,.5f,current,layout,[]);
+        Assert.True(projected.Geometry.IsValid);
+        Assert.Equal(camera.WorldToScreen(new(10,0,0),1920,1080).Position,projected.Geometry.Anchor);
+        Assert.False((ring with {Entity=new(1,2)}).Project(world,camera,.5f,current,layout,[]).Geometry.IsValid);
+        var foreign=Snapshot(3,new(20,0,0),new(2));buffer.Publish(foreign);world.Update(buffer);
+        Assert.False(ring.Project(world,camera,1,foreign,layout,[]).Geometry.IsValid);
+        camera.CenterOn(new(10000,0,0));
+        Assert.False(ring.Project(world,camera,1,current,layout,[]).Geometry.IsValid);
+    }
+
     [Fact]
     public void CloseReleasesOwnershipAtOnceWhileAlphaFadesFor160Milliseconds()
     {

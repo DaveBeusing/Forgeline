@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Input;
 
 namespace ForgeLine.Presentation;
 
@@ -10,7 +11,7 @@ internal sealed partial class PlayerActionDockHudRenderer
         var ring = panel.Ring;
         var geometry = ring.Geometry;
         if (!ring.Resolved || !geometry.IsValid || ring.Opacity <= 0) return;
-        float scale = MathF.Min(layout.Scale, 1.75f), opacity = Math.Clamp(ring.Opacity, 0, 1);
+        float scale = (geometry.OuterRadius - geometry.InnerRadius) / 88, opacity = Math.Clamp(ring.Opacity, 0, 1);
         _scale = scale;
         // Tether is decoration only. Its width is one physical pixel and never owns input.
         Vector2 delta = geometry.Anchor - geometry.Center;
@@ -21,6 +22,7 @@ internal sealed partial class PlayerActionDockHudRenderer
             RingQuad(geometry.Anchor - normal, geometry.Anchor + normal, end + normal, end - normal,
                 new(.55f, .68f, .77f, .6f * opacity), width, height);
         }
+        Span<char> valueBuffer = stackalloc char[96];
         for (int i = 0; i < 8; i++)
         {
             var slot = ring.Slots[i];
@@ -54,8 +56,20 @@ internal sealed partial class PlayerActionDockHudRenderer
                     PlayerActionDockHudModel.ResolveFooterLabel(target.Kind, panel.Mode)
             };
             Vector4 text = enabled ? TextColor : MutedTextColor; text.W *= opacity;
-            _text.AddCentered(label, new(center.X - 48 * scale, center.Y, 96 * scale, 24 * scale),
+            _text.AddCentered(label, new(center.X - 48 * scale, center.Y, 96 * scale, 22 * scale),
                 14 * scale, text, width, height, true);
+            var value = new HudTextBuilder(valueBuffer);
+            if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
+            else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
+            else if (item)
+            {
+                var state = PlayerActionDockHudModel.ResolveItemState(panel.Mode, target.ItemIndex, actions,
+                    panel.ContextualPending && panel.ContextualActivationTick == actions?.Tick);
+                value.Append(!state.CanActivate ? state.DisabledReason :
+                    PlayerActionDockHudModel.ResolvePrimaryActionLabel(panel.Mode, target.ItemIndex, actions));
+            }
+            _text.AddCentered(value.Written, new(center.X - 48 * scale, center.Y + 21 * scale, 96 * scale, 20 * scale),
+                12 * scale, text, width, height);
         }
         if (ring.Level == ActionRingLevel.Parameters)
         {
@@ -67,6 +81,33 @@ internal sealed partial class PlayerActionDockHudRenderer
             _text.AddCentered(text.Written, new(selected.X - 48 * scale, selected.Y + 22 * scale, 96 * scale, 20 * scale),
                 12 * scale, MutedTextColor with { W = MutedTextColor.W * opacity }, width, height);
         }
+    }
+
+    private static void AppendRingParameter(ref HudTextBuilder text, PlayerActionDockControlKind kind, in PlayerActionPanelView panel)
+    {
+        if (kind == PlayerActionDockControlKind.CyclePrimary)
+            text.Append(panel.Mode == PlayerActionPanelMode.Supply ? PlayerActionDockHudModel.ResolveSupplyPriorityLabel(panel.SupplyPriority) :
+                panel.Mode == PlayerActionPanelMode.Logistics ? PlayerActionDockHudModel.ResolveLogisticsPriorityLabel(panel.LogisticsPriority) :
+                PlayerActionDockHudModel.ResolvePriorityLabel(panel.Priority));
+        else if (kind == PlayerActionDockControlKind.CycleSecondary)
+        {
+            if (panel.Mode == PlayerActionPanelMode.Production) text.Append(PlayerActionDockHudModel.ResolveProductionModeLabel(panel.ProductionMode));
+            else if (panel.Mode == PlayerActionPanelMode.Supply) text.Append(panel.AutomaticResupplyEnabled ? "AUTO ON" : "AUTO OFF");
+            else text.Append(panel.StockThresholdField switch { PlayerStockThresholdField.Minimum => "MINIMUM", PlayerStockThresholdField.Maximum => "MAXIMUM", _ => "TARGET" });
+        }
+        else if (kind is PlayerActionDockControlKind.Decrease or PlayerActionDockControlKind.Increase)
+        {
+            if (panel.Mode == PlayerActionPanelMode.Supply)
+            { text.Append((panel.SelectedIndex == 0 ? panel.AutomaticFuelThreshold : panel.AutomaticAmmunitionThreshold) * 100, "F0"); text.Append("%"); }
+            else text.Append(panel.Mode == PlayerActionPanelMode.Logistics ? panel.StockThresholdField switch
+                { PlayerStockThresholdField.Minimum => panel.StockMinimum, PlayerStockThresholdField.Maximum => panel.StockMaximum, _ => panel.StockTarget } :
+                panel.DesiredStockQuantity, "F0");
+        }
+        var binding = (panel.Bindings ?? GameplayBindingRegistry.Default).Prompt(kind switch
+        { PlayerActionDockControlKind.Activate => GameplayAction.Activate, PlayerActionDockControlKind.Cancel => GameplayAction.CancelJob,
+            PlayerActionDockControlKind.CyclePrimary => GameplayAction.PrimarySetting, PlayerActionDockControlKind.CycleSecondary => GameplayAction.SecondarySetting,
+            PlayerActionDockControlKind.Decrease => GameplayAction.Decrease, _ => GameplayAction.Increase });
+        text.Append(" "); text.Append(binding);
     }
 
     private void RingSegment(in RadialActionLayout geometry, int slot, Vector4 color, int width, int height)
