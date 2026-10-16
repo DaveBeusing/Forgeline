@@ -714,14 +714,14 @@ public sealed class PlayerActionPanelController
     private void QueueSupplyPriority(
         PlayerActionSnapshot? actions)
     {
-        if (!actions?.Supply.HasValue == true)
+        if (actions?.Supply is not PlayerSupplyActionReadModel supply)
         {
             return;
         }
 
         _pendingRequest =
             PlayerActionRequest.SetSupplyPriority(
-                actions!.Supply!.Value.Entity,
+                supply.Entity,
                 _supplyPriority);
     }
 
@@ -943,14 +943,11 @@ public sealed class PlayerActionPanelController
         PlayerActionSnapshot? actions)
     {
         if (Mode != PlayerActionPanelMode.Supply ||
-            !actions?.Supply.HasValue == true)
+            actions?.Supply is not PlayerSupplyActionReadModel supply)
         {
             _supplyEntity = EntityId.Invalid;
             return;
         }
-
-        PlayerSupplyActionReadModel supply =
-            actions!.Supply!.Value;
 
         if (_supplyEntity == supply.Entity)
         {
@@ -1355,7 +1352,7 @@ public sealed class PlayerActionPanelController
         PlayerActionSnapshot? actions,
         int direction)
     {
-        if (!actions?.Supply.HasValue == true ||
+        if (actions?.Supply is null ||
             SelectedIndex > 1)
         {
             return;
