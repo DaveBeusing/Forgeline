@@ -60,6 +60,17 @@ related tests (`nonmodal-linear-tests.log`, `nonmodal-ownership-tests.log`).
 There are now 29 new nonmodal sequence/guard cases. These runs do not replace the
 full affected suites or the required hosted check.
 
+At 5d294fd8, complete Presentation (1,133 total / 1,126 passed / seven skipped),
+Client (308 passed), Input (22 passed), build/version and map pass. Its canonical
+asset rebuild was interrupted to correct footer slots omitted by the renderer
+but still present in hit tests. Those `nonmodal-verified-*` suite results retain
+their identity; they do not qualify the subsequent correction. Final validation
+uses `nonmodal-qualified-*` and includes the corrected shared footer visibility.
+
+The footer/gap correction also routes wheel input through the same actual
+control predicate, preserving world zoom without paging over decorative gaps.
+It is covered by dedicated omitted-footer and wheel-routing regression cases.
+
 ## Remaining verification
 
 Complete affected suites, full solution, canonical assets/map, native normal and

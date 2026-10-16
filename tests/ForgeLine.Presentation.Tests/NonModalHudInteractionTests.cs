@@ -281,6 +281,36 @@ public sealed class NonModalHudInteractionTests
         Assert.False(f.Dock.ContainsControl(new(card.X + 2, card.Y + 2), snapshot, f.Layout));
     }
 
+    [Fact]
+    public void UndrawnFooterSlotsAreFreeWorldRatherThanInvisibleControls()
+    {
+        var f = new Fixture(); var tab = PlayerActionDockInteractionLayout.GetModeButtonRect(f.Layout, 0);
+        f.Button(PlatformMouseButton.Left, true, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
+        f.Input.BeginFrame(); f.Button(PlatformMouseButton.Left, false, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
+        var empty = PlayerActionDockInteractionLayout.GetFooterButtonRect(f.Layout, 2);
+        var point = new Vector2(empty.X + 2, empty.Y + 2);
+        Assert.False(f.Dock.ContainsControl(point, f.Snapshot, f.Layout));
+        f.Input.BeginFrame(); f.Button(PlatformMouseButton.Left, true, (int)point.X, (int)point.Y); f.Frame();
+        Assert.Equal(PlayerActionPanelMode.Closed, f.Dock.Mode); Assert.False(f.Menus.PointerCaptured);
+    }
+
+    [Fact]
+    public void WheelOverDockGapZoomsWorldWithoutPagingTheMenu()
+    {
+        var f = new Fixture(); var tab = PlayerActionDockInteractionLayout.GetModeButtonRect(f.Layout, 0);
+        f.Button(PlatformMouseButton.Left, true, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
+        f.Input.BeginFrame(); f.Button(PlatformMouseButton.Left, false, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
+        var tactical = new PlayerTacticalActionReadModel([f.Entity], 1, 1, 0, 0, 0, false, false, default, default, [], []);
+        var items = Enumerable.Range(0, 40).Select(_ => new PlayerConstructionActionReadModel(BuildingIds.PowerPlant, "Power Plant", [], false)).ToArray();
+        var actions = new PlayerActionSnapshot(new(1), new(1), items, 0, null, null, tactical: tactical);
+        f.Snapshot = new(new(1), TimeSpan.FromMilliseconds(50), 0, [], sessionId: new(1), playerActions: actions);
+        f.Input.BeginFrame(); f.Input.Apply(PlatformInputEvent.MouseWheel((int)(tab.Right + 1), (int)(tab.Y + 2), -120)); f.Frame();
+        Assert.Equal(0, f.Dock.SelectedIndex); Assert.False(f.Dock.PointerCaptured);
+        var before = f.Camera.Distance;
+        f.Camera.Update(new RtsCameraActionMapper().Map(f.Input, f.Menus.PointerCaptured), 1f / 60, 1600, 900);
+        Assert.NotEqual(before, f.Camera.Distance);
+    }
+
     private sealed class RingMenu : ITransientHudMenu
     {
         public bool IsOpen { get; set; }

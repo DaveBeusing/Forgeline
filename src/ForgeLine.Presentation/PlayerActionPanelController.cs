@@ -280,7 +280,7 @@ public sealed class PlayerActionPanelController
         }
 
         if (Mode != PlayerActionPanelMode.Closed && input.HasPointerPosition &&
-            layout.ActionDock.Contains(input.PointerPosition) && input.WheelDelta != 0 && itemCount > 0)
+            ContainsControl(input.PointerPosition, snapshot, layout) && input.WheelDelta != 0 && itemCount > 0)
         {
             int capacity = PlayerActionDockInteractionLayout.MaximumVisibleItems(layout);
             SelectedIndex = Math.Clamp(SelectedIndex + (input.WheelDelta > 0 ? -capacity : capacity), 0, itemCount - 1);
@@ -345,7 +345,7 @@ public sealed class PlayerActionPanelController
             (layout.PrimaryCommands.Contains(input.PointerPosition) || PlayerActionDockInteractionLayout.CapturesPointer(
                 input.PointerPosition,
                 layout,
-                view.IsOpen, itemCount, SelectedIndex));
+                view.IsOpen, itemCount, SelectedIndex, Mode, actions));
 
         bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
         var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
@@ -381,7 +381,7 @@ public sealed class PlayerActionPanelController
                 layout,
                 view.IsOpen,
                 itemCount,
-                out hit, SelectedIndex);
+                out hit, SelectedIndex, Mode, actions);
         _hoveredIndex =
             hasHit &&
             hit.Kind ==
@@ -393,7 +393,7 @@ public sealed class PlayerActionPanelController
             leftDown;
 
         if (clicked && PlayerActionDockInteractionLayout.TryHit(clickPosition, layout,
-                view.IsOpen, itemCount, out var clickHit, SelectedIndex))
+                view.IsOpen, itemCount, out var clickHit, SelectedIndex, Mode, actions))
         {
             HandlePointerHit(
                 clickHit,
@@ -493,7 +493,7 @@ public sealed class PlayerActionPanelController
         var actions = PlayerActionDockHudModel.ResolveActions(snapshot);
         if (!PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection)) actions = null;
         return layout.PrimaryCommands.Contains(point) || PlayerActionDockInteractionLayout.CapturesPointer(point, layout,
-            Mode != PlayerActionPanelMode.Closed, PlayerActionDockInteractionLayout.GetItemCount(Mode, actions), SelectedIndex);
+            Mode != PlayerActionPanelMode.Closed, PlayerActionDockInteractionLayout.GetItemCount(Mode, actions), SelectedIndex, Mode, actions);
     }
 
     public void DismissTransient(InputState input)

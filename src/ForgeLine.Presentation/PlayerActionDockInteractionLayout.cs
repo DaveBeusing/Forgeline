@@ -92,11 +92,13 @@ internal static class PlayerActionDockInteractionLayout
         float height = (footer.Height - gap) / 2;
         return new(footer.X + index % 3 * (width + gap), footer.Y + index / 3 * (height + gap), width, height);
     }
-    public static bool CapturesPointer(Vector2 pointer, in GameplayHudLayout layout, bool isOpen, int itemCount = 0, int selectedIndex = 0) =>
-        TryHit(pointer, layout, isOpen, itemCount, out _, selectedIndex);
+    public static bool CapturesPointer(Vector2 pointer, in GameplayHudLayout layout, bool isOpen, int itemCount = 0, int selectedIndex = 0, PlayerActionPanelMode mode = PlayerActionPanelMode.Production,
+        PlayerActionSnapshot? actions = null) =>
+        TryHit(pointer, layout, isOpen, itemCount, out _, selectedIndex, mode, actions);
 
     public static bool TryHit(Vector2 pointer, in GameplayHudLayout layout, bool isOpen, int itemCount,
-        out PlayerActionDockHitTarget target, int selectedIndex = 0)
+        out PlayerActionDockHitTarget target, int selectedIndex = 0,
+        PlayerActionPanelMode mode = PlayerActionPanelMode.Production, PlayerActionSnapshot? actions = null)
     {
         for (int i = 0; i < ModeButtonCount; i++)
             if (GetModeButtonRect(layout, i).Contains(pointer))
@@ -116,7 +118,9 @@ internal static class PlayerActionDockInteractionLayout
             if (GetCardRect(layout, i, first).Contains(pointer))
             { target = new(PlayerActionDockControlKind.Item, ItemIndex: i); return true; }
         for (int i = 0; i < FooterButtonCount; i++)
-            if (GetFooterButtonRect(layout, i).Contains(pointer))
+            if ((i == 0 ? PlayerActionDockHudModel.ResolvePrimaryActionLabel(mode, selectedIndex, actions) :
+                PlayerActionDockHudModel.ResolveFooterLabel(FooterControl(i), mode)).Length > 0 &&
+                GetFooterButtonRect(layout, i).Contains(pointer))
             { target = new(FooterControl(i)); return true; }
         target = default; return false;
     }
