@@ -18,6 +18,16 @@ public static class GameplayGuidanceLayout
         float y = guide.Bottom + 4 * layout.Scale;
         return new(region.X, y, region.Width, MathF.Max(0, region.Bottom - y));
     }
-    private static HudRect Available(in GameplayHudLayout layout) => layout.SecondaryView with
-    { Height = MathF.Max(0, layout.SecondaryView.Height - OperationsLayout.EntryBand(layout)) };
+    private static HudRect Available(in GameplayHudLayout layout)
+    {
+        var region = layout.SecondaryView with
+        { Height = MathF.Max(0, layout.SecondaryView.Height - OperationsLayout.EntryBand(layout)) };
+        // The compact inspector can be shorter than the independently scaled
+        // command band. Keep the guide in the left column when those bands overlap.
+        var commands = layout.PrimaryCommands;
+        if (region.Intersects(commands))
+            region = region with { Width = MathF.Max(0, commands.X -
+                GameplayHudVisualStyle.ResolveSafeMargin(layout.Scale) - region.X) };
+        return region;
+    }
 }

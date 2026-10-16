@@ -53,6 +53,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
     internal HudRect LastGuidanceBounds { get; private set; }
+    internal float LastGuidanceTextSize { get; private set; }
     public int LastGuidanceVertexCount { get; private set; }
     internal int LastWorldCorners { get; private set; }
     internal int LastWorldMeters { get; private set; }
@@ -78,6 +79,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(combatGroups);
         LastGuidanceBounds = default;
+        LastGuidanceTextSize = 0;
         LastGuidanceVertexCount = 0;
         LastWorldCorners = LastWorldMeters = 0;
 
@@ -1078,7 +1080,21 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     {
         var region = GameplayGuidanceLayout.Resolve(layout);
         if (region.IsEmpty) return;
-        float scale = MathF.Min(layout.Scale, region.Height / 62);
+        // Account for wrapped text before choosing a compact type size, so later
+        // context lines do not disappear after a long objective uses two rows.
+        float scale = MathF.Min(layout.Scale, region.Height / 83);
+        if (ContextHeight(view, placement, region, scale) > region.Height)
+        {
+            float low = 0, high = scale;
+            for (int i = 0; i < 10; i++)
+            {
+                float candidate = (low + high) * .5f;
+                if (ContextHeight(view, placement, region, candidate) <= region.Height) low = candidate;
+                else high = candidate;
+            }
+            scale = low;
+        }
+        LastGuidanceTextSize = 16 * scale;
         int start = _vertexCount;
         LastGuidanceBounds = region;
         if (!_skin.Panel(region, "panel.compact")) EmitQuad(region.X, region.Y, region.Width, region.Height, GameplayHudVisualStyle.PanelBackground, width, height);
@@ -1102,6 +1118,35 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             }
         }
         LastGuidanceVertexCount = _vertexCount - start;
+    }
+
+    private static float ContextHeight(in PreAlphaUxView view, bool placement, in HudRect region, float scale)
+    {
+        float textWidth = MathF.Max(0, region.Width - 20 * scale);
+        int lines = ContextLines(placement ? view.Placement.Title : view.Guidance.Objective, textWidth, 18 * scale, true, 2) +
+            ContextLines(placement ? view.Placement.Reason : view.Guidance.Binding, textWidth, 16 * scale, false, 2) +
+            ContextLines(placement ? view.Placement.Hint : view.Guidance.Context, textWidth, 16 * scale, false, 2);
+        if (!placement && view.Guidance.Next.Length > 0) lines++;
+        if (placement && view.Placement.Costs is { } amounts) lines += amounts.Count;
+        return (18 + 23 * Math.Max(1, lines)) * scale;
+    }
+
+    private static int ContextLines(ReadOnlySpan<char> text, float width, float size, bool bold, int maximum)
+    {
+        int lines = 0;
+        while (lines < maximum && !text.IsEmpty)
+        {
+            int count = UiFontMetrics.Default.FitPrefix(text, width, size, bold);
+            if (count <= 0) break;
+            if (count < text.Length && lines + 1 < maximum)
+            {
+                int space = text[..count].LastIndexOf(' ');
+                if (space > 0) count = space;
+            }
+            lines++;
+            text = text[count..].TrimStart();
+        }
+        return lines;
     }
 
     private void ContextBlock(ReadOnlySpan<char> text, ref float y, in HudRect region,
