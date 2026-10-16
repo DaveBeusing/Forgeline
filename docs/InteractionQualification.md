@@ -1,5 +1,9 @@
 # RTS interaction qualification
 
+Current nonmodal routing and source-bound sequence evidence are recorded in
+[Nonmodal HUD qualification](NonModalHudQualification.md). Earlier records below
+retain their original execution identities.
+
 ## Contextual commands and hierarchy
 
 `ContextualCommandTests` covers unit/mixed/empty/immobile selections, incoherent session

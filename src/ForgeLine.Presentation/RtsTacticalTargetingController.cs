@@ -121,6 +121,17 @@ public sealed class RtsTacticalTargetingController
             Cancel();
         }
 
+        if (IsActive && snapshot?.PlayerActions is { } actions && actions.SessionId == snapshot.SessionId &&
+            actions.Tick == snapshot.Tick && actions.Tactical is { } tactical)
+        {
+            foreach (var entity in _entities)
+            {
+                bool present = false;
+                for (int i = 0; i < tactical.SelectedEntities.Count; i++) present |= tactical.SelectedEntities[i] == entity;
+                if (!present) { Cancel(); break; }
+            }
+        }
+
         _pointerCaptured =
             IsActive;
 
@@ -161,10 +172,16 @@ public sealed class RtsTacticalTargetingController
             Cancel();
         }
 
+        if (IsActive && !pointerBlocked && input.TryGetMousePressPosition(PlatformMouseButton.Right, out _))
+        {
+            Cancel();
+            _pointerCaptured = true;
+        }
+
         if (IsActive &&
             !pointerBlocked &&
             input.HasPointerPosition &&
-            leftDown &&
+            (leftDown || input.TryGetMousePressPosition(PlatformMouseButton.Left, out _)) &&
             !_leftWasDown)
         {
             if (_hasPointerTarget)
@@ -223,6 +240,7 @@ public sealed class RtsTacticalTargetingController
 
     public void Cancel()
     {
+        _pendingRequest = null;
         CommandFeedback.Clear();
         Mode =
             TacticalTargetingMode.None;

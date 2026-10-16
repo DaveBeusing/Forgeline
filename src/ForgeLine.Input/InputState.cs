@@ -11,6 +11,8 @@ public sealed class InputState
     private readonly bool[] _shiftKeyPressed = new bool[Enum.GetValues<PlatformKey>().Length];
     private readonly HashSet<PlatformMouseButton> _mouseButtonsDown = [];
     private readonly ulong[] _mousePressSequences = new ulong[Enum.GetValues<PlatformMouseButton>().Length];
+    private readonly bool[] _mouseShift = new bool[Enum.GetValues<PlatformMouseButton>().Length];
+    private readonly bool[] _mouseControl = new bool[Enum.GetValues<PlatformMouseButton>().Length];
     private readonly HashSet<PlatformKey> _suppressedKeys = [];
     private readonly HashSet<PlatformMouseButton> _suppressedButtons = [];
     private readonly Dictionary<PlatformMouseButton, Vector2> _mousePressPositions = [];
@@ -75,6 +77,8 @@ public sealed class InputState
                     {
                         _mousePressSequences[(int)inputEvent.MouseButton]++;
                         _mousePressPositions[inputEvent.MouseButton] = _pointerPosition;
+                        _mouseShift[(int)inputEvent.MouseButton] = IsKeyDown(PlatformKey.LeftShift) || IsKeyDown(PlatformKey.RightShift);
+                        _mouseControl[(int)inputEvent.MouseButton] = IsKeyDown(PlatformKey.LeftControl) || IsKeyDown(PlatformKey.RightControl);
                     }
                 }
 
@@ -125,6 +129,15 @@ public sealed class InputState
     public bool WasKeyPressedWithShift(PlatformKey key) => _shiftKeyPressed[(int)key];
 
     public ulong MousePressSequence(PlatformMouseButton button) => _mousePressSequences[(int)button];
+
+    public bool WasMousePressedWithShift(PlatformMouseButton button) => _mouseShift[(int)button];
+    public bool WasMousePressedWithControl(PlatformMouseButton button) => _mouseControl[(int)button];
+    public void SuppressKeyUntilRelease(PlatformKey key)
+    {
+        _keyPressed[(int)key] = false;
+        _shiftKeyPressed[(int)key] = false;
+        if (_keysDown.Remove(key)) _suppressedKeys.Add(key);
+    }
 
     public bool IsMouseButtonDown(PlatformMouseButton button) =>
         _mouseButtonsDown.Contains(button);

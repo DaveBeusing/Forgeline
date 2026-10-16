@@ -92,8 +92,8 @@ internal static class PlayerActionDockInteractionLayout
         float height = (footer.Height - gap) / 2;
         return new(footer.X + index % 3 * (width + gap), footer.Y + index / 3 * (height + gap), width, height);
     }
-    public static bool CapturesPointer(Vector2 pointer, in GameplayHudLayout layout, bool isOpen) =>
-        !layout.ActionDock.IsEmpty && (isOpen ? layout.ActionDock : GetCollapsedRect(layout)).Contains(pointer);
+    public static bool CapturesPointer(Vector2 pointer, in GameplayHudLayout layout, bool isOpen, int itemCount = 0, int selectedIndex = 0) =>
+        TryHit(pointer, layout, isOpen, itemCount, out _, selectedIndex);
 
     public static bool TryHit(Vector2 pointer, in GameplayHudLayout layout, bool isOpen, int itemCount,
         out PlayerActionDockHitTarget target, int selectedIndex = 0)

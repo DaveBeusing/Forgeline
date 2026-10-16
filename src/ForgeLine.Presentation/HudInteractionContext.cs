@@ -47,27 +47,27 @@ public sealed class HudInteractionContext
         region.Contains(position);
 
     public static bool BlocksWorldPointer(
-        Vector2 position, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false) =>
+        Vector2 position, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false, bool includeActionDock = true) =>
         layout.TopStatusBar.Contains(position) ||
         layout.SelectionInspector.Contains(position) ||
         layout.PrimaryCommands.Contains(position) ||
-        (actionDockExpanded
+        (includeActionDock && (actionDockExpanded
             ? layout.ActionDock.Contains(position)
-            : PlayerActionDockInteractionLayout.GetCollapsedRect(layout).Contains(position)) ||
+            : PlayerActionDockInteractionLayout.GetCollapsedRect(layout).Contains(position))) ||
         (minimapEnabled && layout.Minimap.Contains(position)) ||
         (guidanceVisible && GameplayGuidanceLayout.Resolve(layout).Contains(position));
 
     public static bool CapturesWorldPointer(
-        InputState input, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false)
+        InputState input, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false, bool includeActionDock = true)
     {
         ArgumentNullException.ThrowIfNull(input);
         if (!input.HasPointerPosition) return false;
-        if (BlocksWorldPointer(input.PointerPosition, layout, minimapEnabled, actionDockExpanded, guidanceVisible)) return true;
+        if (BlocksWorldPointer(input.PointerPosition, layout, minimapEnabled, actionDockExpanded, guidanceVisible, includeActionDock)) return true;
         ReadOnlySpan<PlatformMouseButton> buttons = [PlatformMouseButton.Left, PlatformMouseButton.Right];
         foreach (PlatformMouseButton button in buttons)
         {
             if (input.TryGetMousePressPosition(button, out Vector2 origin) &&
-                BlocksWorldPointer(origin, layout, minimapEnabled, actionDockExpanded, guidanceVisible)) return true;
+                BlocksWorldPointer(origin, layout, minimapEnabled, actionDockExpanded, guidanceVisible, includeActionDock)) return true;
         }
         return false;
     }

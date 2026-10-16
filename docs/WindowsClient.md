@@ -320,3 +320,37 @@ waits. The image is clipped to named visual-only regions; enabled commands and h
 are unchanged. Low/software quality uses a smaller mip chain. Gameplay pause never replaces
 the current battlefield with title art. Entering a match disposes the frontend image; return
 creates a fresh frontend owner. See [policy and qualification](CinematicFrontend.md).
+
+## Nonmodal gameplay menus
+
+`TransientHudMenuController` coordinates the existing dock and Operations before
+controller actions and world input. A world-origin press dismisses every transient
+menu, then the original retained input reaches the existing selection, move,
+placement or targeting owner exactly once. No synthetic event is injected.
+Selection and target intent are not menu state. Right click during placement or
+targeting cancels that intent and is reserved from movement on the same frame.
+
+Dock tabs, actual cards (including disabled cards), paging and footer controls
+own input. Empty card capacity, decorative dock background and gaps do not.
+The visible Operations information panel deliberately owns its entire background
+so its readable content cannot conceal a world command. Status, minimap, alerts,
+selection controls and onboarding retain their independent input owners.
+
+Menu-origin gestures retain ownership through release outside the panel. A brief
+press/release outside cancels before UI activation. An action already activated
+on pointer-down is not replayed or rolled back on release. Closing is logical and
+immediate: animation opacity never adds capture. Escape closes the whole transient
+stack before target cancellation or Pause; true modal/settings/display states keep
+priority. Focus loss, display/layout, selection identity and session transitions
+clear transient ownership and cancel retained gestures. Dock keyboard focus applies
+only over its controls, leaving free-world camera input available.
+
+Later context/ring menus register `ITransientHudMenu` with this coordinator (four
+bounded registration slots). `ContainsControl` reports actual visible input regions,
+including disabled controls, excluding centers, gaps and decorative connectors.
+`Dismiss` must clear the complete nested stack, hover, press, tooltips and focus
+idempotently. Closed or visually fading menus return `IsOpen == false`; their
+activation path still requires a fresh gesture. Registration lasts for one match.
+
+[Executed interaction qualification](NonModalHudQualification.md) records the
+source identity, sequence tests and remaining native/human acceptance.

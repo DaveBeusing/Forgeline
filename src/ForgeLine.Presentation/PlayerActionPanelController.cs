@@ -116,8 +116,8 @@ public sealed class PlayerActionPanelController
 
     public bool PointerCaptured { get; private set; }
 
-    public bool HasKeyboardFocus =>
-        Mode != PlayerActionPanelMode.Closed;
+    // Dock shortcuts consume their mapped keys; the panel has no free-text editor.
+    public bool HasKeyboardFocus => PointerCaptured && Mode != PlayerActionPanelMode.Closed;
 
     public int HoveredIndex =>
         _hoveredIndex;
@@ -345,7 +345,7 @@ public sealed class PlayerActionPanelController
             (layout.PrimaryCommands.Contains(input.PointerPosition) || PlayerActionDockInteractionLayout.CapturesPointer(
                 input.PointerPosition,
                 layout,
-                view.IsOpen));
+                view.IsOpen, itemCount, SelectedIndex));
 
         bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
         var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
@@ -486,6 +486,21 @@ public sealed class PlayerActionPanelController
             _pendingRequest.Value;
         _pendingRequest = null;
         return true;
+    }
+
+    public bool ContainsControl(System.Numerics.Vector2 point, PresentationSnapshot? snapshot, in GameplayHudLayout layout) =>
+        layout.PrimaryCommands.Contains(point) || PlayerActionDockInteractionLayout.CapturesPointer(point, layout,
+            Mode != PlayerActionPanelMode.Closed,
+            PlayerActionDockInteractionLayout.GetItemCount(Mode, PlayerActionDockHudModel.ResolveActions(snapshot)), SelectedIndex);
+
+    public void DismissTransient(InputState input)
+    {
+        Close();
+        _pendingRequest = null;
+        _contextualActivationTick = null;
+        _contextualHoveredIndex = -1; _contextualPressed = false;
+        _leftPressSequence = input.MousePressSequence(PlatformMouseButton.Left);
+        _leftWasDown = input.IsMouseButtonDown(PlatformMouseButton.Left);
     }
 
     public void Close()
