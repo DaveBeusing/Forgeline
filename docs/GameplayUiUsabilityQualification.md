@@ -1,5 +1,8 @@
 # Gameplay UI usability qualification
 
+Historical evidence for 0.1.370. Its permanent FPS/TPS display contract is
+superseded by [responsive HUD qualification](ResponsiveHudQualification.md).
+
 Source implementation: `e80e9feecffd1e59fc501b40a9c88881c50e06f1`, product 0.1.370.
 Base: master `947d27d834913948f02dfb76381a869c95609878`.
 [Source-bound native and smoke measurements](evidence/gameplay-ui-usability/native.json).

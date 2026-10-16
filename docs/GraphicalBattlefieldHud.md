@@ -52,8 +52,9 @@ the existing `HasHealth`, `HasSupply`, `HasReadiness` and `HasPower` flags, with
 looking up entities or private gameplay data. Work continues to use the copied
 `PlayerWorkSummary`, including its real block reason and percentage.
 
-No changes to hit regions, command submission, readiness/work authority or input
-confirmation are introduced. Production/operations card contents and alerts stay
+Shared hit regions follow the revised responsive geometry. Command submission,
+readiness/work authority and input confirmation retain their existing behavior.
+Production/operations card contents and alerts stay
 with their existing owners for the production interface migration. Minimap,
 cursor, world markers and dynamic tactical geometry are outside this migration.
 Normal HUD surfaces do not draw or reserve FPS/SIM/TPS counters. Detailed
@@ -76,8 +77,11 @@ stack in this revision; its next migration must consume these published bounds.
 `OnboardingBounds` reserves the top-left corner and is consumed by guidance;
 collapsible guidance behavior remains with its existing controller.
 
-Resource density uses one row or two rows while preserving all seven quantities
-and the existing generation/demand state. Live quantities and labels use separate
+Resource density shares 1064/640 design-width thresholds between geometry and
+rendering. Full resource names retain captions of at least 11 physical pixels and
+values of at least 12 pixels across the required matrix. It uses one row or two
+rows while preserving all seven quantities and the existing generation/demand
+state. Live quantities and labels use separate
 font-sized lines; icon/text groups are centered together. Dock tabs and footer
 controls center labels and current bindings in separate rows. Header title slots
 are symmetric around paging controls. `UiTextBatch.AddCentered` uses logical font
