@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace ForgeLine.Navigation;
 
 internal readonly record struct LocalPathSearchResult(
@@ -52,21 +50,34 @@ internal static class LocalPathSearch
         int startIndex = grid.GetIndex(start);
         int destinationIndex = grid.GetIndex(destination);
 
-        var frontier = new PriorityQueue<int, float>();
+        // Keep the cost at insertion so an improved route does not expand
+        // an obsolete queue entry again. Equal estimates prefer progress,
+        // then a stable cell identity rather than incidental heap layout.
+        var frontier = new PriorityQueue<
+            (int Index, float Cost),
+            (float Estimate, float Remaining, int Index)>();
         var bestCost = new Dictionary<int, float>
         {
             [startIndex] = 0.0f
         };
         var previous = new Dictionary<int, int>();
 
+        float startHeuristic = Heuristic(start, destination);
         frontier.Enqueue(
-            startIndex,
-            Heuristic(start, destination));
+            (startIndex, 0.0f),
+            (startHeuristic, startHeuristic, startIndex));
 
         int expanded = 0;
 
-        while (frontier.TryDequeue(out int currentIndex, out _))
+        while (frontier.TryDequeue(out var entry, out _))
         {
+            int currentIndex = entry.Index;
+            float currentCost = bestCost[currentIndex];
+            if (entry.Cost != currentCost)
+            {
+                continue;
+            }
+
             NavigationCellCoordinate current =
                 grid.GetCoordinate(currentIndex);
             expanded++;
@@ -83,7 +94,8 @@ internal static class LocalPathSearch
                 return true;
             }
 
-            float currentCost = bestCost[currentIndex];
+            float currentTraversal =
+                grid.GetTraversalCost(current, capabilities);
 
             for (int neighborIndex = 0;
                  neighborIndex < s_neighbors.Length;
@@ -119,7 +131,7 @@ internal static class LocalPathSearch
                 int nextIndex = grid.GetIndex(next);
                 float traversal =
                     0.5f *
-                    (grid.GetTraversalCost(current, capabilities) +
+                    (currentTraversal +
                      grid.GetTraversalCost(next, capabilities));
                 float candidate =
                     currentCost + moveCost * traversal;
@@ -135,13 +147,14 @@ internal static class LocalPathSearch
                 bestCost[nextIndex] = candidate;
                 previous[nextIndex] = currentIndex;
 
+                float remaining = Heuristic(next, destination);
                 frontier.Enqueue(
-                    nextIndex,
-                    candidate + Heuristic(next, destination));
+                    (nextIndex, candidate),
+                    (candidate + remaining, remaining, nextIndex));
             }
         }
 
-        result = default;
+        result = new LocalPathSearchResult([], expanded);
         return false;
     }
 
