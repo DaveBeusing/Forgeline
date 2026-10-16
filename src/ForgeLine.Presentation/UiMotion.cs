@@ -45,6 +45,12 @@ public sealed class UiMotionTimeline
         return new(Ease(now - _reveal, RevealDuration), Ease(now - _focus, FocusDuration), result);
     }
 
+    public static float SmoothStep(TimeSpan elapsed, TimeSpan duration)
+    {
+        float p = (float)Math.Clamp(elapsed.TotalSeconds / duration.TotalSeconds, 0, 1);
+        return p * p * (3 - 2 * p);
+    }
+
     public void Cancel() { _initialized = false; _hasResult = false; }
 
     private static float Ease(TimeSpan elapsed, TimeSpan duration)

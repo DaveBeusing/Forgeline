@@ -77,10 +77,10 @@ internal sealed class GameplayHudSkin : IDisposable
         _symbols?.Begin(context.Width, context.Height, context.FrameIndex);
         _images?.Begin(context.Width, context.Height, context.FrameIndex);
     }
-    internal bool Panel(HudRect r, string role = "panel.primary")
+    internal bool Panel(HudRect r, string role = "panel.primary", float alpha = 1)
     {
         if (_panels is null) return false;
-        _panels.Draw(PanelIds[role], Rect(r), Vector4.One, true);
+        _panels.Draw(PanelIds[role], Rect(r), new Vector4(1, 1, 1, alpha), true);
         return true;
     }
     internal bool Control(HudRect r, bool enabled = true, bool selected = false, bool hover = false, bool pressed = false, string role = "control.button_compact")

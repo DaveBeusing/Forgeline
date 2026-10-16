@@ -72,7 +72,7 @@ public sealed class TransientHudMenuController
 
     public void Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
         SelectionSet selection, PlayerActionPanelController dock, OperationsController operations,
-        PresentationInteractionState interaction, bool minimapEnabled, bool guidanceVisible, bool blocked = false, string localFeedback = "")
+        PresentationInteractionState interaction, bool minimapEnabled, bool guidanceVisible, bool blocked = false, string localFeedback = "", OnboardingPresentation? onboarding = null)
     {
         var session = snapshot?.SessionId ?? default;
         ulong identity = selection.Revision;
@@ -105,7 +105,7 @@ public sealed class TransientHudMenuController
                 foreach (var menu in _contextMenus)
                     menuOwned |= menu?.IsOpen == true && menu.ContainsControl(origin, layout);
                 bool persistent = HudInteractionContext.BlocksWorldPointer(origin, layout, minimapEnabled,
-                    guidanceVisible: guidanceVisible, includeActionDock: false) ||
+                    guidanceVisible: guidanceVisible, includeActionDock: false, onboarding: onboarding) ||
                     OperationsLayout.Entry(layout).Contains(origin) ||
                     snapshot?.PlayerExperience is not null && ActionableAlertLayout.Resolve(snapshot, layout, dock.Mode != PlayerActionPanelMode.Closed, localFeedback).Contains(origin);
                 _menuOwned[i] = menuOwned;

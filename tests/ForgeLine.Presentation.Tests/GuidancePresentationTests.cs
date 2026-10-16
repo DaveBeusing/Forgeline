@@ -159,6 +159,32 @@ public sealed class GuidancePresentationTests
         Assert.Equal(1, device.BufferCount);
     }
 
+    [Fact]
+    public void HundredAnimatedRoundTripsReuseTheWarmBufferAndOwnOnlyPaintedBounds()
+    {
+        using var device = new RetainedDevice();
+        using var renderer = new RtsInformationOverlayRenderer(device);
+        var snapshot = EarlyGameGuidanceTests.Snapshot(0);
+        var ux = Ux(new EarlyGameGuidanceController().Update(snapshot, true));
+        var context = new RecordingContext(); var camera = new RtsCamera();
+        var layout = GameplayHudLayout.Create(context.Width, context.Height, 96);
+        void Cycle()
+        {
+            for (int i = 0; i <= 16; i++)
+            {
+                float fraction = i <= 8 ? i / 8f : (16 - i) / 8f;
+                var state = OnboardingPresentation.Resolve(layout, fraction);
+                renderer.Render(context, camera, snapshot, default, RtsInformationLayerView.Empty,
+                    CombatGroupOverviewView.Empty, 96, preAlphaUx: ux with { Onboarding = state });
+            }
+        }
+        for (int i = 0; i < 128; i++) Cycle();
+        long start = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 100; i++) Cycle();
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - start);
+        Assert.Equal(1, device.BufferCount);
+    }
+
     private static PreAlphaUxView Ux(EarlyGameGuidanceView guide) => default(PreAlphaUxView) with { ShowOnboarding = true, Guidance = guide };
 
     private sealed class RetainedDevice : IGraphicsDevice
