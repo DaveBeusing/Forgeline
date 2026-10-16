@@ -9,6 +9,7 @@ using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
 
+[Collection(FrameAllocationCollection.Name)]
 public sealed class DirectorateBuildingPresentationTests
 {
     [Theory]
@@ -403,6 +404,7 @@ public sealed class DirectorateBuildingPresentationTests
             new(building, BuildingPresentationState.Destroyed)
         ];
         _ = ResolveNames();
+        FrameAllocationCollection.CompleteBackgroundCollections();
         long before = GC.GetAllocatedBytesForCurrentThread();
         int resolvedCharacters = 0;
         for (int i = 0; i < 1000; i++) resolvedCharacters += ResolveNames();
