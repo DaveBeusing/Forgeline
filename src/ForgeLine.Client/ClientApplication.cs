@@ -364,6 +364,7 @@ internal sealed class ClientApplication
             ? sampledHeight
             : 0.0f;
 
+        using var tacticalCursors = new TacticalCursorSet(window, runtimeAssets);
         var inputState = new InputState();
         var actionMapper = new RtsCameraActionMapper(
             _settings.CameraBindings);
@@ -1575,6 +1576,8 @@ internal sealed class ClientApplication
                         selectionController.PointerMovementTargetValid,
                         PointerCaptured: !gameplayActive || simulationPaused || !window.IsFocused || uiPointerCaptured || buildingPlacementController.AwaitingResult,
                         MovementSelectionSupported: RtsCursorResolver.CanMoveSelection(currentSnapshot, selectionController.Selection, LocalPlayer)));
+            tacticalCursors.Update(cursor, window.Dpi, _settings.UiScale,
+                gameplayActive && !simulationPaused && window.IsFocused && !window.IsMinimized && !uiPointerCaptured && inputState.HasPointerPosition);
             var informationView =
                 new RtsInformationLayerView(
                     informationLayer.MinimapEnabled,

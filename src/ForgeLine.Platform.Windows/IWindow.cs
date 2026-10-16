@@ -18,6 +18,9 @@ public interface IWindow : IDisposable
 
     void RequestClose();
 
+    void SetCursorImage(WindowCursorImage? image) { }
+    void ReleaseCursorImages() => SetCursorImage(null);
+
     void SetMode(WindowMode mode);
     void ConfigureDisplay(WindowConfiguration configuration) =>
         throw new NotSupportedException("Display preview is unsupported by this window.");

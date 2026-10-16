@@ -124,6 +124,12 @@ internal static partial class WindowsNative
 
     [LibraryImport("user32.dll", SetLastError = true)]
     internal static partial int DestroyIcon(nint icon);
+
+    [LibraryImport("user32.dll")]
+    internal static partial nint SetCursor(nint cursor);
+
+    [LibraryImport("user32.dll")]
+    internal static partial int DestroyCursor(nint cursor);
     internal const uint WmEraseBackground = 0x0014;
 
     [LibraryImport("user32.dll")]
@@ -321,6 +327,9 @@ internal static partial class WindowsNative
 
     [LibraryImport("user32.dll", EntryPoint = "ScreenToClient", SetLastError = true)]
     internal static partial int ScreenToClient(nint windowHandle, ref NativePoint point);
+
+    [LibraryImport("user32.dll")]
+    internal static partial int GetCursorPos(out NativePoint point);
 
     [LibraryImport("user32.dll", EntryPoint = "SetProcessDpiAwarenessContext", SetLastError = true)]
     internal static partial int SetProcessDpiAwarenessContext(nint dpiContext);
