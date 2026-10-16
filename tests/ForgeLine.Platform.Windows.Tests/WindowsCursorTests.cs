@@ -8,7 +8,7 @@ namespace ForgeLine.Platform.Windows.Tests;
 public sealed class WindowsCursorTests
 {
     [Theory]
-    [InlineData(24,3,2)] [InlineData(32,4,3)] [InlineData(48,6,5)] [InlineData(64,8,6)]
+    [InlineData(24,3,2)] [InlineData(32,4,3)] [InlineData(48,6,4)] [InlineData(64,8,6)]
     public void NativePointerPreservesHotspotDimensionsAndReleasesSessionHandles(int size,int x,int y)
     {
         using var platform = new WindowsPlatform();
@@ -26,9 +26,18 @@ public sealed class WindowsCursorTests
             owner.SetCursorImage(image);
             Assert.Equal(cursor,window.CursorHandle);
             Assert.NotEqual(0,GetIconInfo(cursor,out var info));
-            try { Assert.Equal(0,info.IsIcon); Assert.Equal((uint)x,info.X); Assert.Equal((uint)y,info.Y); }
+            try
+            {
+                Assert.Equal(0,info.IsIcon); Assert.Equal((uint)x,info.X); Assert.Equal((uint)y,info.Y);
+                Assert.NotEqual(0,GetObject(info.Color,Marshal.SizeOf<Bitmap>(),out var bitmap));
+                Assert.Equal(size,bitmap.Width); Assert.Equal(size,bitmap.Height);
+            }
             finally { _=DeleteObject(info.Mask); _=DeleteObject(info.Color); }
+            _=WindowsNative.SendMessage(owner.NativeHandle.Value,WindowsNative.WmSetFocus,0,0);
+            _=WindowsNative.SendMessage(owner.NativeHandle.Value,0x0020,(nuint)owner.NativeHandle.Value,1);
+            Assert.Equal(cursor,GetCursor());
             _=WindowsNative.SendMessage(owner.NativeHandle.Value,WindowsNative.WmKillFocus,0,0);
+            Assert.Equal(WindowsNative.LoadCursor(0,new nint(WindowsNative.CursorArrow)),GetCursor());
             owner.SetCursorImage(null);
             Assert.Equal(0,window.CursorHandle);
             _=WindowsNative.SendMessage(owner.NativeHandle.Value,WindowsNative.WmSetFocus,0,0);
@@ -56,6 +65,9 @@ public sealed class WindowsCursorTests
         Assert.Throws<ArgumentException>(()=>new WindowCursorImage(32,0,0,new byte[3]));
     }
     [StructLayout(LayoutKind.Sequential)] private struct IconInfo { public int IsIcon; public uint X,Y; public nint Mask,Color; }
+    [StructLayout(LayoutKind.Sequential)] private struct Bitmap { public int Type,Width,Height,WidthBytes; public ushort Planes,BitsPerPixel; public nint Bits; }
+    [DllImport("gdi32.dll",EntryPoint="GetObjectW")] private static extern int GetObject(nint handle,int length,out Bitmap bitmap);
+    [DllImport("user32.dll")] private static extern nint GetCursor();
     [DllImport("user32.dll")] private static extern int GetIconInfo(nint handle,out IconInfo info);
     [DllImport("gdi32.dll")] private static extern int DeleteObject(nint handle);
 }

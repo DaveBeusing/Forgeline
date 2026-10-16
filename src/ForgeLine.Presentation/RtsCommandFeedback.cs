@@ -22,7 +22,7 @@ public sealed class RtsCommandFeedback
         Position = position;
         IsValid = valid;
         IsAttack = attack;
-        _attackMove = attackMove;
+        _attackMove = attack && attackMove;
         _remainingSeconds = 0.8f;
     }
 
