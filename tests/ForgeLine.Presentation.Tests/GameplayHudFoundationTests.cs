@@ -58,7 +58,7 @@ public sealed class GameplayHudFoundationTests
             layout.TopStatusBar.Intersects(
                 layout.AlertStack));
         Assert.False(
-            layout.ActionDock.Intersects(
+            layout.VisibleActionDock(false).Intersects(
                 layout.AlertStack));
         Assert.False(
             layout.ActionDock.Intersects(

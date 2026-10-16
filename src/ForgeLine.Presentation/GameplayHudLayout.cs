@@ -60,7 +60,7 @@ public readonly record struct GameplayHudLayout(
         }
     }
 
-    public const int ContractVersion = 2;
+    public const int ContractVersion = 3;
 
     public float Gap => MathF.Min(GameplayHudVisualStyle.ResolveSafeMargin(Scale), 16);
 
@@ -75,7 +75,7 @@ public readonly record struct GameplayHudLayout(
         float top = VisibleActionDock(expanded).Bottom + gap;
         float bottom = MathF.Max(top, Minimap.Y - gap);
         return new(ActionDock.X, top, ActionDock.Width,
-            MathF.Min(GameplayHudVisualStyle.AlertStackHeight * DockContentScale, bottom - top));
+            MathF.Min(224 * Math.Clamp(DockContentScale, 1, 1.5f), bottom - top));
     }
 
     public float DockContentScale => MathF.Min(Scale, ActionDock.Width / 608);
@@ -268,7 +268,7 @@ public readonly record struct GameplayHudLayout(
                     secondaryBottom -
                     secondaryTop));
 
-        return new GameplayHudLayout(
+        var result = new GameplayHudLayout(
             viewportWidth,
             viewportHeight,
             scale,
@@ -279,5 +279,6 @@ public readonly record struct GameplayHudLayout(
             alertStack,
             minimap,
             secondaryView);
+        return result with { AlertStack = result.NotificationBounds(false) };
     }
 }

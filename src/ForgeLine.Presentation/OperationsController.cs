@@ -7,7 +7,7 @@ using ForgeLine.Simulation;
 namespace ForgeLine.Presentation;
 
 public readonly record struct OperationsView(bool Open, OperationsCategory Filter = OperationsCategory.All,
-    int Page = 0, EntityId Selected = default, SimulationSessionId Session = default, bool Suppressed = false);
+    int Page = 0, EntityId Selected = default, SimulationSessionId Session = default, bool Suppressed = false, bool Notifications = false);
 public readonly record struct OperationsInteraction(bool Captured, EntityId Navigate = default,
     PlayerActionPanelMode Controls = PlayerActionPanelMode.Closed);
 
@@ -48,6 +48,7 @@ public static class OperationsLayout
         if (s <= 0) return default;
         return index switch
         {
+            12 => new(p.X + 222 * x, p.Y + 6 * s, 138 * x, 22 * s),
             0 => new(p.X + 366 * x, p.Y + 6 * s, 78 * x, 22 * s),
             1 => new(p.X + 6 * x, p.Y + 120 * s, 210 * x, 22 * s),
             2 => new(p.X + 222 * x, p.Y + 120 * s, 222 * x, 22 * s),
@@ -90,6 +91,8 @@ public sealed class OperationsController
         View = default; _lastRouteFocus = default;
         CancelInput(input); interaction.SetOperationsOpen(false);
     }
+    public void OpenNotifications(SimulationSessionId session, PresentationInteractionState interaction)
+    { View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
     public void CancelInput(InputState input) => _press = input.MousePressSequence(PlatformMouseButton.Left);
     public OperationsInteraction Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
         PresentationInteractionState interaction, bool blocked = false)
@@ -121,18 +124,25 @@ public sealed class OperationsController
             View = new(!View.Open, Session: _session); interaction.SetOperationsOpen(View.Open); return new(true);
         }
         if (!View.Open && snapshot?.PlayerExperience is { } experience && !experience.IsMatchComplete &&
-            (layout.TopStatusBar.Contains(origin) || ActionableAlertLayout.Contains(experience, layout, origin) ||
+            (layout.TopStatusBar.Contains(origin) ||
                 layout.SelectionInspector.Contains(origin) && experience.Selection.HasSingleEntityDetails &&
                 (experience.Selection.HasInventory || experience.Selection.HasSupply || experience.Selection.Work.Kind != PlayerWorkKind.None)))
         {
-            var filter = ActionableAlertLayout.Contains(experience, layout, origin) ? OperationsCategory.Blocked :
-                layout.SelectionInspector.Contains(origin) ? experience.Selection.HasSupply ? OperationsCategory.Supply :
+            var filter = layout.SelectionInspector.Contains(origin) ? experience.Selection.HasSupply ? OperationsCategory.Supply :
                     experience.Selection.Work.Kind != PlayerWorkKind.None ? OperationsCategory.Production : OperationsCategory.Logistics : OperationsCategory.All;
             View = new(true, filter, Session: _session); interaction.SetOperationsOpen(true); return new(true);
         }
         if (!View.Open || !panel.Contains(origin)) return new(captured);
         if (OperationsLayout.Control(layout, 0).Contains(origin))
         { View = default; interaction.SetOperationsOpen(false); return new(true); }
+        if (OperationsLayout.Control(layout, 12).Contains(origin))
+        { View = View with { Notifications = !View.Notifications, Page = 0 }; return new(true); }
+        if (View.Notifications)
+        {
+            if (OperationsLayout.Control(layout, 1).Contains(origin)) View = View with { Notifications = false, Page = 0 };
+            else if (OperationsLayout.Control(layout, 2).Contains(origin)) View = View with { Page = View.Page == int.MaxValue ? 0 : View.Page + 1 };
+            return new(true);
+        }
         if (OperationsSnapshot.Resolve(snapshot) is not { } data) return new(true);
         for (int index = 1; index <= 11; index++)
         {

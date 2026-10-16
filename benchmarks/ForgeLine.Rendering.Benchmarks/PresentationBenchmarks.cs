@@ -644,6 +644,8 @@ public class PresentationBenchmarks : IDisposable
     internal sealed class NullGraphicsCommandContext :
         IGraphicsCommandContext
     {
+        public long DrawCalls { get; private set; }
+        public long DrawnVertices { get; private set; }
         public int Width { get; init; } = 1600;
 
         public int Height { get; init; } = 900;
@@ -700,6 +702,7 @@ public class PresentationBenchmarks : IDisposable
             int vertexCount,
             int startVertex = 0)
         {
+            DrawCalls++; DrawnVertices += vertexCount;
         }
 
         public void DrawIndexed(

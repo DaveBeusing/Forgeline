@@ -892,7 +892,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 break;
 
             default:
-                if (!string.IsNullOrEmpty(view.InteractionHint) || (view.ShowOnboarding && !view.Guidance.Visible && !view.Placement.Visible))
+                if (view.Placement.Visible || (view.ShowOnboarding && !view.Guidance.Visible && !view.Placement.Visible && string.IsNullOrEmpty(view.InteractionHint)))
                 {
                     EmitOnboardingHint(
                         view.InteractionHint,

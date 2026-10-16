@@ -59,3 +59,13 @@ The composed HUD shares seven atlas pages (28 MiB): one Core, two Icons and four
 `EconomicInterfaceSkinTests` covers work/availability independence, shortages, output/power/inventory blocking, queued versus active units, cancel-only controls, technology completion/identity, missing routes/providers, stale tooltips, current Operations selection, zero warm allocation, native thin/selected progress visibility and opaque ownership. Existing Operations, alert, tooltip, strict bitmap geometry and client tests remain in place. The complete CI job remains required.
 
 See [source-bound qualification, package and remaining gates](GraphicalProductionAndOperationsQualification.md). Automated repeatability does not grant human art, readability, accessibility or physical-monitor acceptance.
+
+## Notification details
+
+The version-3 notification stack consumes the visible right dock bounds. Operations
+and notifications remain simultaneously visible without overlapping. The header's
+Notifications control opens current authorized alert and command text, including
+content hidden by stack overflow. Six cached lines are retained per detail page;
+Next Message Page cycles all text and Facilities returns to the existing facility
+view. Current snapshots replace resolved/expired facts instead of keeping history.
+See [notification qualification](NotificationStackQualification.md).

@@ -1173,7 +1173,8 @@ internal sealed class ClientApplication
                 actionPanel, operationsController, presentationInteraction, informationLayer.MinimapEnabled,
                 buildingPlacementController.IsActive ||
                 (_settings.ShowOnboarding && !smokeTest && !guidanceInteraction.Hidden && inputSnapshot?.Guidance is not null &&
-                    !selectionController.IsDragSelecting && !tacticalTargetingController.IsActive));
+                    !selectionController.IsDragSelecting && !tacticalTargetingController.IsActive),
+                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback);
             hudInteraction.CapturePointer(transientMenus.PointerCaptured);
 
             if (inputMatchTerminal)
@@ -1217,8 +1218,8 @@ internal sealed class ClientApplication
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
             var alertResult = alertController.Update(inputState, inputSnapshot, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
-                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive ||
-                    operationsController.View.Open && !operationsController.View.Suppressed, seconds: frameElapsed.TotalSeconds);
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, seconds: frameElapsed.TotalSeconds, dockExpanded: actionPanel.Mode != PlayerActionPanelMode.Closed,
+                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback);
             hudInteraction.CapturePointer(alertResult.Captured);
             if (alertResult.Target.IsValid && inputSnapshot is not null)
             {
@@ -1240,7 +1241,10 @@ internal sealed class ClientApplication
                 }
             }
             if (alertResult.OpenOperations && inputSnapshot is not null)
-                operationsController.OpenCategory(alertResult.Category, inputSnapshot.SessionId, presentationInteraction);
+            {
+                if (alertResult.NotificationDetails) operationsController.OpenNotifications(inputSnapshot.SessionId, presentationInteraction);
+                else operationsController.OpenCategory(alertResult.Category, inputSnapshot.SessionId, presentationInteraction);
+            }
             var operationsResult = operationsController.Update(inputState, inputSnapshot, interactionLayout, presentationInteraction,
                 blocked: alertResult.Captured || modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive);

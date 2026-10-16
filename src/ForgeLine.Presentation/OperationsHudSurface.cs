@@ -16,6 +16,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     private readonly GameplayHudSkin _skin;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);
     private readonly OperationsVertex[] _vertices = new OperationsVertex[MaxVertices];
+    private readonly NotificationDetailText _notificationDetails = new();
     private int _count, _line, _width, _height, _underlay;
     private HudRect _bounds;
     private float _scale;
@@ -66,8 +67,10 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                 Quad(new HudRect(_bounds.X, _bounds.Y, 3 * _scale, _bounds.Height), GameplayHudVisualStyle.Focus);
                 Line("OPERATIONS", true);
                 Control(context.Layout, 0, "CLOSE");
+                Control(context.Layout, 12, view.Notifications ? "FACILITIES" : "NOTIFICATIONS");
                 var data = OperationsSnapshot.Resolve(context.Snapshot);
-                if (data is null) Line("WAITING FOR CURRENT OWNED DATA");
+                if (view.Notifications) RenderNotificationDetails(context);
+                else if (data is null) Line("WAITING FOR CURRENT OWNED DATA");
                 else
                 {
                     Span<char> text = stackalloc char[192];
@@ -155,6 +158,25 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         _text.Render(context.Graphics);
         LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
     }
+    private void RenderNotificationDetails(in GameplayHudRenderContext context)
+    {
+        Line("CURRENT NOTIFICATIONS / COMMAND RESULTS");
+        var row = OperationsLayout.Control(context.Layout, 3);
+        float size = LastPanelTextSize;
+        _notificationDetails.Update(context.Snapshot, MathF.Max(1, row.Width - 16 * _scale), size,
+            context.PreAlphaUx.Placement.Visible ? "" : context.PreAlphaUx.InteractionHint, context.Operations.Page);
+        Control(context.Layout, 1, "FACILITIES"); Control(context.Layout, 2, "NEXT MESSAGE PAGE");
+        var previous = _bounds;
+        for (int i = 0; i < 6; i++)
+        {
+            int index = i;
+            if (index >= _notificationDetails.Lines.Count) break;
+            _bounds = OperationsLayout.Control(context.Layout, i + 3); _line = 0;
+            Line(_notificationDetails.Lines[index]);
+        }
+        _bounds = previous; _line = 0;
+    }
+
     private static void Number(ref OperationsTextBuilder builder, double? value, string format = "0")
     { if (value.HasValue && double.IsFinite(value.Value)) builder.Number(value.Value, format); else builder.Append("N/A"); }
     internal static RtsUiIcon CategoryIcon(OperationsCategory category) => category switch
