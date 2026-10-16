@@ -29,6 +29,7 @@ public sealed class NotificationStackTests
             Assert.InRange(detailRows,1,6);
             float detailSize=OperationsLayout.NotificationTextSize(layout);
             Assert.Equal(stack.FontSize,detailSize);
+            Assert.True(UiFontMetrics.Default.Measure("CLOSE",detailSize) <= OperationsLayout.NotificationControl(layout,0).Width-8);
             var detail=OperationsLayout.NotificationControl(layout,detailRows+2);
             Assert.True(detail.Height>=detailSize+4);
             Assert.True(detail.Bottom<OperationsLayout.NotificationControl(layout,1).Y);

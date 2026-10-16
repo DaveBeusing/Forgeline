@@ -66,8 +66,8 @@ public static class OperationsLayout
         float height = line + 8, half = MathF.Max(0, (panel.Width - 18) / 2);
         return index switch
         {
-            0 => new(panel.Right - MathF.Min(90, panel.Width * .3f) - 6, panel.Y + 4,
-                MathF.Min(90, panel.Width * .3f), height),
+            0 => new(panel.Right - MathF.Min(90 * ActionableAlertLayout.Scale(layout), panel.Width * .3f) - 6, panel.Y + 4,
+                MathF.Min(90 * ActionableAlertLayout.Scale(layout), panel.Width * .3f), height),
             1 => new(panel.X + 6, panel.Bottom - height - 6, half, height),
             2 => new(panel.X + 12 + half, panel.Bottom - height - 6, half, height),
             _ => new(panel.X + 8, panel.Y + height + 12 + (index - 3) * (line + 4),
