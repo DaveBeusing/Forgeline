@@ -47,6 +47,19 @@ Later ring menus use ITransientHudMenu rather than adding outside-click handlers
   distinct in `artifacts/nonmodal-initial-build.log`, `nonmodal-build-v2/v3/v4/v5.log`,
   `nonmodal-focused-tests.log` and `nonmodal-focused-v2-tests.log`.
 
+The first broad verification attempt at 7596cb91 was deliberately interrupted
+during Presentation tests before completing any suite or native/asset/package
+gate. Target-source identity validation was changed from nested comparisons to
+a linear comparison of the existing ordered copied selection. The interrupted
+logs under `nonmodal-final-*` are not passing evidence. Final verification uses
+a separate `nonmodal-verified-*` prefix.
+
+The subsequent focused linear-identity control passes 34 tests; shared
+selection-aware card ownership adds a stale-selection regression and passes 52
+related tests (`nonmodal-linear-tests.log`, `nonmodal-ownership-tests.log`).
+There are now 29 new nonmodal sequence/guard cases. These runs do not replace the
+full affected suites or the required hosted check.
+
 ## Remaining verification
 
 Complete affected suites, full solution, canonical assets/map, native normal and

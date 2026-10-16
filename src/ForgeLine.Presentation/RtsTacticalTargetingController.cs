@@ -124,12 +124,10 @@ public sealed class RtsTacticalTargetingController
         if (IsActive && snapshot?.PlayerActions is { } actions && actions.SessionId == snapshot.SessionId &&
             actions.Tick == snapshot.Tick && actions.Tactical is { } tactical)
         {
-            foreach (var entity in _entities)
-            {
-                bool present = false;
-                for (int i = 0; i < tactical.SelectedEntities.Count; i++) present |= tactical.SelectedEntities[i] == entity;
-                if (!present) { Cancel(); break; }
-            }
+            if (tactical.SelectedEntities.Count != _entities.Length) Cancel();
+            else
+                for (int i = 0; i < _entities.Length; i++)
+                    if (tactical.SelectedEntities[i] != _entities[i]) { Cancel(); break; }
         }
 
         _pointerCaptured =

@@ -488,10 +488,13 @@ public sealed class PlayerActionPanelController
         return true;
     }
 
-    public bool ContainsControl(System.Numerics.Vector2 point, PresentationSnapshot? snapshot, in GameplayHudLayout layout) =>
-        layout.PrimaryCommands.Contains(point) || PlayerActionDockInteractionLayout.CapturesPointer(point, layout,
-            Mode != PlayerActionPanelMode.Closed,
-            PlayerActionDockInteractionLayout.GetItemCount(Mode, PlayerActionDockHudModel.ResolveActions(snapshot)), SelectedIndex);
+    public bool ContainsControl(System.Numerics.Vector2 point, PresentationSnapshot? snapshot, in GameplayHudLayout layout)
+    {
+        var actions = PlayerActionDockHudModel.ResolveActions(snapshot);
+        if (!PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection)) actions = null;
+        return layout.PrimaryCommands.Contains(point) || PlayerActionDockInteractionLayout.CapturesPointer(point, layout,
+            Mode != PlayerActionPanelMode.Closed, PlayerActionDockInteractionLayout.GetItemCount(Mode, actions), SelectedIndex);
+    }
 
     public void DismissTransient(InputState input)
     {

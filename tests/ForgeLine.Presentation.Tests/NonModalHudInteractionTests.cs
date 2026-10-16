@@ -268,6 +268,19 @@ public sealed class NonModalHudInteractionTests
         Assert.False(f.Targeting.IsActive); Assert.False(f.Targeting.TryTakeRequest(out _));
     }
 
+    [Fact]
+    public void StaleSelectionCardsAreNotInvisiblePointerBlockers()
+    {
+        var f = new Fixture();
+        var tab = PlayerActionDockInteractionLayout.GetModeButtonRect(f.Layout, 0);
+        f.Button(PlatformMouseButton.Left, true, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
+        var actions = new PlayerActionSnapshot(new(1), new(1),
+            [new PlayerConstructionActionReadModel(BuildingIds.PowerPlant, "Power Plant", [], false)], 0, null, null);
+        var snapshot = new PresentationSnapshot(new(1), TimeSpan.FromMilliseconds(50), 0, [], sessionId: new(1), playerActions: actions);
+        var card = PlayerActionDockInteractionLayout.GetCardRect(f.Layout, 0);
+        Assert.False(f.Dock.ContainsControl(new(card.X + 2, card.Y + 2), snapshot, f.Layout));
+    }
+
     private sealed class RingMenu : ITransientHudMenu
     {
         public bool IsOpen { get; set; }
