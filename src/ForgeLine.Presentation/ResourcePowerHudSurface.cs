@@ -119,6 +119,12 @@ internal static class ResourcePowerHudModel
         (alerts & alert) !=
         PlayerAlertState.None;
 
+    public static string GetResourceLabel(int index) => index switch
+    {
+        0 => "Ferrous Ore", 1 => "Volatiles", 2 => "Silicates", 3 => "Steel",
+        4 => "Fuel", 5 => "Electronics", 6 => "Ammunition", _ => string.Empty
+    };
+
     public static RtsUiIcon GetResourceIcon(
         int index) =>
         index switch
@@ -383,12 +389,12 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         {
             var cell = density.Resource(index);
             var icon = ResourcePowerHudModel.GetResourceIcon(index);
-            var definition = RtsUiIconCatalog.Get(icon);
+            string label = ResourcePowerHudModel.GetResourceLabel(index);
             var value = new HudTextBuilder(buffer);
             AppendQuantity(ref value, ResourcePowerHudModel.GetResourceQuantity(experience.Resources, index));
-            float labelSize = 12 * _scale, valueSize = 16 * _scale;
+            float labelSize = MathF.Max(11, 12 * _scale), valueSize = 16 * _scale;
             float textWidth = MathF.Min(cell.Width - 23 * _scale, MathF.Max(
-                UiFontMetrics.Default.MeasureLineBounds(definition.ShortLabel, labelSize).Width,
+                UiFontMetrics.Default.MeasureLineBounds(label, labelSize).Width,
                 UiFontMetrics.Default.MeasureLineBounds(value.Written, valueSize, true).Width));
             float groupWidth = textWidth + 17 * _scale;
             float groupX = cell.X + (cell.Width - groupWidth) * .5f;
@@ -404,12 +410,12 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             var valueRect = new HudRect(labelRect.X, labelRect.Bottom, textWidth, valueSize * lineHeight);
             if (_text.Ready)
             {
-                _text.AddCentered(definition.ShortLabel, labelRect, labelSize, MutedTextColor, width, height);
+                _text.AddCentered(label, labelRect, labelSize, MutedTextColor, width, height);
                 _text.AddCentered(value.Written, valueRect, valueSize, TextColor, width, height, bold: true);
             }
             else
             {
-                EmitText(definition.ShortLabel, labelRect.X, labelRect.Y, MutedTextColor, width, height);
+                EmitText(label, labelRect.X, labelRect.Y, MutedTextColor, width, height);
                 EmitText(value.Written, valueRect.X, valueRect.Y, TextColor, width, height);
             }
         }
@@ -420,7 +426,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         EmitQuad(power.X, power.Y + 3 * _scale, 3 * _scale, power.Height - 6 * _scale,
             state, width, height);
         if (experience.Power.IsConstrained) _skin.State(power, UiSkinState.Warning);
-        float labelHeight = 12 * _scale * UiFontMetrics.Default.Description.LineHeight /
+        float powerLabelSize = MathF.Max(11, 12 * _scale);
+        float labelHeight = powerLabelSize * UiFontMetrics.Default.Description.LineHeight /
             UiFontMetrics.Default.Description.PixelSize;
         float valueHeight = 16 * _scale * UiFontMetrics.Default.Description.LineHeight /
             UiFontMetrics.Default.Description.PixelSize;
@@ -431,7 +438,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         var text = new HudTextBuilder(powerBuffer);
         text.Append("POWER / ");
         text.Append(ResourcePowerHudModel.ResolvePowerStateLabel(experience.Power));
-        if (!_text.AddCentered(text.Written, labelBounds, 12 * _scale, state, width, height))
+        if (!_text.AddCentered(text.Written, labelBounds, powerLabelSize, state, width, height))
             EmitText(text.Written, labelBounds.X, labelBounds.Y, state, width, height);
         text = new HudTextBuilder(powerBuffer);
         AppendQuantity(ref text, experience.Power.Generation); text.Append(" / ");

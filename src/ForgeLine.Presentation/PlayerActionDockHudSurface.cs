@@ -1563,47 +1563,6 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 "NONE"
         };
 
-    private void EmitCenteredText(
-        string text,
-        in HudRect rect,
-        Vector4 color,
-        int width,
-        int height)
-    {
-        float textWidth = _text.Ready ? UiFontMetrics.Default.Measure(text, UiTypography.Style(UiTextRole.Telemetry).Size * _scale)
-            : text.Length * GlyphAdvance * _scale;
-        float x =
-            MathF.Max(
-                rect.X +
-                    2.0f *
-                    _scale,
-                rect.X +
-                    (rect.Width -
-                     textWidth) *
-                    0.5f);
-        float y =
-            rect.Y +
-            MathF.Max(
-                2.0f *
-                _scale,
-                (rect.Height -
-                 7.0f *
-                 GlyphPixelSize *
-                 _scale) *
-                0.5f);
-
-        EmitClippedText(
-            text,
-            x,
-            y,
-            rect.Right -
-                2.0f *
-                _scale,
-            color,
-            width,
-            height);
-    }
-
     private void EmitClippedText(
         string text,
         float x,
