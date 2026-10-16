@@ -95,13 +95,14 @@ internal sealed class GameplayHudSkin : IDisposable
         return true;
     }
     internal void State(HudRect r, UiSkinState state) => _panels?.Overlay(state, Rect(r), Vector4.One);
+    internal void PanelClip(HudRect r) => _panels?.SetClip(Rect(r));
     internal void IconClip(HudRect r) => _symbols?.SetClip(Rect(r));
-    internal bool Icon(RtsUiIcon icon, float x, float y, float size)
+    internal bool Icon(RtsUiIcon icon, float x, float y, float size, Vector4? tint = null)
     {
         if (_symbols is null) return false;
         string? id = GameplayHudArtwork.Icon(icon, size);
         if (id is null) return false;
-        _symbols.Draw(id, new(x,y,size,size), Vector4.One);
+        _symbols.Draw(id, new(x,y,size,size), tint ?? Vector4.One);
         return true;
     }
     internal void Projected(string id, Vector2 a, Vector2 b, Vector2 c, Vector2 d, Vector4 tint) => _symbols?.DrawProjected(id, a, b, c, d, tint);

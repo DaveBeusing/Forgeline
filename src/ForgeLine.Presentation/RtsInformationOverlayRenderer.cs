@@ -54,6 +54,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     public int LastRenderedVertexCount { get; private set; }
     internal HudRect LastGuidanceBounds { get; private set; }
     public int LastGuidanceVertexCount { get; private set; }
+    internal int LastWorldCorners { get; private set; }
+    internal int LastWorldMeters { get; private set; }
 
     public void Render(
         IGraphicsCommandContext context,
@@ -77,6 +79,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(combatGroups);
         LastGuidanceBounds = default;
         LastGuidanceVertexCount = 0;
+        LastWorldCorners = LastWorldMeters = 0;
 
         if (context.Width <= 0 ||
             context.Height <= 0)
@@ -96,7 +99,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float scale =
             layout.Scale;
 
-        EmitWorldArtwork(camera, snapshot, view, targeting, scale, context.Width, context.Height);
+        if (preAlphaUx.Mode == PreAlphaUxMode.None) EmitWorldArtwork(camera, snapshot, view, targeting, layout, context.Width, context.Height);
         if (view.MinimapEnabled)
         {
             RtsMinimapFrame minimap =
@@ -110,7 +113,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
             EmitMinimap(
                 minimap,
-                camera.Target,
+                camera,
                 view,
                 RtsStrategicOverlayHudModel.IsCurrent(snapshot, view.OverlayMode) ? snapshot.StrategicOverlay : null,
                 layout,
@@ -203,9 +206,14 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     }
 
     private void EmitWorldArtwork(RtsCamera camera, PresentationSnapshot snapshot, in RtsInformationLayerView view,
-        in TacticalTargetingView targeting, float scale, int width, int height)
+        in TacticalTargetingView targeting, in GameplayHudLayout layout, int width, int height)
     {
+        float scale = layout.Scale;
         if (!_skin.Ready || snapshot.PlayerExperience is not { IsMatchComplete: false } experience || experience.Tick != snapshot.Tick) return;
+        HudRect worldClip = new(0, layout.TopStatusBar.Bottom, width,
+            MathF.Max(0, MathF.Min(layout.SelectionInspector.Y, layout.Minimap.Y) - layout.TopStatusBar.Bottom));
+        _skin.IconClip(worldClip);
+        _skin.PanelClip(worldClip);
         var selection = experience.Selection;
         var hover = snapshot.Hover is { } candidate && candidate.SessionId == snapshot.SessionId && candidate.Tick == snapshot.Tick
             ? candidate : (PlayerHoverSummary?)null;
@@ -224,8 +232,11 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 var c = camera.WorldToScreen(TacticalFootprint.Corner(instance, corner, patchX, patchZ), width, height);
                 var d = camera.WorldToScreen(TacticalFootprint.Corner(instance, corner, 0, patchZ), width, height);
                 if (a.IsVisible && b.IsVisible && c.IsVisible && d.IsVisible)
+                {
+                    LastWorldCorners++;
                     _skin.Projected("ui.artwork.directorate.world.selection_corner.p32", a.Position, b.Position, c.Position, d.Position,
                         primary ? new Vector4(.25f,1,.35f,1) : new Vector4(.15f,.85f,1,1));
+                }
             }
             // Aggregate selection values must never be painted onto one member of a group.
             PlayerSelectionSummary facts = primary && selection.Count == 1 ? selection : hovered ? hover!.Value.OwnedDetails : default;
@@ -233,9 +244,16 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             var anchor = camera.WorldToScreen(instance.Transform.Position + Vector3.UnitY * extents.Y, width, height);
             if (!anchor.IsVisible) continue;
             float x = anchor.Position.X - 24 * scale, y = anchor.Position.Y - 12 * scale;
-            if (facts.HasHealth) _skin.Bar(new(x,y,48*scale,4*scale), facts.HealthFraction, new(.25f,1,.35f,1));
-            if (facts.HasSupply)
+            if (facts.HasHealth && double.IsFinite(facts.HealthFraction))
             {
+                LastWorldMeters++;
+                Vector4 healthColor = facts.HealthFraction <= .25 ? ForgeLineUiPalette.Critical :
+                    facts.HealthFraction <= .5 ? ForgeLineUiPalette.Warning : new(.25f,1,.35f,1);
+                _skin.Bar(new(x,y,48*scale,4*scale), facts.HealthFraction, healthColor);
+            }
+            if (facts.HasSupply && double.IsFinite(facts.FuelFraction) && double.IsFinite(facts.AmmunitionFraction))
+            {
+                LastWorldMeters += 2;
                 _skin.Bar(new(x,y+5*scale,23*scale,3*scale), facts.FuelFraction, new(.95f,.7f,.2f,1));
                 _skin.Bar(new(x+25*scale,y+5*scale,23*scale,3*scale), facts.AmmunitionFraction, new(.7f,.85f,1,1));
             }
@@ -245,11 +263,13 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             var point = camera.WorldToScreen(targeting.PointerWorldTarget, width, height);
             if (point.IsVisible && targeting.PointerTargetValid) _skin.Target(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale));
         }
+        _skin.IconClip(new(0,0,width,height));
+        _skin.PanelClip(new(0,0,width,height));
     }
 
     private void EmitMinimap(
         in RtsMinimapFrame model,
-        Vector3 cameraTarget,
+        RtsCamera camera,
         in RtsInformationLayerView view,
         StrategicOverlaySnapshot? overlay,
         in GameplayHudLayout layout,
@@ -466,7 +486,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 0.5f,
                 symbolSize,
                 width,
-                height);
+                height,
+                symbol.IsCurrent ? 1 : .5f);
 
             if (symbol.Kind ==
                     RtsMinimapSymbolKind.SelectedGroup &&
@@ -560,7 +581,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         _skin.IconClip(new HudRect(0, 0, width, height));
         Vector2 cameraPosition =
             RtsMinimapModelBuilder.NormalizeWorldPosition(
-                cameraTarget,
+                camera.Target,
                 model.WorldBounds);
         float cameraX =
             left +
@@ -594,6 +615,13 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             cameraColor,
             width,
             height);
+
+        if (_skin.Ready)
+        {
+            Span<Vector2> footprint = stackalloc Vector2[4];
+            if (RtsMinimapCameraFootprint.TryProject(camera, map, model.WorldBounds, width, height, footprint))
+                for (int edge = 0; edge < 4; edge++) EmitPixelLine(footprint[edge], footprint[(edge + 1) % 4], MathF.Max(1, scale), cameraColor, width, height);
+        }
 
         if (view.MinimapPointerCaptured &&
             view.MinimapPointerWorldValid)
@@ -1822,9 +1850,10 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float y,
         float size,
         int width,
-        int height)
+        int height,
+        float opacity = 1)
     {
-        if (_skin.Icon(icon, x, y, size)) return;
+        if (_skin.Icon(icon, x, y, size, new Vector4(1,1,1,opacity))) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
@@ -1885,6 +1914,17 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                    out Vector4 runtimeColor)
             ? runtimeColor
             : definition.FallbackTint;
+    }
+
+    private void EmitPixelLine(Vector2 a, Vector2 b, float thickness, Vector4 color, int width, int height)
+    {
+        if (_vertexCount + 6 > _vertexLimit || Vector2.DistanceSquared(a,b) < .01f) return;
+        Vector2 normal = Vector2.Normalize(new Vector2(a.Y-b.Y,b.X-a.X)) * thickness * .5f;
+        Vector2 p0 = a+normal, p1 = b+normal, p2 = b-normal, p3 = a-normal;
+        p0 = new(p0.X/width*2-1,1-p0.Y/height*2); p1 = new(p1.X/width*2-1,1-p1.Y/height*2);
+        p2 = new(p2.X/width*2-1,1-p2.Y/height*2); p3 = new(p3.X/width*2-1,1-p3.Y/height*2);
+        _vertices[_vertexCount++] = new(p0,color); _vertices[_vertexCount++] = new(p1,color); _vertices[_vertexCount++] = new(p2,color);
+        _vertices[_vertexCount++] = new(p0,color); _vertices[_vertexCount++] = new(p2,color); _vertices[_vertexCount++] = new(p3,color);
     }
 
     private void EmitQuad(

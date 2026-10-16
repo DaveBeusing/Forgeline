@@ -19,7 +19,8 @@ internal sealed class TacticalCursorSet : IDisposable
         for (int role = 0; role < Roles.Length; role++) for (int size = 0; size < Sizes.Length; size++)
         {
             string id = $"ui.artwork.directorate.cursor.{Roles[role]}.p{Sizes[size]}";
-            var sprite = data.Sprites.Single(s => s.Id == id);
+            var sprite = data.Sprites.SingleOrDefault(s => s.Id == id)
+                ?? throw new InvalidDataException($"Required native cursor '{id}' is missing. Reinstall the complete player.");
             if (sprite.Width != Sizes[size] || sprite.Height != Sizes[size] || sprite.HotspotX < 0 || sprite.HotspotY < 0)
                 throw new InvalidDataException($"Required native cursor '{id}' has invalid dimensions or hotspot.");
             if (!pages.TryGetValue(sprite.Page, out var texture))

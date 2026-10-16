@@ -143,6 +143,16 @@ jobs:
         shell: pwsh
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.EconomicInterfaceSkinTests ForgeLine.Presentation.Tests.OperationsTests ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.HoverTooltipTests
 
+      - name: Tactical artwork privacy and native pointer ownership
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Platform.Windows.Tests/ForgeLine.Platform.Windows.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Platform.Windows.Tests.WindowsCursorTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.TacticalCursorTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.TacticalArtworkTests ForgeLine.Presentation.Tests.SelectionMarkerTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests ForgeLine.Presentation.Tests.RtsInformationLayerTests ForgeLine.Presentation.Tests.TacticalTargetingInteractionTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Graphical frontend skin and pointer contracts
         shell: pwsh
         run: |
