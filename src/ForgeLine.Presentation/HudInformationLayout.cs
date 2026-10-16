@@ -8,7 +8,7 @@ internal readonly record struct ResourceStripLayout(HudRect Bounds, float Scale,
         HudRect bounds = layout.TopStatusBar;
         bool twoRows = bounds.Width < 930 * layout.Scale && bounds.Height >= 54;
         float scale = MathF.Min(layout.Scale, MathF.Min(bounds.Width / (twoRows ? 640 : 930),
-            bounds.Height / (twoRows ? 64 : 36)));
+            bounds.Height / (twoRows ? 80 : 48)));
         return new(bounds, MathF.Max(0, scale), twoRows);
     }
 

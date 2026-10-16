@@ -270,8 +270,8 @@ See [named regions and migration](FrontendLayout.md) and [qualification](Fronten
 
 F1 and unmodified F12 do not open a gameplay help page. Escape opens Pause,
 where Controls and Settings remain available. Shift+F1 toggles the detailed
-performance overlay. The compact FPS and measured simulation TPS strip stays
-visible independently; paused/stopped simulation states retain explicit labels.
+performance overlay. FPS and measured simulation throughput are available through
+that diagnostic overlay; paused/stopped simulation states retain explicit labels.
 Windows generic Shift/Control messages are decoded by scan code/extended bit,
 and brief Shift+F1 presses survive release before the next platform frame.
 

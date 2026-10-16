@@ -270,7 +270,7 @@ internal static class VisualReferenceCapture
                             FormationTemplate.Compact, groups, captureUx, rasterDpi, uiScale,
                             hoverTooltip: hover,
                             runtimeMetrics: new RuntimeMetricsView(60, 20, RuntimeSimulationState.Running),
-                            showRuntimeMetrics: uiScenario != UiReferenceScenario.World, operations: operations);
+                            showRuntimeMetrics: false, operations: operations);
                         if (frontend is not null && frontendView is { } pause)
                             frontend.Render(context, pause);
                     };

@@ -60,6 +60,54 @@ public sealed class UiTextBatchTests
         Assert.All(MemoryMarshal.Cast<byte, Vertex>(device.Buffers[^1].Bytes).ToArray(), v => Assert.True(v.Position.X <= (135f / 1600 * 2 - 1) + .0001f));
     }
     [Fact]
+    public void WarmCenteredControlTextDoesNotAllocateOrGrowResources()
+    {
+        using var device = new Device(); using var batch = new UiTextBatch(device);
+        var rect = new HudRect(100, 100, 240, 64);
+        for (int i = 0; i < 128; i++) Frame();
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 256; i++) Frame();
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+        Assert.Equal(1, device.TextureCreates);
+        Assert.Empty(device.Buffers);
+        void Frame() { batch.Begin(); batch.AddCentered("ÄÖÜ / 999.9M\nSHIFT + B", rect, 16,
+            Vector4.One, 1600, 900); }
+    }
+
+    [Theory]
+    [InlineData("I")]
+    [InlineData("WWW")]
+    [InlineData("ÄÖÜ äöü ß")]
+    [InlineData("1234567890")]
+    [InlineData("POWER / CONSTRAINED\n999.9M / N/A")]
+    public void CenteredControlsUseLogicalLineHeightAndInkOverhang(string text)
+    {
+        using var device = new Device(); using var batch = new UiTextBatch(device);
+        var rect = new HudRect(100, 100, 360, 100);
+        const float size = 20;
+        batch.Begin(); batch.AddCentered(text, rect, size, Vector4.One, 1600, 900);
+        batch.Render(new RecordingContext());
+        Assert.Equal(0, batch.Diagnostics.MissingGlyphs);
+        var vertices = MemoryMarshal.Cast<byte, Vertex>(device.Buffers[^1].Bytes);
+        var font = UiFontMetrics.Default;
+        var first = font.Glyph(text[0], false, out _);
+        float factor = size / font.Description.PixelSize;
+        float actualOriginX = (vertices[0].Position.X + 1) * 800 - first.Left * factor;
+        float actualOriginY = (1 - vertices[0].Position.Y) * 450 -
+            (font.Description.Ascent + first.Top) * factor;
+        var line = font.MeasureLineBounds(text, size);
+        Assert.InRange(MathF.Abs(actualOriginX + line.X + line.Width / 2 - (rect.X + rect.Width / 2)), 0, 1);
+        int lines = text.Count(c => c == '\n') + 1;
+        float blockHeight = lines * font.Description.LineHeight * factor;
+        Assert.InRange(MathF.Abs(actualOriginY + blockHeight / 2 - (rect.Y + rect.Height / 2)), 0, 1);
+        Assert.All(vertices.ToArray(), v =>
+        {
+            float x = (v.Position.X + 1) * 800, y = (1 - v.Position.Y) * 450;
+            Assert.InRange(x, rect.X, rect.Right); Assert.InRange(y, rect.Y, rect.Bottom);
+        });
+    }
+
+    [Fact]
     public void UnavailableFontTextureReleasesPipelineAndExplainsFallback()
     {
         using var device = new Device { FailTexture = true }; using var batch = new UiTextBatch(device);

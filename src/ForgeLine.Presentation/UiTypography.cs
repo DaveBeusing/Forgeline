@@ -84,6 +84,32 @@ public sealed class UiFontMetrics
         }
         return MathF.Max(maximum, current);
     }
+    // Logical advances plus ink overhang, in coordinates relative to the line top.
+    internal HudRect MeasureLineBounds(ReadOnlySpan<char> text, float size, bool bold = false)
+    {
+        ValidateSize(size);
+        float scale = size / Description.PixelSize;
+        float cursor = 0, left = 0, right = 0, top = 0, bottom = Description.LineHeight * scale;
+        int previous = 0;
+        for (int index = 0; index < text.Length;)
+        {
+            int cp = Next(text, ref index);
+            if (cp == '\r') continue;
+            if (cp == '\n') break;
+            if (cp == '\t') cp = ' ';
+            var glyph = Glyph(cp, bold, out _);
+            cursor += Kern(previous, glyph.Codepoint, bold) * scale;
+            left = MathF.Min(left, cursor + glyph.Left * scale);
+            right = MathF.Max(right, cursor + (glyph.Left + glyph.Width) * scale);
+            top = MathF.Min(top, (Description.Ascent + glyph.Top) * scale);
+            bottom = MathF.Max(bottom, (Description.Ascent + glyph.Top + glyph.Height) * scale);
+            cursor += glyph.Advance * scale;
+            right = MathF.Max(right, cursor);
+            previous = glyph.Codepoint;
+        }
+        return new(left, top, right - left, bottom - top);
+    }
+
     internal int FitPrefix(ReadOnlySpan<char> text, float width, float size, bool bold)
     {
         float current = 0; int previous = 0, index = 0;

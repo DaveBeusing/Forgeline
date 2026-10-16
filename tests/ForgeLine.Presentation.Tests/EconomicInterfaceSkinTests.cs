@@ -117,10 +117,12 @@ public sealed class EconomicInterfaceSkinTests
             { _ = EconomicCardVisual.Resolve(PlayerActionPanelMode.UnitProduction, index, actions, false); _ = EconomicCardVisual.Portrait(PlayerActionPanelMode.UnitProduction, index, actions); }
         }
     }
-    [Fact]
-    public void SelectedQueueProgressRemainsVisibleAboveTheFocusBorder()
+    [Theory]
+    [InlineData(1280, 720)]
+    [InlineData(1920, 1080)]
+    public void SelectedQueueProgressRemainsVisibleAboveTheFocusBorder(int outputWidth, int outputHeight)
     {
-        using var platform = new WindowsPlatform(); using IWindow window = platform.CreateWindow(new("FORGELINE selected queue",1280,720));
+        using var platform = new WindowsPlatform(); using IWindow window = platform.CreateWindow(new("FORGELINE selected queue",outputWidth,outputHeight));
         using var device = GraphicsDeviceFactory.CreateForWindow(window,new() { ForceSoftwareAdapter = true,EnableVSync = false });
         using var renderer = new PlayerActionDockHudRenderer(device,RuntimeAssetCatalog.Load(Path.Combine(Root(),"assets/runtime")));
         HudRect card = default; int width = 0; float scale = 1;
@@ -128,7 +130,6 @@ public sealed class EconomicInterfaceSkinTests
         {
             var layout = GameplayHudLayout.Create(c.Width,c.Height,96,1); width = c.Width;
             scale = PlayerActionDockInteractionLayout.Scale(layout);
-            Assert.False(PlayerActionDockInteractionLayout.Compact(layout));
             card = PlayerActionDockInteractionLayout.GetCardRect(layout,0);
             renderer.Render(c,Snapshot(actions:Processing(ProductionBlockReason.None,progress:progress)),
                 default(PlayerActionPanelView) with { Mode = PlayerActionPanelMode.Production,SelectedIndex = 0 },default,FormationTemplate.Compact,layout);

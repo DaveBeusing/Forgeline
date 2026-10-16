@@ -60,9 +60,31 @@ public readonly record struct GameplayHudLayout(
         }
     }
 
-    public HudRect RuntimeMetrics => SafeArea.IsEmpty ? default : new HudRect(
-        SafeArea.Right - MathF.Min(142.0f * Scale, SafeArea.Width), SafeArea.Y,
-        MathF.Min(142.0f * Scale, SafeArea.Width), TopStatusBar.Height);
+    public const int ContractVersion = 2;
+
+    public float Gap => MathF.Min(GameplayHudVisualStyle.ResolveSafeMargin(Scale), 16);
+
+    // Capacity is stable while modes change. Only drawn controls own pointer input.
+    public HudRect VisibleActionDock(bool expanded) => expanded
+        ? ActionDock : PlayerActionDockInteractionLayout.GetCollapsedRect(this);
+
+    public HudRect NotificationBounds(bool expanded)
+    {
+        if (SafeArea.IsEmpty || ActionDock.IsEmpty) return default;
+        float gap = Gap;
+        float top = VisibleActionDock(expanded).Bottom + gap;
+        float bottom = MathF.Max(top, Minimap.Y - gap);
+        return new(ActionDock.X, top, ActionDock.Width,
+            MathF.Min(GameplayHudVisualStyle.AlertStackHeight * DockContentScale, bottom - top));
+    }
+
+    public float DockContentScale => MathF.Min(Scale, ActionDock.Width / 608);
+
+    public HudRect OnboardingBounds => SafeArea.IsEmpty ? default : new(
+        SafeArea.X, SafeArea.Y,
+        MathF.Max(0, TopStatusBar.X - Gap - SafeArea.X),
+        MathF.Min(156 * MathF.Min(Scale, 1.5f), MathF.Max(0, SelectionInspector.Y - SafeArea.Y -
+            Gap)));
 
     public float ActionRowStartOffset =>
         64.0f * Scale;
@@ -112,13 +134,13 @@ public readonly record struct GameplayHudLayout(
                 safeWidth,
                 safeHeight);
 
-        if (safeArea.IsEmpty)
+        if (safeArea.IsEmpty || viewportWidth < 320 || viewportHeight < 240)
         {
             return new GameplayHudLayout(
                 viewportWidth,
                 viewportHeight,
                 scale,
-                safeArea,
+                default,
                 default,
                 default,
                 default,
@@ -127,16 +149,13 @@ public readonly record struct GameplayHudLayout(
                 default);
         }
 
-        float topHeight =
-            MathF.Min(
-                GameplayHudVisualStyle.TopStatusBarHeight * scale,
-                safeArea.Height);
-        var topStatusBar =
-            new HudRect(
-                safeArea.X,
-                safeArea.Y,
-                MathF.Max(0.0f, safeArea.Width - 142.0f * scale - margin),
-                topHeight);
+        margin = MathF.Min(margin, 16);
+        float actionWidth = MathF.Min(GameplayHudVisualStyle.ActionDockWidth * scale, safeArea.Width * .46f);
+        float topWidth = MathF.Min(2 * actionWidth, safeArea.Width * .70f);
+        bool twoRows = topWidth < 930 * scale;
+        float stripScale = MathF.Min(scale, topWidth / (twoRows ? 640 : 930));
+        float topHeight = MathF.Min((twoRows ? 80 : 48) * stripScale, safeArea.Height);
+        var topStatusBar = new HudRect(safeArea.Right - topWidth, safeArea.Y, topWidth, topHeight);
 
         float minimapLimit =
             MathF.Max(
@@ -182,18 +201,14 @@ public readonly record struct GameplayHudLayout(
                 selectionWidth,
                 selectionHeight);
 
-        float actionWidth =
-            MathF.Min(
-                GameplayHudVisualStyle.ActionDockWidth * scale,
-                safeArea.Width * 0.46f);
         float actionTop =
             topStatusBar.Bottom +
             margin;
         float actionBottom =
             MathF.Max(
                 actionTop,
-                minimap.Y -
-                margin);
+                minimap.Y - margin - MathF.Min(GameplayHudVisualStyle.AlertStackHeight *
+                    MathF.Min(scale, actionWidth / 608), safeArea.Height * .10f) - margin);
         float actionHeight =
             MathF.Min(
                 GameplayHudVisualStyle.ActionDockHeight * scale,
@@ -215,9 +230,9 @@ public readonly record struct GameplayHudLayout(
                 actionDock.X -
                 safeArea.X -
                 margin);
-        float alertTop =
-            topStatusBar.Bottom +
-            margin;
+        float alertTop = MathF.Max(topStatusBar.Bottom,
+            safeArea.Y + MathF.Min(156 * MathF.Min(scale, 1.5f),
+                MathF.Max(0, selectionInspector.Y - safeArea.Y - margin))) + margin;
         float alertHeight =
             MathF.Min(
                 GameplayHudVisualStyle.AlertStackHeight * scale,
