@@ -79,11 +79,13 @@ public sealed class TacticalArtworkTests
         Render(instance with {Selectable=new(new PlayerId(2),ControllableEntityCategory.Unit)},experience);
         Assert.Equal(0,renderer.LastWorldCorners); Assert.Equal(0,renderer.LastWorldMeters);
         // Repeated thousand-unit map/group updates reuse atlas pages and bounded buffers.
-        var army = Enumerable.Range(1,1000).Select(i => instance with { Entity=new EntityId((uint)i,1),
+        var army = Enumerable.Range(1,1000).Select(i => instance with { Entity=new EntityId((uint)i,1),UnitFeature=new(UnitIds.MainBattleTank,default),
             Transform=instance.Transform with {Position=new Vector3((i%40-20)*8,0,(i/40-12)*8)} }).ToArray();
         var armyView=view with {MinimapEnabled=true,SelectedEntities=army.Select(i=>i.Entity).ToArray()};
         var armySnapshot=new PresentationSnapshot(new SimulationTick(1),TimeSpan.FromMilliseconds(50),1000,army,
             playerExperience:experience with {Selection=selection with {Count=1000}});
+        var model = new RtsMinimapScratch().Update(armySnapshot,new(new(-500),new(500)),new PlayerId(1),armyView.SelectedEntities,Array.Empty<EntityId>());
+        Assert.Equal(2000,model.Symbols.Count); // Unit glyph plus selected-group glyph per unit.
         long uploads=device.Diagnostics.Resources.TextureUploadCount;
         int buffers=renderer.SkinDiagnostics.Buffers;
         for(int frame=0;frame<12;frame++)
@@ -91,6 +93,7 @@ public sealed class TacticalArtworkTests
             device.RenderFrame(GraphicsColor.ForgeLineClear,c=>renderer.Render(c,camera,armySnapshot,new(new(-500),new(500)),armyView,CombatGroupOverviewView.Empty,96));
             Assert.Equal(0,renderer.SkinDiagnostics.DroppedQuads);
             Assert.Equal(0,renderer.LastWorldMeters);
+            Assert.True(renderer.SkinDiagnostics.Vertices >= 12_000);
             Assert.Equal(buffers,renderer.SkinDiagnostics.Buffers);
             Assert.Equal(uploads,device.Diagnostics.Resources.TextureUploadCount);
         }
