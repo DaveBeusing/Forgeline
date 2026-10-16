@@ -43,7 +43,19 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
             var corner = camera.WorldToScreen(TacticalFootprint.Corner(instance, i), layout.ViewportWidth, layout.ViewportHeight);
             if (corner.IsVisible) radius = MathF.Max(radius, Vector2.Distance(projected.Position, corner.Position));
         }
-        return this with { Geometry = RadialActionLayout.Fit(projected.Position, radius, layout, occupied), Resolved = true };
+        ActionRingSlots slots = Slots;
+        var actions = PlayerActionDockHudModel.ResolveActions(snapshot);
+        for (int i = 0; i < 8; i++)
+        {
+            var saved = slots[i];
+            if (!saved.Present || saved.Navigation != ActionRingNavigation.None || saved.Target.Kind == PlayerActionDockControlKind.Mode) continue;
+            int resolved = -1;
+            int count = PlayerActionDockInteractionLayout.GetItemCount(saved.Target.Mode, actions);
+            for (int item = 0; item < count; item++)
+                if (ItemKey(saved.Target.Mode,item,actions) == saved.Key) { resolved = item; break; }
+            slots[i] = resolved < 0 ? saved with { Present = false } : saved with { Target = saved.Target with { ItemIndex = resolved } };
+        }
+        return this with { Geometry = RadialActionLayout.Fit(projected.Position, radius, layout, occupied), Resolved = true, Slots = slots };
     }
 
     internal static ActionRingKey ItemKey(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions)

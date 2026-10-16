@@ -3,6 +3,7 @@ using Xunit;
 using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Simulation;
+using ForgeLine.Economy;
 
 namespace ForgeLine.Presentation.Tests;
 
@@ -91,6 +92,28 @@ public sealed class RadialActionLayoutTests
         Assert.False(ring.Project(world,camera,1,foreign,layout,[]).Geometry.IsValid);
         camera.CenterOn(new(10000,0,0));
         Assert.False(ring.Project(world,camera,1,current,layout,[]).Geometry.IsValid);
+    }
+
+    [Fact]
+    public void RenderSnapshotResolvesStableItemKeysInsteadOfReusingAnOldQueueIndex()
+    {
+        var entity=new EntityId(1,1);var session=new SimulationSessionId(1);var request=new EntityId(20,1);
+        var facility=new PlayerProductionFacilityActionReadModel(entity,default,default,default,default,0,[],
+            [new(request,new RecipeId(1),"Existing request",ProductionPriority.Normal,ProductionRequestMode.OneShot,false,false)]);
+        var snapshot=new PresentationSnapshot(new(5),TimeSpan.FromMilliseconds(50),1,
+            [new RenderInstance(entity,RenderTransform.Identity,default,default,RenderVisibilityMask.World,Selectable:new(new(1),ControllableEntityCategory.Building))],
+            sessionId:session,playerExperience:default(PlayerExperienceSnapshot) with {Player=new(1),Tick=new(5)},
+            playerActions:new(session,new(5),[],0,facility,null));
+        var buffer=new PresentationSnapshotBuffer();buffer.Publish(snapshot);var world=new RenderWorld();world.Update(buffer);
+        ActionRingSlots slots=default;
+        slots[0]=new(new(PlayerActionDockControlKind.Item,PlayerActionPanelMode.Production,2),new(2,20,1));
+        slots[1]=new(new(PlayerActionDockControlKind.Item,PlayerActionPanelMode.Production,1),new(2,19,1));
+        var ring=new ObjectActionRingView(entity,session,1,1,true,true) {Slots=slots};
+        var camera=new RtsCamera();camera.CenterOn(Vector3.Zero);
+        var resolved=ring.Project(world,camera,1,snapshot,GameplayHudLayout.Create(1920,1080,96),[]);
+        Assert.Equal(0,resolved.Slots[0].Target.ItemIndex);
+        Assert.False(resolved.Slots[1].Present);
+        Assert.Equal(slots[0].Key,resolved.Slots[0].Key);
     }
 
     [Fact]

@@ -76,7 +76,7 @@ internal sealed partial class PlayerActionDockHudRenderer
             // Keep the inner hole visually and interactively free. Parameter values sit on their controls.
             Span<char> buffer = stackalloc char[192];
             var text = new HudTextBuilder(buffer);
-            text.Append(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, panel.SelectedIndex, actions));
+            text.Append(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, ring.Slots[0].Target.ItemIndex, actions));
             var selected = geometry.LabelCenter(6);
             _text.AddCentered(text.Written, new(selected.X - 38 * scale, selected.Y + 12 * scale, 76 * scale, 16 * scale),
                 12 * scale, MutedTextColor with { W = MutedTextColor.W * opacity }, width, height);

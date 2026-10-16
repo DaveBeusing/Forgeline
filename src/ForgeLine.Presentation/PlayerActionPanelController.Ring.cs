@@ -71,7 +71,7 @@ public sealed partial class PlayerActionPanelController
     private ObjectActionRingView BuildRing(PlayerActionSnapshot? actions)
     {
         var ring = new ObjectActionRingView(_ringEntity, _ringSession, _ringSelection, _ringRevision, _ringSingle,
-            _ringOpen, _presentedRing.Geometry, _presentedRing.Resolved, HoveredSlot: _presentedRing.HoveredSlot, Pressed: _pointerPressed)
+            _ringOpen, _presentedRing.Geometry, _presentedRing.Resolved, HoveredSlot: _presentedRing.Resolved ? _presentedRing.HoveredSlot : -1, Pressed: _pointerPressed)
             { Level = _ringLevel };
         if (!_ringSingle || !_ringOpen) return ring;
         ActionRingSlots slots = default;
