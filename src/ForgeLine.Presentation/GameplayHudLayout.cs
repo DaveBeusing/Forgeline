@@ -152,8 +152,8 @@ public readonly record struct GameplayHudLayout(
         margin = MathF.Min(margin, 16);
         float actionWidth = MathF.Min(GameplayHudVisualStyle.ActionDockWidth * scale, safeArea.Width * .46f);
         float topWidth = MathF.Min(2 * actionWidth, safeArea.Width * .70f);
-        bool twoRows = topWidth < 930 * scale;
-        float stripScale = MathF.Min(scale, topWidth / (twoRows ? 640 : 930));
+        bool twoRows = topWidth < ResourceStripLayout.WideDesignWidth * scale;
+        float stripScale = MathF.Min(scale, topWidth / (twoRows ? ResourceStripLayout.CompactDesignWidth : ResourceStripLayout.WideDesignWidth));
         float topHeight = MathF.Min((twoRows ? 80 : 48) * stripScale, safeArea.Height);
         var topStatusBar = new HudRect(safeArea.Right - topWidth, safeArea.Y, topWidth, topHeight);
 

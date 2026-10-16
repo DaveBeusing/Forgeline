@@ -63,6 +63,21 @@ public sealed class HudInformationLayoutTests
         for (int index = 0; index < 7; index++) Inside(layout.TopStatusBar, strip.Resource(index));
     }
 
+    [Theory]
+    [InlineData(1360, 1f)]
+    [InlineData(1100, .75f)]
+    public void FullLabelsFitAcrossTheSingleToDoubleRowTransition(int width, float userScale)
+    {
+        var strip = ResourceStripLayout.Create(GameplayHudLayout.Create(width, 720, 96, userScale));
+        for (int index = 0; index < 7; index++)
+        {
+            float inkWidth = UiFontMetrics.Default.MeasureLineBounds(ResourcePowerHudModel.GetResourceLabel(index),
+                MathF.Max(11, 12 * strip.Scale)).Width;
+            Assert.True(inkWidth <= strip.Resource(index).Width - 23 * strip.Scale,
+                $"{width}px: {ResourcePowerHudModel.GetResourceLabel(index)} needs {inkWidth}px.");
+        }
+    }
+
     private static void Inside(HudRect outer, HudRect inner)
     {
         Assert.False(inner.IsEmpty);
