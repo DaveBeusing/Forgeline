@@ -38,8 +38,8 @@ internal static class GroundMovementStep
         double awayZ = start.Z - Math.Clamp((double)start.Z, bounds.Minimum.Z, bounds.Maximum.Z);
         if (awayX * awayX + awayZ * awayZ < radiusSquared)
         {
-            // Already penetrating: retain the existing explicit depenetration
-            // policy instead of trapping a spawning or displaced unit forever.
+            // Already penetrating: retain the existing depenetration policy
+            // instead of trapping a spawning or displaced unit forever.
             return false;
         }
 
@@ -83,9 +83,13 @@ internal static class GroundMovementStep
         double z = start.Z - cornerZ;
         double b = x * dx + z * dz;
         if (b >= 0) return;
-        double c = x * x + z * z - radiusSquared;
-        double discriminant = b * b - lengthSquared * c;
-        if (discriminant < 0) return;
+        double cross = x * dz - z * dx;
+        double scaledRadius = lengthSquared * radiusSquared;
+        double discriminant = scaledRadius - cross * cross;
+        // A tangent touches but does not enter the exclusion circle. Treat
+        // round-off at that boundary consistently so parallel traffic cannot
+        // stick permanently at a rounded corner.
+        if (discriminant <= scaledRadius * 1e-12) return;
         double t = (-b - Math.Sqrt(discriminant)) / lengthSquared;
         if (t >= 0 && t <= 1 && t < earliest) earliest = t;
     }

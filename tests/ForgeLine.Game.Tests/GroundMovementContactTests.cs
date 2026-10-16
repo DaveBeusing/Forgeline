@@ -13,6 +13,33 @@ public sealed class GroundMovementContactTests
     [InlineData(8.4f, true)]
     public void DiagonalCornerUsesCircularClearanceNotExpandedSquare(float extent, bool blocked)
     {
+        Vector3 target = new(extent, 0.5f, 7);
+        (SimulationCoordinator simulation, EntityId unit) = RunStep(new Vector3(7, 0.5f, extent), target);
+        Vector3 position = simulation.Entities.GetComponent<WorldTransform>(unit).Position;
+        Assert.Equal(blocked, simulation.Entities.HasComponent<MovementOrder>(unit));
+        if (blocked)
+        {
+            Assert.True(Vector2.Distance(new Vector2(position.X, position.Z), new Vector2(8, 8)) >= 0.4999f);
+            Assert.True(Vector3.Distance(position, target) > 0.06f);
+        }
+        else
+        {
+            Assert.InRange(Vector3.Distance(position, target), 0, 0.06f);
+        }
+    }
+
+    [Fact]
+    public void ExactTangentCrossesBothCornerCapsWithoutStopping()
+    {
+        Vector3 target = new(7.5f, 0.5f, 11);
+        (SimulationCoordinator simulation, EntityId unit) = RunStep(new Vector3(7.5f, 0.5f, 7), target);
+
+        Assert.False(simulation.Entities.HasComponent<MovementOrder>(unit));
+        Assert.InRange(Vector3.Distance(simulation.Entities.GetComponent<WorldTransform>(unit).Position, target), 0, 0.06f);
+    }
+
+    private static (SimulationCoordinator Simulation, EntityId Unit) RunStep(Vector3 start, Vector3 target)
+    {
         var simulation = new SimulationCoordinator(ticksPerSecond: 20);
         var spatial = new SpatialGridIndex(new SpatialGridSettings
         {
@@ -37,8 +64,6 @@ public sealed class GroundMovementContactTests
             new SpatialEntryMetadata(0, 1UL << 63, SpatialMobility.Static)));
 
         EntityId unit = simulation.Entities.CreateEntity();
-        Vector3 start = new(7, 0.5f, extent);
-        Vector3 target = new(extent, 0.5f, 7);
         simulation.Entities.AddComponent(unit, new WorldTransform(start, Quaternion.Identity, Vector3.One));
         simulation.Entities.AddComponent(unit, new GroundMovement(100, 100, 1, MathF.Tau,
             0.5f, 0.05f, 2, 0, 45, 0.5f));
@@ -47,24 +72,14 @@ public sealed class GroundMovementContactTests
             new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
         simulation.AdvanceOneTick();
 
-        simulation.Entities.SetComponent(unit, GroundMovementState.Stationary(MathF.PI * 0.75f) with
+        Vector3 direction = Vector3.Normalize(target - start);
+        simulation.Entities.SetComponent(unit, GroundMovementState.Stationary(MathF.Atan2(direction.X, direction.Z)) with
         {
-            Velocity = Vector3.Normalize(target - start) * 40
+            Velocity = direction * 100
         });
         simulation.Entities.AddComponent(unit, new MovementOrder(new PlayerId(1), target,
             simulation.CurrentTick, new SimulationTick(2)));
         simulation.AdvanceOneTick();
-
-        Vector3 position = simulation.Entities.GetComponent<WorldTransform>(unit).Position;
-        Assert.Equal(blocked, simulation.Entities.HasComponent<MovementOrder>(unit));
-        if (blocked)
-        {
-            Assert.True(Vector2.Distance(new Vector2(position.X, position.Z), new Vector2(8, 8)) >= 0.4999f);
-            Assert.True(Vector3.Distance(position, target) > 0.06f);
-        }
-        else
-        {
-            Assert.InRange(Vector3.Distance(position, target), 0, 0.06f);
-        }
+        return (simulation, unit);
     }
 }
