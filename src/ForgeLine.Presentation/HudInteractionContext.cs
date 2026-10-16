@@ -47,10 +47,10 @@ public sealed class HudInteractionContext
         region.Contains(position);
 
     public static bool BlocksWorldPointer(
-        Vector2 position, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false, bool includeActionDock = true, OnboardingPresentation? onboarding = null) =>
+        Vector2 position, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false, bool includeActionDock = true, OnboardingPresentation? onboarding = null, bool includePrimaryCommands = true) =>
         layout.TopStatusBar.Contains(position) ||
         layout.SelectionInspector.Contains(position) ||
-        layout.PrimaryCommands.Contains(position) ||
+        (includePrimaryCommands && layout.PrimaryCommands.Contains(position)) ||
         (includeActionDock && (actionDockExpanded
             ? layout.ActionDock.Contains(position)
             : PlayerActionDockInteractionLayout.GetCollapsedRect(layout).Contains(position))) ||
@@ -58,7 +58,7 @@ public sealed class HudInteractionContext
         (onboarding?.Contains(position) ?? (guidanceVisible && GameplayGuidanceLayout.Resolve(layout).Contains(position)));
 
     public static bool CapturesWorldPointer(
-        InputState input, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false, bool includeActionDock = true, OnboardingPresentation? onboarding = null)
+        InputState input, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false, bool includeActionDock = true, OnboardingPresentation? onboarding = null, bool includePrimaryCommands = true)
     {
         ArgumentNullException.ThrowIfNull(input);
         if (!input.HasPointerPosition) return false;
@@ -66,12 +66,12 @@ public sealed class HudInteractionContext
         bool movingGesture = input.IsMouseButtonDown(PlatformMouseButton.Left) || input.IsMouseButtonDown(PlatformMouseButton.Right) ||
             input.WasMouseButtonReleased(PlatformMouseButton.Left) || input.WasMouseButtonReleased(PlatformMouseButton.Right);
         if (BlocksWorldPointer(input.PointerPosition, layout, minimapEnabled, actionDockExpanded, guidanceVisible, includeActionDock,
-            movingGesture && onboarding.HasValue ? default(OnboardingPresentation) : onboarding)) return true;
+            movingGesture && onboarding.HasValue ? default(OnboardingPresentation) : onboarding, includePrimaryCommands)) return true;
         ReadOnlySpan<PlatformMouseButton> buttons = [PlatformMouseButton.Left, PlatformMouseButton.Right];
         foreach (PlatformMouseButton button in buttons)
         {
             if (input.TryGetMousePressPosition(button, out Vector2 origin) &&
-                BlocksWorldPointer(origin, layout, minimapEnabled, actionDockExpanded, guidanceVisible, includeActionDock, onboarding)) return true;
+                BlocksWorldPointer(origin, layout, minimapEnabled, actionDockExpanded, guidanceVisible, includeActionDock, onboarding, includePrimaryCommands)) return true;
         }
         return false;
     }

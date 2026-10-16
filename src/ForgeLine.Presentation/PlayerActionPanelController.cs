@@ -53,11 +53,13 @@ public readonly record struct PlayerActionPanelView(
     bool SelectionPending = false, GameplayBindingRegistry? Bindings = null, int ContextualHoveredIndex = -1, bool ContextualPressed = false)
 {
     public UiMotionView? Motion { get; init; }
+    public ObjectActionRingView Ring { get; init; }
+    public bool DockExpanded => IsOpen && !Ring.SingleOwned;
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
 }
 
-public sealed class PlayerActionPanelController
+public sealed partial class PlayerActionPanelController
 {
     private readonly ulong[] _keySequences = new ulong[Enum.GetValues<PlatformKey>().Length];
     private readonly GameplayBindingRegistry _bindings;
@@ -96,6 +98,8 @@ public sealed class PlayerActionPanelController
     private SelectionSet? _currentSelection;
 
     public PlayerActionPanelMode Mode { get; private set; }
+    public bool DockExpanded => Mode != PlayerActionPanelMode.Closed && !_ringSingle;
+    public bool HasOpenMenu => Mode != PlayerActionPanelMode.Closed || _ringOpen;
 
     public int SelectedIndex { get; private set; }
 
@@ -187,6 +191,7 @@ public sealed class PlayerActionPanelController
 
         if (displayChanged || sessionChanged)
         {
+            CloseRing();
             _pendingRequest = null;
             input.SuppressHeldInput();
             for (int i = 0; i < _keySequences.Length; i++) _keySequences[i] = input.KeyPressSequence((PlatformKey)i);
@@ -322,7 +327,7 @@ public sealed class PlayerActionPanelController
                 adjustment);
         }
 
-        if (input.HasPointerPosition)
+        if (!_ringSingle && input.HasPointerPosition)
             for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out _); i++)
                 if (ContextualCommandModel.Button(layout, i).Contains(input.PointerPosition))
                     _contextualHoveredIndex = i;
@@ -340,6 +345,12 @@ public sealed class PlayerActionPanelController
             input.IsMouseButtonDown(
                 PlatformMouseButton.Left);
 
+        if (_ringSingle)
+        {
+            UpdateRingPointer(input, snapshot, actions, layout, view, freshPress);
+        }
+        else
+        {
         PointerCaptured =
             input.HasPointerPosition &&
             (layout.PrimaryCommands.Contains(input.PointerPosition) || PlayerActionDockInteractionLayout.CapturesPointer(
@@ -400,6 +411,8 @@ public sealed class PlayerActionPanelController
                 actions,
                 view);
             PointerCaptured = true;
+        }
+
         }
 
         bool activate =
@@ -470,7 +483,8 @@ public sealed class PlayerActionPanelController
             _contextualActivationTick.HasValue,
             _contextualActivationTick,
             _sessionId,
-            !PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection), _bindings, _contextualHoveredIndex, _contextualPressed);
+            !PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection), _bindings, _contextualHoveredIndex, _contextualPressed)
+        { Ring = BuildRing(actions) };
     }
 
     public bool TryTakeRequest(
@@ -492,8 +506,8 @@ public sealed class PlayerActionPanelController
     {
         var actions = PlayerActionDockHudModel.ResolveActions(snapshot);
         if (!PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection)) actions = null;
-        return layout.PrimaryCommands.Contains(point) || PlayerActionDockInteractionLayout.CapturesPointer(point, layout,
-            Mode != PlayerActionPanelMode.Closed, PlayerActionDockInteractionLayout.GetItemCount(Mode, actions), SelectedIndex, Mode, actions);
+        return (_ringSingle ? _presentedRing.TryHit(point, out _) : layout.PrimaryCommands.Contains(point)) || PlayerActionDockInteractionLayout.CapturesPointer(point, layout,
+            DockExpanded, PlayerActionDockInteractionLayout.GetItemCount(Mode, actions), SelectedIndex, Mode, actions);
     }
 
     public void DismissTransient(InputState input)
@@ -508,6 +522,7 @@ public sealed class PlayerActionPanelController
 
     public void Close()
     {
+        CloseRing();
         Feedback = string.Empty;
         _feedbackRemaining = default;
         Mode =
@@ -542,6 +557,7 @@ public sealed class PlayerActionPanelController
         _desiredStockQuantity = 0.0;
         _stockResourceId = ResourceId.None;
         _supplyEntity = EntityId.Invalid;
+        if (_ringSingle) { _ringOpen = Mode != PlayerActionPanelMode.Closed; _ringLevel = ActionRingLevel.Items; _ringRevision++; _ringPage = 0; }
     }
 
     private void ActivateSelected(

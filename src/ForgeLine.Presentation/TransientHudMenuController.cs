@@ -45,7 +45,7 @@ public sealed class TransientHudMenuController
     }
 
     public bool HasOpenMenus(PlayerActionPanelController dock, OperationsController operations) =>
-        dock.Mode != PlayerActionPanelMode.Closed || operations.View.Open || HasOpenContextMenu();
+        dock.HasOpenMenu || operations.View.Open || HasOpenContextMenu();
 
     private bool HasOpenContextMenu()
     {
@@ -105,9 +105,9 @@ public sealed class TransientHudMenuController
                 foreach (var menu in _contextMenus)
                     menuOwned |= menu?.IsOpen == true && menu.ContainsControl(origin, layout);
                 bool persistent = HudInteractionContext.BlocksWorldPointer(origin, layout, minimapEnabled,
-                    guidanceVisible: guidanceVisible, includeActionDock: false, onboarding: onboarding) ||
+                    guidanceVisible: guidanceVisible, includeActionDock: false, onboarding: onboarding, includePrimaryCommands: !dock.SingleObjectActions) ||
                     OperationsLayout.Entry(layout).Contains(origin) ||
-                    snapshot?.PlayerExperience is not null && ActionableAlertLayout.Resolve(snapshot, layout, dock.Mode != PlayerActionPanelMode.Closed, localFeedback).Contains(origin);
+                    snapshot?.PlayerExperience is not null && ActionableAlertLayout.Resolve(snapshot, layout, dock.DockExpanded, localFeedback).Contains(origin);
                 _menuOwned[i] = menuOwned;
                 _owned[i] = menuOwned || persistent;
                 LastGesture = new(0, button, origin, input.WasMousePressedWithShift(button),

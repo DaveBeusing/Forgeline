@@ -46,7 +46,7 @@ internal sealed class PlayerActionDockHudSurface : IGameplayHudSurface
         _renderer.Dispose();
 }
 
-internal sealed class PlayerActionDockHudRenderer : IDisposable
+internal sealed partial class PlayerActionDockHudRenderer : IDisposable
 {
     private const int MaxVertices = 262_144;
     private const int VertexStride = 24;
@@ -131,7 +131,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         _scale =
             layout.Scale;
 
-        EmitPrimaryCommands(snapshot, panel, targeting, layout, graphics.Width, graphics.Height);
+        if (!panel.Ring.SingleOwned) EmitPrimaryCommands(snapshot, panel, targeting, layout, graphics.Width, graphics.Height);
         _scale = PlayerActionDockInteractionLayout.Scale(layout);
 
         EmitModeBar(
@@ -144,7 +144,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         PlayerActionSnapshot? actions =
             panel.SelectionPending ? null : PlayerActionDockHudModel.ResolveActions(snapshot);
 
-        if (panel.IsOpen)
+        if (panel.DockExpanded)
         {
             EmitExpandedDock(
                 snapshot,
@@ -172,7 +172,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             return;
         }
 
-        _skin.Flush(graphics);
+        EmitObjectRing(panel, actions, layout, graphics.Width, graphics.Height);
+        _skin.FlushPanels(graphics);
         if (_vertexCount > 0)
         {
             IGraphicsBuffer vertexBuffer =
@@ -193,6 +194,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
 
         }
 
+        _skin.FlushArtwork(graphics);
         _text.Render(graphics);
         LastRenderedVertexCount = _vertexCount + _text.VertexCount + _skin.Vertices;
     }

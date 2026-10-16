@@ -1178,6 +1178,8 @@ internal sealed class ClientApplication
 
             GameplayHudLayout interactionLayout = GameplayHudLayout.Create(
                 window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
+            actionPanel.SynchronizeObjectRing(inputState, inputSnapshot, renderWorld, selectionController.Selection, false);
+            actionPanel.AdoptPresentedRing(renderHost.LatestActionRing);
             transientMenus.Update(inputState, inputSnapshot, interactionLayout, selectionController.Selection,
                 actionPanel, operationsController, presentationInteraction, informationLayer.MinimapEnabled,
                 buildingPlacementController.IsActive,
@@ -1225,7 +1227,7 @@ internal sealed class ClientApplication
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
             var alertResult = alertController.Update(inputState, inputSnapshot, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
-                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, seconds: frameElapsed.TotalSeconds, dockExpanded: actionPanel.Mode != PlayerActionPanelMode.Closed,
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, seconds: frameElapsed.TotalSeconds, dockExpanded: actionPanel.DockExpanded,
                 localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback);
             hudInteraction.CapturePointer(alertResult.Captured);
             if (alertResult.Target.IsValid && inputSnapshot is not null)
@@ -1311,9 +1313,9 @@ internal sealed class ClientApplication
                 minimapInteraction.PointerCaptured);
 
             hudInteraction.CapturePointer(HudInteractionContext.CapturesWorldPointer(
-                inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.Mode != PlayerActionPanelMode.Closed,
+                inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.DockExpanded,
                 buildingPlacementController.IsActive, includeActionDock: false,
-                onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View));
+                onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View, includePrimaryCommands: !actionPanel.SingleObjectActions));
 
             if (minimapInteraction.TryTakeMovementRequest(
                     out MovementOrderRequest minimapMovement))
@@ -1570,6 +1572,9 @@ internal sealed class ClientApplication
                     SelectedCombatGroup.Resolve(currentSnapshot),
                     selectionController.Selection);
 
+            actionPanel.SynchronizeObjectRing(inputState, currentSnapshot, renderWorld, selectionController.Selection,
+                !hudInteraction.PointerCaptured && !buildingPlacementController.IsActive && !tacticalTargetingController.IsActive &&
+                window.IsFocused && !simulationPaused && !modalFrame);
             PlayerActionPanelView actionPanelView =
                 actionPanel.CreateView(
                     window.ClientSize.Width,

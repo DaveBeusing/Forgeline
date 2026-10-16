@@ -142,6 +142,8 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly ClientFrontendRenderHost? _frontendOwner;
     private readonly Func<ClientSimulationTelemetry>? _simulationTelemetry;
     private readonly object _frameGate = new();
+    private ObjectActionRingView _latestActionRing;
+    public ObjectActionRingView LatestActionRing { get { lock (_frameGate) return _latestActionRing; } }
     private readonly object _disposeGate = new();
     private readonly object _faultWaitGate = new();
     private readonly GraphicsWindowTarget? _initialTarget;
@@ -452,6 +454,7 @@ internal sealed class ClientRenderHost : IDisposable
             using var particleRenderer = new ParticleVfxRenderer(graphics, _runtimeAssets, qualityProfile.Particles, lighting);
             long lastParticleFrame = Stopwatch.GetTimestamp();
             var dockFeedback = new UiInteractionFeedback();
+            var ringMotion = new ObjectActionRingMotion();
             var frontendFeedback = new UiInteractionFeedback();
             using var uiAudio = new WaveOutUiAudio();
             using var gameplayOverlayRenderer =
@@ -719,6 +722,20 @@ internal sealed class ClientRenderHost : IDisposable
                             renderCamera,
                             gameplayDraw,
                             RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
+                        var ringLayout = GameplayHudLayout.Create(context.Width, context.Height, current.Dpi, current.UiScale);
+                        Span<HudRect> occupied = stackalloc HudRect[8];
+                        occupied[0] = ringLayout.TopStatusBar;
+                        occupied[1] = ringLayout.SelectionInspector;
+                        occupied[2] = ringLayout.Minimap;
+                        occupied[3] = ringLayout.VisibleActionDock(false);
+                        occupied[4] = ringLayout.NotificationBounds(false);
+                        occupied[5] = current.PreAlphaUx.Onboarding?.VisiblePanel ?? default;
+                        occupied[6] = current.PreAlphaUx.Onboarding?.Tab ?? default;
+                        occupied[7] = current.Operations.Open ? OperationsLayout.Panel(ringLayout) : OperationsLayout.Entry(ringLayout);
+                        animatedPanel = animatedPanel with { Ring = animatedPanel.Ring.Project(renderWorld, renderCamera,
+                            renderAlpha, snapshot, ringLayout, occupied) };
+                        animatedPanel = animatedPanel with { Ring = ringMotion.Update(animatedPanel.Ring, uiNow,
+                            current.MetricsActive && current.FeedbackSettings.Animate(qualityProfile.Active)) };
                         gameplayHudRenderer.Render(
                             context,
                             renderCamera,
@@ -755,6 +772,9 @@ internal sealed class ClientRenderHost : IDisposable
                                 current.UiScale);
                         }
                     });
+
+                if (graphics.PresentedFrameCount > presentedBefore)
+                    lock (_frameGate) _latestActionRing = animatedPanel.Ring;
 
                 if (!_startupPresented && graphics.PresentedFrameCount > presentedBefore && current.Frontend is null &&
                     (!_expectedSession.HasValue || snapshot.SessionId == _expectedSession.Value))
