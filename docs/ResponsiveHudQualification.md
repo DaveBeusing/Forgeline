@@ -59,3 +59,21 @@ are not raster goldens or human visual acceptance. Card labels now share the
 metric centering helper. A closed dock always draws its published status strip,
 including the no-target context prompt, so input does not reserve invisible
 full-card height. The updated fixture and native evidence need validation below.
+
+## Implemented follow-up checks
+
+- `006e587190f80a5780a6fd54e5694cd1875dd64d`: visible collapsed status,
+  centered card rows and 135 retained structural fixture keys. Focused structure,
+  text and native queue tests: 39 passed (`right-hud-structural-tests.log`).
+  An initial test build lacked the Game namespace import; the corrected build is
+  retained separately as `right-hud-structural-build-v2.log`.
+- `b3bf79440d128f42c4000a6bc3739a56e97c6df4`: billion/scientific quantity
+  formatting preserves every digit in the defined compact representation. All
+  45 layout combinations check zero, several magnitudes, maximum finite double
+  and unknown values at a minimum 12-pixel numeric size. All 21 resource/layout
+  tests pass (`right-hud-quantity-tests-v2.log`). The first failed quantity run is
+  retained separately. Real zero remains `0`; nonfinite values remain `N/A`.
+- PR: https://github.com/DaveBeusing/Forgeline/pull/217 (draft).
+  Initial-head CI and Frame hot paths fail before asset compilation on the old
+  structure fixture. Updated source retains those gates and adds the new layout,
+  text and Shift+F1 tests to the early hosted stages. New-head results are pending.
