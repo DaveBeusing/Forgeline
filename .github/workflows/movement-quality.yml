@@ -10,6 +10,8 @@ on:
       - 'tests/ForgeLine.Navigation.Tests/**'
       - 'tests/ForgeLine.Game.Tests/**'
       - 'tests/ForgeLine.Presentation.Tests/**'
+      - 'benchmarks/ForgeLine.Navigation.Benchmarks/**'
+      - 'build/Measure-NavigationComparison.ps1'
       - 'Directory.Build.props'
       - 'Directory.Packages.props'
       - 'global.json'
@@ -56,10 +58,18 @@ jobs:
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class '*Mechanical*' '*RenderWorld*' '*RenderInterpolation*'
       - name: Canonical map connectivity
         run: dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/movement-map-qualification.json
+      - name: Paired navigation CPU and allocation measurements
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        env:
+          NAVIGATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: ./build/Measure-NavigationComparison.ps1 -BaseRef "$env:NAVIGATION_BASE_SHA"
       - name: Preserve qualification evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: movement-quality
-          path: artifacts/movement-map-qualification.json
+          path: |
+            artifacts/movement-map-qualification.json
+            artifacts/movement-quality/
           if-no-files-found: ignore
