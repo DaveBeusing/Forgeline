@@ -286,3 +286,7 @@ HUD text uses a larger 14 px base at unit scale. Onboarding uses 18 px headings,
 16 px body text, word wrapping and 23 px line spacing. DPI and UI scale are
 respected without the old 1.25 guide cap; only available viewport height can
 reduce the guide scale. The guide remains inside its existing reserved region.
+
+## Native tactical pointer and map footprint
+
+Gameplay replaces the Windows pointer with a single authored native cursor through `IWindow.SetCursorImage`; UI/pause/focus/session exit restores Windows ownership. All eleven cursor roles use exact compiled hotspots and prepared 24/32/48/64-pixel DPI/scale variants. Input coordinates and click/drag thresholds are unchanged. The minimap fits current camera ground-plane rays through the existing world-to-map transform; decorative panels and clipped marker pixels introduce no new hit area. [Tactical contracts and limitations](GraphicalTacticalInterface.md) and [qualification](GraphicalTacticalInterfaceQualification.md) include native dimensions, focus restoration, privacy, resize/DPI tests and pending physical-pointer review.

@@ -36,7 +36,7 @@ and ordinary compiled textures.
 | Frontend | Main/pause menu commands, all settings fields and all four sections | Utility glyphs supplement live labels and reasons |
 | Status | Supply, feedback, building and unit presentation enums | Existing authoritative states only; pending differs from accepted/partial/rejected |
 | Technology | Four actual technology IDs | Existing domain glyph plus live technology name; no speculative unlocks |
-| Cursor | All eleven `RtsCursorKind` values | Source only; no OS cursor change or second pointer activation |
+| Cursor | All eleven `RtsCursorKind` values | Native Windows pointer replacement at 24/32/48/64 pixels; exact compiled hotspots; no second pointer |
 | Minimap | All ten `RtsMinimapSymbolKind` values | Shape-coded allegiance/knowledge; generic unidentified contact |
 | Information layers | Every non-None `StrategicOverlayMode` | Existing logistics/supply/sensors/navigation/power/all layers |
 | World markers | Selection corner, ring segment, target, move, attack-move | Components for live geometry; no static map or baked range circle |
@@ -146,10 +146,7 @@ Channel-loss aids are diagnostic proxies, not calibrated color-vision simulation
 or human accessibility acceptance. Pixel/source validity, native repeatability,
 gameplay identity, integrated usability and human art decisions remain separate.
 
-Atlas packing/rendering is implemented. Role-based live binding, actual cursor installation,
-live contact privacy and final physical-display acceptance belong to their
-subsequent integration scopes. The representative first menu control is migrated; the other surfaces remain
-pending migration. No source-validity result grants final AAA acceptance.
+Atlas packing, frontend, battlefield/economic and tactical consumers are implemented through the linked consumer contracts. Live contact privacy and native cursor ownership have focused tests. Final physical-display and human graphical acceptance remain pending. No source-validity result grants final AAA acceptance.
 
 ## Battlefield consumer integration
 
@@ -157,9 +154,13 @@ The [graphical battlefield HUD](GraphicalBattlefieldHud.md) now consumes compile
 resource/selection artwork and actual roster portraits through `GameplayHudArtwork`
 and `GameplayHudSkin`. Exact mappings are validated against this source catalog
 and the packed sprites. Existing `ui.icon.*` IDs remain valid for independent
-bitmap paths and the tactical map/cursor consumers outside this integration.
+bitmap/bootstrap paths; tactical consumers now use the same packed semantic source.
 No artwork, definitions or catalog content changes in this consumer integration.
 
 ## Production and operations consumers
 
 [Domain cards and operations](GraphicalProductionAndOperations.md) now consume actual offered/queued roster portraits, existing resource/command/status roles, explicit TechnologyId 1-4 role bindings and Operations category artwork. Unknown future technologies remain neutral. The source catalog and packed payloads are unchanged; bindings and native lifetime/privacy are qualified separately from pending human art acceptance.
+
+## Tactical consumers
+
+[The tactical interface](GraphicalTacticalInterface.md) binds map/layer symbols to the existing faction-filtered model, corners to actual render footprints and order glyphs to copied local intent. Cursor pixels and hotspots come from the compiled atlas and replace the native Windows pointer during gameplay. Sixteen-pixel cursor inspection variants and unavailable gameplay roles remain inactive. Source artwork is unchanged; [qualification](GraphicalTacticalInterfaceQualification.md) records exact native/package identities and remaining acceptance gates.

@@ -1,0 +1,4323 @@
+{
+  "schemaVersion": 1,
+  "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+  "base": "a9e8f0b76b02ff9c1e85aba9b9d33952c357cc63",
+  "version": "0.1.379-dev",
+  "humanVisualAcceptance": "pending",
+  "native": {
+    "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+    "totalCases": 48,
+    "roots": [
+      {
+        "root": "artifacts\\tactical-native-final-normal",
+        "manifestSha256": "2fbafdd683deb9d694c45f5c0125c4feb969d8154aa91be961388037f528d1d5",
+        "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+        "runtimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+        "clientAssemblySha256": "241DEDBC9FA6F80DA0E8408EB41FE2F4ADB0E16751D88ABBEE3AF968ECAE31B4",
+        "presentationAssemblySha256": "94E7D7EDD619871FBA7868752A63C35CE2D5BFDF4FF4973D162FED675F7FFCD5",
+        "cases": 5
+      },
+      {
+        "root": "artifacts\\tactical-native-final-close",
+        "manifestSha256": "96a3d9b05cc5eec61458e4edb26c55467c2a5ea9ca1cae2ff321a134ec4fde27",
+        "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+        "runtimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+        "clientAssemblySha256": "241DEDBC9FA6F80DA0E8408EB41FE2F4ADB0E16751D88ABBEE3AF968ECAE31B4",
+        "presentationAssemblySha256": "94E7D7EDD619871FBA7868752A63C35CE2D5BFDF4FF4973D162FED675F7FFCD5",
+        "cases": 5
+      },
+      {
+        "root": "artifacts\\tactical-native-final-world-zooms",
+        "manifestSha256": "adc75c31f1289d214500820e7f590cfbe753d945f1cee31a5c20d935a4e50e0c",
+        "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+        "runtimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+        "clientAssemblySha256": "241DEDBC9FA6F80DA0E8408EB41FE2F4ADB0E16751D88ABBEE3AF968ECAE31B4",
+        "presentationAssemblySha256": "94E7D7EDD619871FBA7868752A63C35CE2D5BFDF4FF4973D162FED675F7FFCD5",
+        "cases": 3
+      },
+      {
+        "root": "artifacts\\tactical-native-final-compact",
+        "manifestSha256": "dbbc4f92eeb4fddb93e3e0fa73e1d8a64b087e3280d6adcdba31f3326cb13c07",
+        "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+        "runtimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+        "clientAssemblySha256": "241DEDBC9FA6F80DA0E8408EB41FE2F4ADB0E16751D88ABBEE3AF968ECAE31B4",
+        "presentationAssemblySha256": "94E7D7EDD619871FBA7868752A63C35CE2D5BFDF4FF4973D162FED675F7FFCD5",
+        "cases": 15
+      },
+      {
+        "root": "artifacts\\tactical-native-final-wide",
+        "manifestSha256": "f7153839a0e85f216176f77d706fa6659c1d5b43a80debc386eb070b5406d8cb",
+        "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+        "runtimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+        "clientAssemblySha256": "241DEDBC9FA6F80DA0E8408EB41FE2F4ADB0E16751D88ABBEE3AF968ECAE31B4",
+        "presentationAssemblySha256": "94E7D7EDD619871FBA7868752A63C35CE2D5BFDF4FF4973D162FED675F7FFCD5",
+        "cases": 10
+      },
+      {
+        "root": "artifacts\\tactical-native-final-4k",
+        "manifestSha256": "8f236b1b5e169ebe37f85432dcb4b52a4fb9559eee3d682e9354dfb9246dbb79",
+        "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+        "runtimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+        "clientAssemblySha256": "241DEDBC9FA6F80DA0E8408EB41FE2F4ADB0E16751D88ABBEE3AF968ECAE31B4",
+        "presentationAssemblySha256": "94E7D7EDD619871FBA7868752A63C35CE2D5BFDF4FF4973D162FED675F7FFCD5",
+        "cases": 5
+      },
+      {
+        "root": "artifacts\\tactical-native-final-dark",
+        "manifestSha256": "239d259f0eea4906705e0cc0e04b3e3bac3bb3f4d303e08e563cf4ff4041e7c6",
+        "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+        "runtimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+        "clientAssemblySha256": "241DEDBC9FA6F80DA0E8408EB41FE2F4ADB0E16751D88ABBEE3AF968ECAE31B4",
+        "presentationAssemblySha256": "94E7D7EDD619871FBA7868752A63C35CE2D5BFDF4FF4973D162FED675F7FFCD5",
+        "cases": 5
+      }
+    ],
+    "humanVisualAcceptance": "pending",
+    "skin": {
+      "residentBytes": [
+        29360128
+      ],
+      "batches": [
+        13
+      ],
+      "buffers": [
+        52
+      ],
+      "draws": [
+        15,
+        39
+      ],
+      "vertices": [
+        1920,
+        4608
+      ],
+      "uploadBytes": [
+        61440,
+        147456
+      ]
+    },
+    "cases": [
+      {
+        "root": "tactical-native-final-normal",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiContacts-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiContacts-Scale1.00.png",
+        "imageSha256": "020B0DD5625B01452BD741472511AB2CEF75CDE1AF2477959402177B3074BC37",
+        "pixelSha256": "FA0ED5181E7C29436F83EAA060181706C2F4DE3F7B0B696FF4479A76F2C2E5AF",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3090,
+          "vertexUploadBytes": 98880,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 21.4979875,
+          "p50": 21.4511,
+          "p95": 24.253,
+          "p99": 24.253
+        },
+        "gpu": {
+          "samples": 7,
+          "mean": 11.266541714285713,
+          "p50": 10.255712,
+          "p95": 19.877344,
+          "p99": 19.877344
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 62,
+          "textureReleaseCount": 0
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 187,
+          "fenceWaitCount": 33,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-normal",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiTargeting-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiTargeting-Scale1.00.png",
+        "imageSha256": "764681544C0C89D62CA41ACE3A42D1371ABA21483B37EE47AFEAEE26C6B96311",
+        "pixelSha256": "DB8AC85EC8AB5390A151EC04391E4B30AC0601264E49EAFFE7918DC9BDD46734",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3582,
+          "vertexUploadBytes": 114624,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 18.6568875,
+          "p50": 16.4426,
+          "p95": 30.4453,
+          "p99": 30.4453
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 24.522330666666665,
+          "p50": 23.787968,
+          "p95": 29.071136,
+          "p99": 29.071136
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 124,
+          "textureReleaseCount": 62
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 675,
+          "fenceWaitCount": 73,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-normal",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMinimapStrategic-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMinimapStrategic-Scale1.00.png",
+        "imageSha256": "0AEACBBBEF5BB639BC3E0A2770E8DB760037BBFF02D471FFC370F91F8B0487C1",
+        "pixelSha256": "D24B11C1654B4D7CEE8E177631FD8A5CCB88BB07259CFC79CE159A236A59FB86",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 20,
+          "vertices": 3534,
+          "vertexUploadBytes": 113088,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 12.8381625,
+          "p50": 9.6424,
+          "p95": 26.0864,
+          "p99": 26.0864
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 17.914085333333333,
+          "p50": 14.979744,
+          "p95": 25.262272,
+          "p99": 25.262272
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 85,
+          "residentTextureBytes": 89868532,
+          "shaderResourceDescriptorsUsed": 92,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 209,
+          "textureReleaseCount": 124
+        },
+        "health": {
+          "liveResourceCount": 358,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 1232,
+          "fenceWaitCount": 119,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-normal",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMixedSelection-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMixedSelection-Scale1.00.png",
+        "imageSha256": "0760189E501687E2D57399A1D9AE1E811748871A16433BB089D611D7A8B81015",
+        "pixelSha256": "9440867925DD2E247E568F315F4F701265CAA8E641FB51697A625E3DCEB9DBBB",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 23,
+          "vertices": 3822,
+          "vertexUploadBytes": 122304,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 11.726175,
+          "p50": 11.3851,
+          "p95": 22.4414,
+          "p99": 22.4414
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 15.692421333333334,
+          "p50": 11.778688,
+          "p95": 21.43744,
+          "p99": 21.43744
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 271,
+          "textureReleaseCount": 209
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 1777,
+          "fenceWaitCount": 159,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-normal",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSupplyCritical-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSupplyCritical-Scale1.00.png",
+        "imageSha256": "4722C5B97D84C5149C3278ECF30C082735FD6E4BDF7131490BA4DB15DBBFE7EF",
+        "pixelSha256": "7A67648170CCE3620E6C7D61FC16DCD6B64FF5A9EFD855F7C392DB7F63C5E5E1",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 39,
+          "vertices": 3972,
+          "vertexUploadBytes": 127104,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 12.268325,
+          "p50": 11.8583,
+          "p95": 24.8054,
+          "p99": 24.8054
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 18.632303999999998,
+          "p50": 19.854304,
+          "p95": 24.325824,
+          "p99": 24.325824
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 333,
+          "textureReleaseCount": 271
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 2265,
+          "fenceWaitCount": 199,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-close",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiContacts-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiContacts-Scale1.00.png",
+        "imageSha256": "BAC7F703F5CD8CEE23395B2A61D4903F70DC54B6689E4969ABEBAD9D355660A3",
+        "pixelSha256": "65B5A096DD50FEEF4CF11134AE9C204B46038F4821DC79552C250BAF7C3839FF",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3090,
+          "vertexUploadBytes": 98880,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 23.461875,
+          "p50": 22.6587,
+          "p95": 25.3063,
+          "p99": 25.3063
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 19.860842666666667,
+          "p50": 16.562912,
+          "p95": 26.07696,
+          "p99": 26.07696
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 62,
+          "textureReleaseCount": 0
+        },
+        "health": {
+          "liveResourceCount": 305,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 187,
+          "fenceWaitCount": 33,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-close",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiTargeting-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiTargeting-Scale1.00.png",
+        "imageSha256": "0A8D965DB43D9D116E577CE6D054B83F57303580618F4131FCEC99F9B2CDF9E4",
+        "pixelSha256": "285CEF84FC3D12D2AAFFAD6D64FCA7E91F6D36B05D9E7723B4F582644ACED238",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3582,
+          "vertexUploadBytes": 114624,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 16.4861,
+          "p50": 11.6535,
+          "p95": 26.7904,
+          "p99": 26.7904
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 22.80243733333333,
+          "p50": 26.110272,
+          "p95": 27.665728,
+          "p99": 27.665728
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 124,
+          "textureReleaseCount": 62
+        },
+        "health": {
+          "liveResourceCount": 305,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 679,
+          "fenceWaitCount": 72,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-close",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiMinimapStrategic-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiMinimapStrategic-Scale1.00.png",
+        "imageSha256": "22A8189371051B2444B5D8D574E3FC3ACA86DE78C391197C036FF140BB188CF1",
+        "pixelSha256": "903366612EE41D7C9018D1F9BB16662E24C4AAA212FB43ECCE1F9B3C00F1E62B",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 20,
+          "vertices": 3534,
+          "vertexUploadBytes": 113088,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 18.2650875,
+          "p50": 19.55,
+          "p95": 31.7806,
+          "p99": 31.7806
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 26.919504,
+          "p50": 28.168384,
+          "p95": 29.386176,
+          "p99": 29.386176
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 186,
+          "textureReleaseCount": 124
+        },
+        "health": {
+          "liveResourceCount": 305,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 1171,
+          "fenceWaitCount": 112,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-close",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiMixedSelection-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiMixedSelection-Scale1.00.png",
+        "imageSha256": "B984E9BF48AD5BDD22AD722958B02159EE229E6F7392FA43FDB86CC3E620B99E",
+        "pixelSha256": "3B9F95A5214E2FD0CBE1AF066FB626181B91224FA495A8CD100BA9077D609CD2",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 23,
+          "vertices": 3822,
+          "vertexUploadBytes": 122304,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 14.74875,
+          "p50": 15.9742,
+          "p95": 29.2804,
+          "p99": 29.2804
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 22.754938666666664,
+          "p50": 25.696224,
+          "p95": 26.305152,
+          "p99": 26.305152
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 248,
+          "textureReleaseCount": 186
+        },
+        "health": {
+          "liveResourceCount": 305,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 1663,
+          "fenceWaitCount": 152,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-close",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiSupplyCritical-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiSupplyCritical-Scale1.00.png",
+        "imageSha256": "81F5C12F4486C5D9F3C780DC79C597D2E88139BBE0FD4841FD73204728CD75FE",
+        "pixelSha256": "E4BA060D5F21098D53DAF1116AAC03CF1A26B0C229F0D45800142A088E97C42E",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 39,
+          "vertices": 3972,
+          "vertexUploadBytes": 127104,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 23.35415,
+          "p50": 30.6441,
+          "p95": 41.5744,
+          "p99": 41.5744
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 33.851152,
+          "p50": 36.16464,
+          "p95": 36.845696,
+          "p99": 36.845696
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 310,
+          "textureReleaseCount": 248
+        },
+        "health": {
+          "liveResourceCount": 305,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 2155,
+          "fenceWaitCount": 192,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-world-zooms",
+        "key": "BattlefieldCombat-1920x1080-Medium-CloseTactical-Dpi96",
+        "image": "BattlefieldCombat-1920x1080-Medium-CloseTactical-Dpi96.png",
+        "imageSha256": "7C4393E0EEE3FF70DB86A7218EE03C055E314A3BB2EF5914D992BE66F320AC5D",
+        "pixelSha256": "24288F87B24514BA8040BBD133BA2DAB2A231BE6600746F19462ECBE3CE922F1",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 15,
+          "vertices": 1920,
+          "vertexUploadBytes": 61440,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 20.831625,
+          "p50": 20.238,
+          "p95": 23.3899,
+          "p99": 23.3899
+        },
+        "gpu": {
+          "samples": 7,
+          "mean": 20.488109714285713,
+          "p50": 19.103264,
+          "p95": 28.811872,
+          "p99": 28.811872
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 62,
+          "textureReleaseCount": 0
+        },
+        "health": {
+          "liveResourceCount": 302,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 187,
+          "fenceWaitCount": 33,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-world-zooms",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96.png",
+        "imageSha256": "0928D79BA8439115AD9A486FCAE3E0174A9269F824C1A3B48A0580930910F1F2",
+        "pixelSha256": "E2F2162DE85F9D987C902408B6F0386679BFFB1FCC7465E080225B6A5D11E95E",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 15,
+          "vertices": 1920,
+          "vertexUploadBytes": 61440,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 13.6187125,
+          "p50": 9.6962,
+          "p95": 26.1492,
+          "p99": 26.1492
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 19.043498666666668,
+          "p50": 20.852672,
+          "p95": 25.045376,
+          "p99": 25.045376
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 124,
+          "textureReleaseCount": 62
+        },
+        "health": {
+          "liveResourceCount": 298,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 676,
+          "fenceWaitCount": 72,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-world-zooms",
+        "key": "BattlefieldCombat-1920x1080-Medium-Strategic-Dpi96",
+        "image": "BattlefieldCombat-1920x1080-Medium-Strategic-Dpi96.png",
+        "imageSha256": "9DAC8933DAB1961A6A55EF7D26EB227D7163859ABA27275B110881E076C2EBCD",
+        "pixelSha256": "72FAA87F36747F88406564B4BD603560751157996F5C0902B104DFBCCBEE6D28",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 15,
+          "vertices": 1920,
+          "vertexUploadBytes": 61440,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 12.030887499999999,
+          "p50": 11.4869,
+          "p95": 23.7438,
+          "p99": 23.7438
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 16.642421333333335,
+          "p50": 15.127296,
+          "p95": 23.174336,
+          "p99": 23.174336
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 85,
+          "residentTextureBytes": 89868532,
+          "shaderResourceDescriptorsUsed": 92,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 209,
+          "textureReleaseCount": 124
+        },
+        "health": {
+          "liveResourceCount": 355,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 1230,
+          "fenceWaitCount": 118,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiContacts-Scale0.75",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiContacts-Scale0.75.png",
+        "imageSha256": "CB2EEC727581D1BC67B338A9A7D2FD726DB7F7EF35F9709E549166CE79E4D69C",
+        "pixelSha256": "8739B654A873A55ECF46E84EF8DCA0FC79922702628B0A2C4E05DB2C437036D7",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3198,
+          "vertexUploadBytes": 102336,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 18.059475,
+          "p50": 17.7979,
+          "p95": 19.0981,
+          "p99": 19.0981
+        },
+        "gpu": {
+          "samples": 8,
+          "mean": 11.161348,
+          "p50": 10.297504,
+          "p95": 17.450784,
+          "p99": 17.450784
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 0.75,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 62,
+          "textureReleaseCount": 0
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 187,
+          "fenceWaitCount": 33,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiContacts-Scale1.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiContacts-Scale1.00.png",
+        "imageSha256": "6803D1E256D0AA2634F59886E27EFED507BCAFC053EA7CA07B3258F33899B9E3",
+        "pixelSha256": "F45423EAEFBCC6C53739688BB04524593F3C0E55C8F437DE45DA5429E5D31AD8",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3198,
+          "vertexUploadBytes": 102336,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 10.209487499999998,
+          "p50": 7.4325,
+          "p95": 18.7211,
+          "p99": 18.7211
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 12.355322666666666,
+          "p50": 10.149728,
+          "p95": 19.330656,
+          "p99": 19.330656
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 124,
+          "textureReleaseCount": 62
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 675,
+          "fenceWaitCount": 72,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiContacts-Scale2.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiContacts-Scale2.00.png",
+        "imageSha256": "A06FC3EE597DB9B5A7103B653D1A625DF25DF844D431EC25810330CBFED27D26",
+        "pixelSha256": "76A0F3BDCDC254173A9EDD409016ECF4CCF75F879D4061F1D4375008FECB65E1",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3090,
+          "vertexUploadBytes": 98880,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 13.1037,
+          "p50": 8.3869,
+          "p95": 26.1733,
+          "p99": 26.1733
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 17.752730666666668,
+          "p50": 17.41472,
+          "p95": 24.439392,
+          "p99": 24.439392
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 186,
+          "textureReleaseCount": 124
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 1163,
+          "fenceWaitCount": 112,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiTargeting-Scale0.75",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiTargeting-Scale0.75.png",
+        "imageSha256": "84811AF416BCC12E1CE1BEF8F0041F7534878C0A99C72C6B6B1E1BBD747415B4",
+        "pixelSha256": "94C6A6CD719579B44D0C906416C22A31923D1B9752659639CC374F15E53E43A7",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3600,
+          "vertexUploadBytes": 115200,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 8.702125,
+          "p50": 6.0165,
+          "p95": 21.5926,
+          "p99": 21.5926
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 12.168090666666666,
+          "p50": 8.845536,
+          "p95": 19.366656,
+          "p99": 19.366656
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 0.75,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 248,
+          "textureReleaseCount": 186
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 1651,
+          "fenceWaitCount": 152,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiTargeting-Scale1.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiTargeting-Scale1.00.png",
+        "imageSha256": "82B8010A34E7C7C857A36CF285D8DD7325A52E3971CBC0641544FF97C917B92E",
+        "pixelSha256": "323D10A1B6EB1CE30E80E9C4A2F8A852C06B60DDD09F80F620EA587B001176B6",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 17,
+          "vertices": 3480,
+          "vertexUploadBytes": 111360,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 8.865675,
+          "p50": 5.2489,
+          "p95": 21.1843,
+          "p99": 21.1843
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 11.959424,
+          "p50": 7.71584,
+          "p95": 20.263424,
+          "p99": 20.263424
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 310,
+          "textureReleaseCount": 248
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 2139,
+          "fenceWaitCount": 192,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiTargeting-Scale2.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiTargeting-Scale2.00.png",
+        "imageSha256": "4BBC46F6FEFD2B6BB7DC01AECF4F028798B29ED0EE0ABAA7F243E8EA3872BB3B",
+        "pixelSha256": "A8463A56503F5015C467AC70576A51F31B919EAEF77538EFB0A96E8725AC3B65",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 17,
+          "vertices": 3408,
+          "vertexUploadBytes": 109056,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 8.6479,
+          "p50": 5.8445,
+          "p95": 20.7953,
+          "p99": 20.7953
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 12.357098666666666,
+          "p50": 8.834624,
+          "p95": 20.436832,
+          "p99": 20.436832
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 372,
+          "textureReleaseCount": 310
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 2627,
+          "fenceWaitCount": 232,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale0.75",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale0.75.png",
+        "imageSha256": "BFFBE05E146E0EB99E313789D0C9D7C73919653151F0E13729EBB1821951AE5E",
+        "pixelSha256": "38A4B4B66C48B05942625F537FC6DAA417C7620B18779B983D440B2D6B2BAD54",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 20,
+          "vertices": 3642,
+          "vertexUploadBytes": 116544,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 11.1360875,
+          "p50": 12.3782,
+          "p95": 22.7573,
+          "p99": 22.7573
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 15.411034666666666,
+          "p50": 13.527584,
+          "p95": 22.903392,
+          "p99": 22.903392
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 0.75,
+        "resources": {
+          "loadedTextureCount": 85,
+          "residentTextureBytes": 89868532,
+          "shaderResourceDescriptorsUsed": 92,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 457,
+          "textureReleaseCount": 372
+        },
+        "health": {
+          "liveResourceCount": 358,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 3184,
+          "fenceWaitCount": 278,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale1.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale1.00.png",
+        "imageSha256": "67BBB281AEB80338B85D876673E9EA313D5B1F156B6418D7DD2D109948D074E5",
+        "pixelSha256": "08C4801D2428BB89789618DB887678EC35D8E6F067D4B8C762EAB3FD38DBDB11",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 20,
+          "vertices": 3642,
+          "vertexUploadBytes": 116544,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 14.33375,
+          "p50": 17.8933,
+          "p95": 23.3137,
+          "p99": 23.3137
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 22.09743466666667,
+          "p50": 22.924768,
+          "p95": 23.478688,
+          "p99": 23.478688
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 85,
+          "residentTextureBytes": 89868532,
+          "shaderResourceDescriptorsUsed": 92,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 542,
+          "textureReleaseCount": 457
+        },
+        "health": {
+          "liveResourceCount": 358,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 3798,
+          "fenceWaitCount": 324,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale2.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale2.00.png",
+        "imageSha256": "18DCD8C169BC24573E70E57264AF8CAA6FFCD87762B3246E9BAAE0D67A58C0AD",
+        "pixelSha256": "C3185BDE84F3819192F05E6850358DA3D21320333EDB202CB1C09A2CF3E8C7C7",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3522,
+          "vertexUploadBytes": 112704,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 10.711525,
+          "p50": 9.635,
+          "p95": 22.9108,
+          "p99": 22.9108
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 15.279968000000002,
+          "p50": 13.7192,
+          "p95": 22.921856,
+          "p99": 22.921856
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 85,
+          "residentTextureBytes": 89868532,
+          "shaderResourceDescriptorsUsed": 92,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 627,
+          "textureReleaseCount": 542
+        },
+        "health": {
+          "liveResourceCount": 358,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 9,
+          "releasedResourceCount": 4412,
+          "fenceWaitCount": 370,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale0.75",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale0.75.png",
+        "imageSha256": "27A92C31CDBB14A933950E0106171D2F733C0BBB903BA441AE45273318A65EB0",
+        "pixelSha256": "C0F5CF5542AEA48976D90C86E0C2205EDDDF2FFDDD1F194366BFE0C35CDEAD2B",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 23,
+          "vertices": 4038,
+          "vertexUploadBytes": 129216,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 12.6462875,
+          "p50": 7.1364,
+          "p95": 27.7065,
+          "p99": 27.7065
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 17.650821333333337,
+          "p50": 16.671136,
+          "p95": 23.894112,
+          "p99": 23.894112
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 0.75,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 689,
+          "textureReleaseCount": 627
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 9,
+          "releasedResourceCount": 4957,
+          "fenceWaitCount": 410,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale1.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale1.00.png",
+        "imageSha256": "65D8177A86912950EA8BA5F37B24413F209F1E980EF747448B947A1A81FCE141",
+        "pixelSha256": "C92505468F43D7112808FD965836CD151004C4B3753A7C157F45D3490FD0DC52",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 23,
+          "vertices": 4038,
+          "vertexUploadBytes": 129216,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 8.716075,
+          "p50": 9.5289,
+          "p95": 18.7893,
+          "p99": 18.7893
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 11.692026666666665,
+          "p50": 10.157344,
+          "p95": 19.267424,
+          "p99": 19.267424
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 751,
+          "textureReleaseCount": 689
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 9,
+          "releasedResourceCount": 5445,
+          "fenceWaitCount": 450,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale2.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale2.00.png",
+        "imageSha256": "920F51C62D6B3A26E64DF87416C2F8DF4AD206CB63CF32D56C72AF8CE16F76B7",
+        "pixelSha256": "F35686A7DFE7E9819B0807DDF4A53AFC29C1EF632373F288371B4B2DDDDCAF85",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 21,
+          "vertices": 3918,
+          "vertexUploadBytes": 125376,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 8.8936875,
+          "p50": 5.9208,
+          "p95": 21.2978,
+          "p99": 21.2978
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 13.760693333333334,
+          "p50": 11.82496,
+          "p95": 20.553248,
+          "p99": 20.553248
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 813,
+          "textureReleaseCount": 751
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 9,
+          "releasedResourceCount": 5933,
+          "fenceWaitCount": 490,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale0.75",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale0.75.png",
+        "imageSha256": "814EC0633457108B87BF844CD66BD11738778B72D0F55C2D8376C307D30139C3",
+        "pixelSha256": "B4C4B130D78D41CE42173DAA1AF1C6CBFD183A6D3C9E5ECD46DEC4BDB2CE1A52",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 39,
+          "vertices": 4218,
+          "vertexUploadBytes": 134976,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 8.792200000000001,
+          "p50": 6.1095,
+          "p95": 21.1196,
+          "p99": 21.1196
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 12.088890666666666,
+          "p50": 10.43024,
+          "p95": 20.760704,
+          "p99": 20.760704
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 0.75,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 875,
+          "textureReleaseCount": 813
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 9,
+          "releasedResourceCount": 6421,
+          "fenceWaitCount": 530,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale1.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale1.00.png",
+        "imageSha256": "FCAA38005B0BE11AE753E9C2ACEACA8A2254698691DE8C19FE8CC68C1579D15A",
+        "pixelSha256": "8065F9E676B4C0C9C5958CF542D3DF3A11CE9FAAE78888DB66C30EBBD757A952",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 39,
+          "vertices": 4218,
+          "vertexUploadBytes": 134976,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 7.986025,
+          "p50": 6.0554,
+          "p95": 14.9607,
+          "p99": 14.9607
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 9.910096000000001,
+          "p50": 8.785024,
+          "p95": 11.836576,
+          "p99": 11.836576
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 937,
+          "textureReleaseCount": 875
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 9,
+          "releasedResourceCount": 6909,
+          "fenceWaitCount": 570,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-compact",
+        "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale2.00",
+        "image": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale2.00.png",
+        "imageSha256": "FDF58ECC79449CE8C348D554CA71759929551EC9C8C91D83433769D4484FDCBD",
+        "pixelSha256": "B30855DA29E5DA1C0F2C86676291598F4275DAF0800B71D073F129B1E57A524A",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 37,
+          "vertices": 4176,
+          "vertexUploadBytes": 133632,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 14.182175,
+          "p50": 14.2212,
+          "p95": 26.6077,
+          "p99": 26.6077
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 20.112368000000004,
+          "p50": 17.314688,
+          "p95": 25.888992,
+          "p99": 25.888992
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 999,
+          "textureReleaseCount": 937
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 9,
+          "releasedResourceCount": 7397,
+          "fenceWaitCount": 610,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiContacts-Scale1.00",
+        "image": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiContacts-Scale1.00.png",
+        "imageSha256": "0D2920607A827759153F1722D28F32B325F32E56242F0F7E267082CF0E83B8A5",
+        "pixelSha256": "7B5D798B698803F07F1206CF5D170551A9CE941CBCF9976C4E0A9047B8999446",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3198,
+          "vertexUploadBytes": 102336,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 23.526025,
+          "p50": 22.5154,
+          "p95": 29.4132,
+          "p99": 29.4132
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 28.318506666666664,
+          "p50": 28.55952,
+          "p95": 31.397056,
+          "p99": 31.397056
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 62,
+          "textureReleaseCount": 0
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 187,
+          "fenceWaitCount": 36,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiTargeting-Scale1.00",
+        "image": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiTargeting-Scale1.00.png",
+        "imageSha256": "4080D02561E861339D482A53FF65E0DA72D37FE0B5FB947C4488BE88B7FCABD6",
+        "pixelSha256": "8CC453C29B98F078796161759CD98D500C5AE04C7C1ABFA1A844D7CD8937FC77",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3600,
+          "vertexUploadBytes": 115200,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 20.846337499999997,
+          "p50": 23.5613,
+          "p95": 37.4724,
+          "p99": 37.4724
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 28.37136533333333,
+          "p50": 25.578976,
+          "p95": 35.5608,
+          "p99": 35.5608
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 124,
+          "textureReleaseCount": 62
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 675,
+          "fenceWaitCount": 76,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale1.00",
+        "image": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale1.00.png",
+        "imageSha256": "F8F26CD24FD68F9ADA43802E08C2A6DF92C20B12D11346EA717E0987BA16BADD",
+        "pixelSha256": "2AA0B78A5C0B8D1EFE1D0E125377711600EBA3AF2020A79A852ABB1742535AF0",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 20,
+          "vertices": 3642,
+          "vertexUploadBytes": 116544,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 20.7271375,
+          "p50": 24.3198,
+          "p95": 33.7463,
+          "p99": 33.7463
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 27.678149333333334,
+          "p50": 28.56192,
+          "p95": 29.752704,
+          "p99": 29.752704
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 85,
+          "residentTextureBytes": 89868532,
+          "shaderResourceDescriptorsUsed": 92,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 209,
+          "textureReleaseCount": 124
+        },
+        "health": {
+          "liveResourceCount": 358,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 1232,
+          "fenceWaitCount": 122,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale1.00",
+        "image": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale1.00.png",
+        "imageSha256": "39DC6C29D9E6DE8662D648B748754ABBEE2539E202FEFD2991551C2E3ADDD7D8",
+        "pixelSha256": "A9DEF3D75BC0D49A53A6ECF74826945B2CEB8A897AC8DDBD4E2FEEE443AFB4E5",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 23,
+          "vertices": 4038,
+          "vertexUploadBytes": 129216,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 18.9826875,
+          "p50": 27.8823,
+          "p95": 30.3474,
+          "p99": 30.3474
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 28.80790933333333,
+          "p50": 28.528704,
+          "p95": 31.190848,
+          "p99": 31.190848
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 271,
+          "textureReleaseCount": 209
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 1777,
+          "fenceWaitCount": 162,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale1.00",
+        "image": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale1.00.png",
+        "imageSha256": "D586DFA2CA89AC289B2BC3AD2F36211C9574F1FCAAFE129125866BDE255E447D",
+        "pixelSha256": "672F369912BCE6BC96011A9F7EF5586E04683AE135ECD3CB4E5F5ED4647D1ED7",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 39,
+          "vertices": 4218,
+          "vertexUploadBytes": 134976,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 18.316812499999997,
+          "p50": 19.0397,
+          "p95": 30.7355,
+          "p99": 30.7355
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 27.461189333333333,
+          "p50": 28.761824,
+          "p95": 31.321984,
+          "p99": 31.321984
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 333,
+          "textureReleaseCount": 271
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 2265,
+          "fenceWaitCount": 202,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiContacts-Scale1.00",
+        "image": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiContacts-Scale1.00.png",
+        "imageSha256": "F007CB06243296FA0B30B53FC1EC8EFB87A7D218E52F989FECE623B31BB0D93E",
+        "pixelSha256": "B004B1D6E1CD919062EC033CF020B6B569AF71AABE3794085980D19B79B2E345",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3198,
+          "vertexUploadBytes": 102336,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 23.983787500000002,
+          "p50": 34.5827,
+          "p95": 41.0516,
+          "p99": 41.0516
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 37.036757333333334,
+          "p50": 35.937696,
+          "p95": 40.877408,
+          "p99": 40.877408
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 63,
+          "residentTextureBytes": 77193996,
+          "shaderResourceDescriptorsUsed": 70,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 396,
+          "textureReleaseCount": 333
+        },
+        "health": {
+          "liveResourceCount": 304,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 2759,
+          "fenceWaitCount": 243,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiTargeting-Scale1.00",
+        "image": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiTargeting-Scale1.00.png",
+        "imageSha256": "F278C082C7C58079A0A1D9C6ECE9E7373109791E746FE9142AE9A37AE5429401",
+        "pixelSha256": "D263BD1306EAABA441CBDF5C420D57DB118D00F177F7D00E33F721CB4B181EF8",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3600,
+          "vertexUploadBytes": 115200,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 23.4693,
+          "p50": 34.2222,
+          "p95": 37.3803,
+          "p99": 37.3803
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 36.62782933333333,
+          "p50": 36.661312,
+          "p95": 37.785088,
+          "p99": 37.785088
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 63,
+          "residentTextureBytes": 77193996,
+          "shaderResourceDescriptorsUsed": 70,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 459,
+          "textureReleaseCount": 396
+        },
+        "health": {
+          "liveResourceCount": 304,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 3253,
+          "fenceWaitCount": 283,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale1.00",
+        "image": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale1.00.png",
+        "imageSha256": "D6DE54C5B5CA684A24CEC9AD29E25080402F386ACCDC3ACBFA9B3CE90DA6A2CB",
+        "pixelSha256": "036602CEF3ABE4971E48F29A23DC4F501BDFC89221C8116C269999038C17F29C",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 20,
+          "vertices": 3642,
+          "vertexUploadBytes": 116544,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 24.877850000000002,
+          "p50": 35.3331,
+          "p95": 45.702,
+          "p99": 45.702
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 37.33465066666667,
+          "p50": 36.124192,
+          "p95": 42.263744,
+          "p99": 42.263744
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 89,
+          "residentTextureBytes": 89891412,
+          "shaderResourceDescriptorsUsed": 96,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 89,
+          "peakResidentTextureBytes": 89891412,
+          "peakShaderResourceDescriptorsUsed": 96,
+          "textureUploadCount": 548,
+          "textureReleaseCount": 459
+        },
+        "health": {
+          "liveResourceCount": 370,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 3825,
+          "fenceWaitCount": 329,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale1.00",
+        "image": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiMixedSelection-Scale1.00.png",
+        "imageSha256": "772558B2E3ADCCF051CC21C813596800A3106D009768126F3652038C631F3EDB",
+        "pixelSha256": "44EF3D4B9F565B8FE14C02A0A51CA48A444957EC6C91F94F2978B1D48D1CDA73",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 23,
+          "vertices": 4038,
+          "vertexUploadBytes": 129216,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 31.136487499999998,
+          "p50": 45.5747,
+          "p95": 52.9862,
+          "p99": 52.9862
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 47.189349333333325,
+          "p50": 47.309536,
+          "p95": 48.814368,
+          "p99": 48.814368
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 63,
+          "residentTextureBytes": 77193996,
+          "shaderResourceDescriptorsUsed": 70,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 89,
+          "peakResidentTextureBytes": 89891412,
+          "peakShaderResourceDescriptorsUsed": 96,
+          "textureUploadCount": 611,
+          "textureReleaseCount": 548
+        },
+        "health": {
+          "liveResourceCount": 304,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 4385,
+          "fenceWaitCount": 369,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-wide",
+        "key": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale1.00",
+        "image": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiSupplyCritical-Scale1.00.png",
+        "imageSha256": "2329E40B8E965459882ED4CBE6DF41201355ECD86E67584927D261375F5C57DD",
+        "pixelSha256": "39EC3E1CBCFBABCBEB931349B2C4E4526E303C4695ADD15970CD8DE6C33A7734",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 39,
+          "vertices": 4218,
+          "vertexUploadBytes": 134976,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 24.4861,
+          "p50": 34.8895,
+          "p95": 42.94,
+          "p99": 42.94
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 37.43778666666667,
+          "p50": 36.8296,
+          "p95": 40.975232,
+          "p99": 40.975232
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 144,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 63,
+          "residentTextureBytes": 77193996,
+          "shaderResourceDescriptorsUsed": 70,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 89,
+          "peakResidentTextureBytes": 89891412,
+          "peakShaderResourceDescriptorsUsed": 96,
+          "textureUploadCount": 674,
+          "textureReleaseCount": 611
+        },
+        "health": {
+          "liveResourceCount": 304,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 4879,
+          "fenceWaitCount": 409,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-4k",
+        "key": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiContacts-Scale2.00",
+        "image": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiContacts-Scale2.00.png",
+        "imageSha256": "87DD06F75F73E51573E0299B7BADBE19DF86A49D04A1057BE43C3103A2C72356",
+        "pixelSha256": "0A80BECDC344AE5E4E4EFB59CA5152354B2EF284DD3ED8337B9A4107FB5015FC",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 17,
+          "vertices": 3198,
+          "vertexUploadBytes": 102336,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 37.429787499999996,
+          "p50": 22.5039,
+          "p95": 61.9732,
+          "p99": 61.9732
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 51.47064533333333,
+          "p50": 50.250176,
+          "p95": 57.422464,
+          "p99": 57.422464
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 192,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 62,
+          "textureReleaseCount": 0
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 187,
+          "fenceWaitCount": 38,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-4k",
+        "key": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiTargeting-Scale2.00",
+        "image": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiTargeting-Scale2.00.png",
+        "imageSha256": "25257D5C66E372AF6BA839E45876876953446E8FE3F58B14CCF006D37CC6CF83",
+        "pixelSha256": "560BD71CB6D5B7323CBACC7C0C56BC6AC7C585DBB0A47DB8923745152EA9EF20",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 17,
+          "vertices": 3480,
+          "vertexUploadBytes": 111360,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 35.920775,
+          "p50": 50.6475,
+          "p95": 60.3016,
+          "p99": 60.3016
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 52.742565333333346,
+          "p50": 49.597952,
+          "p95": 60.202528,
+          "p99": 60.202528
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 192,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 62,
+          "peakResidentTextureBytes": 77188276,
+          "peakShaderResourceDescriptorsUsed": 69,
+          "textureUploadCount": 124,
+          "textureReleaseCount": 62
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 675,
+          "fenceWaitCount": 78,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-4k",
+        "key": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiMinimapStrategic-Scale2.00",
+        "image": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiMinimapStrategic-Scale2.00.png",
+        "imageSha256": "6C8598F66A7635009E893CA06743D240503DF67A2808B03CA4CFD85D91E78C6B",
+        "pixelSha256": "7E7E5714C39F741EDB2FE991F90C89CD53A5E36E1976735F606084BE37687207",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 20,
+          "vertices": 3642,
+          "vertexUploadBytes": 116544,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 37.341575,
+          "p50": 55.1048,
+          "p95": 62.1652,
+          "p99": 62.1652
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 56.340730666666666,
+          "p50": 53.914816,
+          "p95": 61.224928,
+          "p99": 61.224928
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 192,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 85,
+          "residentTextureBytes": 89868532,
+          "shaderResourceDescriptorsUsed": 92,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 209,
+          "textureReleaseCount": 124
+        },
+        "health": {
+          "liveResourceCount": 358,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 1232,
+          "fenceWaitCount": 124,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-4k",
+        "key": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiMixedSelection-Scale2.00",
+        "image": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiMixedSelection-Scale2.00.png",
+        "imageSha256": "1798D09AC0602BE3BEFAD1D1C53FF8D8CE8D5EC9BBC5A011460ED407E516115A",
+        "pixelSha256": "63CD0207FF48E4936E9EA9C63AF7864F76B825A4EE46B4C3846E02AA318A7D17",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 23,
+          "vertices": 4038,
+          "vertexUploadBytes": 129216,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 36.1054,
+          "p50": 49.0197,
+          "p95": 59.7653,
+          "p99": 59.7653
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 56.579098666666674,
+          "p50": 57.041408,
+          "p95": 64.211296,
+          "p99": 64.211296
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 192,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 271,
+          "textureReleaseCount": 209
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 1777,
+          "fenceWaitCount": 164,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-4k",
+        "key": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiSupplyCritical-Scale2.00",
+        "image": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiSupplyCritical-Scale2.00.png",
+        "imageSha256": "302A202C351CDEC8E499985614835558C013E2A961478939D4831FB17100ED9D",
+        "pixelSha256": "8338536FFC586AD0637271D2713AF6FFBAA2F4FA44C4F4B42B084195E9E6481E",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 39,
+          "vertices": 4608,
+          "vertexUploadBytes": 147456,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 45.0066375,
+          "p50": 67.1457,
+          "p95": 74.1206,
+          "p99": 74.1206
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 66.20512533333333,
+          "p50": 65.53632,
+          "p95": 69.167616,
+          "p99": 69.167616
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 192,
+        "uiScale": 2,
+        "resources": {
+          "loadedTextureCount": 62,
+          "residentTextureBytes": 77188276,
+          "shaderResourceDescriptorsUsed": 69,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 85,
+          "peakResidentTextureBytes": 89868532,
+          "peakShaderResourceDescriptorsUsed": 92,
+          "textureUploadCount": 333,
+          "textureReleaseCount": 271
+        },
+        "health": {
+          "liveResourceCount": 301,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 6,
+          "releasedResourceCount": 2265,
+          "fenceWaitCount": 204,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-dark",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiContacts-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiContacts-Scale1.00.png",
+        "imageSha256": "BEC71A6CB2CB95215DAC8FEDCD38932B42A85C10EDBB0E70DE7C6443D7808AC9",
+        "pixelSha256": "ECA24285D9F39F96FA25281968EF9107E2C6D40371FEF7D2264DF4378491C4B9",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3090,
+          "vertexUploadBytes": 98880,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 25.581225000000003,
+          "p50": 23.5301,
+          "p95": 31.5184,
+          "p99": 31.5184
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 28.805578666666666,
+          "p50": 30.068896,
+          "p95": 35.688928,
+          "p99": 35.688928
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 70,
+          "residentTextureBytes": 77234036,
+          "shaderResourceDescriptorsUsed": 77,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 70,
+          "peakResidentTextureBytes": 77234036,
+          "peakShaderResourceDescriptorsUsed": 77,
+          "textureUploadCount": 70,
+          "textureReleaseCount": 0
+        },
+        "health": {
+          "liveResourceCount": 333,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 211,
+          "fenceWaitCount": 35,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-dark",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiTargeting-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiTargeting-Scale1.00.png",
+        "imageSha256": "D6DC28E3D2BD05AF7783BC8A83DD422FB4D5CA6DAB59FE208686925ADF657926",
+        "pixelSha256": "AE2E88A242F01B14473B5288AFB484249D9F53F5D1C3D88EFFC1E3E97A9437A0",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 18,
+          "vertices": 3582,
+          "vertexUploadBytes": 114624,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 16.602375000000002,
+          "p50": 11.3859,
+          "p95": 30.362,
+          "p99": 30.362
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 24.436064,
+          "p50": 26.833248,
+          "p95": 29.830176,
+          "p99": 29.830176
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 70,
+          "residentTextureBytes": 77234036,
+          "shaderResourceDescriptorsUsed": 77,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 70,
+          "peakResidentTextureBytes": 77234036,
+          "peakShaderResourceDescriptorsUsed": 77,
+          "textureUploadCount": 140,
+          "textureReleaseCount": 70
+        },
+        "health": {
+          "liveResourceCount": 333,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 755,
+          "fenceWaitCount": 75,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-dark",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiMinimapStrategic-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiMinimapStrategic-Scale1.00.png",
+        "imageSha256": "5E5885E5B3F082BC2B11DB489FD7D4940FC894D0D9510BAC344A34DC7E392B1B",
+        "pixelSha256": "A5E4787468773528460B293B106D8A9C97B8B158DB2538FAFCF6E377E9B99175",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 20,
+          "vertices": 3534,
+          "vertexUploadBytes": 113088,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 16.668187500000002,
+          "p50": 17.889,
+          "p95": 29.6507,
+          "p99": 29.6507
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 25.164543999999996,
+          "p50": 26.3384,
+          "p95": 29.609248,
+          "p99": 29.609248
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 70,
+          "residentTextureBytes": 77234036,
+          "shaderResourceDescriptorsUsed": 77,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 70,
+          "peakResidentTextureBytes": 77234036,
+          "peakShaderResourceDescriptorsUsed": 77,
+          "textureUploadCount": 210,
+          "textureReleaseCount": 140
+        },
+        "health": {
+          "liveResourceCount": 333,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 3,
+          "releasedResourceCount": 1299,
+          "fenceWaitCount": 115,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-dark",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiMixedSelection-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiMixedSelection-Scale1.00.png",
+        "imageSha256": "7DE053E9917D2EC5FD2FC2DB6362DAB5A2CBB22F9E06658A49AA769BF60F2FA7",
+        "pixelSha256": "83008D5D23251739F9A47B03D5A6B203F24C5D85B7E0838D564200A2CEF642D4",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 23,
+          "vertices": 3822,
+          "vertexUploadBytes": 122304,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 16.624075,
+          "p50": 22.2528,
+          "p95": 30.2962,
+          "p99": 30.2962
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 25.332426666666667,
+          "p50": 22.369536,
+          "p95": 29.743712,
+          "p99": 29.743712
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 70,
+          "residentTextureBytes": 77234036,
+          "shaderResourceDescriptorsUsed": 77,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 70,
+          "peakResidentTextureBytes": 77234036,
+          "peakShaderResourceDescriptorsUsed": 77,
+          "textureUploadCount": 280,
+          "textureReleaseCount": 210
+        },
+        "health": {
+          "liveResourceCount": 333,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 9,
+          "releasedResourceCount": 1843,
+          "fenceWaitCount": 155,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      {
+        "root": "tactical-native-final-dark",
+        "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiSupplyCritical-Scale1.00",
+        "image": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiSupplyCritical-Scale1.00.png",
+        "imageSha256": "5C3EA66DC8603FDD8EA1BD3478E88D44ED4E20B26B3C6CE4824065F251AD419B",
+        "pixelSha256": "D98F6D1F9AE5F107BF11AC1ED948A01508A81625BD646A5B85D6AB7E48A5D80F",
+        "skin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 16777216,
+          "batches": 13,
+          "buffers": 52,
+          "draws": 39,
+          "vertices": 3972,
+          "vertexUploadBytes": 127104,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 29360128,
+          "prepared": true
+        },
+        "cpu": {
+          "samples": 8,
+          "mean": 19.594075,
+          "p50": 19.2274,
+          "p95": 35.5085,
+          "p99": 35.5085
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 28.07823466666667,
+          "p50": 29.150048,
+          "p95": 32.939264,
+          "p99": 32.939264
+        },
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "rasterDpi": 96,
+        "uiScale": 1,
+        "resources": {
+          "loadedTextureCount": 70,
+          "residentTextureBytes": 77234036,
+          "shaderResourceDescriptorsUsed": 77,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 70,
+          "peakResidentTextureBytes": 77234036,
+          "peakShaderResourceDescriptorsUsed": 77,
+          "textureUploadCount": 350,
+          "textureReleaseCount": 280
+        },
+        "health": {
+          "liveResourceCount": 333,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 9,
+          "releasedResourceCount": 2387,
+          "fenceWaitCount": 195,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      }
+    ]
+  },
+  "package": {
+    "source": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+    "archive": "artifacts\\graphical-tactical-package\\FORGELINE-0.1.379-dev-win-x64.zip",
+    "archiveBytes": 39996785,
+    "archiveSha256": "c10f1a143dd9c5fa972b0fe65f604cd580ca74adf685116dee15c8ce7ebf2dc8",
+    "verifiedManifestFiles": 1403,
+    "verifiedRuntimeAssets": 1337,
+    "sharedRuntimeFiles": 1338,
+    "packageOnlyPlaybackSidecars": [
+      "audio/ui/accepted.wav",
+      "audio/ui/intent.wav",
+      "audio/ui/navigation.wav",
+      "audio/ui/rejected.wav",
+      "branding/studio-intro.mp4",
+      "branding/studio-intro.wav"
+    ],
+    "sourceFilesExcluded": true,
+    "exactPackagedCaptureMatches": 5,
+    "createdFreshSettings": true,
+    "developmentRuntimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+    "packagedRuntimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+    "provenance": {
+      "channel": "dev",
+      "sdk": "10.0.401",
+      "runAttempt": null,
+      "configuration": "Release",
+      "version": "0.1.379-dev",
+      "runtimeAssetCompiler": "1.10.0",
+      "runtimeIdentifier": "win-x64",
+      "sourceTreeClean": true,
+      "buildTimeUtc": "2026-10-16T07:57:35.2348811+00:00",
+      "product": "FORGELINE",
+      "informationalVersion": "0.1.379-dev+0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+      "sourceRevision": "0cb9b8089f84abfdce0e754e9176be5c4628c16b",
+      "runtimeAssetSignature": "5cb87ff663e609ff3c0842be2671e3eabc9a9389e3562a66e0fba46733700932",
+      "runUrl": null,
+      "productVersion": "0.1.379",
+      "targetFramework": "net10.0-windows",
+      "runId": null,
+      "repository": "https://github.com/DaveBeusing/Forgeline"
+    }
+  },
+  "regression": {
+    "total": 2100,
+    "passed": 2090,
+    "failed": 1,
+    "skipped": 9,
+    "status": "failed",
+    "failure": "DirectorateBuildingPresentationTests.RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(fuel_refinery): 1984 bytes, expected zero",
+    "focusedTactical": 94,
+    "nativeCursor": 5,
+    "runtimeCursor": 7,
+    "isolatedAllocationCurrent": 39,
+    "isolatedAllocationMasterAssembly": 39,
+    "allocationRootCause": "unresolved; both isolated controls pass; broad-run failure remains failed"
+  },
+  "terminal": {
+    "outcome": "Victory",
+    "reason": "CommandCoreDestroyed",
+    "tick": 42922,
+    "elapsedMilliseconds": 107467.1641,
+    "completedCargo": 268,
+    "failedCargo": 0,
+    "routeFailures": 0
+  },
+  "ci": {
+    "sourceRun": 38868574666,
+    "status": "failure",
+    "tacticalStep": "success",
+    "failedStep": "Windows window mode and visual qualification smoke",
+    "gameplayTextureBytes": 99608050,
+    "budgetBytes": 58720256,
+    "frameRun": 38868574683,
+    "frameStatus": "success",
+    "scalabilityRun": 38868574673,
+    "scalabilityStatus": "success"
+  },
+  "runtimeRecompile": {
+    "oldContentSignature": "b6cbe90cbbd4dfc780abb28f5d42f7bc3b469ae0cf4e663f594975a2bfd219d9",
+    "newContentSignature": "5cb87ff663e609ff3c0842be2671e3eabc9a9389e3562a66e0fba46733700932",
+    "verifiedEqualPayloads": 1337,
+    "changedRecords": [
+      {
+        "id": "branding.forgeline.menu.directorate",
+        "oldSourceHash": "5f3bc065b99d8548b8be0f37f484db98699347f20f6359d701d3bd38d2f29710",
+        "newSourceHash": "67b97e12632c088055402b5dd50a934e6af5e16fdb89a5196bea5ccb762eeae4",
+        "oldRuntimeHash": "8f1cf7d6096d2dbc9b23883400bd834352a078132bf8e0b92118887584c29895",
+        "newRuntimeHash": "49444533fbd0f109135142de8cfcaef149c0dd210aabbbea637133f0683e2d23",
+        "payloadEqual": true,
+        "payloadSha256": "c012796d8bd463987e1e125ab2d9b82803cd48fd8573ad366219e142f42be660"
+      }
+    ],
+    "explanation": "The clean master checkout materialized the existing menu definition with CRLF. Its exact source/build metadata changed; all 1337 binary payloads remain byte-identical. No asset source was edited or normalized to force matching fingerprints."
+  },
+  "images": [
+    {
+      "file": "contacts.png",
+      "root": "tactical-native-final-normal",
+      "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiContacts-Scale1.00",
+      "imageSha256": "020B0DD5625B01452BD741472511AB2CEF75CDE1AF2477959402177B3074BC37",
+      "pixelSha256": "FA0ED5181E7C29436F83EAA060181706C2F4DE3F7B0B696FF4479A76F2C2E5AF",
+      "bytes": 4157949
+    },
+    {
+      "file": "targeting.png",
+      "root": "tactical-native-final-normal",
+      "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiTargeting-Scale1.00",
+      "imageSha256": "764681544C0C89D62CA41ACE3A42D1371ABA21483B37EE47AFEAEE26C6B96311",
+      "pixelSha256": "DB8AC85EC8AB5390A151EC04391E4B30AC0601264E49EAFFE7918DC9BDD46734",
+      "bytes": 4162278
+    },
+    {
+      "file": "world-supply-close.png",
+      "root": "tactical-native-final-close",
+      "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiSupplyCritical-Scale1.00",
+      "imageSha256": "81F5C12F4486C5D9F3C780DC79C597D2E88139BBE0FD4841FD73204728CD75FE",
+      "pixelSha256": "E4BA060D5F21098D53DAF1116AAC03CF1A26B0C229F0D45800142A088E97C42E",
+      "bytes": 3812551
+    },
+    {
+      "file": "compact-contacts.png",
+      "root": "tactical-native-final-compact",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiContacts-Scale2.00",
+      "imageSha256": "A06FC3EE597DB9B5A7103B653D1A625DF25DF844D431EC25810330CBFED27D26",
+      "pixelSha256": "76A0F3BDCDC254173A9EDD409016ECF4CCF75F879D4061F1D4375008FECB65E1",
+      "bytes": 1161958
+    },
+    {
+      "file": "strategic-ultrawide.png",
+      "root": "tactical-native-final-wide",
+      "key": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiMinimapStrategic-Scale1.00",
+      "imageSha256": "D6DE54C5B5CA684A24CEC9AD29E25080402F386ACCDC3ACBFA9B3CE90DA6A2CB",
+      "pixelSha256": "036602CEF3ABE4971E48F29A23DC4F501BDFC89221C8116C269999038C17F29C",
+      "bytes": 7411941
+    },
+    {
+      "file": "selection-4k.png",
+      "root": "tactical-native-final-4k",
+      "key": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiMixedSelection-Scale2.00",
+      "imageSha256": "1798D09AC0602BE3BEFAD1D1C53FF8D8CE8D5EC9BBC5A011460ED407E516115A",
+      "pixelSha256": "63CD0207FF48E4936E9EA9C63AF7864F76B825A4EE46B4C3846E02AA318A7D17",
+      "bytes": 8686344
+    },
+    {
+      "file": "world-supply-dark.png",
+      "root": "tactical-native-final-dark",
+      "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-Inspection120-UiSupplyCritical-Scale1.00",
+      "imageSha256": "5C3EA66DC8603FDD8EA1BD3478E88D44ED4E20B26B3C6CE4824065F251AD419B",
+      "pixelSha256": "D98F6D1F9AE5F107BF11AC1ED948A01508A81625BD646A5B85D6AB7E48A5D80F",
+      "bytes": 3614100
+    }
+  ],
+  "archive": {
+    "file": "qualification-records.zip",
+    "sha256": "635694278283781b272baf033b11546176149df5487850d74754d91228038b94",
+    "bytes": 1414749
+  },
+  "records": [
+    {
+      "path": "artifacts\\tactical-native-final-normal\\manifest.json",
+      "archiveEntry": "artifacts/tactical-native-final-normal/manifest.json",
+      "sha256": "2fbafdd683deb9d694c45f5c0125c4feb969d8154aa91be961388037f528d1d5",
+      "bytes": 314381
+    },
+    {
+      "path": "artifacts\\tactical-native-final-close\\manifest.json",
+      "archiveEntry": "artifacts/tactical-native-final-close/manifest.json",
+      "sha256": "96a3d9b05cc5eec61458e4edb26c55467c2a5ea9ca1cae2ff321a134ec4fde27",
+      "bytes": 313806
+    },
+    {
+      "path": "artifacts\\tactical-native-final-world-zooms\\manifest.json",
+      "archiveEntry": "artifacts/tactical-native-final-world-zooms/manifest.json",
+      "sha256": "adc75c31f1289d214500820e7f590cfbe753d945f1cee31a5c20d935a4e50e0c",
+      "bytes": 184960
+    },
+    {
+      "path": "artifacts\\tactical-native-final-compact\\manifest.json",
+      "archiveEntry": "artifacts/tactical-native-final-compact/manifest.json",
+      "sha256": "dbbc4f92eeb4fddb93e3e0fa73e1d8a64b087e3280d6adcdba31f3326cb13c07",
+      "bytes": 942490
+    },
+    {
+      "path": "artifacts\\tactical-native-final-wide\\manifest.json",
+      "archiveEntry": "artifacts/tactical-native-final-wide/manifest.json",
+      "sha256": "f7153839a0e85f216176f77d706fa6659c1d5b43a80debc386eb070b5406d8cb",
+      "bytes": 629154
+    },
+    {
+      "path": "artifacts\\tactical-native-final-4k\\manifest.json",
+      "archiveEntry": "artifacts/tactical-native-final-4k/manifest.json",
+      "sha256": "8f236b1b5e169ebe37f85432dcb4b52a4fb9559eee3d682e9354dfb9246dbb79",
+      "bytes": 315410
+    },
+    {
+      "path": "artifacts\\tactical-native-final-dark\\manifest.json",
+      "archiveEntry": "artifacts/tactical-native-final-dark/manifest.json",
+      "sha256": "239d259f0eea4906705e0cc0e04b3e3bac3bb3f4d303e08e563cf4ff4041e7c6",
+      "bytes": 314104
+    },
+    {
+      "path": "artifacts\\tactical-native-packaged\\manifest.json",
+      "archiveEntry": "artifacts/tactical-native-packaged/manifest.json",
+      "sha256": "c55fe25c39a4a8493f75ae555cc718e05aa816257643ca13f8864c77e3ba870f",
+      "bytes": 314603
+    },
+    {
+      "path": "artifacts\\tactical-ui-normal\\manifest.json",
+      "archiveEntry": "artifacts/tactical-ui-normal/manifest.json",
+      "sha256": "08a8f0f3f9dd939b308482520d64f5941746e1648a45f0a5cb992f7afd575f67",
+      "bytes": 314307
+    },
+    {
+      "path": "artifacts\\tactical-final-restore.log",
+      "archiveEntry": "artifacts/tactical-final-restore.log",
+      "sha256": "b6e86dbe3d5ac9198a3e82ee1ca6a9e04022afabf87593d31b1d6012309749e8",
+      "bytes": 126
+    },
+    {
+      "path": "artifacts\\tactical-final-source-build.log",
+      "archiveEntry": "artifacts/tactical-final-source-build.log",
+      "sha256": "c5e1d852193902af57e0e515608e0d93a314cb83bba7013ebf5826a1e47003b9",
+      "bytes": 8809
+    },
+    {
+      "path": "artifacts\\tactical-final-references.log",
+      "archiveEntry": "artifacts/tactical-final-references.log",
+      "sha256": "2834442048167a3e16fb8d8bbd76b13cba766a16c33cb9fba23983ca5ce9f040",
+      "bytes": 95
+    },
+    {
+      "path": "artifacts\\tactical-final-version.log",
+      "archiveEntry": "artifacts/tactical-final-version.log",
+      "sha256": "9708fbb4c76990f6b10c2c135df336ca86c51a9ed8c9877d8501084bc2073e37",
+      "bytes": 727
+    },
+    {
+      "path": "artifacts\\tactical-assets.log",
+      "archiveEntry": "artifacts/tactical-assets.log",
+      "sha256": "17e1cff93793cfdbc2dd3b005f1324d249dda42b07f211bf48d486af5d06071f",
+      "bytes": 9403618
+    },
+    {
+      "path": "artifacts\\tactical-asset-qualification.json",
+      "archiveEntry": "artifacts/tactical-asset-qualification.json",
+      "sha256": "2b22da7bf71b2da706b51425cc79380909f98e14928ec837560ebac51605dce0",
+      "bytes": 2016
+    },
+    {
+      "path": "artifacts\\tactical-final-assets.log",
+      "archiveEntry": "artifacts/tactical-final-assets.log",
+      "sha256": "75e804981d764703d7b0ab2f6f6fb7fba8efa566368e63749240ab6b0240d186",
+      "bytes": 2081
+    },
+    {
+      "path": "artifacts\\tactical-final-asset-qualification.json",
+      "archiveEntry": "artifacts/tactical-final-asset-qualification.json",
+      "sha256": "caaf8255eefa3b19e7e4a1db2b7cb62f9c6ccbd0012c9c59fbf9a6e82dfafbf0",
+      "bytes": 2016
+    },
+    {
+      "path": "artifacts\\tactical-final-contracts.log",
+      "archiveEntry": "artifacts/tactical-final-contracts.log",
+      "sha256": "9e5f17d43f96ff04945c25f0251d8ec79a289dba29865c5181e6db7168d282dc",
+      "bytes": 604
+    },
+    {
+      "path": "artifacts\\tactical-final-platform.log",
+      "archiveEntry": "artifacts/tactical-final-platform.log",
+      "sha256": "0d07dfb3b1034dbaa3c936637044c19d9e625d4177ae33f262461e46a430b9ad",
+      "bytes": 616
+    },
+    {
+      "path": "artifacts\\tactical-final-cursors.log",
+      "archiveEntry": "artifacts/tactical-final-cursors.log",
+      "sha256": "bbf666ee557219a5494bbb91e958688fb02a02622827d15d9cf582787616147a",
+      "bytes": 576
+    },
+    {
+      "path": "artifacts\\tactical-final-full-tests.log",
+      "archiveEntry": "artifacts/tactical-final-full-tests.log",
+      "sha256": "2d5d8111345ea9d08cf1256c41d56ecabd6474cd9ecddf1cefc2560cd405cba0",
+      "bytes": 36112
+    },
+    {
+      "path": "artifacts\\tactical-full-tests.log",
+      "archiveEntry": "artifacts/tactical-full-tests.log",
+      "sha256": "094c433807a8d8564cb7be60781e8d786341d669dc92877ff1fb42210748c4f7",
+      "bytes": 38106
+    },
+    {
+      "path": "artifacts\\tactical-isolated-allocation.log",
+      "archiveEntry": "artifacts/tactical-isolated-allocation.log",
+      "sha256": "dc1d324c7211b0b07a5645e222307cc4c2d5d93e1d9091ebad8d997940e5bfd7",
+      "bytes": 602
+    },
+    {
+      "path": "artifacts\\tactical-master-allocation-control.log",
+      "archiveEntry": "artifacts/tactical-master-allocation-control.log",
+      "sha256": "e92be029143ec5da9f04ebf4ba20e2300c3cdc6ba9ffee2dd1a197976b28d0aa",
+      "bytes": 39
+    },
+    {
+      "path": "artifacts\\tactical-master-allocation-control-mtp.log",
+      "archiveEntry": "artifacts/tactical-master-allocation-control-mtp.log",
+      "sha256": "fed657be30e0b69bbbd53ba196bedeb101e4e1b75e2f2be883a888e8fa86bc26",
+      "bytes": 566
+    },
+    {
+      "path": "artifacts\\tactical-allocation-control-identity.json",
+      "archiveEntry": "artifacts/tactical-allocation-control-identity.json",
+      "sha256": "524d4f7a876243943427a9b1f12a8d3ac8cd7f919d1074b56029ba34b1a32955",
+      "bytes": 791
+    },
+    {
+      "path": "artifacts\\tactical-source-build.log",
+      "archiveEntry": "artifacts/tactical-source-build.log",
+      "sha256": "f8d369ab4dd22cc790c7bcc98f5e834a1563a35aa8d8fb06d3dd4f93152de49a",
+      "bytes": 9396
+    },
+    {
+      "path": "artifacts\\tactical-native-normal.log",
+      "archiveEntry": "artifacts/tactical-native-normal.log",
+      "sha256": "41aeca0de8d5cd8d27cf108f533e3dff1a1ada81eaa0ce6293ee5566d8123fe4",
+      "bytes": 113
+    },
+    {
+      "path": "artifacts\\tactical-native-verification.json",
+      "archiveEntry": "artifacts/tactical-native-verification.json",
+      "sha256": "f9eeb3999c36258c810b68d5bd269404159a7d2bb4903acdc4b259e9bede8f55",
+      "bytes": 118776
+    },
+    {
+      "path": "artifacts\\tactical-package-verification.json",
+      "archiveEntry": "artifacts/tactical-package-verification.json",
+      "sha256": "5c8934bbb0c5a8d73bc7ab8f17677be4a7a4ba2f170e0d57f24df429f9abb720",
+      "bytes": 1688
+    },
+    {
+      "path": "artifacts\\tactical-runtime-recompile-comparison.json",
+      "archiveEntry": "artifacts/tactical-runtime-recompile-comparison.json",
+      "sha256": "cb6918deb94c3b85d31b4512f1b924f7c1fc43c7b6840ec3f8935f8cacbc7be7",
+      "bytes": 1074
+    },
+    {
+      "path": "artifacts\\tactical-source-ci.json",
+      "archiveEntry": "artifacts/tactical-source-ci.json",
+      "sha256": "00aca84af78e2aedf4f68ecab5258cd1c33c1f7b6cd46926454f9ab14a2e9cc2",
+      "bytes": 8687
+    },
+    {
+      "path": "artifacts\\tactical-source-ci-job.log",
+      "archiveEntry": "artifacts/tactical-source-ci-job.log",
+      "sha256": "948d270f7550ea6d65d906eaf1200efbce7d2d6eb2de49fd8db022353de21f4b",
+      "bytes": 8728123
+    },
+    {
+      "path": "artifacts\\tactical-source-ci-failure.log",
+      "archiveEntry": "artifacts/tactical-source-ci-failure.log",
+      "sha256": "ba2ee02a2431bcb2d77277989989de0b873e2296138cb4ae9ca3257f62cd0167",
+      "bytes": 927
+    },
+    {
+      "path": "artifacts\\tactical-package.log",
+      "archiveEntry": "artifacts/tactical-package.log",
+      "sha256": "4f13621b084079a3a3be18a00384b243e78b2751141bcdd8aff589b6fcc8b055",
+      "bytes": 3797
+    },
+    {
+      "path": "artifacts\\tactical-package-smoke.log",
+      "archiveEntry": "artifacts/tactical-package-smoke.log",
+      "sha256": "453a1197dd5feec20fdb07ae7f802e95099c959bbb02f4bfdf161dba6e887048",
+      "bytes": 3982
+    },
+    {
+      "path": "artifacts\\tactical-package-capture.log",
+      "archiveEntry": "artifacts/tactical-package-capture.log",
+      "sha256": "8f09b1cdf5ad51738f9384e3cc44e904335368920f44ffb90f39f94501c0f566",
+      "bytes": 68
+    },
+    {
+      "path": "artifacts\\tactical-terminal-match.json",
+      "archiveEntry": "artifacts/tactical-terminal-match.json",
+      "sha256": "a45e8b91c07886936a6f41e03321248c31730c6060888ff1f2e2ac2d8d9d04a0",
+      "bytes": 5212
+    },
+    {
+      "path": "artifacts\\tactical-terminal-telemetry.json",
+      "archiveEntry": "artifacts/tactical-terminal-telemetry.json",
+      "sha256": "bd278acf5c4b4f02fa315771e343f77ac8cf227a0c4365997b13d41bff381837",
+      "bytes": 42987
+    },
+    {
+      "path": "artifacts\\tactical-terminal-match.progression-1.json",
+      "archiveEntry": "artifacts/tactical-terminal-match.progression-1.json",
+      "sha256": "7e94a1d32c86795fb41a595ef0acef57631478ebd0de511391d4bc70b8176c2a",
+      "bytes": 3525305
+    },
+    {
+      "path": "artifacts\\tactical-terminal-match.log",
+      "archiveEntry": "artifacts/tactical-terminal-match.log",
+      "sha256": "e0d294e4a1879d40dcfb3178415895f8fc9daa2fff065d2a766829a73a3001d1",
+      "bytes": 243154
+    },
+    {
+      "path": "artifacts\\Qualify-TacticalInterface.ps1",
+      "archiveEntry": "artifacts/Qualify-TacticalInterface.ps1",
+      "sha256": "05f4f7a93c425c693ae0c92019cffb91f824d5626d3c8ebfcf7e8f2e9d66eada",
+      "bytes": 2378
+    },
+    {
+      "path": "artifacts\\Capture-TacticalInterface.ps1",
+      "archiveEntry": "artifacts/Capture-TacticalInterface.ps1",
+      "sha256": "be470e74270fbee62675f113d1bc888d43fc1ce4c772532a27e08bcb0e27b78a",
+      "bytes": 2745
+    },
+    {
+      "path": "artifacts\\Package-TacticalInterface.ps1",
+      "archiveEntry": "artifacts/Package-TacticalInterface.ps1",
+      "sha256": "b41722186a9de8f253ac36428325d2ecae19402139d7e1b36f00528015d5c0fc",
+      "bytes": 1927
+    },
+    {
+      "path": "artifacts\\Verify-TacticalNative.py",
+      "archiveEntry": "artifacts/Verify-TacticalNative.py",
+      "sha256": "6fd9abee2dec34cde2d0ba53c36ba043e63dc96105d1b91b18b1e7e03119d3d8",
+      "bytes": 2904
+    },
+    {
+      "path": "artifacts\\Verify-TacticalPackage.py",
+      "archiveEntry": "artifacts/Verify-TacticalPackage.py",
+      "sha256": "a8b0c62ec7d9291bf670221787f39224b629685afccaf1d2813f3c702cee4303",
+      "bytes": 2858
+    },
+    {
+      "path": "artifacts\\tactical-native-final-normal.log",
+      "archiveEntry": "artifacts/tactical-native-final-normal.log",
+      "sha256": "8f09b1cdf5ad51738f9384e3cc44e904335368920f44ffb90f39f94501c0f566",
+      "bytes": 68
+    },
+    {
+      "path": "artifacts\\tactical-native-final-close.log",
+      "archiveEntry": "artifacts/tactical-native-final-close.log",
+      "sha256": "8f09b1cdf5ad51738f9384e3cc44e904335368920f44ffb90f39f94501c0f566",
+      "bytes": 68
+    },
+    {
+      "path": "artifacts\\tactical-native-final-world-zooms.log",
+      "archiveEntry": "artifacts/tactical-native-final-world-zooms.log",
+      "sha256": "ac7cd11e99629adf8c4104b203a75e41de8eb389024da7e35d47c3c8ed3edfa4",
+      "bytes": 68
+    },
+    {
+      "path": "artifacts\\tactical-native-final-compact.log",
+      "archiveEntry": "artifacts/tactical-native-final-compact.log",
+      "sha256": "29d3a4cd93069039c063489dc79bad141cfe2ad0fd9d690ac4b001a035437a93",
+      "bytes": 69
+    },
+    {
+      "path": "artifacts\\tactical-native-final-wide.log",
+      "archiveEntry": "artifacts/tactical-native-final-wide.log",
+      "sha256": "12332580ec9669e655cde340ee1992af05d5c5f08e3aabc271d4595f99d88e01",
+      "bytes": 69
+    },
+    {
+      "path": "artifacts\\tactical-native-final-4k.log",
+      "archiveEntry": "artifacts/tactical-native-final-4k.log",
+      "sha256": "8f09b1cdf5ad51738f9384e3cc44e904335368920f44ffb90f39f94501c0f566",
+      "bytes": 68
+    },
+    {
+      "path": "artifacts\\tactical-native-final-dark.log",
+      "archiveEntry": "artifacts/tactical-native-final-dark.log",
+      "sha256": "8f09b1cdf5ad51738f9384e3cc44e904335368920f44ffb90f39f94501c0f566",
+      "bytes": 68
+    }
+  ]
+}

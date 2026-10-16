@@ -162,4 +162,8 @@ See [native and package qualification](GraphicalBattlefieldHudQualification.md).
 
 ## Economic HUD consumers
 
-[Production and operations](GraphicalProductionAndOperations.md) share the same seven atlas pages. Current composed HUD preparation is twelve bounded batches / 48 buffers / 5,603,328 upload-buffer bytes. Thin progress tracks resample complete sprites below the authored height and still clip the fill fraction. Operations records its opaque underlay before skin and remaining text. [Qualification](GraphicalProductionAndOperationsQualification.md) preserves source and package identities.
+[Production and operations](GraphicalProductionAndOperations.md) share the same seven atlas pages. That integration prepared twelve bounded batches / 48 buffers / 5,603,328 upload-buffer bytes. Thin progress tracks resample complete sprites below the authored height and still clip the fill fraction. Operations records its opaque underlay before skin and remaining text. [Qualification](GraphicalProductionAndOperationsQualification.md) preserves source and package identities.
+
+## Tactical consumers
+
+[The tactical interface](GraphicalTacticalInterface.md) adds bounded projected quads for footprint components and separates Core-before-geometry from Icons-after-geometry recording. Map scissoring preserves exact interaction bounds. The information owner prepares 4,096 icon quads; current whole-HUD preparation is 13 batches / 52 buffers / 8,749,056 reserved upload bytes, with the same seven shared atlas pages (28 MiB). Native cursors extract validated atlas pixels on the platform thread and allocate no additional GPU textures. See [qualification](GraphicalTacticalInterfaceQualification.md).

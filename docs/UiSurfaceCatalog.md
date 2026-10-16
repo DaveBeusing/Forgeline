@@ -81,9 +81,9 @@ geometry remains an independent bootstrap/debug path. [Domain cards, operations 
 | Technology current/research/blocked | same dock owner; live technology data | card/header/footer geometry | control.button_compact, explicit TechnologyId artwork, progress.*, disabled/pending/accepted; implemented |
 | Dock pagination, six rebound-key footer actions | same dock owner; live hotkeys | `GetPageButtonRect`, `GetFooterButtonRect` | control.button_compact, shared overlays; implemented shell controls |
 | Dock focus/hover/press/pending/accepted/rejected | same dock owner; compiled shell/control state layers; compiled domain-card states and retained structural cues | shared dock hit regions and controller state | nine shared overlays; preserve command lifecycle; implemented |
-| Minimap frame and selectors/legend | `RtsInformationHudSurface` / `RtsInformationOverlayRenderer`; quads/glyphs | `GameplayHudLayout.Minimap`, `RtsMinimapInteractionLayout` | panel.minimap, control.tab/row_compact; tactical |
-| Minimap terrain, fog, permitted contacts, objectives, camera footprint | same information owner; dynamic colored geometry | `RtsMinimapInteractionLayout.MapWorldToPointer` / minimap layout | retain live geometry; semantic markers separate; tactical |
-| Strategic information-layer tabs/legend | same information owner; live layer view | `GameplayHudLayout.SecondaryView`, information controls | control.tab, panel.compact; tactical |
+| Minimap frame and selectors/legend | `RtsInformationHudSurface` / `RtsInformationOverlayRenderer`; compiled panel/controls/glyphs | `GameplayHudLayout.Minimap`, `RtsMinimapInteractionLayout` | panel.minimap, control.tab, panel.inset; implemented |
+| Minimap terrain, fog, permitted contacts, objectives, camera footprint | same information owner; live geometry plus clipped permitted atlas symbols | `RtsMinimapInteractionLayout.MapWorldToPointer` / minimap layout | retain live terrain/fog/transform/camera rays; mapped contact/objective art; implemented |
+| Strategic information-layer tabs/legend | same information owner; live layer view | `GameplayHudLayout.SecondaryView`, information controls | control.tab, panel.inset, mapped layer glyphs; implemented |
 | Combat-group overview assigned/selected/mixed, empty omitted, keyboard shortcuts | same information owner; compiled group controls and live summaries | `SecondaryView`, `GameplayGuidanceLayout.Remaining`; group keyboard controller | control.button_compact, selected/focus; HUD |
 | Match setup/pause/terminal result/restart | same information owner; live `PreAlphaUxView` and match result | `EmitSystemPanel` fitted viewport bounds | panel.dialog, control.button; HUD |
 | Legacy help renderer (currently unreachable from F1) | same information owner; procedural help text | `EmitHelpPanel` fitted bounds | retain dormant compatibility path; no new help page |
@@ -98,9 +98,9 @@ geometry remains an independent bootstrap/debug path. [Domain cards, operations 
 
 | Surface | Owner / geometry | Disposition |
 | --- | --- | --- |
-| Selection outlines, drag box, orders and targeting | `RtsInformationOverlayRenderer` and interaction overlays; camera projection and live pointer/world coordinates | retain data-driven geometry; tactical art only where appropriate |
+| Selection outlines, drag box, orders and targeting | `RtsInformationOverlayRenderer`, `TacticalFootprint` and interaction owners; actual extents, rotation, camera and copied intent | projected corner/target/move art; terrain-sampled oriented group outlines and drag geometry retained |
 | Build placement footprint and valid/invalid preview | Client placement controller and presentation world overlays; actual placement footprint | retain authoritative validity and dynamic geometry; tactical migration |
-| Native pointer | Windows platform | retain OS cursor; no additional cursor introduced |
+| Native pointer | Windows platform / `TacticalCursorSet` | single native pointer, eleven roles, four sizes with authored hotspots; OS ownership restored on exit |
 | Debug primitives, development overlays | `DebugDrawRenderer`, `DebugOverlayState`; debug projection/layout | retain asset-independent diagnostics |
 | Early bootstrap and native fatal/startup failure | `ForgeLine.Platform.Windows/WindowsBootstrapSurface`, Client bootstrap/failure owners | retain independent native rendering; no required production art |
 | Studio/product identity | existing embedded marks and wordmark | retain approved branding; no reference insignia replacement |
@@ -122,3 +122,7 @@ contracts; catalog coverage does not authorize new gameplay or speculative widge
 ## Graphical economic surface coverage
 
 Build/processing/unit/logistics/supply/technology/tactical domain cards, actual queue work states, existing tooltip costs/prerequisites, Operations controls/rows/details and actionable alerts now use prepared production layers. Empty rows remain non-actions; cancel/priority/mode controls retain existing capabilities. See [exact roles and ownership](GraphicalProductionAndOperations.md) and [source-bound validation](GraphicalProductionAndOperationsQualification.md). No source artwork, new research, queue capacity, reordered gameplay, map or cursor mechanics are introduced.
+
+## Graphical tactical consumer coverage
+
+[Map, native cursor and world indicators](GraphicalTacticalInterface.md) now use production panels, selector/layer glyphs, permitted contact/objective/group art, projected primary/hover corner components, transient order/target art and current owned single-entity status frames. Dynamic fog, ranges, routes, placement and terrain-sampled group outlines remain intentional geometry. [Qualification](GraphicalTacticalInterfaceQualification.md) separates native repeatability, privacy/hotspot/resource contracts, unresolved gates and pending physical/human acceptance.

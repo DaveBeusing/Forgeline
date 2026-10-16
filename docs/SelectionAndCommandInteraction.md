@@ -248,11 +248,11 @@ While a tactical targeting mode is active, its left click is captured through th
 
 ## Selection and command feedback rendering
 
-The normalized drag marquee follows current pointer state in each published presentation frame, independently of simulation ticks. It is clipped to the client gameplay viewport, drawn with a faint 10% alpha fill, a dark contrast border and a DPI-scaled colored outline. The information renderer reserves geometry capacity for the marquee/cursor after other overlays. Box picking still uses visible eligible projected entity centers; Shift retains the existing toggle semantics.
+The normalized drag marquee follows current pointer state in each published presentation frame, independently of simulation ticks. It is clipped to the client gameplay viewport, drawn with a faint 10% alpha fill, a dark contrast border and a DPI-scaled colored outline. The information renderer reserves geometry capacity for the marquee after other overlays; the only mouse cursor is native Windows. Box picking still uses visible eligible projected entity centers; Shift retains the existing toggle semantics.
 
 Player world lines use the existing bounded overlay renderer with reusable screen-expanded triangles, a three-pixel reference width scaled by DPI/UI settings and soft alpha edges. They retain the established depth-disabled player feedback policy and one draw batch. Developer lines retain their depth policy and original line path. A thousand selected objects require 24,000 lines, below the 32,768-line cap; the expanded buffer is bounded at 7.5 MiB per frame slot.
 
-Movement clicks and existing tactical targeting clicks display presentation-only feedback for 0.8 seconds. Movement uses a circle/cross, attack-family requests add an inner circle, and invalid spatial targets use an X plus the existing invalid cursor. These indicate local targeting/submission intent, not authoritative acceptance or persistent simulation orders. Existing command-result HUD messages remain authoritative. Frame time expires the markers; focus/modal/session transitions clear them.
+Movement clicks and existing tactical targeting clicks display presentation-only feedback for 0.8 seconds. Dynamic movement circles/crosses and attack-family inner circles retain their geometry; copied Move/Attack/AttackMove/invalid intent now additionally uses production glyphs. Invalid spatial targets retain their X and native invalid cursor. These indicate local targeting/submission intent, not authoritative acceptance or persistent simulation orders. Existing command-result HUD messages remain authoritative. Frame time expires the markers; focus/modal/session transitions clear them.
 
 Automated coverage includes four drag directions, quick clicks, DPI threshold latching, cancellation, ownership/hidden-object filtering, footprint/terrain geometry, zoom minimum radius, marquee clipping/blending/cancellation, feedback expiry and a thousand-ring single-batch budget. Manual zoom/terrain/camera-angle, 60/144 Hz, high-DPI and HUD-overlap verification remains part of the pre-alpha checklist.
 
@@ -293,3 +293,7 @@ Informational command result cards remain non-actionable.
 The selected card determines the visible dock page. Rebound NextItem, wheel and header arrows navigate without simulation requests. Rendering, pointer hits and hover share the visible window; hidden cards cannot be clicked. Wheel suppresses simultaneous clicks. Collapsed ownership follows the visible strip. Existing session/tick/selection/terminal guards remain in force.
 
 See [dock qualification](CommandDockQualification.md) for the interaction checks, native reference coverage and remaining live acceptance.
+
+## Graphical world feedback
+
+[Projected footprint components](GraphicalTacticalInterface.md) emphasize the primary selection and current permitted hover. Group outlines use oriented X/Z extents with the existing terrain samples and bounded line batch. World status frames require current owned single-entity facts; group aggregates and foreign operational details are omitted. `RtsCommandFeedback.View` copies the existing 0.8-second local intent lifetime without adding command authority or authoritative acknowledgements. See [qualification](GraphicalTacticalInterfaceQualification.md).
