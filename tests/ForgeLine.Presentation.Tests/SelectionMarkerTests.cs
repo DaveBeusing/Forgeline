@@ -11,18 +11,18 @@ public sealed class SelectionMarkerTests
     [Theory]
     [InlineData(ControllableEntityCategory.Unit, 8f, 12f)]
     [InlineData(ControllableEntityCategory.Building, 60f, 90f)]
-    public void CircularRingEnclosesFootprintAndSamplesSlopedTerrain(
+    public void OrientedEllipseFitsEachFootprintAxisAndSamplesSlopedTerrain(
         ControllableEntityCategory category, float width, float depth)
     {
         RenderInstance instance = Instance(category, new(width, 10f, depth));
         var draw = new DebugDraw { Enabled = true };
         RtsWorldMarkerVisualization.DrawSelected(draw, instance, Vector4.One, new SlopedTerrain());
         Assert.Equal(24, draw.Lines.Length);
-        float radius = new Vector2(width * 0.5f, depth * 0.5f).Length() * 1.08f;
+        float radiusX = width * .55f, radiusZ = depth * .55f;
         foreach (DebugLine line in draw.Lines)
         {
             Vector3 p = line.Start;
-            Assert.InRange(new Vector2(p.X, p.Z).Length(), radius - 0.001f, radius + 0.001f);
+            Assert.InRange(p.X * p.X / (radiusX * radiusX) + p.Z * p.Z / (radiusZ * radiusZ), .999f, 1.001f);
             Assert.InRange(p.Y, p.X * 0.1f + p.Z * 0.2f + 0.079f, p.X * 0.1f + p.Z * 0.2f + 0.081f);
         }
     }
@@ -60,6 +60,22 @@ public sealed class SelectionMarkerTests
         }
         Assert.Equal(24_000, draw.Lines.Length);
         Assert.True(draw.Lines.Length < 32_768);
+    }
+
+    [Fact]
+    public void LongRotatedBuildingRetainsItsNarrowAxisAndCornerOrientation()
+    {
+        var instance = Instance(ControllableEntityCategory.Building, new(12,10,80));
+        instance = instance with { Transform = instance.Transform with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2) } };
+        var draw = new DebugDraw { Enabled = true };
+        RtsWorldMarkerVisualization.DrawSelected(draw, instance, Vector4.One);
+        Assert.All(draw.Lines.ToArray(), line => Assert.InRange(MathF.Abs(line.Start.Z), 0, 6.601f));
+        Assert.Contains(draw.Lines.ToArray(), line => MathF.Abs(line.Start.X) > 43.9f);
+        var a = TacticalFootprint.Corner(instance,0);
+        var b = TacticalFootprint.Corner(instance,1);
+        Assert.InRange(Vector3.Distance(a,b),13.199f,13.201f);
+        var slope = TacticalFootprint.Corner(instance,0,terrain:new SlopedTerrain());
+        Assert.InRange(slope.Y,slope.X*.1f+slope.Z*.2f+.079f,slope.X*.1f+slope.Z*.2f+.081f);
     }
 
     private static RenderInstance Instance(ControllableEntityCategory category, Vector3 scale) =>

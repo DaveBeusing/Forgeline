@@ -64,7 +64,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         CombatGroupOverviewView combatGroups,
         uint dpi,
         float uiScale = 1.0f,
-        PreAlphaUxView preAlphaUx = default)
+        PreAlphaUxView preAlphaUx = default,
+        TacticalTargetingView targeting = default)
     {
         ThrowIfDisposed();
         _text.Begin();
@@ -95,6 +96,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float scale =
             layout.Scale;
 
+        EmitWorldArtwork(camera, snapshot, view, targeting, scale, context.Width, context.Height);
         if (view.MinimapEnabled)
         {
             RtsMinimapFrame minimap =
@@ -198,6 +200,51 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
+    }
+
+    private void EmitWorldArtwork(RtsCamera camera, PresentationSnapshot snapshot, in RtsInformationLayerView view,
+        in TacticalTargetingView targeting, float scale, int width, int height)
+    {
+        if (!_skin.Ready || snapshot.PlayerExperience is not { IsMatchComplete: false } experience || experience.Tick != snapshot.Tick) return;
+        var selection = experience.Selection;
+        var hover = snapshot.Hover is { } candidate && candidate.SessionId == snapshot.SessionId && candidate.Tick == snapshot.Tick
+            ? candidate : (PlayerHoverSummary?)null;
+        // Only primary selection and current permitted hover receive corner art; the whole group retains bounded world outlines.
+        foreach (ref readonly var instance in snapshot.Instances)
+        {
+            bool primary = selection.Count > 0 && selection.PrimaryEntity == instance.Entity && instance.Selectable.Owner == experience.Player && view.SelectedEntities is { } selected && selected.Contains(instance.Entity);
+            bool hovered = hover is { } h && h.Entity == instance.Entity;
+            if ((!primary && !hovered) || (instance.Visibility & RenderVisibilityMask.World) == 0 || !instance.Mesh.IsValid || !instance.Material.IsValid) continue;
+            Vector3 extents = PresentationBounds.ResolveLocalHalfExtents(instance);
+            float patchX = MathF.Min(extents.X * .6f, 3), patchZ = MathF.Min(extents.Z * .6f, 3);
+            for (int corner = 0; corner < 4; corner++)
+            {
+                var a = camera.WorldToScreen(TacticalFootprint.Corner(instance, corner), width, height);
+                var b = camera.WorldToScreen(TacticalFootprint.Corner(instance, corner, patchX), width, height);
+                var c = camera.WorldToScreen(TacticalFootprint.Corner(instance, corner, patchX, patchZ), width, height);
+                var d = camera.WorldToScreen(TacticalFootprint.Corner(instance, corner, 0, patchZ), width, height);
+                if (a.IsVisible && b.IsVisible && c.IsVisible && d.IsVisible)
+                    _skin.Projected("ui.artwork.directorate.world.selection_corner.p32", a.Position, b.Position, c.Position, d.Position,
+                        primary ? new Vector4(.25f,1,.35f,1) : new Vector4(.15f,.85f,1,1));
+            }
+            // Aggregate selection values must never be painted onto one member of a group.
+            PlayerSelectionSummary facts = primary && selection.Count == 1 ? selection : hovered ? hover!.Value.OwnedDetails : default;
+            if (facts.Count != 1 || facts.PrimaryEntity != instance.Entity || instance.Selectable.Owner != experience.Player) continue;
+            var anchor = camera.WorldToScreen(instance.Transform.Position + Vector3.UnitY * extents.Y, width, height);
+            if (!anchor.IsVisible) continue;
+            float x = anchor.Position.X - 24 * scale, y = anchor.Position.Y - 12 * scale;
+            if (facts.HasHealth) _skin.Bar(new(x,y,48*scale,4*scale), facts.HealthFraction, new(.25f,1,.35f,1));
+            if (facts.HasSupply)
+            {
+                _skin.Bar(new(x,y+5*scale,23*scale,3*scale), facts.FuelFraction, new(.95f,.7f,.2f,1));
+                _skin.Bar(new(x+25*scale,y+5*scale,23*scale,3*scale), facts.AmmunitionFraction, new(.7f,.85f,1,1));
+            }
+        }
+        if (targeting.HasPointerTarget)
+        {
+            var point = camera.WorldToScreen(targeting.PointerWorldTarget, width, height);
+            if (point.IsVisible && targeting.PointerTargetValid) _skin.Target(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale));
+        }
     }
 
     private void EmitMinimap(

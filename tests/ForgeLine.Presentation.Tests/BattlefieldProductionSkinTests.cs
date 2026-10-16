@@ -66,8 +66,8 @@ public sealed class BattlefieldProductionSkinTests
                 Assert.True(hud.SkinDiagnostics.Prepared);
                 Assert.Equal(28 * 1024 * 1024, hud.SkinDiagnostics.ResidentPageBytes);
                 Assert.Equal(8, device.Diagnostics.Resources.LoadedTextureCount); // seven shared atlas pages plus one shared font
-                Assert.Equal(12, hud.SkinDiagnostics.Batches);
-                Assert.Equal(48, hud.SkinDiagnostics.Buffers);
+                Assert.Equal(13, hud.SkinDiagnostics.Batches);
+                Assert.Equal(52, hud.SkinDiagnostics.Buffers);
                 long uploads = device.Diagnostics.Resources.TextureUploadCount;
                 var camera = new RtsCamera();
                 foreach (var selected in new[] { Selection, Selection with { DisplayName = new string('W', 300) },

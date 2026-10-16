@@ -57,18 +57,21 @@ public static class RtsWorldMarkerVisualization
         }
 
         Vector3 extents = PresentationBounds.ResolveLocalHalfExtents(instance);
-        float radius = MathF.Max(float.IsFinite(minimumRadius) ? MathF.Max(1.0f, minimumRadius) : 1.0f,
-            new Vector2(extents.X, extents.Z).Length() * 1.08f);
         Vector3 center = instance.Transform.Position;
         float fallbackHeight = PresentationBounds.ResolveGroundPlaneY(instance);
         const int segments = 24;
-        Vector3 previous = GroundPoint(center.X + radius, center.Z, fallbackHeight, terrain);
+        float minimum = float.IsFinite(minimumRadius) ? MathF.Max(1, minimumRadius) : 1;
+        Vector2 axes = new(MathF.Max(minimum, extents.X * 1.1f), MathF.Max(minimum, extents.Z * 1.1f));
+        Quaternion rotation = PresentationBounds.ResolveRotation(instance.Transform.Rotation);
+        Vector3 first = Vector3.Transform(new Vector3(axes.X, 0, 0), rotation);
+        Vector3 previous = GroundPoint(center.X + first.X, center.Z + first.Z, fallbackHeight, terrain);
         for (int index = 1; index <= segments; index++)
         {
             float angle = index * (MathF.Tau / segments);
+            Vector3 offset = Vector3.Transform(new Vector3(MathF.Cos(angle) * axes.X, 0, MathF.Sin(angle) * axes.Y), rotation);
             Vector3 next = GroundPoint(
-                center.X + MathF.Cos(angle) * radius,
-                center.Z + MathF.Sin(angle) * radius,
+                center.X + offset.X,
+                center.Z + offset.Z,
                 fallbackHeight,
                 terrain);
             if (!dashed || (index & 1) != 0)

@@ -91,6 +91,28 @@ public sealed class UiSkinBatch : IDisposable
         else Quad(sprite.Page, destination, new(sprite.X, sprite.Y, sprite.Width, sprite.Height), tint);
         _clip = oldClip;
     }
+    /// <summary>Four projected footprint corners, in texture winding. Scissor remains authoritative.</summary>
+    public void DrawProjected(string id, Vector2 a, Vector2 b, Vector2 c, Vector2 d, Vector4 tint)
+    {
+        Check();
+        if (!Finite(tint) || tint.X < 0 || tint.Y < 0 || tint.Z < 0 || tint.W < 0 ||
+            tint.X > 1 || tint.Y > 1 || tint.Z > 1 || tint.W > 1 ||
+            !FinitePoint(a) || !FinitePoint(b) || !FinitePoint(c) || !FinitePoint(d))
+            throw new ArgumentException("Invalid projected UI quad.");
+        var sprite = _resources.Sprite(id);
+        if (_count + 6 > _vertices.Length) { _dropped++; return; }
+        var page = _resources.Data.Pages[sprite.Page];
+        Vector2 uv0 = new((float)sprite.X / page.Width, (float)sprite.Y / page.Height);
+        Vector2 uv1 = new((float)(sprite.X + sprite.Width) / page.Width, (float)(sprite.Y + sprite.Height) / page.Height);
+        if (_commandCount > 0 && _commands[_commandCount-1].Page == sprite.Page && _commands[_commandCount-1].Clip == _clip)
+            _commands[_commandCount-1].Count += 6;
+        else _commands[_commandCount++] = new(sprite.Page, _count, 6, _clip);
+        a = Screen(a); b = Screen(b); c = Screen(c); d = Screen(d);
+        _vertices[_count++] = new(a,tint,uv0); _vertices[_count++] = new(b,tint,new(uv1.X,uv0.Y)); _vertices[_count++] = new(c,tint,uv1);
+        _vertices[_count++] = new(a,tint,uv0); _vertices[_count++] = new(c,tint,uv1); _vertices[_count++] = new(d,tint,new(uv0.X,uv1.Y));
+    }
+    private Vector2 Screen(Vector2 p) => new(p.X / _width * 2 - 1, 1 - p.Y / _height * 2);
+    private static bool FinitePoint(Vector2 p) => float.IsFinite(p.X) && float.IsFinite(p.Y);
     public void Tile(string id, UiSkinRect destination, Vector4 tint)
     {
         Check(); Validate(destination);

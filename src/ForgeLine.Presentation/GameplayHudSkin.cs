@@ -53,6 +53,8 @@ internal sealed class GameplayHudSkin : IDisposable
             {
                 _icons = new(graphics, catalog, UiSkinGroup.Icons);
                 foreach (string id in GameplayHudArtwork.RequiredIcons) _ = _icons.Sprite(id);
+                _ = _icons.Sprite("ui.artwork.directorate.world.selection_corner.p32");
+                _ = _icons.Sprite("ui.artwork.directorate.world.target.p32");
                 _symbols = new(graphics, _icons, maximumQuads: maximumIcons);
             }
             if (portraits)
@@ -102,6 +104,8 @@ internal sealed class GameplayHudSkin : IDisposable
         _symbols.Draw(id, new(x,y,size,size), Vector4.One);
         return true;
     }
+    internal void Projected(string id, Vector2 a, Vector2 b, Vector2 c, Vector2 d, Vector4 tint) => _symbols?.DrawProjected(id, a, b, c, d, tint);
+    internal void Target(HudRect r) => _symbols?.Draw("ui.artwork.directorate.world.target.p32", Rect(r), Vector4.One);
     internal bool Portrait(in PlayerSelectionSummary selection, HudRect r)
     {
         if (_images is null) return false;
