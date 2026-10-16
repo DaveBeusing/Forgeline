@@ -1,10 +1,39 @@
 # Native UI review handbook
 
+Current executed coverage, immutable evidence and open resource/test/human gates
+are recorded in [graphical interface qualification](GraphicalInterfaceQualification.md).
+Schema-2 matrix plans pin every runtime file, including playback sidecars; resume
+requires the same whole-tree hash. State banks extend dynamically in groups of 29.
+
 Use the existing [reference evidence lane](VisualReferenceEvidence.md). Automated
 structure, GPU performance and human art/accessibility decisions are separate.
 No matching checksum grants typography, AAA quality or physical-display acceptance.
 
 ## Reproduce a candidate
+
+The complete current graphical interface has 58 named states. Use the bounded
+matrix orchestrator after committing, building and qualifying runtime assets:
+
+```powershell
+./build/Test-UiQualificationMatrix.ps1
+./build/Invoke-UiInterfaceQualification.ps1 -Capture -OutputRoot artifacts/interface-native
+# Resume only with identical committed source, client and runtime content.
+./build/Invoke-UiInterfaceQualification.ps1 -Capture -Resume -OutputRoot artifacts/interface-native
+```
+
+This produces 2,610 cases: all 58 states at five outputs, raster DPI 96/144/192
+and scales .75/1/2. Thirty independently complete cohorts preserve the native
+30-state request limit. Each successful cohort checks the exact state/scale
+union, original hashes, native dimensions, text, skin and resource diagnostics,
+and exports a separate pending review. Partial/failed attempts remain untouched;
+resume creates a new attempt instead of promoting partial records. The final
+union must contain exactly 2,610 unique keys. Plan-only invocation omits
+`-Capture` and does not constitute executed evidence. Full original images remain
+in the requested output roots; completion records do not replace them.
+
+This matrix uses Medium cinematic frontend frames and populated HUD fixtures.
+It does not replace separate software/fallback, bright/dark, world-resolution,
+warm performance, lifecycle, interactive journey or physical-monitor checks.
 
 Commit and build the revision, compile/qualify canonical runtime assets, and use
 a new output root. Run these commands in PowerShell from the repository root:

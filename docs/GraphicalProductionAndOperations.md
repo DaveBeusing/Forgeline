@@ -1,5 +1,11 @@
 # Graphical production and operations interface
 
+Compact Operations uses independent horizontal control fitting and vertical
+row/type scaling through `OperationsLayout`. Its panel avoids primary commands,
+inspector, action dock and minimap; normal/larger UI scales retain a 14-pixel text
+floor. Six-row paging and existing actions remain authoritative. See the
+[qualification and original comparisons](GraphicalInterfaceQualification.md).
+
 The command dock now renders its existing domain cards from prepared production atlases. Operations rows/details and actionable alerts use the same skin. The implementation consumes copied read models; simulation rules, input geometry and command validation remain authoritative.
 
 ## Surface coverage

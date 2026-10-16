@@ -1,5 +1,10 @@
 # Graphical battlefield HUD
 
+Compact guidance shares its safe bounds with input capture and reserves the
+primary command band. Text fitting accounts for wrapped objective/binding/context
+and next-step rows before selecting type size. See the
+[qualification and original comparisons](GraphicalInterfaceQualification.md).
+
 The battlefield HUD reads the existing copied `PlayerExperienceSnapshot`, action,
 selection and combat-group views. It adds no simulation state, selection members,
 visibility decisions, resources or population limits. Layout and input ownership

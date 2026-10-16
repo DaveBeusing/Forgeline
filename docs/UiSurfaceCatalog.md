@@ -1,8 +1,11 @@
 # Player interface surface catalog
 
+The [integrated qualification](GraphicalInterfaceQualification.md) records all
+58 current states, native coverage, compact-layout repairs and pending acceptance.
+
 ## Audit contract
 
-Audited against master `27d80f8b04d77404b5287e66d533dcfea3788250` (0.1.372).
+Production-owner audit updated against master `5bfd8a14ceaea60368ded7bad0b0a6e2f79a5be8` (0.1.379).
 All paths below are repository relative. Renderer owners are in
 `src/ForgeLine.Presentation/` unless another project is named. Input/layout owners
 remain authoritative for bounds; artwork never defines independent hit targets.
@@ -11,8 +14,10 @@ remain authoritative for bounds; artwork never defines independent hit targets.
 **Frontend status:** all normal frontend rows now use the compiled skin through
 [graphical frontend integration](GraphicalFrontend.md). Bootstrap/recovery and
 studio playback remain intentional independent paths. Human acceptance is pending.
-**Battlefield status:** source families are available; live HUD migration remains
-pending. Source availability never implies final visual approval.
+**Battlefield status:** all six normal HUD owners now prepare compiled production
+skins, with the economic and tactical bindings detailed below. The historical
+HUD labels in the mapping table identify the owning integration, not pending
+source production. Human visual and physical-display acceptance remains pending.
 
 Skin names below abbreviate `ui.skin.directorate.`. Shared control states are
 normal/base, hover, pressed, focus, selected, disabled and applicable semantic
@@ -108,9 +113,10 @@ geometry remains an independent bootstrap/debug path. [Domain cards, operations 
 ## Evidence and maintenance
 
 The [semantic artwork catalog](UiIconArtwork.md) now supplies icon/portrait/cursor
-source mappings for these owners. Source availability does not change any row's
-pending live-migration or human-acceptance status. Existing legacy material icons
-remain active until the shared atlas renderer and consumer integration are qualified.
+source mappings for these owners. Normal production UI uses the shared atlas
+renderer. Individual texture IDs remain compiled compatibility content; their
+presence does not imply an additional upload by the normal skinned owner.
+Source availability and completed integration do not grant human acceptance.
 
 [Skin contract](UiSkinArtwork.md) and `assets/source/ui/directorate/skin.catalog.json`
 define the available source families/states. [Qualification](UiSkinQualification.md)

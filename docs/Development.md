@@ -1,5 +1,9 @@
 # Development
 
+The [UI review handbook](UiVisualReview.md) describes bounded native capture and
+resume. [Graphical interface qualification](GraphicalInterfaceQualification.md)
+records executed coverage, package identity and required gates still outstanding.
+
 ## Source of Truth
 
 The current GitHub repository is the technical source of truth for implemented code, configuration, tests, and current build behavior.

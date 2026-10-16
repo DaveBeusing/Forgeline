@@ -18,8 +18,8 @@ public sealed class GuidancePresentationTests
         get
         {
             var cases = new TheoryData<int, int, uint, float>();
-            foreach (var size in new[] { (1024, 720), (1600, 900), (2560, 1440), (3440, 1440) })
-                foreach (uint dpi in new[] { 96u, 144u })
+            foreach (var size in new[] { (1024, 720), (1280, 720), (1600, 900), (1920, 1080), (2560, 1440), (3440, 1440), (3840, 2160) })
+                foreach (uint dpi in new[] { 96u, 144u, 192u })
                     foreach (float scale in new[] { .75f, 1f, 2f }) cases.Add(size.Item1, size.Item2, dpi, scale);
             return cases;
         }
@@ -38,10 +38,12 @@ public sealed class GuidancePresentationTests
         renderer.Render(context, new RtsCamera(), snapshot, new AxisAlignedBounds(new Vector3(-1000), new Vector3(1000)),
             RtsInformationLayerView.Empty, CombatGroupOverviewView.Empty, dpi, uiScale, Ux(guide));
         Assert.True(renderer.LastGuidanceVertexCount > 0);
+        if (uiScale >= 1) Assert.True(renderer.LastGuidanceTextSize >= 14,
+            $"Guidance text {renderer.LastGuidanceTextSize}px in {renderer.LastGuidanceBounds} is below the readable minimum.");
         var panel = renderer.LastGuidanceBounds;
         Assert.True(layout.SafeArea.Contains(new Vector2(panel.X, panel.Y)));
         Assert.True(layout.SafeArea.Contains(new Vector2(panel.Right, panel.Bottom)));
-        foreach (var other in new[] { layout.AlertStack, layout.ActionDock, layout.SelectionInspector, layout.Minimap, layout.TopStatusBar })
+        foreach (var other in new[] { layout.AlertStack, layout.ActionDock, layout.SelectionInspector, layout.PrimaryCommands, layout.Minimap, layout.TopStatusBar })
             Assert.False(panel.Intersects(other));
         Assert.All(device.Buffers.SelectMany(buffer => buffer.Vertices), vertex =>
         {
@@ -49,6 +51,24 @@ public sealed class GuidancePresentationTests
             Assert.InRange(vertex.Position.X, -1f, 1f);
             Assert.InRange(vertex.Position.Y, -1f, 1f);
         });
+    }
+
+    [Theory]
+    [InlineData(96)]
+    [InlineData(144)]
+    [InlineData(192)]
+    public void InitialOnboardingKeepsReadableBodyAndCommandsVisible(uint dpi)
+    {
+        using var device = new RecordingDevice();
+        using var renderer = new RtsInformationOverlayRenderer(device);
+        var snapshot = EarlyGameGuidanceTests.Snapshot(0);
+        var context = new RecordingContext { Width = 1280, Height = 720 };
+        var layout = GameplayHudLayout.Create(1280, 720, dpi, 2);
+        renderer.Render(context, new RtsCamera(), snapshot, default, RtsInformationLayerView.Empty,
+            CombatGroupOverviewView.Empty, dpi, 2, Ux(new EarlyGameGuidanceController().Update(snapshot, true)));
+        Assert.True(renderer.LastGuidanceTextSize >= 14);
+        Assert.False(renderer.LastGuidanceBounds.Intersects(layout.PrimaryCommands));
+        Assert.True(renderer.LastGuidanceVertexCount > 0);
     }
 
     [Fact]

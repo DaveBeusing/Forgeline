@@ -71,6 +71,10 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: UI qualification matrix coverage contracts
+        shell: pwsh
+        run: ./build/Test-UiQualificationMatrix.ps1
+
       - name: Compile and qualify canonical map
         run: dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
 

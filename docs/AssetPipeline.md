@@ -1,5 +1,9 @@
 # Asset Pipeline
 
+Integrated UI source/container hashes, source-less package identity and unchanged
+resource-budget failures are recorded in
+[graphical interface qualification](GraphicalInterfaceQualification.md).
+
 World vegetation source geometry can be reproduced with
 `python build/Author-WorldVegetation.py`. It retains the existing source paths,
 stable IDs, material atlas regions and High/Reduced chains. Compile its glTF

@@ -1,5 +1,9 @@
 # Native frontend and HUD qualification
 
+This is the historical 0.1.369 qualification. Current integrated skin/frontend/HUD
+coverage, fixes and unresolved gates are recorded in
+[graphical interface qualification](GraphicalInterfaceQualification.md).
+
 ## Decision and sources
 
 The production reference lane now covers named frontend and HUD states, immutable

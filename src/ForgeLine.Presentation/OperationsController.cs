@@ -34,25 +34,27 @@ public static class OperationsLayout
         float y = layout.TopStatusBar.Bottom + gap;
         float height = MathF.Max(0, layout.SelectionInspector.Y - y - gap);
         float width = MathF.Min(450 * layout.Scale,
-            MathF.Min(MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - gap), height * 450 / 346));
-        if (y + MathF.Min(height, width * 346 / 450) > layout.PrimaryCommands.Y)
+            MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - gap));
+        float panelHeight = MathF.Min(height, 374 * layout.Scale);
+        if (y + panelHeight > layout.PrimaryCommands.Y)
             width = MathF.Min(width, MathF.Max(0, layout.PrimaryCommands.X - layout.SafeArea.X - gap));
-        return new(layout.SafeArea.X, y, width, MathF.Min(height, width * 346 / 450));
+        return new(layout.SafeArea.X, y, width, panelHeight);
     }
-    public static float Scale(in GameplayHudLayout layout) { var p = Panel(layout); return MathF.Min(layout.Scale, MathF.Min(p.Width / 450, p.Height / 346)); }
+    // Narrow columns fit horizontally without shrinking text and row height.
+    public static float Scale(in GameplayHudLayout layout) { var p = Panel(layout); return p.IsEmpty ? 0 : MathF.Min(layout.Scale, p.Height / 374); }
     public static HudRect Control(in GameplayHudLayout layout, int index)
     {
-        var p = Panel(layout); float s = Scale(layout);
+        var p = Panel(layout); float s = Scale(layout), x = MathF.Min(layout.Scale, p.Width / 450);
         if (s <= 0) return default;
         return index switch
         {
-            0 => new(p.X + 366 * s, p.Y + 6 * s, 78 * s, 16 * s),
-            1 => new(p.X + 6 * s, p.Y + 104 * s, 210 * s, 16 * s),
-            2 => new(p.X + 222 * s, p.Y + 104 * s, 222 * s, 16 * s),
-            >= 3 and <= 8 => new(p.X + 6 * s, p.Y + (126 + (index - 3) * 22) * s, 438 * s, 20 * s),
-            9 => new(p.X + 6 * s, p.Y + 322 * s, 210 * s, 18 * s),
-            11 => new(p.X + 6 * s, p.Y + 292 * s, 438 * s, 18 * s),
-            _ => new(p.X + 222 * s, p.Y + 322 * s, 222 * s, 18 * s)
+            0 => new(p.X + 366 * x, p.Y + 6 * s, 78 * x, 22 * s),
+            1 => new(p.X + 6 * x, p.Y + 120 * s, 210 * x, 22 * s),
+            2 => new(p.X + 222 * x, p.Y + 120 * s, 222 * x, 22 * s),
+            >= 3 and <= 8 => new(p.X + 6 * x, p.Y + (146 + (index - 3) * 22) * s, 438 * x, 22 * s),
+            9 => new(p.X + 6 * x, p.Y + 346 * s, 210 * x, 22 * s),
+            11 => new(p.X + 6 * x, p.Y + 316 * s, 438 * x, 22 * s),
+            _ => new(p.X + 222 * x, p.Y + 346 * s, 222 * x, 22 * s)
         };
     }
     public static OperationsFacility? Row(OperationsSnapshot snapshot, in OperationsView view, int index)
