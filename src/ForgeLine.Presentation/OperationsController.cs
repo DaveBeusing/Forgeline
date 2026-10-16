@@ -58,6 +58,28 @@ public static class OperationsLayout
             _ => new(p.X + 222 * x, p.Y + 346 * s, 222 * x, 22 * s)
         };
     }
+    public static float NotificationTextSize(in GameplayHudLayout layout) => 14 * ActionableAlertLayout.Scale(layout);
+    public static HudRect NotificationControl(in GameplayHudLayout layout, int index)
+    {
+        var panel = Panel(layout); float size = NotificationTextSize(layout);
+        float line = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * size;
+        float height = line + 8, half = MathF.Max(0, (panel.Width - 18) / 2);
+        return index switch
+        {
+            0 => new(panel.Right - MathF.Min(90, panel.Width * .3f) - 6, panel.Y + 4,
+                MathF.Min(90, panel.Width * .3f), height),
+            1 => new(panel.X + 6, panel.Bottom - height - 6, half, height),
+            2 => new(panel.X + 12 + half, panel.Bottom - height - 6, half, height),
+            _ => new(panel.X + 8, panel.Y + height + 12 + (index - 3) * (line + 4),
+                MathF.Max(0, panel.Width - 16), line + 4)
+        };
+    }
+    public static int NotificationRows(in GameplayHudLayout layout)
+    {
+        var first = NotificationControl(layout, 3); var footer = NotificationControl(layout, 1);
+        return Math.Clamp((int)((footer.Y - 4 - first.Y) / MathF.Max(1, first.Height)), 0, PageSize);
+    }
+
     public static OperationsFacility? Row(OperationsSnapshot snapshot, in OperationsView view, int index)
     {
         int skip = Math.Max(0, view.Page) * PageSize + index;
@@ -133,16 +155,18 @@ public sealed class OperationsController
             View = new(true, filter, Session: _session); interaction.SetOperationsOpen(true); return new(true);
         }
         if (!View.Open || !panel.Contains(origin)) return new(captured);
+        if (View.Notifications)
+        {
+            if (OperationsLayout.NotificationControl(layout, 0).Contains(origin))
+            { View = default; interaction.SetOperationsOpen(false); }
+            else if (OperationsLayout.NotificationControl(layout, 1).Contains(origin)) View = View with { Notifications = false, Page = 0 };
+            else if (OperationsLayout.NotificationControl(layout, 2).Contains(origin)) View = View with { Page = View.Page == int.MaxValue ? 0 : View.Page + 1 };
+            return new(true);
+        }
         if (OperationsLayout.Control(layout, 0).Contains(origin))
         { View = default; interaction.SetOperationsOpen(false); return new(true); }
         if (OperationsLayout.Control(layout, 12).Contains(origin))
-        { View = View with { Notifications = !View.Notifications, Page = 0 }; return new(true); }
-        if (View.Notifications)
-        {
-            if (OperationsLayout.Control(layout, 1).Contains(origin)) View = View with { Notifications = false, Page = 0 };
-            else if (OperationsLayout.Control(layout, 2).Contains(origin)) View = View with { Page = View.Page == int.MaxValue ? 0 : View.Page + 1 };
-            return new(true);
-        }
+        { View = View with { Notifications = true, Page = 0 }; return new(true); }
         if (OperationsSnapshot.Resolve(snapshot) is not { } data) return new(true);
         for (int index = 1; index <= 11; index++)
         {

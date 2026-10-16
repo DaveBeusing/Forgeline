@@ -39,7 +39,9 @@ public static class ActionableAlertLayout
         Span<NotificationCardLayout> cards = stackalloc NotificationCardLayout[4];
         cards.Clear();
         var revision = new HashCode();
-        revision.Add(experience.Player); revision.Add(experience.Feedback);
+        revision.Add(experience.Player); revision.Add(experience.Alerts); revision.Add(experience.Feedback);
+        revision.Add(experience.CriticalSupplyUnits); revision.Add(experience.BlockedProductionFacilities);
+        revision.Add(localFeedback);
         if (alerts is not null)
             for (int a = 0; a < alerts.Alerts.Count; a++) revision.Add(alerts.Alerts[a]);
         Span<char> text = stackalloc char[2048];

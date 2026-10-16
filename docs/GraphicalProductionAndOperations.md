@@ -65,7 +65,8 @@ See [source-bound qualification, package and remaining gates](GraphicalProductio
 The version-3 notification stack consumes the visible right dock bounds. Operations
 and notifications remain simultaneously visible without overlapping. The header's
 Notifications control opens current authorized alert and command text, including
-content hidden by stack overflow. Six cached lines are retained per detail page;
+content hidden by stack overflow. At most six cached lines are retained per detail page at 14–21 physical pixels;
+compact panels reduce visible line count instead of font size.
 Next Message Page cycles all text and Facilities returns to the existing facility
 view. Current snapshots replace resolved/expired facts instead of keeping history.
 See [notification qualification](NotificationStackQualification.md).

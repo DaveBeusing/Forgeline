@@ -38,7 +38,7 @@ The HUD information update bounds alert cards and their actual pointer regions. 
 `ResourcePowerHudRenderer` now uses compiled raised cards, semantic icons and warning/error overlays while retaining severity labels/rails, priority, bounded records and exact FOCUS/OPS/MORE hit regions. Notifications sit one shared gap below the visible right action dock. Operations
 remains on the left and does not suppress notifications. Command feedback remains separate from work completion. Tactical map/cursor/world geometry retains its existing owner. Long labels wrap using real font metrics, with two lines, ellipsis and MORE.
 Operations exposes a Notifications entry even when the stack cannot fit a card;
-its six-line detail page reaches the complete current authorized text. There is
+its bounded detail pages reach the complete current authorized text. There is
 no notification history. Empty space and gaps remain world input. A held click
 requires the same full stack revision, lifecycle identity and target generation
 on release. Local command/navigation feedback shares this stack; placement

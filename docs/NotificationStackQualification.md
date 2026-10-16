@@ -21,7 +21,8 @@ One value-type list contains at most three regular cards plus a compact MORE row
 Text uses the existing font metrics, a 14–21 physical-pixel floor/range, at most
 two lines, and ellipsis. Overflow reduces card count instead of text size.
 Unshown complete content is accessible through Operations → Notifications.
-The detail owner retains six lines, with cached source text from the existing
+The detail owner retains at most six lines, with a 14–21 pixel font floor and
+fewer visible lines when the available panel height is constrained, with cached source text from the existing
 five authorized conditions and existing command/local results. It pages all text,
 including strings longer than the common typography helper's 256-line limit.
 
@@ -53,6 +54,7 @@ use OPS. MORE opens current details. Operations does not hide the right stack.
   Client 308 passed / 0 failed. No structural command-dock fixture was changed.
 - Complete suite, source-stamped native repeat captures, runtime assets, package,
   headless and hosted checks: pending final execution.
+- Compact detail geometry and Operations regression run: 100 passed.
 - Human typography/contrast, physical monitor/DPI, accessibility and live
   alert-to-world journeys remain pending. New captures are candidates, not goldens.
 

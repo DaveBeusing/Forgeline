@@ -80,6 +80,8 @@ internal static class AlertMapMeasurements
         File.WriteAllText(output, JsonSerializer.Serialize(new
         {
             BuildVersion = typeof(ActionableAlertSnapshot).Assembly.GetName().Version?.ToString(),
+            SourceIdentity = typeof(ActionableAlertSnapshot).Assembly.GetCustomAttributesData()
+                .First(attribute => attribute.AttributeType.Name == "AssemblyInformationalVersionAttribute").ConstructorArguments[0].Value,
             Warmup = warmup,
             Samples = samples,
             TieredCompilation = Environment.GetEnvironmentVariable("DOTNET_TieredCompilation") ?? "Runtime default",

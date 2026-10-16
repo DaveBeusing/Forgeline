@@ -11,7 +11,8 @@ function Get-UiQualificationScenarios {
       'DockRejected','MinimapStrategic','Onboarding',
       'SelectionUnit','SelectionBuilding','SelectionEmpty','SelectionLongName','MissingPlayerData','GameplayTooltip',
       'GroupSummary','ResourceUnknown','SelectedGroup','Operations','OperationsEmpty','OperationsMissing',
-      'ProductionQueue','LogisticsBlocked','SupplyPolicy','TechnologyBlocked','DockQueueTooltip','DockTechnologyTooltip')
+      'ProductionQueue','LogisticsBlocked','SupplyPolicy','TechnologyBlocked','DockQueueTooltip','DockTechnologyTooltip',
+      'NotificationsCollapsed','NotificationsExpanded','NotificationDetails')
 }
 
 function Assert-UiQualificationUnion {

@@ -25,6 +25,14 @@ public sealed class NotificationStackTests
             Assert.InRange(stack.FontSize,14,21);
             Assert.InRange(stack.Count,0,4);
             Assert.False(stack.Bounds.Intersects(layout.Minimap));
+            int detailRows=OperationsLayout.NotificationRows(layout);
+            Assert.InRange(detailRows,1,6);
+            float detailSize=OperationsLayout.NotificationTextSize(layout);
+            Assert.InRange(detailSize,14,21);
+            var detail=OperationsLayout.NotificationControl(layout,detailRows+2);
+            Assert.True(detail.Height>=detailSize+4);
+            Assert.True(detail.Bottom<OperationsLayout.NotificationControl(layout,1).Y);
+            Assert.True(OperationsLayout.Panel(layout).Contains(new(detail.Right,detail.Bottom)));
             for (int i = 0; i < stack.Count; i++)
             {
                 var card = stack.Card(i);
@@ -80,6 +88,19 @@ public sealed class NotificationStackTests
         Press(input,rect,true); controller.Update(input,before,layout);
         input.BeginFrame(); Press(input,rect,false);
         Assert.False(controller.Update(input,after,layout).NotificationDetails);
+    }
+
+    [Fact]
+    public void HiddenCountChangeRejectsOverflowGesture()
+    {
+        var snapshot=Snapshot(); var layout=GameplayHudLayout.Create(1920,1080,96);
+        var input=new InputState(); var controller=new ActionableAlertController();
+        controller.Update(input,snapshot,layout);
+        var rect=ActionableAlertLayout.Resolve(snapshot,layout).Overflow.Bounds;
+        Press(input,rect,true); controller.Update(input,snapshot,layout);
+        input.BeginFrame(); Press(input,rect,false);
+        var changed=Snapshot(experience:Experience() with { BlockedProductionFacilities=2 });
+        Assert.False(controller.Update(input,changed,layout).NotificationDetails);
     }
 
     [Fact]
@@ -158,7 +179,7 @@ public sealed class NotificationStackTests
         controller.OpenCategory(OperationsCategory.All,snapshot.SessionId,state);
         Click(input,OperationsLayout.Control(layout,12)); controller.Update(input,snapshot,layout,state);
         Assert.True(controller.View.Notifications);
-        Click(input,OperationsLayout.Control(layout,1)); controller.Update(input,snapshot,layout,state);
+        Click(input,OperationsLayout.NotificationControl(layout,1)); controller.Update(input,snapshot,layout,state);
         Assert.False(controller.View.Notifications); Assert.True(controller.View.Open);
     }
 
