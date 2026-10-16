@@ -1,0 +1,50 @@
+Set-StrictMode -Version Latest
+
+function Get-UiQualificationScenarios {
+    # Keep this explicit: adding a fixture must deliberately extend acceptance coverage.
+    @('Menu','MenuFocus','MenuDisabled','MenuReveal','Loading','LoadingError',
+      'NewGame','LoadGame','LoadEmpty','LoadBroken','SettingsLong','ControlsLong','Pause','Credits',
+      'ResourcePressure','LowPower','SupplyCritical','MixedSelection','Targeting','QueueBlocked',
+      'Technology','Contacts','DockFocus','DockHover','DockPressed','DockPending','DockAccepted',
+      'DockRejected','MinimapStrategic','Onboarding','SettingsAudio','SettingsGraphics','Controls',
+      'SettingsGeneral','SettingsBindings','BindingConflict','DisplayTrial','PauseSettings','MenuHover','MenuPressed',
+      'SelectionUnit','SelectionBuilding','SelectionEmpty','SelectionLongName','MissingPlayerData','GameplayTooltip',
+      'GroupSummary','ResourceUnknown','SelectedGroup','Operations','OperationsEmpty','OperationsMissing',
+      'ProductionQueue','LogisticsBlocked','SupplyPolicy','TechnologyBlocked','DockQueueTooltip','DockTechnologyTooltip')
+}
+
+function Get-UiQualificationCohorts {
+    foreach ($dpi in @(96,144,192)) {
+        foreach ($display in @('1280x720','1920x1080','2560x1440','3440x1440','3840x2160')) {
+            [pscustomobject]@{ id = "dpi$dpi-$display"; dpi = $dpi; display = $display }
+        }
+    }
+}
+
+function Assert-UiQualificationCoverage {
+    param([Parameter(Mandatory)]$Manifest, [Parameter(Mandatory)]$Cohort,
+          [Parameter(Mandatory)][string]$Commit)
+    if ($Manifest.status -cne 'structural-pass' -or $Manifest.commit -cne $Commit) {
+        throw 'Incomplete cohort or changed source identity.'
+    }
+    $expected = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($scenario in Get-UiQualificationScenarios) {
+        foreach ($scale in @(.75,1,2)) { [void]$expected.Add("$scenario/$scale") }
+    }
+    $keys = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $dimensions = $Cohort.display.Split('x')
+    foreach ($capture in $Manifest.captures) {
+        $pair = "$($capture.ui.scenario)/$($capture.uiScale)"
+        if (-not $expected.Remove($pair) -or -not $keys.Add($capture.key)) {
+            throw "Unexpected or duplicate UI case: $pair"
+        }
+        if ($capture.rasterDpi -ne $Cohort.dpi -or
+            $capture.requestedDisplay.width -ne [int]$dimensions[0] -or
+            $capture.requestedDisplay.height -ne [int]$dimensions[1] -or
+            $capture.actualSurface.width -ne [int]$dimensions[0] -or
+            $capture.actualSurface.height -ne [int]$dimensions[1]) {
+            throw "Incorrect requested or native output/DPI: $($capture.key)"
+        }
+    }
+    if ($expected.Count) { throw "Missing $($expected.Count) UI cases in $($Cohort.id)." }
+}
