@@ -146,6 +146,59 @@ public sealed class ObjectActionRingTests
         Assert.True(View(controller,snapshot).Ring.Open);
     }
 
+    [Fact]
+    public void OrdinarySelectionPressAndReleaseInSeparateFramesOpensExactlyOnce()
+    {
+        var snapshot=Snapshot(PlayerActionPanelMode.Production,"Ready");var world=World(snapshot);
+        var input=new InputState();var controller=new PlayerActionPanelController();var selection=new SelectionSet();
+        controller.Update(input,snapshot,1920,1080,currentSelection:selection);
+        input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonDown,new(600,400));
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,false);
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,true,selectionResolved:true);
+        Assert.False(View(controller,snapshot).Ring.Open);
+        input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonUp,new(600,400));
+        Assert.False(input.TryGetMousePressPosition(PlatformMouseButton.Left,out _));
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,false);
+        selection.SetSingle(Entity);
+        new TransientHudMenuController().SelectionCommitted(input,selection,controller,new OperationsController(),new PresentationInteractionState());
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,true,selectionResolved:true);
+        Assert.True(View(controller,snapshot).Ring.Open);Assert.False(controller.TryTakeRequest(out _));
+        controller.Close();input.BeginFrame();
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,true,selectionResolved:true);
+        Assert.False(View(controller,snapshot).Ring.Open);
+    }
+
+    [Fact]
+    public void NewQueueRequestFillsRemovedSlotWithoutMovingSurvivorsOrReusingAnArmedPress()
+    {
+        var (controller,input,snapshot,selection)=Open(PlayerActionPanelMode.Production,PlatformKey.P);
+        input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonDown,Geometry.LabelCenter(1));
+        controller.Update(input,snapshot,1920,1080,currentSelection:selection);
+        var a=snapshot.PlayerActions!;var p=a.Production!;
+        var replacement=p.Requests[0] with {RequestEntity=new(22,1),DisplayName="New request"};
+        var production=new PlayerProductionFacilityActionReadModel(p.Entity,default,default,p.Status,p.BlockReason,p.Progress,p.Recipes,[p.Requests[1],replacement]);
+        var next=new PresentationSnapshot(new(5),snapshot.TickDuration,1,snapshot.Instances,sessionId:snapshot.SessionId,
+            playerExperience:snapshot.PlayerExperience!.Value with {Tick=new(5)},
+            playerActions:new(snapshot.SessionId,new(5),a.Construction,0,production,null,tactical:a.Tactical));
+        Present(controller,next);input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonUp,Geometry.LabelCenter(1));
+        controller.Update(input,next,1920,1080,currentSelection:selection);
+        Assert.False(controller.TryTakeRequest(out _));
+        ClickSlot(controller,input,next,selection,1);
+        Assert.True(controller.TryTakeRequest(out var request));Assert.Equal(new EntityId(22,1),request.RequestEntity);
+    }
+
+    [Fact]
+    public void DismissalDuringAWorldPressCancelsThePendingSelectionOpen()
+    {
+        var (controller,input,snapshot,selection)=Open(PlayerActionPanelMode.Production,PlatformKey.P);var world=World(snapshot);
+        controller.Close();input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonDown,new(600,400));
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,true,selectionResolved:true);
+        controller.DismissTransient(input);
+        input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonUp,new(600,400));
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,true,selectionResolved:true);
+        Assert.False(View(controller,snapshot).Ring.Open);
+    }
+
     private static (PlayerActionPanelController,InputState,PresentationSnapshot,SelectionSet) Open(PlayerActionPanelMode mode,PlatformKey key,string state="Ready")
     {
         var snapshot=Snapshot(mode,state); var selection=new SelectionSet(); selection.SetSingle(Entity);

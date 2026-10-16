@@ -20,6 +20,7 @@ public sealed partial class PlayerActionPanelController
     private ActionRingSlot _pressedRingSlot;
     private bool _ringArmed;
     private ulong _selectionClickSequence;
+    private bool _selectionOpenArmed;
     private ActionRingSlots _itemSlots;
     private PlayerActionPanelMode _itemSlotsMode;
     private int _itemSlotsPage = -1;
@@ -36,6 +37,7 @@ public sealed partial class PlayerActionPanelController
             world.TryGetInterpolatedInstance(entity, 1, out var instance) && (instance.Visibility & RenderVisibilityMask.World) != 0 && instance.Selectable.IsSelectable &&
             instance.Selectable.Owner == experience.Player;
         var session = snapshot?.SessionId ?? default;
+        if (input.FocusLostThisFrame || session != _ringSession) _selectionOpenArmed = false;
         bool changed = entity != _ringEntity || session != _ringSession || selection.Revision != _ringSelection;
         if (changed || !eligible) { Close(); _presentedRing = default; }
         _ringSingle = eligible;
@@ -43,16 +45,18 @@ public sealed partial class PlayerActionPanelController
         _ringSession = session;
         _ringSelection = selection.Revision;
         ulong sequence = input.MousePressSequence(PlatformMouseButton.Left);
-        bool freshSelection = allowSelectionOpen && sequence != _selectionClickSequence &&
-            (input.WasMouseButtonReleased(PlatformMouseButton.Left) || !input.IsMouseButtonDown(PlatformMouseButton.Left));
-        if (eligible && freshSelection && input.TryGetMousePressPosition(PlatformMouseButton.Left, out _))
+        if (!selectionResolved) return;
+        if (sequence != _selectionClickSequence && input.TryGetMousePressPosition(PlatformMouseButton.Left, out _))
+            _selectionOpenArmed = allowSelectionOpen;
+        bool released = input.WasMouseButtonReleased(PlatformMouseButton.Left);
+        if (eligible && allowSelectionOpen && _selectionOpenArmed && released && sequence != _selectionClickSequence)
         {
             _ringOpen = true; _ringLevel = ActionRingLevel.Categories; Mode = PlayerActionPanelMode.Closed;
             _itemSlotsPage = -1;
             _ringRevision++; _ringArmed = false;
         }
-        if (selectionResolved)
-            _selectionClickSequence = sequence;
+        if (released || !input.IsMouseButtonDown(PlatformMouseButton.Left))
+        { _selectionClickSequence = sequence; _selectionOpenArmed = false; }
     }
 
     public void AdoptPresentedRing(in ObjectActionRingView ring)
@@ -98,6 +102,8 @@ public sealed partial class PlayerActionPanelController
                     _itemSlots[i] = new(new(PlayerActionDockControlKind.Item, Mode, first + i),
                         ObjectActionRingView.ItemKey(Mode, first + i, actions));
             }
+            for (int i = 0; i < 4; i++)
+                if (_itemSlots[i].Present && FindRingItem(_itemSlots[i].Key, actions) < 0) _itemSlots[i] = default;
             for (int candidate = first; candidate < Math.Min(count, first + 4); candidate++)
             {
                 var key = ObjectActionRingView.ItemKey(Mode, candidate, actions);

@@ -54,9 +54,9 @@ public sealed class TransientHudMenuController
     }
 
     public void Dismiss(InputState input, PlayerActionPanelController dock, OperationsController operations,
-        PresentationInteractionState interaction)
+        PresentationInteractionState interaction, bool preserveSelectionGesture = false)
     {
-        dock.DismissTransient(input);
+        dock.DismissTransient(input, preserveSelectionGesture);
         operations.Close(input, interaction);
         foreach (var menu in _contextMenus) if (menu?.IsOpen == true) menu.Dismiss(input);
     }
@@ -131,7 +131,7 @@ public sealed class TransientHudMenuController
         OperationsController operations, PresentationInteractionState interaction)
     {
         if (!ReferenceEquals(_selectionOwner, selection) || _selection != selection.Revision)
-            Dismiss(input, dock, operations, interaction);
+            Dismiss(input, dock, operations, interaction, preserveSelectionGesture: true);
         _selectionOwner = selection;
         _selection = selection.Revision;
     }

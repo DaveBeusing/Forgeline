@@ -517,8 +517,9 @@ public sealed partial class PlayerActionPanelController
             DockExpanded, PlayerActionDockInteractionLayout.GetItemCount(Mode, actions), SelectedIndex, Mode, actions);
     }
 
-    public void DismissTransient(InputState input)
+    public void DismissTransient(InputState input, bool preserveSelectionGesture = false)
     {
+        if (!preserveSelectionGesture) _selectionOpenArmed = false;
         Close();
         _pendingRequest = null;
         _contextualActivationTick = null;
