@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Game;
 using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
@@ -42,6 +43,25 @@ public sealed class ResponsiveHudLayoutTests
                 }
             }
         }
+    }
+
+    [Fact]
+    public void CollapsedReservationHasAVisibleStatusSurfaceEvenWithoutTargeting()
+    {
+        using var device = new SelectionOverlayRenderingTests.RecordingDevice();
+        using var renderer = new PlayerActionDockHudRenderer(device, null);
+        var context = new SelectionOverlayRenderingTests.RecordingContext();
+        var layout = GameplayHudLayout.Create(context.Width, context.Height, 96);
+        var bar = PlayerActionDockInteractionLayout.GetModeBarRect(layout);
+        var visible = layout.VisibleActionDock(false);
+        renderer.Render(context, GameplayRebindingTests.Snapshot(), default, default,
+            FormationTemplate.Compact, layout);
+        Assert.Contains(device.Buffers.SelectMany(b => b.Vertices), vertex =>
+        {
+            float x = (vertex.Position.X + 1) * context.Width / 2;
+            float y = (1 - vertex.Position.Y) * context.Height / 2;
+            return x > visible.X && x < visible.Right && y > bar.Bottom && y <= visible.Bottom;
+        });
     }
 
     [Theory]

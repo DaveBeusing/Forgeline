@@ -904,20 +904,21 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             if (!portrait) EmitIcon(_skin.Ready ? EconomicCardVisual.Icon(panel.Mode, index, actions) : PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, index, actions), rect.X + 6 * _scale,
                 rect.Y + 5 * _scale, 14 * _scale, width, height);
             float textX = rect.X + (portrait ? compact ? 34 : 40 : 25) * _scale;
-            DockText(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, index, actions),
-                textX, rect.Y + 4 * _scale, rect.Right - 5 * _scale,
-                TextColor, compact ? 11 : 13, true, width, height);
+            CenterDockText(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, index, actions),
+                new(textX, rect.Y + 2 * _scale, MathF.Max(0, rect.Right - 5 * _scale - textX),
+                    (compact ? 16 : 20) * _scale), TextColor, compact ? 11 : 13, true, width, height);
             var text = new HudTextBuilder(buffer);
             if (_skin.Ready && work.Label.Length > 0) text.Append(work.Label);
             else if (pending) text.Append("REQUEST PENDING");
             else if (!state.CanActivate) text.Append(state.DisabledReason);
             else AppendItemStatus(ref text, panel.Mode, index, actions, panel);
-            DockText(text.Written, textX, rect.Y + (compact ? 18 : 22) * _scale,
-                rect.Right - 5 * _scale, state.CanActivate ? MutedTextColor : GameplayHudVisualStyle.Warning,
+            CenterDockText(text.Written, new(textX, rect.Y + (compact ? 18 : 22) * _scale,
+                MathF.Max(0, rect.Right - 5 * _scale - textX), 15 * _scale),
+                state.CanActivate ? MutedTextColor : GameplayHudVisualStyle.Warning,
                 compact ? 10 : 11, false, width, height);
             text = new(buffer); AppendCardDetail(ref text, panel.Mode, index, actions, _skin.Ready);
-            DockText(text.Written, rect.X + 6 * _scale, rect.Y + (compact ? 30 : 39) * _scale,
-                rect.Right - 5 * _scale, MutedTextColor, 10, false, width, height);
+            CenterDockText(text.Written, new(rect.X + 6 * _scale, rect.Y + (compact ? 32 : 38) * _scale,
+                MathF.Max(0, rect.Width - 11 * _scale), 14 * _scale), MutedTextColor, 10, false, width, height);
             double? progress = _skin.Ready ? work.Progress : CardProgress(panel.Mode, index, actions);
             if (progress.HasValue)
             {
@@ -1461,7 +1462,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         }
         else
         {
-            return;
+            text.Append("SELECT OWNED CONTEXT / CHOOSE ACTION");
         }
 
         if (!_skin.Panel(strip, "panel.compact")) EmitQuad(

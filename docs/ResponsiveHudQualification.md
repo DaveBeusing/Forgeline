@@ -46,3 +46,16 @@ Historical broad visual evidence in GraphicalInterfaceQualification.md describes
 its original source and is not acceptance of this layout. Required checks, native
 readbacks, resource budgets and physical/human review remain separate. Existing
 texture-budget and allocation failures are not waived by this revision.
+
+## Structural fixture migration
+
+The first committed source `eb27dc06a873ad9d18cb14db551a208f3617d12c`
+passes all 308 Client tests. Its full Presentation run has 1,096 total,
+1,088 passed, one failed and seven skipped: the old command-dock structure hash
+still represented the superseded layout. Original log:
+`artifacts/right-hud-presentation-tests.log`. All 135 existing bootstrap fixture
+keys are retained; regenerated structural hashes describe the new layout and
+are not raster goldens or human visual acceptance. Card labels now share the
+metric centering helper. A closed dock always draws its published status strip,
+including the no-target context prompt, so input does not reserve invisible
+full-card height. The updated fixture and native evidence need validation below.
