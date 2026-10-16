@@ -59,10 +59,10 @@ foreach ($cohort in $plan.cohorts) {
     }
     $root = Join-Path $output "$($cohort.id)-attempt$attempt"
     if (-not (Test-Path -LiteralPath $root)) {
-        Write-Output "Capturing $($cohort.id): $($plan.scenarios.Count * 3) cases."
+        Write-Output "Capturing $($cohort.id): $($cohort.scenarios.Count * 3) cases."
         & "$PSScriptRoot/Invoke-RtsReferenceQualification.ps1" -Capture -ClientPath $client -RuntimeAssetRoot $runtime `
             -Scenes BattlefieldCombat -Profiles Medium -Zooms NormalGameplay -Displays $cohort.display `
-            -RasterDpi $cohort.dpi -UiScales .75,1,2 -UiScenarios $plan.scenarios -CinematicFrontend `
+            -RasterDpi $cohort.dpi -UiScales .75,1,2 -UiScenarios $cohort.scenarios -CinematicFrontend `
             -Warmups 3 -Samples 8 -RepeatCaptures 2 -OutputRoot $root
     }
     $manifestPath = Join-Path $root 'manifest.json'
@@ -91,9 +91,7 @@ foreach ($cohort in $plan.cohorts) {
         $completed[-1] | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $checkpoint -Encoding utf8
     }
 }
-if (@($completed | ForEach-Object keys | Select-Object -Unique).Count -ne $plan.expectedCases) {
-    throw 'Final case union is incomplete or overlaps.'
-}
+Assert-UiQualificationUnion -Cohorts $completed -ExpectedCases $plan.expectedCases
 $summary = Join-Path $output 'complete.json'
 if (Test-Path -LiteralPath $summary) { throw 'This matrix already has a completion record.' }
 [ordered]@{ schemaVersion=1; commit=$commit; status='structural-pass'; cases=$plan.expectedCases

@@ -4,19 +4,36 @@ function Get-UiQualificationScenarios {
     # Keep this explicit: adding a fixture must deliberately extend acceptance coverage.
     @('Menu','MenuFocus','MenuDisabled','MenuReveal','Loading','LoadingError',
       'NewGame','LoadGame','LoadEmpty','LoadBroken','SettingsLong','ControlsLong','Pause','Credits',
+      'SettingsAudio','SettingsGraphics','Controls','SettingsGeneral','SettingsBindings','BindingConflict',
+      'DisplayTrial','PauseSettings','MenuHover','MenuPressed',
       'ResourcePressure','LowPower','SupplyCritical','MixedSelection','Targeting','QueueBlocked',
       'Technology','Contacts','DockFocus','DockHover','DockPressed','DockPending','DockAccepted',
-      'DockRejected','MinimapStrategic','Onboarding','SettingsAudio','SettingsGraphics','Controls',
-      'SettingsGeneral','SettingsBindings','BindingConflict','DisplayTrial','PauseSettings','MenuHover','MenuPressed',
+      'DockRejected','MinimapStrategic','Onboarding',
       'SelectionUnit','SelectionBuilding','SelectionEmpty','SelectionLongName','MissingPlayerData','GameplayTooltip',
       'GroupSummary','ResourceUnknown','SelectedGroup','Operations','OperationsEmpty','OperationsMissing',
       'ProductionQueue','LogisticsBlocked','SupplyPolicy','TechnologyBlocked','DockQueueTooltip','DockTechnologyTooltip')
 }
 
+function Assert-UiQualificationUnion {
+    param([Parameter(Mandatory)][array]$Cohorts, [Parameter(Mandatory)][int]$ExpectedCases)
+    $keys = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($cohort in $Cohorts) {
+        foreach ($key in $cohort['keys']) {
+            if (-not $keys.Add($key)) { throw "Overlapping cohort key: $key" }
+        }
+    }
+    if ($keys.Count -ne $ExpectedCases) { throw "Incomplete UI union: $($keys.Count) / $ExpectedCases cases." }
+}
+
 function Get-UiQualificationCohorts {
+    $scenarios = @(Get-UiQualificationScenarios)
     foreach ($dpi in @(96,144,192)) {
         foreach ($display in @('1280x720','1920x1080','2560x1440','3440x1440','3840x2160')) {
-            [pscustomobject]@{ id = "dpi$dpi-$display"; dpi = $dpi; display = $display }
+            # The native request contract permits at most 30 states per process.
+            foreach ($bank in @(0,1)) {
+                [pscustomobject]@{ id = "dpi$dpi-$display-states$($bank+1)"; dpi = $dpi; display = $display
+                    scenarios = @($scenarios[($bank*29)..($bank*29+28)]) }
+            }
         }
     }
 }
@@ -28,7 +45,7 @@ function Assert-UiQualificationCoverage {
         throw 'Incomplete cohort or changed source identity.'
     }
     $expected = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-    foreach ($scenario in Get-UiQualificationScenarios) {
+    foreach ($scenario in $Cohort.scenarios) {
         foreach ($scale in @(.75,1,2)) { [void]$expected.Add("$scenario/$scale") }
     }
     $keys = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
