@@ -221,6 +221,12 @@ internal static class VisualReferenceCapture
                         new(display.Width * .65f, display.Height * .6f), true, display.Width, display.Height,
                         GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale).Scale,
                         panel.Mode, DockControl: 2, DockIndex: 0) : default;
+                    if (uiScenario is UiReferenceScenario.DockQueueTooltip or UiReferenceScenario.DockTechnologyTooltip)
+                        hover = new(snapshot.SessionId,default,default,new(display.Width * .65f,display.Height * .45f),true,display.Width,display.Height,
+                            GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale).Scale,
+                            DockMode:panel.Mode,DockControl:2,DockIndex:panel.SelectedIndex);
+                    var operations = uiScenario is UiReferenceScenario.Operations or UiReferenceScenario.OperationsEmpty or UiReferenceScenario.OperationsMissing
+                        ? new OperationsView(true,Session:snapshot.SessionId,Selected:snapshot.Operations is { Facilities.Count: > 0 } ops ? ops.Facilities[0].Entity : default) : default;
                     var groups = uiScenario == UiReferenceScenario.GroupSummary ? new CombatGroupOverviewView(
                         [default(CombatGroupSummaryReadModel) with { Slot = 1, Label = "Armoured support", MemberCount = 3,
                             IsActive = true, IsSelected = true, HasHealth = true, Health = .4, HasSupply = true,
@@ -264,7 +270,7 @@ internal static class VisualReferenceCapture
                             FormationTemplate.Compact, groups, captureUx, rasterDpi, uiScale,
                             hoverTooltip: hover,
                             runtimeMetrics: new RuntimeMetricsView(60, 20, RuntimeSimulationState.Running),
-                            showRuntimeMetrics: uiScenario != UiReferenceScenario.World);
+                            showRuntimeMetrics: uiScenario != UiReferenceScenario.World, operations: operations);
                         if (frontend is not null && frontendView is { } pause)
                             frontend.Render(context, pause);
                     };

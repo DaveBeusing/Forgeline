@@ -96,6 +96,13 @@ public sealed class UiReferenceScenarioTests
             if (state == UiReferenceScenario.SelectionEmpty) Assert.Equal(0, snapshot.PlayerExperience!.Value.Selection.Count);
             if (state == UiReferenceScenario.MissingPlayerData) Assert.Null(snapshot.PlayerExperience);
             if (state == UiReferenceScenario.DockPending) Assert.True(panel.ContextualPending);
+            if (state == UiReferenceScenario.ProductionQueue) { Assert.Equal(PlayerActionPanelMode.Production,panel.Mode); Assert.Equal(1,panel.SelectedIndex); }
+            if (state == UiReferenceScenario.LogisticsBlocked) Assert.Equal(PlayerActionPanelMode.Logistics,panel.Mode);
+            if (state == UiReferenceScenario.SupplyPolicy) Assert.Equal(PlayerActionPanelMode.Supply,panel.Mode);
+            if (state == UiReferenceScenario.TechnologyBlocked) Assert.Equal(PlayerTechnologyState.Locked,snapshot.PlayerActions!.Technology[0].State);
+            if (state == UiReferenceScenario.Operations) Assert.Single(snapshot.Operations!.Facilities);
+            if (state == UiReferenceScenario.OperationsEmpty) Assert.Empty(snapshot.Operations!.Facilities);
+            if (state == UiReferenceScenario.OperationsMissing) Assert.Null(snapshot.Operations);
             if (state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed)
             {
                 Assert.Equal(1, panel.HoveredIndex);

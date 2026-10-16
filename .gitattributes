@@ -24,3 +24,5 @@ docs/qualification/graphical-frontend/evidence.json text eol=lf
 # Immutable battlefield qualification records preserve original bytes.
 docs/qualification/graphical-battlefield/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/qualification/graphical-battlefield/evidence.json text eol=lf
+
+docs/qualification/graphical-operations/evidence.json text eol=lf

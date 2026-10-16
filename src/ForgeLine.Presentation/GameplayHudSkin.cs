@@ -110,12 +110,23 @@ internal sealed class GameplayHudSkin : IDisposable
         _images.Draw(id, Rect(r with { X = r.X + 2, Y = r.Y + 2, Width = r.Width - 4, Height = r.Height - 4 }), Vector4.One);
         return true;
     }
+    internal bool Portrait(PlayerSelectionKind kind, uint identity, HudRect r)
+    {
+        if (_images is null) return false;
+        string? id = GameplayHudArtwork.Portrait(kind, identity, r.Width);
+        if (id is null) return false;
+        Panel(r, "panel.portrait");
+        _images.Draw(id, Rect(r with { X = r.X + 1, Y = r.Y + 1, Width = r.Width - 2, Height = r.Height - 2 }), Vector4.One);
+        return true;
+    }
     internal bool Bar(HudRect r, double fraction, Vector4 tint)
     {
         if (_panels is null) return false;
-        _panels.Draw("ui.skin.directorate.progress.progress_track", Rect(r), Vector4.One, true);
+        // Resample the complete sprite below its authored height: compressed borders would remove the centre.
+        bool sliced = r.Height >= 12;
+        _panels.Draw("ui.skin.directorate.progress.progress_track", Rect(r), Vector4.One, sliced);
         if (double.IsFinite(fraction))
-            _panels.Draw("ui.skin.directorate.progress.progress_fill", Rect(r), tint, true, (float)Math.Clamp(fraction,0,1));
+            _panels.Draw("ui.skin.directorate.progress.progress_fill", Rect(r), tint, sliced, (float)Math.Clamp(fraction,0,1));
         return true;
     }
     internal void Flush(IGraphicsCommandContext context) { _panels?.Flush(context); _symbols?.Flush(context); _images?.Flush(context); }

@@ -93,7 +93,11 @@ internal static class GameplayHudArtwork
         if (!selection.HasSingleEntityDetails) return null;
         uint id = selection.Kind == PlayerSelectionKind.Unit ? selection.CommonUnitId.Value :
             selection.Kind == PlayerSelectionKind.Building ? selection.CommonBuildingId.Value : 0;
-        if (!Portraits.TryGetValue((selection.Kind, id), out var ids)) return null;
+        return Portrait(selection.Kind, id, pixels);
+    }
+    internal static string? Portrait(PlayerSelectionKind kind, uint id, float pixels)
+    {
+        if (!Portraits.TryGetValue((kind, id), out var ids)) return null;
         return ids[pixels <= 48 ? 0 : pixels <= 64 ? 1 : pixels <= 96 ? 2 : pixels <= 128 ? 3 : 4];
     }
 }

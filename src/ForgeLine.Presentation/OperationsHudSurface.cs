@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using ForgeLine.Assets;
 using ForgeLine.Graphics;
 
 namespace ForgeLine.Presentation;
@@ -12,16 +13,22 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
     private readonly IGraphicsPipeline _pipeline;
+    private readonly GameplayHudSkin _skin;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);
     private readonly OperationsVertex[] _vertices = new OperationsVertex[MaxVertices];
-    private int _count, _line, _width, _height;
+    private int _count, _line, _width, _height, _underlay;
     private HudRect _bounds;
     private float _scale;
     private bool _disposed;
-    public OperationsHudSurface(IGraphicsDevice graphics)
-    { _graphics = graphics; _text = new(graphics); _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true); }
+    public OperationsHudSurface(IGraphicsDevice graphics, RuntimeAssetCatalog? runtimeAssets = null)
+    {
+        _graphics = graphics; _text = new(graphics); _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true);
+        try { _skin = new(graphics, runtimeAssets, icons: true); }
+        catch { _text.Dispose(); _pipeline.Dispose(); throw; }
+    }
     public GameplayHudRegion Regions => GameplayHudRegion.SecondaryView | GameplayHudRegion.AlertStack;
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
     public void Render(in GameplayHudRenderContext context)
     {
@@ -29,13 +36,14 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         LastRenderedVertexCount = 0; _text.Begin();
         _width = context.Graphics.Width; _height = context.Graphics.Height;
         if (_width <= 0 || _height <= 0) return;
-        _count = 0; _line = 0;
+        _skin.Begin(context.Graphics);
+        _count = 0; _line = 0; _underlay = 0;
         _scale = MathF.Min(context.Layout.Scale, OperationsLayout.Entry(context.Layout).Width / 126);
         _bounds = OperationsLayout.Entry(context.Layout);
         bool panelVisible = context.Operations.Open && !context.Operations.Suppressed && context.Operations.Session == context.Snapshot.SessionId;
         if (!_bounds.IsEmpty && !panelVisible)
         {
-            Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
+            if (!_skin.Control(_bounds)) Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
             Line("OPERATIONS", true);
         }
         var view = context.Operations;
@@ -45,8 +53,10 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
             _bounds = OperationsLayout.Panel(context.Layout); _line = 0;
             if (_scale > 0)
             {
-                Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = 1 });
-                Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 24 * _scale), GameplayHudVisualStyle.PanelHeader);
+                if (_skin.Ready) { Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = 1 }); _underlay = _count; }
+                if (!_skin.Panel(_bounds)) Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = 1 });
+                var header = new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 24 * _scale);
+                if (!_skin.Panel(header, "panel.raised")) Quad(header, GameplayHudVisualStyle.PanelHeader);
                 Quad(new HudRect(_bounds.X, _bounds.Y, 3 * _scale, _bounds.Height), GameplayHudVisualStyle.Focus);
                 Line("OPERATIONS", true);
                 Control(context.Layout, 0, "CLOSE");
@@ -88,10 +98,12 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                         var facility = OperationsLayout.Row(data, view, i);
                         Control(context.Layout, i + 3, b.Written,
                             facility is { } active && active.Entity == view.Selected,
-                            facility is { } blocked && blocked.Cause.Length > 0);
+                            facility is { } blocked && blocked.Cause.Length > 0,
+                            facility.HasValue, facility is { } f ? CategoryIcon(f.Category) : null);
                     }
                     var panel = _bounds; _line = 0;
                     _bounds = new(panel.X, panel.Y + 264 * _scale, panel.Width, 52 * _scale);
+                    _skin.Panel(_bounds, "panel.inset");
                     OperationsFacility? selected = null;
                     for (int rowIndex = 0; rowIndex < data.Facilities.Count; rowIndex++)
                         if (data.Facilities[rowIndex].Entity == view.Selected) { selected = data.Facilities[rowIndex]; break; }
@@ -114,32 +126,55 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     }
                     else Line("SELECT A FACILITY FOR CAUSE AND CONTROLS");
                     _bounds = panel;
-                    Control(context.Layout, 9, selected.HasValue ? "FOCUS FACILITY" : "SELECT FACILITY TO FOCUS");
-                    Control(context.Layout, 10, selected.HasValue && selected.Value.Controls != PlayerActionPanelMode.Closed ? "OPEN EXISTING CONTROLS" : "NO FACILITY CONTROLS");
+                    Control(context.Layout, 9, selected.HasValue ? "FOCUS FACILITY" : "SELECT FACILITY TO FOCUS", enabled: selected.HasValue);
+                    bool controls = selected.HasValue && selected.Value.Controls != PlayerActionPanelMode.Closed;
+                    Control(context.Layout, 10, controls ? "OPEN EXISTING CONTROLS" : "NO FACILITY CONTROLS", enabled: controls);
                 }
             }
         }
-        if (_count == 0) return;
-        if (!_buffers.TryGetValue(context.Graphics.FrameIndex, out var buffer))
-        { buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload)); _buffers.Add(context.Graphics.FrameIndex, buffer); }
-        buffer.SetData<OperationsVertex>(_vertices.AsSpan(0, _count));
-        context.Graphics.SetPipeline(_pipeline); context.Graphics.SetVertexBuffer(buffer, 24); context.Graphics.Draw(_count);
+        if (_count == 0 && _skin.Vertices == 0 && _text.VertexCount == 0) return;
+        IGraphicsBuffer? frameBuffer = null;
+        if (_count > 0)
+        {
+            if (!_buffers.TryGetValue(context.Graphics.FrameIndex, out var buffer))
+            { buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload)); _buffers.Add(context.Graphics.FrameIndex, buffer); }
+            buffer.SetData<OperationsVertex>(_vertices.AsSpan(0, _count));
+            frameBuffer = buffer;
+            if (_underlay > 0)
+            { context.Graphics.SetPipeline(_pipeline); context.Graphics.SetVertexBuffer(buffer, 24); context.Graphics.Draw(_underlay); }
+        }
+        _skin.Flush(context.Graphics);
+        if (frameBuffer is not null && _count > _underlay)
+        { context.Graphics.SetPipeline(_pipeline); context.Graphics.SetVertexBuffer(frameBuffer, 24); context.Graphics.Draw(_count - _underlay, _underlay); }
         _text.Render(context.Graphics);
-        LastRenderedVertexCount = _count + _text.VertexCount;
+        LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
     }
     private static void Number(ref OperationsTextBuilder builder, double? value, string format = "0")
-    { if (value.HasValue) builder.Number(value.Value, format); else builder.Append("N/A"); }
-    private void Control(in GameplayHudLayout layout, int index, ReadOnlySpan<char> label, bool selected = false, bool blocked = false)
+    { if (value.HasValue && double.IsFinite(value.Value)) builder.Number(value.Value, format); else builder.Append("N/A"); }
+    internal static RtsUiIcon CategoryIcon(OperationsCategory category) => category switch
+    {
+        OperationsCategory.Production => RtsUiIcon.BuildingFactory,
+        OperationsCategory.Logistics => RtsUiIcon.UnitLogistics,
+        OperationsCategory.Supply => RtsUiIcon.BuildingSupply,
+        OperationsCategory.Power => RtsUiIcon.BuildingPower,
+        _ => RtsUiIcon.StatusAlert
+    };
+    private void Control(in GameplayHudLayout layout, int index, ReadOnlySpan<char> label, bool selected = false, bool blocked = false,
+        bool enabled = true, RtsUiIcon? icon = null)
     {
         var previous = _bounds; int line = _line;
         _bounds = OperationsLayout.Control(layout, index); _line = 0;
-        Quad(_bounds, selected ? GameplayHudVisualStyle.PanelSelected : GameplayHudVisualStyle.PanelRaised);
+        if (_skin.Ready && label.IsEmpty) { _bounds = previous; _line = line; return; }
+        if (!_skin.Control(_bounds, enabled, selected)) Quad(_bounds, selected ? GameplayHudVisualStyle.PanelSelected : GameplayHudVisualStyle.PanelRaised);
+        if (blocked) _skin.State(_bounds, UiSkinState.Warning);
         if (selected || blocked)
         {
             var rail = new HudRect(_bounds.X, _bounds.Y, 2 * _scale, _bounds.Height);
             Quad(rail, blocked ? GameplayHudVisualStyle.Warning : GameplayHudVisualStyle.Focus);
             if (blocked) Quad(rail with { X = rail.X + 3 * _scale }, GameplayHudVisualStyle.Warning);
         }
+        if (icon.HasValue && _skin.Icon(icon.Value, _bounds.X + 5 * _scale, _bounds.Y + 3 * _scale, 14 * _scale))
+            _bounds = _bounds with { X = _bounds.X + 16 * _scale, Width = _bounds.Width - 16 * _scale };
         Line(label, true);
         _bounds = previous; _line = line;
     }
@@ -183,6 +218,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         foreach (var buffer in _buffers.Values) buffer.Dispose();
         _buffers.Clear();
         _text.Dispose();
+        _skin.Dispose();
         _pipeline.Dispose();
         _disposed = true;
     }
@@ -203,6 +239,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         }
         public void Number(double value, string format)
         {
+            if (!double.IsFinite(value)) { Append("N/A"); return; }
             if (value.TryFormat(_buffer[_length..], out int written, format, CultureInfo.InvariantCulture)) _length += written;
         }
     }

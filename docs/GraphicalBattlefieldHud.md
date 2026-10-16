@@ -75,3 +75,7 @@ failure.
 
 See [qualification](GraphicalBattlefieldHudQualification.md) for exact source,
 checks, immutable captures, measured costs and remaining acceptance gates.
+
+## Subsequent economic content integration
+
+[Production cards, operations and alerts](GraphicalProductionAndOperations.md) now use the existing shared skin. The eight-batch figures above describe initial 0.1.377 integration; current composed preparation uses twelve batches / 48 buffers / 5,603,328 bytes with the same 28 MiB shared pages. The linked [economic qualification](GraphicalProductionAndOperationsQualification.md) supplies current source-bound coverage; earlier qualification remains historical evidence.

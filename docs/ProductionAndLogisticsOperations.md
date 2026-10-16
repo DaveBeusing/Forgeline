@@ -37,3 +37,7 @@ While open, extraction runs at the existing fixed-tick cadence (20 Hz in the can
 Native startup smoke qualifies HUD composition and window modes. It does not establish active operations interaction, terrain contrast, text readability on every monitor, live DPI transitions, mixed-route focus journeys or steady-state GPU acceptance. Those remain manual acceptance items until exercised.
 
 The HUD information update fits the opaque Operations panel inside its available space and clear of selection commands. The separate entry is hidden while the panel is open; CLOSE remains available. Selected and blocked rows have distinct rails plus text. See [HUD evidence](BattlefieldHudQualification.md).
+
+## Graphical operations integration
+
+The [production/operations interface](GraphicalProductionAndOperations.md) now uses shared compiled panels, category icons, state controls and the selected inspector. The panel retains an opaque backing; current visible Operations suppresses underlying alert drawing. Filters, paging, copied diagnostics, privacy and focus/open-controls semantics remain unchanged. [Qualification](GraphicalProductionAndOperationsQualification.md) records source-bound tests, native cases, packaging and pending acceptance.

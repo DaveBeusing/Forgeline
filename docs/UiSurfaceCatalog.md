@@ -55,17 +55,15 @@ The six surfaces below compose in `GameplayHudRenderer`. The normal resource,
 selection, group, command-shell, tooltip and guidance paths now use prepared
 production atlas layers and the existing live text atlas; see
 [graphical battlefield HUD](GraphicalBattlefieldHud.md). Their legacy bitmap
-geometry remains an independent bootstrap/debug path. Domain-card contents,
-operations/alerts and tactical map/cursor/world geometry keep the migration
-owners shown below. No new simulation/read-model authority is introduced.
+geometry remains an independent bootstrap/debug path. [Domain cards, operations and alerts](GraphicalProductionAndOperations.md) now consume compiled production layers through the existing owners. Tactical map/cursor/world geometry retains its later migration owner. No new simulation/read-model authority is introduced.
 
 | Surface / actual states | Owner / existing graphics | Layout and hit geometry | Required production family / migration |
 | --- | --- | --- | --- |
 | WaitingForSnapshot, WaitingForPlayerData | `ResourcePowerHudSurface.RenderWaiting`; compiled resource panel and live waiting text | `GameplayHudLayout.TopStatusBar` | panel.resource; explicit required-asset failure and independent bootstrap; implemented |
 | Seven resource quantities, compact two-row/unavailable/zero | `ResourcePowerHudSurface`; compiled resource cells/icons and live totals | `ResourceStripLayout.Create`, `Resource(index)` | panel.resource; seven mapped semantic icons; implemented |
 | Power generation/demand, low power | `ResourcePowerHudSurface`; compiled power cell and state overlay | `ResourceStripLayout.Power` | panel.resource, overlay.warning/error; HUD |
-| Command result feedback pending/accepted/rejected | `ResourcePowerHudSurface`; labels/rails | `HudInformationLayout.Alerts` | panel.banner, status overlays; production |
-| Alerts standard/warning/critical; facility/core/supply focus | `ResourcePowerHudSurface`; live severity and semantic icons | `ActionableAlertLayout`, `GameplayHudLayout.AlertStack` | panel.banner, overlays.warning/error; production |
+| Command result feedback accepted/partial/rejected | `ResourcePowerHudSurface`; compiled cards, live labels/rails | `HudInformationLayout.Alerts` | panel.raised, severity overlays and live OK/PART/FAIL labels; implemented |
+| Alerts standard/warning/critical; facility/core/supply focus | `ResourcePowerHudSurface`; live severity and semantic icons | `ActionableAlertLayout`, `GameplayHudLayout.AlertStack` | panel.raised, overlays.warning/error; implemented |
 | FPS/TPS and expanded runtime diagnostics | `ResourcePowerHudSurface`; independent text/quads | `GameplayHudLayout.RuntimeMetrics` | retain independent diagnostic path |
 | Empty selection, single owned unit/building, permitted enemy/contact | `SelectionInspectorHudSurface`; compiled shell and permitted roster portrait | `GameplayHudLayout.SelectionInspector`, `HudInformationLayout.InspectorScale` | panel.primary/portrait; mapped roster portraits for permitted single identities; implemented |
 | Health, ammunition, fuel, supply/readiness, copied work | `SelectionInspectorHudSurface`; clipped atlas fills/tracks and live text | inspector internal fitted bounds | progress.*, panel.inset; live quantities and permitted facts; HUD |
@@ -74,15 +72,15 @@ owners shown below. No new simulation/read-model authority is introduced.
 | Primary RTS commands/targeting availability | `PlayerActionDockHudSurface`; compiled shell controls with shared hit targets | `GameplayHudLayout.PrimaryCommands`, `PlayerActionDockInteractionLayout` | control.button, shared overlays; HUD shell / tactical content |
 | Dock closed/collapsed/open; compact/scroll | `PlayerActionDockHudSurface`; compiled shell | `ActionDock`, `GetCollapsedRect`, `GetCardsRect`, `FirstVisibleItem` | panel.primary/compact, control.row_compact; HUD shell |
 | Mode tabs: Construction, Production, UnitProduction, Logistics, Supply, Tactical, Technology | `PlayerActionDockHudSurface`; compiled tabs | `GetModeBarRect`, `GetModeButtonRect` | control.tab, selected/focus layers; HUD shell |
-| Construction cards, costs, placement availability | `PlayerActionDockHudSurface`; live card data and icons | `GetCardRect`, `GetHeaderRect` | control.row, panel.portrait, status overlays; production |
-| Production recipes, stock/blocked/current work | same dock owner; live recipe data | same card/header geometry | control.row, progress.*, status overlays; production |
-| UnitProduction roster/queue/cancel | same dock owner; live queue data | card/header/footer geometry | control.row, progress.*, control.button_compact; production |
-| Logistics route/capacity/storage/threshold actions | same dock owner; live logistics data | card/header/footer geometry | control.row, control.button_compact, warning/error; production |
-| Supply service/refuel/rearm/repair, unavailable facts | same dock owner; live supply data | card/header/footer geometry | control.row, progress.*, warning/error; production |
-| Tactical targeting and current order | same dock owner; live targeting facts | card/header/footer geometry | control.row, selected/focus/error; tactical |
-| Technology current/research/blocked | same dock owner; live technology data | card/header/footer geometry | control.row, progress.*, disabled/pending; production |
+| Construction cards, costs, placement availability | `PlayerActionDockHudSurface`; live card data and icons | `GetCardRect`, `GetHeaderRect` | control.button_compact, panel.portrait, status overlays; actual building portraits; implemented |
+| Production recipes, stock/blocked/current work | same dock owner; compiled cards and live recipe/request data | same card/header geometry | control.button_compact, progress.*, status overlays; implemented |
+| UnitProduction roster/queue/cancel | same dock owner; actual roster portraits and live queue data | card/header/footer geometry | control.button_compact, progress.*, control.button_compact; implemented |
+| Logistics stock policy/distribution/cargo facts | same dock owner; live logistics data | card/header/footer geometry | control.button_compact, logistics artwork, warning/error; implemented |
+| Supply fuel/ammunition thresholds/provider, unavailable facts | same dock owner; live supply data | card/header/footer geometry | control.button_compact, fuel/ammunition/provider artwork, warning/error; implemented |
+| Tactical targeting and current order | same dock owner; live targeting facts | card/header/footer geometry | control.button_compact, command artwork, selected/focus/error; implemented cards; world targeting retains tactical owner |
+| Technology current/research/blocked | same dock owner; live technology data | card/header/footer geometry | control.button_compact, explicit TechnologyId artwork, progress.*, disabled/pending/accepted; implemented |
 | Dock pagination, six rebound-key footer actions | same dock owner; live hotkeys | `GetPageButtonRect`, `GetFooterButtonRect` | control.button_compact, shared overlays; implemented shell controls |
-| Dock focus/hover/press/pending/accepted/rejected | same dock owner; compiled shell/control state layers; retained domain-card cues | shared dock hit regions and controller state | nine shared overlays; preserve command lifecycle; HUD/production |
+| Dock focus/hover/press/pending/accepted/rejected | same dock owner; compiled shell/control state layers; compiled domain-card states and retained structural cues | shared dock hit regions and controller state | nine shared overlays; preserve command lifecycle; implemented |
 | Minimap frame and selectors/legend | `RtsInformationHudSurface` / `RtsInformationOverlayRenderer`; quads/glyphs | `GameplayHudLayout.Minimap`, `RtsMinimapInteractionLayout` | panel.minimap, control.tab/row_compact; tactical |
 | Minimap terrain, fog, permitted contacts, objectives, camera footprint | same information owner; dynamic colored geometry | `RtsMinimapInteractionLayout.MapWorldToPointer` / minimap layout | retain live geometry; semantic markers separate; tactical |
 | Strategic information-layer tabs/legend | same information owner; live layer view | `GameplayHudLayout.SecondaryView`, information controls | control.tab, panel.compact; tactical |
@@ -91,10 +89,10 @@ owners shown below. No new simulation/read-model authority is introduced.
 | Legacy help renderer (currently unreachable from F1) | same information owner; procedural help text | `EmitHelpPanel` fitted bounds | retain dormant compatibility path; no new help page |
 | Onboarding objective/context/hint/dismiss | same information owner; `EarlyGameGuidance`; compiled backplate | `GameplayGuidanceLayout.Resolve`, secondary bounds | panel.tooltip, control.button_compact; HUD |
 | World hover tooltip owned/visible/unknown, delay/clamp | `WorldHoverTooltipSurface`; compiled fitted backplate/live text | pointer-derived bounds clamped to viewport; no new hit region | panel.tooltip; omit unauthorized facts; HUD |
-| Operations entry/open/closed/suppressed/waiting | `OperationsHudSurface`; geometric shell | `OperationsLayout.Entry`, `Panel` | panel.primary/compact, control.button_compact; production |
-| Operations resource totals, facilities/routes, no-flow-data | same operations owner; live text | `OperationsLayout.Panel` fitted internal bounds | panel.inset, control.separator; production |
-| Operations filter/page/facility selection/blocked/details | same operations owner; geometric controls | `OperationsLayout.Control`, `Row`, `PageSize` | control.row, button_compact, selected/warning/error; production |
-| Operations focus facility/open existing controls/close | same operations owner | `OperationsLayout.Control` indices 0,9,10 | control.button_compact, disabled/focus; production |
+| Operations entry/open/closed/suppressed/waiting | `OperationsHudSurface`; compiled shell with opaque backing | `OperationsLayout.Entry`, `Panel` | panel.primary/raised/inset, control.button_compact; implemented |
+| Operations resource totals, facilities/routes, no-flow-data | same operations owner; live text | `OperationsLayout.Panel` fitted internal bounds | panel.primary/inset, explicit N/A; implemented |
+| Operations filter/page/facility selection/blocked/details | same operations owner; compiled category rows/controls | `OperationsLayout.Control`, `Row`, `PageSize` | control.button_compact, category artwork, selected/warning/disabled; implemented |
+| Operations focus facility/open existing controls/close | same operations owner | `OperationsLayout.Control` indices 0,9,10 | control.button_compact, disabled/focus; implemented |
 
 ## World, diagnostics and independent paths
 
@@ -120,3 +118,7 @@ records exact validation status. Live migrations must update their rows with the
 actual runtime binding, candidate evidence identity and attributable review;
 source existence is never consumer acceptance. All controls use existing input
 contracts; catalog coverage does not authorize new gameplay or speculative widgets.
+
+## Graphical economic surface coverage
+
+Build/processing/unit/logistics/supply/technology/tactical domain cards, actual queue work states, existing tooltip costs/prerequisites, Operations controls/rows/details and actionable alerts now use prepared production layers. Empty rows remain non-actions; cancel/priority/mode controls retain existing capabilities. See [exact roles and ownership](GraphicalProductionAndOperations.md) and [source-bound validation](GraphicalProductionAndOperationsQualification.md). No source artwork, new research, queue capacity, reordered gameplay, map or cursor mechanics are introduced.

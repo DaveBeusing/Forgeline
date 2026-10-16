@@ -200,7 +200,9 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
             context.Snapshot,
             context.Layout,
             context.RuntimeMetrics,
-            context.ShowRuntimeMetrics);
+            context.ShowRuntimeMetrics,
+            context.Operations.Open && !context.Operations.Suppressed && context.Operations.Session == context.Snapshot.SessionId &&
+                OperationsLayout.Scale(context.Layout) > 0);
 
     public void RenderWaiting(IGraphicsCommandContext graphics, in GameplayHudLayout layout,
         in RuntimeMetricsView metrics, bool showRuntimeMetrics = false) =>
@@ -270,7 +272,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         PresentationSnapshot? snapshot,
         in GameplayHudLayout layout,
         in RuntimeMetricsView metrics = default,
-        bool showRuntimeMetrics = true)
+        bool showRuntimeMetrics = true, bool hideNotifications = false)
     {
         ThrowIfDisposed();
         _text.Begin();
@@ -293,9 +295,12 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             if (snapshot?.PlayerExperience is PlayerExperienceSnapshot experience)
             {
                 EmitTopStatusBar(experience, layout.TopStatusBar, graphics.Width, graphics.Height);
-                if (ActionableAlertSnapshot.Resolve(snapshot) is { } alerts)
-                    EmitActionableNotifications(experience, alerts, layout, graphics.Width, graphics.Height);
-                else { _scale = HudInformationLayout.AlertScale(layout); EmitNotificationStack(experience, HudInformationLayout.Alerts(layout), graphics.Width, graphics.Height); _scale = layout.Scale; }
+                if (!hideNotifications)
+                {
+                    if (ActionableAlertSnapshot.Resolve(snapshot) is { } alerts)
+                        EmitActionableNotifications(experience, alerts, layout, graphics.Width, graphics.Height);
+                    else { _scale = HudInformationLayout.AlertScale(layout); EmitNotificationStack(experience, HudInformationLayout.Alerts(layout), graphics.Width, graphics.Height); _scale = layout.Scale; }
+                }
             }
             else
             {
@@ -786,7 +791,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             SeverityColor(
                 severity);
 
-        EmitQuad(
+        var card = new HudRect(region.X, y, region.Width, cardHeight);
+        if (!_skin.Panel(card, "panel.raised")) EmitQuad(
             region.X,
             y,
             region.Width,
@@ -794,6 +800,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             GameplayHudVisualStyle.PanelRaised,
             width,
             height);
+        _skin.State(card, severity == HudAlertSeverity.Critical ? UiSkinState.Error :
+            severity == HudAlertSeverity.Warning ? UiSkinState.Warning : UiSkinState.Normal);
         EmitQuad(
             region.X,
             y,
@@ -1188,6 +1196,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         int width,
         int height)
     {
+        if (_skin.Icon(icon, x, y, size)) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
