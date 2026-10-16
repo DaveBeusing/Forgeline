@@ -39,6 +39,11 @@ Below the track's authored twelve-pixel height, the complete progress sprite is 
 
 ## Work state and authority
 
+The Supply editor tolerates absent action snapshots, missing supply data and
+snapshots rejected by the existing tick/selection checks. These states emit no
+supply priority, policy or resupply request. Once valid copied data returns,
+thresholds, automatic policy and priority are refreshed even for the same entity.
+
 Command availability is independent from work state. Pending means awaiting a result. Accepted/partial/rejected feedback remains copied command feedback, never production completion. A retained request can be queued, paused, started or blocked; its own active flag and the facility's actual block reason determine treatment. Production-skin cards never borrow active work progress for inactive requests. Blocked work remains visible while supported cancel/priority controls remain usable.
 
 Technology completion is shown only for copied `PlayerTechnologyState.Completed`. Processing/unit read models do not retain completed-job history; removed requests disappear rather than creating invented completed cards. There is no new reorder/drag-and-drop capability or fabricated queue capacity. Empty/current-context messages and the actual item count remain explicit; empty Operations rows do not gain actions or frames.

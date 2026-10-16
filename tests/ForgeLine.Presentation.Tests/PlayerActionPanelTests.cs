@@ -797,6 +797,78 @@ public sealed class PlayerActionPanelTests
         Assert.Equal(policyEntity, remove.RequestEntity);
     }
 
+    [Theory]
+    [InlineData("missing-actions")]
+    [InlineData("missing-supply")]
+    [InlineData("stale-actions")]
+    [InlineData("selection-changed")]
+    public void SupplyEditorIgnoresUnavailableActionsAndResynchronizesSameEntity(string unavailableReason)
+    {
+        var unit = new EntityId(80, 1);
+        var supply = new PlayerSupplyActionReadModel(unit, BattlefieldSupplyStatus.LowSupply,
+            0.2, 0.3, true, 0.2, 0.2, new EntityId(81, 1),
+            PlayerSupplyProviderState.Traveling, 100, 50, ResupplyProviderRejection.None);
+        var available = CreateSnapshot(supply: supply);
+        var input = new InputState();
+        var controller = new PlayerActionPanelController();
+        controller.Update(input, available, 1600, 900);
+        Press(input, PlatformKey.Y);
+        controller.Update(input, available, 1600, 900);
+        Release(input, PlatformKey.Y);
+        controller.Update(input, available, 1600, 900);
+        Assert.Equal(PlayerActionPanelMode.Supply, controller.Mode);
+
+        var unavailable = unavailableReason switch
+        {
+            "missing-actions" => new PresentationSnapshot(new SimulationTick(4),
+                TimeSpan.FromMilliseconds(50), 0, ReadOnlySpan<RenderInstance>.Empty,
+                sessionId: available.SessionId),
+            "missing-supply" => CreateSnapshot(),
+            "stale-actions" => new PresentationSnapshot(new SimulationTick(5),
+                TimeSpan.FromMilliseconds(50), 0, ReadOnlySpan<RenderInstance>.Empty,
+                sessionId: available.SessionId, playerActions: available.PlayerActions),
+            _ => available
+        };
+        SelectionSet? selection = null;
+        if (unavailableReason == "selection-changed")
+        {
+            selection = new SelectionSet();
+            selection.SetSingle(new EntityId(99, 1));
+        }
+
+        controller.Update(input, unavailable, 1600, 900, currentSelection: selection);
+        foreach (var key in new[] { PlatformKey.T, PlatformKey.M, PlatformKey.Right,
+                     PlatformKey.Left, PlatformKey.Enter, PlatformKey.C })
+        {
+            Press(input, key);
+            controller.Update(input, unavailable, 1600, 900, currentSelection: selection);
+            Assert.False(controller.TryTakeRequest(out _));
+            Release(input, key);
+            controller.Update(input, unavailable, 1600, 900, currentSelection: selection);
+        }
+
+        var refreshed = CreateSnapshot(supply: supply with
+        {
+            AutomaticEnabled = false, AutomaticFuelThreshold = 0.65,
+            AutomaticAmmunitionThreshold = 0.75, Priority = BattlefieldSupplyPriority.Critical
+        });
+        controller.Update(input, refreshed, 1600, 900);
+        var view = controller.CreateView(1600, 900, refreshed.PlayerActions);
+        Assert.Equal(PlayerActionPanelMode.Supply, controller.Mode);
+        Assert.False(view.AutomaticResupplyEnabled);
+        Assert.Equal(0.65, view.AutomaticFuelThreshold);
+        Assert.Equal(0.75, view.AutomaticAmmunitionThreshold);
+        Assert.Equal(BattlefieldSupplyPriority.Critical, controller.SupplyPriority);
+        Assert.False(controller.TryTakeRequest(out _));
+        Press(input, PlatformKey.Enter);
+        controller.Update(input, refreshed, 1600, 900);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(PlayerActionRequestKind.SetAutomaticResupplyPolicy, request.Kind);
+        Assert.Equal(unit, request.Facility);
+        Assert.Equal(0.65, request.AutomaticFuelThreshold);
+        Assert.Equal(0.75, request.AutomaticAmmunitionThreshold);
+    }
+
     [Fact]
     public void SupplyPaletteAdjustsPolicyAndRequestsExplicitResupply()
     {
