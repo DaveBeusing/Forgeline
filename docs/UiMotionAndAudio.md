@@ -13,8 +13,10 @@ The existing 140 ms screen-entry interval is a short accent-line reveal within t
 new panel, rather than moving text or controls. Focus rails grow in place over
 80 ms. A 220 ms, nonlooping result rail accompanies explicit copied result text.
 Pressed/hover/disabled feedback remains immediate and structural. There is no
-flashing loop, camera movement, hidden text, animation-duration readiness gate or
-animated hit region. Selected controls retain a visible rail throughout.
+flashing loop, camera movement, hidden text or animation-duration readiness gate.
+These decorations keep stationary hit regions. The sliding onboarding exception
+below shares its transformed clip with input. Selected controls retain a visible
+rail throughout.
 
 These are initial engineering values, not a claim of completed usability testing.
 Human motion/sound acceptance is required before calling the visual feel qualified.
@@ -95,3 +97,14 @@ executed checks and unresolved acceptance; stable captures do not grant pixel-go
 approval or physical-monitor certification.
 
 See [executed package/native qualification and remaining acceptance](UiFeedbackQualification.md).
+
+## Sliding onboarding exception
+
+Only the optional onboarding panel moves: a 220 ms SmoothStep (3p² − 2p³) slide
+from the currently painted position to the left clip boundary. Its copied
+`OnboardingPresentation` owns panel transform, clip, visible intersection and tab;
+painting and hit tests consume that exact revision. Other controls keep stationary
+hit regions. One transition reverses immediately without queues or simulation time.
+Reduced Motion, Low/fallback quality, a gap over 250 ms, rollback, focus loss,
+minimize and viewport changes settle to the current logical target. Geometry changes
+cancel stale gestures. No decorative timing gates input or readiness.

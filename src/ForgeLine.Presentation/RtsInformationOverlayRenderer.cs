@@ -52,6 +52,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
+    private HudRect? _guidanceClip;
     internal HudRect LastGuidanceBounds { get; private set; }
     internal float LastGuidanceTextSize { get; private set; }
     public int LastGuidanceVertexCount { get; private set; }
@@ -892,7 +893,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 break;
 
             default:
-                if (view.Placement.Visible || (view.ShowOnboarding && !view.Guidance.Visible && !view.Placement.Visible && string.IsNullOrEmpty(view.InteractionHint)))
+                if (view.Placement.Visible)
                 {
                     EmitOnboardingHint(
                         view.InteractionHint,
@@ -1078,8 +1079,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
     private void EmitContextGuidance(in PreAlphaUxView view, bool placement, in GameplayHudLayout layout, int width, int height)
     {
-        var region = GameplayGuidanceLayout.Resolve(layout);
-        if (region.IsEmpty) return;
+        var state = placement ? OnboardingPresentation.Resolve(layout, 0) : view.Onboarding ?? OnboardingPresentation.Resolve(layout, 0);
+        if (!state.Visible) return;
+        var region = state.Panel;
+        _guidanceClip = state.Clip;
+        _text.Clip = state.Clip;
+        _skin.PanelClip(state.Clip);
         // Account for wrapped text before choosing a compact type size, so later
         // context lines do not disappear after a long objective uses two rows.
         float scale = MathF.Min(layout.Scale, region.Height / 83);
@@ -1094,16 +1099,27 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             }
             scale = low;
         }
+        scale = MathF.Max(.875f, scale);
         LastGuidanceTextSize = 16 * scale;
         int start = _vertexCount;
-        LastGuidanceBounds = region;
-        if (!_skin.Panel(region, "panel.compact")) EmitQuad(region.X, region.Y, region.Width, region.Height, GameplayHudVisualStyle.PanelBackground, width, height);
+        LastGuidanceBounds = state.VisiblePanel.IsEmpty ? state.Tab : state.VisiblePanel;
+        float alpha = placement ? 1 : OnboardingPresentation.BackgroundAlpha;
+        if (!_skin.Panel(region, "panel.compact", alpha)) EmitQuad(region.X, region.Y, region.Width, region.Height,
+            GameplayHudVisualStyle.PanelBackground with { W = alpha }, width, height);
         EmitQuad(region.X, region.Y, 3 * scale, region.Height, GameplayHudVisualStyle.Focus, width, height);
+        if (!placement && !state.Tab.IsEmpty)
+        {
+            var contentClip = state.Clip with { X = state.Tab.Right, Width = MathF.Max(0, state.Clip.Right - state.Tab.Right) };
+            _text.Clip = contentClip; _guidanceClip = contentClip;
+        }
         float y = region.Y + 8 * scale;
-        ContextBlock(placement ? view.Placement.Title : view.Guidance.Objective, ref y, region, scale, true, 2, width, height);
-        ContextBlock(placement ? view.Placement.Reason : view.Guidance.Binding, ref y, region, scale, false, 2, width, height);
-        ContextBlock(placement ? view.Placement.Hint : view.Guidance.Context, ref y, region, scale, false, 2, width, height);
-        if (!placement && view.Guidance.Next.Length > 0)
+        if (!placement)
+            ContextBlock(state.Compact ? "< HINT / SHIFT+F12" : "< MINIMIZE  /  SHIFT+F12", ref y, region, scale, false, 1, width, height);
+        ContextBlock(placement ? view.Placement.Title : view.Guidance.Objective, ref y, region, scale, true, !placement && state.Compact ? 1 : 2, width, height);
+        ContextBlock(placement ? view.Placement.Reason : view.Guidance.Binding, ref y, region, scale, false, !placement && state.Compact ? 1 : 2, width, height);
+        if (placement || !state.Compact)
+            ContextBlock(placement ? view.Placement.Hint : view.Guidance.Context, ref y, region, scale, false, 2, width, height);
+        if (!placement && !state.Compact && view.Guidance.Next.Length > 0)
             ContextBlock(view.Guidance.Next, ref y, region, scale, false, 1, width, height);
         if (placement && view.Placement.Costs is { } costs)
         {
@@ -1117,6 +1133,27 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 ContextBlock(text.Written, ref y, region, scale, false, 1, width, height);
             }
         }
+        _text.Clip = state.Clip; _guidanceClip = state.Clip;
+        if (!placement && !state.Tab.IsEmpty)
+        {
+            var tab = state.Tab;
+            if (!_skin.Panel(tab, "control.button_compact", OnboardingPresentation.BackgroundAlpha))
+                EmitQuad(tab.X, tab.Y, tab.Width, tab.Height, GameplayHudVisualStyle.PanelRaised with { W = OnboardingPresentation.BackgroundAlpha }, width, height);
+            float tabSize = state.TabTextSize;
+            var label = state.TabLabelBounds;
+            if (!_text.AddCentered("HINT", label, tabSize, GameplayHudVisualStyle.TextPrimary, width, height))
+                EmitText("HINT", label.X, label.Y, label.Right, GameplayHudVisualStyle.TextPrimary,
+                    tabSize / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
+            _text.Add(">", tab.X + 10, tab.Y + tab.Height / 2, tabSize, GameplayHudVisualStyle.TextPrimary, width, height, tab.Width - 12);
+        }
+        if (!placement && state.Focused)
+        {
+            var focus = state.Tab.IsEmpty ? state.VisiblePanel : state.Tab;
+            EmitQuad(focus.X, focus.Y, focus.Width, 3, GameplayHudVisualStyle.Focus, width, height);
+        }
+        _guidanceClip = null;
+        _text.Clip = null;
+        _skin.PanelClip(new(0, 0, width, height));
         LastGuidanceVertexCount = _vertexCount - start;
     }
 
@@ -1128,7 +1165,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             ContextLines(placement ? view.Placement.Hint : view.Guidance.Context, textWidth, 16 * scale, false, 2);
         if (!placement && view.Guidance.Next.Length > 0) lines++;
         if (placement && view.Placement.Costs is { } amounts) lines += amounts.Count;
-        return (18 + 23 * Math.Max(1, lines)) * scale;
+        return (18 + 23 * Math.Max(1, lines + (placement ? 0 : 1))) * scale;
     }
 
     private static int ContextLines(ReadOnlySpan<char> text, float width, float size, bool bold, int maximum)
@@ -1982,6 +2019,11 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int width,
         int height)
     {
+        if (_guidanceClip is { } clip)
+        {
+            var r = OnboardingPresentation.Intersect(new(x, y, quadWidth, quadHeight), clip);
+            x = r.X; y = r.Y; quadWidth = r.Width; quadHeight = r.Height;
+        }
         if (_vertexCount >
                 _vertexLimit -
                 6 ||

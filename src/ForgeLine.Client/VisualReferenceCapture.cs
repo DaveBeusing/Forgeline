@@ -212,10 +212,12 @@ internal static class VisualReferenceCapture
                         HasPointer = uiScenario == UiReferenceScenario.Targeting, PointerPosition = new(display.Width * .5f, display.Height * .5f) };
                     var targeting = uiScenario == UiReferenceScenario.Targeting ? new TacticalTargetingView(TacticalTargetingMode.Attack, 2, 1, 1, 0)
                     { HasPointerTarget = true, PointerTargetValid = true, PointerWorldTarget = fixture.Target } : default;
-                    var captureUx = uiScenario == UiReferenceScenario.Onboarding ? default(PreAlphaUxView) with
+                    var captureUx = UiReferenceStates.IsOnboarding(uiScenario) ? default(PreAlphaUxView) with
                     {
                         ShowOnboarding = true,
-                        Guidance = new EarlyGameGuidanceController().Update(snapshot, true)
+                        Guidance = new EarlyGameGuidanceController().Update(snapshot, true),
+                        Onboarding = OnboardingPresentation.Resolve(GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale),
+                            UiReferenceStates.OnboardingCollapse(uiScenario))
                     } : default;
                     var hover = uiScenario == UiReferenceScenario.GameplayTooltip ? new HoverTooltipView(snapshot.SessionId, default, default,
                         new(display.Width * .65f, display.Height * .6f), true, display.Width, display.Height,

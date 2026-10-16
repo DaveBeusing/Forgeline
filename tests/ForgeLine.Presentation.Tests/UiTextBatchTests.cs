@@ -45,6 +45,29 @@ public sealed class UiTextBatchTests
         Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
     }
     [Fact]
+    public void TranslatedGlyphsClipBothGeometryAndAtlasCoordinatesAtTheSharedHintBoundary()
+    {
+        using var device = new Device(); using var batch = new UiTextBatch(device);
+        var clip = new HudRect(100, 110, 48, 16);
+        batch.Clip = clip;
+        batch.Begin(); batch.Add("MMMM", 80, 100, 32, Vector4.One, 1600, 900);
+        Assert.True(batch.VertexCount > 0);
+        batch.Render(new RecordingContext());
+        var vertices = MemoryMarshal.Cast<byte, Vertex>(device.Buffers[^1].Bytes)[..batch.VertexCount];
+        foreach (var vertex in vertices)
+        {
+            float x = (vertex.Position.X + 1) * 800, y = (1 - vertex.Position.Y) * 450;
+            Assert.InRange(x, clip.X - .001f, clip.Right + .001f);
+            Assert.InRange(y, clip.Y - .001f, clip.Bottom + .001f);
+            Assert.InRange(vertex.Uv.X, 0, 1); Assert.InRange(vertex.Uv.Y, 0, 1);
+            Assert.Equal(1, vertex.Color.W);
+        }
+        batch.Clip = null;
+        batch.Begin(); batch.Add("M", 5, 5, 32, Vector4.One, 1600, 900);
+        Assert.True(batch.VertexCount > 0); // Subsequent HUD owners retain the full viewport.
+    }
+
+    [Fact]
     public void AlignmentBaselineAndEllipsisUseSharedMetrics()
     {
         using var device = new Device(); using var batch = new UiTextBatch(device); var context = new RecordingContext();

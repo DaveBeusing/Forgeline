@@ -28,4 +28,4 @@ public readonly record struct PreAlphaUxView(
     string SettingsPath,
     EarlyGameGuidanceView Guidance = default,
     PlacementContextFeedbackView Placement = default,
-    string InteractionHint = "", GameplayBindingRegistry? Bindings = null);
+    string InteractionHint = "", GameplayBindingRegistry? Bindings = null, OnboardingPresentation? Onboarding = null);

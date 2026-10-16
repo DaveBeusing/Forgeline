@@ -139,6 +139,13 @@ public sealed class InputState
         if (_keysDown.Remove(key)) _suppressedKeys.Add(key);
     }
 
+    public void SuppressMouseButtonUntilRelease(PlatformMouseButton button)
+    {
+        _mousePressPositions.Remove(button);
+        _mouseButtonsReleased.Remove(button);
+        if (_mouseButtonsDown.Remove(button)) _suppressedButtons.Add(button);
+    }
+
     public bool IsMouseButtonDown(PlatformMouseButton button) =>
         _mouseButtonsDown.Contains(button);
 

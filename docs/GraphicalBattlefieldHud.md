@@ -78,7 +78,9 @@ a 224-pixel design-height cap; constrained clients display fewer cards. Text sta
 at least 14 physical pixels. Shared card geometry supplies drawing and input.
 See [notification stack qualification](NotificationStackQualification.md).
 `OnboardingBounds` reserves the top-left corner and is consumed by guidance;
-collapsible guidance behavior remains with its existing controller.
+`OnboardingPresentation` publishes the same translated panel, safe clip and visible
+tab for rendering and input. The existing session interaction owner retains the
+minimized target until a new match. See [onboarding interaction](OnboardingInteraction.md).
 
 Resource density shares 1064/640 design-width thresholds between geometry and
 rendering. Full resource names retain captions of at least 11 physical pixels and

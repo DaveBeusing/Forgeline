@@ -21,6 +21,7 @@ internal sealed class UiTextBatch : IDisposable
     private Vertex[] _vertices = new Vertex[384];
     private int _count, _missing, _dropped;
     private bool _disposed;
+    internal HudRect? Clip { get; set; }
     public bool Ready => _atlas is not null;
     public string? FailureReason { get; }
     public int VertexCount => _count;
@@ -129,6 +130,9 @@ internal sealed class UiTextBatch : IDisposable
         float left = x + glyph.Left * scale, top = y + (baseline ? 0 : d.Ascent * scale) + glyph.Top * scale;
         float r = left + glyph.Width * scale, b = top + glyph.Height * scale;
         float clipLeft = MathF.Max(0, left), clipTop = MathF.Max(0, top), clipRight = MathF.Min(MathF.Min(width, right), r), clipBottom = MathF.Min(height, b);
+        if (Clip is { } clip)
+        { clipLeft = MathF.Max(clipLeft, clip.X); clipTop = MathF.Max(clipTop, clip.Y);
+          clipRight = MathF.Min(clipRight, clip.Right); clipBottom = MathF.Min(clipBottom, clip.Bottom); }
         if (clipRight <= clipLeft || clipBottom <= clipTop) return;
         float u0 = (glyph.X + (clipLeft - left) / scale) / d.Width, v0 = (glyph.Y + (clipTop - top) / scale) / d.Height;
         float u1 = (glyph.X + (clipRight - left) / scale) / d.Width, v1 = (glyph.Y + (clipBottom - top) / scale) / d.Height;

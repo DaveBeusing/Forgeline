@@ -1,0 +1,34 @@
+[
+  {
+    "file": "expanded-1080p.png",
+    "original": "D:\\Code\\Forgeline\\artifacts\\onboarding-reference-1080\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiOnboarding-Scale1.00.png",
+    "source": "6aad37feebcce50adbb02dcd90c60cf85694fcd1",
+    "bytes": 4070979,
+    "sha256": "dc8d4ee16c0e5aa97b4ec2acd18275522e39b681afa506a9b69d66310daa5bc3",
+    "review": "pending"
+  },
+  {
+    "file": "restore-720p-high-scale.png",
+    "original": "D:\\Code\\Forgeline\\artifacts\\onboarding-qualified-sequence\\1280-False-60-0-220.png",
+    "source": "6aad37feebcce50adbb02dcd90c60cf85694fcd1",
+    "bytes": 1817797,
+    "sha256": "20b144286bd9e2a91dcbb14f5abe13d7900f1dd2edbc03b279d082f4fd2f8a47",
+    "review": "pending"
+  },
+  {
+    "file": "compact-dark-720p.png",
+    "original": "D:\\Code\\Forgeline\\artifacts\\onboarding-reference-dark\\BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi96-UiOnboarding-Scale0.75.png",
+    "source": "6aad37feebcce50adbb02dcd90c60cf85694fcd1",
+    "bytes": 1655827,
+    "sha256": "a754d04ed2fe822a2d15f15cf7de625ae5585337c375e0cddbdf511735edf134",
+    "review": "pending"
+  },
+  {
+    "file": "expanded-4k.png",
+    "original": "D:\\Code\\Forgeline\\artifacts\\onboarding-reference-4k\\BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiOnboarding-Scale2.00.png",
+    "source": "6aad37feebcce50adbb02dcd90c60cf85694fcd1",
+    "bytes": 11659590,
+    "sha256": "aa3e2512d6393784f6f6fb34f3e64e4d1b6994624d7be39c3a7a6eadb1fffef7",
+    "review": "pending"
+  }
+]
