@@ -115,6 +115,16 @@ public sealed class GameplayGuidanceInteractionTests
     }
 
     [Fact]
+    public void DisablingDuringASlideSettlesWithoutLosingTheSessionTarget()
+    {
+        var input = new InputState(); var guide = new GameplayGuidanceInteraction();
+        Update(guide, input, 0); Click(input, Layout.SafeArea.X + 5, Layout.SafeArea.Y + 5); Update(guide, input, 1);
+        Release(input); Update(guide, input, 56); Assert.InRange(guide.View.Collapse, .15f, .16f);
+        Update(guide, input, 57, enabled: false); Assert.False(guide.View.Visible);
+        Update(guide, input, 58); Assert.Equal(OnboardingPhase.Collapsed, guide.View.Phase);
+    }
+
+    [Fact]
     public void OutsideClickEscapeAndHeldPressAcrossResizeCannotToggleTheGuide()
     {
         var input = new InputState(); var guide = new GameplayGuidanceInteraction();

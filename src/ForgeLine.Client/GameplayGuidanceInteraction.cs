@@ -26,7 +26,7 @@ internal sealed class GameplayGuidanceInteraction
         bool replaced = session.IsSpecified && session != _session;
         bool changed = _initialized && _layout != layout;
         if (replaced) { _session = session; Hidden = false; _collapse = 0; _moving = false; _focused = false; }
-        bool interrupted = !_initialized || replaced || changed || blocked || input.FocusLostThisFrame ||
+        bool interrupted = !_initialized || replaced || changed || blocked || !enabled || input.FocusLostThisFrame ||
             now < _last || now - _last > TimeSpan.FromMilliseconds(250) || !animate;
         _initialized = true; _layout = layout; _last = now;
         if (interrupted) { _collapse = Hidden ? 1 : 0; _moving = false; }
