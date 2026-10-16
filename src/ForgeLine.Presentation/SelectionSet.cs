@@ -8,23 +8,26 @@ public sealed class SelectionSet
 
     public int Count => _entities.Count;
 
+    public ulong Revision { get; private set; }
+
     public IReadOnlyCollection<EntityId> Entities => _entities;
 
     public bool Contains(EntityId entity) =>
         entity.IsValid && _entities.BinarySearch(entity) >= 0;
 
-    public void Clear() => _entities.Clear();
+    public void Clear() { if (_entities.Count == 0) return; _entities.Clear(); Revision++; }
 
     internal void Add(EntityId entity)
     {
         if (!entity.IsValid) return;
         int index = _entities.BinarySearch(entity);
-        if (index < 0) _entities.Insert(~index, entity);
+        if (index < 0) { _entities.Insert(~index, entity); Revision++; }
     }
 
     public void SetSingle(EntityId entity)
     {
-        _entities.Clear();
+        if (_entities.Count == 1 && _entities[0] == entity || _entities.Count == 0 && !entity.IsValid) return;
+        _entities.Clear(); Revision++;
 
         if (entity.IsValid)
         {
@@ -45,11 +48,13 @@ public sealed class SelectionSet
             _entities.Insert(~index, entity);
         }
         else _entities.RemoveAt(index);
+        Revision++;
     }
 
     public void Replace(ReadOnlySpan<EntityId> entities)
     {
-        _entities.Clear();
+        if (entities.SequenceEqual(System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_entities))) return;
+        Clear();
         AddRange(entities);
     }
 
@@ -64,7 +69,7 @@ public sealed class SelectionSet
     public void Remove(EntityId entity)
     {
         int index = _entities.BinarySearch(entity);
-        if (index >= 0) _entities.RemoveAt(index);
+        if (index >= 0) { _entities.RemoveAt(index); Revision++; }
     }
 
     public EntityId[] ToArray()

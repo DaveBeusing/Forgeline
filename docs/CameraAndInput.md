@@ -290,3 +290,37 @@ reduce the guide scale. The guide remains inside its existing reserved region.
 ## Native tactical pointer and map footprint
 
 Gameplay replaces the Windows pointer with a single authored native cursor through `IWindow.SetCursorImage`; UI/pause/focus/session exit restores Windows ownership. All eleven cursor roles use exact compiled hotspots and prepared 24/32/48/64-pixel DPI/scale variants. Input coordinates and click/drag thresholds are unchanged. The minimap fits current camera ground-plane rays through the existing world-to-map transform; decorative panels and clipped marker pixels introduce no new hit area. [Tactical contracts and limitations](GraphicalTacticalInterface.md) and [qualification](GraphicalTacticalInterfaceQualification.md) include native dimensions, focus restoration, privacy, resize/DPI tests and pending physical-pointer review.
+
+## Nonmodal gameplay menus
+
+`TransientHudMenuController` coordinates the existing dock and Operations before
+controller actions and world input. A world-origin press dismisses every transient
+menu, then the original retained input reaches the existing selection, move,
+placement or targeting owner exactly once. No synthetic event is injected.
+Selection and target intent are not menu state. Right click during placement or
+targeting cancels that intent and is reserved from movement on the same frame.
+
+Dock tabs, actual cards (including disabled cards), paging and footer controls
+own input. Empty card capacity, decorative dock background and gaps do not.
+The visible Operations information panel deliberately owns its entire background
+so its readable content cannot conceal a world command. Status, minimap, alerts,
+selection controls and onboarding retain their independent input owners.
+
+Menu-origin gestures retain ownership through release outside the panel. A brief
+press/release outside cancels before UI activation. An action already activated
+on pointer-down is not replayed or rolled back on release. Closing is logical and
+immediate: animation opacity never adds capture. Escape closes the whole transient
+stack before target cancellation or Pause; true modal/settings/display states keep
+priority. Focus loss, display/layout, selection identity and session transitions
+clear transient ownership and cancel retained gestures. Dock keyboard focus applies
+only over its controls, leaving free-world camera input available.
+
+Later context/ring menus register `ITransientHudMenu` with this coordinator (four
+bounded registration slots). `ContainsControl` reports actual visible input regions,
+including disabled controls, excluding centers, gaps and decorative connectors.
+`Dismiss` must clear the complete nested stack, hover, press, tooltips and focus
+idempotently. Closed or visually fading menus return `IsOpen == false`; their
+activation path still requires a fresh gesture. Registration lasts for one match.
+
+[Executed interaction qualification](NonModalHudQualification.md) records the
+source identity, sequence tests and remaining native/human acceptance.

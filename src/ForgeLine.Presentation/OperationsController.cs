@@ -83,6 +83,13 @@ public sealed class OperationsController
     public OperationsView View { get; private set; }
     public void OpenCategory(OperationsCategory category, SimulationSessionId session, PresentationInteractionState interaction)
     { View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
+    public bool ContainsSurface(System.Numerics.Vector2 point, in GameplayHudLayout layout) =>
+        View.Open && !View.Suppressed && OperationsLayout.Panel(layout).Contains(point);
+    public void Close(InputState input, PresentationInteractionState interaction)
+    {
+        View = default; _lastRouteFocus = default;
+        CancelInput(input); interaction.SetOperationsOpen(false);
+    }
     public void CancelInput(InputState input) => _press = input.MousePressSequence(PlatformMouseButton.Left);
     public OperationsInteraction Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
         PresentationInteractionState interaction, bool blocked = false)

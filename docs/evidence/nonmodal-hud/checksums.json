@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "qualifiedProductSource": "2edaa4cf3d02b0d4e21ebfcfab8b961ef863c068",
+  "version": "0.1.384-dev",
+  "records": {
+    "file": "records.zip",
+    "bytes": 2342785,
+    "sha256": "ccdeb3494920386a4c976440acd6375897b1553fab6798c0620383ed192eeefd"
+  },
+  "identity": {
+    "native": {
+      "application": "Ready",
+      "session": "Ready",
+      "build": "0.1.384-dev+2edaa4cf3d02b0d4e21ebfcfab8b961ef863c068",
+      "source": "2edaa4cf3d02b0d4e21ebfcfab8b961ef863c068",
+      "diagnosticsSha256": "48d303703e93d625d5e8f944c82143fe4ad843ac1f0aed51da1e81a484db65a1"
+    },
+    "packaged": {
+      "application": "Ready",
+      "session": "Ready",
+      "build": "0.1.384-dev+2edaa4cf3d02b0d4e21ebfcfab8b961ef863c068",
+      "source": "2edaa4cf3d02b0d4e21ebfcfab8b961ef863c068",
+      "diagnosticsSha256": "1c9e0f6177125bd9b2aa1b7267a5341c0186517e0e4ee226b4317865fa03752d"
+    },
+    "package": {
+      "sha256": "f168c71f6b3bc1a98015c0217a8ab0de68fed1f390a2b4d63df37c472a0348a5",
+      "bytes": 40007143,
+      "provenance": {
+        "runtimeIdentifier": "win-x64",
+        "productVersion": "0.1.384",
+        "repository": "https://github.com/DaveBeusing/Forgeline",
+        "runId": null,
+        "sdk": "10.0.401",
+        "buildTimeUtc": "2026-10-16T16:42:43.2105607+00:00",
+        "product": "FORGELINE",
+        "runAttempt": null,
+        "targetFramework": "net10.0-windows",
+        "version": "0.1.384-dev",
+        "informationalVersion": "0.1.384-dev+2edaa4cf3d02b0d4e21ebfcfab8b961ef863c068",
+        "configuration": "Release",
+        "runtimeAssetCompiler": "1.10.0",
+        "channel": "dev",
+        "runtimeAssetSignature": "5cb87ff663e609ff3c0842be2671e3eabc9a9389e3562a66e0fba46733700932",
+        "sourceTreeClean": true,
+        "runUrl": null,
+        "sourceRevision": "2edaa4cf3d02b0d4e21ebfcfab8b961ef863c068"
+      }
+    },
+    "source": "2edaa4cf3d02b0d4e21ebfcfab8b961ef863c068",
+    "compiledPresentationSha256": "4a4dad1878270e971bd4ba3405c490b2f2512dec181271c53368e9073475c5cc"
+  }
+}

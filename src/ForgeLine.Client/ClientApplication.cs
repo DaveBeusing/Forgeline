@@ -395,6 +395,7 @@ internal sealed class ClientApplication
             new CombatGroupInputController();
         var combatGroupCard = new CombatGroupCardController();
         var operationsController = new OperationsController();
+        var transientMenus = new TransientHudMenuController();
         var alertController = new ActionableAlertController();
         var memberFocusSelection = new SelectionSet();
         var buildingPlacementController =
@@ -720,6 +721,18 @@ internal sealed class ClientApplication
                 inputExperience?.IsMatchComplete ==
                 true;
 
+            bool menuEscape = transientMenus.ConsumeEscape(inputState, actionPanel, operationsController,
+                presentationInteraction, pauseMenuActive || wasShellBlocking || modalFrame || window.ClientSize.IsEmpty || !window.IsFocused);
+            if (menuEscape) returnPressed = false;
+            else if (returnPressed && !pauseMenuActive && !wasShellBlocking && !modalFrame &&
+                (buildingPlacementController.IsActive || tacticalTargetingController.IsActive))
+            {
+                buildingPlacementController.Cancel(presentationInteraction);
+                tacticalTargetingController.Cancel();
+                inputState.SuppressKeyUntilRelease(PlatformKey.Escape);
+                returnPressed = false;
+            }
+
             PauseMenuCommand? pauseMenuCommand =
                 null;
 
@@ -1038,6 +1051,10 @@ internal sealed class ClientApplication
             if (shouldPauseForWindow ||
                 shellBlocksGameplay || modalFrame || shellChanged || !window.IsFocused)
             {
+                transientMenus.Update(inputState, inputSnapshot,
+                    GameplayHudLayout.Create(window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale),
+                    selectionController.Selection, actionPanel, operationsController, presentationInteraction,
+                    informationLayer.MinimapEnabled, false, blocked: true);
                 operationsController.CancelInput(inputState);
                 alertController.CancelInput(inputState);
                 hoverTooltip.Reset();
@@ -1150,6 +1167,15 @@ internal sealed class ClientApplication
                 continue;
             }
 
+            GameplayHudLayout interactionLayout = GameplayHudLayout.Create(
+                window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
+            transientMenus.Update(inputState, inputSnapshot, interactionLayout, selectionController.Selection,
+                actionPanel, operationsController, presentationInteraction, informationLayer.MinimapEnabled,
+                buildingPlacementController.IsActive ||
+                (_settings.ShowOnboarding && !smokeTest && !guidanceInteraction.Hidden && inputSnapshot?.Guidance is not null &&
+                    !selectionController.IsDragSelecting && !tacticalTargetingController.IsActive));
+            hudInteraction.CapturePointer(transientMenus.PointerCaptured);
+
             if (inputMatchTerminal)
             {
                 actionPanel.Close();
@@ -1165,17 +1191,6 @@ internal sealed class ClientApplication
                     window.Dpi,
                     _settings.UiScale,
                     currentSelection: selectionController.Selection);
-
-                if (actionPanel.HasKeyboardFocus)
-                {
-                    tacticalTargetingController.Cancel();
-
-                    if (buildingPlacementController.IsActive)
-                    {
-                        buildingPlacementController.Cancel(
-                            presentationInteraction);
-                    }
-                }
 
                 if (actionPanel.TryTakeRequest(
                         out PlayerActionRequest actionRequest))
@@ -1196,12 +1211,6 @@ internal sealed class ClientApplication
             hudInteraction.CaptureKeyboard(
                 actionPanel.HasKeyboardFocus);
 
-            GameplayHudLayout interactionLayout =
-                GameplayHudLayout.Create(
-                    window.ClientSize.Width,
-                    window.ClientSize.Height,
-                    window.Dpi,
-                    _settings.UiScale);
             CombatGroupCardResult cardResult = combatGroupCard.Update(inputState, inputSnapshot,
                 selectionController.Selection, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
@@ -1294,7 +1303,7 @@ internal sealed class ClientApplication
                 inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.Mode != PlayerActionPanelMode.Closed,
                 buildingPlacementController.IsActive ||
                 (_settings.ShowOnboarding && !smokeTest && !guidanceInteraction.Hidden && inputSnapshot?.Guidance is not null &&
-                    !selectionController.IsDragSelecting && !tacticalTargetingController.IsActive)));
+                    !selectionController.IsDragSelecting && !tacticalTargetingController.IsActive), includeActionDock: false));
 
             if (minimapInteraction.TryTakeMovementRequest(
                     out MovementOrderRequest minimapMovement))
@@ -1394,6 +1403,7 @@ internal sealed class ClientApplication
 
             if (gameplayActive)
             {
+                bool targetingWasActive = tacticalTargetingController.IsActive;
                 tacticalTargetingController.Update(
                     inputState,
                     camera,
@@ -1435,7 +1445,7 @@ internal sealed class ClientApplication
                     displayScale: interactionLayout.Scale);
                 }
 
-                bool placementCaptured = placementWasActive || buildingPlacementController.IsActive;
+                bool placementCaptured = placementWasActive || buildingPlacementController.IsActive || targetingWasActive;
                 if (placementCaptured)
                 {
                     selectionController.Update(inputState, camera, renderWorld, terrainWorld,

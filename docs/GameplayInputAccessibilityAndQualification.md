@@ -16,7 +16,7 @@ Schema 1 migrates to schema 2 with default gameplay mappings and the saved camer
 
 Command cards, mode tabs, controls help, onboarding, placement/production explanations, hover hints, formation and map hints read the session registry. Captions and combined prompts are retained, not formatted during every HUD rebuild. The current UI language is English; the fallback prompt catalog is the shared source for key substitution, without claiming additional language packs. Supported Windows logical-key captions describe the key actually routed by the platform.
 
-Contextual controls now use the same fill and shape policy as dock cards: hover outline, focus rail, pressed underline and disabled double rail. HOVER/FOCUS/PRESS text accompanies shortcut prompts, while disabled and pending controls retain the actual reason. Accepted/partial/rejected feedback continues to use authoritative result text and counts. Escape closing a panel displays CANCELLED - PANEL CLOSED for three seconds and submits no request. Targeting/placement cancellation retains its existing controls and preview clearing; local intent remains separate from accepted execution.
+Contextual controls now use the same fill and shape policy as dock cards: hover outline, focus rail, pressed underline and disabled double rail. HOVER/FOCUS/PRESS text accompanies shortcut prompts, while disabled and pending controls retain the actual reason. Accepted/partial/rejected feedback continues to use authoritative result text and counts. Escape closes the complete transient menu stack before Pause and submits no request. Targeting/placement cancellation retains its existing controls and preview clearing; local intent remains separate from accepted execution.
 
 Short key taps are consumed once. Resize, session replacement, focus loss and modal suppression consume retained edges; held keys must be physically released before a fresh activation. Existing pointer ownership, minimap targeting, selection identity and intelligence masking remain intact.
 
@@ -35,3 +35,37 @@ Run the repo-defined Release Windows window-mode qualification with 1,000 stress
 For manual acceptance, use the same deterministic match, camera/zoom and selected objects in windowed and borderless mode. Capture native screenshots for: normal and remapped controls help; keyboard-only Settings with a camera conflict; focused/hovered/pressed/disabled/pending cards; accepted/partial/rejected and local cancellation messages; operations and strategic-map overlays over bright terrain, dark vegetation and dense markers. Compare 16:9/16:10/ultrawide/4K, .75–2 UI scale, small viewports and long labels. Record screenshot names, build, real viewport/DPI, bindings, terrain and window mode alongside each image. SVG fixture previews do not replace this evidence.
 
 Also exercise save/load/restart, alt-tab/held inputs, moving between monitors, help/pause, tactical/minimap capture and sustained high-load CPU/GPU/upload timings on the target refresh rates. Record failed or unexecuted items explicitly. No automated geometry or startup check alone qualifies these live monitor, terrain, framebuffer or performance acceptance items.
+
+## Nonmodal gameplay menus
+
+`TransientHudMenuController` coordinates the existing dock and Operations before
+controller actions and world input. A world-origin press dismisses every transient
+menu, then the original retained input reaches the existing selection, move,
+placement or targeting owner exactly once. No synthetic event is injected.
+Selection and target intent are not menu state. Right click during placement or
+targeting cancels that intent and is reserved from movement on the same frame.
+
+Dock tabs, actual cards (including disabled cards), paging and footer controls
+own input. Empty card capacity, decorative dock background and gaps do not.
+The visible Operations information panel deliberately owns its entire background
+so its readable content cannot conceal a world command. Status, minimap, alerts,
+selection controls and onboarding retain their independent input owners.
+
+Menu-origin gestures retain ownership through release outside the panel. A brief
+press/release outside cancels before UI activation. An action already activated
+on pointer-down is not replayed or rolled back on release. Closing is logical and
+immediate: animation opacity never adds capture. Escape closes the whole transient
+stack before target cancellation or Pause; true modal/settings/display states keep
+priority. Focus loss, display/layout, selection identity and session transitions
+clear transient ownership and cancel retained gestures. Dock keyboard focus applies
+only over its controls, leaving free-world camera input available.
+
+Later context/ring menus register `ITransientHudMenu` with this coordinator (four
+bounded registration slots). `ContainsControl` reports actual visible input regions,
+including disabled controls, excluding centers, gaps and decorative connectors.
+`Dismiss` must clear the complete nested stack, hover, press, tooltips and focus
+idempotently. Closed or visually fading menus return `IsOpen == false`; their
+activation path still requires a fresh gesture. Registration lasts for one match.
+
+[Executed interaction qualification](NonModalHudQualification.md) records the
+source identity, sequence tests and remaining native/human acceptance.

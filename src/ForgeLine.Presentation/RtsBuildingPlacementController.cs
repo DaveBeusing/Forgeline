@@ -174,6 +174,13 @@ public sealed class RtsBuildingPlacementController
             return;
         }
 
+        if (IsActive && input.TryGetMousePressPosition(PlatformMouseButton.Right, out _))
+        {
+            Cancel(interaction);
+            _leftWasDown = leftDown;
+            return;
+        }
+
         if (_awaitingResult)
         { _leftWasDown = leftDown; return; }
 
