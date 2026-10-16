@@ -8,7 +8,7 @@ FOCUS means a captured locally owned candidate exists. Clicking focuses and sele
 
 OPS indicates no captured spatial candidate. Clicking opens the existing Supply, Power or Blocked operations filter and explains that the target is unavailable. A target that disappeared or cannot be shown receives the same fallback. Operations capture may need the next completed tick; its waiting state remains explicit. Overflow MORE opens Blocked operations. Command-result cards are informational and do not repeat or resubmit commands. Navigation creates no simulation request and does not equate intent with accepted execution.
 
-The optional operations panel covers the left alert area while open, so it owns that space. Help/pause and focus changes consume retained press edges; targeting and placement suppress alert activation. A short click is handled once only when press and release remain on the same shared row. Resize/session transitions discard activation. Existing action/minimap/world pointer priority is preserved. At compact scales the existing stack can retain only the highest-priority row, or collapse; the resource-strip and operations entry remain available. No unrelated outer HUD layout changes are made.
+Operations remains in the left column while the right notification stack stays visible. Pause/focus changes consume retained press edges; targeting and placement suppress alert activation. A short click activates once only when press and release retain the same shared card, action and revision. Resize/session transitions discard activation. Existing action/minimap/world pointer priority is preserved. Compact stacks show fewer cards or a severity-marked MORE summary; resource and Operations entries remain available. General dock width and world-input sequencing retain their existing owners.
 
 ## Strategic layers
 
@@ -22,7 +22,10 @@ Routes use lines with a cross for disabled links. Route capacity is configured t
 
 Alert capture runs at the existing completed-tick cadence (20 Hz for canonical matches), scans owned controllable candidates once and retains at most five records. Source scan cost scales with candidates; no constant-time extraction claim is made. Existing strategic capture and geometry caps are preserved. The added brownout shape adds four lines per retained brownout marker, at most 128 markers in Power or 48 in All. The retained HUD reads copied lists and performs no live ECS query.
 
-`ActionableAlertTests` and `StrategicMapExperienceTests` cover deduplication, resolution/recurrence, session/rollback, destruction, ownership, lifecycle input guards, unavailable destinations, compact geometry, strategic freshness, immutable lists and brownout shape. Existing minimap, display, intelligence and client journeys remain regression gates. `--alert-map-hotpaths artifacts/alert-map-hotpaths.json` measures active-alert full HUD/minimap plus idle alert input at 1/10/100/1000 entities across all seven layers, with 128 warmups and 256 samples. Warm managed allocation must remain zero. CPU/null-graphics timings exclude extraction, world overlay drawing, GPU uploads, waits and Present and do not establish FPS acceptance.
+`ActionableAlertTests` and `StrategicMapExperienceTests` cover deduplication, resolution/recurrence, session/rollback, destruction, ownership, lifecycle input guards, unavailable destinations, compact geometry, strategic freshness, immutable lists and brownout shape. Existing minimap, display, intelligence and client journeys remain regression gates. `--alert-map-hotpaths artifacts/alert-map-hotpaths.json` measures active-alert full HUD/minimap plus idle alert input at 1/10/100/1000 entities across all seven layers and both dock states, with five active conditions, one
+command result and one local navigation result, with 128 warmups and 256 samples. The report includes visible cards, CPU draw/vertex/upload counts. These null
+graphics counts are distinct from native atlas draws. Warm managed allocation
+must remain zero. CPU/null-graphics timings exclude extraction, world overlay drawing, GPU uploads, waits and Present and do not establish FPS acceptance.
 
 Native startup/window qualification checks composition and material bindings. Live alert-to-inspector/operations journeys, save/load interaction, terrain contrast, tiny-scale text, monitor DPI/focus transitions and steady-state GPU performance require separate manual acceptance. Startup smoke does not claim those results.
 
@@ -32,7 +35,16 @@ The HUD information update bounds alert cards and their actual pointer regions. 
 
 ## Graphical alert integration
 
-`ResourcePowerHudRenderer` now uses compiled raised cards, semantic icons and warning/error overlays while retaining severity labels/rails, priority, bounded records and exact FOCUS/OPS/MORE hit regions. Current visible Operations owns the overlapping area. Command feedback remains separate from work completion. Tactical map/cursor/world geometry retains its existing owner. See [production/operations contracts](GraphicalProductionAndOperations.md) and [qualification](GraphicalProductionAndOperationsQualification.md).
+`ResourcePowerHudRenderer` now uses compiled raised cards, semantic icons and warning/error overlays while retaining severity labels/rails, priority, bounded records and exact FOCUS/OPS/MORE hit regions. Notifications sit one shared gap below the visible right action dock. Operations
+remains on the left and does not suppress notifications. Command feedback remains separate from work completion. Tactical map/cursor/world geometry retains its existing owner. Long labels wrap using real font metrics, with two lines, ellipsis and MORE.
+Operations exposes a Notifications entry even when the stack cannot fit a card;
+its bounded detail pages reach the complete current authorized text. A summary-only stack preserves the highest hidden severity with explicit
+CRITICAL/WARNING text and the existing marker. There is no notification history. Empty space and gaps remain world input. A held click
+requires the same full stack revision, lifecycle identity and target generation
+on release. Local command/navigation feedback shares this stack; placement
+guidance retains its placement context. See [stack qualification](NotificationStackQualification.md).
+
+See [production/operations contracts](GraphicalProductionAndOperations.md) and [qualification](GraphicalProductionAndOperationsQualification.md).
 
 ## Graphical tactical integration
 

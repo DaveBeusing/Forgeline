@@ -7,7 +7,7 @@ using ForgeLine.Simulation;
 namespace ForgeLine.Presentation;
 
 public readonly record struct OperationsView(bool Open, OperationsCategory Filter = OperationsCategory.All,
-    int Page = 0, EntityId Selected = default, SimulationSessionId Session = default, bool Suppressed = false);
+    int Page = 0, EntityId Selected = default, SimulationSessionId Session = default, bool Suppressed = false, bool Notifications = false);
 public readonly record struct OperationsInteraction(bool Captured, EntityId Navigate = default,
     PlayerActionPanelMode Controls = PlayerActionPanelMode.Closed);
 
@@ -48,6 +48,7 @@ public static class OperationsLayout
         if (s <= 0) return default;
         return index switch
         {
+            12 => new(p.X + 222 * x, p.Y + 6 * s, 138 * x, 22 * s),
             0 => new(p.X + 366 * x, p.Y + 6 * s, 78 * x, 22 * s),
             1 => new(p.X + 6 * x, p.Y + 120 * s, 210 * x, 22 * s),
             2 => new(p.X + 222 * x, p.Y + 120 * s, 222 * x, 22 * s),
@@ -57,6 +58,28 @@ public static class OperationsLayout
             _ => new(p.X + 222 * x, p.Y + 346 * s, 222 * x, 22 * s)
         };
     }
+    public static float NotificationTextSize(in GameplayHudLayout layout) => 14 * ActionableAlertLayout.Scale(layout);
+    public static HudRect NotificationControl(in GameplayHudLayout layout, int index)
+    {
+        var panel = Panel(layout); float size = NotificationTextSize(layout);
+        float line = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * size;
+        float height = line + 8, half = MathF.Max(0, (panel.Width - 18) / 2);
+        return index switch
+        {
+            0 => new(panel.Right - MathF.Min(90 * ActionableAlertLayout.Scale(layout), panel.Width * .3f) - 6, panel.Y + 4,
+                MathF.Min(90 * ActionableAlertLayout.Scale(layout), panel.Width * .3f), height),
+            1 => new(panel.X + 6, panel.Bottom - height - 6, half, height),
+            2 => new(panel.X + 12 + half, panel.Bottom - height - 6, half, height),
+            _ => new(panel.X + 8, panel.Y + height + 12 + (index - 3) * (line + 4),
+                MathF.Max(0, panel.Width - 16), line + 4)
+        };
+    }
+    public static int NotificationRows(in GameplayHudLayout layout)
+    {
+        var first = NotificationControl(layout, 3); var footer = NotificationControl(layout, 1);
+        return Math.Clamp((int)((footer.Y - 4 - first.Y) / MathF.Max(1, first.Height)), 0, PageSize);
+    }
+
     public static OperationsFacility? Row(OperationsSnapshot snapshot, in OperationsView view, int index)
     {
         int skip = Math.Max(0, view.Page) * PageSize + index;
@@ -90,9 +113,11 @@ public sealed class OperationsController
         View = default; _lastRouteFocus = default;
         CancelInput(input); interaction.SetOperationsOpen(false);
     }
+    public void OpenNotifications(SimulationSessionId session, PresentationInteractionState interaction)
+    { View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
     public void CancelInput(InputState input) => _press = input.MousePressSequence(PlatformMouseButton.Left);
     public OperationsInteraction Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
-        PresentationInteractionState interaction, bool blocked = false)
+        PresentationInteractionState interaction, bool blocked = false, bool inputCaptured = false)
     {
         ulong press = input.MousePressSequence(PlatformMouseButton.Left);
         bool fresh = press != _press; _press = press;
@@ -114,25 +139,34 @@ public sealed class OperationsController
         bool captured = input.HasPointerPosition && (entry.Contains(input.PointerPosition) || View.Open && panel.Contains(input.PointerPosition));
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
         captured |= fresh && originValid && (entry.Contains(origin) || View.Open && panel.Contains(origin));
-        if (transition || !fresh || !input.HasPointerPosition || !originValid || snapshot?.PlayerExperience is null ||
+        if (inputCaptured || transition || !fresh || !input.HasPointerPosition || !originValid || snapshot?.PlayerExperience is null ||
             !snapshot.SessionId.IsSpecified || snapshot.PlayerExperience.Value.IsMatchComplete) return new(captured);
         if (entry.Contains(origin))
         {
             View = new(!View.Open, Session: _session); interaction.SetOperationsOpen(View.Open); return new(true);
         }
         if (!View.Open && snapshot?.PlayerExperience is { } experience && !experience.IsMatchComplete &&
-            (layout.TopStatusBar.Contains(origin) || ActionableAlertLayout.Contains(experience, layout, origin) ||
+            (layout.TopStatusBar.Contains(origin) ||
                 layout.SelectionInspector.Contains(origin) && experience.Selection.HasSingleEntityDetails &&
                 (experience.Selection.HasInventory || experience.Selection.HasSupply || experience.Selection.Work.Kind != PlayerWorkKind.None)))
         {
-            var filter = ActionableAlertLayout.Contains(experience, layout, origin) ? OperationsCategory.Blocked :
-                layout.SelectionInspector.Contains(origin) ? experience.Selection.HasSupply ? OperationsCategory.Supply :
+            var filter = layout.SelectionInspector.Contains(origin) ? experience.Selection.HasSupply ? OperationsCategory.Supply :
                     experience.Selection.Work.Kind != PlayerWorkKind.None ? OperationsCategory.Production : OperationsCategory.Logistics : OperationsCategory.All;
             View = new(true, filter, Session: _session); interaction.SetOperationsOpen(true); return new(true);
         }
         if (!View.Open || !panel.Contains(origin)) return new(captured);
+        if (View.Notifications)
+        {
+            if (OperationsLayout.NotificationControl(layout, 0).Contains(origin))
+            { View = default; interaction.SetOperationsOpen(false); }
+            else if (OperationsLayout.NotificationControl(layout, 1).Contains(origin)) View = View with { Notifications = false, Page = 0 };
+            else if (OperationsLayout.NotificationControl(layout, 2).Contains(origin)) View = View with { Page = View.Page == int.MaxValue ? 0 : View.Page + 1 };
+            return new(true);
+        }
         if (OperationsLayout.Control(layout, 0).Contains(origin))
         { View = default; interaction.SetOperationsOpen(false); return new(true); }
+        if (OperationsLayout.Control(layout, 12).Contains(origin))
+        { View = View with { Notifications = true, Page = 0 }; return new(true); }
         if (OperationsSnapshot.Resolve(snapshot) is not { } data) return new(true);
         for (int index = 1; index <= 11; index++)
         {

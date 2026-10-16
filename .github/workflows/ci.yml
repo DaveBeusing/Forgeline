@@ -89,7 +89,7 @@ jobs:
       - name: Battlefield HUD hierarchy and interaction contracts
         shell: pwsh
         run: |
-          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.HudInformationLayoutTests ForgeLine.Presentation.Tests.GameplayHudVisualQualificationTests ForgeLine.Presentation.Tests.GameplayHudLayoutIntegrationTests ForgeLine.Presentation.Tests.GameplayHudRuntimeTests ForgeLine.Presentation.Tests.ResourcePowerAlertHudTests ForgeLine.Presentation.Tests.SelectionInspectorHudTests ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.GameplayUiFixtureTests ForgeLine.Presentation.Tests.ResponsiveHudLayoutTests ForgeLine.Presentation.Tests.NonModalHudInteractionTests ForgeLine.Presentation.Tests.UiTextBatchTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.HudInformationLayoutTests ForgeLine.Presentation.Tests.GameplayHudVisualQualificationTests ForgeLine.Presentation.Tests.GameplayHudLayoutIntegrationTests ForgeLine.Presentation.Tests.GameplayHudRuntimeTests ForgeLine.Presentation.Tests.ResourcePowerAlertHudTests ForgeLine.Presentation.Tests.SelectionInspectorHudTests ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.NotificationStackTests ForgeLine.Presentation.Tests.GameplayUiFixtureTests ForgeLine.Presentation.Tests.ResponsiveHudLayoutTests ForgeLine.Presentation.Tests.NonModalHudInteractionTests ForgeLine.Presentation.Tests.UiTextBatchTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GameplayInteractionJourneyTests ForgeLine.Client.Tests.GameplayMetricsOverlayTests ForgeLine.Client.Tests.GameplayGuidanceInteractionTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -145,7 +145,7 @@ jobs:
 
       - name: Graphical economy work states and operations privacy contracts
         shell: pwsh
-        run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.EconomicInterfaceSkinTests ForgeLine.Presentation.Tests.OperationsTests ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.HoverTooltipTests
+        run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.EconomicInterfaceSkinTests ForgeLine.Presentation.Tests.OperationsTests ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.NotificationStackTests ForgeLine.Presentation.Tests.HoverTooltipTests
 
       - name: Tactical artwork privacy and native pointer ownership
         shell: pwsh

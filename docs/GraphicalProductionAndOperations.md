@@ -33,7 +33,7 @@ The command dock now renders its existing domain cards from prepared production 
 
 Frames use `ui.skin.directorate.control.button_compact`, `panel.primary`, `panel.raised`, `panel.inset`, `panel.portrait` and `panel.tooltip`, with existing `overlay.*` and `progress.progress_track` / `progress.progress_fill` sprites. No source, definition, atlas or compiled asset is changed. Reference sheets remain reference-only.
 
-The owners record skin, remaining dynamic geometry, then live text. Operations first submits an opaque underlay from its existing upload buffer, then the skin and dynamic rails/text. Alert drawing is withheld only while a current visible Operations panel owns that area. No decorative hit region is added. Shared resources and optional catalog-free bootstrap paths retain their original lifetime rules.
+The owners record skin, remaining dynamic geometry, then live text. Operations first submits an opaque underlay from its existing upload buffer, then the skin and dynamic rails/text. Alert drawing continues in the right stack while Operations owns its separate left panel. No decorative hit region is added. Shared resources and optional catalog-free bootstrap paths retain their original lifetime rules.
 
 Below the track's authored twelve-pixel height, the complete progress sprite is resampled so compressed nine-slice borders do not remove its centre. Filling clips actual width/UVs and never stretches a fraction across the entire track. Normal cards place progress above selection decoration; compact cards retain numeric progress and avoid overlaying cost text.
 
@@ -59,3 +59,14 @@ The composed HUD shares seven atlas pages (28 MiB): one Core, two Icons and four
 `EconomicInterfaceSkinTests` covers work/availability independence, shortages, output/power/inventory blocking, queued versus active units, cancel-only controls, technology completion/identity, missing routes/providers, stale tooltips, current Operations selection, zero warm allocation, native thin/selected progress visibility and opaque ownership. Existing Operations, alert, tooltip, strict bitmap geometry and client tests remain in place. The complete CI job remains required.
 
 See [source-bound qualification, package and remaining gates](GraphicalProductionAndOperationsQualification.md). Automated repeatability does not grant human art, readability, accessibility or physical-monitor acceptance.
+
+## Notification details
+
+The version-3 notification stack consumes the visible right dock bounds. Operations
+and notifications remain simultaneously visible without overlapping. The header's
+Notifications control opens current authorized alert and command text, including
+content hidden by stack overflow. At most six cached lines are retained per detail page at a minimum of 14 physical pixels following dock content scale;
+compact panels reduce visible line count instead of font size.
+Next Message Page cycles all text and Facilities returns to the existing facility
+view. Current snapshots replace resolved/expired facts instead of keeping history.
+See [notification qualification](NotificationStackQualification.md).

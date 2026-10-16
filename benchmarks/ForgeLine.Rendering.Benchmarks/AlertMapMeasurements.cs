@@ -19,6 +19,7 @@ internal static class AlertMapMeasurements
         var results = new List<object>();
         foreach (int count in new[] { 1, 10, 100, 1000 })
             foreach (var mode in Enum.GetValues<StrategicOverlayMode>())
+            foreach (bool expanded in new[] { false, true })
             {
                 var instances = Enumerable.Range(1, count).Select(i => new RenderInstance(new((uint)i, 1),
                     new(new Vector3(i % 32 * 30, 0, i / 32 * 30), Quaternion.Identity, Vector3.One), new(1),
@@ -30,7 +31,9 @@ internal static class AlertMapMeasurements
                     MatchStatus = PlayerMatchStatus.Active,
                     Alerts = (PlayerAlertState)31,
                     CriticalSupplyUnits = count,
-                    BlockedProductionFacilities = count
+                    BlockedProductionFacilities = count,
+                    Feedback = PlayerCommandFeedback.None with { Kind = PlayerCommandFeedbackKind.Construction,
+                        State = PlayerCommandFeedbackState.Rejected, RejectedTargets = count, ResolvedAtTick = new(4) }
                 };
                 var alerts = new AlertLifecycleTracker().Capture(new(1), experience, []);
                 var sensors = Enumerable.Range(1, count).Select(i => new StrategicSensorReadModel(new((uint)i, 1), Vector3.Zero, 10, 20, 5)).ToArray();
@@ -42,13 +45,17 @@ internal static class AlertMapMeasurements
                 var input = new InputState(); var controller = new ActionableAlertController(); var layout = GameplayHudLayout.Create(1600, 900, 96);
                 var view = RtsInformationLayerView.Empty with { OverlayMode = mode };
                 var bounds = new AxisAlignedBounds(Vector3.Zero, new(2048, 100, 2048));
+                var panel = default(PlayerActionPanelView) with { Mode = expanded ? PlayerActionPanelMode.Construction : PlayerActionPanelMode.Closed };
+                var ux = default(PreAlphaUxView) with { InteractionHint = "TARGET UNAVAILABLE - OPEN OPERATIONS" };
                 void Frame()
                 {
-                    controller.Update(input, snapshot, layout);
-                    renderer.Render(graphics, camera, snapshot, bounds, view, default, default, default, CombatGroupOverviewView.Empty, default, 96, 1);
+                    controller.Update(input, snapshot, layout, dockExpanded: expanded, localFeedback: ux.InteractionHint);
+                    renderer.Render(graphics, camera, snapshot, bounds, view, panel, default, default, CombatGroupOverviewView.Empty, ux, 96, 1);
                 }
                 for (int i = 0; i < warmup; i++) Frame();
-                var times = new double[samples]; long before = GC.GetAllocatedBytesForCurrentThread();
+                var times = new double[samples];
+                long uploadBefore = device.UploadedBytes, drawsBefore = graphics.DrawCalls, verticesBefore = graphics.DrawnVertices;
+                long before = GC.GetAllocatedBytesForCurrentThread();
                 for (int i = 0; i < samples; i++) { long started = Stopwatch.GetTimestamp(); Frame(); times[i] = Stopwatch.GetElapsedTime(started).TotalMicroseconds; }
                 long bytes = GC.GetAllocatedBytesForCurrentThread() - before;
                 if (bytes != 0) throw new InvalidOperationException($"Alert/map HUD allocated {bytes} warm bytes for {count} entities/{mode}.");
@@ -56,6 +63,12 @@ internal static class AlertMapMeasurements
                 results.Add(new
                 {
                     Entities = count,
+                    DockExpanded = expanded,
+                    VisibleCards = ActionableAlertLayout.Resolve(snapshot, layout, expanded, ux.InteractionHint).Count,
+                    ActiveNotifications = 7,
+                    DrawsPerFrame = (graphics.DrawCalls - drawsBefore) / (double)samples,
+                    VerticesPerFrame = (graphics.DrawnVertices - verticesBefore) / (double)samples,
+                    UploadBytesPerFrame = (device.UploadedBytes - uploadBefore) / (double)samples,
                     Layer = mode.ToString(),
                     BytesPerSample = bytes / (double)samples,
                     P50Microseconds = times[samples / 2],
@@ -67,6 +80,8 @@ internal static class AlertMapMeasurements
         File.WriteAllText(output, JsonSerializer.Serialize(new
         {
             BuildVersion = typeof(ActionableAlertSnapshot).Assembly.GetName().Version?.ToString(),
+            SourceIdentity = typeof(ActionableAlertSnapshot).Assembly.GetCustomAttributesData()
+                .First(attribute => attribute.AttributeType.Name == "AssemblyInformationalVersionAttribute").ConstructorArguments[0].Value,
             Warmup = warmup,
             Samples = samples,
             TieredCompilation = Environment.GetEnvironmentVariable("DOTNET_TieredCompilation") ?? "Runtime default",

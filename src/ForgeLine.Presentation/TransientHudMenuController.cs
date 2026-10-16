@@ -72,7 +72,7 @@ public sealed class TransientHudMenuController
 
     public void Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
         SelectionSet selection, PlayerActionPanelController dock, OperationsController operations,
-        PresentationInteractionState interaction, bool minimapEnabled, bool guidanceVisible, bool blocked = false)
+        PresentationInteractionState interaction, bool minimapEnabled, bool guidanceVisible, bool blocked = false, string localFeedback = "")
     {
         var session = snapshot?.SessionId ?? default;
         ulong identity = selection.Revision;
@@ -107,7 +107,7 @@ public sealed class TransientHudMenuController
                 bool persistent = HudInteractionContext.BlocksWorldPointer(origin, layout, minimapEnabled,
                     guidanceVisible: guidanceVisible, includeActionDock: false) ||
                     OperationsLayout.Entry(layout).Contains(origin) ||
-                    snapshot?.PlayerExperience is { } experience && ActionableAlertLayout.Contains(experience, layout, origin);
+                    snapshot?.PlayerExperience is not null && ActionableAlertLayout.Resolve(snapshot, layout, dock.Mode != PlayerActionPanelMode.Closed, localFeedback).Contains(origin);
                 _menuOwned[i] = menuOwned;
                 _owned[i] = menuOwned || persistent;
                 LastGesture = new(0, button, origin, input.WasMousePressedWithShift(button),

@@ -16,6 +16,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     private readonly GameplayHudSkin _skin;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);
     private readonly OperationsVertex[] _vertices = new OperationsVertex[MaxVertices];
+    private readonly NotificationDetailText _notificationDetails = new();
     private int _count, _line, _width, _height, _underlay;
     private HudRect _bounds;
     private float _scale;
@@ -61,11 +62,15 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
             {
                 if (_skin.Ready) { Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = 1 }); _underlay = _count; }
                 if (!_skin.Panel(_bounds)) Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = 1 });
+                if (view.Notifications) RenderNotificationDetails(context);
+                else
+                {
                 var header = new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 24 * _scale);
                 if (!_skin.Panel(header, "panel.raised")) Quad(header, GameplayHudVisualStyle.PanelHeader);
                 Quad(new HudRect(_bounds.X, _bounds.Y, 3 * _scale, _bounds.Height), GameplayHudVisualStyle.Focus);
                 Line("OPERATIONS", true);
                 Control(context.Layout, 0, "CLOSE");
+                Control(context.Layout, 12, view.Notifications ? "FACILITIES" : "NOTIFICATIONS");
                 var data = OperationsSnapshot.Resolve(context.Snapshot);
                 if (data is null) Line("WAITING FOR CURRENT OWNED DATA");
                 else
@@ -136,6 +141,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     bool controls = selected.HasValue && selected.Value.Controls != PlayerActionPanelMode.Closed;
                     Control(context.Layout, 10, controls ? "OPEN EXISTING CONTROLS" : "NO FACILITY CONTROLS", enabled: controls);
                 }
+                }
             }
         }
         if (_count == 0 && _skin.Vertices == 0 && _text.VertexCount == 0) return;
@@ -155,6 +161,35 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         _text.Render(context.Graphics);
         LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
     }
+    private void RenderNotificationDetails(in GameplayHudRenderContext context)
+    {
+        LastPanelTextSize = OperationsLayout.NotificationTextSize(context.Layout);
+        _scale = LastPanelTextSize / 14;
+        var panel = _bounds;
+        var close = OperationsLayout.NotificationControl(context.Layout, 0);
+        var title = new HudRect(panel.X + 8, close.Y, MathF.Max(0, close.X - panel.X - 16), close.Height);
+        _text.AddCentered("NOTIFICATIONS", title, LastPanelTextSize, GameplayHudVisualStyle.TextPrimary, _width, _height, true);
+        NotificationControl(context.Layout, 0, "CLOSE");
+        NotificationControl(context.Layout, 1, "FACILITIES");
+        NotificationControl(context.Layout, 2, "NEXT PAGE");
+        var row = OperationsLayout.NotificationControl(context.Layout, 3);
+        int rows = OperationsLayout.NotificationRows(context.Layout);
+        _notificationDetails.Update(context.Snapshot, MathF.Max(1, row.Width), LastPanelTextSize,
+            context.PreAlphaUx.Placement.Visible ? "" : context.PreAlphaUx.InteractionHint, context.Operations.Page, rows);
+        for (int i = 0; i < rows; i++)
+        {
+            row = OperationsLayout.NotificationControl(context.Layout, i + 3);
+            _text.Add(_notificationDetails.Lines[i], row.X, row.Y + 2, LastPanelTextSize,
+                GameplayHudVisualStyle.TextPrimary, _width, _height, row.Width);
+        }
+    }
+    private void NotificationControl(in GameplayHudLayout layout, int index, string label)
+    {
+        var bounds = OperationsLayout.NotificationControl(layout, index);
+        if (!_skin.Control(bounds)) Quad(bounds, GameplayHudVisualStyle.PanelRaised);
+        _text.AddCentered(label, bounds, LastPanelTextSize, GameplayHudVisualStyle.TextPrimary, _width, _height);
+    }
+
     private static void Number(ref OperationsTextBuilder builder, double? value, string format = "0")
     { if (value.HasValue && double.IsFinite(value.Value)) builder.Number(value.Value, format); else builder.Append("N/A"); }
     internal static RtsUiIcon CategoryIcon(OperationsCategory category) => category switch

@@ -63,7 +63,7 @@ public sealed class GameplayHudVisualQualificationTests
     public void StatusAndDockUseTheVersionedRightAlignedContract(int width, int height, uint dpi)
     {
         var layout = GameplayHudLayout.Create(width, height, dpi);
-        Assert.Equal(2, GameplayHudLayout.ContractVersion);
+        Assert.Equal(3, GameplayHudLayout.ContractVersion);
         Assert.Equal(layout.SafeArea.Right, layout.TopStatusBar.Right, 3);
         Assert.Equal(layout.SafeArea.Right, layout.ActionDock.Right, 3);
         Assert.Equal(layout.SafeArea.Y, layout.TopStatusBar.Y);

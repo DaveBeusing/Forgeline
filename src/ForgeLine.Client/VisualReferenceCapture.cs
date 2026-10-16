@@ -225,7 +225,8 @@ internal static class VisualReferenceCapture
                         hover = new(snapshot.SessionId,default,default,new(display.Width * .65f,display.Height * .45f),true,display.Width,display.Height,
                             GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale).Scale,
                             DockMode:panel.Mode,DockControl:2,DockIndex:panel.SelectedIndex);
-                    var operations = uiScenario is UiReferenceScenario.Operations or UiReferenceScenario.OperationsEmpty or UiReferenceScenario.OperationsMissing
+                    var operations = uiScenario == UiReferenceScenario.NotificationDetails
+                        ? new OperationsView(true, Session: snapshot.SessionId, Notifications: true) : uiScenario is UiReferenceScenario.Operations or UiReferenceScenario.OperationsEmpty or UiReferenceScenario.OperationsMissing
                         ? new OperationsView(true,Session:snapshot.SessionId,Selected:snapshot.Operations is { Facilities.Count: > 0 } ops ? ops.Facilities[0].Entity : default) : default;
                     var groups = uiScenario == UiReferenceScenario.GroupSummary ? new CombatGroupOverviewView(
                         [default(CombatGroupSummaryReadModel) with { Slot = 1, Label = "Armoured support", MemberCount = 3,
@@ -392,10 +393,12 @@ internal static class VisualReferenceCapture
                     if (uiScenario != UiReferenceScenario.World && (!text.AtlasReady || text.DroppedGlyphs != 0 || text.MissingGlyphs != 0))
                         throw new InvalidDataException("Named UI state contains incomplete text.");
                     object[] regions = uiScenario == UiReferenceScenario.World ? [] : UiReferenceStates.Regions(rgba, display.Width, display.Height,
-                        frontendView?.Layout, GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale));
+                        frontendView?.Layout, GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen);
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
                         pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fingerprint = fixture.Fingerprint,
-                        ui = new { scenario = uiScenario, fixtureVersion = 1,
+                        ui = new { scenario = uiScenario, fixtureVersion = 2,
+                            notifications = frontend is null ? ActionableAlertLayout.Resolve(snapshot,
+                                GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen) : (NotificationStackLayout?)null,
                             skin = frontend?.SkinDiagnostics, battlefieldSkin = frontend is null ? hud.SkinDiagnostics : (GameplayHudSkinDiagnostics?)null, skinState = frontend?.SkinState, skinnedControls = frontend?.LastSkinnedControlCount, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",
                             interaction = new { panel.Mode, panel.SelectedIndex, panel.HoveredIndex, panel.PointerPressed,
                                 panel.ContextualHoveredIndex, panel.ContextualPressed, panel.ContextualPending, targetingMode = targeting.Mode },

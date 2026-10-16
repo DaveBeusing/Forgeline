@@ -207,8 +207,7 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
             context.Layout,
             context.RuntimeMetrics,
             context.ShowRuntimeMetrics,
-            context.Operations.Open && !context.Operations.Suppressed && context.Operations.Session == context.Snapshot.SessionId &&
-                OperationsLayout.Scale(context.Layout) > 0);
+            dockExpanded: context.ActionPanel.IsOpen, localFeedback: context.PreAlphaUx.Placement.Visible ? "" : context.PreAlphaUx.InteractionHint);
 
     public void RenderWaiting(IGraphicsCommandContext graphics, in GameplayHudLayout layout,
         in RuntimeMetricsView metrics, bool showRuntimeMetrics = false) =>
@@ -278,7 +277,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         PresentationSnapshot? snapshot,
         in GameplayHudLayout layout,
         in RuntimeMetricsView metrics = default,
-        bool showRuntimeMetrics = false, bool hideNotifications = false)
+        bool showRuntimeMetrics = false, bool hideNotifications = false, bool dockExpanded = false, string localFeedback = "")
     {
         ThrowIfDisposed();
         _text.Begin();
@@ -303,9 +302,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 EmitTopStatusBar(experience, layout.TopStatusBar, graphics.Width, graphics.Height);
                 if (!hideNotifications)
                 {
-                    if (ActionableAlertSnapshot.Resolve(snapshot) is { } alerts)
-                        EmitActionableNotifications(experience, alerts, layout, graphics.Width, graphics.Height);
-                    else { _scale = HudInformationLayout.AlertScale(layout); EmitNotificationStack(experience, HudInformationLayout.Alerts(layout), graphics.Width, graphics.Height); _scale = layout.Scale; }
+                    EmitNotificationStack(snapshot, experience, layout, dockExpanded, graphics.Width, graphics.Height, localFeedback);
                 }
             }
             else
@@ -448,422 +445,69 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         _scale = previousScale;
     }
 
-    private void EmitNotificationStack(
-        in PlayerExperienceSnapshot experience,
-        in HudRect region,
-        int width,
-        int height)
+    private void EmitNotificationStack(PresentationSnapshot? snapshot, in PlayerExperienceSnapshot experience,
+        in GameplayHudLayout layout, bool expanded, int width, int height, string localFeedback)
     {
-        if (region.IsEmpty)
+        var alerts = ActionableAlertSnapshot.Resolve(snapshot);
+        var stack = ActionableAlertLayout.Resolve(snapshot, layout, expanded, localFeedback);
+        Span<char> buffer = stackalloc char[2048];
+        Span<char> ellipsis = stackalloc char[2052];
+        _scale = stack.FontSize / 12;
+        for (int i = 0; i < stack.Count; i++)
         {
-            return;
-        }
-
-        float rowHeight =
-            21.0f * _scale;
-        int maximumRows =
-            Math.Max(
-                0,
-                (int)MathF.Floor(
-                    region.Height /
-                    rowHeight));
-
-        if (maximumRows == 0)
-        {
-            return;
-        }
-
-        bool feedbackVisible =
-            ResourcePowerHudModel.IsCommandFeedbackVisible(
-                experience);
-        int totalItems =
-            ResourcePowerHudModel.ResolveNotificationCount(
-                experience);
-
-        if (totalItems == 0)
-        {
-            return;
-        }
-
-        int contentRows =
-            totalItems > maximumRows &&
-            maximumRows > 1
-                ? maximumRows - 1
-                : maximumRows;
-        int emitted = 0;
-        float y =
-            region.Y;
-
-        if (ResourcePowerHudModel.HasAlert(
-                experience.Alerts,
-                PlayerAlertState.CommandCoreDestroyed) &&
-            emitted < contentRows)
-        {
-            EmitAlertCard(
-                PlayerAlertState.CommandCoreDestroyed,
-                "CORE DESTROYED",
-                0,
-                region,
-                y,
-                width,
-                height);
-            emitted++;
-            y += rowHeight;
-        }
-
-        if (ResourcePowerHudModel.HasAlert(
-                experience.Alerts,
-                PlayerAlertState.CommandCoreDamaged) &&
-            emitted < contentRows)
-        {
-            EmitAlertCard(
-                PlayerAlertState.CommandCoreDamaged,
-                "CORE DAMAGED",
-                0,
-                region,
-                y,
-                width,
-                height);
-            emitted++;
-            y += rowHeight;
-        }
-
-        if (ResourcePowerHudModel.HasAlert(
-                experience.Alerts,
-                PlayerAlertState.SupplyCritical) &&
-            emitted < contentRows)
-        {
-            EmitAlertCard(
-                PlayerAlertState.SupplyCritical,
-                "SUPPLY CRITICAL",
-                experience.CriticalSupplyUnits,
-                region,
-                y,
-                width,
-                height);
-            emitted++;
-            y += rowHeight;
-        }
-
-        if (feedbackVisible &&
-            emitted < contentRows)
-        {
-            EmitCommandFeedbackCard(
-                experience.Feedback,
-                region,
-                y,
-                width,
-                height);
-            emitted++;
-            y += rowHeight;
-        }
-
-        if (ResourcePowerHudModel.HasAlert(
-                experience.Alerts,
-                PlayerAlertState.ProductionBlocked) &&
-            emitted < contentRows)
-        {
-            EmitAlertCard(
-                PlayerAlertState.ProductionBlocked,
-                "PRODUCTION BLOCKED",
-                experience.BlockedProductionFacilities,
-                region,
-                y,
-                width,
-                height);
-            emitted++;
-            y += rowHeight;
-        }
-
-        if (ResourcePowerHudModel.HasAlert(
-                experience.Alerts,
-                PlayerAlertState.LowPower) &&
-            emitted < contentRows)
-        {
-            EmitAlertCard(
-                PlayerAlertState.LowPower,
-                "POWER CONSTRAINED",
-                0,
-                region,
-                y,
-                width,
-                height);
-            emitted++;
-            y += rowHeight;
-        }
-
-        int hidden =
-            totalItems -
-            emitted;
-
-        if (hidden > 0 &&
-            emitted < maximumRows)
-        {
-            Span<char> buffer =
-                stackalloc char[32];
-            var text =
-                new HudTextBuilder(
-                    buffer);
-            text.Append("MORE ");
-            text.Append(hidden);
-
-            EmitNotificationCard(
-                RtsUiIcon.StatusAlert,
-                HudAlertSeverity.Information,
-                text.Written,
-                region,
-                y,
-                width,
-                height);
-        }
-    }
-
-    private void EmitActionableNotifications(in PlayerExperienceSnapshot experience, ActionableAlertSnapshot alerts, in GameplayHudLayout layout, int width, int height)
-    {
-        _scale = HudInformationLayout.AlertScale(layout);
-        int maximum = (int)(layout.AlertStack.Height / (21 * _scale));
-        var region = HudInformationLayout.Alerts(layout);
-        for (int row = 0; row < maximum; row++)
-        {
-            var item = ActionableAlertLayout.Item(experience, layout, row);
-            var rect = ActionableAlertLayout.Row(layout, row);
-            if (item.Feedback) EmitCommandFeedbackCard(experience.Feedback, region, rect.Y, width, height);
-            else if (item.Hidden > 0) EmitAlertCard(PlayerAlertState.None, "MORE - OPEN OPS", item.Hidden, region, rect.Y, width, height);
-            else if (item.Kind != PlayerAlertState.None)
-                for (int i = 0; i < alerts.Alerts.Count; i++)
+            var card = stack.Card(i);
+            var item = card.Item;
+            var color = NotificationText.Severity(experience, item);
+            if (!_skin.Panel(card.Bounds, "panel.raised")) EmitQuad(card.Bounds.X, card.Bounds.Y,
+                card.Bounds.Width, card.Bounds.Height, GameplayHudVisualStyle.PanelRaised, width, height);
+            _skin.State(card.Bounds, color == HudAlertSeverity.Critical ? UiSkinState.Error : color == HudAlertSeverity.Warning ? UiSkinState.Warning : UiSkinState.Normal);
+            EmitQuad(card.Bounds.X, card.Bounds.Y, color == HudAlertSeverity.Critical ? 5 : 3,
+                card.Bounds.Height, SeverityColor(color), width, height);
+            if (item.Hidden == 0) EmitIcon(item.Feedback ? CommandIcon(experience.Feedback.Kind) : AlertIcon(item.Kind),
+                card.Bounds.X + 8 * ActionableAlertLayout.Scale(layout), card.Bounds.Y + 4 * ActionableAlertLayout.Scale(layout),
+                stack.FontSize, width, height);
+            var text = NotificationText.Format(experience, alerts, item, buffer, localFeedback);
+            float y = card.Text.Y;
+            float lineHeight = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * stack.FontSize;
+            while (text.Length > 0 && y + stack.FontSize <= card.Text.Bottom)
+            {
+                var line = NotificationText.Line(text, card.Text.Width, stack.FontSize, out int consumed);
+                if (card.Truncated && y + lineHeight + stack.FontSize > card.Text.Bottom)
                 {
-                    var alert = alerts.Alerts[i];
-                    if (alert.Identity.Kind != item.Kind) continue;
-                    int count = item.Kind == PlayerAlertState.SupplyCritical ? experience.CriticalSupplyUnits :
-                        item.Kind == PlayerAlertState.ProductionBlocked ? experience.BlockedProductionFacilities : 0;
-                    EmitAlertCard(item.Kind, alert.Label, count, region, rect.Y, width, height, alert.Target.IsValid ? " FOCUS" : " OPS");
-                    break;
+                    float suffixWidth = UiFontMetrics.Default.Measure("...", stack.FontSize);
+                    int prefix = UiFontMetrics.Default.FitPrefix(line, MathF.Max(0, card.Text.Width - suffixWidth), stack.FontSize, false);
+                    line[..prefix].CopyTo(ellipsis); "...".AsSpan().CopyTo(ellipsis[prefix..]);
+                    line = ellipsis[..(prefix + 3)];
                 }
-        }
-    }
-
-    private void EmitAlertCard(
-        PlayerAlertState alert,
-        string label,
-        int count,
-        in HudRect region,
-        float y,
-        int width,
-        int height, string suffix = "")
-    {
-        Span<char> buffer =
-            stackalloc char[96];
-        var text =
-            new HudTextBuilder(
-                buffer);
-        HudAlertSeverity severity =
-            ResourcePowerHudModel.ResolveAlertSeverity(
-                alert);
-
-        text.Append(
-            SeverityLabel(
-                severity));
-        text.Append(" ");
-        text.Append(label);
-        text.Append(suffix);
-
-        if (count > 0)
-        {
-            text.Append(" ");
-            text.Append(count);
-        }
-
-        EmitNotificationCard(
-            AlertIcon(
-                alert),
-            severity,
-            text.Written,
-            region,
-            y,
-            width,
-            height);
-    }
-
-    private void EmitCommandFeedbackCard(
-        in PlayerCommandFeedback feedback,
-        in HudRect region,
-        float y,
-        int width,
-        int height)
-    {
-        Span<char> buffer =
-            stackalloc char[128];
-        var text =
-            new HudTextBuilder(
-                buffer);
-        HudAlertSeverity severity =
-            feedback.State switch
+                if (!_text.Add(line, card.Text.X, y, stack.FontSize, TextColor, width, height, card.Text.Width))
+                    EmitText(line[..Math.Min(line.Length, (int)(card.Text.Width / (GlyphAdvance * _scale)))],
+                        card.Text.X, y, TextColor, width, height);
+                text = text[consumed..];
+                y += lineHeight;
+            }
+            if (!card.Action.IsEmpty && item.Hidden == 0)
             {
-                PlayerCommandFeedbackState.Accepted =>
-                    HudAlertSeverity.Information,
-                PlayerCommandFeedbackState.Partial =>
-                    HudAlertSeverity.Warning,
-                PlayerCommandFeedbackState.Rejected =>
-                    HudAlertSeverity.Critical,
-                _ =>
-                    HudAlertSeverity.Information
-            };
-
-        text.Append(
-            feedback.State switch
-            {
-                PlayerCommandFeedbackState.Accepted =>
-                    "OK",
-                PlayerCommandFeedbackState.Partial =>
-                    "PART",
-                PlayerCommandFeedbackState.Rejected =>
-                    "FAIL",
-                _ =>
-                    "INFO"
-            });
-        text.Append(" ");
-        text.Append(
-            CommandLabel(
-                feedback.Kind));
-
-        if (feedback.AcceptedTargets > 0 ||
-            feedback.RejectedTargets > 0)
-        {
-            text.Append(" ");
-            text.Append(
-                feedback.AcceptedTargets);
-            text.Append("/");
-            text.Append(
-                feedback.RejectedTargets);
+                string label = item.Feedback || item.Local ? "MORE" : "OPS";
+                if (alerts is not null)
+                    for (int a = 0; a < alerts.Alerts.Count; a++)
+                        if (alerts.Alerts[a].Identity.Kind == item.Kind && alerts.Alerts[a].Target.IsValid) label = "FOCUS";
+                EmitNotificationAction(label, card.Action, stack.FontSize, width, height);
+            }
+            if (card.Truncated && !card.Details.IsEmpty)
+            { EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height); }
         }
-
-        string failure =
-            ResolveFailureLabel(
-                feedback);
-
-        if (failure.Length > 0)
-        {
-            text.Append(" ");
-            text.Append(
-                failure);
-        }
-
-        EmitNotificationCard(
-            CommandIcon(
-                feedback.Kind),
-            severity,
-            text.Written,
-            region,
-            y,
-            width,
-            height);
+        _scale = layout.Scale;
     }
 
-    private void EmitNotificationCard(
-        RtsUiIcon icon,
-        HudAlertSeverity severity,
-        ReadOnlySpan<char> text,
-        in HudRect region,
-        float y,
-        int width,
-        int height)
+    private void EmitNotificationAction(string label, in HudRect bounds, float fontSize, int width, int height)
     {
-        float cardHeight =
-            18.0f * _scale;
-        float markerWidth =
-            severity == HudAlertSeverity.Critical
-                ? 5.0f * _scale
-                : 3.0f * _scale;
-        Vector4 severityColor =
-            SeverityColor(
-                severity);
-
-        var card = new HudRect(region.X, y, region.Width, cardHeight);
-        if (!_skin.Panel(card, "panel.raised")) EmitQuad(
-            region.X,
-            y,
-            region.Width,
-            cardHeight,
-            GameplayHudVisualStyle.PanelRaised,
-            width,
-            height);
-        _skin.State(card, severity == HudAlertSeverity.Critical ? UiSkinState.Error :
-            severity == HudAlertSeverity.Warning ? UiSkinState.Warning : UiSkinState.Normal);
-        EmitQuad(
-            region.X,
-            y,
-            markerWidth,
-            cardHeight,
-            severityColor,
-            width,
-            height);
-
-        if (severity ==
-                HudAlertSeverity.Critical &&
-            markerWidth >=
-                4.0f * _scale)
+        if (!_skin.Control(bounds)) EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
+            GameplayHudVisualStyle.PanelRaised, width, height);
+        if (!_text.AddCentered(label, bounds, fontSize, TextColor, width, height))
         {
-            EmitQuad(
-                region.X +
-                    markerWidth +
-                    2.0f * _scale,
-                y +
-                    3.0f * _scale,
-                2.0f * _scale,
-                cardHeight -
-                    6.0f * _scale,
-                severityColor,
-                width,
-                height);
+            int count = Math.Min(label.Length, Math.Max(0, (int)(bounds.Width / (GlyphAdvance * _scale))));
+            EmitText(label.AsSpan(0, count), bounds.X, bounds.Y, TextColor, width, height);
         }
-
-        float iconSize =
-            11.0f * _scale;
-        float iconX =
-            region.X +
-            12.0f * _scale;
-
-        EmitIcon(
-            icon,
-            iconX,
-            y +
-                (cardHeight - iconSize) *
-                0.5f,
-            iconSize,
-            width,
-            height);
-
-        float textX =
-            region.X +
-            30.0f * _scale;
-        float maximumTextWidth =
-            MathF.Max(
-                0.0f,
-                region.Right -
-                textX -
-                4.0f * _scale);
-        if (_text.Add(text, textX, y + 4f * _scale, 12f * _scale, TextColor,
-            width, height, maximumTextWidth)) return;
-        int maximumCharacters =
-            Math.Max(
-                0,
-                (int)MathF.Floor(
-                    maximumTextWidth /
-                    (GlyphAdvance * _scale)));
-        ReadOnlySpan<char> visible =
-            text[
-                ..Math.Min(
-                    text.Length,
-                    maximumCharacters)];
-
-        EmitText(
-            visible,
-            textX,
-            y +
-                4.0f * _scale,
-            severityColor,
-            width,
-            height);
     }
 
     private static Vector4 SeverityColor(
@@ -920,7 +564,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 RtsUiIcon.StatusAlert
         };
 
-    private static string CommandLabel(
+    internal static string CommandLabel(
         PlayerCommandFeedbackKind kind) =>
         kind switch
         {
@@ -958,7 +602,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 "INFO"
         };
 
-    private static string ResolveFailureLabel(
+    internal static string ResolveFailureLabel(
         in PlayerCommandFeedback feedback)
     {
         if (feedback.PlacementFailure !=

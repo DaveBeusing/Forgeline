@@ -1,0 +1,1055 @@
+{
+  "productSource": "3b5c545e4396c56a40f8ac54cb82fa285370e4da",
+  "renderingSource": "7a421bef309118dea32726dcd292321975b76a75",
+  "archive": "records.zip",
+  "archiveBytes": 1459134,
+  "archiveSha256": "70f5a61ffd666c85f3129b47823a24a416f85caed6e108e2c4c515d135df1803",
+  "records": [
+    {
+      "file": "artifacts/notifications-asset-pipeline.log",
+      "bytes": 129,
+      "sha256": "9efd5a7012c78abaa41d9090c238b5ff7752e086426e72b213513664f6654a39"
+    },
+    {
+      "file": "artifacts/notifications-assets.log",
+      "bytes": 7846510,
+      "sha256": "3473d0bfa6ef4459697aba3431461ea78a373c01e66af1e5484fa59d23a3b75f"
+    },
+    {
+      "file": "artifacts/notifications-audit.py",
+      "bytes": 4175,
+      "sha256": "516065e5f1eca24967764adc7e81d9167142fd816ab1955b0becda9ccba4a30d"
+    },
+    {
+      "file": "artifacts/notifications-balance-telemetry.json",
+      "bytes": 45185,
+      "sha256": "7129450bb023116ea5cd5bfaef92054a2dc20d2e0bb96736c0bb64a7cc5b927f"
+    },
+    {
+      "file": "artifacts/notifications-build-v2.log",
+      "bytes": 5283,
+      "sha256": "e35eecff6c8bd7fd62c97fa862822e4c23b8e6266f2ad178bcd6ff0b5863fbe0"
+    },
+    {
+      "file": "artifacts/notifications-build-v3.log",
+      "bytes": 5283,
+      "sha256": "ddcdf013b05d0f095408e731c0485696154cef0896471ee6c9a2ef82a5f459e2"
+    },
+    {
+      "file": "artifacts/notifications-build-v4.log",
+      "bytes": 5164,
+      "sha256": "516fae659b18654fbad56ff173a4c36db581310526b06b3344d1c3cf225cf716"
+    },
+    {
+      "file": "artifacts/notifications-build-v5.log",
+      "bytes": 5283,
+      "sha256": "1b046be956a3fad8a6d1a6f171405d2cc6bd0e123467fd02f24e3f7577c0eb51"
+    },
+    {
+      "file": "artifacts/notifications-build-v6.log",
+      "bytes": 5283,
+      "sha256": "53c2aad47b85857bb12699d6e09f90d9fd676ba0797cd6d79ffa7a945aba962d"
+    },
+    {
+      "file": "artifacts/notifications-build-v7.log",
+      "bytes": 5283,
+      "sha256": "af65d532d0e4bab5f950b562f05f632398f0f6f498c7fbb01ee95f1b6543ff47"
+    },
+    {
+      "file": "artifacts/notifications-build-v8.log",
+      "bytes": 5283,
+      "sha256": "5d4d94f3e608ccf628744ecaa7971ad97c2c5efa79783a4f34c42bd18325a654"
+    },
+    {
+      "file": "artifacts/notifications-client-completion.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-client-completion.log",
+      "bytes": 418,
+      "sha256": "267a966a1a96374e2c4124ff97d1eef2f36e30a9d10973c4cacc3c8235bb9753"
+    },
+    {
+      "file": "artifacts/notifications-client-current.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-client-current.log",
+      "bytes": 418,
+      "sha256": "f030ef68f62a58f007ac1f86267542655b89ac91f09e6feeb7066673fd983ec9"
+    },
+    {
+      "file": "artifacts/notifications-client-summary-final.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-client-summary-final.log",
+      "bytes": 418,
+      "sha256": "07d7459330d400f3323f214705a68d17815d6f5fea41d098fc9f5dd6eeaef08c"
+    },
+    {
+      "file": "artifacts/notifications-client-v2.log",
+      "bytes": 418,
+      "sha256": "e792268be0b305b8076183d172f65c7dd785d16fc01b3c6a5b7f84408e4d71ee"
+    },
+    {
+      "file": "artifacts/notifications-client.log",
+      "bytes": 12249,
+      "sha256": "44f7b8af0969a72dc68e72dabd8c59c387b8e0f82d2da33c1f76fd47b4118d3e"
+    },
+    {
+      "file": "artifacts/notifications-complete-suite-final.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-complete-suite-final.log",
+      "bytes": 9175,
+      "sha256": "bc1d09a3b51a387ab3399fc46f81a08f3d9c2e0b0838b949bb850b582d972ad2"
+    },
+    {
+      "file": "artifacts/notifications-complete-suite.log",
+      "bytes": 16014,
+      "sha256": "852a0b883e3b4df540ac66034a774b781e39db1538c298dae2b8e7a7e404438e"
+    },
+    {
+      "file": "artifacts/notifications-completion-audit.json",
+      "bytes": 3917,
+      "sha256": "45cd7aaa1a0737564f863a7b9ad4316f3ad64fffe97e926db2be2f3cbd3c878b"
+    },
+    {
+      "file": "artifacts/notifications-completion-audit.log",
+      "bytes": 157,
+      "sha256": "b3feb8c228ca89595afbc33a776d80fc57daceeeefa62dcb6dc103375cb19300"
+    },
+    {
+      "file": "artifacts/notifications-completion-audit.py",
+      "bytes": 4165,
+      "sha256": "08578924fb127b531957b4a184a4d639a31bd66d8d7538f614fac2421152b9e5"
+    },
+    {
+      "file": "artifacts/notifications-completion-client-build.log",
+      "bytes": 2412,
+      "sha256": "c2028039ddb6985d72eeafbf201f3a696dcc53faf69a30f31448db16d4a32299"
+    },
+    {
+      "file": "artifacts/notifications-completion-compact-max/comparison.json",
+      "bytes": 1017,
+      "sha256": "5dae0d50ae97b66efff3db9c599a3d13ba79d1aa26d4dab7316d56d929ef66ff"
+    },
+    {
+      "file": "artifacts/notifications-completion-compact-max/manifest.json",
+      "bytes": 194960,
+      "sha256": "c0e75f6e3e8e02e9ee11d13a5a3c710ae8ccb6f96f53c3c7045c3409a8b86ba1"
+    },
+    {
+      "file": "artifacts/notifications-completion-compact-max.log",
+      "bytes": 68,
+      "sha256": "ec79445ad855ad3d2ecb0b14b7f287771fdc7557d5c3c14feb4ee190c16a91a3"
+    },
+    {
+      "file": "artifacts/notifications-completion-compact-max.request.json",
+      "bytes": 1284,
+      "sha256": "c607dc7ebe67da04fd8028d7a6556219eaa1791e1b81b3bea7b26a655932c6d6"
+    },
+    {
+      "file": "artifacts/notifications-completion-day/comparison.json",
+      "bytes": 1009,
+      "sha256": "1420530e4804d112a4c53ed8b00651b370c60991bae88e67f173db58b96ba6c5"
+    },
+    {
+      "file": "artifacts/notifications-completion-day/manifest.json",
+      "bytes": 196480,
+      "sha256": "4a97ed13118cb3b8735bbd65253cad29317ad49f15e9b896ee524c2dbd620b8f"
+    },
+    {
+      "file": "artifacts/notifications-completion-day.log",
+      "bytes": 68,
+      "sha256": "ec79445ad855ad3d2ecb0b14b7f287771fdc7557d5c3c14feb4ee190c16a91a3"
+    },
+    {
+      "file": "artifacts/notifications-completion-day.request.json",
+      "bytes": 1276,
+      "sha256": "2d9c114e742c2e6c53ace7238e903b3d6555c25c0c0eb56a3a7180e77ca1bfba"
+    },
+    {
+      "file": "artifacts/notifications-completion-large/comparison.json",
+      "bytes": 1012,
+      "sha256": "53805b681047ef5186873617cb5be20db6dbc1ed06aa132a663f14fffeb3670e"
+    },
+    {
+      "file": "artifacts/notifications-completion-large/manifest.json",
+      "bytes": 196643,
+      "sha256": "1b13e83802261db6e7e47c311ad74a9ce8c2170cd8c3ab80f660bc58940aa7c2"
+    },
+    {
+      "file": "artifacts/notifications-completion-large.log",
+      "bytes": 68,
+      "sha256": "ec79445ad855ad3d2ecb0b14b7f287771fdc7557d5c3c14feb4ee190c16a91a3"
+    },
+    {
+      "file": "artifacts/notifications-completion-large.request.json",
+      "bytes": 1279,
+      "sha256": "51df33b326889b0180ad3407b6c93e2d1721769df8bad8c8475ce3f5c447f7eb"
+    },
+    {
+      "file": "artifacts/notifications-completion-presentation-build.log",
+      "bytes": 2212,
+      "sha256": "2552f7bad7cb9f86927676b4f38c997426658e3027affea17f8838a4433a08d0"
+    },
+    {
+      "file": "artifacts/notifications-completion-release-build.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-completion-release-build.log",
+      "bytes": 5283,
+      "sha256": "c9e206d4662a93d795c1520619cae6832a2e9598c0ad48a53a78f9f4dd95583d"
+    },
+    {
+      "file": "artifacts/notifications-current-audit.json",
+      "bytes": 3908,
+      "sha256": "e3a8abed5914295b7bfe713891989f4494fcfaeee441ea9220e4246e01f2efdc"
+    },
+    {
+      "file": "artifacts/notifications-current-audit.log",
+      "bytes": 157,
+      "sha256": "5858d393af981b332c6e737bce68f4d04826942d434754479d16a9afef6ccbf3"
+    },
+    {
+      "file": "artifacts/notifications-current-audit.py",
+      "bytes": 4145,
+      "sha256": "b5f7a6aeb91c69b21fff03e7f033450b0b4c9941ea1e1fbbc5c781b3d5f2967b"
+    },
+    {
+      "file": "artifacts/notifications-current-benchmark-build.log",
+      "bytes": 2441,
+      "sha256": "bdf51749a755914eab5f987af12a1f932a71f270b5f7d4e80483a12340c79a2f"
+    },
+    {
+      "file": "artifacts/notifications-current-day/comparison.json",
+      "bytes": 1008,
+      "sha256": "7c1aee8a8e626b0f4bbba4c45b22ab0ee48476c1868015c24a25c03bcd51e7b0"
+    },
+    {
+      "file": "artifacts/notifications-current-day/manifest.json",
+      "bytes": 196502,
+      "sha256": "b25a7bfbce44d2d3965a569aa29927bce87958c0da294978bd0de1b8a1cec857"
+    },
+    {
+      "file": "artifacts/notifications-current-day.log",
+      "bytes": 688,
+      "sha256": "6b22594e4041b6c3f9a318993515f25c1ec1a123c07ad606d0f1bfcc921ea3fd"
+    },
+    {
+      "file": "artifacts/notifications-current-day.request.json",
+      "bytes": 1273,
+      "sha256": "6eaa527ddc61418ae2cc3fac62eeb52530584211bbdb61a7ef41daa636828cfd"
+    },
+    {
+      "file": "artifacts/notifications-current-large/comparison.json",
+      "bytes": 1498,
+      "sha256": "5190f900c76282c67691f5419969f98489d2f027857e72a6f37dcde960064879"
+    },
+    {
+      "file": "artifacts/notifications-current-large/manifest.json",
+      "bytes": 391279,
+      "sha256": "fd43fd5fef3c8cd71b96780298454fb0d4b7a6551ed7300cb15699cf55f050e0"
+    },
+    {
+      "file": "artifacts/notifications-current-large.log",
+      "bytes": 801,
+      "sha256": "aee1e27c74e62a40674b22ceb8bf63ffa08bff1df035036c0cb2710a475cb2b2"
+    },
+    {
+      "file": "artifacts/notifications-current-large.request.json",
+      "bytes": 1306,
+      "sha256": "43b5ca5413ca8ac41ffcd39dda5e6b97e8d1d1f9d4cf113f6784c1f45a6bd5c5"
+    },
+    {
+      "file": "artifacts/notifications-details-build.log",
+      "bytes": 5283,
+      "sha256": "690f5fa9c47299fb973c3df08c37d9d9ba8f9d92c24c1e82cb86197145bb9f2e"
+    },
+    {
+      "file": "artifacts/notifications-details-final-build.log",
+      "bytes": 5283,
+      "sha256": "b7dfa8a6de4c1689c647f97ed51974e4ea642c74a6af6d6b615075e78318c33a"
+    },
+    {
+      "file": "artifacts/notifications-details-final-tests.log",
+      "bytes": 442,
+      "sha256": "0d64aa473c7eed3a7f82b782f1c19fee866edd9b441f11d0f4a9a593af23ef9e"
+    },
+    {
+      "file": "artifacts/notifications-details-tests.log",
+      "bytes": 442,
+      "sha256": "8c0c6d8b845a2322dd529577551a140e23d7561fade1ccc83d6b211a3c7564a3"
+    },
+    {
+      "file": "artifacts/notifications-final-compact/comparison.json",
+      "bytes": 1979,
+      "sha256": "f9b912af4666c5448a099984212c9e8053efcf9e4f9d97a5074706af5546f68a"
+    },
+    {
+      "file": "artifacts/notifications-final-compact/manifest.json",
+      "bytes": 585665,
+      "sha256": "63bd421a5c730aca7f4fea3d96bb28a3e022e07beca3c390535db92eab07dfc7"
+    },
+    {
+      "file": "artifacts/notifications-final-compact-max/comparison.json",
+      "bytes": 1994,
+      "sha256": "6ea38922e733a0052bef237d4e12ea826010ae8c07ae7ee7087a6d0583cc72dc"
+    },
+    {
+      "file": "artifacts/notifications-final-compact-max/manifest.json",
+      "bytes": 584598,
+      "sha256": "a20499eb0149b4cc18940fef2a1ac0577f89e67a5938a5efd9a09fc1e1b38350"
+    },
+    {
+      "file": "artifacts/notifications-final-compact-max.log",
+      "bytes": 621,
+      "sha256": "438ffc53cc12d76ae6a2ff67a838c215a09980a6d764b7d707415999d82b327a"
+    },
+    {
+      "file": "artifacts/notifications-final-compact-max.request.json",
+      "bytes": 1340,
+      "sha256": "fe7dbb8dcddaf98b666afa63e5179ebebe0faa2b5f669ebfec297a3093e05221"
+    },
+    {
+      "file": "artifacts/notifications-final-compact.log",
+      "bytes": 618,
+      "sha256": "39161750d434944feb006f7fa22b664b18fbcf6525125c79c652a775f969ef1b"
+    },
+    {
+      "file": "artifacts/notifications-final-compact.request.json",
+      "bytes": 1336,
+      "sha256": "f201e9d0880f94eaf921db621130103450fba061fbdf6198ab828ddd1d52685f"
+    },
+    {
+      "file": "artifacts/notifications-final-dark/comparison.json",
+      "bytes": 1500,
+      "sha256": "65523d52fa2e4f07e9e00dee09350a8a6362c57553dccfe4993ed41c069adf8e"
+    },
+    {
+      "file": "artifacts/notifications-final-dark/manifest.json",
+      "bytes": 391283,
+      "sha256": "35e274057de3c7f5265e986758cdaae6b5233ebc3fda96822e002169f53b634b"
+    },
+    {
+      "file": "artifacts/notifications-final-dark.log",
+      "bytes": 802,
+      "sha256": "dbfe9c01b0048e31a5f3b3a2d91857d17f0f04b400bbf6cca5814d3584b28833"
+    },
+    {
+      "file": "artifacts/notifications-final-dark.request.json",
+      "bytes": 1305,
+      "sha256": "f786fe25adfdc1a469a4bfcfe41fc5c2e298bc2cb4acb4c8c8687205fcbcd5b5"
+    },
+    {
+      "file": "artifacts/notifications-final-day/comparison.json",
+      "bytes": 2493,
+      "sha256": "9c8708ef4e2117a0678e0016b65c172785ac145951514605d1c93cabbd2268a9"
+    },
+    {
+      "file": "artifacts/notifications-final-day/manifest.json",
+      "bytes": 780553,
+      "sha256": "2d5356c7e1f932c4a4193bb7102fe3c8a8046a3335c13c5c7091f72cf1e694f5"
+    },
+    {
+      "file": "artifacts/notifications-final-day.log",
+      "bytes": 1015,
+      "sha256": "ea4a5d5102cdfb3867cfb511e1936757e03f6a35785eed0196adfe9fccd7e71b"
+    },
+    {
+      "file": "artifacts/notifications-final-day.request.json",
+      "bytes": 1355,
+      "sha256": "265690e674048382eb8f8d54948ba00c7ae5888e651006138cf12bbda888ac87"
+    },
+    {
+      "file": "artifacts/notifications-final-focused.log",
+      "bytes": 438,
+      "sha256": "eba2703d1b5c32309c1a7a4593a546b5d25efec24a70f18352a39b72ca46c784"
+    },
+    {
+      "file": "artifacts/notifications-final-large/comparison.json",
+      "bytes": 1983,
+      "sha256": "9f0fa684f6d7925bcfcb0204cfe2842f4b7da6a8aef021012835944f792847fd"
+    },
+    {
+      "file": "artifacts/notifications-final-large/manifest.json",
+      "bytes": 586489,
+      "sha256": "345b4d099198469d14949bd137af3b4bad7bf14d76fdb2f84f418889046a258d"
+    },
+    {
+      "file": "artifacts/notifications-final-large.log",
+      "bytes": 914,
+      "sha256": "1d3077816b1531679d352e6c8ca466e936f2f4283980e8502b54719998adf584"
+    },
+    {
+      "file": "artifacts/notifications-final-large.request.json",
+      "bytes": 1335,
+      "sha256": "8bd8bd039fb81661898223ad049bc971adc3fa34ee9642d519f3a70804306db5"
+    },
+    {
+      "file": "artifacts/notifications-final-source-build.log",
+      "bytes": 158303,
+      "sha256": "30d907d82cac2190398bc2350bf35db04f4e99763293cf7acc7bf0c9fdff6270"
+    },
+    {
+      "file": "artifacts/notifications-focused-v1.log",
+      "bytes": 442,
+      "sha256": "9a034fc440f46433b2f4186973bf00dff5f9b1751e85a27c6d264decaa4d1ef0"
+    },
+    {
+      "file": "artifacts/notifications-focused-v3.log",
+      "bytes": 440,
+      "sha256": "13b46b7f39faceda393a4f5cfd6e9c4d1c80d2da8a7b0335ee0ba0844839e391"
+    },
+    {
+      "file": "artifacts/notifications-gates.json",
+      "bytes": 1018,
+      "sha256": "2c9dae3832d3fd0e9610f8114badf0c675a9905ad4184cd9d2e008c30c0e4da4"
+    },
+    {
+      "file": "artifacts/notifications-headless-smoke.json",
+      "bytes": 1432,
+      "sha256": "c6f35ea8ecd6735baa6afe01e5840f2e24cba588d23aff720541b892ade9056b"
+    },
+    {
+      "file": "artifacts/notifications-headless-smoke.log",
+      "bytes": 240,
+      "sha256": "1b3aadc2c75c3e584684b2908af8790d90a99b0368490ee3b26443273a2619fb"
+    },
+    {
+      "file": "artifacts/notifications-headless-stress.json",
+      "bytes": 1436,
+      "sha256": "2455157ef9b4af3d60f7accbedf889753032a2ad6959e184d95f7ccd004f8301"
+    },
+    {
+      "file": "artifacts/notifications-headless-stress.log",
+      "bytes": 241,
+      "sha256": "0e2b032d03d8c11390427d70f1383c933b18ecc56a91e2012c6b70b0ab04b25b"
+    },
+    {
+      "file": "artifacts/notifications-hosted-final-ci-excerpt.txt",
+      "bytes": 517,
+      "sha256": "5b69131bd63853c57f227e059d1defd986420574274565ff5f9b366c891ea261"
+    },
+    {
+      "file": "artifacts/notifications-hosted-initial-ci.txt",
+      "bytes": 828,
+      "sha256": "d7f13800cd4548d805e04b9885938b973c6edb680bb0d29edb4e216cb0bde284"
+    },
+    {
+      "file": "artifacts/notifications-hosted-source-checks.json",
+      "bytes": 21364,
+      "sha256": "b99da93c55830b0eb5d7607bcccf9d349376289dafad8de487097e117b28f00f"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-completion.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-completion.json",
+      "bytes": 21306,
+      "sha256": "61ed0642aa2b2d54164c2f9138f589a259339c67a68be14901f98051fc239671"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-completion.log",
+      "bytes": 68,
+      "sha256": "d010ccc5bbd79ec9544307b36fe7fa1bc2aed1beb47d427e4bdb01c463224aba"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-current.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-current.json",
+      "bytes": 21324,
+      "sha256": "7135498bafd757bfa85ff99016701e73acf0943e6e656a59db3e4ba02d9d6eee"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-current.log",
+      "bytes": 68,
+      "sha256": "d010ccc5bbd79ec9544307b36fe7fa1bc2aed1beb47d427e4bdb01c463224aba"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-final.json",
+      "bytes": 21344,
+      "sha256": "31041db45d7a719007d3fc28373c8226303b63e198c30052a0650c3c6fc50a59"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-final.log",
+      "bytes": 68,
+      "sha256": "d010ccc5bbd79ec9544307b36fe7fa1bc2aed1beb47d427e4bdb01c463224aba"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-qualified.json",
+      "bytes": 21304,
+      "sha256": "b7da6bcf3559ea09be5b97131c61e8dc0b737c4811d82a1bc893deefaf148df0"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-qualified.log",
+      "bytes": 68,
+      "sha256": "d010ccc5bbd79ec9544307b36fe7fa1bc2aed1beb47d427e4bdb01c463224aba"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-release.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-release.json",
+      "bytes": 21326,
+      "sha256": "537bb7ee565ea95adf61095f98c3121c5cb5b530325c298cbe54e73dcdd408a4"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths-release.log",
+      "bytes": 68,
+      "sha256": "d010ccc5bbd79ec9544307b36fe7fa1bc2aed1beb47d427e4bdb01c463224aba"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths.json",
+      "bytes": 21235,
+      "sha256": "551585ba546b6fda75de14e125d3586345b57bdc7b5b59efb7226098645760bd"
+    },
+    {
+      "file": "artifacts/notifications-hotpaths.log",
+      "bytes": 68,
+      "sha256": "d010ccc5bbd79ec9544307b36fe7fa1bc2aed1beb47d427e4bdb01c463224aba"
+    },
+    {
+      "file": "artifacts/notifications-initial-build.log",
+      "bytes": 5008,
+      "sha256": "e2b7414b69c405e09495f9e80f8a01605cefcb118b13b411d1bf1b040359bb4a"
+    },
+    {
+      "file": "artifacts/notifications-input-build.log",
+      "bytes": 2212,
+      "sha256": "cf04e3093a082b2097f892ed2e36d259ba64658eaf1e3b6076b3c386f3c6d4dc"
+    },
+    {
+      "file": "artifacts/notifications-input-client-build.log",
+      "bytes": 2412,
+      "sha256": "b968de6d22f56b53a66566dc3d74631ac7fa4f6b1d839414cb8bb12d791a240d"
+    },
+    {
+      "file": "artifacts/notifications-input-tests.log",
+      "bytes": 442,
+      "sha256": "29c21e34d1ec50469dcb782b2ee9df4287cd373d425c23ec4d7081c712bd3d7b"
+    },
+    {
+      "file": "artifacts/notifications-map-qualification.json",
+      "bytes": 402,
+      "sha256": "cd90ad2dace857bacc1a44da8ebc18869e89153c5c49f2fd1a2f8ddb39abbda2"
+    },
+    {
+      "file": "artifacts/notifications-map.log",
+      "bytes": 211,
+      "sha256": "48a9b338dcbef0a833b541692648ca7324c35ac7746170b0bd8a30b1df98f75c"
+    },
+    {
+      "file": "artifacts/notifications-matrix-release.log",
+      "bytes": 276,
+      "sha256": "4f421e7759d783e339cc5c69709f18054fec7f59381e5f8f8513e45588b15e4c"
+    },
+    {
+      "file": "artifacts/notifications-matrix.log",
+      "bytes": 276,
+      "sha256": "4f421e7759d783e339cc5c69709f18054fec7f59381e5f8f8513e45588b15e4c"
+    },
+    {
+      "file": "artifacts/notifications-native-audit.json",
+      "bytes": 18277,
+      "sha256": "ffeaa933c29dbf6511b9c00392240d028df07e5f8673b5f6c607104edfb7e485"
+    },
+    {
+      "file": "artifacts/notifications-native-audit.log",
+      "bytes": 158,
+      "sha256": "1b12e46e552125c018ac5f53073acff6ed4edb689f9c320d1444424b1a5ee11b"
+    },
+    {
+      "file": "artifacts/notifications-native-compact/comparison.json",
+      "bytes": 1988,
+      "sha256": "91500b621e639919f5f148bebf90a53878902f00f2612f697cbdf7cc74cd6c11"
+    },
+    {
+      "file": "artifacts/notifications-native-compact/manifest.json",
+      "bytes": 581443,
+      "sha256": "7377975c08af875e7edfe029bb4ec3347c0e865417cda30a4f386639b0f7da30"
+    },
+    {
+      "file": "artifacts/notifications-native-compact-max/comparison.json",
+      "bytes": 1998,
+      "sha256": "080311ae00f0958d6466cec0fbdf7ae0297c4da73e31ca7223247c9a58636364"
+    },
+    {
+      "file": "artifacts/notifications-native-compact-max/manifest.json",
+      "bytes": 585622,
+      "sha256": "7f637df22d79814e25030ddf6b0286939d6dfc265443f2dea13f9df2c87db88e"
+    },
+    {
+      "file": "artifacts/notifications-native-compact-max.log",
+      "bytes": 621,
+      "sha256": "438ffc53cc12d76ae6a2ff67a838c215a09980a6d764b7d707415999d82b327a"
+    },
+    {
+      "file": "artifacts/notifications-native-compact-max.request.json",
+      "bytes": 1341,
+      "sha256": "cdb6eebfffa123394c825bf2b22e58a5b9392db5365eed3ed64e78150e5e3a5c"
+    },
+    {
+      "file": "artifacts/notifications-native-compact.log",
+      "bytes": 618,
+      "sha256": "39161750d434944feb006f7fa22b664b18fbcf6525125c79c652a775f969ef1b"
+    },
+    {
+      "file": "artifacts/notifications-native-compact.request.json",
+      "bytes": 1337,
+      "sha256": "5d6a1743ed74ed6a6927f147242102a02fefbe05649685787d8e84d45990b4b5"
+    },
+    {
+      "file": "artifacts/notifications-native-dark/comparison.json",
+      "bytes": 1509,
+      "sha256": "ae9b12a81a37aac437df9cbb69582fe88cebf03857406c05a0cebad9a50c9903"
+    },
+    {
+      "file": "artifacts/notifications-native-dark/manifest.json",
+      "bytes": 390517,
+      "sha256": "4b7d082e22f6e8c165b4307774fd613b8efa154ec323523a3989bf7cc503adb4"
+    },
+    {
+      "file": "artifacts/notifications-native-dark.log",
+      "bytes": 802,
+      "sha256": "dbfe9c01b0048e31a5f3b3a2d91857d17f0f04b400bbf6cca5814d3584b28833"
+    },
+    {
+      "file": "artifacts/notifications-native-dark.request.json",
+      "bytes": 1306,
+      "sha256": "d4573241718737c938467feac292480d69fe5dfc6f60c2188c3d2b5c9b7478e5"
+    },
+    {
+      "file": "artifacts/notifications-native-day-v2/comparison.json",
+      "bytes": 2468,
+      "sha256": "2230b6af9f1bf8fae3e4021f05a66c4ff1e9b7fb6d23b8e1ce6bcbc75b305223"
+    },
+    {
+      "file": "artifacts/notifications-native-day-v2/manifest.json",
+      "bytes": 780672,
+      "sha256": "ba1418aa102e8d9dd6d748f1b9d41502b9d4e7e47f64a74d0ca16ece403752ab"
+    },
+    {
+      "file": "artifacts/notifications-native-day-v2.log",
+      "bytes": 1015,
+      "sha256": "ea4a5d5102cdfb3867cfb511e1936757e03f6a35785eed0196adfe9fccd7e71b"
+    },
+    {
+      "file": "artifacts/notifications-native-day-v2.request.json",
+      "bytes": 1359,
+      "sha256": "5cad470d3af80d5be8746e0f3dbba958eae0a9e11de69f1ab680123228212ffe"
+    },
+    {
+      "file": "artifacts/notifications-native-day.log",
+      "bytes": 478,
+      "sha256": "64ca5202e94cc9a59ca0f569a812c52d31ba6c21678bcc28a55b63916141e1a7"
+    },
+    {
+      "file": "artifacts/notifications-native-day.request.json",
+      "bytes": 1332,
+      "sha256": "82276c16543ad4919702bd4f8346ef37c4ef6cf766761ee6798ee5ed27263b78"
+    },
+    {
+      "file": "artifacts/notifications-native-large/comparison.json",
+      "bytes": 1987,
+      "sha256": "6a1b108ad753b7701a0e30abfe6d727cdaacab168db65dfec6ed871133e39678"
+    },
+    {
+      "file": "artifacts/notifications-native-large/manifest.json",
+      "bytes": 586396,
+      "sha256": "70fa5c2a0cffc06fad378ffc69dcd9e2fbd4d977d1b73ec4645382d0bf0263bc"
+    },
+    {
+      "file": "artifacts/notifications-native-large.log",
+      "bytes": 914,
+      "sha256": "1d3077816b1531679d352e6c8ca466e936f2f4283980e8502b54719998adf584"
+    },
+    {
+      "file": "artifacts/notifications-native-large.request.json",
+      "bytes": 1336,
+      "sha256": "e805148e6bae9311da58af69e777461b9476a64941efe028fcc85f8f54f308ad"
+    },
+    {
+      "file": "artifacts/notifications-normal-startup.json",
+      "bytes": 10647,
+      "sha256": "a4d5420b8d523352f9e56120560095d413d645f35c54e5a15ef6928a2771a4cd"
+    },
+    {
+      "file": "artifacts/notifications-normal.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "artifacts/notifications-normal.stdout.log",
+      "bytes": 3127,
+      "sha256": "1e8fa10f19c473654e3aca0b0b418410661eccf4d15d54961f2eafabce099c0a"
+    },
+    {
+      "file": "artifacts/notifications-package/asset-compilation.jsonl",
+      "bytes": 1170,
+      "sha256": "8ab92bb08e8de72888c90ad8c2016219e17b8bae0566628536812d214fbad5ea"
+    },
+    {
+      "file": "artifacts/notifications-package/asset-qualification.json",
+      "bytes": 2016,
+      "sha256": "42bab0fcb623528bfca88096ea553dcd81827f699c50800abbbf870b6533a804"
+    },
+    {
+      "file": "artifacts/notifications-package/FORGELINE-0.1.385-dev-win-x64.zip.provenance.json",
+      "bytes": 729,
+      "sha256": "a9162e6afa17af0207437f61f5cc5d793b6aeb7dfa280b0236a973878cb8b95e"
+    },
+    {
+      "file": "artifacts/notifications-package/FORGELINE-0.1.385-dev-win-x64.zip.sha256",
+      "bytes": 101,
+      "sha256": "0d3ec6c319edf103f4b1a970d67c9f7ee52ada2c3ab3073ea70ea3108f8b20d4"
+    },
+    {
+      "file": "artifacts/notifications-package-startup.json",
+      "bytes": 10664,
+      "sha256": "3fe8a072ca0b491c7a95c1b9a4827c6eb348f4af6918b97dc1268b3db6b7119d"
+    },
+    {
+      "file": "artifacts/notifications-package.log",
+      "bytes": 3202,
+      "sha256": "fd4ff19ea52083101438d957964a6a6c0c2338989eea2d90316230b4eeebe1f9"
+    },
+    {
+      "file": "artifacts/notifications-package.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "artifacts/notifications-package.stdout.log",
+      "bytes": 3163,
+      "sha256": "8a198c61cb0a2709299d33cce1c804136d2aa22ee35b6487fda84cd7fe27b560"
+    },
+    {
+      "file": "artifacts/notifications-presentation-completion.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-presentation-completion.log",
+      "bytes": 2926,
+      "sha256": "4e2c982aab30e7e3c02af2658b4448e38c5cf1035d8e0b02f379a08c1c2686e4"
+    },
+    {
+      "file": "artifacts/notifications-presentation-current.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-presentation-current.log",
+      "bytes": 2926,
+      "sha256": "0cc6d8936f1ed4e1326849d6ff886b5827ed4566bbb914a18dcc26c49aa52c21"
+    },
+    {
+      "file": "artifacts/notifications-presentation-summary-final.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-presentation-summary-final.log",
+      "bytes": 2926,
+      "sha256": "00ca46c69bd7e26f3ca4d358b93eab9625a37ed4ae04d882f4fd724ab938fbba"
+    },
+    {
+      "file": "artifacts/notifications-presentation-v2.log",
+      "bytes": 2926,
+      "sha256": "707b5e4f8b15ff1c8eb704858ba3119206feb50a4b40570f25700d3970599376"
+    },
+    {
+      "file": "artifacts/notifications-presentation.log",
+      "bytes": 221561,
+      "sha256": "98ab00ee15a2f262c77aa078797c2342045cdd06426109677d7d629ec1680c30"
+    },
+    {
+      "file": "artifacts/notifications-qualified-audit.json",
+      "bytes": 18339,
+      "sha256": "2291ea35191c227d9d781e449c7bdc7b6fe2e6dfd9360ab16872cb52a12b2aa2"
+    },
+    {
+      "file": "artifacts/notifications-qualified-audit.log",
+      "bytes": 158,
+      "sha256": "c6c8531b767599a0db3694964f312b61693dac8c1aad7b524386e12039ee33c1"
+    },
+    {
+      "file": "artifacts/notifications-qualified-audit.py",
+      "bytes": 4182,
+      "sha256": "c86ccfe5fe26537c2c218b43cdfcfe4c6337d9087a1ca541b56e046968ba677e"
+    },
+    {
+      "file": "artifacts/notifications-qualified-build.log",
+      "bytes": 5283,
+      "sha256": "73833d26904804103830587cd74c9929dc38cbc96ad28a4c0ef5fb331f91325f"
+    },
+    {
+      "file": "artifacts/notifications-qualified-compact/comparison.json",
+      "bytes": 1984,
+      "sha256": "9d1b2e97ac1138b8cd1443a69a5604c15bf58e5f16e436755b7f5e342eff5299"
+    },
+    {
+      "file": "artifacts/notifications-qualified-compact/manifest.json",
+      "bytes": 585275,
+      "sha256": "57d6cd6f196dd437adec2b4b67d19fc3ca7a62f7d17683bac17d4fe72000ff8c"
+    },
+    {
+      "file": "artifacts/notifications-qualified-compact-max/comparison.json",
+      "bytes": 1987,
+      "sha256": "1d1f78584465c368bc5d268baed2430a7513bf39cb133916eb647e69d642a98d"
+    },
+    {
+      "file": "artifacts/notifications-qualified-compact-max/manifest.json",
+      "bytes": 585785,
+      "sha256": "766fb17e37dcb648f04c58b9fab3e5d892cecc0454fcc82a2984871cde885a4d"
+    },
+    {
+      "file": "artifacts/notifications-qualified-compact-max.log",
+      "bytes": 621,
+      "sha256": "438ffc53cc12d76ae6a2ff67a838c215a09980a6d764b7d707415999d82b327a"
+    },
+    {
+      "file": "artifacts/notifications-qualified-compact-max.request.json",
+      "bytes": 1344,
+      "sha256": "a11c37cfe8694e760c9f593825382f83b9b55e235e9af651b5f5aff670e8c783"
+    },
+    {
+      "file": "artifacts/notifications-qualified-compact.log",
+      "bytes": 618,
+      "sha256": "39161750d434944feb006f7fa22b664b18fbcf6525125c79c652a775f969ef1b"
+    },
+    {
+      "file": "artifacts/notifications-qualified-compact.request.json",
+      "bytes": 1340,
+      "sha256": "b8ae9a73b4aeec0f2d42104df3fc1da05250c4eb2771ecec85b166d30f66137d"
+    },
+    {
+      "file": "artifacts/notifications-qualified-dark/comparison.json",
+      "bytes": 1514,
+      "sha256": "195163e2242b94c7dadbcb3dbf7d5396fea131b27b060f471558b9f6e05c16f1"
+    },
+    {
+      "file": "artifacts/notifications-qualified-dark/manifest.json",
+      "bytes": 391238,
+      "sha256": "721179e7c55643fb183f81165fa308c3d25af22a2d687d41259a4dc28ef0c8eb"
+    },
+    {
+      "file": "artifacts/notifications-qualified-dark.log",
+      "bytes": 802,
+      "sha256": "dbfe9c01b0048e31a5f3b3a2d91857d17f0f04b400bbf6cca5814d3584b28833"
+    },
+    {
+      "file": "artifacts/notifications-qualified-dark.request.json",
+      "bytes": 1309,
+      "sha256": "24094b0d1c74b3b7407edde71cb4ee6fa88ccbbf4619dc56e96e786eb3055288"
+    },
+    {
+      "file": "artifacts/notifications-qualified-day/comparison.json",
+      "bytes": 2487,
+      "sha256": "4621e4320b53909dbc7ed0f943a155e84133c90f277c0c56d86ec6636728aa5c"
+    },
+    {
+      "file": "artifacts/notifications-qualified-day/manifest.json",
+      "bytes": 780469,
+      "sha256": "dc27c096c5e6afad5ed53eae398ab37654f100584353c63b95603568933b87c4"
+    },
+    {
+      "file": "artifacts/notifications-qualified-day.log",
+      "bytes": 1015,
+      "sha256": "ea4a5d5102cdfb3867cfb511e1936757e03f6a35785eed0196adfe9fccd7e71b"
+    },
+    {
+      "file": "artifacts/notifications-qualified-day.request.json",
+      "bytes": 1359,
+      "sha256": "e5b6e3bd6c95bb85c2b80ae4efb8aea17330304ebb2e5a17a706d80bc21c110b"
+    },
+    {
+      "file": "artifacts/notifications-qualified-large/comparison.json",
+      "bytes": 1983,
+      "sha256": "c15b7d3bc0052ad006db4cdf309e20fa83b812e803ba6edb9313a4b3f1e5775c"
+    },
+    {
+      "file": "artifacts/notifications-qualified-large/manifest.json",
+      "bytes": 586585,
+      "sha256": "6feceefde16ab9af6ac54b2baa7a793115777d828115ab1767f800831fb0768e"
+    },
+    {
+      "file": "artifacts/notifications-qualified-large.log",
+      "bytes": 914,
+      "sha256": "1d3077816b1531679d352e6c8ca466e936f2f4283980e8502b54719998adf584"
+    },
+    {
+      "file": "artifacts/notifications-qualified-large.request.json",
+      "bytes": 1339,
+      "sha256": "55fcf05d3ef9200b5670332af657a43ffa58d009960d592ca1b21d7dde0a1124"
+    },
+    {
+      "file": "artifacts/notifications-qualified-package/asset-compilation.jsonl",
+      "bytes": 1178,
+      "sha256": "245e853c346382753ee11b440096192673435b30e65bee5c622d1c8771ac35d0"
+    },
+    {
+      "file": "artifacts/notifications-qualified-package/asset-qualification.json",
+      "bytes": 2016,
+      "sha256": "c3a8b4c9d7c378afe6909309921374bd9715918f37ae928ff4aaf553beb14736"
+    },
+    {
+      "file": "artifacts/notifications-qualified-package/FORGELINE-0.1.385-dev-win-x64.zip.provenance.json",
+      "bytes": 729,
+      "sha256": "d50924fc6202e1b5569d12201de8faf6a417da8e5a18229148f68fd30faaadb4"
+    },
+    {
+      "file": "artifacts/notifications-qualified-package/FORGELINE-0.1.385-dev-win-x64.zip.sha256",
+      "bytes": 101,
+      "sha256": "f5cbd6fd521dcd68b9995d3b5e710d155b8c984d65858e25e6459d025daa40d4"
+    },
+    {
+      "file": "artifacts/notifications-qualified-package-smoke.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-qualified-package.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-qualified-package.log",
+      "bytes": 3443,
+      "sha256": "67e52136c861b6c66544cd64173a14fbe84c6d47b43f5ede79c837ab29ca6434"
+    },
+    {
+      "file": "artifacts/notifications-qualified-package.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "artifacts/notifications-qualified-package.stdout.log",
+      "bytes": 3175,
+      "sha256": "dbb21ff45c36a367b363f06b5618828b194bb706d674107a05124b4636ebd6a5"
+    },
+    {
+      "file": "artifacts/notifications-qualified-startup.json",
+      "bytes": 10679,
+      "sha256": "1f682f0f57005a457d3714271d1b346abb9e50445a1de72fd76fa433300af050"
+    },
+    {
+      "file": "artifacts/notifications-references.log",
+      "bytes": 95,
+      "sha256": "2834442048167a3e16fb8d8bbd76b13cba766a16c33cb9fba23983ca5ce9f040"
+    },
+    {
+      "file": "artifacts/notifications-release-build-final.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "file": "artifacts/notifications-release-build-final.log",
+      "bytes": 5283,
+      "sha256": "9ec5fc9834b0585235958d5ad995f47d9b5757531ba66267b8cd5a06a19e8331"
+    },
+    {
+      "file": "artifacts/notifications-restore.log",
+      "bytes": 126,
+      "sha256": "b6e86dbe3d5ac9198a3e82ee1ca6a9e04022afabf87593d31b1d6012309749e8"
+    },
+    {
+      "file": "artifacts/notifications-scale-build.log",
+      "bytes": 5283,
+      "sha256": "d4ff4b1e9db531e61c9097b31f2a1cf2c0f2450aa920c24a0cdf80b7f5a887cf"
+    },
+    {
+      "file": "artifacts/notifications-scale-qualified-build.log",
+      "bytes": 5283,
+      "sha256": "aedf24563b32206c930253e81a3a1b95beb18cbcd9fd4d517769d912559a0059"
+    },
+    {
+      "file": "artifacts/notifications-scale-tests.log",
+      "bytes": 440,
+      "sha256": "3f9f92ffb673b4f159987598395d1096564796a68ca1a4dca28f89c10f2c1cae"
+    },
+    {
+      "file": "artifacts/notifications-semver-completion.log",
+      "bytes": 60,
+      "sha256": "bdf46fbe701a74b35869473dda8032cc9b8ebe2b3154141d485d2649035242e3"
+    },
+    {
+      "file": "artifacts/notifications-semver-final.log",
+      "bytes": 60,
+      "sha256": "bdf46fbe701a74b35869473dda8032cc9b8ebe2b3154141d485d2649035242e3"
+    },
+    {
+      "file": "artifacts/notifications-semver-qualified.log",
+      "bytes": 60,
+      "sha256": "bdf46fbe701a74b35869473dda8032cc9b8ebe2b3154141d485d2649035242e3"
+    },
+    {
+      "file": "artifacts/notifications-semver-release.log",
+      "bytes": 60,
+      "sha256": "bdf46fbe701a74b35869473dda8032cc9b8ebe2b3154141d485d2649035242e3"
+    },
+    {
+      "file": "artifacts/notifications-semver.log",
+      "bytes": 60,
+      "sha256": "bdf46fbe701a74b35869473dda8032cc9b8ebe2b3154141d485d2649035242e3"
+    },
+    {
+      "file": "artifacts/notifications-source-build.log",
+      "bytes": 5283,
+      "sha256": "43d7b3d037e37d293505bf573d2f176097a3fdc1a03c6eeb1b00bf02bbec4735"
+    },
+    {
+      "file": "artifacts/notifications-summary-build.log",
+      "bytes": 2212,
+      "sha256": "2ca508bc0fd62c21f823c70800ea0eabf3fa49e715ea20987c84a88bbe0059b8"
+    },
+    {
+      "file": "artifacts/notifications-summary-client-build.log",
+      "bytes": 2412,
+      "sha256": "17e08faf449ee8fdd368a8c0be2893e36d11d093f1cc83ac2125f04b448e16fb"
+    },
+    {
+      "file": "artifacts/notifications-summary-presentation-build.log",
+      "bytes": 2212,
+      "sha256": "3ee17ae7352fe1bd366f6b5bbe3f5d0d240e04bb4b16175d0da7fd354edd45db"
+    },
+    {
+      "file": "artifacts/notifications-summary-tests.log",
+      "bytes": 440,
+      "sha256": "cbc0105e834a87201c2f0cb4af4597e578edd1d90c901514d773f024e162cd3e"
+    },
+    {
+      "file": "artifacts/notifications-terminal-match.json",
+      "bytes": 5181,
+      "sha256": "f8a0139bc3afe6a996525e9c2f2503ecf07505f9fad560c05e9120040a77f0ff"
+    },
+    {
+      "file": "artifacts/notifications-terminal-match.log",
+      "bytes": 232044,
+      "sha256": "c689d2ce59183d14772256d99fe74d582305fc2237219bd77cdc31b6502f70e3"
+    },
+    {
+      "file": "artifacts/notifications-terminal-match.progression-1.json",
+      "bytes": 3667159,
+      "sha256": "0763b5f35127d3b8de92939fa453c66e12056c96b6fdfc205c7924d0544097e4"
+    }
+  ],
+  "note": "Original diagnostic bytes, including superseded/failing attempts. Only the qualification ledger identifies final source-bound results. Original PNGs remain at audited absolute paths; three originals are also checked in alongside this archive."
+}

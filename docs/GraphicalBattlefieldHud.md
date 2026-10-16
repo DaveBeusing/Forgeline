@@ -54,8 +54,8 @@ looking up entities or private gameplay data. Work continues to use the copied
 
 Shared hit regions follow the revised responsive geometry. Command submission,
 readiness/work authority and input confirmation retain their existing behavior.
-Production/operations card contents and alerts stay
-with their existing owners for the production interface migration. Minimap,
+Production/operations cards and alerts retain their existing domain owners;
+notifications consume the shared right-dock geometry. Minimap,
 cursor, world markers and dynamic tactical geometry are outside this migration.
 Normal HUD surfaces do not draw or reserve FPS/SIM/TPS counters. Detailed
 statistics remain available through Shift+F1, independently of resource rendering.
@@ -63,7 +63,7 @@ Telemetry collection and emergency bitmap/text diagnostics retain their owners.
 
 ## Shared responsive layout
 
-`GameplayHudLayout.ContractVersion` is 2. `TopStatusBar.Right`,
+`GameplayHudLayout.ContractVersion` is 3. `TopStatusBar.Right`,
 `ActionDock.Right` and `NotificationBounds(expanded).Right` equal `SafeArea.Right`.
 The resource strip is at most twice the common dock width and leaves a separate
 left column. The dock begins one `Gap` below the strip. Gap is a physical-pixel
@@ -72,8 +72,11 @@ value capped at 16; DPI and user scaling are resolved once by `Create`.
 `ActionDock` is the bounded expanded capacity. `VisibleActionDock(expanded)` is
 the actual expanded or collapsed region; input uses the same collapsed geometry.
 `NotificationBounds(expanded)` begins one gap below that visible region and is
-clamped above the minimap. The notification renderer retains its current left
-stack in this revision; its next migration must consume these published bounds.
+clamped above the minimap. The notification renderer consumes those bounds through
+`ActionableAlertLayout.Resolve`. Up to three cards and a compact MORE row fit within
+a 224-pixel design-height cap; constrained clients display fewer cards. Text stays
+at least 14 physical pixels. Shared card geometry supplies drawing and input.
+See [notification stack qualification](NotificationStackQualification.md).
 `OnboardingBounds` reserves the top-left corner and is consumed by guidance;
 collapsible guidance behavior remains with its existing controller.
 

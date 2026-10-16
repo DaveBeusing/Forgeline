@@ -16,7 +16,8 @@ internal enum UiReferenceScenario
     DockRejected, MinimapStrategic, Onboarding, SettingsAudio, SettingsGraphics, Controls,
     SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed,
     SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary, ResourceUnknown, SelectedGroup,
-    Operations, OperationsEmpty, OperationsMissing, ProductionQueue, LogisticsBlocked, SupplyPolicy, TechnologyBlocked, DockQueueTooltip, DockTechnologyTooltip
+    Operations, OperationsEmpty, OperationsMissing, ProductionQueue, LogisticsBlocked, SupplyPolicy, TechnologyBlocked, DockQueueTooltip, DockTechnologyTooltip,
+    NotificationsCollapsed, NotificationsExpanded, NotificationDetails
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -188,6 +189,22 @@ internal static class UiReferenceStates
                     operations: state == UiReferenceScenario.OperationsMissing ? null : new(data.Session,data.Tick,data.Player,[],data.Resources,[],0,0));
             panel = default;
         }
+        if (state is UiReferenceScenario.NotificationsCollapsed or UiReferenceScenario.NotificationsExpanded or UiReferenceScenario.NotificationDetails)
+        {
+            snapshot = BattlefieldHudCapture.State(snapshot, "Production");
+            var experience = snapshot.PlayerExperience!.Value with
+            { Alerts = (PlayerAlertState)31, Feedback = PlayerCommandFeedback.None with
+                { Kind = PlayerCommandFeedbackKind.Construction, State = PlayerCommandFeedbackState.Rejected,
+                    RejectedTargets = 1, ResolvedAtTick = snapshot.Tick } };
+            var captured = new AlertLifecycleTracker().Capture(snapshot.SessionId, experience, []);
+            var alerts = captured.Alerts.Select((alert, index) => index == 2 ? alert with
+                { Label = "SUPPLY CRITICAL / Main Battle Tank formation: ammunition unavailable at the assigned depot. Restore the existing supply route before the next engagement." } : alert).ToArray();
+            snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
+                snapshot.Intelligence, snapshot.SessionId, experience, playerActions: snapshot.PlayerActions,
+                vfxMetrics: snapshot.VfxMetrics, operations: snapshot.Operations,
+                alerts: new(snapshot.SessionId, snapshot.Tick, experience.Player, alerts));
+            if (state != UiReferenceScenario.NotificationsExpanded) panel = default;
+        }
         return (snapshot, panel);
     }
 
@@ -195,7 +212,7 @@ internal static class UiReferenceStates
         new(s.Tick, s.TickDuration, s.SimulationEntityCount, s.Instances, s.Intelligence, s.SessionId, experience,
             playerActions: s.PlayerActions, vfxMetrics: s.VfxMetrics, alerts: s.Alerts, operations: s.Operations);
 
-    internal static object[] Regions(byte[] rgba, int width, int height, FrontendGeometry? frontend, GameplayHudLayout hud)
+    internal static object[] Regions(byte[] rgba, int width, int height, FrontendGeometry? frontend, GameplayHudLayout hud, bool expanded = false)
     {
         var regions = new List<(string Name, float X, float Y, float Width, float Height)>();
         if (frontend is { } f)
@@ -207,7 +224,7 @@ internal static class UiReferenceStates
         else
         {
             Add("resources", hud.TopStatusBar); Add("selection", hud.SelectionInspector);
-            Add("action-dock", hud.ActionDock); Add("alerts", hud.AlertStack); Add("minimap", hud.Minimap);
+            Add("action-dock", hud.VisibleActionDock(expanded)); Add("alerts", hud.NotificationBounds(expanded)); Add("minimap", hud.Minimap);
             void Add(string name, HudRect r) => regions.Add((name, r.X, r.Y, r.Width, r.Height));
         }
         return regions.Select(r =>

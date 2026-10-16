@@ -32,7 +32,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GameplayRebindingTests ForgeLine.Presentation.Tests.GameplayUiFixtureTests ForgeLine.Presentation.Tests.ResponsiveHudLayoutTests ForgeLine.Presentation.Tests.UiTextBatchTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.StrategicMapExperienceTests
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.NotificationStackTests ForgeLine.Presentation.Tests.StrategicMapExperienceTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.OperationsTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
