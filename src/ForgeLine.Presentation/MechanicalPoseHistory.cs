@@ -18,6 +18,9 @@ internal sealed class MechanicalPoseHistory
 
     public void Begin(SimulationSessionId session, ulong tick, double tickSeconds)
     {
+        // UI-only refreshes can extract the same completed tick again. Keep
+        // its already captured phase instead of treating it as a discontinuity.
+        if (_initialized && session == _session && tick == _tick) return;
         bool contiguous = _initialized && session == _session && tick == _tick + 1;
         (_previous, _current) = (_current, _previous);
         _current.Clear();
@@ -32,6 +35,9 @@ internal sealed class MechanicalPoseHistory
     public MechanicalPose Capture(EntityId entity, Vector3 position, Quaternion rotation,
         bool active, bool shot, float elevation, bool openDoor)
     {
+        // A completed tick owns one cosmetic pose per full entity identity.
+        // In particular, a second extraction must not lose a one-shot recoil.
+        if (_current.TryGetValue(entity, out Entry captured)) return captured.Pose;
         if (_current.Count >= Capacity) return default;
         bool found = _previous.TryGetValue(entity, out Entry previous);
         MechanicalPose pose = found ? previous.Pose : new MechanicalPose(true, 0, 0, _seconds, -1, elevation, 0);
