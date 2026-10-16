@@ -12,6 +12,10 @@ The reviewed baseline is `4641a3114b57421a04ce9da449e9a95b41168d6d` on `master`.
 
 `LocalPathSearch` retains the insertion cost with each priority-queue entry. Entries superseded by a cheaper route are skipped before expansion. Equal estimated costs use remaining heuristic distance and stable cell identity as explicit tie-breakers. Current-cell traversal cost is evaluated once per expanded node instead of once for each relaxed neighbor.
 
+`LocalPathFrontier` reuses exclusively leased queue storage. The process-wide pool retains at most eight queues; queues whose peak active entry count exceeds 16,384 are discarded rather than retained. Rent/return use atomic ownership transfer, never share an active queue, and do not allocate pool nodes. All search exit paths return through `finally`. Cleared entries contain only value data, not world, entity or path references. Search dictionaries and returned routes remain independently owned.
+
+This bounded reuse addresses the increased transient queue allocation observed with richer priority entries. It trades bounded retained capacity for lower warmed-query allocation. Cold starts, more than eight concurrent searches and oversized queues may still allocate. Measure both retained memory and per-query allocation; this is not a zero-allocation pathfinder.
+
 Diagonal corner guards, slope costs and the bounded corridor policy are preserved. These changes do not introduce continuous any-angle path smoothing or a full-map fallback.
 
 ### Cached regional routes and work accounting
@@ -24,7 +28,7 @@ Local expanded-node diagnostics now include work spent on an unsuccessful narrow
 
 Ground movement shortens a proposed step when that segment would pass through the local arrival region. It does not snap sideways, bypass collision checks, increase speed or change the stop-radius definition. Terrain and obstacle validation precede arrival acceptance.
 
-Mobile and static candidate queries are independent of optional steering weights. Static candidates cover both look-ahead and maximum tick travel. A swept circle against static bounds clips a step at the first contact, including rounded corner caps and a small contact skin. Existing penetration recovery remains explicit. Neighbor buffers are reused; a further static query occurs only when penetration correction expands the travel envelope.
+Mobile and static candidate queries are independent of optional steering weights. Static candidates cover both look-ahead and maximum tick travel. A swept circle against static bounds clips a step at the first contact, including rounded corner caps and a small contact skin. Non-penetrating corner tangency does not block parallel travel. Existing penetration recovery remains explicit. Neighbor buffers are reused; a further static query occurs only when penetration correction expands the travel envelope.
 
 This is swept **static** collision, not a guarantee against fast opposing mobile units or every multi-unit penetration configuration. Movement continues to use preceding-tick spatial occupancy.
 
@@ -41,12 +45,13 @@ History remains capacity-bounded and is pruned at new tick boundaries. Generatio
 | Local route cost and obstacle safety | Independent Dijkstra comparison on open, sloped and obstructed single-sector fixtures; both side cells checked for diagonal steps |
 | Stable search results | Cold/warm and concurrent searches agree on cells, waypoints and expansion count |
 | Bounded simple-route work | An open 16-cell diagonal expands 16 local nodes |
+| Search workspace isolation | Concurrent success/failure searches across different worlds and targets cannot inherit queue entries |
 | Arrival precision | Small and zero-radius targets with high incoming speed at 10/20/60 Hz; off-axis near misses remain active |
 | Static safety | Thin walls with steering disabled, blocked targets, tangential travel, rounded corner clearance and initial-overlap recovery |
 | Mobile endpoint separation | Disabling repulsion steering does not disable candidate penetration correction |
 | Visual continuity | Repeat extraction/capture, next-tick progression, hidden reappearance, entity generation reuse, tick gaps and signed interpolated wheel distance |
 
-The fixtures are in `LocalNavigationQualityTests`, `GroundMovementPrecisionTests`, `GroundMovementContactTests` and `MechanicalMotionQualityTests`. Existing movement, formation, navigation handoff and rendering tests remain part of qualification.
+The fixtures are in `LocalNavigationQualityTests`, `NavigationWorkspaceIsolationTests`, `GroundMovementPrecisionTests`, `GroundMovementContactTests` and `MechanicalMotionQualityTests`. Existing movement, formation, navigation handoff and rendering tests remain part of qualification.
 
 ## Reproduction
 
