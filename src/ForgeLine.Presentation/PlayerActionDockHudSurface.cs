@@ -278,11 +278,12 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 selected ? GameplayHudVisualStyle.PanelSelected : CardColor, width, height);
             if (selected) EmitQuad(rect.X, rect.Bottom - 3 * _scale, rect.Width, 3 * _scale,
                 GameplayHudVisualStyle.Focus, width, height);
-            var text = new HudTextBuilder(buffer);
-            text.Append(PlayerActionDockHudModel.ResolveModeShortcut(mode, bindings)); text.Append(" ");
-            text.Append(PlayerActionDockHudModel.ResolveModeLabel(mode));
-            DockText(text.Written, rect.X + 4 * _scale, rect.Y + 8 * _scale,
-                rect.Right - 3 * _scale, selected ? TextColor : MutedTextColor, 11, selected, width, height);
+            CenterDockText(PlayerActionDockHudModel.ResolveModeLabel(mode),
+                rect with { Height = rect.Height * .60f }, selected ? TextColor : MutedTextColor,
+                11, selected, width, height);
+            CenterDockText(PlayerActionDockHudModel.ResolveModeShortcut(mode, bindings),
+                new(rect.X, rect.Y + rect.Height * .60f, rect.Width, rect.Height * .40f),
+                MutedTextColor, 9, false, width, height);
         }
     }
 
@@ -360,8 +361,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         if (snapshot.PlayerExperience is { } experience && experience.Tick == snapshot.Tick &&
             experience.Selection.HasSingleEntityDetails && actions is not null)
         { text.Append(" / "); text.Append(experience.Selection.DisplayName); }
-        DockText(text.Written, header.X + 7 * _scale, header.Y + 3 * _scale,
-            header.Right - 58 * _scale, TextColor, 13, true, width, height);
+        CenterDockText(text.Written, new(header.X + 58 * _scale, header.Y,
+            MathF.Max(0, header.Width - 116 * _scale), 19 * _scale), TextColor, 13, true, width, height);
 
         bool pending = actions?.PendingCommandCount > 0 || ContextualCommandModel.HasPending(panel, snapshot);
         if (pending || panel.SelectionPending) _skin.State(header, UiSkinState.Pending);
@@ -407,7 +408,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             var rect = PlayerActionDockInteractionLayout.GetPageButtonRect(layout, i);
             bool enabled = i == 0 ? start > 0 : start + capacity < items;
             if (!_skin.Control(rect, enabled)) EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? CardColor : PanelColor, width, height);
-            DockText(i == 0 ? "<" : ">", rect.X + 6 * _scale, rect.Y + 3 * _scale, rect.Right - _scale,
+            CenterDockText(i == 0 ? "<" : ">", rect,
                 enabled ? TextColor : MutedTextColor, 12, true, width, height);
         }
     }
@@ -903,22 +904,23 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             if (!portrait) EmitIcon(_skin.Ready ? EconomicCardVisual.Icon(panel.Mode, index, actions) : PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, index, actions), rect.X + 6 * _scale,
                 rect.Y + 5 * _scale, 14 * _scale, width, height);
             float textX = rect.X + (portrait ? compact ? 34 : 40 : 25) * _scale;
-            DockText(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, index, actions),
-                textX, rect.Y + 4 * _scale, rect.Right - 5 * _scale,
-                TextColor, compact ? 11 : 13, true, width, height);
+            CenterDockText(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, index, actions),
+                new(textX, rect.Y + 2 * _scale, MathF.Max(0, rect.Right - 5 * _scale - textX),
+                    (compact ? 16 : 20) * _scale), TextColor, compact ? 11 : 13, true, width, height);
             var text = new HudTextBuilder(buffer);
             if (_skin.Ready && work.Label.Length > 0) text.Append(work.Label);
             else if (pending) text.Append("REQUEST PENDING");
             else if (!state.CanActivate) text.Append(state.DisabledReason);
             else AppendItemStatus(ref text, panel.Mode, index, actions, panel);
-            DockText(text.Written, textX, rect.Y + (compact ? 18 : 22) * _scale,
-                rect.Right - 5 * _scale, state.CanActivate ? MutedTextColor : GameplayHudVisualStyle.Warning,
+            CenterDockText(text.Written, new(textX, rect.Y + (compact ? 18 : 22) * _scale,
+                MathF.Max(0, rect.Right - 5 * _scale - textX), 15 * _scale),
+                state.CanActivate ? MutedTextColor : GameplayHudVisualStyle.Warning,
                 compact ? 10 : 11, false, width, height);
             text = new(buffer); AppendCardDetail(ref text, panel.Mode, index, actions, _skin.Ready);
-            DockText(text.Written, rect.X + 6 * _scale, rect.Y + (compact ? 30 : 39) * _scale,
-                rect.Right - 5 * _scale, MutedTextColor, 10, false, width, height);
+            CenterDockText(text.Written, new(rect.X + 6 * _scale, rect.Y + (compact ? 32 : 38) * _scale,
+                MathF.Max(0, rect.Width - 11 * _scale), 14 * _scale), MutedTextColor, 10, false, width, height);
             double? progress = _skin.Ready ? work.Progress : CardProgress(panel.Mode, index, actions);
-            if (!compact && progress.HasValue)
+            if (progress.HasValue)
             {
                 if (_skin.Bar(new(rect.X + 6 * _scale, rect.Bottom - 8 * _scale, rect.Width - 12 * _scale, 2 * _scale),
                     progress.Value, work.State == UiSkinState.Warning ? GameplayHudVisualStyle.Warning : GameplayHudVisualStyle.Focus)) continue;
@@ -1345,14 +1347,21 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             if (label.Length == 0) continue;
             bool enabled = PlayerActionDockHudModel.CanUseControl(control, panel.Mode, panel.SelectedIndex, panel, actions);
             if (!_skin.Control(rect, enabled)) EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? CardColor : GameplayHudVisualStyle.PanelDisabled, width, height);
-            var text = new HudTextBuilder(buffer);
-            text.Append((panel.Bindings ?? GameplayBindingRegistry.Default).Prompt(index switch
+            string shortcut = (panel.Bindings ?? GameplayBindingRegistry.Default).Prompt(index switch
             { 0 => GameplayAction.Activate, 1 => GameplayAction.CancelJob, 2 => GameplayAction.PrimarySetting,
-              3 => GameplayAction.SecondarySetting, 4 => GameplayAction.Decrease, _ => GameplayAction.Increase }));
-            text.Append(" / "); text.Append(label);
-            DockText(text.Written, rect.X + 5 * _scale, rect.Y + 4 * _scale, rect.Right - 4 * _scale,
+              3 => GameplayAction.SecondarySetting, 4 => GameplayAction.Decrease, _ => GameplayAction.Increase });
+            CenterDockText(label, rect with { Height = rect.Height * .58f },
                 enabled ? TextColor : MutedTextColor, 11, index == 0, width, height);
+            CenterDockText(shortcut, new(rect.X, rect.Y + rect.Height * .58f, rect.Width, rect.Height * .42f),
+                MutedTextColor, 9, false, width, height);
         }
+    }
+
+    private void CenterDockText(ReadOnlySpan<char> text, in HudRect rect, Vector4 color,
+        float size, bool bold, int width, int height)
+    {
+        if (_text.AddCentered(text, rect, MathF.Max(size == 9 ? 10 : 12, size * _scale), color, width, height, bold)) return;
+        EmitClippedText(text, rect.X + 3 * _scale, rect.Y, rect.Right - 3 * _scale, color, width, height);
     }
 
     private void DockText(ReadOnlySpan<char> text, float x, float y, float right, Vector4 color,
@@ -1453,7 +1462,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         }
         else
         {
-            return;
+            text.Append("SELECT OWNED CONTEXT / CHOOSE ACTION");
         }
 
         if (!_skin.Panel(strip, "panel.compact")) EmitQuad(
@@ -1553,47 +1562,6 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             _ =>
                 "NONE"
         };
-
-    private void EmitCenteredText(
-        string text,
-        in HudRect rect,
-        Vector4 color,
-        int width,
-        int height)
-    {
-        float textWidth = _text.Ready ? UiFontMetrics.Default.Measure(text, UiTypography.Style(UiTextRole.Telemetry).Size * _scale)
-            : text.Length * GlyphAdvance * _scale;
-        float x =
-            MathF.Max(
-                rect.X +
-                    2.0f *
-                    _scale,
-                rect.X +
-                    (rect.Width -
-                     textWidth) *
-                    0.5f);
-        float y =
-            rect.Y +
-            MathF.Max(
-                2.0f *
-                _scale,
-                (rect.Height -
-                 7.0f *
-                 GlyphPixelSize *
-                 _scale) *
-                0.5f);
-
-        EmitClippedText(
-            text,
-            x,
-            y,
-            rect.Right -
-                2.0f *
-                _scale,
-            color,
-            width,
-            height);
-    }
 
     private void EmitClippedText(
         string text,

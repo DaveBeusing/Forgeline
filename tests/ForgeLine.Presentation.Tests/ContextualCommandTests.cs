@@ -45,7 +45,7 @@ public sealed class ContextualCommandTests
     }
 
     [Fact]
-    public void RuntimeCountersAreOptInWithoutDisablingMeasurement()
+    public void NormalHudNeverDrawsCountersWithoutDisablingMeasurement()
     {
         using var device = new SelectionOverlayRenderingTests.RecordingDevice();
         using var renderer = new ResourcePowerHudRenderer(device, null);
@@ -55,7 +55,7 @@ public sealed class ContextualCommandTests
         renderer.Render(context, null, layout, metrics, showRuntimeMetrics: false);
         int without = renderer.LastRenderedVertexCount;
         renderer.Render(context, null, layout, metrics, showRuntimeMetrics: true);
-        Assert.True(renderer.LastRenderedVertexCount > without);
+        Assert.Equal(without, renderer.LastRenderedVertexCount);
         Assert.Equal(60, metrics.FramesPerSecond);
     }
 

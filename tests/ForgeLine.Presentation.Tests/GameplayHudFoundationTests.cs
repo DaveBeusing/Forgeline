@@ -106,10 +106,8 @@ public sealed class GameplayHudFoundationTests
         Assert.True(
             layout.SafeArea.X >=
             GameplayHudVisualStyle.MinimumSafeMargin);
-        Assert.Equal(
-            GameplayHudVisualStyle.TopStatusBarHeight *
-            layout.Scale,
-            layout.TopStatusBar.Height);
+        var strip = ResourceStripLayout.Create(layout);
+        Assert.Equal((strip.TwoRows ? 80 : 48) * strip.Scale, layout.TopStatusBar.Height, 3);
     }
 
     [Fact]

@@ -30,6 +30,15 @@ internal readonly record struct ClientWindowQualificationSnapshot(
 
 internal sealed class ClientApplication
 {
+    internal static void UpdateMetricsOverlay(InputState input, bool modalFrame, ref bool enabled, ref bool held)
+    {
+        bool down = input.WasKeyPressedWithShift(PlatformKey.F1) ||
+            (input.IsKeyDown(PlatformKey.F1) &&
+             (input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift)));
+        if (!modalFrame && down && !held) enabled = !enabled;
+        held = down;
+    }
+
     private const float MaximumCameraDeltaSeconds = 0.1f;
     private const int MaximumDebugInstanceBoxes = 24;
     private const int MaximumDebugLabels = 4;
@@ -631,12 +640,7 @@ internal sealed class ClientApplication
                 if (inputState.WasKeyPressed(PlatformKey.Up) || inputState.WheelDelta > 0) controlsScroll = Math.Max(0, controlsScroll - 1);
             }
             bool modalFrame = wasShellBlocking || guidanceInteraction.BlocksGameplayThisFrame;
-            bool metricsDown = inputState.WasKeyPressedWithShift(PlatformKey.F1) ||
-                (inputState.IsKeyDown(PlatformKey.F1) &&
-                 (inputState.IsKeyDown(PlatformKey.LeftShift) || inputState.IsKeyDown(PlatformKey.RightShift)));
-            if (!modalFrame && metricsDown && !overlayToggleHeld)
-                overlayEnabled = !overlayEnabled;
-            overlayToggleHeld = metricsDown;
+            UpdateMetricsOverlay(inputState, modalFrame, ref overlayEnabled, ref overlayToggleHeld);
             if (!modalFrame)
             {
                 UpdateDebugOverlayToggles(

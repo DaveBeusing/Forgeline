@@ -68,7 +68,7 @@ internal sealed class UiTextBatch : IDisposable
     }
     public void Begin() { ObjectDisposedException.ThrowIf(_disposed, this); _count = 0; _missing = 0; _dropped = 0; }
     public bool Add(ReadOnlySpan<char> text, float x, float y, float size, Vector4 color, int width, int height,
-        float maximumWidth = float.MaxValue, bool bold = false, UiTextAlignment alignment = UiTextAlignment.Left, bool baseline = false)
+        float maximumWidth = float.MaxValue, bool bold = false, UiTextAlignment alignment = UiTextAlignment.Left, bool baseline = false, bool centerInkBounds = false)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (!Ready) return false;
@@ -91,7 +91,9 @@ internal sealed class UiTextBatch : IDisposable
                 prefix = font.FitPrefix(line, MathF.Max(0, maximumWidth - ellipsis), size, bold);
                 measured = font.Measure(line[..prefix], size, bold) + ellipsis;
             }
-            float cursor = x + (alignment == UiTextAlignment.Center ? (maximumWidth - measured) * .5f : alignment == UiTextAlignment.Right ? maximumWidth - measured : 0);
+            var bounds = centerInkBounds ? font.MeasureLineBounds(line[..prefix], size, bold) : default;
+            float centeredWidth = truncate ? MathF.Max(measured, bounds.Right + ellipsis) - bounds.X : bounds.Width;
+            float cursor = x + (alignment == UiTextAlignment.Center ? (maximumWidth - (centerInkBounds ? centeredWidth : measured)) * .5f - (centerInkBounds ? bounds.X : 0) : alignment == UiTextAlignment.Right ? maximumWidth - measured : 0);
             int previous = 0;
             for (int index = 0; index < prefix;)
             {
@@ -107,6 +109,17 @@ internal sealed class UiTextBatch : IDisposable
         }
         return true;
     }
+    public bool AddCentered(ReadOnlySpan<char> text, in HudRect bounds, float size, Vector4 color,
+        int width, int height, bool bold = false)
+    {
+        if (bounds.IsEmpty) return Ready;
+        var font = UiFontMetrics.Default;
+        float blockHeight = font.Description.LineHeight * size / font.Description.PixelSize;
+        foreach (char c in text) if (c == '\n') blockHeight += font.Description.LineHeight * size / font.Description.PixelSize;
+        return Add(text, bounds.X, bounds.Y + (bounds.Height - blockHeight) * .5f, size, color,
+            width, height, bounds.Width, bold, UiTextAlignment.Center, centerInkBounds: true);
+    }
+
     private void Emit(UiFontGlyph glyph, float x, float y, float size, Vector4 color, int width, int height, float right, bool baseline)
     {
         if (glyph.Width == 0 || glyph.Height == 0) return;

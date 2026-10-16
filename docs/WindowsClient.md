@@ -200,7 +200,13 @@ The following gameplay keys are defaults; command cards and help show the active
 
 The player-facing HUD is rendered through the existing lightweight overlay path but is independent from the Shift + F1 development metrics toggle.
 
-The top-right readout is opt-in with Shift + F1. It shows successful frame presentations per second (`FPS`) and completed simulation ticks per second (`SIM … TPS`). Measurement remains active while hidden. Independent 750 ms windows measure actual throughput, including missed render publications and stalled simulation ticks. Warm-up and unavailable observations show an em dash; paused and terminal simulation show `PAUSED` and `STOPPED`. Backgrounding, suspension, restart and gaps longer than two seconds clear stale readings. The readout reserves its own safe-area region beside the resource strip and does not capture world clicks.
+Detailed statistics are toggled with Shift + F1. The normal resource/action HUD
+contains no FPS/SIM/TPS readout or reserved metrics column. Measurement remains
+active while the diagnostic overlay is hidden; sampler readiness still supports
+startup/window qualification. The resource strip shares the right edge of the
+bounded action dock and exposes separate top-left guidance and below-dock
+notification reservations through `GameplayHudLayout`. See
+[responsive HUD qualification](ResponsiveHudQualification.md).
 
 Selection commands occupy a shared adaptive panel beside the selection inspector.
 Combat actions activate by click; Command Core and copied facility capabilities open

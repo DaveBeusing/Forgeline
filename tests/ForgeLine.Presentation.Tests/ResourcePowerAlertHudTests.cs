@@ -13,6 +13,9 @@ public sealed class ResourcePowerAlertHudTests
     [InlineData(0, "0")]
     [InlineData(1200, "1200")]
     [InlineData(12000, "12.0K")]
+    [InlineData(1260000000, "1.3B")]
+    [InlineData(1000000000000000, "1E15")]
+    [InlineData(double.MaxValue, "1.8E308")]
     public void UnknownQuantityCannotBePresentedAsARealZero(double value, string expected)
     {
         Span<char> buffer = stackalloc char[40];

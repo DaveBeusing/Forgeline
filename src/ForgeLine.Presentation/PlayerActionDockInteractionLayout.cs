@@ -28,18 +28,18 @@ internal static class PlayerActionDockInteractionLayout
 
     // Fit dock content inside its existing region, independently of the surrounding HUD.
     public static float Scale(in GameplayHudLayout layout) =>
-        MathF.Max(0, MathF.Min(layout.Scale, MathF.Min(layout.ActionDock.Width / 520, layout.ActionDock.Height / 168)));
+        MathF.Max(0, MathF.Min(layout.Scale, MathF.Min(layout.ActionDock.Width / 520, layout.ActionDock.Height / 230)));
 
     public static bool Compact(in GameplayHudLayout layout) => layout.ActionDock.Height < 280 * Scale(layout);
-    public static float ModeBarHeight(in GameplayHudLayout layout) => (Compact(layout) ? 28 : 32) * Scale(layout);
+    public static float ModeBarHeight(in GameplayHudLayout layout) => (Compact(layout) ? 42 : 46) * Scale(layout);
     public static float HeaderHeight(in GameplayHudLayout layout) => (Compact(layout) ? 36 : 64) * Scale(layout);
-    public static float FooterHeight(in GameplayHudLayout layout) => (Compact(layout) ? 40 : 56) * Scale(layout);
-    public static float CardHeight(in GameplayHudLayout layout) => (Compact(layout) ? 44 : 60) * Scale(layout);
+    public static float FooterHeight(in GameplayHudLayout layout) => (Compact(layout) ? 76 : 84) * Scale(layout);
+    public static float CardHeight(in GameplayHudLayout layout) => (Compact(layout) ? 52 : 60) * Scale(layout);
     public static int Columns(in GameplayHudLayout layout) => layout.ActionDock.Width >= 480 * Scale(layout) ? 2 : 1;
     public static HudRect GetModeBarRect(in GameplayHudLayout layout) =>
         new(layout.ActionDock.X, layout.ActionDock.Y, layout.ActionDock.Width, ModeBarHeight(layout));
     public static HudRect GetCollapsedRect(in GameplayHudLayout layout) =>
-        GetModeBarRect(layout) with { Height = MathF.Min(layout.ActionDock.Height, 52 * Scale(layout)) };
+        GetModeBarRect(layout) with { Height = MathF.Min(layout.ActionDock.Height, 68 * Scale(layout)) };
     public static HudRect GetHeaderRect(in GameplayHudLayout layout) =>
         new(layout.ActionDock.X, GetModeBarRect(layout).Bottom, layout.ActionDock.Width, HeaderHeight(layout));
     public static HudRect GetFooterRect(in GameplayHudLayout layout) =>

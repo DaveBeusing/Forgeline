@@ -119,6 +119,12 @@ internal static class ResourcePowerHudModel
         (alerts & alert) !=
         PlayerAlertState.None;
 
+    public static string GetResourceLabel(int index) => index switch
+    {
+        0 => "Ferrous Ore", 1 => "Volatiles", 2 => "Silicates", 3 => "Steel",
+        4 => "Fuel", 5 => "Electronics", 6 => "Ammunition", _ => string.Empty
+    };
+
     public static RtsUiIcon GetResourceIcon(
         int index) =>
         index switch
@@ -272,7 +278,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         PresentationSnapshot? snapshot,
         in GameplayHudLayout layout,
         in RuntimeMetricsView metrics = default,
-        bool showRuntimeMetrics = true, bool hideNotifications = false)
+        bool showRuntimeMetrics = false, bool hideNotifications = false)
     {
         ThrowIfDisposed();
         _text.Begin();
@@ -307,13 +313,14 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 HudRect bar = layout.TopStatusBar;
                 if (!_skin.Panel(bar, "panel.resource")) EmitQuad(bar.X, bar.Y, bar.Width, bar.Height, PanelColor, graphics.Width, graphics.Height);
                 ReadOnlySpan<char> label = snapshot is null ? "WAITING FOR MATCH" : "WAITING FOR PLAYER DATA";
-                int count = Math.Min(label.Length, Math.Max(0, (int)((bar.Width - 16 * _scale) / (GlyphAdvance * _scale))));
-                EmitText(label[..count], bar.X + 8 * _scale, bar.Y + 12 * _scale,
-                    MutedTextColor, graphics.Width, graphics.Height);
+                if (!_text.AddCentered(label, bar, 14 * MathF.Min(_scale, 1.5f), MutedTextColor,
+                    graphics.Width, graphics.Height))
+                    EmitText(label, bar.X + 8 * _scale, bar.Y + 12 * _scale,
+                        MutedTextColor, graphics.Width, graphics.Height);
             }
         }
         _scale = layout.Scale;
-        if (showRuntimeMetrics) EmitRuntimeMetrics(metrics, layout.RuntimeMetrics, graphics.Width, graphics.Height);
+
 
         if (_vertexCount == 0 && _skin.Vertices == 0 && _text.VertexCount == 0)
         {
@@ -366,37 +373,6 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         _disposed = true;
     }
 
-    private void EmitRuntimeMetrics(in RuntimeMetricsView metrics, in HudRect region, int width, int height)
-    {
-        if (region.IsEmpty) return;
-        EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
-        float originalScale = _scale;
-        _scale = MathF.Min(_scale, MathF.Min(region.Width / 142.0f, region.Height / 36.0f));
-        Span<char> text = stackalloc char[32];
-        var builder = new HudTextBuilder(text);
-        builder.Append("FPS  ");
-        if (metrics.FramesPerSecond is double fps)
-        {
-            if (fps >= 10000) builder.Append(">9999");
-            else builder.Append(fps, "F0");
-        }
-        else builder.Append("—");
-        EmitText(builder.Written, region.X + 8 * _scale, region.Y + 6 * _scale, MutedTextColor, width, height);
-        builder = new HudTextBuilder(text);
-        builder.Append("SIM  ");
-        if (metrics.SimulationState == RuntimeSimulationState.Paused) builder.Append("PAUSED");
-        else if (metrics.SimulationState == RuntimeSimulationState.Stopped) builder.Append("STOPPED");
-        else if (metrics.TicksPerSecond is double tps)
-        {
-            if (tps >= 10000) builder.Append(">9999");
-            else builder.Append(tps, "F1");
-            builder.Append(" TPS");
-        }
-        else builder.Append("— TPS");
-        EmitText(builder.Written, region.X + 8 * _scale, region.Y + 20 * _scale, MutedTextColor, width, height);
-        _scale = originalScale;
-    }
-
     private void EmitTopStatusBar(
         in PlayerExperienceSnapshot experience, in HudRect bar, int width, int height)
     {
@@ -413,28 +389,34 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         {
             var cell = density.Resource(index);
             var icon = ResourcePowerHudModel.GetResourceIcon(index);
-            var definition = RtsUiIconCatalog.Get(icon);
-            float top = cell.Y + (cell.Height - 30 * _scale) * .5f;
-            _skin.Panel(cell, "panel.resource");
-            if (!_skin.Icon(icon, cell.X + 2 * _scale, top + 9 * _scale, 12 * _scale))
-                EmitIcon(icon, cell.X + 2 * _scale, top + 9 * _scale, 12 * _scale, width, height);
-            EmitQuad(cell.Right - _scale, cell.Y + 5 * _scale, _scale,
-                cell.Height - 10 * _scale, GameplayHudVisualStyle.QuietBorder, width, height);
-            float textX = cell.X + 19 * _scale;
-            float textWidth = MathF.Max(0, cell.Right - textX - 5 * _scale);
+            string label = ResourcePowerHudModel.GetResourceLabel(index);
             var value = new HudTextBuilder(buffer);
             AppendQuantity(ref value, ResourcePowerHudModel.GetResourceQuantity(experience.Resources, index));
+            float labelSize = MathF.Max(11, 12 * _scale), valueSize = 16 * _scale;
+            float textWidth = MathF.Min(cell.Width - 23 * _scale, MathF.Max(
+                UiFontMetrics.Default.MeasureLineBounds(label, labelSize).Width,
+                UiFontMetrics.Default.MeasureLineBounds(value.Written, valueSize, true).Width));
+            float groupWidth = textWidth + 17 * _scale;
+            float groupX = cell.X + (cell.Width - groupWidth) * .5f;
+            _skin.Panel(cell, "panel.resource");
+            float iconY = cell.Y + (cell.Height - 12 * _scale) * .5f;
+            if (!_skin.Icon(icon, groupX, iconY, 12 * _scale))
+                EmitIcon(icon, groupX, iconY, 12 * _scale, width, height);
+            float lineHeight = UiFontMetrics.Default.Description.LineHeight /
+                UiFontMetrics.Default.Description.PixelSize;
+            float blockHeight = (labelSize + valueSize) * lineHeight;
+            float top = cell.Y + (cell.Height - blockHeight) * .5f;
+            var labelRect = new HudRect(groupX + 17 * _scale, top, textWidth, labelSize * lineHeight);
+            var valueRect = new HudRect(labelRect.X, labelRect.Bottom, textWidth, valueSize * lineHeight);
             if (_text.Ready)
             {
-                _text.Add(definition.ShortLabel, textX, top, GameplayHudVisualStyle.CaptionTextSize * _scale,
-                    MutedTextColor, width, height, textWidth);
-                _text.Add(value.Written, textX, top + 13 * _scale, GameplayHudVisualStyle.ValueTextSize * _scale,
-                    TextColor, width, height, textWidth, bold: true, alignment: UiTextAlignment.Right);
+                _text.AddCentered(label, labelRect, labelSize, MutedTextColor, width, height);
+                _text.AddCentered(value.Written, valueRect, valueSize, TextColor, width, height, bold: true);
             }
             else
             {
-                EmitText(definition.ShortLabel, textX, top, MutedTextColor, width, height);
-                EmitText(value.Written, textX, top + 13 * _scale, TextColor, width, height);
+                EmitText(label, labelRect.X, labelRect.Y, MutedTextColor, width, height);
+                EmitText(value.Written, valueRect.X, valueRect.Y, TextColor, width, height);
             }
         }
         var power = density.Power;
@@ -444,20 +426,25 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         EmitQuad(power.X, power.Y + 3 * _scale, 3 * _scale, power.Height - 6 * _scale,
             state, width, height);
         if (experience.Power.IsConstrained) _skin.State(power, UiSkinState.Warning);
-        float y = power.Y + (power.Height - 28 * _scale) * .5f;
+        float powerLabelSize = MathF.Max(11, 12 * _scale);
+        float labelHeight = powerLabelSize * UiFontMetrics.Default.Description.LineHeight /
+            UiFontMetrics.Default.Description.PixelSize;
+        float valueHeight = 16 * _scale * UiFontMetrics.Default.Description.LineHeight /
+            UiFontMetrics.Default.Description.PixelSize;
+        float y = power.Y + (power.Height - labelHeight - valueHeight) * .5f;
+        var labelBounds = new HudRect(power.X + 6 * _scale, y, power.Width - 12 * _scale, labelHeight);
+        var valueBounds = new HudRect(labelBounds.X, labelBounds.Bottom, labelBounds.Width, valueHeight);
         Span<char> powerBuffer = stackalloc char[80];
         var text = new HudTextBuilder(powerBuffer);
         text.Append("POWER / ");
         text.Append(ResourcePowerHudModel.ResolvePowerStateLabel(experience.Power));
-        if (!_text.Add(text.Written, power.X + 10 * _scale, y, 10 * _scale,
-            state, width, height, power.Width - 18 * _scale, bold: true))
-            EmitText(text.Written, power.X + 10 * _scale, y, state, width, height);
+        if (!_text.AddCentered(text.Written, labelBounds, powerLabelSize, state, width, height))
+            EmitText(text.Written, labelBounds.X, labelBounds.Y, state, width, height);
         text = new HudTextBuilder(powerBuffer);
         AppendQuantity(ref text, experience.Power.Generation); text.Append(" / ");
         AppendQuantity(ref text, experience.Power.Demand);
-        if (!_text.Add(text.Written, power.X + 10 * _scale, y + 12 * _scale, 13 * _scale,
-            TextColor, width, height, power.Width - 18 * _scale, bold: true))
-            EmitText(text.Written, power.X + 10 * _scale, y + 13 * _scale, TextColor, width, height);
+        if (!_text.AddCentered(text.Written, valueBounds, 16 * _scale, TextColor, width, height, bold: true))
+            EmitText(text.Written, valueBounds.X, valueBounds.Y, TextColor, width, height);
         _scale = previousScale;
     }
 
@@ -1079,6 +1066,18 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     {
         if (!double.IsFinite(value)) { builder.Append("N/A"); return; }
         double normalized = Math.Max(0.0, value);
+
+        if (normalized >= 1_000_000_000_000.0)
+        {
+            builder.Append(normalized, "0.#E0");
+            return;
+        }
+        if (normalized >= 1_000_000_000.0)
+        {
+            builder.Append(normalized / 1_000_000_000.0, "F1");
+            builder.Append("B");
+            return;
+        }
 
         if (normalized >=
             1_000_000.0)

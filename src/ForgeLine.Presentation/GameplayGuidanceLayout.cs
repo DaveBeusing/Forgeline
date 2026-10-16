@@ -20,8 +20,7 @@ public static class GameplayGuidanceLayout
     }
     private static HudRect Available(in GameplayHudLayout layout)
     {
-        var region = layout.SecondaryView with
-        { Height = MathF.Max(0, layout.SecondaryView.Height - OperationsLayout.EntryBand(layout)) };
+        var region = layout.OnboardingBounds;
         // The compact inspector can be shorter than the independently scaled
         // command band. Keep the guide in the left column when those bands overlap.
         var commands = layout.PrimaryCommands;

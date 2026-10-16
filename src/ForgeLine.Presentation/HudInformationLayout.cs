@@ -3,12 +3,15 @@ namespace ForgeLine.Presentation;
 /// <summary>Local content density within the existing interaction regions.</summary>
 internal readonly record struct ResourceStripLayout(HudRect Bounds, float Scale, bool TwoRows)
 {
+    public const float WideDesignWidth = 1064;
+    public const float CompactDesignWidth = 640;
+
     public static ResourceStripLayout Create(in GameplayHudLayout layout)
     {
         HudRect bounds = layout.TopStatusBar;
-        bool twoRows = bounds.Width < 930 * layout.Scale && bounds.Height >= 54;
-        float scale = MathF.Min(layout.Scale, MathF.Min(bounds.Width / (twoRows ? 640 : 930),
-            bounds.Height / (twoRows ? 64 : 36)));
+        bool twoRows = bounds.Width < WideDesignWidth * layout.Scale;
+        float scale = MathF.Min(layout.Scale, MathF.Min(bounds.Width / (twoRows ? CompactDesignWidth : WideDesignWidth),
+            bounds.Height / (twoRows ? 80 : 48)));
         return new(bounds, MathF.Max(0, scale), twoRows);
     }
 

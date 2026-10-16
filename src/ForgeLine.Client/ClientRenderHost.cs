@@ -736,7 +736,7 @@ internal sealed class ClientRenderHost : IDisposable
                             gameplayDraw,
                             runtimeMetrics,
                             current.HoverTooltip,
-                            showRuntimeMetrics: true,
+                            showRuntimeMetrics: false,
                             operations: current.Operations);
                         developmentOverlayRenderer.Render(
                             context,

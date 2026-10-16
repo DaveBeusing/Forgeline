@@ -15,18 +15,11 @@ public sealed class GameplayHudRuntimeTests
     [InlineData(1280, 720, 144, 1.25f)]
     [InlineData(1920, 1080, 192, 2.0f)]
     [InlineData(3440, 1440, 144, 1.0f)]
-    public void MetricsAnchorWithinSafeAreaAndNeverCaptureWorldInput(int width, int height, uint dpi, float scale)
+    public void StatusStripUsesTheRightAlignedSharedLayout(int width, int height, uint dpi, float scale)
     {
         GameplayHudLayout layout = GameplayHudLayout.Create(width, height, dpi, scale);
-        HudRect metrics = layout.RuntimeMetrics;
-        Assert.Equal(layout.SafeArea.Right, metrics.Right, 3);
-        Assert.Equal(layout.SafeArea.Y, metrics.Y);
-        Assert.False(metrics.Intersects(layout.TopStatusBar));
-        Assert.False(metrics.Intersects(layout.ActionDock));
-        Assert.False(metrics.Intersects(layout.AlertStack));
-        Assert.True(layout.SafeArea.Contains(new(metrics.X, metrics.Y)));
-        Assert.True(layout.SafeArea.Contains(new(metrics.Right, metrics.Bottom)));
-        Assert.False(HudInteractionContext.BlocksWorldPointer(new(metrics.X + 1, metrics.Y + 1), layout, true));
+        Assert.Equal(layout.SafeArea.Right, layout.TopStatusBar.Right, 3);
+        Assert.True(layout.TopStatusBar.Width <= 2 * layout.ActionDock.Width);
 
         using var device = new RecordingDevice();
         using var renderer = new ResourcePowerHudRenderer(device, null);

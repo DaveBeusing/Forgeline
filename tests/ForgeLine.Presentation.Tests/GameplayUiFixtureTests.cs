@@ -20,7 +20,7 @@ public sealed class GameplayUiFixtureTests
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
     [Fact]
-    public void BootstrapReboundLongLabelAndFeedbackGeometryMatchesReviewedFixtures()
+    public void BootstrapReboundLongLabelAndFeedbackGeometryMatchesStructuralFixtures()
     {
         var fixtures = new SortedDictionary<string, Fixture>(StringComparer.Ordinal);
         var bindings = new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Build, ForgeLine.Platform.PlatformKey.G));

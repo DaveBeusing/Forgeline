@@ -4,7 +4,10 @@
 
 The Windows frontend is rendered by `FrontendOverlayRenderer` over the existing Direct3D 12 graphics device. The UI is intentionally independent of game authority, and `ForgeLine.UI` owns navigation/focus and pointer hit testing. The gameplay HUD uses distinct, modular surfaces composed by `GameplayHudRenderer`.
 
-The frontend uses the bundled antialiased DejaVu font atlas and adaptive physical-client-pixel regions. See [UI typography](UiTypography.md) for font resources, metrics, fallback and ownership. `FrontendGeometry` supplies named regions to both drawing and input; see [layout contract](FrontendLayout.md). The battlefield HUD has a separate DPI-aware layout with named regions. These constraints are relevant to every visual change: presentation must not drift away from actual input geometry.
+The frontend uses the bundled antialiased DejaVu font atlas and adaptive physical-client-pixel regions. See [UI typography](UiTypography.md) for font resources, metrics, fallback and ownership. `FrontendGeometry` supplies named regions to both drawing and input; see [layout contract](FrontendLayout.md). The battlefield HUD has a separate DPI-aware layout with named regions. Its
+version-2 contract groups resources and actions on the right, reserves onboarding
+on the upper left and publishes notification bounds below the visible dock.
+Normal HUD counters are removed; diagnostics remain available through Shift+F1. These constraints are relevant to every visual change: presentation must not drift away from actual input geometry.
 
 ### Verified design weaknesses
 
