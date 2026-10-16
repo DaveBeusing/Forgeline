@@ -736,29 +736,21 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 height);
 
             float iconSize =
-                8.0f *
+                (_skin.Ready ? 10.0f : 8.0f) *
                 scale;
             EmitIcon(
                 RtsStrategicOverlayHudModel.ResolveIcon(
                     mode),
-                rect.X +
-                    2.0f *
-                    scale,
-                rect.Y +
-                    3.0f *
-                    scale,
+                _skin.Ready ? rect.X + (rect.Width - iconSize) * .5f : rect.X + 2 * scale,
+                rect.Y + (_skin.Ready ? 1 : 3) * scale,
                 iconSize,
                 width,
                 height);
             EmitText(
                 RtsStrategicOverlayHudModel.ResolveShortLabel(
                     mode),
-                rect.X +
-                    12.0f *
-                    scale,
-                rect.Y +
-                    5.0f *
-                    scale,
+                rect.X + (_skin.Ready ? 2 : 12) * scale,
+                rect.Y + (_skin.Ready ? 11 : 5) * scale,
                 rect.Right -
                     1.0f *
                     scale,
@@ -768,7 +760,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                     0.92f,
                     1.0f),
                 scale *
-                    0.62f,
+                    (_skin.Ready ? .8f : .62f),
                 width,
                 height);
 
