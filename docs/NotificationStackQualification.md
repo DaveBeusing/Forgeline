@@ -13,15 +13,15 @@ complete. This document does not grant merge, release or visual acceptance.
 `GameplayHudLayout` and `ActionableAlertLayout` publish contract version 3.
 `NotificationBounds(expanded)` starts at visible dock bottom plus `Gap`, shares
 the dock's width and safe right edge, and ends above the minimap. Its maximum
-height is 224 times the bounded dock text scale (1 to 1.5). Expanded dock capacity
+height is 224 times the actual dock content scale with a minimum of 1. Expanded dock capacity
 and global input sequencing are unchanged. `AlertStack` identifies the collapsed
 reservation; consumers with current dock state use `NotificationBounds`.
 
 One value-type list contains at most three regular cards plus a compact MORE row.
-Text uses the existing font metrics, a 14–21 physical-pixel floor/range, at most
+Text uses the existing font metrics, a 14-physical-pixel floor and the actual dock content scale, at most
 two lines, and ellipsis. Overflow reduces card count instead of text size.
 Unshown complete content is accessible through Operations → Notifications.
-The detail owner retains at most six lines, with a 14–21 pixel font floor and
+The detail owner retains at most six lines, with a 14-pixel floor and the actual dock content scale and
 fewer visible lines when the available panel height is constrained, with cached source text from the existing
 five authorized conditions and existing command/local results. It pages all text,
 including strings longer than the common typography helper's 256-line limit.
@@ -64,3 +64,13 @@ Earlier left-position screenshots remain historical evidence. See
 [prior graphical qualification](GraphicalInterfaceQualification.md) for baseline
 failures and earlier artifact identities. Do not substitute their results for
 this version's checks.
+
+## Native scaling correction
+
+The first 15 source-stamped images at `5089a3682975259be1792dc3cd72eacf610c2e71`
+passed structural/repeated-pixel checks. Review found that the provisional
+1.5 text-scale cap made notification text disproportionately small beside the
+4K large-scale action dock. That cap is removed: both notification and detail
+text now follow the existing actual dock content scale, with a 14-pixel floor.
+The display matrix requires that exact relationship. New captures must use the
+corrected source; the earlier images are retained as prior candidates.

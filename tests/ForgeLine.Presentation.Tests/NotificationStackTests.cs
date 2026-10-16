@@ -22,13 +22,13 @@ public sealed class NotificationStackTests
             var dock = layout.VisibleActionDock(expanded);
             Assert.Equal(dock.Right, stack.Bounds.Right, 3);
             Assert.Equal(dock.Bottom + layout.Gap, stack.Bounds.Y, 3);
-            Assert.InRange(stack.FontSize,14,21);
+            Assert.Equal(14*MathF.Max(1,layout.DockContentScale),stack.FontSize);
             Assert.InRange(stack.Count,0,4);
             Assert.False(stack.Bounds.Intersects(layout.Minimap));
             int detailRows=OperationsLayout.NotificationRows(layout);
             Assert.InRange(detailRows,1,6);
             float detailSize=OperationsLayout.NotificationTextSize(layout);
-            Assert.InRange(detailSize,14,21);
+            Assert.Equal(stack.FontSize,detailSize);
             var detail=OperationsLayout.NotificationControl(layout,detailRows+2);
             Assert.True(detail.Height>=detailSize+4);
             Assert.True(detail.Bottom<OperationsLayout.NotificationControl(layout,1).Y);

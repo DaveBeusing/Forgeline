@@ -75,7 +75,7 @@ public readonly record struct GameplayHudLayout(
         float top = VisibleActionDock(expanded).Bottom + gap;
         float bottom = MathF.Max(top, Minimap.Y - gap);
         return new(ActionDock.X, top, ActionDock.Width,
-            MathF.Min(224 * Math.Clamp(DockContentScale, 1, 1.5f), bottom - top));
+            MathF.Min(224 * MathF.Max(1, DockContentScale), bottom - top));
     }
 
     public float DockContentScale => MathF.Min(Scale, ActionDock.Width / 608);
