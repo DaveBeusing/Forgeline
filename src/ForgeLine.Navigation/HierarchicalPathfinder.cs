@@ -91,19 +91,11 @@ public sealed class HierarchicalPathfinder
             startSector,
             destinationSector);
 
-        var candidate =
-            new Lazy<HighLevelRouteCacheEntry>(
-                () => CreateHighLevelRouteEntry(
-                    graph,
-                    cacheKey),
-                LazyThreadSafetyMode.ExecutionAndPublication);
-
-        Lazy<HighLevelRouteCacheEntry> cached =
-            _highLevelCache.GetOrAdd(
-                cacheKey,
-                candidate);
-        bool cacheHit =
-            !ReferenceEquals(candidate, cached);
+        bool cacheHit = true;
+        if (!_highLevelCache.TryGetValue(cacheKey, out var cached))
+        {
+            cached = GetOrCreateHighLevelRoute(graph, cacheKey, out cacheHit);
+        }
 
         HighLevelRouteCacheEntry highLevel = cached.Value;
 
@@ -115,7 +107,6 @@ public sealed class HierarchicalPathfinder
                 NavigationFailureReason.NoHighLevelRoute);
         }
 
-        int localExpanded = 0;
         LocalPathSearchResult local;
 
         bool refined = LocalPathSearch.TryFindPath(
@@ -127,6 +118,7 @@ public sealed class HierarchicalPathfinder
             capabilities,
             corridorExpansion: 0,
             out local);
+        int localExpanded = local.ExpandedNodeCount;
 
         if (!refined)
         {
@@ -139,6 +131,7 @@ public sealed class HierarchicalPathfinder
                 capabilities,
                 corridorExpansion: 1,
                 out local);
+            localExpanded += local.ExpandedNodeCount;
         }
 
         if (!refined)
@@ -147,8 +140,6 @@ public sealed class HierarchicalPathfinder
                 world.Version,
                 NavigationFailureReason.NoLocalRoute);
         }
-
-        localExpanded += local.ExpandedNodeCount;
 
         Vector3[] waypoints =
             CreateWaypoints(
@@ -183,6 +174,22 @@ public sealed class HierarchicalPathfinder
             world.Version,
             NavigationFailureReason.None,
             path);
+    }
+
+    private Lazy<HighLevelRouteCacheEntry> GetOrCreateHighLevelRoute(
+        NavigationSectorGraph graph,
+        HighLevelRouteCacheKey key,
+        out bool cacheHit)
+    {
+        // Keep closure creation on the miss path. Concurrent misses still
+        // publish one lazy entry and evaluate its graph search only once.
+        var candidate = new Lazy<HighLevelRouteCacheEntry>(
+            () => CreateHighLevelRouteEntry(graph, key),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        Lazy<HighLevelRouteCacheEntry> cached =
+            _highLevelCache.GetOrAdd(key, candidate);
+        cacheHit = !ReferenceEquals(candidate, cached);
+        return cached;
     }
 
     private static bool TryProjectEndpoint(
@@ -299,5 +306,4 @@ public sealed class HierarchicalPathfinder
     private readonly record struct HighLevelRouteCacheEntry(
         bool Found,
         HighLevelRoute? Route);
-
 }
