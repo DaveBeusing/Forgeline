@@ -205,16 +205,14 @@ public sealed class OperationsTests
     }
 
     [Theory]
-    [InlineData(1024, 720, 96, 1)]
-    [InlineData(1600, 900, 144, 1)]
-    [InlineData(1920, 1080, 192, 2)]
-    [InlineData(3840, 2160, 192, 1)]
+    [MemberData(nameof(GuidancePresentationTests.Displays), MemberType = typeof(GuidancePresentationTests))]
     public void SharedControlsFitSafeAreaAndKeepDockMinimapAvailable(int width, int height, uint dpi, float uiScale)
     {
         var layout = GameplayHudLayout.Create(width, height, dpi, uiScale);
         var panel = OperationsLayout.Panel(layout);
         Assert.False(panel.Intersects(layout.ActionDock)); Assert.False(panel.Intersects(layout.Minimap));
         Assert.False(panel.Intersects(layout.SelectionInspector));
+        Assert.False(panel.Intersects(layout.PrimaryCommands));
         for (int index = 0; index < 12; index++)
         {
             var control = OperationsLayout.Control(layout, index);
@@ -229,6 +227,7 @@ public sealed class OperationsTests
         var context = new GameplayHudRenderContext(graphics, new RtsCamera(), Snapshot(data), default, default, default, default,
             default, CombatGroupOverviewView.Empty, default, layout, dpi, uiScale, null, Operations: new(true, Selected: new(1, 1), Session: new(1)));
         renderer.Render(context);
+        if (uiScale >= 1) Assert.True(renderer.LastPanelTextSize >= 14);
         Assert.InRange(renderer.LastRenderedVertexCount, 100, OperationsHudSurface.MaxVertices);
         Assert.All(device.Buffer!.Vertices, vertex =>
         { Assert.InRange(vertex.Position.X, -1, 1); Assert.InRange(vertex.Position.Y, -1, 1); });

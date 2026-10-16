@@ -30,10 +30,14 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
+    internal float LastPanelTextSize { get; private set; }
+    private float _minimumTextScale;
+    private bool _panelText;
     public void Render(in GameplayHudRenderContext context)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        LastRenderedVertexCount = 0; _text.Begin();
+        LastRenderedVertexCount = 0; LastPanelTextSize = 0; _panelText = false; _text.Begin();
+        _minimumTextScale = MathF.Min(1, context.Layout.Scale);
         _width = context.Graphics.Width; _height = context.Graphics.Height;
         if (_width <= 0 || _height <= 0) return;
         _skin.Begin(context.Graphics);
@@ -50,6 +54,8 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         if (view.Open && !view.Suppressed && view.Session == context.Snapshot.SessionId)
         {
             _scale = OperationsLayout.Scale(context.Layout);
+            _panelText = true;
+            LastPanelTextSize = MathF.Max(14 * _minimumTextScale, 14 * _scale);
             _bounds = OperationsLayout.Panel(context.Layout); _line = 0;
             if (_scale > 0)
             {
@@ -102,7 +108,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                             facility.HasValue, facility is { } f ? CategoryIcon(f.Category) : null);
                     }
                     var panel = _bounds; _line = 0;
-                    _bounds = new(panel.X, panel.Y + 264 * _scale, panel.Width, 52 * _scale);
+                    _bounds = new(panel.X, panel.Y + 284 * _scale, panel.Width, 56 * _scale);
                     _skin.Panel(_bounds, "panel.inset");
                     OperationsFacility? selected = null;
                     for (int rowIndex = 0; rowIndex < data.Facilities.Count; rowIndex++)
@@ -182,11 +188,13 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     {
         if (text.IsEmpty || _line >= MaxLines) return;
         float x = _bounds.X + 8 * _scale;
-        float y = _bounds.Y + (4 + _line++ * 14) * _scale;
-        if (y + 7 * _scale > _bounds.Bottom - 2 * _scale) return;
+        float size = _panelText ? LastPanelTextSize : 12 * _scale;
+        float leading = _panelText ? MathF.Max(15 * _minimumTextScale, 16 * _scale) : 14 * _scale;
+        float y = _bounds.Y + (_panelText ? 4 : 2) * _scale + _line++ * leading;
+        if (y + size > _bounds.Bottom - (_panelText ? 2 * _scale : 0)) return;
         int characters = Math.Min(68, Math.Max(0, (int)((_bounds.Width - 16 * _scale) / (6.4f * _scale))));
         var color = primary ? GameplayHudVisualStyle.TextPrimary : GameplayHudVisualStyle.TextSecondary;
-        if (_text.Add(text, x, y, 12f * _scale, color, _width, _height,
+        if (_text.Add(text, x, y, size, color, _width, _height,
             MathF.Max(0, _bounds.Right - 8f * _scale - x), bold: primary)) return;
         for (int i = 0; i < Math.Min(text.Length, characters); i++)
         {

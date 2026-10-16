@@ -53,6 +53,24 @@ public sealed class GuidancePresentationTests
         });
     }
 
+    [Theory]
+    [InlineData(96)]
+    [InlineData(144)]
+    [InlineData(192)]
+    public void InitialOnboardingKeepsReadableBodyAndCommandsVisible(uint dpi)
+    {
+        using var device = new RecordingDevice();
+        using var renderer = new RtsInformationOverlayRenderer(device);
+        var snapshot = EarlyGameGuidanceTests.Snapshot(0);
+        var context = new RecordingContext { Width = 1280, Height = 720 };
+        var layout = GameplayHudLayout.Create(1280, 720, dpi, 2);
+        renderer.Render(context, new RtsCamera(), snapshot, default, RtsInformationLayerView.Empty,
+            CombatGroupOverviewView.Empty, dpi, 2, Ux(new EarlyGameGuidanceController().Update(snapshot, true)));
+        Assert.True(renderer.LastGuidanceTextSize >= 14);
+        Assert.False(renderer.LastGuidanceBounds.Intersects(layout.PrimaryCommands));
+        Assert.True(renderer.LastGuidanceVertexCount > 0);
+    }
+
     [Fact]
     public void PointerDoesNotDrawAnAdditionalMouseCursor()
     {
