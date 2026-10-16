@@ -47,8 +47,20 @@ public sealed class RadialActionLayoutTests
         var hud=GameplayHudLayout.Create(1280,720,192,2);
         var fit=RadialActionLayout.Fit(new(640,360),500,hud,[hud.TopStatusBar,hud.SelectionInspector,hud.Minimap,hud.VisibleActionDock(false),hud.NotificationBounds(false),OperationsLayout.Entry(hud)]);
         Assert.True(fit.IsValid);
-        Assert.InRange((fit.OuterRadius-fit.InnerRadius)/88,1,1.75f);
+        Assert.InRange((fit.OuterRadius-fit.InnerRadius)/96,1,1.75f);
     }
+    [Theory] [InlineData(80)] [InlineData(100)]
+    public void HorizontalIconLabelAndValueBoundsRemainInsideEverySector(float inner)
+    {
+        var ring=new RadialActionLayout(new(500,500),new(500,500),inner,inner+96,8);
+        for(int slot=0;slot<8;slot++)
+        {
+            var center=ring.LabelCenter(slot);
+            foreach(float x in new[] {-38f,38f}) foreach(float y in new[] {-28f,28f})
+                Assert.Equal(slot,ring.Hit(center+new Vector2(x,y)));
+        }
+    }
+
     [Fact]
     public void InvalidOrUnavailableGeometryNeverOwnsInput()
     {
@@ -79,6 +91,16 @@ public sealed class RadialActionLayoutTests
         Assert.False(ring.Project(world,camera,1,foreign,layout,[]).Geometry.IsValid);
         camera.CenterOn(new(10000,0,0));
         Assert.False(ring.Project(world,camera,1,current,layout,[]).Geometry.IsValid);
+    }
+
+    [Fact]
+    public void SettledClosedDecorationPreservesSingleObjectMigrationAndOwnsNoInput()
+    {
+        var motion=new ObjectActionRingMotion();
+        var current=new ObjectActionRingView(new(1,1),new(1),1,1,true,false);
+        var view=motion.Update(current,TimeSpan.Zero,true);
+        Assert.True(view.SingleOwned);Assert.False(view.Open);Assert.Equal(current.Entity,view.Entity);
+        Assert.False(view.TryHit(new(500,500),out _));
     }
 
     [Fact]

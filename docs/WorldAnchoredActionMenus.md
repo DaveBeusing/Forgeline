@@ -41,3 +41,9 @@ The existing action renderer retains its pipeline, per-frame vertex buffers, sha
 ## Integration checkpoint
 
 Full solution Release build passes with zero warnings/errors. Sixteen ring integration tests and 59 focused geometry / existing action / nonmodal tests pass. Added explicit native reference states for all seven categories, parameters, pending, edges, tooltips, half reveal/close and offscreen anchors; the matrix contract covers 82 states × 45 output/DPI/scale combinations (3,690 planned cases). This count is coverage planning, not completed native evidence. Native runtime comparison includes 128 open/close/context cycles and injected 30/60/144 Hz motion sampling. Next step: committed-source native capture and canonical qualification, then archive original candidate evidence and report remaining gates.
+
+## Native iteration
+
+Source 16434321: fourteen 1080p reference states completed eight identical native pixel repeats per state. Initial native runtime churn passed 128 cycles: live resources 112 → 112, atlas buffers 52 → 52, eight resident textures, 28 MiB shared atlas pages. Same-device complete clear/HUD/text comparison measured legacy expanded dock CPU submit p50 5,033.2 µs / GPU p50 2.736416 ms, single closed 5,027.7 µs / 2.384032 ms, ring 5,023.0 µs / 2.487744 ms. These are sequential local samples including Present/waits, not gameplay FPS or universal improvement claims. Original outputs remain under artifacts/rings-reference-16434321 and artifacts/rings-runtime-16434321.
+
+Inspection identified labels too close to angular boundaries. The following refinement increases the free center/band spacing, bounds each icon/title/value column inside its sector (asserted at all eight positions), and uses shorter navigation labels. Closed animation state also retains the single-object migration flag so it cannot restore legacy visuals. Requalification on the new source is required; previous captures are historical iteration evidence.

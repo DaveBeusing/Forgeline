@@ -22,6 +22,7 @@ public sealed class ObjectActionRingMotion
         float eased = UiMotionTimeline.SmoothStep(now - _started, Duration);
         _opacity = _from + ((open ? 1 : 0) - _from) * eased;
         if (open) _visual = current;
+        if (!open && (_opacity <= 0 || identityChanged || !current.SingleOwned)) return current with { Opacity = 0 };
         return open ? current with { Opacity = _opacity } :
             _visual with { Open = false, Opacity = _opacity, HoveredSlot = -1, Pressed = false };
     }

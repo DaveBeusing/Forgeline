@@ -11,7 +11,7 @@ internal sealed partial class PlayerActionDockHudRenderer
         var ring = panel.Ring;
         var geometry = ring.Geometry;
         if (!ring.Resolved || !geometry.IsValid || ring.Opacity <= 0) return;
-        float scale = (geometry.OuterRadius - geometry.InnerRadius) / 88, opacity = Math.Clamp(ring.Opacity, 0, 1);
+        float scale = (geometry.OuterRadius - geometry.InnerRadius) / 96, opacity = Math.Clamp(ring.Opacity, 0, 1);
         _scale = scale;
         // Tether is decoration only. Its width is one physical pixel and never owns input.
         Vector2 delta = geometry.Anchor - geometry.Center;
@@ -39,24 +39,24 @@ internal sealed partial class PlayerActionDockHudRenderer
             fill.W *= opacity;
             RingSegment(geometry, i, fill, width, height);
             Vector2 center = geometry.LabelCenter(i);
-            float iconSize = 26 * scale;
+            float iconSize = 20 * scale;
             var icon = mode ? PlayerActionDockHudModel.ResolveModeIcon(target.Mode) :
                 item ? PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, target.ItemIndex, actions) :
                 PlayerActionDockHudModel.ResolveModeIcon(panel.Mode);
-            _skin.Icon(icon, center.X - iconSize / 2, center.Y - 30 * scale, iconSize,
+            _skin.Icon(icon, center.X - iconSize / 2, center.Y - 28 * scale, iconSize,
                 new Vector4(enabled ? 1 : .55f, enabled ? 1 : .55f, enabled ? 1 : .55f, opacity));
             string label = slot.Navigation switch
             {
                 ActionRingNavigation.Back => "Back", ActionRingNavigation.Close => "Close",
-                ActionRingNavigation.Next => "Next page", ActionRingNavigation.Previous => "Prev page",
-                ActionRingNavigation.Parameters => "Parameters", ActionRingNavigation.NextItem => "Next item",
+                ActionRingNavigation.Next => "Next", ActionRingNavigation.Previous => "Prev",
+                ActionRingNavigation.Parameters => "Params", ActionRingNavigation.NextItem => "Next item",
                 _ => mode ? PlayerActionDockHudModel.ResolveModeLabel(target.Mode) :
                     item ? PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, target.ItemIndex, actions) :
                     target.Kind == PlayerActionDockControlKind.Activate ? PlayerActionDockHudModel.ResolvePrimaryActionLabel(panel.Mode, target.ItemIndex, actions) :
                     PlayerActionDockHudModel.ResolveFooterLabel(target.Kind, panel.Mode)
             };
             Vector4 text = enabled ? TextColor : MutedTextColor; text.W *= opacity;
-            _text.AddCentered(label, new(center.X - 48 * scale, center.Y, 96 * scale, 22 * scale),
+            _text.AddCentered(label, new(center.X - 38 * scale, center.Y - 7 * scale, 76 * scale, 20 * scale),
                 14 * scale, text, width, height, true);
             var value = new HudTextBuilder(valueBuffer);
             if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
@@ -68,7 +68,7 @@ internal sealed partial class PlayerActionDockHudRenderer
                 value.Append(!state.CanActivate ? state.DisabledReason :
                     PlayerActionDockHudModel.ResolvePrimaryActionLabel(panel.Mode, target.ItemIndex, actions));
             }
-            _text.AddCentered(value.Written, new(center.X - 48 * scale, center.Y + 21 * scale, 96 * scale, 20 * scale),
+            _text.AddCentered(value.Written, new(center.X - 38 * scale, center.Y + 12 * scale, 76 * scale, 16 * scale),
                 12 * scale, text, width, height);
         }
         if (ring.Level == ActionRingLevel.Parameters)
@@ -78,7 +78,7 @@ internal sealed partial class PlayerActionDockHudRenderer
             var text = new HudTextBuilder(buffer);
             text.Append(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, panel.SelectedIndex, actions));
             var selected = geometry.LabelCenter(6);
-            _text.AddCentered(text.Written, new(selected.X - 48 * scale, selected.Y + 22 * scale, 96 * scale, 20 * scale),
+            _text.AddCentered(text.Written, new(selected.X - 38 * scale, selected.Y + 12 * scale, 76 * scale, 16 * scale),
                 12 * scale, MutedTextColor with { W = MutedTextColor.W * opacity }, width, height);
         }
     }

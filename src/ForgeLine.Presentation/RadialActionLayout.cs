@@ -36,8 +36,8 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
         for (int attempt = 0; attempt < 5; attempt++)
         {
             float scale = preferred + (1 - preferred) * attempt / 4;
-            float inner = Math.Clamp(footprintRadius + 10 * scale, 60 * scale, (100 - attempt * 10) * scale);
-            var fit = TryFit(anchor, inner, inner + 88 * scale, hud.SafeArea, occupied, count);
+            float inner = Math.Clamp(footprintRadius + 10 * scale, 80 * scale, (100 - attempt * 5) * scale);
+            var fit = TryFit(anchor, inner, inner + 96 * scale, hud.SafeArea, occupied, count);
             if (fit.IsValid) return fit;
         }
         return default;

@@ -74,7 +74,7 @@ internal static class HoverTooltipResolver
         if (panel.SelectionPending || !panel.IsOpen || panel.Mode != mode || snapshot.PlayerActions is not { } actions ||
             actions.SessionId != snapshot.SessionId || actions.Tick != snapshot.Tick) return null;
         if (control == PlayerActionDockControlKind.Page)
-            return new("PAGE CARDS", "DOCK NAVIGATION", "CHANGES SELECTION", "CLICK / WHEEL / TAB");
+            return new(panel.Ring.SingleOwned ? "RING NAVIGATION" : "PAGE CARDS", "ACTION NAVIGATION", "CHANGES SELECTION", "CLICK / WHEEL / TAB");
         int index = view.DockIndex;
         if (control != PlayerActionDockControlKind.Item && index != panel.SelectedIndex) return null;
         if (control == PlayerActionDockControlKind.Item &&

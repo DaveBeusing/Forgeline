@@ -48,9 +48,11 @@ public sealed class HoverTooltipController
         var next = new HoverTooltipView(snapshot.SessionId, EntityId.Invalid, default, pointer,
             false, layout.ViewportWidth, layout.ViewportHeight, layout.Scale);
         int count = panel.SelectionPending ? 0 : PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
-        if (panel.Ring.TryHit(pointer, out var radial) && radial.Navigation == ActionRingNavigation.None)
+        if (panel.Ring.TryHit(pointer, out var radial))
         {
-            var target = radial.Target;
+            var target = radial.Navigation is ActionRingNavigation.Parameters or ActionRingNavigation.NextItem
+                ? new PlayerActionDockHitTarget(PlayerActionDockControlKind.Item,panel.Mode,panel.SelectedIndex)
+                : radial.Navigation != ActionRingNavigation.None ? new(PlayerActionDockControlKind.Page,panel.Mode,panel.SelectedIndex) : radial.Target;
             next = next with { DockMode = target.Mode, DockControl = (int)target.Kind,
                 DockIndex = target.ItemIndex };
         }
