@@ -7,7 +7,7 @@ namespace ForgeLine.Presentation.Tests;
 // per-thread counters: https://github.com/dotnet/runtime/issues/134724.
 // Keep precise allocation checks away from concurrent allocating test classes.
 [CollectionDefinition(Name, DisableParallelization = true)]
-public sealed class FrameAllocationCollection
+public sealed class FrameAllocationTestGroup
 {
     public const string Name = "Frame allocation counters";
 
@@ -20,7 +20,7 @@ public sealed class FrameAllocationCollection
     }
 }
 
-[Collection(FrameAllocationCollection.Name)]
+[Collection(FrameAllocationTestGroup.Name)]
 public sealed class AllocationCounterTests
 {
     [Fact]
@@ -28,7 +28,7 @@ public sealed class AllocationCounterTests
     {
         _ = Allocate();
         Thread.SpinWait(1_000);
-        FrameAllocationCollection.CompleteBackgroundCollections();
+        FrameAllocationTestGroup.CompleteBackgroundCollections();
         long before = GC.GetAllocatedBytesForCurrentThread();
         Thread.SpinWait(1_000);
         long idle = GC.GetAllocatedBytesForCurrentThread() - before;
@@ -37,7 +37,7 @@ public sealed class AllocationCounterTests
         long positive = GC.GetAllocatedBytesForCurrentThread() - before;
         GC.KeepAlive(value);
         Assert.Equal(0, idle);
-        Assert.True(positive >= 37);
+        Assert.Equal(64, positive);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
