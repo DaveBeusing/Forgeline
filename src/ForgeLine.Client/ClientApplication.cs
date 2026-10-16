@@ -1596,7 +1596,11 @@ internal sealed class ClientApplication
                     MinimapPointerWorldTarget:
                         minimapInteraction.View.PointerWorldTarget,
                     MinimapCameraDragging:
-                        minimapInteraction.View.IsCameraDragging);
+                        minimapInteraction.View.IsCameraDragging)
+                {
+                    MovementFeedback = selectionController.CommandFeedback.View,
+                    TacticalFeedback = tacticalTargetingController.CommandFeedback.View
+                };
 
             HoverTooltipView tooltipView = hoverTooltip.Update(inputState, currentSnapshot,
                 selectionController.HoveredEntity, camera, interactionLayout, actionPanelView,

@@ -263,8 +263,17 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             var point = camera.WorldToScreen(targeting.PointerWorldTarget, width, height);
             if (point.IsVisible && targeting.PointerTargetValid) _skin.Target(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale));
         }
+        EmitOrderArtwork(camera, view.MovementFeedback, scale, width, height);
+        EmitOrderArtwork(camera, view.TacticalFeedback, scale, width, height);
         _skin.IconClip(new(0,0,width,height));
         _skin.PanelClip(new(0,0,width,height));
+    }
+
+    private void EmitOrderArtwork(RtsCamera camera, in RtsCommandMarkerView marker, float scale, int width, int height)
+    {
+        if (!marker.Visible) return;
+        var point = camera.WorldToScreen(marker.Position,width,height);
+        if (point.IsVisible) _skin.Order(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale),marker);
     }
 
     private void EmitMinimap(

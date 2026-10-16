@@ -14,6 +14,21 @@ namespace ForgeLine.Presentation.Tests;
 [Collection("Native scene output")]
 public sealed class TacticalArtworkTests
 {
+    [Fact]
+    public void OrderArtworkCopiesExistingIntentAndExpiryWithoutInventingAnAcknowledgement()
+    {
+        var feedback=new RtsCommandFeedback();
+        feedback.Show(new(12,0,34),true,true,attackMove:true);
+        var copy=feedback.View;
+        Assert.Equal(RtsCommandMarkerKind.AttackMove,copy.Kind);
+        Assert.True(copy.Valid); Assert.True(copy.Visible);
+        feedback.Advance(TimeSpan.FromSeconds(.79)); Assert.True(feedback.View.Visible);
+        feedback.Advance(TimeSpan.FromSeconds(.02)); Assert.False(feedback.View.Visible);
+        Assert.True(copy.Visible); // Published value cannot be changed by the controller.
+        feedback.Show(Vector3.Zero,false); Assert.False(feedback.View.Valid);
+        Assert.Equal(RtsCommandMarkerKind.Move,feedback.View.Kind);
+        feedback.Clear(); Assert.False(feedback.View.Visible);
+    }
     [Theory]
     [InlineData(1280,720,96u,.75f)] [InlineData(1920,1080,144u,1f)]
     [InlineData(2560,1440,192u,2f)] [InlineData(3440,1440,144u,1f)] [InlineData(3840,2160,192u,1f)]

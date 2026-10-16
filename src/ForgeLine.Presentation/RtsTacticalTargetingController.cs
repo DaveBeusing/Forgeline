@@ -170,7 +170,8 @@ public sealed class RtsTacticalTargetingController
             if (_hasPointerTarget)
             {
                 CommandFeedback.Show(_pointerWorldTarget, _pointerTargetValid,
-                    Mode is TacticalTargetingMode.Attack or TacticalTargetingMode.AttackMove or TacticalTargetingMode.FireMission);
+                    Mode is TacticalTargetingMode.Attack or TacticalTargetingMode.AttackMove or TacticalTargetingMode.FireMission,
+                    attackMove: Mode == TacticalTargetingMode.AttackMove);
             }
             TryResolveTarget(
                 camera,
