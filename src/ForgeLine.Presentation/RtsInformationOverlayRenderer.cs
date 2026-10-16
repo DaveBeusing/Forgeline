@@ -45,7 +45,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
         _text = new UiTextBatch(graphics);
-        try { _skin = new(graphics, runtimeAssets, icons: false, portraits: false); }
+        try { _skin = new(graphics, runtimeAssets, icons: true, portraits: false, maximumIcons: 4096); }
         catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
 
@@ -153,7 +153,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             return;
         }
 
-        _skin.Flush(context);
+        _skin.FlushPanels(context);
         if (_vertexCount > 0)
         {
             IGraphicsBuffer vertexBuffer =
@@ -174,6 +174,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
         }
 
+        // Terrain/fog and live lines precede clipped contact artwork; text remains last.
+        _skin.FlushArtwork(context);
         _text.Render(context);
         LastRenderedVertexCount = _vertexCount + _text.VertexCount + _skin.Vertices;
     }
@@ -225,7 +227,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             RtsMinimapInteractionLayout.GetLegendRect(
                 layout);
 
-        EmitQuad(
+        if (!_skin.Panel(layout.Minimap, "panel.minimap")) EmitQuad(
             layout.Minimap.X,
             layout.Minimap.Y,
             layout.Minimap.Width,
@@ -379,6 +381,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             }
         }
 
+        _skin.IconClip(map);
         for (int index = 0;
              index < model.Symbols.Count;
              index++)
@@ -403,8 +406,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 symbol.Kind is
                     RtsMinimapSymbolKind.Objective or
                     RtsMinimapSymbolKind.AttackNotification
-                    ? 9.0f * scale
-                    : 6.0f * scale;
+                    ? (_skin.Ready ? 14.0f : 9.0f) * scale
+                    : (_skin.Ready ? 11.0f : 6.0f) * scale;
 
             EmitIcon(
                 symbol.Icon,
@@ -507,6 +510,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             }
         }
 
+        _skin.IconClip(new HudRect(0, 0, width, height));
         Vector2 cameraPosition =
             RtsMinimapModelBuilder.NormalizeWorldPosition(
                 cameraTarget,
@@ -592,7 +596,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int width,
         int height)
     {
-        EmitQuad(
+        if (!_skin.Ready) EmitQuad(
             selector.X,
             selector.Y,
             selector.Width,
@@ -637,7 +641,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             bool selected =
                 mode ==
                 selectedMode;
-            EmitQuad(
+            if (!_skin.Control(rect, selected: selected, role: "control.tab")) EmitQuad(
                 rect.X,
                 rect.Y,
                 rect.Width,
@@ -722,7 +726,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int width,
         int height)
     {
-        EmitQuad(
+        if (!_skin.Panel(legend, "panel.inset")) EmitQuad(
             legend.X,
             legend.Y,
             legend.Width,
@@ -1773,6 +1777,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int width,
         int height)
     {
+        if (_skin.Icon(icon, x, y, size)) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
