@@ -7,7 +7,6 @@ using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
 
-[Collection(FrameAllocationTestGroup.Name)]
 public sealed class SimpleInstanceRendererTests : IDisposable
 {
     private readonly FakeGraphicsDevice _graphics = new();
@@ -155,7 +154,6 @@ public sealed class SimpleInstanceRendererTests : IDisposable
         using var renderer = new SimpleInstanceRenderer(_graphics);
         var context = new FakeGraphicsCommandContext();
         for (int i = 0; i < 32; i++) renderer.Render(context, camera, world, 1.0f);
-        FrameAllocationTestGroup.CompleteBackgroundCollections();
         long before = GC.GetAllocatedBytesForCurrentThread();
         for (int i = 0; i < 64; i++) renderer.Render(context, camera, world, 1.0f);
         Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
