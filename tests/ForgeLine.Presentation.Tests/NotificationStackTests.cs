@@ -52,6 +52,17 @@ public sealed class NotificationStackTests
     }
 
     [Fact]
+    public void CriticalSeveritySurvivesSummaryOnlySpace()
+    {
+        var snapshot=Snapshot(); var layout=GameplayHudLayout.Create(1280,720,192,2);
+        var stack=ActionableAlertLayout.Resolve(snapshot,layout,true);
+        Assert.Equal(1,stack.Count); Assert.Equal(5,stack.First.Item.Hidden);
+        Assert.Equal(HudAlertSeverity.Critical,NotificationText.Severity(snapshot.PlayerExperience!.Value,stack.First.Item));
+        Span<char> text=stackalloc char[256];
+        Assert.StartsWith("CRITICAL / MORE",NotificationText.Format(snapshot.PlayerExperience.Value,snapshot.Alerts,stack.First.Item,text).ToString());
+    }
+
+    [Fact]
     public void ThreeCardsAndOverflowKeepPriorityAndReachHiddenContent()
     {
         var snapshot = Snapshot(); var layout = GameplayHudLayout.Create(1920,1080,96);

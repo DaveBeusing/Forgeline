@@ -72,7 +72,15 @@ public static class ActionableAlertLayout
         if (consumed < total && y + summary <= bounds.Bottom)
         {
             var rect = new HudRect(bounds.X, y, bounds.Width, summary);
-            cards[count++] = new(new(default, Hidden: total - consumed), rect,
+            var representative = consumed == ResourcePowerHudModel.ResolveNotificationCount(experience)
+                ? new AlertNotification(default, Local: true) : Ordered(experience, consumed);
+            for (int i = consumed + 1; i < total; i++)
+            {
+                var candidate = i == ResourcePowerHudModel.ResolveNotificationCount(experience)
+                    ? new AlertNotification(default, Local: true) : Ordered(experience, i);
+                if (NotificationText.Severity(experience, candidate) > NotificationText.Severity(experience, representative)) representative = candidate;
+            }
+            cards[count++] = new(representative with { Hidden = total - consumed }, rect,
                 new(rect.X + padding, rect.Y + padding, rect.Width - 2 * padding, line), rect, rect, false);
         }
         return new(bounds, font, count, cards[0], cards[1], cards[2], cards[3], revision.ToHashCode());
@@ -100,7 +108,10 @@ internal static class NotificationText
         in AlertNotification item, Span<char> buffer, string localFeedback = "")
     {
         var b = new ResourcePowerHudRenderer.HudTextBuilder(buffer);
-        if (item.Hidden > 0) { b.Append("MORE / "); b.Append(item.Hidden); b.Append(" MESSAGES"); }
+        if (item.Hidden > 0) { var severity = Severity(experience, item);
+            if (severity == HudAlertSeverity.Critical) b.Append("CRITICAL / ");
+            else if (severity == HudAlertSeverity.Warning) b.Append("WARNING / ");
+            b.Append("MORE / "); b.Append(item.Hidden); b.Append(" MESSAGES"); }
         else if (item.Local) b.Append(localFeedback);
         else if (item.Feedback)
         {
@@ -123,6 +134,11 @@ internal static class NotificationText
         }
         return b.Written;
     }
+    public static HudAlertSeverity Severity(in PlayerExperienceSnapshot experience, in AlertNotification item) =>
+        item.Local ? HudAlertSeverity.Information : item.Feedback ? experience.Feedback.State switch
+        { PlayerCommandFeedbackState.Rejected => HudAlertSeverity.Critical, PlayerCommandFeedbackState.Partial => HudAlertSeverity.Warning, _ => HudAlertSeverity.Information }
+        : ResourcePowerHudModel.ResolveAlertSeverity(item.Kind);
+
     public static ulong Revision(ReadOnlySpan<char> text)
     { ulong hash = 14695981039346656037; foreach (char c in text) hash = unchecked((hash ^ c) * 1099511628211); return hash; }
 

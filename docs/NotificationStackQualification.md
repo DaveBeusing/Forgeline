@@ -74,3 +74,16 @@ passed structural/repeated-pixel checks. Review found that the provisional
 text now follow the existing actual dock content scale, with a 14-pixel floor.
 The display matrix requires that exact relationship. New captures must use the
 corrected source; the earlier images are retained as prior candidates.
+
+## Compact severity and immediate details
+
+A summary-only stack keeps the highest hidden severity, including explicit
+CRITICAL/WARNING text and the existing colored rail/skin state. The 720p,
+192-DPI, scale-2 expanded-dock case verifies that critical facts remain apparent
+when no regular card fits. Summary priority does not change the existing ordered
+notification data or its lifetime.
+
+Consumed notification input no longer suppresses the Operations surface. MORE
+opens details immediately and keeps them visible while the pointer remains over
+the source card. The local navigation owner still consumes the gesture once;
+modal/focus/placement suppression retains its existing meaning.

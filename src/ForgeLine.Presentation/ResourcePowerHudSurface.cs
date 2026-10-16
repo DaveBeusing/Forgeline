@@ -457,10 +457,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         {
             var card = stack.Card(i);
             var item = card.Item;
-            var color = item.Local ? HudAlertSeverity.Information : item.Feedback ? experience.Feedback.State == PlayerCommandFeedbackState.Rejected
-                ? HudAlertSeverity.Critical : experience.Feedback.State == PlayerCommandFeedbackState.Partial
-                    ? HudAlertSeverity.Warning : HudAlertSeverity.Information
-                : ResourcePowerHudModel.ResolveAlertSeverity(item.Kind);
+            var color = NotificationText.Severity(experience, item);
             if (!_skin.Panel(card.Bounds, "panel.raised")) EmitQuad(card.Bounds.X, card.Bounds.Y,
                 card.Bounds.Width, card.Bounds.Height, GameplayHudVisualStyle.PanelRaised, width, height);
             _skin.State(card.Bounds, color == HudAlertSeverity.Critical ? UiSkinState.Error : color == HudAlertSeverity.Warning ? UiSkinState.Warning : UiSkinState.Normal);
