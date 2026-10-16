@@ -412,6 +412,9 @@ public readonly record struct RtsInformationLayerView(
     Vector3 MinimapPointerWorldTarget = default,
     bool MinimapCameraDragging = false)
 {
+    public RtsCommandMarkerView MovementFeedback { get; init; }
+    public RtsCommandMarkerView TacticalFeedback { get; init; }
+
     public static RtsInformationLayerView Empty =>
         new(
             true,

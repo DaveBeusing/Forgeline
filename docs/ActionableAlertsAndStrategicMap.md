@@ -33,3 +33,7 @@ The HUD information update bounds alert cards and their actual pointer regions. 
 ## Graphical alert integration
 
 `ResourcePowerHudRenderer` now uses compiled raised cards, semantic icons and warning/error overlays while retaining severity labels/rails, priority, bounded records and exact FOCUS/OPS/MORE hit regions. Current visible Operations owns the overlapping area. Command feedback remains separate from work completion. Tactical map/cursor/world geometry retains its existing owner. See [production/operations contracts](GraphicalProductionAndOperations.md) and [qualification](GraphicalProductionAndOperationsQualification.md).
+
+## Graphical tactical integration
+
+[Production minimap/layer/marker and world feedback](GraphicalTacticalInterface.md) now uses the shared atlas over live geometry. Contacts keep faction-filtered identity and stored-position rules; map frames do not alter click transforms. Camera-footprint rays remain presentation geometry. Ranges/routes/coverage/placement retain their existing authority and shapes. [Source-bound qualification](GraphicalTacticalInterfaceQualification.md) records native pixel repeatability, copied private-fact exclusions, cursor hotspots and remaining gates.

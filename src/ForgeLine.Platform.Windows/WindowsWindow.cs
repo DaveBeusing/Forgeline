@@ -34,6 +34,40 @@ internal sealed class WindowsWindow : IWindow
     private string? _bootstrapStatus;
     private bool _bootstrapFailed;
     private WindowsWindowIcons? _icons;
+    private readonly Dictionary<WindowCursorImage, nint> _cursors = new();
+    private nint _cursor;
+    internal nint CursorHandle => _cursor;
+    internal int CursorCount => _cursors.Count;
+
+    public void ReleaseCursorImages()
+    {
+        SetCursorImage(null);
+        foreach (nint cursor in _cursors.Values) _ = WindowsNative.DestroyCursor(cursor);
+        _cursors.Clear();
+    }
+
+    public void SetCursorImage(WindowCursorImage? image)
+    {
+        EnsureOwnerThread();
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (image is not null) ThrowIfUnavailable();
+        nint next = 0;
+        if (image is not null && !_cursors.TryGetValue(image, out next))
+        {
+            if (_cursors.Count >= 44) throw new InvalidOperationException("Native pointer cache capacity exceeded.");
+            byte[] bytes = image.Resource();
+            next = WindowsNative.CreateIconFromResourceEx(bytes, (uint)bytes.Length, 0, 0x00030000, image.Size, image.Size, 0);
+            if (next == 0) throw CreateLastErrorException("Unable to create the native tactical cursor.");
+            _cursors.Add(image, next);
+        }
+        if (_cursor == next) return;
+        _cursor = next;
+        // WM_SETCURSOR limits ownership to the focused client area, including after DPI/window changes.
+        if (_isFocused && _handle != 0 && WindowsNative.GetCursorPos(out var pointer) != 0 &&
+            WindowsNative.ScreenToClient(_handle, ref pointer) != 0 && WindowsNative.GetClientRect(_handle, out var bounds) != 0 &&
+            pointer.X >= 0 && pointer.Y >= 0 && pointer.X < bounds.Right && pointer.Y < bounds.Bottom)
+            _ = WindowsNative.SendMessage(_handle, 0x0020, (nuint)_handle, 1);
+    }
     internal bool BootstrapPainted { get; private set; }
     internal bool BootstrapActive => _bootstrapStatus is not null;
 
@@ -303,6 +337,10 @@ internal sealed class WindowsWindow : IWindow
         }
 
         _isOpen = false;
+        _ = WindowsNative.SetCursor(WindowsNative.LoadCursor(0, new nint(WindowsNative.CursorArrow)));
+        foreach (nint cursor in _cursors.Values) _ = WindowsNative.DestroyCursor(cursor);
+        _cursors.Clear();
+        _cursor = 0;
         _icons?.Dispose();
         _icons = null;
         _inputEvents.Clear();
@@ -411,6 +449,9 @@ internal sealed class WindowsWindow : IWindow
     {
         switch (message)
         {
+            case 0x0020 when _isFocused && (lParam.ToInt64() & 0xffff) == 1 && _cursor != 0:
+                _ = WindowsNative.SetCursor(_cursor);
+                return 1;
             case WindowsNative.WmPaint when _bootstrapStatus is not null:
                 BootstrapPainted |= WindowsBootstrapSurface.Paint(windowHandle, _dpi, _bootstrapStatus, _bootstrapFailed);
                 return 0;
@@ -437,6 +478,7 @@ internal sealed class WindowsWindow : IWindow
                 return 0;
 
             case WindowsNative.WmKillFocus:
+                _ = WindowsNative.SetCursor(WindowsNative.LoadCursor(0, new nint(WindowsNative.CursorArrow)));
                 _isFocused = false;
                 _inputEvents.Enqueue(PlatformInputEvent.FocusLost());
                 EnqueueEvent(WindowEventKind.FocusLost);

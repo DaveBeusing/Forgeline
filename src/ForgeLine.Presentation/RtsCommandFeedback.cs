@@ -2,6 +2,9 @@ using System.Numerics;
 
 namespace ForgeLine.Presentation;
 
+public enum RtsCommandMarkerKind : byte { Move, Attack, AttackMove }
+public readonly record struct RtsCommandMarkerView(bool Visible, Vector3 Position, bool Valid, RtsCommandMarkerKind Kind);
+
 public sealed class RtsCommandFeedback
 {
     private float _remainingSeconds;
@@ -10,12 +13,16 @@ public sealed class RtsCommandFeedback
     public Vector3 Position { get; private set; }
     public bool IsValid { get; private set; }
     public bool IsAttack { get; private set; }
+    private bool _attackMove;
+    public RtsCommandMarkerView View => new(IsVisible, Position, IsValid,
+        _attackMove ? RtsCommandMarkerKind.AttackMove : IsAttack ? RtsCommandMarkerKind.Attack : RtsCommandMarkerKind.Move);
 
-    public void Show(Vector3 position, bool valid, bool attack = false)
+    public void Show(Vector3 position, bool valid, bool attack = false, bool attackMove = false)
     {
         Position = position;
         IsValid = valid;
         IsAttack = attack;
+        _attackMove = attack && attackMove;
         _remainingSeconds = 0.8f;
     }
 

@@ -21,7 +21,7 @@ public readonly record struct GameplayHudSkinDiagnostics(long CoreBytes, long Ic
 /// Bootstrap/test devices remain independent of assets; a required production asset failure is explicit.</summary>
 internal sealed class GameplayHudSkin : IDisposable
 {
-    private static readonly Dictionary<string, string> PanelIds = new[] { "panel.primary", "panel.resource", "panel.raised", "panel.compact", "panel.inset", "panel.portrait", "panel.tooltip", "control.button_compact", "control.tab" }
+    private static readonly Dictionary<string, string> PanelIds = new[] { "panel.primary", "panel.resource", "panel.raised", "panel.compact", "panel.inset", "panel.portrait", "panel.tooltip", "panel.minimap", "control.button_compact", "control.tab" }
         .ToDictionary(static role => role, static role => "ui.skin.directorate." + role, StringComparer.Ordinal);
     private readonly UiSkinResources? _core, _icons, _portraits;
     private readonly UiSkinBatch? _panels, _symbols, _images;
@@ -38,13 +38,13 @@ internal sealed class GameplayHudSkin : IDisposable
     }
     internal bool Ready => _panels is not null;
     internal int Vertices => (_panels?.Diagnostics.Vertices ?? 0) + (_symbols?.Diagnostics.Vertices ?? 0) + (_images?.Diagnostics.Vertices ?? 0);
-    internal GameplayHudSkin(IGraphicsDevice graphics, RuntimeAssetCatalog? catalog, bool icons = false, bool portraits = false)
+    internal GameplayHudSkin(IGraphicsDevice graphics, RuntimeAssetCatalog? catalog, bool icons = false, bool portraits = false, int maximumIcons = 256)
     {
         if (catalog is null || !graphics.SupportsUiText) return;
         try
         {
             _core = new(graphics, catalog);
-            foreach (string role in new[] { "panel.primary", "panel.resource", "panel.raised", "panel.compact", "panel.inset", "panel.portrait", "panel.tooltip",
+            foreach (string role in new[] { "panel.primary", "panel.resource", "panel.raised", "panel.compact", "panel.inset", "panel.portrait", "panel.tooltip", "panel.minimap",
                 "control.button_compact", "control.tab", "progress.progress_track", "progress.progress_fill",
                 "overlay.hover", "overlay.pressed", "overlay.focus", "overlay.selected", "overlay.disabled", "overlay.warning", "overlay.error", "overlay.pending", "overlay.accepted" })
                 _ = _core.Sprite("ui.skin.directorate." + role);
@@ -53,7 +53,10 @@ internal sealed class GameplayHudSkin : IDisposable
             {
                 _icons = new(graphics, catalog, UiSkinGroup.Icons);
                 foreach (string id in GameplayHudArtwork.RequiredIcons) _ = _icons.Sprite(id);
-                _symbols = new(graphics, _icons, maximumQuads: 256);
+                _ = _icons.Sprite("ui.artwork.directorate.world.selection_corner.p32");
+                foreach (string id in new[] { "ui.artwork.directorate.world.target.p32", "ui.artwork.directorate.world.move.p32",
+                    "ui.artwork.directorate.world.attack_move.p32", "ui.artwork.directorate.status.invalid.p32" }) _ = _icons.Sprite(id);
+                _symbols = new(graphics, _icons, maximumQuads: maximumIcons);
             }
             if (portraits)
             {
@@ -93,13 +96,27 @@ internal sealed class GameplayHudSkin : IDisposable
         return true;
     }
     internal void State(HudRect r, UiSkinState state) => _panels?.Overlay(state, Rect(r), Vector4.One);
-    internal bool Icon(RtsUiIcon icon, float x, float y, float size)
+    internal void PanelClip(HudRect r) => _panels?.SetClip(Rect(r));
+    internal void IconClip(HudRect r) => _symbols?.SetClip(Rect(r));
+    internal bool Icon(RtsUiIcon icon, float x, float y, float size, Vector4? tint = null)
     {
         if (_symbols is null) return false;
         string? id = GameplayHudArtwork.Icon(icon, size);
         if (id is null) return false;
-        _symbols.Draw(id, new(x,y,size,size), Vector4.One);
+        _symbols.Draw(id, new(x,y,size,size), tint ?? Vector4.One);
         return true;
+    }
+    internal void Projected(string id, Vector2 a, Vector2 b, Vector2 c, Vector2 d, Vector4 tint) => _symbols?.DrawProjected(id, a, b, c, d, tint);
+    internal void Target(HudRect r) => _symbols?.Draw("ui.artwork.directorate.world.target.p32", Rect(r), Vector4.One);
+    internal void Order(HudRect r, in RtsCommandMarkerView marker)
+    {
+        string id = !marker.Valid ? "ui.artwork.directorate.status.invalid.p32" : marker.Kind switch
+        {
+            RtsCommandMarkerKind.AttackMove => "ui.artwork.directorate.world.attack_move.p32",
+            RtsCommandMarkerKind.Attack => "ui.artwork.directorate.world.target.p32",
+            _ => "ui.artwork.directorate.world.move.p32"
+        };
+        _symbols?.Draw(id, Rect(r), Vector4.One);
     }
     internal bool Portrait(in PlayerSelectionSummary selection, HudRect r)
     {
@@ -129,7 +146,9 @@ internal sealed class GameplayHudSkin : IDisposable
             _panels.Draw("ui.skin.directorate.progress.progress_fill", Rect(r), tint, sliced, (float)Math.Clamp(fraction,0,1));
         return true;
     }
-    internal void Flush(IGraphicsCommandContext context) { _panels?.Flush(context); _symbols?.Flush(context); _images?.Flush(context); }
+    internal void FlushPanels(IGraphicsCommandContext context) => _panels?.Flush(context);
+    internal void FlushArtwork(IGraphicsCommandContext context) { _symbols?.Flush(context); _images?.Flush(context); }
+    internal void Flush(IGraphicsCommandContext context) { FlushPanels(context); FlushArtwork(context); }
     private static UiSkinRect Rect(HudRect r) => new(r.X,r.Y,r.Width,r.Height);
     public void Dispose()
     {

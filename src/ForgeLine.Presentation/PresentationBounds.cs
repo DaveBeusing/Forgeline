@@ -92,7 +92,7 @@ public static class PresentationBounds
             0.5f,
             MinimumHalfExtents.Y);
 
-    private static Quaternion ResolveRotation(
+    internal static Quaternion ResolveRotation(
         Quaternion rotation)
     {
         float lengthSquared =

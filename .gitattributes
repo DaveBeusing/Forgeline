@@ -26,3 +26,7 @@ docs/qualification/graphical-battlefield/*.json -text whitespace=blank-at-eol,bl
 docs/qualification/graphical-battlefield/evidence.json text eol=lf
 
 docs/qualification/graphical-operations/evidence.json text eol=lf
+
+docs/qualification/graphical-tactical/evidence.json text eol=lf
+docs/qualification/graphical-tactical/*.png binary
+docs/qualification/graphical-tactical/*.zip binary
