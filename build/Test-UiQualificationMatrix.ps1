@@ -19,7 +19,9 @@ foreach ($cohort in $cohorts) {
     $dimensions = $cohort.display.Split('x')
     $captures = @(foreach ($scenario in $scenarios) {
         foreach ($scale in @(.75,1,2)) {
-            [pscustomobject]@{ key="$($cohort.id)/$scenario/$scale"; ui=[pscustomobject]@{scenario=$scenario};
+            [pscustomobject]@{ key="$($cohort.id)/$scenario/$scale";
+                ui=[pscustomobject]@{scenario=$scenario;skin=[pscustomobject]@{missingAssets=0;droppedQuads=0}};
+                graphics=[pscustomobject]@{health=[pscustomobject]@{submissionFaultCount=0}};
                 uiScale=$scale; rasterDpi=$cohort.dpi;
                 requestedDisplay=[pscustomobject]@{width=[int]$dimensions[0];height=[int]$dimensions[1]};
                 actualSurface=[pscustomobject]@{width=[int]$dimensions[0];height=[int]$dimensions[1]} }
@@ -42,6 +44,15 @@ foreach ($cohort in $cohorts) {
     $captures[0].rasterDpi++
     Reject { Assert-UiQualificationCoverage $manifest $cohort $commit }
     $captures[0].rasterDpi--
+    $captures[0].ui.skin.missingAssets++
+    Reject { Assert-UiQualificationCoverage $manifest $cohort $commit }
+    $captures[0].ui.skin.missingAssets--
+    $captures[0].ui.skin.droppedQuads++
+    Reject { Assert-UiQualificationCoverage $manifest $cohort $commit }
+    $captures[0].ui.skin.droppedQuads--
+    $captures[0].graphics.health.submissionFaultCount++
+    Reject { Assert-UiQualificationCoverage $manifest $cohort $commit }
+    $captures[0].graphics.health.submissionFaultCount--
     $captures[0].ui.scenario = 'Unknown'
     Reject { Assert-UiQualificationCoverage $manifest $cohort $commit }
 }

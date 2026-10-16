@@ -45,6 +45,14 @@ function Assert-UiQualificationCoverage {
             $capture.actualSurface.height -ne [int]$dimensions[1]) {
             throw "Incorrect requested or native output/DPI: $($capture.key)"
         }
+        if ($capture.graphics.health.submissionFaultCount -ne 0) { throw "Submission fault: $($capture.key)" }
+        foreach ($name in @('skin','battlefieldSkin')) {
+            if ($capture.ui.PSObject.Properties.Name -contains $name -and $null -ne $capture.ui.$name) {
+                if ($capture.ui.$name.missingAssets -ne 0 -or $capture.ui.$name.droppedQuads -ne 0) {
+                    throw "Incomplete production skin: $($capture.key)"
+                }
+            }
+        }
     }
     if ($expected.Count) { throw "Missing $($expected.Count) UI cases in $($Cohort.id)." }
 }
