@@ -1060,6 +1060,18 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         if (!double.IsFinite(value)) { builder.Append("N/A"); return; }
         double normalized = Math.Max(0.0, value);
 
+        if (normalized >= 1_000_000_000_000.0)
+        {
+            builder.Append(normalized, "0.#E0");
+            return;
+        }
+        if (normalized >= 1_000_000_000.0)
+        {
+            builder.Append(normalized / 1_000_000_000.0, "F1");
+            builder.Append("B");
+            return;
+        }
+
         if (normalized >=
             1_000_000.0)
         {
