@@ -1,0 +1,23 @@
+[
+  {
+    "file": "notifications-1080p.png",
+    "source": "7a421bef309118dea32726dcd292321975b76a75",
+    "sha256": "10dc3ca1b8f9cc3e01f9c8f85e399c59cd267e9fbbef2694b9d047de82d5cb8c",
+    "bytes": 4411745,
+    "visualAcceptance": "pending"
+  },
+  {
+    "file": "critical-overflow-720p.png",
+    "source": "7a421bef309118dea32726dcd292321975b76a75",
+    "sha256": "96a989c553b138b7449a0d38f663ecb538d2464157c199dc73cf4dcc427383df",
+    "bytes": 1408549,
+    "visualAcceptance": "pending"
+  },
+  {
+    "file": "details-4k.png",
+    "source": "3b5c545e4396c56a40f8ac54cb82fa285370e4da",
+    "sha256": "a646622f59b60fd8e190c4663e0217d7ea5e261593074af9077eb5afcae0c569",
+    "bytes": 8008330,
+    "visualAcceptance": "pending"
+  }
+]

@@ -33,7 +33,7 @@ The command dock now renders its existing domain cards from prepared production 
 
 Frames use `ui.skin.directorate.control.button_compact`, `panel.primary`, `panel.raised`, `panel.inset`, `panel.portrait` and `panel.tooltip`, with existing `overlay.*` and `progress.progress_track` / `progress.progress_fill` sprites. No source, definition, atlas or compiled asset is changed. Reference sheets remain reference-only.
 
-The owners record skin, remaining dynamic geometry, then live text. Operations first submits an opaque underlay from its existing upload buffer, then the skin and dynamic rails/text. Alert drawing is withheld only while a current visible Operations panel owns that area. No decorative hit region is added. Shared resources and optional catalog-free bootstrap paths retain their original lifetime rules.
+The owners record skin, remaining dynamic geometry, then live text. Operations first submits an opaque underlay from its existing upload buffer, then the skin and dynamic rails/text. Alert drawing continues in the right stack while Operations owns its separate left panel. No decorative hit region is added. Shared resources and optional catalog-free bootstrap paths retain their original lifetime rules.
 
 Below the track's authored twelve-pixel height, the complete progress sprite is resampled so compressed nine-slice borders do not remove its centre. Filling clips actual width/UVs and never stretches a fraction across the entire track. Normal cards place progress above selection decoration; compact cards retain numeric progress and avoid overlaying cost text.
 

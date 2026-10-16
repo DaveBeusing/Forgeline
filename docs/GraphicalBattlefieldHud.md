@@ -54,8 +54,8 @@ looking up entities or private gameplay data. Work continues to use the copied
 
 Shared hit regions follow the revised responsive geometry. Command submission,
 readiness/work authority and input confirmation retain their existing behavior.
-Production/operations card contents and alerts stay
-with their existing owners for the production interface migration. Minimap,
+Production/operations cards and alerts retain their existing domain owners;
+notifications consume the shared right-dock geometry. Minimap,
 cursor, world markers and dynamic tactical geometry are outside this migration.
 Normal HUD surfaces do not draw or reserve FPS/SIM/TPS counters. Detailed
 statistics remain available through Shift+F1, independently of resource rendering.
