@@ -29,7 +29,10 @@ Bodies retain a 14 physical-pixel floor. Below 260 physical pixels of width or
 140 of height, a reduced objective/binding view replaces context/next-step rows;
 all text uses actual atlas metrics and ellipsis. Safe bounds remain at the top;
 no fullscreen modal or downward relocation is used. The tab is 56 design pixels
-wide and 48 high, capped by safe bounds; HINT and a right chevron identify restore.
+wide and 48 high at unit scale. Its physical scale is bounded between 1 and 1.5
+before safe bounds clip it, keeping restore compact on large HUDs. The label has
+its own padded rectangle and 14–24 px native type; HINT and a right chevron
+identify restore.
 Clients with no usable safe region publish no target.
 
 One 220 ms presentation-time SmoothStep transition can reverse from its current
