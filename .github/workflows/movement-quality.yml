@@ -1,0 +1,75 @@
+name: Movement quality
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'src/ForgeLine.Navigation/**'
+      - 'src/ForgeLine.Game/**'
+      - 'src/ForgeLine.Presentation/**'
+      - 'tests/ForgeLine.Navigation.Tests/**'
+      - 'tests/ForgeLine.Game.Tests/**'
+      - 'tests/ForgeLine.Presentation.Tests/**'
+      - 'benchmarks/ForgeLine.Navigation.Benchmarks/**'
+      - 'build/Measure-NavigationComparison.ps1'
+      - 'Directory.Build.props'
+      - 'Directory.Packages.props'
+      - 'global.json'
+      - '.github/workflows/movement-quality.yml'
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: movement-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: '1'
+  TESTINGPLATFORM_TELEMETRY_OPTOUT: '1'
+
+jobs:
+  navigation-movement:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Restore
+        run: dotnet restore ForgeLine.sln
+      - name: Validate project boundaries
+        shell: pwsh
+        run: ./build/Validate-ProjectReferences.ps1
+      - name: Release build
+        run: dotnet build ForgeLine.sln --configuration Release --no-restore
+      - name: Navigation correctness and quality
+        run: dotnet test --project tests/ForgeLine.Navigation.Tests/ForgeLine.Navigation.Tests.csproj --configuration Release --no-build
+      - name: Locomotion, formations and navigation handoff
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class '*GroundMovement*' '*FormationMovement*' '*HierarchicalNavigation*'
+      - name: Mechanical motion and interpolation
+        run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class '*Mechanical*' '*RenderWorld*' '*RenderInterpolation*'
+      - name: Canonical map connectivity
+        run: dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/movement-map-qualification.json
+      - name: Paired navigation CPU and allocation measurements
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        env:
+          NAVIGATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: ./build/Measure-NavigationComparison.ps1 -BaseRef "$env:NAVIGATION_BASE_SHA"
+      - name: Preserve qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: movement-quality
+          path: |
+            artifacts/movement-map-qualification.json
+            artifacts/movement-quality/
+          if-no-files-found: ignore

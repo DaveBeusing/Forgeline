@@ -7,7 +7,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
-public sealed class GroundMovementSystem : ISimulationSystem
+public sealed partial class GroundMovementSystem : ISimulationSystem
 {
     private const float MinimumDirectionLengthSquared = 0.000001f;
     private const float RadiansToDegrees = 180.0f / MathF.PI;
@@ -286,6 +286,11 @@ public sealed class GroundMovementSystem : ISimulationSystem
             return;
         }
 
+        QueryMovementNeighborhood(
+            position,
+            MathF.Max(Horizontal(state.Velocity).Length(), movement.MaximumSpeed) * deltaSeconds,
+            movement);
+
         Vector3 targetDirection = NormalizeHorizontal(targetDelta);
         Vector3 steering = targetDirection;
 
@@ -367,8 +372,11 @@ public sealed class GroundMovementSystem : ISimulationSystem
             desiredSpeed,
             speedChange);
 
-        Vector3 candidate =
-            position + forward * (speed * deltaSeconds);
+        Vector3 candidate = GroundMovementStep.ClampArrival(
+            position,
+            position + forward * (speed * deltaSeconds),
+            order.WorldTarget,
+            movement.StopRadius + 0.01f);
 
         ResolveMobilePenetration(
             entity,
@@ -378,6 +386,7 @@ public sealed class GroundMovementSystem : ISimulationSystem
             entity,
             ref candidate,
             movement);
+        ConstrainStaticStep(entity, position, ref candidate, movement);
 
         bool terrainBlocked = !TryApplyTerrain(
             ref candidate,
@@ -499,24 +508,10 @@ public sealed class GroundMovementSystem : ISimulationSystem
         in GroundMovement movement,
         ref int adjustmentCount)
     {
-        if (_spatialIndex is null)
+        if (_spatialIndex is null || _options.SeparationWeight <= 0.0f)
         {
-            _neighborBuffer.Clear();
             return Vector3.Zero;
         }
-
-        if (_options.SeparationWeight <= 0.0f)
-        {
-            _neighborBuffer.Clear();
-            return Vector3.Zero;
-        }
-
-        _spatialIndex.QueryRadius(
-            position,
-            movement.SeparationRadius,
-            _neighborBuffer,
-            new SpatialQueryFilter(Mobility: SpatialMobility.Mobile),
-            SpatialQueryOrder.StableEntityId);
 
         Vector3 steering = Vector3.Zero;
         ReadOnlySpan<EntityId> neighbors = _neighborBuffer.Results;
@@ -589,21 +584,8 @@ public sealed class GroundMovementSystem : ISimulationSystem
             movement.ObstacleLookAhead <= 0.0f ||
             _options.ObstacleSteeringWeight <= 0.0f)
         {
-            _obstacleBuffer.Clear();
             return Vector3.Zero;
         }
-
-        float queryRadius =
-            movement.ObstacleLookAhead +
-            movement.Radius +
-            _options.ObstacleClearanceMeters;
-
-        _spatialIndex.QueryRadius(
-            position,
-            queryRadius,
-            _obstacleBuffer,
-            new SpatialQueryFilter(Mobility: SpatialMobility.Static),
-            SpatialQueryOrder.StableEntityId);
 
         Vector3 probe =
             position + targetDirection * movement.ObstacleLookAhead;
