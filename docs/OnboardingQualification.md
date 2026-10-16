@@ -43,3 +43,34 @@ results remain pending. All old failed build logs are retained; the second compi
 error was a compact-state variable referenced outside its renderer scope, fixed
 locally without changing a test. Native tooling also adopted the existing cached
 JSON-options convention after the analyzer rejected its one-shot options instance.
+
+## Native first pass and tab correction
+
+Product source bad397aa21f5bd4b5222982f01473196ba47a79a:
+`artifacts/onboarding-native-sequence/qualification.json` records 120 quarter-time
+samples, two identical readbacks each, both directions, 30/60/144 Hz inputs,
+normal/reduced motion and 720p high-scale/1080p clients. Source identity, native
+adapter, text, skin and health are recorded. The 40 original PNGs remain local.
+Native execution exits 0; no glyph/skin/submission failures were observed.
+
+Image inspection found the high-scale tab label truncated to HI… because its body
+text padding consumed too much width. The tab now publishes a separate padded
+label rectangle and readable text size; native centered text uses that rectangle.
+Four font-metric fit cases cover the complete HINT label. The subsequent focused
+geometry/guidance/text run passes 97 cases, with a warning/error-free build.
+These corrected images still need fresh source-bound capture.
+
+The first package attempt in artifacts/onboarding-package failed manifest-tree
+reproducibility while source/build work overlapped its two publish passes. It is
+invalid qualification evidence and is retained unchanged, not overwritten or
+called a successful package. Final packaging must run with frozen source and no
+concurrent builds, in a new output directory. The natural validation match runs
+from an immutable headless copy, preserving source-output DLL ownership.
+
+Canonical assets: 1,337 records / successful forced rebuild and asset-process
+contracts; no inputs changed. Map qualification: 71 reachability checks, two
+alternate navigation links and two alternate road links. Headless 1,000/10,000
+entity smoke tests pass. Next: commit tab fix, rebuild that source, repeat native
+sequences/bright-dark snapshots, run complete solution, then isolated reproducible
+package and fresh-settings smoke. Current-head hosted checks and human review
+remain open.

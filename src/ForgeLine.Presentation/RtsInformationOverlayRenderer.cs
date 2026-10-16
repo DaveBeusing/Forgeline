@@ -1139,9 +1139,11 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             var tab = state.Tab;
             if (!_skin.Panel(tab, "control.button_compact", OnboardingPresentation.BackgroundAlpha))
                 EmitQuad(tab.X, tab.Y, tab.Width, tab.Height, GameplayHudVisualStyle.PanelRaised with { W = OnboardingPresentation.BackgroundAlpha }, width, height);
-            float tabSize = MathF.Min(16 * MathF.Max(1, MathF.Min(layout.Scale, 1.5f)), tab.Width / 2.6f);
-            float tabY = tab.Y + 4;
-            ContextBlock("HINT", ref tabY, tab, tabSize / 16, false, 1, width, height);
+            float tabSize = state.TabTextSize;
+            var label = state.TabLabelBounds;
+            if (!_text.AddCentered("HINT", label, tabSize, GameplayHudVisualStyle.TextPrimary, width, height))
+                EmitText("HINT", label.X, label.Y, label.Right, GameplayHudVisualStyle.TextPrimary,
+                    tabSize / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
             _text.Add(">", tab.X + 10, tab.Y + tab.Height / 2, tabSize, GameplayHudVisualStyle.TextPrimary, width, height, tab.Width - 12);
         }
         if (!placement && state.Focused)

@@ -13,6 +13,8 @@ public readonly record struct OnboardingPresentation(OnboardingPhase Phase, HudR
     public const float TabWidth = 56;
     public static readonly TimeSpan Duration = TimeSpan.FromMilliseconds(220);
     public string AccessibleName => Collapse > 0 ? "Restore onboarding hint" : "Minimize onboarding hint";
+    public HudRect TabLabelBounds => new(Tab.X + 4, Tab.Y + 4, MathF.Max(0, Tab.Width - 8), Tab.Height * .5f);
+    public float TabTextSize => MathF.Min(24, MathF.Max(14, Tab.Width * 16 / TabWidth));
     public bool Compact => Clip.Width < 260 || Clip.Height < 140;
     public bool Visible => Phase != OnboardingPhase.Hidden;
     public bool Contains(Vector2 point) => Visible && (VisiblePanel.Contains(point) || Tab.Contains(point));

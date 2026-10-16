@@ -25,6 +25,20 @@ public sealed class OnboardingGeometryTests
         Assert.False(state.Contains(new(state.Clip.X - 1, state.Clip.Y + 10)));
     }
 
+    [Theory]
+    [InlineData(1280, 720, 192, 2)]
+    [InlineData(1920, 1080, 96, 1)]
+    [InlineData(3840, 2160, 192, 2)]
+    [InlineData(1024, 720, 144, .75f)]
+    public void RestoreTabFitsItsCompleteNameAtAReadableSize(int width, int height, uint dpi, float scale)
+    {
+        var state = OnboardingPresentation.Resolve(GameplayHudLayout.Create(width, height, dpi, scale), 1);
+        Assert.False(state.Tab.IsEmpty);
+        Assert.True(UiFontMetrics.Default.Measure("HINT", state.TabTextSize) <= state.TabLabelBounds.Width);
+        Assert.InRange(state.TabTextSize, 14, 24);
+        Assert.Equal("Restore onboarding hint", state.AccessibleName);
+    }
+
     [Fact]
     public void SlidingHintCannotCaptureAnExistingWorldDragOrItsRelease()
     {
