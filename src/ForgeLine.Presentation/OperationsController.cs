@@ -117,7 +117,7 @@ public sealed class OperationsController
     { View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
     public void CancelInput(InputState input) => _press = input.MousePressSequence(PlatformMouseButton.Left);
     public OperationsInteraction Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
-        PresentationInteractionState interaction, bool blocked = false)
+        PresentationInteractionState interaction, bool blocked = false, bool inputCaptured = false)
     {
         ulong press = input.MousePressSequence(PlatformMouseButton.Left);
         bool fresh = press != _press; _press = press;
@@ -139,7 +139,7 @@ public sealed class OperationsController
         bool captured = input.HasPointerPosition && (entry.Contains(input.PointerPosition) || View.Open && panel.Contains(input.PointerPosition));
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
         captured |= fresh && originValid && (entry.Contains(origin) || View.Open && panel.Contains(origin));
-        if (transition || !fresh || !input.HasPointerPosition || !originValid || snapshot?.PlayerExperience is null ||
+        if (inputCaptured || transition || !fresh || !input.HasPointerPosition || !originValid || snapshot?.PlayerExperience is null ||
             !snapshot.SessionId.IsSpecified || snapshot.PlayerExperience.Value.IsMatchComplete) return new(captured);
         if (entry.Contains(origin))
         {

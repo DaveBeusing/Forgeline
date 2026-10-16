@@ -170,6 +170,25 @@ public sealed class NotificationStackTests
     }
 
     [Fact]
+    public void MoreOpensDetailsImmediatelyWhilePointerRemainsOverStack()
+    {
+        var input=new InputState(); var alerts=new ActionableAlertController(); var operations=new OperationsController();
+        var interaction=new PresentationInteractionState(); var snapshot=Snapshot();
+        var layout=GameplayHudLayout.Create(1920,1080,96);
+        alerts.Update(input,snapshot,layout); operations.Update(input,snapshot,layout,interaction);
+        Click(input,ActionableAlertLayout.Resolve(snapshot,layout).Overflow.Bounds);
+        var result=alerts.Update(input,snapshot,layout);
+        Assert.True(result.NotificationDetails);
+        operations.OpenNotifications(snapshot.SessionId,interaction);
+        operations.Update(input,snapshot,layout,interaction,inputCaptured:result.Captured);
+        Assert.True(operations.View.Open); Assert.False(operations.View.Suppressed);
+        input.BeginFrame(); result=alerts.Update(input,snapshot,layout);
+        Assert.True(result.Captured); Assert.False(result.OpenOperations);
+        operations.Update(input,snapshot,layout,interaction,inputCaptured:result.Captured);
+        Assert.True(operations.View.Notifications); Assert.False(operations.View.Suppressed);
+    }
+
+    [Fact]
     public void OperationsOffersNotificationsWithoutVisibleStackOrFacilityData()
     {
         var input=new InputState(); var controller=new OperationsController();

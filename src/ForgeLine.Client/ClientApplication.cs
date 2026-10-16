@@ -1246,8 +1246,8 @@ internal sealed class ClientApplication
                 else operationsController.OpenCategory(alertResult.Category, inputSnapshot.SessionId, presentationInteraction);
             }
             var operationsResult = operationsController.Update(inputState, inputSnapshot, interactionLayout, presentationInteraction,
-                blocked: alertResult.Captured || modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
-                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
+                blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, inputCaptured: alertResult.Captured);
             hudInteraction.CapturePointer(operationsResult.Captured);
             if (operationsResult.Navigate.IsValid && inputSnapshot is not null)
             {
