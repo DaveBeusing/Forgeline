@@ -64,7 +64,7 @@ public sealed class TacticalArtworkTests
         Render(instance with {Selectable=new(new PlayerId(2),ControllableEntityCategory.Unit)},experience);
         Assert.Equal(0,renderer.LastWorldCorners); Assert.Equal(0,renderer.LastWorldMeters);
         // Repeated thousand-unit map/group updates reuse atlas pages and bounded buffers.
-        var army = Enumerable.Range(1,1000).Select(i => instance with { Entity=new EntityId(i,1),
+        var army = Enumerable.Range(1,1000).Select(i => instance with { Entity=new EntityId((uint)i,1),
             Transform=instance.Transform with {Position=new Vector3((i%40-20)*8,0,(i/40-12)*8)} }).ToArray();
         var armyView=view with {MinimapEnabled=true,SelectedEntities=army.Select(i=>i.Entity).ToArray()};
         var armySnapshot=new PresentationSnapshot(new SimulationTick(1),TimeSpan.FromMilliseconds(50),1000,army,
