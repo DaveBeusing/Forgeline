@@ -17,9 +17,10 @@ $commit = (& git -C $repository rev-parse HEAD).Trim()
 if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve source identity.' }
 if ($Capture -and (& git -C $repository status --porcelain)) { throw 'Commit and build before capturing.' }
 $plan = [ordered]@{
-    schemaVersion = 1; commit = $commit
+    schemaVersion = 2; commit = $commit
     clientSha256 = (Get-FileHash -LiteralPath $client).Hash
     runtimeManifestSha256 = (Get-FileHash -LiteralPath (Join-Path $runtime 'manifest.json')).Hash
+    runtimeFingerprint = Get-UiRuntimeFingerprint -Root $runtime
     client = $client; runtimeRoot = $runtime
     scenarios = @(Get-UiQualificationScenarios); uiScales = @(.75,1,2)
     cohorts = @(Get-UiQualificationCohorts)
@@ -29,7 +30,7 @@ $plan = [ordered]@{
 $planPath = Join-Path $output 'plan.json'
 if ($Resume) {
     $previous = Get-Content -LiteralPath $planPath -Raw | ConvertFrom-Json
-    foreach ($field in @('commit','clientSha256','runtimeManifestSha256','client','runtimeRoot')) {
+    foreach ($field in @('commit','clientSha256','runtimeManifestSha256','runtimeFingerprint','client','runtimeRoot')) {
         if ($previous.$field -cne $plan[$field]) { throw "Resume identity changed: $field" }
     }
     if (($previous.scenarios -join ',') -cne ($plan.scenarios -join ',') -or
@@ -71,6 +72,7 @@ foreach ($cohort in $plan.cohorts) {
     if ($manifest.clientAssemblySha256 -cne $clientAssembly -or $manifest.presentationAssemblySha256 -cne $presentationAssembly) {
         throw 'Completed cohort has different binary hashes.'
     }
+    if ($manifest.runtimeFingerprint -cne $plan.runtimeFingerprint) { throw 'Runtime tree differs from the pinned plan.' }
     if ($completed.Count -and $manifest.runtimeFingerprint -cne $completed[0].runtimeFingerprint) { throw 'Runtime content changed between cohorts.' }
     # Revalidate originals on resume, retaining previous diagnostic reports.
     $validation = Join-Path $output "$($cohort.id)-attempt$attempt.validation-$([DateTime]::UtcNow.Ticks).json"

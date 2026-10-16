@@ -13,10 +13,12 @@ if (@(Compare-Object $scenarios @(Get-UiQualificationScenarios) -CaseSensitive).
     throw 'Qualification matrix does not cover every named UI fixture.'
 }
 $cohorts = @(Get-UiQualificationCohorts)
-if ($cohorts.Count -ne 30 -or @($cohorts.id | Select-Object -Unique).Count -ne 30) { throw 'Incomplete display/DPI matrix.' }
+$expectedCohorts = 15 * [int][Math]::Ceiling($scenarios.Count / 29.0)
+if ($cohorts.Count -ne $expectedCohorts -or @($cohorts.id | Select-Object -Unique).Count -ne $expectedCohorts) { throw 'Incomplete display/DPI matrix.' }
 foreach ($group in $cohorts | Group-Object dpi,display) {
     $union = @($group.Group | ForEach-Object scenarios)
-    if ($union.Count -ne 58 -or @($union | Select-Object -Unique).Count -ne 58) { throw 'State banks overlap or omit fixtures.' }
+    if ($union.Count -ne $scenarios.Count -or @($union | Select-Object -Unique).Count -ne $scenarios.Count -or
+        @(Compare-Object $scenarios $union -CaseSensitive).Count) { throw 'State banks overlap or omit fixtures.' }
 }
 $commit = 'a' * 40
 $complete = @()
@@ -51,6 +53,10 @@ foreach ($cohort in $cohorts) {
     $captures[0].rasterDpi++
     Reject { Assert-UiQualificationCoverage $manifest $cohort $commit }
     $captures[0].rasterDpi--
+    $skin = $captures[0].ui.skin
+    $captures[0].ui.skin = $null
+    Reject { Assert-UiQualificationCoverage $manifest $cohort $commit }
+    $captures[0].ui.skin = $skin
     $captures[0].ui.skin.missingAssets++
     Reject { Assert-UiQualificationCoverage $manifest $cohort $commit }
     $captures[0].ui.skin.missingAssets--
@@ -63,9 +69,10 @@ foreach ($cohort in $cohorts) {
     $captures[0].ui.scenario = 'Unknown'
     Reject { Assert-UiQualificationCoverage $manifest $cohort $commit }
 }
-Assert-UiQualificationUnion $complete 2610
-Reject { Assert-UiQualificationUnion $complete[1..29] 2610 }
-Reject { Assert-UiQualificationUnion ($complete + $complete[0]) 2610 }
+$expectedCases = $scenarios.Count * 45
+Assert-UiQualificationUnion $complete $expectedCases
+Reject { Assert-UiQualificationUnion $complete[1..($complete.Count-1)] $expectedCases }
+Reject { Assert-UiQualificationUnion ($complete + $complete[0]) $expectedCases }
 # Keep every existing distinct-state pair together so native comparison still runs.
 $distinct = [regex]::Matches($source, '\(UiReferenceScenario\.(\w+), UiReferenceScenario\.(\w+)\)')
 foreach ($pair in $distinct) {
@@ -74,3 +81,34 @@ foreach ($pair in $distinct) {
     }
 }
 Write-Output "UI coverage contracts passed: $($scenarios.Count) states x 45 display/DPI/scale combinations; incomplete, duplicate, changed-source, wrong-output and unexpected cases rejected. Synthetic metadata is not native evidence."
+
+# A future state beyond two banks must neither disappear nor duplicate an existing state.
+$extended = @($scenarios) + 'AdditionalFixture'
+foreach ($group in @(Get-UiQualificationCohorts -Scenarios $extended) | Group-Object dpi,display) {
+    $union = @($group.Group | ForEach-Object scenarios)
+    if ($union.Count -ne $extended.Count -or @(Compare-Object $extended $union -CaseSensitive).Count -or
+        @($group.Group | Where-Object { $_.scenarios.Count -gt 29 }).Count) { throw 'Extended state banking lost coverage.' }
+}
+# Runtime playback sidecars participate even when the sealed manifest is unchanged.
+$temporary = Join-Path ([IO.Path]::GetTempPath()) ('ui-runtime-fingerprint-' + [Guid]::NewGuid().ToString('N'))
+$first = Join-Path $temporary 'first'
+$second = Join-Path $temporary 'second'
+try {
+    [void][IO.Directory]::CreateDirectory($first)
+    [void][IO.Directory]::CreateDirectory($second)
+    [IO.File]::WriteAllText((Join-Path $first 'manifest.json'), '{}')
+    [IO.File]::WriteAllText((Join-Path $second 'manifest.json'), '{}')
+    $initial = Get-UiRuntimeFingerprint $first
+    if ($initial -cne (Get-UiRuntimeFingerprint $second)) { throw 'Fingerprint includes absolute root.' }
+    [IO.File]::WriteAllBytes((Join-Path $first 'cue.wav'), [byte[]]@(1,2,3))
+    $withSidecar = Get-UiRuntimeFingerprint $first
+    if ($withSidecar -ceq $initial) { throw 'Sidecar addition was ignored.' }
+    [IO.File]::WriteAllBytes((Join-Path $first 'cue.wav'), [byte[]]@(1,2,4))
+    if ((Get-UiRuntimeFingerprint $first) -ceq $withSidecar) { throw 'Sidecar mutation was ignored.' }
+} finally {
+    $resolved = [IO.Path]::GetFullPath($temporary)
+    $prefix = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\') + [IO.Path]::DirectorySeparatorChar
+    if (-not $resolved.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Temporary path escaped its root.' }
+    Remove-Item -LiteralPath $resolved -Recurse -Force
+}
+Write-Output 'Extended state banking and whole-runtime fingerprint contracts passed.'

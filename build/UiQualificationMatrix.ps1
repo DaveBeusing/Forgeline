@@ -26,13 +26,15 @@ function Assert-UiQualificationUnion {
 }
 
 function Get-UiQualificationCohorts {
-    $scenarios = @(Get-UiQualificationScenarios)
+    param([string[]]$Scenarios = @(Get-UiQualificationScenarios))
     foreach ($dpi in @(96,144,192)) {
         foreach ($display in @('1280x720','1920x1080','2560x1440','3440x1440','3840x2160')) {
             # The native request contract permits at most 30 states per process.
-            foreach ($bank in @(0,1)) {
+            for ($offset = 0; $offset -lt $Scenarios.Count; $offset += 29) {
+                $bank = [int]($offset / 29)
+                $last = [Math]::Min($offset + 28, $Scenarios.Count - 1)
                 [pscustomobject]@{ id = "dpi$dpi-$display-states$($bank+1)"; dpi = $dpi; display = $display
-                    scenarios = @($scenarios[($bank*29)..($bank*29+28)]) }
+                    scenarios = @($Scenarios[$offset..$last]) }
             }
         }
     }
@@ -63,13 +65,32 @@ function Assert-UiQualificationCoverage {
             throw "Incorrect requested or native output/DPI: $($capture.key)"
         }
         if ($capture.graphics.health.submissionFaultCount -ne 0) { throw "Submission fault: $($capture.key)" }
+        $hasSkin = $false
         foreach ($name in @('skin','battlefieldSkin')) {
             if ($capture.ui.PSObject.Properties.Name -contains $name -and $null -ne $capture.ui.$name) {
+                $hasSkin = $true
                 if ($capture.ui.$name.missingAssets -ne 0 -or $capture.ui.$name.droppedQuads -ne 0) {
                     throw "Incomplete production skin: $($capture.key)"
                 }
             }
         }
+        if (-not $hasSkin) { throw "Missing production skin diagnostics: $($capture.key)" }
     }
     if ($expected.Count) { throw "Missing $($expected.Count) UI cases in $($Cohort.id)." }
+}
+
+function Get-UiRuntimeFingerprint {
+    param([Parameter(Mandatory)][string]$Root)
+    $rootPath = [IO.Path]::GetFullPath($Root)
+    [string[]]$files = @([IO.Directory]::EnumerateFiles($rootPath, '*', [IO.SearchOption]::AllDirectories))
+    [Array]::Sort($files, [StringComparer]::Ordinal)
+    $hash = [Security.Cryptography.IncrementalHash]::CreateHash([Security.Cryptography.HashAlgorithmName]::SHA256)
+    try {
+        foreach ($file in $files) {
+            $relative = [IO.Path]::GetRelativePath($rootPath, $file).Replace('\', '/')
+            $hash.AppendData([Text.Encoding]::UTF8.GetBytes($relative))
+            $hash.AppendData([Convert]::FromHexString((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash))
+        }
+        [Convert]::ToHexString($hash.GetHashAndReset())
+    } finally { $hash.Dispose() }
 }
