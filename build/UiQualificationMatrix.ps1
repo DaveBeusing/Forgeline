@@ -9,6 +9,8 @@ function Get-UiQualificationScenarios {
       'ResourcePressure','LowPower','SupplyCritical','MixedSelection','Targeting','QueueBlocked',
       'Technology','Contacts','DockFocus','DockHover','DockPressed','DockPending','DockAccepted',
       'DockRejected','MinimapStrategic','Onboarding',
+      'OnboardingClosing25','OnboardingClosing50','OnboardingClosing75','OnboardingCollapsed',
+      'OnboardingOpening25','OnboardingOpening50','OnboardingOpening75',
       'SelectionUnit','SelectionBuilding','SelectionEmpty','SelectionLongName','MissingPlayerData','GameplayTooltip',
       'GroupSummary','ResourceUnknown','SelectedGroup','Operations','OperationsEmpty','OperationsMissing',
       'ProductionQueue','LogisticsBlocked','SupplyPolicy','TechnologyBlocked','DockQueueTooltip','DockTechnologyTooltip',

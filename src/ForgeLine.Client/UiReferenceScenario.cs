@@ -17,7 +17,9 @@ internal enum UiReferenceScenario
     SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed,
     SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary, ResourceUnknown, SelectedGroup,
     Operations, OperationsEmpty, OperationsMissing, ProductionQueue, LogisticsBlocked, SupplyPolicy, TechnologyBlocked, DockQueueTooltip, DockTechnologyTooltip,
-    NotificationsCollapsed, NotificationsExpanded, NotificationDetails
+    NotificationsCollapsed, NotificationsExpanded, NotificationDetails,
+    OnboardingClosing25, OnboardingClosing50, OnboardingClosing75, OnboardingCollapsed,
+    OnboardingOpening25, OnboardingOpening50, OnboardingOpening75
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -91,6 +93,18 @@ internal static class UiReferenceStates
         return view with { Layout = FrontendGeometry.Resolve(width, height, scale, dpi, view.Kind == FrontendSurfaceKind.Controls) };
     }
 
+    internal static bool IsOnboarding(UiReferenceScenario state) => state == UiReferenceScenario.Onboarding ||
+        state is >= UiReferenceScenario.OnboardingClosing25 and <= UiReferenceScenario.OnboardingOpening75;
+
+    internal static float OnboardingCollapse(UiReferenceScenario state) => state switch
+    {
+        UiReferenceScenario.OnboardingClosing25 or UiReferenceScenario.OnboardingOpening75 => UiMotionTimeline.SmoothStep(TimeSpan.FromMilliseconds(55), OnboardingPresentation.Duration),
+        UiReferenceScenario.OnboardingClosing50 or UiReferenceScenario.OnboardingOpening50 => .5f,
+        UiReferenceScenario.OnboardingClosing75 or UiReferenceScenario.OnboardingOpening25 => UiMotionTimeline.SmoothStep(TimeSpan.FromMilliseconds(165), OnboardingPresentation.Duration),
+        UiReferenceScenario.OnboardingCollapsed => 1,
+        _ => 0
+    };
+
     private static FrontendSurfaceView BindingConflict()
     {
         var model = new SettingsModel(ClientSettingsFrontendAdapter.ToSnapshot(new ClientUserSettings()));
@@ -156,7 +170,7 @@ internal static class UiReferenceStates
             snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
             { Resources = new(double.NaN,double.NaN,double.NaN,double.NaN,double.NaN,double.NaN,double.NaN),
                 Power = snapshot.PlayerExperience.Value.Power with { Generation = double.NaN, Demand = double.NaN } });
-        if (state == UiReferenceScenario.Onboarding)
+        if (IsOnboarding(state))
             snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
                 snapshot.Intelligence, snapshot.SessionId, snapshot.PlayerExperience, playerActions: snapshot.PlayerActions,
                 guidance: new PlayerGuidanceSummary(snapshot.SessionId, snapshot.Tick, snapshot.PlayerExperience!.Value.Player, default));

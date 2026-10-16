@@ -284,8 +284,14 @@ world targeting feedback and minimap markers remain contextual indicators.
 
 HUD text uses a larger 14 px base at unit scale. Onboarding uses 18 px headings,
 16 px body text, word wrapping and 23 px line spacing. DPI and UI scale are
-respected without the old 1.25 guide cap; only available viewport height can
-reduce the guide scale. The guide remains inside its existing reserved region.
+resolved once; body text keeps a 14 physical-pixel floor. The guide remains at
+the safe top-left corner. Narrow/short regions show the objective and binding in
+a compact state. Click the hint to slide it away, then click HINT > to restore it.
+Shift+F12 also toggles the guide. With the dock/Operations closed and default Tab
+available, Tab focuses the hint; Enter/Space toggles it with a visible focus rail.
+Existing menu navigation, camera bindings and unfocused Space-to-pause retain
+priority. Minimized state lasts only for the current match; new objectives do not
+reopen it. Turning onboarding off removes the hint and tab entirely.
 
 ## Native tactical pointer and map footprint
 
