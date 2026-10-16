@@ -1,5 +1,8 @@
 # Player interface surface catalog
 
+The [integrated qualification](GraphicalInterfaceQualification.md) records all
+58 current states, native coverage, compact-layout repairs and pending acceptance.
+
 ## Audit contract
 
 Production-owner audit updated against master `5bfd8a14ceaea60368ded7bad0b0a6e2f79a5be8` (0.1.379).

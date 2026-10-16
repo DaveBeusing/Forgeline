@@ -1,5 +1,10 @@
 # Native UI review handbook
 
+Current executed coverage, immutable evidence and open resource/test/human gates
+are recorded in [graphical interface qualification](GraphicalInterfaceQualification.md).
+Schema-2 matrix plans pin every runtime file, including playback sidecars; resume
+requires the same whole-tree hash. State banks extend dynamically in groups of 29.
+
 Use the existing [reference evidence lane](VisualReferenceEvidence.md). Automated
 structure, GPU performance and human art/accessibility decisions are separate.
 No matching checksum grants typography, AAA quality or physical-display acceptance.

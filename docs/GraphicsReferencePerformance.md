@@ -1,5 +1,9 @@
 # Graphics reference scene and performance qualification
 
+For matched installed UI workloads, full-matrix resource counters and the
+separate whole-frame/skin-cost boundaries, see
+[graphical interface qualification](GraphicalInterfaceQualification.md).
+
 The existing native Central Divide reference runner now supports paired performance runs without adding a gameplay preset or changing normal startup. The representative preset reuses IndustrialBase and BattlefieldCombat: the approved thirteen-building roster, vehicles/infantry, canonical terrain and vegetation, lighting, atmosphere, selection/HUD, visible combat effects and filtered hidden enemies. Vehicles1000 reuses CombatSupportRepeated's 1,000 extracted production vehicles. Camera culling can reduce the visible root population; mechanical parts can expand submitted object-instance counts above the 1,000 root vehicles.
 
 ## Setup and invocation

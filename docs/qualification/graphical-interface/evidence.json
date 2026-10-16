@@ -1,0 +1,2573 @@
+{
+  "schemaVersion": 1,
+  "base": "5bfd8a14ceaea60368ded7bad0b0a6e2f79a5be8",
+  "applicationSource": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+  "version": "0.1.380-dev",
+  "qualificationSource": "a73698d46a27d5d834d56ae773fc88af85e31b7a",
+  "testSource": "a2c29525564a2ff5530d508fd790c685978ec6ac",
+  "visualAcceptance": "pending",
+  "physicalMonitor": "pending",
+  "liveMotion": "pending",
+  "native": {
+    "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+    "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+    "distinctCases": 2610,
+    "readbacks": 5220,
+    "cohorts": [
+      {
+        "id": "dpi96-1280x720-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-1280x720-states1-attempt1",
+        "manifestSha256": "AE9FF42592103FFA2EFC297B8D3058F787A6DB39A5A8F87EFD32714C79747FC3",
+        "reviewSha256": "735d7546f459ae9281917a71a26d37835622b10b415f60a8d4d58079fe2a775a",
+        "cases": 87
+      },
+      {
+        "id": "dpi96-1280x720-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-1280x720-states2-attempt1",
+        "manifestSha256": "B9700816BFCBCF500EAD9C35A40BE244A1E47C0D68086DA58B1EF172D5CDC0BA",
+        "reviewSha256": "041d27bbeb5fcc34af870799dbb2e9cb78815be69513088f929a16a65f60ce2a",
+        "cases": 87
+      },
+      {
+        "id": "dpi96-1920x1080-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-1920x1080-states1-attempt1",
+        "manifestSha256": "7BFE62CA77B5818D623B7D83D16486BC9BC42C6219E2FEA5844B2AB4825A6B03",
+        "reviewSha256": "9d2cd38ea424a16ce35a3f56ba5aeacd509136aa17637d8bcf42cd1f450e7acb",
+        "cases": 87
+      },
+      {
+        "id": "dpi96-1920x1080-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-1920x1080-states2-attempt1",
+        "manifestSha256": "168D4D5959062602EFBE6B947D261BB02E019FAA39513EC2CF8FFF87A58F31E0",
+        "reviewSha256": "5f8abb04525915689618234bc286444ee4326028d391ca5299fee97b90fa6603",
+        "cases": 87
+      },
+      {
+        "id": "dpi96-2560x1440-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-2560x1440-states1-attempt1",
+        "manifestSha256": "10F28A3E249AD6DC62E5142837C75CA25D79500EAB3EF4BF2A529610E0A41AD3",
+        "reviewSha256": "0ff70d93276258c6752ad05ae1130024375ab2f192f789e98f4ccfb806b231f7",
+        "cases": 87
+      },
+      {
+        "id": "dpi96-2560x1440-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-2560x1440-states2-attempt1",
+        "manifestSha256": "69D1D12B8771BD27B5BFCE1544F7CAF0F3A445E0657FC130615B75F2A58ADDF8",
+        "reviewSha256": "885c244736f075eedf6023ed9879f90bf6e1b9d324314e28bb635b0019eb261f",
+        "cases": 87
+      },
+      {
+        "id": "dpi96-3440x1440-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-3440x1440-states1-attempt1",
+        "manifestSha256": "9B5FF75F1179BAF1136EA78905EFC31EE18930E97D8DDE8772D2290137197D72",
+        "reviewSha256": "668e15fc9793705f8d1d4a969e62418bdb525e995de289ea7df56a3905012edf",
+        "cases": 87
+      },
+      {
+        "id": "dpi96-3440x1440-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-3440x1440-states2-attempt1",
+        "manifestSha256": "E6FEA38AAEE75EFB7BF894121C7EC5D613D4DAE112D06149967F0293EBE427A7",
+        "reviewSha256": "aeccd4db5d5c77d320e38efd98a5f555e0a181a3c86bab13f48e2a594949464e",
+        "cases": 87
+      },
+      {
+        "id": "dpi96-3840x2160-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-3840x2160-states1-attempt1",
+        "manifestSha256": "62BE4057276A0A0530257D5C09535FD137FCBC520A2DF6750BD25FFF54E09454",
+        "reviewSha256": "b4de852abc5aeb24ef5dd09aafd058c894df7ce07a388048b03cdfd73973cd7d",
+        "cases": 87
+      },
+      {
+        "id": "dpi96-3840x2160-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi96-3840x2160-states2-attempt1",
+        "manifestSha256": "C8D9E0172061D2997AAB24A04AE183C66F87CD69A420B332EC63C05B14F557C3",
+        "reviewSha256": "b49a3c95875f846cbb7dcdf4fbf1a0fd0910a0f3e566143ecfdea7c2b988d6e1",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-1280x720-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-1280x720-states1-attempt1",
+        "manifestSha256": "17502805D370447A4E1FE7FCAC0564EC8B78727ABFA5EEFEDF795806F991A5BD",
+        "reviewSha256": "8312ed3818568f77f8e797e1ed39e2e37267801d1cca7f2225f0c52589096b5c",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-1280x720-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-1280x720-states2-attempt1",
+        "manifestSha256": "B735638FCA3321047DF14ED5167211C770ACAB25669B3BADC4F54F1EFFB6883D",
+        "reviewSha256": "db03ffe8ee2735eed1cf972b13fb61d4bd8508d0577b3321e72a78f139cd3a2a",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-1920x1080-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-1920x1080-states1-attempt1",
+        "manifestSha256": "0787448304645E13736F69D6C36090B4F6ED7FAF2B99B7DC1FBF5CEE81390765",
+        "reviewSha256": "dee2af0005e316ed2d18177c54e0fd6c6e02ceca44f262586e48ac721e1c4758",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-1920x1080-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-1920x1080-states2-attempt1",
+        "manifestSha256": "8DD100991466DFB97565F35C9A3F97566247702E126B1079F79282EF89AC6C0C",
+        "reviewSha256": "b2a5f1701ad4a1027249ecc6ea6ddd3e2ed4c3b1181222dd47a8da449bdd924c",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-2560x1440-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-2560x1440-states1-attempt1",
+        "manifestSha256": "0ED39CF1219A8E889CDE81B6EF27A55D9BD217A0293FCAC4B61851A0223EF02A",
+        "reviewSha256": "0243b4271413c97f1b1e36029b5b8c359eead1836fd004591834ab796eaf068e",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-2560x1440-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-2560x1440-states2-attempt1",
+        "manifestSha256": "6F06CEF80BE17F5076BB1FDF0A6659DC20B2FD35B7F493C4DCDC5E6CDFFD9B27",
+        "reviewSha256": "b3b90c0a84c75c8ec6d1841c59ffd2ad951c21bf4a5d561878bbdfad4bb21d20",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-3440x1440-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-3440x1440-states1-attempt1",
+        "manifestSha256": "40C65220A972F4741EA2390BBBF40BFA69D4DE7813244139AD226DA60690F4A9",
+        "reviewSha256": "bda76529844342a202d23bfc7da3ad766139c8458fa79f6d0aa390f8d74b026c",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-3440x1440-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-3440x1440-states2-attempt1",
+        "manifestSha256": "0DB8988EA2ADAF301024D3BE0B38C83BD403CB20759C08548BBEE55BCFADFEA7",
+        "reviewSha256": "df6465007cdf03809d6acc6a75360e949e13056a14c3e4c87d256c473a457292",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-3840x2160-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-3840x2160-states1-attempt1",
+        "manifestSha256": "19B61E130BFAA8B78A92CC24599ACCD12249F49CE78C93BD20C31EF5A889EFB8",
+        "reviewSha256": "76d7cd77fcfe3aa99c2f4df041c5e1b0f3ebc59bc9ac442595a2cbb7237fb5e5",
+        "cases": 87
+      },
+      {
+        "id": "dpi144-3840x2160-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi144-3840x2160-states2-attempt1",
+        "manifestSha256": "27488C4AC4114EC0F09A52C44EB8BC95CA0E5D036264EE9F0F9B530DEB40E655",
+        "reviewSha256": "58d738d3f391b844b568c04b5ccd18d90512159736987c74ef04b5809d8be8cf",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-1280x720-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-1280x720-states1-attempt1",
+        "manifestSha256": "4759501EC5168729D7F50BA17B665FED4D86B2B4CC9E22A5B88A5A6BE0519BBC",
+        "reviewSha256": "c835713db31cda6fffebeb10343e2accadf9f15f4831d75b8fe9ffb67e53f7bf",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-1280x720-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-1280x720-states2-attempt1",
+        "manifestSha256": "9CB6D28406F06ADC28365EF84E0292A77A7BDEC008A9F19691BC7DA3C771B7A6",
+        "reviewSha256": "5463aae019a7cbd52fe472c9c1ad8a6601b56940e2d0c3457243e0497372478f",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-1920x1080-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-1920x1080-states1-attempt1",
+        "manifestSha256": "CF37AA77618E45427531880468EE35AE9B158C9D59EFAD6F0CC1F1515A5F882F",
+        "reviewSha256": "963905257ac6b2c003cfd8d7ddfb0db0844cb6a9e934dbbe52d176e82a784fbd",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-1920x1080-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-1920x1080-states2-attempt1",
+        "manifestSha256": "5E2CE30CD765F40457D745D2B1CE5428CC622C0472BE8DAB343A14BD2F02DF35",
+        "reviewSha256": "d1c8793272a1cf5a1fee9f2dbdb14035bb043bd71ab8e24e731188ad24397774",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-2560x1440-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-2560x1440-states1-attempt1",
+        "manifestSha256": "586C7C7F5B689928A685EFDA2C2D604035DC2BFEDAA63D931221F93730F35A88",
+        "reviewSha256": "56deac1c6161f5567df07a4319dd5f2d293b6097516470ec20197b5caad9b016",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-2560x1440-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-2560x1440-states2-attempt1",
+        "manifestSha256": "56068DDFC7BE025FB378B850BE874D7E922E4F35B834CB3BAC9B0188F98C9683",
+        "reviewSha256": "b670a684e4fb0218c02bd80163013a343d065923087bcc99dfd7f20e7de3de73",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-3440x1440-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-3440x1440-states1-attempt1",
+        "manifestSha256": "68EAEDCEF0E37779EBC3EF0A730A5AFFD0773FB4729DCE6D5A3DD168C6C16640",
+        "reviewSha256": "24b376cbe5d39bea77c9f5ba6042cc74700da95fd122b39dcc0ec251748499e4",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-3440x1440-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-3440x1440-states2-attempt1",
+        "manifestSha256": "C46C40D24D83FB17185A93F3AE6164BB467B966DEC8C6776B51A12BDF8772A1E",
+        "reviewSha256": "1cea3a5177fbd2c3106965446ee6842e5228c6d528eac3ecce57690ddc9c4a1b",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-3840x2160-states1",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-3840x2160-states1-attempt1",
+        "manifestSha256": "90E06976D1D541391B7B34CD26BDBFC01A1115C11736E600CCD1F352F8BDD675",
+        "reviewSha256": "664cc8017403cdbe1e3ae69e3cbd6e422a4cb18fee2470317f79fd7838e44161",
+        "cases": 87
+      },
+      {
+        "id": "dpi192-3840x2160-states2",
+        "root": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\Forgeline\\artifacts\\interface-native-installed\\dpi192-3840x2160-states2-attempt1",
+        "manifestSha256": "DB8868BE3C6F77F31FEA5C461138341642C7CCC7E13E9130AF5860793785DEEC",
+        "reviewSha256": "77793e1a5b4e33bd209d4dc556256efc580e747537e65dd01300629fb249b3f3",
+        "cases": 87
+      }
+    ],
+    "assemblyHashes": [
+      "9ABB26080D2A9BAAA6099E838DC73E08D27C6437C15EB8DF2E1289B62FEC41B2",
+      "688DEBCB7D1B81FC467C7109839918E9F02E93F73BC687EBC40010EDF498B85E"
+    ],
+    "drivers": [
+      "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724"
+    ],
+    "hostWindowDpis": [
+      144
+    ],
+    "originalPngBytes": 12825001603,
+    "visualAcceptance": "pending",
+    "physicalMonitor": "pending",
+    "liveMotion": "pending"
+  },
+  "package": {
+    "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+    "archive": "artifacts\\graphical-interface-package\\FORGELINE-0.1.380-dev-win-x64.zip",
+    "archiveBytes": 39997668,
+    "archiveSha256": "c366d3452fe6b1ddf6e14ae3f5943ed5459484e6bb87f14857643218b12595fa",
+    "verifiedFiles": 1403,
+    "verifiedAssets": 1337,
+    "contentSignature": "5cb87ff663e609ff3c0842be2671e3eabc9a9389e3562a66e0fba46733700932",
+    "sourceFilesExcluded": true,
+    "provenance": {
+      "configuration": "Release",
+      "runtimeAssetCompiler": "1.10.0",
+      "runtimeAssetSignature": "5cb87ff663e609ff3c0842be2671e3eabc9a9389e3562a66e0fba46733700932",
+      "runUrl": null,
+      "runtimeIdentifier": "win-x64",
+      "version": "0.1.380-dev",
+      "sourceRevision": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "buildTimeUtc": "2026-10-16T09:46:47.7457415+00:00",
+      "repository": "https://github.com/DaveBeusing/Forgeline",
+      "channel": "dev",
+      "runId": "",
+      "productVersion": "0.1.380",
+      "sourceTreeClean": true,
+      "product": "FORGELINE",
+      "targetFramework": "net10.0-windows",
+      "runAttempt": "",
+      "sdk": "10.0.401",
+      "informationalVersion": "0.1.380-dev+705e63297748fc1fd675d3fe331fbd94e8c20c34"
+    }
+  },
+  "archive": {
+    "path": "qualification-records.zip",
+    "bytes": 20766464,
+    "sha256": "ff5b52a9973290055c8905cd9b3feb614f6b03a818ea2402838c64294405c654",
+    "entries": [
+      {
+        "path": "artifacts/After-InterfaceMatrix.ps1",
+        "bytes": 1434,
+        "sha256": "5320fd47fc3600a7482fddcec7c3bdae70dc3e14d7d6eed95c7c3c83f14abe6d"
+      },
+      {
+        "path": "artifacts/allocation-counter-probe/CounterProbe.csproj",
+        "bytes": 162,
+        "sha256": "dbaaf6b5b775c2fb5e4a9adbda6c7b258e71bcd3c68bf91a6106c6fd42f7e133"
+      },
+      {
+        "path": "artifacts/allocation-counter-probe/Program.before-finally-fix.txt",
+        "bytes": 3438,
+        "sha256": "24c2f02e57b63b7a20c08baacd273173c3e76a7f39b0cbb71940832dbdcc5311"
+      },
+      {
+        "path": "artifacts/allocation-counter-probe/Program.cs",
+        "bytes": 3476,
+        "sha256": "9a03b6b57177c3b0d66b9d5cfecb012250fb3e5ca294eacad83252c2240d5887"
+      },
+      {
+        "path": "artifacts/Capture-TacticalInterface.ps1",
+        "bytes": 2745,
+        "sha256": "be470e74270fbee62675f113d1bc888d43fc1ce4c772532a27e08bcb0e27b78a"
+      },
+      {
+        "path": "artifacts/Compare-InstalledInterfacePerformance.ps1",
+        "bytes": 4559,
+        "sha256": "6f15b702e721c4a4224cf8b1b84b7883903876494ea488a3c27728b5253b8751"
+      },
+      {
+        "path": "artifacts/Compare-InterfaceHalfUi.py",
+        "bytes": 2063,
+        "sha256": "a5fcdf367e9211bdd81e6ab41bb5de34c462be05736d74477260661752df63c7"
+      },
+      {
+        "path": "artifacts/Continue-InterfaceRecords.ps1",
+        "bytes": 1489,
+        "sha256": "fa6d9228abd474d6823fc4cb5c2ccd4e50c535281ec484874fcef0077066a5b0"
+      },
+      {
+        "path": "artifacts/Export-InterfaceInspection.py",
+        "bytes": 4979,
+        "sha256": "b844010bbf1f3b26713955c38a4bf561b49aed7874bd0c28cf3192e89cc7d43e"
+      },
+      {
+        "path": "artifacts/Fetch-InterfaceCiLog.py",
+        "bytes": 1615,
+        "sha256": "60d2aa4e02987c1420af066f20680ca99ed45f6fc735d7a73164d76bc8ba8877"
+      },
+      {
+        "path": "artifacts/Fetch-RetainedInterfaceCiLog.py",
+        "bytes": 1619,
+        "sha256": "0c428bf02aea25c12817ea82c43a41c2b77b7c4154b7e255beb0024f7992380c"
+      },
+      {
+        "path": "artifacts/Finalize-InterfaceRecords.ps1",
+        "bytes": 2867,
+        "sha256": "421c296c8d318340b9a42344a975d9fc060bf3fa2623ef1f45a8ec25e56ea893"
+      },
+      {
+        "path": "artifacts/interface-artwork-audit.json",
+        "bytes": 2427,
+        "sha256": "c060abfc25067bf0d072f25c6ce2ec511f6c96aa5cba559f81fd39ac6031c3e8"
+      },
+      {
+        "path": "artifacts/interface-asset-recovery-control.json",
+        "bytes": 167,
+        "sha256": "106a3b0a2908ece49e99283c2f4fa2f9cf28024d48b00e459b321b447246e1d9"
+      },
+      {
+        "path": "artifacts/interface-asset-recovery-control.log",
+        "bytes": 560,
+        "sha256": "a0f21d46bb021a2185797ea1273ac4a0f54f18fb8fe3669e519849a4cefc0c99"
+      },
+      {
+        "path": "artifacts/interface-assets.json",
+        "bytes": 2016,
+        "sha256": "bfdcfe6f28b6cab7ff79128b10a3bd07c29b3833fc2770f552139605c53341b7"
+      },
+      {
+        "path": "artifacts/interface-assets.jsonl",
+        "bytes": 2457914,
+        "sha256": "ea0a80f76b691cce48d7f5cdc9f384bf9548b297d7415d3270a7d5e4430a83ea"
+      },
+      {
+        "path": "artifacts/interface-assets.log",
+        "bytes": 1726242,
+        "sha256": "9297c0c46274a79d6f27aa206182e3aea318c8ef344a0bc30d7357ef1025bcf9"
+      },
+      {
+        "path": "artifacts/interface-banked-contracts-verified.log",
+        "bytes": 204,
+        "sha256": "aea9c0a3a3675fb4e292f12216b710af390fd984bc876c5f246d578c114c1207"
+      },
+      {
+        "path": "artifacts/interface-banked-contracts.log",
+        "bytes": 204,
+        "sha256": "aea9c0a3a3675fb4e292f12216b710af390fd984bc876c5f246d578c114c1207"
+      },
+      {
+        "path": "artifacts/interface-before-after-1280x720-states1.json",
+        "bytes": 119503,
+        "sha256": "04423a8293c842fb0c7e67a8cdf3115e58c017627e0308108a07e40e2d7ee63c"
+      },
+      {
+        "path": "artifacts/interface-before-after-1280x720-states2.json",
+        "bytes": 113085,
+        "sha256": "ccb2b8701d6d58aad1085a256d7cbf22f29d0a1aca2edc141f2583a6372686fa"
+      },
+      {
+        "path": "artifacts/interface-before-after-1920x1080-states1.json",
+        "bytes": 119785,
+        "sha256": "2c3792936cfca1cc21ebc91a4bf0941f64e93edbab20c191c6edd35abe6db0ae"
+      },
+      {
+        "path": "artifacts/interface-before-after-1920x1080-states2.json",
+        "bytes": 113607,
+        "sha256": "00525101293af4efbff59ecb9539b0ff49b74a1294002b2e63da3b6f71932a1d"
+      },
+      {
+        "path": "artifacts/interface-build.log",
+        "bytes": 8809,
+        "sha256": "d316c74dff5a375ecb17f3a0ff8270c2aead307bb1e332c97355fc897e643a43"
+      },
+      {
+        "path": "artifacts/interface-checks.json",
+        "bytes": 1525,
+        "sha256": "2cc566fbdd428cdf8c534d01e2c727b0624375e1bd34ff09ae59f8e6ea5a4816"
+      },
+      {
+        "path": "artifacts/interface-contracts.log",
+        "bytes": 1432,
+        "sha256": "416101344cd6abbed6b1afdf87f601dfe4c406dd5590f9e38aba1315c6bf040c"
+      },
+      {
+        "path": "artifacts/interface-counter-build-initial.log",
+        "bytes": 1289,
+        "sha256": "85aa4c3c7484c74c306847de7d29d6eff3eda1992a9016fe8f3aa7740ece129e"
+      },
+      {
+        "path": "artifacts/interface-counter-build.log",
+        "bytes": 434,
+        "sha256": "e579e6077bbfbd08837ca8a6cfa12b10be2f5bbe1dd5ae354d6c7e94a05a08d4"
+      },
+      {
+        "path": "artifacts/interface-counter-diagnostic.json",
+        "bytes": 19453,
+        "sha256": "19e8de6a5f63b16697fcfb4f26c2afd2325cb018ba0093087bfe087b8024251b"
+      },
+      {
+        "path": "artifacts/interface-counter-recovery.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "artifacts/interface-counter-source-build.log",
+        "bytes": 9646,
+        "sha256": "47f7c62fcd8417cfcd0ce491c3d278dcd7632baf6dbab4d04174f43a5fb9b849"
+      },
+      {
+        "path": "artifacts/interface-final-assets.json",
+        "bytes": 2016,
+        "sha256": "64c77cd968c159a36a664d3a4928547c635218246b65968b2ac69d6640b26aba"
+      },
+      {
+        "path": "artifacts/interface-final-assets.jsonl",
+        "bytes": 2457392,
+        "sha256": "106ee9484f58bdf4f5a96fd9b1044cfdc3d0d4628ebc12030000c7ae244f1f08"
+      },
+      {
+        "path": "artifacts/interface-final-assets.log",
+        "bytes": 1725901,
+        "sha256": "e14c78dafb680108d50df774885e7a352566d720974a3599d0e709b948095d7d"
+      },
+      {
+        "path": "artifacts/interface-final-checks.json",
+        "bytes": 2437,
+        "sha256": "56fa793bc7f158302e8792e81aaf8c5dc1ccc2c42b409b51bae5841354911968"
+      },
+      {
+        "path": "artifacts/interface-final-contracts.log",
+        "bytes": 1643,
+        "sha256": "7ebd29f1bdb4fa89f8923d393361d335ac9fbe9a46bbad924dd3614780a004cc"
+      },
+      {
+        "path": "artifacts/interface-final-dark-terrain.log",
+        "bytes": 68,
+        "sha256": "ac7cd11e99629adf8c4104b203a75e41de8eb389024da7e35d47c3c8ed3edfa4"
+      },
+      {
+        "path": "artifacts/interface-final-full-tests.log",
+        "bytes": 37539,
+        "sha256": "43677b68e46facd1bc249a067bae0d2bdeb7b9be1ecdd74c3d0c792a63e11325"
+      },
+      {
+        "path": "artifacts/interface-final-installed-matrix.log",
+        "bytes": 11674,
+        "sha256": "ac618b5ec7cf9178d815cb9ad9978e5e1dd7be4ed22652521706d9ee1cd0b041"
+      },
+      {
+        "path": "artifacts/interface-final-installed-negative.log",
+        "bytes": 101,
+        "sha256": "9d75588f15cddb6e9dc6eedbbd4174742f8767d748bc4b96192024a4dddcd592"
+      },
+      {
+        "path": "artifacts/interface-final-installed-window-modes.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "artifacts/interface-final-package.log",
+        "bytes": 100,
+        "sha256": "49751db44de6ce84bcf23be6744d83e3fc9f2c70aaf5c04132922ad8326a02ba"
+      },
+      {
+        "path": "artifacts/interface-final-qualification.log",
+        "bytes": 297081,
+        "sha256": "a0bf06be7868322b2f0d6eb22306727fb933836a72275c32a5f1d6b5d5b814e1"
+      },
+      {
+        "path": "artifacts/interface-final-records-initial.log",
+        "bytes": 719,
+        "sha256": "4e53a674e66da7b0f8855757da6edbfe67e6540af6e89f98d6624150cf660b9c"
+      },
+      {
+        "path": "artifacts/interface-final-records-recovered.log",
+        "bytes": 3096,
+        "sha256": "3d49ca1fc9bfb021050cbc476cd35bb3835a451fa40ed0e93b3572deeee1c26a"
+      },
+      {
+        "path": "artifacts/interface-final-records.log",
+        "bytes": 719,
+        "sha256": "4e53a674e66da7b0f8855757da6edbfe67e6540af6e89f98d6624150cf660b9c"
+      },
+      {
+        "path": "artifacts/interface-final-references.log",
+        "bytes": 95,
+        "sha256": "2834442048167a3e16fb8d8bbd76b13cba766a16c33cb9fba23983ca5ce9f040"
+      },
+      {
+        "path": "artifacts/interface-final-restore.log",
+        "bytes": 126,
+        "sha256": "b6e86dbe3d5ac9198a3e82ee1ca6a9e04022afabf87593d31b1d6012309749e8"
+      },
+      {
+        "path": "artifacts/interface-final-software-fallback.log",
+        "bytes": 68,
+        "sha256": "5e51e12a8ea03bdcde197f6be7e87dacf8b6a126a1635d502a722d0b47f3170f"
+      },
+      {
+        "path": "artifacts/interface-final-version-recheck.log",
+        "bytes": 60,
+        "sha256": "90872c8d0bf54191c151e0c3b2758226bea6e8e458b1793938e978d079f0f156"
+      },
+      {
+        "path": "artifacts/interface-final-version.log",
+        "bytes": 727,
+        "sha256": "7a8a2da39039373885880465e749f15bf2f0d46f88f8f33d27e42b3875622ec1"
+      },
+      {
+        "path": "artifacts/interface-final-warm-pair.log",
+        "bytes": 224,
+        "sha256": "ca4416b9d67848b90a2919f4e681be92dfea66e60f43239eca149f2ecbd780ee"
+      },
+      {
+        "path": "artifacts/interface-final-window-budget.log",
+        "bytes": 437,
+        "sha256": "daaa0769e24244c1b332b279cb930bc38bec7d41ce149cd8a3752b275d399a64"
+      },
+      {
+        "path": "artifacts/interface-final-world-half.log",
+        "bytes": 68,
+        "sha256": "5e51e12a8ea03bdcde197f6be7e87dacf8b6a126a1635d502a722d0b47f3170f"
+      },
+      {
+        "path": "artifacts/interface-full-tests.log",
+        "bytes": 13357,
+        "sha256": "c9e943c9f19bc02339452d2d03d325221946547e0d6942742ec14d6f2ee8c57e"
+      },
+      {
+        "path": "artifacts/interface-guidance-build.log",
+        "bytes": 8809,
+        "sha256": "7bc9c5185d908b2a4e0991e4b418a9fb81918a292cf0e041c4e3c1543de6fb4b"
+      },
+      {
+        "path": "artifacts/interface-guidance-fitted-build.log",
+        "bytes": 8809,
+        "sha256": "6886072952de61d05a352cb3370dd1933e75059b549cd52cb8d9d3ec179244cd"
+      },
+      {
+        "path": "artifacts/interface-guidance-fitted-tests.log",
+        "bytes": 4967,
+        "sha256": "74288dcc434cc2f31232c90a1401f9d462dee3e7a7dfd852a6b4b680bcbeedb8"
+      },
+      {
+        "path": "artifacts/interface-guidance-readable-build.log",
+        "bytes": 3770,
+        "sha256": "b811526c429fb2490141ab6d5b19e5088c689e317578e99000e468971a531fa0"
+      },
+      {
+        "path": "artifacts/interface-guidance-readable-tests.log",
+        "bytes": 602,
+        "sha256": "4f0c6afa09669f148c2a831aa0879d37fc5171a884a0cabd5c05df95623a0f47"
+      },
+      {
+        "path": "artifacts/interface-guidance-tests.log",
+        "bytes": 3919,
+        "sha256": "f93bc05784c4021ddf2d963ea71b5b6d400f97e0662c6b93bf83851f17ffdbdd"
+      },
+      {
+        "path": "artifacts/interface-half-ui-comparison.json",
+        "bytes": 8337,
+        "sha256": "2d6876659fcd4077d67a51d444c0ecdcb730c586898d00340e886d73d8f6c4a9"
+      },
+      {
+        "path": "artifacts/interface-half-ui-comparison.log",
+        "bytes": 52,
+        "sha256": "c812acf258e875f9e0190b71aa9d8cbcc4215ecbd8d1009da9fbf8a459ca3615"
+      },
+      {
+        "path": "artifacts/interface-hardened-contracts.log",
+        "bytes": 276,
+        "sha256": "6637110d6d29b0f5ebe99fb383cd984b91b4317e693808249b9b3df4f7f8588b"
+      },
+      {
+        "path": "artifacts/interface-hardened-plan/plan.json",
+        "bytes": 28177,
+        "sha256": "b524f6e2c72add7a04befcdca83f5a8c4a7c0407ea404833d7aae45543787b31"
+      },
+      {
+        "path": "artifacts/interface-hardened-plan-resume.log",
+        "bytes": 43,
+        "sha256": "b0808853e23fc5caa563d90f5a4b774ff3f138fb29b31884fba612e26a9df7a9"
+      },
+      {
+        "path": "artifacts/interface-hardened-plan.log",
+        "bytes": 43,
+        "sha256": "b0808853e23fc5caa563d90f5a4b774ff3f138fb29b31884fba612e26a9df7a9"
+      },
+      {
+        "path": "artifacts/interface-hardened-runtime-fingerprint.log",
+        "bytes": 66,
+        "sha256": "7ba6c4ce291c092f44b5dcc7859eb24ae899555c6a202d0de466070101b5aaf7"
+      },
+      {
+        "path": "artifacts/interface-installed-borderless.json",
+        "bytes": 9018,
+        "sha256": "81679af834448e6b5601aa830200a631d489fc1270b0a312a52e16d64a9a565f"
+      },
+      {
+        "path": "artifacts/interface-installed-dark/comparison.json",
+        "bytes": 1944,
+        "sha256": "57a33e232b6745ee5c054180895e94954243c520bab3799539e2941b274a2519"
+      },
+      {
+        "path": "artifacts/interface-installed-dark/manifest.json",
+        "bytes": 189853,
+        "sha256": "d4d95539c1badccd6543d5f85a2e46bc4070cad6d41e11347ae795febeb061f4"
+      },
+      {
+        "path": "artifacts/interface-installed-dark.request.json",
+        "bytes": 1529,
+        "sha256": "8930c506c4491b4766d22c43d31d0da81162f0a9416033fd1a6855bd93f26c5f"
+      },
+      {
+        "path": "artifacts/interface-installed-failures/corrupt-core-mesh/runtime/manifest.json",
+        "bytes": 1323223,
+        "sha256": "6f1550eb40c7be074a3e3da4595c0d5575b51068fb1071f148b826198a08c6c1"
+      },
+      {
+        "path": "artifacts/interface-installed-failures/corrupt-core-mesh/startup.json",
+        "bytes": 6767,
+        "sha256": "f2f680492b340af3bea81fff95d632793583881f6253c49184b5a5c1e47df54f"
+      },
+      {
+        "path": "artifacts/interface-installed-failures/corrupt-signature/runtime/manifest.json",
+        "bytes": 1323225,
+        "sha256": "9f7f0a73c97e4569e8f15d6466ded41c0af2f3171cc2e2e3ff2e154e68cea46b"
+      },
+      {
+        "path": "artifacts/interface-installed-failures/corrupt-signature/startup.json",
+        "bytes": 5737,
+        "sha256": "4bac11e679448ee697274a346febc06c6e8cab89b7fb95e8100e4a50513a9327"
+      },
+      {
+        "path": "artifacts/interface-installed-failures/missing-manifest/startup.json",
+        "bytes": 5222,
+        "sha256": "af90a69ac75077bd110569c72c96f60d18413d5260c82ced53e052bdb706cdfa"
+      },
+      {
+        "path": "artifacts/interface-installed-failures/missing-ui-page/runtime/manifest.json",
+        "bytes": 1323223,
+        "sha256": "6f1550eb40c7be074a3e3da4595c0d5575b51068fb1071f148b826198a08c6c1"
+      },
+      {
+        "path": "artifacts/interface-installed-failures/missing-ui-page/startup.json",
+        "bytes": 9959,
+        "sha256": "51b96433261162b3442db0720f230ebde8956d0724a999172a2098159f793bc0"
+      },
+      {
+        "path": "artifacts/interface-installed-failures/results.json",
+        "bytes": 1481,
+        "sha256": "69da3a68fa9ab49e3e3636cc06f6005d1849664b461bfba0b090253be11e5421"
+      },
+      {
+        "path": "artifacts/interface-installed-half/comparison.json",
+        "bytes": 2417,
+        "sha256": "3a06d3c00c90c4f4a94d72e574cab48c685e4e2f67bc04033b0d2707f53d3edd"
+      },
+      {
+        "path": "artifacts/interface-installed-half/manifest.json",
+        "bytes": 252060,
+        "sha256": "cf615fb29f0bd40bae16064d5afd783edbe2d893fff289e130fe3d6f448bf2c4"
+      },
+      {
+        "path": "artifacts/interface-installed-half.request.json",
+        "bytes": 1542,
+        "sha256": "60f8753a55dc2ede15593a7bb376bc4a9cc2bc2c8d3b34af49d8416b1802f334"
+      },
+      {
+        "path": "artifacts/interface-installed-warp/comparison.json",
+        "bytes": 2412,
+        "sha256": "22203ca699b5b5368cb88043773fc5d0ddc04638e756934d5218561ee65c5b38"
+      },
+      {
+        "path": "artifacts/interface-installed-warp/manifest.json",
+        "bytes": 248577,
+        "sha256": "db22b00f59bbabacb3d5a2e05ccb8f5086b6eb73dd1f6e9073fd6dd816248a29"
+      },
+      {
+        "path": "artifacts/interface-installed-warp.request.json",
+        "bytes": 1536,
+        "sha256": "9f4dd3c7fb30cc79963dabaa2a78feb3681dd5def4f02975a8444971cedd0f73"
+      },
+      {
+        "path": "artifacts/interface-installed-windowed.json",
+        "bytes": 8959,
+        "sha256": "bde5691bdbec73d7c93e002edc1236d637f809f2385e5bead28272387df74d93"
+      },
+      {
+        "path": "artifacts/interface-isolated-focused-tests.log",
+        "bytes": 1644,
+        "sha256": "24408ba17d6d288528973dfd0451f5ed68b8ddf75e03acac5549ee0d56779b0a"
+      },
+      {
+        "path": "artifacts/interface-isolated-source-build.log",
+        "bytes": 8809,
+        "sha256": "b55445f2dc55d3535d36019776448375174bff0badd7b0d924ebd16ec8667f43"
+      },
+      {
+        "path": "artifacts/interface-lifetime.log",
+        "bytes": 2679,
+        "sha256": "b6525dcec116d74b4628e44680195ee05b14388a536cb6a389d6f747e32cc841"
+      },
+      {
+        "path": "artifacts/interface-master-build.log",
+        "bytes": 8809,
+        "sha256": "2b6d76ef222fd4bde5ef2f145745d828466f2630c0aef8aef01fcaa96d6111dc"
+      },
+      {
+        "path": "artifacts/interface-master-tests.log",
+        "bytes": 36116,
+        "sha256": "069da51833f8f30c9905a7d7410cb0fca07f5e9ec48c6f761f84af0ec2860ef6"
+      },
+      {
+        "path": "artifacts/interface-matrix.log",
+        "bytes": 374,
+        "sha256": "b2af93091277e5547a4eb2f39fa3c5dc9d9a115a458f39df764ec7fb5c8ab0f6"
+      },
+      {
+        "path": "artifacts/interface-native-build.log",
+        "bytes": 8809,
+        "sha256": "4df763aa4d3b70aa1f8f1eca89142ca22caa53ccf6bc7484c59476b9ac95078c"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states1-attempt1/comparison.json",
+        "bytes": 41567,
+        "sha256": "2f97ba1c51e5f2ac33e76263700d9d59564fc335bbd92fab63cb0ef1d8ea031c"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states1-attempt1/manifest.json",
+        "bytes": 5401040,
+        "sha256": "7c668080335386389019927ec385ccd0caf126995e054f4ab3ff6690b3680dff"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states1-attempt1.complete.json",
+        "bytes": 8232,
+        "sha256": "7ec5389a9e60ae5a25d5460afb88d1e122efbd84993ce2d8ff401b112d0f1afe"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states1-attempt1.request.json",
+        "bytes": 2040,
+        "sha256": "f850008a3108cddc995d54f906457f4ddb96c270fcbd69293845e836b20233a9"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states1-attempt1.review.pending.json",
+        "bytes": 48269,
+        "sha256": "98297b30ff2f5656a844a1619db41671a10efb9c8b1fb325d7d6150866694106"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states1-attempt1.validation-639277381861018195.json",
+        "bytes": 41567,
+        "sha256": "2f97ba1c51e5f2ac33e76263700d9d59564fc335bbd92fab63cb0ef1d8ea031c"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states2-attempt1/comparison.json",
+        "bytes": 42183,
+        "sha256": "fc1ee9a40d33fe837919c592921655d034691c06900cdf55e8b4d327d190b1c9"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states2-attempt1/manifest.json",
+        "bytes": 5442067,
+        "sha256": "14322d689af046ba4c1b7c18358abc3ab83ad802df8829f3963143bc57d44ae1"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states2-attempt1.complete.json",
+        "bytes": 8469,
+        "sha256": "19c3b5a3a3f1d5bc598c8177aa5e3d383193ea1acd05175294fbbe2ef050bb99"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states2-attempt1.request.json",
+        "bytes": 2119,
+        "sha256": "6c486d67f25c4b6207f468187e36c4f340e653cf3ad9efb482d0928abd38caa2"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states2-attempt1.review.pending.json",
+        "bytes": 48506,
+        "sha256": "1f8d2b3b2131b3554938e0ac6237aad91fd62551c081a71f9affdb36c60c44ec"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1280x720-states2-attempt1.validation-639277383463996618.json",
+        "bytes": 42183,
+        "sha256": "fc1ee9a40d33fe837919c592921655d034691c06900cdf55e8b4d327d190b1c9"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states1-attempt1/comparison.json",
+        "bytes": 41842,
+        "sha256": "4181a9bf7b53f4d5d228a9bfa4d259b2672b6f7bbfa4c82a84586925deadff64"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states1-attempt1/manifest.json",
+        "bytes": 5404214,
+        "sha256": "aacd4b9001af304156b540b2c28361193373cad225a8cd807ecaef3955fab8b7"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states1-attempt1.complete.json",
+        "bytes": 8322,
+        "sha256": "5e67577995213a2dca88a23d887f0636775894accce50796a60d3d393c3c87b5"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states1-attempt1.request.json",
+        "bytes": 2042,
+        "sha256": "e87e641cc724cb56f8a43d245ebbe31c580cafd885843b34b6881d3142a4f162"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states1-attempt1.review.pending.json",
+        "bytes": 48356,
+        "sha256": "44f49533e6724a60b0737d97f8b9617d562994044523604049dc2d4ef93c4dac"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states1-attempt1.validation-639277384672909877.json",
+        "bytes": 41842,
+        "sha256": "4181a9bf7b53f4d5d228a9bfa4d259b2672b6f7bbfa4c82a84586925deadff64"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states2-attempt1/comparison.json",
+        "bytes": 42260,
+        "sha256": "f4201a0708806c3450d97b6952383dc04ba02a6d3f66edfff065cdf0d19a36ef"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states2-attempt1/manifest.json",
+        "bytes": 5442343,
+        "sha256": "79a141450f9a7d35d1fdf5a22600db5f8549dc9c3e06a913b58c8160be2e30a4"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states2-attempt1.complete.json",
+        "bytes": 8559,
+        "sha256": "1937bba0ea114b50d6f3af735f52d55903a5061fec3a07c2e0072c07512a66db"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states2-attempt1.request.json",
+        "bytes": 2121,
+        "sha256": "0ca4864c5569d06496b36ab5e3438c6117c8540c332f4dda746daf5094d40e4b"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states2-attempt1.review.pending.json",
+        "bytes": 48593,
+        "sha256": "50fbd7a3bf83b077e5aeb35914351a3acb6eb7da46ac86b863df7c45d682ef2e"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-1920x1080-states2-attempt1.validation-639277386409354062.json",
+        "bytes": 42260,
+        "sha256": "f4201a0708806c3450d97b6952383dc04ba02a6d3f66edfff065cdf0d19a36ef"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-2560x1440-states1-attempt1/failure.json",
+        "bytes": 1317,
+        "sha256": "01b822eac269cd3b7bb331dfbc221fe3a2d421751d6ef17614f82ba7c7b8f9be"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-2560x1440-states1-attempt1/manifest.json",
+        "bytes": 3038645,
+        "sha256": "84d73d3cc45f2b169c82a41403a673928dbeb1f4f92430acfa343508e0fd149e"
+      },
+      {
+        "path": "artifacts/interface-native-final/dpi96-2560x1440-states1-attempt1.request.json",
+        "bytes": 2042,
+        "sha256": "9a3c535578c33e4fae96765197afbbcdc8f50338a143120e8bd1f697ce9bd405"
+      },
+      {
+        "path": "artifacts/interface-native-final/plan.json",
+        "bytes": 28084,
+        "sha256": "1d0b4c9b39f30ad20299d4925cc144074df8ab13e7d1d40d6474254ed93c1618"
+      },
+      {
+        "path": "artifacts/interface-native-final.log",
+        "bytes": 3605,
+        "sha256": "0bd6087d3b0a9a8948faaef367542cc374fe3924d63bb3fe09cbe3e199467a35"
+      },
+      {
+        "path": "artifacts/interface-native-inspection.html",
+        "bytes": 1387910,
+        "sha256": "1231f8b282bccc753225a44fdb6adb0e54cd1f98e05e55f6f74065c3b6447411"
+      },
+      {
+        "path": "artifacts/interface-native-installed/complete.json",
+        "bytes": 266756,
+        "sha256": "f54577ee4899d610fb81481d6543e7ea30ad398a5b01677bfeb45b44d8a56924"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states1-attempt1/comparison.json",
+        "bytes": 41912,
+        "sha256": "5f0abbabf9364428d2776b2123c36ad7f808a48f9c26f37b719a798c079f963f"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states1-attempt1/manifest.json",
+        "bytes": 5403837,
+        "sha256": "17502805d370447a4e1fe7fcac0564ec8b78727abfa5eefedf795806f991a5bd"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states1-attempt1.complete.json",
+        "bytes": 8330,
+        "sha256": "34fe5317cc06e70bf053dbb4ccd9e909c8f17afa2a3e0d7640d9bfb260994ff2"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states1-attempt1.request.json",
+        "bytes": 2104,
+        "sha256": "fdb33cc21eb9532ec7632cf7900f5602c66a93a933a3a3d89bfe639d2ee8f714"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states1-attempt1.review.pending.json",
+        "bytes": 48356,
+        "sha256": "8312ed3818568f77f8e797e1ed39e2e37267801d1cca7f2225f0c52589096b5c"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states1-attempt1.validation-639277430969832482.json",
+        "bytes": 41912,
+        "sha256": "5f0abbabf9364428d2776b2123c36ad7f808a48f9c26f37b719a798c079f963f"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states2-attempt1/comparison.json",
+        "bytes": 42067,
+        "sha256": "d4956d52c34dd6cb8ef8c0f7f66785f932394e0553b8d2ffd42981daa0efe812"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states2-attempt1/manifest.json",
+        "bytes": 5442198,
+        "sha256": "b735638fca3321047df14ed5167211c770acab25669b3badc4f54f1effb6883d"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states2-attempt1.complete.json",
+        "bytes": 8567,
+        "sha256": "0a8026e57b3423d68ed6f70a09b0c55c1ccb05c2eef917bd45ec24ae85b27e3c"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states2-attempt1.request.json",
+        "bytes": 2183,
+        "sha256": "4af7c50bce312dd9c350c65622352eadab7203693e97b047f0597b3d72c2bb22"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states2-attempt1.review.pending.json",
+        "bytes": 48593,
+        "sha256": "db03ffe8ee2735eed1cf972b13fb61d4bd8508d0577b3321e72a78f139cd3a2a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1280x720-states2-attempt1.validation-639277432419059627.json",
+        "bytes": 42067,
+        "sha256": "d4956d52c34dd6cb8ef8c0f7f66785f932394e0553b8d2ffd42981daa0efe812"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states1-attempt1/comparison.json",
+        "bytes": 41854,
+        "sha256": "202a4f689ade149ac293a79a0e7d7e49ab89dc820c2927523d8fece29e6295e6"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states1-attempt1/manifest.json",
+        "bytes": 5404643,
+        "sha256": "0787448304645e13736f69d6c36090b4f6ed7faf2b99b7dc1fbf5cee81390765"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states1-attempt1.complete.json",
+        "bytes": 8420,
+        "sha256": "c1b6b5cb126ba11156f62039dbfeaa90734f353877570affa01907157b3cd8a3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states1-attempt1.request.json",
+        "bytes": 2106,
+        "sha256": "cb51804223d85685ecd83b80003c2a436df7f6f99a2855279217a742a6bd737e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states1-attempt1.review.pending.json",
+        "bytes": 48443,
+        "sha256": "dee2af0005e316ed2d18177c54e0fd6c6e02ceca44f262586e48ac721e1c4758"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states1-attempt1.validation-639277433573029643.json",
+        "bytes": 41854,
+        "sha256": "202a4f689ade149ac293a79a0e7d7e49ab89dc820c2927523d8fece29e6295e6"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states2-attempt1/comparison.json",
+        "bytes": 42154,
+        "sha256": "6ba20a54fe7e31af5532c60dabfeb0dea9e237b6c6c9f956985159d760a842d9"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states2-attempt1/manifest.json",
+        "bytes": 5443188,
+        "sha256": "8dd100991466dfb97565f35c9a3f97566247702e126b1079f79282ef89ac6c0c"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states2-attempt1.complete.json",
+        "bytes": 8657,
+        "sha256": "21b97c6083625d809a0f7e0da6a2131273651a7f736cc2da459ae85e1040026f"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states2-attempt1.request.json",
+        "bytes": 2185,
+        "sha256": "bd11e2c3f5e6ce9a9ce02c2ef8eebeaf36560b8a562cda9a2e708f077c1877e7"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states2-attempt1.review.pending.json",
+        "bytes": 48680,
+        "sha256": "b2a5f1701ad4a1027249ecc6ea6ddd3e2ed4c3b1181222dd47a8da449bdd924c"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-1920x1080-states2-attempt1.validation-639277435180169855.json",
+        "bytes": 42154,
+        "sha256": "6ba20a54fe7e31af5532c60dabfeb0dea9e237b6c6c9f956985159d760a842d9"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states1-attempt1/comparison.json",
+        "bytes": 41904,
+        "sha256": "303e00f6de410d6f97f2394357006504f9b03074f8205a7dc87270d3865ad013"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states1-attempt1/manifest.json",
+        "bytes": 5406519,
+        "sha256": "0ed39cf1219a8e889cde81b6ef27a55d9bd217a0293fcac4b61851a0223ef02a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states1-attempt1.complete.json",
+        "bytes": 8420,
+        "sha256": "cdb59991053dda0e68b71f637728e104f864d50a7983b2232f14816d3480eb17"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states1-attempt1.request.json",
+        "bytes": 2106,
+        "sha256": "abdf6a3033a70efa91c847651af63f1cf2411f722c9cc39a8d11a45a284315a0"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states1-attempt1.review.pending.json",
+        "bytes": 48443,
+        "sha256": "0243b4271413c97f1b1e36029b5b8c359eead1836fd004591834ab796eaf068e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states1-attempt1.validation-639277436393951425.json",
+        "bytes": 41904,
+        "sha256": "303e00f6de410d6f97f2394357006504f9b03074f8205a7dc87270d3865ad013"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states2-attempt1/comparison.json",
+        "bytes": 42162,
+        "sha256": "72716a96422b2f5cb5decbb332cb2143d314f5a4f467a19be30f98e7768f69cf"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states2-attempt1/manifest.json",
+        "bytes": 5444097,
+        "sha256": "6f06cef80be17f5076bb1fdf0a6659dc20b2fd35b7f493c4dcdc5e6cdffd9b27"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states2-attempt1.complete.json",
+        "bytes": 8657,
+        "sha256": "eb039b55dd497f2ce5386a23f20e02972b583bbc158314f18bf4160a417e3d44"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states2-attempt1.request.json",
+        "bytes": 2185,
+        "sha256": "819e19515de0e2ff63fcb519bd3a1331eaa2ed06b10af985b96742b831432a58"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states2-attempt1.review.pending.json",
+        "bytes": 48680,
+        "sha256": "b3b90c0a84c75c8ec6d1841c59ffd2ad951c21bf4a5d561878bbdfad4bb21d20"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-2560x1440-states2-attempt1.validation-639277438285022251.json",
+        "bytes": 42162,
+        "sha256": "72716a96422b2f5cb5decbb332cb2143d314f5a4f467a19be30f98e7768f69cf"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states1-attempt1/comparison.json",
+        "bytes": 41966,
+        "sha256": "03b91f03db31da7542cd84a17a911ba5333e433bc520dbbe632243aec4a5aa36"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states1-attempt1/manifest.json",
+        "bytes": 5408085,
+        "sha256": "40c65220a972f4741ea2390bbbf40bfa69d4de7813244139ad226da60690f4a9"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states1-attempt1.complete.json",
+        "bytes": 8420,
+        "sha256": "15c1a018f81aff0a60315f287ea6b79aeb694d30a5db609b51fa8e2f96a09d6e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states1-attempt1.request.json",
+        "bytes": 2106,
+        "sha256": "58792b384155963c89c096c3076dbe7e8eb5313979207121e608cebc11dc58b4"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states1-attempt1.review.pending.json",
+        "bytes": 48443,
+        "sha256": "bda76529844342a202d23bfc7da3ad766139c8458fa79f6d0aa390f8d74b026c"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states1-attempt1.validation-639277439635264690.json",
+        "bytes": 41966,
+        "sha256": "03b91f03db31da7542cd84a17a911ba5333e433bc520dbbe632243aec4a5aa36"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states2-attempt1/comparison.json",
+        "bytes": 42211,
+        "sha256": "7d452db5403c6fe2b41899fdc7c6e8e26f7ca4d91ed170bee123adb0fbb183ba"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states2-attempt1/manifest.json",
+        "bytes": 5446024,
+        "sha256": "0db8988ea2adaf301024d3be0b38c83bd403cb20759c08548bbee55bcfadfea7"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states2-attempt1.complete.json",
+        "bytes": 8657,
+        "sha256": "b00e7ff015c7269707eca7f47d0c47dbfbe34c10b1b42646e40a8d8f6b99aa74"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states2-attempt1.request.json",
+        "bytes": 2185,
+        "sha256": "ff66c148835cfcbe199cf2ff33c5804006c9f6ecc7d42a59980e888db50ead6d"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states2-attempt1.review.pending.json",
+        "bytes": 48680,
+        "sha256": "df6465007cdf03809d6acc6a75360e949e13056a14c3e4c87d256c473a457292"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3440x1440-states2-attempt1.validation-639277441860362716.json",
+        "bytes": 42211,
+        "sha256": "7d452db5403c6fe2b41899fdc7c6e8e26f7ca4d91ed170bee123adb0fbb183ba"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states1-attempt1/comparison.json",
+        "bytes": 41873,
+        "sha256": "3eda179e8f8177e00ce7877d4050600360feabc9806ee6dfe91323cd7f170d4d"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states1-attempt1/manifest.json",
+        "bytes": 5408115,
+        "sha256": "19b61e130bfaa8b78a92cc24599accd12249f49ce78c93bd20c31ef5a889efb8"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states1-attempt1.complete.json",
+        "bytes": 8420,
+        "sha256": "0b48caceade0894f9c59561217f4de89f80690c71149b0d90862c4079998c2e3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states1-attempt1.request.json",
+        "bytes": 2106,
+        "sha256": "402d9ddf284488aa13b519138a7c8fe18f685b84ee988723596c6f695faf258c"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states1-attempt1.review.pending.json",
+        "bytes": 48443,
+        "sha256": "76d7cd77fcfe3aa99c2f4df041c5e1b0f3ebc59bc9ac442595a2cbb7237fb5e5"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states1-attempt1.validation-639277443496971489.json",
+        "bytes": 41873,
+        "sha256": "3eda179e8f8177e00ce7877d4050600360feabc9806ee6dfe91323cd7f170d4d"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states2-attempt1/comparison.json",
+        "bytes": 42171,
+        "sha256": "d0338d741c242cab422070e0074be33e747f8193d6bdd65e58b7fbdd8cae23cd"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states2-attempt1/manifest.json",
+        "bytes": 5444618,
+        "sha256": "27488c4ac4114ec0f09a52c44eb8bc95ca0e5d036264ee9f0f9b530deb40e655"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states2-attempt1.complete.json",
+        "bytes": 8657,
+        "sha256": "fac4343d9e72c65dad5733027c37aaf0f010dfcfdf20c63d4721fe5dfe601326"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states2-attempt1.request.json",
+        "bytes": 2185,
+        "sha256": "c20575889cd67db852d64ddac66f3c1eb79a898c73e6cfa56b9bfa2d5d4b5a04"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states2-attempt1.review.pending.json",
+        "bytes": 48680,
+        "sha256": "58d738d3f391b844b568c04b5ccd18d90512159736987c74ef04b5809d8be8cf"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi144-3840x2160-states2-attempt1.validation-639277446119971502.json",
+        "bytes": 42171,
+        "sha256": "d0338d741c242cab422070e0074be33e747f8193d6bdd65e58b7fbdd8cae23cd"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states1-attempt1/comparison.json",
+        "bytes": 41797,
+        "sha256": "18ec3d7d07d653a0ff088c0a31cda918839af4a5e56516698f0c693b3a783567"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states1-attempt1/manifest.json",
+        "bytes": 5404333,
+        "sha256": "4759501ec5168729d7f50ba17b665fed4d86b2b4cc9e22a5b88a5a6be0519bbc"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states1-attempt1.complete.json",
+        "bytes": 8330,
+        "sha256": "08f1bd190001a5efea0b3edd0619e3da397cfca45955b212ddf026c0b445852b"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states1-attempt1.request.json",
+        "bytes": 2104,
+        "sha256": "2829e169c8b29c8e3079e82fa1dcbdeddcc9ff381c070fe872167755d1d95d5a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states1-attempt1.review.pending.json",
+        "bytes": 48356,
+        "sha256": "c835713db31cda6fffebeb10343e2accadf9f15f4831d75b8fe9ffb67e53f7bf"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states1-attempt1.validation-639277447176008189.json",
+        "bytes": 41797,
+        "sha256": "18ec3d7d07d653a0ff088c0a31cda918839af4a5e56516698f0c693b3a783567"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states2-attempt1/comparison.json",
+        "bytes": 42085,
+        "sha256": "61c6cd296a571f04e4439ca4fff29bddf295c65fc9b88d992731277ac6e60a2a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states2-attempt1/manifest.json",
+        "bytes": 5441701,
+        "sha256": "9cb6d28406f06adc28365ef84e0292a77a7bdec008a9f19691bc7da3c771b7a6"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states2-attempt1.complete.json",
+        "bytes": 8567,
+        "sha256": "ff1e46bb7db4678b164c88d48fdcceda838030090e367e14ab27a895498f97db"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states2-attempt1.request.json",
+        "bytes": 2183,
+        "sha256": "e8e654bdd1d12a39490d7ef9a31df8b344932f0adf3b3a89466dca3eac8b7e43"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states2-attempt1.review.pending.json",
+        "bytes": 48593,
+        "sha256": "5463aae019a7cbd52fe472c9c1ad8a6601b56940e2d0c3457243e0497372478f"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1280x720-states2-attempt1.validation-639277448594564038.json",
+        "bytes": 42085,
+        "sha256": "61c6cd296a571f04e4439ca4fff29bddf295c65fc9b88d992731277ac6e60a2a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states1-attempt1/comparison.json",
+        "bytes": 41774,
+        "sha256": "b65155031ac67bf86bc1c0e89574f018b1fa87df123fb657eaf68dfc61a62ab3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states1-attempt1/manifest.json",
+        "bytes": 5404446,
+        "sha256": "cf37aa77618e45427531880468ee35ae9b158c9d59efad6f0cc1f1515a5f882f"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states1-attempt1.complete.json",
+        "bytes": 8420,
+        "sha256": "10e6854e35518bc31135886afa5573b7d22b5f44fffe2575bd7b5f94ce79d177"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states1-attempt1.request.json",
+        "bytes": 2106,
+        "sha256": "4e70dfa77cbe84754694c77bca3914b723669c4e660f2784055d2959f6b5bf1e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states1-attempt1.review.pending.json",
+        "bytes": 48443,
+        "sha256": "963905257ac6b2c003cfd8d7ddfb0db0844cb6a9e934dbbe52d176e82a784fbd"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states1-attempt1.validation-639277449852202862.json",
+        "bytes": 41774,
+        "sha256": "b65155031ac67bf86bc1c0e89574f018b1fa87df123fb657eaf68dfc61a62ab3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states2-attempt1/comparison.json",
+        "bytes": 42092,
+        "sha256": "0e774ab4fc1eee8700d5c4f0eefea4e9ac95aff0cd198d1d4480c22c14c9bd6e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states2-attempt1/manifest.json",
+        "bytes": 5442852,
+        "sha256": "5e2ce30cd765f40457d745d2b1ce5428cc622c0472be8dab343a14bd2f02df35"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states2-attempt1.complete.json",
+        "bytes": 8657,
+        "sha256": "7e366665158ca4b387dcdcf9b2fd3f9c3bc74f5c22e2eee59d3016e3a27c4a11"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states2-attempt1.request.json",
+        "bytes": 2185,
+        "sha256": "7f2f80da28f3fb134807be463b838d243a4f8db17d8b10d4820f63721b76c3f3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states2-attempt1.review.pending.json",
+        "bytes": 48680,
+        "sha256": "d1c8793272a1cf5a1fee9f2dbdb14035bb043bd71ab8e24e731188ad24397774"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-1920x1080-states2-attempt1.validation-639277451547015099.json",
+        "bytes": 42092,
+        "sha256": "0e774ab4fc1eee8700d5c4f0eefea4e9ac95aff0cd198d1d4480c22c14c9bd6e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states1-attempt1/comparison.json",
+        "bytes": 41987,
+        "sha256": "8758d77130765aeac828c75ed4f65aac342e02e0f7c5bf0549d72306ff0fffbe"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states1-attempt1/manifest.json",
+        "bytes": 5406393,
+        "sha256": "586c7c7f5b689928a685efda2c2d604035dc2bfedaa63d931221f93730f35a88"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states1-attempt1.complete.json",
+        "bytes": 8420,
+        "sha256": "b3cbd23ea043e8b825323cb85fd5f581f58c8de066b41584926f7299b903b49a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states1-attempt1.request.json",
+        "bytes": 2106,
+        "sha256": "edb4906240b1b53f1b86ff94e8ad2f7366494031ba8bb9080332d32fe94c47fa"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states1-attempt1.review.pending.json",
+        "bytes": 48443,
+        "sha256": "56deac1c6161f5567df07a4319dd5f2d293b6097516470ec20197b5caad9b016"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states1-attempt1.validation-639277452811782026.json",
+        "bytes": 41987,
+        "sha256": "8758d77130765aeac828c75ed4f65aac342e02e0f7c5bf0549d72306ff0fffbe"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states2-attempt1/comparison.json",
+        "bytes": 42285,
+        "sha256": "4f25a7e06fb876797f502deebfc7c86ec7ebbd8a209822f3ad5e58485622fc5a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states2-attempt1/manifest.json",
+        "bytes": 5444110,
+        "sha256": "56068ddfc7be025fb378b850be874d7e922e4f35b834cb3bac9b0188f98c9683"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states2-attempt1.complete.json",
+        "bytes": 8657,
+        "sha256": "f4add12d116dbb599472bbe829d70a54867231b2c4794b674da5af7352c8756a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states2-attempt1.request.json",
+        "bytes": 2185,
+        "sha256": "045fc4753a8e110ed7d23c81fc8ac722dd7daf260bc182b48af40298664baab9"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states2-attempt1.review.pending.json",
+        "bytes": 48680,
+        "sha256": "b670a684e4fb0218c02bd80163013a343d065923087bcc99dfd7f20e7de3de73"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-2560x1440-states2-attempt1.validation-639277454668537015.json",
+        "bytes": 42285,
+        "sha256": "4f25a7e06fb876797f502deebfc7c86ec7ebbd8a209822f3ad5e58485622fc5a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states1-attempt1/comparison.json",
+        "bytes": 41846,
+        "sha256": "1763e147b453e881bcb80b8b5824d9df3571784e5732290f21fe0a8339e8e228"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states1-attempt1/manifest.json",
+        "bytes": 5408519,
+        "sha256": "68eaedcef0e37779ebc3ef0a730a5affd0773fb4729dce6d5a3dd168c6c16640"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states1-attempt1.complete.json",
+        "bytes": 8420,
+        "sha256": "d78fab66e8bf940337c9c0b9959143ea1762d70ed1f7532e36d88022951068d3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states1-attempt1.request.json",
+        "bytes": 2106,
+        "sha256": "81edc7c8c139e03bec2d11d95e3655b7d218ebd370360d0c6f0c363f204a4f8a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states1-attempt1.review.pending.json",
+        "bytes": 48443,
+        "sha256": "24b376cbe5d39bea77c9f5ba6042cc74700da95fd122b39dcc0ec251748499e4"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states1-attempt1.validation-639277456028674098.json",
+        "bytes": 41846,
+        "sha256": "1763e147b453e881bcb80b8b5824d9df3571784e5732290f21fe0a8339e8e228"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states2-attempt1/comparison.json",
+        "bytes": 42165,
+        "sha256": "bb130c2c2de14a2d1a5df534e416a32e4eca96e444a7efa80fd3170a092cdf50"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states2-attempt1/manifest.json",
+        "bytes": 5446358,
+        "sha256": "c46c40d24d83fb17185a93f3ae6164bb467b966dec8c6776b51a12bdf8772a1e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states2-attempt1.complete.json",
+        "bytes": 8657,
+        "sha256": "ab8872c05b7eb1c8c40a06eea3825f502b7b49eaca9de0ef5d65946f601c84c2"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states2-attempt1.request.json",
+        "bytes": 2185,
+        "sha256": "94697034c9ac92b10707d61915e27965936016566343fce988c28d2091b618ea"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states2-attempt1.review.pending.json",
+        "bytes": 48680,
+        "sha256": "1cea3a5177fbd2c3106965446ee6842e5228c6d528eac3ecce57690ddc9c4a1b"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3440x1440-states2-attempt1.validation-639277458095007684.json",
+        "bytes": 42165,
+        "sha256": "bb130c2c2de14a2d1a5df534e416a32e4eca96e444a7efa80fd3170a092cdf50"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states1-attempt1/comparison.json",
+        "bytes": 41885,
+        "sha256": "e23e18ac263334805f68a947562a0adb4f580a3f5218caf49d28a7160cea5dc8"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states1-attempt1/manifest.json",
+        "bytes": 5408112,
+        "sha256": "90e06976d1d541391b7b34cd26bdbfc01a1115c11736e600ccd1f352f8bdd675"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states1-attempt1.complete.json",
+        "bytes": 8420,
+        "sha256": "df1a1c1b87c295096b5c8f4ddf57a762c6752fc184eff48b9b782b3b18e843ba"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states1-attempt1.request.json",
+        "bytes": 2106,
+        "sha256": "3841207cd58aa6413f783e2f17f1d5b4a7b2574536a59d523b3922802fb17dc3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states1-attempt1.review.pending.json",
+        "bytes": 48443,
+        "sha256": "664cc8017403cdbe1e3ae69e3cbd6e422a4cb18fee2470317f79fd7838e44161"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states1-attempt1.validation-639277459661582664.json",
+        "bytes": 41885,
+        "sha256": "e23e18ac263334805f68a947562a0adb4f580a3f5218caf49d28a7160cea5dc8"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states2-attempt1/comparison.json",
+        "bytes": 42269,
+        "sha256": "a22cee2c0516aef11ee78dcff2ccd04ec20875f7440ae3a9cb8af0cf798ec1b4"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states2-attempt1/manifest.json",
+        "bytes": 5445842,
+        "sha256": "db8868be3c6f77f31fea5c461138341642c7ccc7e13e9130af5860793785deec"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states2-attempt1.complete.json",
+        "bytes": 8657,
+        "sha256": "fa37efe999d21b396a240aa6ecbc822a1b703826b69e56c852a77daa9bb1b0e6"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states2-attempt1.request.json",
+        "bytes": 2185,
+        "sha256": "6f971597bfd8cc65a78dbe7c7152fda514ba289c252a9180bb7dff5ccc7fe0b1"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states2-attempt1.review.pending.json",
+        "bytes": 48680,
+        "sha256": "77793e1a5b4e33bd209d4dc556256efc580e747537e65dd01300629fb249b3f3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi192-3840x2160-states2-attempt1.validation-639277462251145008.json",
+        "bytes": 42269,
+        "sha256": "a22cee2c0516aef11ee78dcff2ccd04ec20875f7440ae3a9cb8af0cf798ec1b4"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states1-attempt1/comparison.json",
+        "bytes": 41713,
+        "sha256": "6955b52ac92daea84541d6f7a6c8a4e15b047bf78f50b8e319026fcb5fd4a915"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states1-attempt1/manifest.json",
+        "bytes": 5401587,
+        "sha256": "ae9ff42592103ffa2efc297b8d3058f787a6db39a5a8f87efd32714c79747fc3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states1-attempt1.complete.json",
+        "bytes": 8240,
+        "sha256": "f77daccac50b2eaa4e451f21bc0217745bc86274ed974b54da4620ea509d6a94"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states1-attempt1.request.json",
+        "bytes": 2102,
+        "sha256": "1bfae59703e4105158e64e84282817fcc48240e5a163f1bb598f7fb14fe8f313"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states1-attempt1.review.pending.json",
+        "bytes": 48269,
+        "sha256": "735d7546f459ae9281917a71a26d37835622b10b415f60a8d4d58079fe2a775a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states1-attempt1.validation-639277413928272658.json",
+        "bytes": 41713,
+        "sha256": "6955b52ac92daea84541d6f7a6c8a4e15b047bf78f50b8e319026fcb5fd4a915"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states2-attempt1/comparison.json",
+        "bytes": 42006,
+        "sha256": "414f247a9271357c2f4d8384640efeaf4b7f04af683e7bd8369ea98267a9e117"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states2-attempt1/manifest.json",
+        "bytes": 5441587,
+        "sha256": "b9700816bfcbcf500ead9c35a40be244a1e47c0d68086da58b1ef172d5cdc0ba"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states2-attempt1.complete.json",
+        "bytes": 8477,
+        "sha256": "f30e83a39ef261e08c0ed9543097c715662ba05bbc0de9ef5ffd19df12a2ee45"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states2-attempt1.request.json",
+        "bytes": 2181,
+        "sha256": "72f9b78554b2d9e8c16b1f36bebb1f6378a011c258942d4975057a3bcddf31b8"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states2-attempt1.review.pending.json",
+        "bytes": 48506,
+        "sha256": "041d27bbeb5fcc34af870799dbb2e9cb78815be69513088f929a16a65f60ce2a"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1280x720-states2-attempt1.validation-639277415451606481.json",
+        "bytes": 42006,
+        "sha256": "414f247a9271357c2f4d8384640efeaf4b7f04af683e7bd8369ea98267a9e117"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states1-attempt1/comparison.json",
+        "bytes": 41820,
+        "sha256": "642f58aba9a1846c633364cff71c0ceafa4d1b7dc7c4bf8d443a99143dc42342"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states1-attempt1/manifest.json",
+        "bytes": 5404575,
+        "sha256": "7bfe62ca77b5818d623b7d83d16486bc9bc42c6219e2fea5844b2ab4825a6b03"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states1-attempt1.complete.json",
+        "bytes": 8330,
+        "sha256": "691429c48d68a9efb3ec2e5c9fd559111d507c2cfa6072800e883e500a2540b9"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states1-attempt1.request.json",
+        "bytes": 2104,
+        "sha256": "a8a467e9564b2604b9421eb090f99a121cf62c2fd51feffd1352919e9408f42f"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states1-attempt1.review.pending.json",
+        "bytes": 48356,
+        "sha256": "9d2cd38ea424a16ce35a3f56ba5aeacd509136aa17637d8bcf42cd1f450e7acb"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states1-attempt1.validation-639277416808076794.json",
+        "bytes": 41820,
+        "sha256": "642f58aba9a1846c633364cff71c0ceafa4d1b7dc7c4bf8d443a99143dc42342"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states2-attempt1/comparison.json",
+        "bytes": 42174,
+        "sha256": "78a1891603e2f70a6a14e45c426b32cac3bca179c1d826f484a291785dee3f5e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states2-attempt1/manifest.json",
+        "bytes": 5441368,
+        "sha256": "168d4d5959062602efbe6b947d261bb02e019faa39513ec2cf8fff87a58f31e0"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states2-attempt1.complete.json",
+        "bytes": 8567,
+        "sha256": "adee551d6a2bec20f14036639cd48d5466af86052f2669ff76d1e25a6231e0c0"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states2-attempt1.request.json",
+        "bytes": 2183,
+        "sha256": "fc1f3f7aec61f8de4b99f860b61f85675d392efe4b3f4a6d49256ddc2c4426d1"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states2-attempt1.review.pending.json",
+        "bytes": 48593,
+        "sha256": "5f8abb04525915689618234bc286444ee4326028d391ca5299fee97b90fa6603"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-1920x1080-states2-attempt1.validation-639277418520391236.json",
+        "bytes": 42174,
+        "sha256": "78a1891603e2f70a6a14e45c426b32cac3bca179c1d826f484a291785dee3f5e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states1-attempt1/comparison.json",
+        "bytes": 41827,
+        "sha256": "e61f8b9ff86730915b3d089dc3d3b3749601b0ca577e36271c94f128ee386973"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states1-attempt1/manifest.json",
+        "bytes": 5405715,
+        "sha256": "10f28a3e249ad6dc62e5142837c75ca25d79500eab3ef4bf2a529610e0a41ad3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states1-attempt1.complete.json",
+        "bytes": 8330,
+        "sha256": "ddcde6851eb603b912e7be95ebd68a54c657be330a243caf042bce953a667f93"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states1-attempt1.request.json",
+        "bytes": 2104,
+        "sha256": "2782f072dd8c68956f386f253a868f26966f45e54e207b5b612730579369cd28"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states1-attempt1.review.pending.json",
+        "bytes": 48356,
+        "sha256": "0ff70d93276258c6752ad05ae1130024375ab2f192f789e98f4ccfb806b231f7"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states1-attempt1.validation-639277419823989807.json",
+        "bytes": 41827,
+        "sha256": "e61f8b9ff86730915b3d089dc3d3b3749601b0ca577e36271c94f128ee386973"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states2-attempt1/comparison.json",
+        "bytes": 42067,
+        "sha256": "5646ee8275056e2388c8841acb4c6e214036c81557300665bab7254b071df7a1"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states2-attempt1/manifest.json",
+        "bytes": 5443798,
+        "sha256": "69d1d12b8771bd27b5bfce1544f7caf0f3a445e0657fc130615b75f2a58addf8"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states2-attempt1.complete.json",
+        "bytes": 8567,
+        "sha256": "ad44cc898a15f9c79b6bbdbb919b0dfff5aaf55149585a8ea1180fdc90d82711"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states2-attempt1.request.json",
+        "bytes": 2183,
+        "sha256": "348a148cecfd6efe0d8ccb4937e9c0b8659c37059420dc8192b8f05e0f295ed3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states2-attempt1.review.pending.json",
+        "bytes": 48593,
+        "sha256": "885c244736f075eedf6023ed9879f90bf6e1b9d324314e28bb635b0019eb261f"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-2560x1440-states2-attempt1.validation-639277421780447580.json",
+        "bytes": 42067,
+        "sha256": "5646ee8275056e2388c8841acb4c6e214036c81557300665bab7254b071df7a1"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states1-attempt1/comparison.json",
+        "bytes": 41851,
+        "sha256": "3e7e298a19d6fff84388b883ab059c2ca0fb647e5ec9fcb19b66462d9d7adaa9"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states1-attempt1/manifest.json",
+        "bytes": 5408473,
+        "sha256": "9b5ff75f1179baf1136ea78905efc31ee18930e97d8dde8772d2290137197d72"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states1-attempt1.complete.json",
+        "bytes": 8330,
+        "sha256": "f0d734e226dc000c0547596966e0069194d9e6b18ca142b7bc7f4e996001ca28"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states1-attempt1.request.json",
+        "bytes": 2104,
+        "sha256": "d292203eee4362e78cca6d61a9161e16e18fd5e29a66ae8f2eab7d297cf519d9"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states1-attempt1.review.pending.json",
+        "bytes": 48356,
+        "sha256": "668e15fc9793705f8d1d4a969e62418bdb525e995de289ea7df56a3905012edf"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states1-attempt1.validation-639277423161335513.json",
+        "bytes": 41851,
+        "sha256": "3e7e298a19d6fff84388b883ab059c2ca0fb647e5ec9fcb19b66462d9d7adaa9"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states2-attempt1/comparison.json",
+        "bytes": 42081,
+        "sha256": "e9b9b452531ceb82d65a0404147d5aae336003199b5d9c7e99efc58203e59484"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states2-attempt1/manifest.json",
+        "bytes": 5444733,
+        "sha256": "e6fea38aaee75efb7bf894121c7ec5d613d4dae112d06149967f0293ebe427a7"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states2-attempt1.complete.json",
+        "bytes": 8567,
+        "sha256": "c45cb1bd9614a7e626114f98c486ec0715a0f7e1b0e273b39b78d1cdf494cdca"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states2-attempt1.request.json",
+        "bytes": 2183,
+        "sha256": "de1c0c840ecee82a3f0264ffbf42911fccd373426f17168fbedf1670134089c7"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states2-attempt1.review.pending.json",
+        "bytes": 48593,
+        "sha256": "aeccd4db5d5c77d320e38efd98a5f555e0a181a3c86bab13f48e2a594949464e"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3440x1440-states2-attempt1.validation-639277425353589862.json",
+        "bytes": 42081,
+        "sha256": "e9b9b452531ceb82d65a0404147d5aae336003199b5d9c7e99efc58203e59484"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states1-attempt1/comparison.json",
+        "bytes": 41790,
+        "sha256": "0d73cc1bb1a39c1f3205725741a24cdb381162f52847de48a68ab8a5f3ba91b6"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states1-attempt1/manifest.json",
+        "bytes": 5408062,
+        "sha256": "62be4057276a0a0530257d5c09535fd137fcbc520a2df6750bd25fff54e09454"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states1-attempt1.complete.json",
+        "bytes": 8330,
+        "sha256": "c230a0fe9451be841610567e67ac4e46470a43a034d4c7957745f6f6eb4aa2e7"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states1-attempt1.request.json",
+        "bytes": 2104,
+        "sha256": "b3f9da5f4bd227592da6d80a05f3f334c28890a8e097201293453cea4756b237"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states1-attempt1.review.pending.json",
+        "bytes": 48356,
+        "sha256": "b4de852abc5aeb24ef5dd09aafd058c894df7ce07a388048b03cdfd73973cd7d"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states1-attempt1.validation-639277426974964735.json",
+        "bytes": 41790,
+        "sha256": "0d73cc1bb1a39c1f3205725741a24cdb381162f52847de48a68ab8a5f3ba91b6"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states2-attempt1/comparison.json",
+        "bytes": 42130,
+        "sha256": "664a661a813848a08f01d420bac72013d02c846a396644099c94f7ac3b804b77"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states2-attempt1/manifest.json",
+        "bytes": 5444277,
+        "sha256": "c8d9e0172061d2997aab24a04ae183c66f87cd69a420b332ec63c05b14f557c3"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states2-attempt1.complete.json",
+        "bytes": 8567,
+        "sha256": "486e2e9d84d94920ab690206125de94db265f0e800f58a04b7c2b79c7dc4729f"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states2-attempt1.request.json",
+        "bytes": 2183,
+        "sha256": "4a6387a3db703d5ce4bb8ad3427946b6323f64fbf70c2dc3e30070e38705c81b"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states2-attempt1.review.pending.json",
+        "bytes": 48593,
+        "sha256": "b49a3c95875f846cbb7dcdf4fbf1a0fd0910a0f3e566143ecfdea7c2b988d6e1"
+      },
+      {
+        "path": "artifacts/interface-native-installed/dpi96-3840x2160-states2-attempt1.validation-639277429892978001.json",
+        "bytes": 42130,
+        "sha256": "664a661a813848a08f01d420bac72013d02c846a396644099c94f7ac3b804b77"
+      },
+      {
+        "path": "artifacts/interface-native-installed/plan.json",
+        "bytes": 28137,
+        "sha256": "f3d5c0d13a3bb0cb4a3e906e5dd4ce19cd0757d7a8d19a1a636be36b0c91f31a"
+      },
+      {
+        "path": "artifacts/interface-native-verification.json",
+        "bytes": 8807964,
+        "sha256": "11efb316a5c38e35ef09130dd5f4115f815c5f8b9c6acc3c1ee9dea6414802a5"
+      },
+      {
+        "path": "artifacts/interface-operations-readable-build.log",
+        "bytes": 3770,
+        "sha256": "7d42c7dad1e8b8f212440f1e86d4c04f9121547c56ae75af964b0746467640e5"
+      },
+      {
+        "path": "artifacts/interface-operations-readable-tests.log",
+        "bytes": 606,
+        "sha256": "98afc23b4fe465d8714149830fbf39eaa7cc24f4bf2ea12829b6d226554fd333"
+      },
+      {
+        "path": "artifacts/interface-package-match-1.json",
+        "bytes": 10929,
+        "sha256": "6b8c83ea12ad4b288eb61c37792df50ee53b962550d688965460b7bf2eaaf354"
+      },
+      {
+        "path": "artifacts/interface-package-match-1.log",
+        "bytes": 3977,
+        "sha256": "a97096ec3e0933d7b376853f4bd6b0524243936c8e7c1dd07ccb87107978e219"
+      },
+      {
+        "path": "artifacts/interface-package-match-2.json",
+        "bytes": 10920,
+        "sha256": "93794c7bccc5203a3ac603b85dded6395fbec40bb6f6f736147f5d9889649595"
+      },
+      {
+        "path": "artifacts/interface-package-match-2.log",
+        "bytes": 3978,
+        "sha256": "990d157def2f1fb7ed86b43c7021288f88d6a8f3a0ea681f1f72a0e5aad9ad63"
+      },
+      {
+        "path": "artifacts/interface-package-verification.json",
+        "bytes": 1196,
+        "sha256": "859f8f4472d4ee6d0295ddc60e35a243d35bfb7a5ce2ae308a77eb9ea4fee286"
+      },
+      {
+        "path": "artifacts/interface-package.log",
+        "bytes": 3801,
+        "sha256": "98dfe874ef7632f2e21c4c3345ec41ef58376e6bba0025e793c0b0a1e3730af3"
+      },
+      {
+        "path": "artifacts/interface-packaged-native/comparison.json",
+        "bytes": 3358,
+        "sha256": "abe44ea7e7fa88b23af8c972aa578450f7fb2e1ffba00cbb9bd47a87f06537d4"
+      },
+      {
+        "path": "artifacts/interface-packaged-native/manifest.json",
+        "bytes": 374686,
+        "sha256": "797de00b87d1a12be638a0aef0d5ef6b14343ec0124d477d4f1afb578b2c3151"
+      },
+      {
+        "path": "artifacts/interface-packaged-native.log",
+        "bytes": 68,
+        "sha256": "db0fcefaa15dfa8554b57b84a5ae6e247589fd8c4437117aea0fdc92a80342c8"
+      },
+      {
+        "path": "artifacts/interface-packaged-native.request.json",
+        "bytes": 1590,
+        "sha256": "577305111b9ed8d7131591627bcc823c95a80085fbdd1f75c9aeee584f8fc36f"
+      },
+      {
+        "path": "artifacts/interface-packaged-startup/launch-0.json",
+        "bytes": 8017,
+        "sha256": "26c8593c8a765c68341e5012ca141f416c1ebe00b2a32e17fce06f53029bf0be"
+      },
+      {
+        "path": "artifacts/interface-packaged-startup/launch-1.json",
+        "bytes": 7998,
+        "sha256": "593043b8cf8206a106593ec674aef65672eeccaae3e89a28533136957d29ba82"
+      },
+      {
+        "path": "artifacts/interface-packaged-startup/launch-2.json",
+        "bytes": 8009,
+        "sha256": "483b049086a0664902189cae42a5adeca5b1f3587d93039a3eaf352a97ad5e6a"
+      },
+      {
+        "path": "artifacts/interface-packaged-startup/summary.json",
+        "bytes": 2994,
+        "sha256": "2ace69ab9882c729e683c5922bfc40eaa7f5c04c8cbb1397276abb93d06a4f75"
+      },
+      {
+        "path": "artifacts/interface-packaged-startup.log",
+        "bytes": 182,
+        "sha256": "afa1fc9e66fadd39a39bc5859047b26a4c1e87882445b793c94ebc66f11895f7"
+      },
+      {
+        "path": "artifacts/interface-pending-review-gate.log",
+        "bytes": 366,
+        "sha256": "eca8c484b5e5f394735236ac0e554b2c12c520e4aabb1889c25e9f0b721201da"
+      },
+      {
+        "path": "artifacts/interface-performance-after/compact/run-1/comparison.json",
+        "bytes": 1492,
+        "sha256": "ed96591d0d4b315922e37b1d4fbab3e83cedd008945d066b15a16110be0989a5"
+      },
+      {
+        "path": "artifacts/interface-performance-after/compact/run-1/manifest.json",
+        "bytes": 2721548,
+        "sha256": "0ba3e49587865e0fc10af568dfbb8066d7070a9f095b3929ea7566559b2dbf39"
+      },
+      {
+        "path": "artifacts/interface-performance-after/compact/run-1.request.json",
+        "bytes": 1534,
+        "sha256": "1f2b8ef0ab3fc635ddcf0b54fcaec0c000f8c72759d86b529fdae418cc35fedd"
+      },
+      {
+        "path": "artifacts/interface-performance-after/compact/run-2/comparison.json",
+        "bytes": 1492,
+        "sha256": "9dda8987ff9a6ea498a0d2411956b36271964d2120bbf7a3b87dcbdcacf8c8d8"
+      },
+      {
+        "path": "artifacts/interface-performance-after/compact/run-2/manifest.json",
+        "bytes": 2721983,
+        "sha256": "35bfa7a99f433b4c707d30242aade7fc8dc27163c34dd91b07d9208b30baf1be"
+      },
+      {
+        "path": "artifacts/interface-performance-after/compact/run-2.request.json",
+        "bytes": 1534,
+        "sha256": "f9ce234a0203c03a67907d6da507f8a3561845174e7a781ec4027717c806b790"
+      },
+      {
+        "path": "artifacts/interface-performance-after/normal/run-1/comparison.json",
+        "bytes": 2446,
+        "sha256": "33fe0f67e21d5f1002108191693501ce3ec8dd5bc7e0d28e9a1a10c293ec2742"
+      },
+      {
+        "path": "artifacts/interface-performance-after/normal/run-1/manifest.json",
+        "bytes": 5418539,
+        "sha256": "73057aa847c2993a56159aa7d844dd4def06f3310b8d5e7803cfdf328d37d762"
+      },
+      {
+        "path": "artifacts/interface-performance-after/normal/run-1.request.json",
+        "bytes": 1562,
+        "sha256": "f82f12447b8b2f0e5e477f175c44ae834de6d60eac7d36ace66b9a59c5aac222"
+      },
+      {
+        "path": "artifacts/interface-performance-after/normal/run-2/comparison.json",
+        "bytes": 2448,
+        "sha256": "1db79d137b9a59790a5eaff6a29b3826ef1519f72d7781515c8b7b72af4d5a80"
+      },
+      {
+        "path": "artifacts/interface-performance-after/normal/run-2/manifest.json",
+        "bytes": 5418611,
+        "sha256": "32cec51a244485474d8e4ce54035f0197b5ec8baea1f527b32dac19906055ea8"
+      },
+      {
+        "path": "artifacts/interface-performance-after/normal/run-2.request.json",
+        "bytes": 1562,
+        "sha256": "13cfd10103a731dc731399a958754e67e38918867a1175f1cbc3f7d17e903a43"
+      },
+      {
+        "path": "artifacts/interface-performance-after-compact-variance.json",
+        "bytes": 5284,
+        "sha256": "e1ce623d09d720ea356b229eafdd03f72b3be476d0c8118d6f744cdc7b1cfc0e"
+      },
+      {
+        "path": "artifacts/interface-performance-after-normal-variance.json",
+        "bytes": 10080,
+        "sha256": "8ff25b4e703185ed60adb67c98e5079728f42bf0f50d98b3c34b035a06b114a9"
+      },
+      {
+        "path": "artifacts/interface-performance-before/compact/run-1/comparison.json",
+        "bytes": 1491,
+        "sha256": "85be51cee18433e49bbaa54e3cfbf1465ed0b08f45f4c6ecc0f02a596e19e38a"
+      },
+      {
+        "path": "artifacts/interface-performance-before/compact/run-1/manifest.json",
+        "bytes": 2721652,
+        "sha256": "cdc78013576ab2489baa30f87eb8355e682de18a6d9ce142400e7a8962ef7447"
+      },
+      {
+        "path": "artifacts/interface-performance-before/compact/run-1.request.json",
+        "bytes": 1534,
+        "sha256": "32eabc7bc19ca7d13d7090597a463df80af17a23ac13e12f334a50a5cfcee370"
+      },
+      {
+        "path": "artifacts/interface-performance-before/compact/run-2/comparison.json",
+        "bytes": 1490,
+        "sha256": "63307c80c58edb53e50bdcaef637bc06847fb3244b294efc184b0155ae40e8df"
+      },
+      {
+        "path": "artifacts/interface-performance-before/compact/run-2/manifest.json",
+        "bytes": 2721567,
+        "sha256": "26d6a714e02a8f50be24189343219049a87c3b9f01aad271a9fda9b1052eeccb"
+      },
+      {
+        "path": "artifacts/interface-performance-before/compact/run-2.request.json",
+        "bytes": 1534,
+        "sha256": "0b2b36b1df9ca627e70415961c3aeb2b8fe6fe5b5745c57dce17da1eb708144b"
+      },
+      {
+        "path": "artifacts/interface-performance-before/normal/run-1/comparison.json",
+        "bytes": 2442,
+        "sha256": "30bd5da1c6fc111a5c466f59caa50e3163cd6a46bd74a094307ab04af8237f59"
+      },
+      {
+        "path": "artifacts/interface-performance-before/normal/run-1/manifest.json",
+        "bytes": 5417951,
+        "sha256": "e1ef35f5a506b52d4144922b6fbbef5027f0b5972d81f592302164741fee0d43"
+      },
+      {
+        "path": "artifacts/interface-performance-before/normal/run-1.request.json",
+        "bytes": 1562,
+        "sha256": "10cf1fe635ffc917f78bc54ff460abe15ff5efd3508cdcdc21e2a092628337de"
+      },
+      {
+        "path": "artifacts/interface-performance-before/normal/run-2/comparison.json",
+        "bytes": 2445,
+        "sha256": "38551e921b95f9ca92e41e07b218fa33793ff24013840ea4d0dd1c59521392e3"
+      },
+      {
+        "path": "artifacts/interface-performance-before/normal/run-2/manifest.json",
+        "bytes": 5418944,
+        "sha256": "c94f46fc74979f2be92ffed605432244e0d46ee74198db3c6a59eec01ea3cbaa"
+      },
+      {
+        "path": "artifacts/interface-performance-before/normal/run-2.request.json",
+        "bytes": 1562,
+        "sha256": "4dedc82c408b320dfa0b5abc071aa9a04c9b0b1f8576a34fa5ed109d0a28e612"
+      },
+      {
+        "path": "artifacts/interface-performance-before-compact-variance.json",
+        "bytes": 5294,
+        "sha256": "6de5e5f88d16fb8b93f654267c87fb6000df8045611c812f536c49a44169bbd2"
+      },
+      {
+        "path": "artifacts/interface-performance-before-normal-variance.json",
+        "bytes": 10080,
+        "sha256": "be300146431f1c46adfb342a967c07fbb63b857a228fae6827b71dab77d21b27"
+      },
+      {
+        "path": "artifacts/interface-performance-compact-before-after.json",
+        "bytes": 5281,
+        "sha256": "786eba9802cafb6a243832aef7eb425c8d4492159e9316a4b602775e7d385702"
+      },
+      {
+        "path": "artifacts/interface-performance-identities.json",
+        "bytes": 3865,
+        "sha256": "86c7a52eb988c3c5752efdc91941a51b6f4d36feffd57158ad64feb47a7811f3"
+      },
+      {
+        "path": "artifacts/interface-performance-normal-before-after.json",
+        "bytes": 10074,
+        "sha256": "653f185553e7fe4c7aff69e3ea7a9d13a968272f7a704355a31a3eb1f710762a"
+      },
+      {
+        "path": "artifacts/interface-performance-package-verification.json",
+        "bytes": 631,
+        "sha256": "5b3ec80ed13aa3c71f2db45eb5f49bdc5f5389a5a24fc8651a889255e742d1de"
+      },
+      {
+        "path": "artifacts/interface-post-native-recovery.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "artifacts/interface-post-native-stage.json",
+        "bytes": 248,
+        "sha256": "b68663cf337b38fa2994e65436e6ae5da722909ee79fa0135aa8f32977c8776d"
+      },
+      {
+        "path": "artifacts/interface-post-native.log",
+        "bytes": 10934,
+        "sha256": "cc81186e9bbd650a418c5f4ec2cad6a04e54e428bfbac0e889968f2ecfdd0346"
+      },
+      {
+        "path": "artifacts/interface-readable-build.log",
+        "bytes": 8809,
+        "sha256": "cd75affdd6d7977365da2a129b429934998a9690aba78e1fbb24ef3e6d69514d"
+      },
+      {
+        "path": "artifacts/interface-readable-probe-dpi192/comparison.json",
+        "bytes": 1474,
+        "sha256": "bf57eb25ede3194405e4669ed49e240db317283ddc5dff5258eebd79db74d233"
+      },
+      {
+        "path": "artifacts/interface-readable-probe-dpi192/manifest.json",
+        "bytes": 127201,
+        "sha256": "5c830c350156a3964fcc68a13f028baadc8d25a92fcb27b0ae1d657161731cfd"
+      },
+      {
+        "path": "artifacts/interface-readable-probe-dpi192.request.json",
+        "bytes": 1461,
+        "sha256": "d7d68800028dd25d6fd7c4dc7925f06f3174e7a59e1493ecd99a5c0e985a53c9"
+      },
+      {
+        "path": "artifacts/interface-readable-probe-dpi96/comparison.json",
+        "bytes": 1472,
+        "sha256": "95d7841e486cab0a221c7fe32c22800df268fd28e5739bfe8b6c0e4438add6f0"
+      },
+      {
+        "path": "artifacts/interface-readable-probe-dpi96/manifest.json",
+        "bytes": 127031,
+        "sha256": "4add2e3eba44cf639f626b05f3fd2aa42a2a16a9e4f47fd5bd31c9d0271bc27b"
+      },
+      {
+        "path": "artifacts/interface-readable-probe-dpi96.request.json",
+        "bytes": 1459,
+        "sha256": "58d7d4164e579408a0593a0d2f1d01945f1d1f96cada5d5ffb0f2a5e7d282357"
+      },
+      {
+        "path": "artifacts/interface-readable-probe.log",
+        "bytes": 976,
+        "sha256": "0d653f1c6926b26f7367301a77932a5da7621adc7966bb78e969b266ca4859b1"
+      },
+      {
+        "path": "artifacts/interface-readable-source-build.log",
+        "bytes": 8809,
+        "sha256": "d43c9079568eb3541e44a5066f6e338c913c8453c23299f87da6a95f84d44cb2"
+      },
+      {
+        "path": "artifacts/interface-readable-tests.log",
+        "bytes": 606,
+        "sha256": "cc39e60d032b6243b8325c0d48284d9eacc970099c1f46acca95b79782a19c58"
+      },
+      {
+        "path": "artifacts/interface-record-stage.json",
+        "bytes": 117,
+        "sha256": "18c63cf1dd8d2f7534cb46e20b56c4d8fc47ae33ae4ffd317553f26af1ac1c2a"
+      },
+      {
+        "path": "artifacts/interface-recovery-load.log",
+        "bytes": 118,
+        "sha256": "abc1965d84c347a8a1ad8ca78f1f96eab76ea2c1ace972c5a82f6dd30bf27159"
+      },
+      {
+        "path": "artifacts/interface-recovery-replay.log",
+        "bytes": 111,
+        "sha256": "216cb9afb8e0c4a561760de472822bec91370d040fdb0356e7bc3d266d90efd0"
+      },
+      {
+        "path": "artifacts/interface-recovery-save.log",
+        "bytes": 1226,
+        "sha256": "d21b5931f8f7e5136fd53ccfd6f6379d8cafef906ea5afec17ab64666edd5f3d"
+      },
+      {
+        "path": "artifacts/interface-recovery.replay.json",
+        "bytes": 4913,
+        "sha256": "2edf7112b821bbd57344836312c6fbd1e366e75d577fdaabd7df7d3c3e8ebf1e"
+      },
+      {
+        "path": "artifacts/interface-recovery.save.json",
+        "bytes": 309055,
+        "sha256": "f93be36ff470ac20dff13d9b8bb0a7b914c4c130822351d5a695dccf0fc10ce7"
+      },
+      {
+        "path": "artifacts/interface-references.log",
+        "bytes": 95,
+        "sha256": "2834442048167a3e16fb8d8bbd76b13cba766a16c33cb9fba23983ca5ce9f040"
+      },
+      {
+        "path": "artifacts/interface-restore.log",
+        "bytes": 8305,
+        "sha256": "0ce0def7ace366739a8c6c65a2ee8d7eece904d267a87af64311f083d450dfe5"
+      },
+      {
+        "path": "artifacts/interface-retained-ci-failure.log",
+        "bytes": 927,
+        "sha256": "0aa970f74306b0d20312c042f4afa4d0cf38b19839ef3e8c458fda3d36077089"
+      },
+      {
+        "path": "artifacts/interface-retained-ci-job.log",
+        "bytes": 8712826,
+        "sha256": "5236f6b1ffa97d885d30d983a464a11f49738678cca46be6b567f8e6e446a5ed"
+      },
+      {
+        "path": "artifacts/interface-retained-ci-jobs.json",
+        "bytes": 8864,
+        "sha256": "5cfd9c625857383703b45857dacc79b3455767636cf0397a53b74556c6087a51"
+      },
+      {
+        "path": "artifacts/interface-retained-ci-runs.json",
+        "bytes": 1200,
+        "sha256": "931879ec3d1db0eee9da665ecd41d1fa5d0d8b8076487439d6adc408a94d8890"
+      },
+      {
+        "path": "artifacts/interface-retained-protocol-build.log",
+        "bytes": 8809,
+        "sha256": "b892eb814c364222b9aaaa9ca94122ecc9549c2328b7f197aad6481daf8842da"
+      },
+      {
+        "path": "artifacts/interface-retained-protocol-result.json",
+        "bytes": 226,
+        "sha256": "f9344d29c2c6202a21a0b1374c921b2b06e86c8c8ca4a466e6b40eaae62d5525"
+      },
+      {
+        "path": "artifacts/interface-retained-protocol-source.log",
+        "bytes": 42,
+        "sha256": "8dac90c55d3ac5e1d012048e44ad7f4b3e00f01e7452ebb5ab34cb5127b5641d"
+      },
+      {
+        "path": "artifacts/interface-retained-protocol-tests.log",
+        "bytes": 36925,
+        "sha256": "8aec1342260f38979daa07833764e9aa72dce8957b9de4a243915ad32034c6eb"
+      },
+      {
+        "path": "artifacts/interface-review-interface-installed-dark.pending.json",
+        "bytes": 2001,
+        "sha256": "6535eb2e621e1b469f9b1d2a6808986b60eca525011fb6eb653b7b9f21095e51"
+      },
+      {
+        "path": "artifacts/interface-review-interface-installed-half.pending.json",
+        "bytes": 2550,
+        "sha256": "209ff4b68ba6df3bd515ab19bcef15450453f642f9b03f1e63460c78aad8fd5b"
+      },
+      {
+        "path": "artifacts/interface-review-interface-installed-warp.pending.json",
+        "bytes": 2526,
+        "sha256": "8ab74f14311f6c7940122957fe9a5ad16ed03170480f5091ff29dd94d49d324f"
+      },
+      {
+        "path": "artifacts/interface-review-interface-packaged-native.pending.json",
+        "bytes": 3658,
+        "sha256": "c8249f37d22e5599641a7968f74b11d2b01cdbca9fdd0abf960e0bceeb1b4733"
+      },
+      {
+        "path": "artifacts/interface-review-interface-performance-after-compact-run-1.pending.json",
+        "bytes": 1452,
+        "sha256": "7b1d2354c549e18fade4e181584f8c168de5e82a18758d3c77ff92915870862f"
+      },
+      {
+        "path": "artifacts/interface-review-interface-performance-after-compact-run-2.pending.json",
+        "bytes": 1452,
+        "sha256": "6d97ca73ebb6a2ad0bd5271a0dd78d8331d2c058935150218c85966fa09b9f35"
+      },
+      {
+        "path": "artifacts/interface-review-interface-performance-after-normal-run-1.pending.json",
+        "bytes": 2546,
+        "sha256": "3a1a96dd4a2b72a22640e8d867b0d0a80baa97f7746a21d1a21428c89c47e9ab"
+      },
+      {
+        "path": "artifacts/interface-review-interface-performance-after-normal-run-2.pending.json",
+        "bytes": 2546,
+        "sha256": "de4084e034666d988f9d560728b400d8887c4c7ce667290bb183151efae336b6"
+      },
+      {
+        "path": "artifacts/interface-review-interface-performance-before-compact-run-1.pending.json",
+        "bytes": 1452,
+        "sha256": "e9675b785283923b35d3db7e1c4501068ba4c64f11aebda0bd5ada70704a73ed"
+      },
+      {
+        "path": "artifacts/interface-review-interface-performance-before-compact-run-2.pending.json",
+        "bytes": 1452,
+        "sha256": "34814915ebdc923a6801e986532fbd7a4739179cef611e2c54db0c615c2175cf"
+      },
+      {
+        "path": "artifacts/interface-review-interface-performance-before-normal-run-1.pending.json",
+        "bytes": 2546,
+        "sha256": "dd4117824cfe65bcec70accf3f2909e6c0911380bdec46e2f5de001dab1904e1"
+      },
+      {
+        "path": "artifacts/interface-review-interface-performance-before-normal-run-2.pending.json",
+        "bytes": 2546,
+        "sha256": "09f54989b35e8d7426ae91f60e889244621fd480ba9dfa5371a8020fe691a5f7"
+      },
+      {
+        "path": "artifacts/interface-review-interface-readable-probe-dpi192.pending.json",
+        "bytes": 1452,
+        "sha256": "2c1460aa25e776dbf836913bca163fe531eb4ba647a325bf932d20d623d3e229"
+      },
+      {
+        "path": "artifacts/interface-review-interface-readable-probe-dpi96.pending.json",
+        "bytes": 1450,
+        "sha256": "9d366f4ee62c26005d5664979d56f284ef55dd72f93bc4edaf828fb94c5a5167"
+      },
+      {
+        "path": "artifacts/interface-review-interface-warm-installed-run-1.pending.json",
+        "bytes": 2546,
+        "sha256": "704668e18861a9d23476647e04f574f2bc362e3e93ccb0b9df3b177326d159bb"
+      },
+      {
+        "path": "artifacts/interface-review-interface-warm-installed-run-2.pending.json",
+        "bytes": 2546,
+        "sha256": "4585b1481a6682bb2b67c3d75f141befc9efe595b04fbb3343c6e2216e2ea6dd"
+      },
+      {
+        "path": "artifacts/interface-source-body-equivalence.json",
+        "bytes": 370,
+        "sha256": "74156de5fd89c4b6e9e23aa7b17ac05a1e634e7dc8c281dc5f5cb92cf74e72bf"
+      },
+      {
+        "path": "artifacts/interface-source-ci-failure.log",
+        "bytes": 927,
+        "sha256": "eded09649017830e351c3eb760a5e6ed9b3bacc5a5d2bef81661b49cc99e9388"
+      },
+      {
+        "path": "artifacts/interface-source-ci-job.log",
+        "bytes": 8735405,
+        "sha256": "c30f41c7c40aabf062aeef8b6474e026f6ecf2c7abad4c0f8ec04b1df240c50a"
+      },
+      {
+        "path": "artifacts/interface-terminal-telemetry.json",
+        "bytes": 42987,
+        "sha256": "bd278acf5c4b4f02fa315771e343f77ac8cf227a0c4365997b13d41bff381837"
+      },
+      {
+        "path": "artifacts/interface-terminal.json",
+        "bytes": 5209,
+        "sha256": "4757d838332340218a512fb65eaacad62f21db0cb25b7574a854949837846e14"
+      },
+      {
+        "path": "artifacts/interface-terminal.log",
+        "bytes": 243145,
+        "sha256": "f60397a34af9102a580d88615c6737d201d98b6f56a65b1901b9a3884b06512e"
+      },
+      {
+        "path": "artifacts/interface-terminal.progression-1.json",
+        "bytes": 3525305,
+        "sha256": "7e94a1d32c86795fb41a595ef0acef57631478ebd0de511391d4bc70b8176c2a"
+      },
+      {
+        "path": "artifacts/interface-version.log",
+        "bytes": 727,
+        "sha256": "34df20ffd583494442b6ca57980a6c227b5f94c78164bb178f4a64d0938ec5fd"
+      },
+      {
+        "path": "artifacts/interface-warm-installed/run-1/comparison.json",
+        "bytes": 2444,
+        "sha256": "42847fbcf6751ccff8c84aba71f40cb8a162da5307b0aa0876dd382abde5d2b9"
+      },
+      {
+        "path": "artifacts/interface-warm-installed/run-1/manifest.json",
+        "bytes": 5418976,
+        "sha256": "95dee6f9204ff2d7e30a60b6dd5b47fe57837d1b414dc2cd8be70d9c8d67c803"
+      },
+      {
+        "path": "artifacts/interface-warm-installed/run-1.request.json",
+        "bytes": 1551,
+        "sha256": "ad5746a9ef0faf2d7d75784404f7b9cd1ced16acdf1beec6b1b9aa8a5ae45089"
+      },
+      {
+        "path": "artifacts/interface-warm-installed/run-2/comparison.json",
+        "bytes": 2445,
+        "sha256": "5d8747d037df6ae437f4d645c82a348351ce86773938c55712d3639389725cd4"
+      },
+      {
+        "path": "artifacts/interface-warm-installed/run-2/manifest.json",
+        "bytes": 5417448,
+        "sha256": "05f026ad7206a79fe170f459d28ec428589ccc54d949724a3eb002faa960c2e8"
+      },
+      {
+        "path": "artifacts/interface-warm-installed/run-2.request.json",
+        "bytes": 1551,
+        "sha256": "6ebb3069bffc00f9fb258505de187ccde882fe545a61471cda3c604142391aaf"
+      },
+      {
+        "path": "artifacts/interface-warm-installed/variance.json",
+        "bytes": 9997,
+        "sha256": "b2cb39c1470297a909e012be4cfc37ca147658fb7c32fe4b25bbb9205161ad7b"
+      },
+      {
+        "path": "artifacts/interface-window-budget.log",
+        "bytes": 437,
+        "sha256": "daaa0769e24244c1b332b279cb930bc38bec7d41ce149cd8a3752b275d399a64"
+      },
+      {
+        "path": "artifacts/Package-EconomicInterface.ps1",
+        "bytes": 1591,
+        "sha256": "4a26f075e5cb4fc21d42cc7b3382a7c74454d0d18d8c97345239c76e780cdb3e"
+      },
+      {
+        "path": "artifacts/Package-GraphicalInterface.ps1",
+        "bytes": 3341,
+        "sha256": "ee86d3d82ed9d7fee27976e1ba73dab4f6d6663a681870a41c80d0fb7ebfd3cc"
+      },
+      {
+        "path": "artifacts/Package-TacticalInterface.ps1",
+        "bytes": 1927,
+        "sha256": "b41722186a9de8f253ac36428325d2ecae19402139d7e1b36f00528015d5c0fc"
+      },
+      {
+        "path": "artifacts/Probe-ReadableInterface.ps1",
+        "bytes": 493,
+        "sha256": "a5bd4d0940088ba84605824dc8fb49671c2f7780f863f0cfd40588622f5161db"
+      },
+      {
+        "path": "artifacts/Qualify-EconomicInterface.ps1",
+        "bytes": 2333,
+        "sha256": "2bf0c0a3ca80460aa20f69cf281129421faac07185bdcabdf5f5cd71e63ab52b"
+      },
+      {
+        "path": "artifacts/Qualify-EconomicInterfaceFinal.ps1",
+        "bytes": 2375,
+        "sha256": "d81eb91eb7c99be04a859314fbb7841f48fa1db4bd5abfbd0443bc6ab39403ff"
+      },
+      {
+        "path": "artifacts/Qualify-GraphicalInterface.ps1",
+        "bytes": 2753,
+        "sha256": "bb48e3a18f4d8bea39d00e057aa2f2440594a1fe0e45a1ba3e0315c716054370"
+      },
+      {
+        "path": "artifacts/Qualify-InstalledInterface.ps1",
+        "bytes": 5561,
+        "sha256": "92e9b297475e54e670f378317df6fc02ff3aca5ed10c8fe313cb5b9681c71256"
+      },
+      {
+        "path": "artifacts/Qualify-TacticalInterface.ps1",
+        "bytes": 2378,
+        "sha256": "05f4f7a93c425c693ae0c92019cffb91f824d5626d3c8ebfcf7e8f2e9d66eada"
+      },
+      {
+        "path": "artifacts/Retain-InterfaceEvidence.py",
+        "bytes": 4178,
+        "sha256": "f62914b2ff04b68e45aa26df763063fb5b48014700bd9259c2fce993f1c5a415"
+      },
+      {
+        "path": "artifacts/Test-EconomicInterfaceFinal.ps1",
+        "bytes": 1174,
+        "sha256": "09c7a361dbc2b6f6c2037c2c705b56e32555e7827acfcdd787912b9b58207dfd"
+      },
+      {
+        "path": "artifacts/Test-InstalledInterfaceFailures.ps1",
+        "bytes": 4204,
+        "sha256": "ba13f856c5a9d69c02028b35d971a7cf4c4d3d7a203c1eb75a4e244967d4126c"
+      },
+      {
+        "path": "artifacts/Verify-InstalledInterfaceMatrix.initial.py",
+        "bytes": 4986,
+        "sha256": "33e80afec8c0ad054ea5cf897d25c113cb44035b4058eff483b00b004d1bbf6c"
+      },
+      {
+        "path": "artifacts/Verify-InstalledInterfaceMatrix.py",
+        "bytes": 5217,
+        "sha256": "191aa9c80f9589731d168252d5560b72ccefa48abad5e4ed88c01fba306e54f6"
+      },
+      {
+        "path": "artifacts/Verify-InterfacePerformancePackages.py",
+        "bytes": 1384,
+        "sha256": "67c2a990d27269417edae0435c0f3403f34c269cea8aa89e60f89d4ae140c671"
+      }
+    ]
+  },
+  "selectedOriginals": [
+    {
+      "path": "onboarding-before.png",
+      "original": "artifacts/interface-native-final/dpi96-1280x720-states2-attempt1/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi96-UiOnboarding-Scale2.00.png",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi96-UiOnboarding-Scale2.00",
+      "source": "726315b70d81e2fa7c0c9ffd7b9be815162553a9",
+      "runtimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+      "imageSha256": "C95AE1FBEE69F91107CC178AA88673BE0DF90F89EE93F3C00DD1563778803CCC",
+      "pixelSha256": "D96A368FA44517C0C1A8D9BEF8ABE50DD23D7E03C755FA40F174587956C20DD2",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "onboarding-after.png",
+      "original": "artifacts/interface-native-installed/dpi96-1280x720-states2-attempt1/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi96-UiOnboarding-Scale2.00.png",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi96-UiOnboarding-Scale2.00",
+      "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+      "imageSha256": "922BE85DE9ED1495901A536EBB2056F0C7ACA87C42C5FE359E95240D351B0E9A",
+      "pixelSha256": "56A764029FBA690CF04287CCBDDB261E3C9116CC2E3C328F93612AE7A11ADACC",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "onboarding-dpi192.png",
+      "original": "artifacts/interface-native-installed/dpi192-1280x720-states2-attempt1/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiOnboarding-Scale2.00.png",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiOnboarding-Scale2.00",
+      "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+      "imageSha256": "531BE9E0BABB67470F75172567A43694771FCE4C693FD0A55F5EC4D8EB54334C",
+      "pixelSha256": "C5BB2E02FFA5635A3B33F51B50AD82EDB8138FC495820B430BF0C0DC0C875824",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "operations-before.png",
+      "original": "artifacts/interface-native-final/dpi96-1280x720-states2-attempt1/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi96-UiOperations-Scale2.00.png",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi96-UiOperations-Scale2.00",
+      "source": "726315b70d81e2fa7c0c9ffd7b9be815162553a9",
+      "runtimeFingerprint": "ADE1441B64F93A5BD649686DA1AD9FD2B924CE7C01B6AC50FCCBBBBAD12DDA67",
+      "imageSha256": "BB45DAF169A77741215A30CCAEEB88CE67DA0059143F18D82E21BD7E43C6DEEB",
+      "pixelSha256": "593071DC7A081A9ED0F382F50380DCCAC614EDB4E45E2E0DB2492185C4B59CE7",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "operations-after.png",
+      "original": "artifacts/interface-native-installed/dpi96-1280x720-states2-attempt1/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi96-UiOperations-Scale2.00.png",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi96-UiOperations-Scale2.00",
+      "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+      "imageSha256": "74CA639B7B4BA906BCCDBA2C5002B41C0F6D2FB224933E58B04DBB4DC97FF992",
+      "pixelSha256": "D797F0C31242E2F0E2DF9AFCE54492F90D117F6BBD48DFD239B30DC9F1ACED0A",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "menu.png",
+      "original": "artifacts/interface-native-installed/dpi96-1920x1080-states1-attempt1/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenu-Scale1.00.png",
+      "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenu-Scale1.00",
+      "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+      "imageSha256": "EB0E8CBFBAB0DEBC21988F83007E0496E1A20792B33747D8A174F4B386B87DF6",
+      "pixelSha256": "C7704427CEA1E0EB41A6DBB8B3F783A519082C7EE6EDBD6A04490CDC75B468E3",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "audio-settings.png",
+      "original": "artifacts/interface-native-installed/dpi144-2560x1440-states1-attempt1/BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiSettingsAudio-Scale1.00.png",
+      "key": "BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi144-UiSettingsAudio-Scale1.00",
+      "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+      "imageSha256": "DB86EBA746D0D67EA18A3540546E9C1323F666A8D5199AFD00C8F783328D31FB",
+      "pixelSha256": "16E61D3C65F872A56DEB19D55F29B126307C08A95F1C61779CD01206886A654C",
+      "width": 2560,
+      "height": 1440
+    },
+    {
+      "path": "controls-compact.png",
+      "original": "artifacts/interface-native-installed/dpi192-1280x720-states1-attempt1/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiControlsLong-Scale2.00.png",
+      "key": "BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiControlsLong-Scale2.00",
+      "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+      "imageSha256": "4AF0716A636A3F1158097A1A09CBDD76A07B15CB22D7210371A4A128DB28702E",
+      "pixelSha256": "43090F98B95ABEE90F6865ED5820ACD2A159EE8DB0A44A659AC49F025FA1CA48",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "path": "selection-4k.png",
+      "original": "artifacts/interface-native-installed/dpi192-3840x2160-states2-attempt1/BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiSelectionUnit-Scale2.00.png",
+      "key": "BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiSelectionUnit-Scale2.00",
+      "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+      "imageSha256": "36173EC4C4931AB142BA49DA08571ED847BFE4FB593CA8CA1C62A57471446ACB",
+      "pixelSha256": "A084CC914AFAE582527BA62D76DB51C5BFCD10B4A7C513F2C75EBE1015AED46D",
+      "width": 3840,
+      "height": 2160
+    },
+    {
+      "path": "contacts-ultrawide.png",
+      "original": "artifacts/interface-native-installed/dpi144-3440x1440-states2-attempt1/BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiContacts-Scale1.00.png",
+      "key": "BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi144-UiContacts-Scale1.00",
+      "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+      "imageSha256": "18219831ADED489118DBC692368E5DFECB00779A7EE68BD0DB95267E356E1962",
+      "pixelSha256": "9C3AD715406444D618EF9F1D062B8E9B0DF92AA2C59ACFA7BF65630BE9EBDE6F",
+      "width": 3440,
+      "height": 1440
+    },
+    {
+      "path": "operations-overcast.png",
+      "original": "artifacts/interface-installed-dark/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiOperations-Scale1.00.png",
+      "key": "BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiOperations-Scale1.00",
+      "source": "705e63297748fc1fd675d3fe331fbd94e8c20c34",
+      "runtimeFingerprint": "B8ACA01894C15F98C09ACB5A1A80EA173B7FCD73C51D4C7E7BFF3701B61F523F",
+      "imageSha256": "4B2DFF12590A036E457A460154EB99DAEDF494A1ABED460FA637DFB55EFE4A15",
+      "pixelSha256": "3486AC29B16A0B799A83B9935C96A540BB8FADA97F99BDAD9A550FCE43BF3136",
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}
