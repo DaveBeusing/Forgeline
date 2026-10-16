@@ -624,9 +624,17 @@ internal sealed class ClientApplication
                 MaximumCameraDeltaSeconds);
 
             bool wasShellBlocking = pauseMenuActive;
+            var inputGuidance = guidance.Update(renderWorld.CurrentSnapshot, true, bindings: _gameplayBindings);
             guidanceInteraction.Update(inputState, renderWorld.CurrentSnapshot?.SessionId ?? SimulationSessionId.None,
-                _settings.ShowOnboarding && !smokeTest && !wasShellBlocking && window.IsFocused &&
-                renderWorld.CurrentSnapshot?.PlayerExperience is { IsMatchComplete: false });
+                _settings.ShowOnboarding && !smokeTest && inputGuidance.Visible,
+                GameplayHudLayout.Create(window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale),
+                _platform.Clock.GetElapsedTime(startedAt, now),
+                _settings.CreateUiFeedbackSettings().Animate(renderHost.LatestQualification?.QualityProfile.Active ?? RenderQuality.Low),
+                wasShellBlocking || !window.IsFocused || window.IsMinimized || selectionController.IsDragSelecting ||
+                buildingPlacementController.IsActive || tacticalTargetingController.IsActive || inputState.IsMouseButtonDown(PlatformMouseButton.Middle),
+                actionPanel.Mode == PlayerActionPanelMode.Closed && !operationsController.View.Open &&
+                _gameplayBindings.Key(GameplayAction.NextItem) == PlatformKey.Tab &&
+                !GameplayBindingRegistry.UsesCamera(_settings.CameraBindings, PlatformKey.Tab));
             FrontendLayout modalLayout = FrontendDesign.ResolveLayout(window.ClientSize.Width, window.ClientSize.Height,
                 _settings.UiScale, window.Dpi, pauseControlsVisible);
             if (modalLifetime.Update(inputState, modalLayout.Geometry, pauseMenuActive ? (pauseSettings.Visible ? 4 : pauseControlsVisible ? 2 : 1) : 0,
@@ -640,7 +648,7 @@ internal sealed class ClientApplication
                 if (inputState.WasKeyPressed(PlatformKey.Down) || inputState.WheelDelta < 0) controlsScroll++;
                 if (inputState.WasKeyPressed(PlatformKey.Up) || inputState.WheelDelta > 0) controlsScroll = Math.Max(0, controlsScroll - 1);
             }
-            bool modalFrame = wasShellBlocking || guidanceInteraction.BlocksGameplayThisFrame;
+            bool modalFrame = wasShellBlocking || guidanceInteraction.ShortcutConsumedThisFrame;
             UpdateMetricsOverlay(inputState, modalFrame, ref overlayEnabled, ref overlayToggleHeld);
             if (!modalFrame)
             {
@@ -715,6 +723,7 @@ internal sealed class ClientApplication
             hudInteraction.BeginFrame(
                 inputSnapshot?.SessionId ??
                 SimulationSessionId.None);
+            hudInteraction.CapturePointer(guidanceInteraction.BlocksGameplayThisFrame);
             PlayerExperienceSnapshot? inputExperience =
                 inputSnapshot?.PlayerExperience;
             bool inputMatchTerminal =
@@ -909,7 +918,7 @@ internal sealed class ClientApplication
             }
 
             bool shellChanged = wasShellBlocking != (pauseMenuActive);
-            if (shellChanged || inputState.FocusLostThisFrame || guidanceInteraction.BlocksGameplayThisFrame)
+            if (shellChanged || inputState.FocusLostThisFrame || guidanceInteraction.ShortcutConsumedThisFrame)
             {
                 inputState.SuppressHeldInput();
                 pauseHeld = false;
@@ -941,7 +950,7 @@ internal sealed class ClientApplication
                     false,
                     false,
                     _settings.ShowOnboarding &&
-                    !smokeTest && !guidanceInteraction.Hidden);
+                    !smokeTest);
 
             if (inputExperience?.MatchStatus ==
                     PlayerMatchStatus.Ended &&
@@ -1171,10 +1180,8 @@ internal sealed class ClientApplication
                 window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
             transientMenus.Update(inputState, inputSnapshot, interactionLayout, selectionController.Selection,
                 actionPanel, operationsController, presentationInteraction, informationLayer.MinimapEnabled,
-                buildingPlacementController.IsActive ||
-                (_settings.ShowOnboarding && !smokeTest && !guidanceInteraction.Hidden && inputSnapshot?.Guidance is not null &&
-                    !selectionController.IsDragSelecting && !tacticalTargetingController.IsActive),
-                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback);
+                buildingPlacementController.IsActive,
+                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback, onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View);
             hudInteraction.CapturePointer(transientMenus.PointerCaptured);
 
             if (inputMatchTerminal)
@@ -1305,9 +1312,8 @@ internal sealed class ClientApplication
 
             hudInteraction.CapturePointer(HudInteractionContext.CapturesWorldPointer(
                 inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.Mode != PlayerActionPanelMode.Closed,
-                buildingPlacementController.IsActive ||
-                (_settings.ShowOnboarding && !smokeTest && !guidanceInteraction.Hidden && inputSnapshot?.Guidance is not null &&
-                    !selectionController.IsDragSelecting && !tacticalTargetingController.IsActive), includeActionDock: false));
+                buildingPlacementController.IsActive, includeActionDock: false,
+                onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View));
 
             if (minimapInteraction.TryTakeMovementRequest(
                     out MovementOrderRequest minimapMovement))
@@ -1631,7 +1637,8 @@ internal sealed class ClientApplication
             preAlphaUx = preAlphaUx with
             {
                 InteractionHint = buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
-                Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding && !guidanceInteraction.Hidden,
+                Onboarding = guidanceInteraction.View,
+                Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding,
                     simulationPaused || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
                     tacticalTargetingView.Mode != TacticalTargetingMode.None || inputState.IsMouseButtonDown(PlatformMouseButton.Middle), _gameplayBindings),
                 Placement = placementFeedback
