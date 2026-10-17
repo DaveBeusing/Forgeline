@@ -67,7 +67,7 @@ internal static class HoverTooltipResolver
             if (groupControl is < 0 or > 11) return null;
             int participants = group.Participants(groupControl);
             return new(GroupActionRingContext.Label(groupControl), "GROUP SELECTION",
-                group.HasOperationalFacts && panel.Ring.GroupFactsCurrent ? $"ELIGIBLE {participants} / SELECTED {group.SelectedCount}" : "UPDATING GROUP DATA", participants == 0 ? "NO ELIGIBLE MEMBERS" :
+                group.HasOperationalFacts && panel.Ring.GroupFactsCurrent ? $"ELIGIBLE {participants} / SELECTED {group.SelectedCount}" : "UPDATING GROUP DATA", !group.HasOperationalFacts || !panel.Ring.GroupFactsCurrent ? "WAIT FOR CURRENT GROUP DATA" : participants == 0 ? "NO ELIGIBLE MEMBERS" :
                 groupControl < 8 ? "FILTER CURRENT SELECTION; SAVED GROUP UNCHANGED" : "CLICK TO REQUEST");
         }
         if (view.Contextual)

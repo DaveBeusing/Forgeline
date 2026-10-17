@@ -302,6 +302,20 @@ public sealed class GroupActionRingTests
         Assert.False(owner.ReconcileSelection(world));Assert.Equal(2,owner.Selection.Count);
     }
 
+    [Fact]
+    public void UnsupportedBuildingGroupDoesNotInventUnitFocusEligibility()
+    {
+        var snapshot=Snapshot(2);var instances=snapshot.Instances.ToArray();
+        for(int i=0;i<instances.Length;i++) instances[i]=instances[i] with{Selectable=new(new PlayerId(1),ControllableEntityCategory.Building)};
+        var buildings=new PresentationSnapshot(snapshot.Tick,snapshot.TickDuration,2,instances,sessionId:snapshot.SessionId,
+            playerExperience:snapshot.PlayerExperience,playerActions:snapshot.PlayerActions,combatGroups:new(snapshot.Tick,[],snapshot.SessionId));
+        var selection=new SelectionSet();selection.Replace([new(1,1),new(2,1)]);
+        var context=GroupActionRingContext.Capture(buildings,World(buildings),selection)!;
+        Assert.Equal(2,context.Count);Assert.True(context.HasOperationalFacts);
+        Assert.Equal(0,context.Participants(11));Assert.Equal(0,context.Participants(10));
+        Assert.False(new CombatGroupCardController().Activate(11,buildings,selection).FocusSelection);
+    }
+
     private static (PlayerActionPanelController,InputState,PresentationSnapshot,SelectionSet,RenderWorld) Open(int count)
     {
         var snapshot=Snapshot(count); var world=World(snapshot); var selection=new SelectionSet();

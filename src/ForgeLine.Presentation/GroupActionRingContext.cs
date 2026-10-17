@@ -33,12 +33,12 @@ public sealed class GroupActionRingContext
                 instance.Selectable.Owner != experience.Player) continue;
             members.Add(entity);
             if (operational is null || !operational.TryGet(entity, out var member)) continue;
+            counts[11]++;
             counts[SelectedCombatGroup.TypeIndex(member.Unit)]++;
             if (member.HasHealth && member.HealthFraction <= .25) counts[8]++;
             if (member.HasSupply && member.SupplyStatus is BattlefieldSupplyStatus.Critical or BattlefieldSupplyStatus.Unsupplied) counts[9]++;
             if (member.CombatEligible) counts[10]++;
         }
-        counts[11] = operational is null ? 0 : members.Count;
         return new(members.ToArray(), selection.Count, counts, snapshot.Tick, operational is not null);
     }
 
