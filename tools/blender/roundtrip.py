@@ -132,6 +132,7 @@ def close_matrix(actual, expected, message, tolerance=SOCKET_EPS):
 def export_scene(catalog, ids, families, geometries):
     scene=bpy.context.scene;bpy.context.view_layer.update()
     require(len(bpy.data.scenes)==1,'Only one authored scene is supported')
+    require(not scene.animation_data and not bpy.data.actions,'Scene animation is unsupported')
     require(scene.unit_settings.system=='METRIC' and scene.unit_settings.scale_length==1.0,'Scene metre unit scale changed')
     require('fl_contract' in scene,'Missing Blender source contract')
     contract=json.loads(scene['fl_contract'])
@@ -190,7 +191,7 @@ def export_scene(catalog, ids, families, geometries):
         seen=set()
         for pi,part_index,low,high,triangle_start in slices(parts,baseline):
             obj=get(aid,'geometry',(pi,part_index));primitive=baseline['primitives'][pi]
-            require(obj.type=='MESH' and obj.parent==frames[part_index] and not obj.data.shape_keys,'Mesh parent/type/morph changed')
+            require(obj.type=='MESH' and obj.mode=='OBJECT' and obj.parent==frames[part_index] and not obj.data.shape_keys and not obj.data.animation_data,'Mesh parent/type/morph/edit mode changed')
             require(obj['fl_logical_name']==primitive['name'],'Source mesh logical name changed')
             close_matrix(obj.matrix_basis,Matrix.Identity(4),'Mesh origin/axis/scale changed')
             mesh=obj.data;refs=definition.get('materialReferences',[])
@@ -267,7 +268,7 @@ def run(request):
         if args.action!='Export':
             bpy.ops.wm.save_as_mainfile(filepath=str(output/'authoring.blend'),check_existing=False)
         if args.action!='Import':
-            source_root=output/'source';catalog.copy_to(ids,source_root)
+            source_root=output/'source';catalog.copy_to(ids,output/'baseline-source');catalog.copy_to(ids,source_root)
             for aid,geometry in results.items():
                 path,definition=catalog.definitions[aid];relative=path.relative_to(catalog.root)
                 new_source=Path('_roundtrip')/(aid+'.glb')
