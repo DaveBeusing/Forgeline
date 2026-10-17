@@ -55,7 +55,7 @@ public sealed class WorldPcmMixer
     private static bool ValidVolume(float v) => float.IsFinite(v) && v is >= 0 and <= 1;
     public float Score(in AudioMixSource source)
     {
-        if (source.Clip is <= 0 or >= 128 || _clips[source.Clip] is null || !Enum.IsDefined(source.Bus)) return 0;
+        if (source.Clip is <= 0 or >= 128 || _clips[source.Clip] is null || source.Bus > AudioMixBus.Ambience) return 0;
         float bus = source.Bus switch { AudioMixBus.Alerts => _settings.Alerts, AudioMixBus.Ambience => _settings.Ambience, _ => _settings.World };
         if (!_settings.Enabled || !_listener.IsValid) return 0;
         float attenuation = 1;

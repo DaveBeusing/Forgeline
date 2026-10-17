@@ -53,7 +53,7 @@ The current development slice centers on **Central Divide**, a **3.072 × 3.072 
 
 Directorate buildings and units use compiled assets with physical LODs and damage-state geometry. Rifle Squad and Combat Engineer now have distinct four-member visual kits; their figures are presentation detail, while each squad remains one simulation entity. Scout Vehicle, artillery, cargo and supply trucks have dedicated component kits and damaged/critical/wreck meshes. Human art review and sustained native performance acceptance for those vehicle kits remain pending. See [infantry and battlefield production](docs/InfantryBattlefieldProduction.md) and [combat/support unit production](docs/CombatSupportUnitProduction.md).
 
-**Development status:** This is a **pre-alpha vertical slice**. Rail gameplay, interactive map editing, other factions, multiplayer, remain future work. The Windows client now plays bounded spatial battlefield sounds, alerts and ambience; see [spatial world audio](docs/SpatialWorldAudio.md). Measured qualification covers specific workloads and hardware; frame-rate and entity-scale targets remain engineering goals.
+**Development status:** This is a **pre-alpha vertical slice**. Rail gameplay, interactive map editing, other factions and multiplayer remain future work. The Windows client now plays bounded spatial battlefield sounds, alerts and ambience; see [spatial world audio](docs/SpatialWorldAudio.md). Measured qualification covers specific workloads and hardware; frame-rate and entity-scale targets remain engineering goals.
 
 See [Central Divide](docs/CentralDivideScenario.md) and the [Windows client guide](docs/WindowsClient.md).
 

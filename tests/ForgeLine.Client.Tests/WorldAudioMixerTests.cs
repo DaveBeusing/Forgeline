@@ -154,9 +154,11 @@ public sealed class WorldAudioMixerTests
         var m = Mixer(); var sources = Enumerable.Range(1, 1024).Select(i => Source(2, i % 280, entity: (uint)i)).ToArray();
         var block = new short[960];
         void Step() { m.SetLoops(sources); for (uint i = 1; i <= 24; i++) m.Play(Source(priority: 1, entity: i)); for (uint i = 1; i <= 4; i++) m.Play(Source(bus: AudioMixBus.Alerts, entity: i)); m.Render(block); }
-        for (int i = 0; i < 512; i++) Step();
+        double TimedStep() { long start = Stopwatch.GetTimestamp(); Step(); return Stopwatch.GetElapsedTime(start).TotalMilliseconds; }
+        _ = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 512; i++) _ = TimedStep();
         double[] times = new double[64]; long before = GC.GetAllocatedBytesForCurrentThread();
-        for (int i = 0; i < times.Length; i++) { long start = Stopwatch.GetTimestamp(); Step(); times[i] = Stopwatch.GetElapsedTime(start).TotalMilliseconds; }
+        for (int i = 0; i < times.Length; i++) times[i] = TimedStep();
         long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
         Assert.Equal(0, allocated); Assert.True(m.ActiveVoices <= 64); Assert.True(Energy(block, 0) > 0);
         Assert.All(block, sample => Assert.InRange((int)sample, -29490, 29490)); Array.Sort(times);
