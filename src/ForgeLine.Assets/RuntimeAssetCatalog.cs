@@ -62,6 +62,8 @@ public sealed class RuntimeAssetCatalog
         foreach (var record in manifest.Assets)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (record.AnimationReferences is null || record.AnimationReferences.Any(reference => !AssetId.TryParse(reference, out _)))
+                throw new InvalidDataException("Runtime animation references require an array of valid stable IDs.");
             MechanicalMeshValidation.Validate(record.MechanicalParts, record.Sockets);
             var id = AssetId.Parse(record.Id);
             if (!records.TryAdd(id, record))

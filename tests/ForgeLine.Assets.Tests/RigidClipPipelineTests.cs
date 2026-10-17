@@ -62,7 +62,7 @@ public sealed class RigidClipPipelineTests
     }
 
     [Theory]
-    [InlineData("missing-node")][InlineData("duplicate-channel")][InlineData("cubic")]
+    [InlineData("null-references")][InlineData("missing-node")][InlineData("duplicate-channel")][InlineData("cubic")]
     [InlineData("scale")][InlineData("cycle")][InlineData("rest")][InlineData("sparse")]
     [InlineData("count-bomb")][InlineData("view-range")][InlineData("zero-duration")]
     [InlineData("bad-times")][InlineData("nonfinite")][InlineData("quaternion")]
@@ -87,6 +87,7 @@ public sealed class RigidClipPipelineTests
         var mesh = JsonNode.Parse(File.ReadAllText(Path.Combine(fixture.Source, "frame.asset.json")))!;
         switch (scenario)
         {
+            case "null-references": mesh["animationReferences"] = null; break;
             case "missing-node": animation["channels"]![0]!["target"]!["node"] = 100; break;
             case "duplicate-channel": animation["channels"]!.AsArray().Add(animation["channels"]![0]!.DeepClone()); break;
             case "cubic": animation["samplers"]![0]!["interpolation"] = "CUBICSPLINE"; break;

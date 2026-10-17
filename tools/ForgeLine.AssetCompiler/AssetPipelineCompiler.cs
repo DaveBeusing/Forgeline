@@ -291,6 +291,12 @@ public static class AssetPipelineCompiler
                 continue;
             }
 
+            if (definition.AnimationReferences is null)
+            {
+                diagnostics.Add(new("ASSET012", AssetCompilerDiagnosticSeverity.Error,
+                    "animationReferences must be an array, not null.", id.Value, ToRelativePath(sourceRoot, definitionPath)));
+                continue;
+            }
             ValidateDefinition(definition, id, sourcePath, sourceRoot, diagnostics);
             var dependencies = CollectDependencies(definition, id, sourcePath, sourceRoot, diagnostics);
 
