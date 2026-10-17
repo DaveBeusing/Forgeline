@@ -343,7 +343,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                         ? _mechanicalHistory.Capture(entity, transform.Position, transform.Rotation,
                             unitFeature.IsSpecified && !unitFeature.IsWreck || buildingFeature.State == BuildingPresentationState.Operational,
                             _mechanicalShots.Contains(entity), ResolveAimElevation(entities, entity),
-                            buildingFeature.State == BuildingPresentationState.Operational) : default);
+                            buildingFeature.State == BuildingPresentationState.Operational,
+                            MechanicalDoorPolicy.CanMove(buildingFeature.State,
+                                entities.TryGetComponent(entity, out UnitProductionFacility motionFactory) ? motionFactory.Status : null,
+                                entities.TryGetComponent(entity, out ProductionFacility motionProduction) ? motionProduction.Status : null)) : default);
 
             CaptureWorldAudioEntity(entities, entity, transform.Position, selectable, unitFeature, buildingFeature);
 

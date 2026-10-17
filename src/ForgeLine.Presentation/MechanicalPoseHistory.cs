@@ -33,7 +33,7 @@ internal sealed class MechanicalPoseHistory
     }
 
     public MechanicalPose Capture(EntityId entity, Vector3 position, Quaternion rotation,
-        bool active, bool shot, float elevation, bool openDoor)
+        bool active, bool shot, float elevation, bool openDoor, bool allowDoorMotion = true)
     {
         // A completed tick owns one cosmetic pose per full entity identity.
         // In particular, a second extraction must not lose a one-shot recoil.
@@ -50,7 +50,9 @@ internal sealed class MechanicalPoseHistory
                 travel = Vector3.Dot(delta, Vector3.Transform(Vector3.UnitZ, rotation));
         }
         float doorTarget = openDoor ? 1 : 0;
-        float door = pose.Door + Math.Clamp(doorTarget - pose.Door, -(float)_step, (float)_step);
+        float door = allowDoorMotion
+            ? pose.Door + Math.Clamp(doorTarget - pose.Door, -(float)_step, (float)_step)
+            : pose.Door;
         pose = pose with
         {
             TravelMeters = pose.TravelMeters + travel,
