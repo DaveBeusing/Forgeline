@@ -723,3 +723,7 @@ asset with source provenance; it is loaded only after the interactive menu has p
 ## Blender surface and LOD preparation
 
 [Bounded surface production](BlenderSurfaceProduction.md) extends the validated Blender importer with explicit per-asset geometry and texture budgets, modifier drafts, PBR inspection and source clones. Existing generators and compiler ownership remain authoritative; no player or publish dependency is added.
+
+## Blender rigid motion metadata
+
+[Mechanical authoring](BlenderMechanicalAuthoring.md) edits the existing typed rigid ranges through validated rest projects and emits static source clones. A separate generated inspection project is compared with actual runtime pose matrices. No generic clip or player-side Blender dependency is introduced.

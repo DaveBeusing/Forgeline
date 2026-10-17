@@ -83,6 +83,10 @@ jobs:
       - name: Blender source geometry contracts
         run: python -m unittest discover -s tools/blender/tests -p 'test_*contract.py' -v
 
+      - name: Rigid motion lifecycle and allocation contracts
+        shell: pwsh
+        run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.MechanicalMotionTests ForgeLine.Presentation.Tests.MechanicalMotionQualityTests ForgeLine.Presentation.Tests.MechanicalGeometryBatchingTests ForgeLine.Presentation.Tests.MechanicalDoorPolicyTests --parallel none
+
       - name: Blender launcher protocol contracts
         shell: pwsh
         run: ./tools/blender/Test-BlenderToolchain.ps1 -OutputRoot artifacts/blender-contracts-ci

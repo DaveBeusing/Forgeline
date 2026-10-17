@@ -153,3 +153,7 @@ applied to the game automatically.
 ## Surface and LOD preparation
 
 The pinned production entrypoint adds bounded modifier evaluation, PBR inspection, LOD/state cost reports and repeated compiled qualification. See [surface production](../../docs/BlenderSurfaceProduction.md).
+
+## Rigid motion authoring
+
+Use Invoke-BlenderMotion.ps1 and Test-BlenderMotion.ps1 for the existing tank/factory part metadata, reviewed mechanical pivots and compiled runtime matrix parity. See [mechanical authoring](../../docs/BlenderMechanicalAuthoring.md).
