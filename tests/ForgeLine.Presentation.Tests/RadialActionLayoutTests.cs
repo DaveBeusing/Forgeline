@@ -43,6 +43,27 @@ public sealed class RadialActionLayoutTests
         }
     }
     [Fact]
+    public void CompactTacticalTitlesRemainDistinctBeforeTooltipExpansion()
+    {
+        var titles=Enumerable.Range(0,8).Select(i=>PlayerActionDockHudModel.ResolveRingItemTitle(PlayerActionPanelMode.Tactical,i,null,true)).ToArray();
+        Assert.Equal(8,titles.Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.All(titles,title=>Assert.InRange(title.Length,1,5));
+    }
+
+    [Fact]
+    public void ExpandedOnboardingAtCompactMaximumDensityKeepsNativeTypeAndExactSectorLabels()
+    {
+        var hud=GameplayHudLayout.Create(1280,720,192,2);
+        var ring=RadialActionLayout.Fit(new(640,360),0,hud,[hud.TopStatusBar,hud.SelectionInspector,hud.Minimap,
+            hud.VisibleActionDock(false),hud.NotificationBounds(false),hud.OnboardingBounds,OperationsLayout.Entry(hud)]);
+        Assert.True(ring.IsValid);
+        Assert.True(ring.OuterRadius-ring.InnerRadius>=96);
+        for(int slot=0;slot<8;slot++)
+        foreach(float x in new[]{-ring.LabelHalfWidth,ring.LabelHalfWidth}) foreach(float y in new[]{-28f,28f})
+            Assert.Equal(slot,ring.Hit(ring.LabelCenter(slot)+new Vector2(x,y)));
+    }
+
+    [Fact]
     public void CompactHighDpiRingKeepsReadableLabelsAndAvoidsTheActualHud()
     {
         var hud=GameplayHudLayout.Create(1280,720,192,2);

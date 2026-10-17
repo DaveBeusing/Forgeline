@@ -302,6 +302,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             EntityId building = Add(new(-24, 0, -32), new(16, 10, 16));
             simulation.Entities.AddComponent(building, new CompletedBuilding(BuildingIds.VehicleFactory, new(1), SimulationTick.Zero));
             simulation.Entities.AddComponent(building, new HealthState(20, 100));
+            simulation.Entities.AddComponent(building, new ControllableEntity(new(1),ControllableEntityCategory.Building));
         }
         if (infantryReview)
         {

@@ -119,7 +119,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Single object ring interaction contracts
-        run: dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ObjectActionRingTests
+        run: dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ObjectActionRingTests ForgeLine.Client.Tests.GroupActionRingTests
 
       - name: Compile and qualify runtime assets
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --mode build --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json

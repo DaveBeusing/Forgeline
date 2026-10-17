@@ -11,6 +11,10 @@ The system exists for two reasons:
 
 Formation movement remains a game/simulation concern. Presentation only visualizes extracted debug state and never owns formation state.
 
+## Presentation controls
+
+The [shared group ring](GroupActionMenus.md) uses existing selection and tactical/movement requests. Its visible anchor never filters command membership. Formation cycling still chooses the template for subsequent commands; group ring rendering does not create routes or mutate movement groups.
+
 ## Command Boundary
 
 Player interaction still enters simulation through `MoveEntitiesCommand`.

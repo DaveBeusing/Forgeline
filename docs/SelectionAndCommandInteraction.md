@@ -1,12 +1,10 @@
 # Selection and Command Interaction
 
-The primary contextual command panel shares rendering and pointer bounds beside the
-selection inspector. Combat-eligible units expose existing tactical commands; Command
-Core and copied facility capabilities open the advanced dock. Disabled reasons appear
-on controls and in hover help. Tactical clicks submit intent through the existing request
-boundary; K/Tab/Enter remains the keyboard alternative. Mixed selections use eligible
-members, and missing/stale/terminal data cannot activate primary commands. Stop/Hold
-cancel targeting and placement. See [Player Action Dock](PlayerActionDock.md).
+Owned single objects and multiple selections use one world anchored action ring. The informational inspector remains; the global category bar opens modes in that ring. Shared sectors, gaps, clipping and tooltips use the published render geometry. Clicking an available item starts its existing action immediately; targeting still uses the existing world-target rule. K/Tab/Enter remains the keyboard alternative, without an extra confirmation for pointer actions.
+
+Groups retain the entire intended authorized selection through the existing dispatcher and shared-route path. Partial capabilities show eligible/selected counts; exact authoritative accepted/rejected results remain visible. Type filters, attention focus, formation cycling and group focus use the existing adapter and preserve saved group slots. Outside clicks close every transient level and reach the world once. Session, generation, ownership and membership changes invalidate pressed actions; two to one changes ring context and zero closes it.
+
+See [world anchored menus](WorldAnchoredActionMenus.md), [group menus](GroupActionMenus.md) and [current qualification / open gates](GroupActionMenuQualification.md). Global controls without an object context retain their existing fallback.
 
 ## Hover tooltips
 

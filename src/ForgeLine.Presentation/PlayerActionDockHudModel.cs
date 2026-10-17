@@ -41,6 +41,18 @@ internal static class PlayerActionDockHudModel
         actions.Tick == snapshot.Tick && snapshot.PlayerExperience is not { IsMatchComplete: true }
             ? actions : null;
 
+    public static string ResolveRingItemTitle(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions, bool compact)
+    {
+        if (mode != PlayerActionPanelMode.Tactical) return ResolveItemTitle(mode,index,actions);
+        return index switch
+        {
+            0 => compact ? "Atk" : "Attack",
+            1 => compact ? "Atk-M" : "Atk move",
+            2 => "Stop", 3 => "Hold", 4 => compact ? "Ret" : "Retreat",
+            5 => "Fire", 6 => "Cease", 7 => compact ? "Rcv" : "Recover", _ => ""
+        };
+    }
+
     public static string ResolveModeLabel(
         PlayerActionPanelMode mode) =>
         mode switch

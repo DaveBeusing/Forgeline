@@ -31,15 +31,15 @@ internal sealed partial class PlayerActionDockHudRenderer
             bool navigation = slot.Navigation != ActionRingNavigation.None;
             bool mode = target.Kind == PlayerActionDockControlKind.Mode;
             bool item = target.Kind == PlayerActionDockControlKind.Item;
-            bool enabled = navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
-                panel.Mode, target.ItemIndex, panel, actions);
+            bool enabled = slot.Enabled && (slot.Navigation == ActionRingNavigation.GroupControl ? ring.Group?.Participants(target.ItemIndex) > 0 : navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
+                panel.Mode, target.ItemIndex, panel, actions));
             bool hovered = ring.Open && ring.HoveredSlot == i;
             Vector4 fill = enabled ? new(.045f, .075f, .10f, .82f) : new(.04f, .045f, .055f, .82f);
             if (hovered) fill = ring.Pressed ? new(.15f, .30f, .34f, .94f) : new(.10f, .22f, .27f, .90f);
             fill.W *= opacity;
             RingSegment(geometry, i, fill, width, height);
             Vector2 center = geometry.LabelCenter(i);
-            float iconSize = 20 * scale;
+            float iconSize = 20 * scale, halfWidth = geometry.LabelHalfWidth;
             var icon = mode ? PlayerActionDockHudModel.ResolveModeIcon(target.Mode) :
                 item ? PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, target.ItemIndex, actions) :
                 PlayerActionDockHudModel.ResolveModeIcon(panel.Mode);
@@ -47,19 +47,37 @@ internal sealed partial class PlayerActionDockHudRenderer
                 new Vector4(enabled ? 1 : .55f, enabled ? 1 : .55f, enabled ? 1 : .55f, opacity));
             string label = slot.Navigation switch
             {
+                ActionRingNavigation.Group => "Group", ActionRingNavigation.GroupControl => GroupActionRingContext.Label(target.ItemIndex),
                 ActionRingNavigation.Back => "Back", ActionRingNavigation.Close => "Close",
                 ActionRingNavigation.Next => "Next", ActionRingNavigation.Previous => "Prev",
                 ActionRingNavigation.Parameters => "Params", ActionRingNavigation.NextItem => "Next item",
                 _ => mode ? PlayerActionDockHudModel.ResolveModeLabel(target.Mode) :
-                    item ? PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, target.ItemIndex, actions) :
+                    item ? PlayerActionDockHudModel.ResolveRingItemTitle(panel.Mode, target.ItemIndex, actions, geometry.LabelHalfWidth < 38 * scale) :
                     target.Kind == PlayerActionDockControlKind.Activate ? PlayerActionDockHudModel.ResolvePrimaryActionLabel(panel.Mode, target.ItemIndex, actions) :
                     PlayerActionDockHudModel.ResolveFooterLabel(target.Kind, panel.Mode)
             };
             Vector4 text = enabled ? TextColor : MutedTextColor; text.W *= opacity;
-            _text.AddCentered(label, new(center.X - 38 * scale, center.Y - 7 * scale, 76 * scale, 20 * scale),
+            if (slot.Navigation == ActionRingNavigation.Group && ring.Group is { } identity)
+            {
+                var heading = new HudTextBuilder(valueBuffer); heading.Append("Group "); heading.Append(identity.Count);
+                _text.AddCentered(heading.Written, new(center.X - halfWidth, center.Y - 7 * scale, halfWidth * 2, 20 * scale),
+                    14 * scale, text, width, height, true);
+            }
+            else _text.AddCentered(label, new(center.X - halfWidth, center.Y - 7 * scale, halfWidth * 2, 20 * scale),
                 14 * scale, text, width, height, true);
             var value = new HudTextBuilder(valueBuffer);
-            if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
+            if (slot.Navigation == ActionRingNavigation.GroupControl && ring.Group is { } group)
+            { if (group.HasOperationalFacts && ring.GroupFactsCurrent) value.Append(group.Participants(target.ItemIndex)); else value.Append("Updating"); value.Append(" / "); value.Append(group.SelectedCount); }
+            else if (slot.Navigation == ActionRingNavigation.Group && ring.Group is { } summary)
+                value.Append(ring.VisibleMembers < summary.Count ? "Part visible" : "Selection tools");
+            else if (item && panel.Mode == PlayerActionPanelMode.Tactical && ring.Group is { } participants && actions?.Tactical is { } tactical)
+            {
+                if (!participants.MatchesSelection(tactical.SelectedEntities)) value.Append("Updating");
+                else if (!PlayerActionDockHudModel.ResolveItemState(panel.Mode,target.ItemIndex,actions,false).CanActivate) value.Append("Blocked");
+                else { value.Append(target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append("/");
+                    value.Append(participants.SelectedCount); value.Append(geometry.LabelHalfWidth < 38 * scale ? " elig" : " eligible"); }
+            }
+            else if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
             else if (item)
             {
@@ -68,7 +86,7 @@ internal sealed partial class PlayerActionDockHudRenderer
                 value.Append(!state.CanActivate ? state.DisabledReason :
                     PlayerActionDockHudModel.ResolvePrimaryActionLabel(panel.Mode, target.ItemIndex, actions));
             }
-            _text.AddCentered(value.Written, new(center.X - 38 * scale, center.Y + 12 * scale, 76 * scale, 16 * scale),
+            _text.AddCentered(value.Written, new(center.X - halfWidth, center.Y + 12 * scale, halfWidth * 2, 16 * scale),
                 12 * scale, text, width, height);
         }
         if (ring.Level == ActionRingLevel.Parameters)
@@ -78,7 +96,7 @@ internal sealed partial class PlayerActionDockHudRenderer
             var text = new HudTextBuilder(buffer);
             text.Append(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, ring.Slots[0].Target.ItemIndex, actions));
             var selected = geometry.LabelCenter(6);
-            _text.AddCentered(text.Written, new(selected.X - 38 * scale, selected.Y + 12 * scale, 76 * scale, 16 * scale),
+            _text.AddCentered(text.Written, new(selected.X - geometry.LabelHalfWidth, selected.Y + 12 * scale, geometry.LabelHalfWidth * 2, 16 * scale),
                 12 * scale, MutedTextColor with { W = MutedTextColor.W * opacity }, width, height);
         }
     }

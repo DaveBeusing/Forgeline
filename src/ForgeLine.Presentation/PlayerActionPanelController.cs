@@ -54,7 +54,7 @@ public readonly record struct PlayerActionPanelView(
 {
     public UiMotionView? Motion { get; init; }
     public ObjectActionRingView Ring { get; init; }
-    public bool DockExpanded => IsOpen && !Ring.SingleOwned;
+    public bool DockExpanded => IsOpen && !Ring.UsesRing;
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
 }
@@ -98,7 +98,7 @@ public sealed partial class PlayerActionPanelController
     private SelectionSet? _currentSelection;
 
     public PlayerActionPanelMode Mode { get; private set; }
-    public bool DockExpanded => Mode != PlayerActionPanelMode.Closed && !_ringSingle;
+    public bool DockExpanded => Mode != PlayerActionPanelMode.Closed && !_ringContext;
     public bool HasOpenMenu => Mode != PlayerActionPanelMode.Closed || _ringOpen;
 
     public int SelectedIndex { get; private set; }
@@ -160,7 +160,7 @@ public sealed partial class PlayerActionPanelController
         _leftPressSequence = pressSequence;
         if (input.FocusLostThisFrame && !input.HasPointerPosition)
         {
-            if (_ringSingle) Close();
+            if (_ringContext) Close();
             Feedback = string.Empty;
             _pendingRequest = null;
             PointerCaptured = false;
@@ -179,7 +179,8 @@ public sealed partial class PlayerActionPanelController
 
         PlayerActionSnapshot? actions =
             PlayerActionDockHudModel.ResolveActions(snapshot);
-        if (!PlayerActionDockHudModel.MatchesSelection(actions, currentSelection)) actions = null;
+        if (!PlayerActionDockHudModel.MatchesSelection(actions, currentSelection) ||
+            _ringGroup is not null && !_ringGroup.MatchesSelection(actions?.Tactical?.SelectedEntities)) actions = null;
 
         if (snapshot?.PlayerExperience is
                 PlayerExperienceSnapshot experience &&
@@ -280,7 +281,7 @@ public sealed partial class PlayerActionPanelController
                 _desiredStockQuantity = 0.0;
                 _stockResourceId = ResourceId.None;
                 _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions);
-                if (_ringSingle) { _ringPage = SelectedIndex / 4; _ringRevision++; _presentedRing = default; }
+                if (_ringContext) { _ringPage = SelectedIndex / 4; _ringRevision++; _presentedRing = default; }
             }
             else
             {
@@ -291,11 +292,11 @@ public sealed partial class PlayerActionPanelController
         if (Mode != PlayerActionPanelMode.Closed && input.HasPointerPosition &&
             ContainsControl(input.PointerPosition, snapshot, layout) && input.WheelDelta != 0 && itemCount > 0)
         {
-            int capacity = _ringSingle ? 4 : PlayerActionDockInteractionLayout.MaximumVisibleItems(layout);
+            int capacity = _ringContext ? 4 : PlayerActionDockInteractionLayout.MaximumVisibleItems(layout);
             SelectedIndex = Math.Clamp(SelectedIndex + (input.WheelDelta > 0 ? -capacity : capacity), 0, itemCount - 1);
             _desiredStockQuantity = 0.0;
             _stockResourceId = ResourceId.None;
-            if (_ringSingle) { _ringPage = SelectedIndex / 4; _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions); _ringRevision++; _presentedRing = default; }
+            if (_ringContext) { _ringPage = SelectedIndex / 4; _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions); _ringRevision++; _presentedRing = default; }
         }
         SynchronizeStockEditor(actions);
         SynchronizeSupplyEditor(actions);
@@ -332,7 +333,7 @@ public sealed partial class PlayerActionPanelController
                 adjustment);
         }
 
-        if (!_ringSingle && input.HasPointerPosition)
+        if (!_ringContext && input.HasPointerPosition)
             for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out _); i++)
                 if (ContextualCommandModel.Button(layout, i).Contains(input.PointerPosition))
                     _contextualHoveredIndex = i;
@@ -350,7 +351,7 @@ public sealed partial class PlayerActionPanelController
             input.IsMouseButtonDown(
                 PlatformMouseButton.Left);
 
-        if (_ringSingle)
+        if (_ringContext)
         {
             UpdateRingPointer(input, snapshot, actions, layout, view, freshPress);
         }
@@ -429,7 +430,7 @@ public sealed partial class PlayerActionPanelController
                 Mode, SelectedIndex, view, actions))
         {
             ActivateSelected(actions);
-            if (_ringSingle && _pendingRequest.HasValue) _contextualActivationTick = snapshot?.Tick;
+            if (_ringContext && _pendingRequest.HasValue) _contextualActivationTick = snapshot?.Tick;
         }
 
         bool cancel =
@@ -443,7 +444,7 @@ public sealed partial class PlayerActionPanelController
         if (cancel && !requestPending)
         {
             CancelSelected(actions);
-            if (_ringSingle && _pendingRequest.HasValue) _contextualActivationTick = snapshot?.Tick;
+            if (_ringContext && _pendingRequest.HasValue) _contextualActivationTick = snapshot?.Tick;
         }
         else
         {
@@ -513,13 +514,13 @@ public sealed partial class PlayerActionPanelController
     {
         var actions = PlayerActionDockHudModel.ResolveActions(snapshot);
         if (!PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection)) actions = null;
-        return (_ringSingle ? _presentedRing.TryHit(point, out _) : layout.PrimaryCommands.Contains(point)) || PlayerActionDockInteractionLayout.CapturesPointer(point, layout,
+        return (_ringContext ? _presentedRing.TryHit(point, out _) : layout.PrimaryCommands.Contains(point)) || PlayerActionDockInteractionLayout.CapturesPointer(point, layout,
             DockExpanded, PlayerActionDockInteractionLayout.GetItemCount(Mode, actions), SelectedIndex, Mode, actions);
     }
 
     public void DismissTransient(InputState input, bool preserveSelectionGesture = false)
     {
-        if (!preserveSelectionGesture) _selectionOpenArmed = false;
+        if (!preserveSelectionGesture) { _selectionOpenArmed = false; _reopenSelection = false; }
         Close();
         _pendingRequest = null;
         _contextualActivationTick = null;
@@ -565,7 +566,7 @@ public sealed partial class PlayerActionPanelController
         _desiredStockQuantity = 0.0;
         _stockResourceId = ResourceId.None;
         _supplyEntity = EntityId.Invalid;
-        if (_ringSingle) { _ringOpen = Mode != PlayerActionPanelMode.Closed; _ringLevel = ActionRingLevel.Items; _ringRevision++; _ringPage = 0;
+        if (_ringContext) { _ringOpen = Mode != PlayerActionPanelMode.Closed; _ringLevel = ActionRingLevel.Items; _ringRevision++; _ringPage = 0;
             _presentedRing = default; _ringArmed = false; _itemSlotsPage = -1; }
     }
 

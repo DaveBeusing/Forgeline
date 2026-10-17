@@ -6,11 +6,11 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Presentation;
 
-internal enum ActionRingLevel : byte { Categories, Items, Parameters }
-internal enum ActionRingNavigation : byte { None, Back, Previous, Next, Parameters, NextItem, Close }
+internal enum ActionRingLevel : byte { Categories, Items, Parameters, Group }
+internal enum ActionRingNavigation : byte { None, Back, Previous, Next, Parameters, NextItem, Close, Group, GroupControl }
 internal readonly record struct ActionRingKey(byte Kind, uint Id, uint Generation = 0);
 internal readonly record struct ActionRingSlot(PlayerActionDockHitTarget Target, ActionRingKey Key,
-    ActionRingNavigation Navigation = ActionRingNavigation.None, bool Present = true);
+    ActionRingNavigation Navigation = ActionRingNavigation.None, bool Present = true, bool Enabled = true);
 [InlineArray(8)] internal struct ActionRingSlots { private ActionRingSlot _first; }
 
 /// <summary>Copied menu state; no mutable collections cross the input/render boundary.</summary>
@@ -18,6 +18,10 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
     ulong Revision, bool SingleOwned, bool Open, RadialActionLayout Geometry = default, bool Resolved = false,
     float Opacity = 1, int HoveredSlot = -1, bool Pressed = false)
 {
+    public GroupActionRingContext? Group { get; init; }
+    public bool GroupFactsCurrent { get; init; }
+    public int VisibleMembers { get; init; }
+    public bool UsesRing => SingleOwned || Group is not null;
     internal ActionRingSlots Slots { get; init; }
     internal ActionRingLevel Level { get; init; }
     internal bool TryHit(Vector2 point, out ActionRingSlot slot)
@@ -31,31 +35,50 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
         PresentationSnapshot snapshot, in GameplayHudLayout layout, ReadOnlySpan<HudRect> occupied)
     {
         if (!Open) return this with { Resolved = true };
-        if (snapshot.SessionId != Session || snapshot.PlayerExperience is not { IsMatchComplete: false } experience ||
-            !world.TryGetInterpolatedInstance(Entity, alpha, out var instance) ||
-            (instance.Visibility & RenderVisibilityMask.World) == 0 || !instance.Selectable.IsSelectable || instance.Selectable.Owner != experience.Player)
+        if (snapshot.SessionId != Session || snapshot.PlayerExperience is not { IsMatchComplete: false } experience)
             return this with { Geometry = default, Resolved = true };
-        var projected = camera.WorldToScreen(instance.Transform.Position, layout.ViewportWidth, layout.ViewportHeight);
-        if (!projected.IsVisible) return this with { Geometry = default, Resolved = true };
-        float radius = 0;
-        for (int i = 0; i < 4; i++)
+        Vector2 anchor; float radius = 0; int visible = 0;
+        if (Group is not null)
         {
-            var corner = camera.WorldToScreen(TacticalFootprint.Corner(instance, i), layout.ViewportWidth, layout.ViewportHeight);
-            if (corner.IsVisible) radius = MathF.Max(radius, Vector2.Distance(projected.Position, corner.Position));
+            if (!Group.TryAnchor(world, camera, alpha, experience.Player, layout, out anchor, out visible))
+                return this with { Geometry = default, Resolved = true };
+        }
+        else
+        {
+            if (!world.TryGetInterpolatedInstance(Entity, alpha, out var instance) ||
+                (instance.Visibility & RenderVisibilityMask.World) == 0 || !instance.Selectable.IsSelectable || instance.Selectable.Owner != experience.Player)
+                return this with { Geometry = default, Resolved = true };
+            var projected = camera.WorldToScreen(instance.Transform.Position, layout.ViewportWidth, layout.ViewportHeight);
+            if (!projected.IsVisible) return this with { Geometry = default, Resolved = true };
+            anchor = projected.Position;
+            for (int i = 0; i < 4; i++)
+            {
+                var corner = camera.WorldToScreen(TacticalFootprint.Corner(instance, i), layout.ViewportWidth, layout.ViewportHeight);
+                if (corner.IsVisible) radius = MathF.Max(radius, Vector2.Distance(anchor, corner.Position));
+            }
         }
         ActionRingSlots slots = Slots;
         var actions = PlayerActionDockHudModel.ResolveActions(snapshot);
+        bool selectionCurrent = Group is null || Group.MatchesSelection(actions?.Tactical?.SelectedEntities);
+        bool groupFactsCurrent = selectionCurrent && Group is { HasOperationalFacts: true } && Group.Tick == snapshot.Tick;
         for (int i = 0; i < 8; i++)
         {
             var saved = slots[i];
+            if (saved.Navigation == ActionRingNavigation.GroupControl)
+            {
+                slots[i] = saved with { Enabled = groupFactsCurrent && Group!.Participants(saved.Target.ItemIndex) > 0 };
+                continue;
+            }
+            if (!selectionCurrent) { slots[i] = saved with { Enabled = saved.Navigation != ActionRingNavigation.None }; continue; }
             if (!saved.Present || saved.Navigation != ActionRingNavigation.None || saved.Target.Kind == PlayerActionDockControlKind.Mode) continue;
             int resolved = -1;
             int count = PlayerActionDockInteractionLayout.GetItemCount(saved.Target.Mode, actions);
             for (int item = 0; item < count; item++)
                 if (ItemKey(saved.Target.Mode,item,actions) == saved.Key) { resolved = item; break; }
-            slots[i] = resolved < 0 ? saved with { Present = false } : saved with { Target = saved.Target with { ItemIndex = resolved } };
+            slots[i] = resolved < 0 ? saved with { Present = false } : saved with { Target = saved.Target with { ItemIndex = resolved },
+                Enabled = saved.Target.Kind != PlayerActionDockControlKind.Item || PlayerActionDockHudModel.ResolveItemState(saved.Target.Mode,resolved,actions,false).CanActivate };
         }
-        return this with { Geometry = RadialActionLayout.Fit(projected.Position, radius, layout, occupied), Resolved = true, Slots = slots };
+        return this with { Geometry = RadialActionLayout.Fit(anchor, radius, layout, occupied), Resolved = true, Slots = slots, VisibleMembers = visible, GroupFactsCurrent = groupFactsCurrent };
     }
 
     internal static ActionRingKey ItemKey(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions)

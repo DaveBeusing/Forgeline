@@ -58,6 +58,18 @@ internal static class HoverTooltipResolver
     {
         var control = (PlayerActionDockControlKind)view.DockControl;
         var mode = view.DockMode;
+        if (control == PlayerActionDockControlKind.Page && panel.Ring.Group is { } group && view.DockIndex <= -99)
+        {
+            int groupControl = -100 - view.DockIndex;
+            if (view.DockIndex == -99) return new($"GROUP {group.Count} / SELECTED {group.SelectedCount}", "SELECTION TOOLS",
+                panel.Ring.VisibleMembers < group.Count ? "PART OF SELECTION VISIBLE" : "SELECTION VISIBLE",
+                "VISIBILITY DOES NOT FILTER COMMAND MEMBERS");
+            if (groupControl is < 0 or > 11) return null;
+            int participants = group.Participants(groupControl);
+            return new(GroupActionRingContext.Label(groupControl), "GROUP SELECTION",
+                group.HasOperationalFacts && panel.Ring.GroupFactsCurrent ? $"ELIGIBLE {participants} / SELECTED {group.SelectedCount}" : "UPDATING GROUP DATA", !group.HasOperationalFacts || !panel.Ring.GroupFactsCurrent ? "WAIT FOR CURRENT GROUP DATA" : participants == 0 ? "NO ELIGIBLE MEMBERS" :
+                groupControl < 8 ? "FILTER CURRENT SELECTION; SAVED GROUP UNCHANGED" : "CLICK TO REQUEST");
+        }
         if (view.Contextual)
         {
             for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command,
@@ -73,8 +85,10 @@ internal static class HoverTooltipResolver
                 PlayerActionDockHudModel.ResolveModeShortcut(mode, panel.Bindings), "CLICK TO OPEN / CLOSE");
         if (panel.SelectionPending || !panel.IsOpen || panel.Mode != mode || snapshot.PlayerActions is not { } actions ||
             actions.SessionId != snapshot.SessionId || actions.Tick != snapshot.Tick) return null;
+        if (panel.Ring.Group is { } currentGroup && !currentGroup.MatchesSelection(actions.Tactical?.SelectedEntities))
+            return new("GROUP ACTION", "CURRENT SELECTION", "UPDATING SELECTION", "");
         if (control == PlayerActionDockControlKind.Page)
-            return new(panel.Ring.SingleOwned ? "RING NAVIGATION" : "PAGE CARDS", "ACTION NAVIGATION", "CHANGES SELECTION", "CLICK / WHEEL / TAB");
+            return new(panel.Ring.UsesRing ? "RING NAVIGATION" : "PAGE CARDS", "ACTION NAVIGATION", "CHANGES SELECTION", "CLICK / WHEEL / TAB");
         int index = view.DockIndex;
         if (control != PlayerActionDockControlKind.Item && index != panel.SelectedIndex) return null;
         if (control == PlayerActionDockControlKind.Item &&
@@ -88,10 +102,11 @@ internal static class HoverTooltipResolver
         string status = enabled ? "AVAILABLE AT CAPTURED TICK" :
             !state.CanActivate && control is PlayerActionDockControlKind.Item or PlayerActionDockControlKind.Activate
                 ? state.DisabledReason : "UNAVAILABLE IN CURRENT CONTEXT";
-        string hint = !enabled ? string.Empty : item ? (panel.Ring.SingleOwned ? "CLICK TO ACT / PARAMETERS TO EDIT" : "SELECT CARD / ENTER TO ACT") : "CLICK TO REQUEST";
+        string hint = !enabled ? string.Empty : item ? (panel.Ring.UsesRing ? "CLICK TO ACT / PARAMETERS TO EDIT" : "SELECT CARD / ENTER TO ACT") : "CLICK TO REQUEST";
         IReadOnlyList<PlayerActionResourceAmount>? costs = null, outputs = null;
         uint? ticks = null;
-        string requirement = string.Empty;
+        string requirement = mode == PlayerActionPanelMode.Tactical && panel.Ring.Group is { } selectedGroup && actions.Tactical is { } tactical
+              ? $"ELIGIBLE {(index is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount)} / SELECTED {selectedGroup.SelectedCount}; AUTHORITATIVE PARTIAL RESULTS APPLY" : string.Empty;
         IReadOnlyList<PlayerTechnologyPrerequisiteReadModel>? prerequisites = null;
         if ((item || control == PlayerActionDockControlKind.Activate) && index >= 0 &&
             index < PlayerActionDockInteractionLayout.GetItemCount(mode, actions))

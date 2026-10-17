@@ -300,46 +300,25 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         var text = new HudTextBuilder(buffer);
         text.Append("GROUP "); text.Append(group.TotalCount); text.Append(" UNITS "); text.Append(group.LiveCount);
         text.Append(" COMBAT "); text.Append(group.CombatCount);
-        GroupText(text.Written, 6, region, TextColor, width, height);
+        GroupText(text.Written, 0, region, TextColor, width, height, heading:true);
         text = new HudTextBuilder(buffer);
         text.Append("AVG HP "); AppendCovered(ref text, group.Health, group.HealthCount);
         text.Append(" READY "); AppendCovered(ref text, group.Readiness, group.ReadinessCount);
-        GroupText(text.Written, 18, region, MutedTextColor, width, height);
+        GroupText(text.Written, 1, region, MutedTextColor, width, height);
         text = new HudTextBuilder(buffer);
         text.Append("AVG FUEL "); AppendCovered(ref text, group.Fuel, group.SupplyCount);
         text.Append(" AMMO "); AppendCovered(ref text, group.Ammunition, group.SupplyCount);
-        GroupText(text.Written, 30, region, MutedTextColor, width, height);
-        for (int index = 0; index < 12; index++)
-        {
-            var rect = CombatGroupCardLayout.Control(layout, index);
-            text = new HudTextBuilder(buffer);
-            bool enabled;
-            if (index < 8)
-            {
-                int count = group.Composition(index);
-                text.Append(SelectedCombatGroup.TypeLabel(index)); text.Append(" "); text.Append(count);
-                enabled = count > 0;
-            }
-            else if (index == 8)
-            { text.Append("HP<=25% "); text.Append(group.DamagedCount); text.Append(" FOCUS"); enabled = group.DamagedCount > 0; }
-            else if (index == 9)
-            { text.Append("SUPPLY! "); text.Append(group.UnsuppliedCount); text.Append(" FOCUS"); enabled = group.UnsuppliedCount > 0; }
-            else if (index == 10)
-            { text.Append(bindings.Prompt(GameplayAction.Formation)); text.Append(" "); text.Append(formation switch { FormationTemplate.Line => "LINE", FormationTemplate.Column => "COLUMN", FormationTemplate.Wedge => "WEDGE", _ => "COMPACT" }); text.Append(" NEXT"); enabled = group.CombatCount > 0; }
-            else { text.Append("FOCUS GROUP"); enabled = group.LiveCount > 0; }
-            if (!_skin.Control(rect, enabled)) EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? GameplayHudVisualStyle.PanelRaised : PanelColor, width, height);
-            if (!_text.Add(text.Written, rect.X + _scale, rect.Y + _scale, 9 * _scale,
-                enabled ? TextColor : MutedTextColor, width, height, rect.Width - 2 * _scale))
-                EmitClippedText(text.Written, rect.X + _scale, rect.Y + _scale, rect.Right - _scale,
-                    enabled ? TextColor : MutedTextColor, width, height);
-        }
+        GroupText(text.Written, 2, region, MutedTextColor, width, height);
+        text = new HudTextBuilder(buffer);
+        text.Append("FORMATION "); text.Append(formation switch { FormationTemplate.Line => "LINE", FormationTemplate.Column => "COLUMN", FormationTemplate.Wedge => "WEDGE", _ => "COMPACT" });
+        GroupText(text.Written, 3, region, MutedTextColor, width, height);
         text = new HudTextBuilder(buffer);
         text.Append("LAST CMD ");
         text.Append(feedback.State switch { PlayerCommandFeedbackState.Partial => "PARTIAL ",
             PlayerCommandFeedbackState.Accepted => "ACCEPTED ", PlayerCommandFeedbackState.Rejected => "REJECTED ", _ => "NONE" });
         if (feedback.State != PlayerCommandFeedbackState.None)
         { text.Append(feedback.AcceptedTargets); text.Append(" OK / "); text.Append(feedback.RejectedTargets); text.Append(" REJECTED"); }
-        GroupText(text.Written, 98, region, TextColor, width, height);
+        GroupText(text.Written, 4, region, TextColor, width, height);
     }
 
     private static void AppendCovered(ref HudTextBuilder text, double value, int count)
@@ -348,11 +327,13 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         text.Append(value * 100, "F0"); text.Append("%("); text.Append(count); text.Append(")");
     }
 
-    private void GroupText(ReadOnlySpan<char> text, float offset, in HudRect region, Vector4 color, int width, int height)
+    private void GroupText(ReadOnlySpan<char> text, int row, in HudRect region, Vector4 color, int width, int height, bool heading=false)
     {
-        if (!_text.Add(text, region.X + 6 * _scale, region.Y + offset * _scale, 10 * _scale,
+        float y=region.Y+6*_scale+row*(region.Height-12*_scale)/5;
+        float size=MathF.Max(heading ? 14 : 12,(heading ? 16 : 14)*_scale);
+        if (!_text.Add(text, region.X + 6 * _scale, y, size,
             color, width, height, region.Width - 12 * _scale))
-            EmitClippedText(text, region.X + 6 * _scale, region.Y + offset * _scale,
+            EmitClippedText(text, region.X + 6 * _scale, y,
                 region.Right - 6 * _scale, color, width, height);
     }
 

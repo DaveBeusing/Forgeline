@@ -40,30 +40,40 @@ public sealed class CombatGroupCardController
         if (blocked || transition || input.FocusLostThisFrame || !input.HasPointerPosition || !fresh ||
             !pressedInside || selection.Count < 2 || snapshot?.PlayerExperience?.Selection.Count != selection.Count || SelectedCombatGroup.Resolve(snapshot) is not { } operational)
             return new(captured);
-        var group = SelectedCombatGroup.Create(operational, selection);
         for (int index = 0; index < 12; index++)
         {
             if (!CombatGroupCardLayout.Control(layout, index).Contains(origin)) continue;
-            if (index < 8)
-            {
-                _filtered.Clear();
-                foreach (EntityId entity in selection.Entities)
-                    if (operational.TryGet(entity, out var member) && SelectedCombatGroup.TypeIndex(member.Unit) == index)
-                        _filtered.Add(entity);
-                if (_filtered.Count == 0) return new(true);
-                selection.Replace(System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_filtered));
-                return new(true, SelectionChanged: true);
-            }
-            return index switch
-            {
-                8 => new(true, FocusMember: NextAttention(operational, selection, damaged: true)),
-                9 => new(true, FocusMember: NextAttention(operational, selection, damaged: false)),
-                10 => new(true, CycleFormation: group.CombatCount > 0),
-                _ => new(true, FocusSelection: group.LiveCount > 0)
-            };
+            return Activate(index, snapshot, selection);
         }
         return new(captured);
     }
+    /// <summary>Shared selection/focus adapter for the ring. No gameplay command is submitted here.</summary>
+    public CombatGroupCardResult Activate(int index, PresentationSnapshot? snapshot, SelectionSet selection)
+    {
+        if (index is < 0 or > 11 || selection.Count < 2 ||
+            SelectedCombatGroup.Resolve(snapshot) is not { } operational ||
+            snapshot?.PlayerExperience?.Selection.Count != selection.Count) return default;
+        if (_session != snapshot.SessionId) { _lastDamaged = default; _lastUnsupplied = default; _session = snapshot.SessionId; }
+        var group = SelectedCombatGroup.Create(operational, selection);
+        if (index < 8)
+        {
+            _filtered.Clear();
+            foreach (EntityId entity in selection.Entities)
+                if (operational.TryGet(entity, out var member) && SelectedCombatGroup.TypeIndex(member.Unit) == index)
+                _filtered.Add(entity);
+            if (_filtered.Count == 0) return new(true);
+            selection.Replace(System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_filtered));
+            return new(true, SelectionChanged: true);
+        }
+        return index switch
+        {
+            8 => new(true, FocusMember: NextAttention(operational, selection, damaged: true)),
+            9 => new(true, FocusMember: NextAttention(operational, selection, damaged: false)),
+            10 => new(true, CycleFormation: group.CombatCount > 0),
+            _ => new(true, FocusSelection: group.LiveCount > 0)
+        };
+    }
+
     private EntityId NextAttention(CombatGroupOperationalSnapshot operational, SelectionSet selection, bool damaged)
     {
         EntityId previous = damaged ? _lastDamaged : _lastUnsupplied;

@@ -9,6 +9,7 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
     public bool IsValid => Count is >= 1 and <= 8 && float.IsFinite(Center.X) && float.IsFinite(Center.Y) &&
         float.IsFinite(Anchor.X) && float.IsFinite(Anchor.Y) && float.IsFinite(InnerRadius) &&
         float.IsFinite(OuterRadius) && InnerRadius > 0 && OuterRadius > InnerRadius;
+    public float LabelHalfWidth => InnerRadius < 80 * ((OuterRadius - InnerRadius) / 96) ? 30 * ((OuterRadius - InnerRadius) / 96) : 38 * ((OuterRadius - InnerRadius) / 96);
     public float Step => MathF.Tau / Count;
     public float Start(int slot) => -MathF.PI / 2 - Step / 2 + slot * Step + GapRadians / 2;
     public float End(int slot) => Start(slot) + Step - GapRadians;
@@ -26,6 +27,21 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
         return local >= GapRadians / 2 && local <= Step - GapRadians / 2 ? slot : -1;
     }
 
+    /// <summary>One obstacle contract for gameplay, fixture preparation and native recording.</summary>
+    public static void ResolveObstacles(Span<HudRect> occupied, in GameplayHudLayout layout,
+        OnboardingPresentation? onboarding = null, OperationsView operations = default)
+    {
+        if (occupied.Length != 8) throw new ArgumentException("Ring obstacle storage must contain eight rectangles.",nameof(occupied));
+        occupied[0]=layout.TopStatusBar;
+        occupied[1]=layout.SelectionInspector;
+        occupied[2]=layout.Minimap;
+        occupied[3]=layout.VisibleActionDock(false);
+        occupied[4]=layout.NotificationBounds(false);
+        occupied[5]=onboarding?.VisiblePanel ?? default;
+        occupied[6]=onboarding?.Tab ?? default;
+        occupied[7]=operations.Open ? OperationsLayout.Panel(layout) : OperationsLayout.Entry(layout);
+    }
+
     public static RadialActionLayout Fit(Vector2 anchor, float footprintRadius, in GameplayHudLayout hud,
         ReadOnlySpan<HudRect> occupied, int count = 8)
     {
@@ -40,7 +56,9 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
             var fit = TryFit(anchor, inner, inner + 96 * scale, hud.SafeArea, occupied, count);
             if (fit.IsValid) return fit;
         }
-        return default;
+        // Preserve fourteen-pixel type and the full control band; a narrower label box
+        // permits the compact inner hole when expanded hints occupy the left corner.
+        return TryFit(anchor, 60, 156, hud.SafeArea, occupied, count);
     }
 
     private static RadialActionLayout TryFit(Vector2 anchor, float inner, float outer, in HudRect safe,

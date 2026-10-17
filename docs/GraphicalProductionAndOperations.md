@@ -1,5 +1,7 @@
 # Graphical production and operations interface
 
+Current multi-selection controls use the shared [group action ring](GroupActionMenus.md). Rectangular group controls below describe historical parity; the inspector now retains read-only facts and exact command results.
+
 Own single buildings and units now use [world anchored action rings](WorldAnchoredActionMenus.md). Selection release opens categories; the global mode bar and bound keys open the same ring. Click an item to act immediately. Parameters exposes existing priority, mode, thresholds and queue cancellation before activation; Next item selects the edited item. Back / previous / next page remain fixed controls. The inner hole and gaps allow world input; outside clicks dismiss centrally. The inspector remains informational. Group selection temporarily retains the existing rectangular controls. Closed/fading rings own no input; alpha transitions last 160 ms and reduced/Low modes settle immediately.
 
 Rectangular action-card/footer/pagination descriptions below apply to the temporary group/global fallback. Earlier single-object qualification captures are historical; current single-owned controls and evidence are defined by the linked ring-menu specification and qualification report.
