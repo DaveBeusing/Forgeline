@@ -78,3 +78,7 @@ visible shot history supplies recoil. No authoritative component, trajectory,
 collision, skeleton or animation-resource contract changes. Clamped pitch may not
 align with steep close-range trajectories. See
 [vehicle geometry and measured limits](../CombatSupportUnitProduction.md).
+
+## Blender rest-pose authoring
+
+The [authoring adapter](../BlenderMechanicalAuthoring.md) reuses these typed ranges and fixed axes. Separate preview actions are inspection-only and cannot become runtime clips. Open doors retain completed-tick progress during power loss and production pause; powered idle resumes the bounded closing transition. Gameplay sockets, authoritative simulation and the existing static LOD fallback remain unchanged.

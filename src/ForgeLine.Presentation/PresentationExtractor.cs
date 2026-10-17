@@ -322,6 +322,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 _extraction.Scenario.Terrain.TrySampleHeight(transform.Position.X, transform.Position.Z, out float ground))
                 transform = transform with { Position = transform.Position with { Y = ground } };
 
+            bool ownedProductionMotion = _extraction is not null &&
+                MechanicalDoorPolicy.CanReadProduction(selectable.Owner, _extraction.Player);
+
             baseInstances[baseIndex++] =
                 new RenderInstance(
                     entity,
@@ -343,7 +346,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                         ? _mechanicalHistory.Capture(entity, transform.Position, transform.Rotation,
                             unitFeature.IsSpecified && !unitFeature.IsWreck || buildingFeature.State == BuildingPresentationState.Operational,
                             _mechanicalShots.Contains(entity), ResolveAimElevation(entities, entity),
-                            buildingFeature.State == BuildingPresentationState.Operational) : default);
+                            buildingFeature.State == BuildingPresentationState.Operational,
+                            MechanicalDoorPolicy.CanMove(buildingFeature.State,
+                                ownedProductionMotion && entities.TryGetComponent(entity, out UnitProductionFacility motionFactory) ? motionFactory.Status : null,
+                                ownedProductionMotion && entities.TryGetComponent(entity, out ProductionFacility motionProduction) ? motionProduction.Status : null)) : default);
 
             CaptureWorldAudioEntity(entities, entity, transform.Position, selectable, unitFeature, buildingFeature);
 
