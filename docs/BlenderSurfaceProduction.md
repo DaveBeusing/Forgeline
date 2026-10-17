@@ -98,3 +98,5 @@ Do not copy a failed export into production. Keep its logs, fix the profile or s
 cause, and rerun into a fresh output root. Reimport after changing authoritative
 sources. Applying a successful candidate requires reviewing its source definitions,
 compiler output, runtime captures and budgets through the normal content PR process.
+
+Recorded results, native before/after images, package provenance and the evidenced hosted WARP blocker are in [surface production qualification](BlenderSurfaceProductionQualification.md).
