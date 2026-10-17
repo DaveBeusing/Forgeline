@@ -1,0 +1,511 @@
+{
+  "revision": "7e4f6f70da61bdf8eba248e03d8bf1725d287a5b",
+  "version": "0.1.392",
+  "pr": 226,
+  "catalog": {
+    "assets": 1337,
+    "textures": 900,
+    "totalTextureBytes": 59451623,
+    "studioBytes": 1786417,
+    "gameplayBytes": 57665206,
+    "gameplayLimit": 58720256
+  },
+  "modes": {
+    "windowed": {
+      "window": {
+        "mode": "Windowed",
+        "clientWidth": 1600,
+        "clientHeight": 900,
+        "isMinimized": false,
+        "dpi": 144
+      },
+      "metrics": {
+        "instanceDrawCalls": 9,
+        "visibleInstances": 121,
+        "lod1Instances": 1,
+        "lod2Instances": 0,
+        "peakResidentTextureBytes": 45718384,
+        "peakShaderResourceDescriptorsUsed": 69,
+        "textureBindingFailureCount": 0,
+        "materialBindingFailureCount": 0,
+        "totalMeasuredDrawCalls": 65,
+        "runtimeMeshInstances": 24,
+        "texturedRuntimeMeshInstances": 24,
+        "debugLayerEnabled": false
+      }
+    },
+    "borderless": {
+      "window": {
+        "mode": "BorderlessFullscreen",
+        "clientWidth": 5120,
+        "clientHeight": 2160,
+        "isMinimized": false,
+        "dpi": 144
+      },
+      "metrics": {
+        "instanceDrawCalls": 9,
+        "visibleInstances": 154,
+        "lod1Instances": 1,
+        "lod2Instances": 0,
+        "peakResidentTextureBytes": 45718384,
+        "peakShaderResourceDescriptorsUsed": 69,
+        "textureBindingFailureCount": 0,
+        "materialBindingFailureCount": 0,
+        "totalMeasuredDrawCalls": 66,
+        "runtimeMeshInstances": 24,
+        "texturedRuntimeMeshInstances": 24,
+        "debugLayerEnabled": false
+      }
+    }
+  },
+  "qualifiedUtc": "2026-10-17T16:33:02.256105+00:00",
+  "baseRevision": "c98da7229d330b2ede30e2427053b87298d1f3de",
+  "catalogBeforeGameplayBytes": 99608050,
+  "limits": {
+    "gameplayTextureBytes": 58720256,
+    "studioTextureBytes": 3145728,
+    "sceneTextureBytes": 67108864,
+    "descriptors": 512,
+    "instanceDraws": "11 + min(11,lod1Instances) + min(11,lod2Instances)"
+  },
+  "geometry": {
+    "baselineInstanceDraws": 15,
+    "qualifiedInstanceDraws": 9,
+    "before": {
+      "instances": 24,
+      "triangles": 14728
+    },
+    "after": {
+      "instances": 24,
+      "triangles": 14728
+    },
+    "baselineBatches": [
+      {
+        "Mesh": "infrastructure.directorate.road.straight",
+        "Material": "material.directorate.infrastructure.road",
+        "Part": -1,
+        "Instances": 1,
+        "Indices": 36
+      },
+      {
+        "Mesh": "infrastructure.directorate.road.shoulder",
+        "Material": "material.directorate.infrastructure.road_shoulder",
+        "Part": -1,
+        "Instances": 2,
+        "Indices": 36
+      },
+      {
+        "Mesh": "building.directorate.command_core",
+        "Material": "material.directorate.building.unpowered",
+        "Part": -1,
+        "Instances": 1,
+        "Indices": 12732
+      },
+      {
+        "Mesh": "building.directorate.command_core.unpowered",
+        "Material": "material.directorate.building.unpowered",
+        "Part": -1,
+        "Instances": 1,
+        "Indices": 108
+      },
+      {
+        "Mesh": "unit.directorate.combat_engineer.lod1",
+        "Material": "material.directorate.unit.rifle_squad",
+        "Part": -1,
+        "Instances": 1,
+        "Indices": 7152
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 0,
+        "Instances": 2,
+        "Indices": 5322
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 1,
+        "Instances": 2,
+        "Indices": 840
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 2,
+        "Instances": 2,
+        "Indices": 840
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 3,
+        "Instances": 2,
+        "Indices": 840
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 4,
+        "Instances": 2,
+        "Indices": 840
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 5,
+        "Instances": 2,
+        "Indices": 840
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 6,
+        "Instances": 2,
+        "Indices": 840
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 7,
+        "Instances": 2,
+        "Indices": 840
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 8,
+        "Instances": 2,
+        "Indices": 840
+      },
+      {
+        "Mesh": "",
+        "Material": "",
+        "Part": -1,
+        "Instances": 114,
+        "Indices": 0
+      }
+    ],
+    "qualifiedBatches": [
+      {
+        "Mesh": "infrastructure.directorate.road.straight",
+        "Material": "material.directorate.infrastructure.road",
+        "Part": -1,
+        "Instances": 1,
+        "Indices": 36
+      },
+      {
+        "Mesh": "infrastructure.directorate.road.shoulder",
+        "Material": "material.directorate.infrastructure.road_shoulder",
+        "Part": -1,
+        "Instances": 2,
+        "Indices": 36
+      },
+      {
+        "Mesh": "building.directorate.command_core",
+        "Material": "material.directorate.building.unpowered",
+        "Part": -1,
+        "Instances": 1,
+        "Indices": 12732
+      },
+      {
+        "Mesh": "building.directorate.command_core.unpowered",
+        "Material": "material.directorate.building.unpowered",
+        "Part": -1,
+        "Instances": 1,
+        "Indices": 108
+      },
+      {
+        "Mesh": "unit.directorate.combat_engineer.lod1",
+        "Material": "material.directorate.unit.rifle_squad",
+        "Part": -1,
+        "Instances": 1,
+        "Indices": 7152
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 0,
+        "Instances": 2,
+        "Indices": 5322
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 1,
+        "Instances": 8,
+        "Indices": 840
+      },
+      {
+        "Mesh": "unit.directorate.cargo_truck",
+        "Material": "material.directorate.unit.cargo_truck",
+        "Part": 2,
+        "Instances": 8,
+        "Indices": 840
+      },
+      {
+        "Mesh": "",
+        "Material": "",
+        "Part": -1,
+        "Instances": 147,
+        "Indices": 36
+      }
+    ]
+  },
+  "textureQuality": {
+    "minimumPsnrRgb": 50.04042254292506,
+    "maximumAlphaError": 0,
+    "textures": [
+      {
+        "Id": "texture.world.terrain.crushed_gravel",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1398128,
+        "ReferenceBytes": 5592404,
+        "PsnrRgb": 54.01000074936942,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "texture.world.terrain.concrete_base",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1398128,
+        "ReferenceBytes": 5592404,
+        "PsnrRgb": 64.40046583977056,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "texture.world.terrain.cracked_earth",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1398128,
+        "ReferenceBytes": 5592404,
+        "PsnrRgb": 59.6391872546444,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "texture.world.terrain.rocky_scrub",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1398128,
+        "ReferenceBytes": 5592404,
+        "PsnrRgb": 56.264481676559555,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "texture.world.terrain.dark_ash",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1398128,
+        "ReferenceBytes": 5592404,
+        "PsnrRgb": 61.66040568091123,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "texture.world.terrain.dry_dirt",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1398128,
+        "ReferenceBytes": 5592404,
+        "PsnrRgb": 62.579152936108144,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "texture.world.terrain.bedrock",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1398128,
+        "ReferenceBytes": 5592404,
+        "PsnrRgb": 64.33291968022968,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "ui.atlas.directorate.portraits.p1",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1048576,
+        "ReferenceBytes": 4194304,
+        "PsnrRgb": 51.33186774358848,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "ui.atlas.directorate.portraits.p2",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1048576,
+        "ReferenceBytes": 4194304,
+        "PsnrRgb": 52.328350279655744,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "ui.atlas.directorate.portraits.p3",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1048576,
+        "ReferenceBytes": 4194304,
+        "PsnrRgb": 51.67130265517593,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      },
+      {
+        "Id": "ui.atlas.directorate.portraits.p4",
+        "Width": 1024,
+        "Height": 1024,
+        "CompressedBytes": 1048576,
+        "ReferenceBytes": 4194304,
+        "PsnrRgb": 50.04042254292506,
+        "MeanAlphaError": 0,
+        "MaximumAlphaError": 0
+      }
+    ]
+  },
+  "tests": {
+    "build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "focusedPresentation": {
+      "passed": 55,
+      "failed": 0
+    },
+    "firstFullRun": {
+      "revision": "cda3f79030db1ba344f980fa54946d13d1815fe5",
+      "total": 2515,
+      "passed": 2502,
+      "failed": 2,
+      "skipped": 11,
+      "note": "Two obsolete resident-byte expectations corrected in subsequent test-only commits."
+    },
+    "qualifiedFullRun": {
+      "total": 2515,
+      "passed": 2499,
+      "failed": 5,
+      "skipped": 11,
+      "duration": "11m14.994s",
+      "exitCode": 2,
+      "failures": [
+        "ForgeLine.Presentation.Tests.DirectorateBuildingPresentationTests.RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(family: \"command_core\")",
+        "ForgeLine.Presentation.Tests.NonModalHudInteractionTests.WarmMenuRoutingAllocatesNoManagedMemory",
+        "ForgeLine.Presentation.Tests.RtsInformationLayerTests.RenderScratchRebuildsAcrossFogSelectionAndSessionChangesWithoutMutatingOwnedModels",
+        "ForgeLine.Assets.Tests.AssetPipelineTests.FollowingCleanWriterWaitsUntilBuildQualificationCompletes",
+        "ForgeLine.Client.Tests.ClientStartupNativeTests.BrandedFramePresentsWhileAssetWorkerIsBlockedAndMenuWaitsForHandoff"
+      ]
+    },
+    "isolatedDiagnosticRuns": {
+      "presentation": 15,
+      "assets": 1,
+      "startup": 1,
+      "failed": 0,
+      "parallelization": "none",
+      "note": "Original assertions and timeouts retained. Diagnostic passes do not clear the failed full-suite gate."
+    }
+  },
+  "package": {
+    "archiveName": "FORGELINE-0.1.392-dev-win-x64.zip",
+    "archiveBytes": 54646665,
+    "sha256": "148a182f36ba902a50f92d101564f51f0ba5881d05ab3ccffafc68bcc857ed99",
+    "verifiedManifestFiles": 1461,
+    "reproduciblePublishTrees": true,
+    "provenance": {
+      "informationalVersion": "0.1.392-dev+7e4f6f70da61bdf8eba248e03d8bf1725d287a5b",
+      "runtimeAssetSignature": "7d78c06c12f4f2bbbd3ae5886e881ff9601679bc6617cf5eca1a3a7891722882",
+      "targetFramework": "net10.0-windows",
+      "sourceRevision": "7e4f6f70da61bdf8eba248e03d8bf1725d287a5b",
+      "channel": "dev",
+      "runtimeIdentifier": "win-x64",
+      "sourceTreeClean": true,
+      "runAttempt": null,
+      "version": "0.1.392-dev",
+      "runId": null,
+      "runUrl": null,
+      "configuration": "Release",
+      "repository": "https://github.com/DaveBeusing/Forgeline",
+      "sdk": "10.0.401",
+      "runtimeAssetCompiler": "1.10.0",
+      "product": "FORGELINE",
+      "buildTimeUtc": "2026-10-17T16:29:14.0216260+00:00",
+      "productVersion": "0.1.392"
+    }
+  },
+  "installedSmoke": {
+    "exitCode": 0,
+    "applicationReadiness": "Ready",
+    "sessionReadiness": "Ready",
+    "droppedEvents": 0,
+    "stderrBytes": 0,
+    "emptyWorkingDirectoryRetained": true,
+    "runtimeOverrideRemoved": true,
+    "window": {
+      "mode": "Windowed",
+      "clientWidth": 1600,
+      "clientHeight": 900,
+      "isMinimized": false,
+      "dpi": 144
+    },
+    "metrics": {
+      "instanceDrawCalls": 9,
+      "visibleInstances": 121,
+      "lod1Instances": 1,
+      "lod2Instances": 0,
+      "peakResidentTextureBytes": 45718384,
+      "peakShaderResourceDescriptorsUsed": 69,
+      "textureBindingFailureCount": 0,
+      "materialBindingFailureCount": 0,
+      "totalMeasuredDrawCalls": 65,
+      "runtimeMeshInstances": 24,
+      "texturedRuntimeMeshInstances": 24,
+      "debugLayerEnabled": false
+    },
+    "audio": "50 blocks, zero failures/drops; no retained resources"
+  },
+  "ciSnapshot": {
+    "headSha": "7e4f6f70da61bdf8eba248e03d8bf1725d287a5b",
+    "status": "in_progress",
+    "conclusion": "",
+    "jobs": [
+      {
+        "name": "build-test",
+        "status": "in_progress",
+        "conclusion": "",
+        "activeSteps": [
+          "Windows window mode and visual qualification smoke"
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "Full parallel solution gate failed five tests; exact causes remain unproven. Isolated diagnostic passes are not a substitute.",
+    "Native Direct3D debug layer unavailable.",
+    "Canonical budget smokes do not establish sustained FPS, subjective visual approval or natural match termination."
+  ],
+  "localArtifactHashes": {
+    "graphics-budget-qualified-build.log": "50011c7228fa25903d2ddd16a8eaf6f4920061e1d902b7d2f3a7648c5a883802",
+    "graphics-budget-qualified-focused.log": "559774cc82dd64d700b8d864d9db128c87004c0de7027bac7db64d8815fcb557",
+    "graphics-budget-final-full-tests.log": "17467b4280d15ad1275c149ec5a25c50881b449ae16b03ef5480aa532cb86965",
+    "graphics-budget-qualified-full-tests.log": "c231adcae4d7c59be8a3379313ff45230ccd1ee4470b301a3f3f38676ff47553",
+    "graphics-budget-isolated-presentation.log": "7fd5ab59efbeb8cc3518dc30e15590ec9f45113bdba4109ec663e57c0d768c00",
+    "graphics-budget-isolated-assets.log": "7a38a5a1c20280d82d38389a1533026c4a5ad82d7855e639f06774d969697809",
+    "graphics-budget-isolated-startup.log": "081357e1a65e9a1192a5911dc5d2b8b6122688e1e78ca876403b014c1c55e61f",
+    "graphics-budget-final-draw-contracts.log": "64f2742ad705d95a89e44fd9a34f0ae6ed5048a8d04f70ae516210cd4dd66258",
+    "graphics-budget-final-input-contracts.log": "9749fcd1ef1d7dd6e5039d0ed41d166afd09cd7c8923dc8b347f254737f91c0b",
+    "graphics-budget-qualified-window-modes.log": "e0f856104cfa489ee47d1c7186de86a57f964c62c76b039f6afaa5196e20ee96",
+    "graphics-budget-final-assets.log": "90e319c76fa8cb5834342a5b17adcc223c19ece45251bdb9b84f3774054d7ffb",
+    "graphics-budget-package-7e4f6f70.log": "c8569e47463cbbf49e2fdd76e966b54602da74c7d65cfb811e17b9556b8112d7",
+    "graphics-budget-installed-stdout.log": "ac5aad90c8345980b8d7a861bfcd43159156fc41298fc11483e97131f0310dad",
+    "graphics-budget-installed-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "graphics-budget-qualified-windowed.json": "65d98c3f517e452149c912953722646dbd4dbab6dee3cfaba186397263aadb7a",
+    "graphics-budget-qualified-borderless.json": "675acac8fcbc9b128ce7218e4325aadcad21d2be2fe12f34e03b96fd2e0f4b8a",
+    "graphics-budget-qualified-texture-quality.json": "b98ea25cccdc168fc5846d6e1a90e89d67efeb5b8401eaffccbeb1deb1ba0339",
+    "graphics-budget-installed-startup.json": "9c6237f63feb3638364af4eddddf525f94f86a45121a5e44756108050e6d85ef",
+    "graphics-budget-installed-visual.json": "7a26691bbd27df891fb74560483fda22c7add023f9b5479100966dfced06cc6c"
+  }
+}
