@@ -11,7 +11,7 @@ No matching checksum grants typography, AAA quality or physical-display acceptan
 
 ## Reproduce a candidate
 
-The complete current graphical interface has 68 named states. Use the bounded
+The complete current graphical interface has 82 named states. Use the bounded
 matrix orchestrator after committing, building and qualifying runtime assets:
 
 ```powershell
@@ -21,13 +21,13 @@ matrix orchestrator after committing, building and qualifying runtime assets:
 ./build/Invoke-UiInterfaceQualification.ps1 -Capture -Resume -OutputRoot artifacts/interface-native
 ```
 
-This produces 3,060 cases: all 68 states at five outputs, raster DPI 96/144/192
+This produces 3,690 cases: all 82 states at five outputs, raster DPI 96/144/192
 and scales .75/1/2. Forty-five independently complete cohorts preserve the native
 30-state request limit. Each successful cohort checks the exact state/scale
 union, original hashes, native dimensions, text, skin and resource diagnostics,
 and exports a separate pending review. Partial/failed attempts remain untouched;
 resume creates a new attempt instead of promoting partial records. The final
-union must contain exactly 3,060 unique keys. Plan-only invocation omits
+union must contain exactly 3,690 unique keys. Plan-only invocation omits
 `-Capture` and does not constitute executed evidence. Full original images remain
 in the requested output roots; completion records do not replace them.
 
@@ -150,3 +150,5 @@ Onboarding adds exact 55/110/165 ms closing/opening candidates plus the settled
 collapsed tab. These authored snapshots use the production SmoothStep transform;
 they are deterministic sequence samples, not measured gameplay frame rates or
 human-approved motion. Review them with the expanded Onboarding candidate.
+
+The fourteen Ring states exercise each category, parameter editing, pending state, edge displacement, tooltip, half reveal / close and an offscreen anchor. They use the production controller and geometry over copied permitted objects; closed / offscreen visuals own no input. Review [world anchored actions](WorldAnchoredActionMenus.md) before accepting candidates.

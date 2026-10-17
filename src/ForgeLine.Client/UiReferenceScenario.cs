@@ -19,7 +19,9 @@ internal enum UiReferenceScenario
     Operations, OperationsEmpty, OperationsMissing, ProductionQueue, LogisticsBlocked, SupplyPolicy, TechnologyBlocked, DockQueueTooltip, DockTechnologyTooltip,
     NotificationsCollapsed, NotificationsExpanded, NotificationDetails,
     OnboardingClosing25, OnboardingClosing50, OnboardingClosing75, OnboardingCollapsed,
-    OnboardingOpening25, OnboardingOpening50, OnboardingOpening75
+    OnboardingOpening25, OnboardingOpening50, OnboardingOpening75,
+    RingConstruction, RingProduction, RingUnits, RingLogistics, RingSupply, RingTactical, RingTechnology, RingParameters,
+    RingPending, RingEdge, RingTooltip, RingOpening50, RingClosing50, RingOffscreen
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -125,6 +127,7 @@ internal static class UiReferenceStates
     internal static (PresentationSnapshot Snapshot, PlayerActionPanelView Panel) Hud(PresentationSnapshot source,
         UiReferenceScenario state, int width, int height, uint dpi, float scale)
     {
+        if (ObjectActionRingCapture.IsRing(state)) return ObjectActionRingCapture.Fixture(source,state,width,height,dpi,scale);
         if (state == UiReferenceScenario.World) return (source, default);
         if (IsFrontend(state)) return (source, default);
         string dockState = state switch

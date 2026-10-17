@@ -14,7 +14,9 @@ function Get-UiQualificationScenarios {
       'SelectionUnit','SelectionBuilding','SelectionEmpty','SelectionLongName','MissingPlayerData','GameplayTooltip',
       'GroupSummary','ResourceUnknown','SelectedGroup','Operations','OperationsEmpty','OperationsMissing',
       'ProductionQueue','LogisticsBlocked','SupplyPolicy','TechnologyBlocked','DockQueueTooltip','DockTechnologyTooltip',
-      'NotificationsCollapsed','NotificationsExpanded','NotificationDetails')
+      'NotificationsCollapsed','NotificationsExpanded','NotificationDetails',
+      'RingConstruction','RingProduction','RingUnits','RingLogistics','RingSupply','RingTactical','RingTechnology','RingParameters',
+      'RingPending','RingEdge','RingTooltip','RingOpening50','RingClosing50','RingOffscreen')
 }
 
 function Assert-UiQualificationUnion {

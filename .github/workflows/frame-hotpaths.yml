@@ -30,7 +30,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GameplayBindingSettingsTests ForgeLine.Client.Tests.GameplayBindingEditorTests ForgeLine.Client.Tests.GameplayHelpControllerTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GameplayRebindingTests ForgeLine.Presentation.Tests.GameplayUiFixtureTests ForgeLine.Presentation.Tests.ResponsiveHudLayoutTests ForgeLine.Presentation.Tests.OnboardingGeometryTests ForgeLine.Presentation.Tests.UiTextBatchTests
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GameplayRebindingTests ForgeLine.Presentation.Tests.GameplayUiFixtureTests ForgeLine.Presentation.Tests.ResponsiveHudLayoutTests ForgeLine.Presentation.Tests.OnboardingGeometryTests ForgeLine.Presentation.Tests.RadialActionLayoutTests ForgeLine.Presentation.Tests.UiTextBatchTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.NotificationStackTests ForgeLine.Presentation.Tests.StrategicMapExperienceTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

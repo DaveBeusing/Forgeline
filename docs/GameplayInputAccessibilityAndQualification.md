@@ -1,5 +1,7 @@
 # Gameplay Input and Visual Qualification
 
+Own single selections use [world anchored action rings](WorldAnchoredActionMenus.md). Click/release selects an object and opens categories. Category keys and the global bar reopen its ring. Click an item to act; use Parameters and Next item for pre-activation editing, queue cancellation and existing setting shortcuts. The inner hole, empty sectors and gaps remain world input. Outside click and Escape dismiss centrally; targeting uses the next world click once. Group controls retain their current dock.
+
 Gameplay shortcuts share `GameplayBindingRegistry` in the input boundary. The registry captures immutable keys, captions and cached English fallback prompts; the platform now recognizes every Latin letter. Camera mapping stays in the existing `RtsCameraBindings` contract and is consulted for conflicts. Selection, navigation and commands still use the existing presentation controllers and authoritative request gateway.
 
 ## Editing and migration

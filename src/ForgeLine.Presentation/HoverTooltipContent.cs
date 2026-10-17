@@ -74,7 +74,7 @@ internal static class HoverTooltipResolver
         if (panel.SelectionPending || !panel.IsOpen || panel.Mode != mode || snapshot.PlayerActions is not { } actions ||
             actions.SessionId != snapshot.SessionId || actions.Tick != snapshot.Tick) return null;
         if (control == PlayerActionDockControlKind.Page)
-            return new("PAGE CARDS", "DOCK NAVIGATION", "CHANGES SELECTION", "CLICK / WHEEL / TAB");
+            return new(panel.Ring.SingleOwned ? "RING NAVIGATION" : "PAGE CARDS", "ACTION NAVIGATION", "CHANGES SELECTION", "CLICK / WHEEL / TAB");
         int index = view.DockIndex;
         if (control != PlayerActionDockControlKind.Item && index != panel.SelectedIndex) return null;
         if (control == PlayerActionDockControlKind.Item &&
@@ -88,7 +88,7 @@ internal static class HoverTooltipResolver
         string status = enabled ? "AVAILABLE AT CAPTURED TICK" :
             !state.CanActivate && control is PlayerActionDockControlKind.Item or PlayerActionDockControlKind.Activate
                 ? state.DisabledReason : "UNAVAILABLE IN CURRENT CONTEXT";
-        string hint = !enabled ? string.Empty : item ? "SELECT CARD / ENTER TO ACT" : "CLICK TO REQUEST";
+        string hint = !enabled ? string.Empty : item ? (panel.Ring.SingleOwned ? "CLICK TO ACT / PARAMETERS TO EDIT" : "SELECT CARD / ENTER TO ACT") : "CLICK TO REQUEST";
         IReadOnlyList<PlayerActionResourceAmount>? costs = null, outputs = null;
         uint? ticks = null;
         string requirement = string.Empty;

@@ -1,0 +1,40 @@
+{
+  "qualifiedSource": "e1bb70913770725da58c7b81370cd4fd290ee97a",
+  "version": "0.1.387-dev",
+  "images": [
+    {
+      "file": "construction-e1bb7091.png",
+      "source": "artifacts\\rings-reference-e1bb7091\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiRingConstruction-Scale1.00.png",
+      "sha256": "3b88ff94b2ed2105bd6f6dc9e7cd1aa5e5e563875a5c55c5a08336e6280e65ea"
+    },
+    {
+      "file": "parameters-e1bb7091.png",
+      "source": "artifacts\\rings-reference-e1bb7091\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiRingParameters-Scale1.00.png",
+      "sha256": "6ab6a3ec03b1103d5d4f06a37eb8e09d85d93a6415401a8fd8b3156f4781deda"
+    },
+    {
+      "file": "tooltip-e1bb7091.png",
+      "source": "artifacts\\rings-reference-e1bb7091\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiRingTooltip-Scale1.00.png",
+      "sha256": "d0a8e159252e49a6f7694a1019ead8e94cf23e7975c9fb4f7349cb53fb110473"
+    },
+    {
+      "file": "edge-e1bb7091.png",
+      "source": "artifacts\\rings-reference-e1bb7091\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiRingEdge-Scale1.00.png",
+      "sha256": "0c1a117b8c8201871fd78e7b7ee9ee246eeac8cfc6aa25da1173d4e3f506fcb1"
+    },
+    {
+      "file": "compact-parameters-7b889a31.png",
+      "source": "artifacts\\rings-compact-7b889a31\\BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiRingParameters-Scale2.00.png",
+      "sha256": "3725985fe8014e8d70259ee7a757f94177096f2bc75adcf2d072e58b5a8c0e06"
+    },
+    {
+      "file": "dark-half-tooltip-7b889a31.png",
+      "source": "artifacts\\rings-dark-half-7b889a31\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiRingTooltip-Scale1.00.png",
+      "sha256": "7d987d1aaf4169993bc82c80cd4ce0a25c77b918bfe88f0e052fa9c11cf04d33"
+    }
+  ],
+  "recordsSha256": "6ceb4d304d963105757942389d7f6669c067611873701bd08397c2b0fdbfae84",
+  "records": 48,
+  "packageSha256": "275a4ebb5bfc4f7d05fb70e717b542571be3698ce4246f72a928d1c3e67e5c56",
+  "approval": "Original native candidates; no human visual/motion approval and no accepted golden."
+}

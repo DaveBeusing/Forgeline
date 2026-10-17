@@ -48,14 +48,22 @@ public sealed class HoverTooltipController
         var next = new HoverTooltipView(snapshot.SessionId, EntityId.Invalid, default, pointer,
             false, layout.ViewportWidth, layout.ViewportHeight, layout.Scale);
         int count = panel.SelectionPending ? 0 : PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
-        if (ContextualCommandModel.TryHit(pointer, snapshot, layout, out var command,
+        if (panel.Ring.TryHit(pointer, out var radial))
+        {
+            var target = radial.Navigation is ActionRingNavigation.Parameters or ActionRingNavigation.NextItem
+                ? new PlayerActionDockHitTarget(PlayerActionDockControlKind.Item,panel.Mode,panel.SelectedIndex)
+                : radial.Navigation != ActionRingNavigation.None ? new(PlayerActionDockControlKind.Page,panel.Mode,panel.SelectedIndex) : radial.Target;
+            next = next with { DockMode = target.Mode, DockControl = (int)target.Kind,
+                DockIndex = target.ItemIndex };
+        }
+        else if (!panel.Ring.SingleOwned && ContextualCommandModel.TryHit(pointer, snapshot, layout, out var command,
                 localPending: ContextualCommandModel.HasPending(panel, snapshot), selectionPending: panel.SelectionPending))
         {
             next = next with { DockMode = command.Mode,
                 DockControl = (int)(command.OpensMode ? PlayerActionDockControlKind.Mode : PlayerActionDockControlKind.Item),
                 DockIndex = command.ItemIndex, Contextual = true };
         }
-        else if (PlayerActionDockInteractionLayout.TryHit(pointer, layout, panel.IsOpen, count, out var hit, panel.SelectedIndex))
+        else if (PlayerActionDockInteractionLayout.TryHit(pointer, layout, panel.DockExpanded, count, out var hit, panel.SelectedIndex))
         {
             next = next with
             {
@@ -65,7 +73,7 @@ public sealed class HoverTooltipController
             };
         }
         else if (!worldPointerCaptured &&
-            !HudInteractionContext.BlocksWorldPointer(pointer, layout, true, panel.IsOpen))
+            !HudInteractionContext.BlocksWorldPointer(pointer, layout, true, panel.DockExpanded, includePrimaryCommands: !panel.Ring.SingleOwned))
         {
             next = next with { Entity = hoveredEntity };
             // Current detected contacts use copied opaque contact positions, never an ECS raycast.
