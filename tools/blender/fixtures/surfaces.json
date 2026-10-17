@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "maxTexturePayloadBytes": 7325040,
+  "jobs": {
+    "building.directorate.command_core": {
+      "ratio": 1,
+      "bevelMetres": 0,
+      "weightedNormals": false,
+      "protectedParts": [],
+      "limits": {
+        "maxTriangles": 4244,
+        "maxSections": 1,
+        "minSilhouetteIou": 0.99,
+        "maxRelativeBoundsError": 1e-05,
+        "maxGeometryBytes": 479856
+      }
+    },
+    "building.directorate.command_core.lod1": {
+      "ratio": 1,
+      "bevelMetres": 0,
+      "weightedNormals": false,
+      "protectedParts": [],
+      "limits": {
+        "maxTriangles": 952,
+        "maxSections": 1,
+        "minSilhouetteIou": 0.99,
+        "maxRelativeBoundsError": 1e-05,
+        "maxGeometryBytes": 101664
+      }
+    },
+    "building.directorate.command_core.lod2": {
+      "ratio": 1,
+      "bevelMetres": 0,
+      "weightedNormals": false,
+      "protectedParts": [],
+      "limits": {
+        "maxTriangles": 348,
+        "maxSections": 1,
+        "minSilhouetteIou": 0.99,
+        "maxRelativeBoundsError": 1e-05,
+        "maxGeometryBytes": 38160
+      }
+    },
+    "unit.directorate.main_battle_tank": {
+      "ratio": 1,
+      "bevelMetres": 0,
+      "weightedNormals": false,
+      "protectedParts": [],
+      "limits": {
+        "maxTriangles": 6272,
+        "maxSections": 1,
+        "minSilhouetteIou": 0.99,
+        "maxRelativeBoundsError": 1e-05,
+        "maxGeometryBytes": 655104
+      }
+    },
+    "unit.directorate.main_battle_tank.lod1": {
+      "ratio": 1,
+      "bevelMetres": 0,
+      "weightedNormals": false,
+      "protectedParts": [],
+      "limits": {
+        "maxTriangles": 892,
+        "maxSections": 1,
+        "minSilhouetteIou": 0.99,
+        "maxRelativeBoundsError": 1e-05,
+        "maxGeometryBytes": 96336
+      }
+    },
+    "unit.directorate.main_battle_tank.lod2": {
+      "ratio": 1,
+      "bevelMetres": 0,
+      "weightedNormals": false,
+      "protectedParts": [],
+      "limits": {
+        "maxTriangles": 244,
+        "maxSections": 1,
+        "minSilhouetteIou": 0.99,
+        "maxRelativeBoundsError": 1e-05,
+        "maxGeometryBytes": 28464
+      }
+    }
+  }
+}
