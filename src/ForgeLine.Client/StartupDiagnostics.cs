@@ -213,9 +213,14 @@ internal sealed class StartupDiagnostics
         lock (_gate) return _events![.._count];
     }
 
-    internal void WriteReport(string path, bool announce = true)
+    internal (int Events, StartupReadiness Application, StartupReadiness Session, int SessionId, int Dropped) CheckpointState
     {
-        if (!Enabled) return;
+        get { lock (_gate) return (_count, _application, _session, _sessionId, _dropped); }
+    }
+
+    internal bool WriteReport(string path, bool announce = true)
+    {
+        if (!Enabled) return false;
         object report;
         lock (_gate)
             report = new
@@ -239,10 +244,12 @@ internal sealed class StartupDiagnostics
             File.WriteAllText(temporary, JsonSerializer.Serialize(report, ReportSerialization.Options));
             File.Move(temporary, fullPath, overwrite: true);
             if (announce) Console.WriteLine($"[startup:report] path=\"{fullPath}\"");
+            return true;
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException)
         {
             Console.Error.WriteLine($"[startup:report-failed] type={error.GetType().Name} message={error.Message}");
+            return false;
         }
     }
 

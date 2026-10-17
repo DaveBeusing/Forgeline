@@ -46,4 +46,45 @@ public sealed class StartupCheckpointTests
         }
         finally { if (Directory.Exists(directory)) Directory.Delete(directory, true); }
     }
+    [Fact]
+    public void ReadinessChangesArePersistedEvenWithoutAnotherEvent()
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "ForgeLine.Startup", Guid.NewGuid().ToString("N"));
+        string path = Path.Combine(directory, "startup.json");
+        try
+        {
+            var diagnostics = new StartupDiagnostics(Stopwatch.GetTimestamp(), Guid.NewGuid(), 1);
+            diagnostics.Mark(StartupPhase.ProcessEntered);
+            using var checkpoint = new StartupCheckpoint(diagnostics, path);
+            checkpoint.Flush();
+            int events = diagnostics.Snapshot().Length;
+            diagnostics.Finish(new InvalidDataException("Failed before another phase started"));
+            Assert.Equal(events, diagnostics.Snapshot().Length);
+            checkpoint.Flush();
+            using var report = JsonDocument.Parse(File.ReadAllText(path));
+            Assert.Equal("Failed", report.RootElement.GetProperty("ApplicationReadiness").GetString());
+        }
+        finally { if (Directory.Exists(directory)) Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void FailedAtomicReplacementIsRetriedWithoutAnotherEvent()
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "ForgeLine.Startup", Guid.NewGuid().ToString("N"));
+        string path = Path.Combine(directory, "startup.json");
+        Directory.CreateDirectory(path); // A directory cannot be replaced by the report file.
+        try
+        {
+            var diagnostics = new StartupDiagnostics(Stopwatch.GetTimestamp(), Guid.NewGuid(), 1);
+            diagnostics.Mark(StartupPhase.ProcessEntered);
+            using var checkpoint = new StartupCheckpoint(diagnostics, path);
+            checkpoint.Flush();
+            Assert.False(File.Exists(path));
+            Directory.Delete(path);
+            checkpoint.Flush();
+            using var report = JsonDocument.Parse(File.ReadAllText(path));
+            Assert.Equal("Pending", report.RootElement.GetProperty("ApplicationReadiness").GetString());
+        }
+        finally { if (Directory.Exists(directory)) Directory.Delete(directory, true); }
+    }
 }
