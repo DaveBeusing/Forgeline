@@ -1,5 +1,7 @@
 # World anchored action menus
 
+Current validation and remaining gates: [qualification report](WorldAnchoredActionMenuQualification.md). Checkpoints below retain their original source identities.
+
 ## Action parity
 
 Single owned entities use the same PlayerActionPanelController dispatcher and copied PlayerActionSnapshot as the previous dock. The global mode bar stays available. Group selection retains its existing dock and contextual commands.
