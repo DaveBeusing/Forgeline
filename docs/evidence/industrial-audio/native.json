@@ -1,0 +1,36 @@
+{
+  "DirectCues": [
+    {
+      "Cue": "Navigation",
+      "Submitted": true,
+      "ResetAndRestarted": true
+    },
+    {
+      "Cue": "Intent",
+      "Submitted": true,
+      "ResetAndRestarted": true
+    },
+    {
+      "Cue": "Accepted",
+      "Submitted": true,
+      "ResetAndRestarted": true
+    },
+    {
+      "Cue": "Rejected",
+      "Submitted": true,
+      "ResetAndRestarted": true
+    }
+  ],
+  "AsynchronousOwner": {
+    "Available": false,
+    "OwnsNativeResources": false,
+    "Played": 2,
+    "Dropped": 0,
+    "PlaybackFailures": 7,
+    "ClipFailures": 0,
+    "DeviceFailures": 0,
+    "QueueDepth": 0,
+    "OwnerStopped": true
+  },
+  "Limitation": "Buffer submission and lifetime only; no subjective listening or physical device-removal test."
+}

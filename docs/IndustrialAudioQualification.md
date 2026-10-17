@@ -53,7 +53,49 @@ can be retried without another event. No per-checkpoint event-array copy is need
   The failing existing startup checkpoint test read Pending instead of Failed.
   The original failure is retained. Two deterministic checkpoint regression cases
   cover readiness changes without an event and retry after a failed replacement;
-  the complete post-fix result is recorded below after execution.
+  the complete post-fix result is recorded below.
+
+## Frozen-source and package results
+
+Qualified product/test source: **`34a0a346046c03aff8ba17ffa021ec5a9f3aa6ec`**.
+The subsequent evidence update changes documentation only.
+
+| Check | Executed result |
+| --- | --- |
+| Frozen Release solution build | Zero warnings/errors; SDK 10.0.401 |
+| Complete post-fix Client suite | 395 passed, zero failed, one explicit device test excluded; also passes inside the final full run |
+| Full solution | **2,424 total: 2,412 passed, 2 failed, 10 skipped**, exit 2, 6m26.052s |
+| Full-run failures | Unchanged Presentation tests: storage-depot state resolution **7,264 bytes**, contact tooltip **1,792 bytes**, each expected zero |
+| Same two classes, identical binaries, `--parallel none` | **33 passed**, no failed cases; does not replace the full failure or establish its root cause |
+| Real-device explicit test | **1 passed**; all four UI buffers submit/reset/restart; asynchronous Intent then Accepted submit, two successes, seven busy failed attempts, zero clip/device failures; owner stops with no retained native resources |
+| Source client smoke | Ready/Ready, zero dropped startup events, own source catalog, isolated settings |
+| Reproducible Windows package | Two independent publish trees compare identically; package UI/skin/provenance gates pass |
+| Extracted package, empty working directory | Ready/Ready, zero dropped startup events, empty stderr, isolated sound-enabled settings, own 1,337-asset catalog and exactly four byte-identical UI files |
+| Package world audio | None; the other 56 clips remain qualified source assets |
+| Project graph / version | 43 projects, no dependency cycle; exactly one PATCH relative to master |
+
+Package `artifacts/audio-package-34a0a346/FORGELINE-0.1.389-dev-win-x64.zip`:
+**40,062,155 bytes**, SHA-256
+`410b28f9bb7d23a84ddfd2e4180f65e9b0abc6d7851c37984285fb65c650d512`.
+Its provenance confirms clean source and the qualified source revision above.
+Runtime content signature remains
+`5cb87ff663e609ff3c0842be2671e3eabc9a9389e3562a66e0fba46733700932`.
+
+The source [PR CI run 39036596981](https://github.com/DaveBeusing/Forgeline/actions/runs/39036596981/job/117407613375)
+passes Build, the audio source/package contract, and the new audio reliability
+step. It later fails the unchanged `OperationsTests.OverviewAndRenderInputHaveZeroWarmAllocation(100)`:
+**7,176 bytes instead of zero**, 156 of 157 cases pass in that group. The exact
+same 157-case group passes locally on the frozen binaries, without changing the
+assertion or test command. That local pass does not clear the failed CI run;
+its cause remains unproven. This PR run does not reach the separate texture gate.
+
+[Evidence index and exact log hashes](evidence/industrial-audio/validation.json),
+[signal checks](evidence/industrial-audio/signal-validation.json),
+[offline reconstruction](evidence/industrial-audio/reproduction.json), and
+[native buffer/owner report](evidence/industrial-audio/native.json) preserve the
+separate evidence lanes. The signal validator's `not_executed` list describes that
+standalone tool; independent C# and device executions are recorded above. Native
+buffer submission is not acoustic latency measurement or subjective sound approval.
 
 Commands and full raw logs are retained under `artifacts/audio-*`. Reproduction:
 
