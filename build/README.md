@@ -18,3 +18,9 @@ Repository-wide build configuration is centralized in the root `Directory.Build.
 Additional build scripts belong in this directory when they become necessary. The foundation intentionally avoids wrapper scripts until they add value beyond the canonical .NET CLI commands.
 
 `Invoke-ScalabilityQualification.ps1` captures the bounded CPU matrix, optional extended samples and opt-in native GPU reports. `Compare-ScalabilityReports.ps1` checks comparison metadata and produces advisory percentile/allocation deltas. See [Scalability qualification](../docs/ScalabilityQualification.md) for prerequisites and interpretation.
+
+The optional [Blender authoring entrypoint](../tools/blender/README.md) lives under
+`tools/blender/`. Its protocol contracts run without Blender in normal CI; native
+export/compiler/idempotency qualification is available locally and through an
+opt-in workflow on a provisioned authoring runner. It does not participate in
+player startup or acquire Blender during build/publish.

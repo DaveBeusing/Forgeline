@@ -1,0 +1,43 @@
+name: Blender authoring qualification
+
+on:
+  workflow_dispatch:
+    inputs:
+      blender_executable:
+        description: 'Optional absolute executable path; empty uses pinned-version discovery'
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blender-authoring-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  export-smoke:
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 15
+    env:
+      FORGELINE_BLENDER_PATH: ${{ inputs.blender_executable }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Qualify pinned Blender export
+        shell: pwsh
+        run: ./tools/blender/Test-BlenderSmoke.ps1 -OutputRoot artifacts/blender-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Retain authoring evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blender-authoring-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/blender-ci-*
+          retention-days: 14
