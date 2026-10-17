@@ -127,10 +127,16 @@ def chassis(kit,lod,modules=None):
                             track['wheelRadius'][0]*.70,track['wheelRadius'][1]*.70,1,track['sides'][lod])
                     pivot=[side*.43,track['wheelY'],z]
                     part=Mesh(); r=track['hubRadius']
-                    part.cylinder([pivot[0]-.052,pivot[1],z],[pivot[0]+.052,pivot[1],z],r,15,12)
+                    part.cylinder([pivot[0]-.052,pivot[1],z],[pivot[0]+.052,pivot[1],z],r,15,8)
                     for angle in (0,np.pi/2,np.pi,3*np.pi/2):
-                        y=pivot[1]+r*.58*np.sin(angle); zz=z+r*.58*np.cos(angle)
-                        part.cylinder([side*.476,y,zz],[side*.479,y,zz],.004,1,6)
+                        # Elliptical canonical spokes become circular in gameplay metres.
+                        arm=Mesh(); arm.box([-.003,.018,-.004],[.003,.118,.004],1)
+                        cosine,sine=np.cos(angle),np.sin(angle)
+                        rotation=np.array([[1,0,0],[0,cosine,-sine],[0,sine,cosine]])
+                        scale=np.array([1,1,3/7.2])
+                        arm.positions=[(rotation@v)*scale+np.array([side*.478,pivot[1],z]) for v in arm.positions]
+                        arm.normals=[(rotation@n)/scale for n in arm.normals]
+                        arm.normals=[n/np.linalg.norm(n) for n in arm.normals];part.merge(arm)
                     name=f'road_wheel_{1 if side<0 else 2}_{number}'
                     wheel_parts.append((name,part,pivot))
                     sockets.append(dict(name='motion_'+name,x=pivot[0],y=pivot[1],z=pivot[2]))
@@ -158,6 +164,11 @@ def chassis(kit,lod,modules=None):
 
 def turret(kit,lod,modules=None):
     m=Mesh(); t=kit['turret']; m.loft(t['profiles'],0,t['edge'][lod]); boxes(m,t['boxes'],lod)
+    if lod==0 and 'cheekArmor' in t:
+        armor=t['cheekArmor']
+        for side in (-1,1):
+            plate=Mesh();plate.loft(armor['profiles'],8,armor['bevel'])
+            plate.positions=[v+np.array([side*armor['offsetX'],0,0]) for v in plate.positions];m.merge(plate)
     sides=t['cannon']['sides'][lod]
     m.cylinder([0,0,.02],[0,.067,.02],.19,1,sides)
     if lod<2:
@@ -169,7 +180,7 @@ def turret(kit,lod,modules=None):
             for side in (-1,1):
                 for z in (.085,.11,.135):
                     x=side*.245
-                    m.cylinder([x,.13,z],[x,.21,z+.025],.012,7,8,inner=.007)
+                    m.cylinder([x,.13,z],[x,.21,z+.025],.012,7,6,inner=.007)
                 m.box([side*.245-.015,.17,-.08],[side*.245+.015,.185,-.025],1,.002)
     cannon=Mesh(); c=t['cannon']
     cannon.cylinder(c['start'],c['end'],c['radius'],7,sides,c['inner'])

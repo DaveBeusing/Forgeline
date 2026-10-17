@@ -1,8 +1,8 @@
 {
   "meshes": {
     "chassis_lod0": {
-      "vertices": 12080,
-      "triangles": 6272,
+      "vertices": 10928,
+      "triangles": 5528,
       "minimum": [
         -0.49000000953674316,
         -0.5,
@@ -13,11 +13,11 @@
         0.10000000149011612,
         0.4099999964237213
       ],
-      "sha256": "886472bccaba9fe080758982cc3c6a95823b6aec85a2097b127cf703f6b7930c"
+      "sha256": "a7ebe8977614587672a030c1a707042c0ebc42282ed2d9e504af4ad8172b8cfb"
     },
     "turret_lod0": {
-      "vertices": 3584,
-      "triangles": 1752,
+      "vertices": 3648,
+      "triangles": 1736,
       "minimum": [
         -0.27000001072883606,
         0.0,
@@ -28,7 +28,7 @@
         0.28999999165534973,
         0.6399999856948853
       ],
-      "sha256": "37e83c7813e1a8d0c02652436719dc30de0e69a66ae0d2409fc2a3bd5cacf885"
+      "sha256": "ae13e5b4c0ac4ec1ae9364abb3f3e5ffed426fb5b8e014acfbcfea85f945ac40"
     },
     "combined_lod1": {
       "vertices": 1784,
@@ -106,53 +106,53 @@
       "sha256": "05b3658284fa2b390c7cb7197be4493ec9a0dd5f581fd199a313ecb62b75ecb0"
     },
     "kit.hull": {
-      "vertices": 896,
-      "triangles": 408,
+      "vertices": 1904,
+      "triangles": 872,
       "minimum": [
-        -0.3499999940395355,
+        -0.4860000014305115,
         -0.2800000011920929,
         -0.4300000071525574
       ],
       "maximum": [
-        0.3499999940395355,
+        0.4860000014305115,
         0.10000000149011612,
         0.4099999964237213
       ],
-      "sha256": "2d180c3ad73ef4cccb868bd64357a9983687bee9f2d89d28711147535f0bfbc6"
+      "sha256": "8e9d3f72e4936c566b0947769c7ba309a554bcaa9d7d81e999ab1ce95b482642"
     },
     "kit.left_track": {
-      "vertices": 5592,
-      "triangles": 2932,
+      "vertices": 4512,
+      "triangles": 2328,
       "minimum": [
         -0.49000000953674316,
         -0.5,
-        -0.4224405884742737
+        -0.4219503104686737
       ],
       "maximum": [
         -0.3199999928474426,
         0.02800000086426735,
-        0.4014405906200409
+        0.4009999930858612
       ],
-      "sha256": "0c5abeedbb4ca382b28884853a288c81e1f0ff5afd65f2e1f8a698e58366fde8"
+      "sha256": "634449ed7f280cce3962544df69c0c57b6024ffd9e520786fd6c1dd6419c94ce"
     },
     "kit.right_track": {
-      "vertices": 5592,
-      "triangles": 2932,
+      "vertices": 4512,
+      "triangles": 2328,
       "minimum": [
         0.3199999928474426,
         -0.5,
-        -0.4224405884742737
+        -0.4219503104686737
       ],
       "maximum": [
         0.49000000953674316,
         0.02800000086426735,
-        0.4014405906200409
+        0.4009999930858612
       ],
-      "sha256": "d3ff6db373b7ed1f442d331b75ce2ea20d31f502c60d756663ffb0bd84a8ed91"
+      "sha256": "b18904451e01375a35ed154a8d52edb28435d6612b9187a53f25d88fdd37f55a"
     },
     "kit.turret_body": {
-      "vertices": 2080,
-      "triangles": 1020,
+      "vertices": 2400,
+      "triangles": 1132,
       "minimum": [
         -0.27000001072883606,
         0.0,
@@ -163,11 +163,11 @@
         0.28999999165534973,
         0.20999999344348907
       ],
-      "sha256": "39f52cf57039102106d23a21f3dee904a5c31a35d89d96650208063dd5775db5"
+      "sha256": "6fcf7cec2ad7cbb583523f0633c4feacc630133afc523060f43daf30d212137a"
     },
     "kit.cannon": {
-      "vertices": 1504,
-      "triangles": 732,
+      "vertices": 1248,
+      "triangles": 604,
       "minimum": [
         -0.06700000166893005,
         0.11699999868869781,
@@ -178,7 +178,7 @@
         0.20399999618530273,
         0.6399999856948853
       ],
-      "sha256": "dc7e9ca135531c5565cecf74ee94d95a9b6b18cccf9a3b2fc6dd68ac993c06fc"
+      "sha256": "73f6b3d23ba18c6e7623f029f360c6a336ab505576fb01fa2ab3e470aa0b98d5"
     }
   },
   "bindings": {
@@ -187,14 +187,14 @@
         {
           "name": "body",
           "firstIndex": 0,
-          "indexCount": 15840,
+          "indexCount": 14760,
           "parent": -1,
           "motion": "static"
         },
         {
           "name": "road_wheel_1_0",
-          "firstIndex": 15840,
-          "indexCount": 372,
+          "firstIndex": 14760,
+          "indexCount": 228,
           "parent": -1,
           "motion": "wheel",
           "socket": "motion_road_wheel_1_0",
@@ -203,8 +203,8 @@
         },
         {
           "name": "road_wheel_1_1",
-          "firstIndex": 16212,
-          "indexCount": 372,
+          "firstIndex": 14988,
+          "indexCount": 228,
           "parent": -1,
           "motion": "wheel",
           "socket": "motion_road_wheel_1_1",
@@ -213,8 +213,8 @@
         },
         {
           "name": "road_wheel_1_2",
-          "firstIndex": 16584,
-          "indexCount": 372,
+          "firstIndex": 15216,
+          "indexCount": 228,
           "parent": -1,
           "motion": "wheel",
           "socket": "motion_road_wheel_1_2",
@@ -223,8 +223,8 @@
         },
         {
           "name": "road_wheel_1_3",
-          "firstIndex": 16956,
-          "indexCount": 372,
+          "firstIndex": 15444,
+          "indexCount": 228,
           "parent": -1,
           "motion": "wheel",
           "socket": "motion_road_wheel_1_3",
@@ -233,8 +233,8 @@
         },
         {
           "name": "road_wheel_2_0",
-          "firstIndex": 17328,
-          "indexCount": 372,
+          "firstIndex": 15672,
+          "indexCount": 228,
           "parent": -1,
           "motion": "wheel",
           "socket": "motion_road_wheel_2_0",
@@ -243,8 +243,8 @@
         },
         {
           "name": "road_wheel_2_1",
-          "firstIndex": 17700,
-          "indexCount": 372,
+          "firstIndex": 15900,
+          "indexCount": 228,
           "parent": -1,
           "motion": "wheel",
           "socket": "motion_road_wheel_2_1",
@@ -253,8 +253,8 @@
         },
         {
           "name": "road_wheel_2_2",
-          "firstIndex": 18072,
-          "indexCount": 372,
+          "firstIndex": 16128,
+          "indexCount": 228,
           "parent": -1,
           "motion": "wheel",
           "socket": "motion_road_wheel_2_2",
@@ -263,8 +263,8 @@
         },
         {
           "name": "road_wheel_2_3",
-          "firstIndex": 18444,
-          "indexCount": 372,
+          "firstIndex": 16356,
+          "indexCount": 228,
           "parent": -1,
           "motion": "wheel",
           "socket": "motion_road_wheel_2_3",
@@ -358,14 +358,14 @@
         {
           "name": "body",
           "firstIndex": 0,
-          "indexCount": 3060,
+          "indexCount": 3396,
           "parent": -1,
           "motion": "static"
         },
         {
           "name": "cannon",
-          "firstIndex": 3060,
-          "indexCount": 2196,
+          "firstIndex": 3396,
+          "indexCount": 1812,
           "parent": -1,
           "motion": "cannon",
           "socket": "motion_cannon",
