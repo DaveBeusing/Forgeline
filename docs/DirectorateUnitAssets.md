@@ -93,7 +93,7 @@ The Asset Compiler stores these sockets in the runtime manifest. The weapon/VFX 
 
 ## Animation boundary
 
-The current runtime asset contract does not yet contain an animation asset type and the compiler intentionally rejects animation references. This package therefore does not invent unsupported animation metadata.
+Optional independent [rigid clip assets](RigidClipAssets.md) now compile and play through static named ranges. The production units continue using their existing mechanical contract; turret/wheel/recoil behavior is not replaced by generic clips.
 
 The Main Battle Tank already uses the articulation contract for its LOD0 turret. LOD0 is authored as a hull mesh plus `unit.directorate.main_battle_tank.turret`. `PresentationExtractor` derives relative horizontal aim yaw from the authoritative `WeaponState` target and unit transforms, and the renderer rotates the turret mesh around `turret_pivot`. LOD1 and LOD2 remain combined silhouette meshes to avoid strategic-distance attachment overhead.
 

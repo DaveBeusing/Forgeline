@@ -177,10 +177,10 @@ Supported metadata includes:
 - LOD references;
 - collision reference and collision requirement;
 - named sockets/attachment points;
-- reserved animation references;
+- optional typed rigid animation references;
 - canonical source scale.
 
-Animation references are currently rejected because the runtime animation asset type is not implemented yet. This prevents authoring metadata from implying unsupported runtime behavior.
+Compiler 1.11.0 supports one optional rigid-node clip per static mechanical mesh. See [rigid clip assets](RigidClipAssets.md) for supported channels, bounds and source-less qualification. Unsupported animation features fail explicitly.
 
 ## Source Scale and Coordinates
 
@@ -502,7 +502,7 @@ The compiler currently rejects or reports:
 - malformed LOD metadata;
 - missing required collision references;
 - duplicate or non-finite socket metadata;
-- unsupported animation references;
+- unsupported or mismatched animation references/channels;
 - invalid mesh/accessor/buffer data;
 - invalid or unsupported PNG/TGA content;
 - invalid texture usage/color-space combinations;
@@ -567,7 +567,7 @@ See [World Asset Presentation](WorldAssetPresentation.md) for how stable world a
 
 The first production-oriented gameplay-unit set lives below `assets/source/units/directorate/`. Six unit families provide stable LOD0/LOD1/LOD2 meshes, separate collision assets, runtime materials, strategic-symbol materials, and required gameplay-facing sockets. The existing Combat Engineer reuses the Rifle Squad visual family rather than creating a duplicate asset lineage.
 
-The runtime animation asset type is still intentionally absent, so unit source metadata does not claim unsupported animation references. Articulation and VFX integration points are established through named sockets instead.
+The production units retain their established typed mechanical articulation and VFX sockets. Optional independent rigid clips are available through the [bounded clip contract](RigidClipAssets.md); production unit definitions do not opt into clips automatically.
 
 See [Directorate Unit Assets](DirectorateUnitAssets.md) for the complete unit presentation contract.
 

@@ -159,3 +159,5 @@ The pinned production entrypoint adds bounded modifier evaluation, PBR inspectio
 Use Invoke-BlenderMotion.ps1 and Test-BlenderMotion.ps1 for the existing tank/factory part metadata, reviewed mechanical pivots and compiled runtime matrix parity. See [mechanical authoring](../../docs/BlenderMechanicalAuthoring.md).
 
 Saved Directorate tank production: [authoring and recovery](../../docs/BlenderTankProduction.md). Use `Invoke-BlenderTank.ps1` for isolated exports and `Test-BlenderTank.ps1` for reopened-source, edit rejection and compiler integrity checks.
+
+Independent rigid clips: [supported assets and native review](../../docs/RigidClipAssets.md). `Test-BlenderRigidClips.ps1` compares the committed fixture with two actual exports and source-less compiled validation.

@@ -19,6 +19,7 @@ param(
     [ValidateSet(0,96,120,144,192)][uint]$RasterDpi = 0,
     [ValidateRange(0,360)][float]$YawDegrees = 45,
     [ValidateRange(0,120)][float]$InspectionDistanceMeters = 0,
+    [Nullable[double]]$MechanicalSeconds = $null,
     [ValidateSet('Warm','RendererCold')][string]$RunProfile = 'Warm',
     [ValidateSet('Fixed','Sweep','Traverse')][string]$CameraPath = 'Fixed',
     [ValidateRange(0,1)][float]$WorldDaylight = 1,
@@ -70,7 +71,7 @@ if ($Capture) {
         outputRoot = $referenceRoot; commit = $commit
         runtimeRoot = $(if ($RuntimeAssetRoot) { [IO.Path]::GetFullPath($RuntimeAssetRoot) } else { Join-Path $repositoryRoot 'assets/runtime' })
         runProfile = $RunProfile; cameraPath = $CameraPath
-        driver = $drivers; software = [bool]$Software; warmups = $Warmups; samples = $Samples; repeatCaptures = $RepeatCaptures; continueAfterMismatch = [bool]$ContinueAfterMismatch; rasterDpi = $RasterDpi; yawDegrees = $YawDegrees; inspectionDistanceMeters = $InspectionDistanceMeters
+        driver = $drivers; software = [bool]$Software; warmups = $Warmups; samples = $Samples; repeatCaptures = $RepeatCaptures; continueAfterMismatch = [bool]$ContinueAfterMismatch; rasterDpi = $RasterDpi; yawDegrees = $YawDegrees; inspectionDistanceMeters = $InspectionDistanceMeters; mechanicalSeconds = $MechanicalSeconds
         scenes = $Scenes; profiles = $Profiles; zooms = $Zooms
         uiScenarios = $UiScenarios; uiScales = $UiScales; cinematicFrontend = [bool]$CinematicFrontend
         displays = @($Displays | ForEach-Object { $parts = $_.Split('x'); @{ width = [int]$parts[0]; height = [int]$parts[1] } })
@@ -91,7 +92,7 @@ if ($Capture) {
     & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $referenceRoot -BaselineRoot $BaselineRoot
     return
 }
-if ($Software -or $BaselineRoot -or $RasterDpi -or $YawDegrees -ne 45 -or $InspectionDistanceMeters -ne 0 -or $RunProfile -ne 'Warm' -or $CameraPath -ne 'Fixed' -or $RuntimeAssetRoot -or $ClientPath -or $CinematicFrontend -or ($UiScenarios -join ',') -ne 'World' -or ($UiScales -join ',') -ne '1') { throw 'Capture options require explicit -Capture mode.' }
+if ($null -ne $MechanicalSeconds -or $Software -or $BaselineRoot -or $RasterDpi -or $YawDegrees -ne 45 -or $InspectionDistanceMeters -ne 0 -or $RunProfile -ne 'Warm' -or $CameraPath -ne 'Fixed' -or $RuntimeAssetRoot -or $ClientPath -or $CinematicFrontend -or ($UiScenarios -join ',') -ne 'World' -or ($UiScales -join ',') -ne '1') { throw 'Capture options require explicit -Capture mode.' }
 $displays = @(@(1920, 1080), @(2560, 1440), @(3840, 2160), @(3440, 1440))
 foreach ($display in $displays) {
     foreach ($zoom in @('CloseTactical', 'NormalGameplay', 'Strategic')) {
