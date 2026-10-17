@@ -98,6 +98,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 out CargoTransport transport) ||
             !_inventories.Contains(transport.CargoInventory) ||
             entities.HasComponent<SupplyLoadingOrder>(transportEntity) ||
+            entities.HasComponent<ResupplyOrder>(transportEntity) ||
+            entities.HasComponent<SupplyRescueAssignment>(transportEntity) ||
             entities.HasComponent<VehicleDockVisit>(transportEntity) ||
             entities.HasComponent<CargoTransportOrder>(
                 transportEntity) ||
@@ -241,16 +243,18 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
-        if (context.Entities.TryGetComponent(entity, out VehicleDockVisit dockExit) && dockExit.Status == VehicleDockStatus.Exiting)
-        {
-            if (!_docks.Exit(context, entity)) { PrepareDockFuelBudget(context, entity); return; }
-        }
         // Battlefield resupply temporarily owns locomotion. Keep the cargo
         // order and runtime state intact so the same delivery resumes once
         // the resupply order is completed.
-        if (context.Entities.HasComponent<ResupplyOrder>(entity))
+        if (context.Entities.HasComponent<ResupplyOrder>(entity) || context.Entities.HasComponent<SupplyRescueAssignment>(entity))
         {
             return;
+        }
+        if (context.Entities.TryGetComponent(entity, out VehicleDockVisit dockExit) &&
+            (dockExit.Status == VehicleDockStatus.Exiting || state.Lifecycle == CargoTransportLifecycleState.Waiting &&
+             state.WaitReason is CargoTransportWaitReason.OriginResourceUnavailable or CargoTransportWaitReason.DestinationCapacity))
+        {
+            if (!_docks.Exit(context, entity)) { PrepareDockFuelBudget(context, entity); return; }
         }
 
         switch (state.Lifecycle)
@@ -798,16 +802,17 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        bool nextSegmentIsDestination = segment.To == order.Destination;
         if (!IsSettledAtNode(
                 context.Entities,
                 entity,
-                targetNode))
+                targetNode, requireDock: nextSegmentIsDestination))
         {
             EnsureMovementToNode(
                 context,
                 entity,
                 transport,
-                targetNode);
+                targetNode, requireDock: nextSegmentIsDestination);
             return;
         }
 
@@ -1232,7 +1237,9 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
-        if (!IsSettledAtNode(
+        bool loadedBuildingAnchor = context.Entities.HasComponent<CompletedBuilding>(anchor.Entity) &&
+            state.LoadedQuantity > QuantityEpsilon && !context.Entities.HasComponent<VehicleDockVisit>(entity);
+        if (!loadedBuildingAnchor && !IsSettledAtNode(
                 context.Entities,
                 entity,
                 anchor))
@@ -1263,6 +1270,11 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 state,
                 CargoTransportWaitReason.RouteUnavailable,
                 context.Tick);
+        }
+        if (context.Entities.HasComponent<VehicleDockVisit>(entity))
+        {
+            _docks.Exit(context, entity);
+            PrepareDockFuelBudget(context, entity);
         }
     }
 
@@ -1358,6 +1370,10 @@ public sealed class CargoTransportSystem : ISimulationSystem
             entities,
             entity);
 
+        if (entities.TryGetComponent(entity, out VehicleDockVisit dock))
+            VehicleDockingService.Put(entities, entity, dock with { Status = VehicleDockStatus.Exiting,
+                ServiceStartedTick = 0, ServiceProgress = 0 });
+
         Wait(
             entities,
             entity,
@@ -1374,7 +1390,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
         SimulationContext context,
         EntityId entity,
         in CargoTransport transport,
-        in LogisticsNode node)
+        in LogisticsNode node, bool requireDock = true)
     {
         if (!context.Entities.TryGetComponent(
                 entity,
@@ -1386,7 +1402,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
-        if (context.Entities.HasComponent<CompletedBuilding>(node.Entity) || TryGetStaticNodeBounds(context.Entities, node, out _))
+        if (requireDock && (context.Entities.HasComponent<CompletedBuilding>(node.Entity) || TryGetStaticNodeBounds(context.Entities, node, out _)))
         {
             _docks.Approach(context, entity, node.Entity, transport.Owner);
             PrepareDockFuelBudget(context, entity);
@@ -1407,7 +1423,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
-        Vector3 movementPosition = node.WorldPosition;
+        Vector3 movementPosition = requireDock ? node.WorldPosition : ResolveTransitApproachPosition(context.Entities, node, transportTransform.Position, groundMovement);
 
         if (_navigation is not null &&
             context.Entities.TryGetComponent(entity, out NavigationAgent agent))
@@ -1565,6 +1581,74 @@ public sealed class CargoTransportSystem : ISimulationSystem
         return nearest;
     }
 
+    private static Vector3 ResolveTransitApproachPosition(
+        EntityRegistry entities,
+        in LogisticsNode node,
+        Vector3 origin,
+        in GroundMovement movement)
+    {
+        if (!TryGetStaticNodeBounds(
+                entities,
+                node,
+                out ForgeLine.World.AxisAlignedBounds bounds))
+        {
+            return node.WorldPosition;
+        }
+
+        const float NavigationCellClearanceMeters = 32.0f;
+
+        float clearance =
+            movement.ObstacleLookAhead +
+            movement.Radius +
+            NavigationCellClearanceMeters;
+        float minimumX =
+            bounds.Minimum.X -
+            clearance;
+        float maximumX =
+            bounds.Maximum.X +
+            clearance;
+        float minimumZ =
+            bounds.Minimum.Z -
+            clearance;
+        float maximumZ =
+            bounds.Maximum.Z +
+            clearance;
+        Vector3 center =
+            (bounds.Minimum +
+             bounds.Maximum) *
+            0.5f;
+        float deltaX =
+            origin.X -
+            center.X;
+        float deltaZ =
+            origin.Z -
+            center.Z;
+
+        if (MathF.Abs(deltaX) >=
+            MathF.Abs(deltaZ))
+        {
+            return new Vector3(
+                deltaX >= 0.0f
+                    ? maximumX
+                    : minimumX,
+                node.WorldPosition.Y,
+                Math.Clamp(
+                    origin.Z,
+                    minimumZ,
+                    maximumZ));
+        }
+
+        return new Vector3(
+            Math.Clamp(
+                origin.X,
+                minimumX,
+                maximumX),
+            node.WorldPosition.Y,
+            deltaZ >= 0.0f
+                ? maximumZ
+                : minimumZ);
+    }
+
     private static bool TryGetStaticNodeBounds(
         EntityRegistry entities,
         in LogisticsNode node,
@@ -1614,9 +1698,9 @@ public sealed class CargoTransportSystem : ISimulationSystem
     private static bool IsSettledAtNode(
         EntityRegistry entities,
         EntityId entity,
-        in LogisticsNode node)
+        in LogisticsNode node, bool requireDock = true)
     {
-        if (entities.HasComponent<CompletedBuilding>(node.Entity) || TryGetStaticNodeBounds(entities, node, out _))
+        if (requireDock && (entities.HasComponent<CompletedBuilding>(node.Entity) || TryGetStaticNodeBounds(entities, node, out _)))
         {
             return entities.TryGetComponent(entity, out VehicleDockVisit visit) && visit.Building == node.Entity &&
                 visit.Status is VehicleDockStatus.Docked or VehicleDockStatus.Servicing &&

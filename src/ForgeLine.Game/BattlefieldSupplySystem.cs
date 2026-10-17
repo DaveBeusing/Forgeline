@@ -219,21 +219,30 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
 
             if (!context.Entities.TryGetComponent(
                     truckEntity,
-                    out SupplyTruck truck) ||
-                !context.Entities.TryGetComponent(
-                    truckEntity,
-                    out WorldTransform truckTransform) ||
-                !_inventories.Contains(truck.InventoryId))
+                    out SupplyTruck truck))
             {
+                continue;
+            }
+            if (!context.Entities.TryGetComponent(truckEntity, out WorldTransform truckTransform) || !_inventories.Contains(truck.InventoryId))
+            {
+                VehicleDockingService.Cancel(context.Entities, truckEntity);
                 continue;
             }
 
             if (!context.Entities.TryGetComponent(truckEntity, out SupplyLoadingOrder order) ||
                 context.Entities.HasComponent<CargoTransportOrder>(truckEntity) ||
+                context.Entities.HasComponent<SupplyRescueAssignment>(truckEntity) ||
                 context.Entities.HasComponent<ResupplyOrder>(truckEntity)) continue;
             if (context.Entities.TryGetComponent(truckEntity, out VehicleDockVisit exit) && exit.Status == VehicleDockStatus.Exiting)
             {
-                if (_docks.Exit(context, truckEntity)) context.Entities.RemoveComponent<SupplyLoadingOrder>(truckEntity);
+                if (_docks.Exit(context, truckEntity))
+                {
+                    if (order.WaitReason == VehicleDockBlockReason.None) context.Entities.RemoveComponent<SupplyLoadingOrder>(truckEntity);
+                    else VehicleDockingService.Put(context.Entities, truckEntity, order with
+                    {
+                        RetryAtTick = context.Tick.Value + (ulong)Math.Ceiling(1 / context.TickDuration.TotalSeconds)
+                    });
+                }
                 CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity);
                 continue;
             }
@@ -254,24 +263,39 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 VehicleDockingService.Cancel(context.Entities, truckEntity);
                 continue;
             }
-            bool docked = _docks.Approach(context, truckEntity, order.Source, truck.Owner);
-            CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity);
-            if (!docked) continue;
-            var visit = context.Entities.GetComponent<VehicleDockVisit>(truckEntity);
             double fuel = Math.Max(0, truck.FuelTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel));
             double ammunition = Math.Max(0, truck.AmmunitionTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition));
             double quantity = Math.Min(20, Math.Min(fuel, _inventories.GetAvailableQuantity(loadingInventory, ResourceIds.Fuel))) +
                 Math.Min(20, Math.Min(ammunition, _inventories.GetAvailableQuantity(loadingInventory, ResourceIds.Ammunition)));
-            if (fuel + ammunition <= QuantityEpsilon) { _docks.Exit(context, truckEntity); CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity); continue; }
             bool full = _inventories.GetAddableQuantity(truck.InventoryId, ResourceIds.Fuel, 1) <= QuantityEpsilon &&
                 _inventories.GetAddableQuantity(truck.InventoryId, ResourceIds.Ammunition, 1) <= QuantityEpsilon;
-            if (full) { _docks.Exit(context, truckEntity); CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity); continue; }
-            if (quantity <= QuantityEpsilon)
+            var waitReason = full ? VehicleDockBlockReason.TargetFull : VehicleDockBlockReason.SourceEmpty;
+            if (order.WaitReason != VehicleDockBlockReason.None)
+            {
+                if (fuel + ammunition <= QuantityEpsilon) { VehicleDockingService.Cancel(context.Entities, truckEntity); continue; }
+                if (context.Tick.Value < order.RetryAtTick) continue;
+                if (quantity <= QuantityEpsilon || full)
+                {
+                    VehicleDockingService.Put(context.Entities, truckEntity, order with { WaitReason = waitReason,
+                        RetryAtTick = context.Tick.Value + (ulong)Math.Ceiling(1 / context.TickDuration.TotalSeconds) });
+                    continue;
+                }
+                VehicleDockingService.Put(context.Entities, truckEntity, order with { WaitReason = VehicleDockBlockReason.None, RetryAtTick = 0 });
+            }
+            bool docked = _docks.Approach(context, truckEntity, order.Source, truck.Owner);
+            CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity);
+            if (!docked) continue;
+            var visit = context.Entities.GetComponent<VehicleDockVisit>(truckEntity);
+            if (fuel + ammunition <= QuantityEpsilon) { _docks.Exit(context, truckEntity); CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity); continue; }
+            if (quantity <= QuantityEpsilon || full)
             {
                 VehicleDockingService.Put(context.Entities, truckEntity, visit with
                 {
-                    Reason = VehicleDockBlockReason.SourceEmpty, ServiceStartedTick = 0, ServiceProgress = 0
+                    Reason = waitReason, ServiceStartedTick = 0, ServiceProgress = 0
                 });
+                VehicleDockingService.Put(context.Entities, truckEntity, order with { WaitReason = waitReason });
+                _docks.Exit(context, truckEntity);
+                CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity);
                 continue;
             }
             if (!_docks.CanTransfer(context, truckEntity, visit.Generation, quantity)) continue;
@@ -328,6 +352,7 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
             SupplyProvider provider =
                 context.Entities.GetComponent<SupplyProvider>(entity);
 
+            if (context.Entities.HasComponent<SupplyTruck>(entity) && context.Entities.HasComponent<CargoTransportOrder>(entity)) continue;
             if (!provider.Enabled ||
                 !_inventories.Contains(provider.InventoryId) ||
                 !context.Entities.TryGetComponent(
@@ -446,6 +471,7 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                             ResourceIds.Fuel));
 
                 if (deficit > QuantityEpsilon &&
+                    !CargoDeliveryFuelPolicy.ShouldDeferRefueling(context.Entities, _inventories, recipient.Entity) &&
                     TrySelectProvider(
                         recipient,
                         ResourceIds.Fuel,

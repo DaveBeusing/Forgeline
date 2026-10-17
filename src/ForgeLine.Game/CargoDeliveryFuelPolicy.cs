@@ -63,6 +63,14 @@ internal static class CargoDeliveryFuelPolicy
             return false;
         }
 
+        if (!entities.HasComponent<SupplyTruck>(entity) && !entities.HasComponent<ResupplyOrder>(entity) &&
+            entities.HasComponent<CargoTransportOrder>(entity) &&
+            entities.TryGetComponent(entity, out VehicleDockVisit dock) &&
+            dock.Status is VehicleDockStatus.Docked or VehicleDockStatus.Servicing or VehicleDockStatus.Exiting &&
+            entities.TryGetComponent(entity, out UnitFuelState dockFuel) && inventories.Contains(dockFuel.InventoryId) &&
+            inventories.GetAvailableQuantity(dockFuel.InventoryId, ResourceIds.Fuel) > dockFuel.Capacity * ReserveFraction)
+            return true;
+
         if (entities.HasComponent<SupplyTruck>(entity) ||
             entities.HasComponent<ResupplyOrder>(entity) ||
             entities.HasComponent<NavigationFailureState>(entity) ||
