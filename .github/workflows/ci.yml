@@ -85,7 +85,11 @@ jobs:
 
       - name: Rigid motion lifecycle and allocation contracts
         shell: pwsh
-        run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.MechanicalMotionTests ForgeLine.Presentation.Tests.MechanicalMotionQualityTests ForgeLine.Presentation.Tests.MechanicalGeometryBatchingTests ForgeLine.Presentation.Tests.MechanicalDoorPolicyTests --parallel none
+        run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.MechanicalMotionTests ForgeLine.Presentation.Tests.MechanicalMotionQualityTests ForgeLine.Presentation.Tests.MechanicalGeometryBatchingTests ForgeLine.Presentation.Tests.MechanicalDoorPolicyTests ForgeLine.Presentation.Tests.RigidClipPlaybackTests ForgeLine.Presentation.Tests.RigidClipRendererTests --parallel none
+
+      - name: Rigid clip compilation and deployment contracts
+        shell: pwsh
+        run: dotnet test --project tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Assets.Tests.RigidClipPipelineTests --parallel none
 
       - name: Blender launcher protocol contracts
         shell: pwsh

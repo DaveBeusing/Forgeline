@@ -30,6 +30,8 @@ public readonly record struct MechanicalPose(
 
 internal readonly record struct MechanicalPartBinding(MechanicalMeshPart Part, Vector3 Pivot)
 {
+    public AnimationChannel? ClipTranslation { get; init; }
+    public AnimationChannel? ClipRotation { get; init; }
     public int GeometryPartIndex { get; init; } = -1;
     public Vector3 GeometryOffset { get; init; }
 }
@@ -85,13 +87,14 @@ internal static class MechanicalMotionSpace
 internal static class MechanicalTransforms
 {
     public static void Compose(ReadOnlySpan<MechanicalPartBinding> parts, in RenderInstance instance,
-        Matrix4x4 world, Span<Matrix4x4> transforms, float weight = 1)
+        Matrix4x4 world, Span<Matrix4x4> transforms, float weight = 1, RuntimeAnimationData? clip = null)
     {
         if (parts.Length > MechanicalMeshValidation.MaximumParts || transforms.Length < parts.Length)
             throw new ArgumentException("Insufficient bounded mechanical transform storage.");
         MechanicalPose pose = instance.MechanicalPose;
         bool enabled = pose.IsSpecified && !instance.UnitFeature.IsWreck && !instance.BuildingFeature.IsDestroyed;
         if (!Matrix4x4.Decompose(world, out Vector3 scale, out _, out _)) scale = instance.Transform.Scale;
+        float clipTime = clip?.LoopTime(pose.ActiveSeconds) ?? 0;
         for (int i = 0; i < parts.Length; i++)
         {
             MechanicalPartBinding binding = parts[i];
@@ -119,9 +122,16 @@ internal static class MechanicalTransforms
                     _ => Vector3.Zero
                 };
             }
+            if (enabled && clip is not null)
+            {
+                if (binding.ClipTranslation is { } ct) { Vector4 v = ct.Evaluate(clipTime); translation = new(v.X, v.Y, v.Z); }
+                if (binding.ClipRotation is { } cr) { Vector4 v = cr.Evaluate(clipTime); rotation = new(v.X, v.Y, v.Z, v.W); }
+            }
             if (weight <= 0) { rotation = Quaternion.Identity; translation = Vector3.Zero; }
             else if (weight < 1) { rotation = Quaternion.Slerp(Quaternion.Identity, rotation, weight); translation *= weight; }
-            Matrix4x4 motion = Matrix4x4.CreateTranslation(translation) * MechanicalMotionSpace.Rotation(scale, rotation);
+            Matrix4x4 motion = clip is null
+                ? Matrix4x4.CreateTranslation(translation) * MechanicalMotionSpace.Rotation(scale, rotation)
+                : Matrix4x4.CreateFromQuaternion(rotation) * Matrix4x4.CreateTranslation(translation);
             Matrix4x4 local = Matrix4x4.CreateTranslation(-binding.Pivot) * motion * Matrix4x4.CreateTranslation(binding.Pivot);
             transforms[i] = local * (part.Parent < 0 ? world : transforms[part.Parent]);
         }

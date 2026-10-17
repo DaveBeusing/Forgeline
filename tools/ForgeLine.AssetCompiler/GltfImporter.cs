@@ -856,15 +856,17 @@ internal static class GltfImporter
         float.IsFinite(value.Y) &&
         float.IsFinite(value.Z);
 
-    private static LoadedGltf Load(string path, string sourceRoot)
+    internal static LoadedGltf Load(string path, string sourceRoot, int maximumBytes = int.MaxValue)
+
     {
+        if (new FileInfo(path).Length > maximumBytes) throw new InvalidDataException("glTF source exceeds bounded input size.");
         var extension = Path.GetExtension(path);
         if (extension.Equals(".gltf", StringComparison.OrdinalIgnoreCase))
         {
             var document = JsonDocument.Parse(File.ReadAllBytes(path));
             try
             {
-                var buffers = LoadBuffers(document.RootElement, path, sourceRoot, null);
+                var buffers = LoadBuffers(document.RootElement, path, sourceRoot, null, maximumBytes);
                 return new LoadedGltf(document, buffers);
             }
             catch
@@ -921,6 +923,7 @@ internal static class GltfImporter
             offset += (int)chunkLength;
         }
 
+        if (offset != bytes.Length) throw new InvalidDataException("GLB contains a truncated trailing chunk header.");
         if (jsonChunk is null)
         {
             throw new InvalidDataException("GLB does not contain a JSON chunk.");
@@ -929,7 +932,7 @@ internal static class GltfImporter
         var glbDocument = JsonDocument.Parse(jsonChunk);
         try
         {
-            var buffers = LoadBuffers(glbDocument.RootElement, path, sourceRoot, binaryChunk);
+            var buffers = LoadBuffers(glbDocument.RootElement, path, sourceRoot, binaryChunk, maximumBytes);
             return new LoadedGltf(glbDocument, buffers);
         }
         catch
@@ -943,7 +946,7 @@ internal static class GltfImporter
         JsonElement root,
         string gltfPath,
         string sourceRoot,
-        byte[]? binaryChunk)
+        byte[]? binaryChunk, int maximumBytes)
     {
         if (!root.TryGetProperty("buffers", out var buffersElement))
         {
@@ -953,24 +956,31 @@ internal static class GltfImporter
         var sourceDirectory = Path.GetDirectoryName(gltfPath)
             ?? throw new InvalidDataException($"Could not resolve source directory for '{gltfPath}'.");
 
+        if (buffersElement.GetArrayLength() > 64) throw new InvalidDataException("Too many glTF buffers.");
+        long totalBytes = 0, actualBytes = 0;
         var buffers = new byte[buffersElement.GetArrayLength()][];
         var bufferIndex = 0;
         foreach (var bufferElement in buffersElement.EnumerateArray())
         {
             byte[] data;
+            if (!bufferElement.TryGetProperty("byteLength", out var declared) || declared.GetInt64() < 0 || (totalBytes += declared.GetInt64()) > maximumBytes)
+                throw new InvalidDataException("glTF buffers exceed bounded input size.");
             if (bufferElement.TryGetProperty("uri", out var uriProperty))
             {
                 var uri = uriProperty.GetString()
                     ?? throw new InvalidDataException("glTF buffer URI is null.");
 
-                data = uri.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
-                    ? DecodeDataUri(uri)
-                    : File.ReadAllBytes(
-                        AssetHashing.ResolveWithinRoot(
-                            sourceRoot,
-                            Path.Combine(
-                                sourceDirectory,
-                                Uri.UnescapeDataString(uri.Replace('/', Path.DirectorySeparatorChar)))));
+                if (uri.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (uri.Length > (long)maximumBytes * 2) throw new InvalidDataException("glTF data URI exceeds bounded input size.");
+                    data = DecodeDataUri(uri);
+                }
+                else
+                {
+                    string external = AssetHashing.ResolveWithinRoot(sourceRoot, Path.Combine(sourceDirectory, Uri.UnescapeDataString(uri.Replace('/', Path.DirectorySeparatorChar))));
+                    if (new FileInfo(external).Length > maximumBytes) throw new InvalidDataException("glTF external buffer exceeds bounded input size.");
+                    data = File.ReadAllBytes(external);
+                }
             }
             else
             {
@@ -982,24 +992,25 @@ internal static class GltfImporter
             if (bufferElement.TryGetProperty("byteLength", out var byteLengthProperty))
             {
                 var byteLength = byteLengthProperty.GetInt32();
-                if (byteLength < 0 || data.Length < byteLength)
+                if (byteLength < 0 || data.Length < byteLength || data.Length > maximumBytes)
                 {
                     throw new InvalidDataException(
                         $"glTF buffer {bufferIndex} contains {data.Length} bytes but declares {byteLength}.");
                 }
             }
 
+            if ((actualBytes += data.Length) > maximumBytes) throw new InvalidDataException("glTF actual buffer bytes exceed bounded input size.");
             buffers[bufferIndex++] = data;
         }
 
         return buffers;
     }
 
-    private static float[] ReadFloatAccessor(
+    internal static float[] ReadFloatAccessor(
         JsonElement root,
         byte[][] buffers,
         int accessorIndex,
-        string expectedType)
+        string expectedType, int maximumCount = 16_000_000)
     {
         var accessor = GetArrayElement(root, "accessors", accessorIndex);
         if (accessor.TryGetProperty("sparse", out _))
@@ -1018,6 +1029,7 @@ internal static class GltfImporter
         int components =
             expectedType switch
             {
+                "SCALAR" => 1,
                 "VEC2" => 2,
                 "VEC3" => 3,
                 "VEC4" => 4,
@@ -1025,7 +1037,7 @@ internal static class GltfImporter
                     $"Unsupported floating-point accessor type '{expectedType}'.")
             };
         var count = accessor.GetProperty("count").GetInt32();
-        if (count <= 0)
+        if (count <= 0 || count > maximumCount || accessor.TryGetProperty("normalized", out var normalized) && normalized.GetBoolean())
         {
             throw new InvalidDataException($"glTF accessor {accessorIndex} has invalid count {count}.");
         }
@@ -1049,11 +1061,15 @@ internal static class GltfImporter
             ? strideProperty.GetInt32()
             : elementSize;
 
-        if (stride < elementSize)
+        if (stride < elementSize || stride > 252 || stride % 4 != 0 || viewOffset % 4 != 0 || accessorOffset % 4 != 0)
         {
             throw new InvalidDataException($"glTF buffer view {viewIndex} byteStride is smaller than the accessor element.");
         }
 
+        int viewLength = view.GetProperty("byteLength").GetInt32();
+        if (viewOffset < 0 || accessorOffset < 0 || viewLength < 0 || (long)viewOffset + viewLength > buffers[bufferIndex].Length ||
+            (long)accessorOffset + (long)(count - 1) * stride + elementSize > viewLength)
+            throw new InvalidDataException("glTF accessor exceeds its declared buffer view.");
         var buffer = buffers[bufferIndex];
         var values = new float[checked(count * components)];
         for (var item = 0; item < count; item++)
@@ -1127,6 +1143,10 @@ internal static class GltfImporter
             throw new InvalidDataException($"glTF buffer view {viewIndex} byteStride is invalid for indices.");
         }
 
+        int viewLength = view.GetProperty("byteLength").GetInt32();
+        if (viewOffset < 0 || accessorOffset < 0 || viewLength < 0 || (long)viewOffset + viewLength > buffers[bufferIndex].Length ||
+            (long)accessorOffset + (long)(count - 1) * stride + componentSize > viewLength)
+            throw new InvalidDataException("glTF accessor exceeds its declared buffer view.");
         var buffer = buffers[bufferIndex];
         var values = new uint[count];
         for (var item = 0; item < count; item++)
@@ -1194,7 +1214,7 @@ internal static class GltfImporter
         }
     }
 
-    private sealed class LoadedGltf(JsonDocument document, byte[][] buffers) : IDisposable
+    internal sealed class LoadedGltf(JsonDocument document, byte[][] buffers) : IDisposable
     {
         public JsonDocument Document { get; } = document;
 

@@ -136,7 +136,7 @@ internal static class Program
             $"assets={qualification.AssetCount} " +
             $"meshes={qualification.MeshCount} " +
             $"textures={qualification.TextureCount} " +
-            $"materials={qualification.MaterialCount} " +
+            $"materials={qualification.MaterialCount} animations={qualification.AnimationCount} " +
             $"bytes={qualification.TotalRuntimeBytes} " +
             $"catalogLoadMs={qualification.CatalogLoadDuration.TotalMilliseconds:F3} " +
             $"assetReadMs={qualification.AssetReadDuration.TotalMilliseconds:F3}.");

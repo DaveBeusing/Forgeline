@@ -47,6 +47,12 @@ public sealed class VisualReferenceCaptureTests
         request.Validate();
         Assert.Equal(45, request.YawDegrees);
         Assert.Equal(0, request.InspectionDistanceMeters);
+        Assert.Null(request.MechanicalSeconds);
+        var clipRequest = request with { Scenes = [VisualReferenceSceneKind.MainBattleTankProduction], MechanicalSeconds = 1 };
+        clipRequest.Validate();
+        foreach (double time in new[] { -1d, 121d, double.NaN, double.PositiveInfinity })
+            Assert.Throws<ArgumentOutOfRangeException>(() => (clipRequest with { MechanicalSeconds = time }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (request with { MechanicalSeconds = 1 }).Validate());
         foreach (float distance in new[] { 0f, 20f, 120f }) (request with { InspectionDistanceMeters = distance }).Validate();
         foreach (float distance in new[] { -1f, 19f, 121f, float.NaN, float.PositiveInfinity })
             Assert.Throws<ArgumentOutOfRangeException>(() => (request with { InspectionDistanceMeters = distance }).Validate());

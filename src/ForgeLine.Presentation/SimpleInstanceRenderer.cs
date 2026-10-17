@@ -1496,7 +1496,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             ? mesh.MechanicalParts : null;
         Span<Matrix4x4> transforms = stackalloc Matrix4x4[MechanicalMeshValidation.MaximumParts];
         if (usesMesh && parts.Length > 0)
-            MechanicalTransforms.Compose(parts, instance, world, transforms, motionWeight);
+            MechanicalTransforms.Compose(parts, instance, world, transforms, motionWeight, mesh.Clip);
         int count = usesMesh && parts.Length > 0 ? parts.Length : 1;
         for (int i = 0; i < count; i++)
         {

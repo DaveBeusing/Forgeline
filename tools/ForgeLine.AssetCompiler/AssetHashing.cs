@@ -9,8 +9,10 @@ internal static class AssetHashing
     public static string ComputeAssetSourceHash(
         string definitionPath,
         string sourcePath,
-        string sourceRoot)
+        string sourceRoot, long maximumInputBytes = long.MaxValue)
     {
+        long inputBytes = new FileInfo(sourcePath).Length;
+        if (inputBytes > maximumInputBytes) throw new InvalidDataException("Asset source exceeds bounded input size.");
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         AppendFile(hash, definitionPath);
         AppendFile(hash, sourcePath);
@@ -19,6 +21,7 @@ internal static class AssetHashing
         {
             foreach (var referencedFile in EnumerateExternalGltfBuffers(sourcePath, sourceRoot))
             {
+                if ((inputBytes += new FileInfo(referencedFile).Length) > maximumInputBytes) throw new InvalidDataException("Asset source dependencies exceed bounded input size.");
                 AppendFile(hash, referencedFile);
             }
         }

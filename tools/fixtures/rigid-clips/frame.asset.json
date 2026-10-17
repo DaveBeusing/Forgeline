@@ -1,0 +1,9 @@
+{
+  "id":"mesh.test.rigid_clip","type":"mesh","source":"rigid_clip.glb",
+  "materialReferences":["material.test.frame"],"animationReferences":["animation.test.arm_cycle"],
+  "sockets":[{"name":"pivot","x":0,"y":0,"z":0}],
+  "mechanicalParts":[
+    {"name":"arm","firstIndex":0,"indexCount":36,"parent":-1,"motion":"static","socket":"pivot"},
+    {"name":"frame","firstIndex":36,"indexCount":144,"parent":-1,"motion":"static","socket":"pivot"}
+  ]
+}

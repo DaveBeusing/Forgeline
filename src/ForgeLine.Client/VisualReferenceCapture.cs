@@ -27,6 +27,7 @@ internal sealed record VisualReferenceCaptureRequest
     public bool ContinueAfterMismatch { get; init; }
     public uint RasterDpi { get; init; }
     public float YawDegrees { get; init; } = 45;
+    public double? MechanicalSeconds { get; init; }
     public float InspectionDistanceMeters { get; init; }
     public ReferenceRunProfile RunProfile { get; init; }
     public ReferenceCameraPath CameraPath { get; init; }
@@ -63,6 +64,9 @@ internal sealed record VisualReferenceCaptureRequest
             throw new ArgumentException("Named UI states require the fixed BattlefieldCombat normal-zoom fixture.");
         if (!Enum.IsDefined(RunProfile) || !Enum.IsDefined(CameraPath)) throw new ArgumentException("Unsupported performance profile or camera path.");
         if (Commit is null || Commit.Length != 40 || Commit.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("Capture requires a complete source commit.");
+        if (MechanicalSeconds is double seconds && (!double.IsFinite(seconds) || seconds is < 0 or > RuntimeAnimationData.MaximumDuration ||
+            Scenes is null || Scenes.Any(s => s is not (VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation))))
+            throw new ArgumentOutOfRangeException(nameof(MechanicalSeconds));
         if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
         if (RepeatCaptures is < 2 or > 128) throw new ArgumentOutOfRangeException(nameof(RepeatCaptures));
         if (RasterDpi is not (0 or 96 or 120 or 144 or 192)) throw new ArgumentOutOfRangeException(nameof(RasterDpi));
@@ -111,7 +115,7 @@ internal static class VisualReferenceCapture
             string runtimeFingerprint = RuntimeFingerprint(request.RuntimeRoot);
             var catalog = RuntimeAssetCatalog.Load(request.RuntimeRoot);
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
-            var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain, runtimeAssets: catalog)).ToArray();
+            var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain, runtimeAssets: catalog, mechanicalSeconds: request.MechanicalSeconds)).ToArray();
             using var capturePower = new ReferenceCapturePowerLease();
             using var platform = new WindowsPlatform();
             using IWindow window = platform.CreateWindow(new("FORGELINE Reference Capture", 1280, 720));
@@ -178,6 +182,7 @@ internal static class VisualReferenceCapture
                     string key = $"{fixture.Kind}-{display.Width}x{display.Height}-{quality}-{zoom}";
                     if (request.RasterDpi != 0) key += $"-Dpi{request.RasterDpi}";
                     if (request.YawDegrees != 45) key += $"-Yaw{request.YawDegrees.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+                    if (request.MechanicalSeconds is double poseTime) key += $"-MechanicalT{poseTime.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
                     if (request.InspectionDistanceMeters != 0) key += $"-Inspection{request.InspectionDistanceMeters.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
                     if (request.RunProfile != ReferenceRunProfile.Warm) key += $"-{request.RunProfile}";
                     if (request.CameraPath != ReferenceCameraPath.Fixed) key += $"-{request.CameraPath}";
@@ -419,7 +424,7 @@ internal static class VisualReferenceCapture
                             captureOffset = uiScenario == UiReferenceScenario.MenuReveal ? "Authored half-reveal; live motion reviewed separately" : "Settled fixed state",
                             regions, text, vertices = frontend?.LastRenderedVertexCount ?? hud.LastRenderedVertexCount,
                             background = frontend?.BackgroundDiagnostics },
-                        seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, captureVisualSeconds, camera = camera.CaptureState(),
+                        seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, captureVisualSeconds, mechanicalSeconds = request.MechanicalSeconds, camera = camera.CaptureState(),
                         requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize, hostWindowDpi = window.Dpi,
                         rasterDpi, uiScale, requestedQuality = quality, profile, lighting,
                         localHaze = graphics.Atmosphere.Enabled ? graphics.Atmosphere.LocalHaze : null, surfaceMarks = request.SurfaceMarks,

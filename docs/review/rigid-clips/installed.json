@@ -1,0 +1,43 @@
+{
+  "verifiedFiles": 1462,
+  "archiveSha256": "855f315a69326ae30d5b2436d83607b93fa6256ecd93377b1e197d211037228f",
+  "stressInstances": 1000,
+  "captureStatus": "structural-pass",
+  "archiveBytes": 54549065,
+  "stressExitCode": 0,
+  "authoringFiles": 0,
+  "blenderPath": "D:/unavailable/blender.exe",
+  "matchesEarlierNativeFrame": true,
+  "materials": {
+    "loadedMaterialCount": 8,
+    "loadedAssetTextureCount": 4,
+    "bindingFailureCount": 0,
+    "loadedMeshCount": 40,
+    "residentMeshBytes": 1802784,
+    "loadedAnimationCount": 1,
+    "residentAnimationBytes": 232
+  },
+  "imageSha256": "5FD860A2FFD93982EE7253E16E642D3DE439928AC4C15CC301C7F5303C346F15",
+  "source": "b7526cf259709de4b4fe76e1647d19ebe797d71a",
+  "instances": {
+    "totalInstances": 519,
+    "visibleInstances": 8,
+    "culledInstances": 511,
+    "drawCalls": 7,
+    "highLodInstances": 7,
+    "reducedLodInstances": 1,
+    "runtimeMeshInstances": 31,
+    "texturedRuntimeMeshInstances": 31,
+    "fallbackMeshInstances": 0,
+    "lod1Instances": 0,
+    "lod2Instances": 1,
+    "animatedVegetationInstances": 0,
+    "visibleVegetationInstances": 0,
+    "clusterTests": 17,
+    "rejectedClusters": 9,
+    "clusterCulledInstances": 288,
+    "instanceBoundsTests": 225,
+    "skippedDecalResources": 0
+  },
+  "runtimeEnvironmentOverride": false
+}
