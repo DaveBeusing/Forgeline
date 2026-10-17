@@ -82,7 +82,7 @@ public sealed class ProductionAssetMaterialCompletenessTests
                 productionTextureCount++;
             }
             Assert.Equal(24, productionTextureCount);
-            Assert.Equal(51_364_204L, productionResidentBytes);
+            Assert.Equal(22_004_272L, productionResidentBytes);
 
             RuntimeAssetRecord[] productionMeshes =
                 catalog.Manifest.Assets

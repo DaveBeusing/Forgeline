@@ -149,7 +149,7 @@ function Invoke-ClientSmoke {
 
     & (Join-Path $PSScriptRoot 'Validate-VisualDrawBudgets.ps1') -Metrics $metrics
 
-    # Native production PBR maps allocate 51,364,204 bytes; the bounded scene
+    # Native production PBR maps allocate 22,004,272 bytes; the bounded scene
     # allowance includes control/UI/effect textures and display-dependent masks.
     if ($metrics.peakResidentTextureBytes -gt 67108864) {
         throw "Peak resident texture bytes $($metrics.peakResidentTextureBytes) exceeded the 64 MiB production scene budget."
