@@ -75,13 +75,19 @@ internal static class ObjectActionRingRuntimeCapture
                 var ring=frames[0].Panel.Ring;
                 motion.Update(ring with {Open=false},TimeSpan.Zero,!reduced);
                 for(int direction=0;direction<2;direction++)
+                {
+                    bool intermediate=false;
                     for(int i=0;i<=(int)Math.Ceiling(.16*hz);i++)
                     {
                         double ms=Math.Min(160,i*1000.0/hz);
                         var visual=motion.Update(ring with {Open=direction==0},TimeSpan.FromMilliseconds(10+direction*180+ms),!reduced);
+                        intermediate |= visual.Opacity is > 0 and < 1;
                         active=(frames[0].Snapshot,frames[0].Panel with {Ring=visual});graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
                         transitions.Add(new {InjectedHz=hz,ReducedMotion=reduced,Direction=direction,Milliseconds=ms,visual.Opacity,visual.Open});
                     }
+                    if (!reduced && !intermediate) throw new InvalidDataException("Ring opening/closing skipped its continuous alpha track.");
+                    if (reduced && intermediate) throw new InvalidDataException("Reduced motion did not settle immediately.");
+                }
             }
             for(int cycle=0;cycle<128;cycle++)
             {

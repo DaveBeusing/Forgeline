@@ -126,6 +126,18 @@ public sealed class RadialActionLayoutTests
         Assert.False(view.TryHit(new(500,500),out _));
     }
 
+    [Theory] [InlineData(false)] [InlineData(true)]
+    public void FirstOwnedContextOpensWithTheSame160MillisecondAlphaTrack(bool reduced)
+    {
+        var motion=new ObjectActionRingMotion();var start=TimeSpan.FromSeconds(1);
+        motion.Update(default,start,!reduced);
+        var ring=new ObjectActionRingView(new(1,1),new(1),1,1,true,true,new(new(500,500),new(500,500),80,176,8),true);
+        var opened=start+TimeSpan.FromMilliseconds(16);
+        Assert.Equal(reduced ? 1:0,motion.Update(ring,opened,!reduced).Opacity);
+        Assert.Equal(reduced ? 1:.5f,motion.Update(ring,opened+TimeSpan.FromMilliseconds(80),!reduced).Opacity);
+        Assert.Equal(1,motion.Update(ring,opened+TimeSpan.FromMilliseconds(160),!reduced).Opacity);
+    }
+
     [Fact]
     public void CloseReleasesOwnershipAtOnceWhileAlphaFadesFor160Milliseconds()
     {

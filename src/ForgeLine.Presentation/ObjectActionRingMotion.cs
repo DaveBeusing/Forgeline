@@ -13,11 +13,15 @@ public sealed class ObjectActionRingMotion
         bool interrupted = !_initialized || now < _last || now - _last > TimeSpan.FromMilliseconds(250);
         bool open = current.Open && current.Geometry.IsValid;
         bool identityChanged = _visual.Entity != current.Entity || _visual.Session != current.Session;
-        if (!animate || interrupted || identityChanged || !current.SingleOwned)
+        if (identityChanged)
+        {
+            _visual = current; _opacity = 0; _from = 0; _started = now;
+        }
+        if (!animate || interrupted || !current.SingleOwned)
         {
             _opacity = open ? 1 : 0; _started = now; _from = _opacity;
         }
-        else if (open != _open) { _from = _opacity; _started = now; }
+        else if (open != _open || identityChanged) { _from = _opacity; _started = now; }
         _initialized = true; _last = now; _open = open;
         float eased = UiMotionTimeline.SmoothStep(now - _started, Duration);
         _opacity = _from + ((open ? 1 : 0) - _from) * eased;
