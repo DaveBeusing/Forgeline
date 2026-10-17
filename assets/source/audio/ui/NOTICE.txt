@@ -1,11 +1,14 @@
-FORGELINE interface cues
+FORGELINE Industrial Sound Library
 
-navigation.wav, intent.wav, accepted.wav and rejected.wav are original mathematical
-tone synthesis, with no recordings, samples or third-party sound libraries.
-Reproducible source: build/Generate-UiAudio.py (Python standard library, build-time only).
-Stereo 48 kHz PCM16, 35/55/95/110 ms; peak synthesis gain 0.16.
+Audio content: original procedural synthesis from the included DSP recipes.
+No third-party sound recordings, music recordings, or voice recordings were
+incorporated into these WAV files. No external sample attribution is required
+by this production process. The files contain no claim of field-recorded origin.
 
-Copyright 2026 FORGELINE contributors. These four sound files are dedicated to the
-public domain under CC0 1.0 Universal: https://creativecommons.org/publicdomain/zero/1.0/
-Redistribution and modification are permitted. The studio introduction is separate
-and is not licensed or repurposed by this notice.
+NumPy, SciPy and FFmpeg are authoring/validation tools, not bundled recordings.
+Their executable files and libraries are not included in this archive. Their
+respective licenses continue to apply when those tools are installed or used.
+
+No change to the FORGELINE repository's code or asset licensing policy is made
+by this delivery. Apply the project's approved asset terms during integration.
+Technical validation does not constitute subjective sound or release approval.

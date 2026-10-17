@@ -25,9 +25,10 @@ foreach ($name in $expected.Keys) {
     }
 }
 $notice = Join-Path $audioRoot 'NOTICE.txt'
-if ((Get-Content $notice -Raw) -notmatch 'CC0 1.0') { throw 'UI sound provenance notice is missing.' }
+if ((Get-Content $notice -Raw) -notmatch 'original procedural synthesis') { throw 'UI sound provenance notice is missing.' }
 if ($PublishRoot) {
     $publishedNotice = Join-Path $PublishRoot 'ThirdPartyNotices/UiAudio.txt'
     if (-not (Test-Path $publishedNotice) -or (Get-FileHash $notice).Hash -ne (Get-FileHash $publishedNotice).Hash) { throw 'Packaged UI sound notice differs.' }
 }
+& (Join-Path $PSScriptRoot 'Validate-AudioLibrary.ps1')
 Write-Output 'Four bounded original PCM cues, provenance and package identity passed.'
