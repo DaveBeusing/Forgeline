@@ -209,6 +209,7 @@ public sealed class AutomatedDistributionSystem
                     request.AssignedTruck))
             {
                 ReleaseReservationIfPresent(request);
+                if (hasReservation) context.Entities.RemoveComponent<CargoTransportReservation>(request.AssignedTruck);
                 ReleaseCapacityReservationIfPresent(request);
                 CompleteOrContinueRequest(
                     context,
@@ -279,6 +280,8 @@ public sealed class AutomatedDistributionSystem
                 continue;
             }
 
+            RequestState? existing = FindActiveRequest(policyState.PolicyEntity);
+            if (existing is not null) existing.Priority = policy.Priority;
             double currentQuantity =
                 _inventories.GetQuantity(
                     destinationInventory,
@@ -302,9 +305,6 @@ public sealed class AutomatedDistributionSystem
             {
                 continue;
             }
-
-            RequestState? existing =
-                FindActiveRequest(policyState.PolicyEntity);
 
             if (existing is not null)
             {
@@ -358,8 +358,8 @@ public sealed class AutomatedDistributionSystem
             (left, right) =>
             {
                 int priorityComparison =
-                    GetEffectivePriority(left, context.Tick).CompareTo(
-                        GetEffectivePriority(right, context.Tick));
+                    GetEffectivePriority(left, context.Tick, context.Entities).CompareTo(
+                        GetEffectivePriority(right, context.Tick, context.Entities));
 
                 if (priorityComparison != 0)
                 {
@@ -640,9 +640,11 @@ public sealed class AutomatedDistributionSystem
                 continue;
             }
 
-            if (!best.Succeeded ||
-                capacityRoute.Route.TotalCost < best.Route!.TotalCost ||
-                (capacityRoute.Route.TotalCost == best.Route!.TotalCost &&
+            bool physicalService = entities.HasComponent<BuildingLoadingDock>(destination.Entity);
+            bool comparableBatch = !physicalService || !best.Succeeded || quantity == best.Quantity;
+            if (!best.Succeeded || physicalService && quantity > best.Quantity ||
+                comparableBatch && capacityRoute.Route.TotalCost < best.Route!.TotalCost ||
+                (comparableBatch && capacityRoute.Route.TotalCost == best.Route!.TotalCost &&
                  node.Id < best.SourceNode.Id))
             {
                 best =
@@ -920,9 +922,17 @@ public sealed class AutomatedDistributionSystem
 
     private int GetEffectivePriority(
         RequestState request,
-        SimulationTick tick)
+        SimulationTick tick,
+        EntityRegistry entities)
     {
         int basePriority = (int)request.Priority;
+        if (request.Priority == LogisticsStockPriority.Critical &&
+            entities.TryGetComponent(request.PolicyEntity, out LogisticsStockPolicy policy) &&
+            _network.TryGetNode(request.Destination, out LogisticsNode destination) &&
+            entities.HasComponent<BuildingLoadingDock>(destination.Entity) &&
+            TryResolveDestinationInventory(entities, destination, out InventoryId inventory) &&
+            _inventories.GetQuantity(inventory, request.ResourceId) + QuantityEpsilon >= policy.DesiredMinimum)
+            basePriority = (int)LogisticsStockPriority.High;
         ulong age = tick.Value >= request.WaitingSinceTick.Value
             ? tick.Value - request.WaitingSinceTick.Value
             : 0;

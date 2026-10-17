@@ -250,7 +250,8 @@ public sealed class MatchRuntimeCompositionTests
         Assert.False(
             scenario.Simulation.Entities.HasComponent<
                 CargoTransportOrder>(
-                    truck));
+                    truck),
+            $"cargo={scenario.Simulation.Entities.GetComponent<CargoTransportRuntimeState>(truck)}; pose={scenario.Simulation.Entities.GetComponent<WorldTransform>(truck)}; dock={DockState(scenario, truck)}");
         Assert.Equal(
             quantity,
             scenario.Inventories.GetQuantity(
@@ -434,4 +435,5 @@ public sealed class MatchRuntimeCompositionTests
         throw new InvalidOperationException(
             "No traversable navigation cell was found.");
     }
+    private static string DockState(MatchRuntime runtime, EntityId truck) => runtime.Simulation.Entities.TryGetComponent(truck, out VehicleDockVisit dock) ? dock.ToString() : "none";
 }

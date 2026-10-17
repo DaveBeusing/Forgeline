@@ -1930,12 +1930,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (HasSupplyLoadingMovement(
-                    context,
-                    candidate,
-                    controller,
-                    owned,
-                    truck))
+            if (HasSupplyLoadingMovement(context, candidate))
             {
                 continue;
             }
@@ -2846,6 +2841,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             if (!context.Entities.TryGetComponent(entity, out SupplyTruck truck) ||
                 context.Entities.HasComponent<ResupplyOrder>(entity) ||
+                context.Entities.HasComponent<SupplyLoadingOrder>(entity) ||
                 !context.Entities.TryGetComponent(entity, out WorldTransform transform))
             {
                 continue;
@@ -2858,12 +2854,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     out _);
             bool loadingMovement =
                 hasMovement &&
-                HasSupplyLoadingMovement(
-                    context,
-                    entity,
-                    controller,
-                    owned,
-                    truck);
+                HasSupplyLoadingMovement(context, entity);
             bool needsFuel =
                 _inventories.GetQuantity(
                     truck.InventoryId,
@@ -2998,299 +2989,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (bestDistance <=
-                truck.LoadRangeMeters *
-                truck.LoadRangeMeters)
-            {
-                if (loadingMovement)
-                {
-                    new StopMovementCommand(
-                        truck.Owner,
-                        [entity],
-                        context.Tick)
-                        .Execute(context);
-                }
-
-                continue;
-            }
-
-            bool movingToSelectedLoadingSource =
-                hasMovement &&
-                TacticalCommandUtilities.TryGetMovementIntent(
-                    context,
-                    entity,
-                    out MovementOrder loadingIntent) &&
-                HorizontalDistanceToSupplyLoadingSourceSquared(
-                    context,
-                    loadingSource,
-                    destination,
-                    loadingIntent.WorldTarget) <=
-                truck.LoadRangeMeters *
-                truck.LoadRangeMeters;
-
-            if (movingToSelectedLoadingSource)
-            {
-                continue;
-            }
-
-            destination =
-                ResolveSupplyLoadingApproach(
-                    context,
-                    loadingSource,
-                    entity,
-                    destination,
-                    transform.Position,
-                    truck.LoadRangeMeters);
-
-            if (hasMovement)
-            {
-                new StopMovementCommand(
-                    truck.Owner,
-                    [entity],
-                    context.Tick)
-                    .Execute(context);
-            }
-
-            new MoveEntitiesCommand(
-                truck.Owner,
-                [entity],
-                destination,
-                context.Tick).Execute(context);
+            if (!context.Entities.HasComponent<BuildingLoadingDock>(loadingSource)) continue;
+            if (hasMovement) new StopMovementCommand(truck.Owner, [entity], context.Tick).Execute(context);
+            VehicleDockingService.Put(context.Entities, entity, new SupplyLoadingOrder(loadingSource, context.Tick));
         }
     }
-
-    private static bool HasSupplyLoadingMovement(
-        SimulationContext context,
-        EntityId entity,
-        SkirmishOpponentController controller,
-        OwnedState owned,
-        in SupplyTruck truck)
-    {
-        if (!TacticalCommandUtilities.TryGetMovementIntent(
-                context,
-                entity,
-                out MovementOrder movement))
-        {
-            return false;
-        }
-
-        float loadRangeSquared =
-            truck.LoadRangeMeters *
-            truck.LoadRangeMeters;
-
-        for (int index = 0;
-             index < owned.SupplyDepots.Count;
-             index++)
-        {
-            (EntityId depotEntity, Vector3 depotPosition) =
-                owned.SupplyDepots[index];
-
-            if (!context.Entities.TryGetComponent(
-                    depotEntity,
-                    out SupplyDepot depot) ||
-                depot.State != SupplyDepotState.Operational)
-            {
-                continue;
-            }
-
-            if (HorizontalDistanceToSupplyLoadingSourceSquared(
-                    context,
-                    depotEntity,
-                    depotPosition,
-                    movement.WorldTarget) <=
-                loadRangeSquared)
-            {
-                return true;
-            }
-        }
-
-        if (context.Entities.IsAlive(
-                controller.PreferredConstructionSource) &&
-            context.Entities.TryGetComponent(
-                controller.PreferredConstructionSource,
-                out WorldTransform commandCoreTransform) &&
-            HorizontalDistanceToSupplyLoadingSourceSquared(
-                context,
-                controller.PreferredConstructionSource,
-                commandCoreTransform.Position,
-                movement.WorldTarget) <=
-            loadRangeSquared)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    private static Vector3 ResolveSupplyLoadingApproach(
-        SimulationContext context,
-        EntityId source,
-        EntityId truckEntity,
-        Vector3 sourcePosition,
-        Vector3 truckPosition,
-        float loadRangeMeters)
-    {
-        float halfExtentX = 0.0f;
-        float halfExtentZ = 0.0f;
-
-        if (context.Entities.TryGetComponent(
-                source,
-                out SpatialPresence sourcePresence))
-        {
-            halfExtentX =
-                sourcePresence.HalfExtents.X;
-            halfExtentZ =
-                sourcePresence.HalfExtents.Z;
-        }
-
-        float truckHalfExtentX = 2.0f;
-        float truckHalfExtentZ = 2.0f;
-
-        if (context.Entities.TryGetComponent(
-                truckEntity,
-                out SpatialPresence truckPresence))
-        {
-            truckHalfExtentX =
-                truckPresence.HalfExtents.X;
-            truckHalfExtentZ =
-                truckPresence.HalfExtents.Z;
-        }
-
-        float approach =
-            MathF.Max(
-                0.0f,
-                loadRangeMeters - 1.0f);
-
-        Span<Vector3> candidates =
-        [
-            sourcePosition +
-            new Vector3(
-                halfExtentX + approach,
-                0.0f,
-                0.0f),
-            sourcePosition +
-            new Vector3(
-                -(halfExtentX + approach),
-                0.0f,
-                0.0f),
-            sourcePosition +
-            new Vector3(
-                0.0f,
-                0.0f,
-                halfExtentZ + approach),
-            sourcePosition +
-            new Vector3(
-                0.0f,
-                0.0f,
-                -(halfExtentZ + approach))
-        ];
-
-        Vector3 selected =
-            candidates[0];
-        float selectedDistanceSquared =
-            float.PositiveInfinity;
-        bool foundClearCandidate = false;
-
-        for (int index = 0;
-             index < candidates.Length;
-             index++)
-        {
-            Vector3 candidate =
-                candidates[index];
-            bool clear =
-                IsSupplyLoadingApproachClear(
-                    context,
-                    source,
-                    candidate,
-                    truckHalfExtentX,
-                    truckHalfExtentZ);
-
-            if (foundClearCandidate &&
-                !clear)
-            {
-                continue;
-            }
-
-            float distanceSquared =
-                HorizontalDistanceSquared(
-                    truckPosition,
-                    candidate);
-
-            if ((!foundClearCandidate && clear) ||
-                clear == foundClearCandidate &&
-                distanceSquared <
-                selectedDistanceSquared)
-            {
-                selected =
-                    candidate;
-                selectedDistanceSquared =
-                    distanceSquared;
-                foundClearCandidate =
-                    clear;
-            }
-        }
-
-        return selected;
-    }
-
-    private static bool IsSupplyLoadingApproachClear(
-        SimulationContext context,
-        EntityId loadingSource,
-        Vector3 candidate,
-        float truckHalfExtentX,
-        float truckHalfExtentZ)
-    {
-        const float clearanceMeters = 1.0f;
-
-        foreach (EntityId entity in
-                 context.Entities.Query<
-                     SpatialPresence,
-                     WorldTransform>(
-                         QueryIterationOrder.StableByEntityIndex))
-        {
-            if (entity == loadingSource)
-            {
-                continue;
-            }
-
-            SpatialPresence presence =
-                context.Entities.GetComponent<SpatialPresence>(
-                    entity);
-
-            if (presence.Metadata.Mobility !=
-                SpatialMobility.Static)
-            {
-                continue;
-            }
-
-            WorldTransform transform =
-                context.Entities.GetComponent<WorldTransform>(
-                    entity);
-            float allowedX =
-                presence.HalfExtents.X +
-                truckHalfExtentX +
-                clearanceMeters;
-            float allowedZ =
-                presence.HalfExtents.Z +
-                truckHalfExtentZ +
-                clearanceMeters;
-
-            if (MathF.Abs(
-                    candidate.X -
-                    transform.Position.X) <
-                allowedX &&
-                MathF.Abs(
-                    candidate.Z -
-                    transform.Position.Z) <
-                allowedZ)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
+    private static bool HasSupplyLoadingMovement(SimulationContext context, EntityId entity) =>
+        context.Entities.HasComponent<SupplyLoadingOrder>(entity);
     private static float HorizontalDistanceToSupplyLoadingSourceSquared(
         SimulationContext context,
         EntityId source,
@@ -3332,8 +3037,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         bool powerRecoveryRequired =
             owned.PowerDemand > 0.0 &&
             (owned.PowerGeneration <
-                 owned.PowerDemand ||
+                 owned.PowerDemand + 20.0 ||
              owned.OfflineConsumers > 0);
+        bool fuelProductionRecoveryRequired =
+            !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage coreStorage) ||
+            _inventories.GetAvailableQuantity(coreStorage.InventoryId, ResourceIds.Fuel) < 360;
         bool forwardConstructionRequired =
             !RequiresCargoReplacementReserve(owned, configuration) &&
             owned.CombatUnits.Count >= configuration.MinimumAttackUnits &&
@@ -3346,10 +3054,26 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                  context, owned, controller.HomePosition,
                  minimumDistanceMeters: 500.0f,
                  supportRadiusMeters: 260.0f).HasValue);
-        LogisticsStockPriority constructionRawPriority =
-            powerRecoveryRequired || forwardConstructionRequired
-                ? LogisticsStockPriority.Critical
-                : LogisticsStockPriority.High;
+        BuildingDefinition? nextConstruction = null;
+        if (powerRecoveryRequired && GetBuildingCount(owned, BuildingIds.PowerPlant) < MaximumRecoveryPowerPlants &&
+            !HasPendingBuilding(owned, BuildingIds.PowerPlant)) nextConstruction = _buildings[BuildingIds.PowerPlant];
+        foreach (ResourceId resource in RawResources)
+            if (nextConstruction is null && !HasOperationalExtractor(context, owned, resource) &&
+                !HasPendingExtractor(context, owned, resource)) nextConstruction = _buildings[BuildingIds.Extractor];
+        foreach (BuildingId building in IndustrialPlan)
+            if (nextConstruction is null && GetBuildingCount(owned, building) == 0 && !HasPendingBuilding(owned, building))
+                nextConstruction = _buildings[building];
+
+        LogisticsStockPriority ConstructionPriority(ResourceId resource)
+        {
+            if (forwardConstructionRequired) return LogisticsStockPriority.Critical;
+            if (nextConstruction is null || !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage storage))
+                return LogisticsStockPriority.High;
+            foreach (BuildingResourceCost cost in nextConstruction.Costs)
+                if (cost.ResourceId == resource && _inventories.GetAvailableQuantity(storage.InventoryId, resource) + 1e-9 < cost.Quantity)
+                    return LogisticsStockPriority.Critical;
+            return LogisticsStockPriority.High;
+        }
 
         if (context.Entities.IsAlive(
                 controller.PreferredConstructionSource))
@@ -3362,7 +3086,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 220.0,
                 650.0,
                 1_100.0,
-                constructionRawPriority);
+                ConstructionPriority(ResourceIds.FerrousOre));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3371,7 +3095,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 140.0,
                 450.0,
                 800.0,
-                constructionRawPriority);
+                ConstructionPriority(ResourceIds.Volatiles));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3380,7 +3104,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 140.0,
                 450.0,
                 800.0,
-                constructionRawPriority);
+                ConstructionPriority(ResourceIds.Silicates));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3389,7 +3113,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 220.0,
                 500.0,
                 1_000.0,
-                LogisticsStockPriority.High);
+                ConstructionPriority(ResourceIds.Steel));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3398,7 +3122,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 160.0,
                 360.0,
                 600.0,
-                LogisticsStockPriority.High);
+                ConstructionPriority(ResourceIds.Electronics));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3447,9 +3171,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     80.0,
                     220.0,
                     450.0,
-                    powerRecoveryRequired
-                        ? LogisticsStockPriority.High
-                        : LogisticsStockPriority.Critical);
+                    !powerRecoveryRequired && fuelProductionRecoveryRequired
+                        ? LogisticsStockPriority.Critical
+                        : LogisticsStockPriority.High);
             }
 
             if (facility.Supports(
@@ -3639,6 +3363,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         target = Math.Max(target, minimum);
         maximum = Math.Max(maximum, target);
+        if (priority == LogisticsStockPriority.Critical && facility.Status == UnitProductionStatus.NoInput)
+        {
+            double needed = 0;
+            if (_units.TryGet(plannedUnit, out UnitDefinition? planned))
+                foreach (UnitResourceCost cost in planned.Costs)
+                    if (cost.ResourceId == resource) needed = Math.Max(needed, cost.Quantity);
+            if (_units.TryGet(facility.ActiveUnit, out UnitDefinition? active))
+                foreach (UnitResourceCost cost in active.Costs)
+                    if (cost.ResourceId == resource) needed = Math.Max(needed, cost.Quantity);
+            if (needed > 1e-9) needed = Math.Max(needed, minimum);
+            if (needed <= 1e-9 || _inventories.GetAvailableQuantity(facility.InputInventory, resource) + 1e-9 >= needed)
+                priority = LogisticsStockPriority.High;
+        }
         SetStockPolicy(
             context,
             facility.Owner,
@@ -4778,6 +4515,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return command.RequestEntity.IsValid;
     }
 
+    private Vector3 ResolveExtractorServiceSite(in BattlefieldResourceDepositDefinition deposit)
+    {
+        float depth = _buildings[BuildingIds.Extractor].Footprint.Depth;
+        return deposit.Center + new Vector3(0, 0, deposit.HalfExtents.Z - depth * 0.5f);
+    }
     private bool TryIssueExtractor(
         SimulationContext context,
         SkirmishOpponentController controller,
@@ -4807,7 +4549,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                    controller,
                    owned,
                    BuildingIds.Extractor,
-                   deposit.Value.Center);
+                   ResolveExtractorServiceSite(deposit.Value));
     }
 
     private bool TryIssueNearestContestedExtractor(
@@ -4835,7 +4577,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                    controller,
                    owned,
                    BuildingIds.Extractor,
-                   deposit.Value.Center);
+                   ResolveExtractorServiceSite(deposit.Value));
     }
 
     private bool TrySelectConstructionSource(

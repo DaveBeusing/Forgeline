@@ -1310,7 +1310,26 @@ public sealed class PlayerConstructionProductionFlowTests
             scenario.Simulation.AdvanceOneTick();
         }
 
-        Assert.True(condition());
+        var diagnostics = new List<string>();
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<CompletedBuilding>())
+            diagnostics.Add($"building {entity}:{scenario.Simulation.Entities.GetComponent<CompletedBuilding>(entity).BuildingId}" +
+                $"@{scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position}");
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<UnitProductionFacility>())
+        {
+            var facility = scenario.Simulation.Entities.GetComponent<UnitProductionFacility>(entity);
+            diagnostics.Add($"factory {entity}: steel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Steel)}" +
+                $" electronics={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Electronics)}" +
+                $" fuel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Fuel)}" +
+                $" ammunition={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Ammunition)}");
+        }
+        diagnostics.Add($"distribution={string.Join(';', scenario.AutomatedDistribution.LastDebugSnapshot.Requests)}");
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<CargoTransport>())
+            diagnostics.Add($"{entity}: {scenario.Simulation.Entities.GetComponent<CargoTransportRuntimeState>(entity)} " +
+            $"position={scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position} " +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit visit) ? $"dock={visit} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out MovementOrder move) ? $"move={move.WorldTarget} " : "") +
+            $"motion={scenario.Simulation.Entities.GetComponent<GroundMovementState>(entity)}");
+        Assert.True(condition(), string.Join("; ", diagnostics));
     }
 
     private static MatchRuntime CreateScenario(

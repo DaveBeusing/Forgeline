@@ -19,6 +19,7 @@ internal sealed class SkirmishScenarioHarness
     public SkirmishStartingBase GetBase(PlayerId player) => _scenario.GetBase(player);
 
     public SimulationCoordinator Simulation => _scenario.Simulation;
+    public MatchRuntimeServices Services => _scenario.Services;
 
     public BattlefieldDefinition Battlefield => _scenario.Battlefield;
 

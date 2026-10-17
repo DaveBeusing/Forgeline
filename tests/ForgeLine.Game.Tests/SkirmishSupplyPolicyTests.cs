@@ -105,6 +105,7 @@ public sealed class SkirmishSupplyPolicyTests
         EntityId depot = entities.CreateEntity();
         entities.AddComponent(depot, new WorldTransform(new Vector3(420.0f, 0.0f, 1800.0f), Quaternion.Identity, Vector3.One));
         entities.AddComponent(depot, new CompletedBuilding(BuildingIds.SupplyDepot, scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player, SimulationTick.Zero));
+        entities.AddComponent(depot, new BuildingLoadingDock(new(0, 0, 12.5f), Vector3.UnitX, 18));
         entities.AddComponent(depot, new SupplyDepot(inventory, scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         entities.AddComponent(depot, new SpatialPresence(new Vector3(8.0f, 4.0f, 8.0f),
             new SpatialEntryMetadata(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value, 0, SpatialMobility.Static)));
@@ -132,13 +133,18 @@ public sealed class SkirmishSupplyPolicyTests
 
         scenario.Simulation.RunTicks(600, TestContext.Current.CancellationToken);
 
+        Assert.True(scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel) > 0, $"pose={entities.GetComponent<WorldTransform>(truck)}; dock={DockState(entities, truck)}; operational={entities.HasComponent<ResupplyOrder>(truck)}; load={entities.HasComponent<SupplyLoadingOrder>(truck)}");
         Assert.Equal(supply.FuelTarget, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel), precision: 6);
         Assert.Equal(supply.AmmunitionTarget, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition), precision: 6);
         Assert.Equal(600.0 - supply.FuelTarget, scenario.Inventories.GetQuantity(inventory, ResourceIds.Fuel), precision: 6);
         Assert.Equal(800.0 - supply.AmmunitionTarget, scenario.Inventories.GetQuantity(inventory, ResourceIds.Ammunition), precision: 6);
-        Assert.False(
-            entities.HasComponent<MovementOrder>(
-                truck));
+        if (entities.HasComponent<MovementOrder>(truck))
+        {
+            var exiting = entities.GetComponent<VehicleDockVisit>(truck);
+            Assert.Equal(VehicleDockStatus.Exiting, exiting.Status);
+            Assert.Equal(truck, entities.GetComponent<VehicleDockSlot>(depot).Truck);
+        }
+        else Assert.False(entities.HasComponent<SupplyLoadingOrder>(truck));
         Assert.False(
             entities.HasComponent<NavigationPendingPath>(
                 truck));
@@ -181,6 +187,7 @@ public sealed class SkirmishSupplyPolicyTests
                 BuildingIds.SupplyDepot,
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
+        entities.AddComponent(depot, new BuildingLoadingDock(new(0, 0, 12.5f), Vector3.UnitX, 18));
         entities.AddComponent(
             depot,
             new SupplyDepot(
@@ -937,4 +944,5 @@ public sealed class SkirmishSupplyPolicyTests
         throw new Xunit.Sdk.XunitException(
             $"No stock policy found for target {target} and resource {resource}.");
     }
+    private static string DockState(EntityRegistry entities, EntityId truck) => entities.TryGetComponent(truck, out VehicleDockVisit dock) ? dock.ToString() : "none";
 }

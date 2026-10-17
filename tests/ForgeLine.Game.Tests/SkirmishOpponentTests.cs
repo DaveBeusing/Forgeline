@@ -968,6 +968,17 @@ public sealed class SkirmishOpponentTests
                 ResourceIds.Fuel);
         AutomatedDistributionMetrics distribution =
             scenario.AutomatedDistribution.Metrics;
+        var extraction = new List<string>();
+        var construction = new List<string>();
+        foreach (var entity in scenario.Simulation.Entities.Query<ConstructionSite>())
+            construction.Add(scenario.Simulation.Entities.GetComponent<ConstructionSite>(entity).ToString());
+        scenario.Services.BuildingCommands.TryGetLastResult(side.Player, out var buildResult);
+        foreach (var entity in scenario.Simulation.Entities.Query<ResourceExtractor>())
+        {
+            var extractor = scenario.Simulation.Entities.GetComponent<ResourceExtractor>(entity);
+            if (scenario.Simulation.Entities.TryGetComponent(entity, out InventoryStorage storage))
+                extraction.Add($"{entity}:{extractor.ResourceId}/{extractor.State}/{scenario.Inventories.GetQuantity(storage.InventoryId, extractor.ResourceId):F0}");
+        }
         CargoTransportMetrics cargo =
             scenario.CargoTransport.Metrics;
         string distributionFailures =
@@ -1011,13 +1022,20 @@ public sealed class SkirmishOpponentTests
                                 ? $"{movementOrder.WorldTarget.X:F0},{movementOrder.WorldTarget.Z:F0}"
                                 : "none";
 
+                        string motion = scenario.Simulation.Entities.TryGetComponent(entity, out GroundMovementState ground)
+                            ? $"{ground.Status}/{ground.Velocity.Length():F2}/heading={ground.HeadingRadians:F2}" : "none";
+                        string order = scenario.Simulation.Entities.TryGetComponent(entity, out CargoTransportOrder delivery)
+                            ? $"{delivery.ResourceId}/{delivery.RequestedQuantity:F0}/{delivery.Origin}->{delivery.Destination}" : "none";
+                        string dock = scenario.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit visit)
+                            ? $"{visit.Building}/g{visit.Generation}/{visit.Status}/{visit.Reason} settled={visit.SettledTicks} last={visit.LastObservedTick} transfer={visit.LastTransferTick} service={visit.Pose.Service.X:F0},{visit.Pose.Service.Z:F0}"
+                            : "none";
                         return
-                            $"{entity}:{transport.Lifecycle}/{transport.FailureReason}" +
+                            $"{entity}:{transport.Lifecycle}/{transport.FailureReason} state={scenario.Simulation.Entities.GetComponent<CargoTransportRuntimeState>(entity)}" +
                             $"@{transport.WorldPosition.X:F0},{transport.WorldPosition.Z:F0}" +
                             (transport.HasMovementTarget
                                 ? $" cargo->{transport.MovementTarget.X:F0},{transport.MovementTarget.Z:F0}"
                                 : string.Empty) +
-                            $" move->{movement} fuel={fuel} resupply={resupply}";
+                            $" move->{movement} fuel={fuel} resupply={resupply} dock={dock} motion={motion} order={order}";
                     }));
 
         var unitProductionEntries =
@@ -1073,10 +1091,12 @@ public sealed class SkirmishOpponentTests
             $"supply={scenario.CountBuildings(side.Player, BuildingIds.SupplyDepot)} " +
             $"radar={scenario.CountBuildings(side.Player, BuildingIds.Radar)} " +
             $"coreSteel={coreSteel:F0} coreElectronics={coreElectronics:F0} coreFuel={coreFuel:F0} " +
-            $"totalSteel={debug.Economy.Steel:F0} totalElectronics={debug.Economy.Electronics:F0} " +
+            $"totalSteel={debug.Economy.Steel:F0} totalElectronics={debug.Economy.Electronics:F0} extraction={string.Join(';', extraction)} " +
             $"production={debug.Economy.ProductionFacilities} unitProduction={debug.Economy.UnitProductionFacilities} " +
+            $"build={buildResult} sites={string.Join(';', construction)} " +
             $"distribution=p{distribution.PendingRequestCount}/a{distribution.AssignedRequestCount}/t{distribution.InTransitRequestCount}/r{distribution.RetryPendingRequestCount}/c{distribution.CompletedRequestCount}/f{distribution.FailedRequestCount} " +
             $"distributionFailures={distributionFailures} " +
+            $"requests={string.Join(';', scenario.AutomatedDistribution.LastDebugSnapshot.Requests.Select(r => $"{r.RequestId}:{r.ResourceId}/{r.Destination}/{r.State}/qty{r.RequestedQuantity:F0}/reserved{r.ReservedQuantity:F0}/truck{r.AssignedTruck}"))} " +
             $"cargo={cargo.TransportCount}/active{cargo.ActiveTransportCount}/wait{cargo.WaitingTransportCount}/failed{cargo.FailedTransportCount}/delivered{cargo.DeliveredQuantity:F0}/routeFail{cargo.RouteFailureCount} " +
             $"cargoStates={cargoStates} " +
             $"unitProductionStates={unitProductionStates} " +

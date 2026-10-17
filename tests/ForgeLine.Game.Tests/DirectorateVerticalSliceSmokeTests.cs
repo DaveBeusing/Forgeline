@@ -94,6 +94,7 @@ public sealed class DirectorateVerticalSliceSmokeTests
         var technologies = DirectorateTechnologyDefinitions.CreateCatalog();
         simulation.RegisterSystem(new TechnologyResearchSystem(technologies, inventories));
         simulation.RegisterSystem(battlefieldSupply);
+        simulation.RegisterSystem(new GroundMovementSystem(terrain, spatialIndex));
 
         EntityId source =
             CreateFundedConstructionInventory(
@@ -125,9 +126,9 @@ public sealed class DirectorateVerticalSliceSmokeTests
             BuildingId buildingId = requiredBuildings[index];
             Vector3 position =
                 new(
-                    30.0f + (index % 5) * 45.0f,
+                    55.0f + (index % 4) * 65.0f,
                     0.0f,
-                    30.0f + (index / 5) * 55.0f);
+                    35.0f + (index / 4) * 60.0f);
 
             if (buildingId == BuildingIds.Extractor)
             {
@@ -157,9 +158,8 @@ public sealed class DirectorateVerticalSliceSmokeTests
                 new SimulationCommandSource(Player.Value));
             simulation.AdvanceOneTick();
 
-            Assert.Equal(
-                BuildCommandRejectionReason.None,
-                buildingCommands.Metrics.LastRejection);
+            Assert.True(buildingCommands.Metrics.LastRejection == BuildCommandRejectionReason.None,
+                $"{buildingId}: {buildingCommands.Metrics.LastRejection}");
 
             EntityId site =
                 buildingCommands.Metrics.LastCreatedSite;
@@ -384,15 +384,25 @@ public sealed class DirectorateVerticalSliceSmokeTests
                 ResourceIds.Ammunition,
                 300.0).Succeeded);
 
+        var authoredDock = simulation.Entities.GetComponent<BuildingLoadingDock>(supplyDepotEntity);
+        var dockForward = Vector3.Transform(authoredDock.Forward, depotTransform.Rotation);
+        float dockHeading = MathF.Atan2(dockForward.X, dockForward.Z);
         simulation.Entities.SetComponent(
             supplyTruckEntity,
             simulation.Entities.GetComponent<WorldTransform>(
                 supplyTruckEntity) with
             {
-                Position = depotTransform.Position
+                Position = depotTransform.Position + Vector3.Transform(authoredDock.ServicePosition, depotTransform.Rotation) + new Vector3(0, simulation.Entities.GetComponent<GroundMovement>(supplyTruckEntity).HeightOffset, 0),
+                Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, dockHeading)
             });
 
+        var forward = Vector3.Transform(Vector3.UnitX, depotTransform.Rotation);
+        simulation.Entities.SetComponent(supplyTruckEntity, GroundMovementState.Stationary(MathF.Atan2(forward.X, forward.Z)));
+        simulation.SubmitCommand(new ResupplyCommand(new PlayerId(1), [supplyTruckEntity], simulation.CurrentTick), simulation.CurrentTick.Next());
         simulation.AdvanceOneTick();
+        for (int tick = 0; tick < 1000 && simulation.Entities.HasComponent<SupplyLoadingOrder>(supplyTruckEntity); tick++)
+            simulation.AdvanceOneTick();
+        Assert.False(simulation.Entities.HasComponent<SupplyLoadingOrder>(supplyTruckEntity));
 
         SupplyTruck supplyTruck =
             simulation.Entities.GetComponent<SupplyTruck>(
@@ -572,7 +582,7 @@ public sealed class DirectorateVerticalSliceSmokeTests
         public AxisAlignedBounds WorldBounds { get; } =
             new(
                 Vector3.Zero,
-                new Vector3(256.0f, 20.0f, 256.0f));
+                new Vector3(320.0f, 20.0f, 320.0f));
 
         public bool TrySampleHeight(
             float worldX,
