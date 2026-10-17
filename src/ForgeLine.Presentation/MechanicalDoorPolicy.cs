@@ -1,3 +1,4 @@
+using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
 
@@ -5,6 +6,8 @@ namespace ForgeLine.Presentation;
 
 internal static class MechanicalDoorPolicy
 {
+    public static bool CanReadProduction(PlayerId owner, PlayerId viewer) => owner.IsSpecified && owner == viewer;
+
     public static bool CanMove(BuildingPresentationState state,
         UnitProductionStatus? units = null, ProductionStatus? processing = null) =>
         state is BuildingPresentationState.Operational or BuildingPresentationState.Idle &&

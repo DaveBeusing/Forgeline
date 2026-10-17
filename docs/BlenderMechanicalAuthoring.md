@@ -99,6 +99,9 @@ does not introduce a new timing curve. Custom axes, free animation clips, skelet
 weights and arbitrary Blender shader/animation graph baking are unsupported.
 The rigid contract limits remain those validated by the actual compiler and loader.
 
+Detailed production pause/power reasons are read only for the owning viewer;
+foreign/unspecified viewers retain the public building-state fallback.
+
 The presentation change freezes an already open door during power loss, damage,
 destruction, construction or production pause. Powered Idle/NoInput/OutputFull
 allows its existing bounded return toward closed. Resuming production continues

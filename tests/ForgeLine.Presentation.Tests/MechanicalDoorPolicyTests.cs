@@ -9,6 +9,15 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class MechanicalDoorPolicyTests
 {
+    [Fact]
+    public void ForeignAndUnspecifiedViewersCannotReadPrivateProductionStatus()
+    {
+        Assert.True(MechanicalDoorPolicy.CanReadProduction(new(1),new(1)));
+        Assert.False(MechanicalDoorPolicy.CanReadProduction(new(1),new(2)));
+        Assert.False(MechanicalDoorPolicy.CanReadProduction(default,default));
+        Assert.False(MechanicalDoorPolicy.CanReadProduction(new(1),default));
+    }
+
     [Theory]
     [InlineData(UnitProductionStatus.Idle,true)]
     [InlineData(UnitProductionStatus.Running,true)]
