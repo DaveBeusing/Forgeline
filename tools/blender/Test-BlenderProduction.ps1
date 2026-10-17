@@ -15,6 +15,10 @@ foreach ($name in @('first','second')) {
     & (Join-Path $PSScriptRoot 'Invoke-BlenderProduction.ps1') -OutputRoot (Join-Path $root $name) -RenderPreviews:($RenderPreviews -and $name -eq 'first') -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
 }
 & (Join-Path $PSScriptRoot 'Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'tests/native_production_contract.py') -InputRoot assets/source -OutputRoot (Join-Path $root 'native-contracts') -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
+& dotnet $compiler --mode development --source (Join-Path $root 'native-contracts/source') --runtime (Join-Path $root 'native-contracts/runtime') --qualification-output (Join-Path $root 'generated-lod-qualification.json') 2>&1 | Out-File -LiteralPath (Join-Path $root 'generated-lod-compile.log') -Encoding utf8NoBOM
+if ($LASTEXITCODE -ne 0) { throw 'Generated LOD fixture failed compiler validation.' }
+& dotnet $compiler --mode validate --source (Join-Path $root 'absent-generated-source') --runtime (Join-Path $root 'native-contracts/runtime') 2>&1 | Out-File -LiteralPath (Join-Path $root 'generated-lod-source-less.log') -Encoding utf8NoBOM
+if ($LASTEXITCODE -ne 0) { throw 'Generated LOD fixture failed source-less validation.' }
 $firstReport = Get-Content -LiteralPath (Join-Path $root 'first/production-report.json') -Raw | ConvertFrom-Json
 function Copy-Seed([string]$Seed, [string]$Target) {
     $manifestPath = Join-Path $Seed 'manifest.json'
@@ -68,6 +72,6 @@ try {
 }
 finally { $env:FORGELINE_BLENDER_PRODUCTION_ROOT = $oldRoot; $env:FORGELINE_BLENDER_RUNTIME_SEED = $oldSeed }
 @{ success = $true; fixtures = 2; meshes = 19; assetCount = 29; repeatedSourceAndRuntimeBytes = $true;  sourceLessIntegrity = $true;
-    compiledRendererContracts = $true; overlayAvailable = [bool]$RuntimeSeedRoot } |
+    compiledRendererContracts = $true; generatedLodCompiled = $true; overlayAvailable = [bool]$RuntimeSeedRoot } |
     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $root 'qualification.json') -Encoding utf8NoBOM
 Write-Host "Blender surface production qualification passed: $root/qualification.json"

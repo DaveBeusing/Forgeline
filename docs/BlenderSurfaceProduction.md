@@ -88,7 +88,8 @@ The qualifier performs two independent production exports, compares source and
 compiled file bytes, validates source-less assets and runs the existing compiled
 geometry/metadata/mechanical batching comparison for all 19 meshes. Native modifier
 cases cover planar reduction, collapse, calibrated bevel, normals, invalid options
-and moving-part protection. A full runtime seed enables a sealed overlay for the
+and moving-part protection. The reduced planar LOD is also compiled with authored
+UV/tangents and validated without source files. A full runtime seed enables a sealed overlay for the
 existing native capture/smoke tools. Normal CI executes Python contracts; the manual
 Blender workflow also executes native production qualification. Runtime visual,
 resource and package results are recorded separately in the qualification report.

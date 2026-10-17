@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import bpy
-from asset_contract import write_json, require
+from asset_contract import write_json, write_glb, require
 from production import validate_job, prepare_geometry
 from production_contract import gate, retarget_geometry
 from roundtrip import import_scene
@@ -51,3 +51,7 @@ require(len(candidate['primitives'][0]['indices'])==len(indices),'Moving partiti
 require(updated['sockets']==protected['sockets'] and updated['mechanicalParts']==protected['mechanicalParts'],'Moving pivot or range changed');passed.append('moving pivot and partition protection')
 write_json(Path(request['outputRoot'])/'native-production-contracts.json',{'success':True,'passed':passed,'planarReduction':measurement})
 print('Native production contracts passed:',len(passed))
+
+source=Path(request['outputRoot'])/'source';source.mkdir()
+write_glb(source/'generated.glb',lod)
+write_json(source/'generated.asset.json',{'id':'mesh.surface_fixture.lod2','type':'mesh','source':'generated.glb','scale':1.0})
