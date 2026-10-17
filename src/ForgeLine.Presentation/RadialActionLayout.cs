@@ -9,6 +9,7 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
     public bool IsValid => Count is >= 1 and <= 8 && float.IsFinite(Center.X) && float.IsFinite(Center.Y) &&
         float.IsFinite(Anchor.X) && float.IsFinite(Anchor.Y) && float.IsFinite(InnerRadius) &&
         float.IsFinite(OuterRadius) && InnerRadius > 0 && OuterRadius > InnerRadius;
+    public float LabelHalfWidth => InnerRadius < 80 * ((OuterRadius - InnerRadius) / 96) ? 30 * ((OuterRadius - InnerRadius) / 96) : 38 * ((OuterRadius - InnerRadius) / 96);
     public float Step => MathF.Tau / Count;
     public float Start(int slot) => -MathF.PI / 2 - Step / 2 + slot * Step + GapRadians / 2;
     public float End(int slot) => Start(slot) + Step - GapRadians;
@@ -40,7 +41,9 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
             var fit = TryFit(anchor, inner, inner + 96 * scale, hud.SafeArea, occupied, count);
             if (fit.IsValid) return fit;
         }
-        return default;
+        // Preserve fourteen-pixel type and the full control band; a narrower label box
+        // permits the compact inner hole when expanded hints occupy the left corner.
+        return TryFit(anchor, 60, 156, hud.SafeArea, occupied, count);
     }
 
     private static RadialActionLayout TryFit(Vector2 anchor, float inner, float outer, in HudRect safe,

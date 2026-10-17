@@ -8,6 +8,28 @@ namespace ForgeLine.Client.Tests;
 public sealed class UiReferenceScenarioTests
 {
     [Fact]
+    public void GroupReferenceStatesRetainWorldAndFitTheSharedHudAcrossAcceptanceDisplays()
+    {
+        var terrain=CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var source=VisualReferenceScene.Create(VisualReferenceSceneKind.BattlefieldCombat,terrain).Snapshot;
+        foreach(var state in new[]{UiReferenceScenario.GroupRing,UiReferenceScenario.GroupRingTools,UiReferenceScenario.GroupRingPartial,UiReferenceScenario.GroupRingEdge})
+        foreach(var display in new[]{(1280,720),(1920,1080),(2560,1440),(3440,1440),(3840,2160)})
+        foreach(var density in new[]{(96u,1f),(192u,2f)})
+        {
+            var snapshot=GroupActionRingCapture.Fixture(source,state);
+            Assert.True(source.Instances.SequenceEqual(snapshot.Instances));
+            var buffer=new PresentationSnapshotBuffer();buffer.Publish(snapshot);var world=new RenderWorld();world.Update(buffer);
+            var layout=GameplayHudLayout.Create(display.Item1,display.Item2,density.Item1,density.Item2);
+            var panel=GroupActionRingCapture.View(snapshot,state,world,new RtsCamera(),layout,density.Item1,density.Item2);
+            Assert.True(panel.Ring.Open);Assert.True(panel.Ring.Geometry.IsValid,$"{state} {display} {density}");
+            Assert.False(panel.DockExpanded);Assert.NotNull(panel.Ring.Group);
+            Assert.True(layout.SafeArea.Contains(panel.Ring.Geometry.Center-new System.Numerics.Vector2(panel.Ring.Geometry.OuterRadius)));
+            Assert.True(layout.SafeArea.Contains(panel.Ring.Geometry.Center+new System.Numerics.Vector2(panel.Ring.Geometry.OuterRadius)));
+            if(state==UiReferenceScenario.GroupRingPartial) Assert.InRange(panel.Ring.VisibleMembers,1,panel.Ring.Group.Count-1);
+        }
+    }
+
+    [Fact]
     public void NativeInteractionPairsMustChangePixelsWithinTheSameDisplayScope()
     {
         var hashes = new Dictionary<string,string>(StringComparer.Ordinal);

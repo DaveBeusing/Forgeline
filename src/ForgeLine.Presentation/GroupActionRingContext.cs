@@ -10,8 +10,9 @@ public sealed class GroupActionRingContext
 {
     private readonly EntityId[] _members;
     private readonly int[] _counts;
-    private GroupActionRingContext(EntityId[] members, int selected, int[] counts, SimulationTick tick)
-    { _members = members; SelectedCount = selected; _counts = counts; Tick = tick; }
+    private GroupActionRingContext(EntityId[] members, int selected, int[] counts, SimulationTick tick, bool hasFacts)
+    { _members = members; SelectedCount = selected; _counts = counts; Tick = tick; HasOperationalFacts = hasFacts; }
+    public bool HasOperationalFacts { get; }
     public int Count => _members.Length;
     public int SelectedCount { get; }
     public SimulationTick Tick { get; }
@@ -37,8 +38,8 @@ public sealed class GroupActionRingContext
             if (member.HasSupply && member.SupplyStatus is BattlefieldSupplyStatus.Critical or BattlefieldSupplyStatus.Unsupplied) counts[9]++;
             if (member.CombatEligible) counts[10]++;
         }
-        counts[11] = members.Count;
-        return new(members.ToArray(), selection.Count, counts, snapshot.Tick);
+        counts[11] = operational is null ? 0 : members.Count;
+        return new(members.ToArray(), selection.Count, counts, snapshot.Tick, operational is not null);
     }
 
     public bool SameMembers(GroupActionRingContext? other) => other is not null && _members.AsSpan().SequenceEqual(other._members);

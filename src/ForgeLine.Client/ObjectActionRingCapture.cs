@@ -9,7 +9,7 @@ namespace ForgeLine.Client;
 /// <summary>Reference states use the production menu/controller and copied permitted render instances.</summary>
 internal static class ObjectActionRingCapture
 {
-    internal static bool IsRing(UiReferenceScenario state) => state is >= UiReferenceScenario.RingConstruction and <= UiReferenceScenario.RingOffscreen;
+    internal static bool IsRing(UiReferenceScenario state) => state is >= UiReferenceScenario.RingConstruction and <= UiReferenceScenario.GroupRingEdge;
     internal static PlayerActionPanelMode Mode(UiReferenceScenario state) => state switch
     {
         UiReferenceScenario.RingConstruction or UiReferenceScenario.RingOpening50 or UiReferenceScenario.RingClosing50 or
@@ -24,6 +24,7 @@ internal static class ObjectActionRingCapture
     internal static (PresentationSnapshot Snapshot, PlayerActionPanelView Panel) Fixture(PresentationSnapshot source,
         UiReferenceScenario state, int width, int height, uint dpi, float scale)
     {
+        if (state is >= UiReferenceScenario.GroupRing) return (GroupActionRingCapture.Fixture(source,state),default);
         var player=source.PlayerExperience!.Value.Player;
         var entity=source.Instances.ToArray().Where(i=>i.Selectable.IsSelectable && i.Selectable.Owner==player)
             .OrderBy(i=>Vector3.DistanceSquared(i.Transform.Position, source.Instances[0].Transform.Position)).First().Entity;
@@ -38,8 +39,9 @@ internal static class ObjectActionRingCapture
     }
 
     internal static PlayerActionPanelView View(PresentationSnapshot snapshot, UiReferenceScenario state, RenderWorld world,
-        RtsCamera camera, in GameplayHudLayout layout)
+        RtsCamera camera, in GameplayHudLayout layout, uint dpi = 96, float scale = 1)
     {
+        if (state is >= UiReferenceScenario.GroupRing) return GroupActionRingCapture.View(snapshot,state,world,camera,layout,dpi,scale);
         var entity=snapshot.PlayerExperience!.Value.Selection.PrimaryEntity;
         if (!world.TryGetInterpolatedInstance(entity,1,out var actor)) throw new InvalidDataException("Ring fixture anchor absent.");
         camera.CenterOn(actor.Transform.Position);

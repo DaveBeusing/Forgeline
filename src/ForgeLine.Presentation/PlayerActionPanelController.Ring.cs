@@ -82,6 +82,12 @@ public sealed partial class PlayerActionPanelController
         { _selectionClickSequence = sequence; _selectionOpenArmed = false; }
     }
 
+    /// <summary>A recalled saved selection is an explicit menu invocation even when its identities are unchanged.</summary>
+    public void ReopenSelectionRing()
+    {
+        Close(); _pendingRequest = null; _groupResult = default; _selectionOpenArmed = false; _reopenSelection = true;
+    }
+
     public void AdoptPresentedRing(in ObjectActionRingView ring)
     {
         if (!_ringOpen || ring.Revision != _ringRevision || ring.Entity != _ringEntity || ring.Session != _ringSession ||

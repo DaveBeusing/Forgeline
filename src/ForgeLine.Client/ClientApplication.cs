@@ -1396,6 +1396,7 @@ internal sealed class ClientApplication
                         buildingPlacementController.IsActive ||
                         tacticalTargetingController.IsActive,
                     elapsed: frameElapsed);
+            if (combatGroupInputResult.Action == CombatGroupInputAction.Recalled) actionPanel.ReopenSelectionRing();
             hudInteraction.CaptureKeyboard(
                 combatGroupInputResult.Handled);
             if (cameraFocus.Update(inputState, currentSnapshot, camera, selectionController.Selection,

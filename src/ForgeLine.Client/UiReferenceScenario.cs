@@ -21,7 +21,7 @@ internal enum UiReferenceScenario
     OnboardingClosing25, OnboardingClosing50, OnboardingClosing75, OnboardingCollapsed,
     OnboardingOpening25, OnboardingOpening50, OnboardingOpening75,
     RingConstruction, RingProduction, RingUnits, RingLogistics, RingSupply, RingTactical, RingTechnology, RingParameters,
-    RingPending, RingEdge, RingTooltip, RingOpening50, RingClosing50, RingOffscreen
+    RingPending, RingEdge, RingTooltip, RingOpening50, RingClosing50, RingOffscreen, GroupRing, GroupRingTools, GroupRingPartial, GroupRingEdge
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>

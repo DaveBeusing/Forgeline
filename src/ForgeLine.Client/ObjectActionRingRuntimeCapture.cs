@@ -28,7 +28,7 @@ internal static class ObjectActionRingRuntimeCapture
             var camera=new RtsCamera(RtsVisualReference.CreateCameraSettings(scene.Target,RtsReferenceZoom.NormalGameplay));
             var layout=GameplayHudLayout.Create(1920,1080,96);
             var states=new[] { UiReferenceScenario.RingConstruction,UiReferenceScenario.RingProduction,UiReferenceScenario.RingUnits,
-                UiReferenceScenario.RingLogistics,UiReferenceScenario.RingSupply,UiReferenceScenario.RingTactical,UiReferenceScenario.RingTechnology,UiReferenceScenario.RingParameters };
+                UiReferenceScenario.RingLogistics,UiReferenceScenario.RingSupply,UiReferenceScenario.RingTactical,UiReferenceScenario.RingTechnology,UiReferenceScenario.RingParameters,UiReferenceScenario.GroupRing,UiReferenceScenario.GroupRingTools,UiReferenceScenario.GroupRingPartial };
             var frames=states.Select(state=>
             {
                 var snapshot=ObjectActionRingCapture.Fixture(scene.Snapshot,state,1920,1080,96,1).Snapshot;
@@ -46,11 +46,11 @@ internal static class ObjectActionRingRuntimeCapture
             graphics.WaitForIdle();
             var before=graphics.Diagnostics;var beforeSkin=hud.SkinDiagnostics;
             var comparisons=new List<object>();
-            for(int kind=0;kind<3;kind++)
+            for(int kind=0;kind<5;kind++)
             {
-                active=frames[1];
+                active=kind>=3 ? frames[8] : frames[1];
                 if(kind==0) active=(active.Snapshot,active.Panel with { Ring=default }); // previous expanded dock
-                if(kind==1) active=(active.Snapshot,active.Panel with { Mode=PlayerActionPanelMode.Closed,Ring=active.Panel.Ring with { Open=false,Geometry=default } });
+                if(kind is 1 or 3) active=(active.Snapshot,active.Panel with { Mode=PlayerActionPanelMode.Closed,Ring=active.Panel.Ring with { Open=false,Geometry=default } });
                 for(int i=0;i<32;i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
                 graphics.WaitForIdle();
                 ulong lastFence=graphics.Diagnostics.Frame?.GpuSubmissionFence ?? 0;
@@ -64,15 +64,16 @@ internal static class ObjectActionRingRuntimeCapture
                     { lastFence=frame.GpuSubmissionFence;gpu.Add(ms); }
                 }
                 graphics.WaitForIdle();Array.Sort(cpu);gpu.Sort();
-                comparisons.Add(new { Kind=kind==0 ? "LegacyExpandedDock":kind==1 ? "SingleObjectClosed":"SingleObjectRing",
+                comparisons.Add(new { Kind=kind==0 ? "LegacyExpandedDock":kind==1 ? "SingleObjectClosed":kind==2 ? "SingleObjectRing":kind==3 ? "GroupClosed":"GroupRing",
                     Warmups=32,Samples=128,CpuSubmitP50Microseconds=cpu[64],CpuSubmitP95Microseconds=cpu[121],
                     GpuSamples=gpu.Count,GpuP50Milliseconds=gpu.Count>0 ? (double?)gpu[gpu.Count/2]:null,
                     Skin=hud.SkinDiagnostics,Text=hud.TextDiagnostics,Vertices=hud.LastRenderedVertexCount });
             }
             var motion=new ObjectActionRingMotion();var transitions=new List<object>();
+            foreach(int motionContext in new[] {0,8})
             foreach(int hz in new[] {30,60,144}) foreach(bool reduced in new[] {false,true})
             {
-                var ring=frames[0].Panel.Ring;
+                var ring=frames[motionContext].Panel.Ring;
                 motion.Update(ring with {Open=false},TimeSpan.Zero,!reduced);
                 for(int direction=0;direction<2;direction++)
                 {
@@ -82,8 +83,8 @@ internal static class ObjectActionRingRuntimeCapture
                         double ms=Math.Min(160,i*1000.0/hz);
                         var visual=motion.Update(ring with {Open=direction==0},TimeSpan.FromMilliseconds(10+direction*180+ms),!reduced);
                         intermediate |= visual.Opacity is > 0 and < 1;
-                        active=(frames[0].Snapshot,frames[0].Panel with {Ring=visual});graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
-                        transitions.Add(new {InjectedHz=hz,ReducedMotion=reduced,Direction=direction,Milliseconds=ms,visual.Opacity,visual.Open});
+                        active=(frames[motionContext].Snapshot,frames[motionContext].Panel with {Ring=visual});graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
+                        transitions.Add(new {Group=motionContext==8,InjectedHz=hz,ReducedMotion=reduced,Direction=direction,Milliseconds=ms,visual.Opacity,visual.Open});
                     }
                     if (!reduced && !intermediate) throw new InvalidDataException("Ring opening/closing skipped its continuous alpha track.");
                     if (reduced && intermediate) throw new InvalidDataException("Reduced motion did not settle immediately.");
@@ -103,7 +104,7 @@ internal static class ObjectActionRingRuntimeCapture
             File.WriteAllText(Path.Combine(output,"qualification.json"),JsonSerializer.Serialize(new {
                 Source=typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                 Contract="Same-device clear/HUD/text comparison, world excluded; CPU includes waits/Present. Sampling Hz is injected presentation time, not measured FPS. Human motion/visual acceptance pending.",
-                ContextCycles=128,Before=before,After=after,BeforeSkin=beforeSkin,AfterSkin=skin,Comparisons=comparisons,Transitions=transitions },JsonOptions));
+                GroupAggregation=GroupActionRingMeasurements.Capture(),ContextCycles=128,Before=before,After=after,BeforeSkin=beforeSkin,AfterSkin=skin,Comparisons=comparisons,Transitions=transitions },JsonOptions));
             return 0;
         }
         catch(Exception error) { Console.Error.WriteLine("[ui:ring:failure] "+error);return 1; }

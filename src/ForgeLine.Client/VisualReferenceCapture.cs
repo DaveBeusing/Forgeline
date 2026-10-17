@@ -196,11 +196,11 @@ internal static class VisualReferenceCapture
                     var buffer = new PresentationSnapshotBuffer(); buffer.Publish(snapshot);
                     var world = new RenderWorld(); world.Update(buffer);
                     if (ObjectActionRingCapture.IsRing(uiScenario))
-                        panel=ObjectActionRingCapture.View(snapshot,uiScenario,world,camera,GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale));
+                        panel=ObjectActionRingCapture.View(snapshot,uiScenario,world,camera,GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale),rasterDpi,uiScale);
                     particles.Prepare(world, camera, display.Width, display.Height, 0);
                     particles.Prepare(world, camera, display.Width, display.Height, .1);
                     particles.Prepare(world, camera, display.Width, display.Height, .1);
-                    var selected = fixture.Snapshot.Instances.ToArray().Where(x => x.Selectable.IsSelectable).Take(3).Select(x => x.Entity).ToArray();
+                    var selected = panel.Ring.Group is not null ? snapshot.PlayerActions!.Tactical!.SelectedEntities.ToArray() : fixture.Snapshot.Instances.ToArray().Where(x => x.Selectable.IsSelectable).Take(3).Select(x => x.Entity).ToArray();
                     var indicators = new DebugDraw { Enabled = true };
                     foreach (var instance in fixture.Snapshot.Instances.ToArray().Where(x => selected.Contains(x.Entity)))
                     {
@@ -214,7 +214,7 @@ internal static class VisualReferenceCapture
                         HasPointer = uiScenario == UiReferenceScenario.Targeting, PointerPosition = new(display.Width * .5f, display.Height * .5f) };
                     var targeting = uiScenario == UiReferenceScenario.Targeting ? new TacticalTargetingView(TacticalTargetingMode.Attack, 2, 1, 1, 0)
                     { HasPointerTarget = true, PointerTargetValid = true, PointerWorldTarget = fixture.Target } : default;
-                    var captureUx = UiReferenceStates.IsOnboarding(uiScenario) ? default(PreAlphaUxView) with
+                    var captureUx = UiReferenceStates.IsOnboarding(uiScenario) || uiScenario is >= UiReferenceScenario.GroupRing ? default(PreAlphaUxView) with
                     {
                         ShowOnboarding = true,
                         Guidance = new EarlyGameGuidanceController().Update(snapshot, true),
@@ -240,7 +240,7 @@ internal static class VisualReferenceCapture
                             IsActive = true, IsSelected = true, HasHealth = true, Health = .4, HasSupply = true,
                             SupplyStatus = BattlefieldSupplyStatus.Critical, Fuel = .12, Ammunition = .08,
                             HasReadiness = true, Readiness = .31, HasFormation = true, Formation = FormationTemplate.Wedge }], []) : CombatGroupOverviewView.Empty;
-                    if (uiScenario == UiReferenceScenario.SelectedGroup && SelectedCombatGroup.Resolve(snapshot) is { } groupMembers)
+                    if ((uiScenario == UiReferenceScenario.SelectedGroup || panel.Ring.Group is not null) && SelectedCombatGroup.Resolve(snapshot) is { } groupMembers)
                     {
                         var selectedUnits = new SelectionSet(); selectedUnits.Replace(groupMembers.EligibleEntities.ToArray());
                         groups = new CombatGroupOverviewView([], [], SelectedCombatGroup.Create(groupMembers, selectedUnits));

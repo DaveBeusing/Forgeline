@@ -39,7 +39,7 @@ internal sealed partial class PlayerActionDockHudRenderer
             fill.W *= opacity;
             RingSegment(geometry, i, fill, width, height);
             Vector2 center = geometry.LabelCenter(i);
-            float iconSize = 20 * scale;
+            float iconSize = 20 * scale, halfWidth = geometry.LabelHalfWidth;
             var icon = mode ? PlayerActionDockHudModel.ResolveModeIcon(target.Mode) :
                 item ? PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, target.ItemIndex, actions) :
                 PlayerActionDockHudModel.ResolveModeIcon(panel.Mode);
@@ -60,14 +60,14 @@ internal sealed partial class PlayerActionDockHudRenderer
             if (slot.Navigation == ActionRingNavigation.Group && ring.Group is { } identity)
             {
                 var heading = new HudTextBuilder(valueBuffer); heading.Append("Group "); heading.Append(identity.Count);
-                _text.AddCentered(heading.Written, new(center.X - 38 * scale, center.Y - 7 * scale, 76 * scale, 20 * scale),
+                _text.AddCentered(heading.Written, new(center.X - halfWidth, center.Y - 7 * scale, halfWidth * 2, 20 * scale),
                     14 * scale, text, width, height, true);
             }
-            else _text.AddCentered(label, new(center.X - 38 * scale, center.Y - 7 * scale, 76 * scale, 20 * scale),
+            else _text.AddCentered(label, new(center.X - halfWidth, center.Y - 7 * scale, halfWidth * 2, 20 * scale),
                 14 * scale, text, width, height, true);
             var value = new HudTextBuilder(valueBuffer);
             if (slot.Navigation == ActionRingNavigation.GroupControl && ring.Group is { } group)
-            { value.Append(group.Participants(target.ItemIndex)); value.Append(" / "); value.Append(group.SelectedCount); }
+            { if (group.HasOperationalFacts) value.Append(group.Participants(target.ItemIndex)); else value.Append("Unknown"); value.Append(" / "); value.Append(group.SelectedCount); }
             else if (slot.Navigation == ActionRingNavigation.Group && ring.Group is { } summary)
                 value.Append(ring.VisibleMembers < summary.Count ? "Part visible" : "Selection tools");
             else if (item && panel.Mode == PlayerActionPanelMode.Tactical && ring.Group is { } participants && actions?.Tactical is { } tactical)
@@ -81,7 +81,7 @@ internal sealed partial class PlayerActionDockHudRenderer
                 value.Append(!state.CanActivate ? state.DisabledReason :
                     PlayerActionDockHudModel.ResolvePrimaryActionLabel(panel.Mode, target.ItemIndex, actions));
             }
-            _text.AddCentered(value.Written, new(center.X - 38 * scale, center.Y + 12 * scale, 76 * scale, 16 * scale),
+            _text.AddCentered(value.Written, new(center.X - halfWidth, center.Y + 12 * scale, halfWidth * 2, 16 * scale),
                 12 * scale, text, width, height);
         }
         if (ring.Level == ActionRingLevel.Parameters)
@@ -91,7 +91,7 @@ internal sealed partial class PlayerActionDockHudRenderer
             var text = new HudTextBuilder(buffer);
             text.Append(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, ring.Slots[0].Target.ItemIndex, actions));
             var selected = geometry.LabelCenter(6);
-            _text.AddCentered(text.Written, new(selected.X - 38 * scale, selected.Y + 12 * scale, 76 * scale, 16 * scale),
+            _text.AddCentered(text.Written, new(selected.X - geometry.LabelHalfWidth, selected.Y + 12 * scale, geometry.LabelHalfWidth * 2, 16 * scale),
                 12 * scale, MutedTextColor with { W = MutedTextColor.W * opacity }, width, height);
         }
     }

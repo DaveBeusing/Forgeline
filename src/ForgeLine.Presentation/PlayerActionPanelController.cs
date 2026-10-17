@@ -54,7 +54,7 @@ public readonly record struct PlayerActionPanelView(
 {
     public UiMotionView? Motion { get; init; }
     public ObjectActionRingView Ring { get; init; }
-    public bool DockExpanded => IsOpen && !Ring.SingleOwned;
+    public bool DockExpanded => IsOpen && !Ring.UsesRing;
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
 }

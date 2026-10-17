@@ -5,6 +5,7 @@ using ForgeLine.Input;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Client.Tests;
@@ -42,6 +43,7 @@ public sealed class GroupActionRingTests
     {
         var (controller,input,snapshot,selection,_) = Open(10);
         Click(controller,input,snapshot,selection,0); // common tactical category
+        Assert.False(View(controller,snapshot).DockExpanded);
         Click(controller,input,snapshot,selection,2); // Stop
         Assert.True(controller.TryTakeRequest(out var request));
         var expected = PlayerActionRequest.StopCombat(selection.ToArray());
@@ -161,6 +163,85 @@ public sealed class GroupActionRingTests
         for(int i=0;i<128;i++) controller.SynchronizeObjectRing(input,snapshot,world,selection,false);
         Assert.Equal(0,GC.GetAllocatedBytesForCurrentThread()-before);
         Assert.Same(group,View(controller,snapshot).Ring.Group);
+    }
+
+    [Fact]
+    public void ForeignAndGenerationMismatchedActorsNeverContributeAnchorOrCapabilities()
+    {
+        var snapshot=Snapshot(2);var selection=new SelectionSet();selection.Replace([new(1,1),new(2,2),new(99,1)]);
+        var group=GroupActionRingContext.Capture(snapshot,World(snapshot),selection)!;
+        Assert.Equal(1,group.Count);Assert.Equal(3,group.SelectedCount);
+        Assert.Equal(1,group.Participants(10));
+        var foreign=snapshot.Instances.ToArray();
+        foreign[0]=foreign[0] with{Selectable=new(new PlayerId(2),ControllableEntityCategory.Unit)};
+        var changed=new PresentationSnapshot(snapshot.Tick,snapshot.TickDuration,2,foreign,sessionId:snapshot.SessionId,playerExperience:snapshot.PlayerExperience);
+        var filtered=GroupActionRingContext.Capture(changed,World(changed),selection)!;
+        Assert.Equal(0,filtered.Count);
+        Assert.False(filtered.TryAnchor(World(changed),new RtsCamera(),1,new(1),GameplayHudLayout.Create(1920,1080,96),out _,out _));
+    }
+
+    [Fact]
+    public void MissingOperationalFactsRemainUnknownAndCannotEnableGroupFilters()
+    {
+        var snapshot=Snapshot(2);
+        var noFacts=new PresentationSnapshot(snapshot.Tick,snapshot.TickDuration,2,snapshot.Instances,sessionId:snapshot.SessionId,playerExperience:snapshot.PlayerExperience);
+        var selection=new SelectionSet();selection.Replace([new(1,1),new(2,1)]);
+        var context=GroupActionRingContext.Capture(noFacts,World(noFacts),selection)!;
+        Assert.Equal(2,context.Count);Assert.False(context.HasOperationalFacts);Assert.Equal(0,context.Participants(10));Assert.Equal(0,context.Participants(8));
+        var control=new CombatGroupCardController();Assert.False(control.Activate(3,noFacts,selection).SelectionChanged);
+        Assert.Equal(2,selection.Count);
+    }
+
+    [Fact]
+    public void SavedGroupRecallReopensOneContextAndDismissedContextDoesNotReopenAtNextTick()
+    {
+        var (controller,input,snapshot,selection,world)=Open(10);
+        Click(controller,input,snapshot,selection,7);
+        controller.DismissTransient(input);
+        input.BeginFrame();
+        controller.SynchronizeObjectRing(input,Snapshot(10,tick:5),World(Snapshot(10,tick:5)),selection,true,true);
+        Assert.False(View(controller,snapshot).Ring.Open);
+        controller.ReopenSelectionRing();
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,true,true);
+        Assert.True(View(controller,snapshot).Ring.Open);
+        Assert.Equal(10,View(controller,snapshot).Ring.Group!.Count);
+        controller.DismissTransient(input);
+        selection.Replace([new(2,1),new(3,1)]);
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,true,true);
+        Assert.True(View(controller,snapshot).Ring.Open);Assert.Equal(2,View(controller,snapshot).Ring.Group!.Count);
+        Assert.Equal(PlayerActionPanelMode.Closed,controller.Mode);
+        Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Theory]
+    [InlineData(false)] [InlineData(true)]
+    public void OutsideRightClickClosesGroupSubmenusAndMovesTheWholeSelectionExactlyOnce(bool coalesced)
+    {
+        var (controller,input,snapshot,selected,world)=Open(10);
+        Click(controller,input,snapshot,selected,7);
+        var owner=new RtsSelectionController(new(new PlayerId(1),ControllableEntityCategory.Unit));
+        var camera=new RtsCamera();var terrain=new FlatTerrain();
+        input.BeginFrame();owner.Update(input,camera,world,terrain,1920,1080,1);
+        owner.Selection.Replace(selected.ToArray());
+        var menus=new TransientHudMenuController();var operations=new OperationsController();var interaction=new PresentationInteractionState();
+        var layout=GameplayHudLayout.Create(1920,1080,96);
+        menus.Update(input,snapshot,layout,owner.Selection,controller,operations,interaction,true,false);
+        input.BeginFrame();input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,PlatformMouseButton.Right,960,450));
+        if(coalesced) input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp,PlatformMouseButton.Right,960,450));
+        menus.Update(input,snapshot,layout,owner.Selection,controller,operations,interaction,true,false);
+        Assert.False(menus.PointerCaptured);Assert.False(controller.HasOpenMenu);
+        owner.Update(input,camera,world,terrain,1920,1080,1,menus.PointerCaptured);
+        Assert.True(owner.TryTakeMovementRequest(out var request));Assert.Equal(selected.ToArray(),request.Entities);
+        Assert.False(owner.TryTakeMovementRequest(out _));Assert.False(controller.TryTakeRequest(out _));
+        input.BeginFrame();input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp,PlatformMouseButton.Right,960,450));
+        owner.Update(input,camera,world,terrain,1920,1080,1);
+        Assert.False(owner.TryTakeMovementRequest(out _));
+    }
+    private sealed class FlatTerrain : ITerrainQuery
+    {
+        public AxisAlignedBounds WorldBounds => new(new Vector3(-1000),new Vector3(1000));
+        public bool TrySampleHeight(float x,float z,out float height){height=0;return true;}
+        public bool TrySampleNormal(float x,float z,out Vector3 normal){normal=Vector3.UnitY;return true;}
     }
 
     private static (PlayerActionPanelController,InputState,PresentationSnapshot,SelectionSet,RenderWorld) Open(int count)
