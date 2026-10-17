@@ -15,7 +15,8 @@ public enum BuildingPlacementFailureReason
     SlopeTooSteep = 4,
     Obstructed = 5,
     OutsideBuildableArea = 6,
-    ResourceDepositRequired = 7
+    ResourceDepositRequired = 7,
+    LoadingCorridorUnavailable = 8
 }
 
 public readonly record struct BuildingPlacementResult(
@@ -27,6 +28,8 @@ public readonly record struct BuildingPlacementResult(
     AxisAlignedBounds Bounds,
     EntityId ResourceDeposit)
 {
+    public AxisAlignedBounds? LoadingCorridor { get; init; }
+
     public static BuildingPlacementResult Invalid(
         BuildingPlacementFailureReason failure,
         BuildingId buildingId,
@@ -51,7 +54,10 @@ public readonly record struct BuildingPlacementPreview(
     AxisAlignedBounds Bounds,
     bool IsValid,
     BuildingPlacementFailureReason Failure,
-    EntityId ResourceDeposit);
+    EntityId ResourceDeposit)
+{
+    public AxisAlignedBounds? LoadingCorridor { get; init; }
+}
 
 public interface IBuildableAreaQuery
 {
@@ -148,7 +154,7 @@ public sealed class BuildingPlacementService
             result.Bounds,
             result.IsValid,
             result.Failure,
-            result.ResourceDeposit);
+            result.ResourceDeposit) { LoadingCorridor = result.LoadingCorridor };
     }
 
     public BuildingPlacementResult Evaluate(
@@ -314,6 +320,47 @@ public sealed class BuildingPlacementService
             }
         }
 
+        // Buildings may not strand an existing bay, including a currently occupied
+        // extended approach. This does not add lane shapes to navigation blockers.
+        foreach (EntityId occupied in entities.Query<VehicleDockSlot>())
+        {
+            var slot = entities.GetComponent<VehicleDockSlot>(occupied);
+            if (occupied != ignoredEntity && slot.Pose.IntersectsLane(bounds))
+                return new(false, BuildingPlacementFailureReason.LoadingCorridorUnavailable, buildingId,
+                    groundPosition, orientation, bounds, deposit) { LoadingCorridor = slot.Pose.CorridorBounds };
+        }
+        _spatialIndex.QueryAabb(new AxisAlignedBounds(bounds.Minimum - new Vector3(64, 16, 64), bounds.Maximum + new Vector3(64, 16, 64)), _queryBuffer);
+        foreach (EntityId neighbor in _queryBuffer.Results)
+        {
+            if (neighbor == ignoredEntity || !entities.TryGetComponent(neighbor, out BuildingLoadingDock existingDock) ||
+                !entities.TryGetComponent(neighbor, out WorldTransform existingBuilding)) continue;
+            var design = WorldTransform.Identity with { Scale = new Vector3(3.4f, 2.5f, 6.8f) };
+            if (VehicleDockPose.TryCreate(existingDock, existingBuilding, design, out var existingPose) && existingPose.IntersectsLane(bounds))
+                return new(false, BuildingPlacementFailureReason.LoadingCorridorUnavailable, buildingId,
+                    groundPosition, orientation, bounds, deposit) { LoadingCorridor = existingPose.CorridorBounds };
+        }
+
+        AxisAlignedBounds? loadingCorridor = null;
+        if (definition.LoadingDock is BuildingLoadingDock loadingDock)
+        {
+            var buildingTransform = new WorldTransform(groundPosition + new Vector3(0, definition.Footprint.Height * 0.5f, 0), BuildingFootprint.GetRotation(orientation), Vector3.One);
+            var designTruck = WorldTransform.Identity with { Scale = new Vector3(3.4f, 2.5f, 6.8f) };
+            if (!VehicleDockPose.TryCreate(loadingDock, buildingTransform, designTruck, out var dockPose))
+                return BuildingPlacementResult.Invalid(BuildingPlacementFailureReason.LoadingCorridorUnavailable, buildingId, groundPosition, orientation);
+            loadingCorridor = dockPose.CorridorBounds;
+            bool clear = dockPose.HasDrivableTerrain(_terrain) && !dockPose.IntersectsLane(bounds);
+            if (clear)
+            {
+                _spatialIndex.QueryAabb(loadingCorridor.Value, _queryBuffer, order: SpatialQueryOrder.StableEntityId);
+                foreach (EntityId occupant in _queryBuffer.Results)
+                    if (occupant != ignoredEntity && _spatialIndex.TryGetEntry(occupant, out SpatialEntry entry) &&
+                        dockPose.IntersectsLane(entry.Bounds)) { clear = false; break; }
+            }
+            if (!clear)
+                return new BuildingPlacementResult(false, BuildingPlacementFailureReason.LoadingCorridorUnavailable,
+                    buildingId, groundPosition, orientation, bounds, deposit) { LoadingCorridor = loadingCorridor };
+        }
+
         return new BuildingPlacementResult(
             true,
             BuildingPlacementFailureReason.None,
@@ -321,7 +368,7 @@ public sealed class BuildingPlacementService
             groundPosition,
             orientation,
             bounds,
-            deposit);
+            deposit) { LoadingCorridor = loadingCorridor };
     }
 
     private bool IsWithinWorldBounds(in AxisAlignedBounds bounds)

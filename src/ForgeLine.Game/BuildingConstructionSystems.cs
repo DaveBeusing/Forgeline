@@ -221,6 +221,8 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
                 request.Issuer,
                 ControllableEntityCategory.Building));
         context.Entities.AddComponent(site, presence);
+        if (definition.LoadingDock is BuildingLoadingDock dock)
+            context.Entities.AddComponent(site, dock);
         context.Entities.AddComponent(
             site,
             new ConstructionSite(
@@ -519,8 +521,6 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                 site.BuildingId,
                 site.Owner,
                 context.Tick));
-        if (definition.LoadingDock is BuildingLoadingDock dock)
-            context.Entities.AddComponent(entity, dock);
         context.Entities.RemoveComponent<ConstructionSite>(entity);
 
         _completedBuildings++;
