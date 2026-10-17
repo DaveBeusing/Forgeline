@@ -47,7 +47,8 @@ internal static class GroupActionRingCapture
         input.BeginFrame();input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,PlatformMouseButton.Left,500,400));
         input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp,PlatformMouseButton.Left,500,400));
         controller.SynchronizeObjectRing(input,snapshot,world,selection,true,true);
-        HudRect[] occupied=[layout.TopStatusBar,layout.SelectionInspector,layout.Minimap,layout.VisibleActionDock(false),layout.NotificationBounds(false),layout.OnboardingBounds,OperationsLayout.Entry(layout)];
+        var occupied=new HudRect[8];
+        RadialActionLayout.ResolveObstacles(occupied,layout,OnboardingPresentation.Resolve(layout,0));
         var panel=controller.CreateView(layout.ViewportWidth,layout.ViewportHeight,snapshot.PlayerActions,dpi,scale);
         var ring=panel.Ring.Project(world,camera,1,snapshot,layout,occupied);
         if (state is UiReferenceScenario.GroupRingTools or UiReferenceScenario.GroupRing && ring.Geometry.IsValid)

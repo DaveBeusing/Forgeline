@@ -26,7 +26,9 @@ internal static class ObjectActionRingCapture
     {
         if (state is >= UiReferenceScenario.GroupRing) return (GroupActionRingCapture.Fixture(source,state),default);
         var player=source.PlayerExperience!.Value.Player;
-        var entity=source.Instances.ToArray().Where(i=>i.Selectable.IsSelectable && i.Selectable.Owner==player)
+        bool unit = Mode(state) is PlayerActionPanelMode.Tactical or PlayerActionPanelMode.Supply;
+        var category = unit ? ControllableEntityCategory.Unit : ControllableEntityCategory.Building;
+        var entity=source.Instances.ToArray().Where(i=>i.Selectable.IsSelectable && i.Selectable.Owner==player && (i.Selectable.Category & category) != 0)
             .OrderBy(i=>Vector3.DistanceSquared(i.Transform.Position, source.Instances[0].Transform.Position)).First().Entity;
         var fixture=CommandDockCapture.Fixture(source,Mode(state),state==UiReferenceScenario.RingPending ? "Pending":"Ready",width,height,dpi,scale,entity);
         var a=fixture.Snapshot.PlayerActions!;
@@ -35,7 +37,7 @@ internal static class ObjectActionRingCapture
         var actions=new PlayerActionSnapshot(a.SessionId,a.Tick,a.Construction,a.PendingCommandCount,a.Production,a.UnitProduction,a.Logistics,a.Supply,tactical,a.Technology);
         var e=fixture.Snapshot.PlayerExperience!.Value;
         return (new(source.Tick,source.TickDuration,source.SimulationEntityCount,source.Instances,source.Intelligence,source.SessionId,
-            e with { Selection=e.Selection with { Count=1,PrimaryEntity=entity } },playerActions:actions,vfxMetrics:source.VfxMetrics),default);
+            e with { Selection=e.Selection with { Count=1,PrimaryEntity=entity,Kind=unit ? PlayerSelectionKind.Unit : PlayerSelectionKind.Building,DisplayName=unit ? "Selected unit" : "Selected building" } },playerActions:actions,vfxMetrics:source.VfxMetrics),default);
     }
 
     internal static PlayerActionPanelView View(PresentationSnapshot snapshot, UiReferenceScenario state, RenderWorld world,
@@ -57,7 +59,8 @@ internal static class ObjectActionRingCapture
         input.BeginFrame(); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,GameplayBindingRegistry.Default.Key(action)));
         controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,currentSelection:selection);
         var panel=controller.CreateView(layout.ViewportWidth,layout.ViewportHeight,snapshot.PlayerActions);
-        HudRect[] occupied=[layout.TopStatusBar,layout.SelectionInspector,layout.Minimap,layout.VisibleActionDock(false),layout.NotificationBounds(false),OperationsLayout.Entry(layout)];
+        var occupied=new HudRect[8];
+        RadialActionLayout.ResolveObstacles(occupied,layout);
         var ring=panel.Ring.Project(world,camera,1,snapshot,layout,occupied);
         if (state==UiReferenceScenario.RingParameters && ring.Geometry.IsValid)
         {

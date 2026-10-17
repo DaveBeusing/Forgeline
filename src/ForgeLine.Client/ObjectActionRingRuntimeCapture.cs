@@ -46,10 +46,10 @@ internal static class ObjectActionRingRuntimeCapture
             graphics.WaitForIdle();
             var before=graphics.Diagnostics;var beforeSkin=hud.SkinDiagnostics;
             var comparisons=new List<object>();
-            for(int kind=0;kind<5;kind++)
+            for(int kind=0;kind<6;kind++)
             {
                 active=kind>=3 ? frames[8] : frames[1];
-                if(kind==0) active=(active.Snapshot,active.Panel with { Ring=default }); // previous expanded dock
+                if(kind is 0 or 5) active=(active.Snapshot,active.Panel with { Ring=default }); // previous expanded dock
                 if(kind is 1 or 3) active=(active.Snapshot,active.Panel with { Mode=PlayerActionPanelMode.Closed,Ring=active.Panel.Ring with { Open=false,Geometry=default } });
                 for(int i=0;i<32;i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
                 graphics.WaitForIdle();
@@ -64,7 +64,7 @@ internal static class ObjectActionRingRuntimeCapture
                     { lastFence=frame.GpuSubmissionFence;gpu.Add(ms); }
                 }
                 graphics.WaitForIdle();Array.Sort(cpu);gpu.Sort();
-                comparisons.Add(new { Kind=kind==0 ? "LegacyExpandedDock":kind==1 ? "SingleObjectClosed":kind==2 ? "SingleObjectRing":kind==3 ? "GroupClosed":"GroupRing",
+                comparisons.Add(new { Kind=kind==0 ? "LegacyExpandedDock":kind==1 ? "SingleObjectClosed":kind==2 ? "SingleObjectRing":kind==3 ? "GroupClosed":kind==4 ? "GroupRing":"GroupExpandedDockReference",
                     Warmups=32,Samples=128,CpuSubmitP50Microseconds=cpu[64],CpuSubmitP95Microseconds=cpu[121],
                     GpuSamples=gpu.Count,GpuP50Milliseconds=gpu.Count>0 ? (double?)gpu[gpu.Count/2]:null,
                     Skin=hud.SkinDiagnostics,Text=hud.TextDiagnostics,Vertices=hud.LastRenderedVertexCount });

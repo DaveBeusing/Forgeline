@@ -277,8 +277,8 @@ internal static class VisualReferenceCapture
                         if (ObjectActionRingCapture.IsRing(uiScenario))
                         {
                             var ringLayout=GameplayHudLayout.Create(context.Width,context.Height,rasterDpi,uiScale);
-                            Span<HudRect> ringOccupied=stackalloc HudRect[6] { ringLayout.TopStatusBar,ringLayout.SelectionInspector,
-                                ringLayout.Minimap,ringLayout.VisibleActionDock(false),ringLayout.NotificationBounds(false),OperationsLayout.Entry(ringLayout) };
+                            Span<HudRect> ringOccupied=stackalloc HudRect[8];
+                            RadialActionLayout.ResolveObstacles(ringOccupied,ringLayout,captureUx.Onboarding,operations);
                             panel=panel with { Ring=panel.Ring.Project(world,camera,1,snapshot,ringLayout,ringOccupied) };
                         }
                         hud.Render(context, camera, snapshot, terrain.WorldBounds, information, panel, targeting,
