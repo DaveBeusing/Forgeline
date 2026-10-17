@@ -9,7 +9,7 @@ The system keeps the player-facing model readable while preserving authoritative
 - Fuel is consumed by movement.
 - Ammunition is consumed through the combat-facing ammunition hook.
 - Supply Depots receive stock through the existing regional logistics network.
-- Supply Trucks normally load when physically near an operational Supply Depot; a friendly Command Core is a deterministic fallback loading source when needed battlefield stock is unavailable from depots.
+- Supply Trucks load through an explicit dock visit to an operational owned Supply Depot or a compatible Command Core fallback.
 - Units receive resources only from an eligible provider within its resupply range.
 - No battlefield resource is granted through a global pool or remote shortcut.
 
@@ -94,7 +94,7 @@ The vehicle has two distinct inventory responsibilities:
 - a dedicated operational Fuel inventory used for its own movement;
 - a cargo inventory that carries Fuel and Ammunition for recipients.
 
-Supply Trucks are explicitly excluded from the regional automated-distribution truck pool. Their normal battlefield loading source is an operational friendly Supply Depot within loading range. A friendly Command Core may also act as a fallback loading source when it is physically within the same loading range and holds Fuel or Ammunition the truck currently needs. This recovery path transfers real inventory stock; it does not create resources or bypass movement.
+Supply Trucks are explicitly excluded from the regional automated-distribution truck pool. The existing Resupply command and opponent planner create a `SupplyLoadingOrder` for a compatible owned Supply Depot or Command Core. The truck must claim the shared lane, reach its exact pose, remain still and complete timed service before real stock transfers. Passing within loading range does not replenish cargo. See [Vehicle Docking](VehicleDocking.md).
 
 The fallback prevents battlefield recovery from deadlocking when regional depot stock is temporarily exhausted while real reserve stock still exists at the base. Supply Depots remain the preferred forward logistics layer, and Supply Trucks still have to travel to a valid loading source before their cargo can be replenished.
 
@@ -123,7 +123,7 @@ This is intentionally automatic. The player manages provider positioning, depot 
 
 `ResupplyCommand` gives selected friendly units a normal simulation command for deliberate resupply.
 
-The command validates ownership and supply eligibility, uses `BattlefieldResupplyPlanner` to select a provider, and stores a real `ResupplyOrder`. A mobile recipient approaches the provider. When the recipient cannot afford that trip or is immobilized, an eligible Supply Truck may instead approach the recipient.
+For a Supply Truck without a cargo transport job, the command first selects a compatible building loading source and creates the dock loading order described above. Other recipients use `BattlefieldResupplyPlanner` and a real `ResupplyOrder`. A mobile recipient approaches the provider. When the recipient cannot afford that trip or is immobilized, an eligible Supply Truck may instead approach the recipient.
 
 Navigation and `GroundMovementSystem` remain authoritative for movement. The command never teleports resources or changes transforms. Already-in-range supply does not require either party to fund a journey.
 

@@ -39,8 +39,9 @@ Writes use a temporary file followed by atomic replacement. A partially written 
 
 The current reader accepts envelope format 1 and payload schema 3. Schema 3
 requires a composition identity and authoritative checkpoint schema 2, including
-vehicle docking semantics. Older payloads and pre-docking replay checkpoints are
-rejected explicitly before runtime reconstruction. Unlimited backward
+vehicle docking semantics. The existing schema-1 composition migration remains
+available only with a compatible authoritative checkpoint; pre-docking
+checkpoints and schema-2 payloads are rejected before runtime reconstruction. Unlimited backward
 compatibility is not implied.
 
 ## Save Payload
