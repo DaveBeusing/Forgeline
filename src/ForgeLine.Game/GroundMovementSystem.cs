@@ -172,6 +172,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         ref int obstacleAdjustments)
     {
         float stopRadius = order.TargetHeadingRadians.HasValue ? 0.1f : movement.StopRadius;
+        float arrivalRadius = stopRadius + 0.01f;
         Vector3 position = transform.Position;
         Vector3 targetDelta = Horizontal(order.WorldTarget - position);
         float distanceToTarget = targetDelta.Length();
@@ -258,7 +259,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         bool newOrder =
             state.ObservedOrderTick.Value != order.AcceptedAtTick.Value;
 
-        if (distanceToTarget <= stopRadius && order.TargetHeadingRadians is float targetHeading &&
+        if (distanceToTarget <= arrivalRadius && order.TargetHeadingRadians is float targetHeading &&
             MathF.Abs(GroundMovementState.NormalizeAngle(state.HeadingRadians - targetHeading)) > MathF.PI / 90)
         {
             float aligned = MoveTowardsAngle(state.HeadingRadians, targetHeading, movement.TurnRateRadiansPerSecond * deltaSeconds);
@@ -266,7 +267,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             entities.SetComponent(entity, state with { HeadingRadians = aligned, Velocity = Vector3.Zero });
             return;
         }
-        if (distanceToTarget <= stopRadius)
+        if (distanceToTarget <= arrivalRadius)
         {
             WorldTransform arrivedTransform = SnapToTerrain(
                 transform,
@@ -345,7 +346,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             MathF.Max(
                 0.0f,
                 2.0f * movement.Deceleration * remainingDistance));
-        float maximumSpeed = order.TargetHeadingRadians.HasValue ? MathF.Min(distanceToTarget > 12 ? 4 : 2, movement.MaximumSpeed) : movement.MaximumSpeed;
+        float maximumSpeed = order.TargetHeadingRadians.HasValue ? MathF.Min(distanceToTarget > 4 ? 6 : 2, movement.MaximumSpeed) : movement.MaximumSpeed;
         if (order.TargetHeadingRadians.HasValue && MathF.Abs(GroundMovementState.NormalizeAngle(desiredHeading - state.HeadingRadians)) > MathF.PI / 30)
             maximumSpeed = MathF.Min(maximumSpeed, 1);
 
@@ -418,8 +419,9 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         Vector3 newDelta = Horizontal(order.WorldTarget - candidate);
         float newDistance = newDelta.Length();
 
-        bool arrived =
-            newDistance <= stopRadius + 0.01f;
+        bool arrived = newDistance <= arrivalRadius &&
+            (!order.TargetHeadingRadians.HasValue ||
+             MathF.Abs(GroundMovementState.NormalizeAngle(heading - order.TargetHeadingRadians.Value)) <= MathF.PI / 90);
 
         if (arrived)
         {

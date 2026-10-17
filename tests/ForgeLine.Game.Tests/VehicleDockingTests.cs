@@ -1,6 +1,7 @@
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Combat;
+using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 using ForgeLine.World;
 using Xunit;
@@ -260,6 +261,81 @@ public sealed class VehicleDockingTests
         public AxisAlignedBounds WorldBounds => new(new(-10, -10, -10), new(20, 10, 30));
         public bool TrySampleHeight(float worldX, float worldZ, out float height) { height = 0; return true; }
         public bool TrySampleNormal(float worldX, float worldZ, out Vector3 normal) { normal = Vector3.UnitY; return true; }
+    }
+
+    [Fact]
+    public void ArrivalToleranceStillCompletesTheRequestedBodyHeading()
+    {
+        var fixture = new Fixture();
+        var movement = GroundMovement.CreateDefault();
+        fixture.Simulation.Entities.AddComponent(fixture.Truck, movement);
+        fixture.SetTruck(new(0.105f, movement.HeightOffset, 14), 0, 0);
+        fixture.Simulation.Entities.AddComponent(fixture.Truck,
+            new MovementOrder(new(1), new(0, movement.HeightOffset, 14), SimulationTick.Zero, new(1), MovementOrderKind.LocalApproach, MathF.PI / 2));
+        fixture.Simulation.RegisterSystem(new GroundMovementSystem());
+        for (int tick = 0; tick < 60; tick++) fixture.Step(_ => { });
+        var state = fixture.Simulation.Entities.GetComponent<GroundMovementState>(fixture.Truck);
+        Assert.True(MathF.Abs(state.HeadingRadians - MathF.PI / 2) <= MathF.PI / 90);
+        Assert.False(fixture.Simulation.Entities.HasComponent<MovementOrder>(fixture.Truck));
+        Assert.True(Vector3.Distance(fixture.Simulation.Entities.GetComponent<WorldTransform>(fixture.Truck).Position,
+            new Vector3(0, movement.HeightOffset, 14)) <= 0.11f);
+    }
+
+    [Fact]
+    public void CoarseBlockedEntryUsesAFreeApproachWithoutMovingTheAuthoredDock()
+    {
+        var settings = new WorldGridSettings { ChunkSizeMeters = 256, HeightSamplesPerSide = 33 };
+        var terrain = new TerrainWorld(settings, [new TerrainChunk(new(0, 0),
+            new TerrainHeightfield(33, 256, new float[33 * 33]))]);
+        var buildingBounds = new AxisAlignedBounds(new(54, -1, 54), new(74, 8, 74));
+        var navigation = new HierarchicalNavigationSystem(new HierarchicalPathfinder(NavigationWorld.Build(terrain,
+            [buildingBounds], new NavigationGridSettings { CellSizeMeters = 32 },
+            new NavigationSectorSettings { SectorSizeCells = 4 })));
+        var spatial = new SpatialGridIndex();
+        var fixture = new Fixture(new VehicleDockingService(terrain, spatial, navigation));
+        var transform = new WorldTransform(new(64, 0, 64), Quaternion.Identity, Vector3.One);
+        fixture.Simulation.Entities.SetComponent(fixture.Building, transform);
+        var presence = new SpatialPresence(new(10, 4, 10), new(1, 0, SpatialMobility.Static));
+        fixture.Simulation.Entities.AddComponent(fixture.Building, presence);
+        spatial.Upsert(presence.CreateEntry(fixture.Building, transform));
+        var movement = GroundMovement.CreateDefault();
+        fixture.Simulation.Entities.AddComponent(fixture.Truck, movement);
+        fixture.Simulation.Entities.AddComponent(fixture.Truck, new NavigationAgent(NavigationMovementClass.Wheeled));
+        fixture.SetTruck(new(120, movement.HeightOffset, 120), 0, 0);
+        fixture.Simulation.RegisterSystem(navigation);
+        fixture.Simulation.RegisterSystem(new GroundMovementSystem(terrain, spatial));
+        VehicleDockPose reserved = default;
+        fixture.Step(context =>
+        {
+            Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out var visit));
+            reserved = visit.Pose;
+            Assert.NotNull(reserved.ApproachStart);
+            Assert.Equal(new Vector3(64, movement.HeightOffset, 78), reserved.Service);
+            Assert.True(MathF.Abs(reserved.Entry.X - 42.8f) < 0.001f);
+        });
+        bool docked = false;
+        for (int tick = 0; tick < 2000 && !docked; tick++)
+            fixture.Step(context => docked = fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1)));
+        Assert.True(docked, fixture.Simulation.Entities.GetComponent<VehicleDockVisit>(fixture.Truck).ToString());
+        Assert.Equal(reserved, fixture.Simulation.Entities.GetComponent<VehicleDockVisit>(fixture.Truck).Pose);
+    }
+
+    [Fact]
+    public void AuthoredServicePointsMatchTheLoadingSocketsAndRealTruckLengths()
+    {
+        var buildings = InitialBuildingDefinitions.CreateCatalog();
+        var units = DirectorateContent.CreateUnitCatalog();
+        var depot = buildings[BuildingIds.SupplyDepot];
+        var supplyDock = Assert.IsType<BuildingLoadingDock>(depot.LoadingDock);
+        foreach (var truck in new[] { UnitIds.CargoTruck, UnitIds.SupplyTruck })
+        {
+            float halfLength = units[truck].VisualScale.Z * 0.5f;
+            Assert.True(MathF.Abs(-0.14f * depot.Footprint.Width - supplyDock.ServicePosition.X) <= halfLength + 0.001f);
+            Assert.True(MathF.Abs(0.26f * depot.Footprint.Width - supplyDock.ServicePosition.X) <= halfLength + 0.001f);
+        }
+        var ammunition = buildings[BuildingIds.AmmunitionPlant];
+        Assert.Equal(-0.25f * ammunition.Footprint.Width,
+            Assert.IsType<BuildingLoadingDock>(ammunition.LoadingDock).ServicePosition.X);
     }
 
     private sealed class Fixture : ISimulationSystem

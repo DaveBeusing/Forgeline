@@ -563,7 +563,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Supply Depot",
                     VisualId = 110,
                     Footprint = new BuildingFootprint(16.0f, 16.0f, 8.0f),
-                    LoadingDock = new(new Vector3(0, -8.0f * 0.5f, 16.0f * 0.5f + 4.5f), Vector3.UnitX, 18),
+                    LoadingDock = new(new Vector3(0.06f * 16, -8.0f * 0.5f, 16.0f * 0.5f + 4.5f), Vector3.UnitX, 18),
                     ConstructionTicks = 90,
                     Costs =
                     [
@@ -656,7 +656,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Ammunition Plant",
                     VisualId = 109,
                     Footprint = new BuildingFootprint(18.0f, 18.0f, 10.0f),
-                    LoadingDock = new(new Vector3(0, -10.0f * 0.5f, 18.0f * 0.5f + 4.5f), Vector3.UnitX, 18),
+                    LoadingDock = new(new Vector3(-0.25f * 18, -10.0f * 0.5f, 18.0f * 0.5f + 4.5f), Vector3.UnitX, 18),
                     ConstructionTicks = 130,
                     Costs =
                     [
