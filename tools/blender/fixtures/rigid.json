@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "unit.directorate.main_battle_tank",
+      "assets": [
+        "unit.directorate.main_battle_tank",
+        "unit.directorate.main_battle_tank.collision",
+        "unit.directorate.main_battle_tank.critical",
+        "unit.directorate.main_battle_tank.damaged",
+        "unit.directorate.main_battle_tank.lod1",
+        "unit.directorate.main_battle_tank.lod2",
+        "unit.directorate.main_battle_tank.turret",
+        "unit.directorate.main_battle_tank.wreck"
+      ],
+      "instanceScale": [
+        4,
+        3,
+        7.2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "building.directorate.vehicle_factory",
+      "assets": [
+        "building.directorate.vehicle_factory",
+        "building.directorate.vehicle_factory.critical",
+        "building.directorate.vehicle_factory.damaged",
+        "building.directorate.vehicle_factory.destroyed",
+        "building.directorate.vehicle_factory.foundation",
+        "building.directorate.vehicle_factory.lod1",
+        "building.directorate.vehicle_factory.lod2",
+        "building.directorate.vehicle_factory.partial_shell",
+        "building.directorate.vehicle_factory.structural_frame",
+        "building.directorate.vehicle_factory.unpowered"
+      ],
+      "instanceScale": [
+        18,
+        10,
+        16
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}
