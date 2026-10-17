@@ -37,7 +37,11 @@ Every save or replay document contains:
 
 Writes use a temporary file followed by atomic replacement. A partially written temporary file is never treated as the requested save path.
 
-The current reader accepts envelope format 1 and payload schemas 1 and 2. Schema 1 describes the existing Central Divide preset and is migrated explicitly. Schema 2 requires a composition identity. Unlimited backward compatibility is not implied.
+The current reader accepts envelope format 1 and payload schema 3. Schema 3
+requires a composition identity and authoritative checkpoint schema 2, including
+vehicle docking semantics. Older payloads and pre-docking replay checkpoints are
+rejected explicitly before runtime reconstruction. Unlimited backward
+compatibility is not implied.
 
 ## Save Payload
 
@@ -152,4 +156,9 @@ The full repository build, tests, and existing natural terminal-match validation
 
 ## Match composition migration
 
-New save/replay payloads use schema 2 with a reproducible composition key and per-player opponent policies. Schema 1 remains readable after envelope checksum validation; its two preset policies migrate to participant keys 1/2. The checkpoint schema, original map key and command discriminators remain stable. Custom composition recovery requires an explicit key resolver and verifies the reconstructed state before returning it. See [Match Runtime and Scenario Composition](adr/MatchRuntimeAndScenarioComposition.md).
+Composition identity and per-player opponent policies remain in schema 3.
+Vehicle docking changes deterministic movement and transfer timing, so historical
+schema-1/2 checkpoints cannot be reconstructed under the new rules. Their saved
+hashes and fixtures are preserved as rejection coverage. Custom composition
+recovery still requires an explicit key resolver and verifies the reconstructed
+state before returning it. See [Match Runtime and Scenario Composition](adr/MatchRuntimeAndScenarioComposition.md).

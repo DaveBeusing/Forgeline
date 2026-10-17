@@ -113,7 +113,8 @@ public sealed record MatchReplayData(
     ulong FinalRandomState,
     IReadOnlyList<RecordedSimulationCommand> Commands,
     MatchState FinalMatchState,
-    string FinalStateSha256);
+    string FinalStateSha256,
+    int AuthoritativeSchemaVersion = 1);
 
 internal sealed record MatchPersistenceEnvelope(
     string Magic,
