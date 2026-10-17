@@ -1,0 +1,1 @@
+{"Sources":1024,"WarmupBlocks":512,"MeasuredBlocks":64,"WorldShotsPerBlock":24,"AlertShotsPerBlock":4,"BlockFrames":480,"MedianMilliseconds":0.3029,"P95Milliseconds":0.3152,"ManagedBytes":0,"Voices":44,"Stage":"Source selection and PCM mixing only; excludes driver and acoustic latency"}
