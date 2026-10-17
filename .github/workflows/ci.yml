@@ -81,7 +81,7 @@ jobs:
           python-version: '3.13'
 
       - name: Blender source geometry contracts
-        run: python -m unittest discover -s tools/blender/tests -p test_asset_contract.py -v
+        run: python -m unittest discover -s tools/blender/tests -p 'test_*contract.py' -v
 
       - name: Blender launcher protocol contracts
         shell: pwsh

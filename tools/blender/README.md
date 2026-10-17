@@ -149,3 +149,7 @@ state/LOD/collision/socket validation and original-vs-compiled renderer checks.
 Use `Invoke-BlenderRoundTrip.ps1` with an explicit fresh artifacts output directory.
 Existing production authors retain ownership; generated source clones are never
 applied to the game automatically.
+
+## Surface and LOD preparation
+
+The pinned production entrypoint adds bounded modifier evaluation, PBR inspection, LOD/state cost reports and repeated compiled qualification. See [surface production](../../docs/BlenderSurfaceProduction.md).
