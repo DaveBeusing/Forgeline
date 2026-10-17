@@ -393,7 +393,6 @@ internal sealed class ClientApplication
             new CombatGroupRegistry();
         var combatGroupInput =
             new CombatGroupInputController();
-        var combatGroupCard = new CombatGroupCardController();
         var operationsController = new OperationsController();
         var transientMenus = new TransientHudMenuController();
         var alertController = new ActionableAlertController();
@@ -1178,13 +1177,15 @@ internal sealed class ClientApplication
 
             GameplayHudLayout interactionLayout = GameplayHudLayout.Create(
                 window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
-            actionPanel.SynchronizeObjectRing(inputState, inputSnapshot, renderWorld, selectionController.Selection, false);
-            actionPanel.AdoptPresentedRing(renderHost.LatestActionRing);
+            if (selectionController.ReconcileSelection(renderWorld))
+                presentationInteraction.SetSelection(selectionController.Selection.Entities);
             transientMenus.Update(inputState, inputSnapshot, interactionLayout, selectionController.Selection,
                 actionPanel, operationsController, presentationInteraction, informationLayer.MinimapEnabled,
                 buildingPlacementController.IsActive,
                 localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback, onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View);
             hudInteraction.CapturePointer(transientMenus.PointerCaptured);
+            actionPanel.SynchronizeObjectRing(inputState, inputSnapshot, renderWorld, selectionController.Selection, false);
+            actionPanel.AdoptPresentedRing(renderHost.LatestActionRing);
 
             if (inputMatchTerminal)
             {
@@ -1221,10 +1222,7 @@ internal sealed class ClientApplication
             hudInteraction.CaptureKeyboard(
                 actionPanel.HasKeyboardFocus);
 
-            CombatGroupCardResult cardResult = combatGroupCard.Update(inputState, inputSnapshot,
-                selectionController.Selection, interactionLayout,
-                blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
-                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
+            CombatGroupCardResult cardResult = actionPanel.TakeGroupResult();
             var alertResult = alertController.Update(inputState, inputSnapshot, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive, seconds: frameElapsed.TotalSeconds, dockExpanded: actionPanel.DockExpanded,
@@ -1315,7 +1313,7 @@ internal sealed class ClientApplication
             hudInteraction.CapturePointer(HudInteractionContext.CapturesWorldPointer(
                 inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.DockExpanded,
                 buildingPlacementController.IsActive, includeActionDock: false,
-                onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View, includePrimaryCommands: !actionPanel.SingleObjectActions));
+                onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View, includePrimaryCommands: !actionPanel.ObjectActions));
 
             if (minimapInteraction.TryTakeMovementRequest(
                     out MovementOrderRequest minimapMovement))

@@ -309,30 +309,12 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         text.Append("AVG FUEL "); AppendCovered(ref text, group.Fuel, group.SupplyCount);
         text.Append(" AMMO "); AppendCovered(ref text, group.Ammunition, group.SupplyCount);
         GroupText(text.Written, 30, region, MutedTextColor, width, height);
-        for (int index = 0; index < 12; index++)
-        {
-            var rect = CombatGroupCardLayout.Control(layout, index);
-            text = new HudTextBuilder(buffer);
-            bool enabled;
-            if (index < 8)
-            {
-                int count = group.Composition(index);
-                text.Append(SelectedCombatGroup.TypeLabel(index)); text.Append(" "); text.Append(count);
-                enabled = count > 0;
-            }
-            else if (index == 8)
-            { text.Append("HP<=25% "); text.Append(group.DamagedCount); text.Append(" FOCUS"); enabled = group.DamagedCount > 0; }
-            else if (index == 9)
-            { text.Append("SUPPLY! "); text.Append(group.UnsuppliedCount); text.Append(" FOCUS"); enabled = group.UnsuppliedCount > 0; }
-            else if (index == 10)
-            { text.Append(bindings.Prompt(GameplayAction.Formation)); text.Append(" "); text.Append(formation switch { FormationTemplate.Line => "LINE", FormationTemplate.Column => "COLUMN", FormationTemplate.Wedge => "WEDGE", _ => "COMPACT" }); text.Append(" NEXT"); enabled = group.CombatCount > 0; }
-            else { text.Append("FOCUS GROUP"); enabled = group.LiveCount > 0; }
-            if (!_skin.Control(rect, enabled)) EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? GameplayHudVisualStyle.PanelRaised : PanelColor, width, height);
-            if (!_text.Add(text.Written, rect.X + _scale, rect.Y + _scale, 9 * _scale,
-                enabled ? TextColor : MutedTextColor, width, height, rect.Width - 2 * _scale))
-                EmitClippedText(text.Written, rect.X + _scale, rect.Y + _scale, rect.Right - _scale,
-                    enabled ? TextColor : MutedTextColor, width, height);
-        }
+        text = new HudTextBuilder(buffer);
+        text.Append("GROUP CONTROLS: WORLD RING");
+        GroupText(text.Written, 48, region, MutedTextColor, width, height);
+        text = new HudTextBuilder(buffer);
+        text.Append("FORMATION "); text.Append(formation switch { FormationTemplate.Line => "LINE", FormationTemplate.Column => "COLUMN", FormationTemplate.Wedge => "WEDGE", _ => "COMPACT" });
+        GroupText(text.Written, 66, region, MutedTextColor, width, height);
         text = new HudTextBuilder(buffer);
         text.Append("LAST CMD ");
         text.Append(feedback.State switch { PlayerCommandFeedbackState.Partial => "PARTIAL ",

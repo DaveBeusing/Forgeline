@@ -131,7 +131,7 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
         _scale =
             layout.Scale;
 
-        if (!panel.Ring.SingleOwned) EmitPrimaryCommands(snapshot, panel, targeting, layout, graphics.Width, graphics.Height);
+        if (!panel.Ring.UsesRing) EmitPrimaryCommands(snapshot, panel, targeting, layout, graphics.Width, graphics.Height);
         _scale = PlayerActionDockInteractionLayout.Scale(layout);
 
         EmitModeBar(

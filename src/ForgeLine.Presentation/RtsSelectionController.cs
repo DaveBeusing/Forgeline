@@ -67,6 +67,27 @@ public sealed class RtsSelectionController
 
     public Vector2 DragCurrent => _selectionCurrent;
 
+    private readonly List<EntityId> _invalidSelection = [];
+    private PresentationSnapshot? _selectionSnapshot;
+    private ulong _checkedSelectionRevision;
+
+    /// <summary>Prunes lost authority/generations once per copied snapshot or selection change, never by camera visibility.</summary>
+    public bool ReconcileSelection(RenderWorld world)
+    {
+        var snapshot = world.CurrentSnapshot;
+        if (snapshot is null || snapshot == _selectionSnapshot && Selection.Revision == _checkedSelectionRevision) return false;
+        _selectionSnapshot = snapshot;
+        _invalidSelection.Clear();
+        foreach (var entity in Selection.Entities)
+            if (!world.TryGetInterpolatedInstance(entity, 1, out var instance) || !_filter.Allows(instance.Selectable))
+                _invalidSelection.Add(entity);
+        foreach (var entity in _invalidSelection) Selection.Remove(entity);
+        _checkedSelectionRevision = Selection.Revision;
+        if (_invalidSelection.Count == 0) return false;
+        CancelPointerInteraction();
+        return true;
+    }
+
     public void CancelPointerInteraction()
     {
         _lastClickEntity = EntityId.Invalid;

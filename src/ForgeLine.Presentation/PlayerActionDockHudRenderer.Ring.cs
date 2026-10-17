@@ -31,7 +31,7 @@ internal sealed partial class PlayerActionDockHudRenderer
             bool navigation = slot.Navigation != ActionRingNavigation.None;
             bool mode = target.Kind == PlayerActionDockControlKind.Mode;
             bool item = target.Kind == PlayerActionDockControlKind.Item;
-            bool enabled = navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
+            bool enabled = slot.Navigation == ActionRingNavigation.GroupControl ? ring.Group?.Participants(target.ItemIndex) > 0 : navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
                 panel.Mode, target.ItemIndex, panel, actions);
             bool hovered = ring.Open && ring.HoveredSlot == i;
             Vector4 fill = enabled ? new(.045f, .075f, .10f, .82f) : new(.04f, .045f, .055f, .82f);
@@ -47,6 +47,7 @@ internal sealed partial class PlayerActionDockHudRenderer
                 new Vector4(enabled ? 1 : .55f, enabled ? 1 : .55f, enabled ? 1 : .55f, opacity));
             string label = slot.Navigation switch
             {
+                ActionRingNavigation.Group => "Group", ActionRingNavigation.GroupControl => GroupActionRingContext.Label(target.ItemIndex),
                 ActionRingNavigation.Back => "Back", ActionRingNavigation.Close => "Close",
                 ActionRingNavigation.Next => "Next", ActionRingNavigation.Previous => "Prev",
                 ActionRingNavigation.Parameters => "Params", ActionRingNavigation.NextItem => "Next item",
@@ -56,10 +57,22 @@ internal sealed partial class PlayerActionDockHudRenderer
                     PlayerActionDockHudModel.ResolveFooterLabel(target.Kind, panel.Mode)
             };
             Vector4 text = enabled ? TextColor : MutedTextColor; text.W *= opacity;
-            _text.AddCentered(label, new(center.X - 38 * scale, center.Y - 7 * scale, 76 * scale, 20 * scale),
+            if (slot.Navigation == ActionRingNavigation.Group && ring.Group is { } identity)
+            {
+                var heading = new HudTextBuilder(valueBuffer); heading.Append("Group "); heading.Append(identity.Count);
+                _text.AddCentered(heading.Written, new(center.X - 38 * scale, center.Y - 7 * scale, 76 * scale, 20 * scale),
+                    14 * scale, text, width, height, true);
+            }
+            else _text.AddCentered(label, new(center.X - 38 * scale, center.Y - 7 * scale, 76 * scale, 20 * scale),
                 14 * scale, text, width, height, true);
             var value = new HudTextBuilder(valueBuffer);
-            if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
+            if (slot.Navigation == ActionRingNavigation.GroupControl && ring.Group is { } group)
+            { value.Append(group.Participants(target.ItemIndex)); value.Append(" / "); value.Append(group.SelectedCount); }
+            else if (slot.Navigation == ActionRingNavigation.Group && ring.Group is { } summary)
+                value.Append(ring.VisibleMembers < summary.Count ? "Part visible" : "Selection tools");
+            else if (item && panel.Mode == PlayerActionPanelMode.Tactical && ring.Group is { } participants && actions?.Tactical is { } tactical)
+            { value.Append(target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append(" / "); value.Append(participants.SelectedCount); value.Append(" eligible"); }
+            else if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
             else if (item)
             {

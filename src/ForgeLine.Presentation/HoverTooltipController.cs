@@ -54,9 +54,10 @@ public sealed class HoverTooltipController
                 ? new PlayerActionDockHitTarget(PlayerActionDockControlKind.Item,panel.Mode,panel.SelectedIndex)
                 : radial.Navigation != ActionRingNavigation.None ? new(PlayerActionDockControlKind.Page,panel.Mode,panel.SelectedIndex) : radial.Target;
             next = next with { DockMode = target.Mode, DockControl = (int)target.Kind,
-                DockIndex = target.ItemIndex };
+                DockIndex = radial.Navigation == ActionRingNavigation.GroupControl ? -100 - radial.Target.ItemIndex :
+                    radial.Navigation == ActionRingNavigation.Group ? -99 : target.ItemIndex };
         }
-        else if (!panel.Ring.SingleOwned && ContextualCommandModel.TryHit(pointer, snapshot, layout, out var command,
+        else if (!panel.Ring.UsesRing && ContextualCommandModel.TryHit(pointer, snapshot, layout, out var command,
                 localPending: ContextualCommandModel.HasPending(panel, snapshot), selectionPending: panel.SelectionPending))
         {
             next = next with { DockMode = command.Mode,
@@ -73,7 +74,7 @@ public sealed class HoverTooltipController
             };
         }
         else if (!worldPointerCaptured &&
-            !HudInteractionContext.BlocksWorldPointer(pointer, layout, true, panel.DockExpanded, includePrimaryCommands: !panel.Ring.SingleOwned))
+            !HudInteractionContext.BlocksWorldPointer(pointer, layout, true, panel.DockExpanded, includePrimaryCommands: !panel.Ring.UsesRing))
         {
             next = next with { Entity = hoveredEntity };
             // Current detected contacts use copied opaque contact positions, never an ECS raycast.

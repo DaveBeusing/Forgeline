@@ -105,7 +105,7 @@ public sealed class TransientHudMenuController
                 foreach (var menu in _contextMenus)
                     menuOwned |= menu?.IsOpen == true && menu.ContainsControl(origin, layout);
                 bool persistent = HudInteractionContext.BlocksWorldPointer(origin, layout, minimapEnabled,
-                    guidanceVisible: guidanceVisible, includeActionDock: false, onboarding: onboarding, includePrimaryCommands: !dock.SingleObjectActions) ||
+                    guidanceVisible: guidanceVisible, includeActionDock: false, onboarding: onboarding, includePrimaryCommands: !dock.ObjectActions) ||
                     OperationsLayout.Entry(layout).Contains(origin) ||
                     snapshot?.PlayerExperience is not null && ActionableAlertLayout.Resolve(snapshot, layout, dock.DockExpanded, localFeedback).Contains(origin);
                 _menuOwned[i] = menuOwned;

@@ -1,0 +1,198 @@
+using System.Numerics;
+using ForgeLine.Core;
+using ForgeLine.Game;
+using ForgeLine.Input;
+using ForgeLine.Platform;
+using ForgeLine.Presentation;
+using ForgeLine.Simulation;
+using Xunit;
+
+namespace ForgeLine.Client.Tests;
+
+public sealed class GroupActionRingTests
+{
+    private static readonly RadialActionLayout Geometry = new(new(960,450),new(960,450),80,176,8);
+
+    [Theory]
+    [InlineData(0)] [InlineData(1)] [InlineData(2)] [InlineData(10)] [InlineData(50)] [InlineData(100)] [InlineData(1000)]
+    public void OneBoundedContextRetainsTheEntireAuthorizedSelection(int count)
+    {
+        var (controller,input,snapshot,selection,world) = Open(count);
+        var ring = View(controller,snapshot).Ring;
+        Assert.Equal(count > 0,ring.Open);
+        Assert.Equal(count > 1,ring.Group is not null);
+        Assert.Equal(count == 1,ring.SingleOwned);
+        Assert.False(controller.DockExpanded);
+        if (count < 2) return;
+        Assert.Equal(count,ring.Group!.Count);
+        Assert.Equal(count,selection.Count);
+        var layout = GameplayHudLayout.Create(1920,1080,96);
+        var projected = ring.Project(world,new RtsCamera(),1,snapshot,layout,[]);
+        Assert.True(projected.Geometry.IsValid);
+        Assert.InRange(projected.Geometry.OuterRadius,176,308);
+        var camera = new RtsCamera();
+        int expectedVisible = snapshot.Instances.ToArray().Count(instance => camera.WorldToScreen(instance.Transform.Position,1920,1080).IsVisible);
+        Assert.Equal(expectedVisible,projected.VisibleMembers);
+        Assert.Equal(count,projected.Group!.Count);
+        Assert.Equal(-1,projected.Geometry.Hit(projected.Geometry.Center));
+    }
+
+    [Fact]
+    public void TacticalRingUsesExactlyTheExistingDispatcherRequestOnceWithAllMembers()
+    {
+        var (controller,input,snapshot,selection,_) = Open(10);
+        Click(controller,input,snapshot,selection,0); // common tactical category
+        Click(controller,input,snapshot,selection,2); // Stop
+        Assert.True(controller.TryTakeRequest(out var request));
+        var expected = PlayerActionRequest.StopCombat(selection.ToArray());
+        Assert.Equal(expected.Kind,request.Kind);
+        Assert.Equal(expected.TacticalEntities,request.TacticalEntities);
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.False(View(controller,snapshot).Ring.Open);
+    }
+
+    [Theory]
+    [InlineData(0)] [InlineData(1)] [InlineData(2)]
+    public void SelectionChangesCancelArmedCommandsAndTransitionTwoToOneToZero(int remaining)
+    {
+        var (controller,input,snapshot,selection,_) = Open(2);
+        Click(controller,input,snapshot,selection,0);
+        Present(controller,snapshot); input.BeginFrame(); Mouse(input,PlatformInputEventKind.MouseButtonDown,2);
+        controller.Update(input,snapshot,1920,1080,currentSelection:selection);
+        selection.Replace(Enumerable.Range(1,remaining).Select(i=>new EntityId((uint)i,1)).ToArray());
+        var next = Snapshot(remaining,tick:5); var world=World(next);
+        controller.SynchronizeObjectRing(input,next,world,selection,false);
+        input.BeginFrame(); Mouse(input,PlatformInputEventKind.MouseButtonUp,2);
+        controller.Update(input,next,1920,1080,currentSelection:selection);
+        controller.SynchronizeObjectRing(input,next,world,selection,true,true);
+        bool dispatched = controller.TryTakeRequest(out var request);
+        Assert.Equal(remaining == 2, dispatched);
+        if (remaining == 2)
+        {
+            Assert.Equal(PlayerActionRequestKind.SubmitStopCombat, request.Kind);
+            Assert.Equal(selection.ToArray(), request.TacticalEntities);
+            Assert.False(controller.TryTakeRequest(out _));
+        }
+        Assert.Equal(remaining==1,View(controller,next).Ring.SingleOwned);
+        Assert.Equal(remaining == 1,View(controller,next).Ring.Open);
+    }
+
+    [Fact]
+    public void SameCountDifferentGenerationAndSessionInvalidatePressedGroupAction()
+    {
+        foreach (bool session in new[]{false,true})
+        {
+            var (controller,input,snapshot,selection,_) = Open(2);
+            Click(controller,input,snapshot,selection,0);
+            Present(controller,snapshot); input.BeginFrame(); Mouse(input,PlatformInputEventKind.MouseButtonDown,2);
+            controller.Update(input,snapshot,1920,1080,currentSelection:selection);
+            var next = Snapshot(2,tick:5,session:session?2ul:1ul,generation:session?1u:2u);
+            selection.Replace(next.PlayerActions!.Tactical!.SelectedEntities.ToArray());
+            controller.SynchronizeObjectRing(input,next,World(next),selection,false);
+            input.BeginFrame(); Mouse(input,PlatformInputEventKind.MouseButtonUp,2);
+            controller.Update(input,next,1920,1080,currentSelection:selection);
+            Assert.False(controller.TryTakeRequest(out _));
+            Assert.False(controller.TakeGroupResult().SelectionChanged);
+        }
+    }
+
+    [Fact]
+    public void AllTypeFiltersAndAttentionFormationFocusRemainAccessibleWithoutEditingSavedMembership()
+    {
+        for (int control=0;control<12;control++)
+        {
+            var (controller,input,snapshot,selection,_) = Open(8);
+            var registry=new CombatGroupRegistry();
+            registry.Synchronize(snapshot.SessionId,snapshot.CombatGroups!.EligibleEntities);
+            registry.Assign(1,selection.Entities,snapshot.CombatGroups.EligibleEntities);
+            Click(controller,input,snapshot,selection,7);
+            for(int page=0;page<control/4;page++) Click(controller,input,snapshot,selection,5);
+            Click(controller,input,snapshot,selection,control%4);
+            var result=controller.TakeGroupResult();
+            Assert.True(result.Captured);
+            Assert.Equal(control<8,result.SelectionChanged);
+            Assert.Equal(control==10,result.CycleFormation);
+            Assert.Equal(control==11,result.FocusSelection);
+            Assert.Equal(control is 8 or 9,result.FocusMember.IsValid);
+            Assert.Equal(8,registry.GetSlot(1).Members.Length);
+            Assert.False(controller.TryTakeRequest(out _));
+        }
+    }
+
+    [Fact]
+    public void OffscreenMemberDoesNotFilterTheCommandAndAnEntirelyOffscreenGroupCloses()
+    {
+        var (controller,input,snapshot,selection,_) = Open(2);
+        var next=Snapshot(2,tick:5,spread:true);
+        controller.SynchronizeObjectRing(input,next,World(next),selection,false);
+        var ring=View(controller,next).Ring.Project(World(next),new RtsCamera(),1,next,GameplayHudLayout.Create(1920,1080,96),[]);
+        Assert.True(ring.Geometry.IsValid); Assert.Equal(1,ring.VisibleMembers); Assert.Equal(2,ring.Group!.Count);
+        Click(controller,input,next,selection,0); Click(controller,input,next,selection,2);
+        Assert.True(controller.TryTakeRequest(out var request)); Assert.Equal(2,request.TacticalEntities!.Length);
+        var gone=Snapshot(2,tick:6,allOffscreen:true);
+        controller.SynchronizeObjectRing(input,gone,World(gone),selection,true,true);
+        controller.OpenOperationsControls(PlayerActionPanelMode.Supply);
+        var projected=View(controller,gone).Ring.Project(World(gone),new RtsCamera(),1,gone,GameplayHudLayout.Create(1920,1080,96),[]);
+        controller.AdoptPresentedRing(projected);
+        Assert.False(View(controller,gone).Ring.Open); Assert.Equal(2,selection.Count);
+    }
+
+    [Fact]
+    public void ReconciliationPrunesLostAuthorityAndGenerationWithoutVisibilityFiltering()
+    {
+        var (_,_,snapshot,selection,world)=Open(3);
+        var owner=new RtsSelectionController(new(new PlayerId(1),ControllableEntityCategory.Unit));
+        owner.Selection.Replace(selection.ToArray());
+        Assert.False(owner.ReconcileSelection(world));
+        var next=Snapshot(2,tick:5,spread:true);
+        Assert.True(owner.ReconcileSelection(World(next))); Assert.Equal(2,owner.Selection.Count);
+        Assert.False(owner.ReconcileSelection(World(next)));
+        Assert.True(owner.ReconcileSelection(World(Snapshot(1,tick:6)))); Assert.Equal(1,owner.Selection.Count);
+        Assert.True(owner.ReconcileSelection(World(Snapshot(0,tick:7)))); Assert.Equal(0,owner.Selection.Count);
+    }
+
+    [Fact]
+    public void UnchangedInputSnapshotReusesImmutableContextAndDoesNotAllocate()
+    {
+        var (controller,input,snapshot,selection,world)=Open(1000);
+        var group=View(controller,snapshot).Ring.Group;
+        for(int i=0;i<128;i++) controller.SynchronizeObjectRing(input,snapshot,world,selection,false);
+        long before=GC.GetAllocatedBytesForCurrentThread();
+        for(int i=0;i<128;i++) controller.SynchronizeObjectRing(input,snapshot,world,selection,false);
+        Assert.Equal(0,GC.GetAllocatedBytesForCurrentThread()-before);
+        Assert.Same(group,View(controller,snapshot).Ring.Group);
+    }
+
+    private static (PlayerActionPanelController,InputState,PresentationSnapshot,SelectionSet,RenderWorld) Open(int count)
+    {
+        var snapshot=Snapshot(count); var world=World(snapshot); var selection=new SelectionSet();
+        selection.Replace(snapshot.PlayerActions!.Tactical!.SelectedEntities.ToArray());
+        var controller=new PlayerActionPanelController();var input=new InputState();
+        input.BeginFrame(); Mouse(input,PlatformInputEventKind.MouseButtonDown,0);Mouse(input,PlatformInputEventKind.MouseButtonUp,0);
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,true,true);
+        controller.Update(input,snapshot,1920,1080,currentSelection:selection);
+        return (controller,input,snapshot,selection,world);
+    }
+    private static PlayerActionPanelView View(PlayerActionPanelController c,PresentationSnapshot s)=>c.CreateView(1920,1080,s.PlayerActions);
+    private static void Present(PlayerActionPanelController c,PresentationSnapshot s)=>c.AdoptPresentedRing(View(c,s).Ring with{Geometry=Geometry,Resolved=true});
+    private static void Mouse(InputState i,PlatformInputEventKind kind,int slot){var p=Geometry.LabelCenter(slot);i.Apply(PlatformInputEvent.MouseButtonChanged(kind,PlatformMouseButton.Left,(int)p.X,(int)p.Y));}
+    private static void Click(PlayerActionPanelController c,InputState input,PresentationSnapshot s,SelectionSet selected,int slot)
+    {
+        Present(c,s);input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonDown,slot);c.Update(input,s,1920,1080,currentSelection:selected);
+        input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonUp,slot);c.Update(input,s,1920,1080,currentSelection:selected);
+    }
+    private static RenderWorld World(PresentationSnapshot s){var b=new PresentationSnapshotBuffer();b.Publish(s);var w=new RenderWorld();w.Update(b);return w;}
+    private static PresentationSnapshot Snapshot(int count,ulong tick=4,ulong session=1,uint generation=1,bool spread=false,bool allOffscreen=false)
+    {
+        var entities=Enumerable.Range(1,count).Select(i=>new EntityId((uint)i,generation)).ToArray();
+        var instances=entities.Select((e,i)=>new RenderInstance(e,RenderTransform.Identity with { Position=allOffscreen || spread && i>0 ? new(100000,0,100000) : new(i*.1f,0,0) },
+            default,default,RenderVisibilityMask.World,Selectable:new(new PlayerId(1),ControllableEntityCategory.Unit))).ToArray();
+        var tactical=new PlayerTacticalActionReadModel(entities,count,count/2+count%2,0,0,0,false,false,default,default,[],[]);
+        var actions=new PlayerActionSnapshot(new(session),new(tick),[],0,null,null,tactical:tactical);
+        var members=entities.Select((e,i)=>new CombatGroupMemberReadModel(e,ControllableEntityCategory.Unit,true,.2,true,BattlefieldSupplyStatus.Critical,.2,.3,
+            false,0,0,false,default,false,default,false,default,new UnitId((uint)(i%8+1)),i%2==0)).ToArray();
+        return new(new(tick),TimeSpan.FromMilliseconds(50),count,instances,sessionId:new(session),
+            playerExperience:default(PlayerExperienceSnapshot) with{Player=new(1),Tick=new(tick),Selection=PlayerSelectionSummary.Empty with{Count=count,Kind=PlayerSelectionKind.Mixed}},
+            playerActions:actions,combatGroups:new(new(tick),members,new(session)));
+    }
+}
