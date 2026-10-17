@@ -25,7 +25,15 @@ public sealed class BlenderRoundTripQualificationTests
         CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_PRODUCTION_ROOT")!), ["first", "second"], true);
     }
 
-    private static void CompareExports(string root, string[] variants, bool prepared)
+    public static bool MotionEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_MOTION_ROOT"));
+
+    [Fact(Skip = "Set FORGELINE_BLENDER_MOTION_ROOT after rigid authoring exports.", SkipUnless = nameof(MotionEnabled))]
+    public void RigidAuthoringPreservesCompiledGeometryAndBatching()
+    {
+        CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_MOTION_ROOT")!), ["first", "second", "reopened"], true, "_rigid/", 11296);
+    }
+
+    private static void CompareExports(string root, string[] variants, bool prepared, string folder = "_prepared/", int expectedTriangles = 16400)
     {
         var baseline = RuntimeAssetCatalog.Load(Path.Combine(root, "baseline-runtime"));
         Assert.Equal(29, baseline.Manifest.Assets.Count);
@@ -56,7 +64,7 @@ public sealed class BlenderRoundTripQualificationTests
                 }
                 if (prepared)
                 {
-                    if (after.SourcePath.Contains("_prepared/", StringComparison.Ordinal))
+                    if (after.SourcePath.Contains(folder, StringComparison.Ordinal))
                         Assert.Contains(before.Id, after.SourcePath, StringComparison.Ordinal);
                     else
                         Assert.Equal(before.SourcePath, after.SourcePath);
@@ -89,7 +97,7 @@ public sealed class BlenderRoundTripQualificationTests
                     Assert.True(Vector3.Distance(oldParts[i].GeometryOffset,newParts[i].GeometryOffset) <= .000001f, before.Id);
                 meshes++; triangles += a.Indices.Count/3; parts += before.MechanicalParts.Count;
             }
-            Assert.Equal(19,meshes); Assert.Equal(16400,triangles);
+            Assert.Equal(19,meshes); Assert.Equal(expectedTriangles,triangles);
             reports.Add(new { variant = name, meshes, triangles, parts, maximumPositionError = positionError, maximumTangentError = tangentError, mechanicalBatchIdentityPreserved = true });
         }
         string? seed = Environment.GetEnvironmentVariable("FORGELINE_BLENDER_RUNTIME_SEED");
