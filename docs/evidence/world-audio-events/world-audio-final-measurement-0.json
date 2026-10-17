@@ -1,0 +1,11 @@
+{
+  "Sources": 0,
+  "Samples": 64,
+  "WarmupTicks": 64,
+  "MedianMilliseconds": 0.0154,
+  "P95Milliseconds": 0.0199,
+  "MaximumManagedBytesPerPublication": 5328,
+  "Loops": 2,
+  "Events": 80,
+  "Stage": "Extraction and immutable publication; no playback or acoustic latency"
+}

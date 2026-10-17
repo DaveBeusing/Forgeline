@@ -103,6 +103,8 @@ public sealed class PresentationSnapshot
 
     public PlayerActionSnapshot? PlayerActions { get; }
 
+    public WorldAudioSnapshot? WorldAudio { get; init; }
+
     public VfxPresentationMetrics VfxMetrics { get; }
 
     public DecalPresentationMetrics DecalMetrics { get; init; }

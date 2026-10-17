@@ -12,7 +12,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisibility
+public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisibility, IWorldAudioVisibility
 {
     private static readonly ArtilleryWeaponCatalog DefaultArtilleryWeapons = DirectorateContent.CreateArtilleryWeaponCatalog();
     private readonly MechanicalPoseHistory _mechanicalHistory = new();
@@ -31,6 +31,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     private ulong? _vfxTick;
     private SimulationSessionId _vfxSession;
     private readonly AlertLifecycleTracker _alerts = new();
+    private readonly WorldAudioEventBridge? _worldAudio;
     public const int MaximumSnapshotEffects = 4096;
     private readonly List<QueuedVfxInstance> _queuedVfx = new(256);
     private int _droppedQueuedVfx;
@@ -75,6 +76,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
             runtimeAssets)
     {
         _extraction = extraction;
+        _worldAudio = new();
         _staticDressing = CaptureStaticDressing(extraction.Scenario);
     }
 
@@ -123,6 +125,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 requiredDebugData);
         }
 
+        _worldAudio?.Begin(_extraction?.Scenario.Simulation.SessionId ?? SimulationSessionId.None,
+            _extraction?.Player ?? default, context.Tick, context.TickDuration);
         _mechanicalShots.Clear();
         _mechanicalHistory.Begin(_extraction?.Scenario.Simulation.SessionId ?? SimulationSessionId.None,
             context.Tick.Value, context.TickDuration.TotalSeconds);
@@ -227,7 +231,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     context, _extraction, interaction.HoveredEntity),
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
                 _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction) : null,
-                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience) : null) { DecalMetrics = _decals.Metrics });
+                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience) : null) { DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this) });
     }
 
     private RenderInstance[] CaptureRenderInstances(
@@ -340,6 +344,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                             unitFeature.IsSpecified && !unitFeature.IsWreck || buildingFeature.State == BuildingPresentationState.Operational,
                             _mechanicalShots.Contains(entity), ResolveAimElevation(entities, entity),
                             buildingFeature.State == BuildingPresentationState.Operational) : default);
+
+            CaptureWorldAudioEntity(entities, entity, transform.Position, selectable, unitFeature, buildingFeature);
 
             QueuePersistentStateVfx(
                 entity,
@@ -938,6 +944,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 continue;
             }
 
+            CaptureWorldAudioCombat(context.Entities, combatEvent);
+
             switch (combatEvent.Type)
             {
                 case CombatEventType.ShotFired:
@@ -955,6 +963,52 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                         combatEvent);
                     break;
             }
+        }
+    }
+
+    private void CaptureWorldAudioEntity(EntityRegistry entities, EntityId entity, Vector3 position,
+        in SelectablePresentationMetadata selectable, in UnitFeaturePresentationMetadata unit,
+        in BuildingFeaturePresentationMetadata building)
+    {
+        if (_extraction is null || _worldAudio is null || selectable.Owner != _extraction.Player || !unit.IsSpecified && !building.IsSpecified) return;
+        bool working = entities.TryGetComponent(entity, out ResourceExtractor extractor) && extractor.State == ResourceExtractorState.Extracting ||
+            entities.TryGetComponent(entity, out ProductionFacility processing) && processing.Status == ProductionStatus.Running ||
+            entities.TryGetComponent(entity, out UnitProductionFacility factory) && factory.Status == UnitProductionStatus.Running;
+        _worldAudio.ObserveEntity(new(entity, position, unit, building, true, working,
+            entities.TryGetComponent(entity, out CargoTransportRuntimeState cargo) ? cargo.Lifecycle : default,
+            entities.TryGetComponent(entity, out UnitSupplyState supply) ? supply : null,
+            entities.TryGetComponent(entity, out HealthState health) ? health.Fraction : null,
+            entities.TryGetComponent(entity, out GroundMovementState movement) ?
+                float.IsFinite(movement.Velocity.LengthSquared()) && movement.Velocity.LengthSquared() > .0025f : null));
+    }
+
+    bool IWorldAudioVisibility.Allows(EntityId entity, Vector3 position) =>
+        _extraction is not null && _decalEntities is not null &&
+        (IsOwnedAudioEntity(_decalEntities, entity) || IsPositionVisible(position));
+
+    private bool IsOwnedAudioEntity(EntityRegistry entities, EntityId entity) => _extraction is not null &&
+        entity.IsValid && entities.TryGetComponent(entity, out ControllableEntity control) && control.Owner == _extraction.Player;
+
+    private void CaptureWorldAudioCombat(EntityRegistry entities, in CombatEvent item)
+    {
+        if (_extraction is null) return;
+        if (item.Type == CombatEventType.ShotFired)
+        {
+            bool knownSource = entities.TryGetComponent(item.Source, out WorldTransform source) &&
+                (IsOwnedAudioEntity(entities, item.Source) || IsVisibleToViewer(entities, item.Source) && IsPositionVisible(source.Position));
+            if (!knownSource && !IsPositionVisible(item.Position)) return;
+            _worldAudio?.ObserveCombat(VfxPresentationCatalog.ResolveCombatEvent(item), knownSource ? item.Source : default,
+                knownSource ? source.Position : item.Position, item.Tick);
+        }
+        else if (item.Type == CombatEventType.Impact)
+        {
+            if (!IsPositionVisible(item.Position)) return;
+            bool knownTarget = IsVisibleToViewer(entities, item.Target) &&
+                entities.TryGetComponent(item.Target, out WorldTransform target) &&
+                (IsOwnedAudioEntity(entities, item.Target) || IsPositionVisible(target.Position));
+            TargetClass? targetClass = knownTarget && entities.TryGetComponent(item.Target, out Targetable targetable) ? targetable.Class : null;
+            var kind = VfxPresentationCatalog.ResolveCombatEvent(item, targetClass);
+            _worldAudio?.ObserveCombat(kind, knownTarget ? item.Target : default, item.Position, item.Tick);
         }
     }
 
@@ -1138,6 +1192,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 continue;
             }
 
+            if (IsPositionVisible(transform.Position))
+                _worldAudio?.ObserveCombat(VfxEffectKind.ExplosionVehicle, entity, transform.Position, context.Tick);
+
             SpawnAt(
                 VfxEffectKind.ExplosionVehicle,
                 transform.Position,
@@ -1178,6 +1235,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
             WorldTransform transform =
                 entities.GetComponent<WorldTransform>(
                     entity);
+
+            if (IsPositionVisible(transform.Position))
+                _worldAudio?.ObserveCombat(VfxEffectKind.ExplosionBuilding, entity, transform.Position, context.Tick);
 
             SpawnAt(
                 VfxEffectKind.ExplosionBuilding,

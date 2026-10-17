@@ -1,0 +1,96 @@
+{
+  "qualifiedSource": "56758c3bac7191742fcfb46eec9d6b4f3ad829a5",
+  "base": "09d431c1ed5361442e19b1e7f94d6803e3e5640b",
+  "productVersion": "0.1.390",
+  "build": {
+    "configuration": "Release",
+    "warnings": 0,
+    "errors": 0,
+    "sdk": "10.0.401"
+  },
+  "focusedTests": {
+    "passed": 52
+  },
+  "solutionTests": {
+    "total": 2476,
+    "passed": 2466,
+    "failed": 0,
+    "skipped": 10,
+    "duration": "6m30.383s"
+  },
+  "bindingCoverage": {
+    "worldClips": 56,
+    "bound": 53,
+    "unavailable": 3,
+    "loopDefinitions": 15
+  },
+  "bounds": {
+    "events": 256,
+    "reservedAlertEvents": 16,
+    "loopCandidates": 1024,
+    "historySlots": 2048,
+    "expiryMilliseconds": 250
+  },
+  "smokes": {
+    "source": {
+      "ApplicationReadiness": "Ready",
+      "SessionReadiness": "Ready",
+      "DroppedEvents": 0
+    },
+    "installed": {
+      "ApplicationReadiness": "Ready",
+      "SessionReadiness": "Ready",
+      "DroppedEvents": 0
+    }
+  },
+  "package": {
+    "file": "FORGELINE-0.1.390-dev-win-x64.zip",
+    "bytes": 40078057,
+    "sha256": "649de095a8bdd19ea147a9d8a16bd306ca12d2456c5293219fda3f5333e6fe6a",
+    "reproducible": true,
+    "provenance": {
+      "sourceTreeClean": true,
+      "runtimeAssetCompiler": "1.10.0",
+      "runUrl": null,
+      "runId": null,
+      "buildTimeUtc": "2026-10-17T14:30:26.0685512+00:00",
+      "runAttempt": null,
+      "productVersion": "0.1.390",
+      "configuration": "Release",
+      "sourceRevision": "56758c3bac7191742fcfb46eec9d6b4f3ad829a5",
+      "runtimeIdentifier": "win-x64",
+      "informationalVersion": "0.1.390-dev+56758c3bac7191742fcfb46eec9d6b4f3ad829a5",
+      "runtimeAssetSignature": "5cb87ff663e609ff3c0842be2671e3eabc9a9389e3562a66e0fba46733700932",
+      "targetFramework": "net10.0-windows",
+      "channel": "dev",
+      "product": "FORGELINE",
+      "version": "0.1.390-dev",
+      "sdk": "10.0.401",
+      "repository": "https://github.com/DaveBeusing/Forgeline"
+    },
+    "runtimeAssets": 1337,
+    "interfaceWavs": 4,
+    "worldWavs": 0,
+    "emptyWorkingDirectoryUnchanged": true,
+    "installedStderrBytes": 0
+  },
+  "sourceCi": {
+    "runId": 39040569584,
+    "headSha": "56758c3bac7191742fcfb46eec9d6b4f3ad829a5",
+    "status": "completed",
+    "conclusion": "failure",
+    "worldAudioContractStep": "success",
+    "failedStep": "Windows window mode and visual qualification smoke",
+    "failure": "Compiled gameplay texture footprint 99608050 bytes exceeded the 56 MiB production catalog budget."
+  },
+  "rawLogsSha256": {
+    "world-audio-final-build.log": "7650b4244eea725c5217d1ccd72b61b1e582e4e4e0c5a404e44763e3f3e32b4f",
+    "world-audio-final-focused.log": "c639974199d6dda2b9f2bedf8ee746dfe267e1bd7e2bd592eb2266c93f8d7a00",
+    "world-audio-full-tests-56758c3b.log": "b4f92c034ec3b3ab25e922ef84eab0d00a65f3556012061b40653fbf1e80a07b",
+    "world-audio-package-56758c3b.log": "43a44ea12fd62b50f1a48a4c88d4d4fc376ccde4ab0ef95d17016a7080a55b90",
+    "world-audio-window-gate-56758c3b.log": "3193c2c7072c9c69eb3a348294d1137e1d31947088ad1ea6e0116962103a8968",
+    "world-audio-ci-source-56758c3b-failed.log": "b41762b1cac43ca03cf8d5d7431145f90b5bc0238dce554a9ca1d26e0e522ab3"
+  },
+  "worldPlaybackQualified": false,
+  "naturalTerminalMatchQualified": false
+}
