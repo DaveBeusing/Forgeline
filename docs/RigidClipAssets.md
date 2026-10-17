@@ -43,3 +43,5 @@ The preparation replaces only the tank LOD0 in the isolated review catalog with 
 `MechanicalSeconds` is a bounded optional fixed pose time (0..120), accepted only for the tank production/formation fixtures. It enters the fixture fingerprint, capture key and metadata; omission preserves original reference poses. Capture 0, .5, 1, 1.5, 2 and 3 seconds for motion/loop review. Capture `MainBattleTankFormation` against both isolated catalogs for repeated-instance cost. Use the existing performance comparison gate without changing budgets. Fixed frames prove exact phases; they do not by themselves prove smooth video playback or human visual acceptance. Qualification results and any remaining acceptance limits belong in the associated evidence report.
 
 Package only compiled manifests/containers through the existing publisher; no Blender, `.blend`, glTF sources or authoring scripts enter the player. Missing references fail catalog/mesh qualification and controlled session loading; rebuild the complete catalog instead of silently ignoring motion.
+
+Recorded native frames, paired cost failures and installed-player results: [qualification](RigidClipQualification.md).
