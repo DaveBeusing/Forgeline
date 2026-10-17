@@ -727,3 +727,5 @@ asset with source provenance; it is loaded only after the interactive menu has p
 ## Blender rigid motion metadata
 
 [Mechanical authoring](BlenderMechanicalAuthoring.md) edits the existing typed rigid ranges through validated rest projects and emits static source clones. A separate generated inspection project is compared with actual runtime pose matrices. No generic clip or player-side Blender dependency is introduced.
+
+The Directorate tank now has a saved [Blender production source](BlenderTankProduction.md) and bounded static-vertex export; its compiler inputs remain sealed GLB geometry with the same IDs/materials and rigid motion.

@@ -1,5 +1,11 @@
 # Directorate Main Battle Tank production brief
 
+Current Blender source, art changes and supported edits are documented in
+[Blender tank production](BlenderTankProduction.md). The saved rest project and
+its reviewed GLB exports now own production geometry. The original recipe remains
+a reconstruction seed. The measurements below describe the earlier production
+baseline unless an explicit later qualification is linked.
+
 Base revision: `b67d142b1587d6dca8b5ef9b3da793a57c179825` on master.
 The existing identity is `unit.directorate.main_battle_tank`; its visual scale
 is 4 x 3 x 7.2m, ground movement centre offset 1.5m, +Y up and +Z forward.

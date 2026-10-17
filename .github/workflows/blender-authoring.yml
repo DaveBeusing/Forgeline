@@ -75,3 +75,28 @@ jobs:
           name: blender-motion-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/blender-motion-ci-*
           retention-days: 14
+
+  tank-production:
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 15
+    env:
+      FORGELINE_BLENDER_PATH: ${{ inputs.blender_executable }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Qualify saved tank production source
+        shell: pwsh
+        run: ./tools/blender/Test-BlenderTank.ps1 -OutputRoot artifacts/tank-production-${{ github.run_id }}-${{ github.run_attempt }} -RenderPreviews
+      - name: Retain tank production evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tank-production-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/tank-production-*
+          retention-days: 14

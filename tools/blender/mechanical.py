@@ -63,8 +63,9 @@ def apply_pivots(catalog,geometries,updates):
                 obj.data.update()
                 if 'fl_normal' in obj.data.attributes:
                     obj.data.normals_split_custom_set([tuple(x.vector) for x in obj.data.attributes['fl_normal'].data])
-                    for loop in obj.data.loops:
-                        obj.data.attributes['fl_normal_preview'].data[loop.index].vector=obj.data.corner_normals[loop.index].vector
+                    previews=[tuple(n.vector) for n in obj.data.corner_normals]
+                    for index,value in enumerate(previews):
+                        obj.data.attributes['fl_normal_preview'].data[index].vector=value
         path,_=catalog.definitions[aid];catalog.definitions[aid]=(path,d)
     bpy.context.view_layer.update()
 
@@ -106,11 +107,11 @@ def layers(families):
             layer.objects.link(obj);obj.hide_set(aid not in visible);obj.hide_render=aid not in visible
 
 
-def preview_images(catalog,ids,families,output,render):
+def preview_images(catalog,ids,families,output,render,resolution=(384,216)):
     from production import surface_preview
     surface_preview(catalog,ids)
     scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.device='CPU';scene.cycles.samples=8
-    scene.render.resolution_x=384;scene.render.resolution_y=216;scene.render.resolution_percentage=100
+    scene.render.resolution_x,scene.render.resolution_y=resolution;scene.render.resolution_percentage=100
     scene.world=bpy.data.worlds.new('Neutral rigid inspection');require(scene.world.node_tree is not None,'Pinned Blender requires a node-based world');scene.world.node_tree.nodes['Background'].inputs['Color'].default_value=(.3,.3,.3,1)
     light=bpy.data.lights.new('Rigid inspection sun','SUN');light.energy=3
     sun=bpy.data.objects.new(light.name,light);scene.collection.objects.link(sun);sun.rotation_euler=(.5,-.5,-.4)
@@ -134,7 +135,7 @@ def preview_images(catalog,ids,families,output,render):
     return images
 
 
-def inspection(catalog,ids,families,geometries,output,render):
+def inspection(catalog,ids,families,geometries,output,render,preview_resolution=(384,216)):
     import_scene(catalog,ids,families,geometries);rows=[]
     scene=bpy.context.scene;scene.render.fps=20;scene.frame_start=1;scene.frame_end=len(SAMPLES)*10
     for si,sample in enumerate(SAMPLES):
@@ -160,7 +161,7 @@ def inspection(catalog,ids,families,geometries,output,render):
                 actual.append([observed[r][c] for c in range(4) for r in range(4)])
                 for prop in ('location','rotation_quaternion','scale'):obj.keyframe_insert(data_path=prop,frame=frame_number)
             rows.append({'id':aid,'root':family['root'],'frame':frame_number,'sample':sample,'matrices':actual})
-    layers(families);images=preview_images(catalog,ids,families,output,render)
+    layers(families);images=preview_images(catalog,ids,families,output,render,preview_resolution)
     # The inspection project has generated actions. It is deliberately not an export input.
     bpy.ops.wm.save_as_mainfile(filepath=str(output/'inspection.blend'),check_existing=False)
     write_json(output/'poses.json',{'schemaVersion':1,'families':families,'samples':rows})
