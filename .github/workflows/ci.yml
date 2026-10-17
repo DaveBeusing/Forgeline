@@ -77,6 +77,12 @@ jobs:
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.UiAudioReliabilityTests ForgeLine.Client.Tests.IndustrialAudioLibraryTests ForgeLine.Client.Tests.UiInteractionFeedbackTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: World audio extraction, visibility and deterministic publication contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.WorldAudioEventBridgeTests ForgeLine.Presentation.Tests.WorldAudioExtractionTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: UI qualification matrix coverage contracts
         shell: pwsh
         run: ./build/Test-UiQualificationMatrix.ps1

@@ -4,6 +4,10 @@ The current change hardens optional interface output and imports the supplied
 industrial source library. It does **not** complete a gameplay mixer, certify a
 release, or turn the production manifest into a player manifest.
 
+Follow-up event-layer implementation and its separate qualification are documented
+in [authorized world audio events](WorldAudioEvents.md). Frozen source, tests and
+package identities below remain the original interface/source-library evidence.
+
 ## Source and integration boundary
 
 Base: `08dc69cf83be37bab31ecc69f37c180cb09a160b`, current master when work began.
