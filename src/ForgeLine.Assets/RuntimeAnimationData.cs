@@ -23,6 +23,7 @@ public sealed class AnimationChannel
 
     public Vector4 Evaluate(float seconds)
     {
+        if (!float.IsFinite(seconds)) seconds = 0;
         int low = 0, high = Times.Count - 1;
         if (seconds <= Times[0]) return Values[0];
         if (seconds >= Times[high]) return Values[high];

@@ -5,7 +5,7 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.10.0";
+    public const string CompilerVersion = "1.11.0";
     public const int RuntimeVersion = RuntimeAssetIntegrity.SupportedRuntimeVersion;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
@@ -315,6 +315,7 @@ public static class AssetPipelineCompiler
         var extension = Path.GetExtension(sourcePath).ToLowerInvariant();
         var validExtension = definition.Type switch
         {
+            RuntimeAssetType.Animation => extension is ".gltf" or ".glb",
             RuntimeAssetType.Mesh => extension is ".gltf" or ".glb",
             RuntimeAssetType.Texture => extension is ".png" or ".tga",
             RuntimeAssetType.Material => extension == ".json",
@@ -453,12 +454,12 @@ public static class AssetPipelineCompiler
                 ToRelativePath(sourceRoot, sourcePath)));
         }
 
-        if (definition.AnimationReferences.Count > 0)
+        if (definition.AnimationReferences.Count > 1 || definition.AnimationReferences.Count > 0 && definition.Type != RuntimeAssetType.Mesh)
         {
             diagnostics.Add(new AssetCompilerDiagnostic(
                 "ASSET012",
                 AssetCompilerDiagnosticSeverity.Error,
-                "Animation asset references are not supported by the current runtime asset baseline.",
+                "Only meshes may reference one optional rigid clip.",
                 id.Value,
                 ToRelativePath(sourceRoot, sourcePath)));
         }
@@ -519,6 +520,7 @@ public static class AssetPipelineCompiler
     {
         var rawDependencies = new List<string>();
         rawDependencies.AddRange(definition.Dependencies);
+        rawDependencies.AddRange(definition.AnimationReferences);
         rawDependencies.AddRange(definition.MaterialReferences);
         rawDependencies.AddRange(definition.TextureReferences);
         rawDependencies.AddRange(definition.Lods.Select(static lod => lod.AssetId));
@@ -591,6 +593,7 @@ public static class AssetPipelineCompiler
     {
         foreach (var node in nodes.Values)
         {
+            ValidateTypedReferences(node, node.Definition.AnimationReferences, RuntimeAssetType.Animation, "animation", nodes, diagnostics);
             foreach (var dependency in node.Dependencies)
             {
                 if (!nodes.ContainsKey(dependency))
@@ -900,7 +903,7 @@ public static class AssetPipelineCompiler
     private static ImportedAssetPayload Import(
         AssetNode node,
         string sourceRoot,
-        IReadOnlyDictionary<AssetId, AssetNode> nodes, IReadOnlyDictionary<AssetId, RuntimeAssetRecord> records, string runtimeRoot, AssetCompilationReporter reporter)
+        IReadOnlyDictionary<AssetId, AssetNode> nodes, Dictionary<AssetId, RuntimeAssetRecord> records, string runtimeRoot, AssetCompilationReporter reporter)
     {
         if (node.Definition.Type == RuntimeAssetType.Mesh)
         {
@@ -915,11 +918,19 @@ public static class AssetPipelineCompiler
                 requirements);
             MechanicalMeshValidation.Validate(node.Definition.MechanicalParts, node.Definition.Sockets,
                 RuntimeMeshData.FromPayload(imported.Payload).Indices.Count);
+            foreach (string clipId in node.Definition.AnimationReferences)
+            {
+                RuntimeAssetRecord clipRecord = records[AssetId.Parse(clipId)];
+                var clip = RuntimeAnimationData.FromPayload(RuntimeAssetFile.Read(Path.Combine(runtimeRoot, clipRecord.RuntimePath), RuntimeAssetType.Animation,
+                    clipRecord.RuntimeBytes, clipRecord.RuntimeHash).Payload);
+                RigidAnimationBinding.Validate(clip, node.Definition.MechanicalParts, node.Definition.Sockets, RuntimeMeshData.FromPayload(imported.Payload));
+            }
             return imported;
         }
 
         return node.Definition.Type switch
         {
+            RuntimeAssetType.Animation => AnimationImporter.Import(node.SourcePath, sourceRoot),
             RuntimeAssetType.Texture => TextureImporter.Import(
                 node.SourcePath,
                 node.Definition.TextureColorSpace,
@@ -1010,7 +1021,7 @@ public static class AssetPipelineCompiler
                 .OrderBy(static lod => lod.Level)
                 .ToArray(),
             CollisionReference = node.Definition.CollisionReference,
-            AnimationReferences = [],
+            AnimationReferences = node.Definition.AnimationReferences.ToArray(),
             MechanicalParts = node.Definition.MechanicalParts.ToArray(),
             Sockets = node.Definition.Sockets
                 .OrderBy(static socket => socket.Name, StringComparer.Ordinal)
@@ -1050,6 +1061,7 @@ public static class AssetPipelineCompiler
         var category = type switch
         {
             RuntimeAssetType.Mesh => "meshes",
+            RuntimeAssetType.Animation => "animations",
             RuntimeAssetType.Texture => "textures",
             RuntimeAssetType.Material => "materials",
             RuntimeAssetType.UiSkin => "ui-skins",

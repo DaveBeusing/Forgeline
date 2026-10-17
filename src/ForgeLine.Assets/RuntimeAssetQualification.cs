@@ -31,6 +31,9 @@ public sealed record RuntimeAssetQualificationReport
 
     public required int MaterialCount { get; init; }
 
+    public int AnimationCount { get; init; }
+    public long AnimationRuntimeBytes { get; init; }
+
     public int UiSkinCount { get; init; }
     public long UiSkinRuntimeBytes { get; init; }
 
@@ -107,7 +110,8 @@ public static class RuntimeAssetQualification
         long studioSplashTextureBytes = 0;
         long materialBytes = 0;
         long skinBytes = 0;
-        int skinCount = 0;
+        int skinCount = 0, animationCount = 0;
+        long animationBytes = 0;
         int meshCount = 0;
         int textureCount = 0;
         int materialCount = 0;
@@ -151,9 +155,17 @@ public static class RuntimeAssetQualification
                 switch (record.Type)
                 {
                     case RuntimeAssetType.Mesh:
-                        _ =
-                            RuntimeMeshData.FromPayload(
-                                content.Payload);
+                        var mesh = RuntimeMeshData.FromPayload(content.Payload);
+                        if (record.AnimationReferences.Count > 1) throw new InvalidDataException("Mesh supports one clip.");
+                        foreach (string clipId in record.AnimationReferences)
+                        {
+                            if (!record.Dependencies.Contains(clipId, StringComparer.Ordinal) || catalog.Get(AssetId.Parse(clipId)).Type != RuntimeAssetType.Animation)
+                                throw new InvalidDataException("Clip must be an explicit animation dependency.");
+                            RigidAnimationBinding.Validate(RuntimeAnimationData.FromPayload(catalog.Read(AssetId.Parse(clipId)).Payload), record.MechanicalParts, record.Sockets, mesh);
+                        }
+                        break;
+                    case RuntimeAssetType.Animation:
+                        _ = RuntimeAnimationData.FromPayload(content.Payload);
                         break;
 
                     case RuntimeAssetType.Texture:
@@ -230,6 +242,9 @@ public static class RuntimeAssetQualification
                     }
                     break;
 
+                case RuntimeAssetType.Animation:
+                    animationCount++; animationBytes = checked(animationBytes + runtimeBytes);
+                    break;
                 case RuntimeAssetType.UiSkin:
                     skinCount++; skinBytes = checked(skinBytes + runtimeBytes);
                     break;
@@ -253,6 +268,7 @@ public static class RuntimeAssetQualification
 
         return new RuntimeAssetQualificationReport
         {
+            AnimationCount = animationCount, AnimationRuntimeBytes = animationBytes,
             UiSkinCount = skinCount, UiSkinRuntimeBytes = skinBytes,
             AssetCount =
                 catalog.Manifest.Assets.Count,
@@ -333,7 +349,7 @@ public static class RuntimeAssetQualification
             issues);
         ValidateReferences(
             record.AnimationReferences,
-            expectedType: null,
+            RuntimeAssetType.Animation,
             "animation",
             record,
             catalog,
