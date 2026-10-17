@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 1,
+  "qualifiedUtc": "2026-10-17T16:57:54.130190+00:00",
+  "qualifiedRevision": "98ba49a43077ae5bd1d22777f956a96a843699c4",
+  "baseRevision": "bd685db469e58f9c16b6bd26b54fa43302da0d9b",
+  "version": "0.1.393",
+  "pr": 227,
+  "environment": {
+    "powershell": "7.6.5",
+    "sdk": "10.0.401",
+    "runtime": ".NET 10.0.12",
+    "os": "Microsoft Windows 10.0.26300",
+    "architecture": "X64"
+  },
+  "build": {
+    "warnings": 0,
+    "errors": 0
+  },
+  "protocolContracts": {
+    "schemaVersion": 1,
+    "success": true,
+    "fixtureOnly": true,
+    "cases": [
+      {
+        "name": "explicit executable with spaces",
+        "passed": true
+      },
+      {
+        "name": "environment discovery and explicit precedence",
+        "passed": true
+      },
+      {
+        "name": "PATH lookup",
+        "passed": true
+      },
+      {
+        "name": "portable install discovery",
+        "passed": true
+      },
+      {
+        "name": "supported Windows installation discovery",
+        "passed": true
+      },
+      {
+        "name": "missing executable",
+        "passed": true
+      },
+      {
+        "name": "invalid executable preserves actionable start error",
+        "passed": true
+      },
+      {
+        "name": "reject version",
+        "passed": true
+      },
+      {
+        "name": "reject bpy",
+        "passed": true
+      },
+      {
+        "name": "reject arch",
+        "passed": true
+      },
+      {
+        "name": "reject machine",
+        "passed": true
+      },
+      {
+        "name": "reject cycle",
+        "passed": true
+      },
+      {
+        "name": "reject foreground",
+        "passed": true
+      },
+      {
+        "name": "reject probe-version",
+        "passed": true
+      },
+      {
+        "name": "reject missing-report",
+        "passed": true
+      },
+      {
+        "name": "reject malformed",
+        "passed": true
+      },
+      {
+        "name": "script nonzero exit and UTF-8 stderr retained",
+        "passed": true
+      },
+      {
+        "name": "literal Unicode paths, argument boundaries and isolated Python environment",
+        "passed": true
+      },
+      {
+        "name": "timeout kills parent and child",
+        "passed": true
+      },
+      {
+        "name": "cancellation kills parent and child",
+        "passed": true
+      },
+      {
+        "name": "pre-launch cancellation",
+        "passed": true
+      },
+      {
+        "name": "invalid script and input rejected",
+        "passed": true
+      },
+      {
+        "name": "production and traversal output rejected",
+        "passed": true
+      },
+      {
+        "name": "output lease excludes concurrent use",
+        "passed": true
+      },
+      {
+        "name": "junction output rejected",
+        "passed": true
+      }
+    ]
+  },
+  "nativeBlender": {
+    "schemaVersion": 1,
+    "success": true,
+    "reproducibleSources": true,
+    "reproducibleRuntime": true,
+    "productionSourceStatusUnchanged": true,
+    "productionSourceBytesUnchanged": true,
+    "sourceLessValidation": true,
+    "nativeExceptionExit23": true,
+    "nativeUtf8Arguments": true,
+    "geometry": {
+      "blenderVersion": [
+        5,
+        2,
+        2
+      ],
+      "geometry": {
+        "boundsMax": [
+          1.0,
+          2.0,
+          1.0
+        ],
+        "boundsMin": [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        "materials": 1,
+        "sha256": "366563c95202218ceb6220e0e72891f43f4db5f135ffde23131c47195e5ca228",
+        "triangles": 12,
+        "vertices": 24
+      },
+      "nodeTransformsBaked": true,
+      "outwardCounterclockwise": true,
+      "scale": 1.0,
+      "schemaVersion": 1,
+      "units": "metres"
+    },
+    "toolchain": {
+      "executable": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+      "executableSha256": "f141a3c5754500e6f84361099a4cd53f0bb7662b6a0d2cfaaa8fbb63e92234a0",
+      "capabilities": {
+        "background": true,
+        "bpy": true,
+        "buildHash": "d13f752e3b9c",
+        "machine": "AMD64",
+        "pointerBits": 64,
+        "pythonVersion": "3.13.13",
+        "schemaVersion": 1,
+        "system": "Windows",
+        "version": "5.2.2",
+        "versionCycle": "release"
+      }
+    }
+  },
+  "smokeCompiler": {
+    "assets": 2,
+    "meshes": 1,
+    "materials": 1,
+    "runtimeBytes": 3237,
+    "sourceLessValidation": true
+  },
+  "assetRegressionTests": {
+    "passed": 30,
+    "failed": 0,
+    "skipped": 0,
+    "classes": [
+      "AssetPipelineTests",
+      "RuntimeAssetQualificationTests"
+    ],
+    "parallelization": "none"
+  },
+  "productionCatalog": {
+    "success": true,
+    "assetCount": 1337,
+    "meshCount": 309,
+    "textureCount": 900,
+    "materialCount": 127,
+    "totalRuntimeBytes": 71365239,
+    "textureRuntimeBytes": 59451623
+  },
+  "productionCompilation": {
+    "compiled": 0,
+    "unchanged": 1337,
+    "note": "Development-mode source/cache verification and complete integrity qualification; not a fresh clean production compile."
+  },
+  "productionSourceGitTreeBefore": "7dd72bcd2be51f57ddba83e0b7de5bd117364ee8",
+  "productionSourceGitTreeAfter": "7dd72bcd2be51f57ddba83e0b7de5bd117364ee8",
+  "runtimeProcessContracts": {
+    "passed": true,
+    "scope": "Separate compiler processes, exclusive locks, interrupted generation and source-less validation"
+  },
+  "headless": {
+    "Seed": 12345,
+    "TickRate": 20,
+    "RequestedTicks": 64,
+    "ExecutedTicks": 64,
+    "RequestedEntities": 1000
+  },
+  "package": {
+    "archiveName": "FORGELINE-0.1.393-dev-win-x64.zip",
+    "archiveBytes": 54646568,
+    "sha256": "407465716f43de3e81aa400c8903cc20fad4f23501feb3305f87ebc2999c4848",
+    "manifestFiles": 1461,
+    "noBlenderOrAuthoringFiles": true,
+    "reproduciblePublishTrees": true,
+    "provenance": {
+      "channel": "dev",
+      "buildTimeUtc": "2026-10-17T16:53:41.8277202+00:00",
+      "runtimeAssetCompiler": "1.10.0",
+      "runAttempt": null,
+      "runId": null,
+      "sdk": "10.0.401",
+      "productVersion": "0.1.393",
+      "repository": "https://github.com/DaveBeusing/Forgeline",
+      "runtimeIdentifier": "win-x64",
+      "runUrl": null,
+      "informationalVersion": "0.1.393-dev+98ba49a43077ae5bd1d22777f956a96a843699c4",
+      "configuration": "Release",
+      "sourceTreeClean": true,
+      "sourceRevision": "98ba49a43077ae5bd1d22777f956a96a843699c4",
+      "version": "0.1.393-dev",
+      "targetFramework": "net10.0-windows",
+      "product": "FORGELINE",
+      "runtimeAssetSignature": "7d78c06c12f4f2bbbd3ae5886e881ff9601679bc6617cf5eca1a3a7891722882"
+    }
+  },
+  "installedPlayer": {
+    "exitCode": 0,
+    "applicationReadiness": "Ready",
+    "sessionReadiness": "Ready",
+    "droppedStartupEvents": 0,
+    "stderrBytes": 0,
+    "emptyCwdRetained": true,
+    "runtimeOverrideRemoved": true,
+    "blenderOverride": "Nonexistent executable; player still succeeds",
+    "window": {
+      "mode": "Windowed",
+      "clientWidth": 1600,
+      "clientHeight": 900,
+      "isMinimized": false,
+      "dpi": 144
+    },
+    "metrics": {
+      "instanceDrawCalls": 9,
+      "peakResidentTextureBytes": 45718384,
+      "peakShaderResourceDescriptorsUsed": 69,
+      "textureBindingFailureCount": 0,
+      "materialBindingFailureCount": 0,
+      "debugLayerEnabled": false
+    },
+    "audioShutdown": "33 blocks, zero failures/drops, retained=False"
+  },
+  "ciSnapshot": {
+    "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39051224060",
+    "headSha": "98ba49a43077ae5bd1d22777f956a96a843699c4",
+    "status": "in_progress",
+    "jobs": [
+      {
+        "name": "build-test",
+        "status": "in_progress",
+        "conclusion": "",
+        "steps": [
+          {
+            "name": "Blender launcher protocol contracts",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Compile and qualify runtime assets",
+            "status": "in_progress",
+            "conclusion": ""
+          }
+        ]
+      }
+    ]
+  },
+  "resolvedValidationFailure": "The first final qualification on 0502bc35 stopped after its successful Blender export because PowerShell redirection interpreted brackets in compiler.log path as a wildcard. 98ba49a4 changes helper log sinks to LiteralPath; fresh bracketed/Unicode roots pass all protocol and native checks. Failed-run evidence is retained.",
+  "limitations": [
+    "Linux native and macOS/ARM execution not qualified; macOS/ARM rejected by policy.",
+    "Optional self-hosted Blender workflow not dispatched; provisioned Windows/X64/blender runner required.",
+    "Full solution suite not rerun locally for this authoring-only scope. Prior broad-suite failures remain documented separately; normal CI is still pending.",
+    "Installed smoke does not establish sustained FPS or subjective visual approval; D3D debug layer not enabled."
+  ],
+  "localLogSha256": {
+    "blender-qualified-build.log": "db6c9b025dc53f99f9d1cf5f42049ea3f351b4f782efbd455ef96cd8b2162165",
+    "blender-contracts-literal.log": "6d4f4cd335ffc052a38fa5b251724b56cf08f596a12c4b44651c81fed943169b",
+    "blender-native-literal.log": "231fc24be729ea9cde711cb372ad55033a24e225a73cb9b829e49067e18a1058",
+    "blender-native-qualified.log": "c42d291d806bfa81258f962b589c2f56ac464493b736f1358e116fc31cb8a790",
+    "blender-runtime-contracts.log": "4de8ce39e4bcbec58b5fa906757a583aa4dbb9bcfa1c4dd419f30a4e7a4dad7c",
+    "blender-production-assets.log": "490f614aa097b9c259e7d6a9944dc5a6f73cd7dd23adb54ca12267dc9e62297c",
+    "blender-asset-tests.log": "743b14834568e306c1cff13b1148febce105e32a971ace76b0fc2ce8fb0872da",
+    "blender-headless.log": "6ea470798c83be0b7dca794472a6675b6a128d5e38545685293675ccec0c2c23",
+    "blender-package-98ba49a4.log": "e6f8e0a2064c0c072f2a15fe8d6f4c6d3e9cd3b914f8c50cb58a310c74672567",
+    "blender-installed-stdout.log": "496e6805f837a7799e3f9985af6533b8be02ba5e398c9a51aea22bc8f04afea7",
+    "blender-installed-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/first/source/smoke.glb": "366563c95202218ceb6220e0e72891f43f4db5f135ffde23131c47195e5ca228",
+    "native/first/source/smoke-report.json": "d5b74000fb304567a6f82aa95490e6bc44c5f67638df70512f661cd3d982d54c",
+    "native/first/runtime/manifest.json": "d06afa74fc6a7a53b23956d67892a520581c46388c17eab8592f9354b67d6017",
+    "native/first/compiler.log": "3c4052ec4893e13dcdce48ec429ea25d77396243fed6438cb1e12da6f22bc3ed",
+    "native/second/compiler.log": "3d6ad0e947083afc2a502875dd0076f3fd8ba68f85ae72cbfe7c60db16e439e5",
+    "native/source-less.log": "9dc28a00deb6c3a51e50b381666474f748d7a47688923b92e91e373430a57686",
+    "native/source-less-qualification.json": "5da1fe657ffb60d09d7fb223a196262e25dbc7a096bfeabcd7f76a1dd5f6baf3",
+    "native/native-failure/report.json": "4c7d6f3123613d0e29aa6cfa9956ae7a653fbac1638ce7da6d5894b16e69ab2a"
+  }
+}

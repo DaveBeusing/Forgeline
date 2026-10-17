@@ -48,7 +48,8 @@ blender --background --factory-startup --python-exit-code 23 --python-expr "impo
 
 ```powershell
 pwsh ./tools/blender/Invoke-Blender.ps1 -Action Smoke -OutputRoot 'artifacts/blender smoke'
-pwsh ./tools/blender/Invoke-Blender.ps1 -Action Script -Script tools/my-export.py -InputRoot assets/source -OutputRoot artifacts/my-export -ScriptArguments 'variant one','literal "quotes"'
+# Call directly from a PowerShell 7.4+ session to pass a typed array:
+& ./tools/blender/Invoke-Blender.ps1 -Action Script -Script tools/my-export.py -InputRoot assets/source -OutputRoot artifacts/my-export -ScriptArguments @('variant one','literal "quotes"')
 ```
 
 `my-export.py` illustrates a future script; it is not a supplied production exporter.
@@ -85,7 +86,9 @@ A script receives `-- --request <absolute-json-path>` with:
 
 Read it with Python's standard library and import `bpy` inside Blender. JSON keeps
 spaces, Unicode, quotes, leading dashes and empty arguments intact; ScriptArguments
-cannot add Blender switches. Write reproducible exports below outputRoot, temporary
+cannot add Blender switches. Pass array parameters by calling the script directly
+inside PowerShell, as above; native `pwsh -File` argument forwarding does not
+preserve a typed PowerShell array. Write reproducible exports below outputRoot, temporary
 files below runRoot, and treat inputRoot as read-only by authoring convention.
 
 Both output-root and per-run `report.json` record success/error and binary/embedded
