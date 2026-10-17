@@ -75,6 +75,10 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Blender launcher protocol contracts
+        shell: pwsh
+        run: ./tools/blender/Test-BlenderToolchain.ps1 -OutputRoot artifacts/blender-contracts-ci
+
       - name: UI audio reliability and industrial source contracts
         shell: pwsh
         run: |

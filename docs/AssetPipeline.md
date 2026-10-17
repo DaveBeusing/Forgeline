@@ -9,6 +9,16 @@ World vegetation source geometry can be reproduced with
 stable IDs, material atlas regions and High/Reduced chains. Compile its glTF
 outputs through the normal compiler; see [environment composition](EnvironmentDressing.md).
 
+## Optional Blender authoring
+
+The [pinned Blender CLI](../tools/blender/README.md) provides background Check,
+Script and isolated Smoke actions using Blender 5.2.2 x64 and bundled Python/bpy.
+Its smoke exports real glTF 2.0 GLB and asset definitions beneath `artifacts/`, then
+qualifies them through the existing compiler and source-less integrity gate.
+Repeated source and runtime outputs are compared byte-for-byte. No production
+source exporter is replaced; Blender is never a player/headless dependency.
+Production IDs, sockets, metre scale and LOD/material contracts remain unchanged.
+
 ## Purpose
 
 [Compiled UI atlases and skin rendering](UiAtlasRendering.md) add compiler 1.10.0
