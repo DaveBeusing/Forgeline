@@ -519,6 +519,8 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                 site.BuildingId,
                 site.Owner,
                 context.Tick));
+        if (definition.LoadingDock is BuildingLoadingDock dock)
+            context.Entities.AddComponent(entity, dock);
         context.Entities.RemoveComponent<ConstructionSite>(entity);
 
         _completedBuildings++;

@@ -171,6 +171,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         ref int neighborAdjustments,
         ref int obstacleAdjustments)
     {
+        float stopRadius = order.TargetHeadingRadians.HasValue ? 0.1f : movement.StopRadius;
         Vector3 position = transform.Position;
         Vector3 targetDelta = Horizontal(order.WorldTarget - position);
         float distanceToTarget = targetDelta.Length();
@@ -257,7 +258,15 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         bool newOrder =
             state.ObservedOrderTick.Value != order.AcceptedAtTick.Value;
 
-        if (distanceToTarget <= movement.StopRadius)
+        if (distanceToTarget <= stopRadius && order.TargetHeadingRadians is float targetHeading &&
+            MathF.Abs(GroundMovementState.NormalizeAngle(state.HeadingRadians - targetHeading)) > MathF.PI / 90)
+        {
+            float aligned = MoveTowardsAngle(state.HeadingRadians, targetHeading, movement.TurnRateRadiansPerSecond * deltaSeconds);
+            entities.SetComponent(entity, transform with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, aligned) });
+            entities.SetComponent(entity, state with { HeadingRadians = aligned, Velocity = Vector3.Zero });
+            return;
+        }
+        if (distanceToTarget <= stopRadius)
         {
             WorldTransform arrivedTransform = SnapToTerrain(
                 transform,
@@ -308,6 +317,8 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             movement,
             ref obstacleAdjustments);
 
+        if (order.TargetHeadingRadians.HasValue) steering = targetDirection;
+
         Vector3 desiredDirection =
             steering.LengthSquared() > MinimumDirectionLengthSquared
                 ? NormalizeHorizontal(steering)
@@ -329,12 +340,14 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         float currentSpeed = Horizontal(state.Velocity).Length();
         float remainingDistance = MathF.Max(
             0.0f,
-            distanceToTarget - movement.StopRadius);
+            distanceToTarget - stopRadius);
         float brakingSpeed = MathF.Sqrt(
             MathF.Max(
                 0.0f,
                 2.0f * movement.Deceleration * remainingDistance));
-        float maximumSpeed = movement.MaximumSpeed;
+        float maximumSpeed = order.TargetHeadingRadians.HasValue ? MathF.Min(distanceToTarget > 12 ? 4 : 2, movement.MaximumSpeed) : movement.MaximumSpeed;
+        if (order.TargetHeadingRadians.HasValue && MathF.Abs(GroundMovementState.NormalizeAngle(desiredHeading - state.HeadingRadians)) > MathF.PI / 30)
+            maximumSpeed = MathF.Min(maximumSpeed, 1);
 
         if (entities.TryGetComponent(
                 entity,
@@ -376,7 +389,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             position,
             position + forward * (speed * deltaSeconds),
             order.WorldTarget,
-            movement.StopRadius + 0.01f);
+            stopRadius + 0.01f);
 
         ResolveMobilePenetration(
             entity,
@@ -406,7 +419,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         float newDistance = newDelta.Length();
 
         bool arrived =
-            newDistance <= movement.StopRadius + 0.01f;
+            newDistance <= stopRadius + 0.01f;
 
         if (arrived)
         {

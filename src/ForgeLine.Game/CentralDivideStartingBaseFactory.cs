@@ -163,6 +163,7 @@ public static class CentralDivideStartingBaseFactory
                 healthPerTick: 4.0,
                 ResourceIds.Steel,
                 resourcePerHealth: 0.2));
+        entities.AddComponent(commandCore, new BuildingLoadingDock(new Vector3(0, -6, 14.5f), Vector3.UnitX, 18));
         entities.AddComponent(
             commandCore,
             new CompletedBuilding(
