@@ -120,8 +120,8 @@ public readonly record struct VehicleDockPose(Vector3 Entry, Vector3 Service, Ve
             {
                 float origin = axis == 0 ? start.X : start.Z;
                 float directionComponent = axis == 0 ? delta.X : delta.Z;
-                float minimum = (axis == 0 ? obstacle.Minimum.X : obstacle.Minimum.Z) - radius;
-                float maximum = (axis == 0 ? obstacle.Maximum.X : obstacle.Maximum.Z) + radius;
+                float minimum = axis == 0 ? obstacle.Minimum.X : obstacle.Minimum.Z;
+                float maximum = axis == 0 ? obstacle.Maximum.X : obstacle.Maximum.Z;
                 if (MathF.Abs(directionComponent) < 0.0001f)
                 {
                     if (origin < minimum || origin > maximum) first = 2;
@@ -134,7 +134,21 @@ public readonly record struct VehicleDockPose(Vector3 Entry, Vector3 Service, Ve
                     last = MathF.Min(last, MathF.Max(enter, leave));
                 }
             }
-            approachBlocked = first <= last;
+            float startX = Math.Clamp(start.X, obstacle.Minimum.X, obstacle.Maximum.X);
+            float startZ = Math.Clamp(start.Z, obstacle.Minimum.Z, obstacle.Maximum.Z);
+            float nearest = (start.X - startX) * (start.X - startX) + (start.Z - startZ) * (start.Z - startZ);
+            nearest = MathF.Min(nearest, (Entry.X - nearestX) * (Entry.X - nearestX) + (Entry.Z - nearestZ) * (Entry.Z - nearestZ));
+            float lengthSquared = delta.X * delta.X + delta.Z * delta.Z;
+            for (int corner = 0; corner < 4; corner++)
+                {
+                    float x = (corner & 1) == 0 ? obstacle.Minimum.X : obstacle.Maximum.X;
+                    float z = (corner & 2) == 0 ? obstacle.Minimum.Z : obstacle.Maximum.Z;
+                    float amount = lengthSquared > 0 ? Math.Clamp(((x - start.X) * delta.X + (z - start.Z) * delta.Z) / lengthSquared, 0, 1) : 0;
+                    float dx = x - start.X - delta.X * amount;
+                    float dz = z - start.Z - delta.Z * amount;
+                    nearest = MathF.Min(nearest, dx * dx + dz * dz);
+                }
+            approachBlocked = first <= last || nearest <= radius * radius;
         }
         return lane || approachBlocked || (Entry.X - nearestX) * (Entry.X - nearestX) + (Entry.Z - nearestZ) * (Entry.Z - nearestZ) <= radius * radius;
     }
@@ -261,7 +275,7 @@ public sealed class VehicleDockingService
                 {
                     for (int candidate = 0; candidate < 3 && !found; candidate++)
                     {
-                        Vector3 offset = candidate switch { 0 => outward, 1 => -direction, _ => outward - direction };
+                        Vector3 offset = candidate switch { 0 => -direction, 1 => outward, _ => outward - direction };
                         Vector3 start = pose.Entry + offset * (step * grid.Settings.CellSizeMeters);
                         var extended = pose with { ApproachStart = start };
                         if (grid.TryWorldToCell(start, out var cell) && grid.IsTraversable(cell, agent.Capabilities) &&
@@ -331,6 +345,8 @@ public sealed class VehicleDockingService
 
     public bool Approach(SimulationContext context, EntityId truck, EntityId building, PlayerId owner)
     {
+        if ((!context.Entities.TryGetComponent(truck, out VehicleDockVisit current) || current.Generation == 0) &&
+            StageBeforeReservation(context, truck, building, owner)) return false;
         if (!TryReserve(context, truck, building, owner, out var visit))
         {
             StopDockMotion(context.Entities, truck);
@@ -373,6 +389,71 @@ public sealed class VehicleDockingService
         }
         Put(entities, truck, visit with { Status = local ? VehicleDockStatus.Approaching : VehicleDockStatus.Reserved, LaneEntered = entered });
         return false;
+    }
+
+    private bool StageBeforeReservation(SimulationContext context, EntityId truck, EntityId building, PlayerId owner)
+    {
+        var entities = context.Entities;
+        if (!OwnsTruck(entities, truck, owner) || !Operational(entities, building) ||
+            !entities.TryGetComponent(building, out CompletedBuilding completed) || completed.Owner != owner ||
+            !entities.TryGetComponent(building, out BuildingLoadingDock definition) ||
+            !entities.TryGetComponent(building, out WorldTransform buildingTransform) ||
+            !entities.TryGetComponent(truck, out WorldTransform transform) ||
+            !entities.TryGetComponent(truck, out GroundMovement movement) ||
+            !entities.TryGetComponent(truck, out GroundMovementState motion) ||
+            !VehicleDockPose.TryCreate(definition, buildingTransform, transform, out var pose)) return false;
+        if (pose.Contains(transform.Position, 0)) return false;
+
+        Vector3 forward = new(MathF.Sin(pose.Heading), 0, MathF.Cos(pose.Heading));
+        float margin = pose.HalfLength + movement.Radius + movement.StopRadius + 2;
+        float distance = MathF.Max(8, margin);
+        if (_navigation is not null) distance += _navigation.World.Grid.Settings.CellSizeMeters;
+        if (entities.TryGetComponent(building, out VehicleDockSlot occupied) && occupied.Pose.ApproachStart is Vector3 approach)
+            distance = MathF.Max(distance, Vector3.Dot(pose.Entry - approach, forward) + margin);
+        Vector3 staging = pose.Entry - forward * distance;
+        if (_navigation is not null && entities.TryGetComponent(truck, out NavigationAgent agent))
+        {
+            var grid = _navigation.World.Grid;
+            bool found = false;
+            for (int step = 1; step <= 6 && !found; step++)
+            {
+                staging = pose.Entry - forward * MathF.Max(distance, step * grid.Settings.CellSizeMeters);
+                found = grid.TryWorldToCell(staging, out var cell) && grid.IsTraversable(cell, agent.Capabilities);
+            }
+            if (!found) return false;
+        }
+        if (_terrain is not null)
+        {
+            if (!_terrain.TrySampleHeight(staging.X, staging.Z, out float height)) return false;
+            staging.Y = height;
+        }
+        staging.Y += movement.HeightOffset;
+        float tolerance = movement.StopRadius + 0.5f;
+        if (VehicleDockPose.HorizontalDistanceSquared(transform.Position, staging) <= tolerance * tolerance &&
+            motion.Velocity.LengthSquared() <= 0.05f * 0.05f) return false;
+
+        // Strategic travel stays outside the entry. A distant truck must not
+        // monopolize the bay while another truck could already use it.
+        if (!TacticalCommandUtilities.TryGetMovementIntent(context, truck, out MovementOrder intent) ||
+            VehicleDockPose.HorizontalDistanceSquared(intent.WorldTarget, staging) > 0.01f)
+        {
+            StopDockMotion(entities, truck);
+            Put(entities, truck, new MovementOrder(owner, staging, context.Tick, context.Tick));
+        }
+        bool busy = entities.TryGetComponent(building, out VehicleDockSlot active) && active.Truck != truck;
+        Put(entities, truck, new VehicleDockVisit(building, 0, busy ? VehicleDockStatus.Busy : VehicleDockStatus.Reserved,
+            busy ? VehicleDockBlockReason.Obstructed : VehicleDockBlockReason.None, pose with { ApproachStart = staging }));
+        return true;
+    }
+
+    internal static bool BlocksStagingStep(EntityRegistry entities, EntityId truck, in WorldTransform current, in WorldTransform next)
+    {
+        if (!entities.TryGetComponent(truck, out VehicleDockVisit visit) || visit.Generation != 0 ||
+            !entities.TryGetComponent(visit.Building, out VehicleDockSlot slot) || slot.Truck == truck) return false;
+        var first = VehicleBounds(current);
+        var second = VehicleBounds(next);
+        return slot.Pose.IntersectsLane(new AxisAlignedBounds(Vector3.Min(first.Minimum, second.Minimum),
+            Vector3.Max(first.Maximum, second.Maximum)));
     }
 
     public bool Exit(SimulationContext context, EntityId truck)
@@ -580,11 +661,16 @@ public sealed class VehicleDockingService
     private static bool OwnerInLane(EntityRegistry entities, in VehicleDockSlot slot)
     {
         if (!entities.TryGetComponent(slot.Truck, out WorldTransform transform)) return false;
+        return slot.Pose.IntersectsLane(VehicleBounds(transform));
+    }
+
+    private static AxisAlignedBounds VehicleBounds(in WorldTransform transform)
+    {
         Vector3 right = Vector3.Transform(Vector3.UnitX, transform.Rotation);
         Vector3 forward = Vector3.Transform(Vector3.UnitZ, transform.Rotation);
         Vector3 half = new(MathF.Abs(right.X) * transform.Scale.X * 0.5f + MathF.Abs(forward.X) * transform.Scale.Z * 0.5f,
             transform.Scale.Y * 0.5f, MathF.Abs(right.Z) * transform.Scale.X * 0.5f + MathF.Abs(forward.Z) * transform.Scale.Z * 0.5f);
-        return slot.Pose.IntersectsLane(new AxisAlignedBounds(transform.Position - half, transform.Position + half));
+        return new AxisAlignedBounds(transform.Position - half, transform.Position + half);
     }
 
     private static bool Operational(EntityRegistry entities, EntityId entity) =>

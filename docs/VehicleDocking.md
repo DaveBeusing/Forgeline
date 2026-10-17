@@ -13,6 +13,10 @@ transforms the entire lane. Vehicle length and width come from the instantiated
 vehicle transform, including the Directorate definitions. No AABB-axis heuristic
 chooses a loading side.
 
+Current definitions provide 12 m of clear longitudinal maneuver distance plus
+half the actual vehicle length on either side of service. Runtime terrain,
+swept footprint and departure checks still apply to this authored space.
+
 The Supply Depot service center spans its authored `supply_transfer` and
 `cargo_load` socket positions with both Directorate truck lengths. The Ammunition
 Plant service point follows the authored `loading_access` offset along its facade.
@@ -32,6 +36,12 @@ and visit generations authorize service and release. Ownership includes approach
 stationary service and confirmed exit. Other trucks receive `Busy` and stop
 without searching a path into the occupied lane. There is no FIFO queue.
 
+Strategic arrivals first reach a point behind the entry without claiming the
+slot. A generation-zero visit describes this approach only; it authorizes no
+service or release. The actual claim happens at the outside maneuver area.
+If another truck claims the slot during strategic travel, the second truck
+stops outside and reports `Busy` without replanning into the occupied lane.
+
 Cancellation revokes the job and movement. It does not release a physically
 occupied corridor. Cleanup checks actual occupancy; neither a timeout nor a stale
 release can give another truck the same occupied lane. Destroyed or cancelled
@@ -41,8 +51,9 @@ vehicles remain obstacles while their physical presence remains registered.
 
 Strategic navigation reaches the validated entry maneuver area. Local movement
 then targets the exact entry, service position and heading, keeping collision and terrain
-constraints. Dock movement is limited to 6 m/s on the straight section,
-2 m/s within 4 m of the target and 1 m/s during heading corrections above 6 degrees.
+constraints. Straight dock movement uses the vehicle's authored speed and
+braking limits. Precision movement is limited to 2 m/s within 1 m of the target
+and 1 m/s during heading corrections above 6 degrees.
 Final heading changes remain bounded by the vehicle's turn rate.
 
 Authorization requires position error at most 0.25 m, heading error at most

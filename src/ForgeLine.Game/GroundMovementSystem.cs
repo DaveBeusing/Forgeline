@@ -346,7 +346,10 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             MathF.Max(
                 0.0f,
                 2.0f * movement.Deceleration * remainingDistance));
-        float maximumSpeed = order.TargetHeadingRadians.HasValue ? MathF.Min(distanceToTarget > 4 ? 6 : 2, movement.MaximumSpeed) : movement.MaximumSpeed;
+        // Straight dock travel uses the vehicle's authored limits and normal
+        // braking distance; precision approach and turns stay slow.
+        float maximumSpeed = order.TargetHeadingRadians.HasValue && distanceToTarget <= 1
+            ? MathF.Min(2, movement.MaximumSpeed) : movement.MaximumSpeed;
         if (order.TargetHeadingRadians.HasValue && MathF.Abs(GroundMovementState.NormalizeAngle(desiredHeading - state.HeadingRadians)) > MathF.PI / 30)
             maximumSpeed = MathF.Min(maximumSpeed, 1);
 
@@ -414,6 +417,16 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
                 0.0f,
                 movement.Deceleration * deltaSeconds);
             terrainBlockedUnits++;
+        }
+
+        var candidateTransform = transform with { Position = candidate, Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading) };
+        if (VehicleDockingService.BlocksStagingStep(entities, entity, transform, candidateTransform))
+        {
+            var waiting = state with { Velocity = Vector3.Zero, Status = GroundMovementStatus.TacticallyPaused,
+                ObservedOrderTick = order.AcceptedAtTick, StalledTicks = 0 };
+            entities.SetComponent(entity, waiting);
+            AddDebugAgent(entity, position, waiting, movement, order.WorldTarget, hasTarget: true);
+            return;
         }
 
         Vector3 newDelta = Horizontal(order.WorldTarget - candidate);

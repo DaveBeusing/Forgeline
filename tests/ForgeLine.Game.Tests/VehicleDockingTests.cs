@@ -338,6 +338,59 @@ public sealed class VehicleDockingTests
             Assert.IsType<BuildingLoadingDock>(ammunition.LoadingDock).ServicePosition.X);
     }
 
+    [Fact]
+    public void DistantArrivalTravelsOutsideTheLaneBeforeClaimingTheBay()
+    {
+        var fixture = new Fixture();
+        fixture.Simulation.Entities.AddComponent(fixture.Truck, GroundMovement.CreateDefault());
+        fixture.SetTruck(new(100, 0, 100), 0, 0);
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1))));
+        Assert.False(fixture.Simulation.Entities.HasComponent<VehicleDockSlot>(fixture.Building));
+        var staged = fixture.Simulation.Entities.GetComponent<VehicleDockVisit>(fixture.Truck);
+        Assert.Equal(0UL, staged.Generation);
+        var move = fixture.Simulation.Entities.GetComponent<MovementOrder>(fixture.Truck);
+        Assert.False((staged.Pose with { ApproachStart = null }).Contains(move.WorldTarget, 0));
+        fixture.SetTruck(move.WorldTarget, 0, 0);
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1))));
+        Assert.Equal(fixture.Truck, fixture.Simulation.Entities.GetComponent<VehicleDockSlot>(fixture.Building).Truck);
+    }
+
+    [Fact]
+    public void SecondArrivalStopsItsOutsideApproachWhenAnotherTruckClaimsTheBay()
+    {
+        var fixture = new Fixture();
+        fixture.Simulation.RegisterSystem(new GroundMovementSystem());
+        var entities = fixture.Simulation.Entities;
+        entities.AddComponent(fixture.OtherTruck, GroundMovement.CreateDefault());
+        entities.AddComponent(fixture.OtherTruck, GroundMovementState.Stationary(0));
+        entities.SetComponent(fixture.OtherTruck, entities.GetComponent<WorldTransform>(fixture.OtherTruck) with { Position = new(100, 0, 14) });
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
+        var move = entities.GetComponent<MovementOrder>(fixture.OtherTruck);
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
+        Assert.Equal(move, entities.GetComponent<MovementOrder>(fixture.OtherTruck));
+        fixture.Step(context => Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out _)));
+        for (int tick = 0; tick < 200; tick++)
+            fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
+        Assert.Equal(VehicleDockStatus.Busy, entities.GetComponent<VehicleDockVisit>(fixture.OtherTruck).Status);
+        Assert.Equal(GroundMovementStatus.TacticallyPaused, entities.GetComponent<GroundMovementState>(fixture.OtherTruck).Status);
+        Vector3 waiting = entities.GetComponent<WorldTransform>(fixture.OtherTruck).Position;
+        var slot = entities.GetComponent<VehicleDockSlot>(fixture.Building);
+        Assert.True(waiting.X > slot.Pose.Exit.X + slot.Pose.HalfLength * 4 + 3);
+        for (int tick = 0; tick < 120; tick++)
+            fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
+        Assert.Equal(waiting, entities.GetComponent<WorldTransform>(fixture.OtherTruck).Position);
+        Assert.Equal(move, entities.GetComponent<MovementOrder>(fixture.OtherTruck));
+        Assert.Equal(fixture.Truck, entities.GetComponent<VehicleDockSlot>(fixture.Building).Truck);
+    }
+
+    [Fact]
+    public void SweptApproachUsesRoundedCornersWithoutAcceptingARealIntersection()
+    {
+        var pose = new VehicleDockPose(Vector3.Zero, new(10, 0, 0), new(20, 0, 0), MathF.PI / 2, 3.2f, 1.6f, new(-16, 0, 0));
+        Assert.False(pose.IntersectsLane(new AxisAlignedBounds(new(-18.5f, -1, -4.8f), new(-18, 1, -4.3f))));
+        Assert.True(pose.IntersectsLane(new AxisAlignedBounds(new(-18.5f, -1, -4.3f), new(-18, 1, -3.8f))));
+    }
+
     private sealed class Fixture : ISimulationSystem
     {
         private Action<SimulationContext>? _action;

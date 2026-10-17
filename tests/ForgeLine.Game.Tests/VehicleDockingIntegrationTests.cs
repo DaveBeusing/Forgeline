@@ -36,9 +36,11 @@ public sealed class VehicleDockingIntegrationTests
             LogisticsNodeCapabilities.CargoSource | LogisticsNodeCapabilities.CargoDestination);
         var target = network.AddNode(destination.Entity, new(120, 0, 0), LogisticsNodeKind.StorageDepot,
             LogisticsNodeCapabilities.CargoDestination);
+        EntityId waypointBuilding = EntityId.Invalid;
         if (viaBuilding)
         {
             var middle = CreateBuilding(simulation, inventories, new(60, 0, 0));
+            waypointBuilding = middle.Entity;
             var waypoint = network.AddNode(middle.Entity, new(60, 0, 0), LogisticsNodeKind.StorageDepot,
                 LogisticsNodeCapabilities.CargoDestination);
             network.AddEdge(origin, waypoint, LogisticsTransportMode.GroundRoad, 60, 60, 100);
@@ -61,6 +63,8 @@ public sealed class VehicleDockingIntegrationTests
         for (int tick = 0; tick < ticksPerSecond * 180; tick++)
         {
             simulation.AdvanceOneTick();
+            if (waypointBuilding.IsValid)
+                Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(waypointBuilding));
             if (invalidateRoute && !changedRoute && simulation.Entities.TryGetComponent(truck, out VehicleDockVisit pendingDock) &&
                 pendingDock.Building == destination.Entity && pendingDock.Status == VehicleDockStatus.Reserved)
             {

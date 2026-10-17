@@ -22,7 +22,7 @@ public sealed class CargoTransportApproachTests
 
         // A detour changes which edge point is closest, not the requested visit.
         fixture.Simulation.Entities.SetComponent(fixture.Truck,
-            new WorldTransform(new Vector3(0.0f, 0.0f, 90.0f), Quaternion.Identity, Vector3.One));
+            fixture.Simulation.Entities.GetComponent<WorldTransform>(fixture.Truck) with { Position = new(0, 0, 90) });
         fixture.Simulation.AdvanceOneTick();
 
         Assert.Equal(original, fixture.Simulation.Entities.GetComponent<MovementOrder>(fixture.Truck));
@@ -41,7 +41,7 @@ public sealed class CargoTransportApproachTests
         MovementOrder original = fixture.Simulation.Entities.GetComponent<MovementOrder>(fixture.Truck);
         fixture.Simulation.Entities.RemoveComponent<MovementOrder>(fixture.Truck);
         fixture.Simulation.Entities.SetComponent(fixture.Truck,
-            new WorldTransform(new Vector3(0.0f, 0.0f, 90.0f), Quaternion.Identity, Vector3.One));
+            fixture.Simulation.Entities.GetComponent<WorldTransform>(fixture.Truck) with { Position = new(0, 0, 90) });
         fixture.Simulation.AdvanceOneTick();
 
         MovementOrder replacement = fixture.Simulation.Entities.GetComponent<MovementOrder>(fixture.Truck);
