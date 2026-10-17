@@ -340,7 +340,7 @@ def main():
     bindings.extend({'domain':'RtsCursorKind','member':name,'role':f'cursor.{name.lower() if name not in ("AttackMove","DragSelect") else {"AttackMove":"attack_move","DragSelect":"drag_select"}[name]}','availability':'runtime_required'} for name in enum_members('src/ForgeLine.Presentation/RtsInformationLayer.cs','RtsCursorKind'))
     bindings.extend({'domain':'RtsMinimapSymbolKind','member':member,'role':role.replace('minimap.','marker.'),'availability':'runtime_required'} for member,role in [(name.removeprefix('Minimap'),role) for name,role in legacy if role.startswith('minimap.')])
     for member in enum_members('src/ForgeLine.UI/FrontendInteraction.cs','FrontendSettingsField'):
-        role='utility.audio' if member.startswith('UiSound') else 'utility.bindings' if member.startswith('Binding') else 'utility.info' if member=='Onboarding' else 'utility.general' if member in ('CameraSpeed','EdgeScroll','ReducedUiMotion') else 'utility.display'
+        role='utility.audio' if member.startswith(('UiSound', 'WorldSound', 'MasterSound', 'AlertSound', 'AmbienceSound')) else 'utility.bindings' if member.startswith('Binding') else 'utility.info' if member=='Onboarding' else 'utility.general' if member in ('CameraSpeed','EdgeScroll','ReducedUiMotion') else 'utility.display'
         bindings.append({'domain':'FrontendSettingsField','member':member,'role':role,'availability':'runtime_required','dynamicLabelRequired':True})
     for identity,role in [(1,'building_role.processing'),(2,'unit_role.logistics'),(3,'unit_role.armor'),(4,'unit_role.reconnaissance')]:
         bindings.append({'domain':'TechnologyId','member':str(identity),'role':role,'availability':'runtime_required','dynamicLabelRequired':True})
