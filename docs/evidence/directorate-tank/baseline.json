@@ -1,0 +1,436 @@
+{
+  "sourceRevision": "f12517c73dfe5863d7227b4f6c18e9139bcc5853",
+  "assets": [
+    {
+      "id": "unit.directorate.main_battle_tank",
+      "definition": {
+        "id": "unit.directorate.main_battle_tank",
+        "type": "mesh",
+        "source": "../sources/main_battle_tank/chassis_lod0.gltf",
+        "materialReferences": [
+          "material.directorate.unit.main_battle_tank"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "unit.directorate.main_battle_tank.lod1",
+            "maxDistance": 140
+          },
+          {
+            "level": 2,
+            "assetId": "unit.directorate.main_battle_tank.lod2",
+            "maxDistance": 380
+          }
+        ],
+        "collisionRequired": true,
+        "collisionReference": "unit.directorate.main_battle_tank.collision",
+        "sockets": [
+          {
+            "name": "turret_pivot",
+            "x": 0,
+            "y": 0.1,
+            "z": 0.02
+          },
+          {
+            "name": "gun_pivot",
+            "x": 0,
+            "y": 0.16,
+            "z": 0.1
+          },
+          {
+            "name": "weapon_muzzle",
+            "x": 0,
+            "y": 0.16,
+            "z": 0.64
+          },
+          {
+            "name": "recoil_anchor",
+            "x": 0,
+            "y": 0.16,
+            "z": 0.16
+          },
+          {
+            "name": "sensor_origin",
+            "x": 0.16,
+            "y": 0.26,
+            "z": 0.05
+          },
+          {
+            "name": "motion_road_wheel_1_0",
+            "x": -0.43,
+            "y": -0.3,
+            "z": -0.2624
+          },
+          {
+            "name": "motion_road_wheel_1_1",
+            "x": -0.43,
+            "y": -0.3,
+            "z": -0.0874666667
+          },
+          {
+            "name": "motion_road_wheel_1_2",
+            "x": -0.43,
+            "y": -0.3,
+            "z": 0.0874666667
+          },
+          {
+            "name": "motion_road_wheel_1_3",
+            "x": -0.43,
+            "y": -0.3,
+            "z": 0.2624
+          },
+          {
+            "name": "motion_road_wheel_2_0",
+            "x": 0.43,
+            "y": -0.3,
+            "z": -0.2624
+          },
+          {
+            "name": "motion_road_wheel_2_1",
+            "x": 0.43,
+            "y": -0.3,
+            "z": -0.0874666667
+          },
+          {
+            "name": "motion_road_wheel_2_2",
+            "x": 0.43,
+            "y": -0.3,
+            "z": 0.0874666667
+          },
+          {
+            "name": "motion_road_wheel_2_3",
+            "x": 0.43,
+            "y": -0.3,
+            "z": 0.2624
+          }
+        ],
+        "mechanicalParts": [
+          {
+            "name": "body",
+            "firstIndex": 0,
+            "indexCount": 15840,
+            "parent": -1,
+            "motion": "static"
+          },
+          {
+            "name": "road_wheel_1_0",
+            "firstIndex": 15840,
+            "indexCount": 372,
+            "parent": -1,
+            "motion": "wheel",
+            "socket": "motion_road_wheel_1_0",
+            "rate": 1.5,
+            "travel": 0
+          },
+          {
+            "name": "road_wheel_1_1",
+            "firstIndex": 16212,
+            "indexCount": 372,
+            "parent": -1,
+            "motion": "wheel",
+            "socket": "motion_road_wheel_1_1",
+            "rate": 1.5,
+            "travel": 0
+          },
+          {
+            "name": "road_wheel_1_2",
+            "firstIndex": 16584,
+            "indexCount": 372,
+            "parent": -1,
+            "motion": "wheel",
+            "socket": "motion_road_wheel_1_2",
+            "rate": 1.5,
+            "travel": 0
+          },
+          {
+            "name": "road_wheel_1_3",
+            "firstIndex": 16956,
+            "indexCount": 372,
+            "parent": -1,
+            "motion": "wheel",
+            "socket": "motion_road_wheel_1_3",
+            "rate": 1.5,
+            "travel": 0
+          },
+          {
+            "name": "road_wheel_2_0",
+            "firstIndex": 17328,
+            "indexCount": 372,
+            "parent": -1,
+            "motion": "wheel",
+            "socket": "motion_road_wheel_2_0",
+            "rate": 1.5,
+            "travel": 0
+          },
+          {
+            "name": "road_wheel_2_1",
+            "firstIndex": 17700,
+            "indexCount": 372,
+            "parent": -1,
+            "motion": "wheel",
+            "socket": "motion_road_wheel_2_1",
+            "rate": 1.5,
+            "travel": 0
+          },
+          {
+            "name": "road_wheel_2_2",
+            "firstIndex": 18072,
+            "indexCount": 372,
+            "parent": -1,
+            "motion": "wheel",
+            "socket": "motion_road_wheel_2_2",
+            "rate": 1.5,
+            "travel": 0
+          },
+          {
+            "name": "road_wheel_2_3",
+            "firstIndex": 18444,
+            "indexCount": 372,
+            "parent": -1,
+            "motion": "wheel",
+            "socket": "motion_road_wheel_2_3",
+            "rate": 1.5,
+            "travel": 0
+          }
+        ]
+      },
+      "definitionSha256": "c466effdd6d9c8d910355d2ad509b62655a0bcca85f491be43fb63df26f0b276",
+      "sourceSha256": "886472bccaba9fe080758982cc3c6a95823b6aec85a2097b127cf703f6b7930c",
+      "geometry": {
+        "vertices": 12080,
+        "triangles": 6272,
+        "primitives": 1,
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "boundsMax": [
+          0.49000000953674316,
+          0.10000000149011612,
+          0.4099999964237213
+        ]
+      }
+    },
+    {
+      "id": "unit.directorate.main_battle_tank.collision",
+      "definition": {
+        "id": "unit.directorate.main_battle_tank.collision",
+        "type": "mesh",
+        "source": "../sources/collision_box.gltf"
+      },
+      "definitionSha256": "73e0a161c37ca64c8052cd526354d7c40f5ce26f5e53fd32b1c7cc7f48ca4bbb",
+      "sourceSha256": "994a38291cb333052e5101e8b693ab754225fe8c29d283cf3773abfbde912d30",
+      "geometry": {
+        "vertices": 8,
+        "triangles": 12,
+        "primitives": 1,
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.46000000834465027,
+          -0.47999998927116394
+        ],
+        "boundsMax": [
+          0.47999998927116394,
+          0.46000000834465027,
+          0.47999998927116394
+        ]
+      }
+    },
+    {
+      "id": "unit.directorate.main_battle_tank.critical",
+      "definition": {
+        "id": "unit.directorate.main_battle_tank.critical",
+        "type": "mesh",
+        "source": "../sources/main_battle_tank/critical.gltf",
+        "materialReferences": [
+          "material.directorate.unit.main_battle_tank"
+        ]
+      },
+      "definitionSha256": "b46ce527122495db4ed71a9807fee73bdbc60b8bf7e14558c2d758471d8172c3",
+      "sourceSha256": "c573b62bafff66bf388f8145c15ce6de7e8a35ea5609145d29ab16e36ab779cd",
+      "geometry": {
+        "vertices": 384,
+        "triangles": 180,
+        "primitives": 1,
+        "boundsMin": [
+          -0.27000001072883606,
+          -0.10999999940395355,
+          -0.3700000047683716
+        ],
+        "boundsMax": [
+          0.30000001192092896,
+          0.15000000596046448,
+          0.39500001072883606
+        ]
+      }
+    },
+    {
+      "id": "unit.directorate.main_battle_tank.damaged",
+      "definition": {
+        "id": "unit.directorate.main_battle_tank.damaged",
+        "type": "mesh",
+        "source": "../sources/main_battle_tank/damaged.gltf",
+        "materialReferences": [
+          "material.directorate.unit.main_battle_tank"
+        ]
+      },
+      "definitionSha256": "3a9e1f83bc5932438eb1705cd1b7ff29f16904de78bbc32b40a566b7b436ba5d",
+      "sourceSha256": "80b6f562a3dd64263467a568127bfd10935d4934f999bd7d9b23892947279d77",
+      "geometry": {
+        "vertices": 192,
+        "triangles": 88,
+        "primitives": 1,
+        "boundsMin": [
+          -0.2800000011920929,
+          -0.05000000074505806,
+          0.15000000596046448
+        ],
+        "boundsMax": [
+          0.4050000011920929,
+          0.03099999949336052,
+          0.36500000953674316
+        ]
+      }
+    },
+    {
+      "id": "unit.directorate.main_battle_tank.lod1",
+      "definition": {
+        "id": "unit.directorate.main_battle_tank.lod1",
+        "type": "mesh",
+        "source": "../sources/main_battle_tank/combined_lod1.gltf",
+        "materialReferences": [
+          "material.directorate.unit.main_battle_tank"
+        ]
+      },
+      "definitionSha256": "6180a9b2055a39130c73b1ebec34827a402a350ce8ed39e06215d940e1757d7b",
+      "sourceSha256": "5d01ba99f49c81f5e51b6dc52ef2272c645d9b744fbf3d49da9b1534c6445a0e",
+      "geometry": {
+        "vertices": 1784,
+        "triangles": 892,
+        "primitives": 1,
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "boundsMax": [
+          0.49000000953674316,
+          0.2809999883174896,
+          0.6399999856948853
+        ]
+      }
+    },
+    {
+      "id": "unit.directorate.main_battle_tank.lod2",
+      "definition": {
+        "id": "unit.directorate.main_battle_tank.lod2",
+        "type": "mesh",
+        "source": "../sources/main_battle_tank/combined_lod2.gltf",
+        "materialReferences": [
+          "material.directorate.unit.main_battle_tank"
+        ]
+      },
+      "definitionSha256": "409d24de73f18767ec0a80c1f6c3853abbfc4a2d0fb7d1c0ddf67c757d4777d7",
+      "sourceSha256": "7e18dd834fb26385b4d59c66bcac548b33fcff467deebd32e3a1b5f9b5555ae3",
+      "geometry": {
+        "vertices": 532,
+        "triangles": 244,
+        "primitives": 1,
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "boundsMax": [
+          0.49000000953674316,
+          0.24500000476837158,
+          0.6399999856948853
+        ]
+      }
+    },
+    {
+      "id": "unit.directorate.main_battle_tank.turret",
+      "definition": {
+        "id": "unit.directorate.main_battle_tank.turret",
+        "type": "mesh",
+        "source": "../sources/main_battle_tank/turret_lod0.gltf",
+        "materialReferences": [
+          "material.directorate.unit.main_battle_tank"
+        ],
+        "sockets": [
+          {
+            "name": "motion_cannon",
+            "x": 0,
+            "y": 0.16,
+            "z": 0.1
+          }
+        ],
+        "mechanicalParts": [
+          {
+            "name": "body",
+            "firstIndex": 0,
+            "indexCount": 3060,
+            "parent": -1,
+            "motion": "static"
+          },
+          {
+            "name": "cannon",
+            "firstIndex": 3060,
+            "indexCount": 2196,
+            "parent": -1,
+            "motion": "cannon",
+            "socket": "motion_cannon",
+            "rate": 1,
+            "travel": 0.045
+          }
+        ]
+      },
+      "definitionSha256": "2660c297834083cde835442d7d54e8ea310c7e20dd87a7a47105f0aa7c4f2831",
+      "sourceSha256": "37e83c7813e1a8d0c02652436719dc30de0e69a66ae0d2409fc2a3bd5cacf885",
+      "geometry": {
+        "vertices": 3584,
+        "triangles": 1752,
+        "primitives": 1,
+        "boundsMin": [
+          -0.27000001072883606,
+          0.0,
+          -0.17000000178813934
+        ],
+        "boundsMax": [
+          0.27000001072883606,
+          0.28999999165534973,
+          0.6399999856948853
+        ]
+      }
+    },
+    {
+      "id": "unit.directorate.main_battle_tank.wreck",
+      "definition": {
+        "id": "unit.directorate.main_battle_tank.wreck",
+        "type": "mesh",
+        "source": "../sources/main_battle_tank/wreck.gltf",
+        "materialReferences": [
+          "material.directorate.unit.main_battle_tank"
+        ]
+      },
+      "definitionSha256": "4d084b68ffaddceb570db4471c29e097bfe07c5c0fbf437543cf3861c0439127",
+      "sourceSha256": "05b3658284fa2b390c7cb7197be4493ec9a0dd5f581fd199a313ecb62b75ecb0",
+      "geometry": {
+        "vertices": 672,
+        "triangles": 300,
+        "primitives": 1,
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "boundsMax": [
+          0.49000000953674316,
+          0.03999999910593033,
+          0.4099999964237213
+        ]
+      }
+    }
+  ]
+}

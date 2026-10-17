@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "unit.directorate.main_battle_tank",
+      "assets": [
+        "unit.directorate.main_battle_tank",
+        "unit.directorate.main_battle_tank.collision",
+        "unit.directorate.main_battle_tank.critical",
+        "unit.directorate.main_battle_tank.damaged",
+        "unit.directorate.main_battle_tank.lod1",
+        "unit.directorate.main_battle_tank.lod2",
+        "unit.directorate.main_battle_tank.turret",
+        "unit.directorate.main_battle_tank.wreck"
+      ],
+      "instanceScale": [
+        4,
+        3,
+        7.2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

@@ -129,7 +129,7 @@ def close_matrix(actual, expected, message, tolerance=SOCKET_EPS):
     require(max(abs(actual[i][j]-expected[i][j]) for i in range(4) for j in range(4))<=tolerance,message)
 
 
-def export_scene(catalog, ids, families, geometries):
+def export_scene(catalog, ids, families, geometries, geometry_comparison=None):
     scene=bpy.context.scene;bpy.context.view_layer.update()
     require(len(bpy.data.scenes)==1,'Only one authored scene is supported')
     require(not scene.animation_data and not bpy.data.actions,'Scene animation is unsupported')
@@ -236,7 +236,7 @@ def export_scene(catalog, ids, families, geometries):
                         if old is None:target[vertex_id]=tuple(value)
                 seen.add((pi,triangle))
         for p in exported['primitives']:require(all(v is not None for a in p['attributes'].values() for v in a),'Source vertices disappeared')
-        deviations=compare_geometry(baseline,exported)
+        deviations=compare_geometry(baseline,exported) if geometry_comparison is None else geometry_comparison(aid,baseline,exported)
         results[aid]=exported
         reports.append({'id':aid,'sourceSha256':sha(catalog.source(aid)),'sourceStats':geometry_stats(baseline),
             'exportStats':geometry_stats(exported),'maximumDeviations':deviations,'sockets':socket_reports,
