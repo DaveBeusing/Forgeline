@@ -14,10 +14,14 @@ $ErrorActionPreference = "Stop"
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $clientProject = Join-Path $repositoryRoot "src/ForgeLine.Client/ForgeLine.Client.csproj"
-$settingsRootPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $SettingsRoot))
-$windowedReportPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $WindowedReport))
-$borderlessReportPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $BorderlessReport))
-$assetQualificationReportPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $AssetQualificationReport))
+$settingsRootPath = [System.IO.Path]::GetFullPath($SettingsRoot, $repositoryRoot)
+$windowedReportPath = [System.IO.Path]::GetFullPath($WindowedReport, $repositoryRoot)
+$borderlessReportPath = [System.IO.Path]::GetFullPath($BorderlessReport, $repositoryRoot)
+$assetQualificationReportPath = [System.IO.Path]::GetFullPath($AssetQualificationReport, $repositoryRoot)
+$ownedSettingsRoot = [System.IO.Path]::GetFullPath('artifacts', $repositoryRoot) + [System.IO.Path]::DirectorySeparatorChar
+if (-not $settingsRootPath.StartsWith($ownedSettingsRoot, [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'Window qualification settings must remain inside the repository artifacts directory.'
+}
 
 function Invoke-ClientSmoke {
     param(
@@ -145,7 +149,7 @@ function Invoke-ClientSmoke {
 
     & (Join-Path $PSScriptRoot 'Validate-VisualDrawBudgets.ps1') -Metrics $metrics
 
-    # Native production PBR maps allocate 51,364,204 bytes; the bounded scene
+    # Native production PBR maps allocate 22,004,272 bytes; the bounded scene
     # allowance includes control/UI/effect textures and display-dependent masks.
     if ($metrics.peakResidentTextureBytes -gt 67108864) {
         throw "Peak resident texture bytes $($metrics.peakResidentTextureBytes) exceeded the 64 MiB production scene budget."
@@ -222,10 +226,16 @@ function Invoke-ClientSmoke {
     )
 }
 
-if (Test-Path $assetQualificationReportPath) {
+if (-not (Test-Path -LiteralPath $assetQualificationReportPath)) { throw "Required asset qualification report is absent: $assetQualificationReportPath" }
+if (Test-Path -LiteralPath $assetQualificationReportPath) {
     $assetQualification = Get-Content -Path $assetQualificationReportPath -Raw | ConvertFrom-Json -Depth 32
 
+    if (-not $assetQualification.success) { throw 'Asset qualification report was unsuccessful.' }
+    $totalTextureBytes = [long]$assetQualification.textureRuntimeBytes
     $studioTextureBytes = [long]$assetQualification.studioSplashTextureRuntimeBytes
+    if ($totalTextureBytes -le 0 -or $studioTextureBytes -lt 0 -or $studioTextureBytes -gt $totalTextureBytes) {
+        throw 'Invalid texture footprint totals in asset qualification report.'
+    }
     $gameplayTextureBytes = [long]$assetQualification.textureRuntimeBytes - $studioTextureBytes
 
     if ($gameplayTextureBytes -gt 58720256) {
@@ -240,7 +250,7 @@ if (Test-Path $assetQualificationReportPath) {
 }
 
 if (Test-Path $settingsRootPath) {
-    Remove-Item -Path $settingsRootPath -Recurse -Force
+    Remove-Item -LiteralPath $settingsRootPath -Recurse -Force
 }
 
 New-Item -Path $settingsRootPath -ItemType Directory -Force | Out-Null

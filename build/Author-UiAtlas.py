@@ -36,7 +36,8 @@ def main():
                 write(OUT / f"{group}_{index}.asset.json", {
                     "id": pages[-1]["id"], "type": "texture", "source": name,
                     "textureUsage": "displayImage", "textureColorSpace": "linear",
-                    "textureGenerateMipmaps": False, "textureFormat": "rgba8Unorm"})
+                    "textureGenerateMipmaps": False, "textureFormat": "bc7Unorm" if group == "portraits" else "rgba8Unorm",
+                    **({"textureCompressionQuality": "balanced"} if group == "portraits" else {})})
 
         for entry, path in sorted(entries, key=lambda e: e[0]["id"]):
             image = Image.open(path).convert("RGBA")

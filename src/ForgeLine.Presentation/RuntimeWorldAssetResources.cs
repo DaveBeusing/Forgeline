@@ -574,6 +574,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             AssetSocket socket = record.Sockets.FirstOrDefault(item => item.Name == part.Socket);
             return new MechanicalPartBinding(part, new Vector3(socket.X, socket.Y, socket.Z));
         }).ToArray();
+        MechanicalGeometryBatching.Assign(data, parts);
         RuntimeMeshVertex[] vertices =
             data.Vertices.ToArray();
         uint[] indices =

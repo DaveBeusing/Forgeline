@@ -6,5 +6,6 @@
   "textureColorSpace": "srgb",
   "textureGenerateMipmaps": true,
   "textureMaxDimension": 1024,
-  "textureFormat": "rgba8Unorm"
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
 }

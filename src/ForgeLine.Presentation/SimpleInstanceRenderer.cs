@@ -800,6 +800,20 @@ public sealed class SimpleInstanceRenderer : IDisposable
             return;
         }
 
+        string? batchReport = Environment.GetEnvironmentVariable("FORGELINE_INSTANCE_BATCH_REPORT");
+        if (!string.IsNullOrWhiteSpace(batchReport))
+        {
+            try
+            {
+                var batches = _batchLookup.Select(pair => new { Mesh = pair.Key.RuntimeMeshId.ToString(),
+                    Material = pair.Key.RuntimeMaterialId.ToString(), Part = pair.Key.PartIndex,
+                    Instances = pair.Value.Instances.Count, Indices = pair.Value.UsesRuntimeMesh ? pair.Value.RuntimeMesh.IndexCount : 36 }).ToArray();
+                File.WriteAllText(batchReport, System.Text.Json.JsonSerializer.Serialize(batches));
+            }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            { Console.Error.WriteLine($"[graphics:batch-report-unavailable] {error.GetType().Name}"); }
+        }
+
         foreach (FrameInstanceBuffer frameBuffer in
                  _frameInstanceBuffers.Values)
         {
@@ -1487,19 +1501,20 @@ public sealed class SimpleInstanceRenderer : IDisposable
         for (int i = 0; i < count; i++)
         {
             bool articulated = usesMesh && parts.Length > 0;
+            int geometryPart = articulated ? parts[i].GeometryPartIndex >= 0 ? parts[i].GeometryPartIndex : i : -1;
             RuntimeMeshBuffers slice = articulated ? mesh with
             {
-                FirstIndex = parts[i].Part.FirstIndex,
-                IndexCount = parts[i].Part.IndexCount
+                FirstIndex = parts[geometryPart].Part.FirstIndex,
+                IndexCount = parts[geometryPart].Part.IndexCount
             } : mesh;
             var key = new InstanceBatchKey(usesMesh, meshId, usesMaterial,
-                usesMaterial ? material.MaterialId : default, articulated ? i : -1);
+                usesMaterial ? material.MaterialId : default, geometryPart);
             if (!_batchLookup.TryGetValue(key, out InstanceBatch? batch))
             {
                 batch = RentBatch(usesMesh, slice, usesMaterial, material);
                 _batchLookup.Add(key, batch);
             }
-            batch.Instances.Add(CreateInstanceRenderData(articulated ? transforms[i] : world,
+            batch.Instances.Add(CreateInstanceRenderData(articulated ? Matrix4x4.CreateTranslation(parts[i].GeometryOffset) * transforms[i] : world,
                 color, usesMaterial, material));
         }
     }
