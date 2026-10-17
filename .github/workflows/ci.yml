@@ -75,6 +75,14 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Set up source-contract Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Blender source geometry contracts
+        run: python -m unittest discover -s tools/blender/tests -p test_asset_contract.py -v
+
       - name: Blender launcher protocol contracts
         shell: pwsh
         run: ./tools/blender/Test-BlenderToolchain.ps1 -OutputRoot artifacts/blender-contracts-ci

@@ -18,6 +18,10 @@ qualifies them through the existing compiler and source-less integrity gate.
 Repeated source and runtime outputs are compared byte-for-byte. No production
 source exporter is replaced; Blender is never a player/headless dependency.
 Production IDs, sockets, metre scale and LOD/material contracts remain unchanged.
+The [source round-trip adapter](BlenderAssetRoundTrip.md) additionally preserves
+existing unit/building geometry, rigid ranges and socket frames in editable Blender
+projects, exporting verified glTF/GLB source clones for this same compiler. Source
+material/texture definitions stay authoritative; outputs are isolated under artifacts.
 
 ## Purpose
 

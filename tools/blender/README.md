@@ -140,3 +140,12 @@ Upgrades require an intentional policy and fixture version change plus native
 compiler/idempotency qualification and geometry/material review. No automatic
 version range or production migration is provided. Future exporters must retain
 the existing asset compiler and production source/runtime boundaries.
+
+## Production source import/export
+
+[Source round trips](../../docs/BlenderAssetRoundTrip.md) extend this launcher with
+asset-definition-based tank/building imports, editable projects, strict GLB export,
+state/LOD/collision/socket validation and original-vs-compiled renderer checks.
+Use `Invoke-BlenderRoundTrip.ps1` with an explicit fresh artifacts output directory.
+Existing production authors retain ownership; generated source clones are never
+applied to the game automatically.
