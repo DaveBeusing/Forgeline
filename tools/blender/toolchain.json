@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "version": "5.2.2",
+  "architecture": "x64",
+  "platforms": [
+    "Windows",
+    "Linux"
+  ],
+  "pythonExitCode": 23
+}
