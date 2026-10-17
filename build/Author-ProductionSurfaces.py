@@ -211,7 +211,7 @@ def terrain(only=None):
         save(path/f'{name}_production_normal.png',normal(h,32))
         save(path/f'{name}_production_orm.png',orm)
         # Base color stays lossless RGBA8: the CPU terrain profile also samples it.
-        definition(path/f'{name}.asset.json',f'texture.world.terrain.{name}',f'{name}_production_base.png','baseColor',1024,False)
+        definition(path/f'{name}.asset.json',f'texture.world.terrain.{name}',f'{name}_production_base.png','baseColor',1024,True)
         for semantic in ('normal','orm'):
             definition(path/f'{name}_production_{semantic}.asset.json',f'texture.world.terrain.{name}_{semantic}',f'{name}_production_{semantic}.png',semantic,512,True)
         print('Authored',name,flush=True)

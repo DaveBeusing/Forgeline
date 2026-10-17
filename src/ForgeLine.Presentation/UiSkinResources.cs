@@ -64,7 +64,7 @@ public sealed class UiSkinResources : IDisposable
                 RuntimeUiSkinData.ValidatePage(p, texture);
                 cancellationToken.ThrowIfCancellationRequested();
                 var mip = texture.Mips[0];
-                textures[i] = device.CreateTexture(new(new(texture.Width, texture.Height, GraphicsTextureFormat.Rgba8Unorm,
+                textures[i] = device.CreateTexture(new(new(texture.Width, texture.Height, texture.Format == RuntimeTextureFormat.Bc7Unorm ? GraphicsTextureFormat.Bc7Unorm : GraphicsTextureFormat.Rgba8Unorm,
                     GraphicsTextureColorSpace.Linear, 1) { DeferUploadWait = true }, [new(mip.Width, mip.Height, mip.RowPitch, mip.Pixels)]));
                 bytes += texture.ResidentByteCount;
             }

@@ -10,7 +10,7 @@ public sealed record UiSkinSprite(string Id, int Page, int X, int Y, int Width, 
     float LogicalWidth, float LogicalHeight, int Padding, UiSkinInsets Insets,
     UiSkinInsets ContentPadding, bool NineSlice, int HotspotX = -1, int HotspotY = -1);
 
-/// <summary>Display-referred, straight-alpha RGBA8, linear sampling, no mipmaps.
+/// <summary>Display-referred straight alpha, linear sampling, no mipmaps. Portrait pages may use BC7.
 /// Page color bytes are already display encoded and bypass world tone mapping.</summary>
 public sealed class RuntimeUiSkinData
 {
@@ -79,8 +79,8 @@ public sealed class RuntimeUiSkinData
     public static void ValidatePage(UiSkinPage page, RuntimeTextureData texture)
     {
         if (texture.Width != page.Width || texture.Height != page.Height || texture.Mips.Count != 1 ||
-            texture.Format != RuntimeTextureFormat.Rgba8Unorm || texture.ColorSpace != RuntimeTextureColorSpace.Linear || texture.Usage != RuntimeTextureUsage.DisplayImage)
-            throw new InvalidDataException($"UI page '{page.Id}' requires exact dimensions, display RGBA8/linear, one mip and straight alpha.");
+            (texture.Format != RuntimeTextureFormat.Rgba8Unorm && !(page.Group == UiSkinGroup.Portraits && texture.Format == RuntimeTextureFormat.Bc7Unorm)) || texture.ColorSpace != RuntimeTextureColorSpace.Linear || texture.Usage != RuntimeTextureUsage.DisplayImage)
+            throw new InvalidDataException($"UI page '{page.Id}' requires exact dimensions, display RGBA8 (or portrait BC7)/linear, one mip and straight alpha.");
     }
 
     public byte[] ToPayload()

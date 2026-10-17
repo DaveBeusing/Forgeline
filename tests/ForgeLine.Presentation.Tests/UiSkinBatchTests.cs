@@ -116,20 +116,51 @@ public sealed class UiSkinBatchTests
         device.WaitForIdle();Assert.Equal(0,device.Diagnostics.Resources.LoadedTextureCount);
         Assert.Equal(0,device.Diagnostics.Health.SubmissionFaultCount);Assert.Equal(0,device.Diagnostics.Debug.ErrorCount);
     }
+    [Fact]
+    public void NativePortraitBc7UploadPreservesLinearDisplaySamplingAndReleasesItsTextures()
+    {
+        using var fixture = new Fixture(portraits: true); using var platform = new WindowsPlatform();
+        using IWindow window = platform.CreateWindow(new("FORGELINE portrait BC7", 640, 360));
+        using var device = GraphicsDeviceFactory.CreateForWindow(window, new() { ForceSoftwareAdapter = true, EnableVSync = false, EnableDebugLayer = true });
+        using (var resources = new UiSkinResources(device, fixture.Catalog, UiSkinGroup.Portraits, TestContext.Current.CancellationToken))
+        using (var batch = new UiSkinBatch(device, resources))
+        {
+            Assert.Equal(2048, resources.PageBytes); int width = 0;
+            var image = device.CaptureFrame(new(0, 0, 0, 1), context =>
+            {
+                width = context.Width; context.BeginPass(GraphicsFramePass.Overlay); batch.Begin(context.Width, context.Height, context.FrameIndex);
+                batch.Draw("ui.sprite.a", new(8, 8, 64, 64), new(1, .5f, .25f, 1)); batch.Flush(context);
+            });
+            int pixel = (32 * width + 32) * 4;
+            Assert.InRange((int)image[pixel], 253, 255); Assert.InRange((int)image[pixel + 1], 126, 129); Assert.InRange((int)image[pixel + 2], 62, 65);
+        }
+        device.WaitForIdle(); Assert.Equal(0, device.Diagnostics.Resources.LoadedTextureCount);
+        Assert.Equal(0, device.Diagnostics.Health.SubmissionFaultCount); Assert.Equal(0, device.Diagnostics.Debug.ErrorCount);
+    }
     [StructLayout(LayoutKind.Sequential)] private readonly record struct Vertex(Vector2 P,Vector4 C,Vector2 U);
     private sealed class Fixture:IDisposable
     {
         public string Root{get;}=Path.Combine(Path.GetTempPath(),"forgeline-skin-batch-"+Guid.NewGuid().ToString("N"));
         public RuntimeAssetCatalog Catalog{get;}
-        public Fixture()
+        public Fixture(bool portraits = false)
         {
             Directory.CreateDirectory(Root);
-            var pages=new[]{new UiSkinPage("ui.page.a",32,32,UiSkinGroup.Core),new UiSkinPage("ui.page.b",32,32,UiSkinGroup.Core)};
+            var pages=new[]{new UiSkinPage("ui.page.a",32,32,portraits ? UiSkinGroup.Portraits : UiSkinGroup.Core),new UiSkinPage("ui.page.b",32,32,portraits ? UiSkinGroup.Portraits : UiSkinGroup.Core)};
             var skin=new RuntimeUiSkinData(pages,[new("ui.sprite.a",0,2,2,20,20,20,20,2,new(8,8,8,8),default,true),new("ui.sprite.b",1,2,2,20,20,20,20,2,default,default,false)]);
             var records=new List<RuntimeAssetRecord>();
             byte[] pixels=new byte[4096];for(int i=0;i<pixels.Length;i+=4){pixels[i]=240;pixels[i+1]=120;pixels[i+2]=60;pixels[i+3]=128;}
-            Add("ui.page.a",RuntimeAssetType.Texture,"page-a.flasset",RuntimeTextureData.FromRgba8(32,32,pixels,RuntimeTextureColorSpace.Linear,RuntimeTextureUsage.DisplayImage).ToPayload(),[]);
-            Add("ui.page.b",RuntimeAssetType.Texture,"page-b.flasset",RuntimeTextureData.FromRgba8(32,32,pixels,RuntimeTextureColorSpace.Linear,RuntimeTextureUsage.DisplayImage).ToPayload(),[]);
+            RuntimeTextureData texture;
+            if (portraits)
+            {
+                byte[] blocks = new byte[1024];
+                // BC7 mode 6: eight 7-bit 127 endpoints plus p-bits one, all indices zero => opaque white.
+                for (int i = 0; i < blocks.Length; i += 16)
+                { blocks[i] = 0xc0; for (int j = 1; j < 8; j++) blocks[i + j] = 0xff; blocks[i + 8] = 1; }
+                texture = new(32, 32, RuntimeTextureFormat.Bc7Unorm, RuntimeTextureColorSpace.Linear, RuntimeTextureUsage.DisplayImage, [new(32, 32, 128, blocks)]);
+            }
+            else texture = RuntimeTextureData.FromRgba8(32,32,pixels,RuntimeTextureColorSpace.Linear,RuntimeTextureUsage.DisplayImage);
+            Add("ui.page.a",RuntimeAssetType.Texture,"page-a.flasset",texture.ToPayload(),[]);
+            Add("ui.page.b",RuntimeAssetType.Texture,"page-b.flasset",texture.ToPayload(),[]);
             Add(UiSkinResources.AssetName,RuntimeAssetType.UiSkin,"skin.flasset",skin.ToPayload(),pages.Select(p=>p.Id).ToArray());
             var manifest=RuntimeAssetIntegrity.SealManifest(new(){CompilerVersion="test",Assets=records});
             File.WriteAllText(Path.Combine(Root,"manifest.json"),JsonSerializer.Serialize(manifest,RuntimeAssetCatalog.CreateJsonOptions()));
