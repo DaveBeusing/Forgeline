@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="ForgeLine.Presentation.Tests" />
+    <InternalsVisibleTo Include="ForgeLine.Client.Tests" />
     <InternalsVisibleTo Include="ForgeLine.Rendering.Benchmarks" />
   </ItemGroup>
   <ItemGroup>

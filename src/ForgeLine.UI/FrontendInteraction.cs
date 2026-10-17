@@ -17,7 +17,8 @@ public enum FrontendSettingsField : byte
     BindingKey = 7,
     RenderQuality = 8,
     ResolutionScale = 9, Antialiasing = 10, Shadows = 11, Textures = 12, ObjectDetail = 13,
-    SurfaceDetail = 14, VegetationMotion = 15, Atmosphere = 16, Particles = 17, ReducedUiMotion = 18, UiSoundEnabled = 19, UiSoundVolume = 20
+    SurfaceDetail = 14, VegetationMotion = 15, Atmosphere = 16, Particles = 17, ReducedUiMotion = 18, UiSoundEnabled = 19, UiSoundVolume = 20,
+    WorldSoundEnabled = 21, MasterSoundVolume = 22, WorldSoundVolume = 23, AlertSoundVolume = 24, AmbienceSoundVolume = 25
 }
 
 public enum FrontendSettingsSection : byte { General, Graphics, Audio, Bindings }
@@ -31,7 +32,8 @@ public sealed class SettingsInteractionModel
         [FrontendSettingsField.RenderQuality, FrontendSettingsField.ResolutionScale, FrontendSettingsField.Antialiasing,
          FrontendSettingsField.Shadows, FrontendSettingsField.Textures, FrontendSettingsField.ObjectDetail,
          FrontendSettingsField.SurfaceDetail, FrontendSettingsField.VegetationMotion, FrontendSettingsField.Atmosphere, FrontendSettingsField.Particles],
-        [FrontendSettingsField.UiSoundEnabled, FrontendSettingsField.UiSoundVolume],
+        [FrontendSettingsField.WorldSoundEnabled, FrontendSettingsField.MasterSoundVolume, FrontendSettingsField.WorldSoundVolume,
+         FrontendSettingsField.AlertSoundVolume, FrontendSettingsField.AmbienceSoundVolume, FrontendSettingsField.UiSoundEnabled, FrontendSettingsField.UiSoundVolume],
         [FrontendSettingsField.BindingAction, FrontendSettingsField.BindingKey]
     ];
     public FrontendSettingsSection Section { get; private set; }
@@ -217,6 +219,16 @@ public sealed class SettingsInteractionModel
                 model.SetUiFeedback(settings.FeedbackSettings with { SoundEnabled = !settings.FeedbackSettings.SoundEnabled }); break;
             case FrontendSettingsField.UiSoundVolume:
                 model.SetUiFeedback(settings.FeedbackSettings with { SoundVolume = Math.Clamp(settings.FeedbackSettings.SoundVolume + Math.Sign(direction) * .05f, 0, 1) }); break;
+            case FrontendSettingsField.WorldSoundEnabled:
+                model.SetWorldAudio(settings.WorldAudio with { Enabled = !settings.WorldAudio.Enabled }); break;
+            case FrontendSettingsField.MasterSoundVolume:
+                model.SetWorldAudio(settings.WorldAudio with { Master = Math.Clamp(settings.WorldAudio.Master + Math.Sign(direction) * .05f, 0, 1) }); break;
+            case FrontendSettingsField.WorldSoundVolume:
+                model.SetWorldAudio(settings.WorldAudio with { World = Math.Clamp(settings.WorldAudio.World + Math.Sign(direction) * .05f, 0, 1) }); break;
+            case FrontendSettingsField.AlertSoundVolume:
+                model.SetWorldAudio(settings.WorldAudio with { Alerts = Math.Clamp(settings.WorldAudio.Alerts + Math.Sign(direction) * .05f, 0, 1) }); break;
+            case FrontendSettingsField.AmbienceSoundVolume:
+                model.SetWorldAudio(settings.WorldAudio with { Ambience = Math.Clamp(settings.WorldAudio.Ambience + Math.Sign(direction) * .05f, 0, 1) }); break;
             case FrontendSettingsField.Onboarding:
                 model.SetOnboarding(
                     !settings.ShowOnboarding);

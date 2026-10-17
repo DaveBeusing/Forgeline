@@ -1,5 +1,10 @@
 # Authorized world audio events
 
+This is the event-layer contract introduced before playback. The current mixer,
+packaging, listener and device lifecycle are documented in
+[spatial world audio](SpatialWorldAudio.md). Historical references below to the
+next mixer step describe the event-layer qualification boundary.
+
 The presentation event bridge translates completed-tick, permitted information
 into immutable audio facts. It is the prerequisite for the world mixer. It adds
 **no world playback, devices, buses in Settings, PCM loading or new packaged WAVs**.

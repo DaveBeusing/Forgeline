@@ -1,0 +1,148 @@
+{
+  "codeAndTestsRevision": "a3e2407cf670fb4a4dab3a092463007bb65fe40d",
+  "packageRevision": "b78c2bf544cddde41224280eb3580ec9ff319c7b",
+  "baseRevision": "0a0a20a4a7b7ba467c86b8f1d6b0be10bbb37f68",
+  "productVersion": "0.1.391",
+  "packageCodeAndTestsIdenticalToQualifiedRevision": true,
+  "packageOnlyChangeFromQualifiedRevision": "Artwork authoring generator maps all seven audio controls to utility.audio; Python syntax and role evaluation passed.",
+  "build": {
+    "configuration": "Release",
+    "warnings": 0,
+    "errors": 0
+  },
+  "focusedClientTests": {
+    "total": 82,
+    "passed": 80,
+    "failed": 0,
+    "explicitSkipped": 2
+  },
+  "eventTests": {
+    "total": 53,
+    "passed": 53,
+    "failed": 0
+  },
+  "solutionTests": {
+    "total": 2501,
+    "passed": 2490,
+    "failed": 0,
+    "skipped": 11,
+    "duration": "5m30.022s"
+  },
+  "initialSolutionRun": {
+    "source": "d2823f94ec4c7022f1035b8209a90efa24af8b54",
+    "total": 2501,
+    "passed": 2487,
+    "failed": 3,
+    "skipped": 11,
+    "failures": [
+      "Audio-tab test still expected two rows",
+      "New settings fields absent from artwork catalog",
+      "Mixed timing/allocation probe measured 7904 bytes before the complete timed path was warmed"
+    ]
+  },
+  "mixMeasurement": {
+    "Sources": 1024,
+    "WarmupBlocks": 512,
+    "MeasuredBlocks": 64,
+    "WorldShotsPerBlock": 24,
+    "AlertShotsPerBlock": 4,
+    "BlockFrames": 480,
+    "MedianMilliseconds": 0.3029,
+    "P95Milliseconds": 0.3152,
+    "ManagedBytes": 0,
+    "Voices": 44,
+    "Stage": "Source selection and PCM mixing only; excludes driver and acoustic latency"
+  },
+  "package": {
+    "file": "FORGELINE-0.1.391-dev-win-x64.zip",
+    "bytes": 55504281,
+    "sha256": "7b96afd06741aa3792d38c19d934bea4d59318a17bb21560b37ae33f5034a521",
+    "reproducible": true,
+    "provenance": {
+      "channel": "dev",
+      "runtimeAssetSignature": "5cb87ff663e609ff3c0842be2671e3eabc9a9389e3562a66e0fba46733700932",
+      "informationalVersion": "0.1.391-dev+b78c2bf544cddde41224280eb3580ec9ff319c7b",
+      "targetFramework": "net10.0-windows",
+      "runAttempt": null,
+      "buildTimeUtc": "2026-10-17T15:16:12.9461953+00:00",
+      "runId": null,
+      "runUrl": null,
+      "sourceRevision": "b78c2bf544cddde41224280eb3580ec9ff319c7b",
+      "configuration": "Release",
+      "runtimeAssetCompiler": "1.10.0",
+      "version": "0.1.391-dev",
+      "productVersion": "0.1.391",
+      "product": "FORGELINE",
+      "sdk": "10.0.401",
+      "sourceTreeClean": true,
+      "runtimeIdentifier": "win-x64",
+      "repository": "https://github.com/DaveBeusing/Forgeline"
+    },
+    "runtimeGraphicsAssets": 1337,
+    "audioWavs": 60,
+    "worldWavs": 56,
+    "interfaceWavs": 4,
+    "separateBrandingIntroWav": true,
+    "allAudioHashesMatchSources": true
+  },
+  "installedSmoke": {
+    "applicationReadiness": "Ready",
+    "sessionReadiness": "Ready",
+    "droppedStartupEvents": 0,
+    "loadedWorldClips": 56,
+    "submittedBlocks": 60,
+    "deviceFailures": 0,
+    "retainedNativeResources": false,
+    "stderrBytes": 0,
+    "emptyWorkingDirectoryUnchanged": true
+  },
+  "canonicalWindowQualification": {
+    "exitCode": 1,
+    "failure": "Compiled gameplay texture footprint 99608050 bytes exceeded the 56 MiB production catalog budget.",
+    "budgetBytes": 58720256,
+    "observedBytes": 99608050
+  },
+  "supplementalWindowQualification": {
+    "exitCode": 1,
+    "failure": "15 instance draw calls exceed the canonical LOD-aware budget of 12.",
+    "limitation": "Absolute asset report argument did not resolve through the script repository-relative path handling, so its texture precheck was skipped. This is supplemental evidence, not a passing canonical qualification."
+  },
+  "ciSnapshot": {
+    "runId": 39044138870,
+    "headSha": "b78c2bf544cddde41224280eb3580ec9ff319c7b",
+    "status": "in_progress",
+    "conclusion": "",
+    "audioSteps": [
+      {
+        "name": "World audio playback catalog",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "UI audio reliability and industrial source contracts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "World audio extraction, visibility and deterministic publication contracts",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "failedSteps": []
+  },
+  "naturalTerminalMatchQualified": false,
+  "physicalListeningAndUnplugQualified": false,
+  "rawLogsSha256": {
+    "spatial-mixer-qualified-build.log": "4133c15377c2db6c9c18cffe02a9bfe7d5374e1b3d8275331ebcf163f65101ad",
+    "spatial-mixer-qualified-focused.log": "39e7f18fc7d48509b9d5961f026913cf40b700f0608e9201ca44298433375a34",
+    "spatial-mixer-qualified-events.log": "ac6443972adfa29683b188e87b93575a8c38ae9cf6b8332bf6d7459cac79ad2e",
+    "spatial-mixer-qualified-full-tests.log": "76fded0e51daa39afe2b405a1eb1dd7964e1ec035a29a68fb2630c1c4dc800b9",
+    "spatial-mixer-qualified-native-world.log": "17aa353a6fc56864297dc703b69cd1219c2570986d1d93e1f88c63c47caa1309",
+    "spatial-mixer-qualified-native-ui.log": "8b8bd1fade2d9a0c0a91027236534ea4de40b738e25ef44d24e7aa68aebf69b5",
+    "spatial-mixer-package-b78c2bf5.log": "6f111184e6e489f7f5df0bb25e8034167c3f4d0cef3ea0c5de252e7dd83f35c9",
+    "spatial-mixer-full-tests.log": "aff0550f542d846a999291d3709520a3c90fe4154ba6e12dbf05f7e219545fcd",
+    "spatial-mixer-canonical-window-gate.log": "3193c2c7072c9c69eb3a348294d1137e1d31947088ad1ea6e0116962103a8968",
+    "spatial-mixer-window-gate.log": "a17faeaa09ee0596ff83d221975d644bbcce215d6659eff79145af5be81482f5"
+  }
+}

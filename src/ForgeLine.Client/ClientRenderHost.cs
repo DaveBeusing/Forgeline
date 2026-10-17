@@ -1,3 +1,4 @@
+using ForgeLine.Audio;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using ForgeLine.Assets;
@@ -125,7 +126,7 @@ internal readonly record struct ClientRenderFrame(
     CombatGroupOverviewView? CombatGroups = null,
     bool MetricsActive = true,
     HoverTooltipView HoverTooltip = default,
-    OperationsView Operations = default, UiFeedbackSettings FeedbackSettings = default);
+    OperationsView Operations = default, UiFeedbackSettings FeedbackSettings = default, WorldAudioSettings WorldAudio = default);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -457,6 +458,7 @@ internal sealed class ClientRenderHost : IDisposable
             var ringMotion = new ObjectActionRingMotion();
             var frontendFeedback = new UiInteractionFeedback();
             using var uiAudio = new WaveOutUiAudio();
+            using var worldAudio = new WaveOutWorldAudio(expectedSession: _expectedSession);
             using var gameplayOverlayRenderer =
                 new DebugDrawRenderer(
                     graphics,
@@ -539,7 +541,7 @@ internal sealed class ClientRenderHost : IDisposable
 
                 if (current.SurfaceSuspended)
                 {
-                    dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback();
+                    dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); worldAudio.StopPlayback();
                     runtimeMetricsSampler.Reset();
                     if (!surfaceSuspended)
                     {
@@ -553,7 +555,7 @@ internal sealed class ClientRenderHost : IDisposable
                     continue;
                 }
 
-                if (!current.MetricsActive) { dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); }
+                if (!current.MetricsActive) { dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); worldAudio.StopPlayback(); }
                 if (current.ViewportWidth <= 0 ||
                     current.ViewportHeight <= 0)
                 {
@@ -565,7 +567,7 @@ internal sealed class ClientRenderHost : IDisposable
                     current.ViewportWidth != width ||
                     current.ViewportHeight != height)
                 {
-                    dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback();
+                    dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); worldAudio.StopPlayback();
                     graphics.Resize(
                         current.ViewportWidth,
                         current.ViewportHeight);
@@ -592,6 +594,7 @@ internal sealed class ClientRenderHost : IDisposable
 
                 if (snapshot is null)
                 {
+                    worldAudio.StopPlayback();
                     runtimeMetricsSampler.Reset();
                     graphics.RenderFrame(GraphicsColor.ForgeLineClear, context =>
                     {
@@ -606,6 +609,9 @@ internal sealed class ClientRenderHost : IDisposable
                     continue;
                 }
 
+                worldAudio.Update(snapshot, current.Camera, current.WorldAudio,
+                    current.MetricsActive && !current.SurfaceSuspended && current.Frontend is null && current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
+                    (!_expectedSession.HasValue || snapshot.SessionId == _expectedSession.Value));
                 long now =
                     Stopwatch.GetTimestamp();
                 TimeSpan uiNow = TimeSpan.FromSeconds((double)now / Stopwatch.Frequency);

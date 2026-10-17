@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Nodes;
+using ForgeLine.Audio;
 using ForgeLine.Input;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
@@ -41,6 +42,8 @@ internal sealed record ClientUserSettings
     public bool UiSoundEnabled { get; init; }
     public float UiSoundVolume { get; init; } = .35f;
     public UiFeedbackSettings CreateUiFeedbackSettings() => new(ReducedUiMotion, UiSoundEnabled, UiSoundVolume);
+
+    public WorldAudioSettings WorldAudio { get; init; } = WorldAudioSettings.Default;
 
     public bool EdgeScrollEnabled { get; init; } = true;
 
@@ -98,6 +101,7 @@ internal sealed record ClientUserSettings
             nameof(SceneExposure));
 
         CreateUiFeedbackSettings().Validate();
+        WorldAudio.Validate();
         ArgumentNullException.ThrowIfNull(CameraBindings);
         SceneAtmosphere.Validate();
         Particles.Validate();

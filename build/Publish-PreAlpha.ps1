@@ -188,6 +188,7 @@ $archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.T
 Copy-Item (Join-Path $publishDirectory "build-provenance.json") "$archivePath.provenance.json"
 
 & "$PSScriptRoot/Validate-UiAudio.ps1" -PublishRoot $publishDirectory
+& "$PSScriptRoot/Validate-WorldAudio.ps1" -PublishRoot $publishDirectory
 
 Write-Output "Pre-alpha publish: $publishDirectory"
 Write-Output "Pre-alpha archive: $archivePath"

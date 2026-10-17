@@ -31503,6 +31503,41 @@
       "dynamicLabelRequired": true
     },
     {
+      "domain": "FrontendSettingsField",
+      "member": "WorldSoundEnabled",
+      "role": "utility.audio",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "MasterSoundVolume",
+      "role": "utility.audio",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "WorldSoundVolume",
+      "role": "utility.audio",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "AlertSoundVolume",
+      "role": "utility.audio",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "AmbienceSoundVolume",
+      "role": "utility.audio",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
       "domain": "TechnologyId",
       "member": "1",
       "role": "building_role.processing",
