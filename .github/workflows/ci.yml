@@ -87,6 +87,12 @@ jobs:
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.WorldAudioEventBridgeTests ForgeLine.Presentation.Tests.WorldAudioExtractionTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Graphics budget gate input contracts
+        shell: pwsh
+        run: |
+          ./build/Test-VisualDrawBudgets.ps1
+          ./build/Test-WindowQualificationInputs.ps1
+
       - name: UI qualification matrix coverage contracts
         shell: pwsh
         run: ./build/Test-UiQualificationMatrix.ps1
@@ -147,9 +153,9 @@ jobs:
       - name: Compiled UI atlas and ordered skin contracts
         shell: pwsh
         run: |
-          dotnet test --project tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Assets.Tests.UiSkinPipelineTests
+          dotnet test --project tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Assets.Tests.UiSkinPipelineTests ForgeLine.Assets.Tests.ProductionTextureBudgetTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.UiSkinBatchTests
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.UiSkinBatchTests ForgeLine.Presentation.Tests.MechanicalGeometryBatchingTests ForgeLine.Presentation.Tests.MechanicalMotionTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Graphical battlefield skin identity and native lifetime contracts
