@@ -45,7 +45,7 @@ public sealed class AnimationChannel
 public sealed class RuntimeAnimationData
 {
     public const int CurrentVersion = 1;
-    public const int MaximumNodes = 32, MaximumChannels = 64, MaximumKeysPerChannel = 1024, MaximumKeys = 8192;
+    public const int MaximumNodes = 64, MaximumChannels = 128, MaximumKeysPerChannel = 1024, MaximumKeys = 8192;
     public const int MaximumPayloadBytes = 1_048_576;
     public const float MaximumDuration = 120;
 
