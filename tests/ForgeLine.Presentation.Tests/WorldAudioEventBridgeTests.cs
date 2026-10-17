@@ -247,9 +247,9 @@ public sealed class WorldAudioEventBridgeTests
         b.ObserveCombat(VfxEffectKind.MuzzleInfantry, default, Vector3.One, new(2));
         var audio = b.Complete(Experience(2) with { Alerts = PlayerAlertState.LowPower }); Assert.NotNull(audio);
         var events = audio.Events.ToArray();
-        Assert.Single(events.Where(e => e.Cue == Cue.CombatRifleFire01));
+        Assert.Single(events, e => e.Cue == Cue.CombatRifleFire01);
         Assert.Equal(239, events.Count(e => e.Cue == Cue.VehiclesEngineStart));
-        Assert.Single(events.Where(e => e.Cue == Cue.AlertsPowerLow));
+        Assert.Single(events, e => e.Cue == Cue.AlertsPowerLow);
         Assert.Equal(events.OrderBy(e => e.Sequence), events);
     }
     [Fact]
