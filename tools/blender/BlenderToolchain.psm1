@@ -70,7 +70,7 @@ function Invoke-BlenderProcess {
     $start.StandardOutputEncoding = [Text.UTF8Encoding]::new($false)
     $start.StandardErrorEncoding = [Text.UTF8Encoding]::new($false)
     foreach ($argument in $Arguments) { $start.ArgumentList.Add($argument) }
-    foreach ($key in @('PYTHONHOME','PYTHONPATH','PYTHONUSERBASE','PYTHONSTARTUP','VIRTUAL_ENV','CONDA_PREFIX')) {
+    foreach ($key in @('PYTHONHOME','PYTHONPATH','PYTHONUSERBASE','PYTHONSTARTUP','VIRTUAL_ENV','CONDA_PREFIX','PYTHONOPTIMIZE','PYTHONINSPECT')) {
         [void]$start.Environment.Remove($key)
     }
     $start.Environment['PYTHONIOENCODING'] = 'utf-8'
@@ -120,7 +120,8 @@ function Test-BlenderInstallation {
     $probe = Get-Content -LiteralPath $probePath -Raw | ConvertFrom-Json
     if ($probe.schemaVersion -ne 1 -or $probe.version -ne $Policy.version -or $probe.versionCycle -ne 'release' -or
         $probe.pointerBits -ne 64 -or $probe.machine -notin @('AMD64','x86_64') -or
-        $probe.system -notin $Policy.platforms -or -not $probe.background -or -not $probe.bpy) {
+        $probe.system -notin $Policy.platforms -or $probe.background -isnot [bool] -or -not $probe.background -or
+        $probe.bpy -isnot [bool] -or -not $probe.bpy) {
         throw 'Unsupported bpy version, release cycle, platform, architecture or background capabilities; inspect probe.json.'
     }
     return [pscustomobject]@{ executable = $Executable; executableSha256 = (Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant(); capabilities = $probe }
