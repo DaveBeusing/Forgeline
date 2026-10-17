@@ -28,7 +28,45 @@ public readonly record struct MechanicalPose(
     }
 }
 
-internal readonly record struct MechanicalPartBinding(MechanicalMeshPart Part, Vector3 Pivot);
+internal readonly record struct MechanicalPartBinding(MechanicalMeshPart Part, Vector3 Pivot)
+{
+    public int GeometryPartIndex { get; init; } = -1;
+    public Vector3 GeometryOffset { get; init; }
+}
+
+/// <summary>Mesh-load-only equivalence: identical indexed triangles up to geometric translation share a draw.</summary>
+internal static class MechanicalGeometryBatching
+{
+    internal static void Assign(RuntimeMeshData data, Span<MechanicalPartBinding> parts)
+    {
+        for (int i = 0; i < parts.Length; i++)
+        {
+            int canonical = i; Vector3 offset = Vector3.Zero;
+            for (int j = 0; j < i; j++)
+                if (parts[j].GeometryPartIndex == j && Equivalent(data, parts[i], parts[j], out var translation))
+                { canonical = j; offset = translation; break; }
+            parts[i] = parts[i] with { GeometryPartIndex = canonical, GeometryOffset = offset };
+        }
+    }
+    private static bool Equivalent(RuntimeMeshData data, in MechanicalPartBinding a, in MechanicalPartBinding b, out Vector3 offset)
+    {
+        offset = Vector3.Zero;
+        if (a.Part.IndexCount != b.Part.IndexCount) return false;
+        RuntimeMeshVertex firstA = data.Vertices[(int)data.Indices[a.Part.FirstIndex]];
+        RuntimeMeshVertex firstB = data.Vertices[(int)data.Indices[b.Part.FirstIndex]];
+        offset = new(firstA.X - firstB.X, firstA.Y - firstB.Y, firstA.Z - firstB.Z);
+        for (int k = 0; k < a.Part.IndexCount; k++)
+        {
+            RuntimeMeshVertex x = data.Vertices[(int)data.Indices[a.Part.FirstIndex + k]];
+            RuntimeMeshVertex y = data.Vertices[(int)data.Indices[b.Part.FirstIndex + k]];
+            if (MathF.Abs(x.X - y.X - offset.X) > .00001f || MathF.Abs(x.Y - y.Y - offset.Y) > .00001f || MathF.Abs(x.Z - y.Z - offset.Z) > .00001f ||
+                x.NormalX != y.NormalX || x.NormalY != y.NormalY || x.NormalZ != y.NormalZ || x.U != y.U || x.V != y.V ||
+                MathF.Abs(x.TangentX - y.TangentX) > .000001f || MathF.Abs(x.TangentY - y.TangentY) > .000001f || MathF.Abs(x.TangentZ - y.TangentZ) > .000001f || x.TangentW != y.TangentW) return false;
+        }
+        return true;
+    }
+}
+
 
 internal static class MechanicalMotionSpace
 {
