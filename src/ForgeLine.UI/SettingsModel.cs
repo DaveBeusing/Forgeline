@@ -1,3 +1,4 @@
+using ForgeLine.Audio;
 using ForgeLine.Input;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
@@ -15,7 +16,10 @@ public readonly record struct FrontendSettingsSnapshot(
     bool EdgeScrollEnabled,
     float CameraPanSpeedMultiplier,
     RtsCameraBindings CameraBindings, GameplayBindings? GameplayBindings = null,
-    FrontendRenderQuality RenderQuality = FrontendRenderQuality.Medium, RenderQualitySettings? GraphicsSettings = null, UiFeedbackSettings FeedbackSettings = default);
+    FrontendRenderQuality RenderQuality = FrontendRenderQuality.Medium, RenderQualitySettings? GraphicsSettings = null, UiFeedbackSettings FeedbackSettings = default)
+{
+    public WorldAudioSettings WorldAudio { get; init; } = WorldAudioSettings.Default;
+}
 
 public sealed class SettingsModel
 {
@@ -34,6 +38,12 @@ public sealed class SettingsModel
     {
         settings.Validate();
         Settings = Settings with { FeedbackSettings = settings };
+    }
+
+    public void SetWorldAudio(WorldAudioSettings settings)
+    {
+        settings.Validate();
+        Settings = Settings with { WorldAudio = settings };
     }
 
     public void SetGraphicsSettings(RenderQualitySettings settings)

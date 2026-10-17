@@ -1163,7 +1163,7 @@ internal sealed class ClientApplication
                         _settings.UiScale,
                         preAlphaUx,
                         frontendSurface,
-                        FeedbackSettings: _settings.CreateUiFeedbackSettings(),
+                        FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
                         MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized));
 
                 if (shouldPauseForWindow)
@@ -1673,7 +1673,7 @@ internal sealed class ClientApplication
                         combatGroupOverview,
                     MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
-                    Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings()));
+                    Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {

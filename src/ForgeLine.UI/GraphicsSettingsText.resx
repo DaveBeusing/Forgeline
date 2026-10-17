@@ -44,4 +44,14 @@
   <data name="UiSoundEnabledHelp" xml:space="preserve"><value>Optional navigation and request/result cues. Studio intro sound is separate.</value></data>
   <data name="UiSoundVolume" xml:space="preserve"><value>INTERFACE VOLUME</value></data>
   <data name="UiSoundVolumeHelp" xml:space="preserve"><value>Volume for interface cues only. Zero silences them.</value></data>
+  <data name="WorldSoundEnabled" xml:space="preserve"><value>GAME AUDIO</value></data>
+  <data name="WorldSoundEnabledHelp" xml:space="preserve"><value>Enable battlefield sounds, alerts and ambience. Interface sound is controlled separately.</value></data>
+  <data name="MasterSoundVolume" xml:space="preserve"><value>GAME VOLUME</value></data>
+  <data name="MasterSoundVolumeHelp" xml:space="preserve"><value>Overall volume for battlefield sounds, alerts and ambience.</value></data>
+  <data name="WorldSoundVolume" xml:space="preserve"><value>BATTLEFIELD VOLUME</value></data>
+  <data name="WorldSoundVolumeHelp" xml:space="preserve"><value>Combat, vehicles, construction and industry.</value></data>
+  <data name="AlertSoundVolume" xml:space="preserve"><value>ALERT VOLUME</value></data>
+  <data name="AlertSoundVolumeHelp" xml:space="preserve"><value>Supply warnings, unit readiness and match results.</value></data>
+  <data name="AmbienceSoundVolume" xml:space="preserve"><value>AMBIENCE VOLUME</value></data>
+  <data name="AmbienceSoundVolumeHelp" xml:space="preserve"><value>Wind and distant industrial or battlefield atmosphere.</value></data>
 </root>

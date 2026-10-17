@@ -10,6 +10,8 @@
     <PackageReference Include="Vortice.MediaFoundation" />
     <Content Include="../../assets/source/branding/undefined_behavior/splash/studio-intro.mp4" Link="assets/runtime/branding/studio-intro.mp4" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../../assets/source/branding/undefined_behavior/splash/studio-intro.wav" Link="assets/runtime/branding/studio-intro.wav" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../assets/source/audio/**/*.wav" Exclude="../../assets/source/audio/ui/**/*.wav" Link="assets/runtime/audio/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../assets/source/audio/playback.json" Link="assets/runtime/audio/playback.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../../assets/source/audio/ui/*.wav" Link="assets/runtime/audio/ui/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../../assets/source/audio/ui/NOTICE.txt" Link="ThirdPartyNotices/UiAudio.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../../assets/source/audio/NOTICE.txt" Link="ThirdPartyNotices/IndustrialAudio.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />

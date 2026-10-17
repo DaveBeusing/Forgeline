@@ -211,7 +211,12 @@ internal static class FrontendPresentationAdapter
                 new(GraphicsSettingsText.Get("Particles"), Choice(graphics.Particles, effective.Particles.Quality), IsFocused: focused == FrontendSettingsField.Particles, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("ReducedUiMotion"), settings.FeedbackSettings.ReducedMotion ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.ReducedUiMotion, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("UiSoundEnabled"), settings.FeedbackSettings.SoundEnabled ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.UiSoundEnabled, CanDecrease: true, CanIncrease: true),
-                new(GraphicsSettingsText.Get("UiSoundVolume"), $"{settings.FeedbackSettings.SoundVolume * 100:0}%", IsFocused: focused == FrontendSettingsField.UiSoundVolume, CanDecrease: settings.FeedbackSettings.SoundVolume > 0, CanIncrease: settings.FeedbackSettings.SoundVolume < 1)
+                new(GraphicsSettingsText.Get("UiSoundVolume"), $"{settings.FeedbackSettings.SoundVolume * 100:0}%", IsFocused: focused == FrontendSettingsField.UiSoundVolume, CanDecrease: settings.FeedbackSettings.SoundVolume > 0, CanIncrease: settings.FeedbackSettings.SoundVolume < 1),
+                new(GraphicsSettingsText.Get("WorldSoundEnabled"), settings.WorldAudio.Enabled ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.WorldSoundEnabled, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("MasterSoundVolume"), $"{settings.WorldAudio.Master * 100:0}%", IsFocused: focused == FrontendSettingsField.MasterSoundVolume, CanDecrease: settings.WorldAudio.Master > 0, CanIncrease: settings.WorldAudio.Master < 1),
+                new(GraphicsSettingsText.Get("WorldSoundVolume"), $"{settings.WorldAudio.World * 100:0}%", IsFocused: focused == FrontendSettingsField.WorldSoundVolume, CanDecrease: settings.WorldAudio.World > 0, CanIncrease: settings.WorldAudio.World < 1),
+                new(GraphicsSettingsText.Get("AlertSoundVolume"), $"{settings.WorldAudio.Alerts * 100:0}%", IsFocused: focused == FrontendSettingsField.AlertSoundVolume, CanDecrease: settings.WorldAudio.Alerts > 0, CanIncrease: settings.WorldAudio.Alerts < 1),
+                new(GraphicsSettingsText.Get("AmbienceSoundVolume"), $"{settings.WorldAudio.Ambience * 100:0}%", IsFocused: focused == FrontendSettingsField.AmbienceSoundVolume, CanDecrease: settings.WorldAudio.Ambience > 0, CanIncrease: settings.WorldAudio.Ambience < 1)
             };
         interaction ??= new SettingsInteractionModel();
         foreach (var settingField in Enum.GetValues<FrontendSettingsField>())
@@ -219,10 +224,10 @@ internal static class FrontendPresentationAdapter
             var kind = settingField switch
             {
                 FrontendSettingsField.BorderlessFullscreen or FrontendSettingsField.EdgeScroll or FrontendSettingsField.Onboarding or
-                FrontendSettingsField.ReducedUiMotion or FrontendSettingsField.UiSoundEnabled or FrontendSettingsField.SurfaceDetail or
+                FrontendSettingsField.WorldSoundEnabled or FrontendSettingsField.ReducedUiMotion or FrontendSettingsField.UiSoundEnabled or FrontendSettingsField.SurfaceDetail or
                 FrontendSettingsField.VegetationMotion => FrontendValueKind.Toggle,
                 FrontendSettingsField.UiScale or FrontendSettingsField.CameraSpeed or FrontendSettingsField.UiSoundVolume or
-                FrontendSettingsField.ResolutionScale => FrontendValueKind.Slider,
+                FrontendSettingsField.MasterSoundVolume or FrontendSettingsField.WorldSoundVolume or FrontendSettingsField.AlertSoundVolume or FrontendSettingsField.AmbienceSoundVolume or FrontendSettingsField.ResolutionScale => FrontendValueKind.Slider,
                 FrontendSettingsField.BindingKey => FrontendValueKind.Binding,
                 _ => FrontendValueKind.Choice
             };
@@ -233,6 +238,7 @@ internal static class FrontendPresentationAdapter
                 FrontendSettingsField.Onboarding => settings.ShowOnboarding,
                 FrontendSettingsField.ReducedUiMotion => settings.FeedbackSettings.ReducedMotion,
                 FrontendSettingsField.UiSoundEnabled => settings.FeedbackSettings.SoundEnabled,
+                FrontendSettingsField.WorldSoundEnabled => settings.WorldAudio.Enabled,
                 FrontendSettingsField.SurfaceDetail => graphics.SurfaceDetail ?? effective.TerrainDetail.Enabled,
                 FrontendSettingsField.VegetationMotion => graphics.VegetationMotion ?? effective.VegetationMotion,
                 _ => false
@@ -242,6 +248,10 @@ internal static class FrontendPresentationAdapter
                 FrontendSettingsField.UiScale => (settings.UiScale - FrontendDesign.MinimumScale) / (FrontendDesign.MaximumScale - FrontendDesign.MinimumScale),
                 FrontendSettingsField.CameraSpeed => (settings.CameraPanSpeedMultiplier - .5f) / 2,
                 FrontendSettingsField.UiSoundVolume => settings.FeedbackSettings.SoundVolume,
+                FrontendSettingsField.MasterSoundVolume => settings.WorldAudio.Master,
+                FrontendSettingsField.WorldSoundVolume => settings.WorldAudio.World,
+                FrontendSettingsField.AlertSoundVolume => settings.WorldAudio.Alerts,
+                FrontendSettingsField.AmbienceSoundVolume => settings.WorldAudio.Ambience,
                 FrontendSettingsField.ResolutionScale => ((graphics.ResolutionScale ?? 1) - .5f) * 2,
                 _ => 0
             };

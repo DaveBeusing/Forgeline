@@ -164,7 +164,7 @@ internal sealed class WaveOutUiVoice : IUiAudioOutput
         uint Close(IntPtr device);
         uint GetVolume(IntPtr device, out uint volume);
     }
-    private sealed class WinMmApi : IWaveOutApi
+    internal sealed class WinMmApi : IWaveOutApi
     {
         public uint Open(out IntPtr device, uint id, ref WaveFormat format, IntPtr callback, IntPtr instance, uint flags) => waveOutOpen(out device, id, ref format, callback, instance, flags);
         public uint Prepare(IntPtr device, IntPtr header, uint size) => waveOutPrepareHeader(device, header, size);

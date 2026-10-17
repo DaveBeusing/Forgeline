@@ -231,13 +231,13 @@ internal sealed class WorldAudioEventBridge(Func<long>? clock = null)
     private void Add(Cue cue, EntityId entity, Vector3 position, bool spatial = true, bool finalizing = false)
     {
         if ((!_accepting && !finalizing) || !Finite(position)) return;
-        bool priority = WorldAudioCatalog.Get(cue).Bus == WorldAudioBus.Alerts;
-        if (!priority && _eventCount >= MaximumEvents - 16) { _droppedEvents++; return; }
-        if (_eventCount == MaximumEvents)
+        int priority = EventPriority(cue);
+        int limit = priority == 2 ? MaximumEvents : MaximumEvents - 16;
+        if (_eventCount >= limit)
         {
             int replace = -1;
             for (int i = 0; i < _eventCount; i++)
-                if (WorldAudioCatalog.Get(_events[i].Cue).Bus != WorldAudioBus.Alerts) { replace = i; break; }
+                if (EventPriority(_events[i].Cue) < priority) { replace = i; break; }
             if (replace < 0) { _droppedEvents++; return; }
             _events.AsSpan(replace + 1, _eventCount - replace - 1).CopyTo(_events.AsSpan(replace));
             _eventCount--; _droppedEvents++;
@@ -245,6 +245,8 @@ internal sealed class WorldAudioEventBridge(Func<long>? clock = null)
         ulong expiry = _tick.Value > ulong.MaxValue - _retentionTicks ? ulong.MaxValue : _tick.Value + _retentionTicks;
         _events[_eventCount++] = new(++_sequence, _tick, new(expiry), cue, entity, position, spatial, _capturedAtTimestamp);
     }
+    private static int EventPriority(Cue cue) => WorldAudioCatalog.Get(cue).Bus == WorldAudioBus.Alerts ? 2 :
+        cue is >= Cue.CombatRifleFire01 and <= Cue.CombatImpactConcrete ? 1 : 0;
     private void AddLoop(Cue cue, EntityId entity, Vector3 position, bool spatial = true, bool ambience = false)
     {
         int limit = ambience ? MaximumLoops : MaximumLoops - 3;

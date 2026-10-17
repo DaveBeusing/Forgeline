@@ -1,0 +1,341 @@
+{
+  "schema": 1,
+  "clips": [
+    {
+      "id": "audio.combat.rifle_fire_01",
+      "sha256": "741279551c50bcf0f7b135a961d435a701ef9f7271a63bdcd42cafabfd609c57",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.rifle_fire_02",
+      "sha256": "de525a94aa33224a01690f9210ff8966d27cbb51c80d4e10c1575d59d2af391c",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.rifle_fire_03",
+      "sha256": "5490e613dc51279d16ded96613906a379973ef98bd52dfc6df37caa8be6bd0fa",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.machine_gun_fire_01",
+      "sha256": "6c627394c28d6e64628d0eafbc7199173bd88c3227ed5422fa8ea54a33d587a9",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.machine_gun_fire_02",
+      "sha256": "5179d6083c71cb191d0aafc9a02800f3e725d0528ce1af5c3b04db2c4d667b2c",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.machine_gun_fire_03",
+      "sha256": "fca3d6979400b0ded821db5442dd62a81174585620f26a9df8d4733336ed82fe",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.tank_fire_01",
+      "sha256": "49d375d90bc2a024396b133397d82f9fc3dd01dd54953276300a22e988c91109",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.tank_fire_02",
+      "sha256": "d5a1c075f122ab196e265f03b11b69dde7aae87d6a37bfda6b97ef738757fff5",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.tank_fire_03",
+      "sha256": "8376a6c9bbc8d117ee5e4790776cb9a7e2155a7b580c0d43b289f51a29b671a8",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.artillery_fire_01",
+      "sha256": "2e01ded8b932c35adb466a5975d559bac69845038ad9598c882c021fc21cf523",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.artillery_fire_02",
+      "sha256": "a1454a8e0b411a15e59d75ce1c2f804e9f33bd7381a0d76296705652f7d985b4",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.artillery_fire_03",
+      "sha256": "4651f1800503b7b8b1f7b232eb7f56f39a73a0e51693e316a9f28d7862ca996a",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.explosion_small",
+      "sha256": "ee96520513f7c774d4fcd4979205db604d1316452874ddf36860e6c08bd55b77",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.explosion_vehicle",
+      "sha256": "3135fcb184811a4e035280832891303f9db5f9e3bac36a8fcd25ef04352dda93",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.explosion_building",
+      "sha256": "188c275d421066ebefedabd934025170969dccc6a48267851befc1a6d7e08bef",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.impact_dirt",
+      "sha256": "e58464b8b759e6b1530627a2c71695887d96572e33be77cbff8cef9fa30f5004",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.impact_metal",
+      "sha256": "9264a0d6d46b4a70a47abe883c802c75423a86e0ee5cf7c4621ad36e93d7c3ef",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.impact_concrete",
+      "sha256": "ffda5698b37bb1053face2e8ec6f2d9af3e0a5317524cf47492a232068b820db",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.vehicles.scout_idle_loop",
+      "sha256": "f8305b141b0e3f767d156f82bb6d6a74f0d76613d85d91b617af711e9239b8f3",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 192000
+    },
+    {
+      "id": "audio.vehicles.scout_move_loop",
+      "sha256": "007903fd618531809bda2f4f0ba0b385e16766d9d033fcdfc76d6ce6fff3fe03",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 192000
+    },
+    {
+      "id": "audio.vehicles.truck_idle_loop",
+      "sha256": "1487175021ac3304ed94e8f0c1d8381d4612f42fc04654b8de0b58ac6fe3c923",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 192000
+    },
+    {
+      "id": "audio.vehicles.truck_move_loop",
+      "sha256": "99f7e01028022d04145986e92f9f350da19c9a9b0d1b812c869f80aa283f3138",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 192000
+    },
+    {
+      "id": "audio.vehicles.tank_idle_loop",
+      "sha256": "8bf4eb43cf99c4161e25ece69b2a3b4f591a85d015d36fb8719da3932fe64a83",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 192000
+    },
+    {
+      "id": "audio.vehicles.tank_move_loop",
+      "sha256": "3c78fc622ca4331258083a06751a7150133c7068e3cbab3c157518ee730aec42",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 192000
+    },
+    {
+      "id": "audio.vehicles.engine_start",
+      "sha256": "2339b0bb69f7d81e32bec59542463c0ba1ec7d7f2ed8ac162731d195174b4cc5",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.vehicles.engine_stop",
+      "sha256": "dce6fe97c2e11471a3f74068abf2dbf3b7d9671d8fa417e9270e3ddcb244c926",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.industry.extractor_loop",
+      "sha256": "fe1738b21b29fbdc347c0aa3df5e688be92193c11b3fb4d2c427da621a7ba262",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 288000
+    },
+    {
+      "id": "audio.industry.smelter_loop",
+      "sha256": "33085029d787a3f260b8f06abe6767e8ff8bcdf682fa2ea0a71158469d126f3d",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 288000
+    },
+    {
+      "id": "audio.industry.refinery_loop",
+      "sha256": "4613b826670313398bc74e833cea3bab1fc6ccf22f0722ec741a5de9fa82f606",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 288000
+    },
+    {
+      "id": "audio.industry.factory_loop",
+      "sha256": "e06e488b3e40931f230b92e9c7a1937cb1f1034c0d4ec231a3b7b86d651707c6",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 288000
+    },
+    {
+      "id": "audio.industry.power_plant_loop",
+      "sha256": "ff518d3c6650bca09d3c91f667b00238758217ec998e2cf0e8861b95f1ef080b",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 288000
+    },
+    {
+      "id": "audio.industry.depot_loop",
+      "sha256": "ddd6f020ac828faef2af7a3f0aa0095506aee526d1abd7f20f3b98375d756e28",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 288000
+    },
+    {
+      "id": "audio.logistics.cargo_load",
+      "sha256": "c63e7cbdf6685df7d9cd5afc6e9b6a013074eae4b58644f778ddc341481e5475",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.logistics.cargo_unload",
+      "sha256": "ea3d928814db45ca4bd43655a82236813ee22a9dcd166003ae4de265dd91da05",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.logistics.refuel",
+      "sha256": "2dd8f54a2db6d3ebfa9b3f83a8b07a6292241c65b2e3fc7f6f5edf1dc9ee89a9",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.logistics.rearm",
+      "sha256": "4b24beccf5364fd9dbd0fd0e888a76843c61e98f05a2cd01a523ed5894a959e0",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.logistics.repair",
+      "sha256": "3fbc4df9c886394d6798b4c66b51a1605952d5bac06abe98222aebc4656e3d49",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.logistics.supply_complete",
+      "sha256": "266f658fe3cc742954bea6e257929d761ce09fb69c8299609227960db49d3057",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.construction.place",
+      "sha256": "6bb082e6e4afe5b53a461359ecbc1aebb8413a5d66e8e41cac25a21ea61cf49f",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.construction.start",
+      "sha256": "6c871d2b5122fbaac5ac60e952fbe349431887eb241ad9215515a8ee3a9063b4",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.construction.complete",
+      "sha256": "c250481c90b7a2646fe19c7dff12f91b70e5e534cf6aca5daacf79a27c136e39",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.alerts.supply_low",
+      "sha256": "5f8471ec62d2fabb575dcc3224d6dd63e9be056dc235984e6b700620770d5edb",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.alerts.supply_critical",
+      "sha256": "10c46c9ecfcc0952295289663d673c8d34e587f72c6f859f87406de493f6c647",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.alerts.power_low",
+      "sha256": "b61ac083890d761f134f9ea0b8a1e771a9ae90019c5392227f6b1004a6a94152",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.alerts.power_restored",
+      "sha256": "b7dbc67da0ed43153dd1240b692f29f8abd1382252c9be9631602af56943160e",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.alerts.base_under_attack",
+      "sha256": "0255d402de0fe874bcafb22c49a11cfd9290c06d198477806a3deef074ae4aca",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.alerts.research_complete",
+      "sha256": "4f53f04f529f0a0db9545a1d472c4f181abdad4fe6dcb261e7d71c0a360a644e",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.alerts.unit_ready",
+      "sha256": "85e3b2a796954d92eb9c87219f890a7fdae8c20c686e4bbde47275f03b28e3f9",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.alerts.invalid_order",
+      "sha256": "f47ca6961ff93a7e2e47608f9212b7acaf7eca5818d00c94628e6eee9647335a",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.ambience.wind_loop",
+      "sha256": "3f459f49376f28e0da893194d20b1e00c7fa98a444ef2fecbc79c382df3624f9",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 768000
+    },
+    {
+      "id": "audio.ambience.industrial_loop",
+      "sha256": "915ba589e790beebc2740371c266f89ca52e36a0a754cb1b776035f301f30084",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 768000
+    },
+    {
+      "id": "audio.ambience.battlefield_loop",
+      "sha256": "56769db9c26b33efbf8d67e7db662535e3a8293c6e6c1596bdcb7d20f4647552",
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 768000
+    },
+    {
+      "id": "audio.combat.rocket_launch",
+      "sha256": "c6355fdf4f4e90c96a92706299c9f94357a515f64a765c25191858781fb829b9",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.combat.incoming_artillery",
+      "sha256": "4f2f419916160afd79d724c8a6b2afe4b5af1b40bc641a3e619376721c484443",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.events.victory",
+      "sha256": "2be27e6743b87cbebf43abd6c11fc04d0aeeddeb6978011295565c70b3ad1d97",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    },
+    {
+      "id": "audio.events.defeat",
+      "sha256": "5ee48b00440a4d02f24c6d4aee5feac0981cfd3fb5bf7d18060b452fce392087",
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null
+    }
+  ]
+}
