@@ -248,3 +248,12 @@ and final art approval are not established by these static captures.
 Required remote build-test/rendering/asset CI remains pending publication.
 This is a reviewable draft with concrete art/performance gates, not a claim
 that production or merge acceptance has been achieved.
+
+## Blender source preservation
+
+The [Blender round-trip fixture](BlenderAssetRoundTrip.md) imports this family's
+current source definitions, companion states, LODs and collision dependencies into
+an editable project with named pivots and sockets. Isolated GLB exports pass the
+same asset compiler and compare against the original runtime geometry/metadata.
+This does not replace the parametric source owner or change gameplay dimensions,
+material identities, rigid animation ownership or production asset paths.
