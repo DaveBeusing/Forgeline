@@ -95,7 +95,7 @@ def load_gltf(path, root):
     for node in document.get('nodes', []):
         for key, identity in [('translation', [0,0,0]), ('rotation', [0,0,0,1]), ('scale', [1,1,1]), ('matrix', [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1])]:
             require(key not in node or node[key] == identity, 'Bake glTF node transforms; compiler reads mesh data, not node transforms')
-        require(not node.get('extensions') and 'skin' not in node and not node.get('weights'), 'Unsupported node skin/extension/morph')
+        require('camera' not in node and not node.get('extensions') and 'skin' not in node and not node.get('weights'), 'Unsupported node skin/extension/morph')
         if 'mesh' in node: references.append(node['mesh'])
     require(not document.get('nodes') or sorted(references) == list(range(len(document['meshes']))), 'Each declared source mesh must be instantiated exactly once')
     for material in document.get('materials', []):
@@ -217,9 +217,11 @@ class Catalog:
         return contained(self.root,path.parent/definition['source'])
 
     def closure(self, ids):
-        result = set()
+        result = set(); active = set()
         def visit(aid):
+            require(aid not in active,f'Cyclic asset/LOD references: {aid}')
             if aid in result:return
+            active.add(aid)
             require(aid in self.definitions,f'Missing asset/state/reference {aid}')
             result.add(aid);_,d = self.definitions[aid]
             refs = list(d.get('dependencies',[]))+list(d.get('materialReferences',[]))+list(d.get('textureReferences',[]))
@@ -230,6 +232,7 @@ class Catalog:
                 material = json.loads(self.source(aid).read_text(encoding='utf-8-sig'))
                 refs += [material[k] for k in ('baseColorTexture','normalTexture','ormTexture','emissiveTexture') if material.get(k)]
             for ref in refs:visit(ref)
+            active.remove(aid)
         for aid in ids:visit(aid)
         return sorted(result)
 
