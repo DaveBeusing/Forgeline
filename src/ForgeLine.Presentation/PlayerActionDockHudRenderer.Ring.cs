@@ -52,7 +52,7 @@ internal sealed partial class PlayerActionDockHudRenderer
                 ActionRingNavigation.Next => "Next", ActionRingNavigation.Previous => "Prev",
                 ActionRingNavigation.Parameters => "Params", ActionRingNavigation.NextItem => "Next item",
                 _ => mode ? PlayerActionDockHudModel.ResolveModeLabel(target.Mode) :
-                    item ? PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, target.ItemIndex, actions) :
+                    item ? PlayerActionDockHudModel.ResolveRingItemTitle(panel.Mode, target.ItemIndex, actions, geometry.LabelHalfWidth < 38 * scale) :
                     target.Kind == PlayerActionDockControlKind.Activate ? PlayerActionDockHudModel.ResolvePrimaryActionLabel(panel.Mode, target.ItemIndex, actions) :
                     PlayerActionDockHudModel.ResolveFooterLabel(target.Kind, panel.Mode)
             };
@@ -71,7 +71,12 @@ internal sealed partial class PlayerActionDockHudRenderer
             else if (slot.Navigation == ActionRingNavigation.Group && ring.Group is { } summary)
                 value.Append(ring.VisibleMembers < summary.Count ? "Part visible" : "Selection tools");
             else if (item && panel.Mode == PlayerActionPanelMode.Tactical && ring.Group is { } participants && actions?.Tactical is { } tactical)
-            { if (participants.MatchesSelection(tactical.SelectedEntities)) { value.Append(target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append(" / "); value.Append(participants.SelectedCount); value.Append(" eligible"); } else value.Append("Updating"); }
+            {
+                if (!participants.MatchesSelection(tactical.SelectedEntities)) value.Append("Updating");
+                else if (!PlayerActionDockHudModel.ResolveItemState(panel.Mode,target.ItemIndex,actions,false).CanActivate) value.Append("Blocked");
+                else { value.Append(target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append("/");
+                    value.Append(participants.SelectedCount); value.Append(geometry.LabelHalfWidth < 38 * scale ? " elig" : " eligible"); }
+            }
             else if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
             else if (item)

@@ -43,6 +43,14 @@ public sealed class RadialActionLayoutTests
         }
     }
     [Fact]
+    public void CompactTacticalTitlesRemainDistinctBeforeTooltipExpansion()
+    {
+        var titles=Enumerable.Range(0,8).Select(i=>PlayerActionDockHudModel.ResolveRingItemTitle(PlayerActionPanelMode.Tactical,i,null,true)).ToArray();
+        Assert.Equal(8,titles.Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.All(titles,title=>Assert.InRange(title.Length,1,5));
+    }
+
+    [Fact]
     public void ExpandedOnboardingAtCompactMaximumDensityKeepsNativeTypeAndExactSectorLabels()
     {
         var hud=GameplayHudLayout.Create(1280,720,192,2);
