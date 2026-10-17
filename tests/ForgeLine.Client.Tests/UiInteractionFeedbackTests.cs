@@ -183,9 +183,10 @@ public sealed class UiInteractionFeedbackTests
         audio.Update(UiAudioCue.Accepted, new(SoundEnabled: false, SoundVolume: 1), TimeSpan.Zero, true);
         audio.Update(UiAudioCue.Rejected, new(SoundEnabled: true, SoundVolume: 0), TimeSpan.FromSeconds(1), true);
         Assert.False(audio.Available);
-        Assert.False(audio.TryPlay(UiAudioCue.Intent, float.NaN));
+        audio.Update(UiAudioCue.Intent, new(SoundEnabled: true, SoundVolume: float.NaN), TimeSpan.FromSeconds(2), true);
         audio.Dispose(); audio.Dispose();
-        Assert.False(audio.TryPlay(UiAudioCue.Intent, .5f));
+        Assert.True(audio.WaitForStop(TimeSpan.FromSeconds(5)));
+        Assert.False(audio.Available);
     }
 
     [Fact]
@@ -204,7 +205,7 @@ public sealed class UiInteractionFeedbackTests
     [Fact]
     public void MissingOptionalClipsFailSilentlyWithoutNativeResourcesOrRetries()
     {
-        using var audio = new WaveOutUiAudio(Path.Combine(Path.GetTempPath(), "forgeline-missing-cues-" + Guid.NewGuid()));
+        using var audio = new WaveOutUiVoice(Path.Combine(Path.GetTempPath(), "forgeline-missing-cues-" + Guid.NewGuid()));
         Assert.False(audio.TryPlay(UiAudioCue.Navigation, .1f));
         Assert.False(audio.TryPlay(UiAudioCue.Rejected, .1f));
         Assert.False(audio.Available); Assert.False(audio.OwnsNativeResources);
