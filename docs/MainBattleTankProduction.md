@@ -267,3 +267,5 @@ material identities, rigid animation ownership or production asset paths.
 ## Bounded Blender surface review
 
 The [surface and LOD workflow](BlenderSurfaceProduction.md) inspects this kit with its existing three LODs, ordered material and packed atlas preview. Socket-bound wheel partitions bypass geometry modifiers. The default profile preserves current geometry and resource ceilings; candidates stay in artifacts until separately reviewed. The running-gear generator remains the editable source authority.
+
+Current Blender production measurements and remaining gates: [tank qualification](BlenderTankProductionQualification.md).

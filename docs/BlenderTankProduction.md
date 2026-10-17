@@ -81,3 +81,5 @@ by editing logical properties or removing tests. Retain failed output and choose
 a new directory after correcting the source. Human visual acceptance, live effects
 alignment and sustained performance acceptance remain distinct from structural
 or sampled matrix tests.
+
+Recorded measurements, native image pairs and open acceptance: [qualification](BlenderTankProductionQualification.md).
