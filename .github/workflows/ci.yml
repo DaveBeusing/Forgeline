@@ -71,6 +71,12 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: UI audio reliability and industrial source contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.UiAudioReliabilityTests ForgeLine.Client.Tests.IndustrialAudioLibraryTests ForgeLine.Client.Tests.UiInteractionFeedbackTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: UI qualification matrix coverage contracts
         shell: pwsh
         run: ./build/Test-UiQualificationMatrix.ps1

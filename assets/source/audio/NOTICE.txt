@@ -1,0 +1,14 @@
+FORGELINE Industrial Sound Library
+
+Audio content: original procedural synthesis from the included DSP recipes.
+No third-party sound recordings, music recordings, or voice recordings were
+incorporated into these WAV files. No external sample attribution is required
+by this production process. The files contain no claim of field-recorded origin.
+
+NumPy, SciPy and FFmpeg are authoring/validation tools, not bundled recordings.
+Their executable files and libraries are not included in this archive. Their
+respective licenses continue to apply when those tools are installed or used.
+
+No change to the FORGELINE repository's code or asset licensing policy is made
+by this delivery. Apply the project's approved asset terms during integration.
+Technical validation does not constitute subjective sound or release approval.

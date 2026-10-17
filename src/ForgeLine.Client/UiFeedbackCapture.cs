@@ -125,7 +125,7 @@ internal static class UiFeedbackCapture
                     Console.WriteLine("[ui:feedback:capture] " + key);
                 }
             }
-            using var audio = new WaveOutUiAudio();
+            using var audio = new WaveOutUiVoice();
             var sound = new List<object>();
             foreach (var cue in new[] { UiAudioCue.Navigation, UiAudioCue.Intent, UiAudioCue.Accepted, UiAudioCue.Rejected })
             {

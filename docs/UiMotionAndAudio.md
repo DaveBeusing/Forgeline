@@ -1,6 +1,6 @@
 # UI motion and interface audio
 
-Own single buildings and units now use [world anchored action rings](WorldAnchoredActionMenus.md). Selection release opens categories; the global mode bar and bound keys open the same ring. Click an item to act immediately. Parameters exposes existing priority, mode, thresholds and queue cancellation before activation; Next item selects the edited item. Back / previous / next page remain fixed controls. The inner hole and gaps allow world input; outside clicks dismiss centrally. The inspector remains informational. Group selection temporarily retains the existing rectangular controls. Closed/fading rings own no input; alpha transitions last 160 ms and reduced/Low modes settle immediately.
+Own single buildings and units now use [world anchored action rings](WorldAnchoredActionMenus.md). Selection release opens categories; the global mode bar and bound keys open the same ring. Click an item to act immediately. Parameters exposes existing priority, mode, thresholds and queue cancellation before activation; Next item selects the edited item. Back / previous / next page remain fixed controls. The inner hole and gaps allow world input; outside clicks dismiss centrally. The inspector remains informational. Multi-selection uses the same [group action rings](GroupActionMenus.md). Closed/fading rings own no input; alpha transitions last 160 ms and reduced/Low modes settle immediately.
 
 UI feedback follows presentation time. Render owners feed a monotonic clock to the
 bounded `UiMotionTimeline`; fixed simulation ticks, gameplay requests, selection
@@ -56,19 +56,40 @@ the existing validated adapter and restart boundary.
 
 ## Audio ownership and content
 
-`ForgeLine.Audio` defines the small optional `IUiAudioOutput` contract and bounded
-PCM reader. The Windows client owns one render-thread voice and its native buffers;
-there is no additional audio framework or simulation dependency. At first requested
-cue it loads the four small packaged PCM files once. The player performs no source
-generation, heavyweight import or codec compilation. Muted startup opens no device.
+`ForgeLine.Audio` defines the optional `IUiAudioOutput` contract and bounded UI PCM reader.
+`WaveOutUiAudio` is now an asynchronous mailbox owned by a separate audio thread.
+That owner preloads each clip independently, opens WinMM only when enabled, scales
+samples and releases its own buffers. File reads, driver calls and native teardown
+never execute in an interactive render callback. Muted startup opens no device.
+The studio stream keeps its independent owner.
 
-One nonlooping voice and a 60 ms burst limit drop excess/busy cues; no sound is queued
-for late playback. Mute, zero gain, focus loss, minimize and owner disposal stop
-playback. Native gain is applied to PCM samples, leaving the studio stream and
-system volume untouched. Missing/corrupt content or an unavailable device disables
-this owner's optional audio; text and input remain usable. Owner disposal resets,
-unprepares and closes the output before releasing native buffers, following the
-[Windows reset](https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutreset)
+There is at most **one pending cue**. Rejected outranks Accepted, then Intent and
+Navigation; equal-priority arrivals replace older pending requests. Navigation and
+Intent retain a 60 ms throttle. Results bypass it and can retry a busy voice only
+until **150 ms after original creation**. A failed attempt never refreshes expiry.
+This deliberately replaces the former global no-queue policy. It is not a promise
+that every result is audible: expired, superseded, muted or unavailable requests
+remain bounded and are counted. One active nonlooping voice is never overwritten.
+
+Mute, invalid/zero gain, focus loss, minimize, frontend transitions, incoherent
+snapshots, session replacement and match completion clear pending output. A request
+already inside a driver call can finish before the owner observes cancellation;
+no other thread resets or frees its memory. Dispose signals cancellation and returns
+without joining a potentially blocked driver. The owner performs final release;
+`WaitForStop` is a bounded qualification helper, not a gameplay wait.
+
+Clip errors disable only that clip. Device open/prepare/write errors reset and
+release safely, then retry on later fresh requests after 250/1,000/4,000 ms. Four
+consecutive failures stop opening until explicitly disabled and enabled again.
+No autonomous stale result is kept across recovery. A busy header exceeding clip
+duration plus 500 ms triggers recovery on the next offered request. Buffers refused
+by Unprepare/Close stay owned and are not reopened or freed underneath the driver.
+The diagnostic snapshot records availability, retained native resources, played
+requests, drops, failed attempts, per-clip/device failures, pending depth and owner
+termination. These internal counters do not yet appear as a Settings status row.
+
+Native gain is applied to PCM samples, leaving system gain untouched. Teardown
+follows the [Windows reset](https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutreset)
 and [buffer lifetime](https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutunprepareheader) contracts.
 
 The existing studio stream retains its playback/fade/skip behavior and now restores
@@ -77,13 +98,23 @@ changing one legacy stream's volume also changed a second stream's reported gain
 Restoration prevents the studio fade from leaving later interface cues muted. The
 native probe verifies this interoperation without repurposing the studio clip.
 
-The four stereo 48 kHz PCM16 cues are original mathematical synthesis with no sampled
-or third-party recordings: navigation 35 ms, intent 55 ms, accepted 95 ms, rejected
-110 ms. Total PCM payload is 56,640 bytes. Their CC0 notice is in
-`assets/source/audio/ui/NOTICE.txt` and ships as `ThirdPartyNotices/UiAudio.txt`.
-`build/Generate-UiAudio.py` is offline authoring only. `Validate-UiAudio.ps1` verifies
-format, exact lengths, notice and byte-identical packaged copies. Runtime catalog
-formats and the independent studio intro are unchanged.
+The four stereo 48 kHz PCM16 cues now use the supplied industrial library revision
+1.0.0: navigation 35 ms, intent 55 ms, accepted 95 ms, rejected 110 ms, total
+56,640 PCM bytes. The UI limit remains 38,400 bytes per clip. The supplied procedural
+provenance notice ships as `ThirdPartyNotices/UiAudio.txt` and
+`ThirdPartyNotices/IndustrialAudio.txt`; no new license grant is invented for these
+replacement files. Earlier interface files and their CC0 notice remain in history.
+
+[Industrial audio qualification](IndustrialAudioQualification.md) records the
+60-file source import, independent signal checks, exact hashes and remaining world
+integration gates. `assets/source/audio/library.json` is authoring metadata, not a
+player runtime manifest. Only the four UI files are copied into the player. The
+other 56 clips have a separate `WorldPcmClip` mono/stereo/frame-loop contract and
+are not yet connected to gameplay. `build/audio/RenderIndustrialAudio.py` (also
+reachable through the historical `Generate-UiAudio.py` entry point) is offline only.
+Use an explicit empty `--output` directory to reproduce and compare source hashes.
+`Validate-UiAudio.ps1` checks the complete source library and exact published UI
+copies without requiring Python packages in CI or the player.
 
 ## Qualification
 

@@ -614,6 +614,7 @@ internal sealed class ClientRenderHost : IDisposable
                 FrontendSurfaceView? animatedFrontend = current.Frontend.HasValue ? frontendFeedback.Frontend(
                     current.Frontend.Value with { FeedbackSettings = current.FeedbackSettings, BackgroundQuality = qualityProfile.Active },
                     uiNow, current.MetricsActive, graphics.Diagnostics.Device.IsSoftwareAdapter) : null;
+                if (animatedFrontend.HasValue ? frontendFeedback.ResetAudio : dockFeedback.ResetAudio) uiAudio.StopPlayback();
                 uiAudio.Update(animatedFrontend.HasValue ? frontendFeedback.Cue : dockFeedback.Cue,
                     current.FeedbackSettings, uiNow, current.MetricsActive && (current.Frontend.HasValue || current.PreAlphaUx.Mode == PreAlphaUxMode.None));
                 TimeSpan sinceSnapshot =

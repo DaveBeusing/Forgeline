@@ -1,132 +1,180 @@
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 using ForgeLine.Audio;
 using ForgeLine.Presentation;
 
 namespace ForgeLine.Client;
 
-/// <summary>One render-thread-owned, nonlooping voice. The studio stream is independent.</summary>
-internal sealed class WaveOutUiAudio : IUiAudioOutput
-{
-    private readonly UiPcmClip?[] _clips = new UiPcmClip?[5];
-    private readonly byte[] _scaled = new byte[UiPcmClip.MaximumBytes];
-    private readonly string? _assetRoot;
-    private IntPtr _device, _data, _header;
-    private bool _attempted, _prepared, _disposed, _failed;
-    private TimeSpan _lastCue;
-    private bool _hasCue;
+internal readonly record struct UiAudioRequest(UiAudioCue Cue, TimeSpan CreatedAt);
 
-    internal bool Available => _device != IntPtr.Zero && !_failed && !_disposed;
-    internal bool OwnsNativeResources => _device != IntPtr.Zero || _data != IntPtr.Zero || _header != IntPtr.Zero;
-    internal uint? DeviceVolume => _device != IntPtr.Zero && waveOutGetVolume(_device, out uint volume) == 0 ? volume : null;
-    internal WaveOutUiAudio(string? assetRoot = null) => _assetRoot = assetRoot;
+/// <summary>One bounded pending cue; results outrank decorative input. All timestamps are monotonic.</summary>
+internal sealed class UiAudioMailbox
+{
+    internal static readonly TimeSpan Lifetime = TimeSpan.FromMilliseconds(150);
+    private UiAudioRequest _pending;
+    private TimeSpan? _lastDecorative;
+    internal long Dropped { get; private set; }
+    internal int Count => _pending.Cue == UiAudioCue.None ? 0 : 1;
+    internal static bool IsResult(UiAudioCue cue) => cue is UiAudioCue.Accepted or UiAudioCue.Rejected;
+    private static int Priority(UiAudioCue cue) => cue switch
+    { UiAudioCue.Rejected => 3, UiAudioCue.Accepted => 2, UiAudioCue.Intent => 1, _ => 0 };
+
+    internal void Offer(UiAudioRequest request)
+    {
+        if (request.Cue is <= UiAudioCue.None or > UiAudioCue.Rejected) return;
+        if (_pending.Cue != UiAudioCue.None)
+        {
+            Dropped++;
+            if (Priority(request.Cue) < Priority(_pending.Cue)) return;
+            // A failed old attempt must never replace a newer result.
+            if (request.CreatedAt < _pending.CreatedAt && Priority(request.Cue) == Priority(_pending.Cue)) return;
+        }
+        _pending = request;
+    }
+
+    internal UiAudioRequest Take(TimeSpan now)
+    {
+        var request = _pending;
+        _pending = default;
+        if (request.Cue == UiAudioCue.None) return default;
+        if (now < request.CreatedAt || now - request.CreatedAt > Lifetime ||
+            !IsResult(request.Cue) && _lastDecorative is { } previous && now - previous < TimeSpan.FromMilliseconds(60))
+        { Dropped++; return default; }
+        if (!IsResult(request.Cue)) _lastDecorative = now;
+        return request;
+    }
+
+    internal void Clear()
+    {
+        if (Count != 0) Dropped++;
+        _pending = default;
+        _lastDecorative = null;
+    }
+}
+
+internal readonly record struct UiAudioDiagnostics(bool Available, bool OwnsNativeResources,
+    long Played, long Dropped, long PlaybackFailures, long ClipFailures, long DeviceFailures, int QueueDepth, bool OwnerStopped);
+
+/// <summary>Bounded asynchronous UI output. Only the audio owner touches files, WinMM and native buffers.</summary>
+internal sealed class WaveOutUiAudio : IDisposable
+{
+    private readonly object _gate = new();
+    private readonly AutoResetEvent _signal = new(false);
+    private readonly Thread _owner;
+    private readonly Func<IUiAudioOutput> _createOutput;
+    private readonly UiAudioMailbox _mailbox = new();
+    private bool _enabled, _stopping;
+    private float _volume;
+    private long _generation;
+    private UiAudioDiagnostics _diagnostics;
+    internal UiAudioDiagnostics Diagnostics { get { lock (_gate) return _diagnostics with { Dropped = _mailbox.Dropped, QueueDepth = _mailbox.Count }; } }
+    internal bool Available => Diagnostics.Available;
+    internal bool OwnsNativeResources => Diagnostics.OwnsNativeResources;
+    internal WaveOutUiAudio(Func<IUiAudioOutput>? createOutput = null)
+    {
+        _createOutput = createOutput ?? (() => new WaveOutUiVoice());
+        _owner = new Thread(Run) { IsBackground = true, Name = "ForgeLine UI Audio" };
+        _owner.Start();
+    }
 
     internal void Update(UiAudioCue cue, in UiFeedbackSettings settings, TimeSpan now, bool active)
     {
-        if (!active || !settings.SoundEnabled || settings.SoundVolume <= 0) { StopPlayback(); return; }
-        // No late queue: navigation and autorepeat bursts are dropped at the source.
-        if (cue == UiAudioCue.None || _hasCue && now - _lastCue < TimeSpan.FromMilliseconds(60)) return;
-        _lastCue = now; _hasCue = true;
-        _ = TryPlay(cue, settings.SoundVolume);
+        lock (_gate)
+        {
+            if (_stopping) return;
+            bool enabled = active && settings.SoundEnabled && float.IsFinite(settings.SoundVolume) && settings.SoundVolume is > 0 and <= 1;
+            if (_enabled != enabled) { _generation++; _mailbox.Clear(); }
+            _enabled = enabled;
+            _volume = settings.SoundVolume;
+            if (enabled) _mailbox.Offer(new(cue, now));
+            _signal.Set();
+        }
     }
 
-    public bool TryPlay(UiAudioCue cue, float volume)
+    internal void StopPlayback()
     {
-        if (_disposed || _failed || cue is <= UiAudioCue.None or > UiAudioCue.Rejected ||
-            !float.IsFinite(volume) || volume is <= 0 or > 1) return false;
-        if (!_attempted)
+        lock (_gate)
         {
-            _attempted = true;
-            try { Initialize(); }
-            catch (Exception error) when (error is IOException or InvalidDataException or InvalidOperationException or
-                UnauthorizedAccessException or DllNotFoundException or EntryPointNotFoundException)
+            if (_stopping) return;
+            _generation++;
+            _enabled = false;
+            _mailbox.Clear();
+            _signal.Set();
+        }
+    }
+
+    private void Run()
+    {
+        IUiAudioOutput? output = null;
+        long generation = -1, played = 0, failures = 0;
+        try
+        {
+            output = _createOutput();
+            if (output is WaveOutUiVoice voice) voice.PrepareClips();
+            while (true)
             {
-                _failed = true;
-                Release();
-                Console.Error.WriteLine($"[ui:audio:unavailable] {error.GetType().Name}");
-                return false;
+                _signal.WaitOne(10);
+                UiAudioRequest request;
+                long observed;
+                float volume;
+                bool enabled;
+                TimeSpan now = TimeSpan.FromSeconds((double)Stopwatch.GetTimestamp() / Stopwatch.Frequency);
+                lock (_gate)
+                {
+                    if (_stopping) break;
+                    observed = _generation; enabled = _enabled; volume = _volume;
+                    request = enabled ? _mailbox.Take(now) : default;
+                }
+                if (generation != observed)
+                {
+                    output.StopPlayback();
+                    if (enabled && output is WaveOutUiVoice recovering) recovering.ResetRecovery();
+                    generation = observed;
+                }
+                if (request.Cue != UiAudioCue.None)
+                {
+                    bool success = output.TryPlay(request.Cue, volume);
+                    if (success) played++; else failures++;
+                    lock (_gate)
+                    {
+                        if (!success && _generation == observed && _enabled && !_stopping && UiAudioMailbox.IsResult(request.Cue))
+                            _mailbox.Offer(request);
+                    }
+                }
+                lock (_gate)
+                {
+                    var native = output as WaveOutUiVoice;
+                    _diagnostics = new(native?.Available ?? false, native?.OwnsNativeResources ?? false,
+                        played, _mailbox.Dropped, failures, native?.ClipFailures ?? 0, native?.DeviceFailures ?? 0, _mailbox.Count, false);
+                }
             }
         }
-        if (_device == IntPtr.Zero || _clips[(int)cue] is not { } clip) return false;
-        if (_prepared)
+        catch (Exception error) when (error is IOException or InvalidDataException or InvalidOperationException or
+            UnauthorizedAccessException or DllNotFoundException or EntryPointNotFoundException)
         {
-            var previous = Marshal.PtrToStructure<WaveHeader>(_header);
-            if ((previous.Flags & 1) == 0) return false; // WHDR_DONE; never reset a busy cue to play another.
-            if (waveOutUnprepareHeader(_device, _header, (uint)Marshal.SizeOf<WaveHeader>()) != 0) return false;
-            _prepared = false;
+            Console.Error.WriteLine($"[ui:audio:owner-unavailable] {error.GetType().Name}");
         }
-        for (int i = 0; i < clip.Samples.Length; i += 2)
+        finally
         {
-            short sample = (short)(clip.Samples[i] | clip.Samples[i + 1] << 8);
-            short scaled = (short)Math.Clamp((int)(sample * volume), short.MinValue, short.MaxValue);
-            _scaled[i] = (byte)scaled; _scaled[i + 1] = (byte)(scaled >> 8);
+            output?.Dispose();
+            lock (_gate)
+            {
+                _stopping = true;
+                _mailbox.Clear();
+                _diagnostics = _diagnostics with { Available = false, OwnsNativeResources = (output as WaveOutUiVoice)?.OwnsNativeResources ?? false, OwnerStopped = true };
+                _signal.Dispose();
+            }
         }
-        Marshal.Copy(_scaled, 0, _data, clip.Samples.Length);
-        Marshal.StructureToPtr(new WaveHeader { Data = _data, Length = (uint)clip.Samples.Length }, _header, false);
-        uint prepare = waveOutPrepareHeader(_device, _header, (uint)Marshal.SizeOf<WaveHeader>());
-        if (prepare != 0) { _failed = true; Release(); return false; }
-        _prepared = true;
-        if (waveOutWrite(_device, _header, (uint)Marshal.SizeOf<WaveHeader>()) == 0) return true;
-        _failed = true; Release(); return false;
-    }
-
-    private void Initialize()
-    {
-        if (!OperatingSystem.IsWindows()) return;
-        string[] names = ["navigation", "intent", "accepted", "rejected"];
-        for (int i = 0; i < names.Length; i++)
-        {
-            string root = _assetRoot ?? Path.Combine(AppContext.BaseDirectory, "assets", "runtime", "audio", "ui");
-            using var stream = File.OpenRead(Path.Combine(root, names[i] + ".wav"));
-            _clips[i + 1] = UiPcmClip.Read(stream);
-        }
-        var format = new WaveFormat { Tag = 1, Channels = 2, Rate = 48_000, BytesPerSecond = 192_000, BlockAlign = 4, Bits = 16 };
-        if (waveOutOpen(out _device, uint.MaxValue, ref format, IntPtr.Zero, IntPtr.Zero, 0) != 0)
-            throw new InvalidOperationException("UI audio output is unavailable.");
-        _data = Marshal.AllocHGlobal(UiPcmClip.MaximumBytes);
-        _header = Marshal.AllocHGlobal(Marshal.SizeOf<WaveHeader>());
-    }
-
-    public void StopPlayback()
-    {
-        if (_device != IntPtr.Zero && _prepared)
-        {
-            _ = waveOutReset(_device);
-            if (waveOutUnprepareHeader(_device, _header, (uint)Marshal.SizeOf<WaveHeader>()) == 0) _prepared = false;
-        }
-        _hasCue = false;
-    }
-
-    private void Release()
-    {
-        StopPlayback();
-        // A failing driver must not retain a pointer to memory that we free.
-        // The finalizer can retry teardown; an unreturned native buffer remains owned.
-        if (_prepared) { _failed = true; return; }
-        if (_device != IntPtr.Zero && waveOutClose(_device) != 0) { _failed = true; return; }
-        if (_header != IntPtr.Zero) Marshal.FreeHGlobal(_header);
-        if (_data != IntPtr.Zero) Marshal.FreeHGlobal(_data);
-        _device = _header = _data = IntPtr.Zero;
-        _prepared = false;
     }
 
     public void Dispose()
     {
-        if (_disposed) return;
-        Release(); _disposed = true;
-        if (_device == IntPtr.Zero) GC.SuppressFinalize(this);
+        lock (_gate)
+        {
+            if (_stopping) return;
+            _stopping = true; _mailbox.Clear(); _signal.Set();
+        }
+        // The owner releases its own resources. A blocked driver cannot stall the renderer or
+        // cause another thread to free buffers still owned by WinMM.
     }
-
-    ~WaveOutUiAudio() => Release();
-
-    [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    private struct WaveFormat { public ushort Tag, Channels; public uint Rate, BytesPerSecond; public ushort BlockAlign, Bits, Extra; }
-    [StructLayout(LayoutKind.Sequential)]
-    private struct WaveHeader { public IntPtr Data; public uint Length, Recorded; public UIntPtr User; public uint Flags, Loops; public IntPtr Next; public UIntPtr Reserved; }
-    [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutOpen(out IntPtr device, uint id, ref WaveFormat format, IntPtr callback, IntPtr instance, uint flags);
-    [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutPrepareHeader(IntPtr device, IntPtr header, uint size);
-    [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutUnprepareHeader(IntPtr device, IntPtr header, uint size);
-    [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutWrite(IntPtr device, IntPtr header, uint size);
-    [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutReset(IntPtr device);
-    [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutClose(IntPtr device);
-    [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutGetVolume(IntPtr device, out uint volume);
+    internal bool WaitForStop(TimeSpan timeout) => _owner.Join(timeout);
 }

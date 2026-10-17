@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "34a0a346046c03aff8ba17ffa021ec5a9f3aa6ec",
+  "baseRevision": "08dc69cf83be37bab31ecc69f37c180cb09a160b",
+  "productVersion": "0.1.389",
+  "sourceTreeCleanAtPublish": true,
+  "sdk": "10.0.401",
+  "sourceManifestSha256": "bd1a8f4336f19b0c6db6e949000488d04beab57b73dc2f9a62786af478151bd4",
+  "fullTests": {
+    "total": 2424,
+    "passed": 2412,
+    "failed": 2,
+    "skipped": 10,
+    "duration": "6m26.052s",
+    "exitCode": 2,
+    "failures": [
+      {
+        "test": "DirectorateBuildingPresentationTests.RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(storage_depot)",
+        "expectedBytes": 0,
+        "actualBytes": 7264
+      },
+      {
+        "test": "HoverTooltipRenderingTests.WarmTooltipRenderingHasZeroManagedAllocations(contact)",
+        "expectedBytes": 0,
+        "actualBytes": 1792
+      }
+    ]
+  },
+  "postFixClientTests": {
+    "total": 396,
+    "passed": 395,
+    "failed": 0,
+    "skipped": 1
+  },
+  "isolatedPresentationClasses": {
+    "passed": 33,
+    "failed": 0,
+    "parallel": "none",
+    "replacesFullFailure": false
+  },
+  "localEconomyCiGroup": {
+    "passed": 157,
+    "failed": 0,
+    "replacesCiFailure": false
+  },
+  "nativeExplicitTest": {
+    "passed": 1,
+    "failed": 0,
+    "report": "native.json",
+    "listeningOrPhysicalUnplugQualified": false
+  },
+  "package": {
+    "path": "artifacts/audio-package-34a0a346/FORGELINE-0.1.389-dev-win-x64.zip",
+    "bytes": 40062155,
+    "sha256": "410b28f9bb7d23a84ddfd2e4180f65e9b0abc6d7851c37984285fb65c650d512",
+    "twoPublishReproducibility": true,
+    "runtimeAssetCount": 1337,
+    "uiAudioFileCount": 4,
+    "worldAudioFileCount": 0,
+    "applicationReadiness": "Ready",
+    "sessionReadiness": "Ready",
+    "droppedStartupEvents": 0,
+    "emptyStderr": true,
+    "emptyWorkingDirectory": true,
+    "soundEnabled": true
+  },
+  "sourceLibrary": {
+    "clips": 60,
+    "loops": 15,
+    "pcmBytes": 20852160,
+    "wavBytes": 20854800,
+    "regeneratedHashMatches": 60,
+    "signalChecksPassed": 60,
+    "worldBindingComplete": false
+  },
+  "ci": {
+    "sourceRun": 39036596981,
+    "sourceJob": 117407613375,
+    "sourceConclusion": "failure",
+    "failedTest": "OperationsTests.OverviewAndRenderInputHaveZeroWarmAllocation(100)",
+    "expectedBytes": 0,
+    "actualBytes": 7176,
+    "audioContractStep": "success",
+    "masterRun": 39035035692,
+    "masterFailure": "gameplay texture catalog exceeds unchanged 56 MiB budget",
+    "gameplayTextureBytes": 99608050,
+    "catalogBudgetBytes": 58720256
+  },
+  "logSha256": {
+    "audio-frozen-build.log": "538cbd8f4d2a1a0dc9148c4ad0aa4c300165f09c9b0a8b07a6249a440bf245ef",
+    "audio-full-tests-34a0a346.log": "100b0047c8e7141f4677bb787cba1fbc3471b5542588e10a478327bcfff36716",
+    "audio-presentation-isolated-34a0a346.log": "99368bd4c50f1de1f1ad914c3080353556398b60d6bf84e31080c4bb46eb0966",
+    "audio-economy-contracts-34a0a346.log": "9bb84c7bf65bd7bd2dba084bf304729d7484c32942182f7b3b503229e32caaa4",
+    "audio-native-34a0a346.log": "91aab02d4b7d120335e4685a975fddbfe7a0b9be45002a43659720dd1b936843",
+    "audio-master-ci-failure.log": "64c84d42aba31aac3a7c69419a68706f25b60c770f22fa838941320f8aec0ee6",
+    "audio-ci-34a0a346-failure.log": "58cbe4f4eab35f13a8ced3d2fa12bfe75118b66f1444717507f74e5bde504487",
+    "audio-package-34a0a346.log": "a3cf5075d8017ab739d733037f7efbcbc7658bfdf2a9b8b0a1d33d9e3731d496",
+    "audio-client-complete-tests.log": "c39d7e9625f48583b8a93f06c786a35e66ecb57f87365058880a9ae52b2c79ca",
+    "audio-client-readiness-tests.log": "151244617a1692b61834e8fc88c59f81b864db78e130041b47ba68540017b479"
+  },
+  "remaining": [
+    "world mixer and 56 presentation event bindings",
+    "physical device unplug/return and listening review",
+    "Settings audio status",
+    "allocation failures and full CI",
+    "texture/GPU and natural terminal match qualification"
+  ]
+}

@@ -2,7 +2,7 @@ namespace ForgeLine.Audio;
 
 public enum UiAudioCue : byte { None, Navigation, Intent, Accepted, Rejected }
 
-/// <summary>Nonblocking, optional output. Busy/unavailable devices drop a cue, never queue it.</summary>
+/// <summary>Optional single-voice output. Busy/unavailable devices return false; queueing belongs to the owner.</summary>
 public interface IUiAudioOutput : IDisposable
 {
     bool TryPlay(UiAudioCue cue, float volume);

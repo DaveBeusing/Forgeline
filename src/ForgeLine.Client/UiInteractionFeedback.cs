@@ -19,6 +19,7 @@ internal sealed class UiInteractionFeedback
     private PlayerActionPanelMode _mode;
     private PlayerCommandFeedback _result;
     internal UiAudioCue Cue { get; private set; }
+    internal bool ResetAudio { get; private set; }
 
     internal FrontendSurfaceView Frontend(in FrontendSurfaceView view, TimeSpan now, bool active, bool software = false)
     {
@@ -37,6 +38,7 @@ internal sealed class UiInteractionFeedback
         bool eligible = active && view.Kind is not (FrontendSurfaceKind.Loading or FrontendSurfaceKind.StudioSplash);
         bool resized = _width > 0 && _height > 0 && view.Layout is { } layout &&
             (_width != layout.Width || _height != layout.Height);
+        ResetAudio = !_seen || _cancelled || !eligible || resized || reveal;
         Cue = !_seen || _cancelled || !eligible || resized ? UiAudioCue.None : error ? UiAudioCue.Rejected :
             pressed && !_pressed ? UiAudioCue.Intent : reveal || focused ? UiAudioCue.Navigation : UiAudioCue.None;
         if (!eligible || resized) _motion.Cancel();
@@ -66,6 +68,7 @@ internal sealed class UiInteractionFeedback
             result.State is PlayerCommandFeedbackState.Accepted or PlayerCommandFeedbackState.Partial or PlayerCommandFeedbackState.Rejected &&
             result.ResolvedAtTick.Value <= snapshot.Tick.Value;
         bool changed = !sessionChanged && validResult && result != _result && result.ResolvedAtTick.Value >= _result.ResolvedAtTick.Value;
+        ResetAudio = !eligible || sessionChanged;
         Cue = !eligible || sessionChanged ? UiAudioCue.None : changed ?
             result.State == PlayerCommandFeedbackState.Accepted ? UiAudioCue.Accepted : UiAudioCue.Rejected :
             pending && !_pending ? UiAudioCue.Intent : reveal || focused ? UiAudioCue.Navigation : UiAudioCue.None;

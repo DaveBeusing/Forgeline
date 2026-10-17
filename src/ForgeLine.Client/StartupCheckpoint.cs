@@ -8,7 +8,7 @@ internal sealed class StartupCheckpoint : IDisposable
     private readonly Timer _timer;
     private readonly object _gate = new();
     private bool _disposed;
-    private int _lastCount = -1;
+    private (int Events, StartupReadiness Application, StartupReadiness Session, int SessionId, int Dropped)? _lastState;
 
     internal StartupCheckpoint(StartupDiagnostics diagnostics, string path)
     {
@@ -22,10 +22,10 @@ internal sealed class StartupCheckpoint : IDisposable
         lock (_gate)
         {
             if (_disposed) return;
-            int count = _diagnostics.Snapshot().Length;
-            if (_lastCount == count) return;
-            _diagnostics.WriteReport(_path, announce: false);
-            _lastCount = count;
+            var state = _diagnostics.CheckpointState;
+            if (_lastState == state) return;
+            // A failed atomic replacement must be retried even without another event.
+            if (_diagnostics.WriteReport(_path, announce: false)) _lastState = state;
         }
     }
 

@@ -333,6 +333,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                             renderer.Render(context, FrontendSurfaceView.Loading("PREPARING STUDIO INTRO", false, 0));
                         }
                     });
+                if (feedback.ResetAudio) uiAudio.StopPlayback();
                 uiAudio.Update(feedback.Cue, view.Value.FeedbackSettings, uiNow, view.Value.FeedbackActive);
                 if (ObservePresentation(_startup, _presentedFrames,
                     graphics.PresentedFrameCount, view.Value.Kind,
