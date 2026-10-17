@@ -59,12 +59,14 @@ public sealed class BattlefieldProductionSkinTests
         using IWindow window = platform.CreateWindow(new("FORGELINE battlefield skin", 1280, 720));
         using var device = GraphicsDeviceFactory.CreateForWindow(window, new() { ForceSoftwareAdapter = true, EnableVSync = false, EnableDebugLayer = true });
         var catalog = RuntimeAssetCatalog.Load(RuntimeRoot());
+        var logicalSkin = RuntimeUiSkinData.FromPayload(catalog.Read(AssetId.Parse(UiSkinResources.AssetName)).Payload);
+        Assert.Equal(28 * 1024 * 1024, logicalSkin.PageBytes); // unchanged seven 1024-pixel pages
         for (int session = 0; session < 2; session++)
         {
             using (var hud = new GameplayHudRenderer(device, catalog))
             {
                 Assert.True(hud.SkinDiagnostics.Prepared);
-                Assert.Equal(28 * 1024 * 1024, hud.SkinDiagnostics.ResidentPageBytes);
+                Assert.Equal(16 * 1024 * 1024, hud.SkinDiagnostics.ResidentPageBytes); // three RGBA8 + four BC7 pages
                 Assert.Equal(8, device.Diagnostics.Resources.LoadedTextureCount); // seven shared atlas pages plus one shared font
                 Assert.Equal(13, hud.SkinDiagnostics.Batches);
                 Assert.Equal(52, hud.SkinDiagnostics.Buffers);
