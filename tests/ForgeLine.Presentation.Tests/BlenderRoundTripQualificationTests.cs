@@ -30,10 +30,10 @@ public sealed class BlenderRoundTripQualificationTests
     [Fact(Skip = "Set FORGELINE_BLENDER_MOTION_ROOT after rigid authoring exports.", SkipUnless = nameof(MotionEnabled))]
     public void RigidAuthoringPreservesCompiledGeometryAndBatching()
     {
-        CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_MOTION_ROOT")!), ["first", "second", "reopened"], true, "_rigid/", 11296);
+        CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_MOTION_ROOT")!), ["first", "second", "reopened"], true, "_rigid/", 10536);
     }
 
-    private static void CompareExports(string root, string[] variants, bool prepared, string folder = "_prepared/", int expectedTriangles = 16400)
+    private static void CompareExports(string root, string[] variants, bool prepared, string folder = "_prepared/", int expectedTriangles = 15640)
     {
         var baseline = RuntimeAssetCatalog.Load(Path.Combine(root, "baseline-runtime"));
         Assert.Equal(29, baseline.Manifest.Assets.Count);

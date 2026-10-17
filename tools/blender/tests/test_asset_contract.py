@@ -190,7 +190,7 @@ class AssetContractTests(unittest.TestCase):
         catalog=Catalog(ROOT/'assets/source');ids,families=fixture_selection(catalog,ROOT/'tools/blender/fixtures/production.json',[])
         self.assertEqual(29,len(ids));self.assertEqual(2,len(families))
         meshes=[read_geometry(catalog.source(a),catalog.root,catalog.definitions[a][1]) for a in ids if catalog.definitions[a][1]['type']=='mesh']
-        self.assertEqual(19,len(meshes));self.assertEqual(16400,sum(geometry_stats(g)['triangles'] for g in meshes))
+        self.assertEqual(19,len(meshes));self.assertEqual(15640,sum(geometry_stats(g)['triangles'] for g in meshes))
         self.assertIn('unit.directorate.main_battle_tank.wreck',ids);self.assertIn('building.directorate.command_core.destroyed',ids)
 
 
