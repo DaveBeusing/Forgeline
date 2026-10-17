@@ -218,7 +218,7 @@ public sealed class AutomatedDistributionSystem
     }
 
     void ICargoTransportReservationObserver.OnCargoReservationConsumed(
-        LogisticsTransportRequestId requestId)
+        LogisticsTransportRequestId requestId, double quantity)
     {
         for (int index = 0; index < _requests.Count; index++)
         {
@@ -228,8 +228,8 @@ public sealed class AutomatedDistributionSystem
                 continue;
             }
 
-            request.ReservedQuantity = 0.0;
-            request.ReservedSourceInventory = InventoryId.None;
+            request.ReservedQuantity = Math.Max(0, request.ReservedQuantity - quantity);
+            if (request.ReservedQuantity <= QuantityEpsilon) request.ReservedSourceInventory = InventoryId.None;
             return;
         }
     }

@@ -294,6 +294,37 @@ internal static class CargoDeliveryFuelPolicy
         return false;
     }
 
+    public static void PrepareDockMovement(SimulationContext context, InventoryStore inventories, EntityId entity,
+        NavigationVersion version = default, bool replenishesFuelProduction = false)
+    {
+        var entities = context.Entities;
+        if (entities.HasComponent<NavigationPendingPath>(entity) || entities.HasComponent<NavigationRouteState>(entity) ||
+            !entities.TryGetComponent(entity, out MovementOrder movement)) return;
+        if (ShouldDeferMovement(entities, inventories, entity, movement, version))
+        {
+            entities.RemoveComponent<MovementOrder>(entity);
+            return;
+        }
+        PrepareMovementBudget(entities, inventories, entity, movement, replenishesFuelProduction);
+        if (movement.Kind == MovementOrderKind.LocalApproach && !ValidateLocalMovement(context, entity, movement, version))
+            entities.RemoveComponent<MovementOrder>(entity);
+    }
+
+    private static bool ValidateLocalMovement(SimulationContext context, EntityId entity, MovementOrder movement, NavigationVersion version)
+    {
+        if (!context.Entities.TryGetComponent(entity, out CargoDeliveryFuelBudget budget) || !SameTravel(budget.Movement, movement)) return true;
+        RemoveBudget(context.Entities, entity);
+        if (!context.Entities.TryGetComponent(entity, out WorldTransform transform)) return false;
+        double required = HorizontalDistance(transform.Position, movement.WorldTarget) * budget.FuelPerMeter + budget.ReserveFuel;
+        if (double.IsFinite(required) && budget.AvailableFuel + QuantityEpsilon >= required)
+        {
+            RemoveDeferral(context.Entities, entity);
+            return true;
+        }
+        SetDeferral(context, entity, movement, required, budget.AvailableFuel, version);
+        return false;
+    }
+
     public static void ClearTravelState(
         EntityRegistry entities,
         EntityId entity)
@@ -320,9 +351,8 @@ internal static class CargoDeliveryFuelPolicy
         entities.TryGetComponent(
             entity,
             out CargoTransportRuntimeState state) &&
-        state.Lifecycle is
-            CargoTransportLifecycleState.ToOrigin or
-            CargoTransportLifecycleState.ToDestination;
+        (state.Lifecycle is CargoTransportLifecycleState.ToOrigin or CargoTransportLifecycleState.ToDestination ||
+         entities.HasComponent<VehicleDockVisit>(entity));
 
     private static void SetDeferral(
         SimulationContext context,

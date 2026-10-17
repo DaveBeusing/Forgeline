@@ -68,16 +68,19 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
 {
     private const double QuantityEpsilon = 0.000000001;
 
+    private readonly VehicleDockingService _docks;
     private readonly InventoryStore _inventories;
     private readonly List<EntityId> _fuelUnits = new();
     private readonly List<EntityId> _supplyTrucks = new();
     private readonly List<RecipientCandidate> _recipients = new();
     private readonly List<ProviderCandidate> _providers = new();
+    private ulong? _executedTick;
     private double _totalFuelTransferred;
     private double _totalAmmunitionTransferred;
 
-    public BattlefieldSupplySystem(InventoryStore inventories)
+    public BattlefieldSupplySystem(InventoryStore inventories, VehicleDockingService? docking = null)
     {
+        _docks = docking ?? new VehicleDockingService();
         _inventories = inventories ??
             throw new ArgumentNullException(nameof(inventories));
     }
@@ -97,6 +100,9 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
+        if (_executedTick == context.Tick.Value) return;
+        _executedTick = context.Tick.Value;
+        _docks.Cleanup(context.Entities);
 
         ConsumeMovementFuel(context);
         double loadedFuel = 0.0;
@@ -222,155 +228,63 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 continue;
             }
 
-            if (!TryFindLoadingInventory(
-                    context,
-                    truck,
-                    truckTransform.Position,
-                    out InventoryId loadingInventory))
+            if (!context.Entities.TryGetComponent(truckEntity, out SupplyLoadingOrder order) ||
+                context.Entities.HasComponent<CargoTransportOrder>(truckEntity) ||
+                context.Entities.HasComponent<ResupplyOrder>(truckEntity)) continue;
+            if (context.Entities.TryGetComponent(truckEntity, out VehicleDockVisit exit) && exit.Status == VehicleDockStatus.Exiting)
             {
+                if (_docks.Exit(context, truckEntity)) context.Entities.RemoveComponent<SupplyLoadingOrder>(truckEntity);
+                CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity);
                 continue;
             }
-
-            fuelTransferred +=
-                TransferTowardTarget(
-                    loadingInventory,
-                    truck.InventoryId,
-                    ResourceIds.Fuel,
-                    truck.FuelTarget);
-
-            ammunitionTransferred +=
-                TransferTowardTarget(
-                    loadingInventory,
-                    truck.InventoryId,
-                    ResourceIds.Ammunition,
-                    truck.AmmunitionTarget);
-        }
-    }
-
-    private bool TryFindLoadingInventory(
-        SimulationContext context,
-        in SupplyTruck truck,
-        Vector3 truckPosition,
-        out InventoryId selectedInventory)
-    {
-        selectedInventory = default;
-        InventoryId candidateInventory = default;
-        EntityId selectedEntity = EntityId.Invalid;
-        float bestDistanceSquared = float.PositiveInfinity;
-        float maximumDistanceSquared =
-            truck.LoadRangeMeters * truck.LoadRangeMeters;
-        bool needsFuel =
-            _inventories.GetQuantity(
-                truck.InventoryId,
-                ResourceIds.Fuel) <
-            truck.FuelTarget;
-        bool needsAmmunition =
-            _inventories.GetQuantity(
-                truck.InventoryId,
-                ResourceIds.Ammunition) <
-            truck.AmmunitionTarget;
-
-        foreach (EntityId entity in
-                 context.Entities.Query<SupplyDepot>(
-                     QueryIterationOrder.StableByEntityIndex))
-        {
-            SupplyDepot depot =
-                context.Entities.GetComponent<SupplyDepot>(entity);
-
-            if (depot.State != SupplyDepotState.Operational ||
-                depot.Owner != truck.Owner ||
-                !_inventories.Contains(depot.InventoryId) ||
-                !context.Entities.TryGetComponent(
-                    entity,
-                    out WorldTransform transform))
+            if (!context.Entities.IsAlive(order.Source) ||
+                !context.Entities.TryGetComponent(order.Source, out CompletedBuilding sourceBuilding) || sourceBuilding.Owner != truck.Owner)
             {
+                VehicleDockingService.Cancel(context.Entities, truckEntity);
                 continue;
             }
-
-            ConsiderLoadingSource(
-                entity,
-                depot.InventoryId,
-                transform.Position);
-        }
-
-        foreach (EntityId entity in
-                 context.Entities.Query<SupplyProvider>(
-                     QueryIterationOrder.StableByEntityIndex))
-        {
-            if (!context.Entities.HasComponent<CommandFacility>(entity))
+            InventoryId loadingInventory = InventoryId.None;
+            if (context.Entities.TryGetComponent(order.Source, out SupplyDepot depot) && depot.State == SupplyDepotState.Operational)
+                loadingInventory = depot.InventoryId;
+            else if (context.Entities.HasComponent<CommandFacility>(order.Source) &&
+                context.Entities.TryGetComponent(order.Source, out SupplyProvider provider) && provider.Enabled)
+                loadingInventory = provider.InventoryId;
+            if (!_inventories.Contains(loadingInventory))
             {
+                VehicleDockingService.Cancel(context.Entities, truckEntity);
                 continue;
             }
-
-            SupplyProvider provider =
-                context.Entities.GetComponent<SupplyProvider>(entity);
-
-            if (!provider.Enabled ||
-                provider.Owner != truck.Owner ||
-                !_inventories.Contains(provider.InventoryId) ||
-                !context.Entities.TryGetComponent(
-                    entity,
-                    out WorldTransform transform))
+            bool docked = _docks.Approach(context, truckEntity, order.Source, truck.Owner);
+            CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity);
+            if (!docked) continue;
+            var visit = context.Entities.GetComponent<VehicleDockVisit>(truckEntity);
+            double fuel = Math.Max(0, truck.FuelTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel));
+            double ammunition = Math.Max(0, truck.AmmunitionTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition));
+            double quantity = Math.Min(20, Math.Min(fuel, _inventories.GetAvailableQuantity(loadingInventory, ResourceIds.Fuel))) +
+                Math.Min(20, Math.Min(ammunition, _inventories.GetAvailableQuantity(loadingInventory, ResourceIds.Ammunition)));
+            if (fuel + ammunition <= QuantityEpsilon) { _docks.Exit(context, truckEntity); CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity); continue; }
+            bool full = _inventories.GetAddableQuantity(truck.InventoryId, ResourceIds.Fuel, 1) <= QuantityEpsilon &&
+                _inventories.GetAddableQuantity(truck.InventoryId, ResourceIds.Ammunition, 1) <= QuantityEpsilon;
+            if (full) { _docks.Exit(context, truckEntity); CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity); continue; }
+            if (quantity <= QuantityEpsilon)
             {
+                VehicleDockingService.Put(context.Entities, truckEntity, visit with
+                {
+                    Reason = VehicleDockBlockReason.SourceEmpty, ServiceStartedTick = 0, ServiceProgress = 0
+                });
                 continue;
             }
-
-            ConsiderLoadingSource(
-                entity,
-                provider.InventoryId,
-                transform.Position);
-        }
-
-        if (selectedEntity.IsValid)
-        {
-            selectedInventory = candidateInventory;
-            return true;
-        }
-
-        return false;
-
-        void ConsiderLoadingSource(
-            EntityId entity,
-            InventoryId inventory,
-            Vector3 position)
-        {
-            bool hasNeededFuel =
-                needsFuel &&
-                _inventories.GetAvailableQuantity(
-                    inventory,
-                    ResourceIds.Fuel) > 0.0;
-            bool hasNeededAmmunition =
-                needsAmmunition &&
-                _inventories.GetAvailableQuantity(
-                    inventory,
-                    ResourceIds.Ammunition) > 0.0;
-
-            if (!hasNeededFuel &&
-                !hasNeededAmmunition)
+            if (!_docks.CanTransfer(context, truckEntity, visit.Generation, quantity)) continue;
+            double loadedFuel = TransferTowardTarget(loadingInventory, truck.InventoryId, ResourceIds.Fuel, truck.FuelTarget);
+            double loadedAmmunition = TransferTowardTarget(loadingInventory, truck.InventoryId, ResourceIds.Ammunition, truck.AmmunitionTarget);
+            fuelTransferred += loadedFuel;
+            ammunitionTransferred += loadedAmmunition;
+            if (loadedFuel + loadedAmmunition > QuantityEpsilon) VehicleDockingService.RecordTransfer(context, truckEntity, visit.Generation);
+            if (_inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel) + QuantityEpsilon >= truck.FuelTarget &&
+                _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition) + QuantityEpsilon >= truck.AmmunitionTarget)
             {
-                return;
-            }
-
-            float distanceSquared =
-                HorizontalDistanceToLoadingSourceSquared(
-                    context,
-                    entity,
-                    position,
-                    truckPosition);
-
-            if (distanceSquared > maximumDistanceSquared)
-            {
-                return;
-            }
-
-            if (!selectedEntity.IsValid ||
-                distanceSquared < bestDistanceSquared ||
-                (distanceSquared == bestDistanceSquared &&
-                 entity < selectedEntity))
-            {
-                selectedEntity = entity;
-                candidateInventory = inventory;
-                bestDistanceSquared = distanceSquared;
+                _docks.Exit(context, truckEntity);
+                CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity);
             }
         }
     }
@@ -392,9 +306,9 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 destination,
                 resource);
         double deficit =
-            Math.Max(
+            Math.Min(20, Math.Max(
                 0.0,
-                targetQuantity - current);
+                targetQuantity - current));
 
         return TransferAvailable(
             source,
@@ -986,38 +900,6 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
     {
         float x = left.X - right.X;
         float z = left.Z - right.Z;
-        return x * x + z * z;
-    }
-
-    private static float HorizontalDistanceToLoadingSourceSquared(
-        SimulationContext context,
-        EntityId source,
-        Vector3 sourcePosition,
-        Vector3 loadingPosition)
-    {
-        float x =
-            MathF.Abs(
-                loadingPosition.X -
-                sourcePosition.X);
-        float z =
-            MathF.Abs(
-                loadingPosition.Z -
-                sourcePosition.Z);
-
-        if (context.Entities.TryGetComponent(
-                source,
-                out SpatialPresence presence))
-        {
-            x =
-                MathF.Max(
-                    0.0f,
-                    x - presence.HalfExtents.X);
-            z =
-                MathF.Max(
-                    0.0f,
-                    z - presence.HalfExtents.Z);
-        }
-
         return x * x + z * z;
     }
 

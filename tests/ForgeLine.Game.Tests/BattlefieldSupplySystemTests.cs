@@ -478,7 +478,8 @@ public sealed class BattlefieldSupplySystemTests
             13.5f >
             truckState.LoadRangeMeters);
 
-        simulation.AdvanceOneTick();
+        PrepareLoadingDock(simulation, truck, commandCore);
+        simulation.RunTicks(90, TestContext.Current.CancellationToken);
 
         Assert.Equal(
             truckState.FuelTarget,
@@ -579,7 +580,8 @@ public sealed class BattlefieldSupplySystemTests
                 fuelConsumptionPerMeter: 0.0,
                 priority: BattlefieldSupplyPriority.Low);
 
-        simulation.AdvanceOneTick();
+        PrepareLoadingDock(simulation, truck, depot);
+        simulation.RunTicks(90, TestContext.Current.CancellationToken);
 
         SupplyTruck truckState =
             simulation.Entities.GetComponent<SupplyTruck>(
@@ -919,5 +921,16 @@ public sealed class BattlefieldSupplySystemTests
             priority);
 
         return entity;
+    }
+    private static void PrepareLoadingDock(SimulationCoordinator simulation, EntityId truck, EntityId source)
+    {
+        var entities = simulation.Entities;
+        var building = entities.GetComponent<WorldTransform>(source);
+        entities.AddComponent(source, new CompletedBuilding(BuildingIds.SupplyDepot, LocalPlayer, SimulationTick.Zero));
+        entities.AddComponent(source, new BuildingLoadingDock(new(0, 0, 14), Vector3.UnitX, 18));
+        var transform = entities.GetComponent<WorldTransform>(truck);
+        entities.SetComponent(truck, transform with { Position = building.Position + new Vector3(0, entities.GetComponent<GroundMovement>(truck).HeightOffset, 14), Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2) });
+        entities.SetComponent(truck, GroundMovementState.Stationary(MathF.PI / 2));
+        entities.AddComponent(truck, new SupplyLoadingOrder(source, SimulationTick.Zero));
     }
 }

@@ -13,6 +13,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
     private const double QuantityEpsilon = 0.000000001;
     private const float LogicalTransitNodeApproachRadiusMeters = 72.0f;
 
+    private readonly VehicleDockingService _docks;
     private readonly LogisticsNetwork _network;
     private readonly InventoryStore _inventories;
     private readonly HierarchicalNavigationSystem? _navigation;
@@ -20,6 +21,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
     private readonly Dictionary<EntityId, InventoryId> _trackedInventories = new();
     private readonly List<EntityId> _staleTrackedEntities = new();
     private ICargoTransportReservationObserver? _reservationObserver;
+    private ulong? _executedTick;
     private long _completedOrderCount;
     private long _rerouteCount;
     private long _routeFailureCount;
@@ -29,13 +31,14 @@ public sealed class CargoTransportSystem : ISimulationSystem
     public CargoTransportSystem(
         LogisticsNetwork network,
         InventoryStore inventories,
-        HierarchicalNavigationSystem? navigation = null)
+        HierarchicalNavigationSystem? navigation = null, VehicleDockingService? docking = null)
     {
         _network = network ??
             throw new ArgumentNullException(nameof(network));
         _inventories = inventories ??
             throw new ArgumentNullException(nameof(inventories));
         _navigation = navigation;
+        _docks = docking ?? new VehicleDockingService();
     }
 
     public SimulationPhase Phase =>
@@ -94,6 +97,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 transportEntity,
                 out CargoTransport transport) ||
             !_inventories.Contains(transport.CargoInventory) ||
+            entities.HasComponent<SupplyLoadingOrder>(transportEntity) ||
+            entities.HasComponent<VehicleDockVisit>(transportEntity) ||
             entities.HasComponent<CargoTransportOrder>(
                 transportEntity) ||
             _inventories.GetTotalQuantity(
@@ -143,6 +148,9 @@ public sealed class CargoTransportSystem : ISimulationSystem
     {
         ArgumentNullException.ThrowIfNull(context);
 
+        if (_executedTick == context.Tick.Value) return;
+        _executedTick = context.Tick.Value;
+        _docks.Cleanup(context.Entities);
         CleanupDestroyedTransports(context.Entities);
 
         _transportEntities.Clear();
@@ -196,6 +204,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        if (context.Entities.HasComponent<SupplyLoadingOrder>(entity)) return;
+
         CargoTransportRuntimeState state =
             context.Entities.TryGetComponent(
                 entity,
@@ -231,6 +241,10 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        if (context.Entities.TryGetComponent(entity, out VehicleDockVisit dockExit) && dockExit.Status == VehicleDockStatus.Exiting)
+        {
+            if (!_docks.Exit(context, entity)) { PrepareDockFuelBudget(context, entity); return; }
+        }
         // Battlefield resupply temporarily owns locomotion. Keep the cargo
         // order and runtime state intact so the same delivery resumes once
         // the resupply order is completed.
@@ -475,6 +489,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        double remainingRequested = Math.Max(0, order.RequestedQuantity - state.LoadedQuantity);
         bool hasAutomatedReservation =
             context.Entities.TryGetComponent(
                 entity,
@@ -503,13 +518,13 @@ public sealed class CargoTransportSystem : ISimulationSystem
             _inventories.GetAddableQuantity(
                 transport.CargoInventory,
                 order.ResourceId,
-                order.RequestedQuantity);
+                remainingRequested);
 
         if (order.PartialLoadPolicy ==
             CargoPartialLoadPolicy.RequireRequestedQuantity)
         {
             if (available + QuantityEpsilon <
-                order.RequestedQuantity)
+                remainingRequested)
             {
                 Wait(
                     context.Entities,
@@ -522,7 +537,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             }
 
             if (addable + QuantityEpsilon <
-                order.RequestedQuantity)
+                remainingRequested)
             {
                 Fail(
                     context.Entities,
@@ -536,7 +551,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
         }
 
         double loadQuantity = Math.Min(
-            order.RequestedQuantity,
+            remainingRequested,
             Math.Min(
                 available,
                 addable));
@@ -570,6 +585,14 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        bool dockRequired = context.Entities.HasComponent<BuildingLoadingDock>(origin.Entity);
+        if (dockRequired)
+        {
+            loadQuantity = Math.Min(20, loadQuantity);
+            if (!_docks.Approach(context, entity, origin.Entity, transport.Owner) ||
+                !context.Entities.TryGetComponent(entity, out VehicleDockVisit loadingVisit) ||
+                !_docks.CanTransfer(context, entity, loadingVisit.Generation, loadQuantity)) return;
+        }
         if (hasAutomatedReservation)
         {
             InventoryOperationResult release =
@@ -626,9 +649,12 @@ public sealed class CargoTransportSystem : ISimulationSystem
         if (hasAutomatedReservation)
         {
             _reservationObserver?.OnCargoReservationConsumed(
-                automatedReservation.RequestId);
-            context.Entities.RemoveComponent<CargoTransportReservation>(
-                entity);
+                automatedReservation.RequestId, loadQuantity);
+            double reservedRest = automatedReservation.Quantity - loadQuantity;
+            if (reservedRest > QuantityEpsilon)
+                context.Entities.SetComponent(entity, new CargoTransportReservation(automatedReservation.RequestId,
+                    automatedReservation.SourceInventory, automatedReservation.ResourceId, reservedRest));
+            else context.Entities.RemoveComponent<CargoTransportReservation>(entity);
         }
 
         CargoTransportRuntimeState loadedState =
@@ -642,6 +668,16 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 StateChangedAtTick =
                     context.Tick
             };
+
+        if (context.Entities.TryGetComponent(entity, out VehicleDockVisit loadedVisit))
+            VehicleDockingService.RecordTransfer(context, entity, loadedVisit.Generation);
+        if (dockRequired && loadedState.LoadedQuantity + QuantityEpsilon < order.RequestedQuantity &&
+            _inventories.GetAddableQuantity(transport.CargoInventory, order.ResourceId, 1) > QuantityEpsilon &&
+            (hasAutomatedReservation ? automatedReservation.Quantity - loadQuantity : _inventories.GetAvailableQuantity(sourceInventory, order.ResourceId)) > QuantityEpsilon)
+        {
+            SetState(context.Entities, entity, loadedState);
+            return;
+        }
 
         if (!TryPlanRoute(
                 context.Entities,
@@ -658,6 +694,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 CargoTransportWaitReason.RouteUnavailable,
                 context.Tick);
         }
+        if (context.Entities.HasComponent<VehicleDockVisit>(entity)) { _docks.Exit(context, entity); PrepareDockFuelBudget(context, entity); }
     }
 
     private void ProcessToDestination(
@@ -816,6 +853,11 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 context.Entities,
                 entity,
                 advancedState);
+            if (context.Entities.HasComponent<VehicleDockVisit>(entity))
+            {
+                _docks.Exit(context, entity);
+                PrepareDockFuelBudget(context, entity);
+            }
         }
     }
 
@@ -909,7 +951,13 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
-        InventoryOperationResult transfer =
+        if (context.Entities.HasComponent<BuildingLoadingDock>(destination.Entity))
+        {
+            unloadQuantity = Math.Min(20, unloadQuantity);
+            if (!_docks.Approach(context, entity, destination.Entity, transport.Owner) ||
+                !context.Entities.TryGetComponent(entity, out VehicleDockVisit unloadingVisit) ||
+                !_docks.CanTransfer(context, entity, unloadingVisit.Generation, unloadQuantity)) return;
+        }        InventoryOperationResult transfer =
             _inventories.Transfer(
                 transport.CargoInventory,
                 destinationInventory,
@@ -927,6 +975,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        if (context.Entities.TryGetComponent(entity, out VehicleDockVisit unloadedVisit))
+            VehicleDockingService.RecordTransfer(context, entity, unloadedVisit.Generation);
         _deliveredQuantity += unloadQuantity;
 
         CargoTransportRuntimeState unloadedState =
@@ -946,15 +996,17 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
         if (remaining > QuantityEpsilon)
         {
-            Wait(
-                context.Entities,
-                entity,
-                unloadedState,
-                CargoTransportWaitReason.DestinationCapacity,
-                context.Tick);
+            if (_inventories.GetAddableQuantity(destinationInventory, order.ResourceId, 1) <= QuantityEpsilon)
+                Wait(context.Entities, entity, unloadedState, CargoTransportWaitReason.DestinationCapacity, context.Tick);
+            else SetState(context.Entities, entity, unloadedState);
             return;
         }
-
+        if (context.Entities.HasComponent<VehicleDockVisit>(entity) && !_docks.Exit(context, entity))
+        {
+            PrepareDockFuelBudget(context, entity);
+            SetState(context.Entities, entity, unloadedState);
+            return;
+        }
         CompleteOrder(
             context.Entities,
             entity,
@@ -1334,6 +1386,16 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        if (context.Entities.HasComponent<CompletedBuilding>(node.Entity) || TryGetStaticNodeBounds(context.Entities, node, out _))
+        {
+            _docks.Approach(context, entity, node.Entity, transport.Owner);
+            PrepareDockFuelBudget(context, entity);
+            if (context.Entities.TryGetComponent(entity, out MovementOrder dockMovement) &&
+                (!context.Entities.TryGetComponent(entity, out CargoTransportMovementTarget currentDockTarget) ||
+                 currentDockTarget.WorldPosition != dockMovement.WorldTarget))
+                VehicleDockingService.Put(context.Entities, entity, new CargoTransportMovementTarget(node.Id, dockMovement.WorldTarget, context.Tick));
+            return;
+        }
         // An approach is a fixed destination for this node visit, not a point
         // that follows the truck as it steers. Recomputing it during an active
         // route repeatedly replaces navigation with a path from the new start.
@@ -1345,12 +1407,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
-        Vector3 movementPosition =
-            ResolveNodeApproachPosition(
-                context.Entities,
-                node,
-                transportTransform.Position,
-                groundMovement);
+        Vector3 movementPosition = node.WorldPosition;
 
         if (_navigation is not null &&
             context.Entities.TryGetComponent(entity, out NavigationAgent agent))
@@ -1444,6 +1501,11 @@ public sealed class CargoTransportSystem : ISimulationSystem
         }
     }
 
+    private void PrepareDockFuelBudget(SimulationContext context, EntityId entity)
+    {
+        CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, entity, _navigation?.World.Version ?? default,
+            IsFuelProductionRecoveryOrder(context.Entities, entity));
+    }
     private bool IsFuelProductionRecoveryOrder(
         EntityRegistry entities,
         EntityId entity)
@@ -1503,74 +1565,6 @@ public sealed class CargoTransportSystem : ISimulationSystem
         return nearest;
     }
 
-    private static Vector3 ResolveNodeApproachPosition(
-        EntityRegistry entities,
-        in LogisticsNode node,
-        Vector3 origin,
-        in GroundMovement movement)
-    {
-        if (!TryGetStaticNodeBounds(
-                entities,
-                node,
-                out ForgeLine.World.AxisAlignedBounds bounds))
-        {
-            return node.WorldPosition;
-        }
-
-        const float NavigationCellClearanceMeters = 32.0f;
-
-        float clearance =
-            movement.ObstacleLookAhead +
-            movement.Radius +
-            NavigationCellClearanceMeters;
-        float minimumX =
-            bounds.Minimum.X -
-            clearance;
-        float maximumX =
-            bounds.Maximum.X +
-            clearance;
-        float minimumZ =
-            bounds.Minimum.Z -
-            clearance;
-        float maximumZ =
-            bounds.Maximum.Z +
-            clearance;
-        Vector3 center =
-            (bounds.Minimum +
-             bounds.Maximum) *
-            0.5f;
-        float deltaX =
-            origin.X -
-            center.X;
-        float deltaZ =
-            origin.Z -
-            center.Z;
-
-        if (MathF.Abs(deltaX) >=
-            MathF.Abs(deltaZ))
-        {
-            return new Vector3(
-                deltaX >= 0.0f
-                    ? maximumX
-                    : minimumX,
-                node.WorldPosition.Y,
-                Math.Clamp(
-                    origin.Z,
-                    minimumZ,
-                    maximumZ));
-        }
-
-        return new Vector3(
-            Math.Clamp(
-                origin.X,
-                minimumX,
-                maximumX),
-            node.WorldPosition.Y,
-            deltaZ >= 0.0f
-                ? maximumZ
-                : minimumZ);
-    }
-
     private static bool TryGetStaticNodeBounds(
         EntityRegistry entities,
         in LogisticsNode node,
@@ -1622,7 +1616,13 @@ public sealed class CargoTransportSystem : ISimulationSystem
         EntityId entity,
         in LogisticsNode node)
     {
-        if (!entities.TryGetComponent(
+        if (entities.HasComponent<CompletedBuilding>(node.Entity) || TryGetStaticNodeBounds(entities, node, out _))
+        {
+            return entities.TryGetComponent(entity, out VehicleDockVisit visit) && visit.Building == node.Entity &&
+                visit.Status is VehicleDockStatus.Docked or VehicleDockStatus.Servicing &&
+                entities.TryGetComponent(entity, out WorldTransform truckPose) &&
+                entities.TryGetComponent(entity, out GroundMovementState motion) && visit.Pose.IsSettled(truckPose, motion);
+        }        if (!entities.TryGetComponent(
                 entity,
                 out WorldTransform transform) ||
             !entities.TryGetComponent(
@@ -1632,12 +1632,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return false;
         }
 
-        if (IsWithinStaticNodeApproachRange(
-                entities,
-                node,
-                transform.Position,
-                movement) ||
-            IsWithinLogicalTransitNodeApproachRange(
+        if (IsWithinLogicalTransitNodeApproachRange(
                 entities,
                 node,
                 transform.Position))
@@ -1664,12 +1659,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 movement.StopRadius +
                 1.5f;
 
-            if (TryGetStaticNodeBounds(entities, node, out _))
-            {
-                // Another truck may occupy the exact loading point. Allow the
-                // recipient to stop alongside it without waiting for overlap.
-                approachTolerance += movement.Radius * 2.0f;
-            }
+
 
             if (approachDelta.LengthSquared() <=
                 approachTolerance *
@@ -1719,81 +1709,6 @@ public sealed class CargoTransportSystem : ISimulationSystem
         return delta.LengthSquared() <=
             LogicalTransitNodeApproachRadiusMeters *
             LogicalTransitNodeApproachRadiusMeters;
-    }
-
-    private static bool IsWithinStaticNodeApproachRange(
-        EntityRegistry entities,
-        in LogisticsNode node,
-        Vector3 position,
-        in GroundMovement movement)
-    {
-        float tolerance =
-            movement.ObstacleLookAhead +
-            movement.Radius +
-            0.25f;
-
-        if (entities.IsAlive(node.Entity) &&
-            entities.TryGetComponent(
-                node.Entity,
-                out ResourceExtractor extractor) &&
-            entities.IsAlive(extractor.Deposit) &&
-            entities.TryGetComponent(
-                extractor.Deposit,
-                out ResourceDeposit deposit) &&
-            IsWithinBoundsApproachRange(
-                deposit.Bounds,
-                position,
-                tolerance))
-        {
-            return true;
-        }
-
-        if (!entities.IsAlive(node.Entity) ||
-            !entities.TryGetComponent(
-                node.Entity,
-                out WorldTransform nodeTransform) ||
-            !entities.TryGetComponent(
-                node.Entity,
-                out SpatialPresence presence) ||
-            presence.Metadata.Mobility !=
-            ForgeLine.World.SpatialMobility.Static)
-        {
-            return false;
-        }
-
-        var bounds =
-            presence.CreateEntry(
-                node.Entity,
-                nodeTransform).Bounds;
-
-        return IsWithinBoundsApproachRange(
-            bounds,
-            position,
-            tolerance);
-    }
-
-    private static bool IsWithinBoundsApproachRange(
-        in ForgeLine.World.AxisAlignedBounds bounds,
-        Vector3 position,
-        float tolerance)
-    {
-        float deltaX =
-            position.X < bounds.Minimum.X
-                ? bounds.Minimum.X - position.X
-                : position.X > bounds.Maximum.X
-                    ? position.X - bounds.Maximum.X
-                    : 0.0f;
-        float deltaZ =
-            position.Z < bounds.Minimum.Z
-                ? bounds.Minimum.Z - position.Z
-                : position.Z > bounds.Maximum.Z
-                    ? position.Z - bounds.Maximum.Z
-                    : 0.0f;
-
-        return
-            deltaX * deltaX +
-            deltaZ * deltaZ <=
-            tolerance * tolerance;
     }
 
     private bool TryResolveSourceInventory(
@@ -1933,7 +1848,11 @@ public sealed class CargoTransportSystem : ISimulationSystem
         CargoTransportWaitReason reason,
         SimulationTick tick)
     {
-        SetState(
+        if (entities.TryGetComponent(entity, out VehicleDockVisit dock) &&
+            reason is CargoTransportWaitReason.OriginResourceUnavailable or CargoTransportWaitReason.DestinationCapacity or
+                CargoTransportWaitReason.OriginUnavailable or CargoTransportWaitReason.DestinationUnavailable)
+            VehicleDockingService.Put(entities, entity, dock with { ServiceStartedTick = 0, ServiceProgress = 0,
+                Reason = reason == CargoTransportWaitReason.DestinationCapacity ? VehicleDockBlockReason.TargetFull : VehicleDockBlockReason.SourceEmpty });        SetState(
             entities,
             entity,
             state with
@@ -1960,6 +1879,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        VehicleDockingService.Cancel(entities, entity);
         ClearNavigation(
             entities,
             entity);

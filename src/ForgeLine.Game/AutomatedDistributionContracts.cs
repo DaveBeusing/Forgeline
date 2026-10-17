@@ -8,7 +8,7 @@ namespace ForgeLine.Game;
 internal interface ICargoTransportReservationObserver
 {
     void OnCargoReservationConsumed(
-        LogisticsTransportRequestId requestId);
+        LogisticsTransportRequestId requestId, double quantity);
 }
 
 public enum LogisticsHubState : byte

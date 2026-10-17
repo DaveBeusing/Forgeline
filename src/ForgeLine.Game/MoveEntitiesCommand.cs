@@ -96,6 +96,7 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
                 continue;
             }
 
+            VehicleDockingService.Cancel(context.Entities, entity);
             accepted++;
 
             if (!_preserveCombatIntent)
@@ -312,6 +313,7 @@ public sealed class StopMovementCommand : ISimulationCommand
             TacticalCommandUtilities.ClearMovementIntent(
                 context,
                 entity);
+            VehicleDockingService.Cancel(context.Entities, entity);
             accepted++;
         }
 
