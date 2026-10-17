@@ -9,6 +9,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
     private readonly IGraphicsDevice _graphics;
     private readonly RuntimeAssetCatalog _catalog;
     private readonly TextureDetailQuality _textureDetail;
+    private readonly Dictionary<AssetId, RuntimeAnimationData> _clips = [];
     private readonly Dictionary<AssetId, RuntimeMeshBuffers> _meshes = [];
     private readonly Dictionary<AssetId, RuntimeMaterialResources> _materials = [];
     private readonly Dictionary<AssetId, RuntimeTextureResource> _textures = [];
@@ -19,6 +20,9 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
     private readonly IGraphicsTexture _missingBaseColor;
     private long _materialBindingFailures;
     private long _residentMeshBytes;
+    private long _residentClipBytes;
+    internal const int MaximumLoadedClips = 128;
+    internal const long MaximumClipCacheBytes = 16 * 1024 * 1024;
     private bool _disposed;
 
     public RuntimeWorldAssetResources(
@@ -110,7 +114,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             return new RuntimeMaterialDiagnostics(
                 _materials.Count,
                 _textures.Count,
-                _materialBindingFailures) { LoadedMeshCount = _meshes.Count, ResidentMeshBytes = _residentMeshBytes };
+                _materialBindingFailures) { LoadedMeshCount = _meshes.Count, ResidentMeshBytes = _residentMeshBytes, LoadedAnimationCount = _clips.Count, ResidentAnimationBytes = _residentClipBytes };
         }
     }
 
@@ -334,6 +338,8 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         _whiteBaseColor.Dispose();
 
         _meshes.Clear();
+        _clips.Clear();
+        _residentClipBytes = 0;
         _materials.Clear();
         _textures.Clear();
         _disposed = true;
@@ -574,6 +580,30 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             AssetSocket socket = record.Sockets.FirstOrDefault(item => item.Name == part.Socket);
             return new MechanicalPartBinding(part, new Vector3(socket.X, socket.Y, socket.Z));
         }).ToArray();
+        RuntimeAnimationData? clip = null;
+        if (record.AnimationReferences.Count > 1) throw new InvalidDataException("Mesh supports one rigid clip.");
+        foreach (string clipId in record.AnimationReferences)
+        {
+            var id = AssetId.Parse(clipId);
+            if (!record.Dependencies.Contains(clipId, StringComparer.Ordinal) || _catalog.Get(id).Type != RuntimeAssetType.Animation)
+                throw new InvalidDataException("Mesh clip must resolve to an explicit animation dependency.");
+            if (!_clips.TryGetValue(id, out clip))
+            {
+                byte[] clipPayload = _catalog.Read(id).Payload;
+                if (_clips.Count >= MaximumLoadedClips || _residentClipBytes + clipPayload.Length > MaximumClipCacheBytes)
+                    throw new InvalidDataException("Rigid clip session cache exceeds 128 assets or 16MiB.");
+                clip = RuntimeAnimationData.FromPayload(clipPayload);
+                _clips.Add(id, clip);
+                _residentClipBytes += clipPayload.Length;
+            }
+            int[] map = RigidAnimationBinding.Validate(clip, record.MechanicalParts, record.Sockets, data);
+            for (int i = 0; i < parts.Length; i++)
+                parts[i] = parts[i] with
+                {
+                    ClipTranslation = clip.Channels.FirstOrDefault(c => c.Node == map[i] && c.Path == AnimationPath.Translation),
+                    ClipRotation = clip.Channels.FirstOrDefault(c => c.Node == map[i] && c.Path == AnimationPath.Rotation)
+                };
+        }
         MechanicalGeometryBatching.Assign(data, parts);
         RuntimeMeshVertex[] vertices =
             data.Vertices.ToArray();
@@ -646,7 +676,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
                 materialId,
                 hasMaterial,
                 usesDevelopmentFallback,
-                data.Sections.Count) { MechanicalParts = parts };
+                data.Sections.Count) { MechanicalParts = parts, Clip = clip };
         }
         catch
         {
@@ -671,6 +701,8 @@ public readonly record struct RuntimeMaterialDiagnostics(
 {
     public int LoadedMeshCount { get; init; }
     public long ResidentMeshBytes { get; init; }
+    public int LoadedAnimationCount { get; init; }
+    public long ResidentAnimationBytes { get; init; }
 }
 
 internal readonly record struct RuntimeMaterialResources(
@@ -705,6 +737,7 @@ internal readonly record struct RuntimeMeshBuffers(
     int SectionCount) : IDisposable
 {
     public int FirstIndex { get; init; }
+    public RuntimeAnimationData? Clip { get; init; }
     public MechanicalPartBinding[]? MechanicalParts { get; init; }
 
     public bool IsValid =>

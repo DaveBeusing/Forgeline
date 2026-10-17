@@ -23,9 +23,12 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
     public const int FixedTick = 32;
     public const int FixtureVersion = 3;
 
-    public static VisualReferenceScene Create(VisualReferenceSceneKind kind, TerrainWorld terrain, bool includeHiddenEnemy = true, RuntimeAssetCatalog? runtimeAssets = null)
+    public static VisualReferenceScene Create(VisualReferenceSceneKind kind, TerrainWorld terrain, bool includeHiddenEnemy = true, RuntimeAssetCatalog? runtimeAssets = null, double? mechanicalSeconds = null)
     {
         if (!Enum.IsDefined(kind)) throw new ArgumentOutOfRangeException(nameof(kind));
+        if (mechanicalSeconds is double seconds && (!double.IsFinite(seconds) || seconds is < 0 or > RuntimeAnimationData.MaximumDuration ||
+            kind is not (VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation)))
+            throw new ArgumentOutOfRangeException(nameof(mechanicalSeconds));
         ArgumentNullException.ThrowIfNull(terrain);
         if (kind is VisualReferenceSceneKind.EffectsBarrage or VisualReferenceSceneKind.IndustrialEffects)
             return EffectReferenceScene.Create(kind, terrain, includeHiddenEnemy, runtimeAssets);
@@ -401,7 +404,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 bool formation = kind == VisualReferenceSceneKind.MainBattleTankFormation;
                 visible[i] = item with
                 {
-                    MechanicalPose = new(true, formation || review == 2 ? 1.7 : 0, 2, 1.6,
+                    MechanicalPose = new(true, formation || review == 2 ? 1.7 : 0, mechanicalSeconds ?? 2, 1.6,
                         review == 3 && !formation ? 1.55 : -1, review is 1 or 3 && !formation ? .2f : 0, 0),
                     UnitFeature = item.UnitFeature with { AimYawRadians = !formation && review is 1 or 3 ? .6f : 0 }
                 };

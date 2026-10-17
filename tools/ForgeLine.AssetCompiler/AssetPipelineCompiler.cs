@@ -85,7 +85,7 @@ public static class AssetPipelineCompiler
             try
             {
                 var sourceHash = reporter.Measure("source-hash", () => AssetHashing.ComputeAssetSourceHash(
-                    node.DefinitionPath, node.SourcePath, normalizedSourceRoot),
+                    node.DefinitionPath, node.SourcePath, normalizedSourceRoot, node.Definition.Type == RuntimeAssetType.Animation ? 8 * 1024 * 1024 : long.MaxValue),
                     node.Id.Value, node.SourcePath, $"sourceBytes={new FileInfo(node.SourcePath).Length}");
 
                 var dependencyBuildHashes = node.Dependencies

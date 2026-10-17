@@ -923,6 +923,7 @@ internal static class GltfImporter
             offset += (int)chunkLength;
         }
 
+        if (offset != bytes.Length) throw new InvalidDataException("GLB contains a truncated trailing chunk header.");
         if (jsonChunk is null)
         {
             throw new InvalidDataException("GLB does not contain a JSON chunk.");
@@ -1060,7 +1061,7 @@ internal static class GltfImporter
             ? strideProperty.GetInt32()
             : elementSize;
 
-        if (stride < elementSize)
+        if (stride < elementSize || stride > 252 || stride % 4 != 0 || viewOffset % 4 != 0 || accessorOffset % 4 != 0)
         {
             throw new InvalidDataException($"glTF buffer view {viewIndex} byteStride is smaller than the accessor element.");
         }

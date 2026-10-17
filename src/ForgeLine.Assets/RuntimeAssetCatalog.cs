@@ -72,6 +72,15 @@ public sealed class RuntimeAssetCatalog
             _ = ResolveRuntimePath(normalizedRoot, record.RuntimePath);
         }
 
+        foreach (RuntimeAssetRecord record in manifest.Assets)
+        {
+            if (record.AnimationReferences.Count > 1 || record.AnimationReferences.Count > 0 && record.Type != RuntimeAssetType.Mesh)
+                throw new InvalidDataException("Only meshes may reference one rigid clip.");
+            foreach (string reference in record.AnimationReferences)
+                if (!record.Dependencies.Contains(reference, StringComparer.Ordinal) ||
+                    !records.TryGetValue(AssetId.Parse(reference), out var clip) || clip.Type != RuntimeAssetType.Animation)
+                    throw new InvalidDataException($"Mesh '{record.Id}' has an invalid typed clip dependency '{reference}'.");
+        }
         return new RuntimeAssetCatalog(normalizedRoot, manifest, records);
     }
 

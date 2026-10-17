@@ -26,6 +26,8 @@ public static class RigidAnimationBinding
         }
         Vector3 min = new(float.PositiveInfinity), max = new(float.NegativeInfinity);
         foreach (var v in mesh.Vertices) { min = Vector3.Min(min, new(v.X, v.Y, v.Z)); max = Vector3.Max(max, new(v.X, v.Y, v.Z)); }
+        if (Vector3.Min(min, new(-.50001f)) != new Vector3(-.50001f) || Vector3.Max(max, new(.50001f)) != new Vector3(.50001f))
+            throw new InvalidDataException("Clip meshes must fit the renderer's canonical unit-box culling envelope.");
         for (int i = 0; i < parts.Count; i++)
         {
             Vector3 lo = new(float.PositiveInfinity), hi = new(float.NegativeInfinity);
