@@ -15,7 +15,7 @@ public sealed class BlenderMechanicalQualificationTests
     public void BlenderPoseMatricesMatchRuntimeRigidCompositionIncludingEditedBindings()
     {
         string root=Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_MOTION_ROOT")!);
-        int compared=0;
+        int compared=0;float maximumMatrixError=0;
         foreach(string variant in new[]{"first","second","reopened","edited"})
         {
             var catalog=RuntimeAssetCatalog.Load(Path.Combine(root,variant,"runtime"));
@@ -54,16 +54,45 @@ public sealed class BlenderMechanicalQualificationTests
                 {
                     float[] expected=row.GetProperty("matrices")[i].EnumerateArray().Select(x=>x.GetSingle()).ToArray();
                     float[] actual=Values(matrices[i]);
+                    for(int j=0;j<16;j++)maximumMatrixError=MathF.Max(maximumMatrixError,MathF.Abs(actual[j]-expected[j]));
                     for(int j=0;j<16;j++)Assert.True(MathF.Abs(actual[j]-expected[j])<=.00002f,$"{variant}/{id}/{sample.GetProperty("name").GetString()}/{parts[i].Part.Name}/{j}: {actual[j]} != {expected[j]}");
                     compared++;
                 }
             }
         }
         Assert.Equal(616,compared);
+        File.WriteAllBytes(Path.Combine(root,"pose-comparison.json"),JsonSerializer.SerializeToUtf8Bytes(new {comparedMatrices=compared,maximumMatrixError,variants=4}));
         var edited=RuntimeAssetCatalog.Load(Path.Combine(root,"edited/runtime"));
         var tank=edited.Get(AssetId.Parse("unit.directorate.main_battle_tank"));
         Assert.Equal(-1.75f,tank.MechanicalParts.First(x=>x.Motion==MechanicalMotionKind.Wheel).Rate);
         Assert.Equal(.3f,edited.Get(AssetId.Parse("building.directorate.vehicle_factory")).MechanicalParts.Single(x=>x.Motion==MechanicalMotionKind.Door).Travel);
+    }
+    [Fact(Skip="Set FORGELINE_BLENDER_MOTION_ROOT after native rigid authoring.",SkipUnless=nameof(Enabled))]
+    public void EditedPivotsPreserveStaticGeometryAndCanonicalRangeSharing()
+    {
+        string root=Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_MOTION_ROOT")!);
+        var baseline=RuntimeAssetCatalog.Load(Path.Combine(root,"baseline-runtime"));
+        var edited=RuntimeAssetCatalog.Load(Path.Combine(root,"edited/runtime"));
+        foreach(var before in baseline.Manifest.Assets.Where(x=>x.Type==RuntimeAssetType.Mesh))
+        {
+            var id=AssetId.Parse(before.Id);var after=edited.Get(id);
+            var a=RuntimeMeshData.FromPayload(baseline.Read(id).Payload);var b=RuntimeMeshData.FromPayload(edited.Read(id).Payload);
+            Assert.Equal(a.Indices,b.Indices);Assert.Equal(a.Sections,b.Sections);Assert.Equal(a.MaterialIds,b.MaterialIds);
+            Assert.Equal(a.Vertices.Count,b.Vertices.Count);
+            for(int i=0;i<a.Vertices.Count;i++)
+            {
+                var x=a.Vertices[i];var y=b.Vertices[i];
+                Assert.InRange(Vector3.Distance(new(x.X,x.Y,x.Z),new(y.X,y.Y,y.Z)),0,.00001f);
+            }
+            MechanicalPartBinding[] Bindings(RuntimeAssetRecord record)=>record.MechanicalParts.Select(part=>
+            {
+                var socket=record.Sockets.FirstOrDefault(x=>x.Name==part.Socket);
+                return new MechanicalPartBinding(part,new(socket.X,socket.Y,socket.Z));
+            }).ToArray();
+            var oldParts=Bindings(before);var newParts=Bindings(after);
+            MechanicalGeometryBatching.Assign(a,oldParts);MechanicalGeometryBatching.Assign(b,newParts);
+            Assert.Equal(oldParts.Select(x=>x.GeometryPartIndex),newParts.Select(x=>x.GeometryPartIndex));
+        }
     }
     private static float Number(JsonElement element,string key,float fallback=0)=>element.TryGetProperty(key,out var value)?value.GetSingle():fallback;
     private static Vector3 Vector(JsonElement value)=>new(value[0].GetSingle(),value[1].GetSingle(),value[2].GetSingle());

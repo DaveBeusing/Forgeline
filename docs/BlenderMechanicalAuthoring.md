@@ -102,7 +102,9 @@ The rigid contract limits remain those validated by the actual compiler and load
 The presentation change freezes an already open door during power loss, damage,
 destruction, construction or production pause. Powered Idle/NoInput/OutputFull
 allows its existing bounded return toward closed. Resuming production continues
-from the retained pose. The active clock already follows production/power state;
+from the retained pose. Existing unpowered/damage/wreck mesh variants retain their
+static geometry; retained progress controls the resumed live mesh, not an articulated
+replacement of those variants. The active clock already follows production/power state;
 wheel travel, aim and recoil keep their existing completed-tick inputs. No game
 logic, collision, hit, production, economy, save or authoritative state is modified.
 
