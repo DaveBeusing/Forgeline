@@ -235,3 +235,7 @@ an editable project with named pivots and sockets. Isolated GLB exports pass the
 same asset compiler and compare against the original runtime geometry/metadata.
 This does not replace the parametric source owner or change gameplay dimensions,
 material identities, rigid animation ownership or production asset paths.
+
+## Bounded Blender surface review
+
+The [surface and LOD workflow](BlenderSurfaceProduction.md) inspects this kit and its state/LOD dependencies with packed PBR inputs, calibrated modifier candidates and measured limits. Default output preserves the current three LODs and leaves collision/state sources unchanged. The kit generator remains authoritative; successful source clones are not automatically installed.

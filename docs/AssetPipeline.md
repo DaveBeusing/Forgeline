@@ -719,3 +719,7 @@ storage to avoid a second sRGB decode; BC7 with mipmaps is supported. Normal/ORM
 and BaseColor contracts stay unchanged. The enum addition uses the existing texture payload
 layout and manifest integrity contract. The Directorate menu image is an ordinary compiled
 asset with source provenance; it is loaded only after the interactive menu has presented.
+
+## Blender surface and LOD preparation
+
+[Bounded surface production](BlenderSurfaceProduction.md) extends the validated Blender importer with explicit per-asset geometry and texture budgets, modifier drafts, PBR inspection and source clones. Existing generators and compiler ownership remain authoritative; no player or publish dependency is added.

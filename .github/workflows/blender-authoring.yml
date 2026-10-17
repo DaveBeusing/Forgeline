@@ -37,6 +37,9 @@ jobs:
       - name: Qualify production source round trips
         shell: pwsh
         run: ./tools/blender/Test-BlenderRoundTrip.ps1 -OutputRoot artifacts/blender-roundtrip-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Qualify bounded surface and LOD production
+        shell: pwsh
+        run: ./tools/blender/Test-BlenderProduction.ps1 -OutputRoot artifacts/blender-surfaces-ci-${{ github.run_id }}-${{ github.run_attempt }} -RenderPreviews
       - name: Retain authoring evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -45,4 +48,5 @@ jobs:
           path: |
             artifacts/blender-ci-*
             artifacts/blender-roundtrip-ci-*
+            artifacts/blender-surfaces-ci-*
           retention-days: 14

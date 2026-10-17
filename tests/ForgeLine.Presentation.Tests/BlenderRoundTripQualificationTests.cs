@@ -11,14 +11,26 @@ public sealed class BlenderRoundTripQualificationTests
     private static readonly JsonSerializerOptions ReportOptions = new() { WriteIndented = true };
     public static bool Enabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_ROUNDTRIP_ROOT"));
 
+    public static bool ProductionEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_PRODUCTION_ROOT"));
+
     [Fact(Skip = "Set FORGELINE_BLENDER_ROUNDTRIP_ROOT after native Blender fixture exports.", SkipUnless = nameof(Enabled))]
     public void ExportedProductionMeshesPreserveRuntimeContractsAndMechanicalBatching()
     {
-        string root = Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_ROUNDTRIP_ROOT")!);
+        CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_ROUNDTRIP_ROOT")!), ["first", "second", "reopened"], false);
+    }
+
+    [Fact(Skip = "Set FORGELINE_BLENDER_PRODUCTION_ROOT after native surface qualification.", SkipUnless = nameof(ProductionEnabled))]
+    public void DefaultSurfacePreparationPreservesCompiledGeometryAndBatching()
+    {
+        CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_PRODUCTION_ROOT")!), ["first", "second"], true);
+    }
+
+    private static void CompareExports(string root, string[] variants, bool prepared)
+    {
         var baseline = RuntimeAssetCatalog.Load(Path.Combine(root, "baseline-runtime"));
         Assert.Equal(29, baseline.Manifest.Assets.Count);
         var reports = new List<object>();
-        foreach (string name in new[] { "first", "second", "reopened" })
+        foreach (string name in variants)
         {
             var exported = RuntimeAssetCatalog.Load(Path.Combine(root, name, "runtime"));
             Assert.Equal(baseline.Manifest.Assets.Select(x => x.Id).Order(), exported.Manifest.Assets.Select(x => x.Id).Order());
@@ -42,7 +54,14 @@ public sealed class BlenderRoundTripQualificationTests
                     Assert.Equal(before.RuntimeHash, after.RuntimeHash);
                     continue;
                 }
-                Assert.Contains("_roundtrip/", after.SourcePath.Replace('\\', '/'));
+                if (prepared)
+                {
+                    if (after.SourcePath.Contains("_prepared/", StringComparison.Ordinal))
+                        Assert.Contains(before.Id, after.SourcePath, StringComparison.Ordinal);
+                    else
+                        Assert.Equal(before.SourcePath, after.SourcePath);
+                }
+                else Assert.Contains("_roundtrip/", after.SourcePath.Replace('\\', '/'));
                 var a = RuntimeMeshData.FromPayload(baseline.Read(id).Payload);
                 var b = RuntimeMeshData.FromPayload(exported.Read(id).Payload);
                 Assert.Equal(a.Attributes, b.Attributes);
