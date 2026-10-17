@@ -31,7 +31,10 @@ Every snapshot is scoped to a specified session, player and completed tick.
 `WorldAudioSnapshot.Resolve` rejects mismatched root/experience/audio identities,
 future or inconsistent ticks and older packets. The writer rejects rollback and
 retired lower session identities; changing viewer in a session requires a new
-writer. A repeated tick returns the same payload and cannot authorize new cues.
+writer. A coherent repeated tick returns the same payload and cannot authorize new cues.
+Rollback discards the abandoned history without lowering the tick watermark;
+catch-up re-establishes a silent baseline. A contradictory outcome on a repeated
+tick cannot borrow the older active/winning payload.
 
 ## Events, loops and bounded state
 

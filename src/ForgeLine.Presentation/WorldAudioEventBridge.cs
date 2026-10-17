@@ -39,7 +39,14 @@ internal sealed class WorldAudioEventBridge(Func<long>? clock = null)
     {
         _accepting = _repeat = false;
         if (!session.IsSpecified || !player.IsSpecified || duration < TimeSpan.Zero ||
-            _hasTick && (session.Value < _session.Value || session == _session && (player != _player || tick < _tick))) return false;
+            _hasTick && (session.Value < _session.Value || session == _session && player != _player)) return false;
+        if (_hasTick && session == _session && tick < _tick)
+        {
+            // Keep the high-water tick, but discard history from the abandoned timeline.
+            _baseline = false; _cached = null; _eventCount = _loopCount = 0;
+            Array.Clear(_history);
+            return false;
+        }
         if (_hasTick && session == _session && tick == _tick) { _repeat = true; return false; }
         if (session != _session)
         {
@@ -146,7 +153,8 @@ internal sealed class WorldAudioEventBridge(Func<long>? clock = null)
 
     internal WorldAudioSnapshot? Complete(PlayerExperienceSnapshot? experience, IWorldAudioVisibility? visibility = null)
     {
-        if (_repeat) return _cached;
+        if (_repeat) return experience is { } repeated && repeated.Player == _player && repeated.Tick == _tick &&
+            repeated.MatchStatus == _previousExperience.MatchStatus ? _cached : null;
         if (!_accepting) return null;
         _accepting = false;
         if (experience is not { } current || current.Player != _player || current.Tick != _tick || current.MatchStatus != PlayerMatchStatus.Active && !current.IsMatchComplete || _completed && !current.IsMatchComplete)

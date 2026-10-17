@@ -336,6 +336,29 @@ public sealed class WorldAudioEventBridgeTests
         Assert.Contains(End(b, 3).Events.ToArray(), x => x.Cue == Cue.LogisticsCargoUnload);
     }
 
+    [Fact]
+    public void CatchingUpAfterRejectedRollbackCannotReviveTheAbandonedTimeline()
+    {
+        var b = Warm(); Begin(b, 2); b.ObserveEntity(Truck()); End(b, 2);
+        Begin(b, 3); b.ObserveEntity(Truck() with { Position = Vector3.One });
+        Assert.Contains(End(b, 3).Events.ToArray(), x => x.Cue == Cue.VehiclesEngineStart);
+        Assert.False(b.Begin(new(1), new(1), new(2), TimeSpan.FromMilliseconds(50))); Assert.Null(b.Complete(Experience(2)));
+        Assert.False(b.Begin(new(1), new(1), new(3), TimeSpan.FromMilliseconds(50))); Assert.Null(b.Complete(Experience(3)));
+        Begin(b, 4); b.ObserveEntity(Truck() with { Position = new(100, 0, 0), Moving = true });
+        var recovered = End(b, 4);
+        Assert.Empty(recovered.Events.ToArray());
+        Assert.Contains(recovered.Loops.ToArray(), x => x.Cue == Cue.VehiclesTruckMoveLoop);
+    }
+
+    [Fact]
+    public void RepeatedTickWithConflictingOutcomeCannotBorrowAnActiveOrWinningPayload()
+    {
+        var b = Warm(); Begin(b, 2); var active = End(b, 2);
+        Assert.False(b.Begin(new(1), new(1), new(2), TimeSpan.FromMilliseconds(50)));
+        Assert.Null(b.Complete(Experience(2) with { MatchStatus = PlayerMatchStatus.Victory }));
+        Assert.Same(active, b.Complete(Experience(2)));
+    }
+
     private sealed class Visibility(bool visible) : IWorldAudioVisibility
     { public bool Allows(EntityId entity, Vector3 position) => visible; }
 }
