@@ -141,3 +141,6 @@ Normal CI runs the standard-library contracts without Blender. The existing manu
 Blender workflow now runs native production round-trip qualification on its
 provisioned authoring runner. Local results do not imply that workflow has run.
 Exact local/CI results and remaining limits belong to the qualification report.
+
+Recorded native, compiled, visual and package results, including the open asset
+regression gate, are in [round-trip qualification](BlenderAssetRoundTripQualification.md).

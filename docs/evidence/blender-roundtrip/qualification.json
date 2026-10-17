@@ -1,0 +1,1754 @@
+{
+  "schemaVersion": 1,
+  "qualifiedUtc": "2026-10-17T17:47:09.379050+00:00",
+  "qualifiedRevision": "945a0d57b7666d2026d9b22e3a1a4f8f815cf52d",
+  "baseRevision": "74e5e48f69c74a339354722afb9be091cf6e307c",
+  "version": "0.1.394",
+  "pr": 228,
+  "environment": {
+    "unitTestPython": "3.12.14",
+    "sdk": "10.0.401",
+    "runtime": ".NET 10.0.12",
+    "os": "Microsoft Windows 10.0.26300",
+    "architecture": "X64",
+    "blender": {
+      "executable": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+      "executableSha256": "f141a3c5754500e6f84361099a4cd53f0bb7662b6a0d2cfaaa8fbb63e92234a0",
+      "capabilities": {
+        "background": true,
+        "bpy": true,
+        "buildHash": "d13f752e3b9c",
+        "machine": "AMD64",
+        "pointerBits": 64,
+        "pythonVersion": "3.13.13",
+        "schemaVersion": 1,
+        "system": "Windows",
+        "version": "5.2.2",
+        "versionCycle": "release"
+      }
+    }
+  },
+  "build": {
+    "warnings": 0,
+    "errors": 0
+  },
+  "standardLibraryContracts": {
+    "passed": 29,
+    "failed": 0
+  },
+  "launcherProtocolContracts": {
+    "passed": 25,
+    "fixtureOnly": true
+  },
+  "nativeQualification": {
+    "assetCount": 29,
+    "meshes": 19,
+    "overlayAvailable": true,
+    "compiledRendererContracts": true,
+    "success": true,
+    "reopenedBlendValidated": true,
+    "repeatedSourceAndRuntimeBytes": true,
+    "fixtures": 2,
+    "sourceLessIntegrity": true
+  },
+  "nativeNegativeCases": {
+    "cases": [
+      {
+        "error": "Scene metre unit scale changed",
+        "name": "wrong scene units",
+        "rejected": true
+      },
+      {
+        "error": "Asset origin/axis transform changed",
+        "name": "wrong root axes",
+        "rejected": true
+      },
+      {
+        "error": "Missing socket: building.directorate.command_core/communications",
+        "name": "missing socket",
+        "rejected": true
+      },
+      {
+        "error": "Socket world transform changed",
+        "name": "moved socket",
+        "rejected": true
+      },
+      {
+        "error": "Socket world transform changed",
+        "name": "rotated socket",
+        "rejected": true
+      },
+      {
+        "error": "Part origin/pivot changed",
+        "name": "changed mechanical pivot",
+        "rejected": true
+      },
+      {
+        "error": "Missing root: building.directorate.command_core.damaged/None",
+        "name": "missing state root",
+        "rejected": true
+      },
+      {
+        "error": "Blender split-normal preview changed",
+        "name": "changed geometry",
+        "rejected": true
+      },
+      {
+        "error": "UV channels changed",
+        "name": "removed UV channel",
+        "rejected": true
+      },
+      {
+        "error": "Logical object name changed",
+        "name": "changed logical name",
+        "rejected": true
+      },
+      {
+        "error": "Animation, constraints, modifiers and instances are unsupported",
+        "name": "unsupported modifier",
+        "rejected": true
+      },
+      {
+        "error": "Unsupported material node graph",
+        "name": "changed material nodes",
+        "rejected": true
+      },
+      {
+        "error": "Authored normal channels removed",
+        "name": "removed authored normal",
+        "rejected": true
+      },
+      {
+        "error": "Shared vertex split changes source identity: building.directorate.command_core/NORMAL/0",
+        "name": "changed authored normal",
+        "rejected": true
+      },
+      {
+        "error": "Blender split-normal preview changed",
+        "name": "changed split-normal preview",
+        "rejected": true
+      },
+      {
+        "error": "Mesh parent/type/morph/edit mode changed",
+        "name": "uncommitted edit mode",
+        "rejected": true
+      },
+      {
+        "error": "Material slot order/identity changed",
+        "name": "reordered material slots",
+        "rejected": true
+      },
+      {
+        "error": "Primitive material assignment changed",
+        "name": "wrong primitive material",
+        "rejected": true
+      },
+      {
+        "error": "TANGENT deviation 2.0 exceeds 1e-05; check axes/scale/geometry",
+        "name": "changed tangent handedness",
+        "rejected": true
+      }
+    ],
+    "nativeBlender": true,
+    "success": true,
+    "syntheticTwoSlotTangentPositive": true
+  },
+  "compiledComparison": [
+    {
+      "variant": "first",
+      "meshes": 19,
+      "triangles": 16400,
+      "parts": 11,
+      "maximumPositionError": 3.7252903e-09,
+      "maximumTangentError": 6.017074e-06,
+      "mechanicalBatchIdentityPreserved": true
+    },
+    {
+      "variant": "second",
+      "meshes": 19,
+      "triangles": 16400,
+      "parts": 11,
+      "maximumPositionError": 3.7252903e-09,
+      "maximumTangentError": 6.017074e-06,
+      "mechanicalBatchIdentityPreserved": true
+    },
+    {
+      "variant": "reopened",
+      "meshes": 19,
+      "triangles": 16400,
+      "parts": 11,
+      "maximumPositionError": 3.7252903e-09,
+      "maximumTangentError": 6.017074e-06,
+      "mechanicalBatchIdentityPreserved": true
+    }
+  ],
+  "sourceSignature": "9134094ce220c8c5e9dc2303f121bcf35d9309e759d729066290f6a35138efa1",
+  "sourceHashes": {
+    "buildings/directorate/command_core.asset.json": "b2afaa547a45e0f1423f2ac7bdfce011695822e405d32725f6bfe624bef3f95f",
+    "buildings/directorate/command_core_critical.asset.json": "c496fe2629489795e3e9b496146d90ccc393c3c8ab874344bc1b2c037c3b17b8",
+    "buildings/directorate/command_core_damaged.asset.json": "c560de5a20fd61ff267672c0ff7674ad56158e4907712153965168e5f116e8ca",
+    "buildings/directorate/command_core_destroyed.asset.json": "25b5473bae02e6d9c016de9bacedb0a636b17acb39e4d6ad94e37c922a39126f",
+    "buildings/directorate/command_core_foundation.asset.json": "ec34998a05074701feba88987aebe56487cbfe69fc7d0cdd4ee618d475497bff",
+    "buildings/directorate/command_core_lod1.asset.json": "e7f96d83c5930fa2732dfd8efd07a250cb333daf49662b67c6d6bb04294b8bac",
+    "buildings/directorate/command_core_lod2.asset.json": "bf9cd921990dd8162503121411e559ea7d0018664bb2cedb475f484d7096ffb7",
+    "buildings/directorate/command_core_partial_shell.asset.json": "7650fe2fe39207439c47563a3261a33bdf8a60f30caf28ed55a1aa82ca59a575",
+    "buildings/directorate/command_core_structural_frame.asset.json": "1660f957e4d9adaee13a79c9039311ac33b637825884f9fbff71bf53993f35f6",
+    "buildings/directorate/command_core_unpowered.asset.json": "4d048142b445fa4513fd2ae320f5688459c27f9ae9b5274a49463dccf3e8c152",
+    "buildings/directorate/materials/critical.asset.json": "8c1a6eb4672ce7f238674b5a76f5f8f64ac39528d9cd27b069bd8eb99ee41fa1",
+    "buildings/directorate/materials/critical.material.json": "6e8256d9cd4d811f22f1c0ba8fed303c2fd358e6c9d11af01bad92ace16050b7",
+    "buildings/directorate/materials/damaged.asset.json": "b5d1c0f60bef36661b4525cb7e8c52e5cb46260bfd1c02b9a56c18987f5b5e3e",
+    "buildings/directorate/materials/damaged.material.json": "a1c57cb49c08c1caf03c030e80e57894f254ef8d4e38469fe4a0199c2b2bc636",
+    "buildings/directorate/materials/destroyed.asset.json": "e89a774bce9c320f7a2548c01ecae150863d593f54a63ec936dc5972c9d48eb3",
+    "buildings/directorate/materials/destroyed.material.json": "0a2a981e9afa9ea4477b9fe541ad85b203370686bb36d2effa9ec47cf774ad67",
+    "buildings/directorate/materials/structural.asset.json": "3692dc0effd7a964b33d05610534729780cf4f4920b5230425495ced7ec543b8",
+    "buildings/directorate/materials/structural.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "buildings/directorate/materials/unpowered.asset.json": "f4847dd15d0d5bb22bcdb9eb4529875fe438ddb0ed76f4815ba91e6b18f87fa8",
+    "buildings/directorate/materials/unpowered.material.json": "8373a93e0dbdacae3829d65406c18fb45daa571d01afe73df9cf87652e4590e6",
+    "buildings/directorate/modules/collision_box.asset.json": "b5ac3e871a08eabff5bb20cddf65de2d928f0d7728b7cdd3cd5669205c4ee637",
+    "buildings/directorate/sources/command_core/command_core_assembled_lod0.gltf": "4429cc4175f3db18615e247603de9fd198a59acd85f451dbb17978731bc98fa4",
+    "buildings/directorate/sources/command_core/command_core_assembled_lod1.gltf": "01fa6e3de469240ac9825001ed47085c1556aa33360068df57bce81d1d0ed82f",
+    "buildings/directorate/sources/command_core/command_core_assembled_lod2.gltf": "6347d46a54a37084fe5895cef622fcdf13b5624a99142ff383fe8673371c4af9",
+    "buildings/directorate/sources/command_core/command_core_critical.gltf": "53a7d4eaa98585722d9b3c7bd243b07c85863c021fa4226478adaea62cc2d1b8",
+    "buildings/directorate/sources/command_core/command_core_damaged.gltf": "aa0fe4fbd3830dd1e3cbbcff4b3f179ec8696b730a22db62cd3110af89205f90",
+    "buildings/directorate/sources/command_core/command_core_destroyed.gltf": "5b018354f6fc4d35da7dc86c7b07a4cd2e6abdebf2aa6e4516f142c8571bb0b9",
+    "buildings/directorate/sources/command_core/command_core_foundation.gltf": "699d7e5bfa50f9209e766d171e4c5e89cbeea5bcf4ef8148410c5eef4f7a1bdf",
+    "buildings/directorate/sources/command_core/command_core_partial_shell.gltf": "bfcf222c652c6a6fcfbff12b573c9665c7c5142e3abd761da49a313ca540a6d3",
+    "buildings/directorate/sources/command_core/command_core_structural_frame.gltf": "3a8c398c995262c8a547d5237bee8b3731ecf62479b9c91b9f2a0ab3e1597eec",
+    "buildings/directorate/sources/command_core/command_core_unpowered.gltf": "5f39038775b4435a93214bf486447c2e8f4ed883073bb2f04c08789ebdd4e468",
+    "buildings/directorate/sources/module_collision_box.gltf": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+    "materials/directorate/surfaces/production_surface_base.png": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+    "materials/directorate/surfaces/production_surface_normal.png": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+    "materials/directorate/surfaces/production_surface_orm.png": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+    "materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9",
+    "materials/directorate/textures/status_emissive.asset.json": "464a32ad532fa18cfc149cc1f6f3e887c156025dca9cf8308485fcadac83b5d0",
+    "materials/directorate/textures/status_emissive.tga": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6",
+    "units/directorate/collision/main_battle_tank_collision.asset.json": "73e0a161c37ca64c8052cd526354d7c40f5ce26f5e53fd32b1c7cc7f48ca4bbb",
+    "units/directorate/materials/main_battle_tank.asset.json": "f3ffeb6c2076f8ceb6b22db3dc038fb76e4b6c216e599494ea34f69bc84f0851",
+    "units/directorate/materials/main_battle_tank.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "units/directorate/sources/collision_box.gltf": "994a38291cb333052e5101e8b693ab754225fe8c29d283cf3773abfbde912d30",
+    "units/directorate/sources/main_battle_tank/chassis_lod0.gltf": "886472bccaba9fe080758982cc3c6a95823b6aec85a2097b127cf703f6b7930c",
+    "units/directorate/sources/main_battle_tank/combined_lod1.gltf": "5d01ba99f49c81f5e51b6dc52ef2272c645d9b744fbf3d49da9b1534c6445a0e",
+    "units/directorate/sources/main_battle_tank/combined_lod2.gltf": "7e18dd834fb26385b4d59c66bcac548b33fcff467deebd32e3a1b5f9b5555ae3",
+    "units/directorate/sources/main_battle_tank/critical.gltf": "c573b62bafff66bf388f8145c15ce6de7e8a35ea5609145d29ab16e36ab779cd",
+    "units/directorate/sources/main_battle_tank/damaged.gltf": "80b6f562a3dd64263467a568127bfd10935d4934f999bd7d9b23892947279d77",
+    "units/directorate/sources/main_battle_tank/turret_lod0.gltf": "37e83c7813e1a8d0c02652436719dc30de0e69a66ae0d2409fc2a3bd5cacf885",
+    "units/directorate/sources/main_battle_tank/wreck.gltf": "05b3658284fa2b390c7cb7197be4493ec9a0dd5f581fd199a313ecb62b75ecb0",
+    "units/directorate/vehicles/main_battle_tank.asset.json": "c466effdd6d9c8d910355d2ad509b62655a0bcca85f491be43fb63df26f0b276",
+    "units/directorate/vehicles/main_battle_tank_critical.asset.json": "b46ce527122495db4ed71a9807fee73bdbc60b8bf7e14558c2d758471d8172c3",
+    "units/directorate/vehicles/main_battle_tank_damaged.asset.json": "3a9e1f83bc5932438eb1705cd1b7ff29f16904de78bbc32b40a566b7b436ba5d",
+    "units/directorate/vehicles/main_battle_tank_lod1.asset.json": "6180a9b2055a39130c73b1ebec34827a402a350ce8ed39e06215d940e1757d7b",
+    "units/directorate/vehicles/main_battle_tank_lod2.asset.json": "409d24de73f18767ec0a80c1f6c3853abbfc4a2d0fb7d1c0ddf67c757d4777d7",
+    "units/directorate/vehicles/main_battle_tank_turret.asset.json": "2660c297834083cde835442d7d54e8ea310c7e20dd87a7a47105f0aa7c4f2831",
+    "units/directorate/vehicles/main_battle_tank_wreck.asset.json": "4d084b68ffaddceb570db4471c29e097bfe07c5c0fbf437543cf3861c0439127"
+  },
+  "families": [
+    {
+      "assets": [
+        "unit.directorate.main_battle_tank",
+        "unit.directorate.main_battle_tank.collision",
+        "unit.directorate.main_battle_tank.critical",
+        "unit.directorate.main_battle_tank.damaged",
+        "unit.directorate.main_battle_tank.lod1",
+        "unit.directorate.main_battle_tank.lod2",
+        "unit.directorate.main_battle_tank.turret",
+        "unit.directorate.main_battle_tank.wreck"
+      ],
+      "instanceScale": [
+        4,
+        3,
+        7.2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37,
+      "root": "unit.directorate.main_battle_tank"
+    },
+    {
+      "assets": [
+        "building.directorate.command_core",
+        "building.directorate.command_core.critical",
+        "building.directorate.command_core.damaged",
+        "building.directorate.command_core.destroyed",
+        "building.directorate.command_core.foundation",
+        "building.directorate.command_core.lod1",
+        "building.directorate.command_core.lod2",
+        "building.directorate.command_core.partial_shell",
+        "building.directorate.command_core.structural_frame",
+        "building.directorate.command_core.unpowered"
+      ],
+      "instanceScale": [
+        20,
+        12,
+        20
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37,
+      "root": "building.directorate.command_core"
+    }
+  ],
+  "meshReports": [
+    {
+      "collisionReference": "building.directorate.module.collision_box",
+      "exportSha256": "aad253906aac105ca66c040c8f2326b4a08a2d4aa6af8d4c50e7e7df30f0687a",
+      "exportStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.5600000023841858,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 4244,
+        "vertices": 8936
+      },
+      "id": "building.directorate.command_core",
+      "lods": [
+        {
+          "assetId": "building.directorate.command_core.lod1",
+          "level": 1,
+          "maxDistance": 220
+        },
+        {
+          "assetId": "building.directorate.command_core.lod2",
+          "level": 2,
+          "maxDistance": 620
+        }
+      ],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [
+        {
+          "exported": [
+            0.0,
+            0.39500001072883606,
+            0.05999999865889549
+          ],
+          "instanceWorldErrorMetres": 1.2874603250168093e-07,
+          "localError": 1.0728836041806744e-08,
+          "name": "communications",
+          "source": [
+            0,
+            0.395,
+            0.06
+          ]
+        },
+        {
+          "exported": [
+            0.0,
+            -0.414000004529953,
+            0.25
+          ],
+          "instanceWorldErrorMetres": 5.435943606357796e-08,
+          "localError": 4.52995302380188e-09,
+          "name": "service_access",
+          "source": [
+            0,
+            -0.414,
+            0.25
+          ]
+        },
+        {
+          "exported": [
+            0.28999999165534973,
+            0.1899999976158142,
+            0.05000000074505806
+          ],
+          "instanceWorldErrorMetres": 1.2431893736675192e-07,
+          "localError": 8.344650248570673e-09,
+          "name": "roof_maintenance",
+          "source": [
+            0.29,
+            0.19,
+            0.05
+          ]
+        }
+      ],
+      "sourceSha256": "4429cc4175f3db18615e247603de9fd198a59acd85f451dbb17978731bc98fa4",
+      "sourceStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.5600000023841858,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 4244,
+        "vertices": 8936
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "7e23f68245213bf3e35329e4473bd4398325a702c2e306cd768fee4b91631690",
+      "exportStats": {
+        "boundsMax": [
+          0.40855950117111206,
+          0.3037242293357849,
+          0.41499999165534973
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.20999999344348907,
+          0.011806701309978962
+        ],
+        "primitives": 1,
+        "triangles": 180,
+        "vertices": 324
+      },
+      "id": "building.directorate.command_core.critical",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.critical"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "53a7d4eaa98585722d9b3c7bd243b07c85863c021fa4226478adaea62cc2d1b8",
+      "sourceStats": {
+        "boundsMax": [
+          0.40855950117111206,
+          0.3037242293357849,
+          0.41499999165534973
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.20999999344348907,
+          0.011806701309978962
+        ],
+        "primitives": 1,
+        "triangles": 180,
+        "vertices": 324
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "10ed4cc154dfd429a1c7ee3bb394b53b93b003651bac0598cfc24234c937d76b",
+      "exportStats": {
+        "boundsMax": [
+          0.3700000047683716,
+          0.2329999953508377,
+          0.3449999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.11999999731779099,
+          0.14000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 96
+      },
+      "id": "building.directorate.command_core.damaged",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.damaged"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "aa0fe4fbd3830dd1e3cbbcff4b3f179ec8696b730a22db62cd3110af89205f90",
+      "sourceStats": {
+        "boundsMax": [
+          0.3700000047683716,
+          0.2329999953508377,
+          0.3449999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.11999999731779099,
+          0.14000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 96
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "288b60e9eb58354e065639761a9a2d9d281d3a56a904427a433ae665f7ae6b8f",
+      "exportStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          -0.08500000089406967,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 204,
+        "vertices": 396
+      },
+      "id": "building.directorate.command_core.destroyed",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.destroyed"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "5b018354f6fc4d35da7dc86c7b07a4cd2e6abdebf2aa6e4516f142c8571bb0b9",
+      "sourceStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          -0.08500000089406967,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 204,
+        "vertices": 396
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "909de619022a20ae6b16a14b671afe638329909b2fc5d1ee08f8b9c9cbd2c9a4",
+      "exportStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          -0.25999999046325684,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      },
+      "id": "building.directorate.command_core.foundation",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "699d7e5bfa50f9209e766d171e4c5e89cbeea5bcf4ef8148410c5eef4f7a1bdf",
+      "sourceStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          -0.25999999046325684,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "b28d43d7c039fe33c8df33802b042d7b77a4b1578763b73b74074158c04c2087",
+      "exportStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.5600000023841858,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 952,
+        "vertices": 1880
+      },
+      "id": "building.directorate.command_core.lod1",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "01fa6e3de469240ac9825001ed47085c1556aa33360068df57bce81d1d0ed82f",
+      "sourceStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.5600000023841858,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 952,
+        "vertices": 1880
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "1fad23a26f33d9ba01cd365e5de2b012f8e4d285e151d76a46aaee5ca725d9dd",
+      "exportStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.5600000023841858,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 348,
+        "vertices": 708
+      },
+      "id": "building.directorate.command_core.lod2",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "6347d46a54a37084fe5895cef622fcdf13b5624a99142ff383fe8673371c4af9",
+      "sourceStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.5600000023841858,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 348,
+        "vertices": 708
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "87f1cbda2ff3f48f67131f32a27ec23a9700977a6504f157d3ccaec58351a0d1",
+      "exportStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.24500000476837158,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 288,
+        "vertices": 576
+      },
+      "id": "building.directorate.command_core.partial_shell",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "bfcf222c652c6a6fcfbff12b573c9665c7c5142e3abd761da49a313ca540a6d3",
+      "sourceStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.24500000476837158,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 288,
+        "vertices": 576
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "0192314625bf8d76b82f997ce5dc63f8c14f167444b8d306407b7b11d609605e",
+      "exportStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.24500000476837158,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 240,
+        "vertices": 480
+      },
+      "id": "building.directorate.command_core.structural_frame",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "3a8c398c995262c8a547d5237bee8b3731ecf62479b9c91b9f2a0ab3e1597eec",
+      "sourceStats": {
+        "boundsMax": [
+          0.5049999952316284,
+          0.24500000476837158,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.5049999952316284,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 240,
+        "vertices": 480
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "c2739ecda21ac0553c2c23baf5bcd083ade2ff8f89525d4dd6330cf0ca0586b7",
+      "exportStats": {
+        "boundsMax": [
+          0.41499999165534973,
+          0.5320000052452087,
+          0.2919999957084656
+        ],
+        "boundsMin": [
+          -0.41499999165534973,
+          -0.054999999701976776,
+          0.06300000101327896
+        ],
+        "primitives": 1,
+        "triangles": 36,
+        "vertices": 72
+      },
+      "id": "building.directorate.command_core.unpowered",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.unpowered"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "5f39038775b4435a93214bf486447c2e8f4ed883073bb2f04c08789ebdd4e468",
+      "sourceStats": {
+        "boundsMax": [
+          0.41499999165534973,
+          0.5320000052452087,
+          0.2919999957084656
+        ],
+        "boundsMin": [
+          -0.41499999165534973,
+          -0.054999999701976776,
+          0.06300000101327896
+        ],
+        "primitives": 1,
+        "triangles": 36,
+        "vertices": 72
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "c010fe716a820acd09deef0cf2365d292a2e79dcf1b69b46582f7b5c7e034f0b",
+      "exportStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 8
+      },
+      "id": "building.directorate.module.collision_box",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+      "sourceStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 8
+      }
+    },
+    {
+      "collisionReference": "unit.directorate.main_battle_tank.collision",
+      "exportSha256": "be170d9bf800be5eedba7edd3e3f0c8780848ce554523107aa6092022135e0a3",
+      "exportStats": {
+        "boundsMax": [
+          0.49000000953674316,
+          0.10000000149011612,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "primitives": 1,
+        "triangles": 6272,
+        "vertices": 12080
+      },
+      "id": "unit.directorate.main_battle_tank",
+      "lods": [
+        {
+          "assetId": "unit.directorate.main_battle_tank.lod1",
+          "level": 1,
+          "maxDistance": 140
+        },
+        {
+          "assetId": "unit.directorate.main_battle_tank.lod2",
+          "level": 2,
+          "maxDistance": 380
+        }
+      ],
+      "materialReferences": [
+        "material.directorate.unit.main_battle_tank"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 3.725290298461914e-09,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [
+        "body",
+        "road_wheel_1_0",
+        "road_wheel_1_1",
+        "road_wheel_1_2",
+        "road_wheel_1_3",
+        "road_wheel_2_0",
+        "road_wheel_2_1",
+        "road_wheel_2_2",
+        "road_wheel_2_3"
+      ],
+      "sockets": [
+        {
+          "exported": [
+            0.0,
+            0.10000000149011612,
+            0.019999999552965164
+          ],
+          "instanceWorldErrorMetres": 4.470348535789981e-09,
+          "localError": 1.4901161138336505e-09,
+          "name": "turret_pivot",
+          "source": [
+            0,
+            0.1,
+            0.02
+          ]
+        },
+        {
+          "exported": [
+            0.0,
+            0.1599999964237213,
+            0.10000000149011612
+          ],
+          "instanceWorldErrorMetres": 1.0728836485895954e-08,
+          "localError": 3.5762786898541066e-09,
+          "name": "gun_pivot",
+          "source": [
+            0,
+            0.16,
+            0.1
+          ]
+        },
+        {
+          "exported": [
+            0.0,
+            0.1599999964237213,
+            0.6399999856948853
+          ],
+          "instanceWorldErrorMetres": 8.225692127439288e-08,
+          "localError": 1.4305114759416426e-08,
+          "name": "weapon_muzzle",
+          "source": [
+            0,
+            0.16,
+            0.64
+          ]
+        },
+        {
+          "exported": [
+            0.0,
+            0.1599999964237213,
+            0.1599999964237213
+          ],
+          "instanceWorldErrorMetres": 2.05642294304198e-08,
+          "localError": 3.5762786898541066e-09,
+          "name": "recoil_anchor",
+          "source": [
+            0,
+            0.16,
+            0.16
+          ]
+        },
+        {
+          "exported": [
+            0.1599999964237213,
+            0.25999999046325684,
+            0.05000000074505806
+          ],
+          "instanceWorldErrorMetres": 2.8610229740877458e-08,
+          "localError": 9.536743172944284e-09,
+          "name": "sensor_origin",
+          "source": [
+            0.16,
+            0.26,
+            0.05
+          ]
+        },
+        {
+          "exported": [
+            -0.4300000071525574,
+            -0.30000001192092896,
+            -0.2624000012874603
+          ],
+          "instanceWorldErrorMetres": 3.576278650996301e-08,
+          "localError": 1.1920928966180355e-08,
+          "name": "motion_road_wheel_1_0",
+          "source": [
+            -0.43,
+            -0.3,
+            -0.2624
+          ]
+        },
+        {
+          "exported": [
+            -0.4300000071525574,
+            -0.30000001192092896,
+            -0.08746666461229324
+          ],
+          "instanceWorldErrorMetres": 3.576278650996301e-08,
+          "localError": 1.1920928966180355e-08,
+          "name": "motion_road_wheel_1_1",
+          "source": [
+            -0.43,
+            -0.3,
+            -0.0874666667
+          ]
+        },
+        {
+          "exported": [
+            -0.4300000071525574,
+            -0.30000001192092896,
+            0.08746666461229324
+          ],
+          "instanceWorldErrorMetres": 3.576278650996301e-08,
+          "localError": 1.1920928966180355e-08,
+          "name": "motion_road_wheel_1_2",
+          "source": [
+            -0.43,
+            -0.3,
+            0.0874666667
+          ]
+        },
+        {
+          "exported": [
+            -0.4300000071525574,
+            -0.30000001192092896,
+            0.2624000012874603
+          ],
+          "instanceWorldErrorMetres": 3.576278650996301e-08,
+          "localError": 1.1920928966180355e-08,
+          "name": "motion_road_wheel_1_3",
+          "source": [
+            -0.43,
+            -0.3,
+            0.2624
+          ]
+        },
+        {
+          "exported": [
+            0.4300000071525574,
+            -0.30000001192092896,
+            -0.2624000012874603
+          ],
+          "instanceWorldErrorMetres": 3.576278650996301e-08,
+          "localError": 1.1920928966180355e-08,
+          "name": "motion_road_wheel_2_0",
+          "source": [
+            0.43,
+            -0.3,
+            -0.2624
+          ]
+        },
+        {
+          "exported": [
+            0.4300000071525574,
+            -0.30000001192092896,
+            -0.08746666461229324
+          ],
+          "instanceWorldErrorMetres": 3.576278650996301e-08,
+          "localError": 1.1920928966180355e-08,
+          "name": "motion_road_wheel_2_1",
+          "source": [
+            0.43,
+            -0.3,
+            -0.0874666667
+          ]
+        },
+        {
+          "exported": [
+            0.4300000071525574,
+            -0.30000001192092896,
+            0.08746666461229324
+          ],
+          "instanceWorldErrorMetres": 3.576278650996301e-08,
+          "localError": 1.1920928966180355e-08,
+          "name": "motion_road_wheel_2_2",
+          "source": [
+            0.43,
+            -0.3,
+            0.0874666667
+          ]
+        },
+        {
+          "exported": [
+            0.4300000071525574,
+            -0.30000001192092896,
+            0.2624000012874603
+          ],
+          "instanceWorldErrorMetres": 3.576278650996301e-08,
+          "localError": 1.1920928966180355e-08,
+          "name": "motion_road_wheel_2_3",
+          "source": [
+            0.43,
+            -0.3,
+            0.2624
+          ]
+        }
+      ],
+      "sourceSha256": "886472bccaba9fe080758982cc3c6a95823b6aec85a2097b127cf703f6b7930c",
+      "sourceStats": {
+        "boundsMax": [
+          0.49000000953674316,
+          0.10000000149011612,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "primitives": 1,
+        "triangles": 6272,
+        "vertices": 12080
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "4a8b8d6c316908eeb908c026fb6d59f4b5b2a822c963b26b6478ccc2c4343a3e",
+      "exportStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.46000000834465027,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.46000000834465027,
+          -0.47999998927116394
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 8
+      },
+      "id": "unit.directorate.main_battle_tank.collision",
+      "lods": [],
+      "materialReferences": [],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "994a38291cb333052e5101e8b693ab754225fe8c29d283cf3773abfbde912d30",
+      "sourceStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.46000000834465027,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.46000000834465027,
+          -0.47999998927116394
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 8
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "77b9e9685fc34d972b9c43cbd84878e2c2ce19767c0942002e0c51d0df65e5d1",
+      "exportStats": {
+        "boundsMax": [
+          0.30000001192092896,
+          0.15000000596046448,
+          0.39500001072883606
+        ],
+        "boundsMin": [
+          -0.27000001072883606,
+          -0.10999999940395355,
+          -0.3700000047683716
+        ],
+        "primitives": 1,
+        "triangles": 180,
+        "vertices": 384
+      },
+      "id": "unit.directorate.main_battle_tank.critical",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.unit.main_battle_tank"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "c573b62bafff66bf388f8145c15ce6de7e8a35ea5609145d29ab16e36ab779cd",
+      "sourceStats": {
+        "boundsMax": [
+          0.30000001192092896,
+          0.15000000596046448,
+          0.39500001072883606
+        ],
+        "boundsMin": [
+          -0.27000001072883606,
+          -0.10999999940395355,
+          -0.3700000047683716
+        ],
+        "primitives": 1,
+        "triangles": 180,
+        "vertices": 384
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "3155705e42c9541223ebe7f00f5599318b564d7f9008b5ef7862fc7207cee62e",
+      "exportStats": {
+        "boundsMax": [
+          0.4050000011920929,
+          0.03099999949336052,
+          0.36500000953674316
+        ],
+        "boundsMin": [
+          -0.2800000011920929,
+          -0.05000000074505806,
+          0.15000000596046448
+        ],
+        "primitives": 1,
+        "triangles": 88,
+        "vertices": 192
+      },
+      "id": "unit.directorate.main_battle_tank.damaged",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.unit.main_battle_tank"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "80b6f562a3dd64263467a568127bfd10935d4934f999bd7d9b23892947279d77",
+      "sourceStats": {
+        "boundsMax": [
+          0.4050000011920929,
+          0.03099999949336052,
+          0.36500000953674316
+        ],
+        "boundsMin": [
+          -0.2800000011920929,
+          -0.05000000074505806,
+          0.15000000596046448
+        ],
+        "primitives": 1,
+        "triangles": 88,
+        "vertices": 192
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "427d3b1ab0dbefefbdd24437325d9c4106b2033a06a2f0ab4caa8ca44dff97c5",
+      "exportStats": {
+        "boundsMax": [
+          0.49000000953674316,
+          0.2809999883174896,
+          0.6399999856948853
+        ],
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "primitives": 1,
+        "triangles": 892,
+        "vertices": 1784
+      },
+      "id": "unit.directorate.main_battle_tank.lod1",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.unit.main_battle_tank"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "5d01ba99f49c81f5e51b6dc52ef2272c645d9b744fbf3d49da9b1534c6445a0e",
+      "sourceStats": {
+        "boundsMax": [
+          0.49000000953674316,
+          0.2809999883174896,
+          0.6399999856948853
+        ],
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "primitives": 1,
+        "triangles": 892,
+        "vertices": 1784
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "7149c453e1dc85d45f5997f7c302cb972e71521f9d93501d6a4bfcc15f0716ae",
+      "exportStats": {
+        "boundsMax": [
+          0.49000000953674316,
+          0.24500000476837158,
+          0.6399999856948853
+        ],
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "primitives": 1,
+        "triangles": 244,
+        "vertices": 532
+      },
+      "id": "unit.directorate.main_battle_tank.lod2",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.unit.main_battle_tank"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "7e18dd834fb26385b4d59c66bcac548b33fcff467deebd32e3a1b5f9b5555ae3",
+      "sourceStats": {
+        "boundsMax": [
+          0.49000000953674316,
+          0.24500000476837158,
+          0.6399999856948853
+        ],
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "primitives": 1,
+        "triangles": 244,
+        "vertices": 532
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "eeb947d337a06bfd59cb6491ecdf82e38e6be87e1cbb7101dcabe2f640f7f241",
+      "exportStats": {
+        "boundsMax": [
+          0.27000001072883606,
+          0.28999999165534973,
+          0.6399999856948853
+        ],
+        "boundsMin": [
+          -0.27000001072883606,
+          0.0,
+          -0.17000000178813934
+        ],
+        "primitives": 1,
+        "triangles": 1752,
+        "vertices": 3584
+      },
+      "id": "unit.directorate.main_battle_tank.turret",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.unit.main_battle_tank"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [
+        "body",
+        "cannon"
+      ],
+      "sockets": [
+        {
+          "exported": [
+            0.0,
+            0.1599999964237213,
+            0.10000000149011612
+          ],
+          "instanceWorldErrorMetres": 1.0728836485895954e-08,
+          "localError": 3.5762786898541066e-09,
+          "name": "motion_cannon",
+          "source": [
+            0,
+            0.16,
+            0.1
+          ]
+        }
+      ],
+      "sourceSha256": "37e83c7813e1a8d0c02652436719dc30de0e69a66ae0d2409fc2a3bd5cacf885",
+      "sourceStats": {
+        "boundsMax": [
+          0.27000001072883606,
+          0.28999999165534973,
+          0.6399999856948853
+        ],
+        "boundsMin": [
+          -0.27000001072883606,
+          0.0,
+          -0.17000000178813934
+        ],
+        "primitives": 1,
+        "triangles": 1752,
+        "vertices": 3584
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "d9b1f80647df18187fb852a187d54cdce4dd5ebe6f3fd03f4d43133796904946",
+      "exportStats": {
+        "boundsMax": [
+          0.49000000953674316,
+          0.03999999910593033,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "primitives": 1,
+        "triangles": 300,
+        "vertices": 672
+      },
+      "id": "unit.directorate.main_battle_tank.wreck",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.unit.main_battle_tank"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "05b3658284fa2b390c7cb7197be4493ec9a0dd5f581fd199a313ecb62b75ecb0",
+      "sourceStats": {
+        "boundsMax": [
+          0.49000000953674316,
+          0.03999999910593033,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.49000000953674316,
+          -0.5,
+          -0.4300000071525574
+        ],
+        "primitives": 1,
+        "triangles": 300,
+        "vertices": 672
+      }
+    }
+  ],
+  "maximumGeometryDeviations": {
+    "POSITION": 3.725290298461914e-09,
+    "NORMAL": 0.0,
+    "TEXCOORD_0": 2.9802322387695312e-08,
+    "TANGENT": 0.0
+  },
+  "sceneDeviations": {
+    "maximumEditorSplitNormalEncodingError": 0.00012489072107335292,
+    "maximumSocketInstanceWorldErrorMetres": 1.2874603250168093e-07,
+    "maximumSocketLocalError": 1.4305114759416426e-08
+  },
+  "sourceGitTreeBefore": "7dd72bcd2be51f57ddba83e0b7de5bd117364ee8",
+  "sourceGitTreeAfter": "7dd72bcd2be51f57ddba83e0b7de5bd117364ee8",
+  "productionCatalog": {
+    "success": true,
+    "assetCount": 1337,
+    "meshCount": 309,
+    "textureCount": 900,
+    "materialCount": 127,
+    "textureRuntimeBytes": 59451623,
+    "totalRuntimeBytes": 71365239
+  },
+  "productionCompilation": {
+    "compiled": 0,
+    "unchanged": 1337,
+    "note": "Complete integrity/source/cache verification; not a clean production rebuild."
+  },
+  "assetProcessContracts": {
+    "passed": true
+  },
+  "assetRegressionGate": {
+    "total": 30,
+    "passed": 29,
+    "failed": 1,
+    "skipped": 0,
+    "exitCode": 2,
+    "failure": "AssetPipelineTests.DependencyChangeRebuildsDependentsWhileUnchangedBuildSkips",
+    "exception": "UnauthorizedAccessException: Access to the path is denied at AssetPipelineCompiler.WriteManifestAtomically/File.Move(overwrite:true).",
+    "compilerAndAssetTestSourcesUnchangedFromBase": true,
+    "isolatedDiagnostic": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "note": "One isolated rerun with unchanged assertions. Does not clear the failed 30-case gate; root cause remains unproven."
+    }
+  },
+  "headless": {
+    "ExecutedTicks": 64,
+    "RequestedTicks": 64,
+    "Seed": 12345,
+    "TickRate": 20,
+    "RequestedEntities": 1000
+  },
+  "package": {
+    "archiveName": "FORGELINE-0.1.394-dev-win-x64.zip",
+    "archiveBytes": 54646603,
+    "sha256": "4b381e05c72f4e3445208f0b27dd295c018267cd933299ac5eef7dc1b9c40443",
+    "manifestFiles": 1461,
+    "reproduciblePublishTrees": true,
+    "noBlenderOrAuthoringFiles": true,
+    "originalProductionAssets": true,
+    "provenance": {
+      "configuration": "Release",
+      "buildTimeUtc": "2026-10-17T17:37:06.2666201+00:00",
+      "runAttempt": null,
+      "informationalVersion": "0.1.394-dev+945a0d57b7666d2026d9b22e3a1a4f8f815cf52d",
+      "targetFramework": "net10.0-windows",
+      "sdk": "10.0.401",
+      "runId": null,
+      "runtimeAssetCompiler": "1.10.0",
+      "runUrl": null,
+      "channel": "dev",
+      "productVersion": "0.1.394",
+      "repository": "https://github.com/DaveBeusing/Forgeline",
+      "sourceRevision": "945a0d57b7666d2026d9b22e3a1a4f8f815cf52d",
+      "runtimeAssetSignature": "7d78c06c12f4f2bbbd3ae5886e881ff9601679bc6617cf5eca1a3a7891722882",
+      "version": "0.1.394-dev",
+      "sourceTreeClean": true,
+      "runtimeIdentifier": "win-x64",
+      "product": "FORGELINE"
+    }
+  },
+  "smokes": {
+    "overlay": {
+      "exitCode": 0,
+      "applicationReadiness": "Ready",
+      "sessionReadiness": "Ready",
+      "startupDroppedEvents": 0,
+      "stderrBytes": 0,
+      "emptyWorkingDirectoryRetained": true,
+      "window": {
+        "mode": "Windowed",
+        "clientWidth": 1600,
+        "clientHeight": 900,
+        "isMinimized": false,
+        "dpi": 144
+      },
+      "metrics": {
+        "instanceDrawCalls": 9,
+        "peakResidentTextureBytes": 45718384,
+        "peakShaderResourceDescriptorsUsed": 69,
+        "textureBindingFailureCount": 0,
+        "materialBindingFailureCount": 0,
+        "debugLayerEnabled": false
+      }
+    },
+    "installed": {
+      "exitCode": 0,
+      "applicationReadiness": "Ready",
+      "sessionReadiness": "Ready",
+      "startupDroppedEvents": 0,
+      "stderrBytes": 0,
+      "emptyWorkingDirectoryRetained": true,
+      "window": {
+        "mode": "Windowed",
+        "clientWidth": 1600,
+        "clientHeight": 900,
+        "isMinimized": false,
+        "dpi": 144
+      },
+      "metrics": {
+        "instanceDrawCalls": 9,
+        "peakResidentTextureBytes": 45718384,
+        "peakShaderResourceDescriptorsUsed": 69,
+        "textureBindingFailureCount": 0,
+        "materialBindingFailureCount": 0,
+        "debugLayerEnabled": false
+      }
+    }
+  },
+  "visualEvidence": {
+    "display": [
+      1920,
+      1080
+    ],
+    "quality": "High",
+    "zoom": "CloseTactical",
+    "warmups": 32,
+    "samples": 8,
+    "repeatCaptures": 2,
+    "scenes": [
+      "MainBattleTankProduction",
+      "CommandCoreProduction"
+    ],
+    "comparisons": [
+      {
+        "image": "CommandCoreProduction-1920x1080-High-CloseTactical.png",
+        "identicalPngBytes": false,
+        "baselineSha256": "93a13e69e1606f881431bfc25895ebef249917b4ac57f9ae496f8821c6bb0a24",
+        "exportSha256": "711592a0274a0dfeba99fa12aae94c536ae9d085f80f451346f0bacebf9026f1",
+        "maximumChannelError": 1,
+        "meanAbsoluteChannelError": 6.028163580246913e-07,
+        "differentChannels": 5
+      },
+      {
+        "image": "MainBattleTankProduction-1920x1080-High-CloseTactical.png",
+        "identicalPngBytes": true,
+        "baselineSha256": "2c213fc0e9009735351b1a0ce6229c2180a3044f9829c028545f77877af21030",
+        "exportSha256": "2c213fc0e9009735351b1a0ce6229c2180a3044f9829c028545f77877af21030"
+      }
+    ],
+    "files": [
+      {
+        "file": "before-MainBattleTankProduction.png",
+        "sha256": "2c213fc0e9009735351b1a0ce6229c2180a3044f9829c028545f77877af21030"
+      },
+      {
+        "file": "after-MainBattleTankProduction.png",
+        "sha256": "2c213fc0e9009735351b1a0ce6229c2180a3044f9829c028545f77877af21030"
+      },
+      {
+        "file": "before-CommandCoreProduction.png",
+        "sha256": "93a13e69e1606f881431bfc25895ebef249917b4ac57f9ae496f8821c6bb0a24"
+      },
+      {
+        "file": "after-CommandCoreProduction.png",
+        "sha256": "711592a0274a0dfeba99fa12aae94c536ae9d085f80f451346f0bacebf9026f1"
+      }
+    ],
+    "scope": "Two fixed native reference views; not general art/FPS/animation acceptance."
+  },
+  "ciSnapshot": {
+    "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39053988712",
+    "headSha": "945a0d57b7666d2026d9b22e3a1a4f8f815cf52d",
+    "status": "in_progress",
+    "jobs": [
+      {
+        "name": "build-test",
+        "status": "in_progress",
+        "conclusion": "",
+        "relevantSteps": [
+          {
+            "name": "Blender source geometry contracts",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Blender launcher protocol contracts",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Compiled UI atlas and ordered skin contracts",
+            "status": "in_progress",
+            "conclusion": ""
+          }
+        ]
+      }
+    ]
+  },
+  "resolvedImplementationFailures": [
+    "Blender 5.2 material node behavior required scalar preview validation rather than disabling nodes.",
+    "Editor split-normal encoding caused shared-corner differences; authored float32 normals now survive in verified attributes alongside separately checked preview normals.",
+    "Release analyzer CA1869 was resolved by reusing serializer options."
+  ],
+  "limitations": [
+    "Asset regression gate failed one case; isolated pass does not resolve it.",
+    "Full solution suite not repeated locally; earlier unrelated parallel-suite failures remain separately documented.",
+    "One new .NET comparison is opt-in and skips without native export fixtures.",
+    "Optional self-hosted workflow not dispatched; Linux native execution unqualified.",
+    "Native debug layer disabled/unavailable; short captures do not establish sustained FPS or full-match behavior.",
+    "Production exports are isolated copies and are not installed into source or the published player."
+  ],
+  "localArtifactSha256": {
+    "blender-roundtrip-qualified-build.log": "128bb3426eb7875b2f83c60f42451b2f9da4e4aafdb354851ea4ee7f2c86d1b1",
+    "blender-roundtrip-contracts-final.log": "7fb1f77bc457dad11752d504fb6cfc0f4c884186473e3ad08164be2c967c784f",
+    "blender-roundtrip-tool-contracts.log": "f2d021edf71dfef9b2c53b87b0bee2824f1150881ba3400e0fd9bf8bf2e32256",
+    "blender-roundtrip-qualified.log": "4dd7301aff2cec7b4f2fa2839431df2d9ad05b3d1a1422e52eae34466d5ae238",
+    "blender-roundtrip-runtime-contracts.log": "4bff50cfc09c6e242fd0c213a94c04272b3bd7a61293cae309581cdc64e9dbfc",
+    "blender-roundtrip-production-assets.log": "25eb58935610965c3d20803a9dc14ddd7dadd5ffba69fe4daf7d299926d9ab01",
+    "blender-roundtrip-asset-tests.log": "93fc27921bafa8b1ec468c5cb0f7755ae2c49cc0bf2549fb3971cebed0279907",
+    "blender-roundtrip-asset-diagnostic.log": "10f30a4a37c029b064ee13654d9828f411e7bc740e5ca34f216ee2b5780c9448",
+    "blender-roundtrip-headless.log": "3d941ee47a9fa1240fb33f29bcafbcf6fc810cac0bb502fa6d6eb82fc523fd11",
+    "blender-roundtrip-package.log": "fb788a1634b924cdd5578a85d2aa1d9a4b30c0268daae48447db82042f16d40b",
+    "blender-roundtrip-overlay-stdout.log": "e0fa4799811c4d0f831c617f83cb920cbe9b82c8e5d66003873f66c4445d3abf",
+    "blender-roundtrip-installed-stdout.log": "966bbb457f39a50f823e13b8598b40fe5d6df301b80eead77a84f9a422f89a2f",
+    "blender-roundtrip-reference-baseline.log": "e1409d74eaff7c2f77f8231f8cf34798dfec79de33af12bfa15067d43331a176",
+    "blender-roundtrip-reference-export.log": "e1409d74eaff7c2f77f8231f8cf34798dfec79de33af12bfa15067d43331a176",
+    "blender-roundtrip-initial.log": "88d38042ca887fa63a9e7366964742c5528959bc3e00a6af117c01f5e07b82ca",
+    "blender-roundtrip-second.log": "2cdf55a37c7f35f4fb0f0f8a33fc55ebfd61fd40967b68b9c2a6850a815558c0",
+    "blender-roundtrip-third.log": "93ef1717fd741fb6f529beb2cc2b461c783b56de5f95f735604e8400b7b1b9f4",
+    "blender-roundtrip-build.log": "296166087169daaeb31274f616a1182085e9aeb0364ae05a3f3a935b4971b39b",
+    "native/baseline-compile.log": "cd6b56dd47c7a6f408b9648067216cf1aa55f3ff3179b1b756c1912d21560d08",
+    "native/first-compile.log": "fbf1d9986e20f5c9f10d9023162e2adf274ecc846f44073970279bc2319a64c1",
+    "native/second-compile.log": "ec1ad69c444a368ca209930c35d071b3fe825c16f342b1536e84e62eedccb155",
+    "native/reopened-compile.log": "a89ca7ddd216b4ff550bd0bc5c018a3ec9013e58c1a6b642fe51e0043a14955d",
+    "native/runtime-comparison.log": "62b7ebad95efae78c0ea9a0e5a515137ea817f325021ecb3c3612f0f031d003c",
+    "native/source-less.log": "d547680823dfd52f7baaa5a13c58f1050f0b9d74c61ecf522bd3651c3c76a131",
+    "native/first/roundtrip-report.json": "bbd9b7070079145a5d26ac3e785416db2e8adf2c7a3a2aec4500261db3167f7d",
+    "native/native-contracts/native-contracts.json": "86177dc337c229c840f88e8309aea3fac2ad43ab58c960c3097b6ff23038a07e"
+  }
+}
