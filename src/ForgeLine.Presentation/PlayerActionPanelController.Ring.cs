@@ -105,7 +105,7 @@ public sealed partial class PlayerActionPanelController
     {
         var ring = new ObjectActionRingView(_ringEntity, _ringSession, _ringSelection, _ringRevision, _ringContext && _ringGroup is null,
             _ringOpen, _presentedRing.Geometry, _presentedRing.Resolved, HoveredSlot: _presentedRing.Resolved ? _presentedRing.HoveredSlot : -1, Pressed: _pointerPressed)
-            { Level = _ringLevel, Group = _ringGroup, VisibleMembers = _presentedRing.VisibleMembers };
+            { Level = _ringLevel, Group = _ringGroup, VisibleMembers = _presentedRing.VisibleMembers, GroupFactsCurrent = _presentedRing.GroupFactsCurrent };
         if (!_ringContext || !_ringOpen) return ring;
         ActionRingSlots slots = default;
         if (_ringLevel == ActionRingLevel.Categories)
@@ -207,7 +207,7 @@ public sealed partial class PlayerActionPanelController
         PointerCaptured = hasHit || PlayerActionDockInteractionLayout.CapturesPointer(input.PointerPosition, layout, false);
         if (freshPress && input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin))
         {
-            _ringArmed = _presentedRing.TryHit(origin, out _pressedRingSlot);
+            _ringArmed = _presentedRing.TryHit(origin, out _pressedRingSlot) && _pressedRingSlot.Enabled;
             _pressedRing = _presentedRing;
             if (!_ringArmed && PlayerActionDockInteractionLayout.TryHit(origin, layout, false, 0, out var mode))
             { HandlePointerHit(mode, actions, panel); PointerCaptured = true; }
@@ -218,6 +218,7 @@ public sealed partial class PlayerActionPanelController
             _pressedRing.Revision != _ringRevision || _pressedRing.Session != snapshot?.SessionId ||
             _currentSelection?.Revision != _pressedRing.SelectionRevision ||
             !PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection) ||
+            _ringGroup is not null && !_ringGroup.MatchesSelection(actions?.Tactical?.SelectedEntities) ||
             !_presentedRing.TryHit(input.PointerPosition, out var slot) || slot.Key != _pressedRingSlot.Key ||
             slot.Navigation != _pressedRingSlot.Navigation || slot.Target.Kind != _pressedRingSlot.Target.Kind ||
             slot.Target.Mode != _pressedRingSlot.Target.Mode) return;

@@ -12,6 +12,7 @@ internal static class GroupActionRingCapture
 {
     internal static PresentationSnapshot Fixture(PresentationSnapshot source, UiReferenceScenario state)
     {
+        source = UiReferenceStates.Hud(source,UiReferenceScenario.NotificationsCollapsed,1920,1080,96,1).Snapshot;
         var experience = source.PlayerExperience!.Value;
         var actors = source.Instances.ToArray().Where(i => i.Selectable.IsSelectable && i.Selectable.Owner == experience.Player && (i.Selectable.Category & ControllableEntityCategory.Unit) != 0)
             .DistinctBy(i => i.Entity).Take(3).ToArray();
@@ -21,11 +22,12 @@ internal static class GroupActionRingCapture
         var actions = new PlayerActionSnapshot(source.SessionId,source.Tick,[],0,null,null,tactical:tactical);
         var members = actors.Select((i,n) => new CombatGroupMemberReadModel(i.Entity,i.Selectable.Category,true,.2,true,
             BattlefieldSupplyStatus.Critical,.2,.3,false,0,0,false,default,false,default,false,default,
-            n==0 ? UnitIds.MainBattleTank : UnitIds.SupplyTruck,n==0)).ToArray();
+            i.UnitFeature.Unit,n==0)).ToArray();
         var instances = source.Instances.ToArray();
         return new(source.Tick,source.TickDuration,source.SimulationEntityCount,instances,source.Intelligence,source.SessionId,
             experience with { Selection = experience.Selection with { Count=selected.Length,PrimaryEntity=selected[0],Kind=PlayerSelectionKind.Mixed,DisplayName="Mixed selection" } },
-            playerActions:actions,combatGroups:new(source.Tick,members,source.SessionId),vfxMetrics:source.VfxMetrics);
+            playerActions:actions,combatGroups:new(source.Tick,members,source.SessionId),vfxMetrics:source.VfxMetrics,alerts:source.Alerts,operations:source.Operations,
+            guidance:new PlayerGuidanceSummary(source.SessionId,source.Tick,experience.Player,default));
     }
 
     internal static PlayerActionPanelView View(PresentationSnapshot snapshot, UiReferenceScenario state, RenderWorld world,

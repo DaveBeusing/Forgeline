@@ -67,7 +67,7 @@ internal static class HoverTooltipResolver
             if (groupControl is < 0 or > 11) return null;
             int participants = group.Participants(groupControl);
             return new(GroupActionRingContext.Label(groupControl), "GROUP SELECTION",
-                group.HasOperationalFacts ? $"ELIGIBLE {participants} / SELECTED {group.SelectedCount}" : "GROUP DATA UNAVAILABLE", participants == 0 ? "NO ELIGIBLE MEMBERS" :
+                group.HasOperationalFacts && panel.Ring.GroupFactsCurrent ? $"ELIGIBLE {participants} / SELECTED {group.SelectedCount}" : "UPDATING GROUP DATA", participants == 0 ? "NO ELIGIBLE MEMBERS" :
                 groupControl < 8 ? "FILTER CURRENT SELECTION; SAVED GROUP UNCHANGED" : "CLICK TO REQUEST");
         }
         if (view.Contextual)
@@ -85,6 +85,8 @@ internal static class HoverTooltipResolver
                 PlayerActionDockHudModel.ResolveModeShortcut(mode, panel.Bindings), "CLICK TO OPEN / CLOSE");
         if (panel.SelectionPending || !panel.IsOpen || panel.Mode != mode || snapshot.PlayerActions is not { } actions ||
             actions.SessionId != snapshot.SessionId || actions.Tick != snapshot.Tick) return null;
+        if (panel.Ring.Group is { } currentGroup && !currentGroup.MatchesSelection(actions.Tactical?.SelectedEntities))
+            return new("GROUP ACTION", "CURRENT SELECTION", "UPDATING SELECTION", "");
         if (control == PlayerActionDockControlKind.Page)
             return new(panel.Ring.UsesRing ? "RING NAVIGATION" : "PAGE CARDS", "ACTION NAVIGATION", "CHANGES SELECTION", "CLICK / WHEEL / TAB");
         int index = view.DockIndex;

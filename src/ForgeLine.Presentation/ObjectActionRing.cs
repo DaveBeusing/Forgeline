@@ -10,7 +10,7 @@ internal enum ActionRingLevel : byte { Categories, Items, Parameters, Group }
 internal enum ActionRingNavigation : byte { None, Back, Previous, Next, Parameters, NextItem, Close, Group, GroupControl }
 internal readonly record struct ActionRingKey(byte Kind, uint Id, uint Generation = 0);
 internal readonly record struct ActionRingSlot(PlayerActionDockHitTarget Target, ActionRingKey Key,
-    ActionRingNavigation Navigation = ActionRingNavigation.None, bool Present = true);
+    ActionRingNavigation Navigation = ActionRingNavigation.None, bool Present = true, bool Enabled = true);
 [InlineArray(8)] internal struct ActionRingSlots { private ActionRingSlot _first; }
 
 /// <summary>Copied menu state; no mutable collections cross the input/render boundary.</summary>
@@ -19,6 +19,7 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
     float Opacity = 1, int HoveredSlot = -1, bool Pressed = false)
 {
     public GroupActionRingContext? Group { get; init; }
+    public bool GroupFactsCurrent { get; init; }
     public int VisibleMembers { get; init; }
     public bool UsesRing => SingleOwned || Group is not null;
     internal ActionRingSlots Slots { get; init; }
@@ -58,17 +59,26 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
         }
         ActionRingSlots slots = Slots;
         var actions = PlayerActionDockHudModel.ResolveActions(snapshot);
+        bool selectionCurrent = Group is null || Group.MatchesSelection(actions?.Tactical?.SelectedEntities);
+        bool groupFactsCurrent = selectionCurrent && Group is { HasOperationalFacts: true } && Group.Tick == snapshot.Tick;
         for (int i = 0; i < 8; i++)
         {
             var saved = slots[i];
+            if (saved.Navigation == ActionRingNavigation.GroupControl)
+            {
+                slots[i] = saved with { Enabled = groupFactsCurrent && Group!.Participants(saved.Target.ItemIndex) > 0 };
+                continue;
+            }
+            if (!selectionCurrent) { slots[i] = saved with { Enabled = saved.Navigation != ActionRingNavigation.None }; continue; }
             if (!saved.Present || saved.Navigation != ActionRingNavigation.None || saved.Target.Kind == PlayerActionDockControlKind.Mode) continue;
             int resolved = -1;
             int count = PlayerActionDockInteractionLayout.GetItemCount(saved.Target.Mode, actions);
             for (int item = 0; item < count; item++)
                 if (ItemKey(saved.Target.Mode,item,actions) == saved.Key) { resolved = item; break; }
-            slots[i] = resolved < 0 ? saved with { Present = false } : saved with { Target = saved.Target with { ItemIndex = resolved } };
+            slots[i] = resolved < 0 ? saved with { Present = false } : saved with { Target = saved.Target with { ItemIndex = resolved },
+                Enabled = saved.Target.Kind != PlayerActionDockControlKind.Item || PlayerActionDockHudModel.ResolveItemState(saved.Target.Mode,resolved,actions,false).CanActivate };
         }
-        return this with { Geometry = RadialActionLayout.Fit(anchor, radius, layout, occupied), Resolved = true, Slots = slots, VisibleMembers = visible };
+        return this with { Geometry = RadialActionLayout.Fit(anchor, radius, layout, occupied), Resolved = true, Slots = slots, VisibleMembers = visible, GroupFactsCurrent = groupFactsCurrent };
     }
 
     internal static ActionRingKey ItemKey(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions)

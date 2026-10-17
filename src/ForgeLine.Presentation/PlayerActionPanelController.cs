@@ -179,7 +179,8 @@ public sealed partial class PlayerActionPanelController
 
         PlayerActionSnapshot? actions =
             PlayerActionDockHudModel.ResolveActions(snapshot);
-        if (!PlayerActionDockHudModel.MatchesSelection(actions, currentSelection)) actions = null;
+        if (!PlayerActionDockHudModel.MatchesSelection(actions, currentSelection) ||
+            _ringGroup is not null && !_ringGroup.MatchesSelection(actions?.Tactical?.SelectedEntities)) actions = null;
 
         if (snapshot?.PlayerExperience is
                 PlayerExperienceSnapshot experience &&

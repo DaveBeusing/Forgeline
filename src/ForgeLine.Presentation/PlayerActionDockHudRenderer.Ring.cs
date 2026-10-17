@@ -31,8 +31,8 @@ internal sealed partial class PlayerActionDockHudRenderer
             bool navigation = slot.Navigation != ActionRingNavigation.None;
             bool mode = target.Kind == PlayerActionDockControlKind.Mode;
             bool item = target.Kind == PlayerActionDockControlKind.Item;
-            bool enabled = slot.Navigation == ActionRingNavigation.GroupControl ? ring.Group?.Participants(target.ItemIndex) > 0 : navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
-                panel.Mode, target.ItemIndex, panel, actions);
+            bool enabled = slot.Enabled && (slot.Navigation == ActionRingNavigation.GroupControl ? ring.Group?.Participants(target.ItemIndex) > 0 : navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
+                panel.Mode, target.ItemIndex, panel, actions));
             bool hovered = ring.Open && ring.HoveredSlot == i;
             Vector4 fill = enabled ? new(.045f, .075f, .10f, .82f) : new(.04f, .045f, .055f, .82f);
             if (hovered) fill = ring.Pressed ? new(.15f, .30f, .34f, .94f) : new(.10f, .22f, .27f, .90f);
@@ -67,11 +67,11 @@ internal sealed partial class PlayerActionDockHudRenderer
                 14 * scale, text, width, height, true);
             var value = new HudTextBuilder(valueBuffer);
             if (slot.Navigation == ActionRingNavigation.GroupControl && ring.Group is { } group)
-            { if (group.HasOperationalFacts) value.Append(group.Participants(target.ItemIndex)); else value.Append("Unknown"); value.Append(" / "); value.Append(group.SelectedCount); }
+            { if (group.HasOperationalFacts && ring.GroupFactsCurrent) value.Append(group.Participants(target.ItemIndex)); else value.Append("Updating"); value.Append(" / "); value.Append(group.SelectedCount); }
             else if (slot.Navigation == ActionRingNavigation.Group && ring.Group is { } summary)
                 value.Append(ring.VisibleMembers < summary.Count ? "Part visible" : "Selection tools");
             else if (item && panel.Mode == PlayerActionPanelMode.Tactical && ring.Group is { } participants && actions?.Tactical is { } tactical)
-            { value.Append(target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append(" / "); value.Append(participants.SelectedCount); value.Append(" eligible"); }
+            { if (participants.MatchesSelection(tactical.SelectedEntities)) { value.Append(target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append(" / "); value.Append(participants.SelectedCount); value.Append(" eligible"); } else value.Append("Updating"); }
             else if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
             else if (item)

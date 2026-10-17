@@ -30,7 +30,7 @@ public sealed class GroupActionRingContext
         foreach (var entity in selection.Entities)
         {
             if (!world.TryGetInterpolatedInstance(entity, 1, out var instance) || !instance.Selectable.IsSelectable ||
-                instance.Selectable.Owner != experience.Player || (instance.Visibility & RenderVisibilityMask.World) == 0) continue;
+                instance.Selectable.Owner != experience.Player) continue;
             members.Add(entity);
             if (operational is null || !operational.TryGet(entity, out var member)) continue;
             counts[SelectedCombatGroup.TypeIndex(member.Unit)]++;
@@ -40,6 +40,14 @@ public sealed class GroupActionRingContext
         }
         counts[11] = operational is null ? 0 : members.Count;
         return new(members.ToArray(), selection.Count, counts, snapshot.Tick, operational is not null);
+    }
+
+    public bool MatchesSelection(IReadOnlyList<EntityId>? selected)
+    {
+        if (selected is null || selected.Count != SelectedCount || Count != SelectedCount) return false;
+        // Presentation selection snapshots use the canonical sorted, unique identity order.
+        for (int i=0;i<selected.Count;i++) if (_members[i] != selected[i]) return false;
+        return true;
     }
 
     public bool SameMembers(GroupActionRingContext? other) => other is not null && _members.AsSpan().SequenceEqual(other._members);
@@ -52,8 +60,10 @@ public sealed class GroupActionRingContext
         foreach (var entity in _members)
         {
             if (!world.TryGetInterpolatedInstance(entity, alpha, out var instance) || !instance.Selectable.IsSelectable ||
-                instance.Selectable.Owner != player || (instance.Visibility & RenderVisibilityMask.World) == 0) continue;
-            total += instance.Transform.Position; authorized++;
+                instance.Selectable.Owner != player) continue;
+            authorized++;
+            if ((instance.Visibility & RenderVisibilityMask.World) == 0) continue;
+            total += instance.Transform.Position;
             var projected = camera.WorldToScreen(instance.Transform.Position, layout.ViewportWidth, layout.ViewportHeight);
             if (projected.IsVisible) { shown += projected.Position; visible++; }
         }
