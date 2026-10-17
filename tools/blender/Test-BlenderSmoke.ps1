@@ -21,7 +21,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect production sources.' }
 foreach ($name in @('first','second')) {
     $destination = Join-Path $root $name
     & (Join-Path $PSScriptRoot 'Invoke-Blender.ps1') -Action Smoke -BlenderPath $BlenderPath -OutputRoot $destination -TimeoutSeconds $TimeoutSeconds
-    & dotnet $compiler --mode build --source (Join-Path $destination 'source') --runtime (Join-Path $destination 'runtime') --qualification-output (Join-Path $destination 'asset-qualification.json') > (Join-Path $destination 'compiler.log') 2>&1
+    & dotnet $compiler --mode build --source (Join-Path $destination 'source') --runtime (Join-Path $destination 'runtime') --qualification-output (Join-Path $destination 'asset-qualification.json') 2>&1 | Out-File -LiteralPath (Join-Path $destination 'compiler.log') -Encoding utf8NoBOM
     if ($LASTEXITCODE -ne 0) { throw "Blender export failed canonical compilation: $destination/compiler.log" }
     $qualification = Get-Content -LiteralPath (Join-Path $destination 'asset-qualification.json') -Raw | ConvertFrom-Json
     if (-not $qualification.success -or $qualification.assetCount -ne 2 -or $qualification.meshCount -ne 1 -or $qualification.materialCount -ne 1) { throw 'Unexpected smoke catalog content.' }
@@ -29,7 +29,7 @@ foreach ($name in @('first','second')) {
 $first = Join-Path $root 'first'; $second = Join-Path $root 'second'
 if (Compare-Object (Read-Tree (Join-Path $first 'source')) (Read-Tree (Join-Path $second 'source'))) { throw 'Repeated Blender source exports differ.' }
 if (Compare-Object (Read-Tree (Join-Path $first 'runtime')) (Read-Tree (Join-Path $second 'runtime'))) { throw 'Repeated compiled payloads differ.' }
-& dotnet $compiler --mode validate --source (Join-Path $root 'absent-sources') --runtime (Join-Path $first 'runtime') --qualification-output (Join-Path $root 'source-less-qualification.json') > (Join-Path $root 'source-less.log') 2>&1
+& dotnet $compiler --mode validate --source (Join-Path $root 'absent-sources') --runtime (Join-Path $first 'runtime') --qualification-output (Join-Path $root 'source-less-qualification.json') 2>&1 | Out-File -LiteralPath (Join-Path $root 'source-less.log') -Encoding utf8NoBOM
 if ($LASTEXITCODE -ne 0) { throw 'Source-less smoke runtime failed integrity validation.' }
 $nativeScript = Join-Path $root 'native-contract.py'
 @'

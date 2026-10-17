@@ -10,7 +10,7 @@ if (Test-Path -LiteralPath $root) { throw 'Contract outputs must be fresh; use a
 [void][IO.Directory]::CreateDirectory($root)
 $fixtureProject = Join-Path $PSScriptRoot 'tests/BlenderFixture/BlenderFixture.csproj'
 $fixtureRoot = Join-Path $root 'fixture with spaces'
-& dotnet build $fixtureProject --configuration Release --output $fixtureRoot > (Join-Path $root 'fixture-build.log') 2>&1
+& dotnet build $fixtureProject --configuration Release --output $fixtureRoot 2>&1 | Out-File -LiteralPath (Join-Path $root 'fixture-build.log') -Encoding utf8NoBOM
 if ($LASTEXITCODE -ne 0) { throw "Cannot build protocol fixture: $root/fixture-build.log" }
 $hostName = if ($IsWindows) { 'BlenderFixture.exe' } else { 'BlenderFixture' }
 $fixture = Join-Path $fixtureRoot $hostName
