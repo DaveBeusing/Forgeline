@@ -72,6 +72,9 @@ These thresholds require visual qualification before production acceptance.
 
 Control groups retain Ctrl+digit assignment, digit recall and Ctrl+Shift+digit clearing. Two separate unmodified presses of the same assigned digit within 350 ms recall and then focus the current visible owned surviving members' mean position. The interval is constructor-configurable for tests. Holds, modifiers, another slot, empty groups, session replacement, help/pause and display/focus transitions break the sequence. Short key presses completed between frames are retained once; operating-system repeats are ignored.
 
+Each successful saved-group recall opens exactly one [shared action ring](GroupActionMenus.md), even if the same members were already selected. Current selection, saved slots and simulation-owned movement groups stay separate. Lost generations/authority are pruned independently of camera visibility; a partly visible group keeps full command membership and uses a marked visible anchor. Outside right-click closes the ring and submits the existing whole-selection move once.
+
+
 Focus cancels held world/minimap gestures and shows a brief nonblocking camera message. Viewport, DPI and UI-scale changes suppress held input until release and cancel placement, targeting and double-click/double-tap state. Native interactive monitor transitions remain manual qualification.
 
 | Action | Default |

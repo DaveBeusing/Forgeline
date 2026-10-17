@@ -1,0 +1,92 @@
+{
+  "qualifiedSource": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+  "baseMaster": "1ef23a9fc7ab9195d0d1bdadd97081016ea97861",
+  "version": "0.1.388-dev",
+  "images": [
+    {
+      "file": "compact-commands.png",
+      "original": "artifacts\\group-rings-native-720-632ca88a\\BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiGroupRing-Scale2.00.png",
+      "source": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+      "sha256": "2cb0887a792a10f73d5961e880b5fc4db7858889525654696d31458a6361e78e",
+      "historical": false
+    },
+    {
+      "file": "group-commands.png",
+      "original": "artifacts\\group-rings-native-1080-632ca88a\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiGroupRing-Scale1.00.png",
+      "source": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+      "sha256": "9414b79e2ddfb27a7ec6af029388bf30b590816d35e2e3952d1d126f3f0b483d",
+      "historical": false
+    },
+    {
+      "file": "group-tools.png",
+      "original": "artifacts\\group-rings-native-1080-632ca88a\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiGroupRingTools-Scale1.00.png",
+      "source": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+      "sha256": "d626273bbac2b5afc986a237ace73551eb0f4028803b430123a001abc477b28a",
+      "historical": false
+    },
+    {
+      "file": "partial-selection.png",
+      "original": "artifacts\\group-rings-native-1080-632ca88a\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiGroupRingPartial-Scale1.00.png",
+      "source": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+      "sha256": "d8322b3ae433d557bae77b45c4b5b6b593be7634eb74c405fd9949036082ff6f",
+      "historical": false
+    },
+    {
+      "file": "single-building.png",
+      "original": "artifacts\\group-rings-native-1080-632ca88a\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiRingProduction-Scale1.00.png",
+      "source": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+      "sha256": "4061b13d00d942dee50e59edbc82395316f3a8bb31e61a757da9cf7745668771",
+      "historical": false
+    },
+    {
+      "file": "single-unit.png",
+      "original": "artifacts\\group-rings-native-1080-632ca88a\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiRingTactical-Scale1.00.png",
+      "source": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+      "sha256": "b27c81dd0651a16306de2ca85d7bc6c81c3818a5cb8fc56ce0680c5bf85078b3",
+      "historical": false
+    },
+    {
+      "file": "ultrawide-edge.png",
+      "original": "artifacts\\group-rings-native-ultrawide-632ca88a\\BattlefieldCombat-3440x1440-High-NormalGameplay-Dpi144-UiGroupRingEdge-Scale2.00.png",
+      "source": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+      "sha256": "721002bf6d51170d7063cd82580aa8805d4b6122dbdd0ad63eb4ec02f0f15b15",
+      "historical": false
+    },
+    {
+      "file": "large-display.png",
+      "original": "artifacts\\group-rings-native-4k-632ca88a\\BattlefieldCombat-3840x2160-High-NormalGameplay-Dpi192-UiGroupRing-Scale2.00.png",
+      "source": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+      "sha256": "f5a86eda5becf336ce7e2420d42141cf98697114a561eda9408382dc1f9c89eb",
+      "historical": false
+    },
+    {
+      "file": "dark-half-world.png",
+      "original": "artifacts\\group-rings-native-dark-half-632ca88a\\BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiGroupRing-Scale1.00.png",
+      "source": "632ca88a4b3297b3f1bbd27eb8c1618fd1c16993",
+      "sha256": "2cfd20d566ef32fea52c7aefbdfcb52363e8b52920be747f81b17411cf183552",
+      "historical": false
+    },
+    {
+      "file": "historical-obstacle-candidate.png",
+      "original": "artifacts\\group-rings-native-720-65c35eee\\BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiGroupRing-Scale2.00.png",
+      "source": "65c35eee01b56e633ff8a3912c55c7534449bddb",
+      "sha256": "f3ea47163ec774b13ce53b0774fe6fd440cb5de3f4bfb13303ab1d994afd3b85",
+      "historical": true
+    },
+    {
+      "file": "historical-title-candidate.png",
+      "original": "artifacts\\group-rings-native-720-80a11c9e\\BattlefieldCombat-1280x720-Low-NormalGameplay-Dpi192-UiGroupRing-Scale2.00.png",
+      "source": "80a11c9e3158d47b69a9b4bc81ef3978988791f8",
+      "sha256": "4986a615d2a56c78a0fa01d2f5ba675a24a21e7c7f1441c7766da6f595a982b3",
+      "historical": true
+    }
+  ],
+  "records": 137,
+  "recordsSha256": "8fa278b06024fcb6d3489ed3aa644221587dbbc7cd8245e8e3a82e110ba95d3e",
+  "packageSha256": "88dfd28061d60eeabedf8de9fb741549cddce2544ffdedbd2ddf8460b3e7ed2d",
+  "nativeSourceCandidates": 27,
+  "packagedCandidates": 2,
+  "humanAcceptance": "pending",
+  "fullSolution": "2396 total; 2386 passed; one failed unchanged supply_truck allocation assertion (8144 versus zero); nine existing opt-in skips",
+  "archiveScope": "Original images copied without edits. Nine current representative images and two explicitly historical candidates. All current manifests/hashes remain recorded; remaining originals and the player ZIP stay in local artifacts. No personal settings contents, save payloads, replay payloads or raw full CI job logs are archived."
+}

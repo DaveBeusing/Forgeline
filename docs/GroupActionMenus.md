@@ -1,5 +1,7 @@
 # Group action menus
 
+Final source-bound outcomes, originals and remaining gates: [group action menu qualification](GroupActionMenuQualification.md). Earlier checkpoints below remain historical.
+
 Base master: `1ef23a9fc7ab9195d0d1bdadd97081016ea97861`. Branch: `ui/group-action-rings`. Version: `0.1.388-dev`, one PATCH.
 
 ## Behavior and parity
