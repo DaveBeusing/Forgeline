@@ -11,6 +11,8 @@ from roundtrip import export_scene
 def run(request):
     root=Path(__file__).resolve().parents[3];catalog=Catalog(request['inputRoot']);fixture=root/'tools/blender/fixtures/tank.json';ids,families=fixture_selection(catalog,fixture,[]);output=Path(request['outputRoot']);blend=root/'assets/source/units/directorate/authoring/main_battle_tank.blend'
     geometries={aid:read_geometry(catalog.source(aid),catalog.root,catalog.definitions[aid][1]) for aid in ids if catalog.definitions[aid][1]['type']=='mesh'}
+    load_project(catalog,ids,families,blend);restore_normals()
+    export_scene(catalog,ids,families,geometries,lambda aid,a,b:compare(aid,a,b,catalog.definitions[aid][1]))
     rejected=[]
     for case in ('socket','transform','modifier','action','untracked','material','silhouette','collision','cannon'):
         load_project(catalog,ids,families,blend)
@@ -25,6 +27,7 @@ def run(request):
         else:
             suffix='.collision' if case=='collision' else '.turret'
             obj=next(o for o in bpy.context.scene.objects if o.get('fl_role')=='geometry' and o.get('fl_asset')==ROOT+suffix and (case!='cannon' or o.get('fl_part')==1));obj.data.vertices[0].co.x+=.001
+        restore_normals()
         try:export_scene(catalog,ids,families,geometries,lambda aid,a,b:compare(aid,a,b,catalog.definitions[aid][1]))
         except ValueError as error:rejected.append({'case':case,'error':str(error)})
         else:raise ValueError('Invalid saved project was accepted: '+case)
