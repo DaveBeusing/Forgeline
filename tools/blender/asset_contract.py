@@ -167,6 +167,7 @@ def compare_geometry(baseline, exported):
         require(set(before['attributes']) == set(after['attributes']), 'Vertex channels changed')
         for key, old in before['attributes'].items():
             new = after['attributes'][key]
+            require(all(math.isfinite(v) for row in new for v in row),f'Nonfinite exported {key}')
             require(len(old) == len(new), 'Vertex count changed')
             error = max(abs(a-b) for x,y in zip(old,new) for a,b in zip(x,y))
             eps = POSITION_EPS if key == 'POSITION' else UV_EPS if key == 'TEXCOORD_0' else DIRECTION_EPS
@@ -208,6 +209,7 @@ class Catalog:
         for path in sorted(self.root.rglob('*.asset.json')):
             definition = json.loads(path.read_text(encoding='utf-8-sig'))
             aid = definition['id']
+            require(isinstance(aid,str) and re.fullmatch(r'[a-z0-9_-]+(?:\.[a-z0-9_-]+)*',aid),f'Invalid stable asset ID: {aid}')
             require(aid not in self.definitions, f'Duplicate asset ID {aid}')
             self.definitions[aid] = (contained(self.root,path),definition)
 

@@ -42,7 +42,10 @@ verify('changed material nodes',lambda:next(m for m in bpy.data.materials if m.g
 
 def normal_mesh():return next(o for o in bpy.context.scene.objects if o.get('fl_role')=='geometry' and 'fl_normal' in o.data.attributes)
 verify('removed authored normal',lambda:normal_mesh().data.attributes.remove(normal_mesh().data.attributes['fl_normal']))
-verify('changed authored normal',lambda:setattr(normal_mesh().data.attributes['fl_normal'].data[0],'vector',(1,0,0)))
+def change_authored_normal():
+    value=normal_mesh().data.attributes['fl_normal'].data[0]
+    value.vector=(value.vector.x+.25,value.vector.y,value.vector.z)
+verify('changed authored normal',change_authored_normal)
 verify('changed split-normal preview',lambda:normal_mesh().data.normals_split_custom_set([(1,0,0)]*len(normal_mesh().data.loops)))
 
 def edit_mode():

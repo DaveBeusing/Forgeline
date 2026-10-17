@@ -8,6 +8,7 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class BlenderRoundTripQualificationTests
 {
+    private static readonly JsonSerializerOptions ReportOptions = new() { WriteIndented = true };
     public static bool Enabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_ROUNDTRIP_ROOT"));
 
     [Fact(Skip = "Set FORGELINE_BLENDER_ROUNDTRIP_ROOT after native Blender fixture exports.", SkipUnless = nameof(Enabled))]
@@ -94,7 +95,7 @@ public sealed class BlenderRoundTripQualificationTests
             File.WriteAllBytes(Path.Combine(target,RuntimeAssetCatalog.ManifestFileName),JsonSerializer.SerializeToUtf8Bytes(manifest,RuntimeAssetCatalog.CreateJsonOptions()));
             Assert.True(RuntimeAssetQualification.Run(target,requireIntegrity:true).Success);
         }
-        File.WriteAllText(Path.Combine(root,"runtime-comparison.json"),JsonSerializer.Serialize(reports,new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(Path.Combine(root,"runtime-comparison.json"),JsonSerializer.Serialize(reports,ReportOptions));
     }
 
     private static MechanicalPartBinding[] Bindings(RuntimeAssetRecord record) => record.MechanicalParts.Select(part =>

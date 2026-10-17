@@ -139,6 +139,16 @@ class AssetContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'escapes'):read_geometry(gltf,source,self.definition)
         with self.assertRaisesRegex(ValueError,'escapes'):read_geometry(self.path,source,self.definition)
 
+    def test_reject_identifier_that_could_escape_export_directory(self):
+        self.definition['id']='../../outside'
+        write_json(self.root/'mesh.asset.json',self.definition)
+        with self.assertRaisesRegex(ValueError,'Invalid stable asset ID'):Catalog(self.root)
+
+    def test_reject_nonfinite_exported_channel(self):
+        changed=copy.deepcopy(self.geometry)
+        changed['primitives'][0]['attributes']['TEXCOORD_0'][2]=(0,float('nan'))
+        with self.assertRaisesRegex(ValueError,'Nonfinite exported'):compare_geometry(self.geometry,changed)
+
     def test_reject_nonunit_metadata_scale(self):
         self.definition['scale']=.01;write_json(self.root/'mesh.asset.json',self.definition)
         with self.assertRaisesRegex(ValueError,'scale must be 1.0'):Catalog(self.root).validate(['mesh.test'])
