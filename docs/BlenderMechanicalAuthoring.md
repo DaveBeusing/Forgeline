@@ -139,3 +139,5 @@ launcher logs and `motion-report.json`; fix the source/profile cause and choose 
 new output folder. Do not overwrite a qualified project to retry. Reimport after
 source or profile hashes change, and keep generated inspection actions out of rest
 projects. Existing compiler/source-less integrity and package checks remain required.
+
+Recorded local results and remaining acceptance: [mechanical authoring qualification](BlenderMechanicalAuthoringQualification.md).

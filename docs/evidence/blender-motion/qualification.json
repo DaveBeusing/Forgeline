@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "productVersion": "0.1.396",
+  "authoringSourceRevision": "7d32243199cbab549b533bc138adab9b7413a8e7",
+  "nativeCaptureSourceRevision": "ebb203c5e5ddc86d55a99139cf5c5165e1e249ba",
+  "finalRuntimeSourceRevision": "c8e0a064aaace6c01cfb50bb45801c9ff1af8bed",
+  "authoring": {
+    "reopenedBlendValidated": true,
+    "repeatedSourceAndRuntimeBytes": true,
+    "sourceLessIntegrity": true,
+    "blenderRuntimePoseParity": true,
+    "meshes": 19,
+    "overlayAvailable": true,
+    "editedMetadataCompiled": true,
+    "assetCount": 29,
+    "compiledRendererContracts": true,
+    "fixtures": 2,
+    "success": true
+  },
+  "poses": {
+    "comparedMatrices": 616,
+    "maximumMatrixError": 3.5762787e-06,
+    "variants": 4
+  },
+  "tests": {
+    "pythonContracts": 62,
+    "focusedAssetTests": 12,
+    "finalPresentationTests": 43,
+    "compiledDefaultMeshesCompared": 57,
+    "rejectedNativeScenes": 8,
+    "legacyFactsSkippedInMotionOnlyRun": 2
+  },
+  "captures": [
+    {
+      "key": "MechanicalIdle-1920x1080-High-CloseTactical",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47912856,
+        "shaderResourceDescriptorsUsed": 89,
+        "instanceDrawCalls": 36,
+        "residentMeshBytes": 2843232
+      }
+    },
+    {
+      "key": "MechanicalMoving-1920x1080-High-CloseTactical",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47912856,
+        "shaderResourceDescriptorsUsed": 89,
+        "instanceDrawCalls": 36,
+        "residentMeshBytes": 2843232
+      }
+    },
+    {
+      "key": "MechanicalFiring-1920x1080-High-CloseTactical",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47912856,
+        "shaderResourceDescriptorsUsed": 89,
+        "instanceDrawCalls": 36,
+        "residentMeshBytes": 2843232
+      }
+    },
+    {
+      "key": "MechanicalLoading-1920x1080-High-CloseTactical",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47912856,
+        "shaderResourceDescriptorsUsed": 89,
+        "instanceDrawCalls": 36,
+        "residentMeshBytes": 2843232
+      }
+    },
+    {
+      "key": "MechanicalUnpowered-1920x1080-High-CloseTactical",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47912856,
+        "shaderResourceDescriptorsUsed": 89,
+        "instanceDrawCalls": 37,
+        "residentMeshBytes": 2844528
+      }
+    },
+    {
+      "key": "MechanicalBroken-1920x1080-High-CloseTactical",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47914248,
+        "shaderResourceDescriptorsUsed": 90,
+        "instanceDrawCalls": 41,
+        "residentMeshBytes": 2900256
+      }
+    },
+    {
+      "key": "MainBattleTankFormation-1920x1080-High-CloseTactical",
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 7.233796296296296e-07,
+        "ChangedPixels": 6,
+        "ChangedPixelFraction": 2.8935185185185184e-06,
+        "WithinTolerance": false
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47912856,
+        "shaderResourceDescriptorsUsed": 89,
+        "instanceDrawCalls": 11,
+        "residentMeshBytes": 1562448
+      }
+    },
+    {
+      "key": "VehicleFactoryProduction-1920x1080-High-CloseTactical",
+      "pixelComparison": {
+        "MaximumChannelDelta": 2,
+        "MeanAbsoluteChannelDelta": 1.9290123456790124e-06,
+        "ChangedPixels": 14,
+        "ChangedPixelFraction": 6.751543209876544e-06,
+        "WithinTolerance": false
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47914248,
+        "shaderResourceDescriptorsUsed": 90,
+        "instanceDrawCalls": 20,
+        "residentMeshBytes": 835824
+      }
+    },
+    {
+      "key": "MainBattleTankFormation-1920x1080-High-Strategic",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47935736,
+        "shaderResourceDescriptorsUsed": 93,
+        "instanceDrawCalls": 26,
+        "residentMeshBytes": 180864
+      }
+    },
+    {
+      "key": "VehicleFactoryProduction-1920x1080-High-Strategic",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "repeatPixelsEqual": true,
+      "fallbackMeshInstances": 0,
+      "resourcesUnchanged": {
+        "residentTextureBytes": 47937128,
+        "shaderResourceDescriptorsUsed": 94,
+        "instanceDrawCalls": 37,
+        "residentMeshBytes": 241536
+      }
+    }
+  ],
+  "budgets": [
+    {
+      "variant": "baseline",
+      "renderStressInstances": 100,
+      "startupReady": true,
+      "stderrEmpty": true,
+      "workingDirectoryEmpty": true,
+      "instanceDrawCalls": 9,
+      "peakResidentTextureBytes": 45718384,
+      "peakDescriptors": 69
+    },
+    {
+      "variant": "baseline",
+      "renderStressInstances": 1000,
+      "startupReady": true,
+      "stderrEmpty": true,
+      "workingDirectoryEmpty": true,
+      "instanceDrawCalls": 9,
+      "peakResidentTextureBytes": 45718384,
+      "peakDescriptors": 69
+    },
+    {
+      "variant": "prepared",
+      "renderStressInstances": 100,
+      "startupReady": true,
+      "stderrEmpty": true,
+      "workingDirectoryEmpty": true,
+      "instanceDrawCalls": 9,
+      "peakResidentTextureBytes": 45718384,
+      "peakDescriptors": 69
+    },
+    {
+      "variant": "prepared",
+      "renderStressInstances": 1000,
+      "startupReady": true,
+      "stderrEmpty": true,
+      "workingDirectoryEmpty": true,
+      "instanceDrawCalls": 9,
+      "peakResidentTextureBytes": 45718384,
+      "peakDescriptors": 69
+    }
+  ],
+  "package": {
+    "archive": "FORGELINE-0.1.396-dev-win-x64.zip",
+    "bytes": 54647872,
+    "sha256": "3e945106bbf3120f74a8bd5571e556e1c95918abe4f6f4fdaa2db556c40a126d",
+    "verifiedManifestFiles": 1461,
+    "authoringFilesAbsent": true,
+    "provenance": {
+      "productVersion": "0.1.396",
+      "version": "0.1.396-dev",
+      "runId": null,
+      "informationalVersion": "0.1.396-dev+c8e0a064aaace6c01cfb50bb45801c9ff1af8bed",
+      "sourceRevision": "c8e0a064aaace6c01cfb50bb45801c9ff1af8bed",
+      "sourceTreeClean": true,
+      "product": "FORGELINE",
+      "buildTimeUtc": "2026-10-17T20:17:38.0931249+00:00",
+      "channel": "dev",
+      "configuration": "Release",
+      "runtimeAssetCompiler": "1.10.0",
+      "runtimeIdentifier": "win-x64",
+      "runAttempt": null,
+      "runtimeAssetSignature": "7d78c06c12f4f2bbbd3ae5886e881ff9601679bc6617cf5eca1a3a7891722882",
+      "repository": "https://github.com/DaveBeusing/Forgeline",
+      "sdk": "10.0.401",
+      "runUrl": null,
+      "targetFramework": "net10.0-windows"
+    }
+  },
+  "ci": {
+    "pullRequestRun": "https://github.com/DaveBeusing/Forgeline/actions/runs/39064387565",
+    "baseRun": "https://github.com/DaveBeusing/Forgeline/actions/runs/39062770122",
+    "result": "Both fail WARP BattlefieldCombat reference with ten-second GPU fence timeout; no retry or limit changes."
+  },
+  "limits": [
+    "Human visual acceptance pending",
+    "Debug layer disabled",
+    "Short native timings are observational, not sustained performance acceptance",
+    "Manual provisioned Blender workflow not dispatched",
+    "Native captures precede final ownership guard; final runtime covered by 43 tests and installed smoke"
+  ],
+  "installedSmoke": {
+    "success": true,
+    "startupReady": true,
+    "stderrEmpty": true,
+    "workingDirectoryEmpty": true,
+    "instanceDrawCalls": 9,
+    "peakResidentTextureBytes": 45718384,
+    "peakDescriptors": 69,
+    "renderStressInstances": 1000,
+    "runtimeOverride": false,
+    "blenderPath": "intentionally absent"
+  },
+  "evidenceImages": [
+    {
+      "file": "building.directorate.vehicle_factory-idle.png",
+      "sha256": "25e59a4680d336621add55bc90d84da2957542f4f62c5f4c4532fad68ce58c95"
+    },
+    {
+      "file": "building.directorate.vehicle_factory-producing.png",
+      "sha256": "e3195fa55628dd1cf8483ec581d9e812ee8edc96fff054a30a9cdad755e97ff4"
+    },
+    {
+      "file": "MechanicalFiring-after.png",
+      "sha256": "f5f176c5e64eedf8d561e4bbbf741ef92b230f6f3a47504041497f686883bb82"
+    },
+    {
+      "file": "MechanicalFiring-before.png",
+      "sha256": "f5f176c5e64eedf8d561e4bbbf741ef92b230f6f3a47504041497f686883bb82"
+    },
+    {
+      "file": "unit.directorate.main_battle_tank-firing.png",
+      "sha256": "05a09699c32b0b0db1a0f8b07ef273dba1234391e4c759a89a5d07ad2fc3686f"
+    },
+    {
+      "file": "unit.directorate.main_battle_tank-idle.png",
+      "sha256": "7790cc66c1bd3fb490b65e71eaa53857c0ebdb179f7f70fb9be0a2d4cbad7a69"
+    },
+    {
+      "file": "VehicleFactoryProduction-after.png",
+      "sha256": "7e3238853c8c14a515fbe07e441e24bd09886d9c5b87cfcf71280499f639c4ee"
+    },
+    {
+      "file": "VehicleFactoryProduction-before.png",
+      "sha256": "ecb52c69f0ee31bc727d5698555de3ca839919ac35916907acf16af5c7fb6f2f"
+    }
+  ]
+}
