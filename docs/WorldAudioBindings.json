@@ -1,0 +1,457 @@
+{
+  "schemaVersion": 1,
+  "worldClipCount": 56,
+  "boundClipCount": 53,
+  "unavailableClipCount": 3,
+  "runtimePlayback": false,
+  "bindings": [
+    {
+      "clipAssetId": "audio.combat.rifle_fire_01",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.rifle_fire_02",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.rifle_fire_03",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.machine_gun_fire_01",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.machine_gun_fire_02",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.machine_gun_fire_03",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.tank_fire_01",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.tank_fire_02",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.tank_fire_03",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.artillery_fire_01",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.artillery_fire_02",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.artillery_fire_03",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick authorized ShotFired; cosmetic three-variant rotation independent of simulation RNG."
+    },
+    {
+      "clipAssetId": "audio.combat.explosion_small",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick visible Impact; unknown target identity and classification are sanitized before publication."
+    },
+    {
+      "clipAssetId": "audio.combat.explosion_vehicle",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Newly observed, currently visible wreck of the matching category, after the silent initial baseline."
+    },
+    {
+      "clipAssetId": "audio.combat.explosion_building",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Newly observed, currently visible wreck of the matching category, after the silent initial baseline."
+    },
+    {
+      "clipAssetId": "audio.combat.impact_dirt",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick visible Impact; unknown target identity and classification are sanitized before publication."
+    },
+    {
+      "clipAssetId": "audio.combat.impact_metal",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick visible Impact; unknown target identity and classification are sanitized before publication."
+    },
+    {
+      "clipAssetId": "audio.combat.impact_concrete",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Current-tick visible Impact; unknown target identity and classification are sanitized before publication."
+    },
+    {
+      "clipAssetId": "audio.vehicles.scout_idle_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Complete owned loop set, current ground velocity or consecutive transform motion; corresponding vehicle family."
+    },
+    {
+      "clipAssetId": "audio.vehicles.scout_move_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Complete owned loop set, current ground velocity or consecutive transform motion; corresponding vehicle family."
+    },
+    {
+      "clipAssetId": "audio.vehicles.truck_idle_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Complete owned loop set, current ground velocity or consecutive transform motion; corresponding vehicle family."
+    },
+    {
+      "clipAssetId": "audio.vehicles.truck_move_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Complete owned loop set, current ground velocity or consecutive transform motion; corresponding vehicle family."
+    },
+    {
+      "clipAssetId": "audio.vehicles.tank_idle_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Complete owned loop set, current ground velocity or consecutive transform motion; corresponding vehicle family."
+    },
+    {
+      "clipAssetId": "audio.vehicles.tank_move_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Complete owned loop set, current ground velocity or consecutive transform motion; corresponding vehicle family."
+    },
+    {
+      "clipAssetId": "audio.vehicles.engine_start",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Consecutive owned movement transition with matching full EntityId and unit family; no replay on reacquisition."
+    },
+    {
+      "clipAssetId": "audio.vehicles.engine_stop",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Consecutive owned movement transition with matching full EntityId and unit family; no replay on reacquisition."
+    },
+    {
+      "clipAssetId": "audio.industry.extractor_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned operational building of the mapped family; extractor/processing/unit-production work must actually be running; power and storage/supply depots use their operational state."
+    },
+    {
+      "clipAssetId": "audio.industry.smelter_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned operational building of the mapped family; extractor/processing/unit-production work must actually be running; power and storage/supply depots use their operational state."
+    },
+    {
+      "clipAssetId": "audio.industry.refinery_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned operational building of the mapped family; extractor/processing/unit-production work must actually be running; power and storage/supply depots use their operational state."
+    },
+    {
+      "clipAssetId": "audio.industry.factory_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned operational building of the mapped family; extractor/processing/unit-production work must actually be running; power and storage/supply depots use their operational state."
+    },
+    {
+      "clipAssetId": "audio.industry.power_plant_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned operational building of the mapped family; extractor/processing/unit-production work must actually be running; power and storage/supply depots use their operational state."
+    },
+    {
+      "clipAssetId": "audio.industry.depot_loop",
+      "loop": true,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned operational building of the mapped family; extractor/processing/unit-production work must actually be running; power and storage/supply depots use their operational state."
+    },
+    {
+      "clipAssetId": "audio.logistics.cargo_load",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned cargo lifecycle enters Loading or Unloading on consecutive observations."
+    },
+    {
+      "clipAssetId": "audio.logistics.cargo_unload",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned cargo lifecycle enters Loading or Unloading on consecutive observations."
+    },
+    {
+      "clipAssetId": "audio.logistics.refuel",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Valid owned fuel/ammunition fraction begins increasing; consecutive ticks and bounded 500 ms retrigger cooldown."
+    },
+    {
+      "clipAssetId": "audio.logistics.rearm",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Valid owned fuel/ammunition fraction begins increasing; consecutive ticks and bounded 500 ms retrigger cooldown."
+    },
+    {
+      "clipAssetId": "audio.logistics.repair",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Valid owned nonzero health fraction begins increasing; bounded retrigger cooldown, never inferred resurrection."
+    },
+    {
+      "clipAssetId": "audio.logistics.supply_complete",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned UnitSupplyState recovers to Supplied; not a promise that every transport request finished."
+    },
+    {
+      "clipAssetId": "audio.construction.place",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Latest distinct accepted Construction feedback, coherent player/tick; nonspatial because the feedback contains no authorized placement position."
+    },
+    {
+      "clipAssetId": "audio.construction.start",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "First owned construction observation after initial baseline, only in an unused history slot; no guessed transition on collision."
+    },
+    {
+      "clipAssetId": "audio.construction.complete",
+      "loop": false,
+      "bus": "world",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Consecutive owned construction changes to a finished nondestroyed building state."
+    },
+    {
+      "clipAssetId": "audio.alerts.supply_low",
+      "loop": false,
+      "bus": "alerts",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Aggregate rising LowSupply status from valid, owned UnitSupplyState observations."
+    },
+    {
+      "clipAssetId": "audio.alerts.supply_critical",
+      "loop": false,
+      "bus": "alerts",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Rising authoritative PlayerAlertState.SupplyCritical."
+    },
+    {
+      "clipAssetId": "audio.alerts.power_low",
+      "loop": false,
+      "bus": "alerts",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Rising authoritative PlayerAlertState.LowPower."
+    },
+    {
+      "clipAssetId": "audio.alerts.power_restored",
+      "loop": false,
+      "bus": "alerts",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Authoritative LowPower condition clears."
+    },
+    {
+      "clipAssetId": "audio.alerts.base_under_attack",
+      "loop": false,
+      "bus": "alerts",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Rising authoritative CommandCoreDamaged condition, not a fabricated per-hit alarm."
+    },
+    {
+      "clipAssetId": "audio.alerts.research_complete",
+      "loop": false,
+      "bus": "alerts",
+      "bound": false,
+      "unavailableReason": "No completed-research counter or event is published.",
+      "source": "No completed-research counter or event is published."
+    },
+    {
+      "clipAssetId": "audio.alerts.unit_ready",
+      "loop": false,
+      "bus": "alerts",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned authoritative UnitsProduced counter increases; one notification per observed batch."
+    },
+    {
+      "clipAssetId": "audio.alerts.invalid_order",
+      "loop": false,
+      "bus": "alerts",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Latest distinct coherent rejected/partial command feedback; future feedback is ignored."
+    },
+    {
+      "clipAssetId": "audio.ambience.wind_loop",
+      "loop": true,
+      "bus": "ambience",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Nonspatial active-match bed; no weather-strength claim."
+    },
+    {
+      "clipAssetId": "audio.ambience.industrial_loop",
+      "loop": true,
+      "bus": "ambience",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Owned operational industrial sources exist in this completed tick."
+    },
+    {
+      "clipAssetId": "audio.ambience.battlefield_loop",
+      "loop": true,
+      "bus": "ambience",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Fresh authorized combat remains in the bounded journal after visibility retraction."
+    },
+    {
+      "clipAssetId": "audio.combat.rocket_launch",
+      "loop": false,
+      "bus": "world",
+      "bound": false,
+      "unavailableReason": "No rocket weapon event exists in the current content.",
+      "source": "No rocket weapon event exists in the current content."
+    },
+    {
+      "clipAssetId": "audio.combat.incoming_artillery",
+      "loop": false,
+      "bus": "world",
+      "bound": false,
+      "unavailableReason": "No authorized incoming-shell warning read model exists.",
+      "source": "No authorized incoming-shell warning read model exists."
+    },
+    {
+      "clipAssetId": "audio.events.victory",
+      "loop": false,
+      "bus": "alerts",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Coherent Victory/Defeat transition after initial baseline; no forced outcome, no draw-to-defeat conversion."
+    },
+    {
+      "clipAssetId": "audio.events.defeat",
+      "loop": false,
+      "bus": "alerts",
+      "bound": true,
+      "unavailableReason": "",
+      "source": "Coherent Victory/Defeat transition after initial baseline; no forced outcome, no draw-to-defeat conversion."
+    }
+  ]
+}
