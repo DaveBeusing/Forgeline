@@ -13,6 +13,61 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class PlayerActionPanelTests
 {
     [Fact]
+    public void StaticProviderStockDoesNotOfferRecipientCommandsByMouseOrKeyboard()
+    {
+        var supply = new PlayerSupplyActionReadModel(new(50,1),default,1,1,true,.5,.5,default,default,0,0,default)
+            { IsStaticProvider = true, HasLocalProviderInventory = true, LocalProviderFuel = 75, LocalProviderAmmunition = 40 };
+        var snapshot = CreateSnapshot(supply:supply);
+        var controller = new PlayerActionPanelController(); var input = new InputState();
+        controller.Update(input,snapshot,1600,900);
+        foreach (var key in new[]{ PlatformKey.Y,PlatformKey.T,PlatformKey.M,PlatformKey.Left,PlatformKey.Right,PlatformKey.Enter })
+        { Press(input,key); controller.Update(input,snapshot,1600,900); Release(input,key); controller.Update(input,snapshot,1600,900); }
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.False(PlayerActionDockHudModel.ResolveItemState(PlayerActionPanelMode.Supply,0,snapshot.PlayerActions).CanActivate);
+        Assert.False(PlayerActionDockHudModel.CanCyclePrimary(PlayerActionPanelMode.Supply,snapshot.PlayerActions));
+        Assert.False(PlayerActionDockHudModel.CanCycleSecondary(PlayerActionPanelMode.Supply,snapshot.PlayerActions));
+    }
+
+    [Fact]
+    public void ProductionInputsPreviewPreparesEachResourceWithoutDispatchingAndResetsAcrossEntities()
+    {
+        var steel = new PlayerStockPolicyActionReadModel(default, ResourceIds.Steel, "Steel", 0, 5, 10, 20,
+            LogisticsStockPriority.Normal, true, default, default, default, default);
+        var fuel = steel with { ResourceId = ResourceIds.Fuel, DisplayName = "Fuel" };
+        var requirement = new PlayerProductionRequirement(2, 7, "Vehicle", [new(ResourceIds.Steel, "Steel", 70, 0), new(ResourceIds.Fuel, "Fuel", 60, 0)]);
+        var logistics = new PlayerLogisticsActionReadModel(new(73, 1), [steel, fuel], null, 500, requirements: [requirement]);
+        var snapshot = CreateSnapshot(logistics: logistics);
+        var controller = new PlayerActionPanelController();
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+        Key(PlatformKey.L); Key(PlatformKey.Tab); Key(PlatformKey.Tab);
+        Assert.Equal(2, controller.SelectedIndex);
+        Key(PlatformKey.Right);
+        Assert.Equal(2, controller.CreateView(1600,900,snapshot.PlayerActions).LogisticsSteps);
+        Key(PlatformKey.Enter);
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.Equal(0, controller.SelectedIndex);
+        Assert.Equal(140, controller.CreateView(1600,900,snapshot.PlayerActions).StockTarget);
+        Key(PlatformKey.Enter);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(PlayerActionRequestKind.SetStockPolicy, request.Kind);
+        Assert.Equal(140, request.StockTarget);
+        Assert.Equal(10, logistics.Policies[0].DesiredTarget);
+        Key(PlatformKey.Tab);
+        Assert.Equal(120, controller.CreateView(1600,900,snapshot.PlayerActions).StockTarget);
+        snapshot = CreateSnapshot();
+        controller.Update(input,snapshot,1600,900);
+        snapshot = CreateSnapshot(logistics: logistics);
+        controller.Update(input,snapshot,1600,900);
+        Assert.Equal(10, controller.CreateView(1600,900,snapshot.PlayerActions).StockTarget);
+        snapshot = CreateSnapshot(logistics: new PlayerLogisticsActionReadModel(new(74,2), [steel,fuel], null,500,requirements:[requirement]));
+        controller.Update(input,snapshot,1600,900);
+        Assert.Equal(10, controller.CreateView(1600,900,snapshot.PlayerActions).StockTarget);
+        void Key(PlatformKey key)
+        { Press(input,key); controller.Update(input,snapshot,1600,900); Release(input,key); controller.Update(input,snapshot,1600,900); }
+    }
+
+    [Fact]
     public void ConstructionPaletteNavigatesByKeyboardAndCreatesPlacementRequest()
     {
         PresentationSnapshot snapshot =
@@ -1616,3 +1671,4 @@ public sealed class PlayerActionPanelTests
                 PlatformInputEventKind.KeyUp,
                 key));
 }
+

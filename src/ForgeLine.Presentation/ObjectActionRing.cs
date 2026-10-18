@@ -98,7 +98,11 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
                 if (index < units.Units.Count) { id = units.Units[index].UnitId.Value; break; }
                 var unitRequest = units.Requests[index - units.Units.Count].RequestEntity;
                 return new(2, unitRequest.Index, unitRequest.Generation);
-            case PlayerActionPanelMode.Logistics: id = actions.Logistics!.Policies[index].ResourceId.Value; break;
+            case PlayerActionPanelMode.Logistics:
+                var logistics = actions.Logistics!;
+                if (index < logistics.Policies.Count) { id = logistics.Policies[index].ResourceId.Value; break; }
+                var requirement = logistics.Requirements[index - logistics.Policies.Count];
+                return new((byte)(4 + requirement.Kind), requirement.Id);
             case PlayerActionPanelMode.Technology: id = actions.Technology[index].TechnologyId.Value; break;
             default: kind = 3; id = (uint)index; break;
         }

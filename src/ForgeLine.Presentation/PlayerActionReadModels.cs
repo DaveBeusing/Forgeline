@@ -280,6 +280,14 @@ public readonly record struct PlayerStockPolicyActionReadModel(
     EntityId AssignedTruck)
 {
     public bool HasPolicy => PolicyEntity.IsValid;
+    public double ReservedQuantity { get; init; }
+    public double AvailableQuantity => Math.Max(0, CurrentQuantity - ReservedQuantity);
+    public double AnnouncedQuantity { get; init; }
+    public double RequestedQuantity { get; init; }
+    public EntityId Source { get; init; }
+    public string SourceName { get; init; } = string.Empty;
+    public PlayerWorkSummary Service { get; init; }
+
 }
 
 public readonly record struct PlayerCargoStatusReadModel(
@@ -288,7 +296,18 @@ public readonly record struct PlayerCargoStatusReadModel(
     CargoTransportWaitReason WaitReason,
     CargoTransportFailureReason FailureReason,
     double CargoQuantity,
-    double Capacity);
+    double Capacity)
+{
+    public EntityId Source { get; init; }
+    public EntityId Destination { get; init; }
+    public ResourceId Resource { get; init; }
+    public string SourceName { get; init; } = string.Empty;
+    public string DestinationName { get; init; } = string.Empty;
+    public string ResourceName { get; init; } = string.Empty;
+    public double RequestedQuantity { get; init; }
+}
+
+public readonly record struct PlayerCargoFleet(int Total, int Working, int Bound, int EmptyIdle, int NoDriveFuel);
 
 public sealed class PlayerLogisticsActionReadModel
 {
@@ -297,7 +316,11 @@ public sealed class PlayerLogisticsActionReadModel
     public PlayerLogisticsActionReadModel(
         EntityId entity,
         IReadOnlyList<PlayerStockPolicyActionReadModel> policies,
-        PlayerCargoStatusReadModel? cargo)
+        PlayerCargoStatusReadModel? cargo,
+        double inventoryCapacity = 0,
+        double inventoryQuantity = 0,
+        PlayerWorkSummary service = default,
+        IReadOnlyList<PlayerProductionRequirement>? requirements = null)
     {
         Entity = entity;
         _policies =
@@ -305,6 +328,10 @@ public sealed class PlayerLogisticsActionReadModel
                 policies?.ToArray() ??
                 throw new ArgumentNullException(nameof(policies)));
         Cargo = cargo;
+        InventoryCapacity = inventoryCapacity;
+        InventoryQuantity = inventoryQuantity;
+        Service = service;
+        Requirements = Array.AsReadOnly(requirements?.ToArray() ?? []);
     }
 
     public EntityId Entity { get; }
@@ -313,6 +340,13 @@ public sealed class PlayerLogisticsActionReadModel
         _policies;
 
     public PlayerCargoStatusReadModel? Cargo { get; }
+    public double InventoryCapacity { get; }
+    public double InventoryQuantity { get; }
+    public PlayerWorkSummary Service { get; }
+    public IReadOnlyList<PlayerProductionRequirement> Requirements { get; }
+    public int ItemCount => Policies.Count + Requirements.Count;
+    public bool HasEnabledGraphNode { get; init; }
+    public PlayerCargoFleet CargoFleet { get; init; }
 }
 
 public enum PlayerSupplyProviderState : byte
@@ -339,7 +373,19 @@ public readonly record struct PlayerSupplyActionReadModel(
     double ProviderFuel,
     double ProviderAmmunition,
     ResupplyProviderRejection ProviderRejections,
-    BattlefieldSupplyPriority Priority = BattlefieldSupplyPriority.Normal);
+    BattlefieldSupplyPriority Priority = BattlefieldSupplyPriority.Normal)
+{
+    public PlayerWorkSummary Service { get; init; }
+    public bool IsSupplyTruck { get; init; }
+    public bool IsStaticProvider { get; init; }
+    public bool HasLocalProviderInventory { get; init; }
+    public double LocalProviderFuel { get; init; }
+    public double LocalProviderAmmunition { get; init; }
+    public double CargoFuel { get; init; }
+    public double CargoAmmunition { get; init; }
+    public double DriveFuelQuantity { get; init; }
+    public double DriveFuelCapacity { get; init; }
+}
 
 public readonly record struct PlayerTacticalTargetReadModel(
     EntityId Entity,
@@ -588,7 +634,7 @@ internal static class PlayerActionSnapshotFactory
                 ? CaptureLogistics(
                     context.Entities,
                     scenario,
-                    selectedFacility)
+                    selectedFacility, production, unitProduction)
                 : null;
 
         PlayerSupplyActionReadModel? supply =
@@ -1202,13 +1248,15 @@ internal static class PlayerActionSnapshotFactory
     private static PlayerLogisticsActionReadModel? CaptureLogistics(
         EntityRegistry entities,
         MatchRuntime scenario,
-        EntityId entity)
+        EntityId entity,
+        PlayerProductionFacilityActionReadModel? production,
+        PlayerUnitProductionFacilityActionReadModel? units)
     {
         bool hasInventory =
             TryResolveDistributionInventory(
                 entities,
                 entity,
-                out InventoryId inventory);
+                out InventoryId inventory) && scenario.Inventories.Contains(inventory);
 
         PlayerCargoStatusReadModel? cargo = null;
         if (entities.TryGetComponent(
@@ -1234,7 +1282,17 @@ internal static class PlayerActionSnapshotFactory
                     state.WaitReason,
                     state.FailureReason,
                     quantity,
-                    transport.Capacity);
+                    transport.Capacity)
+                {
+                    Source = entities.TryGetComponent(entity, out CargoTransportOrder sourceOrder) ? OwnedNode(sourceOrder.Origin) : default,
+                    SourceName = entities.TryGetComponent(entity, out CargoTransportOrder sourceNameOrder) ? Name(OwnedNode(sourceNameOrder.Origin)) : "NO SOURCE ASSIGNED",
+                    DestinationName = entities.TryGetComponent(entity, out CargoTransportOrder destinationNameOrder) ? Name(OwnedNode(destinationNameOrder.Destination)) : "NO DESTINATION ASSIGNED",
+                    Destination = entities.TryGetComponent(entity, out CargoTransportOrder destinationOrder) ? OwnedNode(destinationOrder.Destination) : default,
+                    Resource = entities.TryGetComponent(entity, out CargoTransportOrder resourceOrder) ? resourceOrder.ResourceId : default,
+                    ResourceName = entities.TryGetComponent(entity, out CargoTransportOrder namedOrder) &&
+                        scenario.Services.Resources.TryGet(namedOrder.ResourceId, out var resourceDefinition) ? resourceDefinition.DisplayName : string.Empty,
+                    RequestedQuantity = entities.TryGetComponent(entity, out CargoTransportOrder quantityOrder) ? quantityOrder.RequestedQuantity : 0
+                };
         }
 
         if (!hasInventory)
@@ -1243,12 +1301,14 @@ internal static class PlayerActionSnapshotFactory
                 ? new PlayerLogisticsActionReadModel(
                     entity,
                     [],
-                    cargo)
+                    cargo, service: CaptureService(entity)) { CargoFleet = CaptureFleet() }
                 : null;
         }
 
-        var policies =
-            new List<PlayerStockPolicyActionReadModel>();
+        PlayerWorkSummary CaptureService(EntityId target) => PlayerExperienceSnapshotFactory.CaptureWork(
+            entities, target, scenario.Production, scenario.UnitProduction,
+            scenario.Services.UnitDefinitions, scenario.Services.BuildingDefinitions);
+        var policies = new List<PlayerStockPolicyActionReadModel>();
 
         foreach (ResourceDefinition resource in
                  scenario.Services.Resources.Definitions)
@@ -1311,6 +1371,7 @@ internal static class PlayerActionSnapshotFactory
                 out LogisticsBottleneckReason bottleneck,
                 out EntityId assignedTruck);
 
+            var sourceEntity = Source(policyEntity);
             policies.Add(
                 new PlayerStockPolicyActionReadModel(
                     policyEntity,
@@ -1327,13 +1388,95 @@ internal static class PlayerActionSnapshotFactory
                     distributionState,
                     failure,
                     bottleneck,
-                    assignedTruck));
+                    Owned(assignedTruck) ? assignedTruck : EntityId.Invalid)
+                {
+                    ReservedQuantity = scenario.Inventories.GetReservedQuantity(inventory, resource.Id),
+                    RequestedQuantity = Outstanding(policyEntity, false),
+                    AnnouncedQuantity = Outstanding(policyEntity, true),
+                    Source = sourceEntity,
+                    SourceName = Name(sourceEntity),
+                    Service = Owned(assignedTruck) ? CaptureService(assignedTruck) : default
+                });
         }
 
         return new PlayerLogisticsActionReadModel(
             entity,
             policies,
-            cargo);
+            cargo,
+            scenario.Inventories.GetTotalCapacity(inventory),
+            scenario.Inventories.GetTotalQuantity(inventory),
+            CaptureService(entity),
+            (production?.Recipes.Select(r => new PlayerProductionRequirement(1, r.RecipeId.Value, r.DisplayName, r.Inputs)) ?? [])
+                .Concat(units?.Units.Select(u => new PlayerProductionRequirement(2, u.UnitId.Value, u.DisplayName, u.Costs)) ?? [])
+                .ToArray())
+        {
+            HasEnabledGraphNode = scenario.Logistics.TryGetNodeForEntity(entity, out var localNode) &&
+                scenario.Logistics.TryGetNode(localNode, out var graphNode) && graphNode.Enabled,
+            CargoFleet = CaptureFleet()
+        };
+
+        string Name(EntityId target)
+        {
+            if (!Owned(target)) return "NO SOURCE ASSIGNED";
+            if (entities.TryGetComponent(target, out CompletedBuilding building) &&
+                scenario.Services.BuildingDefinitions.TryGet(building.BuildingId, out var definition)) return definition.DisplayName;
+            return "OWNED LOGISTICS SOURCE";
+        }
+        EntityId OwnedNode(ForgeLine.Logistics.LogisticsNodeId node) => scenario.Logistics.TryGetNode(node, out var value) && Owned(value.Entity) ? value.Entity : default;
+        PlayerCargoFleet CaptureFleet()
+        {
+            int total = 0, working = 0, bound = 0, idle = 0, noFuel = 0;
+            foreach (var truck in entities.Query<CargoTransport>())
+            {
+                if (!Owned(truck) || entities.HasComponent<SupplyTruck>(truck) ||
+                    entities.TryGetComponent(truck, out HealthState health) && health.IsDepleted) continue;
+                total++;
+                if (entities.HasComponent<CargoTransportOrder>(truck)) working++;
+                if (entities.HasComponent<CargoTransportReservation>(truck) || entities.HasComponent<ResupplyOrder>(truck)) bound++;
+                if (entities.TryGetComponent(truck, out UnitFuelState fuel) &&
+                    (!scenario.Inventories.Contains(fuel.InventoryId) || scenario.Inventories.GetAvailableQuantity(fuel.InventoryId, ResourceIds.Fuel) <= 1e-9)) noFuel++;
+                var transport = entities.GetComponent<CargoTransport>(truck);
+                if (entities.TryGetComponent(truck, out CargoTransportRuntimeState state) && state.Lifecycle == CargoTransportLifecycleState.Idle &&
+                    !entities.HasComponent<CargoTransportOrder>(truck) && !entities.HasComponent<CargoTransportReservation>(truck) &&
+                    !entities.HasComponent<ResupplyOrder>(truck) && scenario.Inventories.Contains(transport.CargoInventory) &&
+                    scenario.Inventories.GetTotalQuantity(transport.CargoInventory) <= 1e-9) idle++;
+            }
+            return new(total, working, bound, idle, noFuel);
+        }
+        bool Owned(EntityId target) => entities.IsAlive(target) &&
+            entities.TryGetComponent(entity, out ControllableEntity local) &&
+            entities.TryGetComponent(target, out ControllableEntity owner) && owner.Owner == local.Owner;
+        double Outstanding(EntityId policyId, bool assignedOnly)
+        {
+            double total = 0;
+            foreach (var request in scenario.AutomatedDistribution.LastDebugSnapshot.Requests)
+                if (request.PolicyEntity == policyId && request.State is not (LogisticsTransportRequestState.Completed or LogisticsTransportRequestState.Failed))
+                {
+                    if (!assignedOnly)
+                    {
+                        double delivered = request.State is (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
+                            Owned(request.AssignedTruck) && entities.TryGetComponent(request.AssignedTruck, out CargoTransportRuntimeState progress)
+                            ? progress.DeliveredQuantity : 0;
+                        total += Math.Max(0, request.RequestedQuantity - delivered); continue;
+                    }
+                    if (request.State is (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
+                        Owned(request.AssignedTruck) && entities.TryGetComponent(request.AssignedTruck, out CargoTransportOrder order) &&
+                        entities.TryGetComponent(request.AssignedTruck, out CargoTransportRuntimeState state))
+                    {
+                        double reserved = entities.TryGetComponent(request.AssignedTruck, out CargoTransportReservation reservation) &&
+                            reservation.RequestId == request.RequestId ? reservation.Quantity : 0;
+                        total += reserved + Math.Max(0, state.LoadedQuantity - state.DeliveredQuantity);
+                    }
+                }
+            return total;
+        }
+        EntityId Source(EntityId policyId)
+        {
+            foreach (var request in scenario.AutomatedDistribution.LastDebugSnapshot.Requests.Reverse())
+                if (request.PolicyEntity == policyId && request.State is (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
+                    scenario.Logistics.TryGetNode(request.Origin, out var source) && Owned(source.Entity)) return source.Entity;
+            return EntityId.Invalid;
+        }
     }
 
     private static PlayerSupplyActionReadModel? CaptureSupply(
@@ -1389,6 +1532,11 @@ internal static class PlayerActionSnapshotFactory
                 planning.SelectedProvider;
         }
 
+        if (selectedProvider.IsValid &&
+            (!entities.TryGetComponent(entity, out ControllableEntity recipientOwner) ||
+             !entities.TryGetComponent(selectedProvider, out ControllableEntity providerOwner) || providerOwner.Owner != recipientOwner.Owner))
+            selectedProvider = EntityId.Invalid;
+
         ResupplyProviderRejection rejections =
             entities.TryGetComponent(
                 entity,
@@ -1412,6 +1560,8 @@ internal static class PlayerActionSnapshotFactory
                 ? configuredPriority.Priority
                 : BattlefieldSupplyPriority.Normal;
 
+        bool hasLocalProvider = entities.TryGetComponent(entity, out SupplyProvider localProvider);
+        bool hasLocalInventory = hasLocalProvider && scenario.Inventories.Contains(localProvider.InventoryId);
         return new PlayerSupplyActionReadModel(
             entity,
             supplyState.Status,
@@ -1425,7 +1575,23 @@ internal static class PlayerActionSnapshotFactory
             providerFuel,
             providerAmmunition,
             rejections,
-            priority);
+            priority)
+        {
+            IsSupplyTruck = entities.HasComponent<SupplyTruck>(entity),
+            IsStaticProvider = hasLocalProvider && !entities.HasComponent<SupplyTruck>(entity),
+            HasLocalProviderInventory = hasLocalInventory,
+            LocalProviderFuel = hasLocalInventory ? scenario.Inventories.GetQuantity(localProvider.InventoryId,ResourceIds.Fuel) : 0,
+            LocalProviderAmmunition = hasLocalInventory ? scenario.Inventories.GetQuantity(localProvider.InventoryId,ResourceIds.Ammunition) : 0,
+            CargoFuel = entities.TryGetComponent(entity, out SupplyTruck cargoFuel) && scenario.Inventories.Contains(cargoFuel.InventoryId)
+                ? scenario.Inventories.GetQuantity(cargoFuel.InventoryId, ResourceIds.Fuel) : 0,
+            CargoAmmunition = entities.TryGetComponent(entity, out SupplyTruck cargoAmmo) && scenario.Inventories.Contains(cargoAmmo.InventoryId)
+                ? scenario.Inventories.GetQuantity(cargoAmmo.InventoryId, ResourceIds.Ammunition) : 0,
+            DriveFuelQuantity = entities.TryGetComponent(entity, out UnitFuelState driveFuel) && scenario.Inventories.Contains(driveFuel.InventoryId)
+                ? scenario.Inventories.GetQuantity(driveFuel.InventoryId, ResourceIds.Fuel) : 0,
+            DriveFuelCapacity = entities.TryGetComponent(entity, out UnitFuelState driveCapacity) ? driveCapacity.Capacity : 0,
+            Service = PlayerExperienceSnapshotFactory.CaptureWork(entities, entity, scenario.Production, scenario.UnitProduction,
+                scenario.Services.UnitDefinitions, scenario.Services.BuildingDefinitions)
+        };
     }
 
     private static bool TryResolveDistributionInventory(
@@ -1517,13 +1683,21 @@ internal static class PlayerActionSnapshotFactory
 
         LogisticsTransportRequestReadModel selected =
             best.Value;
+        if (selected.State == LogisticsTransportRequestState.Completed) return;
         failure = selected.FailureReason;
         bottleneck = selected.BottleneckReason;
-        assignedTruck = selected.AssignedTruck;
+        assignedTruck = selected.State is LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit
+            ? selected.AssignedTruck : EntityId.Invalid;
 
-        if (selected.AssignedTruck.IsValid &&
+        if (assignedTruck.IsValid &&
+            (!entities.TryGetComponent(policyEntity, out LogisticsStockPolicy policy) ||
+             !entities.TryGetComponent(policy.TargetEntity, out ControllableEntity targetOwner) ||
+             !entities.TryGetComponent(assignedTruck, out ControllableEntity truckOwner) || truckOwner.Owner != targetOwner.Owner))
+            assignedTruck = EntityId.Invalid;
+
+        if (assignedTruck.IsValid &&
             entities.TryGetComponent(
-                selected.AssignedTruck,
+                assignedTruck,
                 out CargoTransportRuntimeState transport))
         {
             state =
@@ -1691,7 +1865,7 @@ internal static class PlayerActionSnapshotFactory
 
         double available =
             scenario.Inventories.Contains(inventory)
-                ? scenario.Inventories.GetQuantity(
+                ? scenario.Inventories.GetAvailableQuantity(
                     inventory,
                     resourceId)
                 : 0.0;

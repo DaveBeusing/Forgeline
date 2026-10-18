@@ -110,6 +110,52 @@ public sealed class HoverTooltipRenderingTests
         Assert.Equal(1, graphics.BufferCount);
     }
 
+    [Theory]
+    [InlineData(1920, 1080, 96u, 1f, false)]
+    [InlineData(1280, 720, 192u, 2f, false)]
+    [InlineData(1280, 720, 192u, 2f, true)]
+    public void LogisticsCatalogDetailsWrapWithinViewportAndRetainAllFourInputs(int width, int height, uint dpi, float scale, bool centered)
+    {
+        var inputs = new[] {
+            new PlayerActionResourceAmount(ResourceIds.Steel, "Steel", 70, 0),
+            new PlayerActionResourceAmount(ResourceIds.Electronics, "Electronics", 24, 0),
+            new PlayerActionResourceAmount(ResourceIds.Fuel, "Fuel", 60, 0),
+            new PlayerActionResourceAmount(ResourceIds.Ammunition, "Ammunition", 40, 0) };
+        var logistics = new PlayerLogisticsActionReadModel(new EntityId(11, 1), [], null, 1000, 0,
+            requirements: [new PlayerProductionRequirement(2, 1, "Scout Vehicle", inputs)]);
+        var actions = new PlayerActionSnapshot(new SimulationSessionId(1), new SimulationTick(1), [], 0, null, null, logistics);
+        var snapshot = HoverTooltipTests.Snapshot(actions: actions);
+        var panel = default(PlayerActionPanelView) with { Mode = PlayerActionPanelMode.Logistics };
+        var layout = GameplayHudLayout.Create(width, height, dpi, scale);
+        var view = new HoverTooltipView(snapshot.SessionId, default, default, new Vector2(width - 1, centered ? height / 2 : height - 1),
+            true, width, height, layout.Scale, panel.Mode, (int)PlayerActionDockControlKind.Item, 0);
+        var content = Assert.IsType<HoverTooltipContent>(HoverTooltipResolver.Resolve(snapshot, view, panel));
+        Assert.True(content.WrapDetails);
+        Assert.Equal(4, content.Costs!.Count);
+        Assert.Contains("PREVIEW CREATES NO ORDERS", content.Explanation);
+        string remaining = content.Explanation;
+        int rows = 0;
+        while (remaining.Length > 0)
+        {
+            int length = WorldHoverTooltipSurface.WrappedPrefix(remaining, false, true);
+            Assert.InRange(UiFontMetrics.Default.Measure(remaining.AsSpan(0, length), UiTypography.Style(UiTextRole.Tooltip).Size), 0, 312);
+            remaining = remaining[length..].TrimStart();
+            rows++;
+        }
+        Assert.True(rows > 1);
+        using var graphics = new RecordingDevice();
+        using var surface = new WorldHoverTooltipSurface(graphics);
+        surface.Render(Context(new RecordingContext { Width = width, Height = height }, snapshot, layout, view) with { ActionPanel = panel });
+        Assert.InRange(surface.LastBounds.X, 0, width);
+        Assert.InRange(surface.LastBounds.Right, 0, width);
+        Assert.InRange(surface.LastBounds.Bottom, 0, height);
+        // The panel may reduce its scale to fit a high-DPI viewport.
+        float fittedScale = surface.LastBounds.Width / 330;
+        Assert.True(surface.LastBounds.Height > 12 * fittedScale * 14);
+        Assert.InRange(surface.LastBounds.Height / fittedScale,
+            16 + surface.LastLayoutLineCount * 14 - .1f, 16 + surface.LastLayoutLineCount * 14 + .1f);
+    }
+
     private static GameplayHudRenderContext Context(IGraphicsCommandContext graphics, PresentationSnapshot snapshot,
         GameplayHudLayout layout, HoverTooltipView view) =>
         new(graphics, new RtsCamera(), snapshot, new AxisAlignedBounds(new Vector3(-1000), new Vector3(1000)),

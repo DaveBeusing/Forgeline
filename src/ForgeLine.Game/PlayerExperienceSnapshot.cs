@@ -748,7 +748,7 @@ public static class PlayerExperienceSnapshotFactory
             commonBuildingId);
     }
 
-    private static PlayerWorkSummary CaptureWork(
+    public static PlayerWorkSummary CaptureWork(
         EntityRegistry entities,
         EntityId entity,
         ProductionSystem production,

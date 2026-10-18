@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Input;
 using ForgeLine.Platform;
@@ -12,6 +13,43 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class GameplayInteractionJourneyTests
 {
+    [Theory]
+    [InlineData(1280,720,96,1f)]
+    [InlineData(1280,720,192,2f)]
+    [InlineData(1920,1080,144,1f)]
+    public void LogisticsInputJourneyUsesReboundActivationAndKeepsPreviewSeparate(int width,int height,uint dpi,float scale)
+    {
+        var bindings = new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Activate,PlatformKey.G));
+        var controller = new PlayerActionPanelController(bindings);
+        var input = new InputState();
+        var policy = new PlayerStockPolicyActionReadModel(default,ResourceIds.Steel,"Steel",0,5,10,20,
+            LogisticsStockPriority.Normal,true,default,default,default,default);
+        var logistics = new PlayerLogisticsActionReadModel(new(7,3),[policy,policy with { ResourceId=ResourceIds.Fuel,DisplayName="Fuel" }],null,400,
+            requirements:[new(2,3,"Vehicle with a deliberately long production label",[new(ResourceIds.Steel,"Steel",91,0),new(ResourceIds.Fuel,"Fuel",37,0)])]);
+        var actions = new PlayerActionSnapshot(new(1),new(1),[],0,null,null,logistics);
+        var snapshot = new PresentationSnapshot(new(1),TimeSpan.FromMilliseconds(50),0,ReadOnlySpan<RenderInstance>.Empty,sessionId:new(1),playerActions:actions);
+        controller.Update(input,snapshot,width,height,dpi,scale);
+        Key(PlatformKey.L); Key(PlatformKey.Tab); Key(PlatformKey.Tab); Key(PlatformKey.Enter);
+        Assert.Equal(2,controller.SelectedIndex);
+        Assert.False(controller.TryTakeRequest(out _));
+        Key(PlatformKey.G);
+        Assert.Equal(0,controller.SelectedIndex);
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.Equal(91,controller.CreateView(width,height,actions,dpi,scale).StockTarget);
+        Key(PlatformKey.G);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(PlayerActionRequestKind.SetStockPolicy,request.Kind);
+        Assert.Equal(91,request.StockTarget);
+        Assert.Equal(10,logistics.Policies[0].DesiredTarget);
+        void Key(PlatformKey key)
+        {
+            input.BeginFrame(); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,key));
+            controller.Update(input,snapshot,width,height,dpi,scale);
+            input.BeginFrame(); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp,key));
+            controller.Update(input,snapshot,width,height,dpi,scale);
+        }
+    }
+
     [Theory]
     [InlineData(1024, 768, 96, ControllableEntityCategory.Unit)]
     [InlineData(1280, 720, 120, ControllableEntityCategory.Building)]

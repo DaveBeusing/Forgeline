@@ -289,9 +289,9 @@ internal static class PlayerActionDockHudModel
             case PlayerActionPanelMode.Logistics:
                 return actions.Logistics is
                            PlayerLogisticsActionReadModel logistics &&
-                       index <
-                           logistics.Policies.Count
-                    ? logistics.Policies[index].DisplayName
+                       index < logistics.ItemCount
+                    ? index < logistics.Policies.Count ? logistics.Policies[index].DisplayName
+                        : logistics.Requirements[index - logistics.Policies.Count].Title
                     : string.Empty;
 
             case PlayerActionPanelMode.Supply:
@@ -431,13 +431,13 @@ internal static class PlayerActionDockHudModel
             case PlayerActionPanelMode.Logistics:
                 return actions.Logistics is
                            PlayerLogisticsActionReadModel logistics &&
-                       index <
-                           logistics.Policies.Count
+                       index < logistics.ItemCount
                     ? PlayerActionDockItemState.Enabled
                     : PlayerActionDockItemState.Disabled(
                         "SELECT LOGISTICS");
 
             case PlayerActionPanelMode.Supply:
+                if (actions.Supply is { IsStaticProvider: true }) return PlayerActionDockItemState.Disabled("USE LOGISTICS FOR STOCK");
                 return actions.Supply.HasValue &&
                        index < 3
                     ? PlayerActionDockItemState.Enabled
@@ -530,6 +530,7 @@ internal static class PlayerActionDockHudModel
                 index - production.Recipes.Count < production.Requests.Count =>
                 production.Requests[index - production.Recipes.Count].Paused ? "RESUME" : "PAUSE",
             PlayerActionPanelMode.Production or PlayerActionPanelMode.UnitProduction => "QUEUE",
+            PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.Policies.Count => "USE INPUTS",
             PlayerActionPanelMode.Logistics => "APPLY POLICY",
             PlayerActionPanelMode.Supply => index < 2 ? "APPLY AUTO" : "REQUEST SUPPLY",
             PlayerActionPanelMode.Technology => "START RESEARCH",
@@ -604,7 +605,7 @@ internal static class PlayerActionDockHudModel
             PlayerActionPanelMode.Logistics =>
                 actions?.Logistics is not null,
             PlayerActionPanelMode.Supply =>
-                actions?.Supply is not null,
+                actions?.Supply is { IsStaticProvider: false },
             _ =>
                 false
         };
@@ -619,7 +620,7 @@ internal static class PlayerActionDockHudModel
             PlayerActionPanelMode.Logistics =>
                 actions?.Logistics is not null,
             PlayerActionPanelMode.Supply =>
-                actions?.Supply is not null,
+                actions?.Supply is { IsStaticProvider: false },
             _ =>
                 false
         };
@@ -655,13 +656,12 @@ internal static class PlayerActionDockHudModel
             actions.Logistics is
                 PlayerLogisticsActionReadModel logistics)
         {
-            return index <
-                logistics.Policies.Count;
+            return index < logistics.ItemCount;
         }
 
         return mode ==
                    PlayerActionPanelMode.Supply &&
-               actions.Supply.HasValue &&
+               actions.Supply is { IsStaticProvider: false } &&
                index <= 1;
     }
 

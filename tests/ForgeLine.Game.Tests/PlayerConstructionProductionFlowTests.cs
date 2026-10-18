@@ -12,6 +12,67 @@ namespace ForgeLine.Game.Tests;
 public sealed class PlayerConstructionProductionFlowTests
 {
     [Fact]
+    public void CatalogScoutPolicyReplacesInsufficientDefaultsAndProducesThroughRealCargo()
+    {
+        using var scenario = CreateScenario(4127);
+        var gateway = new PlayerCommandGateway(scenario.Simulation, scenario.Services.BuildingCommands,
+            scenario.BattlefieldRuntime.MatchStateEntity);
+        scenario.Simulation.RegisterTickObserver(gateway);
+        BuildingId[] build = [BuildingIds.PowerPlant, BuildingIds.PowerPlant, BuildingIds.Smelter, BuildingIds.VehicleFactory];
+        foreach (var id in build) BuildPlayerBuilding(scenario, gateway, id, FindOpenPlacement(scenario, id));
+        scenario.Simulation.RunTicks(build.Max(id => scenario.Services.BuildingDefinitions[id].ConstructionTicks) + 6,
+            TestContext.Current.CancellationToken);
+        var smelter = FindCompletedBuilding(scenario, BuildingIds.Smelter);
+        var factory = FindCompletedBuilding(scenario, BuildingIds.VehicleFactory);
+        var processor = scenario.Simulation.Entities.GetComponent<ProductionFacility>(smelter);
+        var production = scenario.Simulation.Entities.GetComponent<UnitProductionFacility>(factory);
+        var scout = scenario.Services.UnitDefinitions[UnitIds.ScoutVehicle];
+        var steel = scout.Costs.Single(c => c.ResourceId == ResourceIds.Steel).Quantity;
+        var recipe = scenario.Services.ProductionRecipes[RecipeIds.Steel];
+        double cycles = Math.Ceiling(steel / recipe.Outputs.Single(o => o.ResourceId == ResourceIds.Steel).Quantity);
+        // Retain the remaining construction Steel at the Core so the factory's Steel must come from real smelting.
+        var side = scenario.GetBase(new PlayerId(1));
+        double retained = scenario.Inventories.GetQuantity(side.StartingInventory, ResourceIds.Steel);
+        SubmitStockPolicy(scenario,gateway,side.CommandCore,ResourceIds.Steel,retained,retained,retained);
+        foreach (var input in recipe.Inputs)
+            SubmitStockPolicy(scenario,gateway,smelter,input.ResourceId,input.Quantity * cycles,input.Quantity * cycles,input.Quantity * cycles);
+        var queued = DispatchAction(scenario,gateway,PlayerActionRequest.QueueProduction(smelter,RecipeIds.Steel,
+            ProductionPriority.High,ProductionRequestMode.DesiredStock,ResourceIds.Steel,steel));
+        Assert.Equal(PlayerCommandFeedbackState.Accepted,queued.State);
+        RunUntil(scenario,() => scenario.Inventories.GetQuantity(processor.OutputInventory,ResourceIds.Steel) >= steel,5_000);
+        Assert.True(scenario.Simulation.Entities.GetComponent<ProductionFacility>(smelter).CompletedCycles > 0);
+        foreach (var cost in scout.Costs)
+            SubmitStockPolicy(scenario,gateway,factory,cost.ResourceId,5,10,20);
+        QueueUnit(scenario,gateway,factory,UnitIds.ScoutVehicle);
+        scenario.Simulation.RunTicks(2_000,TestContext.Current.CancellationToken);
+        Assert.Empty(FindOwnedUnits(scenario,UnitIds.ScoutVehicle));
+        Assert.Equal(UnitProductionBlockReason.NoInput,scenario.Simulation.Entities.GetComponent<UnitProductionFacility>(factory).BlockReason);
+        foreach (var cost in scout.Costs)
+        {
+            SubmitStockPolicy(scenario,gateway,factory,cost.ResourceId,cost.Quantity,cost.Quantity,cost.Quantity);
+            SubmitStockPolicy(scenario,gateway,factory,cost.ResourceId,cost.Quantity,cost.Quantity,cost.Quantity);
+            int policies = 0;
+            foreach (var entity in scenario.Simulation.Entities.Query<LogisticsStockPolicy>())
+            {
+                var policy = scenario.Simulation.Entities.GetComponent<LogisticsStockPolicy>(entity);
+                if (policy.TargetEntity == factory && policy.ResourceId == cost.ResourceId) policies++;
+            }
+            Assert.Equal(1, policies);
+        }
+        Assert.True(scenario.Logistics.TryGetNodeForEntity(smelter,out var source));
+        bool observedSteelShipment = false;
+        RunUntil(scenario,() =>
+        {
+            observedSteelShipment |= scenario.AutomatedDistribution.LastDebugSnapshot.Requests.Any(r =>
+                r.Origin == source && r.ResourceId == ResourceIds.Steel && r.AssignedTruck.IsValid);
+            return FindOwnedUnits(scenario,UnitIds.ScoutVehicle).Length == 1;
+        },8_000);
+        Assert.True(scenario.AutomatedDistribution.Metrics.CompletedRequestCount >= 5);
+        Assert.True(observedSteelShipment);
+        Assert.Single(FindOwnedUnits(scenario,UnitIds.ScoutVehicle));
+    }
+
+    [Fact]
     public void PlayerCommandsBuildProductionChainAndProduceInfantryVehicleAndSupportUnit()
     {
         using MatchRuntime scenario =
