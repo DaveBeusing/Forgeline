@@ -33,7 +33,7 @@ internal sealed class MechanicalPoseHistory
     }
 
     public MechanicalPose Capture(EntityId entity, Vector3 position, Quaternion rotation,
-        bool active, bool shot, float elevation, bool openDoor, bool allowDoorMotion = true)
+        bool active, bool shot, float elevation, bool openDoor, bool allowDoorMotion = true, InfantryActionInput infantry = default)
     {
         // A completed tick owns one cosmetic pose per full entity identity.
         // In particular, a second extraction must not lose a one-shot recoil.
@@ -41,13 +41,13 @@ internal sealed class MechanicalPoseHistory
         if (_current.Count >= Capacity) return default;
         bool found = _previous.TryGetValue(entity, out Entry previous);
         MechanicalPose pose = found ? previous.Pose : new MechanicalPose(true, 0, 0, _seconds, -1, elevation, 0);
-        double travel = 0;
+        double travel = 0, speed = 0;
         if (found)
         {
             Vector3 delta = position - previous.Position;
             // Teleports reset visual travel instead of producing extreme wheel spin.
             if (delta.LengthSquared() < 400)
-                travel = Vector3.Dot(delta, Vector3.Transform(Vector3.UnitZ, rotation));
+                { travel = Vector3.Dot(delta, Vector3.Transform(Vector3.UnitZ, rotation)); speed = _step > 0 ? delta.Length() / _step : 0; }
         }
         float doorTarget = openDoor ? 1 : 0;
         float door = allowDoorMotion
@@ -62,6 +62,8 @@ internal sealed class MechanicalPoseHistory
             Elevation = elevation,
             Door = door
         };
+        pose = pose with { Infantry = InfantryAnimationState.Advance(pose.Infantry, infantry, _step, speed,
+            pose.LastShotSeconds < 0 ? -1 : pose.Seconds - pose.LastShotSeconds) };
         _current.Add(entity, new Entry(position, pose));
         return pose;
     }

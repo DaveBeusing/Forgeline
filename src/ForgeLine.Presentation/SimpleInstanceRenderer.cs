@@ -143,7 +143,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
             _indexBuffer?.Dispose();
             _vertexBuffer?.Dispose();
             _texturedPipeline?.Dispose();
-            _runtimeAssets?.Dispose();
+            _skinFrames?.Dispose();
+        _runtimeAssets?.Dispose();
             _pipeline?.Dispose();
             _shadowPipeline?.Dispose();
             throw;
@@ -167,7 +168,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             int submitted = LastDiagnostics.RuntimeMeshInstances + LastDiagnostics.FallbackMeshInstances;
             return new InstanceSubmissionMetrics(_instanceStaging.Length, retained, _batches.Count,
                 submitted, (long)submitted * InstanceStride, LastDiagnostics.DrawCalls, textured * 4)
-            { SnapshotIndexBytes = _snapshotIndexBytes, MechanicalPartInstances = mechanical, MechanicalTransformScratchBytes = MechanicalMeshValidation.MaximumParts * 64 };
+            { SnapshotIndexBytes = _snapshotIndexBytes, MechanicalPartInstances = mechanical, MechanicalTransformScratchBytes = MechanicalMeshValidation.MaximumParts * 64, SkinEvaluatedPoses = _skinFrames?.EvaluatedPoses ?? 0, SkinStaticFallbacks = _skinFrames?.StaticFallbacks ?? 0, SkinUploadBytes = _skinFrames?.ResidentBytes ?? 0 };
         }
     }
 
@@ -209,6 +210,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         if (presentationSeconds is { } seconds && (!double.IsFinite(seconds) || seconds < 0))
             throw new ArgumentOutOfRangeException(nameof(presentationSeconds));
 
+        _skinContextFrame = context.FrameIndex; _skinContextShadow = shadowProjection.HasValue;
         _snapshotIndexBytes = world.IndexRetainedBytes;
         if (!_vegetationMotion) presentationSeconds = null;
 
@@ -220,6 +222,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             ViewFrustum.FromViewProjection(
                 shadowProjection ?? matrices.ViewProjection);
         ResetScratch(shadowProjection.HasValue);
+        _skinFrames?.Begin(context.FrameIndex, shadowProjection.HasValue);
         if (!shadowProjection.HasValue) _currentLods.Clear();
         var batchLookup = _batchLookup;
         var batches = _batches;
@@ -267,8 +270,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
             if (instance.VfxFeature.IsSpecified && ++meshFallbackEffects > (particles?.MaximumMeshFallbackEffects ?? 128)) continue;
             AxisAlignedBounds bounds =
+                instance.MechanicalPose.Infantry.IsSpecified ? SkinPresentationBounds.Resolve(instance) :
                 presentationSeconds.HasValue ? VegetationVisualMotion.CullingBounds(instance) :
-                    PresentationBounds.ResolveAxisAlignedBounds(instance);
+                    SkinPresentationBounds.Resolve(instance);
 
             instanceTests++;
             if (!frustum.Intersects(
@@ -314,8 +318,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             if (instance.UnitFeature.IsSpecified)
             {
                 unitLod =
-                    instance.UnitFeature.IsWreck ? UnitAssetLod.Lod2
-                        : (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, diameterScale: _lodDiameterScale);
+                    (UnitAssetLod)SkinPresentationBounds.SelectLod(instance, projectedDiameter, previousLod, _lodDiameterScale);
                 if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)unitLod;
                 unitDefinition =
                     UnitPresentationCatalog.Get(
@@ -325,7 +328,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 hasUnitDefinition =
                     true;
                 string meshAssetId =
-                    instance.UnitFeature.IsWreck
+                    instance.UnitFeature.IsWreck && !(unitLod == UnitAssetLod.Lod0 && instance.MechanicalPose.Infantry is { IsSpecified: true, Action: InfantryAction.Death })
                         ? UnitPresentationCatalog.ResolveWreckAssetId(instance.UnitFeature)
                         : unitDefinition.GetMeshAssetId(
                             unitLod);
@@ -529,6 +532,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         worldMatrix);
             }
 
+            _skinDetail = MechanicalDetailWeight(projectedDiameter, 18, _lodDiameterScale);
             float motionWeight = MechanicalDetailWeight(projectedDiameter, hasBuildingDefinition ? 150 : 90, _lodDiameterScale);
             AddMechanicalBatches(instance, worldMatrix, color, usesRuntimeMesh, runtimeMesh,
                 runtimeMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
@@ -1489,9 +1493,22 @@ public sealed class SimpleInstanceRenderer : IDisposable
         return t * t * (3 - 2 * t);
     }
 
+    private SkinFrameCache? _skinFrames;
+    private int _skinContextFrame;
+    private bool _skinContextShadow;
+    private float _skinDetail;
+
     private void AddMechanicalBatches(in RenderInstance instance, Matrix4x4 world, Vector4 color,
         bool usesMesh, RuntimeMeshBuffers mesh, AssetId meshId, bool usesMaterial, RuntimeMaterialResources material, float motionWeight)
     {
+        int skinVariant = -1;
+        if (usesMesh && mesh.Skin is not null && instance.MechanicalPose.Infantry.IsSpecified)
+        {
+            if (_skinFrames is null) { _skinFrames = new SkinFrameCache(_graphics); _skinFrames.Begin(_skinContextFrame, _skinContextShadow); }
+            // Skin LOD uses the ordinary projected object diameter; distant meshes have no skin reference.
+            float skinDetail = _skinDetail;
+            mesh = _skinFrames.Resolve(meshId, mesh, instance.MechanicalPose.Infantry, skinDetail, out skinVariant);
+        }
         ReadOnlySpan<MechanicalPartBinding> parts = instance.MechanicalPose.IsSpecified && motionWeight > 0
             ? mesh.MechanicalParts : null;
         Span<Matrix4x4> transforms = stackalloc Matrix4x4[MechanicalMeshValidation.MaximumParts];
@@ -1501,7 +1518,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         for (int i = 0; i < count; i++)
         {
             bool articulated = usesMesh && parts.Length > 0;
-            int geometryPart = articulated ? parts[i].GeometryPartIndex >= 0 ? parts[i].GeometryPartIndex : i : -1;
+            int geometryPart = articulated ? parts[i].GeometryPartIndex >= 0 ? parts[i].GeometryPartIndex : i : skinVariant >= 0 ? -2 - skinVariant : -1;
             RuntimeMeshBuffers slice = articulated ? mesh with
             {
                 FirstIndex = parts[geometryPart].Part.FirstIndex,
