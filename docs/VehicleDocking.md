@@ -30,6 +30,13 @@ start outside the facade or behind the entry. The reserved corridor includes
 that connecting segment. Local movement reaches the authored entry before
 service; neither authored entry nor service position is projected onto the grid.
 
+Automatic construction prefers a loading facade facing the base access area
+and validates every selected rotation through normal placement. Extractor
+orientation retains its deposit-edge authoring. Barracks and Vehicle Factory
+production offsets remain on the authored output side, beyond the loading lane,
+so newly produced idle units do not block the next input delivery. Tests check
+this separation against the full unit catalog in all four rotations.
+
 `VehicleDockSlot` belongs to the building; `VehicleDockVisit` and a monotonically
 increasing `VehicleDockGeneration` belong to the truck. Full entity identities
 and visit generations authorize service and release. Ownership includes approach,
@@ -118,6 +125,12 @@ policy. Construction urgency follows the next building's actual missing costs;
 unit-production urgency follows missing costs of the next unit. Neither changes
 stock targets or throughput limits.
 
+Within the Critical dispatch class, powered unit factories blocked on inputs
+and depot Fuel recovery precede ordinary processing-stock replenishment. Age
+and stable request identity still resolve ties within that recovery group.
+Factories without power retain the normal recovery ordering so construction
+inputs can restore power first.
+
 ## Persistence and presentation
 
 Dock components are authoritative ECS state. Save payload schema 3 and
@@ -130,3 +143,14 @@ Selected owned trucks expose copied activity, block reason and service progress
 through the existing player work summary. Hidden or foreign inventory contents
 are not exposed. Simulation ownership remains independent of rendering and
 animation.
+
+## Reference scenes
+
+Visual fixture version 4 runs the real shared docking service, collision index,
+navigation and supply-loading order. Loading captures require stationary cargo
+service progress and a completed supply batch. The sustained case captures after
+at least two completed physical deliveries and tick 1024, within the existing
+4000-tick fixture limit. Historical version-3 captures retain their original
+identity; they are not silently requalified against the changed fixture.
+Native images and a human review of entry, stationary wheels, aligned body,
+physical exit and the waiting second truck remain separate acceptance evidence.
