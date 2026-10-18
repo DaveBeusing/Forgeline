@@ -102,6 +102,15 @@ public static class BattlefieldResupplyPlanner
                     recipientTransform.Position,
                     transform.Position);
 
+            if (distanceSquared > provider.ResupplyRangeMeters * provider.ResupplyRangeMeters &&
+                context.Entities.TryGetComponent(candidate, out SupplyLoadingOrder loading) &&
+                (loading.WaitReason == VehicleDockBlockReason.None ||
+                 VehicleDockingService.HasExclusiveLoadingVisit(context.Entities, candidate)))
+            {
+                rejections |= ResupplyProviderRejection.ProviderBusy;
+                rejectedProviders++;
+                continue;
+            }
             bool canReachProvider = CanReachProvider(
                 context, inventories, recipient, distanceSquared, provider.ResupplyRangeMeters);
             if (!canReachProvider)

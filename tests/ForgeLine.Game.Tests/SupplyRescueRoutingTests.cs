@@ -201,6 +201,35 @@ public sealed class SupplyRescueRoutingTests
         Assert.Equal(truck, entities.GetComponent<ResupplyOrder>(recipient).Provider);
         fixture.AssertStock(truck, 80.0, 40.0);
     }
+    [Fact]
+    public void MovableRecipientUsesStockedDepotInsteadOfChasingALoadingTruck()
+    {
+        var fixture = new Fixture([]);
+        var entities = fixture.Simulation.Entities;
+        EntityId truck = fixture.Truck(Start, 80.0);
+        EntityId recipient = fixture.Recipient();
+        entities.RemoveComponent<SupplyMovementConstraint>(recipient);
+        entities.AddComponent(recipient, new ForgeLine.Combat.Combatant(new(1)));
+        entities.AddComponent(recipient, new UnitSupplyPriority(BattlefieldSupplyPriority.High));
+        entities.SetComponent(recipient, new AutomaticResupplyPolicy(0.2, 0.75));
+        var fuel = entities.GetComponent<UnitFuelState>(recipient);
+        Assert.True(fixture.Inventories.Add(fuel.InventoryId, ResourceIds.Fuel, 10).Succeeded);
+        entities.AddComponent(truck, new SupplyLoadingOrder(entities.CreateEntity(), SimulationTick.Zero));
+        EntityId depot = entities.CreateEntity();
+        var inventory = fixture.Inventories.CreateInventory(new InventorySpecification(200));
+        Assert.True(fixture.Inventories.Add(inventory, ResourceIds.Fuel, 100).Succeeded);
+        Assert.True(fixture.Inventories.Add(inventory, ResourceIds.Ammunition, 100).Succeeded);
+        entities.AddComponent(depot, new WorldTransform(RecipientPosition - Vector3.UnitX * 4, Quaternion.Identity, Vector3.One));
+        entities.AddComponent(depot, new SupplyProvider(inventory, Owner, 20));
+        fixture.Simulation.SubmitCommand(new ResupplyCommand(Owner, [recipient], SimulationTick.Zero), SimulationTick.Zero.Next());
+        fixture.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+        Assert.Equal(depot, entities.GetComponent<ResupplyOrder>(recipient).Provider);
+        Assert.False(entities.HasComponent<SupplyRescueAssignment>(truck));
+        Assert.False(entities.HasComponent<MovementOrder>(truck));
+        Assert.True(entities.HasComponent<SupplyLoadingOrder>(truck));
+        fixture.AssertStock(truck, 80.0, 40.0);
+        Assert.Equal(10, fixture.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel));
+    }
     private sealed class Fixture
     {
         public Fixture(AxisAlignedBounds[] obstacles, bool dynamicInfrastructure = false)
