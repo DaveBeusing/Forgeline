@@ -50,10 +50,6 @@ shared stop. A generation-zero visit describes this approach only; it authorizes
 service or release. The actual claim happens at the outside maneuver area. Nearby outward and diagonal candidates are checked when a neighbor blocks the backward approach. A safe waiting point remains stable when another truck leaves, so releasing the bay does not send the waiting truck on another coarse detour.
 If another truck claims the slot during strategic travel, the second truck
 stops outside and reports `Busy` without replanning into the occupied lane.
-When a staged truck claims the slot, its reached waiting point becomes the frozen
-approach start. The entire connecting maneuver is checked before admission.
-Selecting another coarse start after the claim could send the owner back through
-waiting traffic whose escape is blocked by that same reservation.
 
 A validated dock approach takes motion ownership from the truck's previous
 formation membership and formation speed constraint. Other formation members
