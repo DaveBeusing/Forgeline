@@ -1,0 +1,10 @@
+{"schemaVersion":1,"masterSize":4096,"runtimeCaps":{"base":2048,"normal":1024,"orm":512},"seed":1701,"recipes":{
+"painted_armor":{"cell":0,"baseLinear":[0.095,0.112,0.053],"roughness":0.72,"metallic":0,"heightMetres":0.00018,"frequency":64},
+"gunmetal":{"cell":1,"baseLinear":[0.30,0.32,0.34],"roughness":0.56,"metallic":1,"heightMetres":0.00012,"frequency":96},
+"rubber":{"cell":2,"baseLinear":[0.012,0.015,0.015],"roughness":0.94,"metallic":0,"heightMetres":0.0003,"frequency":48},
+"canvas":{"cell":3,"baseLinear":[0.10,0.10,0.048],"roughness":0.94,"metallic":0,"heightMetres":0.0004,"frequency":128},
+"glass":{"cell":4,"baseLinear":[0.012,0.037,0.053],"roughness":0.23,"metallic":0,"heightMetres":0,"frequency":16},
+"concrete":{"cell":6,"baseLinear":[0.28,0.28,0.24],"roughness":0.91,"metallic":0,"heightMetres":0.0008,"frequency":96},
+"heat_steel":{"cell":7,"baseLinear":[0.068,0.058,0.047],"roughness":0.65,"metallic":1,"heightMetres":0.00012,"frequency":64},
+"grime":{"cell":8,"baseLinear":[0.061,0.07,0.03],"roughness":0.87,"metallic":0,"heightMetres":0.00025,"frequency":32}
+}}

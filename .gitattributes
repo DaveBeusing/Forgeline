@@ -36,3 +36,14 @@ docs/review/infantry-skin/*.json -text whitespace=blank-at-eol,blank-at-eof,spac
 docs/review/infantry-skin/gpu-*.txt -text -whitespace
 docs/review/infantry-skin/poses/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/review/infantry-skin/poses/*.png binary
+
+# Lossless production evidence retains its recorded bytes.
+docs/review/procedural-pbr/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/review/procedural-pbr/*.png binary
+assets/source/materials/directorate/authoring/procedural/*.blend binary
+
+# Preserve byte-hashed authoring recipes and raw native evidence across hosts.
+assets/source/materials/directorate/authoring/procedural/recipe.json -text -whitespace
+docs/review/procedural-pbr/**/*.json -text -whitespace
+docs/review/procedural-pbr/**/*.png binary
+docs/review/procedural-pbr/gpu-*.txt -text -whitespace

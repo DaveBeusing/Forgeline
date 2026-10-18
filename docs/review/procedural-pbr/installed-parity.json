@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "runtimeManifestSha256": "6d06a2ff531440fd1e62aed727ef2e1cd6bdd487edcea4c12065d5ff18055290",
+  "manifestAndAllPayloadsExact": true,
+  "developmentRootFingerprint": "1ECB27E4DEC350B67ECD24B1B5695EC22DD81F5ED75B20D02480B4162B290ADC",
+  "installedRootFingerprint": "CC454B601566FE17B7540430E1E0DC713036CA288E02DDAEB487DF77830F6AEF",
+  "rootFingerprintDifference": "Published root excludes compiler cache and stale unlisted payloads",
+  "developmentPixelSha256": "918BA86802584360EA393F36F9E2A33F531A530BA9565F5DB42A2F24FAA8E8D5",
+  "installedPixelSha256": "918BA86802584360EA393F36F9E2A33F531A530BA9565F5DB42A2F24FAA8E8D5",
+  "pixelExact": true,
+  "packageBytes": 54880998,
+  "packageSha256": "d087d3db3495d500f8cbc51682e6540dc5029b74bd320145b07f26a73edd6c02",
+  "sourceRevision": "2d8496dc2e5fcc004935b5b875081de9befa0017"
+}

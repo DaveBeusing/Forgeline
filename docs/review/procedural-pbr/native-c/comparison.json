@@ -1,0 +1,57 @@
+{
+  "captures": [
+    {
+      "equivalentHardware": false,
+      "comparison": "no-matched-baseline",
+      "sameRuntime": false,
+      "structural": "pass",
+      "key": "MainBattleTankProduction-1920x1080-High-CloseTactical",
+      "cpuMeanDeltaMs": null,
+      "sameSource": false,
+      "pixelComparison": null,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "cpuMeanMs": 30.208887500000003,
+      "gpuMeanMs": 16.274848000000002
+    },
+    {
+      "equivalentHardware": false,
+      "comparison": "no-matched-baseline",
+      "sameRuntime": false,
+      "structural": "pass",
+      "key": "MainBattleTankProduction-1920x1080-High-NormalGameplay",
+      "cpuMeanDeltaMs": null,
+      "sameSource": false,
+      "pixelComparison": null,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "cpuMeanMs": 10.916915625,
+      "gpuMeanMs": 12.051690666666667
+    },
+    {
+      "equivalentHardware": false,
+      "comparison": "no-matched-baseline",
+      "sameRuntime": false,
+      "structural": "pass",
+      "key": "MainBattleTankProduction-1920x1080-High-Strategic",
+      "cpuMeanDeltaMs": null,
+      "sameSource": false,
+      "pixelComparison": null,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "cpuMeanMs": 11.298531249999998,
+      "gpuMeanMs": 12.424917333333331
+    }
+  ],
+  "imageFailures": [],
+  "structural": "pass",
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0,
+  "baselineCommit": null,
+  "imageGateRequested": false,
+  "channelTolerance": 0,
+  "commit": "2d8496dc2e5fcc004935b5b875081de9befa0017",
+  "visualAcceptance": "pending",
+  "pixelComparisonRequested": false
+}
