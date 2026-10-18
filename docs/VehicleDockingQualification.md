@@ -36,6 +36,28 @@ must be qualified separately.
 
 ## Concrete remaining gates
 
+At `339cfc80aac6c063a3b3d470f4663f32c0e540ef`, the complete solution had
+2,686 tests: 2,668 passed, 16 skipped and two failed (the natural strategic
+deadline and `FollowingCleanWriterWaitsUntilBuildQualificationCompletes`).
+The writer test passed isolated with its assertions unchanged. Release build,
+project graph, SemVer, map, entity smoke and save/load/replay passed. All three
+quality workflows passed; main CI was still running at this record.
+The reproducible archive SHA-256 is
+`97D507EA8F9909719B1A5A70094586D68F6A2CFA848CEF4E5DAA92612DAF718C`.
+Fresh settings and two menu launches after one warmup, including native icon
+observations, passed. The three source/package phase captures had identical
+pixels and fixture fingerprints. All 1,358 common runtime files matched; 63
+declared playback sidecars account for different whole-tree runtime fingerprints.
+Human temporal acceptance remains pending.
+
+Its 80,000-tick match retained the preceding 240-delivery/24,118-unit nonterminal
+endpoint. The exhausted-source correction shared the Supply retry deadline,
+which could be renewed between every strategic decision and never become due
+to the planner. An offset-timer regression now runs through multiple decision
+and retry periods. Source selection uses the existing strategic cadence after
+physical departure; the physical Supply retry remains independent. Earlier
+captures and binaries are not requalified by that correction.
+
 The later `4924a1bbcf736ff42296907eb89d92067d92fbca` qualification completed
 the Release build with zero warnings/errors, the 44-project graph, SemVer,
 map compilation, 1,000/10,000-entity smoke and 256-tick save/load/replay.

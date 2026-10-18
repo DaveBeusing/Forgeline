@@ -2848,8 +2848,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             }
 
             bool reconsiderSource = context.Entities.TryGetComponent(entity, out SupplyLoadingOrder loading);
+            // Source selection is bounded by strategic decision cadence. The Supply phase
+            // may renew its retry before every planning decision; sharing that deadline can starve selection forever.
             if (reconsiderSource && (loading.WaitReason != VehicleDockBlockReason.SourceEmpty ||
-                context.Tick.Value < loading.RetryAtTick || context.Entities.HasComponent<VehicleDockVisit>(entity)))
+                context.Entities.HasComponent<VehicleDockVisit>(entity)))
                 continue;
 
             bool hasMovement =

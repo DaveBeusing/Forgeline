@@ -15,7 +15,7 @@ public sealed class SkirmishSupplyPolicyTests
     [InlineData(true, false, true)]
     [InlineData(false, true, true)]
     [InlineData(true, true, false)]
-    public void EmptySourceIsReconsideredAfterDepartureAndRetryWithoutDiscardingPartialCargo(
+    public void StrategicCadenceReconsidersAnEmptySourceEvenWhenSupplyRetriesFallBetweenDecisions(
         bool sourceEmpty, bool retryDue, bool coreStocked)
     {
         using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
@@ -40,11 +40,12 @@ public sealed class SkirmishSupplyPolicyTests
         Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, 100).Succeeded);
         Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, 80).Succeeded);
         var original = new SupplyLoadingOrder(depot, SimulationTick.Zero,
-            sourceEmpty ? VehicleDockBlockReason.SourceEmpty : VehicleDockBlockReason.TargetFull, retryDue ? 0UL : 1_000UL);
+            sourceEmpty ? VehicleDockBlockReason.SourceEmpty : VehicleDockBlockReason.TargetFull,
+            sourceEmpty ? (retryDue ? 0UL : 2UL) : 1_000UL);
         entities.AddComponent(truck, original);
-        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+        scenario.Simulation.RunTicks(52, TestContext.Current.CancellationToken);
         var current = entities.GetComponent<SupplyLoadingOrder>(truck);
-        Assert.Equal(sourceEmpty && retryDue && coreStocked ? side.CommandCore : depot, current.Source);
+        Assert.Equal(sourceEmpty && coreStocked ? side.CommandCore : depot, current.Source);
         Assert.Equal(100, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel));
         Assert.Equal(80, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition));
         if (current.Source == side.CommandCore) Assert.Equal(VehicleDockBlockReason.None, current.WaitReason);

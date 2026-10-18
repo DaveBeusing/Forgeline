@@ -176,10 +176,12 @@ owner still waits for a physically clear corridor. Terrain and collision checks
 remain active, and the slot is not released by a timeout.
 
 Automatic supply planning reconsiders an exhausted loading source after the
-truck has physically left the bay and its retry is due. Another stocked owned
+truck has physically left the bay, on its existing strategic decision cadence. Another stocked owned
 source may complete the same full cargo targets. Partial cargo is retained;
 active dock visits and other waiting reasons are not redirected. Explicit player
 loading orders keep their selected source.
+The physical loading retry timer stays independent of source selection, so
+retries between planning decisions cannot postpone a new source indefinitely.
 
 ## Persistence and presentation
 
