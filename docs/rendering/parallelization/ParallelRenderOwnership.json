@@ -123,7 +123,9 @@
         "src/ForgeLine.Game/VehicleDockQueues.cs",
         "tests/ForgeLine.Game.Tests/GroundMovementSystemTests.cs",
         "src/ForgeLine.Game/TacticalTestOpponentSystem.cs",
-        "tests/ForgeLine.Game.Tests/TacticalCombatSystemTests.cs"
+        "tests/ForgeLine.Game.Tests/TacticalCombatSystemTests.cs",
+        "tests/ForgeLine.Presentation.Tests/GuidancePresentationTests.cs",
+        "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",

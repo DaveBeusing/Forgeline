@@ -1761,5 +1761,80 @@
     "file": "gameplay-investigation/foundation-final-native-correctness.log.gz",
     "originalSha256": "AC3CB17BF4EFA170D9FC0CC2A5B35DF095E0D8E7C14F6F7C27F18E729BC877B7",
     "compressedSha256": "4AB42D46829E3B0CD56CCC72929D66EEFC80B01BEABEDC9E217CF986C54B7923"
+  },
+  {
+    "file": "gameplay-investigation/foundation-7bf-frame-ci-failed.log.gz",
+    "originalSha256": "F338D2F0BCD32806F061C7A0AC39D5D6DDE692017262C4C00AFBCDE6D8C6A984",
+    "compressedSha256": "572D3F8AFE3DE1D843815F99910A51DFED3A4063E874866816E3D5B5EA092ACC"
+  },
+  {
+    "file": "gameplay-investigation/foundation-final-solution-tests.log.gz",
+    "originalSha256": "08E6BEEF15922F2A179B3B510C2090C2B19B3DC5B12FA31456282990BDAD50B8",
+    "compressedSha256": "3B76D8612E3C19CA1180CF555C292363ABC1ADDA3D3B184AAE6348FF854422A6"
+  },
+  {
+    "file": "gameplay-investigation/foundation-guidance-allocation-before.log.gz",
+    "originalSha256": "B21AE9AC266C6A0493F5641870CE52FADF923FB278EB680BCEDE8A84E01F9E27",
+    "compressedSha256": "61751CB0507D6C01494C8933D086778AABF21F19175D2D2397B70D5DA3F3E5BE"
+  },
+  {
+    "file": "gameplay-investigation/foundation-guidance-allocation-build.log.gz",
+    "originalSha256": "9A47240CB09F3322575834E63E0381145370D6BC5AC31C52574D187A58C043CA",
+    "compressedSha256": "C8A7E8E1AAE7B6BC083E3645696F6889AB142D8F93E6FB68A6DEAFAE1F1DAC31"
+  },
+  {
+    "file": "gameplay-investigation/foundation-guidance-allocation-after.log.gz",
+    "originalSha256": "F5E1DD292AE0356F444C0744A4CD01A0E936E7BE4A379F9EC05E6EBB581C1868",
+    "compressedSha256": "352EC4DB64C495BDDFECBE606F71DE28BDAF270685DE592DC187EC38FEBDF017"
+  },
+  {
+    "file": "gameplay-investigation/foundation-guidance-allocation-control-build.log.gz",
+    "originalSha256": "A1E91AB408717703E6BD15BF5A60EC827919D07077BCF742A23034210C51C106",
+    "compressedSha256": "17C50A75DE78DBE77668EAED720F12081469E4AA50AA82A63EB7EAC33E5C7FAC"
+  },
+  {
+    "file": "gameplay-investigation/foundation-guidance-allocation-control.log.gz",
+    "originalSha256": "A8F1DF0F718687D1B783B3253F4A5140D57726A79B0492622D1C84DC69FF9797",
+    "compressedSha256": "0CF417628E750171F35767EC96E0D3AFD4421E9FB1103691B4F3E0B1B355EF3B"
+  },
+  {
+    "file": "gameplay-investigation/foundation-gc-counter-probe-build.log.gz",
+    "originalSha256": "CD1C21B6BE174678DF317B8EB777DD2C94CD85DBA539F3FF6E18234119A79DEF",
+    "compressedSha256": "2E973A8914F16F37B201C41331EEEFE1058EC9809B43F6FCC4A1C2BE033DC29E"
+  },
+  {
+    "file": "gameplay-investigation/foundation-gc-counter-background.json.gz",
+    "originalSha256": "8029382F64CB0F1EB33B5AF0D21AFE01256E3570863AE5ED40B968FBCF17EA19",
+    "compressedSha256": "4D65782272B4975625D9AB75F9C0262449919786438003F84A0FB9B30E4AA5DF"
+  },
+  {
+    "file": "gameplay-investigation/foundation-gc-counter-blocking.json.gz",
+    "originalSha256": "C1CCD9522ECC64BC38DA24B5746C9BD85F0638B45270DC0BFCF7EF244E1862F1",
+    "compressedSha256": "BD6D2A25E23ADB137F730935FDD05C6F7CAFAE4A49B5BA2FDBF2D01A41747FA2"
+  },
+  {
+    "file": "gameplay-investigation/foundation-gc-counter-probe-source.txt.gz",
+    "originalSha256": "37D700E58D8F15EFE3EFE50FF669C652688A1455B25D4B9F5D67A29A651FCC54",
+    "compressedSha256": "9086C38DC70755431A655AACEF2671A1D3F39D244CE73FEEBCA6F88788F140E2"
+  },
+  {
+    "file": "gameplay-investigation/foundation-gc-counter-context.json.gz",
+    "originalSha256": "67CB33F38510C55F4802A87B94354478F46ECBEB9DC44F35A3320DE8D75E5D84",
+    "compressedSha256": "84C7572A78F8CE12334648C205D0CAFE5B0596AAD458699C53C2827F303E0480"
+  },
+  {
+    "file": "gameplay-investigation/foundation-blocking-gc-build.log.gz",
+    "originalSha256": "E16136A9CD4D9E882CC129F843AD5FEE816DF84F5AFE8091C23ABEE2DE18C4C9",
+    "compressedSha256": "58B0B06494D4464553933D57A377E257604E79B0AC09BEDE4B5D89741470702D"
+  },
+  {
+    "file": "gameplay-investigation/foundation-blocking-gc-presentation.log.gz",
+    "originalSha256": "5E6A3AB00CB0815F3CFE544F92D8D6142FED6526D02AAFBFCE09A22F7F9D5DEB",
+    "compressedSha256": "36337B9C295BF79D3881AF25CAF2B2014468449FC7B7D647E1BBE54285E72B87"
+  },
+  {
+    "file": "gameplay-investigation/foundation-blocking-gc-ci-filter.log.gz",
+    "originalSha256": "9D123BEF92B00C9FD9FDECE24F0589441923A41932E857F14DD63445FB32AE7B",
+    "compressedSha256": "9DE492AD30A8BA55163CD1898BA44785D43409D9050F74D614B51C38C1EED1FF"
   }
 ]

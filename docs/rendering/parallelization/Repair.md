@@ -964,3 +964,54 @@ full fixed B-A-A-B renderer qualification remains source-attributed, and final
 code image parity is separately verified. All six final images, source-equivalence
 proof and actual native manifests are retained. Independent human native review
 remains required; parallelReleased remains false and PR #237 remains draft.
+
+
+### Final allocation diagnosis: background-GC counter accounting
+
+Head 7bf522b4 frame-contracts run 39165106914 fails its integrated display block:
+ActiveGuideAndPlacementWithAmountsHaveZeroWarmAllocations(false) reports 3,064
+bytes against zero. The unchanged focused local check passes both cases. A
+thread-isolated guidance candidate passes all 95 cases; adding a real allocating
+control passes 96. These results alone do not establish an allocation's cause.
+The final complete solution run on 0cf888b0 reports 2,817 passed / one failed /
+17 optional skips / 2,835 total (22m42.959s): the already thread-isolated building
+name resolver reports 8,000 bytes for electronics_plant. Every other test module
+passes. This demonstrates that moving the counters to another thread is not a
+complete correction. All these failed and intermediate results are retained.
+
+The official runtime report and proposed accounting correction describe unused
+allocation-context bytes charged by background GC:
+https://github.com/dotnet/runtime/issues/134724 and
+https://github.com/dotnet/runtime/pull/134855 . A standalone, framework-free
+Windows x64 .NET 10.0.12 probe corroborates this interference here. Exactly one
+bounded run per policy uses the same DLL. Both have 32 zero idle controls and
+32 explicit allocation controls of exactly 64 bytes. Under GC pressure, concurrent
+GC produces five nonzero empty intervals out of 256 (2,024 / 8,136 bytes); the
+same binary with only private runtimeconfig System.GC.Concurrent=false produces
+zero out of 256. Generation-two counts are 110 and 197 respectively. The measured
+empty method only reads the counter, spins and reads it again. Complete arrays,
+source, runtime identity, binary hash and bounds are retained. This diagnostic
+supports the upstream accounting explanation; it does not provide stacks for
+every earlier nonzero measurement.
+
+The final correction disables concurrent GC only in the Presentation.Tests
+runtimeconfig. The production player's configuration remains unchanged. Original
+building, text and guidance measurement loops, warmups, samples, assertions and
+zero-byte budgets are restored; the speculative dedicated-thread workarounds are
+removed. A configuration guard requires the test host's blocking-GC mode. An
+allocating positive control requires at least 65,536 observed payload bytes so a
+muted or inert counter cannot satisfy the suite. No production runtime code,
+per-frame allocation allowance or performance threshold is changed. The existing
+Presentation.Tests.csproj and GuidancePresentationTests.cs are included in serial
+foundation ownership under the authorized CI-repair scope; dependency references
+and parallelReleased=false remain unchanged.
+
+The corrected complete Presentation module passes 1,298 cases, zero failures,
+12 optional skips / 1,310 total (75.532s), with zero build warnings/errors. The
+exact previously failed outer dotnet-test CI filter also passes all 97 cases,
+zero failures/skips (8.293s). Together with the complete prior solution run's
+unchanged other modules, every current local case is covered. The final-head CI
+must still run this combined configuration. Renderer/Game source, native image
+parity, both successful fixed performance cohorts and the tick-64,536 terminal
+victory are unaffected by this test-host-only change. Independent human native
+review remains required and parallel release is not granted.
