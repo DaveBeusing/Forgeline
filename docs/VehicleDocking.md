@@ -44,7 +44,9 @@ stationary service and confirmed exit. Other trucks receive `Busy` and stop
 without searching a path into the occupied lane. There is no FIFO queue.
 
 Strategic arrivals first reach a validated point outside the entry without claiming the
-slot. A generation-zero visit describes this approach only; it authorizes no
+slot. Concurrent arrivals choose separated outside maneuver points, including
+their vehicle and separation margins, so they cannot converge on one unreachable
+shared stop. A generation-zero visit describes this approach only; it authorizes no
 service or release. The actual claim happens at the outside maneuver area. Nearby outward and diagonal candidates are checked when a neighbor blocks the backward approach. A safe waiting point remains stable when another truck leaves, so releasing the bay does not send the waiting truck on another coarse detour.
 If another truck claims the slot during strategic travel, the second truck
 stops outside and reports `Busy` without replanning into the occupied lane.
@@ -69,7 +71,7 @@ the body transform and movement heading must agree. Radius proximity, arrival
 status and completing a coarse path cannot authorize inventory transfer.
 
 Cargo batches contain at most 20 units; supply batches contain at most 20 Fuel
-and 20 Ammunition. A rate of 40 aggregate units per second determines a positive
+and 20 Ammunition. A rate of 100 aggregate units per second determines a positive
 tick-based service duration. A batch books only after its service time and valid
 pose checks. The same truck cannot book another batch in that tick. Pose loss
 resets service time; completed batches remain committed.
@@ -115,9 +117,9 @@ Strategically managed combat units leave distant advances to the coordinated
 planner while supplies are prepared. Local identified-target responses, radar
 coordinates within the engagement leash and explicit strategic marches remain
 active; standalone tactical opponents retain their distant advance behavior.
-As processing sites enter operation, the opponent buys a third cargo truck.
-After establishing its initial objective-pressure force, it may buy a fourth,
-within its existing two-to-four-truck fleet bounds. Replacement reserves use
+The opponent buys a third cargo truck as three processing sites open; optional
+expansion to four waits for its first objective-pressure force. Both use its
+existing two-to-four-truck fleet bounds and normal paid production. Replacement reserves use
 the same target, so finite dock cycles do not leave a mature industry on the
 initial two-truck throughput. Vehicle prices and inventory targets are unchanged.
 
@@ -152,9 +154,12 @@ Home placement candidates leave 96 m between neighboring sites so coarse navigat
 cells retain usable access between the authored loading lanes.
 
 Within the Critical dispatch class, Command Core construction shortages,
-powered unit factories blocked on inputs
-and depot Fuel recovery precede ordinary processing-stock replenishment. Age
-and stable request identity still resolve ties within that recovery group.
+powered unit factories blocked on inputs or building an initial vehicle pipeline,
+and depot Fuel with an actual loading/resupply recipient precede passive depot
+buffers and ordinary processing stock. Age and stable request identity still resolve
+ties within each group. Critical factory stock counts unreserved inputs; material
+already bound to production cannot satisfy the next accepted recipe. Its real
+queued successor raises the required input budget without reserving speculative units.
 Factories without power retain the normal recovery ordering so construction
 inputs can restore power first.
 
