@@ -1,9 +1,10 @@
+using ForgeLine.Presentation.RenderContracts;
 using ForgeLine.Core;
 
 namespace ForgeLine.Presentation;
 
 // Current/previous entity correspondence. Production visibility is separately owned by RenderWorld.
-internal sealed class RenderSnapshotIndex
+internal sealed class RenderSnapshotIndex : IRenderSnapshotCorrespondence
 {
     internal const int ClusterSize = InstanceVisibilityIndex.ClusterSize;
     private const int MaximumRetainedInstances = 65_536;
@@ -13,10 +14,10 @@ internal sealed class RenderSnapshotIndex
     // Retains the internal direct-query API used by older callers; production opts out.
     internal RenderSnapshotIndex(bool enableLegacyVisibility = true)
     {
-        if (enableLegacyVisibility) _legacyVisibility = new();
+        if (enableLegacyVisibility) _legacyVisibility = new InstanceVisibilityIndex();
     }
     internal long RetainedBytes => (long)_previousIndices.Length * sizeof(int) + (_legacyVisibility?.RetainedBytes ?? 0);
-    internal int PreviousIndex(int index) => _previousIndices[index];
+    public int PreviousIndex(int index) => _previousIndices[index];
     internal void Rebuild(PresentationSnapshot current, PresentationSnapshot? previous)
     {
         int count = current.InstanceCount;

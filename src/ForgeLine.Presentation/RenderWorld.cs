@@ -1,3 +1,4 @@
+using ForgeLine.Presentation.RenderContracts;
 using ForgeLine.Core;
 
 namespace ForgeLine.Presentation;
@@ -7,7 +8,13 @@ public sealed class RenderWorld
     private PresentationSnapshot? _previous;
     private PresentationSnapshot? _current;
     private readonly RenderSnapshotIndex _index = new(false);
-    private readonly InstanceVisibilityIndex _visibility = new();
+    private readonly IInstanceVisibilityIndex _visibility;
+
+    public RenderWorld() : this(new InstanceVisibilityIndex()) { }
+    internal RenderWorld(IInstanceVisibilityIndex visibility)
+    {
+        _visibility = visibility ?? throw new ArgumentNullException(nameof(visibility));
+    }
     internal bool ClusterVisible(int firstIndex, in ViewFrustum frustum) => _visibility.IsVisible(firstIndex, frustum);
     internal long IndexRetainedBytes => _index.RetainedBytes + _visibility.RetainedBytes;
 

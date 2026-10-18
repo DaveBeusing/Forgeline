@@ -34,6 +34,20 @@ public sealed class RenderBoundaryTests
     }
 
     [Fact]
+    public void SkippedRecordingCancelsPreparationWithoutStrandingTheNextFrame()
+    {
+        using var fixture = new EmptyCatalog(); using var graphics = new ContractGraphicsDevice();
+        using var renderer = new SimpleInstanceRenderer(graphics, fixture.Catalog);
+        var world = World(3, 1); var camera = new RtsCamera();
+        renderer.Prepare(camera, world, new(1600, 900, 1));
+        renderer.Submit(); renderer.Retire();
+        Assert.False(renderer.AssetsPrepared);
+        renderer.Prepare(camera, world, new(1600, 900, 1));
+        renderer.Render(new ContractGraphicsDevice.Context(), camera, world, 1);
+        renderer.Submit(); renderer.Retire();
+        Assert.False(renderer.AssetsPrepared);
+    }
+    [Fact]
     public void DisabledSessionMeasurementAllocatesNoPerFrameObjects()
     {
         using var fixture = new EmptyCatalog(); using var graphics = new ContractGraphicsDevice();

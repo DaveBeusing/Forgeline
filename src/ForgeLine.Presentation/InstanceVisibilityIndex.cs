@@ -1,17 +1,18 @@
+using ForgeLine.Presentation.RenderContracts;
 using System.Numerics;
 using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-internal sealed class InstanceVisibilityIndex
+internal sealed class InstanceVisibilityIndex : IInstanceVisibilityIndex
 {
     internal const int ClusterSize = 32;
     private const int MaximumRetainedInstances = 65_536;
     private AxisAlignedBounds[] _clusters = [];
     private bool[] _validClusters = [];
     internal int ClusterCount { get; private set; }
-    internal long RetainedBytes => (long)_clusters.Length * 25;
-    internal void Rebuild(PresentationSnapshot current, PresentationSnapshot? previous, RenderSnapshotIndex correspondence)
+    public long RetainedBytes => (long)_clusters.Length * 25;
+    public void Rebuild(PresentationSnapshot current, PresentationSnapshot? previous, IRenderSnapshotCorrespondence correspondence)
     {
         int count = current.InstanceCount;
         ClusterCount = count < ClusterSize ? 0 : (count + ClusterSize - 1) / ClusterSize;
@@ -38,7 +39,7 @@ internal sealed class InstanceVisibilityIndex
             }
         }
     }
-    internal bool IsVisible(int firstIndex, in ViewFrustum frustum) =>
+    public bool IsVisible(int firstIndex, in ViewFrustum frustum) =>
         ClusterCount == 0 || !_validClusters[firstIndex / ClusterSize] || frustum.Intersects(_clusters[firstIndex / ClusterSize]);
 
     private static bool TrySweptBounds(in RenderInstance current, RenderInstance? previous, out AxisAlignedBounds bounds)

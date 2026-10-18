@@ -173,7 +173,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
         }
         catch { _runtimeAssets.AbortPrepare(); throw; }
     }
-    public void Submit() { if (_runtimeAssets?.FrameActive == true) _runtimeAssets.Submit(); }
+    public void Submit()
+    {
+        // A suspended/occluded device can skip the recording callback entirely.
+        if (_runtimeAssets?.IsPrepared == true) { _runtimeAssets.AbortPrepare(); return; }
+        if (_runtimeAssets?.FrameActive == true) _runtimeAssets.Submit();
+    }
     public void Retire() { if (_runtimeAssets?.FrameActive == true) _runtimeAssets.Retire(); }
 
     public InstanceRenderDiagnostics LastDiagnostics { get; private set; }
