@@ -27,6 +27,21 @@ def distribution(values):
         for p in (50, 95, 99)}}
 
 
+def frame_phase_evidence(frames):
+    phases = [f["submission"]["assetPreparation"] for f in frames]
+    names = ("prepareMilliseconds", "recordMilliseconds", "submitMilliseconds",
+             "retireMilliseconds", "waitMilliseconds", "presentMilliseconds")
+    measured = {}
+    for name in names:
+        values = [p.get(name) for p in phases]
+        measured[name] = distribution(values) if all(v is not None for v in values) else None
+    tails = sorted(frames, key=lambda f: f["milliseconds"], reverse=True)[:math.ceil(len(frames) * .01)]
+    return {"phaseElapsed": measured, "slowestOnePercent": [
+        {"index": f["index"], "frameElapsedMilliseconds": f["milliseconds"],
+         **{name: f["submission"]["assetPreparation"].get(name) for name in names}}
+        for f in tails]}
+
+
 def summarize_pairs(root, prefix):
     rows, gates = [], []
     for pair in (1, 2):
@@ -56,6 +71,8 @@ def summarize_pairs(root, prefix):
                          "baselineSource": before["commit"], "repairSource": after["commit"],
                          "cpuBefore": baseline["cpu"], "cpuAfter": case["cpu"],
                          "gpuBefore": baseline["gpu"], "gpuAfter": case["gpu"],
+                         "framePhasesBefore": frame_phase_evidence(baseline["performance"]["cpuFrames"]),
+                         "framePhasesAfter": frame_phase_evidence(frames),
                          "meanAllocationBytesBefore": statistics.mean(
                              f["allocatedBytes"] for f in baseline["performance"]["cpuFrames"]),
                          "meanAllocationBytesAfter": statistics.mean(f["allocatedBytes"] for f in frames),
@@ -71,7 +88,7 @@ def main():
     args = parser.parse_args()
     report = {"schemaVersion": 2, "cohorts": {}}
     prefixes = args.prefix or [p for p in (
-        "foundation-serial-pair", "foundation-final-pair", "foundation-current-pair", "foundation-cleared-pair")
+        "foundation-serial-pair", "foundation-final-pair", "foundation-current-pair", "foundation-cleared-pair", "foundation-queue-pair")
         if (args.root / f"{p}1-before").exists()]
     if not prefixes:
         parser.error("No complete predefined repair protocol was found.")

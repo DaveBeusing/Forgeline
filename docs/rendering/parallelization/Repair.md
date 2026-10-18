@@ -491,3 +491,61 @@ file locks; the subsequent build succeeds with zero warnings/errors. These are
 not reported as successful match or source qualification. The 05ee10bf package
 0.1.404-dev passes reproducibility and runtime asset/package validation; later
 source identities must be recorded separately.
+
+
+## Fixture-5 protocol and further supply lifecycle regressions
+
+The fixed B-A-A-B protocol compares master fb78998c with source 7c2988d5 using
+128 warmups, 512 samples and two readbacks. All 12 paired images are exact and
+resources remain at steady plateaus, with zero submission faults. Pair 1 retains
+one failure: IndustrialBase / CloseTactical frame-elapsed p99 is 28.1103 ->
+33.0722 ms (+17.65%, unchanged 15% limit). Pair 2 has no regressions. All means
+and GPU gate comparisons pass. The six slowest frames are now reproduced by the
+summary tool with their aligned phase evidence. Frame 164 takes 33.7612 ms,
+including 31.3246 ms waiting for the reusable graphics buffer; baseline wait
+measurements are unavailable and remain null. This is a measured wait-phase
+attribution, not an override of the failed gate. The separate idle power snapshot
+shows a current 20 W limit and 115 W default; it is not aligned to a slow frame
+and does not prove the cause of that frame. No power/driver setting changes.
+
+Fixture-5 WARP has eight stable readbacks and exact baseline pixels; all three
+damage views also match exactly. All 158 retained native PNGs match their actual
+manifest hashes. All complete historical protocols remain reproducible. The
+summary adds the fifth prefix and elapsed phase/tail observations without
+changing the original gate calculation or replacing missing data with zero.
+
+The required full matches through the 563-test source remain nonterminal. Further
+recorded states expose two concrete lifecycle problems. Source ranking compares
+full targets even for cargo already above its dispatch requirement, which can
+send a truck past an adequate nearby depot. Rank source coverage by the existing
+50% Fuel / 25% Ammunition deficits; six new cases cover both cargo boundaries and
+a nearby source above/below the required minimum. The two observed unnecessary
+far-source choices fail before correction. Physical loading still performs the
+actual transfer and keeps original cargo targets.
+
+A replacement scout can reuse a lower entity index and displace an existing
+forward reconnaissance assignment. Preserve the existing reconnaissance combat
+intent before applying the deterministic entity tie-break. Idle reconnaissance
+selection uses that same reserved scout, so a second idle scout cannot draw away
+the active escort. Two real index/generation reuse cases fail before correction
+and cover multiple strategic decisions. No new authoritative state/schema.
+
+The route-stage test distinguishes actual vanguard arrival from attack admission.
+An attacking tank already inside the existing 180 m staging radius records route
+progress before recovery, while the unchanged readiness, force-size, pressure and
+supply gates still decide whether a new attack can issue. Five cases include no
+attack intent, infantry-only arrivals, rear reinforcements and low Fuel. Three
+positive arrival cases fail before correction. All 568 Game tests pass, zero
+failures/skips, 96.242 seconds; the unchanged full-match gate is still running at
+this checkpoint. No terminal result is claimed.
+
+The earlier all-processor and electronics-only priority variants remain excluded.
+The strict staging-quorum experiment passes 559 tests but does not change the
+real failed match, and is excluded. Retrying prospective power planning on the
+FIFO source fails the existing east 40,000-tick strategic test and remains
+nonterminal at 80,000 ticks; it too is excluded. No deadline is relaxed.
+
+Master has subsequently advanced through PR #239 (logistics setup UI), with
+fixture 6 and product version 0.1.404. Integrate it before final qualification;
+the next PR version must be exactly 0.1.405. Fixture-5 results above retain their
+actual source identities and are not represented as fixture-6 acceptance.

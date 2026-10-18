@@ -236,6 +236,101 @@
       "file": "foundation-trip-game-suite.log.gz",
       "rawSha256": "3df1b2464fedbcd3ff3f3001bf58dbef0b1af807ec59b7724f297ccfcd07fd4a",
       "archiveSha256": "b9113c1a00656c9e1fbb8bc87a1517c2b70a2b822ac6e8d08489c28788b84a17"
+    },
+    {
+      "file": "foundation-trip-opponent.json.gz",
+      "rawSha256": "fbed135756c1b32cc5decf5343cffa8e3acec3cda95d15a0aac3de45acb372e4",
+      "archiveSha256": "90bfa421fd469188b98eb76d422d798d788541fb2ad9c0ad33b456c1dec92bb0"
+    },
+    {
+      "file": "foundation-trip-opponent.save.json.gz",
+      "rawSha256": "d1ce596bfaf8314497906f0dd4c84fe456e2490408b6bf26e55926f934643e6b",
+      "archiveSha256": "b5e99f40333a72a6f5fc4bb007455fbb712cb648e040e165e9aa97306a64f332"
+    },
+    {
+      "file": "foundation-staging-before.log.gz",
+      "rawSha256": "9a1dcdb03773184dc969b31c59119fb6cca845735fb02ea112d9bec45c3b2fd5",
+      "archiveSha256": "5462405706feaf13f4e3022245b8f3a9f39119996007143d1efcc577fadbcb8b"
+    },
+    {
+      "file": "foundation-staging-game-suite.log.gz",
+      "rawSha256": "8e6a6558f133100f3b0b900f92b8ac982fec5d5aca594906944e1d57ff042bea",
+      "archiveSha256": "c8c564e15224712239fe225dd9b83e701ee6cfa1f0f2dfa6968bf00d7ddd1ef1"
+    },
+    {
+      "file": "foundation-staging-opponent.json.gz",
+      "rawSha256": "a2122825c758676039c390bd0ffa544ed5c39c2abde206d46c06c9b896a39cc3",
+      "archiveSha256": "f7ded15ce66856204ef62bbb2698e16792ff967d60f081853beab28d26154a84"
+    },
+    {
+      "file": "foundation-staging-opponent.save.json.gz",
+      "rawSha256": "d1ce596bfaf8314497906f0dd4c84fe456e2490408b6bf26e55926f934643e6b",
+      "archiveSha256": "b5e99f40333a72a6f5fc4bb007455fbb712cb648e040e165e9aa97306a64f332"
+    },
+    {
+      "file": "foundation-queue-power-game-suite.log.gz",
+      "rawSha256": "1fe1ffd3d534764f81caac44b5faddf7500569d1b11a5f238529c4ccf6458acb",
+      "archiveSha256": "fe7ed8f462f4c9327e20ee4167ea1530ef4ae5bd21cc4feaf30f2b506c748907"
+    },
+    {
+      "file": "foundation-queue-power-opponent.json.gz",
+      "rawSha256": "4ba4acf95f2d747c78f0002be2c5f17fc64575e8d83fb9db0e499d7f871c4a71",
+      "archiveSha256": "12709fef427777789f52856251d3ca2eae58ee0d3249a7474b0684ecd8dbed51"
+    },
+    {
+      "file": "foundation-queue-power-opponent.save.json.gz",
+      "rawSha256": "155ee459ad193f6e51c6d31f3748a1b8dd25bcc32d05538114dfd32d4f67a69e",
+      "archiveSha256": "d4f70fee7e3e3b7db4b3bf7adadeeaff34adb0e7c79f94a1f5d16b4dedd12680"
+    },
+    {
+      "file": "foundation-coverage-before.log.gz",
+      "rawSha256": "570a9d17d09c3e5f399768790e64b4a065a3b1aefa88e0aad37b51320fe4cf8d",
+      "archiveSha256": "e3ddc13b08881735aaaded012b280570a07750a64be55832b647c384e5535e97"
+    },
+    {
+      "file": "foundation-coverage-game-suite.log.gz",
+      "rawSha256": "e9da3e551f05a9fca46f799afa16a813390860ef4092687760f6015ef0c7a983",
+      "archiveSha256": "88eb9c4de882518651453848b7c9621c176e4a928a1541aff3ba2910d33b7fad"
+    },
+    {
+      "file": "foundation-coverage-opponent.json.gz",
+      "rawSha256": "058063230f05478fc670554ab390e525607451b6f6bad043a0d00efe01c7e505",
+      "archiveSha256": "56dcaa419f121d46e2f59bc3041a0dffa4f1b9b50e0d7f9168d27af3c62e81d7"
+    },
+    {
+      "file": "foundation-coverage-opponent.save.json.gz",
+      "rawSha256": "4762976317738b7a62ad93bfd1476a574c930898804a423ab2f1a8aede8711ed",
+      "archiveSha256": "013dee370c55652965e215591eb7bf17992aa60089fb7223c1603bd13958d813"
+    },
+    {
+      "file": "foundation-recon-before.log.gz",
+      "rawSha256": "208e13fd01cbae4150653b26830061fe1fabd021b2b0491e0135e5ba10534772",
+      "archiveSha256": "78780b3d6d0b20afac65bb6fd1055ff65376a422b68084b89edbbf0661761e83"
+    },
+    {
+      "file": "foundation-recon-game-suite.log.gz",
+      "rawSha256": "79b48199c7dfe22304aecc821ec5c3b73dcce3e240233274c1796a210a66b2a3",
+      "archiveSha256": "fe5d0417cfdd2297a0ae0f2b6fbcaaf4a477e1d899f89eebdd8be89b29e0cf04"
+    },
+    {
+      "file": "foundation-recon-opponent.json.gz",
+      "rawSha256": "4a1f3f8e2bd82137533c02d4ed69954c5e144203fe6f02151a81244dd1dea0cd",
+      "archiveSha256": "bcc7714eba9504504334f074e55b83ef128e03437ec58e512464d58fd77e6287"
+    },
+    {
+      "file": "foundation-recon-opponent.save.json.gz",
+      "rawSha256": "13654d4ee2725097a31b849201a4f26c460b76f720c6135760e62100b1777f04",
+      "archiveSha256": "dc2a0e25a6e2ae66c609487dcb57e109e3e2556cef934b82a6367e3055ff6a4e"
+    },
+    {
+      "file": "foundation-vanguard-before.log.gz",
+      "rawSha256": "1af61f27515dca7c43caf74893dc4f863e9d647635f1e693562e07c87633da0a",
+      "archiveSha256": "1626fc5f63c20200a30ea871b2fe19cfc130337241843755a68dc31084bc6c2a"
+    },
+    {
+      "file": "foundation-vanguard-game-suite.log.gz",
+      "rawSha256": "1e82ae821ddd49927be5868dabaaaef9abbc2d92a616a8c1c655a8ff69352d38",
+      "archiveSha256": "ac590b0fa5ccb9cee24f7b3a16be262f935cde3dbd26d17fd36a9cd6f8db79b2"
     }
   ]
 }

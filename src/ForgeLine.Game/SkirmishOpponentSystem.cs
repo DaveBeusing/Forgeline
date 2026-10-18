@@ -44,6 +44,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private const int MaximumRetainedScratchCapacity = 4_096;
     private const int MaximumRecoveryPowerPlants = 6;
     private const double OffensiveFuelContinuationMargin = 0.15;
+    private const float ReconnaissancePursuitLeashMeters = 90.0f;
 
     private readonly IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration>
         _configurations;
@@ -249,6 +250,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             controller,
             owned,
             intelligence);
+
+        // Reaching a route stage is persistent progress. Record the vanguard's
+        // arrival before recovery, without waiting for rear reinforcements.
+        if (!state.DeepOffensiveCommitted && configuration.Aggression < 0.70 &&
+            HasVanguardReachedWaypoint(context, owned,
+                SelectOffensiveWaypoint(controller, configuration.Aggression)))
+            state = state with { DeepOffensiveCommitted = true };
 
         SkirmishStrategicState strategicState;
         SkirmishStrategicGoal goal;
@@ -1571,7 +1579,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             if (!HaveCombatOrder(context, [scout], CombatOrderKind.AttackMove, scoutPosition))
             {
                 new AttackMoveCommand(controller.Player, [scout], scoutPosition, context.Tick,
-                    FormationTemplate.Column, pursuitLeashMeters: 90.0f).Execute(context);
+                    FormationTemplate.Column, pursuitLeashMeters: ReconnaissancePursuitLeashMeters).Execute(context);
             }
 
             if (!TacticalCommandUtilities.TryGetMovementIntent(context, escort, out MovementOrder escortIntent) ||
@@ -1590,7 +1598,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 objective,
                 context.Tick,
                 FormationTemplate.Column,
-                pursuitLeashMeters: 90.0f);
+                pursuitLeashMeters: ReconnaissancePursuitLeashMeters);
         command.Execute(context);
 
         var escortedMovement =
@@ -1634,7 +1642,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         EntityId reconReserve =
             ResolveReconReserveScout(
-                owned);
+                context, owned);
         EntityId protectedReconScout =
             reconReserve;
 
@@ -1906,7 +1914,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         OwnedState owned)
     {
         bool released = false;
-        EntityId scout = ResolveReconReserveScout(owned);
+        EntityId scout = ResolveReconReserveScout(context, owned);
         for (int index = 0; index < owned.Units.Count; index++)
         {
             EntityId candidate = owned.Units[index];
@@ -1968,7 +1976,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         EntityId scout =
             ResolveReconReserveScout(
-                owned);
+                context, owned);
 
         if (!scout.IsValid ||
             !context.Entities.TryGetComponent(
@@ -2912,8 +2920,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             Vector3 destination = default;
             float bestDistance = float.PositiveInfinity;
             bool bestCoversCargo = false;
-            double fuelDeficit = Math.Max(0, truck.FuelTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel));
-            double ammunitionDeficit = Math.Max(0, truck.AmmunitionTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition));
+            // Rank sources by the stock needed to become dispatchable. Optional
+            // top-ups must not disqualify a nearby source of the missing cargo.
+            double fuelDeficit = Math.Max(0, truck.FuelTarget * 0.50 - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel));
+            double ammunitionDeficit = Math.Max(0, truck.AmmunitionTarget * 0.25 - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition));
             foreach (var candidate in owned.SupplyDepots)
             {
                 if (!context.Entities.TryGetComponent(candidate.Entity, out SupplyDepot depot) ||
@@ -5226,6 +5236,22 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             : position.X >= center;
     }
 
+    private static bool HasVanguardReachedWaypoint(
+        SimulationContext context, OwnedState owned, Vector3 waypoint)
+    {
+        const float reachedRadiusMeters = 180.0f;
+        foreach (EntityId unit in owned.CombatUnits)
+        {
+            if (owned.UnitByEntity.TryGetValue(unit, out UnitId id) && id == UnitIds.MainBattleTank &&
+                context.Entities.TryGetComponent(unit, out WorldTransform transform) &&
+                HorizontalDistanceSquared(transform.Position, waypoint) <= reachedRadiusMeters * reachedRadiusMeters &&
+                context.Entities.TryGetComponent(unit, out CombatOrderState order) &&
+                order.Kind is CombatOrderKind.Attack or CombatOrderKind.AttackMove)
+                return true;
+        }
+        return false;
+    }
+
     private static bool HasAttackForceReachedWaypoint(
         SimulationContext context,
         EntityId[] attackers,
@@ -5368,6 +5394,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     }
 
     private static EntityId ResolveReconReserveScout(
+        SimulationContext context,
         OwnedState owned) =>
         owned.UnitByEntity
             .Where(
@@ -5379,10 +5406,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             .Select(
                 static pair =>
                     pair.Key)
-            .OrderBy(
-                static entity =>
-                    entity)
+            .OrderBy(entity => ReconnaissanceAssignmentRank(context, entity))
+            .ThenBy(static entity => entity)
             .FirstOrDefault();
+
+    private static int ReconnaissanceAssignmentRank(SimulationContext context, EntityId entity)
+    {
+        if (!context.Entities.TryGetComponent(entity, out CombatOrderState order)) return 2;
+        if (order.Kind == CombatOrderKind.AttackMove &&
+            order.PursuitLeashMeters == ReconnaissancePursuitLeashMeters) return 0;
+        return order.Kind == CombatOrderKind.Retreat ? 1 : 2;
+    }
 
     private static EntityId FindIdleUnit(
         SimulationContext context,
@@ -5390,6 +5424,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         UnitId unitId,
         SkirmishOpponentConfiguration configuration)
     {
+        EntityId reconnaissance = unitId == UnitIds.ScoutVehicle
+            ? ResolveReconReserveScout(context, owned) : EntityId.Invalid;
         foreach (var pair in
                  owned.UnitByEntity
                      .Where(
@@ -5403,8 +5439,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             EntityId entity =
                 pair.Key;
 
-            if (!context.Entities.IsAlive(
-                    entity))
+            // One assigned scout owns reconnaissance and its escort. A fresh
+            // lower-index replacement must not start a second competing mission.
+            if ((unitId == UnitIds.ScoutVehicle && entity != reconnaissance) ||
+                !context.Entities.IsAlive(entity))
             {
                 continue;
             }
@@ -5774,7 +5812,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         EntityId reconReserve =
             ResolveReconReserveScout(
-                owned);
+                context, owned);
         EntityId protectedReconScout =
             reconReserve;
 

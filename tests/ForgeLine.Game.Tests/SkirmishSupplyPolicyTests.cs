@@ -11,6 +11,119 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishSupplyPolicyTests
 {
     [Theory]
+    [InlineData(2, 1, true, true)]
+    [InlineData(1, 2, true, true)]
+    [InlineData(2, 0, true, true)]
+    [InlineData(0, 3, true, false)]
+    [InlineData(2, 1, false, false)]
+    public void VanguardArrivalKeepsRouteProgressBeforeRecoveryAndRearReinforcements(
+        int tanks, int infantry, bool attackOrdered, bool committed)
+    {
+        var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using var scenario = CentralDivideScenario.Create(settings);
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(2));
+        Vector3 home = entities.GetComponent<WorldTransform>(side.CommandCore).Position;
+        float center = scenario.Battlefield.Metadata.WidthMeters * 0.5f;
+        Vector3 waypoint = scenario.Battlefield.Sites.Where(site =>
+            (site.Kind is BattlefieldSiteKind.ForwardOperatingBase or BattlefieldSiteKind.Expansion or BattlefieldSiteKind.MiningOutpost) &&
+            site.Position.X <= center).OrderBy(site => Vector2.DistanceSquared(new Vector2(home.X, home.Z),
+                new Vector2(site.Position.X, site.Position.Z))).ThenByDescending(site => site.Position.X)
+            .ThenBy(site => site.Key, StringComparer.Ordinal).Skip(1).First().Position;
+        var catalog = DirectorateContent.CreateUnitCatalog();
+        var arrived = new List<EntityId>();
+        for (int index = 0; index < tanks + infantry; index++)
+        {
+            EntityId unit = scenario.UnitFactory.Create(catalog[index < tanks ? UnitIds.MainBattleTank : UnitIds.RifleSquad],
+                waypoint + Vector3.UnitZ * (index * 12), side.Player);
+            UnitFuelState fuel = entities.GetComponent<UnitFuelState>(unit);
+            Assert.True(scenario.Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel,
+                scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) - fuel.Capacity * 0.20).Succeeded);
+            arrived.Add(unit);
+        }
+        scenario.UnitFactory.Create(catalog[UnitIds.MainBattleTank], home + Vector3.UnitZ * 40, side.Player);
+        if (attackOrdered)
+            scenario.Simulation.SubmitCommand(new AttackMoveCommand(side.Player, arrived.ToArray(), waypoint,
+                SimulationTick.Zero, FormationTemplate.Column), SimulationTick.Zero.Next());
+
+        scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+
+        Assert.Equal(committed, scenario.GetOpponentState(side.Player).DeepOffensiveCommitted);
+        Assert.False(scenario.Opponents.DebugSnapshot.Single(item => item.Player == side.Player).OffensiveAdmission.IsReady);
+    }
+
+    [Theory]
+    [InlineData(12)]
+    [InlineData(32)]
+    public void ReconnaissanceAssignmentSurvivesLowerIndexScoutReplacement(int ticks)
+    {
+        using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(2));
+        Vector3 home = entities.GetComponent<WorldTransform>(side.CommandCore).Position;
+        Vector3 forward = home - Vector3.UnitX * 900;
+        var catalog = DirectorateContent.CreateUnitCatalog();
+        EntityId retired = scenario.UnitFactory.Create(catalog[UnitIds.ScoutVehicle], home + Vector3.UnitZ * 30, side.Player);
+        EntityId scout = scenario.UnitFactory.Create(catalog[UnitIds.ScoutVehicle], forward, side.Player);
+        Assert.True(entities.DestroyEntity(retired));
+        EntityId replacement = scenario.UnitFactory.Create(catalog[UnitIds.ScoutVehicle], home + Vector3.UnitZ * 30, side.Player);
+        Assert.Equal(retired.Index, replacement.Index);
+        Assert.NotEqual(retired.Generation, replacement.Generation);
+        Assert.True(replacement.Index < scout.Index);
+        EntityId escort = scenario.UnitFactory.Create(catalog[UnitIds.SupplyTruck], forward + Vector3.UnitZ * 10, side.Player);
+        SupplyTruck supply = entities.GetComponent<SupplyTruck>(escort);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, supply.FuelTarget).Succeeded);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, supply.AmmunitionTarget).Succeeded);
+        scenario.Simulation.SubmitCommand(new AttackMoveCommand(side.Player, [scout], forward,
+            SimulationTick.Zero, FormationTemplate.Column, pursuitLeashMeters: 90.0f), SimulationTick.Zero.Next());
+
+        scenario.Simulation.RunTicks((ulong)ticks, TestContext.Current.CancellationToken);
+
+        CombatOrderState mission = entities.GetComponent<CombatOrderState>(scout);
+        Assert.Equal(CombatOrderKind.AttackMove, mission.Kind);
+        Assert.True(mission.Destination.X < forward.X - 100.0f);
+        Assert.Equal(entities.GetComponent<MovementGroupMember>(scout).Group,
+            entities.GetComponent<MovementGroupMember>(escort).Group);
+        Assert.False(entities.TryGetComponent(replacement, out CombatOrderState replacementOrder) &&
+            replacementOrder.Kind == CombatOrderKind.AttackMove);
+    }
+
+    [Theory]
+    [InlineData(0.0, 40.0, 600.0, true)]
+    [InlineData(0.0, 40.0, 70.0, true)]
+    [InlineData(0.0, 40.0, 54.0, false)]
+    [InlineData(0.0, 29.0, 600.0, false)]
+    [InlineData(80.0, 0.0, 600.0, true)]
+    [InlineData(54.0, 0.0, 600.0, false)]
+    public void SupplySourceCoverageIgnoresTopUpsOfAlreadyDispatchableResources(double fuel, double ammunition, double stock, bool nearby)
+    {
+        using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(1));
+        Vector3 position = entities.GetComponent<WorldTransform>(side.CommandCore).Position + Vector3.UnitX * 200;
+        InventoryId inventory = scenario.Inventories.CreateInventory(new InventorySpecification(4_000));
+        Assert.True(scenario.Inventories.Add(inventory, fuel == 0.0 ? ResourceIds.Fuel : ResourceIds.Ammunition, stock).Succeeded);
+        EntityId depot = entities.CreateEntity();
+        entities.AddComponent(depot, new WorldTransform(position, Quaternion.Identity, Vector3.One));
+        entities.AddComponent(depot, new CompletedBuilding(BuildingIds.SupplyDepot, side.Player, SimulationTick.Zero));
+        entities.AddComponent(depot, new ControllableEntity(side.Player, ControllableEntityCategory.Building));
+        entities.AddComponent(depot, new InventoryStorage(inventory));
+        entities.AddComponent(depot, new SupplyDepot(inventory, side.Player));
+        entities.AddComponent(depot, Assert.IsType<BuildingLoadingDock>(DirectorateContent.CreateBuildingCatalog()[BuildingIds.SupplyDepot].LoadingDock));
+        EntityId truck = scenario.UnitFactory.Create(DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck],
+            position + Vector3.UnitZ * 30, side.Player);
+        SupplyTruck supply = entities.GetComponent<SupplyTruck>(truck);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, fuel).Succeeded);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, ammunition).Succeeded);
+
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+
+        Assert.Equal(nearby ? depot : side.CommandCore, entities.GetComponent<SupplyLoadingOrder>(truck).Source);
+        Assert.Equal(fuel, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel));
+        Assert.Equal(ammunition, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition));
+    }
+
+    [Theory]
     [InlineData(0.0, 30.0)]
     [InlineData(29.0, 1.0)]
     [InlineData(30.0, 0.0)]
