@@ -3,6 +3,7 @@ using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Logistics;
+using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 using ForgeLine.World;
 using Xunit;
@@ -363,6 +364,68 @@ public sealed class VehicleDockingIntegrationTests
         Assert.Equal(constructionInput ? olderTarget : factoryTarget, simulation.Entities.GetComponent<CargoTransportOrder>(truck).Destination);
     }
 
+    [Theory]
+    [InlineData(10)]
+    [InlineData(20)]
+    public void CoarseNavigationArrivalsUseSeparateWaitingPointsAndCompleteEveryDelivery(int ticksPerSecond)
+    {
+        var simulation = new SimulationCoordinator(ticksPerSecond);
+        var inventories = new InventoryStore();
+        var network = new LogisticsNetwork();
+        var settings = new WorldGridSettings { ChunkSizeMeters = 512, HeightSamplesPerSide = 33 };
+        var terrain = new TerrainWorld(settings, [new TerrainChunk(new(0, 0), new TerrainHeightfield(33, 512, new float[33 * 33]))]);
+        var source = CreateBuilding(simulation, inventories, new(192, 0, 224));
+        var destination = CreateBuilding(simulation, inventories, new(320, 0, 224));
+        var spatial = new SpatialGridIndex();
+        var obstacles = new List<AxisAlignedBounds>();
+        foreach (EntityId building in new[] { source.Entity, destination.Entity })
+        {
+            var presence = new SpatialPresence(new(10, 5, 10), new(1, 0, SpatialMobility.Static));
+            simulation.Entities.AddComponent(building, presence);
+            var entry = presence.CreateEntry(building, simulation.Entities.GetComponent<WorldTransform>(building));
+            spatial.Upsert(entry);
+            obstacles.Add(entry.Bounds);
+        }
+        var navigation = new HierarchicalNavigationSystem(new HierarchicalPathfinder(NavigationWorld.Build(terrain, obstacles,
+            new NavigationGridSettings { CellSizeMeters = 32 }, new NavigationSectorSettings { SectorSizeCells = 4 })));
+        var docks = new VehicleDockingService(terrain, spatial, navigation);
+        var cargo = new CargoTransportSystem(network, inventories, docking: docks);
+        simulation.RegisterSystem(new SpatialIndexSystem(new SpatialIndexSynchronizer(spatial)));
+        simulation.RegisterSystem(navigation);
+        simulation.RegisterSystem(new GroundMovementSystem(terrain, spatial));
+        simulation.RegisterSystem(cargo);
+        Assert.True(inventories.Add(source.Inventory, ResourceIds.Steel, 180).Succeeded);
+        var origin = network.AddNode(source.Entity, new(192, 0, 224), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoSource);
+        var target = network.AddNode(destination.Entity, new(320, 0, 224), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
+        network.AddEdge(origin, target, LogisticsTransportMode.GroundRoad, 128, 128, 100);
+        var profile = DirectorateContent.CreateUnitCatalog()[UnitIds.CargoTruck];
+        var trucks = new List<EntityId>();
+        for (int index = 0; index < 4; index++)
+        {
+            var truck = CargoTruckFactory.Create(simulation.Entities, inventories, new(64, profile.Movement.HeightOffset, 176 + index * 20),
+                new(1), cargo, new CargoTruckDefinition(profile.Key, profile.CargoCapacity, profile.Movement, profile.VisualScale, profile.VisualId));
+            Assert.True(cargo.TryAssignOrder(simulation.Entities, truck, new(origin, target, ResourceIds.Steel, 40, SimulationTick.Zero), SimulationTick.Zero));
+            trucks.Add(truck);
+        }
+        simulation.AdvanceOneTick();
+        Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(source.Entity));
+        for (int first = 0; first < trucks.Count; first++)
+            for (int second = first + 1; second < trucks.Count; second++)
+            {
+                var a = simulation.Entities.GetComponent<VehicleDockVisit>(trucks[first]).Pose.ApproachStart;
+                var b = simulation.Entities.GetComponent<VehicleDockVisit>(trucks[second]).Pose.ApproachStart;
+                Assert.True(a.HasValue && b.HasValue);
+                Assert.True(Vector3.Distance(a.GetValueOrDefault(), b.GetValueOrDefault()) >= profile.Movement.SeparationRadius * 2);
+            }
+        for (int tick = 1; tick < ticksPerSecond * 180 && trucks.Any(entity => simulation.Entities.HasComponent<CargoTransportOrder>(entity)); tick++)
+            simulation.AdvanceOneTick();
+        foreach (EntityId truck in trucks)
+            Assert.False(simulation.Entities.HasComponent<CargoTransportOrder>(truck), VisitDescription(simulation, truck));
+        Assert.Equal(160, inventories.GetQuantity(destination.Inventory, ResourceIds.Steel));
+        Assert.Equal(20, inventories.GetQuantity(source.Inventory, ResourceIds.Steel));
+        Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(source.Entity));
+        Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(destination.Entity));
+    }
     private static string VisitDescription(SimulationCoordinator simulation, EntityId truck) =>
         simulation.Entities.TryGetComponent(truck, out VehicleDockVisit visit) ? visit.ToString() : "none";
 
