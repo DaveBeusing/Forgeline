@@ -100,7 +100,9 @@
         "src/ForgeLine.Client/ClientRenderPublication.cs",
         "src/ForgeLine.Client/VisualReferenceCapture.cs",
         "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
-        "tests/ForgeLine.Client.Tests/WorldAudioMixerTests.cs"
+        "tests/ForgeLine.Client.Tests/WorldAudioMixerTests.cs",
+        "src/ForgeLine.Client/ClientApplication.cs",
+        "src/ForgeLine.Client/RenderQualification/SmokeRuntimeRateObserver.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",

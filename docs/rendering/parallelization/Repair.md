@@ -87,3 +87,19 @@ Presentation/Client/Graphics suites after this change. The full solution at the
 preceding diagnostic source passed 2,590 tests, zero failed, 16 optional skips,
 2,606 total in 15m35.423s; unchanged asset/headless domains are not reclassified as
 a new execution at a different source identity. Final CI runs the entire solution.
+
+## Slow native smoke liveness
+
+CI 39107228321 passes both the native WARP reference and GUI apphost completion
+steps, then remains in window qualification. The two-second stale-window policy
+of RuntimeMetricsSampler prevents any running FPS/TPS sample when every software
+frame exceeds two seconds. Smoke completion previously waited indefinitely for
+that sample. Keep the sampler policy unchanged: a smoke-only platform observer
+samples actual published successful presentations and completed simulation ticks
+while the render owner works. Cache only observed positive running windows, reset
+on inactivity/session change/rollback, and export that observed window in the
+smoke report. No configured FPS/TPS value, reduced scene or weaker budget is used.
+A missing observation fails after one minute rather than hanging CI. Four
+deterministic tests cover slow eight-second frames, missing frame/tick progress,
+inactivity, session changes and rollback. The additional source paths are serial
+foundation repairs; parallel release remains blocked.
