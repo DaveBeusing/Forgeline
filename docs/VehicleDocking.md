@@ -175,6 +175,12 @@ already overlaps the lane, ordinary movement remains available to clear it; the
 owner still waits for a physically clear corridor. Terrain and collision checks
 remain active, and the slot is not released by a timeout.
 
+Automatic supply planning reconsiders an exhausted loading source after the
+truck has physically left the bay and its retry is due. Another stocked owned
+source may complete the same full cargo targets. Partial cargo is retained;
+active dock visits and other waiting reasons are not redirected. Explicit player
+loading orders keep their selected source.
+
 ## Persistence and presentation
 
 Dock components are authoritative ECS state. Save payload schema 3 and

@@ -2842,11 +2842,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             if (!context.Entities.TryGetComponent(entity, out SupplyTruck truck) ||
                 context.Entities.HasComponent<ResupplyOrder>(entity) ||
-                context.Entities.HasComponent<SupplyLoadingOrder>(entity) ||
                 !context.Entities.TryGetComponent(entity, out WorldTransform transform))
             {
                 continue;
             }
+
+            bool reconsiderSource = context.Entities.TryGetComponent(entity, out SupplyLoadingOrder loading);
+            if (reconsiderSource && (loading.WaitReason != VehicleDockBlockReason.SourceEmpty ||
+                context.Tick.Value < loading.RetryAtTick || context.Entities.HasComponent<VehicleDockVisit>(entity)))
+                continue;
 
             bool hasMovement =
                 TacticalCommandUtilities.TryGetMovementIntent(
@@ -2860,12 +2864,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 _inventories.GetQuantity(
                     truck.InventoryId,
                     ResourceIds.Fuel) <
-                truck.FuelTarget * 0.50;
+                truck.FuelTarget * (reconsiderSource ? 1 : 0.50) - 1e-9;
             bool needsAmmunition =
                 _inventories.GetQuantity(
                     truck.InventoryId,
                     ResourceIds.Ammunition) <
-                truck.AmmunitionTarget * 0.25;
+                truck.AmmunitionTarget * (reconsiderSource ? 1 : 0.25) - 1e-9;
 
             if (!needsFuel && !needsAmmunition)
             {
@@ -3000,6 +3004,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             }
 
             if (!context.Entities.HasComponent<BuildingLoadingDock>(loadingSource)) continue;
+            if (reconsiderSource && loadingSource == loading.Source) continue;
             if (hasMovement) new StopMovementCommand(truck.Owner, [entity], context.Tick).Execute(context);
             VehicleDockingService.Put(context.Entities, entity, new SupplyLoadingOrder(loadingSource, context.Tick));
         }

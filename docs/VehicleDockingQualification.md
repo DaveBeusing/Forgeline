@@ -36,6 +36,33 @@ must be qualified separately.
 
 ## Concrete remaining gates
 
+The later `4924a1bbcf736ff42296907eb89d92067d92fbca` qualification completed
+the Release build with zero warnings/errors, the 44-project graph, SemVer,
+map compilation, 1,000/10,000-entity smoke and 256-tick save/load/replay.
+Its full solution run had 2,682 tests: 2,664 passed, 16 skipped and two failed
+(natural strategic progression and a building-state allocation assertion).
+The allocation method passed all 13 cases in isolation without changing its
+zero-allocation assertion. Three phase-focused Full-HD native images passed
+structural/repeat-image checks; human temporal review remains pending.
+Its reproducible package SHA-256 is
+`F27C49AF73E72130CDE8F5CC8A9428D813C2B38CC1AEEDBDD3E96661B61A7C57`.
+Fresh settings smoke passed. Startup icon observation failed in sample zero;
+that attempt does not qualify startup. All three quality workflows passed;
+the main CI run was still running when this record was written.
+
+The reserved-lane admission deadlock is reproduced by a two-case movement test:
+an already overlapping waiting truck must evacuate, while an outside truck must
+remain outside. One case failed before the correction; both pass afterward.
+The subsequent 80,000-tick match completed 240 deliveries and moved 24,118 cargo
+units with no failed cargo orders or routes, but remained Active/Running with
+both opponents Mobilizing/PrepareOffensive. It is a failed terminal gate.
+The saved endpoint also exposed exhausted-source loading orders that automatic
+planning never reconsidered after departure. Four new cases cover retry timing,
+partial cargo retention, another stocked source and no available replacement;
+one failed before the correction. All 35 supply-policy cases passed afterward.
+That correction requires its own complete qualification; earlier evidence is
+not promoted to its binaries.
+
 - `SkirmishOpponentTests.BoundedHeadlessSkirmishProgressesThroughStrategicLoop`
   fails within its unchanged 40,000 ticks. The eastern factory is still waiting
   on inputs, with no live scout or tank and only its home hub at the deadline.
