@@ -102,6 +102,9 @@ from a compatible owned depot or Command Core. The opponent planner creates the
 same authoritative loading order. Ordinary movement past a source never loads
 the supply cargo compartment.
 
+A loading truck completes its physical exit before escort assignment.
+Existing field distribution remains independent.
+
 Propulsion Fuel remains a separate inventory. A correctly docked truck can load
 with an empty drive tank. An empty tank outside the dock requires the existing
 physical rescue/refueling path. Cargo travel budgets include local approach and
@@ -124,6 +127,13 @@ larger valid load is available. Logical-node dispatch retains its existing cost
 policy. Construction urgency follows the next building's actual missing costs;
 unit-production urgency follows missing costs of the next unit. Neither changes
 stock targets or throughput limits.
+
+During a power shortage, unrelated construction waits while partial deliveries
+accumulate for the next required power plant. Its input policies remain Critical
+through cost reservation, preventing another dispatch from claiming a completed
+construction load before the build command books it. Tactical support continues.
+Home placement candidates leave 96 m between neighboring sites so coarse navigation
+cells retain usable access between the authored loading lanes.
 
 Within the Critical dispatch class, powered unit factories blocked on inputs
 and depot Fuel recovery precede ordinary processing-stock replenishment. Age

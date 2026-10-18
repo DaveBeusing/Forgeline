@@ -1921,6 +1921,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
                     candidate) ||
+                context.Entities.HasComponent<SupplyLoadingOrder>(candidate) ||
                 IsProtectingReconScout(context, candidate, scout) ||
                 !TacticalCommandUtilities.TryGetMovementIntent(
                     context,
@@ -2097,7 +2098,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context.Entities.HasComponent<ResupplyOrder>(
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
-                    candidate))
+                    candidate) ||
+                context.Entities.HasComponent<SupplyLoadingOrder>(candidate))
             {
                 continue;
             }
@@ -2189,6 +2191,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
                     candidate) ||
+                context.Entities.HasComponent<SupplyLoadingOrder>(candidate) ||
                 IsProtectingReconScout(
                     context,
                     candidate,
@@ -2290,6 +2293,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
                     candidate) ||
+                context.Entities.HasComponent<SupplyLoadingOrder>(candidate) ||
                 IsProtectingReconScout(
                     context,
                     candidate,
@@ -3070,7 +3074,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             if (nextConstruction is null || !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage storage))
                 return LogisticsStockPriority.High;
             foreach (BuildingResourceCost cost in nextConstruction.Costs)
-                if (cost.ResourceId == resource && _inventories.GetAvailableQuantity(storage.InventoryId, resource) + 1e-9 < cost.Quantity)
+                if (cost.ResourceId == resource && (nextConstruction.Id == BuildingIds.PowerPlant ||
+                    _inventories.GetAvailableQuantity(storage.InventoryId, resource) + 1e-9 < cost.Quantity))
                     return LogisticsStockPriority.Critical;
             return LogisticsStockPriority.High;
         }
@@ -4471,6 +4476,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         BuildingId buildingId,
         Vector3? requestedPosition)
     {
+        int powerPlants = GetBuildingCount(owned, BuildingIds.PowerPlant);
+        if (buildingId != BuildingIds.PowerPlant && powerPlants < MaximumRecoveryPowerPlants &&
+            (powerPlants == 0 || owned.PowerGeneration < owned.PowerDemand + 20 || owned.OfflineConsumers > 0))
+        {
+            // Preserve partial deliveries for the required power plant while
+            // tactical recovery and field support continue independently.
+            return false;
+        }
         if (owned.ConstructionSites.Count > 0 ||
             HasPendingBuildRequest(
                 context,
@@ -4800,11 +4813,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             Vector2[] nearbyAccess =
             [
-                new(0, 64), new(64, 0), new(-64, 0), new(0, -64),
-                new(64, 64), new(-64, 64), new(64, -64), new(-64, -64),
-                new(0, 128), new(128, 0), new(-128, 0), new(0, -128),
-                new(64, 128), new(-64, 128), new(128, 64), new(-128, 64),
-                new(64, -128), new(-64, -128), new(128, -64), new(-128, -64)
+                new(0, 96), new(96, 0), new(-96, 0), new(0, -96),
+                new(96, 96), new(-96, 96), new(96, -96), new(-96, -96),
+                new(0, 192), new(192, 0), new(-192, 0), new(0, -192),
+                new(96, 192), new(-96, 192), new(192, 96), new(-192, 96),
+                new(96, -192), new(-96, -192), new(192, -96), new(-192, -96)
             ];
             offsets = nearbyAccess.Concat(offsets).ToArray();
         }
