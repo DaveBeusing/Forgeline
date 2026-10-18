@@ -43,9 +43,9 @@ and visit generations authorize service and release. Ownership includes approach
 stationary service and confirmed exit. Other trucks receive `Busy` and stop
 without searching a path into the occupied lane. There is no FIFO queue.
 
-Strategic arrivals first reach a point behind the entry without claiming the
+Strategic arrivals first reach a validated point outside the entry without claiming the
 slot. A generation-zero visit describes this approach only; it authorizes no
-service or release. The actual claim happens at the outside maneuver area.
+service or release. The actual claim happens at the outside maneuver area. Nearby outward and diagonal candidates are checked when a neighbor blocks the backward approach. A safe waiting point remains stable when another truck leaves, so releasing the bay does not send the waiting truck on another coarse detour.
 If another truck claims the slot during strategic travel, the second truck
 stops outside and reports `Busy` without replanning into the occupied lane.
 
@@ -107,6 +107,19 @@ Existing field distribution remains independent. Automatic remote rescue dispatc
 waits for an exclusive loading visit and its exit to finish, even while that
 stationary visit has no movement order. A partial first batch cannot preempt its
 own loading trip; nearby recipients may still receive physical field supply.
+Remote recipients also skip a truck actively traveling to load, so they can use
+a stocked stationary provider instead of chasing its subsequent departure.
+A source-empty truck waiting outside the bay can still serve a remote recovery.
+An unaffordable retreat waits for physical assistance in every strategic phase.
+Strategically managed combat units leave distant advances to the coordinated
+planner while supplies are prepared. Local identified-target responses, radar
+coordinates within the engagement leash and explicit strategic marches remain
+active; standalone tactical opponents retain their distant advance behavior.
+After establishing its initial objective-pressure force, the opponent buys
+additional cargo trucks for the operating processing sites,
+within its existing two-to-four-truck fleet bounds. Replacement reserves use
+the same target, so finite dock cycles do not leave a mature industry on the
+initial two-truck throughput. Vehicle prices and inventory targets are unchanged.
 
 Propulsion Fuel remains a separate inventory. A correctly docked truck can load
 with an empty drive tank. An empty tank outside the dock requires the existing
@@ -162,7 +175,7 @@ animation.
 
 Visual fixture version 4 runs the real shared docking service, collision index,
 navigation and supply-loading order. Loading captures require stationary cargo
-service progress and a completed supply batch. The sustained case captures after
+service progress and a completed supply batch. A second cargo truck must be stationary in `Busy` outside the current owner's reserved corridor. The sustained case captures after
 at least two completed physical deliveries and tick 1024, within the existing
 4000-tick fixture limit. Historical version-3 captures retain their original
 identity; they are not silently requalified against the changed fixture.
