@@ -529,6 +529,30 @@ public sealed class VehicleDockingTests
         Assert.False(entities.HasComponent<VehicleDockSlot>(fixture.Building));
         Assert.False(entities.HasComponent<VehicleDockSlot>(neighbor));
     }
+    [Theory]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    [InlineData(true, false)]
+    public void AuthorizedDockApproachTakesMotionOwnershipFromFormationWithoutChangingOtherMembers(bool far, bool authorized)
+    {
+        var fixture = new Fixture();
+        var entities = fixture.Simulation.Entities;
+        EntityId group = entities.CreateEntity();
+        entities.AddComponent(fixture.Truck, GroundMovement.CreateDefault());
+        entities.AddComponent(fixture.Truck, new ControllableEntity(new(1), ControllableEntityCategory.Unit));
+        entities.AddComponent(fixture.Truck, new MovementGroupMember(group));
+        entities.AddComponent(fixture.Truck, new FormationMovementConstraint(2));
+        entities.AddComponent(fixture.OtherTruck, new MovementGroupMember(group));
+        entities.AddComponent(fixture.OtherTruck, new FormationMovementConstraint(2));
+        if (far) fixture.SetTruck(new(100, 0, 100), 0, 0);
+        fixture.Step(context => fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(authorized ? 1UL : 2UL)));
+        Assert.Equal(!authorized, entities.HasComponent<MovementGroupMember>(fixture.Truck));
+        Assert.Equal(!authorized, entities.HasComponent<FormationMovementConstraint>(fixture.Truck));
+        Assert.Equal(group, entities.GetComponent<MovementGroupMember>(fixture.OtherTruck).Group);
+        Assert.Equal(2, entities.GetComponent<FormationMovementConstraint>(fixture.OtherTruck).MaximumSpeed);
+        Assert.True(entities.IsAlive(group));
+    }
+
     private sealed class Fixture : ISimulationSystem
     {
         private Action<SimulationContext>? _action;

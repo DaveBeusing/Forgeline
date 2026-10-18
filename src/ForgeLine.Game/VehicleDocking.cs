@@ -368,6 +368,7 @@ public sealed class VehicleDockingService
             StopDockMotion(context.Entities, truck);
             return false;
         }
+        ClearFormationMembership(context.Entities, truck);
         if (!LaneClear(context.Entities, building, truck, visit.Pose))
         {
             Put(context.Entities, truck, visit with { Status = VehicleDockStatus.Blocked, Reason = VehicleDockBlockReason.Obstructed });
@@ -418,6 +419,7 @@ public sealed class VehicleDockingService
             !entities.TryGetComponent(truck, out GroundMovement movement) ||
             !entities.TryGetComponent(truck, out GroundMovementState motion) ||
             !VehicleDockPose.TryCreate(definition, buildingTransform, transform, out var pose)) return false;
+        ClearFormationMembership(entities, truck);
         if (pose.Contains(transform.Position, 0)) return false;
 
         Vector3 forward = new(MathF.Sin(pose.Heading), 0, MathF.Cos(pose.Heading));
@@ -629,6 +631,12 @@ public sealed class VehicleDockingService
             if (!OwnerInLane(entities, slot) && LaneClear(entities, building, slot.Truck, slot.Pose))
                 entities.RemoveComponent<VehicleDockSlot>(building);
         }
+    }
+
+    private static void ClearFormationMembership(EntityRegistry entities, EntityId truck)
+    {
+        if (entities.HasComponent<MovementGroupMember>(truck)) entities.RemoveComponent<MovementGroupMember>(truck);
+        if (entities.HasComponent<FormationMovementConstraint>(truck)) entities.RemoveComponent<FormationMovementConstraint>(truck);
     }
 
     private static void StopDockMotion(EntityRegistry entities, EntityId truck)
