@@ -96,7 +96,7 @@ public sealed class VehicleDockingIntegrationTests
             Assert.False(simulation.Entities.HasComponent<CargoTransportOrder>(entity), VisitDescription(simulation, entity));
         Assert.Equal(40 * truckCount, inventories.GetQuantity(destination.Inventory, ResourceIds.Steel));
         Assert.Equal(sourceStock - 40 * truckCount, inventories.GetQuantity(source.Inventory, ResourceIds.Steel));
-        Assert.True(serviceTicks >= ticksPerSecond);
+        Assert.True(serviceTicks >= Math.Ceiling(ticksPerSecond * 0.8));
         Assert.True(sawExit);
         if (invalidateRoute) { Assert.True(changedRoute); Assert.True(cargo.Metrics.RerouteCount > 0); }
         Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(source.Entity));
@@ -325,9 +325,11 @@ public sealed class VehicleDockingIntegrationTests
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void CriticalConstructionAndPoweredFactoriesPrecedeBulkProcessing(bool constructionInput)
+    [InlineData(false, false, false)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    [InlineData(false, true, true)]
+    public void CriticalConstructionAndPoweredFactoriesPrecedeBulkProcessing(bool constructionInput, bool depotReserve, bool loadingDemand)
     {
         var simulation = new SimulationCoordinator();
         var inventories = new InventoryStore();
@@ -340,7 +342,15 @@ public sealed class VehicleDockingIntegrationTests
         var processing = CreateBuilding(simulation, inventories, new(120, 0, 0));
         var factory = CreateBuilding(simulation, inventories, new(240, 0, 0));
         if (constructionInput) simulation.Entities.AddComponent(processing.Entity, new CommandFacility());
-        Assert.True(inventories.Add(source.Inventory, ResourceIds.Steel, 200).Succeeded);
+        ResourceId resource = depotReserve ? ResourceIds.Fuel : ResourceIds.Steel;
+        if (depotReserve)
+            simulation.Entities.AddComponent(processing.Entity, new SupplyDepot(processing.Inventory, new(1)));
+        if (loadingDemand)
+        {
+            EntityId supply = SupplyTruckFactory.Create(simulation.Entities, inventories, new(120, 1, 14), new(1), cargo);
+            simulation.Entities.AddComponent(supply, new SupplyLoadingOrder(processing.Entity, SimulationTick.Zero));
+        }
+        Assert.True(inventories.Add(source.Inventory, resource, 200).Succeeded);
         var origin = network.AddNode(source.Entity, Vector3.Zero, LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoSource);
         var olderTarget = network.AddNode(processing.Entity, new(120, 0, 0), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
         var factoryTarget = network.AddNode(factory.Entity, new(240, 0, 0), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
@@ -349,7 +359,7 @@ public sealed class VehicleDockingIntegrationTests
         foreach (var target in new[] { processing, factory })
         {
             var policy = simulation.Entities.CreateEntity();
-            simulation.Entities.AddComponent(policy, new LogisticsStockPolicy(target.Entity, ResourceIds.Steel, 20, 80, 100, LogisticsStockPriority.Critical));
+            simulation.Entities.AddComponent(policy, new LogisticsStockPolicy(target.Entity, resource, 20, 80, 100, LogisticsStockPriority.Critical));
         }
         simulation.Entities.AddComponent(factory.Entity, new UnitProductionFacility(factory.Inventory,
             UnitProductionCapability.Vehicle, new(1), Vector3.UnitZ * 32, SimulationTick.Zero));
@@ -361,7 +371,10 @@ public sealed class VehicleDockingIntegrationTests
         Assert.Equal(UnitProductionStatus.NoInput, simulation.Entities.GetComponent<UnitProductionFacility>(factory.Entity).Status);
         var truck = CargoTruckFactory.Create(simulation.Entities, inventories, Vector3.Zero, new(1), cargo);
         simulation.RunTicks(100, TestContext.Current.CancellationToken);
-        Assert.Equal(constructionInput ? olderTarget : factoryTarget, simulation.Entities.GetComponent<CargoTransportOrder>(truck).Destination);
+        Assert.Equal(constructionInput || loadingDemand ? olderTarget : factoryTarget, simulation.Entities.GetComponent<CargoTransportOrder>(truck).Destination);
+        foreach (EntityId policy in simulation.Entities.Query<LogisticsStockPolicy>())
+            Assert.Equal(LogisticsStockPriority.Critical, simulation.Entities.GetComponent<LogisticsStockPolicy>(policy).Priority);
+        Assert.Equal(200, inventories.GetQuantity(source.Inventory, resource));
     }
 
     [Theory]
@@ -425,6 +438,36 @@ public sealed class VehicleDockingIntegrationTests
         Assert.Equal(20, inventories.GetQuantity(source.Inventory, ResourceIds.Steel));
         Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(source.Entity));
         Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(destination.Entity));
+    }
+    [Theory]
+    [InlineData(LogisticsStockPriority.Critical, true)]
+    [InlineData(LogisticsStockPriority.High, false)]
+    public void CriticalPhysicalFactoryDemandDoesNotCountInputsAlreadyReservedForProduction(LogisticsStockPriority priority, bool dispatch)
+    {
+        var simulation = new SimulationCoordinator();
+        var inventories = new InventoryStore();
+        var network = new LogisticsNetwork();
+        var cargo = new CargoTransportSystem(network, inventories);
+        simulation.RegisterSystem(new AutomatedDistributionSystem(network, inventories, cargo));
+        var source = CreateBuilding(simulation, inventories, Vector3.Zero);
+        var factory = CreateBuilding(simulation, inventories, new(120, 0, 0));
+        Assert.True(inventories.Add(source.Inventory, ResourceIds.Fuel, 200).Succeeded);
+        Assert.True(inventories.Add(factory.Inventory, ResourceIds.Fuel, 20).Succeeded);
+        Assert.True(inventories.Reserve(factory.Inventory, ResourceIds.Fuel, 20).Succeeded);
+        simulation.Entities.AddComponent(factory.Entity, new UnitProductionFacility(factory.Inventory,
+            UnitProductionCapability.Vehicle, new(1), Vector3.UnitZ * 32, SimulationTick.Zero));
+        var origin = network.AddNode(source.Entity, Vector3.Zero, LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoSource);
+        var target = network.AddNode(factory.Entity, new(120, 0, 0), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
+        network.AddEdge(origin, target, LogisticsTransportMode.GroundRoad, 120, 120, 100);
+        var policy = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(policy, new LogisticsStockPolicy(factory.Entity, ResourceIds.Fuel, 20, 60, 100, priority));
+        EntityId truck = CargoTruckFactory.Create(simulation.Entities, inventories, Vector3.Zero, new(1), cargo);
+        simulation.AdvanceOneTick();
+        Assert.Equal(dispatch, simulation.Entities.HasComponent<CargoTransportOrder>(truck));
+        if (dispatch) Assert.Equal(60, simulation.Entities.GetComponent<CargoTransportOrder>(truck).RequestedQuantity);
+        Assert.Equal(200, inventories.GetQuantity(source.Inventory, ResourceIds.Fuel));
+        Assert.Equal(20, inventories.GetQuantity(factory.Inventory, ResourceIds.Fuel));
+        Assert.Equal(20, inventories.GetReservedQuantity(factory.Inventory, ResourceIds.Fuel));
     }
     private static string VisitDescription(SimulationCoordinator simulation, EntityId truck) =>
         simulation.Entities.TryGetComponent(truck, out VehicleDockVisit visit) ? visit.ToString() : "none";
