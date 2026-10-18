@@ -159,7 +159,12 @@ public sealed class RuntimeSkinData
                 n += Vector3.TransformNormal(new(v.NormalX, v.NormalY, v.NormalZ), palette[j]) * w;
                 t += Vector3.TransformNormal(new(v.TangentX, v.TangentY, v.TangentZ), palette[j]) * w;
             }
-            n = Vector3.Normalize(n); t -= n * Vector3.Dot(n, t); t = Vector3.Normalize(t);
+            // Opposing weighted rotations can cancel a basis even for a valid skin.
+            // Keep deformation finite at that singular blend instead of failing a frame.
+            if (n.LengthSquared() < 1e-12f) n = Vector3.TransformNormal(new(v.NormalX,v.NormalY,v.NormalZ), palette[influence.A]);
+            n = Vector3.Normalize(n); t -= n * Vector3.Dot(n, t);
+            if (t.LengthSquared() < 1e-12f) t = Vector3.Cross(MathF.Abs(n.Y) < .9f ? Vector3.UnitY : Vector3.UnitX, n);
+            t = Vector3.Normalize(t);
             if (!Finite(p) || !Finite(n) || !Finite(t)) throw new InvalidDataException("Skin deformation produced an invalid vertex basis.");
             destination[i] = v with { X = p.X, Y = p.Y, Z = p.Z, NormalX = n.X, NormalY = n.Y, NormalZ = n.Z, TangentX = t.X, TangentY = t.Y, TangentZ = t.Z };
         }

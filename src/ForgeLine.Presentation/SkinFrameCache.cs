@@ -76,9 +76,13 @@ internal sealed class SkinFrameCache(IGraphicsDevice graphics) : IDisposable
             {
                 var original = binding.Data.Mesh.Vertices[i]; var v = vertices[i];
                 Vector3 p = Vector3.Lerp(new(original.X,original.Y,original.Z), new(v.X,v.Y,v.Z), weight);
-                Vector3 n = Vector3.Normalize(Vector3.Lerp(new(original.NormalX,original.NormalY,original.NormalZ),new(v.NormalX,v.NormalY,v.NormalZ),weight));
-                Vector3 t = Vector3.Normalize(Vector3.Lerp(new(original.TangentX,original.TangentY,original.TangentZ),new(v.TangentX,v.TangentY,v.TangentZ),weight));
-                t = Vector3.Normalize(t - n * Vector3.Dot(n,t));
+                Vector3 n = Vector3.Lerp(new(original.NormalX,original.NormalY,original.NormalZ),new(v.NormalX,v.NormalY,v.NormalZ),weight);
+                if (n.LengthSquared() < 1e-12f) n = new(original.NormalX,original.NormalY,original.NormalZ);
+                n = Vector3.Normalize(n);
+                Vector3 t = Vector3.Lerp(new(original.TangentX,original.TangentY,original.TangentZ),new(v.TangentX,v.TangentY,v.TangentZ),weight);
+                t -= n * Vector3.Dot(n,t);
+                if (t.LengthSquared() < 1e-12f) t = Vector3.Cross(MathF.Abs(n.Y) < .9f ? Vector3.UnitY : Vector3.UnitX,n);
+                t = Vector3.Normalize(t);
                 vertices[i] = v with { X=p.X,Y=p.Y,Z=p.Z,NormalX=n.X,NormalY=n.Y,NormalZ=n.Z,TangentX=t.X,TangentY=t.Y,TangentZ=t.Z };
             }
         }

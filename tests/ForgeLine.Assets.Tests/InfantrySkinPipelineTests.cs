@@ -89,6 +89,20 @@ public sealed class InfantrySkinPipelineTests
     }
 
     [Fact]
+    public void OpposingWeightedRotationsKeepAFiniteOrthonormalBasis()
+    {
+        RuntimeMeshVertex[] vertices = [new(.1f,0,0,0,1,0,0,0,1,0,0,1),new(0,.1f,0,0,1,0,0,0,1,0,0,1),new(0,0,.1f,0,1,0,0,0,1,0,0,1)];
+        var mesh=new RuntimeMeshData(RuntimeMeshAttributes.Normal|RuntimeMeshAttributes.Uv0|RuntimeMeshAttributes.Tangent,vertices,[0,1,2],[],[new(0,3,-1)]);
+        SkinJoint[] joints=[new("a",-1,Vector3.Zero,Quaternion.Identity,Matrix4x4.Identity),new("b",-1,Vector3.Zero,Quaternion.Identity,Matrix4x4.Identity)];
+        var skin=new RuntimeSkinData(mesh,joints,Enumerable.Repeat(new SkinInfluence(0,1,0,0,new(.5f,.5f,0,0)),3).ToArray(),[]);
+        var output=new RuntimeMeshVertex[3];skin.Deform([Matrix4x4.Identity,Matrix4x4.CreateRotationZ(MathF.PI)],output);
+        foreach(var vertex in output)
+        {
+            Vector3 normal=new(vertex.NormalX,vertex.NormalY,vertex.NormalZ),tangent=new(vertex.TangentX,vertex.TangentY,vertex.TangentZ);
+            Assert.InRange(normal.Length(),.9999f,1.0001f);Assert.InRange(tangent.Length(),.9999f,1.0001f);Assert.InRange(MathF.Abs(Vector3.Dot(normal,tangent)),0,.00001f);
+        }
+    }
+    [Fact]
     public void PayloadAndBindingRejectInvalidWeightsHierarchySignaturesAndBounds()
     {
         RuntimeMeshVertex[] vertices = [new(.1f,0,0,0,1,0,0,0,1,0,0,1),new(0,.1f,0,0,1,0,0,0,1,0,0,1),new(0,0,.1f,0,1,0,0,0,1,0,0,1)];
