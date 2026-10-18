@@ -1075,6 +1075,20 @@ public sealed class SkirmishOpponentTests
                 $" ammo={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Ammunition):F0}");
         }
 
+        var combatSupply = new List<string>();
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<UnitIdentity>())
+        {
+            var entities = scenario.Simulation.Entities;
+            if (!entities.TryGetComponent(entity, out ControllableEntity control) || control.Owner != side.Player ||
+                !entities.TryGetComponent(entity, out UnitFuelState fuel)) continue;
+            var identity = entities.GetComponent<UnitIdentity>(entity);
+            if (identity.UnitId != UnitIds.MainBattleTank && identity.UnitId != UnitIds.ScoutVehicle) continue;
+            string ammunition = entities.TryGetComponent(entity, out AmmunitionState ammo)
+                ? $"{scenario.Inventories.GetQuantity(ammo.InventoryId, ResourceIds.Ammunition):F1}/{ammo.Capacity:F0}" : "na";
+            string order = entities.TryGetComponent(entity, out CombatOrderState combat) ? combat.ToString() : "none";
+            string resupply = entities.TryGetComponent(entity, out ResupplyOrder refill) ? refill.ToString() : "none";
+            combatSupply.Add($"{entity}/unit{identity.UnitId}@{entities.GetComponent<WorldTransform>(entity).Position}/fuel{scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel):F1}/{fuel.Capacity}/ammo{ammunition}/combat{order}/resupply{resupply}");
+        }
         string unitProductionStates =
             string.Join(
                 ",",
@@ -1103,7 +1117,7 @@ public sealed class SkirmishOpponentTests
             $"requests={string.Join(';', scenario.AutomatedDistribution.LastDebugSnapshot.Requests.Select(r => $"{r.RequestId}:{r.ResourceId}/{r.Destination}/{r.State}/qty{r.RequestedQuantity:F0}/reserved{r.ReservedQuantity:F0}/truck{r.AssignedTruck}"))} " +
             $"cargo={cargo.TransportCount}/active{cargo.ActiveTransportCount}/wait{cargo.WaitingTransportCount}/failed{cargo.FailedTransportCount}/delivered{cargo.DeliveredQuantity:F0}/routeFail{cargo.RouteFailureCount} " +
             $"cargoStates={cargoStates} " +
-            $"unitProductionStates={unitProductionStates} " +
+            $"unitProductionStates={unitProductionStates} combatSupply={string.Join(';', combatSupply)} " +
             $"scouts={scenario.CountUnits(side.Player, UnitIds.ScoutVehicle)} " +
             $"tanks={scenario.CountUnits(side.Player, UnitIds.MainBattleTank)} " +
             $"force={debug.Force.CombatUnits}/ready{debug.Force.AverageReadiness:F2}/supply{debug.Force.MinimumSupply:F2}/currentContacts{debug.Force.CurrentHostileContacts} " +
