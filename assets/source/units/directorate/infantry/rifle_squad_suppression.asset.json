@@ -1,0 +1,7 @@
+{
+  "id": "animation.directorate.rifle_squad.suppression",
+  "type": "animation",
+  "source": "../authoring/infantry/rifle_squad.glb",
+  "skeletalAnimation": true,
+  "animationClip": "suppression"
+}
