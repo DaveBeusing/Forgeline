@@ -278,11 +278,29 @@ public sealed class VehicleDockingService
             }
         }
 
+        if (currentVisit.Generation == 0 && currentVisit.Building == building &&
+            currentVisit.Pose.ApproachStart is Vector3 staged &&
+            VehicleDockPose.HorizontalDistanceSquared(currentVisit.Pose.Service, pose.Service) < 0.001f &&
+            entities.TryGetComponent(truck, out GroundMovement stagedMovement) &&
+            entities.TryGetComponent(truck, out GroundMovementState stagedMotion) &&
+            VehicleDockPose.HorizontalDistanceSquared(truckTransform.Position, staged) <=
+                (stagedMovement.StopRadius + 0.5f) * (stagedMovement.StopRadius + 0.5f) &&
+            stagedMotion.Velocity.LengthSquared() <= 0.05f * 0.05f)
+        {
+            // Reserve the continuous maneuver from the waiting point already reached.
+            // A different coarse entry would send the owner back through waiting traffic.
+            pose = pose with { ApproachStart = staged };
+        }
         if (_navigation is not null && entities.TryGetComponent(truck, out NavigationAgent agent))
         {
             var grid = _navigation.World.Grid;
             Vector3 direction = new(MathF.Sin(pose.Heading), 0, MathF.Cos(pose.Heading));
-            if (!grid.TryWorldToCell(pose.Entry, out var entryCell) || !grid.IsTraversable(entryCell, agent.Capabilities))
+            if (pose.ApproachStart is Vector3 stagedStart)
+            {
+                if (!grid.TryWorldToCell(stagedStart, out var stagedCell) || !grid.IsTraversable(stagedCell, agent.Capabilities))
+                    return Reject(entities, truck, building, VehicleDockBlockReason.Obstructed, out visit);
+            }
+            else if (!grid.TryWorldToCell(pose.Entry, out var entryCell) || !grid.IsTraversable(entryCell, agent.Capabilities))
             {
                 Vector3 outward = new(-direction.Z, 0, direction.X);
                 if (Vector3.Dot(outward, pose.Service - buildingTransform.Position) < 0) outward = -outward;

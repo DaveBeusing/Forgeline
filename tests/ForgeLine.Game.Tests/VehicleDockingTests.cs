@@ -469,8 +469,17 @@ public sealed class VehicleDockingTests
         Assert.False((pose with { ApproachStart = null }).Contains(staging, pose.HalfLength));
         Assert.False(entities.HasComponent<VehicleDockSlot>(fixture.Building));
         bool docked = false;
+        bool claimed = false;
         for (int tick = 0; tick < 2000 && !docked; tick++)
+        {
             fixture.Step(context => docked = fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1)));
+            if (!claimed && entities.TryGetComponent(fixture.Building, out VehicleDockSlot slot))
+            {
+                claimed = true;
+                Assert.Equal(staging, slot.Pose.ApproachStart);
+            }
+        }
+        Assert.True(claimed);
         Assert.True(docked, entities.GetComponent<VehicleDockVisit>(fixture.Truck).ToString());
     }
     [Fact]
