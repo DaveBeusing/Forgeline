@@ -103,7 +103,10 @@ same authoritative loading order. Ordinary movement past a source never loads
 the supply cargo compartment.
 
 A loading truck completes its physical exit before escort assignment.
-Existing field distribution remains independent.
+Existing field distribution remains independent. Automatic remote rescue dispatch
+waits for an exclusive loading visit and its exit to finish, even while that
+stationary visit has no movement order. A partial first batch cannot preempt its
+own loading trip; nearby recipients may still receive physical field supply.
 
 Propulsion Fuel remains a separate inventory. A correctly docked truck can load
 with an empty drive tank. An empty tank outside the dock requires the existing

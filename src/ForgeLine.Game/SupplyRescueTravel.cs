@@ -100,6 +100,8 @@ internal static class SupplyRescueTravel
     public static bool HasUnrelatedMovement(
         SimulationContext context, EntityId provider, EntityId recipient)
     {
+        if (VehicleDockingService.HasExclusiveLoadingVisit(context.Entities, provider)) return true;
+
         if (context.Entities.TryGetComponent(provider, out SupplyRescueAssignment assignment) &&
             assignment.Recipient == recipient && OwnsMovement(context, provider, assignment))
         {

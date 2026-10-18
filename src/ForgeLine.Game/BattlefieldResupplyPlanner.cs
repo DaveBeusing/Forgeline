@@ -417,6 +417,7 @@ public static class BattlefieldResupplyPlanner
                 provider) ||
             !context.Entities.HasComponent<GroundMovement>(
                 provider) ||
+            VehicleDockingService.HasExclusiveLoadingVisit(context.Entities, provider) ||
             context.Entities.HasComponent<ResupplyOrder>(
                 provider) ||
             SupplyRescueTravel.IsDeferred(

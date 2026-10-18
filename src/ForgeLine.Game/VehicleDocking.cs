@@ -546,6 +546,12 @@ public sealed class VehicleDockingService
         // existing distribution owner observes cancellation and releases stock.
     }
 
+    internal static bool HasExclusiveLoadingVisit(EntityRegistry entities, EntityId truck) =>
+        entities.HasComponent<SupplyLoadingOrder>(truck) &&
+        entities.TryGetComponent(truck, out VehicleDockVisit visit) && visit.Generation > 0 &&
+        entities.TryGetComponent(visit.Building, out VehicleDockSlot slot) &&
+        slot.Truck == truck && slot.Generation == visit.Generation;
+
     public void Cleanup(EntityRegistry entities)
     {
         _occupiedBuildings.Clear();
