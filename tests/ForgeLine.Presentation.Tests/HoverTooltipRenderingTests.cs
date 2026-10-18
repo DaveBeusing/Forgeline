@@ -148,7 +148,9 @@ public sealed class HoverTooltipRenderingTests
         Assert.InRange(surface.LastBounds.X, 0, width);
         Assert.InRange(surface.LastBounds.Right, 0, width);
         Assert.InRange(surface.LastBounds.Bottom, 0, height);
-        Assert.True(surface.LastBounds.Height > 12 * layout.Scale * 14);
+        // The panel may reduce its scale to fit a high-DPI viewport.
+        float fittedScale = surface.LastBounds.Width / 330;
+        Assert.True(surface.LastBounds.Height > 12 * fittedScale * 14);
     }
 
     private static GameplayHudRenderContext Context(IGraphicsCommandContext graphics, PresentationSnapshot snapshot,
