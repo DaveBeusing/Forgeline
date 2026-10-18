@@ -461,7 +461,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
         if (definition.Id == UnitIds.ScoutVehicle || definition.Id == UnitIds.SupplyTruck)
             Progress?.Record(context.Tick, facility.Owner,
                 definition.Id == UnitIds.ScoutVehicle ? GameplayProgressKind.ScoutProduced : GameplayProgressKind.SupplyTruckProduced,
-                facilityEntity, facilityEntity, producedUnit, (ulong)requestEntity.Index, default, 1, definition.Id.Value);
+                facilityEntity, facilityEntity, producedUnit, ((ulong)requestEntity.Generation << 32) | requestEntity.Index, default, 1, definition.Id.Value);
         facility.CompletedUnits++;
         facility.LastCompletedTick = context.Tick;
         facility.ClearActive();

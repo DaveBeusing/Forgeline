@@ -36,7 +36,9 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
     internal void Record(SimulationTick tick, PlayerId player, GameplayProgressKind kind, EntityId actor,
         EntityId source, EntityId target, ulong order, ResourceId resource, double quantity, uint definition = 0)
     {
-        if (player.Value <= 0 || !actor.IsValid || !target.IsValid || !double.IsFinite(quantity) || quantity <= 0) return;
+        if (player.Value <= 0 || !_entities.IsAlive(actor) || !_entities.IsAlive(target) ||
+            source.IsValid && !_entities.IsAlive(source) || !double.IsFinite(quantity) || quantity <= 0 ||
+            !_entities.TryGetComponent(target, out ControllableEntity recipient) || recipient.Owner != player) return;
         if (!_latest.TryGetValue(player, out var ledger))
         {
             if (_latest.Count >= 16) return;
@@ -109,7 +111,7 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
                 context.Entities.TryGetComponent(policy.TargetEntity, out CompletedBuilding target) && target.BuildingId == BuildingIds.Smelter &&
                 _policies.Add(entity))
                 Record(context.Tick, target.Owner, GameplayProgressKind.OrePolicyApplied, entity, policy.TargetEntity,
-                    policy.TargetEntity, entity.Index, ResourceIds.FerrousOre, 1, target.BuildingId.Value);
+                    policy.TargetEntity, ((ulong)entity.Generation << 32) | entity.Index, ResourceIds.FerrousOre, 1, target.BuildingId.Value);
         }
         _stale.Clear();
         foreach (var entity in _policies) if (!context.Entities.IsAlive(entity)) _stale.Add(entity);
