@@ -790,6 +790,17 @@ public sealed class PlayerConstructionProductionFlowTests
                 .GetComponent<UnitFuelState>(
                     scout);
 
+        ulong refuelDeadline = scenario.Simulation.CurrentTick.Value + 1_200;
+        RunUntil(scenario, () =>
+            scenario.Inventories.GetQuantity(scoutFuel.InventoryId, ResourceIds.Fuel) >= scoutFuel.Capacity - 0.001 &&
+            !scenario.Simulation.Entities.HasComponent<SupplyLoadingOrder>(supplyTruck), maximumTicks: 1_200);
+        // A finite loading order does not refill cargo consumed by later field supply.
+        Assert.True(gateway.SubmitResupply(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+            supplyTruck, scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+        Assert.True(scenario.Simulation.CurrentTick.Value < refuelDeadline);
+
         RunUntil(
             scenario,
             () =>
@@ -801,7 +812,7 @@ public sealed class PlayerConstructionProductionFlowTests
                     supplyTruckState.InventoryId,
                     ResourceIds.Fuel) >=
                 supplyTruckState.FuelTarget - 0.001,
-            maximumTicks: 1_200);
+            maximumTicks: checked((int)(refuelDeadline - scenario.Simulation.CurrentTick.Value)));
 
         RemoveStockPolicies(
             scenario,
@@ -1311,6 +1322,20 @@ public sealed class PlayerConstructionProductionFlowTests
         foreach (EntityId entity in scenario.Simulation.Entities.Query<CompletedBuilding>())
             diagnostics.Add($"building {entity}:{scenario.Simulation.Entities.GetComponent<CompletedBuilding>(entity).BuildingId}" +
                 $"@{scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position}");
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<SupplyTruck>())
+        {
+            var supply = scenario.Simulation.Entities.GetComponent<SupplyTruck>(entity);
+            diagnostics.Add($"supply {entity}: cargoFuel={scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel)}" +
+                $" cargoAmmo={scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition)}" +
+                $" loading={(scenario.Simulation.Entities.TryGetComponent(entity, out SupplyLoadingOrder loading) ? loading.ToString() : "none")}");
+        }
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<UnitIdentity, UnitFuelState>())
+        {
+            if (scenario.Simulation.Entities.GetComponent<UnitIdentity>(entity).UnitId != UnitIds.ScoutVehicle) continue;
+            var fuel = scenario.Simulation.Entities.GetComponent<UnitFuelState>(entity);
+            diagnostics.Add($"scout {entity}: fuel={scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel)}/{fuel.Capacity}" +
+                $" position={scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position}");
+        }
         foreach (EntityId entity in scenario.Simulation.Entities.Query<UnitProductionFacility>())
         {
             var facility = scenario.Simulation.Entities.GetComponent<UnitProductionFacility>(entity);

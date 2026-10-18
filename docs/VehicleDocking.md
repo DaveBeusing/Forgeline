@@ -76,6 +76,11 @@ tick-based service duration. A batch books only after its service time and valid
 pose checks. The same truck cannot book another batch in that tick. Pose loss
 resets service time; completed batches remain committed.
 
+Supply loading confirms completion on the following tick, after nearby field
+distribution has used the previous batch. A completed order is finite: later
+field consumption requires another explicit loading order or the existing
+opponent loading planner.
+
 Cargo reservations are reduced by the successful batch quantity. Transfer failure
 restores any reservation released for that attempt. Existing inventory operations,
 cargo-loss reporting and distribution observers retain stock ownership. Empty
@@ -113,10 +118,8 @@ Remote recipients also skip a truck actively traveling to load, so they can use
 a stocked stationary provider instead of chasing its subsequent departure.
 A source-empty truck waiting outside the bay can still serve a remote recovery.
 An unaffordable retreat waits for physical assistance in every strategic phase.
-Strategically managed combat units leave distant advances to the coordinated
-planner while supplies are prepared. Local identified-target responses, radar
-coordinates within the engagement leash and explicit strategic marches remain
-active; standalone tactical opponents retain their distant advance behavior.
+Strategic escorts and local tactical responses use their existing combat command
+paths while the loading planner prepares physical supply.
 The opponent buys a third cargo truck as three processing sites open; optional
 expansion to four waits for its first objective-pressure force. Both use its
 existing two-to-four-truck fleet bounds and normal paid production. Replacement reserves use
@@ -157,9 +160,9 @@ Within the Critical dispatch class, Command Core construction shortages,
 powered unit factories blocked on inputs or building an initial vehicle pipeline,
 and depot Fuel with an actual loading/resupply recipient precede passive depot
 buffers and ordinary processing stock. Age and stable request identity still resolve
-ties within each group. Critical factory stock counts unreserved inputs; material
-already bound to production cannot satisfy the next accepted recipe. Its real
-queued successor raises the required input budget without reserving speculative units.
+ties within each group. Factory policies retain total physical stock semantics,
+including reserved material. The production planner includes both the active
+recipe and its real accepted successor in the required input budget.
 Factories without power retain the normal recovery ordering so construction
 inputs can restore power first.
 
