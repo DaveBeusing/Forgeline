@@ -318,3 +318,19 @@ native review remain open; subsequent rendering packages remain blocked. Full lo
 serial-module and final workflow-head validation were still running when this
 native evidence snapshot was committed; their completed results belong to the PR
 validation record and must not be inferred from this snapshot.
+
+## Hosted default-adapter test assumption
+
+Final-head CI 39116265186 completes the whole solution: 2,692 successful, two failed,
+16 optional skips, 2,710 total, 18m21.508s. Every module except Graphics passes,
+including all Client native/decoder/allocation tests and the Asset writer test.
+Both failures are SceneCompositionMatchesLegacyTextureTransferAndPreservesOverlay
+with ForceSoftwareAdapter=false, before its pixel comparisons. That configuration
+has AllowSoftwareAdapterFallback=true; a machine without hardware correctly selects
+WARP. The test incorrectly equates "not forced" with "hardware required".
+Name the parameter forceSoftware and assert software identity when it is forced.
+Keep all four test cases, all three exposure values, both tone mappers, full legacy/
+composed pixel comparisons, overlay equality, resource and resize checks, and their
+unchanged tolerances. Default-selection cases also run their full comparisons on
+CI instead of being skipped or mislabeled as hardware coverage. No production
+adapter-selection behavior changes. The exact test path is a serial CI repair.
