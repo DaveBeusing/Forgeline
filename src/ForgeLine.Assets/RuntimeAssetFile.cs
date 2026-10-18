@@ -73,6 +73,9 @@ public static class RuntimeAssetFile
             throw new InvalidDataException("Runtime asset contains invalid section lengths.");
         }
 
+        if (type == RuntimeAssetType.Animation && (metadataLength > 65536 || payloadLength > RuntimeAnimationData.MaximumPayloadBytes))
+            throw new InvalidDataException("Rigid animation sections exceed production limits.");
+
         var remaining = stream.Length - stream.Position;
         var expectedRemaining = (long)metadataLength + payloadLength;
         if (remaining != expectedRemaining)

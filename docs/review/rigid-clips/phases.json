@@ -1,0 +1,56 @@
+[
+  {
+    "time": "0",
+    "image": "MainBattleTankProduction-1920x1080-High-CloseTactical-MechanicalT0-Inspection20.png",
+    "sha256": "CA8F0810464AC28ECD2E617B3674A15916B3692EC7B57BEF13C72E221AF22C52",
+    "stable": true,
+    "loadedClips": 1,
+    "clipBytes": 232,
+    "draws": 7
+  },
+  {
+    "time": "0.5",
+    "image": "MainBattleTankProduction-1920x1080-High-CloseTactical-MechanicalT0.5-Inspection20.png",
+    "sha256": "5DD1E59189C719739407F1D31651D64D8FD34102097260E058163383D3E7C6CC",
+    "stable": true,
+    "loadedClips": 1,
+    "clipBytes": 232,
+    "draws": 7
+  },
+  {
+    "time": "1",
+    "image": "MainBattleTankProduction-1920x1080-High-CloseTactical-MechanicalT1-Inspection20.png",
+    "sha256": "5FD860A2FFD93982EE7253E16E642D3DE439928AC4C15CC301C7F5303C346F15",
+    "stable": true,
+    "loadedClips": 1,
+    "clipBytes": 232,
+    "draws": 7
+  },
+  {
+    "time": "1.5",
+    "image": "MainBattleTankProduction-1920x1080-High-CloseTactical-MechanicalT1.5-Inspection20.png",
+    "sha256": "1F5AAC8B62F369BD05AFD479A2E176E84D0F9D99C47C3C664A3058F13F39BF06",
+    "stable": true,
+    "loadedClips": 1,
+    "clipBytes": 232,
+    "draws": 7
+  },
+  {
+    "time": "2",
+    "image": "MainBattleTankProduction-1920x1080-High-CloseTactical-MechanicalT2-Inspection20.png",
+    "sha256": "9631123379E32E2D0F85A9C672B97E6DD3AD36F33CCBC0F46EDE1698CD1C9FAA",
+    "stable": true,
+    "loadedClips": 1,
+    "clipBytes": 232,
+    "draws": 7
+  },
+  {
+    "time": "3",
+    "image": "MainBattleTankProduction-1920x1080-High-CloseTactical-MechanicalT3-Inspection20.png",
+    "sha256": "CA8F0810464AC28ECD2E617B3674A15916B3692EC7B57BEF13C72E221AF22C52",
+    "stable": true,
+    "loadedClips": 1,
+    "clipBytes": 232,
+    "draws": 7
+  }
+]

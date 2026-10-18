@@ -6,6 +6,21 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class VisualReferenceSceneTests
 {
+    [Fact]
+    public void ExplicitMechanicalTimeChangesOnlyCopiedPoseAndFingerprint()
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var first = VisualReferenceScene.Create(VisualReferenceSceneKind.MainBattleTankProduction, terrain, mechanicalSeconds: 0);
+        var second = VisualReferenceScene.Create(VisualReferenceSceneKind.MainBattleTankProduction, terrain, mechanicalSeconds: 1);
+        Assert.NotEqual(first.Fingerprint, second.Fingerprint);
+        var a = first.Snapshot.Instances.ToArray(); var b = second.Snapshot.Instances.ToArray();
+        Assert.Equal(a.Length, b.Length);
+        for (int i = 0; i < a.Length; i++) Assert.Equal(a[i], b[i] with { MechanicalPose = a[i].MechanicalPose });
+        Assert.Contains(b, x => x.UnitFeature.Unit == UnitIds.MainBattleTank && x.MechanicalPose.ActiveSeconds == 1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => VisualReferenceScene.Create(VisualReferenceSceneKind.IndustrialBase, terrain, mechanicalSeconds: 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => VisualReferenceScene.Create(VisualReferenceSceneKind.MainBattleTankProduction, terrain, mechanicalSeconds: double.NaN));
+    }
+
     [Theory]
     [InlineData(VisualReferenceSceneKind.EffectsBarrage)]
     [InlineData(VisualReferenceSceneKind.IndustrialEffects)]
