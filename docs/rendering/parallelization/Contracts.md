@@ -107,8 +107,10 @@ observed submission fence, device texture-upload count delta, logical resident
 texture bytes, optional DXGI local usage and existing failure status. Device texture
 deltas cover consecutive supplied observations, including terrain preparation. The
 first observation establishes a baseline; missing observations remain unavailable. Submit/Retire times are not native Present/fence-wait time.
-Present time, wait time and upload byte counts are currently unavailable/null rather
-than synthetic zero. Existing graphics pass/GPU/health diagnostics remain authoritative.
+Native frame-buffer reuse waits and native Present have separate CPU elapsed
+observations. Other backends may leave these unavailable/null. This wait field
+covers frame admission, not all possible upload/resize/idle waits. Upload byte
+counts remain unavailable/null rather than synthetic zero. Existing graphics pass/GPU/health diagnostics remain authoritative.
 With measurement disabled, the new meter does not query diagnostics or run clocks;
 its repeated frame transitions are covered by a zero-allocation regression test.
 

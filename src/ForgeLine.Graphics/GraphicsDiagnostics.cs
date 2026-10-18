@@ -66,6 +66,8 @@ public readonly record struct GraphicsFrameDiagnostics(
     double? WorldGpuMilliseconds,
     double? OverlayGpuMilliseconds)
 {
+    public double? FrameWaitMilliseconds { get; init; }
+    public double? PresentMilliseconds { get; init; }
     public double? CompositeCpuMilliseconds { get; init; }
     public int CompositeDrawCalls => CompositeCpuMilliseconds.HasValue ? 1 : 0;
     public double? CompositeGpuMilliseconds { get; init; }

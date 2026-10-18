@@ -99,7 +99,9 @@ public sealed class RenderBoundaryTests
         session.MetricsEnabled = true;
         var observed = new GraphicsDiagnostics(new("contract", 0, true, "test", false), default)
         {
-            Resources = new(2, 256, 2, 4096, 0) { TextureUploadCount = 10 }
+            Resources = new(2, 256, 2, 4096, 0) { TextureUploadCount = 10 },
+            Frame = new GraphicsFrameDiagnostics(default, 1, 0, null, 7, null, null)
+            { FrameWaitMilliseconds = 3.25, PresentMilliseconds = .125 }
         };
         session.ObserveFrameDiagnostics(observed);
         session.BeginPrepare(new(8), 43); session.EndPrepare();
@@ -112,6 +114,8 @@ public sealed class RenderBoundaryTests
         });
         Assert.Equal(3, session.Metrics.Value.UploadedTextureCount);
         Assert.Equal(1024, session.Metrics.Value.LogicalTextureBytes);
+        Assert.Equal(3.25, session.Metrics.Value.WaitMilliseconds);
+        Assert.Equal(.125, session.Metrics.Value.PresentMilliseconds);
         Assert.Null(session.Metrics.Value.ObservedDxgiLocalUsageBytes);
         Assert.Equal(0, graphics.DiagnosticReads);
         session.BeginPrepare(new(8), 44); session.EndPrepare();

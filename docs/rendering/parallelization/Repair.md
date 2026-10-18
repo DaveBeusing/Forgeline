@@ -53,3 +53,19 @@ remains five seconds, all stop/disposal assertions remain, and no production aud
 code is changed. All 23 non-explicit mixer tests pass; the real-device listening
 test remains explicitly optional. This serial gate repair is added to the foundation
 owner's exact test-file list; subsequent parallel work is still not released.
+
+## Frame-time attribution
+
+The first paired cohort passes all unchanged 15% comparisons. The second reports
+IndustrialBase normal-camera frame-elapsed p95 at +15.948% and GPU p50 at +20.914%;
+both complete cohorts remain retained. No case has a CPU/frame mean regression over
+15%. Measured frame allocations consistently fall by approximately 2,768 bytes per
+frame. A successful first cohort does not discard the second cohort's failed gate.
+
+Add explicit frame-buffer reuse-wait and native Present CPU elapsed observations
+to GraphicsFrameDiagnostics and populate the existing nullable asset-frame fields
+from the supplied snapshot. These are measured native calls, never synthetic zero
+GPU times. Other wait categories remain outside this specific admission metric.
+This additive shared diagnostic change is serialized with the foundation repair.
+A final diagnostic matrix will attribute waits without replacing either comparison
+cohort or rewriting its results.

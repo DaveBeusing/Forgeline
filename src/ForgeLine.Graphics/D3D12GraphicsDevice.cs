@@ -23,6 +23,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     private long _fenceWaitCount;
     private long _submissionFaultCount;
     private ulong _lastSubmittedFrameFence;
+    private double? _frameWaitMilliseconds, _presentMilliseconds;
 
     private readonly GraphicsConfiguration _configuration;
     private readonly IDXGIFactory4 _factory;
@@ -269,6 +270,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                     _cpuTimingSubmission, _worldCpuMilliseconds, _overlayCpuMilliseconds,
                     _gpuTimingFence, _worldGpuMilliseconds, _overlayGpuMilliseconds)
                 {
+                    FrameWaitMilliseconds = _frameWaitMilliseconds,
+                    PresentMilliseconds = _presentMilliseconds,
                     CompositeCpuMilliseconds = _compositeCpuMilliseconds,
                     CompositeGpuMilliseconds = _compositeGpuMilliseconds,
                     GpuTimingUnavailableReason = _gpuTimingUnavailableReason,
@@ -735,7 +738,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             return;
         }
 
+        long waitStarted = System.Diagnostics.Stopwatch.GetTimestamp();
         WaitForFrame(_frameIndex);
+        _frameWaitMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(waitStarted).TotalMilliseconds;
         _resources.Collect(GetCompletedFence());
         ReadCompletedGpuTiming(
             _frameIndex);
@@ -853,9 +858,11 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _compositeCpuMilliseconds = _recordedCompositeCpuMilliseconds;
         _recording = false;
 
+        long presentStarted = System.Diagnostics.Stopwatch.GetTimestamp();
         var presentResult = _swapChain.Present(
             _configuration.EnableVSync ? 1u : 0u,
             PresentFlags.None);
+        _presentMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(presentStarted).TotalMilliseconds;
 
         if (presentResult.Failure)
         {

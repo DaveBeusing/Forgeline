@@ -27,6 +27,8 @@ public sealed class SoftwareFrameAdmissionTests
                 escaped = context;
             });
             Assert.Throws<ObjectDisposedException>(() => escaped!.Draw(3));
+            Assert.True(graphics.Diagnostics.Frame!.Value.FrameWaitMilliseconds >= 0);
+            Assert.True(graphics.Diagnostics.Frame!.Value.PresentMilliseconds >= 0);
         }
         graphics.WaitForIdle();
         Assert.Equal(0, graphics.Diagnostics.Health.PendingRetirementCount);
