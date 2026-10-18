@@ -36,11 +36,28 @@ public sealed class VehicleQueueCoordinator
         if (entities.TryGetComponent(truck, out VehicleQueueEntry existing))
             return existing.Building == building && existing.Owner == owner && existing.Service == service;
         Collect(entities, building);
-        if (_members.Count >= capacity) return false;
+        if (_members.Count >= capacity)
+        {
+            EntityId displaced = SameTickReplacement(entities, truck, building, tick, capacity);
+            if (!displaced.IsValid) return false;
+            var previous = entities.GetComponent<VehicleQueueEntry>(displaced);
+            Remove(entities, displaced, building, previous.Generation);
+            VehicleDockingService.RevokeUnconfirmedQueueAdmission(entities, displaced, building);
+        }
         ulong generation = entities.TryGetComponent(truck, out VehicleQueueSequence sequence) ? checked(sequence.Value + 1) : 1;
         VehicleDockingService.Put(entities, truck, new VehicleQueueSequence(generation));
         VehicleDockingService.Put(entities, truck, new VehicleQueueEntry(building, owner, generation, tick, service, ChangedAtTick: tick));
         return true;
+    }
+
+    internal EntityId SameTickReplacement(EntityRegistry entities, EntityId truck, EntityId building, SimulationTick tick, int capacity)
+    {
+        Collect(entities, building);
+        if (capacity <= 0 || _members.Count < capacity) return EntityId.Invalid;
+        EntityId last = _members[^1];
+        var arrival = entities.GetComponent<VehicleQueueEntry>(last);
+        return arrival.RegisteredAtTick == tick && (truck.Index < last.Index || truck.Index == last.Index && truck.Generation < last.Generation)
+            ? last : EntityId.Invalid;
     }
 
     public bool IsHead(EntityRegistry entities, EntityId truck, EntityId building, SimulationTick tick)

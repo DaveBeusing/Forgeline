@@ -521,6 +521,16 @@ public sealed partial class VehicleDockingService
     {
         _queues.Cleanup(entities);
         _occupiedBuildings.Clear();
+        foreach (EntityId truck in entities.Query<VehicleQueueHolding>())
+        {
+            var holding = entities.GetComponent<VehicleQueueHolding>(truck);
+            if (!Operational(entities, holding.Building) ||
+                !entities.TryGetComponent(holding.Building, out CompletedBuilding source) || !OwnsTruck(entities, truck, source.Owner) ||
+                !entities.TryGetComponent(truck, out VehicleDockVisit waiting) || waiting.Building != holding.Building)
+                _occupiedBuildings.Add(truck);
+        }
+        foreach (EntityId truck in _occupiedBuildings) RemoveQueueAssignment(entities, truck);
+        _occupiedBuildings.Clear();
         foreach (EntityId building in entities.Query<VehicleDockSlot>(QueryIterationOrder.StableByEntityIndex))
             _occupiedBuildings.Add(building);
         foreach (EntityId building in _occupiedBuildings)
@@ -536,6 +546,21 @@ public sealed partial class VehicleDockingService
             if (!OwnerInLane(entities, slot) && LaneClear(entities, building, slot.Truck, slot.Pose))
                 entities.RemoveComponent<VehicleDockSlot>(building);
         }
+    }
+
+    internal static void EndQueueSession(EntityRegistry entities)
+    {
+        var participants = new HashSet<EntityId>();
+        foreach (EntityId truck in entities.Query<VehicleQueueEntry>()) participants.Add(truck);
+        foreach (EntityId truck in entities.Query<VehicleQueueHolding>()) participants.Add(truck);
+        foreach (EntityId truck in entities.Query<VehicleDockVisit>()) participants.Add(truck);
+        foreach (EntityId truck in participants.OrderBy(id => id.Index).ThenBy(id => id.Generation)) Cancel(entities, truck);
+        var buildings = new List<EntityId>();
+        foreach (EntityId building in entities.Query<VehicleDockSlot>()) buildings.Add(building);
+        foreach (EntityId building in buildings) entities.RemoveComponent<VehicleDockSlot>(building);
+        buildings.Clear();
+        foreach (EntityId building in entities.Query<VehicleQueueLane>()) buildings.Add(building);
+        foreach (EntityId building in buildings) entities.RemoveComponent<VehicleQueueLane>(building);
     }
 
     private static void ClearFormationMembership(EntityRegistry entities, EntityId truck)

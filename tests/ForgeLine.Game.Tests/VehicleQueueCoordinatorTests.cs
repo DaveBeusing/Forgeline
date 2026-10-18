@@ -128,6 +128,22 @@ public sealed class VehicleQueueCoordinatorTests
         Assert.False(entities.HasComponent<VehicleQueueEntry>(truck));
     }
 
+    [Fact]
+    public void FullSameTickAdmissionSelectsStableIdentitiesBeforeAnyBayCanBeClaimed()
+    {
+        var entities = new EntityRegistry();
+        var queue = new VehicleQueueCoordinator();
+        EntityId building = Building(entities);
+        EntityId[] trucks = Enumerable.Range(0, 8).Select(_ => Truck(entities)).ToArray();
+        foreach (EntityId truck in trucks.Reverse())
+            Assert.True(queue.TryRegister(entities, truck, building, new(1), new(10), VehicleQueueService.CargoPickup, capacity: 3));
+        Assert.Equal(trucks.Take(3), queue.Collect(entities, building));
+        Assert.False(queue.IsHead(entities, trucks[0], building, new(10)));
+        Assert.True(queue.IsHead(entities, trucks[0], building, new(11)));
+        foreach (EntityId truck in trucks.Skip(3)) Assert.False(entities.HasComponent<VehicleQueueEntry>(truck));
+        Assert.False(queue.TryRegister(entities, trucks[3], building, new(1), new(11), VehicleQueueService.CargoPickup, capacity: 3));
+    }
+
     private static EntityId Building(EntityRegistry entities)
     {
         EntityId building = entities.CreateEntity();

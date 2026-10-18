@@ -54,6 +54,52 @@ public sealed class VehicleQueuePhysicalTests
         foreach (var truck in fixture.Trucks) Assert.False(fixture.Simulation.Entities.HasComponent<VehicleQueueEntry>(truck));
     }
 
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(3, false)]
+    [InlineData(7, false)]
+    [InlineData(0, true)]
+    [InlineData(3, true)]
+    [InlineData(7, true)]
+    public void FrontMiddleAndTailInterruptionsPreserveRemainingPhysicalService(int index, bool destroyed)
+    {
+        var fixture = new Traffic(8, false);
+        fixture.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
+        EntityId removed = fixture.Trucks[index];
+        fixture.Ignored.Add(removed);
+        if (destroyed) Assert.True(fixture.Simulation.Entities.DestroyEntity(removed));
+        else
+        {
+            VehicleDockingService.Cancel(fixture.Simulation.Entities, removed);
+            fixture.Simulation.Entities.AddComponent(removed, new MovementOrder(new(1), new(900, 1, 100),
+                fixture.Simulation.CurrentTick, fixture.Simulation.CurrentTick));
+        }
+        for (int tick = 0; tick < 25_000 && fixture.Completed.Count < 7; tick++) fixture.Simulation.AdvanceOneTick();
+        Assert.Equal(fixture.Trucks.Where(id => id != removed), fixture.Completed);
+        Assert.False(fixture.Simulation.Entities.HasComponent<VehicleDockSlot>(fixture.Building));
+        foreach (EntityId truck in fixture.Trucks) Assert.False(fixture.Simulation.Entities.HasComponent<VehicleQueueEntry>(truck));
+    }
+
+    [Fact]
+    public void RoadCorridorTruncatesTheFiniteRowInsteadOfInventingWaitingPlaces()
+    {
+        var fixture = new Traffic(20, false);
+        EntityId road = fixture.Simulation.Entities.CreateEntity();
+        fixture.Simulation.Entities.AddComponent(road, new RoadTrafficCorridor(new(500, 0, 0), new(500, 0, 1024), 6));
+        fixture.Simulation.AdvanceOneTick();
+        var lane = fixture.Simulation.Entities.GetComponent<VehicleQueueLane>(fixture.Building);
+        Assert.InRange(lane.Capacity, 1, 19);
+        int registered = 0;
+        foreach (EntityId truck in fixture.Trucks)
+            if (fixture.Simulation.Entities.TryGetComponent(truck, out VehicleQueueEntry entry))
+            {
+                registered++;
+                Assert.True(MathF.Abs(entry.Target.X - 500) > 6 + 3.4f);
+            }
+        Assert.InRange(registered, 1, lane.Capacity);
+        Assert.Contains(fixture.Trucks, truck => fixture.Simulation.Entities.HasComponent<VehicleQueueHolding>(truck));
+    }
+
     private static bool BodiesOverlap(in WorldTransform first, in WorldTransform second)
     {
         Vector3 aRight = Vector3.Transform(Vector3.UnitX, first.Rotation), aForward = Vector3.Transform(Vector3.UnitZ, first.Rotation);
@@ -72,15 +118,18 @@ public sealed class VehicleQueuePhysicalTests
     {
         private readonly VehicleDockingService _docks;
         private readonly SpatialGridIndex _spatial = new();
+        private readonly SpatialIndexSynchronizer _synchronizer;
         private readonly HashSet<EntityId> _departing = new();
         public SimulationCoordinator Simulation { get; } = new(ticksPerSecond: 20);
         public EntityId Building { get; }
         public EntityId[] Trucks { get; }
         public List<EntityId> Completed { get; } = new();
+        public HashSet<EntityId> Ignored { get; } = new();
         public SimulationPhase Phase => SimulationPhase.Logistics;
 
         public Traffic(int count, bool opposing)
         {
+            _synchronizer = new(_spatial);
             var terrain = new TerrainWorld(new WorldGridSettings { ChunkSizeMeters = 1024, HeightSamplesPerSide = 3 },
                 [new TerrainChunk(new(0, 0), new TerrainHeightfield(3, 1024, new float[9]))]);
             _docks = new(terrain, _spatial);
@@ -111,13 +160,12 @@ public sealed class VehicleQueuePhysicalTests
 
         public void Execute(SimulationContext context)
         {
-            foreach (var entity in context.Entities.Query<WorldTransform, SpatialPresence>())
-                _spatial.Upsert(context.Entities.GetComponent<SpatialPresence>(entity).CreateEntry(entity,
-                    context.Entities.GetComponent<WorldTransform>(entity)));
+            _synchronizer.CleanupLifecycle(context.Entities);
+            _synchronizer.SynchronizeMovement(context.Entities);
             _docks.Cleanup(context.Entities);
             foreach (EntityId truck in Trucks.Reverse())
             {
-                if (Completed.Contains(truck)) continue;
+                if (Completed.Contains(truck) || Ignored.Contains(truck)) continue;
                 if (_departing.Contains(truck))
                 {
                     if (_docks.Exit(context, truck))

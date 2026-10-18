@@ -96,7 +96,9 @@ public sealed partial class VehicleDockingService
                 previousHalf = half;
             }
             Vector3 proposed = lane.Front - forward * distance;
-            bool place = members.Count < lane.Capacity && QueuePlaceClear(entities, building, truck, proposed, transform, lane.Heading);
+            EntityId replacement = _queues.SameTickReplacement(entities, truck, building, context.Tick, lane.Capacity);
+            if (replacement.IsValid) proposed = entities.GetComponent<VehicleQueueEntry>(replacement).Target;
+            bool place = (members.Count < lane.Capacity || replacement.IsValid) && QueuePlaceClear(entities, building, truck, proposed, transform, lane.Heading);
             if (!localArrival || !place || !_queues.TryRegister(entities, truck, building, owner, context.Tick, service, lane.Capacity))
             {
                 HoldOutsideQueue(context, truck, building, owner, pose, lane, transform, movement,
@@ -121,10 +123,9 @@ public sealed partial class VehicleDockingService
                 pose with { ApproachStart = entry.Target }));
             return true;
         }
-        bool settled = VehicleDockPose.HorizontalDistanceSquared(transform.Position, entry.Target) <= .25f * .25f &&
-            entities.TryGetComponent(truck, out GroundMovementState motion) && motion.Velocity.LengthSquared() <= .05f * .05f &&
-            MathF.Abs(GroundMovementState.NormalizeAngle(motion.HeadingRadians - lane.Heading)) <= MathF.PI / 60;
-        if (settled && _queues.IsHead(entities, truck, building, context.Tick) &&
+        float admissionRadius = transform.Scale.Z + movement.SeparationRadius + movement.StopRadius;
+        bool atAdmission = VehicleDockPose.HorizontalDistanceSquared(transform.Position, lane.Front) <= admissionRadius * admissionRadius;
+        if (atAdmission && _queues.IsHead(entities, truck, building, context.Tick) &&
             !entities.HasComponent<VehicleDockSlot>(building)) return false;
         QueueMove(context, truck, owner, entry.Target, lane.Heading, lane);
         Put(entities, truck, new VehicleDockVisit(building, 0, VehicleDockStatus.Busy,
@@ -154,7 +155,18 @@ public sealed partial class VehicleDockingService
                     !StaticQueueConnectionClear(entities, building, truck, front, pose.Entry, transform, preserveRoad: false)) continue;
                 if (_terrain is not null && _terrain.TrySampleHeight(front.X, front.Z, out float height))
                     front.Y = height + movement.HeightOffset;
-                lane = new(front, pose.Heading, 20);
+                int capacity = 1;
+                Vector3 previous = front;
+                float spacing = transform.Scale.Z + movement.SeparationRadius;
+                for (int index = 1; index < 20; index++)
+                {
+                    Vector3 waiting = front - forward * (index * spacing);
+                    if (!QueuePlaceClear(entities, building, truck, waiting, transform, pose.Heading) ||
+                        !StaticQueueConnectionClear(entities, building, truck, previous, waiting, transform)) break;
+                    capacity++;
+                    previous = waiting;
+                }
+                lane = new(front, pose.Heading, capacity);
                 Put(entities, building, lane);
                 return true;
             }
@@ -332,6 +344,21 @@ public sealed partial class VehicleDockingService
         for (int step = 0; step <= steps; step++)
         {
             Vector3 point = Vector3.Lerp(start, end, (float)step / steps);
+            if (_terrain is not null)
+            {
+                Vector3 travel = end - start; travel.Y = 0;
+                Vector3 side = travel.LengthSquared() > .0001f
+                    ? Vector3.Normalize(new Vector3(travel.Z, 0, -travel.X))
+                    : Vector3.Transform(Vector3.UnitX, vehicle.Rotation);
+                float slope = entities.TryGetComponent(truck, out GroundMovement movement) ? movement.MaximumSlopeDegrees : 24;
+                for (int across = -1; across <= 1; across++)
+                {
+                    Vector3 sample = point + side * (across * radius);
+                    if (!_terrain.TrySampleHeight(sample.X, sample.Z, out float height) || !float.IsFinite(height) ||
+                        !_terrain.TrySampleNormal(sample.X, sample.Z, out Vector3 normal) || !float.IsFinite(normal.Y) ||
+                        normal.Y < MathF.Cos(slope * MathF.PI / 180)) return false;
+                }
+            }
             foreach (EntityId road in entities.Query<RoadTrafficCorridor>())
             {
                 if (!preserveRoad) break;
@@ -359,6 +386,13 @@ public sealed partial class VehicleDockingService
         if (entities.HasComponent<VehicleQueueEntry>(truck)) entities.RemoveComponent<VehicleQueueEntry>(truck);
         if (entities.HasComponent<VehicleQueueMotion>(truck)) entities.RemoveComponent<VehicleQueueMotion>(truck);
         if (entities.HasComponent<VehicleQueueHolding>(truck)) entities.RemoveComponent<VehicleQueueHolding>(truck);
+    }
+
+    internal static void RevokeUnconfirmedQueueAdmission(EntityRegistry entities, EntityId truck, EntityId building)
+    {
+        StopDockMotion(entities, truck);
+        if (entities.TryGetComponent(truck, out VehicleDockVisit visit) && visit.Building == building && visit.Generation == 0)
+            entities.RemoveComponent<VehicleDockVisit>(truck);
     }
 
     internal static bool BlocksQueueStep(EntityRegistry entities, EntityId truck, in WorldTransform current, in WorldTransform next)
