@@ -66,6 +66,8 @@ public sealed class BattlefieldSupplyDebugSnapshot
 
 public sealed class BattlefieldSupplySystem : ISimulationSystem
 {
+    internal GameplayProgressJournal? Progress { get; set; }
+
     private const double QuantityEpsilon = 0.000000001;
 
     private readonly VehicleDockingService _docks;
@@ -301,6 +303,10 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
             if (!_docks.CanTransfer(context, truckEntity, visit.Generation, quantity)) continue;
             double loadedFuel = TransferTowardTarget(loadingInventory, truck.InventoryId, ResourceIds.Fuel, truck.FuelTarget);
             double loadedAmmunition = TransferTowardTarget(loadingInventory, truck.InventoryId, ResourceIds.Ammunition, truck.AmmunitionTarget);
+            Progress?.Record(context.Tick, truck.Owner, GameplayProgressKind.SupplyLoadedFuel, truckEntity, order.Source,
+                truckEntity, visit.Generation, ResourceIds.Fuel, loadedFuel, sourceBuilding.BuildingId.Value);
+            Progress?.Record(context.Tick, truck.Owner, GameplayProgressKind.SupplyLoadedAmmunition, truckEntity, order.Source,
+                truckEntity, visit.Generation, ResourceIds.Ammunition, loadedAmmunition, sourceBuilding.BuildingId.Value);
             fuelTransferred += loadedFuel;
             ammunitionTransferred += loadedAmmunition;
             if (loadedFuel + loadedAmmunition > QuantityEpsilon) VehicleDockingService.RecordTransfer(context, truckEntity, visit.Generation);
@@ -474,12 +480,11 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                         preferredProvider,
                         out ProviderCandidate provider))
                 {
-                    fuelTransferred +=
-                        TransferAvailable(
-                            provider.Provider.InventoryId,
-                            fuel.InventoryId,
-                            ResourceIds.Fuel,
-                            deficit);
+                    double actual = TransferAvailable(provider.Provider.InventoryId, fuel.InventoryId, ResourceIds.Fuel, deficit);
+                    fuelTransferred += actual;
+                    if (context.Entities.HasComponent<SupplyTruck>(provider.Entity))
+                        Progress?.Record(context.Tick, recipient.Owner, GameplayProgressKind.FieldFuelTransferred, provider.Entity,
+                            provider.Entity, recipient.Entity, context.Tick.Value, ResourceIds.Fuel, actual);
                 }
             }
 
@@ -504,12 +509,11 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                         preferredProvider,
                         out ProviderCandidate provider))
                 {
-                    ammunitionTransferred +=
-                        TransferAvailable(
-                            provider.Provider.InventoryId,
-                            ammunition.InventoryId,
-                            ResourceIds.Ammunition,
-                            deficit);
+                    double actual = TransferAvailable(provider.Provider.InventoryId, ammunition.InventoryId, ResourceIds.Ammunition, deficit);
+                    ammunitionTransferred += actual;
+                    if (context.Entities.HasComponent<SupplyTruck>(provider.Entity))
+                        Progress?.Record(context.Tick, recipient.Owner, GameplayProgressKind.FieldAmmunitionTransferred, provider.Entity,
+                            provider.Entity, recipient.Entity, context.Tick.Value, ResourceIds.Ammunition, actual);
                 }
             }
         }

@@ -39,7 +39,7 @@ public sealed class MatchRuntime : IDisposable
         FactionIntelligenceStore intelligence,
         SkirmishOpponentSystem opponents,
         UnitFactory unitFactory,
-        SkirmishMatchInitialization initialization)
+        SkirmishMatchInitialization initialization, GameplayProgressJournal progress)
     {
         RuntimeSettings = runtimeSettings;
         MatchConfiguration = matchConfiguration;
@@ -69,7 +69,10 @@ public sealed class MatchRuntime : IDisposable
         UnitFactory = unitFactory;
         Replay = new MatchReplayRecorder(simulation);
         Initialization = initialization;
+        Progress = progress;
     }
+
+    public GameplayProgressJournal Progress { get; }
 
     public MatchRuntimeSettings RuntimeSettings { get; }
 
@@ -251,9 +254,11 @@ public sealed class MatchRuntime : IDisposable
             new ProductionSystem(
                 recipes,
                 inventories);
+        var progress = new GameplayProgressJournal(simulation.Entities, simulation.SessionId);
+        simulation.RegisterTickObserver(progress);
         var extraction =
             new ResourceExtractionSystem(
-                inventories: inventories);
+                sink: progress, inventories: inventories);
 
         var logistics =
             new LogisticsNetwork();
@@ -297,7 +302,7 @@ public sealed class MatchRuntime : IDisposable
             new CargoTransportSystem(
                 logistics,
                 inventories,
-                navigation, docking);
+                navigation, docking) { Progress = progress };
         var automatedDistribution =
             new AutomatedDistributionSystem(
                 logistics,
@@ -314,7 +319,8 @@ public sealed class MatchRuntime : IDisposable
                 inventories, docking)
             {
                 DebugCaptureEnabled =
-                    runtimeSettings.EnableDebugCapture
+                    runtimeSettings.EnableDebugCapture,
+                Progress = progress
             };
 
         var intelligence =
@@ -347,7 +353,8 @@ public sealed class MatchRuntime : IDisposable
             new UnitProductionSystem(
                 unitDefinitions,
                 inventories,
-                unitFactory);
+                unitFactory) { Progress = progress };
+        progress.Work = (entities, entity) => PlayerExperienceSnapshotFactory.CaptureWork(entities, entity, production, unitProduction, unitDefinitions, buildingDefinitions);
         var technologyResearch =
             new TechnologyResearchSystem(
                 technologyDefinitions,
@@ -671,7 +678,7 @@ public sealed class MatchRuntime : IDisposable
             intelligence,
             opponents,
             unitFactory,
-            initialization);
+            initialization, progress);
     }
 
     private static AxisAlignedBounds[] CollectStaticNavigationObstacles(

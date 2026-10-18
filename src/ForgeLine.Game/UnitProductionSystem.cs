@@ -8,6 +8,8 @@ namespace ForgeLine.Game;
 
 public sealed class UnitProductionSystem : ISimulationSystem
 {
+    internal GameplayProgressJournal? Progress { get; set; }
+
     private const double QuantityTolerance = 1e-9;
 
     private readonly UnitDefinitionCatalog _units;
@@ -456,6 +458,10 @@ public sealed class UnitProductionSystem : ISimulationSystem
                     context.Tick));
         }
 
+        if (definition.Id == UnitIds.ScoutVehicle || definition.Id == UnitIds.SupplyTruck)
+            Progress?.Record(context.Tick, facility.Owner,
+                definition.Id == UnitIds.ScoutVehicle ? GameplayProgressKind.ScoutProduced : GameplayProgressKind.SupplyTruckProduced,
+                facilityEntity, facilityEntity, producedUnit, ((ulong)requestEntity.Generation << 32) | requestEntity.Index, default, 1, definition.Id.Value);
         facility.CompletedUnits++;
         facility.LastCompletedTick = context.Tick;
         facility.ClearActive();

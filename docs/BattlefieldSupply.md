@@ -221,3 +221,5 @@ Actual Fuel and Ammunition move only in `BattlefieldSupplySystem` at legitimate 
 ## Logistics setup
 
 Supply views distinguish a selected Supply Truck's field cargo, its separate drive-tank inventory, and any assigned provider stock. Supply Trucks are excluded from regional Cargo fleet counts. Confirmed loading/queue state comes from the shared simulation service; no additional supply dispatcher or distance-derived queue is introduced. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
+
+The [opening logistics guide](OnboardingInteraction.md) explains these same controls and uses [completed-action evidence](OnboardingQualification.md). Reading a card, starting stock, an accepted policy or a provider assignment never substitutes for an actual delivery or field transfer.

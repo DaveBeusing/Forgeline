@@ -131,7 +131,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         if (contextVisible) EmitContextGuidance(preAlphaUx, placementVisible, layout, context.Width, context.Height);
         EmitCombatGroupOverview(
             combatGroups,
-            GameplayGuidanceLayout.Remaining(layout, contextVisible),
+            GameplayGuidanceLayout.Remaining(layout, contextVisible, placementVisible ? null : preAlphaUx.Onboarding?.Clip),
             scale,
             context.Width,
             context.Height);
@@ -1079,6 +1079,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
     private void EmitContextGuidance(in PreAlphaUxView view, bool placement, in GameplayHudLayout layout, int width, int height)
     {
+        if (!placement && !string.IsNullOrEmpty(view.Guidance.ContentKey))
+        { EmitDetailedGuidance(view, layout, width, height); return; }
         var state = placement ? OnboardingPresentation.Resolve(layout, 0) : view.Onboarding ?? OnboardingPresentation.Resolve(layout, 0);
         if (!state.Visible) return;
         var region = state.Panel;
@@ -1154,6 +1156,79 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         _guidanceClip = null;
         _text.Clip = null;
         _skin.PanelClip(new(0, 0, width, height));
+        LastGuidanceVertexCount = _vertexCount - start;
+    }
+
+    private void EmitDetailedGuidance(in PreAlphaUxView view, in GameplayHudLayout layout, int width, int height)
+    {
+        var state = view.Onboarding ?? OnboardingPresentation.Resolve(layout, 0, detailed: true);
+        if (!state.Visible) return;
+        if (!state.Detailed) state = OnboardingPresentation.Resolve(layout, state.Collapse, true, state.Focused, true);
+        var panel = state.Panel;
+        int start = _vertexCount;
+        _guidanceClip = state.Clip; _text.Clip = state.Clip; _skin.PanelClip(state.Clip);
+        LastGuidanceBounds = state.VisiblePanel.IsEmpty ? state.Tab : state.VisiblePanel;
+        LastGuidanceTextSize = GuidanceCardLayout.TextSize(layout);
+        if (!_skin.Panel(panel, "panel.compact", OnboardingPresentation.BackgroundAlpha))
+            EmitQuad(panel.X, panel.Y, panel.Width, panel.Height, GameplayHudVisualStyle.PanelBackground with { W = OnboardingPresentation.BackgroundAlpha }, width, height);
+        if (!state.Tab.IsEmpty)
+        {
+            var content = state.Clip with { X = state.Tab.Right, Width = MathF.Max(0, state.Clip.Right - state.Tab.Right) };
+            _text.Clip = content; _guidanceClip = content;
+        }
+        float y = panel.Y + 8;
+        ContextBlock("MINIMIZE / SHIFT+F12", ref y, panel, .875f, false, 1, width, height);
+        y = panel.Y + 28;
+        ContextBlock(view.Guidance.Objective, ref y, panel, .9f, true, 2, width, height);
+        y = panel.Y + 68;
+        ContextBlock(view.Guidance.Next, ref y, panel, .875f, false, 2, width, height);
+        y = panel.Y + GuidanceCardLayout.Header;
+        foreach (var line in view.Guidance.Context.AsSpan().EnumerateLines())
+        {
+            if (!_text.Add(line, panel.X + 10, y, LastGuidanceTextSize, GameplayHudVisualStyle.TextPrimary,
+                width, height, MathF.Max(1, panel.Width - 20)))
+                EmitText(line, panel.X + 10, y, panel.Right - 10, GameplayHudVisualStyle.TextPrimary,
+                    LastGuidanceTextSize / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
+            y += LastGuidanceTextSize * 1.4f;
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            var control = GuidanceCardLayout.Control(state, i);
+            if (control.IsEmpty) continue;
+            if (!_skin.Panel(control, "control.button_compact", OnboardingPresentation.BackgroundAlpha))
+                EmitQuad(control.X, control.Y, control.Width, control.Height, GameplayHudVisualStyle.PanelRaised with { W = OnboardingPresentation.BackgroundAlpha }, width, height);
+            if (!_text.AddCentered(GuidanceCardLayout.Label(i), control, 14, GameplayHudVisualStyle.TextPrimary, width, height))
+                EmitText(GuidanceCardLayout.Label(i), control.X + 4, control.Y + 6, control.Right - 4,
+                    GameplayHudVisualStyle.TextPrimary, 14 / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
+            if (state.Focused && state.FocusControl == i) EmitQuad(control.X, control.Y, control.Width, 2, GameplayHudVisualStyle.Focus, width, height);
+        }
+        Span<char> buffer = stackalloc char[96];
+        var label = new HudTextBuilder(buffer);
+        label.Append("SECTION "); label.Append(view.Guidance.Section + 1); label.Append(" / "); label.Append(EarlyGameGuidanceCatalog.Steps.Length);
+        label.Append("   PAGE "); label.Append(view.Guidance.Page + 1); label.Append(" / "); label.Append(view.Guidance.PageCount);
+        if (!_text.Add(label.Written, panel.X + 10, panel.Bottom - 15, 14, GameplayHudVisualStyle.TextPrimary, width, height, MathF.Max(1, panel.Width - 20)))
+            EmitText(label.Written, panel.X + 10, panel.Bottom - 15, panel.Right - 10,
+                GameplayHudVisualStyle.TextPrimary, 14 / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
+        _text.Clip = state.Clip; _guidanceClip = state.Clip;
+        if (!state.Tab.IsEmpty)
+        {
+            if (!_skin.Panel(state.Tab, "control.button_compact", OnboardingPresentation.BackgroundAlpha))
+                EmitQuad(state.Tab.X, state.Tab.Y, state.Tab.Width, state.Tab.Height,
+                    GameplayHudVisualStyle.PanelRaised with { W = OnboardingPresentation.BackgroundAlpha }, width, height);
+            if (!_text.AddCentered("HINT", state.TabLabelBounds, state.TabTextSize, GameplayHudVisualStyle.TextPrimary, width, height))
+                EmitText("HINT", state.TabLabelBounds.X, state.TabLabelBounds.Y, state.TabLabelBounds.Right,
+                    GameplayHudVisualStyle.TextPrimary, state.TabTextSize / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
+            if (!_text.Add(">", state.Tab.X + 10, state.Tab.Y + state.Tab.Height / 2, state.TabTextSize,
+                GameplayHudVisualStyle.TextPrimary, width, height, state.Tab.Width - 12))
+                EmitText(">", state.Tab.X + 10, state.Tab.Y + state.Tab.Height / 2, state.Tab.Right,
+                    GameplayHudVisualStyle.TextPrimary, state.TabTextSize / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
+        }
+        if (state.Focused && (state.FocusControl == 6 || !state.Tab.IsEmpty))
+        {
+            var focus = state.Tab.IsEmpty ? state.VisiblePanel : state.Tab;
+            EmitQuad(focus.X, focus.Y, focus.Width, 3, GameplayHudVisualStyle.Focus, width, height);
+        }
+        _guidanceClip = null; _text.Clip = null; _skin.PanelClip(new(0, 0, width, height));
         LastGuidanceVertexCount = _vertexCount - start;
     }
 

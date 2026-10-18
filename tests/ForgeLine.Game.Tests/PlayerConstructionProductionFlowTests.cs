@@ -9,7 +9,7 @@ using Xunit;
 
 namespace ForgeLine.Game.Tests;
 
-public sealed class PlayerConstructionProductionFlowTests
+public sealed partial class PlayerConstructionProductionFlowTests
 {
     [Fact]
     public void CatalogScoutPolicyReplacesInsufficientDefaultsAndProducesThroughRealCargo()

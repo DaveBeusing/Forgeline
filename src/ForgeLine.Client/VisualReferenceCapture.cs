@@ -223,9 +223,9 @@ internal static class VisualReferenceCapture
                     var captureUx = UiReferenceStates.IsOnboarding(uiScenario) || uiScenario is >= UiReferenceScenario.GroupRing ? default(PreAlphaUxView) with
                     {
                         ShowOnboarding = true,
-                        Guidance = new EarlyGameGuidanceController().Update(snapshot, true),
+                        Guidance = new EarlyGameGuidanceController().Update(snapshot, true, layout: GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale)),
                         Onboarding = OnboardingPresentation.Resolve(GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale),
-                            UiReferenceStates.OnboardingCollapse(uiScenario))
+                            UiReferenceStates.OnboardingCollapse(uiScenario), detailed: true)
                     } : default;
                     var hover = uiScenario == UiReferenceScenario.GameplayTooltip ? new HoverTooltipView(snapshot.SessionId, default, default,
                         new(display.Width * .65f, display.Height * .6f), true, display.Width, display.Height,

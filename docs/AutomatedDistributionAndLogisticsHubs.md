@@ -128,3 +128,5 @@ Player commands validate target ownership before delegating to the existing stoc
 ## Logistics setup
 
 INPUTS / USE INPUTS prepares catalog-based editor thresholds for additional production steps. Preview creates no requests. MIN uses stock plus outstanding demand; TARGET remains the refill goal; MAX is validated/saved but is not enforced as a hard inventory limit. Shared storage capacity remains authoritative. Requested demand and physically assigned incoming loads are displayed separately. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
+
+The [opening logistics guide](OnboardingInteraction.md) explains these same controls and uses [completed-action evidence](OnboardingQualification.md). Reading a card, starting stock, an accepted policy or a provider assignment never substitutes for an actual delivery or field transfer.

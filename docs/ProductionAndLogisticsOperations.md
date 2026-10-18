@@ -46,3 +46,5 @@ The [production/operations interface](GraphicalProductionAndOperations.md) now u
 ## Logistics setup
 
 NO INPUT and reported transport failures open existing Logistics controls. Regular loading-bay waits retain their confirmed queue position and are distinct from production queues, graph throughput and true blocked access. Focus changes no orders. Source/destination names and quantities are restricted to owned copied facts. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
+
+The [opening logistics guide](OnboardingInteraction.md) explains these same controls and uses [completed-action evidence](OnboardingQualification.md). Reading a card, starting stock, an accepted policy or a provider assignment never substitutes for an actual delivery or field transfer.
