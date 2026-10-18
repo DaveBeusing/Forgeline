@@ -514,6 +514,62 @@ public sealed class VehicleDockingIntegrationTests
         Assert.Equal(20, inventories.GetQuantity(factory.Inventory, ResourceIds.Fuel));
         Assert.Equal(20, inventories.GetReservedQuantity(factory.Inventory, ResourceIds.Fuel));
     }
+    [Fact]
+    public void MixedCargoAndSupplyShareOneBayWithoutChangingRolesOrCreatingStock()
+    {
+        var simulation = new SimulationCoordinator(ticksPerSecond: 20);
+        var inventories = new InventoryStore();
+        var network = new LogisticsNetwork();
+        var docks = new VehicleDockingService();
+        var cargo = new CargoTransportSystem(network, inventories, docking: docks);
+        simulation.RegisterSystem(new GroundMovementSystem());
+        // Supply observes the same tick first; arrival identity still determines admission.
+        simulation.RegisterSystem(new BattlefieldSupplySystem(inventories, docks));
+        simulation.RegisterSystem(cargo);
+        var source = CreateBuilding(simulation, inventories, Vector3.Zero);
+        var destination = CreateBuilding(simulation, inventories, new(120, 0, 0));
+        simulation.Entities.AddComponent(source.Entity, new SupplyDepot(source.Inventory, new(1)));
+        Assert.True(inventories.Add(source.Inventory, ResourceIds.Steel, 100).Succeeded);
+        Assert.True(inventories.Add(source.Inventory, ResourceIds.Fuel, 200).Succeeded);
+        Assert.True(inventories.Add(source.Inventory, ResourceIds.Ammunition, 200).Succeeded);
+        var origin = network.AddNode(source.Entity, Vector3.Zero, LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoSource);
+        var target = network.AddNode(destination.Entity, new(120, 0, 0), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
+        network.AddEdge(origin, target, LogisticsTransportMode.GroundRoad, 120, 120, 100);
+        EntityId carrier = CargoTruckFactory.Create(simulation.Entities, inventories, new(-40, 1, 14), new(1), cargo);
+        EntityId supplier = SupplyTruckFactory.Create(simulation.Entities, inventories, new(-55, 1, 14), new(1), cargo);
+        var freight = simulation.Entities.GetComponent<CargoTransport>(carrier);
+        var supply = simulation.Entities.GetComponent<SupplyTruck>(supplier);
+        var drive = simulation.Entities.GetComponent<UnitFuelState>(supplier);
+        double initialDriveFuel = inventories.GetQuantity(drive.InventoryId, ResourceIds.Fuel);
+        Assert.NotEqual(drive.InventoryId, supply.InventoryId);
+        Assert.True(cargo.TryAssignOrder(simulation.Entities, carrier,
+            new(origin, target, ResourceIds.Steel, 40, SimulationTick.Zero), SimulationTick.Zero));
+        simulation.Entities.AddComponent(supplier, new SupplyLoadingOrder(source.Entity, SimulationTick.Zero));
+        var admitted = new List<EntityId>();
+        for (int tick = 0; tick < 3600; tick++)
+        {
+            simulation.AdvanceOneTick();
+            if (simulation.Entities.TryGetComponent(source.Entity, out VehicleDockSlot slot) &&
+                (admitted.Count == 0 || admitted[^1] != slot.Truck)) admitted.Add(slot.Truck);
+            Assert.Equal(100, inventories.GetQuantity(source.Inventory, ResourceIds.Steel) +
+                inventories.GetQuantity(destination.Inventory, ResourceIds.Steel) + inventories.GetQuantity(freight.CargoInventory, ResourceIds.Steel));
+            Assert.Equal(200, inventories.GetQuantity(source.Inventory, ResourceIds.Fuel) + inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel));
+            Assert.Equal(200, inventories.GetQuantity(source.Inventory, ResourceIds.Ammunition) + inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition));
+            Assert.False(simulation.Entities.HasComponent<CargoTransportOrder>(supplier));
+            if (cargo.Metrics.CompletedOrderCount == 1 && !simulation.Entities.HasComponent<SupplyLoadingOrder>(supplier) &&
+                !simulation.Entities.HasComponent<VehicleDockSlot>(source.Entity) && !simulation.Entities.HasComponent<VehicleDockSlot>(destination.Entity)) break;
+        }
+        Assert.Equal(new[] { carrier, supplier }, admitted);
+        Assert.Equal(1, cargo.Metrics.CompletedOrderCount);
+        Assert.Equal(40, inventories.GetQuantity(destination.Inventory, ResourceIds.Steel));
+        Assert.Equal(supply.FuelTarget, inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel));
+        Assert.Equal(supply.AmmunitionTarget, inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition));
+        Assert.True(inventories.GetQuantity(drive.InventoryId, ResourceIds.Fuel) < initialDriveFuel);
+        Assert.False(simulation.Entities.HasComponent<VehicleQueueEntry>(carrier));
+        Assert.False(simulation.Entities.HasComponent<VehicleQueueEntry>(supplier));
+        Assert.False(simulation.Entities.HasComponent<SupplyLoadingOrder>(supplier));
+    }
+
     private static string VisitDescription(SimulationCoordinator simulation, EntityId truck) =>
         simulation.Entities.TryGetComponent(truck, out VehicleDockVisit visit) ? visit.ToString() : "none";
 

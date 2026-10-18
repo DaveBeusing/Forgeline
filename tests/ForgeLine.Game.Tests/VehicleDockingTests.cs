@@ -611,6 +611,58 @@ public sealed class VehicleDockingTests
         Assert.Equal(slot, entities.GetComponent<VehicleDockSlot>(fixture.Building));
     }
 
+    [Theory]
+    [InlineData(28, true)]
+    [InlineData(84, false)]
+    public void NeighboringBaysSerializeOverlappingExitsAndPreserveIndependentService(float buildingZ, bool conflicts)
+    {
+        var fixture = new Fixture();
+        fixture.Simulation.RegisterSystem(new GroundMovementSystem());
+        var entities = fixture.Simulation.Entities;
+        var neighbor = entities.CreateEntity();
+        entities.AddComponent(neighbor, new WorldTransform(new(50, 0, buildingZ),
+            Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI), Vector3.One));
+        entities.AddComponent(neighbor, new CompletedBuilding(BuildingIds.StorageDepot, new(1), SimulationTick.Zero));
+        entities.AddComponent(neighbor, entities.GetComponent<BuildingLoadingDock>(fixture.Building));
+        var other = new WorldTransform(new(50, 0, buildingZ - 14),
+            Quaternion.CreateFromAxisAngle(Vector3.UnitY, -MathF.PI / 2), new(3.2f, 2.4f, 6.4f));
+        entities.SetComponent(fixture.OtherTruck, other);
+        ulong generation = 0;
+        fixture.Step(context =>
+        {
+            Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out var owner));
+            generation = owner.Generation;
+            Assert.Equal(!conflicts, fixture.Docks.TryReserve(context, fixture.OtherTruck, neighbor, new(1), out _));
+        });
+        Assert.Equal(fixture.Truck, entities.GetComponent<VehicleDockSlot>(fixture.Building).Truck);
+        if (!conflicts)
+        {
+            Assert.Equal(fixture.OtherTruck, entities.GetComponent<VehicleDockSlot>(neighbor).Truck);
+            return;
+        }
+        Assert.False(entities.HasComponent<VehicleDockSlot>(neighbor));
+        var outside = other with { Position = new(40, 0, 14) };
+        var inside = other with { Position = new(32, 0, 14) };
+        entities.AddComponent(fixture.OtherTruck, GroundMovement.CreateDefault());
+        entities.AddComponent(fixture.OtherTruck, GroundMovementState.Stationary(-MathF.PI / 2));
+        entities.SetComponent(fixture.OtherTruck, outside);
+        entities.AddComponent(fixture.OtherTruck, new MovementOrder(new(1), inside.Position,
+            fixture.Simulation.CurrentTick, fixture.Simulation.CurrentTick));
+        for (int tick = 0; tick < 40; tick++) fixture.Step(_ => { });
+        float stoppedX = entities.GetComponent<WorldTransform>(fixture.OtherTruck).Position.X;
+        Assert.True(stoppedX < outside.Position.X);
+        Assert.True(stoppedX >= entities.GetComponent<VehicleDockSlot>(fixture.Building).Pose.CorridorBounds.Maximum.X + other.Scale.Z * .5f - .001f);
+        entities.SetComponent(fixture.OtherTruck, inside);
+        entities.SetComponent(fixture.OtherTruck, GroundMovementState.Stationary(MathF.PI / 2));
+        entities.SetComponent(fixture.OtherTruck, new MovementOrder(new(1), outside.Position,
+            fixture.Simulation.CurrentTick, fixture.Simulation.CurrentTick));
+        for (int tick = 0; tick < 40; tick++) fixture.Step(_ => { });
+        Assert.True(entities.GetComponent<WorldTransform>(fixture.OtherTruck).Position.X > 37);
+        fixture.SetTruck(new(100, 0, 300), 0, 0);
+        Assert.True(fixture.Docks.TryRelease(entities, fixture.Truck, fixture.Building, generation));
+        fixture.Step(context => Assert.True(fixture.Docks.TryReserve(context, fixture.OtherTruck, neighbor, new(1), out _)));
+    }
+
     private sealed class Fixture : ISimulationSystem
     {
         private Action<SimulationContext>? _action;

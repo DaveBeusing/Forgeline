@@ -325,7 +325,7 @@ public sealed partial class VehicleDockingService
         if (entities.TryGetComponent(building, out SpatialPresence buildingPresence) &&
             pose.IntersectsLane(buildingPresence.CreateEntry(building, buildingTransform).Bounds))
             return Reject(entities, truck, building, VehicleDockBlockReason.MissingGeometry, out visit);
-        if (!LaneClear(entities, building, truck, pose))
+        if (!ReservedLanesClear(entities, building, pose) || !LaneClear(entities, building, truck, pose))
         {
             visit = new(building, 0, VehicleDockStatus.Blocked, VehicleDockBlockReason.Obstructed, pose);
             Put(entities, truck, visit);
@@ -425,15 +425,19 @@ public sealed partial class VehicleDockingService
     internal static bool BlocksStagingStep(EntityRegistry entities, EntityId truck, in WorldTransform current, in WorldTransform next)
     {
         if (BlocksQueueStep(entities, truck, current, next)) return true;
-        if (!entities.TryGetComponent(truck, out VehicleDockVisit visit) || visit.Generation != 0 ||
-            !entities.TryGetComponent(visit.Building, out VehicleDockSlot slot) || slot.Truck == truck) return false;
+        if (!entities.TryGetComponent(truck, out VehicleDockVisit visit) || visit.Generation != 0) return false;
         var first = VehicleBounds(current);
+        var second = VehicleBounds(next);
+        var swept = new AxisAlignedBounds(Vector3.Min(first.Minimum, second.Minimum), Vector3.Max(first.Maximum, second.Maximum));
         // This is an admission gate. An occupant already overlapping the reserved lane
         // must retain ordinary movement so it can evacuate; the owner still waits for LaneClear.
-        if (slot.Pose.IntersectsLane(first)) return false;
-        var second = VehicleBounds(next);
-        return slot.Pose.IntersectsLane(new AxisAlignedBounds(Vector3.Min(first.Minimum, second.Minimum),
-            Vector3.Max(first.Maximum, second.Maximum)));
+        foreach (EntityId building in entities.Query<VehicleDockSlot>())
+        {
+            var slot = entities.GetComponent<VehicleDockSlot>(building);
+            if (slot.Truck == truck || slot.Pose.IntersectsLane(first)) continue;
+            if (slot.Pose.IntersectsLane(swept)) return true;
+        }
+        return false;
     }
 
     public bool Exit(SimulationContext context, EntityId truck)
@@ -648,6 +652,18 @@ public sealed partial class VehicleDockingService
         }
         distance = 0;
         return false;
+    }
+
+    private static bool ReservedLanesClear(EntityRegistry entities, EntityId building, in VehicleDockPose pose)
+    {
+        var bounds = pose.CorridorBounds;
+        foreach (EntityId neighbor in entities.Query<VehicleDockSlot>())
+        {
+            if (neighbor == building) continue;
+            var occupied = entities.GetComponent<VehicleDockSlot>(neighbor).Pose;
+            if (pose.IntersectsLane(occupied.CorridorBounds) && occupied.IntersectsLane(bounds)) return false;
+        }
+        return true;
     }
 
     private bool LaneClear(EntityRegistry entities, EntityId building, EntityId truck, in VehicleDockPose pose)
