@@ -3486,7 +3486,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         int industry = owned.CombatUnits.Count > configuration.MinimumAttackUnits &&
             GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits
-            ? owned.ProductionFacilities.Count : 0;
+            ? owned.ProductionFacilities.Count : Math.Min(owned.ProductionFacilities.Count, 3);
         int demand = Math.Max(owned.SupplyDepots.Count + (reserveForExpansion ? 1 : 0), industry);
         return Math.Max(configuration.MinimumCargoTrucks, Math.Clamp(demand, 2, 4));
     }

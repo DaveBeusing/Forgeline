@@ -115,8 +115,8 @@ Strategically managed combat units leave distant advances to the coordinated
 planner while supplies are prepared. Local identified-target responses, radar
 coordinates within the engagement leash and explicit strategic marches remain
 active; standalone tactical opponents retain their distant advance behavior.
-After establishing its initial objective-pressure force, the opponent buys
-additional cargo trucks for the operating processing sites,
+As processing sites enter operation, the opponent buys a third cargo truck.
+After establishing its initial objective-pressure force, it may buy a fourth,
 within its existing two-to-four-truck fleet bounds. Replacement reserves use
 the same target, so finite dock cycles do not leave a mature industry on the
 initial two-truck throughput. Vehicle prices and inventory targets are unchanged.
