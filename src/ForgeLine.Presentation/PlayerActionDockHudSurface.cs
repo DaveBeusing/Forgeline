@@ -647,6 +647,8 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
             return;
         }
 
+        if (panel.SelectedIndex >= logistics.Policies.Count)
+        { text.Append("ADDITIONAL STEPS "); text.Append(panel.LogisticsSteps); text.Append(" / USE INPUTS PREPARES EDITOR"); return; }
         text.Append("POLICY ");
         text.Append(
             panel.StockMinimum,
@@ -973,7 +975,9 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
                 }
                 break;
             case PlayerActionPanelMode.Logistics:
-                var stock = actions.Logistics!.Policies[index];
+                if (index >= actions.Logistics!.Policies.Count)
+                { text.Append("CATALOG INPUT PREVIEW / EDIT STEP COUNT / NO POLICY CHANGE"); break; }
+                var stock = actions.Logistics.Policies[index];
                 if (productionSkin) { text.Append("STOCK "); text.Append(stock.CurrentQuantity, "F0"); text.Append(" / "); }
                 text.Append("MIN "); text.Append(stock.DesiredMinimum, "F0"); text.Append(" MAX "); text.Append(stock.DesiredMaximum, "F0");
                 text.Append(stock.Enabled ? " / ENABLED" : " / DISABLED");
@@ -1196,9 +1200,12 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
 
             case PlayerActionPanelMode.Logistics:
             {
-                PlayerStockPolicyActionReadModel policy =
-                    actions.Logistics!.Policies[
-                        index];
+                if (index >= actions.Logistics!.Policies.Count)
+                {
+                    var requirement = actions.Logistics.Requirements[index - actions.Logistics.Policies.Count];
+                    text.Append("USE INPUTS / "); AppendAmounts(ref text, requirement.Inputs); break;
+                }
+                PlayerStockPolicyActionReadModel policy = actions.Logistics.Policies[index];
                 text.Append("STOCK ");
                 text.Append(
                     policy.CurrentQuantity,

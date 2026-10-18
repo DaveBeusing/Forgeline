@@ -77,6 +77,10 @@ internal sealed partial class PlayerActionDockHudRenderer
                 else { value.Append(target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append("/");
                     value.Append(participants.SelectedCount); value.Append(geometry.LabelHalfWidth < 38 * scale ? " elig" : " eligible"); }
             }
+            else if (!navigation && !mode && !item && panel.Mode == PlayerActionPanelMode.Logistics &&
+                actions?.Logistics is { } requirements && panel.SelectedIndex >= requirements.Policies.Count &&
+                target.Kind is PlayerActionDockControlKind.Decrease or PlayerActionDockControlKind.Increase)
+            { value.Append("STEPS "); value.Append(panel.LogisticsSteps); }
             else if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
             else if (item)

@@ -289,9 +289,9 @@ internal static class PlayerActionDockHudModel
             case PlayerActionPanelMode.Logistics:
                 return actions.Logistics is
                            PlayerLogisticsActionReadModel logistics &&
-                       index <
-                           logistics.Policies.Count
-                    ? logistics.Policies[index].DisplayName
+                       index < logistics.ItemCount
+                    ? index < logistics.Policies.Count ? logistics.Policies[index].DisplayName
+                        : "INPUTS: " + logistics.Requirements[index - logistics.Policies.Count].Name
                     : string.Empty;
 
             case PlayerActionPanelMode.Supply:
@@ -431,8 +431,7 @@ internal static class PlayerActionDockHudModel
             case PlayerActionPanelMode.Logistics:
                 return actions.Logistics is
                            PlayerLogisticsActionReadModel logistics &&
-                       index <
-                           logistics.Policies.Count
+                       index < logistics.ItemCount
                     ? PlayerActionDockItemState.Enabled
                     : PlayerActionDockItemState.Disabled(
                         "SELECT LOGISTICS");
@@ -530,6 +529,7 @@ internal static class PlayerActionDockHudModel
                 index - production.Recipes.Count < production.Requests.Count =>
                 production.Requests[index - production.Recipes.Count].Paused ? "RESUME" : "PAUSE",
             PlayerActionPanelMode.Production or PlayerActionPanelMode.UnitProduction => "QUEUE",
+            PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.Policies.Count => "USE INPUTS",
             PlayerActionPanelMode.Logistics => "APPLY POLICY",
             PlayerActionPanelMode.Supply => index < 2 ? "APPLY AUTO" : "REQUEST SUPPLY",
             PlayerActionPanelMode.Technology => "START RESEARCH",
@@ -655,8 +655,7 @@ internal static class PlayerActionDockHudModel
             actions.Logistics is
                 PlayerLogisticsActionReadModel logistics)
         {
-            return index <
-                logistics.Policies.Count;
+            return index < logistics.ItemCount;
         }
 
         return mode ==

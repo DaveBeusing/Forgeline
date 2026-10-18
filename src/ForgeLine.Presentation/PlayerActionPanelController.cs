@@ -53,6 +53,8 @@ public readonly record struct PlayerActionPanelView(
     bool SelectionPending = false, GameplayBindingRegistry? Bindings = null, int ContextualHoveredIndex = -1, bool ContextualPressed = false)
 {
     public UiMotionView? Motion { get; init; }
+    public int LogisticsSteps { get; init; } = 1;
+    public string StockPreview { get; init; } = string.Empty;
     public ObjectActionRingView Ring { get; init; }
     public bool DockExpanded => IsOpen && !Ring.UsesRing;
     public bool IsOpen =>
@@ -70,6 +72,9 @@ public sealed partial class PlayerActionPanelController
     private SimulationSessionId _sessionId;
     private double _desiredStockQuantity;
     private ResourceId _stockResourceId;
+    private EntityId _stockEntity;
+    private ProductionStockProposal? _stockProposal;
+    private int _logisticsSteps = 1;
     private double _stockMinimum;
     private double _stockTarget;
     private double _stockMaximum;
@@ -492,7 +497,8 @@ public sealed partial class PlayerActionPanelController
             _contextualActivationTick,
             _sessionId,
             !PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection), _bindings, _contextualHoveredIndex, _contextualPressed)
-        { Ring = BuildRing(actions) };
+        { Ring = BuildRing(actions), LogisticsSteps = _logisticsSteps,
+            StockPreview = _stockProposal is null ? string.Empty : $"INPUT PREVIEW / {_stockProposal.Steps} ADDITIONAL STEP(S) / APPLY EACH RESOURCE" };
     }
 
     public bool TryTakeRequest(
@@ -541,6 +547,7 @@ public sealed partial class PlayerActionPanelController
         _hoveredIndex = -1;
         _pointerPressed = false;
         _desiredStockQuantity = 0.0;
+        _stockProposal = null; _stockEntity = default; _logisticsSteps = 1;
     }
 
     public void OpenOperationsControls(PlayerActionPanelMode mode)
@@ -565,6 +572,7 @@ public sealed partial class PlayerActionPanelController
         _pointerPressed = false;
         _desiredStockQuantity = 0.0;
         _stockResourceId = ResourceId.None;
+        _stockProposal = null; _stockEntity = default; _logisticsSteps = 1;
         _supplyEntity = EntityId.Invalid;
         if (_ringContext) { _ringOpen = Mode != PlayerActionPanelMode.Closed; _ringLevel = ActionRingLevel.Items; _ringRevision++; _ringPage = 0;
             _presentedRing = default; _ringArmed = false; _itemSlotsPage = -1; }
@@ -716,14 +724,29 @@ public sealed partial class PlayerActionPanelController
     {
         if (logistics is null ||
             SelectedIndex < 0 ||
-            SelectedIndex >= logistics.Policies.Count)
+            SelectedIndex >= logistics.ItemCount)
         {
             return;
         }
+        if (SelectedIndex >= logistics.Policies.Count)
+        {
+            var requirement = logistics.Requirements[SelectedIndex - logistics.Policies.Count];
+            var proposal = ProductionStockProposal.Create(logistics, requirement, _logisticsSteps);
+            Feedback = proposal.Reason;
+            _feedbackRemaining = TimeSpan.FromSeconds(8);
+            if (!proposal.FitsCapacity) return;
+            _stockProposal = proposal;
+            _stockEntity = logistics.Entity;
+            SelectedIndex = logistics.Policies.ToList().FindIndex(p => p.ResourceId == proposal.Thresholds[0].Resource);
+            _stockResourceId = ResourceId.None;
+            SynchronizeStockEditor(new PlayerActionSnapshot(_sessionId, default, [], 0, null, null, logistics));
+            _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex,
+                new PlayerActionSnapshot(_sessionId, default, [], 0, null, null, logistics));
+            _ringPage = SelectedIndex / 4; _itemSlotsPage = -1;
+            return;
+        }
 
-        PlayerStockPolicyActionReadModel policy =
-            logistics.Policies[SelectedIndex];
-
+        PlayerStockPolicyActionReadModel policy = logistics.Policies[SelectedIndex];
         _pendingRequest =
             PlayerActionRequest.SetStockPolicy(
                 logistics.Entity,
@@ -971,6 +994,8 @@ public sealed partial class PlayerActionPanelController
         PlayerStockPolicyActionReadModel policy =
             logistics.Policies[SelectedIndex];
 
+        if (_stockEntity != logistics.Entity)
+        { _stockEntity = logistics.Entity; _stockProposal = null; _stockResourceId = ResourceId.None; }
         if (_stockResourceId == policy.ResourceId)
         {
             return;
@@ -981,6 +1006,10 @@ public sealed partial class PlayerActionPanelController
         _stockTarget = policy.DesiredTarget;
         _stockMaximum = policy.DesiredMaximum;
         LogisticsPriority = policy.Priority;
+        if (_stockProposal is not null)
+            foreach (var threshold in _stockProposal.Thresholds)
+                if (threshold.Resource == policy.ResourceId)
+                { _stockMinimum = threshold.Minimum; _stockTarget = threshold.Target; _stockMaximum = threshold.Maximum; break; }
     }
 
     private void SynchronizeSupplyEditor(
@@ -1341,6 +1370,8 @@ public sealed partial class PlayerActionPanelController
         PlayerActionSnapshot? actions,
         int direction)
     {
+        if (actions?.Logistics is { } logistics && SelectedIndex >= logistics.Policies.Count && SelectedIndex < logistics.ItemCount)
+        { _logisticsSteps = Math.Clamp(_logisticsSteps + direction, 1, 100); return; }
         if (actions?.Logistics is null ||
             SelectedIndex < 0 ||
             SelectedIndex >= actions.Logistics.Policies.Count)
@@ -1430,6 +1461,7 @@ public sealed partial class PlayerActionPanelController
         Close();
         _pendingRequest = null;
         _stockResourceId = ResourceId.None;
+        _stockProposal = null; _stockEntity = default; _logisticsSteps = 1;
         _supplyEntity = EntityId.Invalid;
         _leftWasDown =
             input.IsMouseButtonDown(
@@ -1477,6 +1509,7 @@ public sealed partial class PlayerActionPanelController
         StockThresholdField =
             PlayerStockThresholdField.Target;
         _stockResourceId = ResourceId.None;
+        _stockProposal = null; _stockEntity = default; _logisticsSteps = 1;
         _supplyEntity = EntityId.Invalid;
         PointerCaptured = false;
         _pendingRequest = null;
