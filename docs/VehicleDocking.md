@@ -170,6 +170,11 @@ recipe and its real accepted successor in the required input budget.
 Factories without power retain the normal recovery ordering so construction
 inputs can restore power first.
 
+A waiting vehicle cannot newly enter another truck's reserved lane. If its body
+already overlaps the lane, ordinary movement remains available to clear it; the
+owner still waits for a physically clear corridor. Terrain and collision checks
+remain active, and the slot is not released by a timeout.
+
 ## Persistence and presentation
 
 Dock components are authoritative ECS state. Save payload schema 3 and

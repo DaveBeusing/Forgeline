@@ -1,6 +1,8 @@
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Combat;
+using ForgeLine.Economy;
+using ForgeLine.Logistics;
 using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 using ForgeLine.World;
@@ -551,6 +553,53 @@ public sealed class VehicleDockingTests
         Assert.Equal(group, entities.GetComponent<MovementGroupMember>(fixture.OtherTruck).Group);
         Assert.Equal(2, entities.GetComponent<FormationMovementConstraint>(fixture.OtherTruck).MaximumSpeed);
         Assert.True(entities.IsAlive(group));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void StagingAdmissionLetsAnExistingOverlapClearButPreventsNewEntry(bool startsInside)
+    {
+        var spatial = new SpatialGridIndex();
+        var fixture = new Fixture(new VehicleDockingService(spatial: spatial));
+        var entities = fixture.Simulation.Entities;
+        fixture.Simulation.RegisterSystem(new GroundMovementSystem());
+        entities.AddComponent(fixture.Truck, new SpatialPresence(new(1.6f, 1.2f, 3.2f), new(1, 0, SpatialMobility.Mobile)));
+        fixture.Step(context => Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out _)));
+        var slot = entities.GetComponent<VehicleDockSlot>(fixture.Building);
+        var lane = slot.Pose;
+        var inventories = new InventoryStore();
+        var cargo = new CargoTransportSystem(new LogisticsNetwork(), inventories);
+        Vector3 initial = lane.Exit + new Vector3(startsInside ? 14.2f : 18, 1, startsInside ? 5 : 0);
+        EntityId waiting = SupplyTruckFactory.Create(entities, inventories, initial, new(1), cargo);
+        float heading = startsInside ? 1.9553907f : -MathF.PI / 2;
+        entities.SetComponent(waiting, new WorldTransform(initial, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading), new(3.4f, 2.5f, 6.8f)));
+        entities.SetComponent(waiting, GroundMovementState.Stationary(heading));
+        Vector3 target = startsInside ? lane.Exit + new Vector3(24, 1, 1.5f) : lane.Service + Vector3.UnitY;
+        entities.AddComponent(waiting, new VehicleDockVisit(fixture.Building, 0, VehicleDockStatus.Busy,
+            VehicleDockBlockReason.Obstructed, lane with { ApproachStart = target }));
+        spatial.Upsert(entities.GetComponent<SpatialPresence>(waiting).CreateEntry(waiting, entities.GetComponent<WorldTransform>(waiting)));
+        if (startsInside)
+        {
+            fixture.Step(context => Assert.False(fixture.Docks.ObservePose(context, fixture.Truck, out _)));
+            fixture.Step(context => Assert.False(fixture.Docks.ObservePose(context, fixture.Truck, out _)));
+        }
+        entities.AddComponent(waiting, new MovementOrder(new(1), target, fixture.Simulation.CurrentTick, fixture.Simulation.CurrentTick));
+        for (int tick = 0; tick < 60; tick++) fixture.Step(_ => { });
+        Vector3 final = entities.GetComponent<WorldTransform>(waiting).Position;
+        spatial.Upsert(entities.GetComponent<SpatialPresence>(waiting).CreateEntry(waiting, entities.GetComponent<WorldTransform>(waiting)));
+        if (startsInside)
+        {
+            Assert.True(final.X > initial.X + 4, $"A staged occupant could not clear the lane: {initial} -> {final}.");
+            fixture.Step(context => Assert.False(fixture.Docks.ObservePose(context, fixture.Truck, out _)));
+            fixture.Step(context => Assert.True(fixture.Docks.ObservePose(context, fixture.Truck, out _)));
+        }
+        else
+        {
+            Assert.True(final.X >= lane.CorridorBounds.Maximum.X + 3.4f - .01f);
+            Assert.Equal(GroundMovementStatus.TacticallyPaused, entities.GetComponent<GroundMovementState>(waiting).Status);
+        }
+        Assert.Equal(slot, entities.GetComponent<VehicleDockSlot>(fixture.Building));
     }
 
     private sealed class Fixture : ISimulationSystem

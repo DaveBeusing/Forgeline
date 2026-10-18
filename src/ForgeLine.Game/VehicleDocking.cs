@@ -529,6 +529,9 @@ public sealed class VehicleDockingService
         if (!entities.TryGetComponent(truck, out VehicleDockVisit visit) || visit.Generation != 0 ||
             !entities.TryGetComponent(visit.Building, out VehicleDockSlot slot) || slot.Truck == truck) return false;
         var first = VehicleBounds(current);
+        // This is an admission gate. An occupant already overlapping the reserved lane
+        // must retain ordinary movement so it can evacuate; the owner still waits for LaneClear.
+        if (slot.Pose.IntersectsLane(first)) return false;
         var second = VehicleBounds(next);
         return slot.Pose.IntersectsLane(new AxisAlignedBounds(Vector3.Min(first.Minimum, second.Minimum),
             Vector3.Max(first.Maximum, second.Maximum)));
