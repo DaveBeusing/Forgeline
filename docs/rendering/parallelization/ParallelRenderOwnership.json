@@ -33,7 +33,9 @@
     "docs/Architecture.md",
     "docs/GraphicsReferencePerformance.md",
     "docs/AssetPipeline.md",
-    "src/ForgeLine.Client/VisualReferenceCapture.cs"
+    "src/ForgeLine.Client/VisualReferenceCapture.cs",
+    "src/ForgeLine.Assets/RuntimeSkinData.cs",
+    "src/ForgeLine.Assets/RuntimeAnimationData.cs"
   ],
   "frozenParallelPrefixes": [
     "src/ForgeLine.Graphics/RenderContracts/",
@@ -132,7 +134,8 @@
         "src/ForgeLine.Graphics/D3D12DirectionalShadows.cs",
         "src/ForgeLine.Graphics/D3D12Atmosphere.cs",
         "src/ForgeLine.Graphics/D3D12Particles.cs",
-        "src/ForgeLine.Graphics/D3D12FrameCapture.cs"
+        "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
+        "src/ForgeLine.Presentation/SkinFrameCache.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Graphics/ResourceScheduling/",
@@ -395,5 +398,6 @@
     "tests/ForgeLine.Presentation.Tests/RenderSubmission/",
     "tests/ForgeLine.Presentation.Tests/SnapshotPublication/",
     "tests/ForgeLine.Presentation.Tests/TerrainResidency/"
-  ]
+  ],
+  "foundationImplementationSha": "c3ded4538c8eb4350189e7b8d2b1577ea904ffb1"
 }
