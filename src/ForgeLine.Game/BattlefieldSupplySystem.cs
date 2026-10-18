@@ -304,12 +304,8 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
             fuelTransferred += loadedFuel;
             ammunitionTransferred += loadedAmmunition;
             if (loadedFuel + loadedAmmunition > QuantityEpsilon) VehicleDockingService.RecordTransfer(context, truckEntity, visit.Generation);
-            if (_inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel) + QuantityEpsilon >= truck.FuelTarget &&
-                _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition) + QuantityEpsilon >= truck.AmmunitionTarget)
-            {
-                _docks.Exit(context, truckEntity);
-                CargoDeliveryFuelPolicy.PrepareDockMovement(context, _inventories, truckEntity);
-            }
+            // Field distribution runs after this phase. Confirm the completed
+            // load next tick so its final batch can serve nearby recipients first.
         }
     }
 

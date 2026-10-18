@@ -440,6 +440,47 @@ public sealed class VehicleDockingIntegrationTests
         Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(destination.Entity));
     }
     [Theory]
+    [InlineData(60, 60)]
+    [InlineData(0, 80)]
+    public void DockedSupplyKeepsCargoSeparateFromOptionalDriveTopupsButAllowsRequiredRecovery(
+        double initialDriveFuel, double expectedDriveFuel)
+    {
+        var simulation = new SimulationCoordinator();
+        var inventories = new InventoryStore();
+        var cargo = new CargoTransportSystem(new LogisticsNetwork(), inventories);
+        simulation.RegisterSystem(new GroundMovementSystem());
+        simulation.RegisterSystem(new BattlefieldSupplySystem(inventories));
+        var depot = CreateBuilding(simulation, inventories, Vector3.Zero);
+        simulation.Entities.AddComponent(depot.Entity, new SupplyDepot(depot.Inventory, new(1)));
+        Assert.True(inventories.Add(depot.Inventory, ResourceIds.Fuel, 300).Succeeded);
+        Assert.True(inventories.Add(depot.Inventory, ResourceIds.Ammunition, 300).Succeeded);
+        EntityId truck = SupplyTruckFactory.Create(simulation.Entities, inventories, new(0, 1, 14), new(1), cargo);
+        var transform = simulation.Entities.GetComponent<WorldTransform>(truck);
+        simulation.Entities.SetComponent(truck, transform with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2) });
+        simulation.Entities.SetComponent(truck, GroundMovementState.Stationary(MathF.PI / 2));
+        var fuel = simulation.Entities.GetComponent<UnitFuelState>(truck);
+        Assert.True(inventories.Remove(fuel.InventoryId, ResourceIds.Fuel, fuel.Capacity - initialDriveFuel).Succeeded);
+        simulation.Entities.AddComponent(truck, new SupplyLoadingOrder(depot.Entity, simulation.CurrentTick));
+        for (int tick = 0; tick < 200; tick++)
+        {
+            simulation.AdvanceOneTick();
+            if (simulation.Entities.TryGetComponent(truck, out VehicleDockVisit visit) && visit.LastTransferTick > 0) break;
+        }
+        var supply = simulation.Entities.GetComponent<SupplyTruck>(truck);
+        Assert.True(simulation.Entities.GetComponent<VehicleDockVisit>(truck).LastTransferTick > 0);
+        InventoryId recoveryInventory = inventories.CreateInventory(new InventorySpecification(100));
+        Assert.True(inventories.Add(recoveryInventory, ResourceIds.Fuel, 100).Succeeded);
+        EntityId recoveryProvider = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(recoveryProvider, simulation.Entities.GetComponent<WorldTransform>(truck));
+        simulation.Entities.AddComponent(recoveryProvider, new SupplyProvider(recoveryInventory, new(1), 16));
+        simulation.AdvanceOneTick();
+        Assert.Equal(20, inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel), 6);
+        Assert.Equal(expectedDriveFuel, inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel), 6);
+        Assert.Equal(400 + initialDriveFuel, inventories.GetQuantity(depot.Inventory, ResourceIds.Fuel) +
+            inventories.GetQuantity(recoveryInventory, ResourceIds.Fuel) +
+            inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel) + inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel), 6);
+    }
+    [Theory]
     [InlineData(LogisticsStockPriority.Critical)]
     [InlineData(LogisticsStockPriority.High)]
     public void PhysicalFactoryPoliciesKeepTheirDeclaredTotalStockMeaningWhileInputsAreReserved(LogisticsStockPriority priority)
