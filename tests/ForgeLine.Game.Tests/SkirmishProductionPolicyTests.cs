@@ -11,26 +11,26 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishProductionPolicyTests
 {
     [Theory]
-    [InlineData(true, false, LogisticsStockPriority.Critical)]
-    [InlineData(true, true, LogisticsStockPriority.High)]
-    [InlineData(false, false, LogisticsStockPriority.High)]
-    public void ForwardConstructionReserveYieldsToCargoRecoveryAndInitialMobilization(
-        bool establishedForce, bool cargoLost, LogisticsStockPriority expectedPriority)
+    [InlineData(true, false, true, LogisticsStockPriority.Critical)]
+    [InlineData(true, true, true, LogisticsStockPriority.High)]
+    [InlineData(false, false, false, LogisticsStockPriority.High)]
+    [InlineData(true, false, false, LogisticsStockPriority.High)]
+    public void ForwardConstructionFundingRequiresBootstrapAndYieldsToCargoRecovery(
+        bool bootstrapComplete, bool cargoLost, bool missingCost, LogisticsStockPriority expectedPriority)
     {
-        using MatchRuntime scenario = CentralDivideScenario.Create(
-            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using MatchRuntime scenario = CentralDivideScenario.Create(settings, seed: 2026);
         EntityRegistry entities = scenario.Simulation.Entities;
         var owner = new ForgeLine.Game.PlayerId(1);
         EntityId core = scenario.GetBase(owner).CommandCore;
-        Vector3 position = entities.GetComponent<WorldTransform>(core).Position;
-        entities.AddComponent(core, new PowerGenerator(100.0));
-        if (establishedForce)
+        if (bootstrapComplete)
         {
-            UnitDefinitionCatalog units = DirectorateContent.CreateUnitCatalog();
-            scenario.UnitFactory.Create(units[UnitIds.MainBattleTank], position, owner);
-            for (int index = 0; index < 3; index++)
-                scenario.UnitFactory.Create(units[UnitIds.RifleSquad], position, owner);
+            Assert.True(scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, owner),
+                24_000, TestContext.Current.CancellationToken));
+            ulong nextDecision = scenario.GetOpponentState(owner).LastDecisionTick.Value + settings.OpponentConfigurations[owner.Value].ReactionCadenceTicks;
+            while (scenario.Simulation.CurrentTick.Value + 1 < nextDecision) scenario.Simulation.AdvanceOneTick();
         }
+        else entities.AddComponent(core, new PowerGenerator(100.0));
         if (cargoLost)
         {
             var cargo = new List<EntityId>();
@@ -42,7 +42,12 @@ public sealed class SkirmishProductionPolicyTests
                 Assert.True(entities.DestroyEntity(entity));
         }
 
-        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+        InventoryId inventory = entities.GetComponent<InventoryStorage>(core).InventoryId;
+        double current = scenario.Inventories.GetAvailableQuantity(inventory, ResourceIds.FerrousOre);
+        double desired = missingCost ? 100 : 650;
+        if (current < desired) Assert.True(scenario.Inventories.Add(inventory, ResourceIds.FerrousOre, desired - current).Succeeded);
+        else if (current > desired) Assert.True(scenario.Inventories.Remove(inventory, ResourceIds.FerrousOre, current - desired).Succeeded);
+        scenario.Simulation.RunTicks(bootstrapComplete ? 3UL : 12UL, TestContext.Current.CancellationToken);
 
         LogisticsStockPolicy policy = FindStockPolicy(entities, core, ResourceIds.FerrousOre);
         Assert.Equal(expectedPriority, policy.Priority);

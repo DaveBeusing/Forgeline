@@ -234,6 +234,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             controller,
             owned,
+            economy,
             configuration);
         EnsureProductionPrograms(
             context,
@@ -920,6 +921,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 cadence);
     }
 
+    private static bool RequiresPowerConstruction(OwnedState owned) =>
+        owned.PowerDemand > 0 &&
+        (owned.PowerGeneration < owned.PowerDemand + 20 || owned.OfflineConsumers > 0);
+
     private bool TryRespondToCriticalEconomy(
         SimulationContext context,
         SkirmishOpponentController controller,
@@ -927,8 +932,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         in SkirmishEconomyAssessment economy,
         out SkirmishStrategicGoal goal)
     {
-        if (economy.PowerConstrained ||
-            economy.OfflineConsumers > 0)
+        if (RequiresPowerConstruction(owned))
         {
             if (GetBuildingCount(
                     owned,
@@ -1291,28 +1295,25 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     retreatUnits,
                     deepOffensiveCommitted);
 
-            if (deepOffensiveCommitted)
+            for (int index = retreatUnits.Count - 1; index >= 0; index--)
             {
-                for (int index = retreatUnits.Count - 1; index >= 0; index--)
+                EntityId unit = retreatUnits[index];
+                if (!context.Entities.TryGetComponent(unit, out WorldTransform transform) ||
+                    BattlefieldResupplyPlanner.CanReachProvider(context, _inventories, unit,
+                        HorizontalDistanceSquared(transform.Position, recovery), range: 0.0f))
                 {
-                    EntityId unit = retreatUnits[index];
-                    if (!context.Entities.TryGetComponent(unit, out WorldTransform transform) ||
-                        BattlefieldResupplyPlanner.CanReachProvider(context, _inventories, unit,
-                            HorizontalDistanceSquared(transform.Position, recovery), range: 0.0f))
-                    {
-                        continue;
-                    }
-
-                    // Preserve the remaining fuel for mobile resupply rather
-                    // than starting a retreat that cannot reach its destination.
-                    if (!context.Entities.TryGetComponent(unit, out CombatOrderState order) ||
-                        order.Kind != CombatOrderKind.HoldPosition)
-                    {
-                        new HoldPositionCommand(controller.Player, [unit], context.Tick).Execute(context);
-                    }
-
-                    retreatUnits.RemoveAt(index);
+                    continue;
                 }
+
+                // Preserve the remaining fuel for mobile resupply rather
+                // than starting a retreat that cannot reach its destination.
+                if (!context.Entities.TryGetComponent(unit, out CombatOrderState order) ||
+                    order.Kind != CombatOrderKind.HoldPosition)
+                {
+                    new HoldPositionCommand(controller.Player, [unit], context.Tick).Execute(context);
+                }
+
+                retreatUnits.RemoveAt(index);
             }
 
             EntityId[] newlyRecovering = SelectUnitsNeedingCombatOrder(
@@ -1348,6 +1349,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return forceWideRecovery || recoveryEscortsReleased;
     }
 
+    private static bool CanPlanExpansion(OwnedState owned, in SkirmishEconomyAssessment economy,
+        int totalUnits, SkirmishOpponentConfiguration configuration) =>
+        IsBootstrapComplete(owned) &&
+        (economy.HealthScore >= configuration.ExpansionReadinessThreshold || economy.RawResourceConstrained) &&
+        totalUnits >= 4 && !HasPendingBuilding(owned, BuildingIds.LogisticsHub) &&
+        !HasPendingBuilding(owned, BuildingIds.SupplyDepot);
+
     private bool TryExpand(
         SimulationContext context,
         SkirmishOpponentController controller,
@@ -1360,20 +1368,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         objective = Vector3.Zero;
 
-        bool economyCanSupportExpansion =
-            economy.HealthScore >=
-                configuration.ExpansionReadinessThreshold ||
-            economy.RawResourceConstrained;
-
-        if (!IsBootstrapComplete(owned) ||
-            !economyCanSupportExpansion ||
-            force.TotalUnits < 4 ||
-            HasPendingBuilding(
-                owned,
-                BuildingIds.LogisticsHub) ||
-            HasPendingBuilding(
-                owned,
-                BuildingIds.SupplyDepot))
+        if (!CanPlanExpansion(owned, economy, force.TotalUnits, configuration))
         {
             return false;
         }
@@ -1391,15 +1386,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             objective =
                 unsupportedRemoteHub.Value;
 
-            if (TryIssueBuilding(
+            return TryIssueBuilding(
                     context,
                     controller,
                     owned,
                     BuildingIds.SupplyDepot,
-                    unsupportedRemoteHub.Value))
-            {
-                return true;
-            }
+                    unsupportedRemoteHub.Value);
         }
 
         int remoteHubs =
@@ -1427,6 +1419,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         objective =
             site.Value.Position;
+
+        // A cheaper fallback must not consume partial deliveries for a still-eligible hub.
+        // Site alternatives are considered after its complete construction cost is available.
+        if (!TrySelectConstructionSource(context, controller, owned, _buildings[BuildingIds.LogisticsHub], out _))
+            return false;
 
         if (!TryIssueBuilding(
                 context,
@@ -1921,6 +1918,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
                     candidate) ||
+                context.Entities.HasComponent<SupplyLoadingOrder>(candidate) ||
                 IsProtectingReconScout(context, candidate, scout) ||
                 !TacticalCommandUtilities.TryGetMovementIntent(
                     context,
@@ -1930,12 +1928,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (HasSupplyLoadingMovement(
-                    context,
-                    candidate,
-                    controller,
-                    owned,
-                    truck))
+            if (HasSupplyLoadingMovement(context, candidate))
             {
                 continue;
             }
@@ -2102,7 +2095,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context.Entities.HasComponent<ResupplyOrder>(
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
-                    candidate))
+                    candidate) ||
+                context.Entities.HasComponent<SupplyLoadingOrder>(candidate))
             {
                 continue;
             }
@@ -2194,6 +2188,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
                     candidate) ||
+                context.Entities.HasComponent<SupplyLoadingOrder>(candidate) ||
                 IsProtectingReconScout(
                     context,
                     candidate,
@@ -2295,6 +2290,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
                     candidate) ||
+                context.Entities.HasComponent<SupplyLoadingOrder>(candidate) ||
                 IsProtectingReconScout(
                     context,
                     candidate,
@@ -2851,6 +2847,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
+            bool reconsiderSource = context.Entities.TryGetComponent(entity, out SupplyLoadingOrder loading);
+            // Source selection is bounded by strategic decision cadence. The Supply phase
+            // may renew its retry before every planning decision; sharing that deadline can starve selection forever.
+            if (reconsiderSource && (loading.WaitReason != VehicleDockBlockReason.SourceEmpty ||
+                context.Entities.HasComponent<VehicleDockVisit>(entity)))
+                continue;
+
             bool hasMovement =
                 TacticalCommandUtilities.TryGetMovementIntent(
                     context,
@@ -2858,22 +2861,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     out _);
             bool loadingMovement =
                 hasMovement &&
-                HasSupplyLoadingMovement(
-                    context,
-                    entity,
-                    controller,
-                    owned,
-                    truck);
+                HasSupplyLoadingMovement(context, entity);
             bool needsFuel =
                 _inventories.GetQuantity(
                     truck.InventoryId,
                     ResourceIds.Fuel) <
-                truck.FuelTarget * 0.50;
+                truck.FuelTarget * (reconsiderSource ? 1 : 0.50) - 1e-9;
             bool needsAmmunition =
                 _inventories.GetQuantity(
                     truck.InventoryId,
                     ResourceIds.Ammunition) <
-                truck.AmmunitionTarget * 0.25;
+                truck.AmmunitionTarget * (reconsiderSource ? 1 : 0.25) - 1e-9;
 
             if (!needsFuel && !needsAmmunition)
             {
@@ -2908,6 +2906,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 EntityId.Invalid;
             Vector3 destination = default;
             float bestDistance = float.PositiveInfinity;
+            bool bestCoversCargo = false;
+            double fuelDeficit = Math.Max(0, truck.FuelTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel));
+            double ammunitionDeficit = Math.Max(0, truck.AmmunitionTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition));
             foreach (var candidate in owned.SupplyDepots)
             {
                 if (!context.Entities.TryGetComponent(candidate.Entity, out SupplyDepot depot) ||
@@ -2939,7 +2940,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         candidate.Entity,
                         candidate.Position,
                         transform.Position);
-                if (distance < bestDistance)
+                bool coversCargo = _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Fuel) + 1e-9 >= fuelDeficit &&
+                    _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Ammunition) + 1e-9 >= ammunitionDeficit;
+                if (!loadingSource.IsValid || coversCargo && !bestCoversCargo || coversCargo == bestCoversCargo &&
+                    (distance < bestDistance || distance == bestDistance && candidate.Entity < loadingSource))
                 {
                     loadingSource =
                         candidate.Entity;
@@ -2947,6 +2951,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         candidate.Position;
                     bestDistance =
                         distance;
+                    bestCoversCargo = coversCargo;
                 }
             }
 
@@ -2976,13 +2981,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         commandCoreTransform.Position,
                         transform.Position);
 
-                if (!loadingSource.IsValid ||
+                bool coreCoversCargo = _inventories.GetAvailableQuantity(commandCoreProvider.InventoryId, ResourceIds.Fuel) + 1e-9 >= fuelDeficit &&
+                    _inventories.GetAvailableQuantity(commandCoreProvider.InventoryId, ResourceIds.Ammunition) + 1e-9 >= ammunitionDeficit;
+                if (!loadingSource.IsValid || coreCoversCargo && !bestCoversCargo || coreCoversCargo == bestCoversCargo && (
                     commandCoreDistance <
                         bestDistance ||
                     (commandCoreDistance ==
                         bestDistance &&
                      controller.PreferredConstructionSource <
-                        loadingSource))
+                        loadingSource)))
                 {
                     loadingSource =
                         controller.PreferredConstructionSource;
@@ -2998,299 +3005,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (bestDistance <=
-                truck.LoadRangeMeters *
-                truck.LoadRangeMeters)
-            {
-                if (loadingMovement)
-                {
-                    new StopMovementCommand(
-                        truck.Owner,
-                        [entity],
-                        context.Tick)
-                        .Execute(context);
-                }
-
-                continue;
-            }
-
-            bool movingToSelectedLoadingSource =
-                hasMovement &&
-                TacticalCommandUtilities.TryGetMovementIntent(
-                    context,
-                    entity,
-                    out MovementOrder loadingIntent) &&
-                HorizontalDistanceToSupplyLoadingSourceSquared(
-                    context,
-                    loadingSource,
-                    destination,
-                    loadingIntent.WorldTarget) <=
-                truck.LoadRangeMeters *
-                truck.LoadRangeMeters;
-
-            if (movingToSelectedLoadingSource)
-            {
-                continue;
-            }
-
-            destination =
-                ResolveSupplyLoadingApproach(
-                    context,
-                    loadingSource,
-                    entity,
-                    destination,
-                    transform.Position,
-                    truck.LoadRangeMeters);
-
-            if (hasMovement)
-            {
-                new StopMovementCommand(
-                    truck.Owner,
-                    [entity],
-                    context.Tick)
-                    .Execute(context);
-            }
-
-            new MoveEntitiesCommand(
-                truck.Owner,
-                [entity],
-                destination,
-                context.Tick).Execute(context);
+            if (!context.Entities.HasComponent<BuildingLoadingDock>(loadingSource)) continue;
+            if (reconsiderSource && loadingSource == loading.Source) continue;
+            if (hasMovement) new StopMovementCommand(truck.Owner, [entity], context.Tick).Execute(context);
+            VehicleDockingService.Put(context.Entities, entity, new SupplyLoadingOrder(loadingSource, context.Tick));
         }
     }
-
-    private static bool HasSupplyLoadingMovement(
-        SimulationContext context,
-        EntityId entity,
-        SkirmishOpponentController controller,
-        OwnedState owned,
-        in SupplyTruck truck)
-    {
-        if (!TacticalCommandUtilities.TryGetMovementIntent(
-                context,
-                entity,
-                out MovementOrder movement))
-        {
-            return false;
-        }
-
-        float loadRangeSquared =
-            truck.LoadRangeMeters *
-            truck.LoadRangeMeters;
-
-        for (int index = 0;
-             index < owned.SupplyDepots.Count;
-             index++)
-        {
-            (EntityId depotEntity, Vector3 depotPosition) =
-                owned.SupplyDepots[index];
-
-            if (!context.Entities.TryGetComponent(
-                    depotEntity,
-                    out SupplyDepot depot) ||
-                depot.State != SupplyDepotState.Operational)
-            {
-                continue;
-            }
-
-            if (HorizontalDistanceToSupplyLoadingSourceSquared(
-                    context,
-                    depotEntity,
-                    depotPosition,
-                    movement.WorldTarget) <=
-                loadRangeSquared)
-            {
-                return true;
-            }
-        }
-
-        if (context.Entities.IsAlive(
-                controller.PreferredConstructionSource) &&
-            context.Entities.TryGetComponent(
-                controller.PreferredConstructionSource,
-                out WorldTransform commandCoreTransform) &&
-            HorizontalDistanceToSupplyLoadingSourceSquared(
-                context,
-                controller.PreferredConstructionSource,
-                commandCoreTransform.Position,
-                movement.WorldTarget) <=
-            loadRangeSquared)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    private static Vector3 ResolveSupplyLoadingApproach(
-        SimulationContext context,
-        EntityId source,
-        EntityId truckEntity,
-        Vector3 sourcePosition,
-        Vector3 truckPosition,
-        float loadRangeMeters)
-    {
-        float halfExtentX = 0.0f;
-        float halfExtentZ = 0.0f;
-
-        if (context.Entities.TryGetComponent(
-                source,
-                out SpatialPresence sourcePresence))
-        {
-            halfExtentX =
-                sourcePresence.HalfExtents.X;
-            halfExtentZ =
-                sourcePresence.HalfExtents.Z;
-        }
-
-        float truckHalfExtentX = 2.0f;
-        float truckHalfExtentZ = 2.0f;
-
-        if (context.Entities.TryGetComponent(
-                truckEntity,
-                out SpatialPresence truckPresence))
-        {
-            truckHalfExtentX =
-                truckPresence.HalfExtents.X;
-            truckHalfExtentZ =
-                truckPresence.HalfExtents.Z;
-        }
-
-        float approach =
-            MathF.Max(
-                0.0f,
-                loadRangeMeters - 1.0f);
-
-        Span<Vector3> candidates =
-        [
-            sourcePosition +
-            new Vector3(
-                halfExtentX + approach,
-                0.0f,
-                0.0f),
-            sourcePosition +
-            new Vector3(
-                -(halfExtentX + approach),
-                0.0f,
-                0.0f),
-            sourcePosition +
-            new Vector3(
-                0.0f,
-                0.0f,
-                halfExtentZ + approach),
-            sourcePosition +
-            new Vector3(
-                0.0f,
-                0.0f,
-                -(halfExtentZ + approach))
-        ];
-
-        Vector3 selected =
-            candidates[0];
-        float selectedDistanceSquared =
-            float.PositiveInfinity;
-        bool foundClearCandidate = false;
-
-        for (int index = 0;
-             index < candidates.Length;
-             index++)
-        {
-            Vector3 candidate =
-                candidates[index];
-            bool clear =
-                IsSupplyLoadingApproachClear(
-                    context,
-                    source,
-                    candidate,
-                    truckHalfExtentX,
-                    truckHalfExtentZ);
-
-            if (foundClearCandidate &&
-                !clear)
-            {
-                continue;
-            }
-
-            float distanceSquared =
-                HorizontalDistanceSquared(
-                    truckPosition,
-                    candidate);
-
-            if ((!foundClearCandidate && clear) ||
-                clear == foundClearCandidate &&
-                distanceSquared <
-                selectedDistanceSquared)
-            {
-                selected =
-                    candidate;
-                selectedDistanceSquared =
-                    distanceSquared;
-                foundClearCandidate =
-                    clear;
-            }
-        }
-
-        return selected;
-    }
-
-    private static bool IsSupplyLoadingApproachClear(
-        SimulationContext context,
-        EntityId loadingSource,
-        Vector3 candidate,
-        float truckHalfExtentX,
-        float truckHalfExtentZ)
-    {
-        const float clearanceMeters = 1.0f;
-
-        foreach (EntityId entity in
-                 context.Entities.Query<
-                     SpatialPresence,
-                     WorldTransform>(
-                         QueryIterationOrder.StableByEntityIndex))
-        {
-            if (entity == loadingSource)
-            {
-                continue;
-            }
-
-            SpatialPresence presence =
-                context.Entities.GetComponent<SpatialPresence>(
-                    entity);
-
-            if (presence.Metadata.Mobility !=
-                SpatialMobility.Static)
-            {
-                continue;
-            }
-
-            WorldTransform transform =
-                context.Entities.GetComponent<WorldTransform>(
-                    entity);
-            float allowedX =
-                presence.HalfExtents.X +
-                truckHalfExtentX +
-                clearanceMeters;
-            float allowedZ =
-                presence.HalfExtents.Z +
-                truckHalfExtentZ +
-                clearanceMeters;
-
-            if (MathF.Abs(
-                    candidate.X -
-                    transform.Position.X) <
-                allowedX &&
-                MathF.Abs(
-                    candidate.Z -
-                    transform.Position.Z) <
-                allowedZ)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
+    private static bool HasSupplyLoadingMovement(SimulationContext context, EntityId entity) =>
+        context.Entities.HasComponent<SupplyLoadingOrder>(entity);
     private static float HorizontalDistanceToSupplyLoadingSourceSquared(
         SimulationContext context,
         EntityId source,
@@ -3327,29 +3049,41 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned,
+        in SkirmishEconomyAssessment economy,
         SkirmishOpponentConfiguration configuration)
     {
-        bool powerRecoveryRequired =
-            owned.PowerDemand > 0.0 &&
-            (owned.PowerGeneration <
-                 owned.PowerDemand ||
-             owned.OfflineConsumers > 0);
-        bool forwardConstructionRequired =
-            !RequiresCargoReplacementReserve(owned, configuration) &&
-            owned.CombatUnits.Count >= configuration.MinimumAttackUnits &&
-            GetUnitCount(owned, UnitIds.MainBattleTank) >=
-                configuration.MinimumObjectivePressureUnits &&
-            (CountRemoteBuildings(
-                 context, owned, BuildingIds.LogisticsHub,
-                 controller.HomePosition, minimumDistanceMeters: 500.0f) < 2 ||
-             SelectUnsupportedRemoteHub(
-                 context, owned, controller.HomePosition,
-                 minimumDistanceMeters: 500.0f,
-                 supportRadiusMeters: 260.0f).HasValue);
-        LogisticsStockPriority constructionRawPriority =
-            powerRecoveryRequired || forwardConstructionRequired
-                ? LogisticsStockPriority.Critical
-                : LogisticsStockPriority.High;
+        bool powerRecoveryRequired = RequiresPowerConstruction(owned);
+        bool fuelProductionRecoveryRequired =
+            !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage coreStorage) ||
+            _inventories.GetAvailableQuantity(coreStorage.InventoryId, ResourceIds.Fuel) < 360;
+        BuildingDefinition? nextConstruction = null;
+        if (powerRecoveryRequired && GetBuildingCount(owned, BuildingIds.PowerPlant) < MaximumRecoveryPowerPlants &&
+            !HasPendingBuilding(owned, BuildingIds.PowerPlant)) nextConstruction = _buildings[BuildingIds.PowerPlant];
+        foreach (ResourceId resource in RawResources)
+            if (nextConstruction is null && !HasOperationalExtractor(context, owned, resource) &&
+                !HasPendingExtractor(context, owned, resource)) nextConstruction = _buildings[BuildingIds.Extractor];
+        foreach (BuildingId building in IndustrialPlan)
+            if (nextConstruction is null && GetBuildingCount(owned, building) == 0 && !HasPendingBuilding(owned, building))
+                nextConstruction = _buildings[building];
+        if (nextConstruction is null && !RequiresCargoReplacementReserve(owned, configuration) &&
+            CanPlanExpansion(owned, economy, owned.Units.Count, configuration))
+        {
+            if (SelectUnsupportedRemoteHub(context, owned, controller.HomePosition, 500, 260).HasValue)
+                nextConstruction = _buildings[BuildingIds.SupplyDepot];
+            else if (CountRemoteBuildings(context, owned, BuildingIds.LogisticsHub, controller.HomePosition, 500) < 2)
+                nextConstruction = _buildings[BuildingIds.LogisticsHub];
+        }
+
+        LogisticsStockPriority ConstructionPriority(ResourceId resource)
+        {
+            if (nextConstruction is null || !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage storage))
+                return LogisticsStockPriority.High;
+            foreach (BuildingResourceCost cost in nextConstruction.Costs)
+                if (cost.ResourceId == resource && (nextConstruction.Id == BuildingIds.PowerPlant ||
+                    _inventories.GetAvailableQuantity(storage.InventoryId, resource) + 1e-9 < cost.Quantity))
+                    return LogisticsStockPriority.Critical;
+            return LogisticsStockPriority.High;
+        }
 
         if (context.Entities.IsAlive(
                 controller.PreferredConstructionSource))
@@ -3362,7 +3096,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 220.0,
                 650.0,
                 1_100.0,
-                constructionRawPriority);
+                ConstructionPriority(ResourceIds.FerrousOre));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3371,7 +3105,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 140.0,
                 450.0,
                 800.0,
-                constructionRawPriority);
+                ConstructionPriority(ResourceIds.Volatiles));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3380,7 +3114,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 140.0,
                 450.0,
                 800.0,
-                constructionRawPriority);
+                ConstructionPriority(ResourceIds.Silicates));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3389,7 +3123,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 220.0,
                 500.0,
                 1_000.0,
-                LogisticsStockPriority.High);
+                ConstructionPriority(ResourceIds.Steel));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3398,7 +3132,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 160.0,
                 360.0,
                 600.0,
-                LogisticsStockPriority.High);
+                ConstructionPriority(ResourceIds.Electronics));
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3447,9 +3181,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     80.0,
                     220.0,
                     450.0,
-                    powerRecoveryRequired
-                        ? LogisticsStockPriority.High
-                        : LogisticsStockPriority.Critical);
+                    !powerRecoveryRequired && fuelProductionRecoveryRequired
+                        ? LogisticsStockPriority.Critical
+                        : LogisticsStockPriority.High);
             }
 
             if (facility.Supports(
@@ -3520,10 +3254,20 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             bool blockedLogisticsProduction =
                 facility.Supports(UnitProductionCapability.Logistics) &&
                 facility.Status == UnitProductionStatus.NoInput;
+            bool initialVehiclePipeline = facility.Status == UnitProductionStatus.Running &&
+                facility.Supports(UnitProductionCapability.Vehicle) &&
+                (GetUnitCount(owned, UnitIds.SupplyTruck) < configuration.MinimumSupplyTrucks ||
+                 GetUnitCount(owned, UnitIds.ScoutVehicle) < 1 ||
+                 GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits);
+            bool formingInitialForce = plannedUnit == UnitIds.RifleSquad &&
+                facility.Status == UnitProductionStatus.NoInput &&
+                context.Entities.TryGetComponent(entity, out PowerConsumer productionPower) && productionPower.State == PowerOperationalState.Powered &&
+                GetUnitCount(owned, UnitIds.RifleSquad) < Math.Max(1,
+                    configuration.MinimumAttackUnits - configuration.MinimumObjectivePressureUnits);
             LogisticsStockPriority productionPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||
-                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction
+                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction || formingInitialForce || initialVehiclePipeline
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 
@@ -3550,7 +3294,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             LogisticsStockPriority fuelPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||
-                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction
+                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction || formingInitialForce || initialVehiclePipeline
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 
@@ -3637,8 +3381,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             resource,
             ref minimum);
 
+        double needed = Math.Max(UnitCost(plannedUnit, resource), UnitCost(facility.ActiveUnit, resource));
+        UnitId successor = ResolveQueuedSuccessor(context.Entities, entity, facility);
+        if (successor.IsSpecified)
+            needed = UnitCost(facility.ActiveUnit, resource) + UnitCost(successor, resource);
+        minimum = Math.Max(minimum, needed);
         target = Math.Max(target, minimum);
         maximum = Math.Max(maximum, target);
+        if (priority == LogisticsStockPriority.Critical && facility.Status == UnitProductionStatus.NoInput &&
+            (needed <= 1e-9 || _inventories.GetAvailableQuantity(facility.InputInventory, resource) + 1e-9 >= needed))
+            priority = LogisticsStockPriority.High;
         SetStockPolicy(
             context,
             facility.Owner,
@@ -3650,6 +3402,34 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             priority);
     }
 
+    private double UnitCost(UnitId unitId, ResourceId resource)
+    {
+        if (_units.TryGet(unitId, out UnitDefinition? unit))
+            foreach (UnitResourceCost cost in unit.Costs)
+                if (cost.ResourceId == resource) return cost.Quantity;
+        return 0;
+    }
+
+    private static UnitId ResolveQueuedSuccessor(EntityRegistry entities, EntityId factory, in UnitProductionFacility facility)
+    {
+        if (!facility.ActiveRequest.IsValid) return UnitId.None;
+        EntityId selected = EntityId.Invalid;
+        UnitProductionRequest best = default;
+        foreach (EntityId entity in entities.Query<UnitProductionRequest>(QueryIterationOrder.StableByEntityIndex))
+        {
+            var request = entities.GetComponent<UnitProductionRequest>(entity);
+            if (request.Facility != factory || entity == facility.ActiveRequest ||
+                entities.HasComponent<UnitProductionCancellationRequest>(entity)) continue;
+            if (!selected.IsValid || request.Priority.CompareTo(best.Priority) < 0 ||
+                request.Priority == best.Priority && (request.SubmittedAtTick < best.SubmittedAtTick ||
+                    request.SubmittedAtTick == best.SubmittedAtTick && entity < selected))
+            {
+                selected = entity;
+                best = request;
+            }
+        }
+        return selected.IsValid ? best.UnitId : UnitId.None;
+    }
     private UnitId ResolveUnitProductionPlanningUnit(
         OwnedState owned,
         in UnitProductionFacility facility,
@@ -3739,17 +3519,20 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
+    private static int ResolveCargoFleetTarget(OwnedState owned, SkirmishOpponentConfiguration configuration,
+        bool reserveForExpansion = false)
+    {
+        int industry = owned.CombatUnits.Count > configuration.MinimumAttackUnits &&
+            GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits
+            ? Math.Min(owned.ProductionFacilities.Count, reserveForExpansion ? 4 : 3) : Math.Min(owned.ProductionFacilities.Count, 3);
+        int demand = Math.Max(owned.SupplyDepots.Count + (reserveForExpansion ? 1 : 0), industry);
+        return Math.Max(configuration.MinimumCargoTrucks, Math.Clamp(demand, 2, 4));
+    }
     private static bool RequiresCargoReplacementReserve(
         OwnedState owned,
         SkirmishOpponentConfiguration configuration)
     {
-        int cargoTarget =
-            Math.Max(
-                configuration.MinimumCargoTrucks,
-                Math.Clamp(
-                    owned.SupplyDepots.Count,
-                    2,
-                    4));
+        int cargoTarget = ResolveCargoFleetTarget(owned, configuration);
 
         // Queued vehicles cannot haul their own missing production inputs.
         return GetUnitCount(
@@ -4452,13 +4235,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitId.None;
         }
 
-        int cargoTarget =
-            Math.Max(
-                configuration.MinimumCargoTrucks,
-                Math.Clamp(
-                    owned.SupplyDepots.Count,
-                    2,
-                    4));
+        int cargoTarget = ResolveCargoFleetTarget(owned, configuration);
         int cargoCount =
             GetUnitCount(
                 owned,
@@ -4679,11 +4456,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 [UnitIds.RifleSquad] = 6,
                 [UnitIds.CombatEngineer] = 1,
                 [UnitIds.ScoutVehicle] = 2,
-                [UnitIds.CargoTruck] =
-                    Math.Clamp(
-                        owned.SupplyDepots.Count + 1,
-                        2,
-                        4),
+                [UnitIds.CargoTruck] = ResolveCargoFleetTarget(owned, configuration, reserveForExpansion: true),
                 [UnitIds.SupplyTruck] =
                     configuration.ResolveMatureSupplyTruckTarget(
                         owned.SupplyDepots.Count),
@@ -4734,6 +4507,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         BuildingId buildingId,
         Vector3? requestedPosition)
     {
+        int powerPlants = GetBuildingCount(owned, BuildingIds.PowerPlant);
+        if (buildingId != BuildingIds.PowerPlant && powerPlants < MaximumRecoveryPowerPlants &&
+            (powerPlants == 0 || RequiresPowerConstruction(owned)))
+        {
+            // Preserve partial deliveries for the required power plant while
+            // tactical recovery and field support continue independently.
+            return false;
+        }
         if (owned.ConstructionSites.Count > 0 ||
             HasPendingBuildRequest(
                 context,
@@ -4760,7 +4541,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller,
                 buildingId,
                 requestedPosition,
-                out Vector3 position))
+                out Vector3 position, out BuildingOrientation orientation))
         {
             return false;
         }
@@ -4770,7 +4551,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller.Player,
                 buildingId,
                 position,
-                BuildingOrientation.North,
+                orientation,
                 source,
                 context.Tick);
         command.Execute(context);
@@ -4778,6 +4559,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return command.RequestEntity.IsValid;
     }
 
+    private Vector3 ResolveExtractorServiceSite(in BattlefieldResourceDepositDefinition deposit)
+    {
+        float depth = _buildings[BuildingIds.Extractor].Footprint.Depth;
+        return deposit.Center + new Vector3(0, 0, deposit.HalfExtents.Z - depth * 0.5f);
+    }
     private bool TryIssueExtractor(
         SimulationContext context,
         SkirmishOpponentController controller,
@@ -4807,7 +4593,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                    controller,
                    owned,
                    BuildingIds.Extractor,
-                   deposit.Value.Center);
+                   ResolveExtractorServiceSite(deposit.Value));
     }
 
     private bool TryIssueNearestContestedExtractor(
@@ -4835,7 +4621,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                    controller,
                    owned,
                    BuildingIds.Extractor,
-                   deposit.Value.Center);
+                   ResolveExtractorServiceSite(deposit.Value));
     }
 
     private bool TrySelectConstructionSource(
@@ -4938,22 +4724,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SkirmishOpponentController controller,
         BuildingId buildingId,
         Vector3? requestedPosition,
-        out Vector3 placement)
+        out Vector3 placement, out BuildingOrientation orientation)
     {
+        orientation = BuildingOrientation.North;
         if (requestedPosition.HasValue)
         {
             BuildingPlacementResult direct =
-                _placement.Evaluate(
-                    context.Entities,
-                    controller.Player,
-                    buildingId,
-                    requestedPosition.Value,
-                    BuildingOrientation.North);
+                EvaluateLoadingPlacement(context, controller, buildingId, requestedPosition.Value);
 
             if (direct.IsValid)
             {
                 placement =
                     direct.GroundPosition;
+                orientation = direct.Orientation;
                 return true;
             }
 
@@ -4994,17 +4777,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         offset.Y);
 
                 BuildingPlacementResult nearby =
-                    _placement.Evaluate(
-                        context.Entities,
-                        controller.Player,
-                        buildingId,
-                        candidate,
-                        BuildingOrientation.North);
+                    EvaluateLoadingPlacement(context, controller, buildingId, candidate);
 
                 if (nearby.IsValid)
                 {
                     placement =
                         nearby.GroundPosition;
+                    orientation = nearby.Orientation;
                     return true;
                 }
             }
@@ -5060,13 +4839,27 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             new(-440.0f, 60.0f)
         ];
 
+        bool loadingBuilding = _buildings[buildingId].LoadingDock.HasValue;
+        if (loadingBuilding)
+        {
+            Vector2[] nearbyAccess =
+            [
+                new(0, 96), new(96, 0), new(-96, 0), new(0, -96),
+                new(96, 96), new(-96, 96), new(96, -96), new(-96, -96),
+                new(0, 192), new(192, 0), new(-192, 0), new(0, -192),
+                new(96, 192), new(-96, 192), new(192, 96), new(-192, 96),
+                new(96, -192), new(-96, -192), new(192, -96), new(-192, -96)
+            ];
+            offsets = nearbyAccess.Concat(offsets).ToArray();
+        }
+
         for (int index = 0;
              index < offsets.Length;
              index++)
         {
             Vector2 offset =
                 offsets[
-                    (index +
+                    loadingBuilding ? index : (index +
                      (int)buildingId.Value) %
                     offsets.Length];
 
@@ -5078,23 +4871,37 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     offset.Y);
 
             BuildingPlacementResult result =
-                _placement.Evaluate(
-                    context.Entities,
-                    controller.Player,
-                    buildingId,
-                    candidate,
-                    BuildingOrientation.North);
+                EvaluateLoadingPlacement(context, controller, buildingId, candidate);
 
             if (result.IsValid)
             {
                 placement =
                     result.GroundPosition;
+                orientation = result.Orientation;
                 return true;
             }
         }
 
         placement = default;
         return false;
+    }
+
+    private BuildingPlacementResult EvaluateLoadingPlacement(SimulationContext context,
+        SkirmishOpponentController controller, BuildingId buildingId, Vector3 position)
+    {
+        var definition = _buildings[buildingId];
+        if (buildingId == BuildingIds.Extractor || definition.LoadingDock is not BuildingLoadingDock dock)
+            return _placement.Evaluate(context.Entities, controller.Player, buildingId, position, BuildingOrientation.North);
+        BuildingOrientation preferred = dock.OrientationToward(controller.HomePosition - position);
+        var first = _placement.Evaluate(context.Entities, controller.Player, buildingId, position, preferred);
+        if (first.IsValid) return first;
+        for (int index = 1; index < 4; index++)
+        {
+            var candidate = _placement.Evaluate(context.Entities, controller.Player, buildingId, position,
+                (BuildingOrientation)(((int)preferred + index) % 4));
+            if (candidate.IsValid) return candidate;
+        }
+        return first;
     }
 
     private static bool HasPendingBuildRequest(

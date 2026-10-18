@@ -22,7 +22,7 @@ public sealed class CargoTransportApproachTests
 
         // A detour changes which edge point is closest, not the requested visit.
         fixture.Simulation.Entities.SetComponent(fixture.Truck,
-            new WorldTransform(new Vector3(0.0f, 0.0f, 90.0f), Quaternion.Identity, Vector3.One));
+            fixture.Simulation.Entities.GetComponent<WorldTransform>(fixture.Truck) with { Position = new(0, 0, 90) });
         fixture.Simulation.AdvanceOneTick();
 
         Assert.Equal(original, fixture.Simulation.Entities.GetComponent<MovementOrder>(fixture.Truck));
@@ -34,18 +34,18 @@ public sealed class CargoTransportApproachTests
     }
 
     [Fact]
-    public void InterruptedApproachCanBeIssuedAgainFromTheCurrentPosition()
+    public void InterruptedDockApproachKeepsTheAuthoredEntry()
     {
         var fixture = new Fixture();
         fixture.Simulation.AdvanceOneTick();
         MovementOrder original = fixture.Simulation.Entities.GetComponent<MovementOrder>(fixture.Truck);
         fixture.Simulation.Entities.RemoveComponent<MovementOrder>(fixture.Truck);
         fixture.Simulation.Entities.SetComponent(fixture.Truck,
-            new WorldTransform(new Vector3(0.0f, 0.0f, 90.0f), Quaternion.Identity, Vector3.One));
+            fixture.Simulation.Entities.GetComponent<WorldTransform>(fixture.Truck) with { Position = new(0, 0, 90) });
         fixture.Simulation.AdvanceOneTick();
 
         MovementOrder replacement = fixture.Simulation.Entities.GetComponent<MovementOrder>(fixture.Truck);
-        Assert.NotEqual(original.WorldTarget, replacement.WorldTarget);
+        Assert.Equal(original.WorldTarget, replacement.WorldTarget);
         Assert.Equal(fixture.Simulation.CurrentTick, replacement.AcceptedAtTick);
         Assert.Equal(100.0, fixture.Inventories.GetQuantity(fixture.SourceInventory, ResourceIds.Steel));
     }
@@ -63,6 +63,8 @@ public sealed class CargoTransportApproachTests
             Vector3 position = new(200.0f, 0.0f, 100.0f);
             Simulation.Entities.AddComponent(source, new WorldTransform(position, Quaternion.Identity, Vector3.One));
             Simulation.Entities.AddComponent(source, new InventoryStorage(SourceInventory));
+            Simulation.Entities.AddComponent(source, new CompletedBuilding(BuildingIds.StorageDepot, Owner, SimulationTick.Zero));
+            Simulation.Entities.AddComponent(source, new BuildingLoadingDock(new(0, 0, 12.5f), Vector3.UnitX, 18));
             Simulation.Entities.AddComponent(source, new SpatialPresence(new Vector3(8.0f, 4.0f, 8.0f),
                 new SpatialEntryMetadata(Owner.Value, 0, SpatialMobility.Static)));
             LogisticsNodeId origin = network.AddNode(source, position, LogisticsNodeKind.StorageDepot,

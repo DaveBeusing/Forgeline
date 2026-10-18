@@ -17,7 +17,7 @@ public sealed class CargoTransportSystemTests
     [InlineData(14.0f)]
     [InlineData(16.0f)]
     [InlineData(18.0f)]
-    public void LoadsNearStaticApproachWhileAnActiveMovementOrderRemains(float buildingWidth)
+    public void RadiusArrivalWithoutLoadingGeometryCannotStartLoading(float buildingWidth)
     {
         TransportFixture fixture = CreateFixture(
             sourceQuantity: 80.0,
@@ -54,7 +54,7 @@ public sealed class CargoTransportSystemTests
 
         fixture.Simulation.AdvanceOneTick();
 
-        Assert.Equal(CargoTransportLifecycleState.Loading,
+        Assert.Equal(CargoTransportLifecycleState.ToOrigin,
             fixture.Simulation.Entities.GetComponent<CargoTransportRuntimeState>(truck).Lifecycle);
         Assert.False(fixture.Simulation.Entities.HasComponent<NavigationPendingPath>(truck));
         Assert.Equal(80.0, fixture.TotalConservedQuantity(truck));

@@ -79,7 +79,8 @@ public enum PlayerWorkKind : byte
     None = 0,
     Construction = 1,
     UnitProduction = 2,
-    Processing = 3
+    Processing = 3,
+    Docking = 4
 }
 
 public enum PlayerWorkState : byte
@@ -745,6 +746,40 @@ public static class PlayerExperienceSnapshotFactory
         UnitDefinitionCatalog units,
         BuildingDefinitionCatalog buildings)
     {
+        if (entities.TryGetComponent(entity, out VehicleDockVisit dock))
+        {
+            string activity = dock.Status switch
+            {
+                VehicleDockStatus.Busy => "Loading bay busy",
+                VehicleDockStatus.Blocked => "Loading bay blocked",
+                VehicleDockStatus.Reserved => "Approaching loading bay",
+                VehicleDockStatus.Approaching => "Dock approach",
+                VehicleDockStatus.Aligning => "Aligning",
+                VehicleDockStatus.Servicing => "Loading / unloading",
+                VehicleDockStatus.Exiting => "Leaving loading bay",
+                _ => "Docked"
+            };
+            bool blocked = dock.Status is VehicleDockStatus.Busy or VehicleDockStatus.Blocked ||
+                dock.Reason is VehicleDockBlockReason.SourceEmpty or VehicleDockBlockReason.TargetFull or VehicleDockBlockReason.ExitBlocked;
+            string reason = dock.Reason switch
+            {
+                VehicleDockBlockReason.SourceEmpty => "Source empty",
+                VehicleDockBlockReason.TargetFull => "Target full",
+                VehicleDockBlockReason.ExitBlocked => "Exit blocked",
+                VehicleDockBlockReason.MissingGeometry => "No loading bay",
+                VehicleDockBlockReason.InvalidOwner => "Loading source unavailable",
+                VehicleDockBlockReason.Obstructed => "Loading lane blocked",
+                VehicleDockBlockReason.OutsideTerrain => "Loading lane terrain blocked",
+                VehicleDockBlockReason.PoseLost => "Realigning",
+                VehicleDockBlockReason.None => string.Empty,
+                _ => dock.Reason.ToString()
+            };
+            return new(PlayerWorkKind.Docking, blocked ? PlayerWorkState.Blocked : PlayerWorkState.Running,
+                dock.ServiceProgress, activity, reason);
+        }
+        if (entities.TryGetComponent(entity, out SupplyLoadingOrder loading) && loading.WaitReason != VehicleDockBlockReason.None)
+            return new(PlayerWorkKind.Docking, PlayerWorkState.Blocked, 0, "Waiting for loading bay",
+                loading.WaitReason == VehicleDockBlockReason.TargetFull ? "Target full" : "Source empty");
         if (entities.TryGetComponent(
                 entity,
                 out ConstructionSite construction))

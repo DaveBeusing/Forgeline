@@ -53,7 +53,7 @@ public static class MatchPersistenceService
             scenario.Simulation.Random.State,
             scenario.Replay.CaptureCommands(),
             scenario.GetMatchState(),
-            state.ComputeSha256());
+            state.ComputeSha256(), MatchAuthoritativeSnapshot.CurrentSchemaVersion);
     }
 
     public static MatchRuntime Restore(
@@ -595,6 +595,9 @@ public static class MatchPersistenceService
 
         ValidateSchema(
             replay.SchemaVersion);
+        if (replay.AuthoritativeSchemaVersion != MatchAuthoritativeSnapshot.CurrentSchemaVersion)
+            throw Failure(MatchPersistenceFailureReason.IncompatibleVersion,
+                "Replay uses a different authoritative simulation contract. Pre-docking checkpoints cannot be replayed by the docking simulation.");
         ArgumentNullException.ThrowIfNull(
             replay.Configuration);
         ArgumentNullException.ThrowIfNull(

@@ -7,12 +7,16 @@ Physical cargo transport connects aggregate inventories through visible ground t
 Cargo remains an aggregate quantity inside a Cargo Truck inventory. Resources move between distant economic inventories only through the sequence:
 
 1. travel to an origin logistics node;
-2. load by an atomic inventory transfer into the truck;
+2. claim the origin loading lane, settle and load through timed atomic batches;
 3. follow the selected logistics route through authoritative ground navigation;
-4. arrive at the destination;
-5. unload by atomic inventory transfer into the destination inventory.
+4. exit the origin lane and claim the destination loading lane;
+5. settle, unload through timed atomic batches and physically clear the exit.
 
 The transport lifecycle runs in the fixed-tick simulation and does not depend on rendering, UI, audio, or wall-clock time.
+
+Building service uses the shared [vehicle docking contract](VehicleDocking.md).
+Logical transit nodes retain their existing semantics. A building encountered as
+an intermediate route node also retains its slot until confirmed exit.
 
 ## Cargo Truck Definition
 

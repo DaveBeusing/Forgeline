@@ -9,7 +9,7 @@ namespace ForgeLine.Game;
 public static class MatchPersistenceSerializer
 {
     public const int CurrentFormatVersion = 1;
-    public const int CurrentSchemaVersion = 2;
+    public const int CurrentSchemaVersion = 3;
     public const string Magic = "FORGELINE_MATCH";
 
     private const long MaximumDocumentBytes =
@@ -191,7 +191,7 @@ public static class MatchPersistenceSerializer
         JsonNode root = JsonNode.Parse(payload) ?? throw new JsonException("Empty match payload.");
         if (root["SchemaVersion"]?.GetValue<int>() != 1)
         {
-            if (root["SchemaVersion"]?.GetValue<int>() == 2 &&
+            if (root["SchemaVersion"]?.GetValue<int>() >= 2 &&
                 string.IsNullOrWhiteSpace(root["Configuration"]?["CompositionKey"]?.GetValue<string>()))
             {
                 throw new JsonException("Missing match composition identity.");

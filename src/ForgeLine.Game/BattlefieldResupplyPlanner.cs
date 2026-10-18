@@ -102,6 +102,15 @@ public static class BattlefieldResupplyPlanner
                     recipientTransform.Position,
                     transform.Position);
 
+            if (distanceSquared > provider.ResupplyRangeMeters * provider.ResupplyRangeMeters &&
+                context.Entities.TryGetComponent(candidate, out SupplyLoadingOrder loading) &&
+                (loading.WaitReason == VehicleDockBlockReason.None ||
+                 VehicleDockingService.HasExclusiveLoadingVisit(context.Entities, candidate)))
+            {
+                rejections |= ResupplyProviderRejection.ProviderBusy;
+                rejectedProviders++;
+                continue;
+            }
             bool canReachProvider = CanReachProvider(
                 context, inventories, recipient, distanceSquared, provider.ResupplyRangeMeters);
             if (!canReachProvider)
@@ -227,6 +236,7 @@ public static class BattlefieldResupplyPlanner
 
         if (recipientCanReachProvider)
         {
+            VehicleDockingService.Suspend(context.Entities, recipient);
             Vector3 approachPosition =
                 ResolveProviderApproachPosition(
                     recipientTransform.Position,
@@ -242,6 +252,7 @@ public static class BattlefieldResupplyPlanner
         }
         else
         {
+            VehicleDockingService.Suspend(context.Entities, providerEntity);
             TacticalCommandUtilities.ClearMovementIntent(
                 context,
                 recipient);
@@ -349,6 +360,7 @@ public static class BattlefieldResupplyPlanner
 
         if (context.Entities.HasComponent<SupplyTruck>(candidate))
         {
+            if (context.Entities.HasComponent<CargoTransportOrder>(candidate)) return ResupplyProviderRejection.ProviderBusy;
             if (context.Entities.HasComponent<ResupplyOrder>(candidate))
             {
                 return ResupplyProviderRejection.ProviderRefueling;
@@ -414,6 +426,7 @@ public static class BattlefieldResupplyPlanner
                 provider) ||
             !context.Entities.HasComponent<GroundMovement>(
                 provider) ||
+            VehicleDockingService.HasExclusiveLoadingVisit(context.Entities, provider) ||
             context.Entities.HasComponent<ResupplyOrder>(
                 provider) ||
             SupplyRescueTravel.IsDeferred(

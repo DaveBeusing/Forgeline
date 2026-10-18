@@ -18,6 +18,14 @@ public static class BuildingConstructionDebugVisualization
             : invalidColor;
 
         debugDraw.Box(preview.Bounds, color);
+        if (preview.LoadingCorridor is ForgeLine.World.AxisAlignedBounds corridor)
+        {
+            var outline = new ForgeLine.World.AxisAlignedBounds(
+                new(corridor.Minimum.X, preview.GroundPosition.Y + 0.1f, corridor.Minimum.Z),
+                new(corridor.Maximum.X, preview.GroundPosition.Y + 0.3f, corridor.Maximum.Z));
+            debugDraw.Box(outline, color);
+            debugDraw.Label(outline.Center, "LOADING LANE - KEEP CLEAR", color);
+        }
 
         if (!preview.IsValid)
         {

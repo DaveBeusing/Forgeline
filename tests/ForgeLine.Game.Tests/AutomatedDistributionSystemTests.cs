@@ -14,6 +14,23 @@ public sealed class AutomatedDistributionSystemTests
     private static readonly PlayerId LocalPlayer = new(1);
     private static readonly FactionId LocalFaction = new(1);
 
+    [Fact]
+    public void OutstandingRequestTracksPolicyPriorityAfterTheMinimumIsCovered()
+    {
+        var fixture = CreateFixture(sourceQuantity: 100);
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        fixture.AddPolicy(fixture.DestinationEntity, 20, 80, 100, LogisticsStockPriority.Critical);
+        fixture.Simulation.AdvanceOneTick();
+        Assert.Equal(LogisticsStockPriority.Critical, Assert.Single(fixture.Distribution.LastDebugSnapshot.Requests).Priority);
+        foreach (var entity in fixture.Simulation.Entities.Query<LogisticsStockPolicy>())
+            fixture.Simulation.Entities.SetComponent(entity, new LogisticsStockPolicy(fixture.DestinationEntity,
+                ResourceIds.FerrousOre, 20, 80, 100, LogisticsStockPriority.High));
+        fixture.Simulation.AdvanceOneTick();
+        var request = Assert.Single(fixture.Distribution.LastDebugSnapshot.Requests);
+        Assert.Equal(LogisticsStockPriority.High, request.Priority);
+        Assert.Equal(80, request.RequestedQuantity);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

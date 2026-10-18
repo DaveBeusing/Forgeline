@@ -11,10 +11,246 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishSupplyPolicyTests
 {
     [Theory]
-    [InlineData(false, false)]
-    [InlineData(true, false)]
-    [InlineData(true, true)]
-    public void UnaffordableForwardRetreatWaitsForPhysicalMobileResupply(bool reconnaissance, bool partialRecovery)
+    [InlineData(true, true, true)]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, true)]
+    [InlineData(true, true, false)]
+    public void StrategicCadenceReconsidersAnEmptySourceEvenWhenSupplyRetriesFallBetweenDecisions(
+        bool sourceEmpty, bool retryDue, bool coreStocked)
+    {
+        using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(1));
+        var position = entities.GetComponent<WorldTransform>(side.CommandCore).Position + Vector3.UnitX * 200;
+        var inventory = scenario.Inventories.CreateInventory(new InventorySpecification(4_000));
+        EntityId depot = entities.CreateEntity();
+        entities.AddComponent(depot, new WorldTransform(position, Quaternion.Identity, Vector3.One));
+        entities.AddComponent(depot, new CompletedBuilding(BuildingIds.SupplyDepot, side.Player, SimulationTick.Zero));
+        entities.AddComponent(depot, new ControllableEntity(side.Player, ControllableEntityCategory.Building));
+        entities.AddComponent(depot, new InventoryStorage(inventory));
+        entities.AddComponent(depot, new SupplyDepot(inventory, side.Player));
+        entities.AddComponent(depot, Assert.IsType<BuildingLoadingDock>(DirectorateContent.CreateBuildingCatalog()[BuildingIds.SupplyDepot].LoadingDock));
+        if (!coreStocked)
+            foreach (var resource in new[] { ResourceIds.Fuel, ResourceIds.Ammunition })
+                Assert.True(scenario.Inventories.Remove(side.StartingInventory, resource,
+                    scenario.Inventories.GetAvailableQuantity(side.StartingInventory, resource)).Succeeded);
+        EntityId truck = scenario.UnitFactory.Create(DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck],
+            position + Vector3.UnitZ * 30, side.Player);
+        var supply = entities.GetComponent<SupplyTruck>(truck);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, 100).Succeeded);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, 80).Succeeded);
+        var original = new SupplyLoadingOrder(depot, SimulationTick.Zero,
+            sourceEmpty ? VehicleDockBlockReason.SourceEmpty : VehicleDockBlockReason.TargetFull,
+            sourceEmpty ? (retryDue ? 0UL : 2UL) : 1_000UL);
+        entities.AddComponent(truck, original);
+        scenario.Simulation.RunTicks(52, TestContext.Current.CancellationToken);
+        var current = entities.GetComponent<SupplyLoadingOrder>(truck);
+        Assert.Equal(sourceEmpty && coreStocked ? side.CommandCore : depot, current.Source);
+        Assert.Equal(100, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel));
+        Assert.Equal(80, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition));
+        if (current.Source == side.CommandCore) Assert.Equal(VehicleDockBlockReason.None, current.WaitReason);
+    }
+
+    [Theory]
+    [InlineData(false, true, false, true)]
+    [InlineData(true, true, false, false)]
+    [InlineData(false, false, false, false)]
+    [InlineData(false, true, true, false)]
+    public void SupplyLoadingPrefersAStockedSourceBeforeDistanceAndRetainsPartialFallback(
+        bool depotHasAmmunition, bool coreHasAmmunition, bool truckHasAmmunition, bool useCore)
+    {
+        using MatchRuntime scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(1));
+        var position = entities.GetComponent<WorldTransform>(side.CommandCore).Position + Vector3.UnitX * 200;
+        if (!coreHasAmmunition)
+            Assert.True(scenario.Inventories.Remove(side.StartingInventory, ResourceIds.Ammunition,
+                scenario.Inventories.GetAvailableQuantity(side.StartingInventory, ResourceIds.Ammunition)).Succeeded);
+        var inventory = scenario.Inventories.CreateInventory(new InventorySpecification(4_000));
+        EntityId depot = entities.CreateEntity();
+        entities.AddComponent(depot, new WorldTransform(position, Quaternion.Identity, Vector3.One));
+        entities.AddComponent(depot, new CompletedBuilding(BuildingIds.SupplyDepot, side.Player, SimulationTick.Zero));
+        entities.AddComponent(depot, new ControllableEntity(side.Player, ControllableEntityCategory.Building));
+        entities.AddComponent(depot, new InventoryStorage(inventory));
+        entities.AddComponent(depot, new SupplyDepot(inventory, side.Player));
+        entities.AddComponent(depot, Assert.IsType<BuildingLoadingDock>(DirectorateContent.CreateBuildingCatalog()[BuildingIds.SupplyDepot].LoadingDock));
+        var definition = DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck];
+        Assert.True(scenario.Inventories.Add(inventory, ResourceIds.Fuel, definition.SupplyFuelTarget).Succeeded);
+        if (depotHasAmmunition)
+            Assert.True(scenario.Inventories.Add(inventory, ResourceIds.Ammunition, definition.SupplyAmmunitionTarget).Succeeded);
+        EntityId truck = scenario.UnitFactory.Create(definition, position + Vector3.UnitZ * 30, side.Player);
+        if (truckHasAmmunition)
+            Assert.True(scenario.Inventories.Add(entities.GetComponent<SupplyTruck>(truck).InventoryId,
+                ResourceIds.Ammunition, definition.SupplyAmmunitionTarget).Succeeded);
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+        Assert.Equal(useCore ? side.CommandCore : depot, entities.GetComponent<SupplyLoadingOrder>(truck).Source);
+    }
+    [Fact]
+    public void ExpansionFundingKeepsPartialHubCostsAheadOfOptionalExtractors()
+    {
+        using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation), seed: 2026);
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(2));
+        Assert.True(scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, side.Player),
+            24_000, TestContext.Current.CancellationToken));
+        void SetAvailable(ResourceId resource, double quantity)
+        {
+            double current = scenario.Inventories.GetAvailableQuantity(side.StartingInventory, resource);
+            if (current < quantity) Assert.True(scenario.Inventories.Add(side.StartingInventory, resource, quantity - current).Succeeded);
+            else if (current > quantity) Assert.True(scenario.Inventories.Remove(side.StartingInventory, resource, current - quantity).Succeeded);
+        }
+        List<ConstructionSite> Sites()
+        {
+            var result = new List<ConstructionSite>();
+            foreach (var entity in entities.Query<ConstructionSite>())
+            {
+                var site = entities.GetComponent<ConstructionSite>(entity);
+                if (site.Owner == side.Player) result.Add(site);
+            }
+            return result;
+        }
+        var costs = scenario.Services.BuildingDefinitions[BuildingIds.LogisticsHub].Costs;
+        double oreRequired = costs.Single(cost => cost.ResourceId == ResourceIds.FerrousOre).Quantity;
+        double partial = scenario.Services.BuildingDefinitions[BuildingIds.Extractor].Costs.Single(cost => cost.ResourceId == ResourceIds.FerrousOre).Quantity;
+        Assert.True(partial < oreRequired);
+        foreach (var cost in costs) SetAvailable(cost.ResourceId, cost.ResourceId == ResourceIds.FerrousOre ? partial : cost.Quantity);
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+        Assert.Empty(Sites());
+        Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, side.CommandCore, ResourceIds.FerrousOre).Priority);
+        Assert.Equal(LogisticsStockPriority.High, FindStockPolicy(entities, side.CommandCore, ResourceIds.Silicates).Priority);
+        Assert.Equal(LogisticsStockPriority.High, FindStockPolicy(entities, side.CommandCore, ResourceIds.Volatiles).Priority);
+        Assert.InRange(scenario.Inventories.GetAvailableQuantity(side.StartingInventory, ResourceIds.FerrousOre), partial, oreRequired - 1);
+        SetAvailable(ResourceIds.FerrousOre, oreRequired);
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+        Assert.Contains(Sites(), site => site.BuildingId == BuildingIds.LogisticsHub && site.SourceInventory == side.StartingInventory);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void PowerRecoveryKeepsPartialTruckloadsInsteadOfBuildingMoreUnpoweredExtractors(bool alreadyUnderpowered)
+    {
+        var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using var scenario = CentralDivideScenario.Create(settings with
+        {
+            OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(settings.OpponentConfigurations)
+            {
+                [1] = settings.OpponentConfigurations[1] with { ReactionCadenceTicks = 1 }
+            }
+        });
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new ForgeLine.Game.PlayerId(1));
+        var catalog = scenario.Services.BuildingDefinitions;
+        double partial = catalog[BuildingIds.Extractor].Costs.Single(cost => cost.ResourceId == ResourceIds.FerrousOre).Quantity;
+        double required = catalog[BuildingIds.PowerPlant].Costs.Single(cost => cost.ResourceId == ResourceIds.FerrousOre).Quantity;
+        Assert.True(partial < required);
+        Assert.True(scenario.Inventories.Remove(side.StartingInventory, ResourceIds.FerrousOre,
+            scenario.Inventories.GetQuantity(side.StartingInventory, ResourceIds.FerrousOre)).Succeeded);
+        Assert.True(scenario.Inventories.Add(side.StartingInventory, ResourceIds.FerrousOre, partial).Succeeded);
+        var membership = entities.GetComponent<PowerNetworkMembership>(side.CommandCore);
+        var competingStock = scenario.Inventories.CreateInventory(new InventorySpecification(1_000));
+        var store = entities.CreateEntity();
+        entities.AddComponent(store, entities.GetComponent<WorldTransform>(side.CommandCore) with
+            { Position = entities.GetComponent<WorldTransform>(side.CommandCore).Position + new Vector3(0, 0, 100) });
+        entities.AddComponent(store, new CompletedBuilding(BuildingIds.StorageDepot, side.Player, SimulationTick.Zero));
+        entities.AddComponent(store, new InventoryStorage(competingStock));
+        entities.AddComponent(store, new StorageDepot(competingStock, side.Faction));
+        var policy = entities.CreateEntity();
+        entities.AddComponent(policy, new LogisticsStockPolicy(store, ResourceIds.FerrousOre, required, required, required * 2,
+            LogisticsStockPriority.Critical));
+        foreach (var id in new[] { BuildingIds.PowerPlant, BuildingIds.Radar })
+        {
+            var entity = entities.CreateEntity();
+            entities.AddComponent(entity, entities.GetComponent<WorldTransform>(side.CommandCore));
+            entities.AddComponent(entity, new CompletedBuilding(id, side.Player, SimulationTick.Zero));
+            entities.AddComponent(entity, membership);
+            if (id == BuildingIds.PowerPlant) entities.AddComponent(entity, new PowerGenerator(catalog[id].PowerGeneration));
+            else entities.AddComponent(entity, new PowerConsumer(alreadyUnderpowered ? 100_000 :
+                catalog[BuildingIds.PowerPlant].PowerGeneration - catalog[BuildingIds.CommandCore].PowerDemand - 9,
+                PowerPriority.Industrial));
+        }
+        scenario.Simulation.RunTicks(4, TestContext.Current.CancellationToken);
+        if (!alreadyUnderpowered)
+        {
+            var economy = scenario.Opponents.DebugSnapshot.Single(item => item.Player == side.Player).Economy;
+            Assert.Equal(9, economy.PowerGeneration - economy.PowerDemand);
+            Assert.Equal(0, economy.OfflineConsumers);
+        }
+        Assert.Equal(partial, scenario.Inventories.GetQuantity(side.StartingInventory, ResourceIds.FerrousOre));
+        var sites = new List<ConstructionSite>();
+        foreach (EntityId entity in entities.Query<ConstructionSite>())
+            if (entities.GetComponent<ConstructionSite>(entity).Owner == side.Player)
+                sites.Add(entities.GetComponent<ConstructionSite>(entity));
+        Assert.Empty(sites);
+        Assert.True(scenario.Inventories.Add(side.StartingInventory, ResourceIds.FerrousOre, required - partial).Succeeded);
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+        foreach (EntityId entity in entities.Query<ConstructionSite>())
+            if (entities.GetComponent<ConstructionSite>(entity).Owner == side.Player)
+                sites.Add(entities.GetComponent<ConstructionSite>(entity));
+        Assert.Contains(sites, site => site.BuildingId == BuildingIds.PowerPlant);
+        Assert.Equal(0, scenario.Inventories.GetAvailableQuantity(side.StartingInventory, ResourceIds.FerrousOre));
+        Assert.Equal(required, scenario.Inventories.GetReservedQuantity(side.StartingInventory, ResourceIds.FerrousOre));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void SatisfiedUnitCostDoesNotKeepOptionalStockBufferCritical(bool queuedSuccessor)
+    {
+        var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using var scenario = CentralDivideScenario.Create(settings with
+        {
+            OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(settings.OpponentConfigurations)
+            {
+                [1] = settings.OpponentConfigurations[1] with { ReactionCadenceTicks = 1, MaximumQueuedUnitsPerFacility = 1 }
+            }
+        });
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new ForgeLine.Game.PlayerId(1));
+        var input = scenario.Inventories.CreateInventory(new InventorySpecification(4_000));
+        var tank = DirectorateContent.CreateUnitCatalog()[UnitIds.MainBattleTank];
+        foreach (UnitResourceCost cost in tank.Costs)
+            if (cost.ResourceId != ResourceIds.Steel)
+                Assert.True(scenario.Inventories.Add(input, cost.ResourceId, cost.Quantity).Succeeded);
+        EntityId factory = entities.CreateEntity();
+        entities.AddComponent(factory, entities.GetComponent<WorldTransform>(side.CommandCore));
+        entities.AddComponent(factory, new CompletedBuilding(BuildingIds.VehicleFactory, side.Player, SimulationTick.Zero));
+        entities.AddComponent(factory, new ControllableEntity(side.Player, ControllableEntityCategory.Building));
+        entities.AddComponent(factory, new InventoryStorage(input));
+        entities.AddComponent(factory, new UnitProductionFacility(input, UnitProductionCapability.Vehicle,
+            side.Player, Vector3.UnitZ * 32, SimulationTick.Zero));
+        entities.AddComponent(factory, new PowerNetworkMembership(new PowerNetworkId(10_001)));
+        entities.AddComponent(factory, new PowerGenerator(10));
+        entities.AddComponent(factory, new PowerConsumer(1, PowerPriority.Industrial));
+        var queue = new QueueUnitProductionCommand(side.Player, factory, UnitIds.MainBattleTank, SimulationTick.Zero, ProductionPriority.High);
+        scenario.Simulation.SubmitCommand(queue, SimulationTick.Zero.Next());
+        QueueUnitProductionCommand? next = null;
+        if (queuedSuccessor)
+        {
+            next = new QueueUnitProductionCommand(side.Player, factory, UnitIds.ScoutVehicle, SimulationTick.Zero, ProductionPriority.Normal);
+            scenario.Simulation.SubmitCommand(next, SimulationTick.Zero.Next());
+        }
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+        Assert.True(queue.Accepted);
+        if (next is not null) Assert.True(next.Accepted);
+        Assert.Equal(UnitProductionStatus.NoInput, entities.GetComponent<UnitProductionFacility>(factory).Status);
+        Assert.Equal(UnitIds.MainBattleTank, entities.GetComponent<UnitProductionFacility>(factory).ActiveUnit);
+        LogisticsStockPolicy ammunition = FindStockPolicy(entities, factory, ResourceIds.Ammunition);
+        Assert.Equal(queuedSuccessor ? LogisticsStockPriority.Critical : LogisticsStockPriority.High, ammunition.Priority);
+        Assert.Equal(queuedSuccessor ? 60 : 50, ammunition.DesiredMinimum);
+        Assert.Equal(120, ammunition.DesiredTarget);
+        Assert.Equal(240, ammunition.DesiredMaximum);
+        Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, factory, ResourceIds.Steel).Priority);
+        Assert.Equal(20, scenario.Inventories.GetQuantity(input, ResourceIds.Ammunition));
+    }
+    [Theory]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, true)]
+    [InlineData(true, true, true)]
+    [InlineData(false, false, false)]
+    [InlineData(true, false, false)]
+    [InlineData(true, true, false)]
+    public void UnaffordableForwardRetreatWaitsForPhysicalMobileResupply(bool reconnaissance, bool partialRecovery, bool deepOffensive)
     {
         using MatchRuntime scenario = CentralDivideScenario.Create(
             CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
@@ -26,7 +262,7 @@ public sealed class SkirmishSupplyPolicyTests
             if (entities.GetComponent<SkirmishOpponentController>(controller).Player == owner)
             {
                 var state = entities.GetComponent<SkirmishOpponentState>(controller);
-                entities.SetComponent(controller, state with { DeepOffensiveCommitted = true });
+                entities.SetComponent(controller, state with { DeepOffensiveCommitted = deepOffensive });
             }
         }
 
@@ -78,14 +314,18 @@ public sealed class SkirmishSupplyPolicyTests
         Vector3 home = entities.GetComponent<WorldTransform>(scenario.GetBase(owner).CommandCore).Position;
         EntityId unit = scenario.UnitFactory.Create(
             DirectorateContent.CreateUnitCatalog()[UnitIds.RifleSquad],
-            home + new Vector3(700.0f, 0.0f, 0.0f), owner);
+            home + new Vector3(160.0f, 0.0f, 0.0f), owner);
         UnitFuelState fuel = entities.GetComponent<UnitFuelState>(unit);
         double quantity = scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel);
         Assert.True(scenario.Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel, quantity * 0.8).Succeeded);
+        Assert.True(scenario.Inventories.GetAvailableQuantity(fuel.InventoryId, ResourceIds.Fuel) >= 160 * fuel.ConsumptionPerMeter);
+        scenario.Simulation.SubmitCommand(new RetreatCommand(owner, [unit], home,
+            SimulationTick.Zero, FormationTemplate.Column), SimulationTick.Zero.Next());
 
         scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
         CombatOrderState initial = entities.GetComponent<CombatOrderState>(unit);
         Assert.Equal(CombatOrderKind.Retreat, initial.Kind);
+        Assert.Equal(1UL, initial.AcceptedAtTick.Value);
 
         scenario.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
 
@@ -105,6 +345,7 @@ public sealed class SkirmishSupplyPolicyTests
         EntityId depot = entities.CreateEntity();
         entities.AddComponent(depot, new WorldTransform(new Vector3(420.0f, 0.0f, 1800.0f), Quaternion.Identity, Vector3.One));
         entities.AddComponent(depot, new CompletedBuilding(BuildingIds.SupplyDepot, scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player, SimulationTick.Zero));
+        entities.AddComponent(depot, new BuildingLoadingDock(new(0, 0, 12.5f), Vector3.UnitX, 18));
         entities.AddComponent(depot, new SupplyDepot(inventory, scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         entities.AddComponent(depot, new SpatialPresence(new Vector3(8.0f, 4.0f, 8.0f),
             new SpatialEntryMetadata(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value, 0, SpatialMobility.Static)));
@@ -132,13 +373,18 @@ public sealed class SkirmishSupplyPolicyTests
 
         scenario.Simulation.RunTicks(600, TestContext.Current.CancellationToken);
 
+        Assert.True(scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel) > 0, $"pose={entities.GetComponent<WorldTransform>(truck)}; dock={DockState(entities, truck)}; operational={entities.HasComponent<ResupplyOrder>(truck)}; load={entities.HasComponent<SupplyLoadingOrder>(truck)}");
         Assert.Equal(supply.FuelTarget, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel), precision: 6);
         Assert.Equal(supply.AmmunitionTarget, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition), precision: 6);
         Assert.Equal(600.0 - supply.FuelTarget, scenario.Inventories.GetQuantity(inventory, ResourceIds.Fuel), precision: 6);
         Assert.Equal(800.0 - supply.AmmunitionTarget, scenario.Inventories.GetQuantity(inventory, ResourceIds.Ammunition), precision: 6);
-        Assert.False(
-            entities.HasComponent<MovementOrder>(
-                truck));
+        if (entities.HasComponent<MovementOrder>(truck))
+        {
+            var exiting = entities.GetComponent<VehicleDockVisit>(truck);
+            Assert.Equal(VehicleDockStatus.Exiting, exiting.Status);
+            Assert.Equal(truck, entities.GetComponent<VehicleDockSlot>(depot).Truck);
+        }
+        else Assert.False(entities.HasComponent<SupplyLoadingOrder>(truck));
         Assert.False(
             entities.HasComponent<NavigationPendingPath>(
                 truck));
@@ -181,6 +427,7 @@ public sealed class SkirmishSupplyPolicyTests
                 BuildingIds.SupplyDepot,
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
+        entities.AddComponent(depot, new BuildingLoadingDock(new(0, 0, 12.5f), Vector3.UnitX, 18));
         entities.AddComponent(
             depot,
             new SupplyDepot(
@@ -937,4 +1184,5 @@ public sealed class SkirmishSupplyPolicyTests
         throw new Xunit.Sdk.XunitException(
             $"No stock policy found for target {target} and resource {resource}.");
     }
+    private static string DockState(EntityRegistry entities, EntityId truck) => entities.TryGetComponent(truck, out VehicleDockVisit dock) ? dock.ToString() : "none";
 }

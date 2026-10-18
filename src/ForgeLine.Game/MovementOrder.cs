@@ -15,4 +15,5 @@ public readonly record struct MovementOrder(
     Vector3 WorldTarget,
     SimulationTick SubmittedAtTick,
     SimulationTick AcceptedAtTick,
-    MovementOrderKind Kind = MovementOrderKind.Strategic);
+    MovementOrderKind Kind = MovementOrderKind.Strategic,
+    float? TargetHeadingRadians = null);

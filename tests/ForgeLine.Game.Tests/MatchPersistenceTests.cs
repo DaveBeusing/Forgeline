@@ -10,6 +10,30 @@ namespace ForgeLine.Game.Tests;
 public sealed class MatchPersistenceTests
 {
     [Fact]
+    public void TimedDockServiceRoundTripsThroughSaveAndReplay()
+    {
+        using var original = CreateScenario(seed: 2026);
+        Assert.True(original.RunUntil(runtime =>
+        {
+            foreach (var entity in runtime.Simulation.Entities.Query<VehicleDockVisit>())
+                if (runtime.Simulation.Entities.GetComponent<VehicleDockVisit>(entity).ServiceStartedTick > 0) return true;
+            return false;
+        }, maximumTicks: 5000, cancellationToken: TestContext.Current.CancellationToken));
+        var save = MatchPersistenceService.CaptureSave(original);
+        var replay = MatchPersistenceService.CaptureReplay(original);
+        using var restored = MatchPersistenceService.Restore(MatchPersistenceSerializer.DeserializeSave(
+            MatchPersistenceSerializer.SerializeSave(save)));
+        using var playback = MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(
+            MatchPersistenceSerializer.SerializeReplay(replay)));
+        Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+        Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        original.Simulation.RunTicks(200, TestContext.Current.CancellationToken);
+        restored.Simulation.RunTicks(200, TestContext.Current.CancellationToken);
+        Assert.Equal(MatchAuthoritativeSnapshot.Capture(original).ComputeSha256(),
+            MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+    }
+
+    [Fact]
     public void ActiveMatchSaveRoundTripsAndContinuesDeterministically()
     {
         using MatchRuntime original =
