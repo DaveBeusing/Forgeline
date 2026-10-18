@@ -1,6 +1,6 @@
 # Render foundation qualification
 
-Status: **implemented, not yet accepted**. Parallel start is blocked. No integration,
+Status: **implemented, not yet accepted**. Parallel start is blocked. No further integration,
 protection change, tag or release is performed by this qualification.
 
 ## Identity and immutable behavior
@@ -123,7 +123,7 @@ GPU-fence deadline. Full logs identify this pre-existing software-adapter timeou
 It is not attributed to this refactor and its deadline is not raised. PR CI must
 complete and any introduced failure must be repaired before integration.
 
-The manifest records a functional implementation SHA and a null integrated SHA.
+The manifest records a functional implementation SHA and the actual integrated SHA.
 Only a checked, authorized integration into master and resolution/acceptance of the
 open required gates can update that status and release the eight parallel owners.
 Human native review, the CPU-performance failures and required CI remain explicit.
@@ -137,3 +137,50 @@ Raw manifests, all reference images, per-frame resource/health/CPU/GPU observati
 failed performance comparison and GPU telemetry are retained in [evidence](evidence/).
 Metadata evidence retains its original bytes through a directory-local attributes
 file. Runtime source files and compiled asset formats are unchanged.
+
+## Integrated qualification follow-up
+
+The foundation was merged by PR #236 into master at
+`17810ee192fac495173a7e9da44c973595833f2b` (version 0.1.401). Integration is now
+recorded explicitly in the ownership manifest, independently of acceptance.
+`parallelReleased` remains false. Subsequent resource-scheduling implementation
+has not started; acceptance of this foundation remains its prerequisite.
+
+Final PR CI 39098337001 failed its native WARP reference step at the unchanged
+ten-second fence deadline. CPU-scale 39098337009, frame-contracts 39098336987 and
+navigation 39098336983 passed. The exact software-adapter failure matches the
+pre-foundation master CI 39094375378; this identifies it as a prior failure,
+without exempting the required gate or proving a cause.
+
+The integrated master was rebuilt in isolated output on Windows x64 with the
+pinned SDK: zero warnings/errors, exit 0. The exact WARP scene/profile/camera/
+display/sample/repeat parameters were then reproduced locally, with only the
+explicit client/output locations changed:
+
+```powershell
+dotnet build ForgeLine.sln -c Release --artifacts-path artifacts/foundation-acceptance
+./build/Invoke-RtsReferenceQualification.ps1 -Capture -Software -Scenes BattlefieldCombat -Profiles Low -Zooms NormalGameplay -Displays 640x360 -Warmups 3 -Samples 8 -OutputRoot artifacts/foundation-acceptance-warp-baseline -ClientPath artifacts/foundation-acceptance/bin/ForgeLine.Client/release_win-x64/ForgeLine.Client.exe
+```
+
+Both commands exit 0. The software device is Microsoft Basic Render Driver,
+feature level 12_1, debug layer disabled. The resulting single image passes
+structural checks and all eight repeat readbacks are pixel-identical. The same
+runtime fingerprint is retained. This local result does not replace hosted CI,
+hardware performance acceptance or human image review. Software GPU mean time is
+1,098.706 ms and is not a hardware performance result. The unmodified raw manifest
+and comparison are retained under `evidence/integrated-warp/`.
+
+The seven earlier CPU/frame-time comparison failures remain unchanged and open.
+In the tank-normal and industrial-close cases, measured Prepare means are 0.512
+and 0.324 ms while total frame means increase by 10.266 and 8.544 ms. Those elapsed
+frame samples include device reuse/presentation waits, so the data alone do not
+attribute the whole increase to Prepare CPU work. No failed cohort is replaced,
+threshold relaxed, deadline extended or performance acceptance inferred from this
+observation. Isolated attribution and reproducible performance acceptance remain
+required, together with successful required CI and explicit native image review.
+
+Master CI 39103788914 was still running at this follow-up. Next: inspect its final
+native result, resolve the required CI failure without suppressing it, complete
+performance attribution/acceptance and human review, then release the ownership
+manifest in a separate authorized serial integration. A merge alone does not
+release subsequent rendering work.

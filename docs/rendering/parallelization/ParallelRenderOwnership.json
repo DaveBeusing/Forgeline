@@ -3,7 +3,7 @@
   "repository": "DaveBeusing/Forgeline",
   "analysisBaseSha": "3c61f47274f03a0ab6e3b2022f40ac8205a72eb2",
   "analysisDate": "2026-10-18",
-  "status": "implemented-awaiting-integration-and-required-gates",
+  "status": "integrated-awaiting-required-gates",
   "parallelStartCondition": "Foundation integrated into current master, required baseline gates resolved and write ownership revalidated.",
   "frozenParallelExact": [
     "Directory.Build.props",
@@ -322,7 +322,7 @@
     }
   ],
   "parallelReleased": false,
-  "integratedFoundationSha": null,
+  "integratedFoundationSha": "17810ee192fac495173a7e9da44c973595833f2b",
   "integratedAuthoringPrerequisites": [
     {
       "area": "Blender toolchain",
