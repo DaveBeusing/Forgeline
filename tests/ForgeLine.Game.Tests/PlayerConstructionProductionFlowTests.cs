@@ -723,43 +723,26 @@ public sealed class PlayerConstructionProductionFlowTests
             scenario.Simulation.Entities
                 .GetComponent<SupplyTruck>(
                     supplyTruck);
-        Vector3 supplyTruckPosition =
-            scenario.Simulation.Entities
-                .GetComponent<WorldTransform>(
-                    supplyTruck).Position;
-        Vector3 supplyStagingDirection =
-            Vector3.Normalize(
-                new Vector3(
-                    supplyTruckPosition.X -
-                        supplyDepotPosition.X,
-                    0.0f,
-                    supplyTruckPosition.Z -
-                        supplyDepotPosition.Z));
-        Vector3 supplyTruckLoadPoint =
-            supplyDepotPosition +
-            supplyStagingDirection *
-                (supplyTruckState.LoadRangeMeters - 1.0f);
-
-        Assert.True(
-            gateway.SubmitMovement(
-                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
-                [supplyTruck],
-                supplyTruckLoadPoint,
-                scenario.Simulation.CurrentTick,
-                FormationTemplate.Compact).Accepted);
+        var supplyTransform = scenario.Simulation.Entities.GetComponent<WorldTransform>(supplyTruck);
+        var depotTransform = scenario.Simulation.Entities.GetComponent<WorldTransform>(supplyDepot);
+        Assert.True(VehicleDockPose.TryCreate(scenario.Simulation.Entities.GetComponent<BuildingLoadingDock>(supplyDepot),
+            depotTransform, supplyTransform, out var depotPose));
+        Vector3 depotForward = new(MathF.Sin(depotPose.Heading), 0, MathF.Cos(depotPose.Heading));
+        Vector3 outsideDepot = new(-depotForward.Z, 0, depotForward.X);
+        if (Vector3.Dot(outsideDepot, depotPose.Service - depotTransform.Position) < 0) outsideDepot = -outsideDepot;
+        Vector3 supplyStagingPoint = depotPose.Service + outsideDepot * 12;
+        Assert.True(scenario.Terrain.TrySampleHeight(supplyStagingPoint.X, supplyStagingPoint.Z, out float stagingGround));
+        supplyStagingPoint.Y = stagingGround + scenario.Simulation.Entities.GetComponent<GroundMovement>(supplyTruck).HeightOffset;
+        Assert.True(gateway.SubmitMovement(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+            [supplyTruck], supplyStagingPoint, scenario.Simulation.CurrentTick, FormationTemplate.Compact).Accepted);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(gateway.Results.TryRead(out _));
-
-        RunUntil(
-            scenario,
-            () =>
-                Vector3.DistanceSquared(
-                    scenario.Simulation.Entities
-                        .GetComponent<WorldTransform>(
-                            supplyTruck).Position,
-                    supplyTruckLoadPoint) <=
-                4.0f * 4.0f,
-            maximumTicks: 1_200);
+        RunUntil(scenario, () => Vector3.DistanceSquared(scenario.Simulation.Entities.GetComponent<WorldTransform>(supplyTruck).Position,
+            supplyStagingPoint) <= 4 * 4, maximumTicks: 1_200);
+        Assert.True(gateway.SubmitResupply(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+            supplyTruck, scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
 
         RunUntil(
             scenario,
@@ -772,9 +755,14 @@ public sealed class PlayerConstructionProductionFlowTests
                     ResourceIds.Ammunition) > 0.0,
             maximumTicks: 1_200);
 
-        Vector3 scoutRefuelPoint =
-            supplyTruckLoadPoint +
-            supplyStagingDirection * 8.0f;
+        var loadingVisit = scenario.Simulation.Entities.GetComponent<VehicleDockVisit>(supplyTruck);
+        Assert.Equal(supplyDepot, loadingVisit.Building);
+        Assert.True(loadingVisit.Pose.IsSettled(scenario.Simulation.Entities.GetComponent<WorldTransform>(supplyTruck),
+            scenario.Simulation.Entities.GetComponent<GroundMovementState>(supplyTruck)));
+        Vector3 dockForward = new(MathF.Sin(loadingVisit.Pose.Heading), 0, MathF.Cos(loadingVisit.Pose.Heading));
+        Vector3 outside = new(-dockForward.Z, 0, dockForward.X);
+        if (Vector3.Dot(outside, loadingVisit.Pose.Service - supplyDepotPosition) < 0) outside = -outside;
+        Vector3 scoutRefuelPoint = loadingVisit.Pose.Service + outside * 12;
 
         Assert.True(
             gateway.SubmitMovement(
@@ -802,6 +790,17 @@ public sealed class PlayerConstructionProductionFlowTests
                 .GetComponent<UnitFuelState>(
                     scout);
 
+        ulong refuelDeadline = scenario.Simulation.CurrentTick.Value + 1_200;
+        RunUntil(scenario, () =>
+            scenario.Inventories.GetQuantity(scoutFuel.InventoryId, ResourceIds.Fuel) >= scoutFuel.Capacity - 0.001 &&
+            !scenario.Simulation.Entities.HasComponent<SupplyLoadingOrder>(supplyTruck), maximumTicks: 1_200);
+        // A finite loading order does not refill cargo consumed by later field supply.
+        Assert.True(gateway.SubmitResupply(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+            supplyTruck, scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+        Assert.True(scenario.Simulation.CurrentTick.Value < refuelDeadline);
+
         RunUntil(
             scenario,
             () =>
@@ -813,7 +812,7 @@ public sealed class PlayerConstructionProductionFlowTests
                     supplyTruckState.InventoryId,
                     ResourceIds.Fuel) >=
                 supplyTruckState.FuelTarget - 0.001,
-            maximumTicks: 1_200);
+            maximumTicks: checked((int)(refuelDeadline - scenario.Simulation.CurrentTick.Value)));
 
         RemoveStockPolicies(
             scenario,
@@ -962,7 +961,7 @@ public sealed class PlayerConstructionProductionFlowTests
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 buildingId,
                 position,
-                BuildingOrientation.North,
+                LoadingOrientation(scenario, buildingId, position),
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 scenario.Simulation.CurrentTick);
 
@@ -1221,14 +1220,14 @@ public sealed class PlayerConstructionProductionFlowTests
                         new Vector3(
                             x * 36.0f,
                             0.0f,
-                            z * 36.0f);
+                            (scenario.Services.BuildingDefinitions[buildingId].LoadingDock.HasValue ? -z : z) * 36.0f);
                     BuildingPlacementPreview preview =
                         scenario.Services.BuildingPlacement.CreatePreview(
                             scenario.Simulation.Entities,
                             scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                             buildingId,
                             candidate,
-                            BuildingOrientation.North);
+                            LoadingOrientation(scenario, buildingId, candidate));
 
                     if (preview.IsValid)
                     {
@@ -1240,6 +1239,13 @@ public sealed class PlayerConstructionProductionFlowTests
 
         throw new InvalidOperationException(
             $"No valid placement was found for building '{buildingId}'.");
+    }
+
+    private static BuildingOrientation LoadingOrientation(MatchRuntime scenario, BuildingId buildingId, Vector3 position)
+    {
+        var core = scenario.Simulation.Entities.GetComponent<WorldTransform>(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
+        return scenario.Services.BuildingDefinitions[buildingId].LoadingDock?.OrientationToward(core.Position - position)
+            ?? BuildingOrientation.North;
     }
 
     private static EntityId FindCompletedBuilding(
@@ -1308,9 +1314,44 @@ public sealed class PlayerConstructionProductionFlowTests
              tick++)
         {
             scenario.Simulation.AdvanceOneTick();
+
         }
 
-        Assert.True(condition());
+        if (condition()) return;
+        var diagnostics = new List<string>();
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<CompletedBuilding>())
+            diagnostics.Add($"building {entity}:{scenario.Simulation.Entities.GetComponent<CompletedBuilding>(entity).BuildingId}" +
+                $"@{scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position}");
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<SupplyTruck>())
+        {
+            var supply = scenario.Simulation.Entities.GetComponent<SupplyTruck>(entity);
+            diagnostics.Add($"supply {entity}: cargoFuel={scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel)}" +
+                $" cargoAmmo={scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition)}" +
+                $" loading={(scenario.Simulation.Entities.TryGetComponent(entity, out SupplyLoadingOrder loading) ? loading.ToString() : "none")}");
+        }
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<UnitIdentity, UnitFuelState>())
+        {
+            if (scenario.Simulation.Entities.GetComponent<UnitIdentity>(entity).UnitId != UnitIds.ScoutVehicle) continue;
+            var fuel = scenario.Simulation.Entities.GetComponent<UnitFuelState>(entity);
+            diagnostics.Add($"scout {entity}: fuel={scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel)}/{fuel.Capacity}" +
+                $" position={scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position}");
+        }
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<UnitProductionFacility>())
+        {
+            var facility = scenario.Simulation.Entities.GetComponent<UnitProductionFacility>(entity);
+            diagnostics.Add($"factory {entity}: steel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Steel)}" +
+                $" electronics={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Electronics)}" +
+                $" fuel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Fuel)}" +
+                $" ammunition={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Ammunition)}");
+        }
+        diagnostics.Add($"distribution={string.Join(';', scenario.AutomatedDistribution.LastDebugSnapshot.Requests)}");
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<CargoTransport>())
+            diagnostics.Add($"{entity}: {scenario.Simulation.Entities.GetComponent<CargoTransportRuntimeState>(entity)} " +
+            $"position={scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position} " +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit visit) ? $"dock={visit} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out MovementOrder move) ? $"move={move.WorldTarget} " : "") +
+            $"motion={scenario.Simulation.Entities.GetComponent<GroundMovementState>(entity)}");
+        Assert.True(condition(), string.Join("; ", diagnostics));
     }
 
     private static MatchRuntime CreateScenario(

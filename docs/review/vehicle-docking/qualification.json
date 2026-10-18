@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "940db315f8761fcb2925a40b8da9ea20ad6c9998",
+  "integratedMaster": "cd85373f5e9610cea485b5c2c1755c318cb52315",
+  "productVersion": "0.1.400",
+  "mergeReady": false,
+  "runtimeAssets": {
+    "compiler": "1.12.0",
+    "count": 1357,
+    "runtimeBytes": 75122812,
+    "manifestSha256": "D1786170F593B6D32FE1CF4FCE85514CAB7681F52132D47F15EF2612A3D76870"
+  },
+  "package": {
+    "version": "0.1.400-dev",
+    "sourceTreeClean": true,
+    "reproducible": true,
+    "archive": "artifacts/docking/pkg-940db31/FORGELINE-0.1.400-dev-win-x64.zip",
+    "sha256": "73F1E3D8E826F446A136028BC0FDC473324375A13FFB6535EF5F0410065267DA",
+    "provenanceSha256": "61CDA7027C5DEFD035783FE31D74408E6697EBB912D7B40F12DF782982033528"
+  },
+  "fullMatch": {
+    "seed": 2026,
+    "ticks": 80000,
+    "terminal": false,
+    "cargoDelivered": 22696,
+    "cargoCompleted": 227,
+    "cargoFailed": 0,
+    "routeFailures": 0,
+    "supplyFuel": 13687.8,
+    "supplyAmmunition": 2449,
+    "artilleryShots": 178,
+    "result": "Both opponents remain Mobilizing/PrepareOffensive.",
+    "reportSha256": "14C81775501F146B94FB371574DE893B82A52B65AE25DDC4339DDD24480BB15A"
+  },
+  "native": [
+    {
+      "path": "artifacts/docking/native-940db31-hd/manifest.json",
+      "sha256": "481D949A597A3567C8FC816D08864D910465663D4032CF9CCCD512323145AB41",
+      "status": "structural-pass",
+      "buildIdentity": "0.1.400-dev+940db315f8761fcb2925a40b8da9ea20ad6c9998",
+      "runtimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+      "clientAssemblySha256": "AA19790DB3C8F4B7E32F3C00C9C7FE85579D145C1041C268F21F93D277343025",
+      "presentationAssemblySha256": "B83F7D5F97099BB92B8AA60D86B34101EAB0B8164760B2BF89FDBAB99995FC6F",
+      "captures": [
+        {
+          "key": "LogisticsLoadingProduction-1920x1080-High-CloseTactical",
+          "image": "LogisticsLoadingProduction-1920x1080-High-CloseTactical.png",
+          "imageSha256": "43AE347F429FFEEB305D51E761215E68E4ED675AE40B6F8A47E8FBC50BEBC957",
+          "pixelSha256": "04B73F2D7F57119F205222F3F0E610B474912BD541C53532762DE7BDBCE18530",
+          "kind": "LogisticsLoadingProduction",
+          "fingerprint": "A0BE5E080CA04A0C73D378EF4F4C4AA520973524984BDA843AE339A270277DD3",
+          "tick": 11,
+          "captureVisualSeconds": 0.55,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsLoadingProduction-1920x1080-High-NormalGameplay",
+          "image": "LogisticsLoadingProduction-1920x1080-High-NormalGameplay.png",
+          "imageSha256": "992C88332323625BEF24D33BBF3BC6A5EDE7F51146B51896C3F7D38061380845",
+          "pixelSha256": "8EB887523DDF6656BACBBA588D1301EC3D4A56FA76BF7E0468CA176BA2F77A29",
+          "kind": "LogisticsLoadingProduction",
+          "fingerprint": "A0BE5E080CA04A0C73D378EF4F4C4AA520973524984BDA843AE339A270277DD3",
+          "tick": 11,
+          "captureVisualSeconds": 0.55,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsUnloadingProduction-1920x1080-High-CloseTactical",
+          "image": "LogisticsUnloadingProduction-1920x1080-High-CloseTactical.png",
+          "imageSha256": "C9560E3DCDBD913C0D3FFE5D8D0961426532F1DC9FD50A195F08F23A3A08E052",
+          "pixelSha256": "CD2FCF0CBA2F7C59828F8CE7F5D1BE07CE3BB1E65B161F2A91938535EAD706A8",
+          "kind": "LogisticsUnloadingProduction",
+          "fingerprint": "6ED30329F87A65DE6F56C3EF9189FBAB1D14AF6AF60A9573549DFB6043298196",
+          "tick": 578,
+          "captureVisualSeconds": 28.900000000000002,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsUnloadingProduction-1920x1080-High-NormalGameplay",
+          "image": "LogisticsUnloadingProduction-1920x1080-High-NormalGameplay.png",
+          "imageSha256": "24E3004D21C23CCB9CFDE87C4670D85BA0D460FC7C08EB3935AEA48640370BD0",
+          "pixelSha256": "266DADB19D1138F7BBDF004BC07E73557E803FB9FA53C36D26601AA8A2D83679",
+          "kind": "LogisticsUnloadingProduction",
+          "fingerprint": "6ED30329F87A65DE6F56C3EF9189FBAB1D14AF6AF60A9573549DFB6043298196",
+          "tick": 578,
+          "captureVisualSeconds": 28.900000000000002,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsSustainedProduction-1920x1080-High-CloseTactical",
+          "image": "LogisticsSustainedProduction-1920x1080-High-CloseTactical.png",
+          "imageSha256": "FBE2BC1700E9DF5A3C3E40BE904A48AB9C37D26CF2F0F782D284EACE971B81BD",
+          "pixelSha256": "391A6F2AA91B59E17AF02BD84E27BFE34D8A15004DDE233C25A5AFA520354839",
+          "kind": "LogisticsSustainedProduction",
+          "fingerprint": "304F28127F4A172EAEB6F66A1802F4E754365966EDCFE1699F20ED5E6E4A3BEC",
+          "tick": 1944,
+          "captureVisualSeconds": 97.2,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsSustainedProduction-1920x1080-High-NormalGameplay",
+          "image": "LogisticsSustainedProduction-1920x1080-High-NormalGameplay.png",
+          "imageSha256": "799FEA8C466AEFAB85CEDD601227E01C9F1E99948060C8F9A0490DF40CA25285",
+          "pixelSha256": "B129EB55BE4B43F47E90FBE527D579ABE9A0387185544BDB67827DEE5CEF5820",
+          "kind": "LogisticsSustainedProduction",
+          "fingerprint": "304F28127F4A172EAEB6F66A1802F4E754365966EDCFE1699F20ED5E6E4A3BEC",
+          "tick": 1944,
+          "captureVisualSeconds": 97.2,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "visualReview": "pending"
+        }
+      ]
+    },
+    {
+      "path": "artifacts/docking/native-940db31-front/manifest.json",
+      "sha256": "7B508478FABD0F48E5037D9760E8A463A5E7B3D893C267CD038EFD7AE5400C44",
+      "status": "structural-pass",
+      "buildIdentity": "0.1.400-dev+940db315f8761fcb2925a40b8da9ea20ad6c9998",
+      "runtimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+      "clientAssemblySha256": "AA19790DB3C8F4B7E32F3C00C9C7FE85579D145C1041C268F21F93D277343025",
+      "presentationAssemblySha256": "B83F7D5F97099BB92B8AA60D86B34101EAB0B8164760B2BF89FDBAB99995FC6F",
+      "captures": [
+        {
+          "key": "LogisticsLoadingProduction-1920x1080-High-CloseTactical-Yaw225",
+          "image": "LogisticsLoadingProduction-1920x1080-High-CloseTactical-Yaw225.png",
+          "imageSha256": "2CB7BED26D403D5CABAF62AA24D2AC0D1346AA48AD4CA548A3C2CA86194A1C33",
+          "pixelSha256": "34C1A14363798056ED091B25674259528ABA31C5445904BA3700E894D293C1D9",
+          "kind": "LogisticsLoadingProduction",
+          "fingerprint": "A0BE5E080CA04A0C73D378EF4F4C4AA520973524984BDA843AE339A270277DD3",
+          "tick": 11,
+          "captureVisualSeconds": 0.55,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsUnloadingProduction-1920x1080-High-CloseTactical-Yaw225",
+          "image": "LogisticsUnloadingProduction-1920x1080-High-CloseTactical-Yaw225.png",
+          "imageSha256": "1AFC7AFBDB2EFC0E6C51C0F8BA34022B5A830E08FF4FC51EB22765AC9DD72578",
+          "pixelSha256": "65B0808F16AFA32F800E1E87B36C3F8EA33FA950249230B9394BF0C17452316D",
+          "kind": "LogisticsUnloadingProduction",
+          "fingerprint": "6ED30329F87A65DE6F56C3EF9189FBAB1D14AF6AF60A9573549DFB6043298196",
+          "tick": 578,
+          "captureVisualSeconds": 28.900000000000002,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsSustainedProduction-1920x1080-High-CloseTactical-Yaw225",
+          "image": "LogisticsSustainedProduction-1920x1080-High-CloseTactical-Yaw225.png",
+          "imageSha256": "6291165F1AB2CAC3B383356E3922FF34C7285561C8CD429C66721A667E7E3C46",
+          "pixelSha256": "33D27D1B810414E598B650121D691AB62BE7B24AB922AB1FD9C574413A4D784A",
+          "kind": "LogisticsSustainedProduction",
+          "fingerprint": "304F28127F4A172EAEB6F66A1802F4E754365966EDCFE1699F20ED5E6E4A3BEC",
+          "tick": 1944,
+          "captureVisualSeconds": 97.2,
+          "repeatPixelsEqual": true,
+          "repeatCaptures": 2,
+          "visualReview": "pending"
+        }
+      ]
+    }
+  ],
+  "humanVisualAcceptance": "pending",
+  "performanceAcceptance": "not claimed; concurrent qualification workloads",
+  "nextStep": "Trace physical SupplyLoadingOrder completion, exit ownership and strategic escort readiness in the natural scenario; retain original budgets and collision limits.",
+  "fullSolution": {
+    "sourceRevision": "940db315f8761fcb2925a40b8da9ea20ad6c9998",
+    "total": 2678,
+    "passed": 2659,
+    "skipped": 16,
+    "failed": 3,
+    "failures": [
+      "BoundedHeadlessSkirmishProgressesThroughStrategicLoop",
+      "PlayerCommandsBuildSupplyAndReconThroughNaturalSystems",
+      "FollowingCleanWriterWaitsUntilBuildQualificationCompletes"
+    ],
+    "subsequentPlayerCorrection": "96/96 focused tests pass at 5c3e6ed; original combined deadline and full quantities retained."
+  },
+  "integratedGame": {
+    "sourceRevision": "2ee54587c3cf0e9f5b0b7caffbe5e7a20a8e33db",
+    "version": "0.1.401-dev",
+    "total": 496,
+    "passed": 495,
+    "failed": 1,
+    "failure": "BoundedHeadlessSkirmishProgressesThroughStrategicLoop",
+    "checkpointSchema": 2,
+    "checkpointSeed": 831,
+    "checkpointTick": 4,
+    "checkpointSha256": "424C217FBDEB400FFAB3FC5A303C67467C9E3C7F68332AAA69110DF7DADC9729",
+    "gameAssemblySha256": "319AB253208F07CA2D0175DE1903AD6552B9C8599D6EF36E0776DD970C9BDC16"
+  }
+}

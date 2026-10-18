@@ -25,6 +25,7 @@ public sealed class AutomatedDistributionSystem
     private readonly List<RequestState> _requests = new();
     private readonly List<RequestState> _dispatchCandidates = new();
     private readonly List<PolicyState> _policies = new();
+    private readonly HashSet<EntityId> _fuelDemandTargets = new();
     private ulong _nextRequestId;
     private long _completedRequestCount;
     private long _failedRequestCount;
@@ -92,6 +93,7 @@ public sealed class AutomatedDistributionSystem
             context.Tick);
         ReconcileRequests(context);
         CapturePolicies(context.Entities);
+        CaptureFuelDemand(context.Entities);
         GenerateAndCoalesceRequests(context);
         DispatchPendingRequests(context);
         UpdateMetricsAndDebugSnapshot(context);
@@ -209,6 +211,7 @@ public sealed class AutomatedDistributionSystem
                     request.AssignedTruck))
             {
                 ReleaseReservationIfPresent(request);
+                if (hasReservation) context.Entities.RemoveComponent<CargoTransportReservation>(request.AssignedTruck);
                 ReleaseCapacityReservationIfPresent(request);
                 CompleteOrContinueRequest(
                     context,
@@ -218,7 +221,7 @@ public sealed class AutomatedDistributionSystem
     }
 
     void ICargoTransportReservationObserver.OnCargoReservationConsumed(
-        LogisticsTransportRequestId requestId)
+        LogisticsTransportRequestId requestId, double quantity)
     {
         for (int index = 0; index < _requests.Count; index++)
         {
@@ -228,8 +231,8 @@ public sealed class AutomatedDistributionSystem
                 continue;
             }
 
-            request.ReservedQuantity = 0.0;
-            request.ReservedSourceInventory = InventoryId.None;
+            request.ReservedQuantity = Math.Max(0, request.ReservedQuantity - quantity);
+            if (request.ReservedQuantity <= QuantityEpsilon) request.ReservedSourceInventory = InventoryId.None;
             return;
         }
     }
@@ -279,10 +282,10 @@ public sealed class AutomatedDistributionSystem
                 continue;
             }
 
+            RequestState? existing = FindActiveRequest(policyState.PolicyEntity);
+            if (existing is not null) existing.Priority = policy.Priority;
             double currentQuantity =
-                _inventories.GetQuantity(
-                    destinationInventory,
-                    policy.ResourceId);
+                _inventories.GetQuantity(destinationInventory, policy.ResourceId);
             double outstandingQuantity =
                 GetOutstandingQuantity(policyState.PolicyEntity);
             double projectedQuantity =
@@ -302,9 +305,6 @@ public sealed class AutomatedDistributionSystem
             {
                 continue;
             }
-
-            RequestState? existing =
-                FindActiveRequest(policyState.PolicyEntity);
 
             if (existing is not null)
             {
@@ -358,12 +358,18 @@ public sealed class AutomatedDistributionSystem
             (left, right) =>
             {
                 int priorityComparison =
-                    GetEffectivePriority(left, context.Tick).CompareTo(
-                        GetEffectivePriority(right, context.Tick));
+                    GetEffectivePriority(left, context.Tick, context.Entities).CompareTo(
+                        GetEffectivePriority(right, context.Tick, context.Entities));
 
                 if (priorityComparison != 0)
                 {
                     return priorityComparison;
+                }
+
+                if (GetEffectivePriority(left, context.Tick, context.Entities) == (int)LogisticsStockPriority.Critical)
+                {
+                    int recovery = RecoveryDispatchRank(left, context.Entities).CompareTo(RecoveryDispatchRank(right, context.Entities));
+                    if (recovery != 0) return recovery;
                 }
 
                 int ageComparison =
@@ -640,9 +646,11 @@ public sealed class AutomatedDistributionSystem
                 continue;
             }
 
-            if (!best.Succeeded ||
-                capacityRoute.Route.TotalCost < best.Route!.TotalCost ||
-                (capacityRoute.Route.TotalCost == best.Route!.TotalCost &&
+            bool physicalService = entities.HasComponent<BuildingLoadingDock>(destination.Entity);
+            bool comparableBatch = !physicalService || !best.Succeeded || quantity == best.Quantity;
+            if (!best.Succeeded || physicalService && quantity > best.Quantity ||
+                comparableBatch && capacityRoute.Route.TotalCost < best.Route!.TotalCost ||
+                (comparableBatch && capacityRoute.Route.TotalCost == best.Route!.TotalCost &&
                  node.Id < best.SourceNode.Id))
             {
                 best =
@@ -920,9 +928,17 @@ public sealed class AutomatedDistributionSystem
 
     private int GetEffectivePriority(
         RequestState request,
-        SimulationTick tick)
+        SimulationTick tick,
+        EntityRegistry entities)
     {
         int basePriority = (int)request.Priority;
+        if (request.Priority == LogisticsStockPriority.Critical &&
+            entities.TryGetComponent(request.PolicyEntity, out LogisticsStockPolicy policy) &&
+            _network.TryGetNode(request.Destination, out LogisticsNode destination) &&
+            entities.HasComponent<BuildingLoadingDock>(destination.Entity) &&
+            TryResolveDestinationInventory(entities, destination, out InventoryId inventory) &&
+            _inventories.GetQuantity(inventory, policy.ResourceId) + QuantityEpsilon >= policy.DesiredMinimum)
+            basePriority = (int)LogisticsStockPriority.High;
         ulong age = tick.Value >= request.WaitingSinceTick.Value
             ? tick.Value - request.WaitingSinceTick.Value
             : 0;
@@ -942,6 +958,39 @@ public sealed class AutomatedDistributionSystem
         return basePriority - boundedAging;
     }
 
+    private void CaptureFuelDemand(EntityRegistry entities)
+    {
+        _fuelDemandTargets.Clear();
+        foreach (EntityId recipient in entities.Query<ResupplyOrder>())
+        {
+            var order = entities.GetComponent<ResupplyOrder>(recipient);
+            if (order.RequestedResources.HasFlag(BattlefieldSupplyResource.Fuel)) _fuelDemandTargets.Add(order.Provider);
+        }
+        foreach (EntityId truck in entities.Query<SupplyLoadingOrder, SupplyTruck>())
+        {
+            var loading = entities.GetComponent<SupplyLoadingOrder>(truck);
+            var supply = entities.GetComponent<SupplyTruck>(truck);
+            if (_inventories.Contains(supply.InventoryId) &&
+                _inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel) + QuantityEpsilon < supply.FuelTarget)
+                _fuelDemandTargets.Add(loading.Source);
+        }
+    }
+    private int RecoveryDispatchRank(RequestState request, EntityRegistry entities)
+    {
+        if (!_network.TryGetNode(request.Destination, out LogisticsNode node) ||
+            !entities.HasComponent<BuildingLoadingDock>(node.Entity)) return 2;
+        if (entities.HasComponent<CommandFacility>(node.Entity)) return 0;
+        if (entities.HasComponent<SupplyDepot>(node.Entity) && request.ResourceId == ResourceIds.Fuel)
+        {
+            if (_fuelDemandTargets.Contains(node.Entity)) return 0;
+            return 1;
+        }
+        if (entities.TryGetComponent(node.Entity, out UnitProductionFacility facility) &&
+            facility.Status is UnitProductionStatus.NoInput or UnitProductionStatus.Running &&
+            entities.TryGetComponent(node.Entity, out PowerConsumer power) && power.State == PowerOperationalState.Powered)
+            return 0;
+        return 2;
+    }
     private void DelayRequest(
         RequestState request,
         LogisticsTransportRequestFailureReason reason,
@@ -1019,9 +1068,7 @@ public sealed class AutomatedDistributionSystem
         }
 
         double currentQuantity =
-            _inventories.GetQuantity(
-                destinationInventory,
-                request.ResourceId);
+            _inventories.GetQuantity(destinationInventory, policy.ResourceId);
         double remaining =
             Math.Max(
                 0.0,

@@ -172,6 +172,8 @@ public sealed record BuildingDefinition
 
     public required BuildingFootprint Footprint { get; init; }
 
+    public BuildingLoadingDock? LoadingDock { get; init; }
+
     public required uint ConstructionTicks { get; init; }
 
     public required IReadOnlyList<BuildingResourceCost> Costs { get; init; }
@@ -222,6 +224,9 @@ public sealed record BuildingDefinition
 
         ArgumentException.ThrowIfNullOrWhiteSpace(Key);
         ArgumentException.ThrowIfNullOrWhiteSpace(DisplayName);
+
+        if (LoadingDock is BuildingLoadingDock dock && !dock.IsValid)
+            throw new InvalidOperationException($"Building {Key} has invalid loading geometry.");
 
         if (ConstructionTicks == 0)
         {
@@ -453,6 +458,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Command Core",
                     VisualId = 101,
                     Footprint = new BuildingFootprint(20.0f, 20.0f, 12.0f),
+                    LoadingDock = new(new Vector3(0, -12.0f * 0.5f, 20.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 160,
                     Costs =
                     [
@@ -492,6 +498,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Mine / Extractor",
                     VisualId = 103,
                     Footprint = new BuildingFootprint(12.0f, 12.0f, 8.0f),
+                    LoadingDock = new(new Vector3(0, -8.0f * 0.5f, 12.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 80,
                     Costs =
                     [
@@ -514,6 +521,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Storage Depot",
                     VisualId = 104,
                     Footprint = new BuildingFootprint(14.0f, 14.0f, 8.0f),
+                    LoadingDock = new(new Vector3(0, -8.0f * 0.5f, 14.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 70,
                     Costs =
                     [
@@ -533,6 +541,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Logistics Hub",
                     VisualId = 108,
                     Footprint = new BuildingFootprint(18.0f, 18.0f, 9.0f),
+                    LoadingDock = new(new Vector3(0, -9.0f * 0.5f, 18.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 100,
                     Costs =
                     [
@@ -554,6 +563,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Supply Depot",
                     VisualId = 110,
                     Footprint = new BuildingFootprint(16.0f, 16.0f, 8.0f),
+                    LoadingDock = new(new Vector3(0.06f * 16, -8.0f * 0.5f, 16.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 90,
                     Costs =
                     [
@@ -576,6 +586,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Smelter",
                     VisualId = 105,
                     Footprint = new BuildingFootprint(18.0f, 16.0f, 10.0f),
+                    LoadingDock = new(new Vector3(0, -10.0f * 0.5f, 16.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 120,
                     Costs =
                     [
@@ -598,6 +609,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Refinery",
                     VisualId = 106,
                     Footprint = new BuildingFootprint(18.0f, 16.0f, 10.0f),
+                    LoadingDock = new(new Vector3(0, -10.0f * 0.5f, 16.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 110,
                     Costs =
                     [
@@ -620,6 +632,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Electronics Fabricator",
                     VisualId = 107,
                     Footprint = new BuildingFootprint(18.0f, 18.0f, 10.0f),
+                    LoadingDock = new(new Vector3(0, -10.0f * 0.5f, 18.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 130,
                     Costs =
                     [
@@ -643,6 +656,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Ammunition Plant",
                     VisualId = 109,
                     Footprint = new BuildingFootprint(18.0f, 18.0f, 10.0f),
+                    LoadingDock = new(new Vector3(-0.25f * 18, -10.0f * 0.5f, 18.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 130,
                     Costs =
                     [
@@ -666,6 +680,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Barracks",
                     VisualId = 111,
                     Footprint = new BuildingFootprint(18.0f, 16.0f, 8.0f),
+                    LoadingDock = new(new Vector3(0, -8.0f * 0.5f, 16.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 120,
                     Costs =
                     [
@@ -680,7 +695,7 @@ public static class InitialBuildingDefinitions
                     UnitProductionCapabilities =
                         UnitProductionCapability.Infantry,
                     UnitProductionInputCapacity = 2_000.0,
-                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 14.0f)
+                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 22.0f)
                 },
                 new BuildingDefinition
                 {
@@ -689,6 +704,7 @@ public static class InitialBuildingDefinitions
                     DisplayName = "Vehicle Factory",
                     VisualId = 112,
                     Footprint = new BuildingFootprint(26.0f, 24.0f, 12.0f),
+                    LoadingDock = new(new Vector3(0, -12.0f * 0.5f, 24.0f * 0.5f + 4.5f), Vector3.UnitX, 12),
                     ConstructionTicks = 180,
                     Costs =
                     [
@@ -703,7 +719,7 @@ public static class InitialBuildingDefinitions
                         UnitProductionCapability.Vehicle |
                         UnitProductionCapability.Logistics,
                     UnitProductionInputCapacity = 4_000.0,
-                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 20.0f)
+                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 32.0f)
                 },
                 new BuildingDefinition
                 {

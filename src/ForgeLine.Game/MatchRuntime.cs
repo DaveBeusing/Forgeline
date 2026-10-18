@@ -292,11 +292,12 @@ public sealed class MatchRuntime : IDisposable
         var navigation =
             new HierarchicalNavigationSystem(
                 pathfinder);
+        var docking = new VehicleDockingService(terrain, spatialIndex, navigation);
         var cargoTransport =
             new CargoTransportSystem(
                 logistics,
                 inventories,
-                navigation);
+                navigation, docking);
         var automatedDistribution =
             new AutomatedDistributionSystem(
                 logistics,
@@ -310,7 +311,7 @@ public sealed class MatchRuntime : IDisposable
                     settings.DistributionFairnessAgingTicks);
         var battlefieldSupply =
             new BattlefieldSupplySystem(
-                inventories)
+                inventories, docking)
             {
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture

@@ -102,16 +102,14 @@ public sealed class MatchCompositionTests
     }
 
     [Fact]
-    public void RecordedSchemaOneReplayRetainsItsAuthoritativeCheckpoint()
+    public void RecordedPreDockingReplayIsRejectedBeforeRunningADifferentSimulation()
     {
         string document = File.ReadAllText(Path.Combine(AppContext.BaseDirectory,
             "Fixtures", "schema-1-central-divide.replay.json"));
         MatchReplayData replay = MatchPersistenceSerializer.DeserializeReplay(document);
-        using MatchRuntime playback = MatchPersistenceService.PlayReplay(replay);
-        Assert.Equal(4UL, playback.Simulation.CurrentTick.Value);
-        Assert.Equal(831UL, playback.Simulation.Random.State);
-        Assert.Equal("848FABF78754FA4136EB56D03B5059B5FAA2EC91F2C145CA2FFA022C7251549B",
-            MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        Assert.Equal("848FABF78754FA4136EB56D03B5059B5FAA2EC91F2C145CA2FFA022C7251549B", replay.FinalStateSha256);
+        var error = Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.PlayReplay(replay));
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion, error.Reason);
     }
 
     [Fact]

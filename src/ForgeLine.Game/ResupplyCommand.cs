@@ -52,6 +52,12 @@ public sealed class ResupplyCommand : ISimulationCommand
         {
             EntityId entity = _targets[index];
 
+            if (IsEligibleTarget(context, entity) && context.Entities.HasComponent<SupplyTruck>(entity) &&
+                !context.Entities.HasComponent<CargoTransportOrder>(entity) && TryRequestLoading(context, entity))
+            {
+                accepted++;
+                continue;
+            }
             if (!IsEligibleTarget(context, entity) ||
                 !BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
                     context,
@@ -70,6 +76,28 @@ public sealed class ResupplyCommand : ISimulationCommand
         AcceptedTargetCount = accepted;
         RejectedTargetCount = rejected;
         ExecutedAtTick = context.Tick;
+    }
+
+    private bool TryRequestLoading(SimulationContext context, EntityId truck)
+    {
+        if (context.Entities.HasComponent<SupplyLoadingOrder>(truck)) return true;
+        var position = context.Entities.GetComponent<WorldTransform>(truck).Position;
+        EntityId nearest = EntityId.Invalid;
+        float distance = float.PositiveInfinity;
+        foreach (EntityId source in context.Entities.Query<CompletedBuilding>(ForgeLine.Ecs.QueryIterationOrder.StableByEntityIndex))
+        {
+            var building = context.Entities.GetComponent<CompletedBuilding>(source);
+            if (building.Owner != Issuer || !context.Entities.HasComponent<BuildingLoadingDock>(source) ||
+                !context.Entities.TryGetComponent(source, out WorldTransform transform)) continue;
+            bool usable = context.Entities.TryGetComponent(source, out SupplyDepot depot) && depot.State == SupplyDepotState.Operational ||
+                context.Entities.HasComponent<CommandFacility>(source) &&
+                context.Entities.TryGetComponent(source, out SupplyProvider provider) && provider.Enabled;
+            float candidate = VehicleDockPose.HorizontalDistanceSquared(position, transform.Position);
+            if (usable && candidate < distance) { nearest = source; distance = candidate; }
+        }
+        if (!nearest.IsValid) return false;
+        VehicleDockingService.Put(context.Entities, truck, new SupplyLoadingOrder(nearest, context.Tick));
+        return true;
     }
 
     private bool IsEligibleTarget(

@@ -221,6 +221,8 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
                 request.Issuer,
                 ControllableEntityCategory.Building));
         context.Entities.AddComponent(site, presence);
+        if (definition.LoadingDock is BuildingLoadingDock dock)
+            context.Entities.AddComponent(site, dock);
         context.Entities.AddComponent(
             site,
             new ConstructionSite(

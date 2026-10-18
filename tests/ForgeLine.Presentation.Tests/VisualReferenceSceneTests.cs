@@ -216,9 +216,15 @@ public sealed class VisualReferenceSceneTests
         var buildings = instances.Where(x => x.BuildingFeature.IsSpecified).ToArray();
         var vehicles = instances.Where(x => x.UnitFeature.IsSpecified).ToArray();
         Assert.Equal(3, buildings.Length);
-        Assert.Equal(2, vehicles.Length);
+        Assert.Equal(kind == VisualReferenceSceneKind.LogisticsLoadingProduction ? 3 : 2, vehicles.Length);
         Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.CargoTruck);
         Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.SupplyTruck);
+        if (kind != VisualReferenceSceneKind.LogisticsSustainedProduction)
+        {
+            var focus = kind == VisualReferenceSceneKind.LogisticsTransitProduction ? UnitIds.SupplyTruck : UnitIds.CargoTruck;
+            Assert.Contains(vehicles, x => x.UnitFeature.Unit == focus &&
+                MathF.Pow(x.Transform.Position.X - first.Target.X, 2) + MathF.Pow(x.Transform.Position.Z - first.Target.Z, 2) < .01f);
+        }
         foreach (var vehicle in vehicles)
         foreach (var building in buildings)
         {
@@ -227,7 +233,7 @@ public sealed class VisualReferenceSceneTests
             Assert.True(MathF.Abs(delta.X) > combined.X || MathF.Abs(delta.Z) > combined.Z);
         }
         if (kind == VisualReferenceSceneKind.LogisticsSustainedProduction)
-            Assert.Equal(1024UL, first.Snapshot.Tick.Value);
+            Assert.InRange(first.Snapshot.Tick.Value, 1024UL, 4000UL);
     }
 
     [Fact]

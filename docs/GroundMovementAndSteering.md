@@ -56,6 +56,12 @@ Collision correction and terrain validation run before final arrival acceptance.
 
 An arrived unit stops with zero authoritative velocity, reports `Arrived` for the completion tick and consumes its `MovementOrder`. On the following tick, with no active order, it returns to `Idle`.
 
+Dock orders additionally carry a target heading. They use a 0.1 m movement stop
+radius and complete the bounded heading adjustment before consuming the order.
+The shared [vehicle docking contract](VehicleDocking.md) separately verifies two
+stationary ticks before permitting service. Dock entry and exit use local speed
+limits without changing general strategic movement speeds.
+
 This does not change intermediate waypoint handoff into continuous corridor following. Navigation still owns waypoint publication and completion.
 
 ## Heading and Turning

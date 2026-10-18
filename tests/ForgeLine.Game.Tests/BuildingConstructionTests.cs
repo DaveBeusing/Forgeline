@@ -705,6 +705,29 @@ public sealed class BuildingConstructionTests
             test.Simulation.Entities.HasComponent<StorageDepot>(completed));
     }
 
+    [Fact]
+    public void ConstructionSitesProtectTheirFutureLoadingLaneBeforeCompletion()
+    {
+        var test = CreateTestWorld();
+        var inventory = AddFundedInventory(test, includeAllCosts: true);
+        SubmitBuild(test, inventory, BuildingIds.StorageDepot, new(64, 0, 64));
+        test.Simulation.AdvanceOneTick();
+        var site = test.Commands.Metrics.LastCreatedSite;
+        Assert.True(test.Simulation.Entities.HasComponent<BuildingLoadingDock>(site));
+        Assert.False(test.Simulation.Entities.HasComponent<CompletedBuilding>(site));
+        var preview = test.Placement.CreatePreview(test.Simulation.Entities, Player, BuildingIds.PowerPlant,
+            new(90, 0, 75.5f), BuildingOrientation.North);
+        Assert.False(preview.IsValid);
+        Assert.Equal(BuildingPlacementFailureReason.LoadingCorridorUnavailable, preview.Failure);
+        Assert.NotNull(preview.LoadingCorridor);
+        SubmitBuild(test, inventory, BuildingIds.PowerPlant, new(90, 0, 75.5f));
+        test.Simulation.AdvanceOneTick();
+        Assert.Equal(BuildingPlacementFailureReason.LoadingCorridorUnavailable, test.Commands.Metrics.LastPlacementFailure);
+        test.Simulation.RunTicks(70, TestContext.Current.CancellationToken);
+        Assert.True(test.Simulation.Entities.HasComponent<CompletedBuilding>(site));
+        Assert.True(test.Simulation.Entities.HasComponent<BuildingLoadingDock>(site));
+    }
+
     private static TestWorld CreateTestWorld(
         IBuildableAreaQuery? buildableArea = null)
     {
