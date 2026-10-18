@@ -328,6 +328,8 @@ public readonly record struct TacticalTestOpponent
 
     public float EngagementLeashMeters { get; }
 
+    public bool AllowDistantAdvance { get; init; } = true;
+
     private static void ValidateFraction(
         double value,
         string parameterName)

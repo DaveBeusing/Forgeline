@@ -953,8 +953,10 @@ public sealed class TacticalCombatSystemTests
         Assert.Equal(CombatOrderStatus.Engaging, scenario.Simulation.Entities.GetComponent<TacticalCombatState>(opponent).Status);
     }
 
-    [Fact]
-    public void TacticalTestOpponentUsesDetectedCoordinateThenIdentifiedTarget()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TacticalTestOpponentUsesDetectedCoordinateThenIdentifiedTarget(bool allowDistantAdvance)
     {
         TacticalScenario scenario =
             CreateScenario(
@@ -975,7 +977,7 @@ public sealed class TacticalCombatSystemTests
                 initialAmmunition: 100.0);
         scenario.Simulation.Entities.AddComponent(
             opponent,
-            new TacticalTestOpponent());
+            new TacticalTestOpponent { AllowDistantAdvance = allowDistantAdvance });
 
         scenario.Simulation.Entities.AddComponent(
             opponent,
@@ -1029,8 +1031,10 @@ public sealed class TacticalCombatSystemTests
             identifiedOrder.ExplicitTarget);
     }
 
-    [Fact]
-    public void TacticalTestOpponentAdvancesTowardIdentifiedTargetOutsideEngagementLeash()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TacticalTestOpponentAdvancesTowardIdentifiedTargetOutsideEngagementLeash(bool allowDistantAdvance)
     {
         TacticalScenario scenario =
             CreateScenario(
@@ -1053,7 +1057,7 @@ public sealed class TacticalCombatSystemTests
         scenario.Simulation.Entities.AddComponent(
             opponent,
             new TacticalTestOpponent(
-                engagementLeashMeters: 100.0f));
+                engagementLeashMeters: 100.0f) { AllowDistantAdvance = allowDistantAdvance });
         scenario.Simulation.Entities.AddComponent(
             opponent,
             new VisualSensorState(
@@ -1068,12 +1072,23 @@ public sealed class TacticalCombatSystemTests
                 BlueFaction,
                 new Vector3(300.0f, 0.0f, 0.0f));
 
+        if (!allowDistantAdvance)
+            scenario.Simulation.SubmitCommand(new HoldPositionCommand(RedPlayer, [opponent], SimulationTick.Zero), SimulationTick.Zero.Next());
+
         scenario.Simulation.AdvanceOneTick();
         scenario.Simulation.AdvanceOneTick();
 
         CombatOrderState order =
             scenario.Simulation.Entities.GetComponent<CombatOrderState>(
                 opponent);
+
+        if (!allowDistantAdvance)
+        {
+            Assert.Equal(CombatOrderKind.HoldPosition, order.Kind);
+            Assert.False(scenario.Simulation.Entities.HasComponent<MovementOrder>(opponent));
+            Assert.Equal(Vector3.Zero, scenario.Simulation.Entities.GetComponent<WorldTransform>(opponent).Position);
+            return;
+        }
 
         Assert.Equal(
             CombatOrderKind.AttackMove,
@@ -1092,8 +1107,10 @@ public sealed class TacticalCombatSystemTests
                 opponent).Target);
     }
 
-    [Fact]
-    public void TacticalTestOpponentPreservesStrategicAdvanceForDistantContact()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TacticalTestOpponentPreservesStrategicAdvanceForDistantContact(bool allowDistantAdvance)
     {
         TacticalScenario scenario =
             CreateScenario(
@@ -1116,7 +1133,7 @@ public sealed class TacticalCombatSystemTests
         scenario.Simulation.Entities.AddComponent(
             opponent,
             new TacticalTestOpponent(
-                engagementLeashMeters: 100.0f));
+                engagementLeashMeters: 100.0f) { AllowDistantAdvance = allowDistantAdvance });
         scenario.Simulation.Entities.AddComponent(
             opponent,
             new VisualSensorState(

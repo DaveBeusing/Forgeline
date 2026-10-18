@@ -67,11 +67,56 @@ public sealed class SkirmishSupplyPolicyTests
         Assert.Equal(required, scenario.Inventories.GetReservedQuantity(side.StartingInventory, ResourceIds.FerrousOre));
     }
 
+    [Fact]
+    public void SatisfiedUnitCostDoesNotKeepOptionalStockBufferCritical()
+    {
+        var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using var scenario = CentralDivideScenario.Create(settings with
+        {
+            OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(settings.OpponentConfigurations)
+            {
+                [1] = settings.OpponentConfigurations[1] with { ReactionCadenceTicks = 1 }
+            }
+        });
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new ForgeLine.Game.PlayerId(1));
+        var input = scenario.Inventories.CreateInventory(new InventorySpecification(4_000));
+        var tank = DirectorateContent.CreateUnitCatalog()[UnitIds.MainBattleTank];
+        foreach (UnitResourceCost cost in tank.Costs)
+            if (cost.ResourceId != ResourceIds.Steel)
+                Assert.True(scenario.Inventories.Add(input, cost.ResourceId, cost.Quantity).Succeeded);
+        EntityId factory = entities.CreateEntity();
+        entities.AddComponent(factory, entities.GetComponent<WorldTransform>(side.CommandCore));
+        entities.AddComponent(factory, new CompletedBuilding(BuildingIds.VehicleFactory, side.Player, SimulationTick.Zero));
+        entities.AddComponent(factory, new ControllableEntity(side.Player, ControllableEntityCategory.Building));
+        entities.AddComponent(factory, new InventoryStorage(input));
+        entities.AddComponent(factory, new UnitProductionFacility(input, UnitProductionCapability.Vehicle,
+            side.Player, Vector3.UnitZ * 32, SimulationTick.Zero));
+        entities.AddComponent(factory, new PowerNetworkMembership(new PowerNetworkId(10_001)));
+        entities.AddComponent(factory, new PowerGenerator(10));
+        entities.AddComponent(factory, new PowerConsumer(1, PowerPriority.Industrial));
+        var queue = new QueueUnitProductionCommand(side.Player, factory, UnitIds.MainBattleTank, SimulationTick.Zero, ProductionPriority.High);
+        scenario.Simulation.SubmitCommand(queue, SimulationTick.Zero.Next());
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+        Assert.True(queue.Accepted);
+        Assert.Equal(UnitProductionStatus.NoInput, entities.GetComponent<UnitProductionFacility>(factory).Status);
+        Assert.Equal(UnitIds.MainBattleTank, entities.GetComponent<UnitProductionFacility>(factory).ActiveUnit);
+        LogisticsStockPolicy ammunition = FindStockPolicy(entities, factory, ResourceIds.Ammunition);
+        Assert.Equal(LogisticsStockPriority.High, ammunition.Priority);
+        Assert.Equal(50, ammunition.DesiredMinimum);
+        Assert.Equal(120, ammunition.DesiredTarget);
+        Assert.Equal(240, ammunition.DesiredMaximum);
+        Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, factory, ResourceIds.Steel).Priority);
+        Assert.Equal(20, scenario.Inventories.GetQuantity(input, ResourceIds.Ammunition));
+    }
     [Theory]
-    [InlineData(false, false)]
-    [InlineData(true, false)]
-    [InlineData(true, true)]
-    public void UnaffordableForwardRetreatWaitsForPhysicalMobileResupply(bool reconnaissance, bool partialRecovery)
+    [InlineData(false, false, true)]
+    [InlineData(true, false, true)]
+    [InlineData(true, true, true)]
+    [InlineData(false, false, false)]
+    [InlineData(true, false, false)]
+    [InlineData(true, true, false)]
+    public void UnaffordableForwardRetreatWaitsForPhysicalMobileResupply(bool reconnaissance, bool partialRecovery, bool deepOffensive)
     {
         using MatchRuntime scenario = CentralDivideScenario.Create(
             CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
@@ -83,7 +128,7 @@ public sealed class SkirmishSupplyPolicyTests
             if (entities.GetComponent<SkirmishOpponentController>(controller).Player == owner)
             {
                 var state = entities.GetComponent<SkirmishOpponentState>(controller);
-                entities.SetComponent(controller, state with { DeepOffensiveCommitted = true });
+                entities.SetComponent(controller, state with { DeepOffensiveCommitted = deepOffensive });
             }
         }
 
@@ -135,14 +180,18 @@ public sealed class SkirmishSupplyPolicyTests
         Vector3 home = entities.GetComponent<WorldTransform>(scenario.GetBase(owner).CommandCore).Position;
         EntityId unit = scenario.UnitFactory.Create(
             DirectorateContent.CreateUnitCatalog()[UnitIds.RifleSquad],
-            home + new Vector3(700.0f, 0.0f, 0.0f), owner);
+            home + new Vector3(160.0f, 0.0f, 0.0f), owner);
         UnitFuelState fuel = entities.GetComponent<UnitFuelState>(unit);
         double quantity = scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel);
         Assert.True(scenario.Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel, quantity * 0.8).Succeeded);
+        Assert.True(scenario.Inventories.GetAvailableQuantity(fuel.InventoryId, ResourceIds.Fuel) >= 160 * fuel.ConsumptionPerMeter);
+        scenario.Simulation.SubmitCommand(new RetreatCommand(owner, [unit], home,
+            SimulationTick.Zero, FormationTemplate.Column), SimulationTick.Zero.Next());
 
         scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
         CombatOrderState initial = entities.GetComponent<CombatOrderState>(unit);
         Assert.Equal(CombatOrderKind.Retreat, initial.Kind);
+        Assert.Equal(1UL, initial.AcceptedAtTick.Value);
 
         scenario.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
 
