@@ -69,3 +69,21 @@ GPU times. Other wait categories remain outside this specific admission metric.
 This additive shared diagnostic change is serialized with the foundation repair.
 A final diagnostic matrix will attribute waits without replacing either comparison
 cohort or rewriting its results.
+
+## Avoid duplicate presentation-only preparation
+
+The preparation pass also computed per-instance color, vegetation/world transforms
+and mechanical detail weights that it never consumed. Resolve the same unit turret,
+unit state and building state attachments before leaving preparation; compute those
+colors/transforms/weights only in the recording pass. Visibility, material and LOD
+selection, attachment order, batching and GPU input formats remain unchanged.
+
+This additional actual CPU-work reduction is qualified with two further predefined
+paired cohorts, in opposite order, at 128 warmups/512 samples per case. Keep the
+same six viewpoints/settings, two readbacks and unchanged 15% comparison. Retain all
+earlier failed results; the larger cohorts do not overwrite them. Add native
+DamageDestruction viewpoints to exercise state attachments. Run the final affected
+Presentation/Client/Graphics suites after this change. The full solution at the
+preceding diagnostic source passed 2,590 tests, zero failed, 16 optional skips,
+2,606 total in 15m35.423s; unchanged asset/headless domains are not reclassified as
+a new execution at a different source identity. Final CI runs the entire solution.

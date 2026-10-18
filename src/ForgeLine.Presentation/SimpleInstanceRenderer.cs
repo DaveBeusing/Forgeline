@@ -562,6 +562,25 @@ public sealed class SimpleInstanceRenderer : IDisposable
                  runtimeMesh.SupportsTexturedMaterial);
             if (instance.DecalFeature.IsSpecified && (!usesRuntimeMesh || !usesRuntimeMaterial || runtimeMaterial.UsesDevelopmentFallback || !float.IsFinite(instance.DecalFeature.Opacity)))
             { skippedDecalResources++; continue; }
+            if (preparing)
+            {
+                // Resource demand needs no colors, animated transforms or mechanical
+                // weights. Resolve attachments in the same order, then leave that
+                // presentation work to the recording pass that consumes it.
+                if (_runtimeAssets is { } preparedAssets)
+                {
+                    if (hasUnitDefinition && unitLod == UnitAssetLod.Lod0 &&
+                        !instance.UnitFeature.IsWreck && unitDefinition.HasArticulatedTurret)
+                        preparedAssets.TryGetMesh(unitDefinition.TurretMeshAssetId!, out _);
+                    string? preparedUnitState = hasUnitDefinition
+                        ? UnitPresentationCatalog.ResolveStateAttachmentAssetId(instance.UnitFeature, unitLod) : null;
+                    if (preparedUnitState is not null) preparedAssets.TryGetMesh(preparedUnitState, out _);
+                    string? preparedBuildingState = hasBuildingDefinition
+                        ? BuildingPresentationCatalog.ResolveStateAttachmentAssetId(instance.BuildingFeature) : null;
+                    if (preparedBuildingState is not null) preparedAssets.TryGetMesh(preparedBuildingState, out _);
+                }
+                continue;
+            }
             Vector4 color =
                 ResolveColor(
                     instance,
