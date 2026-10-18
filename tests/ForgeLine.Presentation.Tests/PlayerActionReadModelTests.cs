@@ -18,6 +18,7 @@ public sealed class PlayerActionReadModelTests
     public void CargoOrderShowsCatalogMaterialAndTripQuantityWithOwnedEndpoints()
     {
         using var scenario = CreateScenario(4311);
+        var buffer = RegisterExtraction(scenario,out var interaction,out _);
         scenario.Simulation.AdvanceOneTick();
         var entities = scenario.Simulation.Entities;
         var side = scenario.GetBase(LocalPlayer);
@@ -34,7 +35,6 @@ public sealed class PlayerActionReadModelTests
         var truck = side.StartingUnits.First(unit => entities.HasComponent<CargoTransport>(unit));
         Assert.True(scenario.CargoTransport.TryAssignOrder(entities,truck,
             new CargoTransportOrder(source,target,ResourceIds.Steel,50,scenario.Simulation.CurrentTick),scenario.Simulation.CurrentTick));
-        var buffer = RegisterExtraction(scenario,out var interaction,out _);
         interaction.SetSelection([truck]);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(buffer.TryReadLatest(out var snapshot));
