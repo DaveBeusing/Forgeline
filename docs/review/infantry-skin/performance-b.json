@@ -1,0 +1,91 @@
+{
+  "unqualified": [],
+  "regressions": [],
+  "currentCommit": "da261246765fceb5c31de01afaf6d26c0e789b96",
+  "cases": [
+    {
+      "key": "InfantrySkinningRepeated-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40",
+      "deltas": [
+        {
+          "currentMs": 519.2845859374999,
+          "percent": 0.6315610308245851,
+          "deltaMs": 3.259016406249998,
+          "regressed": false,
+          "statistic": "mean",
+          "metric": "cpu",
+          "baselineMs": 516.0255695312499
+        },
+        {
+          "currentMs": 538.2778,
+          "percent": 2.201941746098096,
+          "deltaMs": 11.59719999999993,
+          "regressed": false,
+          "statistic": "p50",
+          "metric": "cpu",
+          "baselineMs": 526.6806
+        },
+        {
+          "currentMs": 791.5891,
+          "percent": 4.913216119429888,
+          "deltaMs": 37.0711,
+          "regressed": false,
+          "statistic": "p95",
+          "metric": "cpu",
+          "baselineMs": 754.518
+        },
+        {
+          "currentMs": 993.6453,
+          "percent": 2.153105473207624,
+          "deltaMs": 20.943300000000022,
+          "regressed": false,
+          "statistic": "p99",
+          "metric": "cpu",
+          "baselineMs": 972.702
+        },
+        {
+          "currentMs": 543.1915137560977,
+          "percent": 2.6949085502988885,
+          "deltaMs": 14.254372252097824,
+          "regressed": false,
+          "statistic": "mean",
+          "metric": "gpu",
+          "baselineMs": 528.9371415039999
+        },
+        {
+          "currentMs": 539.672416,
+          "percent": 2.2163532098901184,
+          "deltaMs": 11.70169599999997,
+          "regressed": false,
+          "statistic": "p50",
+          "metric": "gpu",
+          "baselineMs": 527.97072
+        },
+        {
+          "currentMs": 561.286496,
+          "percent": 2.2457428752184536,
+          "deltaMs": 12.328192000000058,
+          "regressed": false,
+          "statistic": "p95",
+          "metric": "gpu",
+          "baselineMs": 548.958304
+        },
+        {
+          "currentMs": 562.616416,
+          "percent": 1.7587861752962366,
+          "deltaMs": 9.724191999999903,
+          "regressed": false,
+          "statistic": "p99",
+          "metric": "gpu",
+          "baselineMs": 552.892224
+        }
+      ],
+      "assetPayloadChanged": true,
+      "status": "comparable"
+    }
+  ],
+  "interpretation": "Percent changes are observed variance/trends. Paired runs and repeated cohorts are required before attributing a regression. GPU subsets have explicit counts; software and changed settings cannot satisfy a hardware gate.",
+  "maximumRegressionPercent": 15.0,
+  "baselineCommit": "da261246765fceb5c31de01afaf6d26c0e789b96",
+  "schemaVersion": 1,
+  "gateRequested": true
+}

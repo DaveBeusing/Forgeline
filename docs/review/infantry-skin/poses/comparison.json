@@ -1,0 +1,43 @@
+{
+  "captures": [
+    {
+      "key": "InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "comparison": "no-matched-baseline",
+      "cpuMeanMs": 18.410999999999998,
+      "structural": "pass",
+      "visualReview": "pending",
+      "gpuMeanMs": 11.401103999999998,
+      "cpuMeanDeltaMs": null,
+      "regionChanges": null,
+      "pixelComparison": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "sameRuntime": false
+    },
+    {
+      "key": "InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "comparison": "no-matched-baseline",
+      "cpuMeanMs": 16.347775,
+      "structural": "pass",
+      "visualReview": "pending",
+      "gpuMeanMs": 15.411803428571428,
+      "cpuMeanDeltaMs": null,
+      "regionChanges": null,
+      "pixelComparison": null,
+      "sameSource": false,
+      "equivalentHardware": false,
+      "sameRuntime": false
+    }
+  ],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "channelTolerance": 0,
+  "commit": "da261246765fceb5c31de01afaf6d26c0e789b96",
+  "imageGateRequested": false,
+  "imageFailures": [],
+  "visualAcceptance": "pending",
+  "structural": "pass",
+  "pixelComparisonRequested": false,
+  "baselineCommit": null,
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0
+}
