@@ -123,3 +123,8 @@ The shared player action surface exposes automated-distribution policy for one s
 The panel reads current stock, existing policy values, request state, assigned Cargo Truck, failure reason, and bottleneck reason from immutable completed-tick read models. Submission is not delivery: `AutomatedDistributionSystem` still creates requests, reserves real source stock and route capacity, assigns eligible Cargo Trucks, and relies on `CargoTransportSystem` for physical loading, movement, and unloading.
 
 Player commands validate target ownership before delegating to the existing stock-policy commands. Invalid thresholds, foreign targets, stale policy entities, unavailable source stock, missing routes, saturated capacity, unavailable trucks, and full destinations remain authoritative failures rather than UI-side exceptions or resource grants.
+
+
+## Logistics setup
+
+INPUTS / USE INPUTS prepares catalog-based editor thresholds for additional production steps. Preview creates no requests. MIN uses stock plus outstanding demand; TARGET remains the refill goal; MAX is validated/saved but is not enforced as a hard inventory limit. Shared storage capacity remains authoritative. Requested demand and physically assigned incoming loads are displayed separately. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.

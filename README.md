@@ -221,7 +221,7 @@ docs/         Technical documentation and qualification evidence
 | **Client and controls** | [Windows Client](docs/WindowsClient.md) · [Camera and Input](docs/CameraAndInput.md) · [Interaction Qualification](docs/InteractionQualification.md) |
 | **Interface and operations** | [Command Interface Visual Language](docs/CommandInterfaceVisualLanguage.md) · [Group Orders](docs/FormationMovementAndGroupOrders.md) · [Operations](docs/ProductionAndLogisticsOperations.md) · [Alerts and Strategic Map](docs/ActionableAlertsAndStrategicMap.md) |
 | **World and runtime** | [Central Divide Battlefield](docs/CentralDivideBattlefield.md) · [Simulation Runtime](docs/SimulationRuntime.md) · [Navigation](docs/HierarchicalNavigation.md) |
-| **Economy and supply** | [Industrial Production](docs/IndustrialProduction.md) · [Logistics Routing](docs/LogisticsNetworkAndRouting.md) · [Battlefield Supply](docs/BattlefieldSupply.md) · [Vehicle Docking](docs/VehicleDocking.md) · [Vehicle Queues](docs/VehicleQueues.md) · [Docking Qualification](docs/VehicleDockingQualification.md) |
+| **Economy and supply** | [Industrial Production](docs/IndustrialProduction.md) · [Logistics Setup](docs/LogisticsSetup.md) · [Logistics Routing](docs/LogisticsNetworkAndRouting.md) · [Battlefield Supply](docs/BattlefieldSupply.md) · [Vehicle Docking](docs/VehicleDocking.md) · [Vehicle Queues](docs/VehicleQueues.md) · [Docking Qualification](docs/VehicleDockingQualification.md) |
 | **Warfare** | [Combat Execution](docs/CombatExecution.md) · [Battlefield Intelligence](docs/BattlefieldIntelligence.md) · [Skirmish Opponent](docs/SkirmishOpponent.md) |
 | **Source assets** | [Asset Pipeline](docs/AssetPipeline.md) · [Directorate Buildings](docs/DirectorateBuildingAssets.md) · [Directorate Units](docs/DirectorateUnitAssets.md) · [Infantry and Battlefield Production](docs/InfantryBattlefieldProduction.md) · [Combat/Support Units](docs/CombatSupportUnitProduction.md) |
 | **Graphics and qualification** | [Graphics Settings](docs/GraphicsQualitySettings.md) · [PBR Foundation](docs/PbrFoundationQualification.md) · [Visual Evidence](docs/VisualReferenceEvidence.md) · [Reference Performance](docs/GraphicsReferencePerformance.md) · [Scalability](docs/ScalabilityQualification.md) |
@@ -235,3 +235,4 @@ docs/         Technical documentation and qualification evidence
 **FORGELINE — Build. Supply. Conquer.**
 
 </div>
+

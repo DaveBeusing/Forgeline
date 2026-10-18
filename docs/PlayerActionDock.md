@@ -122,3 +122,8 @@ The keys described above are defaults. Settings can rebind mode, next-item, prim
 All seven modes now use two-column status cards and a two-row footer. Build shows costs/deposit requirements; Process inputs/outputs/queue state; Units costs/technology/queue progress; Logistics stock thresholds/transport context; Supply automatic policy and explicit supply requests; Combat eligibility/target intent; Technology facility/prerequisites/costs/research progress. Captured active work alone has progress. Primary controls name the existing operation. Pending copied commands and matching local contextual requests disable dispatch controls; navigation remains available. Authoritative validation still decides acceptance.
 
 See [native dock qualification](CommandDockQualification.md) for package/source identities, scale coverage, reference images, performance limits and outstanding acceptance.
+
+
+## Logistics setup
+
+LOGISTICS appends INPUTS cards for the selected factory or processor. Select a catalog unit/recipe, adjust additional steps with the existing decrease/increase controls, and USE INPUTS to prepare resource drafts. APPLY POLICY still submits one resource at a time. Drafts and saved rules remain separate; MAX is saved policy metadata, not a hard capacity limit. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.

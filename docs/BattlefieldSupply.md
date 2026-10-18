@@ -216,3 +216,8 @@ The shared action surface exposes battlefield supply for one selected owned supp
 The configured battlefield supply priority is authoritative simulation state and directly participates in the deterministic recipient ordering used by `BattlefieldSupplySystem`. The read model reports current supply state, priority, Fuel/Ammunition fractions, selected provider, provider stock, provider state, and `ResupplyProviderRejection` flags. Provider states are descriptive only: Assigned/Traveling does not promise successful transfer. Empty or destroyed providers, route retry, provider Fuel infeasibility, busy providers, and unavailable stock remain normal authoritative outcomes.
 
 Actual Fuel and Ammunition move only in `BattlefieldSupplySystem` at legitimate transfer range. Automatic and explicit requests use the same `BattlefieldResupplyPlanner`; the player surface does not create a second rescue or transfer implementation.
+
+
+## Logistics setup
+
+Supply views distinguish a selected Supply Truck's field cargo, its separate drive-tank inventory, and any assigned provider stock. Supply Trucks are excluded from regional Cargo fleet counts. Confirmed loading/queue state comes from the shared simulation service; no additional supply dispatcher or distance-derived queue is introduced. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
