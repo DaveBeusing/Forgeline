@@ -426,6 +426,81 @@ public sealed class VehicleDockingTests
         }
     }
 
+    [Fact]
+    public void NearbyOutwardStagingAvoidsAnotherTripBehindAStaticNeighbor()
+    {
+        var settings = new WorldGridSettings { ChunkSizeMeters = 512, HeightSamplesPerSide = 33 };
+        var terrain = new TerrainWorld(settings, [new TerrainChunk(new(0, 0),
+            new TerrainHeightfield(33, 512, new float[33 * 33]))]);
+        var sourceBounds = new AxisAlignedBounds(new(268, -1, 246), new(288, 8, 266));
+        var neighborBounds = new AxisAlignedBounds(new(198, -1, 246), new(218, 8, 266));
+        var navigation = new HierarchicalNavigationSystem(new HierarchicalPathfinder(NavigationWorld.Build(terrain,
+            [sourceBounds, neighborBounds], new NavigationGridSettings { CellSizeMeters = 32 },
+            new NavigationSectorSettings { SectorSizeCells = 4 })));
+        var spatial = new SpatialGridIndex();
+        var fixture = new Fixture(new VehicleDockingService(terrain, spatial, navigation));
+        var entities = fixture.Simulation.Entities;
+        var sourceTransform = new WorldTransform(new(278, 0, 256), Quaternion.Identity, Vector3.One);
+        entities.SetComponent(fixture.Building, sourceTransform);
+        var presence = new SpatialPresence(new(10, 4, 10), new(1, 0, SpatialMobility.Static));
+        entities.AddComponent(fixture.Building, presence);
+        spatial.Upsert(presence.CreateEntry(fixture.Building, sourceTransform));
+        var neighbor = entities.CreateEntity();
+        var neighborTransform = new WorldTransform(new(208, 0, 256), Quaternion.Identity, Vector3.One);
+        entities.AddComponent(neighbor, neighborTransform);
+        entities.AddComponent(neighbor, presence);
+        spatial.Upsert(presence.CreateEntry(neighbor, neighborTransform));
+        var movement = GroundMovement.CreateDefault();
+        entities.AddComponent(fixture.Truck, movement);
+        entities.AddComponent(fixture.Truck, new NavigationAgent(NavigationMovementClass.Wheeled));
+        fixture.SetTruck(new(400, movement.HeightOffset, 400), 0, 0);
+        fixture.Simulation.RegisterSystem(navigation);
+        fixture.Simulation.RegisterSystem(new GroundMovementSystem(terrain, spatial));
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1))));
+        var pose = entities.GetComponent<VehicleDockVisit>(fixture.Truck).Pose;
+        Assert.True(pose.ApproachStart.HasValue);
+        var staging = pose.ApproachStart.GetValueOrDefault();
+        Assert.True(staging.Z > pose.Service.Z + 24);
+        Assert.True(Vector3.Distance(staging, pose.Entry) < 48);
+        Assert.False((pose with { ApproachStart = null }).Contains(staging, pose.HalfLength));
+        Assert.False(entities.HasComponent<VehicleDockSlot>(fixture.Building));
+        bool docked = false;
+        for (int tick = 0; tick < 2000 && !docked; tick++)
+            fixture.Step(context => docked = fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1)));
+        Assert.True(docked, entities.GetComponent<VehicleDockVisit>(fixture.Truck).ToString());
+    }
+    [Fact]
+    public void BusyArrivalKeepsItsSafeWaitingPointUntilTheBayCanBeClaimed()
+    {
+        var fixture = new Fixture();
+        var entities = fixture.Simulation.Entities;
+        var movement = GroundMovement.CreateDefault();
+        entities.AddComponent(fixture.OtherTruck, movement);
+        entities.AddComponent(fixture.OtherTruck, GroundMovementState.Stationary(0));
+        fixture.Step(context =>
+        {
+            Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out var owner));
+            var extended = owner.Pose with { ApproachStart = new(-64, 0, 14) };
+            entities.SetComponent(fixture.Truck, owner with { Pose = extended });
+            var slot = entities.GetComponent<VehicleDockSlot>(fixture.Building);
+            entities.SetComponent(fixture.Building, slot with { Pose = extended });
+            Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1)));
+        });
+        var waitingPoint = entities.GetComponent<VehicleDockVisit>(fixture.OtherTruck).Pose.ApproachStart;
+        Assert.True(waitingPoint.HasValue);
+        entities.SetComponent(fixture.OtherTruck, entities.GetComponent<WorldTransform>(fixture.OtherTruck) with
+            { Position = waitingPoint.GetValueOrDefault() });
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
+        Assert.Equal(waitingPoint, entities.GetComponent<VehicleDockVisit>(fixture.OtherTruck).Pose.ApproachStart);
+        fixture.SetTruck(new(100, 0, 100), 0, 0);
+        fixture.Step(context =>
+        {
+            var owner = entities.GetComponent<VehicleDockVisit>(fixture.Truck);
+            Assert.True(fixture.Docks.TryRelease(entities, fixture.Truck, fixture.Building, owner.Generation));
+            Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1)));
+            Assert.Equal(fixture.OtherTruck, entities.GetComponent<VehicleDockSlot>(fixture.Building).Truck);
+        });
+    }
     private sealed class Fixture : ISimulationSystem
     {
         private Action<SimulationContext>? _action;

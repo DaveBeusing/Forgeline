@@ -271,7 +271,8 @@ public sealed class VehicleDockingService
                 entities.RemoveComponent<VehicleDockSlot>(building);
             else
             {
-                visit = new(building, 0, VehicleDockStatus.Busy, VehicleDockBlockReason.Obstructed, pose);
+                visit = new(building, 0, VehicleDockStatus.Busy, VehicleDockBlockReason.Obstructed,
+                    pose with { ApproachStart = currentVisit.Generation == 0 && currentVisit.Building == building ? currentVisit.Pose.ApproachStart : null });
                 Put(entities, truck, visit);
                 return false;
             }
@@ -432,13 +433,31 @@ public sealed class VehicleDockingService
             bool found = false;
             for (int step = 1; step <= 6 && !found; step++)
             {
-                Vector3 coarseStart = pose.Entry - forward * (step * grid.Settings.CellSizeMeters);
-                if (!grid.TryWorldToCell(coarseStart, out var approachCell) || !grid.IsTraversable(approachCell, agent.Capabilities)) continue;
-                staging = coarseStart - forward * margin;
-                found = grid.TryWorldToCell(staging, out var cell) && grid.IsTraversable(cell, agent.Capabilities);
+                Vector3 outward = new(-forward.Z, 0, forward.X);
+                if (Vector3.Dot(outward, pose.Service - buildingTransform.Position) < 0) outward = -outward;
+                for (int candidate = 0; candidate < 3 && !found; candidate++)
+                {
+                    Vector3 offset = candidate switch { 0 => -forward, 1 => outward, _ => outward - forward };
+                    Vector3 coarseStart = pose.Entry + offset * (step * grid.Settings.CellSizeMeters);
+                    if (!grid.TryWorldToCell(coarseStart, out var approachCell) || !grid.IsTraversable(approachCell, agent.Capabilities)) continue;
+                    Vector3 proposed = coarseStart - forward * margin;
+                    if (!grid.TryWorldToCell(proposed, out var cell) || !grid.IsTraversable(cell, agent.Capabilities) ||
+                        pose.Contains(proposed, pose.HalfLength) ||
+                        entities.TryGetComponent(building, out VehicleDockSlot activeLane) && activeLane.Pose.Contains(proposed, pose.HalfLength)) continue;
+                    staging = proposed;
+                    found = true;
+                }
             }
             if (!found) return false;
         }
+        if (entities.TryGetComponent(truck, out VehicleDockVisit pending) && pending.Generation == 0 && pending.Building == building &&
+            pending.Pose.ApproachStart is Vector3 previous && float.IsFinite(previous.X) && float.IsFinite(previous.Y) && float.IsFinite(previous.Z) &&
+            VehicleDockPose.HorizontalDistanceSquared(pending.Pose.Service, pose.Service) < 0.001f &&
+            !pose.Contains(previous, pose.HalfLength) &&
+            (!entities.TryGetComponent(building, out VehicleDockSlot activeSlot) || !activeSlot.Pose.Contains(previous, pose.HalfLength)) &&
+            (_navigation is null || !entities.TryGetComponent(truck, out NavigationAgent previousAgent) ||
+             _navigation.World.Grid.TryWorldToCell(previous, out var previousCell) && _navigation.World.Grid.IsTraversable(previousCell, previousAgent.Capabilities)))
+            staging = previous - Vector3.UnitY * movement.HeightOffset;
         if (_terrain is not null)
         {
             if (!_terrain.TrySampleHeight(staging.X, staging.Z, out float height)) return false;
