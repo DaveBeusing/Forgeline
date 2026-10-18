@@ -155,14 +155,14 @@ public readonly record struct VehicleDockPose(Vector3 Entry, Vector3 Service, Ve
             nearest = MathF.Min(nearest, (Entry.X - nearestX) * (Entry.X - nearestX) + (Entry.Z - nearestZ) * (Entry.Z - nearestZ));
             float lengthSquared = delta.X * delta.X + delta.Z * delta.Z;
             for (int corner = 0; corner < 4; corner++)
-                {
-                    float x = (corner & 1) == 0 ? obstacle.Minimum.X : obstacle.Maximum.X;
-                    float z = (corner & 2) == 0 ? obstacle.Minimum.Z : obstacle.Maximum.Z;
-                    float amount = lengthSquared > 0 ? Math.Clamp(((x - start.X) * delta.X + (z - start.Z) * delta.Z) / lengthSquared, 0, 1) : 0;
-                    float dx = x - start.X - delta.X * amount;
-                    float dz = z - start.Z - delta.Z * amount;
-                    nearest = MathF.Min(nearest, dx * dx + dz * dz);
-                }
+            {
+                float x = (corner & 1) == 0 ? obstacle.Minimum.X : obstacle.Maximum.X;
+                float z = (corner & 2) == 0 ? obstacle.Minimum.Z : obstacle.Maximum.Z;
+                float amount = lengthSquared > 0 ? Math.Clamp(((x - start.X) * delta.X + (z - start.Z) * delta.Z) / lengthSquared, 0, 1) : 0;
+                float dx = x - start.X - delta.X * amount;
+                float dz = z - start.Z - delta.Z * amount;
+                nearest = MathF.Min(nearest, dx * dx + dz * dz);
+            }
             approachBlocked = first <= last || nearest <= radius * radius;
         }
         return lane || approachBlocked || (Entry.X - nearestX) * (Entry.X - nearestX) + (Entry.Z - nearestZ) * (Entry.Z - nearestZ) <= radius * radius;
