@@ -906,6 +906,41 @@
       "file": "foundation-queue-evacuation-game-suite.log.gz",
       "rawSha256": "70e7b1e9c5b5972931da3fe2ab9768d5cf72134edede7dd811b0546ae6d0f262",
       "archiveSha256": "60692a655264afae38660d589d615d6c4fa6d2ddca20c4a0298935e6030a1f1d"
+    },
+    {
+      "file": "foundation-queue-evacuation-headless-build.log.gz",
+      "rawSha256": "e4e96df19e64cbbef2072eef4bd446446b7b6a45bf6013547d9d59e4bd0e7df8",
+      "archiveSha256": "29b865cf90cb65545684b56bce968b3f37ad391c67323fe860364d968caeccf6"
+    },
+    {
+      "file": "foundation-queue-evacuation-opponent.json.gz",
+      "rawSha256": "b8b2171d2a1cc64e3913f4708692b4e27883c5e62a74f520e51af7a8b159447f",
+      "archiveSha256": "2cba682190b3aebb7574b73065204b671185d52d056df863e36952cfa9c14c66"
+    },
+    {
+      "file": "foundation-queue-evacuation-opponent-telemetry.json.gz",
+      "rawSha256": "9dd71d80b66a3bd54f081202d1133f961730f2e981c7a356c2092d027d14293c",
+      "archiveSha256": "cdc3a5112f1735bbf6d3902b04cdc27f672c88d18a30245b0ceb0951985e12d6"
+    },
+    {
+      "file": "foundation-queue-evacuation-opponent.log.gz",
+      "rawSha256": "34e4bb15718a9f7832b6a81b7861b3259ba81ef0fe2df3c179b9e26a04a33d0e",
+      "archiveSha256": "8e499e377431c592f214acc9b504d59b903c0da68ac359bd8187cafad72ed3d1"
+    },
+    {
+      "file": "foundation-6d8-client-build.log.gz",
+      "rawSha256": "85b368c9b389b8a217965f566d7aa19501a45d4fffb1d0067b6fef36ebebb140",
+      "archiveSha256": "b67bf5d52c36ad3b1adb1f52239b05ba65e0e8f4b030e85973383512691d78e8"
+    },
+    {
+      "file": "foundation-queue-resume-build.log.gz",
+      "rawSha256": "ce6a0b5b709703c6c5a5764722dd814b1de5abdcdacf780e9b9c3dba87876dbd",
+      "archiveSha256": "a281403e7172d28ed5c4788b6c82b3e3204870c5180b5ca4d9e5308105512d3a"
+    },
+    {
+      "file": "foundation-queue-resume-context.json.gz",
+      "rawSha256": "eac6cabb827c87e000581b6b557bf2bccd846df44378dd267ffc2a8529badff5",
+      "archiveSha256": "0277be2ebdd2f91019404ce67a6033cb3c02b8b4447c29ae5e0f67f70eb5ff18"
     }
   ]
 }

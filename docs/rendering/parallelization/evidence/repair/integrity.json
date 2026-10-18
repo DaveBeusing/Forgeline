@@ -1508,5 +1508,40 @@
     "file": "gameplay-investigation/foundation-queue-evacuation-game-suite.log.gz",
     "originalSha256": "70E7B1E9C5B5972931DA3FE2AB9768D5CF72134EDEDE7DD811B0546AE6D0F262",
     "compressedSha256": "60692A655264AFAE38660D589D615D6C4FA6D2DDCA20C4A0298935E6030A1F1D"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-evacuation-headless-build.log.gz",
+    "originalSha256": "E4E96DF19E64CBBEF2072EEF4BD446446B7B6A45BF6013547D9D59E4BD0E7DF8",
+    "compressedSha256": "29B865CF90CB65545684B56BCE968B3F37AD391C67323FE860364D968CAECCF6"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-evacuation-opponent.json.gz",
+    "originalSha256": "B8B2171D2A1CC64E3913F4708692B4E27883C5E62A74F520E51AF7A8B159447F",
+    "compressedSha256": "2CBA682190B3AEBB7574B73065204B671185D52D056DF863E36952CFA9C14C66"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-evacuation-opponent-telemetry.json.gz",
+    "originalSha256": "9DD71D80B66A3BD54F081202D1133F961730F2E981C7A356C2092D027D14293C",
+    "compressedSha256": "CDC3A5112F1735BBF6D3902B04CDC27F672C88D18A30245B0CEB0951985E12D6"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-evacuation-opponent.log.gz",
+    "originalSha256": "34E4BB15718A9F7832B6A81B7861B3259BA81EF0FE2DF3C179B9E26A04A33D0E",
+    "compressedSha256": "8E499E377431C592F214ACC9B504D59B903C0DA68AC359BD8187CAFAD72ED3D1"
+  },
+  {
+    "file": "gameplay-investigation/foundation-6d8-client-build.log.gz",
+    "originalSha256": "85B368C9B389B8A217965F566D7AA19501A45D4FFFB1D0067B6FEF36EBEBB140",
+    "compressedSha256": "B67BF5D52C36AD3B1ADB1F52239B05BA65E0E8F4B030E85973383512691D78E8"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-resume-build.log.gz",
+    "originalSha256": "CE6A0B5B709703C6C5A5764722DD814B1DE5ABDCDACF780E9B9C3DBA87876DBD",
+    "compressedSha256": "A281403E7172D28ED5C4788B6C82B3E3204870C5180B5CA4D9E5308105512D3A"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-resume-context.json.gz",
+    "originalSha256": "EAC6CABB827C87E000581B6B557BF2BCCD846DF44378DD267FFC2A8529BADFF5",
+    "compressedSha256": "0277BE2EBDD2F91019404CE67A6033CB3C02B8B4447C29AE5E0F67F70EB5FF18"
   }
 ]
