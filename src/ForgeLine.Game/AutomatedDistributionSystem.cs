@@ -962,6 +962,7 @@ public sealed class AutomatedDistributionSystem
     {
         if (!_network.TryGetNode(request.Destination, out LogisticsNode node) ||
             !entities.HasComponent<BuildingLoadingDock>(node.Entity)) return 1;
+        if (entities.HasComponent<CommandFacility>(node.Entity)) return 0;
         if (entities.HasComponent<SupplyDepot>(node.Entity) && request.ResourceId == ResourceIds.Fuel) return 0;
         return entities.TryGetComponent(node.Entity, out UnitProductionFacility facility) &&
             facility.Status == UnitProductionStatus.NoInput &&

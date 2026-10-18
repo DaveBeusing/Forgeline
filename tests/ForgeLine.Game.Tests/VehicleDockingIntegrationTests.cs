@@ -323,8 +323,10 @@ public sealed class VehicleDockingIntegrationTests
         Assert.False(simulation.Entities.HasComponent<MovementOrder>(supply));
     }
 
-    [Fact]
-    public void PoweredFactoryInputRecoveryDoesNotWaitBehindBulkProcessingStock()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void CriticalConstructionAndPoweredFactoriesPrecedeBulkProcessing(bool constructionInput)
     {
         var simulation = new SimulationCoordinator();
         var inventories = new InventoryStore();
@@ -336,6 +338,7 @@ public sealed class VehicleDockingIntegrationTests
         var source = CreateBuilding(simulation, inventories, Vector3.Zero);
         var processing = CreateBuilding(simulation, inventories, new(120, 0, 0));
         var factory = CreateBuilding(simulation, inventories, new(240, 0, 0));
+        if (constructionInput) simulation.Entities.AddComponent(processing.Entity, new CommandFacility());
         Assert.True(inventories.Add(source.Inventory, ResourceIds.Steel, 200).Succeeded);
         var origin = network.AddNode(source.Entity, Vector3.Zero, LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoSource);
         var olderTarget = network.AddNode(processing.Entity, new(120, 0, 0), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
@@ -357,7 +360,7 @@ public sealed class VehicleDockingIntegrationTests
         Assert.Equal(UnitProductionStatus.NoInput, simulation.Entities.GetComponent<UnitProductionFacility>(factory.Entity).Status);
         var truck = CargoTruckFactory.Create(simulation.Entities, inventories, Vector3.Zero, new(1), cargo);
         simulation.RunTicks(100, TestContext.Current.CancellationToken);
-        Assert.Equal(factoryTarget, simulation.Entities.GetComponent<CargoTransportOrder>(truck).Destination);
+        Assert.Equal(constructionInput ? olderTarget : factoryTarget, simulation.Entities.GetComponent<CargoTransportOrder>(truck).Destination);
     }
 
     private static string VisitDescription(SimulationCoordinator simulation, EntityId truck) =>

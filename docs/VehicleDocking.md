@@ -138,7 +138,8 @@ construction load before the build command books it. Tactical support continues.
 Home placement candidates leave 96 m between neighboring sites so coarse navigation
 cells retain usable access between the authored loading lanes.
 
-Within the Critical dispatch class, powered unit factories blocked on inputs
+Within the Critical dispatch class, Command Core construction shortages,
+powered unit factories blocked on inputs
 and depot Fuel recovery precede ordinary processing-stock replenishment. Age
 and stable request identity still resolve ties within that recovery group.
 Factories without power retain the normal recovery ordering so construction
