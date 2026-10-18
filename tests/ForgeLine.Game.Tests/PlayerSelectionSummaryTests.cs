@@ -202,6 +202,48 @@ public sealed class PlayerSelectionSummaryTests
             cleared);
     }
 
+    [Fact]
+    public void QueueDetailsAreCopiedOwnedAndDoNotReplaceBuildingProduction()
+    {
+        using var scenario = CentralDivideScenario.Create(seed: 6207);
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new ForgeLine.Game.PlayerId(1));
+        EntityId truck = side.StartingUnits[1];
+        var entry = new VehicleQueueEntry(side.CommandCore, side.Player, 7, new(10), VehicleQueueService.CargoDelivery,
+            Position: 2, WaitingCount: 3, ChangedAtTick: new(11));
+        entities.AddComponent(truck, entry);
+        entities.AddComponent(truck, new VehicleDockVisit(side.CommandCore, 0, VehicleDockStatus.Busy,
+            VehicleDockBlockReason.Obstructed, default));
+        var captured = CaptureSelection(scenario, [truck]);
+        Assert.Equal(2, captured.Work.VehicleQueue!.Value.Position);
+        Assert.Equal(new SimulationTick(11), captured.Work.VehicleQueue.Value.ChangedAtTick);
+        Assert.Equal(captured, CaptureSelection(scenario, [truck]));
+        Assert.Equal(1, CaptureSelection(scenario, [side.CommandCore]).Work.LoadingQueue!.Value.WaitingCount);
+        entities.SetComponent(truck, entry with { Position = 1, ChangedAtTick = new(12) });
+        Assert.Equal(2, captured.Work.VehicleQueue.Value.Position);
+        Assert.Equal(1, CaptureSelection(scenario, [truck]).Work.VehicleQueue!.Value.Position);
+        entities.AddComponent(side.CommandCore, new VehicleDockSlot(truck, 1, default, side.Player));
+        entities.SetComponent(truck, new VehicleDockVisit(side.CommandCore, 1, VehicleDockStatus.Servicing,
+            VehicleDockBlockReason.None, default));
+        Assert.Equal(0, CaptureSelection(scenario, [truck]).Work.VehicleQueue!.Value.WaitingCount);
+        Assert.Equal(0, CaptureSelection(scenario, [side.CommandCore]).Work.LoadingQueue!.Value.WaitingCount);
+        entities.RemoveComponent<VehicleDockSlot>(side.CommandCore);
+        entities.SetComponent(truck, new VehicleDockVisit(side.CommandCore, 0, VehicleDockStatus.Busy,
+            VehicleDockBlockReason.Obstructed, default));
+        EntityId foreign = scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[1];
+        entities.AddComponent(foreign, entry with { Owner = new(2) });
+        entities.AddComponent(foreign, new VehicleDockVisit(side.CommandCore, 0, VehicleDockStatus.Busy,
+            VehicleDockBlockReason.Obstructed, default));
+        Assert.Equal(PlayerSelectionSummary.Empty, CaptureSelection(scenario, [foreign]));
+        Assert.Equal(1, CaptureSelection(scenario, [side.CommandCore]).Work.LoadingQueue!.Value.WaitingCount);
+        entities.RemoveComponent<VehicleQueueEntry>(truck);
+        entities.AddComponent(truck, new VehicleQueueHolding(side.CommandCore, default, VehicleQueueWaitReason.Full, new(13)));
+        var held = CaptureSelection(scenario, [truck]).Work;
+        Assert.Equal(0, held.VehicleQueue!.Value.Position);
+        Assert.Equal(VehicleQueueWaitReason.Full, held.VehicleQueue.Value.WaitReason);
+        Assert.Equal("Waiting area full", held.BlockReason);
+    }
+
     private static PlayerSelectionSummary CaptureSelection(
         MatchRuntime scenario,
         IReadOnlyCollection<EntityId> selected)

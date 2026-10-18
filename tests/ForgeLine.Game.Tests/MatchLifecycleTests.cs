@@ -12,6 +12,30 @@ public sealed class MatchLifecycleTests
     private static readonly PlayerId EastPlayer = new(2);
 
     [Fact]
+    public void CompletingAMatchClearsPhysicalQueueOwnershipWithoutMovingVehicles()
+    {
+        var simulation = new SimulationCoordinator();
+        var entities = simulation.Entities;
+        var match = MatchObjectiveSystem.CreateMatchStateEntity(entities);
+        MatchLifecycle.MarkReady(entities, match, simulation.CurrentTick);
+        MatchLifecycle.Start(entities, match, simulation.CurrentTick);
+        var building = entities.CreateEntity();
+        var truck = entities.CreateEntity();
+        var transform = WorldTransform.Identity;
+        entities.AddComponent(truck, transform);
+        entities.AddComponent(truck, new VehicleQueueEntry(building, WestPlayer, 1, simulation.CurrentTick, VehicleQueueService.CargoPickup));
+        entities.AddComponent(truck, new VehicleDockVisit(building, 1, VehicleDockStatus.Exiting, VehicleDockBlockReason.ExitBlocked, default));
+        entities.AddComponent(building, new VehicleDockSlot(truck, 1, default, WestPlayer));
+        entities.AddComponent(building, new VehicleQueueLane(default, 0, 1));
+        MatchLifecycle.ResolveDraw(entities, match, MatchTerminationReason.MutualCommandCoreDestruction, simulation.CurrentTick);
+        MatchLifecycle.Complete(entities, match, simulation.CurrentTick);
+        Assert.False(entities.HasComponent<VehicleQueueEntry>(truck));
+        Assert.False(entities.HasComponent<VehicleDockSlot>(building));
+        Assert.False(entities.HasComponent<VehicleQueueLane>(building));
+        Assert.Equal(transform, entities.GetComponent<WorldTransform>(truck));
+    }
+
+    [Fact]
     public void InvalidLifecycleTransitionsAreRejectedWithoutStateMutation()
     {
         var simulation =

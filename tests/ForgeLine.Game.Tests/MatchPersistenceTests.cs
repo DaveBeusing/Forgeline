@@ -9,6 +9,49 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class MatchPersistenceTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void WaitingAndExitingQueuesRoundTripWithoutLosingAdmissionOrder(bool exiting)
+    {
+        using var original = CreateScenario(seed: 2026);
+        Assert.True(original.RunUntil(runtime =>
+        {
+            foreach (var entity in runtime.Simulation.Entities.Query<VehicleDockVisit, VehicleQueueEntry>())
+            {
+                var visit = runtime.Simulation.Entities.GetComponent<VehicleDockVisit>(entity);
+                if (exiting ? visit.Status == VehicleDockStatus.Exiting : visit.Generation == 0) return true;
+            }
+            return false;
+        }, maximumTicks: 5000, cancellationToken: TestContext.Current.CancellationToken));
+        var save = MatchPersistenceService.CaptureSave(original);
+        var replay = MatchPersistenceService.CaptureReplay(original);
+        using var restored = MatchPersistenceService.Restore(MatchPersistenceSerializer.DeserializeSave(
+            MatchPersistenceSerializer.SerializeSave(save)));
+        using var playback = MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(
+            MatchPersistenceSerializer.SerializeReplay(replay)));
+        Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+        Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        original.Simulation.RunTicks(200, TestContext.Current.CancellationToken);
+        restored.Simulation.RunTicks(200, TestContext.Current.CancellationToken);
+        Assert.Equal(MatchAuthoritativeSnapshot.Capture(original).ComputeSha256(),
+            MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+    }
+
+    [Fact]
+    public void PreQueueCheckpointsAreRejectedWithTheirOriginalSchema()
+    {
+        using var runtime = CreateScenario(seed: 831);
+        var save = MatchPersistenceService.CaptureSave(runtime);
+        var state = save.State with { SchemaVersion = 2 };
+        var oldSave = save with { SchemaVersion = 3, State = state, StateSha256 = state.ComputeSha256() };
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(oldSave)).Reason);
+        var replay = MatchPersistenceService.CaptureReplay(runtime) with { SchemaVersion = 3, AuthoritativeSchemaVersion = 2 };
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.PlayReplay(replay)).Reason);
+    }
+
     [Fact]
     public void TimedDockServiceRoundTripsThroughSaveAndReplay()
     {

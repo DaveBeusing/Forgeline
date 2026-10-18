@@ -37,11 +37,11 @@ Every save or replay document contains:
 
 Writes use a temporary file followed by atomic replacement. A partially written temporary file is never treated as the requested save path.
 
-The current reader accepts envelope format 1 and payload schema 3. Schema 3
-requires a composition identity and authoritative checkpoint schema 2, including
-vehicle docking semantics. The existing schema-1 composition migration remains
-available only with a compatible authoritative checkpoint; pre-docking
-checkpoints and schema-2 payloads are rejected before runtime reconstruction. Unlimited backward
+The current reader accepts envelope format 1 and payload schema 4. Schema 4
+requires a composition identity and authoritative checkpoint schema 3, including
+vehicle docking and physical queue semantics. The existing schema-1 composition
+migration remains available only with a compatible authoritative checkpoint;
+pre-queue checkpoints are rejected before runtime reconstruction. Unlimited backward
 compatibility is not implied.
 
 ## Save Payload

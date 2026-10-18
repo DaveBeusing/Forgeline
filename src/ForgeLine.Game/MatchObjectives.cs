@@ -522,6 +522,7 @@ public static class MatchLifecycle
                 TransitionCount =
                     checked(state.TransitionCount + 1)
             });
+        VehicleDockingService.EndQueueSession(entities);
     }
 
     private static MatchState RequireState(

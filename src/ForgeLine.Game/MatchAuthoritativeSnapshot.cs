@@ -25,7 +25,7 @@ public sealed record MatchAuthoritativeSnapshot(
     InventoryStoreSnapshot Inventories,
     IReadOnlyList<AuthoritativeDomainSnapshot> Domains)
 {
-    public const int CurrentSchemaVersion = 2;
+    public const int CurrentSchemaVersion = 3;
 
     private static readonly JsonSerializerOptions s_jsonOptions =
         new()

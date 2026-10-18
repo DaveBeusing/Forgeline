@@ -1,5 +1,12 @@
 # Ground Movement and Local Steering
 
+Building service uses the [physical loading queue](VehicleQueues.md). Assigned
+local row motion preserves predecessor spacing and stable individual targets.
+Local admission transfers motion ownership to the existing exclusive dock;
+service retains its settled position, heading and speed checks. Ordinary passing
+remains available outside the queue strip. Queue membership does not teleport
+vehicles or replace physical exit clearance.
+
 ## Purpose
 
 Ground movement is the authoritative fixed-tick locomotion layer for standard RTS ground units.

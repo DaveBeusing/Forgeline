@@ -84,18 +84,25 @@ internal static class LogisticsTrafficReferenceScene
         if (!transport.TryAssignOrder(simulation.Entities, truck,
                 new CargoTransportOrder(source,destination,ResourceIds.FerrousOre,50,SimulationTick.Zero),SimulationTick.Zero))
             throw new InvalidOperationException("Traffic order was rejected.");
-        EntityId waitingTruck = EntityId.Invalid;
+        var waitingTrucks = new List<EntityId>();
         if (kind == VisualReferenceSceneKind.LogisticsLoadingProduction)
         {
-            Vector3 waitingPosition = ServicePoint(source, definition.VisualScale) - Vector3.UnitX * 30;
+            float margin = definition.VisualScale.Z + definition.Movement.SeparationRadius + definition.Movement.StopRadius + 2.5f;
+            float approachLength = AssertLoadingDock(source).ApproachLength + definition.VisualScale.Z * .5f;
+            for (int index = 1; index <= 2; index++)
+            {
+            Vector3 waitingPosition = ServicePoint(source, definition.VisualScale) - Vector3.UnitX *
+                (approachLength + margin + index * (definition.VisualScale.Z + definition.Movement.SeparationRadius));
             waitingPosition.Y += definition.Movement.HeightOffset;
-            waitingTruck = CargoTruckFactory.Create(simulation.Entities, inventories, waitingPosition, new(1), transport,
+            EntityId waitingTruck = CargoTruckFactory.Create(simulation.Entities, inventories, waitingPosition, new(1), transport,
                 new CargoTruckDefinition(definition.Key, definition.CargoCapacity, definition.Movement, definition.VisualScale, definition.VisualId));
+            waitingTrucks.Add(waitingTruck);
             simulation.Entities.AddComponent(waitingTruck, new UnitIdentity(UnitIds.CargoTruck, new(1)));
             Align(waitingTruck);
             if (!transport.TryAssignOrder(simulation.Entities, waitingTruck,
                     new CargoTransportOrder(source, destination, ResourceIds.FerrousOre, 20, SimulationTick.Zero), SimulationTick.Zero))
                 throw new InvalidOperationException("Waiting traffic order was rejected.");
+            }
         }
         CargoTransportRuntimeState state = CargoTransportRuntimeState.Idle;
         for (int tick = 0; tick < 4000; tick++)
@@ -124,7 +131,8 @@ internal static class LogisticsTrafficReferenceScene
         }
         if (!sustained && state.Lifecycle != requested)
             throw new InvalidOperationException($"Traffic did not reach {requested}: {state.Lifecycle}/{state.WaitReason}.");
-        if (waitingTruck.IsValid &&
+        foreach (EntityId waitingTruck in waitingTrucks)
+        if (
             (!simulation.Entities.TryGetComponent(waitingTruck, out VehicleDockVisit waiting) || waiting.Status != VehicleDockStatus.Busy ||
              simulation.Entities.GetComponent<GroundMovementState>(waitingTruck).Velocity.LengthSquared() > 0.05f * 0.05f ||
              simulation.Entities.GetComponent<VehicleDockVisit>(truck).Pose.Contains(simulation.Entities.GetComponent<WorldTransform>(waitingTruck).Position, waiting.Pose.HalfLength)))
@@ -133,7 +141,7 @@ internal static class LogisticsTrafficReferenceScene
         double conserved = inventories.GetQuantity(sourceInventory,ResourceIds.FerrousOre) +
             inventories.GetQuantity(destinationInventory,ResourceIds.FerrousOre) +
             inventories.GetQuantity(simulation.Entities.GetComponent<CargoTransport>(truck).CargoInventory,ResourceIds.FerrousOre);
-        if (waitingTruck.IsValid) conserved += inventories.GetQuantity(
+        foreach (EntityId waitingTruck in waitingTrucks) conserved += inventories.GetQuantity(
             simulation.Entities.GetComponent<CargoTransport>(waitingTruck).CargoInventory, ResourceIds.FerrousOre);
         if (Math.Abs(conserved-100)>1e-6) throw new InvalidOperationException("Traffic did not conserve inventory.");
         if (sustained && transport.Metrics.CompletedOrderCount < 2)
@@ -162,6 +170,13 @@ internal static class LogisticsTrafficReferenceScene
             destinationQuantity = inventories.GetQuantity(destinationInventory,ResourceIds.FerrousOre)
         }, FingerprintOptions)));
         return new(kind,target,snapshot,default,fingerprint);
+
+        BuildingLoadingDock AssertLoadingDock(LogisticsNodeId id)
+        {
+            if (!network.TryGetNode(id, out var node) || !simulation.Entities.TryGetComponent(node.Entity, out BuildingLoadingDock dock))
+                throw new InvalidOperationException("Missing queue loading geometry.");
+            return dock;
+        }
 
         Vector3 Ground(Vector3 point)
         {

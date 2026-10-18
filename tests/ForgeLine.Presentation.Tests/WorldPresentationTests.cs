@@ -29,9 +29,11 @@ public sealed class WorldPresentationTests
             MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256());
         string hash = MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256();
         const string historicalSchemaOne = "848FABF78754FA4136EB56D03B5059B5FAA2EC91F2C145CA2FFA022C7251549B";
-        Assert.Equal(2, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
+        const string historicalSchemaTwo = "424C217FBDEB400FFAB3FC5A303C67467C9E3C7F68332AAA69110DF7DADC9729";
+        Assert.Equal(3, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
         Assert.NotEqual(historicalSchemaOne, hash);
-        Assert.Equal("424C217FBDEB400FFAB3FC5A303C67467C9E3C7F68332AAA69110DF7DADC9729", hash);
+        Assert.NotEqual(historicalSchemaTwo, hash);
+        Assert.Equal("F8851B42FBFD3EF68A46F0D8E26B2C31433C4EBF225F5B4FD6F6156C24CCD979", hash);
         Assert.True(buffer.TryReadLatest(out var snapshot));
         var dressing = snapshot.Instances.ToArray().Where(x => x.Entity.Index >= 0xE000_0000U && x.Entity.Index < 0xF000_0000U).ToArray();
         Assert.Equal(scenario.Battlefield.WorldObjects.Count(x => x.PresentationOnly), dressing.Length);

@@ -220,6 +220,8 @@ public sealed class MatchRuntimeCompositionTests
 
         scenario.Simulation.AdvanceOneTick();
 
+        Assert.True(scenario.Simulation.Entities.HasComponent<CargoTransportMovementTarget>(truck),
+            scenario.Simulation.Entities.GetComponent<VehicleDockVisit>(truck).ToString());
         CargoTransportMovementTarget approach =
             scenario.Simulation.Entities.GetComponent<
                 CargoTransportMovementTarget>(
