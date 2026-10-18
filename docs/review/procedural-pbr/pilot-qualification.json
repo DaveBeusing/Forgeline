@@ -1,0 +1,29 @@
+{
+  "sourceLessVerified": true,
+  "sourceParity": true,
+  "compileSeconds": 88.9265572,
+  "cacheVerified": true,
+  "schemaVersion": 1,
+  "sourceFiles": {
+    "source/materials/directorate/surfaces/production_surface_base.png": "3ba21dff212ca930051f86341b1f7d8b4d97b926add454433869428ab6246683",
+    "source/materials/directorate/surfaces/production_surface_normal.png": "569659f9645d70e5492896fab573fe28a845f7092778bacebd7e1ecfac641c89",
+    "source/materials/directorate/surfaces/production_surface_orm.png": "5f1602d69fb52b3895fe7fab4dcded925bd80889b8d3a149bf572065f708657b",
+    "source/materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "source/materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "source/materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9",
+    "source/units/directorate/collision/main_battle_tank_collision.asset.json": "73e0a161c37ca64c8052cd526354d7c40f5ce26f5e53fd32b1c7cc7f48ca4bbb",
+    "source/units/directorate/materials/main_battle_tank.asset.json": "f3ffeb6c2076f8ceb6b22db3dc038fb76e4b6c216e599494ea34f69bc84f0851",
+    "source/units/directorate/materials/main_battle_tank.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "source/units/directorate/sources/collision_box.gltf": "994a38291cb333052e5101e8b693ab754225fe8c29d283cf3773abfbde912d30",
+    "source/units/directorate/sources/main_battle_tank/blender/unit.directorate.main_battle_tank.glb": "3623103ba4371f0467768c6a0f0bbb9d8c9ea633161244b9b7d3d3443c84458e",
+    "source/units/directorate/sources/main_battle_tank/blender/unit.directorate.main_battle_tank.lod1.glb": "427d3b1ab0dbefefbdd24437325d9c4106b2033a06a2f0ab4caa8ca44dff97c5",
+    "source/units/directorate/sources/main_battle_tank/blender/unit.directorate.main_battle_tank.lod2.glb": "7149c453e1dc85d45f5997f7c302cb972e71521f9d93501d6a4bfcc15f0716ae",
+    "source/units/directorate/sources/main_battle_tank/blender/unit.directorate.main_battle_tank.turret.glb": "0e81697949987ca78b97102dcc76e67234b034c61aa54678a91a4b638732861e",
+    "source/units/directorate/vehicles/main_battle_tank.asset.json": "e4c4d40a200b3f20172b742149efaa4f19b76e20a6de14d6a8f2d7cdfed0bd4f",
+    "source/units/directorate/vehicles/main_battle_tank_lod1.asset.json": "d2a88df689a6dbeb9ac60ccd8da8ddeae1f397c3a8bfb7b2427f065fb112a0a2",
+    "source/units/directorate/vehicles/main_battle_tank_lod2.asset.json": "feb5aed195673e9af173cc8ba6fc5fb3209d4ae4b160dca0eed7354d362cb5e0",
+    "source/units/directorate/vehicles/main_battle_tank_turret.asset.json": "7c10f7177155df243e89997a725ff02fc947288a2f114f15ea1dddb5f6f4085d"
+  },
+  "artApproval": "pending",
+  "key": "271d4aa63fdf392cc12917c7b1dd65616659d316df2cb89912a4da01d5eb91dd"
+}

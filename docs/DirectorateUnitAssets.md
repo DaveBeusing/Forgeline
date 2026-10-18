@@ -212,3 +212,5 @@ allocation behavior. Metric rigid rotations preserve wheel radius and cannon
 length under nonuniform unit scale. Owned active artillery missions supply only
 bounded visual aim; gameplay missions and trajectories remain authoritative.
 See [source, native comparisons and remaining acceptance](CombatSupportUnitProduction.md).
+
+The optional [procedural CPU atlas producer](ProceduralPbrProduction.md) preserves the existing atlas and runtime budgets in isolated, verifiable source generations. Production promotion and art approval remain explicit; see its qualification report.
