@@ -641,6 +641,271 @@
       "file": "foundation-active-rescue-game-suite.log.gz",
       "rawSha256": "297c4f657717ef0bded3718aec6e439c2b6651c8a17e8246d212f46a110c090c",
       "archiveSha256": "cfb7b2893c8e44ed05bea4b3419e1ec23b6660a57596948f0924498138cab396"
+    },
+    {
+      "file": "foundation-active-rescue-headless-build.log.gz",
+      "rawSha256": "9d276c5b3d3a884b142155345ee9abfa1c9010bbea8930409c3a349f2e8c3aa2",
+      "archiveSha256": "8ff01d8b4adfd5736cf4e3fc4904ec8699d4ba06642d707f7921173cf0b97c50"
+    },
+    {
+      "file": "foundation-active-rescue-opponent.json.gz",
+      "rawSha256": "eaeedba1e40f3f6a90a6485e0286c8e910962fca64d7b455d4afb12d352197eb",
+      "archiveSha256": "6c157d056498e3953d6a20df4b06c59e440d1db55afe86089bfbcbedc26bcd45"
+    },
+    {
+      "file": "foundation-active-rescue-opponent.save.json.gz",
+      "rawSha256": "048c1dccbed4f0363650e0deaf4d15692f61709a044ea8e1065cd7783610a122",
+      "archiveSha256": "b1a95f373e5375dc7732069019d51b7bdb66f3fb6191a7353cce925861d75dab"
+    },
+    {
+      "file": "foundation-active-rescue-opponent-telemetry.json.gz",
+      "rawSha256": "619cd22c273f95ef521fefe6270ed0357eb902b080400e882b7080899c3bff21",
+      "archiveSha256": "50a556c95966ae2a55330cd76d461497f30ea77fd6831160144bedf2cf7bd56c"
+    },
+    {
+      "file": "foundation-active-rescue-opponent.log.gz",
+      "rawSha256": "15e493d50d410b6311dca094bf3050af76a6cb68448ed8f662b85a86f11645b0",
+      "archiveSha256": "e019634ce760a051382c8ec981abb032f54cf035561ea75e4989267b00292a60"
+    },
+    {
+      "file": "foundation-2d90-client-build.log.gz",
+      "rawSha256": "98ff4fa5b0823216cbcbc8b0747e788ddce60fbfebebc464c8ba6cc6bbfdb543",
+      "archiveSha256": "71b7845a64232fa844a9fd5735f8b296ac3ea2e3d05c1a427a37154bbd943890"
+    },
+    {
+      "file": "foundation-formation-provider-before.log.gz",
+      "rawSha256": "01f71c2a24b9d02de53e84aa0bd406cb6343dd63b9aeb8f1634a2869d7a7bd24",
+      "archiveSha256": "ca36f2bdc14086aa269e6b7a141875298a8afac2c44905b97d2a324c88644eaf"
+    },
+    {
+      "file": "foundation-pending-formation-before-build.log.gz",
+      "rawSha256": "ec0100c1db902728863b1c747a4f1a6e598c22a319e952b327af757522af5741",
+      "archiveSha256": "eea7a684f55a8edf4b15f478bee0a2f0238df778459b0f93f872d9804c007cdc"
+    },
+    {
+      "file": "foundation-pending-formation-before.log.gz",
+      "rawSha256": "179ac57568111c28550256b2c8e8a509fa2fca73bf5bec568f9955a46b294185",
+      "archiveSha256": "696f547c5a24743f7f777150f83fc895f726329a59ffc75b1e5f95a20b05b453"
+    },
+    {
+      "file": "foundation-pending-formation-after-build.log.gz",
+      "rawSha256": "b48a12eb21b7c1a806a18f9b7f8067910aab77c315e7621acc12f580d6227983",
+      "archiveSha256": "38ff9cb1788917f3f4f41f72dd15e2d513a03aa857d6f7a9f122f51900be5b49"
+    },
+    {
+      "file": "foundation-pending-formation-after.log.gz",
+      "rawSha256": "344cd5c10316509340b4ecfc1441ea6c0737325052f31c96f2d49a313bbc5e31",
+      "archiveSha256": "0f5951f028bea9c2d1b060fdbff202c8c6dfdc2469724020cd1820c44d266cf7"
+    },
+    {
+      "file": "foundation-pending-formation-game-suite.log.gz",
+      "rawSha256": "bb151f7e699e1045c31997f097e13925807e443b07e7447e185b6499fc71c973",
+      "archiveSha256": "1726410045782ca9caec61e26462b0da5c4558ed53a0ee686656b5dc8e97081e"
+    },
+    {
+      "file": "foundation-2d90-ci-allocation-failure.txt.gz",
+      "rawSha256": "0f4e58e51208ca2adf2634e6401f3bf10c9914e9c423d2b4a460512427317a2a",
+      "archiveSha256": "a10ee557dc6c831a3a7ebff12603a3a51cff881f5a478a50d89600edd485a320"
+    },
+    {
+      "file": "foundation-728d-client-build.log.gz",
+      "rawSha256": "524e73714e07b0e4cfca864e1f7223808c4d820114f7b8a68aa56099ff2ec4e4",
+      "archiveSha256": "b87be118cf738fa7c581059eb72623e828866aec6b4ec7b2f60c5be74764dc8c"
+    },
+    {
+      "file": "foundation-728d-headless-identity.json.gz",
+      "rawSha256": "d9c1b6af3f1f466af56589435c37401f05ae0bdcc6b32d7d44b2c9c3f454e9bd",
+      "archiveSha256": "fdf9466384a13f16e7c0b93d95252bbe4fbbb9ecedf407059ff1e00cfb132910"
+    },
+    {
+      "file": "foundation-allocation-before-build.log.gz",
+      "rawSha256": "f4ee0ea6ac5594b5f767631cf5fda59f4b61849e77f2c53ac4af649e487fc4b5",
+      "archiveSha256": "1799b1acbb85dfa4a582a3697cb1ebbe6607103a7e3b4b60be1d88caaa19f466"
+    },
+    {
+      "file": "foundation-allocation-before.log.gz",
+      "rawSha256": "c5392f1aec17f6d93105715ad8f6845806813931814ea7f60d859b6d29bc4234",
+      "archiveSha256": "e6378d0c333f5293e6a69d4ec2b31afdabd92c25df23b18f1ed30f69b56482bb"
+    },
+    {
+      "file": "foundation-convoy-continuation-after-build.log.gz",
+      "rawSha256": "e2a1f93d30bf1b63154dbb110e392e7152c0777c499ca9738819572d0310518a",
+      "archiveSha256": "7d036a030ba4277d38a69ad6f7516a1f791a083b7f2da4a19f0be9ad2ef64cc6"
+    },
+    {
+      "file": "foundation-convoy-continuation-after.log.gz",
+      "rawSha256": "03abcb4e1f3eb1a98220e5359be734065e2af0f07a4896b42a6d4a82fb074f5c",
+      "archiveSha256": "b0bfc2d9c12ed60a3800a20cbc355a49a6bb00e8f793cd3f3416fd69a40c5d6d"
+    },
+    {
+      "file": "foundation-convoy-continuation-before-build.log.gz",
+      "rawSha256": "724d91390cc5ebd13e5b1bbbc610452dfecc1ab50cbd92c963d261b144418f85",
+      "archiveSha256": "ff28e3ce3efc509c65549c8bc54a45a531d6ecdc1cfe9aa82c1a33f092ce8e5e"
+    },
+    {
+      "file": "foundation-convoy-continuation-before.log.gz",
+      "rawSha256": "e9b1f095b9f3ec682ab77027acddafecafe9468be125d85c655d7d4fb60091b9",
+      "archiveSha256": "7037665703122163d20458de3108eeaf70db0674581bbb4d75199b09fc6af1ca"
+    },
+    {
+      "file": "foundation-convoy-continuation-final-build.log.gz",
+      "rawSha256": "25c36890e4d8cf82c054696c3896b9a15f2d051f0fa5fc2caeb381a56d5870e7",
+      "archiveSha256": "f2e698b79a5e9e5f787ec324d1151f6aab208957b2c3da61867c0a864ea2d218"
+    },
+    {
+      "file": "foundation-convoy-continuation-final-focused.log.gz",
+      "rawSha256": "db7444dcfce13a3e6f55a94a67a694198cf07ce0b3c5a9cd11ee55f2c2d38589",
+      "archiveSha256": "766f6a220c087d67a426270b1bbf1d3927e00f90fd9f1b9a1b6631c78bf25af7"
+    },
+    {
+      "file": "foundation-convoy-continuation-final-game-suite.log.gz",
+      "rawSha256": "018ffb4e68a72c7dc8bb9cb669fd1e00335036c0e4a719bc0429ddb78e30a851",
+      "archiveSha256": "fda720181e5081a41912134aa5386e729c9930b99253900d9e521fdb406a62fc"
+    },
+    {
+      "file": "foundation-convoy-phase-build.log.gz",
+      "rawSha256": "e76785a7382224f4872bfe1faa7cd4156475ce7e97871bb9eda0a0b88fabc9bb",
+      "archiveSha256": "0c494a248b784801fc686236577cd3c7ef2675f4f6a518e0e0ffacf3940fca0a"
+    },
+    {
+      "file": "foundation-convoy-phase-focused.log.gz",
+      "rawSha256": "b9a9cdb565e89e77004b19ff9039a61465012a9e5fba18471d1ff0e3adb90d4f",
+      "archiveSha256": "cbb4420b178f76ae42215b1802255adacda6338a92674486a9729e31475443f5"
+    },
+    {
+      "file": "foundation-convoy-phase-game-suite.log.gz",
+      "rawSha256": "7ffe74e8beb154ab605dffaeb56d77d72fb221c3f2ecbf54075f73167cefa059",
+      "archiveSha256": "e373cc1e1f416aee10f11104e91ed5786011ba13733f97549cf2c26ca0be7d39"
+    },
+    {
+      "file": "foundation-convoy-phase-headless-build.log.gz",
+      "rawSha256": "1140f5dedffee8627700cf4041d2d386da79255ad486a7d8884f1918311d2605",
+      "archiveSha256": "16c61ae0c226c891925b1011f1d6cecb4aa2a2c05a1917c55a4ef56274e286f0"
+    },
+    {
+      "file": "foundation-convoy-phase-opponent-telemetry.json.gz",
+      "rawSha256": "74b4926a7a5fb52a03e1fc4af6c7e711fcaefef733ff667a2f045ed1659938bc",
+      "archiveSha256": "78221432076124d477ea99b628b9b62448d161c16ab65c28c010b3aea2c148ed"
+    },
+    {
+      "file": "foundation-convoy-phase-opponent.json.gz",
+      "rawSha256": "fc39bb76ed2566e8751f7e09f0e9f35f3eda7d49d4acfa1854408a50569055aa",
+      "archiveSha256": "de3c957902b6455f781b6029d6d0f3cbff0d7559b7a23a328f8c8bb91208c21f"
+    },
+    {
+      "file": "foundation-convoy-phase-opponent.log.gz",
+      "rawSha256": "73574a1f537b00edc530906d777f3f11ce245299dc4218a77c31c7631935a1da",
+      "archiveSha256": "c81e439470872adf40f2365e2b8844a8740ce710b3182449dbbf4892c34243fc"
+    },
+    {
+      "file": "foundation-convoy-phase-opponent.progression-1.json.gz",
+      "rawSha256": "adbb4432c14ad154d44483dff2ada1ce0e105720465c569bb1aa8ee601081307",
+      "archiveSha256": "40d42101ea3660d1afe0af5829778420418190a6738200009899d589569a9f77"
+    },
+    {
+      "file": "foundation-convoy-phase-opponent.save.json.gz",
+      "rawSha256": "3159b6ce7f173318c0f4016937e81f3af7ff40d266c59fac145485c73fb9b731",
+      "archiveSha256": "81e8f7dc56694295628a7d8bfb4d7bc425e2e27902b48142afdcbd7d3a3ac2c4"
+    },
+    {
+      "file": "foundation-pending-formation-opponent-telemetry.json.gz",
+      "rawSha256": "b5743b6336dd44ba0327b3c6261040d42f872d148c43bad6774fa6fc7b52e1d7",
+      "archiveSha256": "1a363c19de4299225a50423dd58ec41d0fb4435059b9b4b9a169aa111ba21d40"
+    },
+    {
+      "file": "foundation-pending-formation-opponent.json.gz",
+      "rawSha256": "843cb018b633732a9e47041dbff3c8c9eb0c83605c54413ed6fe1ec8450e4b21",
+      "archiveSha256": "d1e680bff4445b1c65fab635b04245eedc8215e0d698c0aa4b1ebe8d8e9b1989"
+    },
+    {
+      "file": "foundation-pending-formation-opponent.log.gz",
+      "rawSha256": "76ec970f4c1da2ee189c87101f4622c23e01323a7b308ca9c38e5699da88de47",
+      "archiveSha256": "303e00e603ce1018ef14c2e26a5f36d7b22abc4e352414cdfaf887b632eb790a"
+    },
+    {
+      "file": "foundation-pending-formation-opponent.progression-1.json.gz",
+      "rawSha256": "647a30e9d3fbb3eaca6908729b947bcc7253886c679a7d4800e93cc666573af9",
+      "archiveSha256": "79f992ee903150f0bcb408c90fe0393a4ce9100b9435326563f308102ea7d336"
+    },
+    {
+      "file": "foundation-pending-formation-opponent.save.json.gz",
+      "rawSha256": "d58268870c8c7d78b2ec2c27502aeb85c9b80082524fd44b2777f310be413bc5",
+      "archiveSha256": "1c16de3eb9a98d6ccd3a10f25fe2f8264d87022199cb4cbb1dbd7c2b95ec77f8"
+    },
+    {
+      "file": "foundation-role-observer-build.log.gz",
+      "rawSha256": "57d190fffc5148a75928be82f9575a277b84c062f7e30676c10fa8acb93fbfc4",
+      "archiveSha256": "2adb6a52bee90e620f21449bda4ac5701b713ededc0eb5f7abd53e22e481ddbb"
+    },
+    {
+      "file": "foundation-role-observer-program.txt.gz",
+      "rawSha256": "1fed09ff8f18dee12dab3b8dcddeff28d5bfb0b0dabb675a17f858816f5e7b22",
+      "archiveSha256": "150e50636fe89bacfbf6963c75f354b3b1c1d36119455d52588a571dc8ba6c95"
+    },
+    {
+      "file": "foundation-role-state-equivalence.json.gz",
+      "rawSha256": "86e5489e949512954ab686fd67eb66059ec61c06940e6a411da74b0cc2267454",
+      "archiveSha256": "20a89126b0b22b63ef91503550a060980b1d4e3b2554a8a55b7b6a1c426c1ae7"
+    },
+    {
+      "file": "foundation-role-timeline.jsonl.gz",
+      "rawSha256": "a69f03b4016b1ed819d60c70adcf911e166673bb3333936bd31354cc0bfc4121",
+      "archiveSha256": "f7ccabb5c71dd250288ffe4e2f72c2951c72ec925b6419bc53d7623da9b71a06"
+    },
+    {
+      "file": "foundation-role-timeline.save.json.gz",
+      "rawSha256": "1e850b3915505fe99768472813475198321df8f37b44c430d610c7dec234fd1a",
+      "archiveSha256": "608e9625a32f8fac2bba2479ecc2852b1ce48a128e89e0ee1eed4b296bd33d12"
+    },
+    {
+      "file": "foundation-allocation-isolated-build.log.gz",
+      "rawSha256": "d409eea6c8212902f6a6828d06982c2bebe7e1a4afaf01e3d088fad5f6f39579",
+      "archiveSha256": "39e7cb0dd171baac253d4a397df2472c263d9479a366e94688e4e07f66e226d7"
+    },
+    {
+      "file": "foundation-allocation-isolated-class.log.gz",
+      "rawSha256": "3796faee22e82b77a585367d23bbf20d020957e1e598abb2fb18397e547e4724",
+      "archiveSha256": "9caccc9a6cd41336694fd82bedc0707ca9d74063eb4d0d2609c0dcf4b3e7a44d"
+    },
+    {
+      "file": "foundation-allocation-presentation-suite.log.gz",
+      "rawSha256": "e330bc384b3e47aae24c281442c45920a5dbef64ac90afdbf299341ee0c2eb5f",
+      "archiveSha256": "826d84afd57c2dbf98a704793f3e7cee0f5c25c2ddc149cbc1863d13e5a5ccb6"
+    },
+    {
+      "file": "foundation-allocation-both-build.log.gz",
+      "rawSha256": "d997d0755d9742d05a5e9da0963b5bc23f838205d4a18efe0a1f821095884f27",
+      "archiveSha256": "0e80a5a4dc93e88779086de575ef2d00c1f7628aa7d280ce322a4baabe3098ba"
+    },
+    {
+      "file": "foundation-allocation-both-suite.log.gz",
+      "rawSha256": "745400855fa7d7e28b5cefd7129b8a590ca79e98fff4138c1b65700b0488967b",
+      "archiveSha256": "51731dfe6b4d1cce4dd845d7ded46bacb558ece81cac4c2e4c98bd57b6f9372d"
+    },
+    {
+      "file": "foundation-queue-evacuation-before-build.log.gz",
+      "rawSha256": "2cfa4799bf8b0ff284bce30165385f673ee9603e38a3af75883d9270b0f511fc",
+      "archiveSha256": "604560516f10c68564f5356776340d924f84a6669bbe2bc4d7b2cd24142b38cc"
+    },
+    {
+      "file": "foundation-queue-evacuation-before.log.gz",
+      "rawSha256": "6d20e96e762d494232e1813645cb232ba68b18fc5e1cd48e6196d5aea1b3ba14",
+      "archiveSha256": "438c2a79bb5d274b7cab8df8a62763d8c66cbdc6887bfd2808ba91b0ccc4f7d9"
+    },
+    {
+      "file": "foundation-queue-evacuation-after-build.log.gz",
+      "rawSha256": "933d43a4e645e78e8242b490f71e284470a55f406d544c43a0f7a6d22934579b",
+      "archiveSha256": "33f625ebccbc630fbba5fd5d4c7da323979cab79531c2ea43a0147f319175c20"
+    },
+    {
+      "file": "foundation-queue-evacuation-after.log.gz",
+      "rawSha256": "bc582d35f58b56d870c2712e6f04e1ef60fed90ec83f562895580f333b6af905",
+      "archiveSha256": "d4b2e2903610a9a513fbabb4eda1e8e9c47e52fc94771da647670757111b82bf"
+    },
+    {
+      "file": "foundation-queue-evacuation-game-suite.log.gz",
+      "rawSha256": "70e7b1e9c5b5972931da3fe2ab9768d5cf72134edede7dd811b0546ae6d0f262",
+      "archiveSha256": "60692a655264afae38660d589d615d6c4fa6d2ddca20c4a0298935e6030a1f1d"
     }
   ]
 }

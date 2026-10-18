@@ -749,3 +749,107 @@ as e0481eda; the test build precedes that checkpoint with identical runtime/test
 source. No other runtime change follows that complete-suite result. The unchanged
 strict terminal run on e0481eda is pending. This checkpoint does not grant parallel
 release or native/performance acceptance. PR #237 remains draft.
+
+The e0481eda terminal check remains Active / Running at 80,000 ticks with both
+cores at full HP. Cargo completions/delivery are 296 / 29,164.5 units. The complete
+failed run is retained. All western tanks in this endpoint are holding for fuel;
+this is not corrected by merely recognizing active support in admission.
+
+### Formation-bound providers between local movement orders
+
+Existing SupplyRescueTravel.HasUnrelatedMovement already protects a provider with
+an unrelated active movement intent. An initial test prototype therefore does not
+establish a missing moving-provider guard; its same-group expectation conflicts
+with that existing protection. The narrower regression models a live formation
+awaiting its local route, with membership retained and no individual movement order.
+On the unchanged source it incorrectly borrows that provider, including when an
+uncommitted alternative is available (two failures, three passing controls).
+
+The candidate treats membership in another live formation as ProviderBusy for
+out-of-range reassignment. Same-group support and in-range transfers remain allowed;
+existing unrelated-movement protection still applies. It introduces no component,
+serialized state, numerical stock threshold or fleet increase. All five focused
+cases pass (0.479s); the complete Game suite is pending. Under the user's existing
+Gameplay-Ursache scope extension, BattlefieldResupplyPlanner.cs and its existing
+ResupplyPlanningDiagnosticsTests.cs are added to serial foundation ownership.
+Parallel release remains false.
+
+The formation-provider candidate completes all 582 Game tests with zero failures
+or skips (2m11.505s), after five focused cases reproduce two original failures and
+pass after repair. It is committed as 728d5a1f. The build precedes the checkpoint
+commit with identical runtime/test source. Its strict 80,000-tick terminal run is
+pending. On pushed checkpoint 2d90cabe, frame contracts, CPU scalability and
+navigation/movement pass; the main hosted build-test job is still running. These
+checks do not replace qualification of the subsequent runtime source.
+
+
+### Continuation, observation and subsequent hosted allocation failure
+
+The 728d5a1f strict terminal check fails at 80,000 ticks, Active / Running,
+with both cores at 1,200 HP. A separate read-only role observer reaches exactly
+its state hash 08D895823770565ABBD530D4CBE07F4ABCC9C22ABC41FEBA0A5BAEF1A1FFE4FD.
+The complete role timeline and saved state are retained. It is a causal diagnostic,
+not a timed qualification. The actual first western reconnaissance escort 194:3
+leaves its group at tick 28,451 with 54.9510515 fuel cargo and 120 ammunition;
+the scout subsequently pauses at tick 28,991. Launch reserves should not be
+applied as optional top-ups during an otherwise supported committed mission.
+
+The broad continuation variant passes its focused cases but fails the eastern
+40,000-tick offensive deadline (587 passed / one failed / 588 total). It is
+excluded. Source 85285f78033f72577a4c4bdab1447eaf6db28992 limits continuation to
+DeepOffensiveCommitted, keeps actual combined scout/provider resupply coverage
+and retreat checks, and passes all 590 Game tests without skips or failures
+(1m51.343s). Its strict terminal check still fails, Active / Running at 80,000
+ticks. Western DeepOffensiveCommitted is true; eastern is false. This result
+does not justify broadening the gate or weakening the terminal requirement.
+
+Hosted main run 39155623741 on pushed source 2d90cabe fails in the test step:
+RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(logistics_hub)
+reports 3,968 bytes against its unchanged zero-byte expectation. Frame contracts,
+CPU scalability and navigation/movement pass. The original 13-case allocation
+test passes locally, so attribution to catalog runtime allocation is unproven.
+Its steady-state resolver already uses precomputed names. The candidate moves
+measurement to an explicitly awaited dedicated thread, suppresses inherited
+execution context, and warms both resolver and allocation counter outside the
+unchanged 1,000-call measurement. All 26 building presentation cases pass.
+
+A complete Presentation module then exposes another zero-byte assertion in
+UiTextBatchTests (3,368 bytes, one failed / 1,302 total / 12 optional skips).
+It receives the same measurement isolation, retaining all 128 measured frames
+and its zero-byte budget. The subsequent complete module passes 1,290 cases,
+zero failures, 12 optional skips / 1,302 total (76.150s), build zero warnings
+and errors. These local results require new hosted CI; they do not prove the
+original allocation's stack origin. The two exact existing test files are
+added to serial foundation ownership under the authorized CI-repair scope.
+
+### Misordered arrival blocks its own physical dock evacuation
+
+The 85285f78 endpoint provides a different long-lived physical blocker: all
+three western supply trucks wait at depot 216:1, with loading orders accepted
+at ticks 51,881 / 53,371 / 52,701. Its reserved owner 194:3 is blocked near the
+entry by queue position three, 191:2. That arrival is physically ahead of its
+predecessor and has a valid coarse route sideways to its assigned tail place.
+It has fuel and no tactical or suppression movement prohibition. The queue's
+no-passing step gate prevents the very first inward-facing steering step and
+never permits it to turn out. Three physical movement regressions reproduce
+zero movement on unchanged runtime at 10/20/60 Hz with the actual vehicle size.
+A simplified unit-size prototype does not reproduce the real footprint case.
+
+The candidate permits a misordered arrival's route intent away from the queue
+axis while preserving FIFO membership, normal physical collisions and the
+exclusive admission gate. A candidate checking only the immediate lateral step
+still fails all three cases because the necessary initial turn faces inward;
+it is excluded. The intent-based candidate passes all 79 ground-movement,
+physical-queue and dock tests (3.121s). Complete Game and terminal qualification
+are pending. VehicleDockQueues.cs and the existing GroundMovementSystemTests.cs
+are included in serial ownership under the authorized gameplay repair scope.
+All earlier failed gates remain retained; parallelReleased remains false.
+
+
+The queue-evacuation runtime passes all 593 Game tests, zero failures/skips
+(100.802s), including the original strategic deadlines. It is committed as
+177d029e9d29469560e0337a16d25cb2651f56dd. The immediately preceding test build
+has identical runtime/test source (format-only UTF-8 BOM removal follows).
+The allocation-only checkpoint is d1032fde; its complete local Presentation
+module result is recorded above. The current strict terminal run is pending;
+no previous terminal failure or isolated performance failure is superseded.
