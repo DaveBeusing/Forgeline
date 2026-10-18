@@ -136,3 +136,25 @@ Ownership-only validation does not grant runtime, visual or merge acceptance.
 
 See [baseline](Baseline.md), [qualification](Qualification.md) and
 [decision](Decision.md) for source identities, actual commands, raw evidence and open gates.
+
+
+## Submitted diagnostic observations
+
+`SimpleInstanceRenderer.ObserveFrameDiagnostics(GraphicsDiagnostics)` consumes an
+existing render-owner snapshot after Submit/Retire. Both the gameplay host and
+native runner call it after their timed frame interval using their existing
+diagnostic capture. Prepare/Submit never poll adapter/memory diagnostics, including
+when metrics are enabled. CPU phase timings still include their actual work.
+Missing observations retain null counters/fences/bytes, not invented zeros. Upload
+counts are deltas between consecutive supplied observations; the first observation
+primes the baseline and disabled intervals invalidate it. Counters that move
+backwards produce unavailable deltas. Sampling is observational and performs no
+GPU retirement. The frozen value/layout contracts are unchanged.
+
+The software graphics backend admits at most one submitted frame before the next
+recording callback. Hardware retains per-back-buffer overlap. This prevents several
+individually healthy multi-second WARP frames accumulating beyond the unchanged
+ten-second idle fence deadline. Timeout remains fatal, with target/completed/last
+frame fences recorded for diagnosis. Descriptor/resource retirement still requires
+actual fence completion; completed prior-frame resources collect before callback
+entry. No extra queue, quality reduction or hardware frame-global idle is introduced.

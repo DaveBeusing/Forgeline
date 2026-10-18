@@ -22,6 +22,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     private GraphicsDeviceException? _failure;
     private long _fenceWaitCount;
     private long _submissionFaultCount;
+    private ulong _lastSubmittedFrameFence;
 
     private readonly GraphicsConfiguration _configuration;
     private readonly IDXGIFactory4 _factory;
@@ -735,6 +736,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
 
         WaitForFrame(_frameIndex);
+        _resources.Collect(GetCompletedFence());
         ReadCompletedGpuTiming(
             _frameIndex);
 
@@ -1650,6 +1652,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _frameFenceValues[_frameIndex] =
             fenceValue;
         _resources.CompleteRecording(fenceValue);
+        _lastSubmittedFrameFence = fenceValue;
     }
 
     private int GetCurrentBackBufferIndex()
@@ -1671,7 +1674,11 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void WaitForFrame(int frameIndex)
     {
-        ulong fenceValue = _frameFenceValues[frameIndex];
+        // WARP shares CPU capacity with recording. Several individually healthy
+        // multi-second frames can otherwise accumulate beyond the idle deadline.
+        // Admit one software frame at a time; hardware keeps per-buffer overlap.
+        ulong fenceValue = _deviceInfo.IsSoftwareAdapter
+            ? _lastSubmittedFrameFence : _frameFenceValues[frameIndex];
         if (fenceValue == 0)
         {
             return;
@@ -1895,7 +1902,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             _ = _frameFenceEvent.WaitOne(100);
             if (System.Diagnostics.Stopwatch.GetElapsedTime(started) >= TimeSpan.FromSeconds(10))
             {
-                throw new GraphicsDeviceException("GPU fence did not complete within ten seconds; restart the client session.", "fence-timeout");
+                throw new GraphicsDeviceException(
+                    $"GPU fence did not complete within ten seconds; restart the client session. target={fenceValue}; completed={GetCompletedFence()}; lastFrame={_lastSubmittedFrameFence}; software={_deviceInfo.IsSoftwareAdapter}.",
+                    "fence-timeout");
             }
         }
     }
