@@ -59,4 +59,3 @@ The material controls show the expected metallic versus dielectric and roughness
 The existing spatial AA plus normal-variance roughness broadening has no temporal history. Camera sweeps inspect spatial shimmer, but readback interrupts pacing and cannot certify live judder, sustained FPS or monitor DPI transitions. There is no new bloom, temporal upscale, environment map or physical HDR display path. Additional display sizes, physical monitor transitions and device/debug-layer investigations remain separate qualifications.
 
 The optional [procedural CPU atlas producer](ProceduralPbrProduction.md) preserves the existing atlas and runtime budgets in isolated, verifiable source generations. Production promotion and art approval remain explicit; see its qualification report.
-

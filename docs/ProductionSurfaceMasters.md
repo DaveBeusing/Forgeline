@@ -210,4 +210,3 @@ The integrated qualification contains 492 assets (309 meshes, 56 textures and
 fallbacks and texture-binding failures; human surface/art acceptance remains open.
 
 The optional [procedural CPU atlas producer](ProceduralPbrProduction.md) preserves the existing atlas and runtime budgets in isolated, verifiable source generations. Production promotion and art approval remain explicit; see its qualification report.
-
