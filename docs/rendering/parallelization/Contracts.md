@@ -127,7 +127,7 @@ dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.
 dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj -c Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
 dotnet test --project tests/ForgeLine.Graphics.Tests/ForgeLine.Graphics.Tests.csproj -c Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
 ./build/Build-RuntimeAssets.ps1 -Mode development -NoBuild
-dotnet test --solution ForgeLine.sln -c Release --no-build
+dotnet test --solution ForgeLine.sln -c Release --no-build --max-parallel-test-modules 1
 ```
 
 Every native command's exit code must be checked. Existing renderer/extraction/index,

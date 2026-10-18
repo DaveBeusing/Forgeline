@@ -272,3 +272,29 @@ the actual optimized-clear change, preserving the same six fixture-4 views, sett
 two readbacks and unchanged 15% gate. Retain every previous failed cohort. Then run
 the complete solution and native window/WARP/state comparisons at the actual new
 source identity. No global power setting or performance threshold is changed.
+
+## Cross-module native qualification policy
+
+The optimized-clear cohorts at `11049693` retain exact pixels in all 12 comparisons.
+Pair 1 fails one unchanged p99 gate (tank normal frame elapsed 25.505 -> 29.427 ms,
++15.38%); pair 2 passes every comparison. All mean and GPU comparisons pass in both.
+This remaining failure is preserved and blocks performance acceptance.
+
+The first full run with exclusive Client collections still reproduces a branded
+startup failure while Graphics, Presentation and Game modules run concurrently;
+the entire Client suite alone passes. Process-local xUnit isolation cannot isolate
+native desktop/codec/timing work from other test modules. Set the full solution
+runner's existing `--max-parallel-test-modules 1` option in CI and reproduction,
+keeping every module, assertion, test filter, optional-test rule and time limit.
+Focused earlier CI steps already run separate project commands. This is a serial
+foundation CI repair to the exact workflow path; parallel implementation remains
+unreleased. Retain the failed concurrent execution independently of the subsequent
+complete serial-module run. No completed full success is inferred from a focused pass.
+
+The known-failed concurrent optimized-clear solution run was stopped after its
+branded startup failure; its log and explicit aborted-after-known-failure record
+remain local. It is not reported as a completed full solution run. The replacement
+executes every module serially with the same built source and unchanged tests.
+CI 39114608164 at runtime source `11049693` now passes the previously failing
+Windows window-mode/visual qualification step after the HDR clear correction.
+Final workflow-head CI and the complete serial-module run still must finish.

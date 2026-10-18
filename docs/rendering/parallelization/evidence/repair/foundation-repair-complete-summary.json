@@ -2049,6 +2049,684 @@
           }
         }
       ]
+    },
+    "foundation-cleared-pair": {
+      "gates": [
+        {
+          "pair": 1,
+          "regressions": [
+            "MainBattleTankProduction-1920x1080-High-NormalGameplay/cpu/p99"
+          ],
+          "unqualified": []
+        },
+        {
+          "pair": 2,
+          "regressions": [],
+          "unqualified": []
+        }
+      ],
+      "cases": [
+        {
+          "pair": 1,
+          "key": "MainBattleTankProduction-1920x1080-High-CloseTactical",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 27.186044140625008,
+            "p50": 27.2847,
+            "p95": 36.9467,
+            "p99": 38.2105
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 26.42146328125002,
+            "p50": 26.8036,
+            "p95": 35.9564,
+            "p99": 37.1342
+          },
+          "gpuBefore": {
+            "samples": 510,
+            "mean": 26.64923005490197,
+            "p50": 27.529632,
+            "p95": 33.819712,
+            "p99": 34.466016
+          },
+          "gpuAfter": {
+            "samples": 510,
+            "mean": 26.188935592156856,
+            "p50": 27.527264,
+            "p95": 33.327936,
+            "p99": 33.859264
+          },
+          "meanAllocationBytesBefore": 2920,
+          "meanAllocationBytesAfter": 152,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 82,
+              "max": 82
+            },
+            "residentTextureBytes": {
+              "min": 47912856,
+              "max": 47912856
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 89,
+              "max": 89
+            },
+            "textureUploadCount": {
+              "min": 82,
+              "max": 82
+            }
+          }
+        },
+        {
+          "pair": 1,
+          "key": "MainBattleTankProduction-1920x1080-High-NormalGameplay",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 18.014634570312495,
+            "p50": 20.3992,
+            "p95": 24.0136,
+            "p99": 25.5048
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 17.488070703125008,
+            "p50": 19.6494,
+            "p95": 23.9536,
+            "p99": 29.4269
+          },
+          "gpuBefore": {
+            "samples": 502,
+            "mean": 17.909586677290843,
+            "p50": 20.311648,
+            "p95": 23.758016,
+            "p99": 24.510784
+          },
+          "gpuAfter": {
+            "samples": 504,
+            "mean": 17.832377587301593,
+            "p50": 20.3608,
+            "p95": 24.169696,
+            "p99": 24.523776
+          },
+          "meanAllocationBytesBefore": 2920,
+          "meanAllocationBytesAfter": 152,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 82,
+              "max": 82
+            },
+            "residentTextureBytes": {
+              "min": 47912856,
+              "max": 47912856
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 89,
+              "max": 89
+            },
+            "textureUploadCount": {
+              "min": 164,
+              "max": 164
+            }
+          }
+        },
+        {
+          "pair": 1,
+          "key": "MainBattleTankProduction-1920x1080-High-Strategic",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 20.565609765625005,
+            "p50": 23.3641,
+            "p95": 26.2742,
+            "p99": 27.4075
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 20.173784960937493,
+            "p50": 22.8264,
+            "p95": 25.6467,
+            "p99": 27.0176
+          },
+          "gpuBefore": {
+            "samples": 510,
+            "mean": 19.394533521568643,
+            "p50": 21.611392,
+            "p95": 25.154944,
+            "p99": 26.233312
+          },
+          "gpuAfter": {
+            "samples": 508,
+            "mean": 19.221129700787387,
+            "p50": 20.979712,
+            "p95": 25.084576,
+            "p99": 25.646048
+          },
+          "meanAllocationBytesBefore": 2824,
+          "meanAllocationBytesAfter": 56,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 86,
+              "max": 86
+            },
+            "residentTextureBytes": {
+              "min": 47935736,
+              "max": 47935736
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 93,
+              "max": 93
+            },
+            "textureUploadCount": {
+              "min": 250,
+              "max": 250
+            }
+          }
+        },
+        {
+          "pair": 1,
+          "key": "IndustrialBase-1920x1080-High-CloseTactical",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 23.103272460937497,
+            "p50": 23.533,
+            "p95": 31.9794,
+            "p99": 33.6301
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 22.40262890625,
+            "p50": 23.0783,
+            "p95": 26.8955,
+            "p99": 33.3342
+          },
+          "gpuBefore": {
+            "samples": 510,
+            "mean": 22.432974556862717,
+            "p50": 24.38352,
+            "p95": 28.879104,
+            "p99": 31.028384
+          },
+          "gpuAfter": {
+            "samples": 510,
+            "mean": 21.92323965490198,
+            "p50": 20.864064,
+            "p95": 27.249152,
+            "p99": 30.755456
+          },
+          "meanAllocationBytesBefore": 2824,
+          "meanAllocationBytesAfter": 56,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 82,
+              "max": 82
+            },
+            "residentTextureBytes": {
+              "min": 47912856,
+              "max": 47912856
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 89,
+              "max": 89
+            },
+            "textureUploadCount": {
+              "min": 332,
+              "max": 332
+            }
+          }
+        },
+        {
+          "pair": 1,
+          "key": "IndustrialBase-1920x1080-High-NormalGameplay",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 18.844116015624987,
+            "p50": 19.6139,
+            "p95": 26.5049,
+            "p99": 27.7503
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 18.091521484374994,
+            "p50": 18.7497,
+            "p95": 26.1119,
+            "p99": 28.2272
+          },
+          "gpuBefore": {
+            "samples": 509,
+            "mean": 18.271308510805497,
+            "p50": 19.335456,
+            "p95": 23.518784,
+            "p99": 23.910816
+          },
+          "gpuAfter": {
+            "samples": 509,
+            "mean": 17.755102805500986,
+            "p50": 18.950912,
+            "p95": 23.24128,
+            "p99": 23.516448
+          },
+          "meanAllocationBytesBefore": 2824,
+          "meanAllocationBytesAfter": 56,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 82,
+              "max": 82
+            },
+            "residentTextureBytes": {
+              "min": 47912856,
+              "max": 47912856
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 89,
+              "max": 89
+            },
+            "textureUploadCount": {
+              "min": 414,
+              "max": 414
+            }
+          }
+        },
+        {
+          "pair": 1,
+          "key": "IndustrialBase-1920x1080-High-Strategic",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 21.721643554687503,
+            "p50": 24.2054,
+            "p95": 27.3323,
+            "p99": 32.7718
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 21.38869648437499,
+            "p50": 22.7917,
+            "p95": 29.2931,
+            "p99": 33.9708
+          },
+          "gpuBefore": {
+            "samples": 507,
+            "mean": 21.31294030769232,
+            "p50": 24.550336,
+            "p95": 26.699744,
+            "p99": 28.519744
+          },
+          "gpuAfter": {
+            "samples": 508,
+            "mean": 21.087173165354343,
+            "p50": 24.198304,
+            "p95": 27.108576,
+            "p99": 28.345088
+          },
+          "meanAllocationBytesBefore": 2824,
+          "meanAllocationBytesAfter": 56,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 86,
+              "max": 86
+            },
+            "residentTextureBytes": {
+              "min": 47935736,
+              "max": 47935736
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 93,
+              "max": 93
+            },
+            "textureUploadCount": {
+              "min": 500,
+              "max": 500
+            }
+          }
+        },
+        {
+          "pair": 2,
+          "key": "MainBattleTankProduction-1920x1080-High-CloseTactical",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 26.659477539062465,
+            "p50": 27.2429,
+            "p95": 36.4148,
+            "p99": 37.1753
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 27.609718554687497,
+            "p50": 27.4306,
+            "p95": 36.7177,
+            "p99": 37.6015
+          },
+          "gpuBefore": {
+            "samples": 510,
+            "mean": 26.064585725490183,
+            "p50": 27.495104,
+            "p95": 33.331488,
+            "p99": 34.091776
+          },
+          "gpuAfter": {
+            "samples": 508,
+            "mean": 26.950638551181097,
+            "p50": 27.673536,
+            "p95": 33.837888,
+            "p99": 34.38704
+          },
+          "meanAllocationBytesBefore": 2920,
+          "meanAllocationBytesAfter": 152,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 82,
+              "max": 82
+            },
+            "residentTextureBytes": {
+              "min": 47912856,
+              "max": 47912856
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 89,
+              "max": 89
+            },
+            "textureUploadCount": {
+              "min": 82,
+              "max": 82
+            }
+          }
+        },
+        {
+          "pair": 2,
+          "key": "MainBattleTankProduction-1920x1080-High-NormalGameplay",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 17.964613085937504,
+            "p50": 20.5025,
+            "p95": 23.4264,
+            "p99": 26.9974
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 17.982628710937497,
+            "p50": 20.5307,
+            "p95": 23.8093,
+            "p99": 25.3085
+          },
+          "gpuBefore": {
+            "samples": 509,
+            "mean": 17.739206412573655,
+            "p50": 20.596192,
+            "p95": 22.084832,
+            "p99": 23.66608
+          },
+          "gpuAfter": {
+            "samples": 510,
+            "mean": 17.934387325490185,
+            "p50": 20.578752,
+            "p95": 23.744832,
+            "p99": 24.484096
+          },
+          "meanAllocationBytesBefore": 2920,
+          "meanAllocationBytesAfter": 152,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 82,
+              "max": 82
+            },
+            "residentTextureBytes": {
+              "min": 47912856,
+              "max": 47912856
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 89,
+              "max": 89
+            },
+            "textureUploadCount": {
+              "min": 164,
+              "max": 164
+            }
+          }
+        },
+        {
+          "pair": 2,
+          "key": "MainBattleTankProduction-1920x1080-High-Strategic",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 21.046315039062527,
+            "p50": 23.7409,
+            "p95": 25.9512,
+            "p99": 30.0493
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 20.837540234374988,
+            "p50": 23.5941,
+            "p95": 26.1778,
+            "p99": 28.6052
+          },
+          "gpuBefore": {
+            "samples": 508,
+            "mean": 19.765980472440948,
+            "p50": 22.370144,
+            "p95": 25.193632,
+            "p99": 26.645376
+          },
+          "gpuAfter": {
+            "samples": 510,
+            "mean": 19.67013778823529,
+            "p50": 22.283264,
+            "p95": 25.223904,
+            "p99": 26.79216
+          },
+          "meanAllocationBytesBefore": 2824,
+          "meanAllocationBytesAfter": 56,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 86,
+              "max": 86
+            },
+            "residentTextureBytes": {
+              "min": 47935736,
+              "max": 47935736
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 93,
+              "max": 93
+            },
+            "textureUploadCount": {
+              "min": 250,
+              "max": 250
+            }
+          }
+        },
+        {
+          "pair": 2,
+          "key": "IndustrialBase-1920x1080-High-CloseTactical",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 22.876799609374988,
+            "p50": 23.5527,
+            "p95": 27.5393,
+            "p99": 33.5386
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 22.981325781250003,
+            "p50": 23.8839,
+            "p95": 28.2175,
+            "p99": 32.9883
+          },
+          "gpuBefore": {
+            "samples": 510,
+            "mean": 22.440489662745104,
+            "p50": 24.562496,
+            "p95": 27.74,
+            "p99": 30.842304
+          },
+          "gpuAfter": {
+            "samples": 510,
+            "mean": 22.297280941176467,
+            "p50": 24.31152,
+            "p95": 27.860512,
+            "p99": 30.363808
+          },
+          "meanAllocationBytesBefore": 2824,
+          "meanAllocationBytesAfter": 56,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 82,
+              "max": 82
+            },
+            "residentTextureBytes": {
+              "min": 47912856,
+              "max": 47912856
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 89,
+              "max": 89
+            },
+            "textureUploadCount": {
+              "min": 332,
+              "max": 332
+            }
+          }
+        },
+        {
+          "pair": 2,
+          "key": "IndustrialBase-1920x1080-High-NormalGameplay",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 18.34325019531249,
+            "p50": 19.7776,
+            "p95": 26.2134,
+            "p99": 27.1338
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 18.85821640624997,
+            "p50": 19.9428,
+            "p95": 26.2884,
+            "p99": 27.2693
+          },
+          "gpuBefore": {
+            "samples": 510,
+            "mean": 17.735822054901973,
+            "p50": 19.177792,
+            "p95": 23.22528,
+            "p99": 23.478816
+          },
+          "gpuAfter": {
+            "samples": 510,
+            "mean": 17.98114170980392,
+            "p50": 19.320576,
+            "p95": 23.134976,
+            "p99": 23.388512
+          },
+          "meanAllocationBytesBefore": 2824,
+          "meanAllocationBytesAfter": 56,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 82,
+              "max": 82
+            },
+            "residentTextureBytes": {
+              "min": 47912856,
+              "max": 47912856
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 89,
+              "max": 89
+            },
+            "textureUploadCount": {
+              "min": 414,
+              "max": 414
+            }
+          }
+        },
+        {
+          "pair": 2,
+          "key": "IndustrialBase-1920x1080-High-Strategic",
+          "exactPixels": true,
+          "baselineSource": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+          "repairSource": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+          "cpuBefore": {
+            "samples": 512,
+            "mean": 22.289714453124994,
+            "p50": 24.5645,
+            "p95": 27.3186,
+            "p99": 33.0354
+          },
+          "cpuAfter": {
+            "samples": 512,
+            "mean": 21.95959472656249,
+            "p50": 24.3783,
+            "p95": 27.0922,
+            "p99": 31.7496
+          },
+          "gpuBefore": {
+            "samples": 510,
+            "mean": 21.7917538509804,
+            "p50": 24.840448,
+            "p95": 26.75712,
+            "p99": 29.564512
+          },
+          "gpuAfter": {
+            "samples": 510,
+            "mean": 21.465109207843135,
+            "p50": 24.645248,
+            "p95": 26.643584,
+            "p99": 28.159296
+          },
+          "meanAllocationBytesBefore": 2825.890625,
+          "meanAllocationBytesAfter": 56,
+          "resourcePlateaus": {
+            "loadedTextureCount": {
+              "min": 86,
+              "max": 86
+            },
+            "residentTextureBytes": {
+              "min": 47935736,
+              "max": 47935736
+            },
+            "shaderResourceDescriptorsUsed": {
+              "min": 93,
+              "max": 93
+            },
+            "textureUploadCount": {
+              "min": 500,
+              "max": 500
+            }
+          }
+        }
+      ]
     }
   },
   "waitTraceSource": "bccae07956a208f059021bbe638f762e214e8c4a",

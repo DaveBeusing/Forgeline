@@ -273,5 +273,49 @@
     "originalManifestSha256": "DEA2E117BA3F155E6409064C5BACFE2C9297D0A7397CD44DB70E5729497BB6A8",
     "compressedManifestSha256": "E4D97DC68B71C6CDD4809FBFCD76CB37797DEE2AE109F4135A9223893EF136A3",
     "losslessGzip": true
+  },
+  {
+    "directory": "foundation-cleared-pair1-before",
+    "sourceCommit": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+    "buildIdentity": "0.1.402-dev+d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+    "fixtureVersion": 4,
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 19043027,
+    "originalManifestSha256": "7CC4AF6AAD4E59B0FFA812D67BF4303FB337E4BCDC2A0702A2BDCEB5E72D0DE9",
+    "compressedManifestSha256": "776D53FF9F1A70FFE4961025117858289E155252C3FFB3F0E04F3570676EFA95",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-cleared-pair1-after",
+    "sourceCommit": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+    "buildIdentity": "0.1.403-dev+11049693dd232aefa30cb35989c3c4ada7c17e46",
+    "fixtureVersion": 4,
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 19048873,
+    "originalManifestSha256": "A22A606E365638C213974A60EA0EA3AC199CB45A80796D03EF2AE6A07D5F7D95",
+    "compressedManifestSha256": "F3C101F0D0594D0EEA5318B8B6FFAAA7191430F3D649E45A6D453FB7CE277190",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-cleared-pair2-before",
+    "sourceCommit": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+    "buildIdentity": "0.1.402-dev+d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+    "fixtureVersion": 4,
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 19045236,
+    "originalManifestSha256": "BC4ED2F02688E1B78F94958230A726A6F704455CA7EDB12C03E011D2460D143A",
+    "compressedManifestSha256": "31283DCA304F8893A5D2B6C7164286839F1E9D01B7ACD63F27E2A6DB52659630",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-cleared-pair2-after",
+    "sourceCommit": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+    "buildIdentity": "0.1.403-dev+11049693dd232aefa30cb35989c3c4ada7c17e46",
+    "fixtureVersion": 4,
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 19044835,
+    "originalManifestSha256": "561F6CCB36104A860E8B3830BE45B064ECA0B851E7C0F15440F2CD6F6644294D",
+    "compressedManifestSha256": "7AB0592C79B3246E723D4FD3CF69A1178A8326E2FC5F3AC7971CD8D6FAF52FF4",
+    "losslessGzip": true
   }
 ]
