@@ -91,6 +91,40 @@ public sealed class RenderBoundaryTests
         Assert.Null(session.Metrics.Value.SubmissionFence);
     }
 
+    [Fact]
+    public void EnabledFrameMeasurementConsumesExistingObservationsWithoutPollingTheDevice()
+    {
+        using var fixture = new EmptyCatalog(); using var graphics = new ContractGraphicsDevice();
+        using var session = new RenderAssetSession(graphics, fixture.Catalog, TextureDetailQuality.Full);
+        session.MetricsEnabled = true;
+        var observed = new GraphicsDiagnostics(new("contract", 0, true, "test", false), default)
+        {
+            Resources = new(2, 256, 2, 4096, 0) { TextureUploadCount = 10 },
+            Frame = new GraphicsFrameDiagnostics(default, 1, 0, null, 7, null, null)
+            { FrameWaitMilliseconds = 3.25, PresentMilliseconds = .125 }
+        };
+        session.ObserveFrameDiagnostics(observed);
+        session.BeginPrepare(new(8), 43); session.EndPrepare();
+        Assert.Throws<InvalidOperationException>(() => session.ObserveFrameDiagnostics(observed));
+        session.BeginRecord(); session.EndRecord(); session.Submit(); session.Retire();
+        Assert.Null(session.Metrics!.Value.LogicalTextureBytes);
+        session.ObserveFrameDiagnostics(observed with
+        {
+            Resources = observed.Resources with { TextureUploadCount = 13, ResidentTextureBytes = 1024 }
+        });
+        Assert.Equal(3, session.Metrics.Value.UploadedTextureCount);
+        Assert.Equal(1024, session.Metrics.Value.LogicalTextureBytes);
+        Assert.Equal(3.25, session.Metrics.Value.WaitMilliseconds);
+        Assert.Equal(.125, session.Metrics.Value.PresentMilliseconds);
+        Assert.Null(session.Metrics.Value.ObservedDxgiLocalUsageBytes);
+        Assert.Equal(0, graphics.DiagnosticReads);
+        session.BeginPrepare(new(8), 44); session.EndPrepare();
+        session.BeginRecord(); session.EndRecord(); session.Submit(); session.Retire();
+        session.ObserveFrameDiagnostics(observed); // Counter reset is unavailable, never a negative upload.
+        Assert.Null(session.Metrics.Value.UploadedTextureCount);
+        Assert.Equal(0, graphics.DiagnosticReads);
+    }
+
     [Theory]
     [InlineData(0)] [InlineData(3)] [InlineData(32)] [InlineData(65537)]
     public void SeparateVisibilityRetainsLegacyClusterAndCorrespondenceResults(int count)

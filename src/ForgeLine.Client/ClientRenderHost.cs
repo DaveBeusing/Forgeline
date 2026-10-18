@@ -798,6 +798,7 @@ internal sealed class ClientRenderHost : IDisposable
 
                 GraphicsDiagnostics diagnostics =
                     graphics.Diagnostics;
+                instanceRenderer.ObserveFrameDiagnostics(diagnostics);
                 PublishQualification(
                     diagnostics,
                     frameTiming,

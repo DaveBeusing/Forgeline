@@ -1,0 +1,4 @@
+timestamp, pstate, clocks.current.graphics [MHz], temperature.gpu, power.draw [W], utilization.gpu [%]
+2026/10/18 09:23:12.419, P8, 180 MHz, 42, 11.46 W, 56 %
+timestamp, pstate, clocks.current.graphics [MHz], temperature.gpu, power.draw [W], utilization.gpu [%]
+2026/10/18 09:25:48.968, P8, 180 MHz, 42, 12.54 W, 58 %

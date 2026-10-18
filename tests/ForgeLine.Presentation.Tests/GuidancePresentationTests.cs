@@ -185,6 +185,28 @@ public sealed class GuidancePresentationTests
         Assert.Equal(1, device.BufferCount);
     }
 
+    [Fact]
+    public void AllocationChecksUseBlockingGcForAccurateThreadCounters()
+    {
+        // Background-GC context retirement can charge unused bytes to this
+        // counter (dotnet/runtime#134724). Only this test host disables it.
+        Assert.Equal(System.Runtime.GCLatencyMode.Batch, System.Runtime.GCSettings.LatencyMode);
+    }
+
+    [Fact]
+    public void WarmAllocationCounterStillDetectsAllocatingFrames()
+    {
+        object? retained = null;
+        for (int i = 0; i < 128; i++) Volatile.Write(ref retained, new byte[256]);
+        _ = GC.GetAllocatedBytesForCurrentThread();
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 256; i++) Volatile.Write(ref retained, new byte[256]);
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        GC.KeepAlive(retained);
+        Assert.True(allocated >= 256L * 256,
+            $"The measurement missed allocating frames: {allocated} bytes.");
+    }
+
     private static PreAlphaUxView Ux(EarlyGameGuidanceView guide) => default(PreAlphaUxView) with { ShowOnboarding = true, Guidance = guide };
 
     private sealed class RetainedDevice : IGraphicsDevice

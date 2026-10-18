@@ -261,6 +261,43 @@ public sealed class ResupplyPlanningDiagnosticsTests
         Assert.Equal(40.0, fixture.Inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel));
     }
 
+    [Theory]
+    [InlineData(false, false, false, false)]
+    [InlineData(true, false, false, false)]
+    [InlineData(false, true, false, false)]
+    [InlineData(false, false, true, false)]
+    [InlineData(false, false, false, true)]
+    public void RemoteResupplyPreservesProvidersCommittedToAnotherFormation(
+        bool sameGroup, bool inRange, bool alternativeAvailable, bool moving)
+    {
+        var fixture = new Fixture();
+        var entities = fixture.Simulation.Entities;
+        EntityId provider = fixture.Truck(inRange ? new Vector3(105, 0, 0) : Vector3.Zero, 80, 40, Owner);
+        EntityId recipient = fixture.Recipient();
+        EntityId group = entities.CreateEntity();
+        entities.AddComponent(provider, new MovementGroupMember(group));
+        entities.AddComponent(group, MovementGroupState.Pending(SimulationTick.Zero));
+        var mission = new MovementOrder(Owner, new Vector3(500, 0, 0), SimulationTick.Zero, SimulationTick.Zero);
+        if (moving) entities.AddComponent(provider, mission);
+        if (sameGroup) entities.AddComponent(recipient, new MovementGroupMember(group));
+        EntityId alternative = alternativeAvailable
+            ? fixture.Truck(new Vector3(-50, 0, 0), 80, 40, Owner) : EntityId.Invalid;
+
+        fixture.Simulation.AdvanceOneTick();
+
+        EntityId expected = sameGroup || inRange ? provider : alternative;
+        Assert.Equal(expected, fixture.Result(recipient).SelectedProvider);
+        if (!sameGroup)
+        {
+            Assert.Equal(group, entities.GetComponent<MovementGroupMember>(provider).Group);
+            if (moving) Assert.Equal(mission, entities.GetComponent<MovementOrder>(provider));
+            else Assert.False(entities.HasComponent<MovementOrder>(provider));
+            Assert.False(entities.HasComponent<SupplyRescueAssignment>(provider));
+        }
+        if (!sameGroup && !inRange)
+            Assert.True(fixture.Result(recipient).Rejections.HasFlag(ResupplyProviderRejection.ProviderBusy));
+    }
+
     [Fact]
     public void InRangeMobileProviderPreservesFormationMembership()
     {

@@ -1,0 +1,57 @@
+{
+  "maximumChangedPixelFraction": 0.0,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "pixelComparisonRequested": false,
+  "commit": "98dc4ba901e158a4da4f63add7cbee77ae1e5fae",
+  "channelTolerance": 0,
+  "captures": [
+    {
+      "comparison": "exact-file-match",
+      "sameSource": false,
+      "visualReview": "pending",
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanMs": 51.32498749999999,
+      "pixelComparison": null,
+      "key": "DamageDestruction-1920x1080-High-CloseTactical",
+      "equivalentHardware": true,
+      "cpuMeanDeltaMs": -5.945450000000015,
+      "sameRuntime": true,
+      "gpuMeanMs": 16.434568000000002
+    },
+    {
+      "comparison": "exact-file-match",
+      "sameSource": false,
+      "visualReview": "pending",
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanMs": 13.050899999999999,
+      "pixelComparison": null,
+      "key": "DamageDestruction-1920x1080-High-NormalGameplay",
+      "equivalentHardware": true,
+      "cpuMeanDeltaMs": -2.8439250000000023,
+      "sameRuntime": true,
+      "gpuMeanMs": 16.695344000000002
+    },
+    {
+      "comparison": "exact-file-match",
+      "sameSource": false,
+      "visualReview": "pending",
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanMs": 12.390125,
+      "pixelComparison": null,
+      "key": "DamageDestruction-1920x1080-High-Strategic",
+      "equivalentHardware": true,
+      "cpuMeanDeltaMs": -1.0219124999999991,
+      "sameRuntime": true,
+      "gpuMeanMs": 17.50776
+    }
+  ],
+  "structural": "pass",
+  "imageGateRequested": false,
+  "schemaVersion": 1,
+  "visualAcceptance": "pending",
+  "baselineCommit": "17810ee192fac495173a7e9da44c973595833f2b",
+  "imageFailures": []
+}

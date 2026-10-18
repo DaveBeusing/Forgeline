@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Running;
+using System.Runtime;
 
 namespace ForgeLine.Rendering.Benchmarks;
 
@@ -6,6 +7,18 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
+        // Exact allocation guards require stable counter accounting. Keep this
+        // opt-in local to these synthetic modes; native/CPU timing modes retain
+        // the caller's production GC policy (dotnet/runtime#134724).
+        if (args.Length == 2 &&
+            (args[0] is "--typography-hotpaths" or "--gameplay-ui-hotpaths" or "--alert-map-hotpaths") &&
+            GCSettings.LatencyMode != GCLatencyMode.Batch)
+        {
+            throw new InvalidOperationException(
+                "Exact allocation guards require process-local DOTNET_gcConcurrent=0. " +
+                "Background GC can misattribute unused allocation-context bytes.");
+        }
+
         if (args is ["--typography-hotpaths", string typographyOutput])
         {
             UiTypographyMeasurements.Run(typographyOutput);

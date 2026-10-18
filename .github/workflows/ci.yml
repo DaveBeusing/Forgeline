@@ -309,7 +309,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Test
-        run: dotnet test --solution ForgeLine.sln --configuration Release --no-build
+        run: dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1
 
       - name: Publish reproducible pre-alpha package
         shell: pwsh

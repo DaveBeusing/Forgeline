@@ -403,6 +403,15 @@ public sealed partial class VehicleDockingService
         Vector3 forward = new(MathF.Sin(motion.Heading), 0, MathF.Cos(motion.Heading));
         Vector3 side = new(forward.Z, 0, -forward.X);
         if (MathF.Abs(Vector3.Dot(current.Position - motion.Front, side)) > current.Scale.X + 2) return false;
+        // A new arrival can already be ahead of its FIFO predecessor. Do not
+        // let the no-passing gate trap it there while it moves sideways out
+        // of the lane to reach its assigned tail position. Inspect the route
+        // intent: the first steering step can point inward while turning.
+        // Physical collision checks and exclusive dock admission still apply.
+        if (Vector3.Dot(predecessor.Position - current.Position, forward) < 0 &&
+            entities.TryGetComponent(truck, out MovementOrder evacuation) &&
+            MathF.Abs(Vector3.Dot(evacuation.WorldTarget - motion.Front, side)) >
+                MathF.Abs(Vector3.Dot(current.Position - motion.Front, side))) return false;
         var ownBounds = VehicleBounds(next);
         var priorBounds = VehicleBounds(predecessor);
         float ownHalf = MathF.Abs(forward.X) * ownBounds.Extents.X + MathF.Abs(forward.Z) * ownBounds.Extents.Z;

@@ -133,7 +133,8 @@ internal sealed partial class D3D12GraphicsDevice
             {
                 ID3D12Resource target = _device.CreateCommittedResource(HeapType.Default,
                     ResourceDescription.Texture2D(Format.R16G16B16A16_Float, checked((uint)width), checked((uint)height),
-                        mipLevels: 1, flags: ResourceFlags.AllowRenderTarget), ResourceStates.PixelShaderResource);
+                        mipLevels: 1, flags: ResourceFlags.AllowRenderTarget), ResourceStates.PixelShaderResource,
+                    new ClearValue(Format.R16G16B16A16_Float, RenderTargetClearColor(GraphicsColor.ForgeLineClear, true)));
                 _sceneTargets[frame] = target;
                 target.Name = $"ForgeLine Linear Scene {frame}";
                 _device.CreateRenderTargetView(target, null, SceneRtv(frame));

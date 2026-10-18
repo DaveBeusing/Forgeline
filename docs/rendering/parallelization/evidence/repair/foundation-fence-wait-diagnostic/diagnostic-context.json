@@ -1,0 +1,132 @@
+{
+  "status": "structural-pass",
+  "sourceCommit": "25f4060746e89e582f339e29b840175701f8e5c8",
+  "sourceQualification": "diagnostic only: source plus retained temporary fence logging patch; not unmodified source",
+  "repeatPixelsEqual": true,
+  "samples": 512,
+  "meanMilliseconds": 24.117307421875,
+  "slowestFrames": [
+    {
+      "index": 371,
+      "milliseconds": 150.4508,
+      "assetPreparation": {
+        "frameSequence": 500,
+        "sessionId": {
+          "value": 1,
+          "isSpecified": true
+        },
+        "snapshotTick": 32,
+        "prepareMilliseconds": 0.2552,
+        "recordMilliseconds": 0.7011000000000001,
+        "submitMilliseconds": 0.0001,
+        "retireMilliseconds": 0.0001,
+        "submissionFence": 591,
+        "presentMilliseconds": 0.2909,
+        "waitMilliseconds": 147.5865,
+        "uploadedTextureCount": 0,
+        "uploadedTextureBytes": null,
+        "logicalTextureBytes": 47935736,
+        "observedDxgiLocalUsageBytes": 391884800,
+        "failureStatus": null
+      }
+    },
+    {
+      "index": 369,
+      "milliseconds": 148.2649,
+      "assetPreparation": {
+        "frameSequence": 498,
+        "sessionId": {
+          "value": 1,
+          "isSpecified": true
+        },
+        "snapshotTick": 32,
+        "prepareMilliseconds": 0.279,
+        "recordMilliseconds": 0.6411,
+        "submitMilliseconds": 0,
+        "retireMilliseconds": 0.0001,
+        "submissionFence": 589,
+        "presentMilliseconds": 0.2878,
+        "waitMilliseconds": 145.4992,
+        "uploadedTextureCount": 0,
+        "uploadedTextureBytes": null,
+        "logicalTextureBytes": 47935736,
+        "observedDxgiLocalUsageBytes": 391884800,
+        "failureStatus": null
+      }
+    },
+    {
+      "index": 373,
+      "milliseconds": 133.8051,
+      "assetPreparation": {
+        "frameSequence": 502,
+        "sessionId": {
+          "value": 1,
+          "isSpecified": true
+        },
+        "snapshotTick": 32,
+        "prepareMilliseconds": 0.4039,
+        "recordMilliseconds": 0.8327,
+        "submitMilliseconds": 0,
+        "retireMilliseconds": 0,
+        "submissionFence": 593,
+        "presentMilliseconds": 0.2688,
+        "waitMilliseconds": 130.6719,
+        "uploadedTextureCount": 0,
+        "uploadedTextureBytes": null,
+        "logicalTextureBytes": 47935736,
+        "observedDxgiLocalUsageBytes": 391884800,
+        "failureStatus": null
+      }
+    },
+    {
+      "index": 223,
+      "milliseconds": 132.1472,
+      "assetPreparation": {
+        "frameSequence": 352,
+        "sessionId": {
+          "value": 1,
+          "isSpecified": true
+        },
+        "snapshotTick": 32,
+        "prepareMilliseconds": 0.2031,
+        "recordMilliseconds": 0.4391,
+        "submitMilliseconds": 0,
+        "retireMilliseconds": 0,
+        "submissionFence": 443,
+        "presentMilliseconds": 0.1949,
+        "waitMilliseconds": 130.3162,
+        "uploadedTextureCount": 0,
+        "uploadedTextureBytes": null,
+        "logicalTextureBytes": 47935736,
+        "observedDxgiLocalUsageBytes": 391884800,
+        "failureStatus": null
+      }
+    },
+    {
+      "index": 55,
+      "milliseconds": 105.9891,
+      "assetPreparation": {
+        "frameSequence": 184,
+        "sessionId": {
+          "value": 1,
+          "isSpecified": true
+        },
+        "snapshotTick": 32,
+        "prepareMilliseconds": 0.1922,
+        "recordMilliseconds": 0.6720999999999999,
+        "submitMilliseconds": 0,
+        "retireMilliseconds": 0,
+        "submissionFence": 275,
+        "presentMilliseconds": 0.1544,
+        "waitMilliseconds": 103.3588,
+        "uploadedTextureCount": 0,
+        "uploadedTextureBytes": null,
+        "logicalTextureBytes": 47935736,
+        "observedDxgiLocalUsageBytes": 391884800,
+        "failureStatus": null
+      }
+    }
+  ],
+  "timeoutLogBytes": 0,
+  "workloadIsolation": "Concurrent foreign UI capture; no performance acceptance"
+}

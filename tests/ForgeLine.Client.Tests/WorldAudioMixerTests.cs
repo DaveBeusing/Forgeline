@@ -13,6 +13,7 @@ using static ForgeLine.Client.WaveOutUiVoice;
 
 namespace ForgeLine.Client.Tests;
 
+[Collection("Exclusive native and timing qualification")]
 public sealed class WorldAudioMixerTests
 {
     private static AudioListener Listener => new(Vector3.Zero, Vector3.UnitX, 300);
@@ -248,7 +249,9 @@ public sealed class WorldAudioMixerTests
         var output = new FakeOutput(); var clip = Clip(true); using var owner = new WaveOutWorldAudio(() => output, m => m.SetClip((int)WorldAudioCue.VehiclesScoutIdleLoop, clip));
         long now = Stopwatch.GetTimestamp(); owner.Publish(Packet(now), Listener, Settings, true);
         Assert.True(SpinWait.SpinUntil(() => Volatile.Read(ref output.Writes) > 0, TimeSpan.FromSeconds(5)));
-        Assert.True(SpinWait.SpinUntil(() => Volatile.Read(ref output.Stops) > 0, TimeSpan.FromSeconds(5)));
+        // Stop runs on the audio owner before it publishes the completed mixer state.
+        // The output counter alone is not a completion barrier for Diagnostics.
+        Assert.True(SpinWait.SpinUntil(() => Volatile.Read(ref output.Stops) > 0 && owner.Diagnostics.Voices == 0, TimeSpan.FromSeconds(5)));
         Assert.Equal(0, owner.Diagnostics.Voices); owner.Dispose(); Assert.True(owner.WaitForStop(TimeSpan.FromSeconds(5))); Assert.True(output.Disposed);
     }
     [Fact(Explicit = true)]

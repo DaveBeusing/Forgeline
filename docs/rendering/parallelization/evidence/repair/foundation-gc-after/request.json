@@ -1,0 +1,57 @@
+{
+  "software": false,
+  "continueAfterMismatch": false,
+  "rasterDpi": 0,
+  "commit": "5ecd0d9f8215448b172ea5d0095fa9cb91fe8b1b",
+  "runProfile": "Warm",
+  "mechanicalSeconds": null,
+  "runtimeRoot": "D:\\Code\\Forgeline\\assets\\runtime",
+  "repeatCaptures": 2,
+  "cinematicFrontend": false,
+  "warmups": 128,
+  "uiScenarios": [
+    "World"
+  ],
+  "profiles": [
+    "High"
+  ],
+  "graphicsSettings": {
+    "environment": {
+      "daylight": 1.0,
+      "cloudCover": 0.0,
+      "wetness": 0.0
+    },
+    "vegetation": {
+      "maximumDistanceMeters": 4000.0,
+      "density": 1.0
+    },
+    "resolutionScale": 1.0,
+    "terrainResidency": {
+      "enabled": true,
+      "maximumResidentChunks": 128
+    }
+  },
+  "outputRoot": "D:\\Code\\Forgeline\\artifacts\\foundation-gc-after",
+  "yawDegrees": 45.0,
+  "localHaze": null,
+  "inspectionDistanceMeters": 0.0,
+  "displays": [
+    {
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "uiScales": [
+    1.0
+  ],
+  "samples": 512,
+  "surfaceMarks": [],
+  "zooms": [
+    "Strategic"
+  ],
+  "scenes": [
+    "IndustrialBase"
+  ],
+  "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+  "cameraPath": "Fixed"
+}

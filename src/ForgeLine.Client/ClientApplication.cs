@@ -1,3 +1,4 @@
+using ForgeLine.Client.RenderQualification;
 using System.Diagnostics;
 using System.Numerics;
 using System.Text.Json;
@@ -547,6 +548,7 @@ internal sealed class ClientApplication
         bool simulationPaused = false;
         bool terminalAcknowledgementRequested = false;
         bool smokeCompletionRequested = false;
+        var smokeRates = smokeTest ? new SmokeRuntimeRateObserver() : null;
 
         WriteWindowState("started", window);
         WriteWorldState("started", terrainWorld);
@@ -1043,9 +1045,15 @@ internal sealed class ClientApplication
             // Smoke completion must be evaluated before the unfocused-window input exit.
             if (smokeTest)
             {
+                TimeSpan smokeElapsed = _platform.Clock.GetElapsedTime(startedAt, now);
+                smokeRates!.Sample(smokeElapsed,
+                    renderHost.LatestQualification?.Surface.PresentedFrameCount ?? 0,
+                    simulationHost.CaptureTelemetry(), !shouldPauseForWindow && !shellBlocksGameplay);
+                if (!smokeCompletionRequested && smokeElapsed >= TimeSpan.FromMinutes(1))
+                    throw new InvalidOperationException("Smoke qualification did not observe running presentation/tick progress within one minute.");
                 if (!smokeCompletionRequested &&
                     _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeCompletionDelay &&
-                    renderHost.LatestQualification is { LastMeasuredRunningRates: not null })
+                    smokeRates.LastRunningRates is not null)
                 {
                     if (!simulationHost.TryRunSmokeCompletion(eastBase.CommandCore))
                         throw new InvalidOperationException("Simulation control boundary is full while scheduling smoke completion.");
@@ -1714,11 +1722,14 @@ internal sealed class ClientApplication
         {
             renderHost.Dispose();
             renderHost.ThrowIfFaulted();
+            ClientVisualQualificationSnapshot? measuredQualification = renderHost.LatestQualification;
+            if (smokeRates?.LastRunningRates is { } runningRates && measuredQualification is { } measured)
+                measuredQualification = measured with { LastMeasuredRunningRates = runningRates };
             WriteVisualQualificationReport(
                 visualQualificationOutput,
                 renderInstanceCount,
                 qualificationWindow,
-                renderHost.LatestQualification);
+                measuredQualification);
         }
 
         return 0;

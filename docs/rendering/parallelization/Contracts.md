@@ -105,10 +105,12 @@ A later coordinated ABI revision is possible; it cannot be hidden in an owner br
 snapshot tick/session, Prepare/Record CPU time, CPU Submit/Retire bookkeeping,
 observed submission fence, device texture-upload count delta, logical resident
 texture bytes, optional DXGI local usage and existing failure status. Device texture
-deltas cover the object-prepare-to-submit interval; earlier terrain preparation has
-its existing diagnostics. Submit/Retire times are not native Present/fence-wait time.
-Present time, wait time and upload byte counts are currently unavailable/null rather
-than synthetic zero. Existing graphics pass/GPU/health diagnostics remain authoritative.
+deltas cover consecutive supplied observations, including terrain preparation. The
+first observation establishes a baseline; missing observations remain unavailable. Submit/Retire times are not native Present/fence-wait time.
+Native frame-buffer reuse waits and native Present have separate CPU elapsed
+observations. Other backends may leave these unavailable/null. This wait field
+covers frame admission, not all possible upload/resize/idle waits. Upload byte
+counts remain unavailable/null rather than synthetic zero. Existing graphics pass/GPU/health diagnostics remain authoritative.
 With measurement disabled, the new meter does not query diagnostics or run clocks;
 its repeated frame transitions are covered by a zero-allocation regression test.
 
@@ -125,7 +127,7 @@ dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.
 dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj -c Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
 dotnet test --project tests/ForgeLine.Graphics.Tests/ForgeLine.Graphics.Tests.csproj -c Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
 ./build/Build-RuntimeAssets.ps1 -Mode development -NoBuild
-dotnet test --solution ForgeLine.sln -c Release --no-build
+dotnet test --solution ForgeLine.sln -c Release --no-build --max-parallel-test-modules 1
 ```
 
 Every native command's exit code must be checked. Existing renderer/extraction/index,
@@ -136,3 +138,32 @@ Ownership-only validation does not grant runtime, visual or merge acceptance.
 
 See [baseline](Baseline.md), [qualification](Qualification.md) and
 [decision](Decision.md) for source identities, actual commands, raw evidence and open gates.
+
+
+## Submitted diagnostic observations
+
+`SimpleInstanceRenderer.ObserveFrameDiagnostics(GraphicsDiagnostics)` consumes an
+existing render-owner snapshot after Submit/Retire. Both the gameplay host and
+native runner call it after their timed frame interval using their existing
+diagnostic capture. Prepare/Submit never poll adapter/memory diagnostics, including
+when metrics are enabled. CPU phase timings still include their actual work.
+Missing observations retain null counters/fences/bytes, not invented zeros. Upload
+counts are deltas between consecutive supplied observations; the first observation
+primes the baseline and disabled intervals invalidate it. Counters that move
+backwards produce unavailable deltas. Sampling is observational and performs no
+GPU retirement. The frozen value/layout contracts are unchanged.
+
+The software graphics backend admits at most one submitted frame before the next
+recording callback. Hardware retains per-back-buffer overlap. This prevents several
+individually healthy multi-second WARP frames accumulating beyond the unchanged
+ten-second idle fence deadline. Timeout remains fatal, with target/completed/last
+frame fences recorded for diagnosis. Descriptor/resource retirement still requires
+actual fence completion; completed prior-frame resources collect before callback
+entry. No extra queue, quality reduction or hardware frame-global idle is introduced.
+
+Repair qualification evidence includes both fixed opposite-order protocols and all
+failed gates. Use `SummarizeRepairEvidence.py` against `docs/rendering/parallelization/evidence/repair`
+to verify image equality, frame resource plateaus, health and complete comparison
+results from losslessly compressed raw manifests. Its diagnostic scheduling summary
+covers a whole reference-thread run; without aligned phase markers it cannot assign
+kernel wait intervals to individual frame tails or substitute for performance gates.

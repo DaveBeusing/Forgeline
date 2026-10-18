@@ -41,9 +41,18 @@ The measured CPU trade-off is recorded in [Typography qualification](UiTypograph
 ```powershell
 pwsh ./build/Validate-UiFonts.ps1
 dotnet test --project tests/ForgeLine.Presentation.Tests -c Release -- --filter-class '*UiFontMetricsTests' '*UiTextBatchTests' '*UiTypographyNativeTests'
-$env:DOTNET_TieredCompilation = '0'
-dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks -c Release -- --typography-hotpaths artifacts/frontend-typography.json
-dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks -c Release -- --gameplay-ui-hotpaths artifacts/gameplay-ui-typography.json
+# Scope counter-accounting/JIT settings to these two guard invocations.
+$qualificationPreviousGcConcurrent = $env:DOTNET_gcConcurrent
+$qualificationPreviousTieredCompilation = $env:DOTNET_TieredCompilation
+try {
+    $env:DOTNET_gcConcurrent = '0'
+    $env:DOTNET_TieredCompilation = '0'
+    dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks -c Release -- --typography-hotpaths artifacts/frontend-typography.json
+    dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks -c Release -- --gameplay-ui-hotpaths artifacts/gameplay-ui-typography.json
+} finally {
+    $env:DOTNET_gcConcurrent = $qualificationPreviousGcConcurrent
+    $env:DOTNET_TieredCompilation = $qualificationPreviousTieredCompilation
+}
 # Run against an unpacked, published Windows client and its compiled runtime root:
 ./ForgeLine.Client.exe --ui-typography-capture <empty-output-directory> <runtime-root>
 ```

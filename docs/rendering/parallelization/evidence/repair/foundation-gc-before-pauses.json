@@ -1,0 +1,261 @@
+{
+  "ProcessId": 39384,
+  "ExitCode": 0,
+  "Provider": "Microsoft-Windows-DotNETRuntime/GC",
+  "Pauses": [
+    {
+      "StartMilliseconds": 84.6044,
+      "EndMilliseconds": 86.505,
+      "PauseMilliseconds": 1.9005999999999972
+    },
+    {
+      "StartMilliseconds": 187.1614,
+      "EndMilliseconds": 187.3631,
+      "PauseMilliseconds": 0.20170000000001664
+    },
+    {
+      "StartMilliseconds": 187.8148,
+      "EndMilliseconds": 187.9418,
+      "PauseMilliseconds": 0.12700000000000955
+    },
+    {
+      "StartMilliseconds": 195.3729,
+      "EndMilliseconds": 195.5856,
+      "PauseMilliseconds": 0.21270000000001232
+    },
+    {
+      "StartMilliseconds": 195.9819,
+      "EndMilliseconds": 196.0815,
+      "PauseMilliseconds": 0.09960000000000946
+    },
+    {
+      "StartMilliseconds": 206.8848,
+      "EndMilliseconds": 207.0119,
+      "PauseMilliseconds": 0.12709999999998445
+    },
+    {
+      "StartMilliseconds": 207.4396,
+      "EndMilliseconds": 207.5352,
+      "PauseMilliseconds": 0.09559999999999036
+    },
+    {
+      "StartMilliseconds": 326.5583,
+      "EndMilliseconds": 326.8549,
+      "PauseMilliseconds": 0.2966000000000122
+    },
+    {
+      "StartMilliseconds": 327.7808,
+      "EndMilliseconds": 328.2561,
+      "PauseMilliseconds": 0.4753000000000043
+    },
+    {
+      "StartMilliseconds": 489.3876,
+      "EndMilliseconds": 492.7827,
+      "PauseMilliseconds": 3.3950999999999567
+    },
+    {
+      "StartMilliseconds": 2260.4217,
+      "EndMilliseconds": 2260.7277,
+      "PauseMilliseconds": 0.30600000000004
+    },
+    {
+      "StartMilliseconds": 2262.8465,
+      "EndMilliseconds": 2263.4566,
+      "PauseMilliseconds": 0.6100999999998749
+    },
+    {
+      "StartMilliseconds": 2270.0282,
+      "EndMilliseconds": 2270.1702,
+      "PauseMilliseconds": 0.14199999999982538
+    },
+    {
+      "StartMilliseconds": 2271.3479,
+      "EndMilliseconds": 2271.4945,
+      "PauseMilliseconds": 0.14659999999958018
+    },
+    {
+      "StartMilliseconds": 2661.566,
+      "EndMilliseconds": 2661.9046,
+      "PauseMilliseconds": 0.3386000000000422
+    },
+    {
+      "StartMilliseconds": 2663.9229,
+      "EndMilliseconds": 2664.6919,
+      "PauseMilliseconds": 0.7689999999997781
+    },
+    {
+      "StartMilliseconds": 2801.8051,
+      "EndMilliseconds": 2802.0865,
+      "PauseMilliseconds": 0.28139999999984866
+    },
+    {
+      "StartMilliseconds": 2804.3318,
+      "EndMilliseconds": 2804.656,
+      "PauseMilliseconds": 0.3242000000000189
+    },
+    {
+      "StartMilliseconds": 2946.0112,
+      "EndMilliseconds": 2946.293,
+      "PauseMilliseconds": 0.281800000000203
+    },
+    {
+      "StartMilliseconds": 2948.6219,
+      "EndMilliseconds": 2950.0049,
+      "PauseMilliseconds": 1.3829999999998108
+    },
+    {
+      "StartMilliseconds": 3044.2351,
+      "EndMilliseconds": 3044.751,
+      "PauseMilliseconds": 0.5159000000003289
+    },
+    {
+      "StartMilliseconds": 3047.3303,
+      "EndMilliseconds": 3047.8478,
+      "PauseMilliseconds": 0.5174999999999272
+    },
+    {
+      "StartMilliseconds": 3414.3175,
+      "EndMilliseconds": 3422.4323,
+      "PauseMilliseconds": 8.114799999999832
+    },
+    {
+      "StartMilliseconds": 3480.0206,
+      "EndMilliseconds": 3480.3368,
+      "PauseMilliseconds": 0.3162000000002081
+    },
+    {
+      "StartMilliseconds": 3482.4373,
+      "EndMilliseconds": 3482.6896,
+      "PauseMilliseconds": 0.2523000000001048
+    },
+    {
+      "StartMilliseconds": 4082.7002,
+      "EndMilliseconds": 4083.1908,
+      "PauseMilliseconds": 0.4905999999996311
+    },
+    {
+      "StartMilliseconds": 4085.5164,
+      "EndMilliseconds": 4086.155,
+      "PauseMilliseconds": 0.6386000000002241
+    },
+    {
+      "StartMilliseconds": 18019.3313,
+      "EndMilliseconds": 18019.6985,
+      "PauseMilliseconds": 0.36719999999695574
+    },
+    {
+      "StartMilliseconds": 18022.3904,
+      "EndMilliseconds": 18022.6713,
+      "PauseMilliseconds": 0.2809000000015658
+    },
+    {
+      "StartMilliseconds": 18665.1563,
+      "EndMilliseconds": 18687.9256,
+      "PauseMilliseconds": 22.76929999999993
+    }
+  ],
+  "Collections": [
+    {
+      "Milliseconds": 84.6659,
+      "Generation": 2,
+      "Type": "NonConcurrentGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 187.2217,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 195.4142,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 206.9192,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 326.6288,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 489.4244,
+      "Generation": 0,
+      "Type": "NonConcurrentGC",
+      "Reason": "AllocSmall"
+    },
+    {
+      "Milliseconds": 2260.4714,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 2270.064,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 2661.6183,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 2801.8439,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 2946.0628,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 3044.2812,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 3414.3568,
+      "Generation": 0,
+      "Type": "NonConcurrentGC",
+      "Reason": "AllocSmall"
+    },
+    {
+      "Milliseconds": 3480.0602,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 4082.7401,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 18019.3973,
+      "Generation": 2,
+      "Type": "BackgroundGC",
+      "Reason": "AllocLarge"
+    },
+    {
+      "Milliseconds": 18665.2712,
+      "Generation": 1,
+      "Type": "NonConcurrentGC",
+      "Reason": "AllocSmall"
+    }
+  ]
+}

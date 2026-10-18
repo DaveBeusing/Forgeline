@@ -332,6 +332,7 @@ internal static class VisualReferenceCapture
                     }
                     graphics.WaitForIdle();
                     var beforeSamples = graphics.Diagnostics;
+                    meshes.ObserveFrameDiagnostics(beforeSamples);
                     var performance = new ReferencePerformanceSamples(request.Samples, beforeSamples.Frame?.GpuSubmissionFence ?? 0);
                     var initialCamera = camera.CaptureState();
                     var cpu = new double[request.Samples]; var gpu = new List<double>(); ulong lastFence = 0;
@@ -345,6 +346,7 @@ internal static class VisualReferenceCapture
                         cpu[i] = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
                         long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocationStart;
                         var sampleDiagnostics = graphics.Diagnostics;
+                        meshes.ObserveFrameDiagnostics(sampleDiagnostics);
                         performance.AddCpu(i, cpu[i], allocatedBytes, sampleDiagnostics,
                             new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics });
                         if (sampleDiagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)

@@ -11,6 +11,36 @@ public sealed class GroundMovementSystemTests
     private static readonly PlayerId LocalPlayer = new(1);
 
     [Theory]
+    [InlineData(10)]
+    [InlineData(20)]
+    [InlineData(60)]
+    public void MisorderedQueueArrivalCanEvacuateSidewaysWithoutPassingItsPredecessor(int ticksPerSecond)
+    {
+        var simulation = new SimulationCoordinator(ticksPerSecond: ticksPerSecond);
+        var entities = simulation.Entities;
+        GroundMovement movement = CreateMovement(maximumSpeed: 13, acceleration: 6.5f,
+            deceleration: 10, turnRateRadiansPerSecond: 2.35f, radius: 2, separationRadius: 5.8f);
+        EntityId predecessor = AddGroundUnit(simulation, new(40, .5f, 20), movement);
+        EntityId arrival = AddGroundUnit(simulation, new(20, .5f, 16), movement);
+        entities.SetComponent(arrival, entities.GetComponent<WorldTransform>(arrival) with
+            { Scale = new(3.4f, 2.5f, 6.8f) });
+        entities.SetComponent(arrival, GroundMovementState.Stationary(-.054f));
+        EntityId building = entities.CreateEntity();
+        entities.AddComponent(arrival, new VehicleQueueEntry(building, new(1), 1, SimulationTick.Zero,
+            VehicleQueueService.SupplyLoading, Position: 3, Target: new(60, .5f, 20),
+            Heading: -MathF.PI / 2, Predecessor: predecessor));
+        entities.AddComponent(arrival, new VehicleQueueMotion(new(40, .5f, 20), new(60, .5f, 20),
+            -MathF.PI / 2, predecessor, 5.8f, 1));
+        AddOrder(simulation, arrival, new(19, .5f, 4), new SimulationTick(1));
+        simulation.RegisterSystem(new GroundMovementSystem(CreateFlatTerrain(128)));
+        simulation.RunTicks((ulong)ticksPerSecond * 3, TestContext.Current.CancellationToken);
+        Vector3 position = entities.GetComponent<WorldTransform>(arrival).Position;
+        Assert.True(position.Z < 10, $"Queue arrival could not evacuate: {position}");
+        Assert.Equal(predecessor, entities.GetComponent<VehicleQueueMotion>(arrival).Predecessor);
+        Assert.Equal(3, entities.GetComponent<VehicleQueueEntry>(arrival).Position);
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void ProgressTrackingDistinguishesSlowTravelFromOscillation(bool oscillating)

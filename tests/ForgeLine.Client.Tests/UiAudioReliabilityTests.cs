@@ -6,6 +6,7 @@ using Xunit;
 
 namespace ForgeLine.Client.Tests;
 
+[Collection("Exclusive native and timing qualification")]
 public sealed class UiAudioReliabilityTests
 {
     private static readonly System.Text.Json.JsonSerializerOptions s_json = new() { WriteIndented = true };
@@ -167,7 +168,13 @@ public sealed class UiAudioReliabilityTests
         audio.Update(UiAudioCue.Accepted, new(SoundEnabled: true), now, true);
         try
         {
-            Assert.True(output.Entered.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
+            Assert.True(SpinWait.SpinUntil(() =>
+            {
+                TestContext.Current.CancellationToken.ThrowIfCancellationRequested();
+                var current = TimeSpan.FromSeconds((double)Stopwatch.GetTimestamp() / Stopwatch.Frequency);
+                audio.Update(UiAudioCue.Accepted, new(SoundEnabled: true), current, true);
+                return output.Entered.IsSet;
+            }, TimeSpan.FromSeconds(5)));
             Assert.NotEqual(Environment.CurrentManagedThreadId, output.PlayThread);
             audio.Update(UiAudioCue.Rejected, new(SoundEnabled: true), now, true);
             audio.StopPlayback();

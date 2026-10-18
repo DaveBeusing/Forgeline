@@ -1,0 +1,57 @@
+{
+  "uiScales": [
+    1.0
+  ],
+  "profiles": [
+    "Low"
+  ],
+  "mechanicalSeconds": null,
+  "outputRoot": "D:\\Code\\Forgeline\\artifacts\\foundation-current-warp",
+  "runProfile": "Warm",
+  "software": true,
+  "surfaceMarks": [],
+  "runtimeRoot": "D:\\Code\\Forgeline\\assets\\runtime",
+  "localHaze": null,
+  "samples": 8,
+  "graphicsSettings": {
+    "vegetation": {
+      "maximumDistanceMeters": 4000.0,
+      "density": 1.0
+    },
+    "resolutionScale": 1.0,
+    "terrainResidency": {
+      "maximumResidentChunks": 128,
+      "enabled": true
+    },
+    "environment": {
+      "wetness": 0.0,
+      "daylight": 1.0,
+      "cloudCover": 0.0
+    }
+  },
+  "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+  "rasterDpi": 0,
+  "repeatCaptures": 8,
+  "scenes": [
+    "BattlefieldCombat"
+  ],
+  "commit": "4f4bf27352cd6af6263996ceccb4048faebeea10",
+  "warmups": 3,
+  "yawDegrees": 45.0,
+  "cameraPath": "Fixed",
+  "displays": [
+    {
+      "height": 360,
+      "width": 640
+    }
+  ],
+  "zooms": [
+    "NormalGameplay"
+  ],
+  "continueAfterMismatch": false,
+  "cinematicFrontend": false,
+  "uiScenarios": [
+    "World"
+  ],
+  "inspectionDistanceMeters": 0.0
+}

@@ -22,6 +22,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     private GraphicsDeviceException? _failure;
     private long _fenceWaitCount;
     private long _submissionFaultCount;
+    private ulong _lastSubmittedFrameFence;
+    private double? _frameWaitMilliseconds, _presentMilliseconds;
 
     private readonly GraphicsConfiguration _configuration;
     private readonly IDXGIFactory4 _factory;
@@ -268,6 +270,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                     _cpuTimingSubmission, _worldCpuMilliseconds, _overlayCpuMilliseconds,
                     _gpuTimingFence, _worldGpuMilliseconds, _overlayGpuMilliseconds)
                 {
+                    FrameWaitMilliseconds = _frameWaitMilliseconds,
+                    PresentMilliseconds = _presentMilliseconds,
                     CompositeCpuMilliseconds = _compositeCpuMilliseconds,
                     CompositeGpuMilliseconds = _compositeGpuMilliseconds,
                     GpuTimingUnavailableReason = _gpuTimingUnavailableReason,
@@ -717,6 +721,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
     }
 
+    private static Color4 RenderTargetClearColor(GraphicsColor color, bool sceneOutput) =>
+        new(color.Red, color.Green, color.Blue, sceneOutput ? -1.0f - color.Alpha : color.Alpha);
+
     private void RenderFrameCore(GraphicsColor clearColor, Action<IGraphicsCommandContext>? recordCommands)
     {
         _resources.Collect(GetCompletedFence());
@@ -734,7 +741,10 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             return;
         }
 
+        long waitStarted = System.Diagnostics.Stopwatch.GetTimestamp();
         WaitForFrame(_frameIndex);
+        _frameWaitMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(waitStarted).TotalMilliseconds;
+        _resources.Collect(GetCompletedFence());
         ReadCompletedGpuTiming(
             _frameIndex);
 
@@ -781,11 +791,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
         _commandList.ClearRenderTargetView(
             rtv,
-            new Color4(
-                clearColor.Red,
-                clearColor.Green,
-                clearColor.Blue,
-                _sceneOutput.Enabled ? -1.0f - clearColor.Alpha : clearColor.Alpha));
+            RenderTargetClearColor(clearColor, _sceneOutput.Enabled));
         _commandList.ClearDepthStencilView(
             dsv,
             ClearFlags.Depth,
@@ -851,9 +857,11 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _compositeCpuMilliseconds = _recordedCompositeCpuMilliseconds;
         _recording = false;
 
+        long presentStarted = System.Diagnostics.Stopwatch.GetTimestamp();
         var presentResult = _swapChain.Present(
             _configuration.EnableVSync ? 1u : 0u,
             PresentFlags.None);
+        _presentMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(presentStarted).TotalMilliseconds;
 
         if (presentResult.Failure)
         {
@@ -1053,6 +1061,13 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 Message message =
                     _debugInfoQueue.GetMessage(
                         index);
+
+                if (message.Severity is MessageSeverity.Warning or MessageSeverity.Error or MessageSeverity.Corruption &&
+                    _debugWarningCount + _debugErrorCount < 16)
+                {
+                    Console.Error.WriteLine(
+                        $"[graphics:debug-layer] severity={message.Severity} id={message.Id} description={message.Description.TrimEnd('\0').ReplaceLineEndings(" ")}");
+                }
 
                 switch (message.Severity)
                 {
@@ -1650,6 +1665,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _frameFenceValues[_frameIndex] =
             fenceValue;
         _resources.CompleteRecording(fenceValue);
+        _lastSubmittedFrameFence = fenceValue;
     }
 
     private int GetCurrentBackBufferIndex()
@@ -1671,7 +1687,11 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void WaitForFrame(int frameIndex)
     {
-        ulong fenceValue = _frameFenceValues[frameIndex];
+        // WARP shares CPU capacity with recording. Several individually healthy
+        // multi-second frames can otherwise accumulate beyond the idle deadline.
+        // Admit one software frame at a time; hardware keeps per-buffer overlap.
+        ulong fenceValue = _deviceInfo.IsSoftwareAdapter
+            ? _lastSubmittedFrameFence : _frameFenceValues[frameIndex];
         if (fenceValue == 0)
         {
             return;
@@ -1895,7 +1915,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             _ = _frameFenceEvent.WaitOne(100);
             if (System.Diagnostics.Stopwatch.GetElapsedTime(started) >= TimeSpan.FromSeconds(10))
             {
-                throw new GraphicsDeviceException("GPU fence did not complete within ten seconds; restart the client session.", "fence-timeout");
+                throw new GraphicsDeviceException(
+                    $"GPU fence did not complete within ten seconds; restart the client session. target={fenceValue}; completed={GetCompletedFence()}; lastFrame={_lastSubmittedFrameFence}; software={_deviceInfo.IsSoftwareAdapter}.",
+                    "fence-timeout");
             }
         }
     }

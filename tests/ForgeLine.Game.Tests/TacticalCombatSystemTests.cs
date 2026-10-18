@@ -930,6 +930,55 @@ public sealed class TacticalCombatSystemTests
                 unit));
     }
 
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(1, true)]
+    [InlineData(2, true)]
+    [InlineData(3, true)]
+    [InlineData(0, false)]
+    [InlineData(1, false)]
+    [InlineData(2, false)]
+    [InlineData(3, false)]
+    public void TacticalOpponentSkipsIdentifiedContactsThatCannotBeCombatTargets(
+        int missingProperties, bool alternative)
+    {
+        TacticalScenario scenario = CreateScenario(weaponRange: 80, registerTestOpponent: true);
+        var entities = scenario.Simulation.Entities;
+        var runtime = new CombatRuntime();
+        scenario.Simulation.RegisterSystem(new CombatExecutionSystem(scenario.Weapons, scenario.Inventories,
+            runtime, targetAvailability: new IntelligenceTargetAvailabilityPolicy(entities, scenario.Intelligence)));
+        scenario.Simulation.RegisterSystem(new CombatDamageResolutionSystem(runtime));
+        EntityId opponent = CreateCombatUnit(scenario, RedPlayer, RedFaction, Vector3.Zero,
+            addVisualSensor: true, visualRange: 150, movable: true, attachSupply: true);
+        entities.AddComponent(opponent, new TacticalTestOpponent());
+        EntityId infrastructure = CreateCombatUnit(scenario, BluePlayer, BlueFaction, new(20, 0, 0));
+        if (missingProperties is 0 or 1) entities.RemoveComponent<Targetable>(infrastructure);
+        if (missingProperties is 0 or 2) entities.RemoveComponent<Combatant>(infrastructure);
+        if (missingProperties is 0 or 3) entities.RemoveComponent<HealthState>(infrastructure);
+        EntityId target = alternative
+            ? CreateCombatUnit(scenario, BluePlayer, BlueFaction, new(60, 0, 0)) : EntityId.Invalid;
+        Vector3 objective = new(100, 0, 0);
+        scenario.Simulation.SubmitCommand(new AttackMoveCommand(RedPlayer, [opponent], objective,
+            scenario.Simulation.CurrentTick), scenario.Simulation.CurrentTick.Next());
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+
+        Assert.True(scenario.Intelligence.IsEntityCurrentlyIdentified(RedFaction, infrastructure));
+        CombatOrderState order = entities.GetComponent<CombatOrderState>(opponent);
+        if (alternative)
+        {
+            Assert.Equal(CombatOrderKind.Attack, order.Kind);
+            Assert.Equal(target, order.ExplicitTarget);
+            Assert.Equal(CombatOrderStatus.Engaging, entities.GetComponent<TacticalCombatState>(opponent).Status);
+            Assert.True(entities.GetComponent<HealthState>(target).Current < 100);
+        }
+        else
+        {
+            Assert.Equal(CombatOrderKind.AttackMove, order.Kind);
+            Assert.Equal(objective, order.Destination);
+            Assert.False(order.ExplicitTarget.IsValid);
+        }
+    }
+
     [Fact]
     public void TacticalTestOpponentSelectsTargetItsWeaponCanEngage()
     {

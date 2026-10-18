@@ -1,0 +1,29 @@
+{
+  "imageFailures": [],
+  "channelTolerance": 0,
+  "visualAcceptance": "pending",
+  "commit": "7c2988d566fdfd9ee5b129be5887eadb174a7257",
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "structural": "pass",
+  "schemaVersion": 1,
+  "captures": [
+    {
+      "comparison": "exact-file-match",
+      "pixelComparison": null,
+      "cpuMeanMs": 1102.8172625,
+      "equivalentHardware": true,
+      "structural": "pass",
+      "key": "BattlefieldCombat-640x360-Low-NormalGameplay",
+      "cpuMeanDeltaMs": 104.38974999999994,
+      "sameSource": false,
+      "visualReview": "pending",
+      "sameRuntime": true,
+      "gpuMeanMs": 1243.3452375,
+      "regionChanges": null
+    }
+  ],
+  "imageGateRequested": false,
+  "pixelComparisonRequested": false,
+  "baselineCommit": "fb78998cbe5ecbf07ba7524366bd4371abf22275",
+  "maximumChangedPixelFraction": 0.0
+}

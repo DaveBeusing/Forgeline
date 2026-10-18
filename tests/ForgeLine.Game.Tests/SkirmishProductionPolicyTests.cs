@@ -780,8 +780,12 @@ public sealed class SkirmishProductionPolicyTests
             $"No stock policy found for target {target} and resource {resource}.");
     }
 
-    [Fact]
-    public void ExpandedSupplyNetworkQueuesAdditionalCargoRecovery()
+    [Theory]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, false)]
+    [InlineData(true, true, true)]
+    public void ExpandedSupplyNetworkQueuesAdditionalCargoRecovery(
+        bool fullIndustry, bool assaultFleetEstablished, bool expectedCargoRecovery)
     {
         MatchRuntime scenario =
             CentralDivideScenario.Create(
@@ -814,6 +818,56 @@ public sealed class SkirmishProductionPolicyTests
                 new SupplyDepot(
                     depotInventory,
                     scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
+        }
+
+        if (assaultFleetEstablished)
+        {
+            var owner = scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player;
+            var configuration = CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation).OpponentConfigurations[owner.Value];
+            var targets = new Dictionary<UnitId, int> {
+                [UnitIds.ScoutVehicle] = 1,
+                [UnitIds.MainBattleTank] = configuration.MinimumObjectivePressureUnits,
+                [UnitIds.MobileArtillery] = 1,
+                [UnitIds.SupplyTruck] = configuration.ResolveMatureSupplyTruckTarget(4)
+            };
+            UnitDefinitionCatalog units = DirectorateContent.CreateUnitCatalog();
+            foreach (var target in targets)
+            {
+                int count = 0;
+                foreach (EntityId unit in entities.Query<ControllableEntity, UnitIdentity>())
+                    if (entities.GetComponent<ControllableEntity>(unit).Owner == owner &&
+                        entities.GetComponent<UnitIdentity>(unit).UnitId == target.Key) count++;
+                while (count++ < target.Value)
+                    scenario.UnitFactory.Create(units[target.Key], coreTransform.Position, owner);
+            }
+        }
+
+        if (fullIndustry)
+        {
+            var owner = scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player;
+            UnitDefinitionCatalog units = DirectorateContent.CreateUnitCatalog();
+            int cargoCount = 0;
+            foreach (EntityId unit in entities.Query<ControllableEntity, UnitIdentity>())
+                if (entities.GetComponent<ControllableEntity>(unit).Owner == owner &&
+                    entities.GetComponent<UnitIdentity>(unit).UnitId == UnitIds.CargoTruck) cargoCount++;
+            while (cargoCount++ < 4)
+                scenario.UnitFactory.Create(units[UnitIds.CargoTruck], coreTransform.Position, owner);
+
+            foreach (var (building, capability) in new[] {
+                (BuildingIds.Smelter, ProductionCapability.SteelProcessing),
+                (BuildingIds.Refinery, ProductionCapability.FuelProcessing),
+                (BuildingIds.ElectronicsPlant, ProductionCapability.ElectronicsProcessing),
+                (BuildingIds.AmmunitionPlant, ProductionCapability.AmmunitionProcessing) })
+            {
+                EntityId processor = entities.CreateEntity();
+                entities.AddComponent(processor, coreTransform);
+                entities.AddComponent(processor, new CompletedBuilding(building, owner, SimulationTick.Zero));
+                entities.AddComponent(processor, new ProductionFacility(
+                    scenario.Inventories.CreateInventory(new InventorySpecification(4_000.0)),
+                    scenario.Inventories.CreateInventory(new InventorySpecification(4_000.0)),
+                    capability, SimulationTick.Zero));
+            }
         }
 
         InventoryId input =
@@ -878,7 +932,7 @@ public sealed class SkirmishProductionPolicyTests
             }
         }
 
-        Assert.True(queuedRecoveryCargo);
+        Assert.Equal(expectedCargoRecovery, queuedRecoveryCargo);
     }
 
     [Theory]

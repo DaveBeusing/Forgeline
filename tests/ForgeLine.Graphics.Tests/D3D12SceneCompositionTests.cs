@@ -42,15 +42,17 @@ public sealed class D3D12SceneCompositionTests
     [InlineData(false, false)]
     [InlineData(true, true)]
     [InlineData(true, false)]
-    public void SceneCompositionMatchesLegacyTextureTransferAndPreservesOverlay(bool warp, bool aces)
+    public void SceneCompositionMatchesLegacyTextureTransferAndPreservesOverlay(bool forceSoftware, bool aces)
     {
         using var platform = new WindowsPlatform();
         using IWindow window = platform.CreateWindow(new WindowConfiguration("FORGELINE Scene Color Test", 320, 240));
         using var graphics = (D3D12GraphicsDevice)GraphicsDeviceFactory.CreateForWindow(window, new GraphicsConfiguration
         {
-            ForceSoftwareAdapter = warp, EnableDebugLayer = false, EnableVSync = false
+            ForceSoftwareAdapter = forceSoftware, AllowSoftwareAdapterFallback = true, EnableDebugLayer = false, EnableVSync = false
         });
-        Assert.Equal(warp, graphics.Diagnostics.Device.IsSoftwareAdapter);
+        // Default adapter selection permits WARP when no hardware device exists.
+        // Forced WARP must still select a software device; every case renders below.
+        if (forceSoftware) Assert.True(graphics.Diagnostics.Device.IsSoftwareAdapter);
         using IGraphicsTexture albedo = graphics.CreateTexture(new GraphicsTextureData(
             new(1, 1, GraphicsTextureFormat.Rgba8Unorm, GraphicsTextureColorSpace.Srgb, 1),
             [new(1, 1, 4, [128, 128, 128, 255])]));

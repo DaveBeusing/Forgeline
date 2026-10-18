@@ -7,7 +7,11 @@ internal sealed class ContractGraphicsDevice : IGraphicsDevice
 {
     internal readonly List<ContractBuffer> Buffers = [];
     public bool IsRecording { get; set; }
-    public GraphicsDiagnostics Diagnostics => new(new("contract", 0, true, "test", false), default);
+    internal int DiagnosticReads { get; private set; }
+    public GraphicsDiagnostics Diagnostics
+    {
+        get { DiagnosticReads++; return new(new("contract", 0, true, "test", false), default); }
+    }
     public IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description) => new Pipeline(description);
     public IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description)
     { var buffer = new ContractBuffer(description); Buffers.Add(buffer); return buffer; }
