@@ -193,3 +193,14 @@ version from 3 to 4. Therefore earlier fixture-3 comparisons remain historical,
 and combined-tree native/performance acceptance requires fixture-4 observations.
 The foundation's actual original integrated SHA remains 17810ee; this newer base
 is not a new foundation release or permission to start subsequent packages.
+
+## Hosted debug-layer follow-up
+
+Combined-tree CI 39112089267 passes WARP reference/apphost completion and now exits
+window smoke normally, with actual positive running rates. Its Windowed report
+contains four D3D12 debug warnings and zero errors, so the unchanged warning gate
+correctly fails. Existing diagnostics counted and then discarded message text.
+Retain the first 16 warning/error/corruption IDs and descriptions in diagnostic
+stderr while continuing to count every message. No severity is filtered, warning
+is waived or debug layer disabled. The next hosted run must identify and resolve
+the actual warning before CI acceptance; the local debug layer remains unavailable.

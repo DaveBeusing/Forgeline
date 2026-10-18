@@ -9,6 +9,8 @@ from pathlib import Path
 
 
 def read_json(path):
+    if not path.exists():
+        path = path.with_suffix("") if path.suffix == ".gz" else path.with_suffix(path.suffix + ".gz")
     raw = path.read_bytes()
     return json.loads(gzip.decompress(raw) if path.suffix == ".gz" else raw)
 
@@ -65,9 +67,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", type=Path, nargs="?", default=Path("artifacts"))
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--prefix", action="append", help="Paired dataset prefix; repeat to include multiple protocols.")
     args = parser.parse_args()
     report = {"schemaVersion": 2, "cohorts": {}}
-    for prefix in ("foundation-serial-pair", "foundation-final-pair"):
+    for prefix in (args.prefix or ["foundation-serial-pair", "foundation-final-pair"]):
         report["cohorts"][prefix] = summarize_pairs(args.root, prefix)
     trace = manifest(args.root, "foundation-repair-wait-trace")
     report["waitTraceSource"] = trace["commit"]
@@ -100,7 +103,7 @@ def main():
     output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     for name, cohort in report["cohorts"].items():
         print(name, [(g["pair"], len(g["regressions"]), len(g["unqualified"])) for g in cohort["gates"]])
-    print("All 24 paired images exact; per-frame resource plateaus and health valid.")
+    print(f"All {sum(len(c['cases']) for c in report['cohorts'].values())} paired images exact; per-frame resource plateaus and health valid.")
 
 
 if __name__ == "__main__":

@@ -1063,6 +1063,13 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                     _debugInfoQueue.GetMessage(
                         index);
 
+                if (message.Severity is MessageSeverity.Warning or MessageSeverity.Error or MessageSeverity.Corruption &&
+                    _debugWarningCount + _debugErrorCount < 16)
+                {
+                    Console.Error.WriteLine(
+                        $"[graphics:debug-layer] severity={message.Severity} id={message.Id} description={message.Description}");
+                }
+
                 switch (message.Severity)
                 {
                     case MessageSeverity.Warning:
