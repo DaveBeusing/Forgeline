@@ -37,4 +37,3 @@ internal static class InfantrySkinReferenceScene
         return new(kind, target, snapshot, default, fingerprint);
     }
 }
-

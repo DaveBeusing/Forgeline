@@ -71,4 +71,3 @@ public sealed class InfantryAnimationTests
         Assert.Equal(fire,InfantryAnimationPose.Interpolate(first,fire,.5f));
     }
 }
-
