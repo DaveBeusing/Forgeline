@@ -1026,6 +1026,10 @@ public sealed class SkirmishOpponentTests
                             ? $"{ground.Status}/{ground.Velocity.Length():F2}/heading={ground.HeadingRadians:F2}" : "none";
                         string order = scenario.Simulation.Entities.TryGetComponent(entity, out CargoTransportOrder delivery)
                             ? $"{delivery.ResourceId}/{delivery.RequestedQuantity:F0}/{delivery.Origin}->{delivery.Destination}" : "none";
+                        string loading = scenario.Simulation.Entities.TryGetComponent(entity, out SupplyLoadingOrder load)
+                            ? $"{load.Source}/{load.WaitReason}/since{load.AcceptedAtTick}" : "none";
+                        if (scenario.Simulation.Entities.TryGetComponent(entity, out SupplyTruck supply))
+                            loading += $"/fuel{scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel):F1}/ammo{scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition):F1}";
                         string dock = scenario.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit visit)
                             ? $"{visit.Building}/g{visit.Generation}/{visit.Status}/{visit.Reason} settled={visit.SettledTicks} last={visit.LastObservedTick} transfer={visit.LastTransferTick} service={visit.Pose.Service.X:F0},{visit.Pose.Service.Z:F0}"
                             : "none";
@@ -1035,7 +1039,7 @@ public sealed class SkirmishOpponentTests
                             (transport.HasMovementTarget
                                 ? $" cargo->{transport.MovementTarget.X:F0},{transport.MovementTarget.Z:F0}"
                                 : string.Empty) +
-                            $" move->{movement} fuel={fuel} resupply={resupply} dock={dock} motion={motion} order={order}";
+                            $" move->{movement} fuel={fuel} resupply={resupply} dock={dock} motion={motion} order={order} loading={loading}";
                     }));
 
         var unitProductionEntries =
