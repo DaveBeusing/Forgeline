@@ -1,0 +1,15 @@
+{
+  "measurements": [
+    {
+      "name": "baseline",
+      "seconds": 84.6885649
+    },
+    {
+      "name": "candidate",
+      "seconds": 73.1553404
+    }
+  ],
+  "maximumRegressionPercent": 15,
+  "schemaVersion": 1,
+  "mode": "sequential-clean-same-compiler"
+}
