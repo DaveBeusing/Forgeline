@@ -91,20 +91,8 @@ public sealed class SkirmishSupplyPolicyTests
         using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation), seed: 2026);
         var entities = scenario.Simulation.Entities;
         var side = scenario.GetBase(new PlayerId(2));
-        BuildingId[] industry = [BuildingIds.PowerPlant, BuildingIds.StorageDepot, BuildingIds.Smelter,
-            BuildingIds.Refinery, BuildingIds.ElectronicsPlant, BuildingIds.LogisticsHub, BuildingIds.SupplyDepot,
-            BuildingIds.Barracks, BuildingIds.VehicleFactory, BuildingIds.AmmunitionPlant, BuildingIds.Radar];
-        Assert.True(scenario.RunUntil(current =>
-        {
-            if (industry.Any(id => current.CountBuildings(side.Player, id) == 0)) return false;
-            var debug = current.Opponents.DebugSnapshot.Single(item => item.Player == side.Player);
-            if (debug.Economy.PowerGeneration < debug.Economy.PowerDemand + 20 ||
-                debug.Economy.ActiveConstructionSites != 0 || debug.Force.CargoTrucks < 3 ||
-                current.Simulation.CurrentTick.Value < debug.LastDecisionTick.Value + 2) return false;
-            foreach (var entity in entities.Query<ConstructionSite>())
-                if (entities.GetComponent<ConstructionSite>(entity).Owner == side.Player) return false;
-            return true;
-        }, 24_000, TestContext.Current.CancellationToken));
+        Assert.True(scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, side.Player),
+            24_000, TestContext.Current.CancellationToken));
         void SetAvailable(ResourceId resource, double quantity)
         {
             double current = scenario.Inventories.GetAvailableQuantity(side.StartingInventory, resource);

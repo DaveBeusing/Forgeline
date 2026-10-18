@@ -9,6 +9,21 @@ namespace ForgeLine.Game.Tests;
 
 internal sealed class SkirmishScenarioHarness
 {
+    internal static bool HasExpansionFundingPrerequisites(MatchRuntime scenario, PlayerId player)
+    {
+        BuildingId[] industry = [BuildingIds.PowerPlant, BuildingIds.StorageDepot, BuildingIds.Smelter,
+            BuildingIds.Refinery, BuildingIds.ElectronicsPlant, BuildingIds.LogisticsHub, BuildingIds.SupplyDepot,
+            BuildingIds.Barracks, BuildingIds.VehicleFactory, BuildingIds.AmmunitionPlant, BuildingIds.Radar];
+        if (industry.Any(id => scenario.CountBuildings(player, id) == 0)) return false;
+        var debug = scenario.Opponents.DebugSnapshot.Single(item => item.Player == player);
+        if (debug.Economy.PowerGeneration < debug.Economy.PowerDemand + 20 ||
+            debug.Economy.ActiveConstructionSites != 0 || debug.Force.CargoTrucks < 3 ||
+            scenario.Simulation.CurrentTick.Value < debug.LastDecisionTick.Value + 2) return false;
+        foreach (var entity in scenario.Simulation.Entities.Query<ConstructionSite>())
+            if (scenario.Simulation.Entities.GetComponent<ConstructionSite>(entity).Owner == player) return false;
+        return true;
+    }
+
     private readonly MatchRuntime _scenario;
 
     private SkirmishScenarioHarness(MatchRuntime scenario)
