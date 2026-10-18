@@ -152,14 +152,19 @@ larger valid load is available. Logical-node dispatch retains its existing cost
 policy. Construction urgency follows the next building's actual missing costs;
 unit-production urgency follows missing costs of the next unit. Neither changes
 stock targets or throughput limits.
+Expansion funding uses the same bootstrap, economy and total-unit prerequisites
+as expansion planning. An unfunded eligible hub keeps its partial deliveries;
+a cheaper optional extractor cannot spend them. A remote hub's supply depot is
+funded before another hub. Site alternatives remain available when the complete
+primary construction cost is available but the primary cannot be placed.
 
 During a power shortage, unrelated construction waits while partial deliveries
 accumulate for the next required power plant. Its input policies remain Critical
-before a blackout when the existing 20-unit power reserve is missing. Funding,
-power-plant scheduling and construction admission use the same capacity rule;
-another consumer cannot spend those partial deliveries in the meantime.
 through cost reservation, preventing another dispatch from claiming a completed
 construction load before the build command books it. Tactical support continues.
+The same protection applies before a blackout when the existing 20-unit power
+reserve is missing. Funding, power-plant scheduling and construction admission
+use the same capacity rule.
 Home placement candidates leave 96 m between neighboring sites so coarse navigation
 cells retain usable access between the authored loading lanes.
 

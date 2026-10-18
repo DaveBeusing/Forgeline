@@ -234,6 +234,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             controller,
             owned,
+            economy,
             configuration);
         EnsureProductionPrograms(
             context,
@@ -1348,6 +1349,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return forceWideRecovery || recoveryEscortsReleased;
     }
 
+    private static bool CanPlanExpansion(OwnedState owned, in SkirmishEconomyAssessment economy,
+        int totalUnits, SkirmishOpponentConfiguration configuration) =>
+        IsBootstrapComplete(owned) &&
+        (economy.HealthScore >= configuration.ExpansionReadinessThreshold || economy.RawResourceConstrained) &&
+        totalUnits >= 4 && !HasPendingBuilding(owned, BuildingIds.LogisticsHub) &&
+        !HasPendingBuilding(owned, BuildingIds.SupplyDepot);
+
     private bool TryExpand(
         SimulationContext context,
         SkirmishOpponentController controller,
@@ -1360,20 +1368,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         objective = Vector3.Zero;
 
-        bool economyCanSupportExpansion =
-            economy.HealthScore >=
-                configuration.ExpansionReadinessThreshold ||
-            economy.RawResourceConstrained;
-
-        if (!IsBootstrapComplete(owned) ||
-            !economyCanSupportExpansion ||
-            force.TotalUnits < 4 ||
-            HasPendingBuilding(
-                owned,
-                BuildingIds.LogisticsHub) ||
-            HasPendingBuilding(
-                owned,
-                BuildingIds.SupplyDepot))
+        if (!CanPlanExpansion(owned, economy, force.TotalUnits, configuration))
         {
             return false;
         }
@@ -1391,15 +1386,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             objective =
                 unsupportedRemoteHub.Value;
 
-            if (TryIssueBuilding(
+            return TryIssueBuilding(
                     context,
                     controller,
                     owned,
                     BuildingIds.SupplyDepot,
-                    unsupportedRemoteHub.Value))
-            {
-                return true;
-            }
+                    unsupportedRemoteHub.Value);
         }
 
         int remoteHubs =
@@ -1427,6 +1419,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         objective =
             site.Value.Position;
+
+        // A cheaper fallback must not consume partial deliveries for a still-eligible hub.
+        // Site alternatives are considered after its complete construction cost is available.
+        if (!TrySelectConstructionSource(context, controller, owned, _buildings[BuildingIds.LogisticsHub], out _))
+            return false;
 
         if (!TryIssueBuilding(
                 context,
@@ -3052,24 +3049,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned,
+        in SkirmishEconomyAssessment economy,
         SkirmishOpponentConfiguration configuration)
     {
         bool powerRecoveryRequired = RequiresPowerConstruction(owned);
         bool fuelProductionRecoveryRequired =
             !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage coreStorage) ||
             _inventories.GetAvailableQuantity(coreStorage.InventoryId, ResourceIds.Fuel) < 360;
-        bool forwardConstructionRequired =
-            !RequiresCargoReplacementReserve(owned, configuration) &&
-            owned.CombatUnits.Count >= configuration.MinimumAttackUnits &&
-            GetUnitCount(owned, UnitIds.MainBattleTank) >=
-                configuration.MinimumObjectivePressureUnits &&
-            (CountRemoteBuildings(
-                 context, owned, BuildingIds.LogisticsHub,
-                 controller.HomePosition, minimumDistanceMeters: 500.0f) < 2 ||
-             SelectUnsupportedRemoteHub(
-                 context, owned, controller.HomePosition,
-                 minimumDistanceMeters: 500.0f,
-                 supportRadiusMeters: 260.0f).HasValue);
         BuildingDefinition? nextConstruction = null;
         if (powerRecoveryRequired && GetBuildingCount(owned, BuildingIds.PowerPlant) < MaximumRecoveryPowerPlants &&
             !HasPendingBuilding(owned, BuildingIds.PowerPlant)) nextConstruction = _buildings[BuildingIds.PowerPlant];
@@ -3079,10 +3065,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         foreach (BuildingId building in IndustrialPlan)
             if (nextConstruction is null && GetBuildingCount(owned, building) == 0 && !HasPendingBuilding(owned, building))
                 nextConstruction = _buildings[building];
+        if (nextConstruction is null && !RequiresCargoReplacementReserve(owned, configuration) &&
+            CanPlanExpansion(owned, economy, owned.Units.Count, configuration))
+        {
+            if (SelectUnsupportedRemoteHub(context, owned, controller.HomePosition, 500, 260).HasValue)
+                nextConstruction = _buildings[BuildingIds.SupplyDepot];
+            else if (CountRemoteBuildings(context, owned, BuildingIds.LogisticsHub, controller.HomePosition, 500) < 2)
+                nextConstruction = _buildings[BuildingIds.LogisticsHub];
+        }
 
         LogisticsStockPriority ConstructionPriority(ResourceId resource)
         {
-            if (forwardConstructionRequired) return LogisticsStockPriority.Critical;
             if (nextConstruction is null || !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage storage))
                 return LogisticsStockPriority.High;
             foreach (BuildingResourceCost cost in nextConstruction.Costs)

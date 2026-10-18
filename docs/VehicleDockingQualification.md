@@ -36,6 +36,30 @@ must be qualified separately.
 
 ## Concrete remaining gates
 
+The complete `10c372c7cbaa6dda9f444efe19de8e2873179d21` run had 2,686 tests:
+2,667 passed, 16 skipped and three failed (natural strategic progression, writer
+cleanup lock and building-state allocation). The latter two passed isolated at
+the same binary revision, 1/1 and 13/13, without changing assertions. Release,
+graph, SemVer, map, entity smoke and save/load/replay passed. All three quality
+workflows passed. Main CI had passed native WARP and was still running window-mode
+qualification when recorded. Its reproducible package SHA-256 is
+`BBAD231ABA0F88E79EF1FFADC4609A1DF31B2FAB8643F08740E32B91F48D589E`;
+fresh settings, startup/icons and three exact source/package phase pairs passed.
+All 1,358 common runtime files matched, with 63 declared installed sidecars.
+Three additional source overview/distance captures passed structural checks;
+human temporal review remains pending. The 80,000-tick match stayed nonterminal
+with 240 deliveries and 23,816 cargo units, zero failed cargo orders/routes.
+
+An observation-only production trace reproduced the seed-2026 40,000-tick state
+hash `6C8AC2BDD0509C04B9D684FB0882D49B6CA21ED3A49F23C02D9F640C1F5221AF`.
+It exposed construction admission spending partial power-plant funding below
+the existing power reserve, followed by a factory outage. The corrected shared
+capacity rule has powered/underpowered coverage. A second real-command test
+reproduced a cheaper extractor spending incomplete hub funding. Expansion stock
+urgency now follows actual planning eligibility and missing primary costs;
+unfunded primary construction is preserved. These later corrections require
+their own complete qualification; this earlier package is not promoted to them.
+
 At `339cfc80aac6c063a3b3d470f4663f32c0e540ef`, the complete solution had
 2,686 tests: 2,668 passed, 16 skipped and two failed (the natural strategic
 deadline and `FollowingCleanWriterWaitsUntilBuildQualificationCompletes`).

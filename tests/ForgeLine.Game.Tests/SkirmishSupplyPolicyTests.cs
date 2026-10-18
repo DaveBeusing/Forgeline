@@ -85,6 +85,58 @@ public sealed class SkirmishSupplyPolicyTests
         scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
         Assert.Equal(useCore ? side.CommandCore : depot, entities.GetComponent<SupplyLoadingOrder>(truck).Source);
     }
+    [Fact]
+    public void ExpansionFundingKeepsPartialHubCostsAheadOfOptionalExtractors()
+    {
+        using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation), seed: 2026);
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(2));
+        BuildingId[] industry = [BuildingIds.PowerPlant, BuildingIds.StorageDepot, BuildingIds.Smelter,
+            BuildingIds.Refinery, BuildingIds.ElectronicsPlant, BuildingIds.LogisticsHub, BuildingIds.SupplyDepot,
+            BuildingIds.Barracks, BuildingIds.VehicleFactory, BuildingIds.AmmunitionPlant, BuildingIds.Radar];
+        Assert.True(scenario.RunUntil(current =>
+        {
+            if (industry.Any(id => current.CountBuildings(side.Player, id) == 0)) return false;
+            var debug = current.Opponents.DebugSnapshot.Single(item => item.Player == side.Player);
+            if (debug.Economy.PowerGeneration < debug.Economy.PowerDemand + 20 ||
+                debug.Economy.ActiveConstructionSites != 0 || debug.Force.CargoTrucks < 3 ||
+                current.Simulation.CurrentTick.Value < debug.LastDecisionTick.Value + 2) return false;
+            foreach (var entity in entities.Query<ConstructionSite>())
+                if (entities.GetComponent<ConstructionSite>(entity).Owner == side.Player) return false;
+            return true;
+        }, 24_000, TestContext.Current.CancellationToken));
+        void SetAvailable(ResourceId resource, double quantity)
+        {
+            double current = scenario.Inventories.GetAvailableQuantity(side.StartingInventory, resource);
+            if (current < quantity) Assert.True(scenario.Inventories.Add(side.StartingInventory, resource, quantity - current).Succeeded);
+            else if (current > quantity) Assert.True(scenario.Inventories.Remove(side.StartingInventory, resource, current - quantity).Succeeded);
+        }
+        List<ConstructionSite> Sites()
+        {
+            var result = new List<ConstructionSite>();
+            foreach (var entity in entities.Query<ConstructionSite>())
+            {
+                var site = entities.GetComponent<ConstructionSite>(entity);
+                if (site.Owner == side.Player) result.Add(site);
+            }
+            return result;
+        }
+        var costs = scenario.Services.BuildingDefinitions[BuildingIds.LogisticsHub].Costs;
+        double oreRequired = costs.Single(cost => cost.ResourceId == ResourceIds.FerrousOre).Quantity;
+        double partial = scenario.Services.BuildingDefinitions[BuildingIds.Extractor].Costs.Single(cost => cost.ResourceId == ResourceIds.FerrousOre).Quantity;
+        Assert.True(partial < oreRequired);
+        foreach (var cost in costs) SetAvailable(cost.ResourceId, cost.ResourceId == ResourceIds.FerrousOre ? partial : cost.Quantity);
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+        Assert.Empty(Sites());
+        Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, side.CommandCore, ResourceIds.FerrousOre).Priority);
+        Assert.Equal(LogisticsStockPriority.High, FindStockPolicy(entities, side.CommandCore, ResourceIds.Silicates).Priority);
+        Assert.Equal(LogisticsStockPriority.High, FindStockPolicy(entities, side.CommandCore, ResourceIds.Volatiles).Priority);
+        Assert.InRange(scenario.Inventories.GetAvailableQuantity(side.StartingInventory, ResourceIds.FerrousOre), partial, oreRequired - 1);
+        SetAvailable(ResourceIds.FerrousOre, oreRequired);
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+        Assert.Contains(Sites(), site => site.BuildingId == BuildingIds.LogisticsHub && site.SourceInventory == side.StartingInventory);
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
