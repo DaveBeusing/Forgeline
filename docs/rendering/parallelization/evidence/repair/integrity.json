@@ -1,0 +1,189 @@
+[
+  {
+    "directory": "foundation-serial-pair1-before",
+    "sourceCommit": "17810ee192fac495173a7e9da44c973595833f2b",
+    "buildIdentity": "0.1.401-dev+17810ee192fac495173a7e9da44c973595833f2b",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 4869609,
+    "originalManifestSha256": "ECCD6F64B8E736F168D1968B6289A0476573EDFD2E17CE2EE20A0F6564814975",
+    "compressedManifestSha256": "3C1ECDD3A460C2A2AF4C9F6CC354DB75A4DF561EA7EC511FAC7EC29056C62C55",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-serial-pair1-after",
+    "sourceCommit": "7c878fe635ef276e351a809f76d25a5fe665f411",
+    "buildIdentity": "0.1.402-dev+7c878fe635ef276e351a809f76d25a5fe665f411",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 4865489,
+    "originalManifestSha256": "2F6DD607CADA8F6F8C62201B59D571E09430778CDFEC09C20908F6D534A8C6E7",
+    "compressedManifestSha256": "0E2612A0B040AF62AC8088C7E5C9BEDFEE3E860F180F8FAEB02A7EBAAE5F2209",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-serial-pair2-before",
+    "sourceCommit": "17810ee192fac495173a7e9da44c973595833f2b",
+    "buildIdentity": "0.1.401-dev+17810ee192fac495173a7e9da44c973595833f2b",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 4868719,
+    "originalManifestSha256": "0D251414C5E2E7437F981A7284DC1A70009303F9A863F414A9AE19ECE86EB00F",
+    "compressedManifestSha256": "8D00ED7A4701F5CB3D3F338A4B540337B7E26865754A3E11F91FB29DDDB8DD68",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-serial-pair2-after",
+    "sourceCommit": "7c878fe635ef276e351a809f76d25a5fe665f411",
+    "buildIdentity": "0.1.402-dev+7c878fe635ef276e351a809f76d25a5fe665f411",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 4867337,
+    "originalManifestSha256": "1A256B44195451138E78AEC6A6FF48A46FE39E5B9E48E01BD4A1BFB0DD275D6A",
+    "compressedManifestSha256": "382C47E4BE08D475D9C22E3D56064F963D1916209CFFC6A58822A7EE8BA85099",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-repair-wait-trace",
+    "sourceCommit": "bccae07956a208f059021bbe638f762e214e8c4a",
+    "buildIdentity": "0.1.402-dev+bccae07956a208f059021bbe638f762e214e8c4a",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 4871302,
+    "originalManifestSha256": "D74AB1C0878D3577253B5F5C76DA1C749332817E4AFB6766ADCD8994E0D80927",
+    "compressedManifestSha256": "3FE5BC7CBBE959E8FDBFDB297C64FF5B8BF67383C4A6B0B1228260C4F694D97D",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-repair-warp",
+    "sourceCommit": "bccae07956a208f059021bbe638f762e214e8c4a",
+    "buildIdentity": "0.1.402-dev+bccae07956a208f059021bbe638f762e214e8c4a",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 77014,
+    "originalManifestSha256": "9389D6372C665360CF135621445812D897404648B45085F34909581C2BE3ECD7",
+    "compressedManifestSha256": "AF16CA504AFEDBC645B71EDDC6BB0165605C8C6CD40FF0670DA8B05D297087C4",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-repair-affinity-two",
+    "sourceCommit": "bccae07956a208f059021bbe638f762e214e8c4a",
+    "buildIdentity": "0.1.402-dev+bccae07956a208f059021bbe638f762e214e8c4a",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 77126,
+    "originalManifestSha256": "92AF196B8A266D869C3417E7C8DE65F71D5047FC7ECE895734EA19D1FA7238C5",
+    "compressedManifestSha256": "2B52448D0C5DD2D4BA54913A3A7A2D1B6245FCF797C1C4083808BDCFFE5FD9C4",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-repair-vfx",
+    "sourceCommit": "bccae07956a208f059021bbe638f762e214e8c4a",
+    "buildIdentity": "0.1.402-dev+bccae07956a208f059021bbe638f762e214e8c4a",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 224179,
+    "originalManifestSha256": "1D1885666D628B5BDBBAFF319CCD13569732453F92D0E1B37225C72ED27B7C73",
+    "compressedManifestSha256": "3723ABC7A846422B8B8059A99FEEE96E4ABE38356359B6EE70D41B403C6D72CE",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-final-pair1-before",
+    "sourceCommit": "17810ee192fac495173a7e9da44c973595833f2b",
+    "buildIdentity": "0.1.401-dev+17810ee192fac495173a7e9da44c973595833f2b",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 19042574,
+    "originalManifestSha256": "7BF497E6E1E26BE405CED183EF0F5CF1D30AB7A37A5BCF8ED55B1326EF8C8599",
+    "compressedManifestSha256": "137384436CA44DD9D3C98C42ED57F5812CA4B77EDA4782C8108EDE5ADEE8D4B9",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-final-pair1-after",
+    "sourceCommit": "5ecd0d9f8215448b172ea5d0095fa9cb91fe8b1b",
+    "buildIdentity": "0.1.402-dev+5ecd0d9f8215448b172ea5d0095fa9cb91fe8b1b",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 19044833,
+    "originalManifestSha256": "52737B066E4C38AA708E17CE15634C9D1D2BF3F04B5337F400DE00C7B4324A80",
+    "compressedManifestSha256": "42ADEFFF68490E6873C4D56884082A449F7B69185538182C90DC4234479435C5",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-final-pair2-before",
+    "sourceCommit": "17810ee192fac495173a7e9da44c973595833f2b",
+    "buildIdentity": "0.1.401-dev+17810ee192fac495173a7e9da44c973595833f2b",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 19043271,
+    "originalManifestSha256": "DC3CF04B4D42FD8DB7D7FC7A0A6C67226F7FABBB6F26BB22897C09B069C921C6",
+    "compressedManifestSha256": "7410D17421D278DC3C2FACBF1CC00E074B6D33F54901C8F7ECD9082EC3102EAF",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-final-pair2-after",
+    "sourceCommit": "5ecd0d9f8215448b172ea5d0095fa9cb91fe8b1b",
+    "buildIdentity": "0.1.402-dev+5ecd0d9f8215448b172ea5d0095fa9cb91fe8b1b",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 19036644,
+    "originalManifestSha256": "ECA00B54FD9D8EE1784DB318BDA5BDA73C70C0442F40D6683B5EF1326B02B316",
+    "compressedManifestSha256": "B202282BF95DD1CEDCC2F74036E6D56F8AA6D1BC6A51A7F1307AA96559E2B29F",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-gc-before",
+    "sourceCommit": "17810ee192fac495173a7e9da44c973595833f2b",
+    "buildIdentity": "0.1.401-dev+17810ee192fac495173a7e9da44c973595833f2b",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 3170267,
+    "originalManifestSha256": "481FE3989C14FD9926A37FC27B34CA02F996089EE2D87624D3B99BBE187092D6",
+    "compressedManifestSha256": "70DBE5AED674AFB1D06115BDC9B7CD88AED601D468AEDB5975375EFC6A73CFA7",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-gc-after",
+    "sourceCommit": "5ecd0d9f8215448b172ea5d0095fa9cb91fe8b1b",
+    "buildIdentity": "0.1.402-dev+5ecd0d9f8215448b172ea5d0095fa9cb91fe8b1b",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 3170409,
+    "originalManifestSha256": "13EAE02621B953E332CDE4ABC93FC9E990D80ADAB3A99EE09F5FC34A14A6D653",
+    "compressedManifestSha256": "D7A90E2766A750A670541D1F3D78E72B85B6665272FB29512D2FC3D7E14DBB89",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-kernel-after",
+    "sourceCommit": "98dc4ba901e158a4da4f63add7cbee77ae1e5fae",
+    "buildIdentity": "0.1.402-dev+98dc4ba901e158a4da4f63add7cbee77ae1e5fae",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 3170558,
+    "originalManifestSha256": "6C7C49529ADC763E5BF6390E933B4597BE5D3CEFE33AD83F6103C5CD69AC529C",
+    "compressedManifestSha256": "7E20CC728928F92CD0E1AA020EEDFBD9583A483AE3C462D5611C7E00F68F8DD3",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-final-damage-before",
+    "sourceCommit": "17810ee192fac495173a7e9da44c973595833f2b",
+    "buildIdentity": "0.1.401-dev+17810ee192fac495173a7e9da44c973595833f2b",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 223604,
+    "originalManifestSha256": "C3EF6F33EC23D8283FC130643147788962EF6AD13083EDBCB48CE5DD535E2D56",
+    "compressedManifestSha256": "B23DAA1C1677EBEEA663A3F15DFA7B50A00832FD3053DFD4950C50AD1745EA1D",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-final-damage-after",
+    "sourceCommit": "98dc4ba901e158a4da4f63add7cbee77ae1e5fae",
+    "buildIdentity": "0.1.402-dev+98dc4ba901e158a4da4f63add7cbee77ae1e5fae",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 223534,
+    "originalManifestSha256": "AD3ABF7D00C2256183F1F746F8D2FE541E6E515FCB9DEFE8CB8CB1271C80880E",
+    "compressedManifestSha256": "F4635CDA29F9B94820DDB017A28650AF2D2ACF7E4406FE2507F04DB486931DE3",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-final-warp",
+    "sourceCommit": "98dc4ba901e158a4da4f63add7cbee77ae1e5fae",
+    "buildIdentity": "0.1.402-dev+98dc4ba901e158a4da4f63add7cbee77ae1e5fae",
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 77043,
+    "originalManifestSha256": "0806868BED963B5C183D3F2BD64B2534BF73A89AFC9C9947842BDBF6AB665069",
+    "compressedManifestSha256": "367C74C15BD1A80C9B7AD500047DDBEB82D5E155CA98E6B01E60364929D0E000",
+    "losslessGzip": true
+  },
+  {
+    "file": "foundation-kernel-after-scheduling.json.gz",
+    "originalBytes": 1375034,
+    "originalSha256": "DAE6D503C9F9B345E0610E8A96940B4FCFD53A3A8127049171F235DB5B823442",
+    "compressedSha256": "14141D9AEFF2BA8F6909F213544A6F9223956BC99F1A811A677ECA9ED97F0CFB",
+    "losslessGzip": true
+  }
+]

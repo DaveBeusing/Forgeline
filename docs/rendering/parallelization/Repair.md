@@ -103,3 +103,81 @@ A missing observation fails after one minute rather than hanging CI. Four
 deterministic tests cover slow eight-second frames, missing frame/tick progress,
 inactivity, session changes and rollback. The additional source paths are serial
 foundation repairs; parallel release remains blocked.
+## Final paired results and diagnostic limits
+
+The final Prepare-work change at `5ecd0d9f8215448b172ea5d0095fa9cb91fe8b1b`
+was tested with both predefined 128-warmup/512-sample cohorts. Both retain all six
+viewpoints and two readbacks. All 24 paired images across the earlier and final
+cohorts are pixel-identical. Per-frame texture/residency/descriptor/upload counts
+plateau, with no pending retirements or submission faults. The final first cohort
+passes; the reversed cohort fails four unchanged CPU/frame-elapsed tail gates:
+
+| Final reversed-cohort case | Statistic | Baseline ms | Repair ms | Change |
+| --- | --- | ---: | ---: | ---: |
+| Tank / strategic | p99 | 27.113 | 33.486 | +23.50% |
+| Industrial / normal | p99 | 26.866 | 32.066 | +19.35% |
+| Industrial / strategic | p95 | 27.728 | 33.651 | +21.36% |
+| Industrial / strategic | p99 | 33.236 | 70.203 | +111.22% |
+
+No final CPU/frame mean or GPU statistic fails the 15% comparison. This does not
+satisfy the required tail gates. The earlier two repair-cohort failures and original
+seven foundation failures remain retained, without selecting successful subsets.
+The initial diagnostic-query repair removes approximately 2,768 measured allocated
+bytes per frame. It does not establish a sustained frame-rate improvement.
+
+A separate six-view diagnostic run measures admission reuse-wait plus native Present
+at 69-86% of mean frame elapsed. Other native waits can occur inside recording;
+remaining elapsed must not be described as operating-system thread CPU time.
+Active hardware probes still report P8/180MHz during rendering. No global power,
+driver, affinity, quality or gate configuration was changed for hardware comparisons.
+
+Separate GC observations cover complete diagnostic runs, including setup/export.
+They do not establish which sampled comparison tails were caused by collection.
+A user-authorized elevated kernel trace at final code source
+`98dc4ba901e158a4da4f63add7cbee77ae1e5fae` captures only the own reference-window
+owner thread: native exit 0, identified window thread, 6,952 completed off-CPU
+intervals, zero dropped retained intervals. Across the whole run, Wait/UserRequest
+accounts for 12,424.773 ms; its maximum interval is 78.518 ms. Ready intervals are
+small in this observation. These are genuine blocked intervals, but without aligned
+frame/phase markers or stacks the trace does not identify a specific native call
+or prove the cause of every tail in a different comparison run. No performance
+failure is waived on this basis. The probe uses temporary local tooling only;
+no profiler dependency, elevated launch or trace collection enters the player.
+
+## Final local validation and evidence
+
+Final player source is `98dc4ba901e158a4da4f63add7cbee77ae1e5fae`, version 0.1.402.
+Release build: zero warnings/errors. Full Client suite: 423 passed, zero failed,
+two optional skips. After the Prepare change, Presentation: 1,272 passed/12 optional
+skips; Graphics: 79 passed/two optional skips. The preceding complete solution run
+passed 2,590 tests with zero failures and 16 optional skips; it is explicitly tied
+to its earlier source, rather than claimed as a full rerun at the final source.
+Required CI runs the complete solution at its actual checked-out identity.
+
+Final native DamageDestruction captures pass all three cameras and match the
+integrated baseline exactly. The final unchanged WARP case passes all eight repeat
+readbacks and matches the integrated baseline exactly. The unchanged window-mode
+script passes Windowed 1600x900 and BorderlessFullscreen 5120x2160, with real
+positive running FPS/TPS observations, no binding failures and no submission faults.
+The local debug layer is unavailable; these results do not certify debug-layer
+execution. Texture budgets pass unchanged: gameplay 57,665,206 bytes below 56 MiB,
+startup studio 1,786,417 bytes below 3 MiB.
+
+Complete raw manifests are retained losslessly as `manifest.json.gz`, with original
+and compressed SHA-256 values in `evidence/repair/integrity.json`; images and both
+passed/failed gate reports remain present. Reproduce the summary directly from the
+compressed evidence:
+
+```powershell
+python build/rendering/parallelization/SummarizeRepairEvidence.py docs/rendering/parallelization/evidence/repair
+```
+
+An initial GUI-launch orchestration attempt failed to wait for child completion,
+so its concurrent `artifacts/foundation-pair*` runs are invalid and excluded. The
+corrected serial and final cohorts use a waited native output pipeline, preserve
+opposite run orders, and never replace a failed cohort. The invalid attempt's
+local logs remain available; it is not performance evidence.
+
+Status remains **implemented, not accepted**. CPU/frame-elapsed tail acceptance,
+required final CI and independent human native-image review are open. The resource
+lifetime/upload package and parallel owners remain blocked by the foundation gate.

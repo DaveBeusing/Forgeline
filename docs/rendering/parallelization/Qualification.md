@@ -184,3 +184,21 @@ native result, resolve the required CI failure without suppressing it, complete
 performance attribution/acceptance and human review, then release the ownership
 manifest in a separate authorized serial integration. A merge alone does not
 release subsequent rendering work.
+## Foundation repair qualification
+
+The follow-up repair and full retained results are documented in [Repair.md](Repair.md).
+The diagnostic-observer allocation and unnecessary Prepare work are removed;
+software backlog is bounded without raising the fence deadline. An audio test
+publication race and slow-software smoke completion are also repaired. Source
+`98dc4ba901e158a4da4f63add7cbee77ae1e5fae` passes final local native damage/WARP
+comparisons and both window modes. CI 39107228321 at the preceding implementation
+passed native WARP and GUI apphost completion, then exposed the smoke liveness issue;
+final required CI must confirm its repair and complete the full solution.
+
+Two larger opposite-order 128/512 hardware cohorts retain exact images and stable
+resources. The first passes; the second has four CPU/frame-elapsed p95/p99 failures.
+Earlier failures remain retained. Native wait/Present and scoped kernel observations
+provide attribution evidence, without turning blocked elapsed time into measured
+thread CPU or overriding the failed gate. All complete datasets and failed reports
+are in [repair evidence](evidence/repair/). Human native-image review, tail-performance
+acceptance and final required CI remain required. No subsequent package is released.

@@ -160,3 +160,10 @@ ten-second idle fence deadline. Timeout remains fatal, with target/completed/las
 frame fences recorded for diagnosis. Descriptor/resource retirement still requires
 actual fence completion; completed prior-frame resources collect before callback
 entry. No extra queue, quality reduction or hardware frame-global idle is introduced.
+
+Repair qualification evidence includes both fixed opposite-order protocols and all
+failed gates. Use `SummarizeRepairEvidence.py` against `docs/rendering/parallelization/evidence/repair`
+to verify image equality, frame resource plateaus, health and complete comparison
+results from losslessly compressed raw manifests. Its diagnostic scheduling summary
+covers a whole reference-thread run; without aligned phase markers it cannot assign
+kernel wait intervals to individual frame tails or substitute for performance gates.

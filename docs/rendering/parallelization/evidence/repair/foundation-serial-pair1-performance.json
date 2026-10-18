@@ -1,0 +1,486 @@
+{
+  "baselineCommit": "17810ee192fac495173a7e9da44c973595833f2b",
+  "unqualified": [],
+  "maximumRegressionPercent": 15.0,
+  "currentCommit": "7c878fe635ef276e351a809f76d25a5fe665f411",
+  "interpretation": "Percent changes are observed variance/trends. Paired runs and repeated cohorts are required before attributing a regression. GPU subsets have explicit counts; software and changed settings cannot satisfy a hardware gate.",
+  "gateRequested": true,
+  "schemaVersion": 1,
+  "regressions": [],
+  "cases": [
+    {
+      "assetPayloadChanged": false,
+      "key": "MainBattleTankProduction-1920x1080-High-CloseTactical",
+      "deltas": [
+        {
+          "baselineMs": 27.128130468750008,
+          "deltaMs": 0.10241874999998046,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": 0.3775370739902654,
+          "currentMs": 27.23054921874999
+        },
+        {
+          "baselineMs": 27.5262,
+          "deltaMs": -0.1750000000000007,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -0.6357579324425482,
+          "currentMs": 27.3512
+        },
+        {
+          "baselineMs": 36.8994,
+          "deltaMs": 0.08229999999999649,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": 0.22303885700037532,
+          "currentMs": 36.9817
+        },
+        {
+          "baselineMs": 38.0426,
+          "deltaMs": 0.36540000000000106,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": 0.9605021738787598,
+          "currentMs": 38.408
+        },
+        {
+          "baselineMs": 26.71405841269842,
+          "deltaMs": 0.1272642539682387,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": 0.47639430895211393,
+          "currentMs": 26.84132266666666
+        },
+        {
+          "baselineMs": 27.648352,
+          "deltaMs": 0.11532800000000165,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": 0.4171243190190925,
+          "currentMs": 27.76368
+        },
+        {
+          "baselineMs": 33.645248,
+          "deltaMs": -0.0740160000000003,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -0.21998946181047707,
+          "currentMs": 33.571232
+        },
+        {
+          "baselineMs": 34.661952,
+          "deltaMs": 0.11478400000000022,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": 0.3311527290788477,
+          "currentMs": 34.776736
+        }
+      ],
+      "status": "comparable"
+    },
+    {
+      "assetPayloadChanged": false,
+      "key": "MainBattleTankProduction-1920x1080-High-NormalGameplay",
+      "deltas": [
+        {
+          "baselineMs": 18.8650015625,
+          "deltaMs": -2.3916132812500024,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -12.677514355493456,
+          "currentMs": 16.47338828125
+        },
+        {
+          "baselineMs": 21.3249,
+          "deltaMs": -4.511800000000001,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -21.157426295082278,
+          "currentMs": 16.8131
+        },
+        {
+          "baselineMs": 23.4471,
+          "deltaMs": -1.3749000000000002,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -5.8638381718847965,
+          "currentMs": 22.0722
+        },
+        {
+          "baselineMs": 24.3074,
+          "deltaMs": -1.9765000000000015,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -8.131268667154863,
+          "currentMs": 22.3309
+        },
+        {
+          "baselineMs": 18.46516647619048,
+          "deltaMs": -1.7480228571428604,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -9.466596791297883,
+          "currentMs": 16.71714361904762
+        },
+        {
+          "baselineMs": 20.178848,
+          "deltaMs": -3.6531519999999986,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -18.103867971055628,
+          "currentMs": 16.525696
+        },
+        {
+          "baselineMs": 21.7912,
+          "deltaMs": -0.05020800000000136,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -0.23040493410184554,
+          "currentMs": 21.740992
+        },
+        {
+          "baselineMs": 23.541888,
+          "deltaMs": -1.5688640000000014,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -6.664138407250945,
+          "currentMs": 21.973024
+        }
+      ],
+      "status": "comparable"
+    },
+    {
+      "assetPayloadChanged": false,
+      "key": "MainBattleTankProduction-1920x1080-High-Strategic",
+      "deltas": [
+        {
+          "baselineMs": 20.7838875,
+          "deltaMs": -0.4915374999999962,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -2.36499307456315,
+          "currentMs": 20.292350000000003
+        },
+        {
+          "baselineMs": 23.5007,
+          "deltaMs": -0.7855999999999987,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -3.3428791482806846,
+          "currentMs": 22.7151
+        },
+        {
+          "baselineMs": 26.9969,
+          "deltaMs": -1.0785000000000018,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -3.9949031185062056,
+          "currentMs": 25.9184
+        },
+        {
+          "baselineMs": 31.6158,
+          "deltaMs": -5.174299999999999,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -16.366183996609283,
+          "currentMs": 26.4415
+        },
+        {
+          "baselineMs": 19.620692063492065,
+          "deltaMs": -0.12018387301587907,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -0.6125363602209702,
+          "currentMs": 19.500508190476186
+        },
+        {
+          "baselineMs": 21.567616,
+          "deltaMs": -0.1422080000000001,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -0.659358920336861,
+          "currentMs": 21.425408
+        },
+        {
+          "baselineMs": 25.023264,
+          "deltaMs": 0.055423999999998586,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": 0.22148989036761385,
+          "currentMs": 25.078688
+        },
+        {
+          "baselineMs": 26.565696,
+          "deltaMs": -1.3962240000000001,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -5.255740335205222,
+          "currentMs": 25.169472
+        }
+      ],
+      "status": "comparable"
+    },
+    {
+      "assetPayloadChanged": false,
+      "key": "IndustrialBase-1920x1080-High-CloseTactical",
+      "deltas": [
+        {
+          "baselineMs": 23.08499453124999,
+          "deltaMs": -0.2726273437499849,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -1.1809720958821595,
+          "currentMs": 22.812367187500005
+        },
+        {
+          "baselineMs": 23.8316,
+          "deltaMs": 0.9110999999999976,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": 3.8230752446331655,
+          "currentMs": 24.7427
+        },
+        {
+          "baselineMs": 31.8543,
+          "deltaMs": -5.580399999999997,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -17.51851398398332,
+          "currentMs": 26.2739
+        },
+        {
+          "baselineMs": 34.0254,
+          "deltaMs": -3.2323999999999984,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -9.49996179324857,
+          "currentMs": 30.793
+        },
+        {
+          "baselineMs": 22.52412444444445,
+          "deltaMs": 0.5291895873015875,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": 2.3494346632954763,
+          "currentMs": 23.053314031746037
+        },
+        {
+          "baselineMs": 24.442304,
+          "deltaMs": 0.4617600000000017,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": 1.8891836056044542,
+          "currentMs": 24.904064
+        },
+        {
+          "baselineMs": 30.077312,
+          "deltaMs": -3.8914240000000007,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -12.938071061669342,
+          "currentMs": 26.185888
+        },
+        {
+          "baselineMs": 30.58336,
+          "deltaMs": -1.8241279999999982,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -5.964446025551144,
+          "currentMs": 28.759232
+        }
+      ],
+      "status": "comparable"
+    },
+    {
+      "assetPayloadChanged": false,
+      "key": "IndustrialBase-1920x1080-High-NormalGameplay",
+      "deltas": [
+        {
+          "baselineMs": 19.4065125,
+          "deltaMs": -1.1897406249999989,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -6.130625608284841,
+          "currentMs": 18.216771875000003
+        },
+        {
+          "baselineMs": 20.1932,
+          "deltaMs": -0.48210000000000264,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -2.387437355149271,
+          "currentMs": 19.7111
+        },
+        {
+          "baselineMs": 26.0822,
+          "deltaMs": -0.07779999999999987,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -0.2982877211278185,
+          "currentMs": 26.0044
+        },
+        {
+          "baselineMs": 27.3283,
+          "deltaMs": -0.7860999999999976,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -2.876505307684699,
+          "currentMs": 26.5422
+        },
+        {
+          "baselineMs": 18.568389841269838,
+          "deltaMs": -1.0032645079364997,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -5.4030775770694905,
+          "currentMs": 17.565125333333338
+        },
+        {
+          "baselineMs": 19.142976,
+          "deltaMs": -0.22716800000000248,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -1.1866911393505506,
+          "currentMs": 18.915808
+        },
+        {
+          "baselineMs": 22.946976,
+          "deltaMs": -0.22441599999999795,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -0.9779763573204502,
+          "currentMs": 22.72256
+        },
+        {
+          "baselineMs": 23.709184,
+          "deltaMs": -0.7891839999999988,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -3.328600427581138,
+          "currentMs": 22.92
+        }
+      ],
+      "status": "comparable"
+    },
+    {
+      "assetPayloadChanged": false,
+      "key": "IndustrialBase-1920x1080-High-Strategic",
+      "deltas": [
+        {
+          "baselineMs": 22.44873515625,
+          "deltaMs": -2.5737820312500013,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -11.465153886558412,
+          "currentMs": 19.874953124999998
+        },
+        {
+          "baselineMs": 24.7963,
+          "deltaMs": -5.161299999999997,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -20.81479898210619,
+          "currentMs": 19.635
+        },
+        {
+          "baselineMs": 30.6387,
+          "deltaMs": -3.8526999999999987,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -12.574619680338914,
+          "currentMs": 26.786
+        },
+        {
+          "baselineMs": 34.1328,
+          "deltaMs": -5.184100000000004,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "cpu",
+          "percent": -15.188030281723163,
+          "currentMs": 28.9487
+        },
+        {
+          "baselineMs": 22.060587428571434,
+          "deltaMs": -2.656044718894016,
+          "statistic": "mean",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -12.039773317432516,
+          "currentMs": 19.40454270967742
+        },
+        {
+          "baselineMs": 24.87104,
+          "deltaMs": -7.978624,
+          "statistic": "p50",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -32.07997735518901,
+          "currentMs": 16.892416
+        },
+        {
+          "baselineMs": 27.4384,
+          "deltaMs": -1.517280000000003,
+          "statistic": "p95",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -5.52976849962098,
+          "currentMs": 25.92112
+        },
+        {
+          "baselineMs": 31.212928,
+          "deltaMs": -3.8745280000000015,
+          "statistic": "p99",
+          "regressed": false,
+          "metric": "gpu",
+          "percent": -12.413215447137805,
+          "currentMs": 27.3384
+        }
+      ],
+      "status": "comparable"
+    }
+  ]
+}
