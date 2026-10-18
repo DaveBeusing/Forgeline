@@ -239,6 +239,18 @@ public sealed class PlayerActionReadModelTests
                 cost.ResourceId ==
                 ResourceIds.Ammunition);
         Assert.False(tank.HasInputs);
+
+        var logistics = Assert.IsType<PlayerLogisticsActionReadModel>(snapshot.PlayerActions?.Logistics);
+        var scout = Assert.Single(logistics.Requirements, r => r.Kind == 2 && r.Id == UnitIds.ScoutVehicle.Value);
+        var proposal = ProductionStockProposal.Create(logistics, scout, 1);
+        Assert.True(proposal.FitsCapacity);
+        foreach (var cost in units.Units.Single(u => u.UnitId == UnitIds.ScoutVehicle).Costs)
+            Assert.Equal(cost.RequiredQuantity, Assert.Single(proposal.Thresholds, t => t.Resource == cost.ResourceId).Target);
+        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Steel && t.Target == 70);
+        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Electronics && t.Target == 24);
+        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Fuel && t.Target == 60);
+        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Ammunition && t.Target == 40);
+        Assert.All(logistics.Policies, p => Assert.Equal(10, p.DesiredTarget));
     }
 
     [Fact]
