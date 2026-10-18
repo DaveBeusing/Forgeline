@@ -181,3 +181,15 @@ local logs remain available; it is not performance evidence.
 Status remains **implemented, not accepted**. CPU/frame-elapsed tail acceptance,
 required final CI and independent human native-image review are open. The resource
 lifetime/upload package and parallel owners remain blocked by the foundation gate.
+
+## Integration with the newer master
+
+While qualification was running, master advanced to
+`d3f5c9cd` (vehicle docking integration, version 0.1.402). The repair branch
+incorporates that upstream change and advances once above the current base to
+0.1.403. All earlier evidence retains its original source/version; none is
+relabeled as a combined-tree execution. Upstream changes the reference fixture
+version from 3 to 4. Therefore earlier fixture-3 comparisons remain historical,
+and combined-tree native/performance acceptance requires fixture-4 observations.
+The foundation's actual original integrated SHA remains 17810ee; this newer base
+is not a new foundation release or permission to start subsequent packages.
