@@ -1,0 +1,2 @@
+evidence/** -text -whitespace
+evidence/**/*.png binary

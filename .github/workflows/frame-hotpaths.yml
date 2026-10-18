@@ -22,6 +22,16 @@ jobs:
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
       - name: Render scratch and snapshot contracts
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.SimpleInstanceRendererTests ForgeLine.Presentation.Tests.PresentationExtractionTests ForgeLine.Presentation.Tests.RenderSnapshotIndexTests
+      - name: Render boundary and publication contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Graphics.Tests/ForgeLine.Graphics.Tests.csproj --configuration Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Concurrent frame publication contracts
         run: dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSimulationHostTests
       - name: Integrated interaction and display contracts

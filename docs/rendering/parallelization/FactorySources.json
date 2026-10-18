@@ -1,0 +1,14 @@
+[
+  {
+    "method": "SimpleInstanceRenderer.CreatePipeline",
+    "sha256": "084b191fe90186c91b38f8125cb84a568a4cc48b29e8b275d5d48c62f0dd9535"
+  },
+  {
+    "method": "SimpleInstanceRenderer.CreateTexturedPipeline",
+    "sha256": "5912b248bd96c817d2bee26ea9e5dcd84d8203edbfa48dc996db6e4fd177fef6"
+  },
+  {
+    "method": "TerrainRenderer.CreateTerrainPipeline",
+    "sha256": "12f904a567869f1413de272b4db06df43c8456d8e986644e42953ca73eed7a6b"
+  }
+]

@@ -83,6 +83,24 @@ jobs:
       - name: Blender source geometry contracts
         run: python -m unittest discover -s tools/blender/tests -p 'test_*contract.py' -v
 
+      - name: Render boundary ownership and shader source contracts
+        shell: pwsh
+        run: |
+          python build/rendering/parallelization/ValidateOwnership.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s build/rendering/parallelization -p 'test_*.py' -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Render boundary and publication contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Graphics.Tests/ForgeLine.Graphics.Tests.csproj --configuration Release --no-build -- --filter-class '*RenderParallelization*' --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Rigid motion lifecycle and allocation contracts
         shell: pwsh
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.MechanicalMotionTests ForgeLine.Presentation.Tests.MechanicalMotionQualityTests ForgeLine.Presentation.Tests.MechanicalGeometryBatchingTests ForgeLine.Presentation.Tests.MechanicalDoorPolicyTests ForgeLine.Presentation.Tests.RigidClipPlaybackTests ForgeLine.Presentation.Tests.RigidClipRendererTests ForgeLine.Presentation.Tests.InfantryAnimationTests ForgeLine.Presentation.Tests.InfantrySkinRendererTests --parallel none
