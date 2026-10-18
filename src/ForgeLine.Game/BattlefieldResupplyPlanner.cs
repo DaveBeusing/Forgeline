@@ -102,6 +102,21 @@ public static class BattlefieldResupplyPlanner
                     recipientTransform.Position,
                     transform.Position);
 
+            // Formation membership remains a mission commitment while an
+            // individual waypoint is pending or has just completed. Nearby
+            // transfers and support of that same formation need no reassignment.
+            if (distanceSquared > provider.ResupplyRangeMeters * provider.ResupplyRangeMeters &&
+                context.Entities.HasComponent<SupplyTruck>(candidate) &&
+                context.Entities.TryGetComponent(candidate, out MovementGroupMember providerMember) &&
+                context.Entities.IsAlive(providerMember.Group) &&
+                (!context.Entities.TryGetComponent(recipient, out MovementGroupMember recipientMember) ||
+                 recipientMember.Group != providerMember.Group))
+            {
+                rejections |= ResupplyProviderRejection.ProviderBusy;
+                rejectedProviders++;
+                continue;
+            }
+
             if (distanceSquared > provider.ResupplyRangeMeters * provider.ResupplyRangeMeters &&
                 context.Entities.TryGetComponent(candidate, out SupplyLoadingOrder loading) &&
                 (loading.WaitReason == VehicleDockBlockReason.None ||

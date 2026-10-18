@@ -115,7 +115,9 @@
         "tests/ForgeLine.Assets.Tests/AssetWriterQualificationGroup.cs",
         "src/ForgeLine.Game/SkirmishOpponentSystem.cs",
         "tests/ForgeLine.Game.Tests/SkirmishSupplyPolicyTests.cs",
-        "tests/ForgeLine.Game.Tests/SkirmishProductionPolicyTests.cs"
+        "tests/ForgeLine.Game.Tests/SkirmishProductionPolicyTests.cs",
+        "src/ForgeLine.Game/BattlefieldResupplyPlanner.cs",
+        "tests/ForgeLine.Game.Tests/ResupplyPlanningDiagnosticsTests.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",
