@@ -125,3 +125,28 @@ jobs:
           name: blender-rigid-clips-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/blender-rigid-clips-*
           retention-days: 14
+
+  infantry-skins:
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 15
+    env:
+      FORGELINE_BLENDER_PATH: ${{ inputs.blender_executable }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Qualify saved infantry masters and source-less skins
+        shell: pwsh
+        run: ./tools/blender/Test-BlenderInfantry.ps1 -OutputRoot artifacts/blender-infantry-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Retain infantry authoring evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blender-infantry-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/blender-infantry-*
+          retention-days: 14
