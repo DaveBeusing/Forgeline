@@ -117,7 +117,11 @@
         "tests/ForgeLine.Game.Tests/SkirmishSupplyPolicyTests.cs",
         "tests/ForgeLine.Game.Tests/SkirmishProductionPolicyTests.cs",
         "src/ForgeLine.Game/BattlefieldResupplyPlanner.cs",
-        "tests/ForgeLine.Game.Tests/ResupplyPlanningDiagnosticsTests.cs"
+        "tests/ForgeLine.Game.Tests/ResupplyPlanningDiagnosticsTests.cs",
+        "tests/ForgeLine.Presentation.Tests/DirectorateBuildingPresentationTests.cs",
+        "tests/ForgeLine.Presentation.Tests/UiTextBatchTests.cs",
+        "src/ForgeLine.Game/VehicleDockQueues.cs",
+        "tests/ForgeLine.Game.Tests/GroundMovementSystemTests.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",

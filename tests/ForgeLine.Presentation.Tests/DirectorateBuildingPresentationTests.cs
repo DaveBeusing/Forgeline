@@ -372,7 +372,7 @@ public sealed class DirectorateBuildingPresentationTests
     [InlineData("storage_depot")]
     [InlineData("supply_depot")]
     [InlineData("logistics_hub")]
-    public void RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(string family)
+    public async Task RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(string family)
     {
         BuildingId building = family switch
         {
@@ -402,12 +402,23 @@ public sealed class DirectorateBuildingPresentationTests
             new(building, BuildingPresentationState.Critical),
             new(building, BuildingPresentationState.Destroyed)
         ];
-        _ = ResolveNames();
-        long before = GC.GetAllocatedBytesForCurrentThread();
-        int resolvedCharacters = 0;
-        for (int i = 0; i < 1000; i++) resolvedCharacters += ResolveNames();
-        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
-        Assert.True(resolvedCharacters > 0);
+        Task<(long Allocated, int Characters)> measurement;
+        using (ExecutionContext.SuppressFlow())
+        {
+            measurement = Task.Factory.StartNew(() =>
+            {
+                // Keep framework-thread activity and runtime/counter startup
+                // outside the steady-state frame-allocation measurement.
+                for (int i = 0; i < 128; i++) _ = ResolveNames();
+                _ = GC.GetAllocatedBytesForCurrentThread();
+                long before = GC.GetAllocatedBytesForCurrentThread();
+                int resolvedCharacters = 0;
+                for (int i = 0; i < 1000; i++) resolvedCharacters += ResolveNames();
+                return (GC.GetAllocatedBytesForCurrentThread() - before, resolvedCharacters);
+            }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
+        (long allocated, int characters) = await measurement;
+        Assert.True(characters > 0);
         Assert.Equal(0, allocated);
 
         int ResolveNames()

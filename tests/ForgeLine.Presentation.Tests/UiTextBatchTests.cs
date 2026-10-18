@@ -28,7 +28,7 @@ public sealed class UiTextBatchTests
         using var third = new UiTextBatch(device); Assert.Equal(2, device.TextureCreates);
     }
     [Fact]
-    public void MissingGlyphIsVisibleAndGeometryIsClippedBoundedAndAllocationFreeAfterWarmup()
+    public async Task MissingGlyphIsVisibleAndGeometryIsClippedBoundedAndAllocationFreeAfterWarmup()
     {
         using var device = new Device(); using var batch = new UiTextBatch(device);
         batch.Begin(); batch.Add("😀", 10, 10, 24, Vector4.One, 1280, 720);
@@ -39,10 +39,24 @@ public sealed class UiTextBatchTests
         batch.Render(new RecordingContext());
         Assert.All(MemoryMarshal.Cast<byte, Vertex>(device.Buffers[^1].Bytes).ToArray(), v =>
         { Assert.InRange(v.Position.X, -1, 1); Assert.InRange(v.Position.Y, -1, 1); Assert.InRange(v.Uv.X, 0, 1); Assert.InRange(v.Uv.Y, 0, 1); });
-        batch.Begin(); batch.Add("AV ÄÖÜ äöü ß → 100%", 3, 3, 12, Vector4.One, 1280, 720);
-        long before = GC.GetAllocatedBytesForCurrentThread();
-        for (int i = 0; i < 128; i++) { batch.Begin(); batch.Add("AV ÄÖÜ äöü ß → 100%", 3, 3, 12, Vector4.One, 1280, 720); }
-        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+        Task<long> measurement;
+        using (ExecutionContext.SuppressFlow())
+        {
+            measurement = Task.Factory.StartNew(() =>
+            {
+                // Exclude framework-thread activity and runtime/counter startup.
+                for (int i = 0; i < 128; i++) AddFrame();
+                _ = GC.GetAllocatedBytesForCurrentThread();
+                long before = GC.GetAllocatedBytesForCurrentThread();
+                for (int i = 0; i < 128; i++) AddFrame();
+                return GC.GetAllocatedBytesForCurrentThread() - before;
+            }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
+        Assert.Equal(0, await measurement);
+        void AddFrame()
+        {
+            batch.Begin(); batch.Add("AV ÄÖÜ äöü ß → 100%", 3, 3, 12, Vector4.One, 1280, 720);
+        }
     }
     [Fact]
     public void TranslatedGlyphsClipBothGeometryAndAtlasCoordinatesAtTheSharedHintBoundary()
