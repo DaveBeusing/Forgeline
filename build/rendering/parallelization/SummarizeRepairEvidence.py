@@ -88,7 +88,7 @@ def main():
     args = parser.parse_args()
     report = {"schemaVersion": 2, "cohorts": {}}
     prefixes = args.prefix or [p for p in (
-        "foundation-serial-pair", "foundation-final-pair", "foundation-current-pair", "foundation-cleared-pair", "foundation-queue-pair", "foundation-ui-pair", "foundation-isolated-ui-pair")
+        "foundation-serial-pair", "foundation-final-pair", "foundation-current-pair", "foundation-cleared-pair", "foundation-queue-pair", "foundation-ui-pair", "foundation-isolated-ui-pair", "foundation-fixture7-pair")
         if (args.root / f"{p}1-before").exists()]
     if not prefixes:
         parser.error("No complete predefined repair protocol was found.")
@@ -96,8 +96,8 @@ def main():
         report["cohorts"][prefix] = summarize_pairs(args.root, prefix)
         if prefix == "foundation-ui-pair":
             report["cohorts"][prefix]["workloadIsolation"] = "Foreign native UI captures overlap both pairs; retained, not isolated acceptance."
-        elif prefix == "foundation-isolated-ui-pair":
-            monitor = args.root / "foundation-isolated-ui-process-monitor.jsonl.gz"
+        elif prefix in ("foundation-isolated-ui-pair", "foundation-fixture7-pair"):
+            monitor = args.root / (("foundation-fixture7" if prefix == "foundation-fixture7-pair" else "foundation-isolated-ui") + "-process-monitor.jsonl.gz")
             raw = gzip.decompress(monitor.read_bytes()) if monitor.exists() else monitor.with_suffix("").read_bytes()
             observations = [json.loads(line) for line in raw.decode("utf-8-sig").splitlines()]
             assert observations and all(not row["foreign"] for row in observations)

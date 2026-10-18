@@ -941,6 +941,86 @@
       "file": "foundation-queue-resume-context.json.gz",
       "rawSha256": "eac6cabb827c87e000581b6b557bf2bccd846df44378dd267ffc2a8529badff5",
       "archiveSha256": "0277be2ebdd2f91019404ce67a6033cb3c02b8b4447c29ae5e0f67f70eb5ff18"
+    },
+    {
+      "file": "foundation-fixture7-solution-build.log.gz",
+      "rawSha256": "5a7a64084d4aedac2fe8a9daeb37747c6ae439ddc93abada7e0a839d696b6843",
+      "archiveSha256": "3aadea1218b27fce383b9dff7edd310253bc512cdefed7fcbac5867ebf495bef"
+    },
+    {
+      "file": "foundation-fixture7-solution-tests.log.gz",
+      "rawSha256": "1a6f437ba92b2f065c3b890cf063afebf315fa0a224577410c1197b61219e55a",
+      "archiveSha256": "6c3a147b42ac2bb186dff4e2fcc8a9f6581841a6989ceb53247bc03e9a828a3a"
+    },
+    {
+      "file": "foundation-fixture7-opponent.json.gz",
+      "rawSha256": "9787de19e0890c544b88cc63251fd2ae4bcf5b0141e935e2d5af73b817845ace",
+      "archiveSha256": "a9f56055778d63226a54420cb228a06eb3428a0f17e2e990a38cace1facb4c4e"
+    },
+    {
+      "file": "foundation-fixture7-opponent-telemetry.json.gz",
+      "rawSha256": "9dd71d80b66a3bd54f081202d1133f961730f2e981c7a356c2092d027d14293c",
+      "archiveSha256": "cdc3a5112f1735bbf6d3902b04cdc27f672c88d18a30245b0ceb0951985e12d6"
+    },
+    {
+      "file": "foundation-fixture7-opponent.save.json.gz",
+      "rawSha256": "15ad04c7fab3b522017b27c0d935a502dd57999f2f847842ad67f5bd811ce699",
+      "archiveSha256": "5d20eff933f2a29937cf0e960cc94fd70ea3c35760f44e0561baa5a1c7adf92f"
+    },
+    {
+      "file": "foundation-fixture7-opponent.log.gz",
+      "rawSha256": "3ef8f3440a1dbc6ab401f8a41d4a1195156eea17d939ce6b91fd5876e3d45619",
+      "archiveSha256": "8f4f442e13925c6428f4b7a0692e561d459e9278bf02dd018bbeaa63ce941657"
+    },
+    {
+      "file": "foundation-fixture7-baseline-build.log.gz",
+      "rawSha256": "2420a15b05021c046e63d22cd9a93ef423a6a871aed98fe5a205e682b08ea483",
+      "archiveSha256": "d2326e199be6de2d10408d6b6b93a1b933f0c003202ffd26d055582017a8cda8"
+    },
+    {
+      "file": "foundation-targetability-before-build.log.gz",
+      "rawSha256": "fde9c3785c38618a7dbd4a2af0986ff63c6ad2f66dda9f79a84ac61e7fbf8631",
+      "archiveSha256": "36a4613e57976e4b51efa2820198197476cd88126d5eb10c2cc3bc5dc27a53f5"
+    },
+    {
+      "file": "foundation-targetability-before.log.gz",
+      "rawSha256": "a89b88cff0e3bfc07c9228cfc667b78923ccb327a8d74c4a34471b8d5e152f57",
+      "archiveSha256": "02ec10786d0695675b85fda6cd1dd43172aae96652f7f0ddb65ccc301f87f0eb"
+    },
+    {
+      "file": "foundation-targetability-after-build.log.gz",
+      "rawSha256": "a88d5101c8a3b0658efbf2b27dcdced08a69b12bca69e7ebc06f32c18534729f",
+      "archiveSha256": "70da1b07b24a7a5ea703969b4e8f7a07830336b03e4718e48c5a126524f1fbfa"
+    },
+    {
+      "file": "foundation-targetability-after.log.gz",
+      "rawSha256": "da7fe55339c3dc37547485b3f37cf5fa9fa66193826fc175cc08a8535076b743",
+      "archiveSha256": "d4874d6f14c32f9ad99698494a2a9177a481c88f166dd7326b665627fdfb9409"
+    },
+    {
+      "file": "foundation-targetability-physical-before-build.log.gz",
+      "rawSha256": "05402cf5808e49af3d9e34e4acc45b6657be268dcc510d3827405ca68168b535",
+      "archiveSha256": "51c41e59f6bc850d1555c2286b712735e8c7bb0297455b5cf968663f5326bda2"
+    },
+    {
+      "file": "foundation-targetability-physical-before.log.gz",
+      "rawSha256": "b007b2dee2625dd274a2bdd165c41284d09b7c1fd18fabe5b85fdce1c36fb059",
+      "archiveSha256": "48e8a3b677bb9528ef7cc6c19fc920e467497970da5a8dd1ac6d8b97a5a746f3"
+    },
+    {
+      "file": "foundation-targetability-physical-after-build.log.gz",
+      "rawSha256": "23ea3e31b6e32f8f88711ef98f2429a17366c92d318c85f757417da4c5147977",
+      "archiveSha256": "946e411d6c664c86657da0d119ad45d1222e7dace459ac469b8b9c6142f7892b"
+    },
+    {
+      "file": "foundation-targetability-physical-after.log.gz",
+      "rawSha256": "e5fcb8614ab98866c58e8ea833dc0441f6aa55779444ca48445b3fc1a75c83fe",
+      "archiveSha256": "f76b6c0f10a30d42d4acf143ad4d5de80db4963355d72ac6c4dfc4cf7081d708"
+    },
+    {
+      "file": "foundation-targetability-game-suite.log.gz",
+      "rawSha256": "3c26833cf2669339c66aa8359e17ca8d572d85e237210ed845e53e037caab706",
+      "archiveSha256": "624620ce317fdb54d260c772ca10e3f81d82f3ce19dc0c5f4b8248c61f0a41ca"
     }
   ]
 }
