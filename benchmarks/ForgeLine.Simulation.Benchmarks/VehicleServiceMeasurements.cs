@@ -23,25 +23,30 @@ internal static class VehicleServiceMeasurements
     public static void Run(string output)
     {
         var results = new List<Measurement>();
+        void Record(Measurement measurement)
+        {
+            results.Add(measurement);
+            Console.WriteLine(measurement);
+        }
         for (int sample = 0; sample < 3; sample++)
         {
             foreach (int count in new[] { 100, 500 })
             {
                 var original = new CargoTransportBenchmarks { TransportCount = count };
                 original.Setup();
-                results.Add(Measure("original-cargo", count, sample, () =>
+                Record(Measure("original-cargo", count, sample, () =>
                 {
                     long completed = original.RunCargoTransportBatch();
                     var navigation = original.NavigationDiagnostics;
                     return new(original.MeasuredTicks, navigation.QueuedPathCount, navigation.ActiveRouteCount + navigation.PendingPathCount, completed);
                 }));
                 var fleet = new Fleet(count);
-                results.Add(Measure("shared-building-service", count, sample, fleet.Run));
+                Record(Measure("shared-building-service", count, sample, fleet.Run));
             }
             var movement = new GroundMovementBenchmarks();
             movement.Setup();
             movement.ResetScenario();
-            results.Add(Measure("original-movement", 1000, sample,
+            Record(Measure("original-movement", 1000, sample,
                 () => new(movement.MoveOneThousandEntitiesForTenTicks(), 0, 0, 0)));
         }
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
@@ -51,7 +56,7 @@ internal static class VehicleServiceMeasurements
             GameVersion = typeof(MatchRuntime).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
             Runtime = Environment.Version.ToString(),
             ProcessorCount = Environment.ProcessorCount,
-            Description = "Three fresh samples; setup excluded; elapsed time and all-thread allocation; original bounded benchmarks retained; shared service observes 600 ticks without a completion promise.",
+            Description = "Three fresh samples; setup excluded; elapsed time and all-thread allocation; original bounded benchmarks retained; shared service observes 2000 ticks without a completion promise.",
             Measurements = results
         }, s_json));
     }
@@ -123,7 +128,7 @@ internal static class VehicleServiceMeasurements
 
         public Counters Run()
         {
-            _simulation.RunTicks(600);
+            _simulation.RunTicks(2000);
             var navigation = _navigation.LastDiagnostics;
             return new(_simulation.CurrentTick.Value, navigation.QueuedPathCount,
                 navigation.ActiveRouteCount + navigation.PendingPathCount, _cargo.Metrics.CompletedOrderCount);

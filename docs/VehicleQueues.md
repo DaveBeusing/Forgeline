@@ -57,7 +57,7 @@ reconstruction. Historical fixtures and hashes remain historical evidence.
 The reproducible measurement entry point is
 `dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks -c Release -- --vehicle-service <report.json>`.
 It retains the original 100/500 transport and 1,000 movement workloads and adds
-600 observed ticks of shared building service at 100/500 transports. Reports carry
+2,000 observed ticks of shared building service at 100/500 transports. Reports carry
 the actual Game assembly provenance, time, allocation, path counts and completed
 deliveries. They do not invent a new timing or delivery budget. Qualification of
 one binary does not qualify a different source head or a later native package.
