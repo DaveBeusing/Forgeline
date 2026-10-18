@@ -853,3 +853,23 @@ has identical runtime/test source (format-only UTF-8 BOM removal follows).
 The allocation-only checkpoint is d1032fde; its complete local Presentation
 module result is recorded above. The current strict terminal run is pending;
 no previous terminal failure or isolated performance failure is superseded.
+
+
+The 177d029e strict gate also fails at 80,000 ticks (Active / Running), despite
+the confirmed physical queue repair. Western strategic state reaches Attacking /
+AttackObjective and eastern reaches Defending with one remaining combat unit;
+this is progress, not a completed lifecycle. Total fuel transferred is
+15,304.37297807682; delivered freight is 28,630 over 289 completed orders.
+The full report/log/telemetry are retained. The additional old-save continuation
+diagnostic was aborted: Restore reconstructs from tick zero and verifies the
+prior state hash; it cannot directly continue that snapshot under changed code.
+No hash validation was bypassed and no continuation success is claimed.
+
+Master advanced to 617312bbf24314a1ee846d0d6096f85ef366ea26 (PR #240, logistics
+onboarding) and is merged without conflicts. Its observational progress journal,
+guidance changes and reference fixture seven are preserved. Product version is
+now 0.1.406, exactly one PATCH over the new master's 0.1.405, replacing the prior
+baseline-relative 0.1.405 increment. Earlier fixture-six native evidence remains
+valid only for its recorded sources; it does not qualify this changed fixture.
+Fresh integrated tests and a strict terminal run with an explicit save output
+are required. The prior failed performance gate remains open.
