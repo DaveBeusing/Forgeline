@@ -34,6 +34,32 @@ public sealed class ProductionStockProposalTests
     }
 
     [Fact]
+    public void PendingDemandAndAssignedLoadAreNotAddedTwiceOrDeclaredArrived()
+    {
+        var steel = Policy(ResourceIds.Steel) with { RequestedQuantity = 70, AnnouncedQuantity = 20 };
+        var logistics = Logistics(130, steel, Policy(ResourceIds.Fuel));
+        var proposal = ProductionStockProposal.Create(logistics, Requirement(70,60),1);
+        Assert.True(proposal.FitsCapacity);
+        Assert.Equal(0, proposal.Thresholds[0].Missing);
+        Assert.Equal(0, proposal.Thresholds[0].Available);
+        Assert.Equal(20, proposal.Thresholds[0].Announced);
+        Assert.Equal(70, proposal.Thresholds[0].Target);
+    }
+
+    [Theory]
+    [InlineData(VehicleDockStatus.Busy, VehicleQueueWaitReason.Predecessor, "WAITING FOR LOADING BAY")]
+    [InlineData(VehicleDockStatus.Aligning, VehicleQueueWaitReason.None, "ALIGNING")]
+    [InlineData(VehicleDockStatus.Exiting, VehicleQueueWaitReason.None, "LEAVING BAY")]
+    [InlineData(VehicleDockStatus.Blocked, VehicleQueueWaitReason.GeometryBlocked, "ACCESS BLOCKED")]
+    public void ServiceLabelsUseConfirmedQueueState(VehicleDockStatus status, VehicleQueueWaitReason reason, string expected)
+    {
+        var work = new PlayerWorkSummary(default,default,0,"","",new(new(70,3),9,VehicleQueueService.CargoPickup,4,8,status,reason,default,new(20)));
+        Assert.Equal(expected, LogisticsStatusCatalog.Service(work));
+        Assert.Contains("POSITION 4", LogisticsStatusCatalog.ServiceDetails(work));
+        Assert.Equal("ACCESS NOT OBSERVED", LogisticsStatusCatalog.Service(default));
+    }
+
+    [Fact]
     public void CatalogChangesAndAdditionalStepCountChangeProposalWithoutTextConstants()
     {
         var logistics = Logistics(1000, Policy(ResourceIds.Steel), Policy(ResourceIds.Fuel));

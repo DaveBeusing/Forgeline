@@ -612,8 +612,7 @@ public sealed partial class PlayerActionPanelController
                 break;
 
             case PlayerActionPanelMode.Logistics:
-                ActivateLogistics(
-                    actions.Logistics);
+                ActivateLogistics(actions);
                 break;
 
             case PlayerActionPanelMode.Supply:
@@ -719,9 +718,9 @@ public sealed partial class PlayerActionPanelController
                 Priority);
     }
 
-    private void ActivateLogistics(
-        PlayerLogisticsActionReadModel? logistics)
+    private void ActivateLogistics(PlayerActionSnapshot actions)
     {
+        var logistics = actions.Logistics;
         if (logistics is null ||
             SelectedIndex < 0 ||
             SelectedIndex >= logistics.ItemCount)
@@ -739,9 +738,8 @@ public sealed partial class PlayerActionPanelController
             _stockEntity = logistics.Entity;
             SelectedIndex = logistics.Policies.ToList().FindIndex(p => p.ResourceId == proposal.Thresholds[0].Resource);
             _stockResourceId = ResourceId.None;
-            SynchronizeStockEditor(new PlayerActionSnapshot(_sessionId, default, [], 0, null, null, logistics));
-            _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex,
-                new PlayerActionSnapshot(_sessionId, default, [], 0, null, null, logistics));
+            SynchronizeStockEditor(actions);
+            _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions);
             _ringPage = SelectedIndex / 4; _itemSlotsPage = -1;
             return;
         }

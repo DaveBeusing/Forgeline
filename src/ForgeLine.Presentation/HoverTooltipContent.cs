@@ -49,8 +49,15 @@ internal static class HoverTooltipResolver
             _ => RtsUiIconCatalog.Get(world.RoleIcon).ShortLabel
         };
         string hint = world.OwnedDetails.Count == 1 ? "LEFT CLICK TO SELECT" : string.Empty;
-        return new(world.DisplayName, role, world.ExtractionState, hint, world,
-            Explanation: (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(world.OwnedDetails.Work.BlockReason)));
+        string explanation = (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(world.OwnedDetails.Work.BlockReason));
+        if (world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } selected && selected.SessionId == snapshot.SessionId && selected.Tick == snapshot.Tick)
+        {
+            if (selected.Logistics is { } logistics && logistics.Entity == world.Entity && logistics.Cargo is { } cargo)
+                explanation = $"REGIONAL CARGO / SOURCE {cargo.Source} / DESTINATION {cargo.Destination}; AUTOMATIC TARGET DEMAND ASSIGNS WORK. " + LogisticsStatusCatalog.ServiceDetails(logistics.Service);
+            else if (selected.Supply is { } supply && supply.Entity == world.Entity)
+                explanation = $"DRIVE TANK {supply.FuelFraction:P0}; FIELD CARGO FUEL {supply.ProviderFuel:0.##} / AMMUNITION {supply.ProviderAmmunition:0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
+        }
+        return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation);
     }
 
     private static HoverTooltipContent? ResolveDock(PresentationSnapshot snapshot, in HoverTooltipView view,
@@ -126,6 +133,32 @@ internal static class HoverTooltipResolver
                     ticks = units.Units[index].ProductionTicks;
                     requirement = units.Units[index].TechnologyUnlocked ? string.Empty : "REQUIRES TECHNOLOGY";
                     break;
+                case PlayerActionPanelMode.Logistics when actions.Logistics is { } logistics:
+                    if (index >= logistics.Policies.Count)
+                    {
+                        var input = logistics.Requirements[index - logistics.Policies.Count];
+                        costs = input.Inputs;
+                        requirement = $"{panel.LogisticsSteps} ADDITIONAL STEP(S); ACTIVE RESERVED WORK IS SEPARATE; NO EXTRA BUFFER";
+                        hint = "USE INPUTS PREPARES EDITOR; APPLY POLICY FOR EACH RESOURCE";
+                    }
+                    else
+                    {
+                        var stock = logistics.Policies[index];
+                        requirement = LogisticsStatusCatalog.PolicyDetails(logistics, stock) +
+                            (logistics.HasEnabledGraphNode ? "; GRAPH NODE ENABLED; LOCAL ACCESS OBSERVED SEPARATELY" : "; NO ENABLED GRAPH NODE");
+                        status = $"{(stock.HasPolicy ? "POLICY SAVED" : "NO SAVED POLICY")} / SOURCE {stock.Source} / CARGO TRUCK {stock.AssignedTruck}";
+                        hint = LogisticsStatusCatalog.Advice(stock.FailureReason);
+                        if (stock.FailureReason == LogisticsTransportRequestFailureReason.NoTruckAvailable)
+                        {
+                            var fleet = logistics.CargoFleet;
+                            requirement += $"; OWN CARGO {fleet.Total}, WORKING {fleet.Working}, BOUND {fleet.Bound}, EMPTY IDLE {fleet.EmptyIdle}, NO DRIVE FUEL {fleet.NoDriveFuel}; COUNTS OVERLAP, ROUTE ELIGIBILITY RECHECKED";
+                        }
+                    }
+                    break;
+                case PlayerActionPanelMode.Supply when actions.Supply is { } supply:
+                    requirement = $"DRIVE TANK {supply.FuelFraction:P0}; FIELD CARGO FUEL {supply.ProviderFuel:0.##} / AMMUNITION {supply.ProviderAmmunition:0.##}";
+                    hint = LogisticsStatusCatalog.ServiceDetails(supply.Service);
+                    break;
                 case PlayerActionPanelMode.Technology:
                     costs = actions.Technology[index].Costs;
                     requirement = actions.Technology[index].RequiredFacilityName;
@@ -139,10 +172,25 @@ internal static class HoverTooltipResolver
             PlayerActionPanelMode.UnitProduction when actions.UnitProduction is { } factory => PlayerActionDockHudModel.ResolveUnitProductionBlockLabel(factory.BlockReason),
             _ => string.Empty
         };
+        string explanation = (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(enabled ? workReason : state.DisabledReason));
+        if (mode == PlayerActionPanelMode.Logistics && actions.Logistics is { } logisticsHelp)
+        {
+            if (index >= 0 && index < logisticsHelp.Policies.Count)
+                explanation = "MIN TRIGGERS REFILL USING STOCK + OUTSTANDING; TARGET REFILLS TO; MAX IS SAVED POLICY, NOT A HARD CAP. " +
+                    LogisticsStatusCatalog.ServiceDetails(logisticsHelp.Policies[index].Service);
+            else explanation = "CATALOG INPUTS; SHARED CAPACITY INCLUDES LOCAL STOCK AND OUTSTANDING DELIVERY DEMAND. PREVIEW CREATES NO ORDERS.";
+            if (control is PlayerActionDockControlKind.CycleSecondary or PlayerActionDockControlKind.Increase or PlayerActionDockControlKind.Decrease)
+                hint = index >= logisticsHelp.Policies.Count ? "ADJUST ADDITIONAL STEP COUNT WITH - / +" : panel.StockThresholdField switch
+                {
+                    PlayerStockThresholdField.Minimum => "MIN: REQUEST WHEN STOCK + OUTSTANDING FALLS BELOW THIS VALUE",
+                    PlayerStockThresholdField.Maximum => "MAX: VALIDATED AND SAVED; DISPATCHER DOES NOT ENFORCE A HARD CAP",
+                    _ => "TARGET: REFILL GOAL; ACTUAL SHARED STORAGE CAPACITY STILL APPLIES"
+                };
+        }
         return new(title, PlayerActionDockHudModel.ResolveModeLabel(mode), status, hint,
             Costs: costs, Outputs: outputs, ProductionTicks: ticks, Requirement: requirement, Prerequisites: prerequisites,
             WorkStatus: ProductionContextFeedback.WorkLabel(workReason),
-            Explanation: (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(enabled ? workReason : state.DisabledReason)),
+            Explanation: explanation,
             VisualState: EconomicCardVisual.Resolve(mode, index, actions, ContextualCommandModel.HasPending(panel, snapshot)).State);
     }
 

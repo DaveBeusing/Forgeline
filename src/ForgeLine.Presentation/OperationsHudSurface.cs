@@ -132,8 +132,16 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                             if (route.Source == detail.Entity || route.Destination == detail.Entity)
                             { routes++; if (!route.Enabled) unavailable++; }
                         }
-                        b = new(text); b.Append("LISTED LINKS "); b.Number(routes, "0"); b.Append(" DISABLED "); b.Number(unavailable, "0");
+                        b = new(text);
+                        if (detail.Service.LoadingQueue is { } loading)
+                        { b.Append(LogisticsStatusCatalog.Service(detail.Service)); b.Append(" / WAITING "); b.Number(loading.WaitingCount, "0"); Line(b.Written); }
+                        else if (detail.Service.VehicleQueue is { } vehicle)
+                        { b.Append(LogisticsStatusCatalog.Service(detail.Service)); b.Append(" / POSITION "); b.Number(vehicle.Position, "0"); Line(b.Written); }
+                        else
+                        {
+                        b.Append("LISTED LINKS "); b.Number(routes, "0"); b.Append(" DISABLED "); b.Number(unavailable, "0");
                         b.Append(" NODE CAP/S "); Number(ref b, detail.TransportCapacity); b.Append(" / FOCUS NEXT"); Line(b.Written);
+                        }
                     }
                     else Line("SELECT A FACILITY FOR CAUSE AND CONTROLS");
                     _bounds = panel;

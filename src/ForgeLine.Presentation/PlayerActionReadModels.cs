@@ -295,7 +295,14 @@ public readonly record struct PlayerCargoStatusReadModel(
     CargoTransportWaitReason WaitReason,
     CargoTransportFailureReason FailureReason,
     double CargoQuantity,
-    double Capacity);
+    double Capacity)
+{
+    public EntityId Source { get; init; }
+    public EntityId Destination { get; init; }
+    public ResourceId Resource { get; init; }
+}
+
+public readonly record struct PlayerCargoFleet(int Total, int Working, int Bound, int EmptyIdle, int NoDriveFuel);
 
 public sealed class PlayerLogisticsActionReadModel
 {
@@ -333,6 +340,8 @@ public sealed class PlayerLogisticsActionReadModel
     public PlayerWorkSummary Service { get; }
     public IReadOnlyList<PlayerProductionRequirement> Requirements { get; }
     public int ItemCount => Policies.Count + Requirements.Count;
+    public bool HasEnabledGraphNode { get; init; }
+    public PlayerCargoFleet CargoFleet { get; init; }
 }
 
 public enum PlayerSupplyProviderState : byte
@@ -359,7 +368,10 @@ public readonly record struct PlayerSupplyActionReadModel(
     double ProviderFuel,
     double ProviderAmmunition,
     ResupplyProviderRejection ProviderRejections,
-    BattlefieldSupplyPriority Priority = BattlefieldSupplyPriority.Normal);
+    BattlefieldSupplyPriority Priority = BattlefieldSupplyPriority.Normal)
+{
+    public PlayerWorkSummary Service { get; init; }
+}
 
 public readonly record struct PlayerTacticalTargetReadModel(
     EntityId Entity,
@@ -1256,7 +1268,12 @@ internal static class PlayerActionSnapshotFactory
                     state.WaitReason,
                     state.FailureReason,
                     quantity,
-                    transport.Capacity);
+                    transport.Capacity)
+                {
+                    Source = entities.TryGetComponent(entity, out CargoTransportOrder sourceOrder) ? OwnedNode(sourceOrder.Origin) : default,
+                    Destination = entities.TryGetComponent(entity, out CargoTransportOrder destinationOrder) ? OwnedNode(destinationOrder.Destination) : default,
+                    Resource = entities.TryGetComponent(entity, out CargoTransportOrder resourceOrder) ? resourceOrder.ResourceId : default
+                };
         }
 
         if (!hasInventory)
@@ -1265,7 +1282,7 @@ internal static class PlayerActionSnapshotFactory
                 ? new PlayerLogisticsActionReadModel(
                     entity,
                     [],
-                    cargo)
+                    cargo, service: CaptureService(entity)) { CargoFleet = CaptureFleet() }
                 : null;
         }
 
@@ -1370,8 +1387,34 @@ internal static class PlayerActionSnapshotFactory
             CaptureService(entity),
             (production?.Recipes.Select(r => new PlayerProductionRequirement(1, r.RecipeId.Value, r.DisplayName, r.Inputs)) ?? [])
                 .Concat(units?.Units.Select(u => new PlayerProductionRequirement(2, u.UnitId.Value, u.DisplayName, u.Costs)) ?? [])
-                .ToArray());
+                .ToArray())
+        {
+            HasEnabledGraphNode = scenario.Logistics.TryGetNodeForEntity(entity, out var localNode) &&
+                scenario.Logistics.TryGetNode(localNode, out var graphNode) && graphNode.Enabled,
+            CargoFleet = CaptureFleet()
+        };
 
+        EntityId OwnedNode(ForgeLine.Logistics.LogisticsNodeId node) => scenario.Logistics.TryGetNode(node, out var value) && Owned(value.Entity) ? value.Entity : default;
+        PlayerCargoFleet CaptureFleet()
+        {
+            int total = 0, working = 0, bound = 0, idle = 0, noFuel = 0;
+            foreach (var truck in entities.Query<CargoTransport>())
+            {
+                if (!Owned(truck) || entities.HasComponent<SupplyTruck>(truck) ||
+                    entities.TryGetComponent(truck, out HealthState health) && health.IsDepleted) continue;
+                total++;
+                if (entities.HasComponent<CargoTransportOrder>(truck)) working++;
+                if (entities.HasComponent<CargoTransportReservation>(truck) || entities.HasComponent<ResupplyOrder>(truck)) bound++;
+                if (entities.TryGetComponent(truck, out UnitFuelState fuel) &&
+                    (!scenario.Inventories.Contains(fuel.InventoryId) || scenario.Inventories.GetAvailableQuantity(fuel.InventoryId, ResourceIds.Fuel) <= 1e-9)) noFuel++;
+                var transport = entities.GetComponent<CargoTransport>(truck);
+                if (entities.TryGetComponent(truck, out CargoTransportRuntimeState state) && state.Lifecycle == CargoTransportLifecycleState.Idle &&
+                    !entities.HasComponent<CargoTransportOrder>(truck) && !entities.HasComponent<CargoTransportReservation>(truck) &&
+                    !entities.HasComponent<ResupplyOrder>(truck) && scenario.Inventories.Contains(transport.CargoInventory) &&
+                    scenario.Inventories.GetTotalQuantity(transport.CargoInventory) <= 1e-9) idle++;
+            }
+            return new(total, working, bound, idle, noFuel);
+        }
         bool Owned(EntityId target) => entities.IsAlive(target) &&
             entities.TryGetComponent(entity, out ControllableEntity local) &&
             entities.TryGetComponent(target, out ControllableEntity owner) && owner.Owner == local.Owner;
@@ -1381,11 +1424,21 @@ internal static class PlayerActionSnapshotFactory
             foreach (var request in scenario.AutomatedDistribution.LastDebugSnapshot.Requests)
                 if (request.PolicyEntity == policyId && request.State is not (LogisticsTransportRequestState.Completed or LogisticsTransportRequestState.Failed))
                 {
-                    if (!assignedOnly) { total += request.RequestedQuantity; continue; }
+                    if (!assignedOnly)
+                    {
+                        double delivered = request.State is (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
+                            Owned(request.AssignedTruck) && entities.TryGetComponent(request.AssignedTruck, out CargoTransportRuntimeState progress)
+                            ? progress.DeliveredQuantity : 0;
+                        total += Math.Max(0, request.RequestedQuantity - delivered); continue;
+                    }
                     if (request.State is (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
                         Owned(request.AssignedTruck) && entities.TryGetComponent(request.AssignedTruck, out CargoTransportOrder order) &&
                         entities.TryGetComponent(request.AssignedTruck, out CargoTransportRuntimeState state))
-                        total += Math.Max(0, order.RequestedQuantity - state.DeliveredQuantity);
+                    {
+                        double reserved = entities.TryGetComponent(request.AssignedTruck, out CargoTransportReservation reservation) &&
+                            reservation.RequestId == request.RequestId ? reservation.Quantity : 0;
+                        total += reserved + Math.Max(0, state.LoadedQuantity - state.DeliveredQuantity);
+                    }
                 }
             return total;
         }
@@ -1487,7 +1540,11 @@ internal static class PlayerActionSnapshotFactory
             providerFuel,
             providerAmmunition,
             rejections,
-            priority);
+            priority)
+        {
+            Service = PlayerExperienceSnapshotFactory.CaptureWork(entities, entity, scenario.Production, scenario.UnitProduction,
+                scenario.Services.UnitDefinitions, scenario.Services.BuildingDefinitions)
+        };
     }
 
     private static bool TryResolveDistributionInventory(

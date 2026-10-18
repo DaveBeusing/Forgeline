@@ -979,7 +979,8 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
                 { text.Append("CATALOG INPUT PREVIEW / EDIT STEP COUNT / NO POLICY CHANGE"); break; }
                 var stock = actions.Logistics.Policies[index];
                 if (productionSkin) { text.Append("STOCK "); text.Append(stock.CurrentQuantity, "F0"); text.Append(" / "); }
-                text.Append("MIN "); text.Append(stock.DesiredMinimum, "F0"); text.Append(" MAX "); text.Append(stock.DesiredMaximum, "F0");
+                text.Append("FREE "); text.Append(stock.AvailableQuantity, "F0"); text.Append(" / RESERVED "); text.Append(stock.ReservedQuantity, "F0");
+                text.Append(" / INCOMING "); text.Append(stock.AnnouncedQuantity, "F0");
                 text.Append(stock.Enabled ? " / ENABLED" : " / DISABLED");
                 break;
             case PlayerActionPanelMode.Supply:
@@ -1223,6 +1224,9 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
                     text.Append(" NO POLICY");
                 }
 
+                text.Append(" REQUESTED "); text.Append(policy.RequestedQuantity, "F0");
+                if (policy.Service.VehicleQueue is { } queue)
+                { text.Append(" "); text.Append(LogisticsStatusCatalog.Service(policy.Service)); text.Append(" POS "); text.Append(queue.Position); }
                 if (policy.DistributionState !=
                     PlayerDistributionActionState.None)
                 {

@@ -34,11 +34,11 @@ public sealed record ProductionStockProposal(bool FitsCapacity, string Reason, i
             var policy = logistics.Policies.FirstOrDefault(p => p.ResourceId == group.Key);
             double required = group.Sum(i => i.RequiredQuantity) * steps;
             double target = required + policy.ReservedQuantity;
-            double missing = Math.Max(0, required - policy.AvailableQuantity - policy.AnnouncedQuantity);
+            double missing = Math.Max(0, required - policy.AvailableQuantity - Math.Max(policy.RequestedQuantity, policy.AnnouncedQuantity));
             additional += missing;
             thresholds.Add(new(group.Key, target, target, target, policy.AvailableQuantity, policy.AnnouncedQuantity, missing));
         }
-        double committedSpace = logistics.InventoryQuantity + logistics.Policies.Sum(p => p.AnnouncedQuantity) + additional;
+        double committedSpace = logistics.InventoryQuantity + logistics.Policies.Sum(p => Math.Max(p.RequestedQuantity, p.AnnouncedQuantity)) + additional;
         bool fits = thresholds.Count > 0 && committedSpace <= logistics.InventoryCapacity + 1e-9;
         return new(fits, fits ? "PREVIEW ONLY - APPLY EACH RESOURCE" : "SHARED STORAGE FULL - CONSUME OR REMOVE STOCK", steps,
             Array.AsReadOnly(thresholds.ToArray()));
