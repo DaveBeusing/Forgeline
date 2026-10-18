@@ -437,22 +437,28 @@ public sealed class AssetPipelineTests
         using var workspace = CreateIntegrityWorkspace();
         using var entered = new ManualResetEventSlim();
         using var finish = new ManualResetEventSlim();
-        Task<AssetCompilationResult> first = Task.Run(() => AssetPipelineCompiler.Compile(
+        Task<AssetCompilationResult> first = Task.Factory.StartNew(() => AssetPipelineCompiler.Compile(
             workspace.SourceRoot, workspace.RuntimeRoot, clean: true, qualifyOutput: () =>
             {
                 entered.Set();
                 if (!finish.Wait(TimeSpan.FromSeconds(10))) { throw new TimeoutException(); }
                 Assert.True(RuntimeAssetQualification.Run(workspace.RuntimeRoot, requireIntegrity: true).Success);
-            }));
+            }), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         Task<AssetCompilationResult>? second = null;
         try
         {
             Assert.True(entered.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
-            second = Task.Run(() => workspace.Compile(clean: true));
+            second = Task.Factory.StartNew(() => workspace.Compile(clean: true),
+                CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             await Task.Delay(100, TestContext.Current.CancellationToken);
             Assert.False(second.IsCompleted);
         }
-        finally { finish.Set(); }
+        finally
+        {
+            finish.Set();
+            await first;
+            if (second is not null) await second;
+        }
         Assert.True((await first).Success);
         Assert.NotNull(second);
         Assert.True((await second).Success);

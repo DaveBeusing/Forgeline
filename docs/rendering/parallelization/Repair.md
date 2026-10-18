@@ -239,3 +239,36 @@ the entire Client suite passes: 423 successful, zero failed, two optional skips,
 425 total, 37.108 seconds. The zero-allocation assertion passes unchanged. This is
 affected-suite validation; it does not erase the five failed assertions from the
 previous complete solution run or certify a complete solution rerun.
+
+## Resolved warning identity and writer cleanup
+
+Diagnostic CI 39113221933 identifies all four warnings as
+`ClearRenderTargetViewMismatchingClearValue`: linear scene render targets were
+created without any optimized clear value. Supply the engine's common clear color
+at HDR resource creation, including the existing negative-alpha background encoding.
+Use the same conversion for actual clearing so the hint and command cannot drift.
+The per-frame caller-provided clear color, shaders and resulting pixels are unchanged;
+other caller colors remain valid ordinary clears. No target recreation, extra idle
+wait, resource scheduling feature or severity filter is introduced. A native
+regression covers four buffers and full/half/full target recreation, with a required
+debug-layer variant explicitly unavailable locally and exercised where installed.
+
+The first combined complete solution run finishes with 2,686 passed, six failed,
+16 optional skips, 2,708 total, 19m51.720s. The additional Assets failure masks an
+entered-event assertion with workspace deletion while a writer still owns its lock.
+The concurrency test uses dedicated long-running writer tasks to avoid blocking
+its own thread-pool admission and always joins both writers in finally before
+workspace disposal, including assertion/cancellation paths. Its five-second entry
+bound, ten-second blocked qualification bound, blocking assertion and successful
+qualification assertions remain unchanged. No compiler production code is changed.
+The exact scene-target and Asset test files are added to the serial repair scope.
+
+Targeted repair validation: Release builds with zero warnings/errors; the full
+Graphics suite passes 80 tests with zero failures and three explicit skips (including
+the unavailable local debug-layer variant), 83 total. All 25 AssetPipelineTests
+pass. Full Client isolation previously passed all 423 non-explicit tests. Before
+final acceptance, run two predefined opposite-order 128/512 hardware cohorts after
+the actual optimized-clear change, preserving the same six fixture-4 views, settings,
+two readbacks and unchanged 15% gate. Retain every previous failed cohort. Then run
+the complete solution and native window/WARP/state comparisons at the actual new
+source identity. No global power setting or performance threshold is changed.

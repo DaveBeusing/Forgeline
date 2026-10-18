@@ -229,5 +229,49 @@
     "originalManifestSha256": "EB87BC6E984FC03F6DC0FF0F0A8F9021A2DAF2D29F888E5A4946703FF6643CF2",
     "compressedManifestSha256": "A15116983D35FD93DC58BA82D512998533F470C6F15C965F5D5C42E55E1A1C2F",
     "losslessGzip": true
+  },
+  {
+    "directory": "foundation-current-damage-before",
+    "sourceCommit": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+    "buildIdentity": "0.1.402-dev+d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+    "fixtureVersion": 4,
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 223311,
+    "originalManifestSha256": "42257A255EF6F2B78DA3FF4D76B7F0A270A7F81A7B5EA25B73CAA359455441F2",
+    "compressedManifestSha256": "E4A50892CA8B491EE1ECB4BEB0163C02A891450A110FD22E109E173877DC9D5C",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-current-damage-after",
+    "sourceCommit": "4f4bf27352cd6af6263996ceccb4048faebeea10",
+    "buildIdentity": "0.1.403-dev+4f4bf27352cd6af6263996ceccb4048faebeea10",
+    "fixtureVersion": 4,
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 223518,
+    "originalManifestSha256": "5225D124503F543885795B2B279DF8F0D0DBB8ADF642434A2B5B6AF1CD21E60F",
+    "compressedManifestSha256": "F40B26ABECB6188DB661EBBB44BC21594404A7EC4398B20A506FD45F4DFE0904",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-current-warp-baseline",
+    "sourceCommit": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+    "buildIdentity": "0.1.402-dev+d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+    "fixtureVersion": 4,
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 76070,
+    "originalManifestSha256": "23F6E7D62034A190C44D2D70AB10AB3633AAC8E7424F878C2D631E66ADCD3E59",
+    "compressedManifestSha256": "58555D1B9160576A390D0149400102902FC535C658430EBDDE567BAB1576CA73",
+    "losslessGzip": true
+  },
+  {
+    "directory": "foundation-current-warp",
+    "sourceCommit": "4f4bf27352cd6af6263996ceccb4048faebeea10",
+    "buildIdentity": "0.1.403-dev+4f4bf27352cd6af6263996ceccb4048faebeea10",
+    "fixtureVersion": 4,
+    "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+    "originalManifestBytes": 76937,
+    "originalManifestSha256": "DEA2E117BA3F155E6409064C5BACFE2C9297D0A7397CD44DB70E5729497BB6A8",
+    "compressedManifestSha256": "E4D97DC68B71C6CDD4809FBFCD76CB37797DEE2AE109F4135A9223893EF136A3",
+    "losslessGzip": true
   }
 ]

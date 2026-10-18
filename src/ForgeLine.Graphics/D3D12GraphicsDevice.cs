@@ -721,6 +721,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
     }
 
+    private static Color4 RenderTargetClearColor(GraphicsColor color, bool sceneOutput) =>
+        new(color.Red, color.Green, color.Blue, sceneOutput ? -1.0f - color.Alpha : color.Alpha);
+
     private void RenderFrameCore(GraphicsColor clearColor, Action<IGraphicsCommandContext>? recordCommands)
     {
         _resources.Collect(GetCompletedFence());
@@ -788,11 +791,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
         _commandList.ClearRenderTargetView(
             rtv,
-            new Color4(
-                clearColor.Red,
-                clearColor.Green,
-                clearColor.Blue,
-                _sceneOutput.Enabled ? -1.0f - clearColor.Alpha : clearColor.Alpha));
+            RenderTargetClearColor(clearColor, _sceneOutput.Enabled));
         _commandList.ClearDepthStencilView(
             dsv,
             ClearFlags.Depth,
@@ -1067,7 +1066,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                     _debugWarningCount + _debugErrorCount < 16)
                 {
                     Console.Error.WriteLine(
-                        $"[graphics:debug-layer] severity={message.Severity} id={message.Id} description={message.Description}");
+                        $"[graphics:debug-layer] severity={message.Severity} id={message.Id} description={message.Description.TrimEnd('\0').ReplaceLineEndings(" ")}");
                 }
 
                 switch (message.Severity)

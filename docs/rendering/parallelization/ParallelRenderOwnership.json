@@ -106,7 +106,9 @@
         "tests/ForgeLine.Client.Tests/ClientStartupNativeTests.cs",
         "tests/ForgeLine.Client.Tests/ClientSessionLoadingNativeTests.cs",
         "tests/ForgeLine.Client.Tests/StudioVideoDecoderTests.cs",
-        "tests/ForgeLine.Client.Tests/UiAudioReliabilityTests.cs"
+        "tests/ForgeLine.Client.Tests/UiAudioReliabilityTests.cs",
+        "src/ForgeLine.Graphics/D3D12SceneComposition.cs",
+        "tests/ForgeLine.Assets.Tests/AssetPipelineTests.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",

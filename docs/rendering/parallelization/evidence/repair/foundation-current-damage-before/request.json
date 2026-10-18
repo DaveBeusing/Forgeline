@@ -1,0 +1,59 @@
+{
+  "software": false,
+  "continueAfterMismatch": false,
+  "rasterDpi": 0,
+  "commit": "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+  "runProfile": "Warm",
+  "mechanicalSeconds": null,
+  "runtimeRoot": "D:\\Code\\Forgeline\\assets\\runtime",
+  "repeatCaptures": 2,
+  "cinematicFrontend": false,
+  "warmups": 3,
+  "uiScenarios": [
+    "World"
+  ],
+  "profiles": [
+    "High"
+  ],
+  "graphicsSettings": {
+    "environment": {
+      "daylight": 1.0,
+      "cloudCover": 0.0,
+      "wetness": 0.0
+    },
+    "vegetation": {
+      "maximumDistanceMeters": 4000.0,
+      "density": 1.0
+    },
+    "resolutionScale": 1.0,
+    "terrainResidency": {
+      "enabled": true,
+      "maximumResidentChunks": 128
+    }
+  },
+  "outputRoot": "D:\\Code\\Forgeline\\artifacts\\foundation-current-damage-before",
+  "yawDegrees": 45.0,
+  "localHaze": null,
+  "inspectionDistanceMeters": 0.0,
+  "displays": [
+    {
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "uiScales": [
+    1.0
+  ],
+  "samples": 8,
+  "surfaceMarks": [],
+  "zooms": [
+    "CloseTactical",
+    "NormalGameplay",
+    "Strategic"
+  ],
+  "scenes": [
+    "DamageDestruction"
+  ],
+  "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+  "cameraPath": "Fixed"
+}
