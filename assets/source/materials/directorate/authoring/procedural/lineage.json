@@ -1,0 +1,13 @@
+{
+  "generationKey": "271d4aa63fdf392cc12917c7b1dd65616659d316df2cb89912a4da01d5eb91dd",
+  "schemaVersion": 1,
+  "artApproval": "pending",
+  "files": {
+    "materials.blend": "85ed3a14fd502320e6b3030cfc00fe03e88b6e5a45b54abcff44a93ca0fd54f2",
+    "production_surface_base.png": "3ba21dff212ca930051f86341b1f7d8b4d97b926add454433869428ab6246683",
+    "production_surface_normal.png": "569659f9645d70e5492896fab573fe28a845f7092778bacebd7e1ecfac641c89",
+    "production_surface_orm.png": "5f1602d69fb52b3895fe7fab4dcded925bd80889b8d3a149bf572065f708657b",
+    "recipe.json": "76ac7d35de96f4db8585084e62229af65c07d82dcea3f66a84e79e695b217969"
+  },
+  "baseline": "cd85373f5e9610cea485b5c2c1755c318cb52315"
+}

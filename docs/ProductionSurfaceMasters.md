@@ -208,3 +208,6 @@ surfaces use the existing inset atlas cells, sRGB Base Color and linear Normal/O
 The integrated qualification contains 492 assets (309 meshes, 56 textures and
 127 materials). Dedicated unit and logistics traffic captures report zero mesh
 fallbacks and texture-binding failures; human surface/art acceptance remains open.
+
+The optional [procedural CPU atlas producer](ProceduralPbrProduction.md) preserves the existing atlas and runtime budgets in isolated, verifiable source generations. Production promotion and art approval remain explicit; see its qualification report.
+

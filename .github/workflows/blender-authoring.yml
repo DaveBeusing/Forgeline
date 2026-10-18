@@ -150,3 +150,28 @@ jobs:
           name: blender-infantry-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/blender-infantry-*
           retention-days: 14
+
+  procedural-pbr:
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 20
+    env:
+      FORGELINE_BLENDER_PATH: ${{ inputs.blender_executable }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Qualify deterministic CPU atlas baking and source-less compilation
+        shell: pwsh
+        run: ./tools/blender/Test-ProceduralPbr.ps1 -OutputRoot artifacts/pbr-${{ github.run_id }}-${{ github.run_attempt }} -RenderPreviews
+      - name: Retain PBR authoring evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: procedural-pbr-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/pbr-*
+          retention-days: 14

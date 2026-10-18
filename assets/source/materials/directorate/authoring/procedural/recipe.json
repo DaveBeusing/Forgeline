@@ -1,0 +1,108 @@
+{
+  "masterSize": 4096,
+  "recipes": {
+    "canvas": {
+      "baseLinear": [
+        0.1,
+        0.1,
+        0.048
+      ],
+      "cell": 3,
+      "frequency": 128,
+      "heightMetres": 0.0004,
+      "metallic": 0,
+      "roughness": 0.94
+    },
+    "concrete": {
+      "baseLinear": [
+        0.28,
+        0.28,
+        0.24
+      ],
+      "cell": 6,
+      "frequency": 96,
+      "heightMetres": 0.0008,
+      "metallic": 0,
+      "roughness": 0.91
+    },
+    "glass": {
+      "baseLinear": [
+        0.012,
+        0.037,
+        0.053
+      ],
+      "cell": 4,
+      "frequency": 16,
+      "heightMetres": 0,
+      "metallic": 0,
+      "roughness": 0.23
+    },
+    "grime": {
+      "baseLinear": [
+        0.061,
+        0.07,
+        0.03
+      ],
+      "cell": 8,
+      "frequency": 32,
+      "heightMetres": 0.00025,
+      "metallic": 0,
+      "roughness": 0.87
+    },
+    "gunmetal": {
+      "baseLinear": [
+        0.3,
+        0.32,
+        0.34
+      ],
+      "cell": 1,
+      "frequency": 96,
+      "heightMetres": 0.00012,
+      "metallic": 1,
+      "roughness": 0.56
+    },
+    "heat_steel": {
+      "baseLinear": [
+        0.068,
+        0.058,
+        0.047
+      ],
+      "cell": 7,
+      "frequency": 64,
+      "heightMetres": 0.00012,
+      "metallic": 1,
+      "roughness": 0.65
+    },
+    "painted_armor": {
+      "baseLinear": [
+        0.095,
+        0.112,
+        0.053
+      ],
+      "cell": 0,
+      "frequency": 64,
+      "heightMetres": 0.00018,
+      "metallic": 0,
+      "roughness": 0.72
+    },
+    "rubber": {
+      "baseLinear": [
+        0.012,
+        0.015,
+        0.015
+      ],
+      "cell": 2,
+      "frequency": 48,
+      "heightMetres": 0.0003,
+      "metallic": 0,
+      "roughness": 0.94
+    }
+  },
+  "runtimeCaps": {
+    "base": 2048,
+    "normal": 1024,
+    "orm": 512
+  },
+  "schemaVersion": 1,
+  "seed": 1701
+}
