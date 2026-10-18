@@ -3247,7 +3247,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 facility.Supports(UnitProductionCapability.Logistics) &&
                 facility.Status == UnitProductionStatus.NoInput;
             bool formingInitialForce = plannedUnit == UnitIds.RifleSquad &&
-                GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits &&
+                facility.Status == UnitProductionStatus.NoInput &&
+                context.Entities.TryGetComponent(entity, out PowerConsumer productionPower) && productionPower.State == PowerOperationalState.Powered &&
                 owned.CombatUnits.Count - (GetUnitCount(owned, UnitIds.ScoutVehicle) > 0 ? 1 : 0) < configuration.MinimumAttackUnits;
             LogisticsStockPriority productionPriority =
                 plannedUnit ==
