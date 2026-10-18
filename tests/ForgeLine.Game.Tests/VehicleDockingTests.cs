@@ -99,8 +99,10 @@ public sealed class VehicleDockingTests
         Assert.False(fixture.Simulation.Entities.HasComponent<VehicleDockSlot>(fixture.Building));
     }
 
-    [Fact]
-    public void SettlingNeedsDistinctTicksAndTransferConsumesPositiveTime()
+    [Theory]
+    [InlineData(40, 20)]
+    [InlineData(100, 8)]
+    public void SettlingNeedsDistinctTicksAndTransferConsumesPositiveTime(double rate, int durationTicks)
     {
         var fixture = new Fixture();
         ulong generation = 0;
@@ -114,14 +116,14 @@ public sealed class VehicleDockingTests
         fixture.Step(context =>
         {
             Assert.True(fixture.Docks.ObservePose(context, fixture.Truck, out _));
-            Assert.False(fixture.Docks.CanTransfer(context, fixture.Truck, generation, 40));
+            Assert.False(fixture.Docks.CanTransfer(context, fixture.Truck, generation, 40, rate));
         });
-        for (int i = 0; i < 19; i++) fixture.Step(context => Assert.False(fixture.Docks.CanTransfer(context, fixture.Truck, generation, 40)));
+        for (int i = 0; i < durationTicks - 1; i++) fixture.Step(context => Assert.False(fixture.Docks.CanTransfer(context, fixture.Truck, generation, 40, rate)));
         fixture.Step(context =>
         {
-            Assert.True(fixture.Docks.CanTransfer(context, fixture.Truck, generation, 40));
+            Assert.True(fixture.Docks.CanTransfer(context, fixture.Truck, generation, 40, rate));
             VehicleDockingService.RecordTransfer(context, fixture.Truck, generation);
-            Assert.False(fixture.Docks.CanTransfer(context, fixture.Truck, generation, 40));
+            Assert.False(fixture.Docks.CanTransfer(context, fixture.Truck, generation, 40, rate));
         });
     }
 
@@ -500,6 +502,32 @@ public sealed class VehicleDockingTests
             Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1)));
             Assert.Equal(fixture.OtherTruck, entities.GetComponent<VehicleDockSlot>(fixture.Building).Truck);
         });
+    }
+    [Fact]
+    public void NeighboringBuildingsDoNotAllocateTheSameOutsideStop()
+    {
+        var fixture = new Fixture();
+        var entities = fixture.Simulation.Entities;
+        var movement = GroundMovement.CreateDefault();
+        entities.AddComponent(fixture.Truck, movement);
+        entities.AddComponent(fixture.OtherTruck, movement);
+        entities.AddComponent(fixture.OtherTruck, GroundMovementState.Stationary(0));
+        fixture.SetTruck(new(100, 0, 100), 0, 0);
+        entities.SetComponent(fixture.OtherTruck, entities.GetComponent<WorldTransform>(fixture.OtherTruck) with { Position = new(140, 0, 100) });
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1))));
+        var first = entities.GetComponent<VehicleDockVisit>(fixture.Truck).Pose.ApproachStart;
+        Assert.True(first.HasValue);
+        EntityId neighbor = entities.CreateEntity();
+        entities.AddComponent(neighbor, new WorldTransform(new(first.GetValueOrDefault().X * 2, 0, 28),
+            Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI), Vector3.One));
+        entities.AddComponent(neighbor, new CompletedBuilding(BuildingIds.StorageDepot, new(1), SimulationTick.Zero));
+        entities.AddComponent(neighbor, entities.GetComponent<BuildingLoadingDock>(fixture.Building));
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, neighbor, new(1))));
+        var second = entities.GetComponent<VehicleDockVisit>(fixture.OtherTruck).Pose.ApproachStart;
+        Assert.True(second.HasValue);
+        Assert.True(Vector3.Distance(first.GetValueOrDefault(), second.GetValueOrDefault()) > movement.SeparationRadius * 2);
+        Assert.False(entities.HasComponent<VehicleDockSlot>(fixture.Building));
+        Assert.False(entities.HasComponent<VehicleDockSlot>(neighbor));
     }
     private sealed class Fixture : ISimulationSystem
     {

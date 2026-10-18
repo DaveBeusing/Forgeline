@@ -443,7 +443,7 @@ public sealed class VehicleDockingService
                     if (!grid.TryWorldToCell(coarseStart, out var approachCell) || !grid.IsTraversable(approachCell, agent.Capabilities)) continue;
                     Vector3 proposed = coarseStart - forward * margin;
                     if (!grid.TryWorldToCell(proposed, out var cell) || !grid.IsTraversable(cell, agent.Capabilities) ||
-                        !StagingPointAvailable(entities, truck, building, proposed, waitingSeparation) ||
+                        !StagingPointAvailable(entities, truck, proposed, waitingSeparation) ||
                         pose.Contains(proposed, pose.HalfLength) ||
                         entities.TryGetComponent(building, out VehicleDockSlot activeLane) && activeLane.Pose.Contains(proposed, pose.HalfLength)) continue;
                     staging = proposed;
@@ -460,13 +460,13 @@ public sealed class VehicleDockingService
         if (entities.TryGetComponent(truck, out VehicleDockVisit pending) && pending.Generation == 0 && pending.Building == building &&
             pending.Pose.ApproachStart is Vector3 previous && float.IsFinite(previous.X) && float.IsFinite(previous.Y) && float.IsFinite(previous.Z) &&
             VehicleDockPose.HorizontalDistanceSquared(pending.Pose.Service, pose.Service) < 0.001f &&
-            StagingPointAvailable(entities, truck, building, previous, waitingSeparation) &&
+            StagingPointAvailable(entities, truck, previous, waitingSeparation) &&
             !pose.Contains(previous, pose.HalfLength) &&
             (!entities.TryGetComponent(building, out VehicleDockSlot activeSlot) || !activeSlot.Pose.Contains(previous, pose.HalfLength)) &&
             (_navigation is null || !entities.TryGetComponent(truck, out NavigationAgent previousAgent) ||
              _navigation.World.Grid.TryWorldToCell(previous, out var previousCell) && _navigation.World.Grid.IsTraversable(previousCell, previousAgent.Capabilities)))
             staging = previous - Vector3.UnitY * movement.HeightOffset;
-        if (!StagingPointAvailable(entities, truck, building, staging, waitingSeparation))
+        if (!StagingPointAvailable(entities, truck, staging, waitingSeparation))
         {
             Vector3 outward = new(-forward.Z, 0, forward.X);
             if (Vector3.Dot(outward, pose.Service - buildingTransform.Position) < 0) outward = -outward;
@@ -476,7 +476,7 @@ public sealed class VehicleDockingService
                 Vector3 candidate = staging + outward * (step * waitingSeparation);
                 if (pose.Contains(candidate, pose.HalfLength) ||
                     entities.TryGetComponent(building, out VehicleDockSlot lane) && lane.Pose.Contains(candidate, pose.HalfLength) ||
-                    !StagingPointAvailable(entities, truck, building, candidate, waitingSeparation)) continue;
+                    !StagingPointAvailable(entities, truck, candidate, waitingSeparation)) continue;
                 staging = candidate;
                 found = true;
             }
@@ -511,13 +511,13 @@ public sealed class VehicleDockingService
         return true;
     }
 
-    private static bool StagingPointAvailable(EntityRegistry entities, EntityId truck, EntityId building, Vector3 point, float separation)
+    private static bool StagingPointAvailable(EntityRegistry entities, EntityId truck, Vector3 point, float separation)
     {
         foreach (EntityId other in entities.Query<VehicleDockVisit>())
         {
             if (other == truck) continue;
             var visit = entities.GetComponent<VehicleDockVisit>(other);
-            if (visit.Generation == 0 && visit.Building == building && visit.Pose.ApproachStart is Vector3 waiting &&
+            if (visit.Generation == 0 && visit.Pose.ApproachStart is Vector3 waiting &&
                 VehicleDockPose.HorizontalDistanceSquared(point, waiting) < separation * separation) return false;
         }
         return true;
@@ -639,7 +639,7 @@ public sealed class VehicleDockingService
         if (entities.HasComponent<NavigationRouteState>(truck)) entities.RemoveComponent<NavigationRouteState>(truck);
     }
 
-    public bool CanTransfer(SimulationContext context, EntityId truck, ulong generation, double quantity, double unitsPerSecond = 40)
+    public bool CanTransfer(SimulationContext context, EntityId truck, ulong generation, double quantity, double unitsPerSecond = 100)
     {
         if (!double.IsFinite(quantity) || quantity <= 0 || !double.IsFinite(unitsPerSecond) || unitsPerSecond <= 0 ||
             !ObservePose(context, truck, out var visit) || visit.Generation != generation ||
