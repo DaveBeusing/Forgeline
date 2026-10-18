@@ -55,7 +55,7 @@ internal static class HoverTooltipResolver
             if (selected.Logistics is { } logistics && logistics.Entity == world.Entity && logistics.Cargo is { } cargo)
                 explanation = $"REGIONAL CARGO / SOURCE {cargo.SourceName} / DESTINATION {cargo.DestinationName}; AUTOMATIC TARGET DEMAND ASSIGNS WORK. " + LogisticsStatusCatalog.ServiceDetails(logistics.Service);
             else if (selected.Supply is { } supply && supply.Entity == world.Entity)
-                explanation = $"DRIVE TANK {supply.FuelFraction:P0}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
+                explanation = $"DRIVE TANK {supply.DriveFuelQuantity:0.##}/{supply.DriveFuelCapacity:0.##}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
         }
         return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation);
     }
@@ -146,7 +146,7 @@ internal static class HoverTooltipResolver
                         var stock = logistics.Policies[index];
                         requirement = (panel.StockPreview.Length > 0 ? panel.StockPreview + "; " : string.Empty) + LogisticsStatusCatalog.PolicyDetails(logistics, stock) +
                             (logistics.HasEnabledGraphNode ? "; NETWORK NODE ACTIVE; LOCAL ACCESS OBSERVED SEPARATELY" : "; NO ACTIVE NETWORK NODE");
-                        status = $"{(stock.HasPolicy ? "POLICY SAVED" : "NO SAVED POLICY")} / SOURCE {stock.SourceName} / {(stock.AssignedTruck.IsValid ? "CARGO TRUCK ASSIGNED" : "NO CARGO TRUCK ASSIGNED")}";
+                        status = $"{(stock.HasPolicy ? "POLICY SAVED" : "NO SAVED POLICY")} / SOURCE {(string.IsNullOrEmpty(stock.SourceName) ? "NOT ASSIGNED" : stock.SourceName)} / {(stock.AssignedTruck.IsValid ? "CARGO TRUCK ASSIGNED" : "NO CARGO TRUCK ASSIGNED")}";
                         hint = LogisticsStatusCatalog.Advice(stock.FailureReason);
                         if (stock.FailureReason == LogisticsTransportRequestFailureReason.NoTruckAvailable)
                         {
@@ -156,7 +156,7 @@ internal static class HoverTooltipResolver
                     }
                     break;
                 case PlayerActionPanelMode.Supply when actions.Supply is { } supply:
-                    requirement = $"DRIVE TANK {supply.FuelFraction:P0}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}";
+                    requirement = $"DRIVE TANK {supply.DriveFuelQuantity:0.##}/{supply.DriveFuelCapacity:0.##}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}";
                     hint = LogisticsStatusCatalog.ServiceDetails(supply.Service);
                     break;
                 case PlayerActionPanelMode.Technology:

@@ -1464,7 +1464,7 @@ internal static class PlayerActionSnapshotFactory
         EntityId Source(EntityId policyId)
         {
             foreach (var request in scenario.AutomatedDistribution.LastDebugSnapshot.Requests.Reverse())
-                if (request.PolicyEntity == policyId && request.State is not (LogisticsTransportRequestState.Completed or LogisticsTransportRequestState.Failed) &&
+                if (request.PolicyEntity == policyId && request.State is (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
                     scenario.Logistics.TryGetNode(request.Origin, out var source) && Owned(source.Entity)) return source.Entity;
             return EntityId.Invalid;
         }

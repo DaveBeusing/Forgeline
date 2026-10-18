@@ -7,12 +7,13 @@ public sealed class PlayerProductionRequirement
 {
     public PlayerProductionRequirement(byte kind, uint id, string name, IReadOnlyList<PlayerActionResourceAmount> inputs)
     {
-        Kind = kind; Id = id; Name = name;
+        Kind = kind; Id = id; Name = name; Title = "INPUTS: " + name;
         Inputs = Array.AsReadOnly(inputs.ToArray());
     }
     public byte Kind { get; }
     public uint Id { get; }
     public string Name { get; }
+    public string Title { get; }
     public IReadOnlyList<PlayerActionResourceAmount> Inputs { get; }
 }
 

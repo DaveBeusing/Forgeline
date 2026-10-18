@@ -291,7 +291,7 @@ internal static class PlayerActionDockHudModel
                            PlayerLogisticsActionReadModel logistics &&
                        index < logistics.ItemCount
                     ? index < logistics.Policies.Count ? logistics.Policies[index].DisplayName
-                        : "INPUTS: " + logistics.Requirements[index - logistics.Policies.Count].Name
+                        : logistics.Requirements[index - logistics.Policies.Count].Title
                     : string.Empty;
 
             case PlayerActionPanelMode.Supply:

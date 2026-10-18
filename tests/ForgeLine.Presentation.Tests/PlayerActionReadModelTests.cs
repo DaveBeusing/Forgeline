@@ -191,11 +191,13 @@ public sealed class PlayerActionReadModelTests
             snapshot.PlayerActions?.Production);
     }
 
-    [Fact]
-    public void UnitProductionActionsCoverSupportedCatalogAndExposeRealCosts()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void UnitProductionActionsCoverSupportedCatalogAndExposeRealCosts(bool changedCatalog)
     {
         using MatchRuntime scenario =
-            CreateScenario(4303);
+            CreateScenario(4303, changedCatalog);
         InventoryId input =
             scenario.Inventories.CreateInventory(
                 new InventorySpecification(10_000.0));
@@ -271,7 +273,7 @@ public sealed class PlayerActionReadModelTests
         Assert.True(proposal.FitsCapacity);
         foreach (var cost in units.Units.Single(u => u.UnitId == UnitIds.ScoutVehicle).Costs)
             Assert.Equal(cost.RequiredQuantity, Assert.Single(proposal.Thresholds, t => t.Resource == cost.ResourceId).Target);
-        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Steel && t.Target == 70);
+        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Steel && t.Target == (changedCatalog ? 91 : 70));
         Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Electronics && t.Target == 24);
         Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Fuel && t.Target == 60);
         Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Ammunition && t.Target == 40);
@@ -687,7 +689,7 @@ public sealed class PlayerActionReadModelTests
     }
 
     private static MatchRuntime CreateScenario(
-        ulong seed)
+        ulong seed, bool changedCatalog = false)
     {
         MatchRuntimeSettings runtime =
             CentralDivideScenario.CreateHeadless(
@@ -700,6 +702,14 @@ public sealed class PlayerActionReadModelTests
                         eastComputerControlled: false)
             };
 
+        if (changedCatalog)
+        {
+            var content = runtime.Composition.Content;
+            var units = new UnitDefinitionCatalog(content.Units.Definitions.Select(unit => unit.Id == UnitIds.ScoutVehicle
+                ? unit with { Costs = unit.Costs.Select(cost => cost.ResourceId == ResourceIds.Steel ? new UnitResourceCost(cost.ResourceId,91) : cost).ToArray() }
+                : unit));
+            runtime = runtime with { Composition = runtime.Composition with { Content = content with { Units = units } } };
+        }
         return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);
