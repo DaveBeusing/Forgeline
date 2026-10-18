@@ -1021,6 +1021,46 @@
       "file": "foundation-targetability-game-suite.log.gz",
       "rawSha256": "3c26833cf2669339c66aa8359e17ca8d572d85e237210ed845e53e037caab706",
       "archiveSha256": "624620ce317fdb54d260c772ca10e3f81d82f3ce19dc0c5f4b8248c61f0a41ca"
+    },
+    {
+      "file": "foundation-targetability-headless-build.log.gz",
+      "rawSha256": "064cda25bc3057bdad58c614385d121582b92b285e9a5248f7f825f3a63c5f05",
+      "archiveSha256": "19a513793cb24f114fa8b4ed06ddb3f2823cef24f2d6a31c4e542e68ab64ee97"
+    },
+    {
+      "file": "foundation-targetability-opponent.json.gz",
+      "rawSha256": "9187d2c5cbb926395ebc8d5a070011f7b725817d136de7693d5b763c9b077d6d",
+      "archiveSha256": "5e0ac27fdf6bcb3afc54af5411105b35976c7b13b1088b5e6bdff0faae4449cb"
+    },
+    {
+      "file": "foundation-targetability-opponent-telemetry.json.gz",
+      "rawSha256": "63fa5de490f27fe702c718a3881add7054e7557852d0e0911b96048f08c9a0e7",
+      "archiveSha256": "e79d2fb7673168f3a107c9601ff151efee446bc79a14f20802e73b7402b49806"
+    },
+    {
+      "file": "foundation-targetability-opponent.save.json.gz",
+      "rawSha256": "144a1ba7db48b4280307defff4f11fd3d3425fdd67004c76fefe3b2efe72d8b3",
+      "archiveSha256": "19ae93d45f0aa7ab13ca4be7c3a81ce94f0eb05faf9a32fc9598d6129bb1f08c"
+    },
+    {
+      "file": "foundation-targetability-opponent.log.gz",
+      "rawSha256": "a3245bfe402acec6a2cc8ec2049a9d36ee78cc76b8eecfa060a77227f23f6855",
+      "archiveSha256": "0e2333b58ceed2b5c197dce64d27f318571862a69ff883e573d75dd25efb13b1"
+    },
+    {
+      "file": "foundation-final-solution-build.log.gz",
+      "rawSha256": "09ee7722b927fc714c5915a7d5bcab1ebb701566757c443f0402c4001d81b7a1",
+      "archiveSha256": "5f9cbbe7e4f7076d88f587425804df95b465169cfa769ae8e4b6f6b86fa598d3"
+    },
+    {
+      "file": "foundation-final-native-source-equivalence.json.gz",
+      "rawSha256": "8aef1bfb9e5b2764aa39f7c00f0b298da05fb5e776134c73278fb867be9285a2",
+      "archiveSha256": "eacf8305903ded0a4a5c6b811621515c3cffc9e30a73b09c4de81fbd7339008d"
+    },
+    {
+      "file": "foundation-final-native-correctness.log.gz",
+      "rawSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "archiveSha256": "4ab42d46829e3b0cd56ccc72929d66eefc80b01beabedc9e217cf986c54b7923"
     }
   ]
 }

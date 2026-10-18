@@ -933,3 +933,34 @@ The independent human review, final-head CI and terminal gate remain open.
 The complete-summary reproducer includes all eight protocols and all 96 exact
 paired images, preserving every historical failed gate. Parallel release
 remains false until all required foundation gates are accepted.
+
+
+### Terminal gate passes; final code images match the qualified renderer
+
+Runtime source f8c7bacacf94eac1c4efb7d6729139a804ed87b2 completes the unchanged
+strict seed-2026 terminal gate at tick 64,536, below the original 80,000 limit:
+Ended / Completed / Victory / CommandCoreDestroyed, winner player one, defeated
+player two. Completion and finalization both occur at tick 64,536. The full
+report, telemetry, log and authoritative save are retained. The standalone
+headless build has zero warnings/errors (21.75s). No winner, resource quantity,
+combat range, target visibility rule or terminal threshold is forced or relaxed.
+Delivered cargo is 21,757 units over 211 completed orders, with zero failed cargo
+orders and zero route failures; normal recorded combat destroys the core.
+
+The final normal solution builds on 0cf888b0 with zero warnings/errors (57.08s).
+Its final integrated suite is running as an additional check after the previous
+2,810-pass complete integration and the subsequent 605-pass changed Game module.
+The resulting PR head's GitHub checks provide final hosted CI status; no earlier
+or canceled run is presented as that final-head result.
+
+Six additional final-code native image cases (0cf888b0) exactly match the timed
+fixture-seven renderer ae6865b0, with two equal readbacks each. This is explicitly
+correctness-only capture (eight warmups / 32 samples), performed while CPU-only
+asset tests run; its short timing samples do not establish performance acceptance.
+Git tree identities prove Graphics (including D3D12), Presentation, Client,
+Assets and runtime assets are unchanged between the timed and final-code sources.
+The only runtime source difference is TacticalTestOpponentSystem.cs. Thus the
+full fixed B-A-A-B renderer qualification remains source-attributed, and final
+code image parity is separately verified. All six final images, source-equivalence
+proof and actual native manifests are retained. Independent human native review
+remains required; parallelReleased remains false and PR #237 remains draft.
