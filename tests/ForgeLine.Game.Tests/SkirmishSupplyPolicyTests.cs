@@ -10,6 +10,40 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class SkirmishSupplyPolicyTests
 {
+    [Theory]
+    [InlineData(false, true, false, true)]
+    [InlineData(true, true, false, false)]
+    [InlineData(false, false, false, false)]
+    [InlineData(false, true, true, false)]
+    public void SupplyLoadingPrefersAStockedSourceBeforeDistanceAndRetainsPartialFallback(
+        bool depotHasAmmunition, bool coreHasAmmunition, bool truckHasAmmunition, bool useCore)
+    {
+        using MatchRuntime scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(1));
+        var position = entities.GetComponent<WorldTransform>(side.CommandCore).Position + Vector3.UnitX * 200;
+        if (!coreHasAmmunition)
+            Assert.True(scenario.Inventories.Remove(side.StartingInventory, ResourceIds.Ammunition,
+                scenario.Inventories.GetAvailableQuantity(side.StartingInventory, ResourceIds.Ammunition)).Succeeded);
+        var inventory = scenario.Inventories.CreateInventory(new InventorySpecification(4_000));
+        EntityId depot = entities.CreateEntity();
+        entities.AddComponent(depot, new WorldTransform(position, Quaternion.Identity, Vector3.One));
+        entities.AddComponent(depot, new CompletedBuilding(BuildingIds.SupplyDepot, side.Player, SimulationTick.Zero));
+        entities.AddComponent(depot, new ControllableEntity(side.Player, ControllableEntityCategory.Building));
+        entities.AddComponent(depot, new InventoryStorage(inventory));
+        entities.AddComponent(depot, new SupplyDepot(inventory, side.Player));
+        entities.AddComponent(depot, Assert.IsType<BuildingLoadingDock>(DirectorateContent.CreateBuildingCatalog()[BuildingIds.SupplyDepot].LoadingDock));
+        var definition = DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck];
+        Assert.True(scenario.Inventories.Add(inventory, ResourceIds.Fuel, definition.SupplyFuelTarget).Succeeded);
+        if (depotHasAmmunition)
+            Assert.True(scenario.Inventories.Add(inventory, ResourceIds.Ammunition, definition.SupplyAmmunitionTarget).Succeeded);
+        EntityId truck = scenario.UnitFactory.Create(definition, position + Vector3.UnitZ * 30, side.Player);
+        if (truckHasAmmunition)
+            Assert.True(scenario.Inventories.Add(entities.GetComponent<SupplyTruck>(truck).InventoryId,
+                ResourceIds.Ammunition, definition.SupplyAmmunitionTarget).Succeeded);
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+        Assert.Equal(useCore ? side.CommandCore : depot, entities.GetComponent<SupplyLoadingOrder>(truck).Source);
+    }
     [Fact]
     public void PowerRecoveryKeepsPartialTruckloadsInsteadOfBuildingMoreUnpoweredExtractors()
     {
@@ -67,15 +101,17 @@ public sealed class SkirmishSupplyPolicyTests
         Assert.Equal(required, scenario.Inventories.GetReservedQuantity(side.StartingInventory, ResourceIds.FerrousOre));
     }
 
-    [Fact]
-    public void SatisfiedUnitCostDoesNotKeepOptionalStockBufferCritical()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void SatisfiedUnitCostDoesNotKeepOptionalStockBufferCritical(bool queuedSuccessor)
     {
         var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
         using var scenario = CentralDivideScenario.Create(settings with
         {
             OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(settings.OpponentConfigurations)
             {
-                [1] = settings.OpponentConfigurations[1] with { ReactionCadenceTicks = 1 }
+                [1] = settings.OpponentConfigurations[1] with { ReactionCadenceTicks = 1, MaximumQueuedUnitsPerFacility = 1 }
             }
         });
         var entities = scenario.Simulation.Entities;
@@ -97,13 +133,20 @@ public sealed class SkirmishSupplyPolicyTests
         entities.AddComponent(factory, new PowerConsumer(1, PowerPriority.Industrial));
         var queue = new QueueUnitProductionCommand(side.Player, factory, UnitIds.MainBattleTank, SimulationTick.Zero, ProductionPriority.High);
         scenario.Simulation.SubmitCommand(queue, SimulationTick.Zero.Next());
+        QueueUnitProductionCommand? next = null;
+        if (queuedSuccessor)
+        {
+            next = new QueueUnitProductionCommand(side.Player, factory, UnitIds.ScoutVehicle, SimulationTick.Zero, ProductionPriority.Normal);
+            scenario.Simulation.SubmitCommand(next, SimulationTick.Zero.Next());
+        }
         scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
         Assert.True(queue.Accepted);
+        if (next is not null) Assert.True(next.Accepted);
         Assert.Equal(UnitProductionStatus.NoInput, entities.GetComponent<UnitProductionFacility>(factory).Status);
         Assert.Equal(UnitIds.MainBattleTank, entities.GetComponent<UnitProductionFacility>(factory).ActiveUnit);
         LogisticsStockPolicy ammunition = FindStockPolicy(entities, factory, ResourceIds.Ammunition);
-        Assert.Equal(LogisticsStockPriority.High, ammunition.Priority);
-        Assert.Equal(50, ammunition.DesiredMinimum);
+        Assert.Equal(queuedSuccessor ? LogisticsStockPriority.Critical : LogisticsStockPriority.High, ammunition.Priority);
+        Assert.Equal(queuedSuccessor ? 60 : 50, ammunition.DesiredMinimum);
         Assert.Equal(120, ammunition.DesiredTarget);
         Assert.Equal(240, ammunition.DesiredMaximum);
         Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, factory, ResourceIds.Steel).Priority);

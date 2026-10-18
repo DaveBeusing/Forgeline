@@ -2900,6 +2900,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 EntityId.Invalid;
             Vector3 destination = default;
             float bestDistance = float.PositiveInfinity;
+            bool bestCoversCargo = false;
+            double fuelDeficit = Math.Max(0, truck.FuelTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel));
+            double ammunitionDeficit = Math.Max(0, truck.AmmunitionTarget - _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition));
             foreach (var candidate in owned.SupplyDepots)
             {
                 if (!context.Entities.TryGetComponent(candidate.Entity, out SupplyDepot depot) ||
@@ -2931,7 +2934,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         candidate.Entity,
                         candidate.Position,
                         transform.Position);
-                if (distance < bestDistance)
+                bool coversCargo = _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Fuel) + 1e-9 >= fuelDeficit &&
+                    _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Ammunition) + 1e-9 >= ammunitionDeficit;
+                if (!loadingSource.IsValid || coversCargo && !bestCoversCargo || coversCargo == bestCoversCargo &&
+                    (distance < bestDistance || distance == bestDistance && candidate.Entity < loadingSource))
                 {
                     loadingSource =
                         candidate.Entity;
@@ -2939,6 +2945,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         candidate.Position;
                     bestDistance =
                         distance;
+                    bestCoversCargo = coversCargo;
                 }
             }
 
@@ -2968,13 +2975,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         commandCoreTransform.Position,
                         transform.Position);
 
-                if (!loadingSource.IsValid ||
+                bool coreCoversCargo = _inventories.GetAvailableQuantity(commandCoreProvider.InventoryId, ResourceIds.Fuel) + 1e-9 >= fuelDeficit &&
+                    _inventories.GetAvailableQuantity(commandCoreProvider.InventoryId, ResourceIds.Ammunition) + 1e-9 >= ammunitionDeficit;
+                if (!loadingSource.IsValid || coreCoversCargo && !bestCoversCargo || coreCoversCargo == bestCoversCargo && (
                     commandCoreDistance <
                         bestDistance ||
                     (commandCoreDistance ==
                         bestDistance &&
                      controller.PreferredConstructionSource <
-                        loadingSource))
+                        loadingSource)))
                 {
                     loadingSource =
                         controller.PreferredConstructionSource;
@@ -3246,14 +3255,20 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             bool blockedLogisticsProduction =
                 facility.Supports(UnitProductionCapability.Logistics) &&
                 facility.Status == UnitProductionStatus.NoInput;
+            bool initialVehiclePipeline = facility.Status == UnitProductionStatus.Running &&
+                facility.Supports(UnitProductionCapability.Vehicle) &&
+                (GetUnitCount(owned, UnitIds.SupplyTruck) < configuration.MinimumSupplyTrucks ||
+                 GetUnitCount(owned, UnitIds.ScoutVehicle) < 1 ||
+                 GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits);
             bool formingInitialForce = plannedUnit == UnitIds.RifleSquad &&
                 facility.Status == UnitProductionStatus.NoInput &&
                 context.Entities.TryGetComponent(entity, out PowerConsumer productionPower) && productionPower.State == PowerOperationalState.Powered &&
-                owned.CombatUnits.Count - (GetUnitCount(owned, UnitIds.ScoutVehicle) > 0 ? 1 : 0) < configuration.MinimumAttackUnits;
+                GetUnitCount(owned, UnitIds.RifleSquad) < Math.Max(1,
+                    configuration.MinimumAttackUnits - configuration.MinimumObjectivePressureUnits);
             LogisticsStockPriority productionPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||
-                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction || formingInitialForce
+                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction || formingInitialForce || initialVehiclePipeline
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 
@@ -3280,7 +3295,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             LogisticsStockPriority fuelPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||
-                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction || formingInitialForce
+                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction || formingInitialForce || initialVehiclePipeline
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 
@@ -3367,20 +3382,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             resource,
             ref minimum);
 
+        double needed = Math.Max(UnitCost(plannedUnit, resource), UnitCost(facility.ActiveUnit, resource));
+        UnitId successor = ResolveQueuedSuccessor(context.Entities, entity, facility);
+        if (successor.IsSpecified)
+            needed = (facility.InputsReserved ? 0 : UnitCost(facility.ActiveUnit, resource)) + UnitCost(successor, resource);
+        minimum = Math.Max(minimum, needed);
         target = Math.Max(target, minimum);
         maximum = Math.Max(maximum, target);
-        if (priority == LogisticsStockPriority.Critical && facility.Status == UnitProductionStatus.NoInput)
-        {
-            double needed = 0;
-            if (_units.TryGet(plannedUnit, out UnitDefinition? planned))
-                foreach (UnitResourceCost cost in planned.Costs)
-                    if (cost.ResourceId == resource) needed = Math.Max(needed, cost.Quantity);
-            if (_units.TryGet(facility.ActiveUnit, out UnitDefinition? active))
-                foreach (UnitResourceCost cost in active.Costs)
-                    if (cost.ResourceId == resource) needed = Math.Max(needed, cost.Quantity);
-            if (needed <= 1e-9 || _inventories.GetAvailableQuantity(facility.InputInventory, resource) + 1e-9 >= needed)
-                priority = LogisticsStockPriority.High;
-        }
+        if (priority == LogisticsStockPriority.Critical && facility.Status == UnitProductionStatus.NoInput &&
+            (needed <= 1e-9 || _inventories.GetAvailableQuantity(facility.InputInventory, resource) + 1e-9 >= needed))
+            priority = LogisticsStockPriority.High;
         SetStockPolicy(
             context,
             facility.Owner,
@@ -3392,6 +3403,34 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             priority);
     }
 
+    private double UnitCost(UnitId unitId, ResourceId resource)
+    {
+        if (_units.TryGet(unitId, out UnitDefinition? unit))
+            foreach (UnitResourceCost cost in unit.Costs)
+                if (cost.ResourceId == resource) return cost.Quantity;
+        return 0;
+    }
+
+    private static UnitId ResolveQueuedSuccessor(EntityRegistry entities, EntityId factory, in UnitProductionFacility facility)
+    {
+        if (!facility.ActiveRequest.IsValid) return UnitId.None;
+        EntityId selected = EntityId.Invalid;
+        UnitProductionRequest best = default;
+        foreach (EntityId entity in entities.Query<UnitProductionRequest>(QueryIterationOrder.StableByEntityIndex))
+        {
+            var request = entities.GetComponent<UnitProductionRequest>(entity);
+            if (request.Facility != factory || entity == facility.ActiveRequest ||
+                entities.HasComponent<UnitProductionCancellationRequest>(entity)) continue;
+            if (!selected.IsValid || request.Priority.CompareTo(best.Priority) < 0 ||
+                request.Priority == best.Priority && (request.SubmittedAtTick < best.SubmittedAtTick ||
+                    request.SubmittedAtTick == best.SubmittedAtTick && entity < selected))
+            {
+                selected = entity;
+                best = request;
+            }
+        }
+        return selected.IsValid ? best.UnitId : UnitId.None;
+    }
     private UnitId ResolveUnitProductionPlanningUnit(
         OwnedState owned,
         in UnitProductionFacility facility,
@@ -3486,7 +3525,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         int industry = owned.CombatUnits.Count > configuration.MinimumAttackUnits &&
             GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits
-            ? owned.ProductionFacilities.Count : Math.Min(owned.ProductionFacilities.Count, 3);
+            ? Math.Min(owned.ProductionFacilities.Count, reserveForExpansion ? 4 : 3) : Math.Min(owned.ProductionFacilities.Count, 3);
         int demand = Math.Max(owned.SupplyDepots.Count + (reserveForExpansion ? 1 : 0), industry);
         return Math.Max(configuration.MinimumCargoTrucks, Math.Clamp(demand, 2, 4));
     }
