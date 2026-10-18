@@ -397,3 +397,39 @@ solution run must include the concurrent large-import classes as well.
 
 The previous frame-elapsed p99 +15.38% failure and independent native review remain
 open. None of these gameplay/CI results release the later parallel workstreams.
+
+
+## Queue-enabled qualification and exhausted AI loading trips
+
+Combined source c9230e4a integrates master fb78998c and advances the PR once to
+0.1.404, above master's 0.1.403. Both combined and unchanged-master builds finish
+without warnings/errors. The combined complete solution passes 2,730 tests with
+17 explicit optional skips, 2,747 total, zero failures, 20m52.278s. This includes
+the large-import classes and the now-exclusive writer collection. The graph has
+47 projects with no cycles, and serial ownership/version validation passes.
+
+The original seed-2026 match remains nonterminal on both queue-enabled binaries:
+227 deliveries, 21,971 cargo units and 138 artillery shots. An endpoint snapshot
+shows combat-ready units and partially stocked Supply Trucks still bound to old
+SourceEmpty loading orders. Normal dispatch needs 50% cargo Fuel and 25% cargo
+Ammunition, but reconsidering an exhausted trip attempts the full targets even
+when no compatible source can supply all remaining cargo. That order excludes
+the otherwise useful provider from reconnaissance/attack supply admission.
+
+Finish this AI-planned exhausted trip when its existing cargo dispatch minimums
+are met and no source can fill the remainder. Preserve full-refill selection when
+a source can do so; below-minimum trucks retain loading/recovery. A dock visit or
+queue registration still prevents release, and active recipient service retains
+its existing ownership. Remove only the obsolete loading obligation; rescue
+movement is preserved. The command-core candidate now propagates its actual
+covers-cargo result, which this completion decision needs.
+
+The new policy regression fails before the change. Six cases include exact
+minimums, empty cargo, each insufficient commodity and an available full source.
+The older no-replacement case now checks the completed partial trip, conserved
+cargo and absence of dock/queue ownership. Original strategic deadlines and
+readiness thresholds remain unchanged. All 551 Game tests pass afterward.
+The required 80,000-tick terminal match remains to be rerun on this source.
+Fixture-5 native pairs use the current unchanged master, retaining the same
+128 warmups / 512 samples, B-A-A-B order, two readbacks and 15% gate. Earlier
+failed fixture-3/4 protocols remain historical evidence and are not reclassified.

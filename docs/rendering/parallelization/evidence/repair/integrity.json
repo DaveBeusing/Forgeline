@@ -467,5 +467,40 @@
     "file": "gameplay-investigation/gameplay-final-full-solution.log.gz",
     "originalSha256": "B8CB8D6372905067A90C4F49918BED2A5B088706EC68DE3B7E8EF8E95617C249",
     "compressedSha256": "1FBA9545D1901CAFD45B661F509267FD8334848CD46E169FE9FD167E1FBEB61B"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-full-solution.log.gz",
+    "originalSha256": "05C9ECEA534AA6D2E83C981F599196C5C72A5C6B73E90EBB4C985C6B6D76A98A",
+    "compressedSha256": "4FCE4B19939FF35549BD2B90AE08DFB022196DD657A27FA375E8BAD71DC61433"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-opponent.json.gz",
+    "originalSha256": "22556C6EF266F3E55129811D9FB6141E6668C101F773BFC1DA9ED28D63355672",
+    "compressedSha256": "83BDB8ACBBC3789DF9D9AE8E4493D52472F9737B986713AFD243FF007783DF15"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-opponent.save.json.gz",
+    "originalSha256": "6E9819FDCBC13638F68D6E0F15DEBDFB36D54DF1CD2168444706D01F13144241",
+    "compressedSha256": "3AE915408F04D40BE9F8DF032F84BB9B9053EE6780D47164F49CD53DF334D5D7"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-master-opponent.json.gz",
+    "originalSha256": "D59462609924B580B25308F8B59616D538ECE0D9847895C31800F1A786D20842",
+    "compressedSha256": "67C7621FF1695FDBA3E660873DCF525E2E1498B029669169A36ABDB4EBB618EC"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-master-opponent.save.json.gz",
+    "originalSha256": "88F34505DA43FF2F0DCDDE9F5FA1CD2A5F764957F71D71987A0B8A8FEA4112BF",
+    "compressedSha256": "7079EAA281414412D0769925625ED1033A75220BE59200810C2738AB9BA396D0"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-dispatch-before.log.gz",
+    "originalSha256": "862B7C18407F637A04387C9B296497534805B9D4B017FACCE7896B0ADAC55A28",
+    "compressedSha256": "F31DBB9AFD0DF3345E8D54A218F60686DE7FB200931A07565DF9308B1CD73AF8"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-dispatch-game-suite.log.gz",
+    "originalSha256": "A8452ECF958E66BCFEC2C0CDC7E1A935F21C2957B1EAF2D055CD07CF6D3EBDE4",
+    "compressedSha256": "77645D3F6E1CCE96AE381CC5BDB4FD300BF426A7D808C5A2A72597596C9B41C6"
   }
 ]

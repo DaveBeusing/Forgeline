@@ -2851,7 +2851,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             // Source selection is bounded by strategic decision cadence. The Supply phase
             // may renew its retry before every planning decision; sharing that deadline can starve selection forever.
             if (reconsiderSource && (loading.WaitReason != VehicleDockBlockReason.SourceEmpty ||
-                context.Entities.HasComponent<VehicleDockVisit>(entity)))
+                context.Entities.HasComponent<VehicleDockVisit>(entity) ||
+                context.Entities.HasComponent<VehicleQueueEntry>(entity)))
                 continue;
 
             bool hasMovement =
@@ -2997,9 +2998,23 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         commandCoreTransform.Position;
                     bestDistance =
                         commandCoreDistance;
+                    bestCoversCargo = coreCoversCargo;
                 }
             }
 
+            // An exhausted trip need not bind an already usable field provider
+            // forever. Keep the existing dispatch thresholds and finish only
+            // after physical exit, when no source can satisfy the remaining load.
+            if (reconsiderSource && !bestCoversCargo &&
+                _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel) >= truck.FuelTarget * 0.50 - 1e-9 &&
+                _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition) >= truck.AmmunitionTarget * 0.25 - 1e-9)
+            {
+                if (loadingMovement && !context.Entities.HasComponent<SupplyRescueAssignment>(entity))
+                    new StopMovementCommand(truck.Owner, [entity], context.Tick).Execute(context);
+                if (context.Entities.HasComponent<SupplyLoadingOrder>(entity))
+                    context.Entities.RemoveComponent<SupplyLoadingOrder>(entity);
+                continue;
+            }
             if (!float.IsFinite(bestDistance))
             {
                 continue;

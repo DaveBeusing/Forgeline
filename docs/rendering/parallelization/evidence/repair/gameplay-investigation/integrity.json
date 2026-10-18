@@ -141,6 +141,41 @@
       "file": "gameplay-final-full-solution.log.gz",
       "rawSha256": "b8cb8d6372905067a90c4f49918bed2a5b088706ec68de3b7e8ef8e95617c249",
       "archiveSha256": "1fba9545d1901cafd45b661f509267fd8334848cd46e169fe9fd167e1fbeb61b"
+    },
+    {
+      "file": "foundation-queue-full-solution.log.gz",
+      "rawSha256": "05c9ecea534aa6d2e83c981f599196c5c72a5c6b73e90ebb4c985c6b6d76a98a",
+      "archiveSha256": "4fce4b19939ff35549bd2b90ae08dfb022196dd657a27fa375e8bad71dc61433"
+    },
+    {
+      "file": "foundation-queue-opponent.json.gz",
+      "rawSha256": "22556c6ef266f3e55129811d9fb6141e6668c101f773bfc1da9ed28d63355672",
+      "archiveSha256": "83bdb8acbbc3789df9d9ae8e4493d52472f9737b986713afd243ff007783df15"
+    },
+    {
+      "file": "foundation-queue-opponent.save.json.gz",
+      "rawSha256": "6e9819fdcbc13638f68d6e0f15debdfb36d54df1cd2168444706d01f13144241",
+      "archiveSha256": "3ae915408f04d40be9f8df032f84bb9b9053ee6780d47164f49cd53df334d5d7"
+    },
+    {
+      "file": "foundation-queue-master-opponent.json.gz",
+      "rawSha256": "d59462609924b580b25308f8b59616d538ece0d9847895c31800f1a786d20842",
+      "archiveSha256": "67c7621ff1695fdba3e660873dcf525e2e1498b029669169a36abdb4ebb618ec"
+    },
+    {
+      "file": "foundation-queue-master-opponent.save.json.gz",
+      "rawSha256": "88f34505da43ff2f0dcdde9f5fa1cd2a5f764957f71d71987a0b8a8fea4112bf",
+      "archiveSha256": "7079eaa281414412d0769925625ed1033a75220be59200810c2738ab9ba396d0"
+    },
+    {
+      "file": "foundation-queue-dispatch-before.log.gz",
+      "rawSha256": "862b7c18407f637a04387c9b296497534805b9d4b017facce7896b0adac55a28",
+      "archiveSha256": "f31dbb9afd0df3345e8d54a218f60686de7fb200931a07565df9308b1cd73af8"
+    },
+    {
+      "file": "foundation-queue-dispatch-game-suite.log.gz",
+      "rawSha256": "a8452ecf958e66bcfec2c0cdc7e1a935f21c2957b1eaf2d055cd07cf6d3ebde4",
+      "archiveSha256": "77645d3f6e1cce96ae381cc5bdb4fd300bf426a7d808c5a2a72597596c9b41c6"
     }
   ]
 }
