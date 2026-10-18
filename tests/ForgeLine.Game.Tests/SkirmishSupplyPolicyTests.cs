@@ -10,6 +10,63 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class SkirmishSupplyPolicyTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void WaitingReconnaissanceRecoversDepartureFuelWithoutChangingAnAdvancingScout(bool advancing)
+    {
+        var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using var scenario = CentralDivideScenario.Create(settings);
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(2));
+        Vector3 forward = entities.GetComponent<WorldTransform>(side.CommandCore).Position - Vector3.UnitX * 900;
+        var catalog = DirectorateContent.CreateUnitCatalog();
+        EntityId scout = scenario.UnitFactory.Create(catalog[UnitIds.ScoutVehicle], forward, side.Player);
+        scenario.Simulation.RunTicks(30, TestContext.Current.CancellationToken);
+        forward = entities.GetComponent<WorldTransform>(scout).Position;
+        var policy = new AutomaticResupplyPolicy(
+            settings.OpponentConfigurations[side.Player.Value].ResupplyThreshold,
+            settings.OpponentConfigurations[side.Player.Value].ResupplyThreshold, enabled: true);
+        if (entities.HasComponent<AutomaticResupplyPolicy>(scout)) entities.SetComponent(scout, policy);
+        else entities.AddComponent(scout, policy);
+        UnitFuelState fuel = entities.GetComponent<UnitFuelState>(scout);
+        Assert.True(scenario.Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel,
+            scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) - fuel.Capacity * 0.30).Succeeded);
+        scenario.Simulation.SubmitCommand(new AttackMoveCommand(side.Player, [scout],
+            advancing ? forward - Vector3.UnitX * 300 : forward, scenario.Simulation.CurrentTick,
+            FormationTemplate.Column, pursuitLeashMeters: 90), scenario.Simulation.CurrentTick.Next());
+
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+
+        double remaining = scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) / fuel.Capacity;
+        if (advancing)
+            Assert.InRange(remaining, settings.OpponentConfigurations[side.Player.Value].ResupplyThreshold, 0.30);
+        else
+        {
+            Vector3 waiting = entities.GetComponent<WorldTransform>(scout).Position;
+            EntityId escort = scenario.UnitFactory.Create(catalog[UnitIds.SupplyTruck], waiting + Vector3.UnitZ * 300, side.Player);
+            SupplyTruck supply = entities.GetComponent<SupplyTruck>(escort);
+            Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, supply.FuelTarget).Succeeded);
+            Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, supply.AmmunitionTarget).Succeeded);
+            scenario.Simulation.RunTicks(2UL * settings.OpponentConfigurations[side.Player.Value].ReactionCadenceTicks,
+                TestContext.Current.CancellationToken);
+            Assert.True(entities.TryGetComponent(scout, out ResupplyOrder requested),
+                "Waiting reconnaissance did not request its available physical provider.");
+            Assert.Equal(escort, requested.Provider);
+            // A 300m trip already needs over 23s at the truck's authored top
+            // speed, before turns and transfers. Allow one physical minute.
+            scenario.Simulation.RunTicks(1200, TestContext.Current.CancellationToken);
+            remaining = scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) / fuel.Capacity;
+            Assert.True(remaining > settings.OpponentConfigurations[side.Player.Value].OffensiveFuelThreshold,
+                $"Waiting reconnaissance remained stranded at fuel {remaining:F4}; " +
+                $"policy={entities.GetComponent<AutomaticResupplyPolicy>(scout)}; " +
+                $"order={(entities.TryGetComponent(scout, out CombatOrderState diagnosticOrder) ? diagnosticOrder : default)}; " +
+                $"readiness={entities.GetComponent<UnitCombatReadiness>(scout)}; " +
+                $"provider={entities.GetComponent<WorldTransform>(escort).Position}; " +
+                $"resupply={entities.HasComponent<ResupplyOrder>(scout)}.");
+        }
+    }
+
     [Fact]
     public void ReconnaissanceWaitsForReplacementAfterItsPhysicalEscortIsLost()
     {

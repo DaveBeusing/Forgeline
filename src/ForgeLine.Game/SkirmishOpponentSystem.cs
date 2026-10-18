@@ -5955,7 +5955,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         if (reconnaissanceUnit)
         {
-            return configuration.ResupplyThreshold;
+            // A paused mission needs the same fuel reserve as FindIdleUnit
+            // requires to depart. Continuing reconnaissance keeps its budget.
+            bool awaitingDeparture =
+                !context.Entities.TryGetComponent(unit, out CombatOrderState reconnaissanceOrder) ||
+                reconnaissanceOrder.Kind is CombatOrderKind.HoldPosition or CombatOrderKind.Retreat ||
+                (reconnaissanceOrder.Kind == CombatOrderKind.AttackMove && reconnaissanceOrder.HasDestination &&
+                 HorizontalDistanceSquared(reconnaissanceOrder.AnchorPosition, reconnaissanceOrder.Destination) <= 16.0f);
+            return awaitingDeparture
+                ? configuration.OffensiveFuelThreshold
+                : configuration.ResupplyThreshold;
         }
 
         if (context.Entities.TryGetComponent(
