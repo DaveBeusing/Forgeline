@@ -3572,7 +3572,27 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits
             ? Math.Min(owned.ProductionFacilities.Count, reserveForExpansion ? 4 : 3) : Math.Min(owned.ProductionFacilities.Count, 3);
         int demand = Math.Max(owned.SupplyDepots.Count + (reserveForExpansion ? 1 : 0), industry);
-        return Math.Max(configuration.MinimumCargoTrucks, Math.Clamp(demand, 2, 4));
+        int maximum = 4;
+        bool assaultFleetEstablished =
+            GetUnitCount(owned, UnitIds.ScoutVehicle) >= 1 &&
+            GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits &&
+            GetUnitCount(owned, UnitIds.MobileArtillery) >= 1 &&
+            GetUnitCount(owned, UnitIds.SupplyTruck) >=
+                configuration.ResolveMatureSupplyTruckTarget(owned.SupplyDepots.Count);
+        if (assaultFleetEstablished && owned.SupplyDepots.Count >= 2 &&
+            GetBuildingCount(owned, BuildingIds.Smelter) > 0 &&
+            GetBuildingCount(owned, BuildingIds.Refinery) > 0 &&
+            GetBuildingCount(owned, BuildingIds.ElectronicsPlant) > 0 &&
+            GetBuildingCount(owned, BuildingIds.AmmunitionPlant) > 0)
+        {
+            // The completed processing chain and forward depots have independent
+            // delivery routes. Their demand adds up; sharing the larger count
+            // leaves the mature fleet at its bootstrap limit indefinitely.
+            demand = Math.Min(owned.ProductionFacilities.Count, 4) +
+                owned.SupplyDepots.Count + (reserveForExpansion ? 1 : 0);
+            maximum = 8;
+        }
+        return Math.Max(configuration.MinimumCargoTrucks, Math.Clamp(demand, 2, maximum));
     }
     private static bool RequiresCargoReplacementReserve(
         OwnedState owned,

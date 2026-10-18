@@ -114,7 +114,8 @@
         "tests/ForgeLine.Game.Tests/GroundMovementPrecisionTests.cs",
         "tests/ForgeLine.Assets.Tests/AssetWriterQualificationGroup.cs",
         "src/ForgeLine.Game/SkirmishOpponentSystem.cs",
-        "tests/ForgeLine.Game.Tests/SkirmishSupplyPolicyTests.cs"
+        "tests/ForgeLine.Game.Tests/SkirmishSupplyPolicyTests.cs",
+        "tests/ForgeLine.Game.Tests/SkirmishProductionPolicyTests.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",
