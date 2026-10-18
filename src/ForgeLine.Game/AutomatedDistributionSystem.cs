@@ -366,6 +366,12 @@ public sealed class AutomatedDistributionSystem
                     return priorityComparison;
                 }
 
+                if (GetEffectivePriority(left, context.Tick, context.Entities) == (int)LogisticsStockPriority.Critical)
+                {
+                    int recovery = RecoveryDispatchRank(left, context.Entities).CompareTo(RecoveryDispatchRank(right, context.Entities));
+                    if (recovery != 0) return recovery;
+                }
+
                 int ageComparison =
                     left.WaitingSinceTick.CompareTo(right.WaitingSinceTick);
 
@@ -950,6 +956,16 @@ public sealed class AutomatedDistributionSystem
             agingSteps);
 
         return basePriority - boundedAging;
+    }
+
+    private int RecoveryDispatchRank(RequestState request, EntityRegistry entities)
+    {
+        if (!_network.TryGetNode(request.Destination, out LogisticsNode node) ||
+            !entities.HasComponent<BuildingLoadingDock>(node.Entity)) return 1;
+        if (entities.HasComponent<SupplyDepot>(node.Entity) && request.ResourceId == ResourceIds.Fuel) return 0;
+        return entities.TryGetComponent(node.Entity, out UnitProductionFacility facility) &&
+            facility.Status == UnitProductionStatus.NoInput &&
+            entities.TryGetComponent(node.Entity, out PowerConsumer power) && power.State == PowerOperationalState.Powered ? 0 : 1;
     }
 
     private void DelayRequest(

@@ -320,6 +320,43 @@ public sealed class VehicleDockingIntegrationTests
         Assert.False(simulation.Entities.HasComponent<MovementOrder>(supply));
     }
 
+    [Fact]
+    public void PoweredFactoryInputRecoveryDoesNotWaitBehindBulkProcessingStock()
+    {
+        var simulation = new SimulationCoordinator();
+        var inventories = new InventoryStore();
+        var network = new LogisticsNetwork();
+        var cargo = new CargoTransportSystem(network, inventories);
+        simulation.RegisterSystem(new AutomatedDistributionSystem(network, inventories, cargo));
+        simulation.RegisterSystem(new UnitProductionSystem(DirectorateContent.CreateUnitCatalog(), inventories,
+            new UnitFactory(simulation.Entities, inventories, cargo)));
+        var source = CreateBuilding(simulation, inventories, Vector3.Zero);
+        var processing = CreateBuilding(simulation, inventories, new(120, 0, 0));
+        var factory = CreateBuilding(simulation, inventories, new(240, 0, 0));
+        Assert.True(inventories.Add(source.Inventory, ResourceIds.Steel, 200).Succeeded);
+        var origin = network.AddNode(source.Entity, Vector3.Zero, LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoSource);
+        var olderTarget = network.AddNode(processing.Entity, new(120, 0, 0), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
+        var factoryTarget = network.AddNode(factory.Entity, new(240, 0, 0), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
+        network.AddEdge(origin, olderTarget, LogisticsTransportMode.GroundRoad, 120, 120, 100);
+        network.AddEdge(origin, factoryTarget, LogisticsTransportMode.GroundRoad, 240, 240, 100);
+        foreach (var target in new[] { processing, factory })
+        {
+            var policy = simulation.Entities.CreateEntity();
+            simulation.Entities.AddComponent(policy, new LogisticsStockPolicy(target.Entity, ResourceIds.Steel, 20, 80, 100, LogisticsStockPriority.Critical));
+        }
+        simulation.Entities.AddComponent(factory.Entity, new UnitProductionFacility(factory.Inventory,
+            UnitProductionCapability.Vehicle, new(1), Vector3.UnitZ * 32, SimulationTick.Zero));
+        simulation.Entities.AddComponent(factory.Entity, new PowerConsumer(1, allocatedPower: 1, state: PowerOperationalState.Powered));
+        var request = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(request, new UnitProductionRequest(factory.Entity, UnitIds.ScoutVehicle,
+            ProductionPriority.Normal, SimulationTick.Zero));
+        simulation.AdvanceOneTick();
+        Assert.Equal(UnitProductionStatus.NoInput, simulation.Entities.GetComponent<UnitProductionFacility>(factory.Entity).Status);
+        var truck = CargoTruckFactory.Create(simulation.Entities, inventories, Vector3.Zero, new(1), cargo);
+        simulation.RunTicks(100, TestContext.Current.CancellationToken);
+        Assert.Equal(factoryTarget, simulation.Entities.GetComponent<CargoTransportOrder>(truck).Destination);
+    }
+
     private static string VisitDescription(SimulationCoordinator simulation, EntityId truck) =>
         simulation.Entities.TryGetComponent(truck, out VehicleDockVisit visit) ? visit.ToString() : "none";
 
