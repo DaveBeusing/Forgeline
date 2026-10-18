@@ -149,6 +149,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
     public bool AssetsPrepared => _runtimeAssets?.IsPrepared == true;
     public RenderAssetFrameMetrics? AssetFrameMetrics => _runtimeAssets?.Metrics;
 
+    public void ObserveFrameDiagnostics(GraphicsDiagnostics diagnostics)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(diagnostics);
+        _runtimeAssets?.ObserveFrameDiagnostics(diagnostics);
+    }
+
     public void Prepare(RtsCamera camera, RenderWorld world, in RenderPreparationRequest request, ParticleVfxRenderer? particles = null)
     {
         ThrowIfDisposed();

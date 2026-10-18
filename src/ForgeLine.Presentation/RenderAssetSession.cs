@@ -25,7 +25,8 @@ internal sealed class RenderAssetSession : IDisposable
     private long _recordStarted;
     private double? _prepareMs, _recordMs, _submitMs, _retireMs;
     private ulong? _fence;
-    private long _uploadsBefore;
+    private long? _uploadsBefore, _observedUploads;
+    private bool _submitted;
     private long? _uploadCount, _logicalBytes;
     private ulong? _dxgiBytes;
     private string? _failure;
@@ -52,7 +53,9 @@ internal sealed class RenderAssetSession : IDisposable
         _explicitFrames = true; _phase = Phase.Preparing; _sequence++; _session = session; _tick = tick;
         _prepareMs = _recordMs = _submitMs = _retireMs = null; _fence = null;
         _uploadCount = _logicalBytes = null; _dxgiBytes = null; _failure = null;
-        if (MetricsEnabled) _uploadsBefore = _graphics.Diagnostics.Resources.TextureUploadCount;
+        if (!MetricsEnabled) _observedUploads = null;
+        _uploadsBefore = MetricsEnabled ? _observedUploads : null;
+        _submitted = false;
         _started = MetricsEnabled ? Stopwatch.GetTimestamp() : 0;
     }
     internal void EndPrepare()
@@ -84,17 +87,29 @@ internal sealed class RenderAssetSession : IDisposable
         if (_graphics.IsRecording || _phase != Phase.Recording)
             throw new InvalidOperationException("Submit follows completed command recording.");
         long start = MetricsEnabled ? Stopwatch.GetTimestamp() : 0;
-        if (MetricsEnabled)
+        _submitted = true;
+        _phase = Phase.Submitted;
+        if (MetricsEnabled) _submitMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+    }
+    // Consume the caller's existing observation outside the measured frame. Never
+    // poll the adapter or allocate diagnostic snapshots from Prepare/Submit.
+    internal void ObserveFrameDiagnostics(GraphicsDiagnostics diagnostics)
+    {
+        CheckOwner();
+        ArgumentNullException.ThrowIfNull(diagnostics);
+        if (_graphics.IsRecording || _phase is not (Phase.Idle or Phase.Submitted))
+            throw new InvalidOperationException("Observe diagnostics after CPU submission.");
+        if (!MetricsEnabled) return;
+        long uploads = diagnostics.Resources.TextureUploadCount;
+        if (_submitted)
         {
-            GraphicsDiagnostics diagnostics = _graphics.Diagnostics;
             _fence = diagnostics.Frame?.GpuSubmissionFence;
-            _uploadCount = diagnostics.Resources.TextureUploadCount - _uploadsBefore;
+            _uploadCount = _uploadsBefore is { } before && uploads >= before ? uploads - before : null;
             _logicalBytes = diagnostics.Resources.ResidentTextureBytes;
             _dxgiBytes = diagnostics.Memory is { Available: true } memory ? memory.LocalUsageBytes : null;
             _failure = diagnostics.Health.FailureReasonCode;
         }
-        _phase = Phase.Submitted;
-        if (MetricsEnabled) _submitMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+        _observedUploads = uploads;
     }
     internal void Retire()
     {
