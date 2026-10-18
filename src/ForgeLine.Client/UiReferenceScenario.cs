@@ -17,6 +17,7 @@ internal enum UiReferenceScenario
     SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed,
     SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary, ResourceUnknown, SelectedGroup,
     Operations, OperationsEmpty, OperationsMissing, ProductionQueue, LogisticsBlocked, SupplyPolicy, TechnologyBlocked, DockQueueTooltip, DockTechnologyTooltip,
+    LogisticsInputs, LogisticsPolicyTooltip,
     NotificationsCollapsed, NotificationsExpanded, NotificationDetails,
     OnboardingClosing25, OnboardingClosing50, OnboardingClosing75, OnboardingCollapsed,
     OnboardingOpening25, OnboardingOpening50, OnboardingOpening75,
@@ -138,7 +139,7 @@ internal static class UiReferenceStates
         };
         var mode = state is UiReferenceScenario.Technology or UiReferenceScenario.TechnologyBlocked or UiReferenceScenario.DockTechnologyTooltip ? PlayerActionPanelMode.Technology :
             state == UiReferenceScenario.ProductionQueue ? PlayerActionPanelMode.Production :
-            state == UiReferenceScenario.LogisticsBlocked ? PlayerActionPanelMode.Logistics :
+            state is UiReferenceScenario.LogisticsBlocked or UiReferenceScenario.LogisticsInputs or UiReferenceScenario.LogisticsPolicyTooltip ? PlayerActionPanelMode.Logistics :
             state == UiReferenceScenario.SupplyPolicy ? PlayerActionPanelMode.Supply :
             state == UiReferenceScenario.Targeting ? PlayerActionPanelMode.Tactical :
             state is UiReferenceScenario.Contacts or UiReferenceScenario.DockFocus or UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed
@@ -148,6 +149,8 @@ internal static class UiReferenceStates
             state is UiReferenceScenario.QueueBlocked or UiReferenceScenario.DockQueueTooltip ? 2 : 0,
             HoveredIndex = state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed ? 1 : -1,
             PointerPressed = state == UiReferenceScenario.DockPressed };
+        if (state == UiReferenceScenario.LogisticsInputs)
+            panel = panel with { SelectedIndex = snapshot.PlayerActions!.Logistics!.Policies.Count, LogisticsSteps = 1 };
         if (state is UiReferenceScenario.ResourcePressure or UiReferenceScenario.LowPower or UiReferenceScenario.SupplyCritical or UiReferenceScenario.MixedSelection)
         {
             snapshot = BattlefieldHudCapture.State(snapshot, state == UiReferenceScenario.SupplyCritical ? "Supply" :

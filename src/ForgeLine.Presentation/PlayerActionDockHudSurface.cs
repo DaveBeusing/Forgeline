@@ -617,6 +617,7 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
             PlayerCargoStatusReadModel cargo)
         {
             text.Append("CARGO ");
+            if (!string.IsNullOrEmpty(cargo.ResourceName)) { text.Append(cargo.ResourceName); text.Append(" "); }
             text.Append(
                 cargo.CargoQuantity,
                 "F0");
@@ -647,7 +648,9 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
             return;
         }
 
-        text.Append("POLICY ");
+        if (panel.SelectedIndex >= logistics.Policies.Count)
+        { text.Append("ADDITIONAL STEPS "); text.Append(panel.LogisticsSteps); text.Append(" / USE INPUTS PREPARES EDITOR"); return; }
+        text.Append(panel.StockPreview.Length > 0 ? "DRAFT " : "POLICY ");
         text.Append(
             panel.StockMinimum,
             "F0");
@@ -689,6 +692,13 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
 
         PlayerSupplyActionReadModel value =
             supply.Value;
+        if (value.IsStaticProvider)
+        {
+            if (!value.HasLocalProviderInventory) { text.Append("PROVIDER INVENTORY UNAVAILABLE"); return; }
+            text.Append("LOCAL PROVIDER FUEL "); text.Append(value.LocalProviderFuel,"F0");
+            text.Append(" AMMO "); text.Append(value.LocalProviderAmmunition,"F0");
+            text.Append(" / LOGISTICS FOR STOCK POLICY"); return;
+        }
 
         text.Append(
             SelectionInspectorHudModel.ResolveSupplyLabel(
@@ -973,9 +983,12 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
                 }
                 break;
             case PlayerActionPanelMode.Logistics:
-                var stock = actions.Logistics!.Policies[index];
+                if (index >= actions.Logistics!.Policies.Count)
+                { text.Append("CATALOG INPUT PREVIEW / EDIT STEP COUNT / NO POLICY CHANGE"); break; }
+                var stock = actions.Logistics.Policies[index];
                 if (productionSkin) { text.Append("STOCK "); text.Append(stock.CurrentQuantity, "F0"); text.Append(" / "); }
-                text.Append("MIN "); text.Append(stock.DesiredMinimum, "F0"); text.Append(" MAX "); text.Append(stock.DesiredMaximum, "F0");
+                text.Append("FREE "); text.Append(stock.AvailableQuantity, "F0"); text.Append(" / RESERVED "); text.Append(stock.ReservedQuantity, "F0");
+                text.Append(" / INCOMING "); text.Append(stock.AnnouncedQuantity, "F0");
                 text.Append(stock.Enabled ? " / ENABLED" : " / DISABLED");
                 break;
             case PlayerActionPanelMode.Supply:
@@ -1196,9 +1209,12 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
 
             case PlayerActionPanelMode.Logistics:
             {
-                PlayerStockPolicyActionReadModel policy =
-                    actions.Logistics!.Policies[
-                        index];
+                if (index >= actions.Logistics!.Policies.Count)
+                {
+                    var requirement = actions.Logistics.Requirements[index - actions.Logistics.Policies.Count];
+                    text.Append("USE INPUTS / "); AppendAmounts(ref text, requirement.Inputs); break;
+                }
+                PlayerStockPolicyActionReadModel policy = actions.Logistics.Policies[index];
                 text.Append("STOCK ");
                 text.Append(
                     policy.CurrentQuantity,
@@ -1216,6 +1232,9 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
                     text.Append(" NO POLICY");
                 }
 
+                text.Append(" REQUESTED "); text.Append(policy.RequestedQuantity, "F0");
+                if (policy.Service.VehicleQueue is { } queue)
+                { text.Append(" "); text.Append(LogisticsStatusCatalog.Service(policy.Service)); text.Append(" POS "); text.Append(queue.Position); }
                 if (policy.DistributionState !=
                     PlayerDistributionActionState.None)
                 {

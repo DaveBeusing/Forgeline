@@ -41,3 +41,8 @@ The HUD information update fits the opaque Operations panel inside its available
 ## Graphical operations integration
 
 The [production/operations interface](GraphicalProductionAndOperations.md) now uses shared compiled panels, category icons, state controls and the selected inspector. The panel retains an opaque backing; current visible Operations suppresses underlying alert drawing. Filters, paging, copied diagnostics, privacy and focus/open-controls semantics remain unchanged. [Qualification](GraphicalProductionAndOperationsQualification.md) records source-bound tests, native cases, packaging and pending acceptance.
+
+
+## Logistics setup
+
+NO INPUT and reported transport failures open existing Logistics controls. Regular loading-bay waits retain their confirmed queue position and are distinct from production queues, graph throughput and true blocked access. Focus changes no orders. Source/destination names and quantities are restricted to owned copied facts. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.

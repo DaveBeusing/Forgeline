@@ -15,6 +15,69 @@ public sealed class PlayerActionReadModelTests
     private static readonly PlayerId LocalPlayer = new(1);
 
     [Fact]
+    public void CargoOrderShowsCatalogMaterialAndTripQuantityWithOwnedEndpoints()
+    {
+        using var scenario = CreateScenario(4311);
+        var buffer = RegisterExtraction(scenario,out var interaction,out _);
+        scenario.Simulation.AdvanceOneTick();
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(LocalPlayer);
+        var core = entities.GetComponent<WorldTransform>(side.CommandCore);
+        var destination = entities.CreateEntity();
+        var inventory = scenario.Inventories.CreateInventory(new InventorySpecification(500));
+        entities.AddComponent(destination,new ControllableEntity(LocalPlayer,ControllableEntityCategory.Building));
+        entities.AddComponent(destination,new WorldTransform(core.Position + new Vector3(100,0,0),Quaternion.Identity,Vector3.One));
+        entities.AddComponent(destination,new InventoryStorage(inventory));
+        var target = scenario.Logistics.AddNode(destination,core.Position + new Vector3(100,0,0),
+            ForgeLine.Logistics.LogisticsNodeKind.StorageDepot,ForgeLine.Logistics.LogisticsNodeCapabilities.CargoDestination);
+        Assert.True(scenario.Logistics.TryGetNodeForEntity(side.CommandCore,out var source));
+        scenario.Logistics.AddEdge(source,target,ForgeLine.Logistics.LogisticsTransportMode.GroundRoad,100,1,100);
+        var truck = side.StartingUnits.First(unit => entities.HasComponent<CargoTransport>(unit));
+        Assert.True(scenario.CargoTransport.TryAssignOrder(entities,truck,
+            new CargoTransportOrder(source,target,ResourceIds.Steel,50,scenario.Simulation.CurrentTick),scenario.Simulation.CurrentTick));
+        interaction.SetSelection([truck]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var cargo = Assert.IsType<PlayerCargoStatusReadModel>(snapshot.PlayerActions!.Logistics!.Cargo);
+        Assert.Equal(ResourceIds.Steel,cargo.Resource);
+        Assert.Equal(scenario.Services.Resources[ResourceIds.Steel].DisplayName,cargo.ResourceName);
+        Assert.Equal(50,cargo.RequestedQuantity);
+        Assert.Equal(side.CommandCore,cargo.Source);
+        Assert.Equal(destination,cargo.Destination);
+        Assert.Equal(scenario.Services.BuildingDefinitions[BuildingIds.CommandCore].DisplayName,cargo.SourceName);
+    }
+
+    [Fact]
+    public void SupplyCargoAndDriveTankAreSeparateAndSupplyIsNotRegionalCargo()
+    {
+        using var scenario = CreateScenario(4310);
+        var side = scenario.GetBase(LocalPlayer);
+        var core = scenario.Simulation.Entities.GetComponent<WorldTransform>(side.CommandCore);
+        var truck = scenario.UnitFactory.Create(scenario.Services.UnitDefinitions[UnitIds.SupplyTruck],core.Position + new Vector3(45,0,45),LocalPlayer);
+        var supplyCargo = scenario.Simulation.Entities.GetComponent<SupplyTruck>(truck);
+        var drive = scenario.Simulation.Entities.GetComponent<UnitFuelState>(truck);
+        Assert.NotEqual(supplyCargo.InventoryId,drive.InventoryId);
+        var buffer = RegisterExtraction(scenario,out var interaction,out _);
+        interaction.SetSelection([truck]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var supply = Assert.IsType<PlayerSupplyActionReadModel>(snapshot.PlayerActions?.Supply);
+        Assert.True(supply.IsSupplyTruck);
+        Assert.Equal(scenario.Inventories.GetQuantity(supplyCargo.InventoryId,ResourceIds.Fuel),supply.CargoFuel);
+        Assert.Equal(scenario.Inventories.GetQuantity(supplyCargo.InventoryId,ResourceIds.Ammunition),supply.CargoAmmunition);
+        Assert.Equal(scenario.Inventories.GetQuantity(drive.InventoryId,ResourceIds.Fuel),supply.DriveFuelQuantity);
+        interaction.SetSelection([side.CommandCore]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out snapshot));
+        Assert.Equal(side.StartingUnits.Count(unit => scenario.Simulation.Entities.HasComponent<CargoTransport>(unit)),snapshot.PlayerActions!.Logistics!.CargoFleet.Total);
+        var coreSupply = Assert.IsType<PlayerSupplyActionReadModel>(snapshot.PlayerActions.Supply);
+        Assert.True(coreSupply.IsStaticProvider);
+        Assert.True(coreSupply.HasLocalProviderInventory);
+        Assert.Equal(scenario.Inventories.GetQuantity(side.StartingInventory,ResourceIds.Fuel),coreSupply.LocalProviderFuel);
+        Assert.Equal(scenario.Inventories.GetQuantity(side.StartingInventory,ResourceIds.Ammunition),coreSupply.LocalProviderAmmunition);
+    }
+
+    [Fact]
     public void ConstructionActionsMirrorCatalogAndOwnCapturedInventoryValues()
     {
         using MatchRuntime scenario =
@@ -166,11 +229,13 @@ public sealed class PlayerActionReadModelTests
             snapshot.PlayerActions?.Production);
     }
 
-    [Fact]
-    public void UnitProductionActionsCoverSupportedCatalogAndExposeRealCosts()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void UnitProductionActionsCoverSupportedCatalogAndExposeRealCosts(bool changedCatalog)
     {
         using MatchRuntime scenario =
-            CreateScenario(4303);
+            CreateScenario(4303, changedCatalog);
         InventoryId input =
             scenario.Inventories.CreateInventory(
                 new InventorySpecification(10_000.0));
@@ -239,6 +304,18 @@ public sealed class PlayerActionReadModelTests
                 cost.ResourceId ==
                 ResourceIds.Ammunition);
         Assert.False(tank.HasInputs);
+
+        var logistics = Assert.IsType<PlayerLogisticsActionReadModel>(snapshot.PlayerActions?.Logistics);
+        var scout = Assert.Single(logistics.Requirements, r => r.Kind == 2 && r.Id == UnitIds.ScoutVehicle.Value);
+        var proposal = ProductionStockProposal.Create(logistics, scout, 1);
+        Assert.True(proposal.FitsCapacity);
+        foreach (var cost in units.Units.Single(u => u.UnitId == UnitIds.ScoutVehicle).Costs)
+            Assert.Equal(cost.RequiredQuantity, Assert.Single(proposal.Thresholds, t => t.Resource == cost.ResourceId).Target);
+        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Steel && t.Target == (changedCatalog ? 91 : 70));
+        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Electronics && t.Target == 24);
+        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Fuel && t.Target == 60);
+        Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Ammunition && t.Target == 40);
+        Assert.All(logistics.Policies, p => Assert.Equal(10, p.DesiredTarget));
     }
 
     [Fact]
@@ -294,6 +371,8 @@ public sealed class PlayerActionReadModelTests
             buffer.TryReadLatest(out snapshot));
         Assert.NotNull(
             snapshot.PlayerActions?.Logistics?.Cargo);
+        Assert.Equal(snapshot.PlayerExperience!.Value.Selection.Work,snapshot.PlayerActions!.Logistics!.Service);
+
 
         EntityId engineer =
             scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
@@ -648,7 +727,7 @@ public sealed class PlayerActionReadModelTests
     }
 
     private static MatchRuntime CreateScenario(
-        ulong seed)
+        ulong seed, bool changedCatalog = false)
     {
         MatchRuntimeSettings runtime =
             CentralDivideScenario.CreateHeadless(
@@ -661,6 +740,14 @@ public sealed class PlayerActionReadModelTests
                         eastComputerControlled: false)
             };
 
+        if (changedCatalog)
+        {
+            var content = runtime.Composition.Content;
+            var units = new UnitDefinitionCatalog(content.Units.Definitions.Select(unit => unit.Id == UnitIds.ScoutVehicle
+                ? unit with { Costs = unit.Costs.Select(cost => cost.ResourceId == ResourceIds.Steel ? new UnitResourceCost(cost.ResourceId,91) : cost).ToArray() }
+                : unit));
+            runtime = runtime with { Composition = runtime.Composition with { Content = content with { Units = units } } };
+        }
         return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);

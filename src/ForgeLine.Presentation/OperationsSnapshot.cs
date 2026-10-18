@@ -14,7 +14,8 @@ public enum OperationsCategory : byte { All, Production, Logistics, Supply, Powe
 public readonly record struct OperationsFacility(EntityId Entity, string Name, OperationsCategory Category,
     string Status, string Cause, string Explanation, int QueueCount, double? InventoryQuantity,
     double? InventoryCapacity, double? PowerDemand, double? AllocatedPower,
-    double? TransportCapacity, double? Utilization, PlayerActionPanelMode Controls, double? GenerationCapacity = null);
+    double? TransportCapacity, double? Utilization, PlayerActionPanelMode Controls, double? GenerationCapacity = null,
+    PlayerWorkSummary Service = default);
 
 public readonly record struct OperationsResource(ResourceId Resource, string Name, double Quantity, double? NetRate);
 
@@ -121,12 +122,23 @@ internal static class OperationsSnapshotFactory
                 name = definition.DisplayName;
             nodeCapacity.TryGetValue(nodeId, out var measured);
             double? transportCapacity = node && scenario.Logistics.TryGetNode(nodeId, out var topology) ? topology.ThroughputCapacityPerSecond : null;
+            var service = PlayerExperienceSnapshotFactory.CaptureWork(entities, entity, scenario.Production, scenario.UnitProduction,
+                scenario.Services.UnitDefinitions, scenario.Services.BuildingDefinitions);
+            if (cargo && service.VehicleQueue is { }) status = LogisticsStatusCatalog.Service(service);
+            bool serviceBlocked = LogisticsStatusCatalog.IsBlocked(service);
+            if (serviceBlocked)
+            {
+                string serviceCause = LogisticsStatusCatalog.BlockedCause(service);
+                cause = cause.Length > 0 ? cause + "/" + serviceCause : serviceCause;
+            }
             var row = new OperationsFacility(entity, name, category, status, cause, Explain(cause), queues.GetValueOrDefault(entity),
                 hasInventory ? quantity : null, hasInventory ? totalCapacity : null, consumer ? power.Demand : null,
                 consumer ? power.AllocatedPower : null, transportCapacity, nodeCapacity.ContainsKey(nodeId) ? measured.Utilization : null,
+                service.VehicleQueue is { WaitReason: VehicleQueueWaitReason.Unavailable } ? PlayerActionPanelMode.Supply :
+                serviceBlocked || cause.Contains("NoInput", StringComparison.Ordinal) || distribution.ContainsKey(entity) ? PlayerActionPanelMode.Logistics :
                 processing ? PlayerActionPanelMode.Production : units ? PlayerActionPanelMode.UnitProduction :
-                depot || provider ? PlayerActionPanelMode.Supply : hasInventory || cargo ? PlayerActionPanelMode.Logistics : PlayerActionPanelMode.Closed,
-                generator ? generation.MaximumGeneration : null);
+                depot || provider ? PlayerActionPanelMode.Logistics : hasInventory || cargo ? PlayerActionPanelMode.Logistics : PlayerActionPanelMode.Closed,
+                generator ? generation.MaximumGeneration : null, service);
             if (rows.Count < OperationsSnapshot.MaximumFacilities) rows.Add(row);
             else if (cause.Length > 0)
             {
@@ -162,6 +174,10 @@ internal static class OperationsSnapshotFactory
     internal static string Explain(string cause) => cause switch
     {
         "NoInput" => "INPUT STOCK INSUFFICIENT - CHECK LOGISTICS",
+        "LoadingAccessBlocked" => "CONFIRMED LOADING ACCESS BLOCKED - FOCUS THE BUILDING",
+        "LoadingExitBlocked" => "CONFIRMED LOADING EXIT BLOCKED - FOCUS THE BUILDING",
+        "NoDriveFuel" => "DRIVE TANK EMPTY - OPEN VEHICLE SUPPLY",
+        "SourceEmpty" => "SOURCE STOCK EMPTY - CHECK SOURCE LOGISTICS",
         "NoPower" => "ALLOCATED POWER BELOW REQUIREMENT",
         "Brownout" => "REPORTED POWER BROWNOUT",
         "Offline" => "REPORTED POWER CONSUMER OFFLINE",

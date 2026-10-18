@@ -71,3 +71,8 @@ activation path still requires a fresh gesture. Registration lasts for one match
 
 [Executed interaction qualification](NonModalHudQualification.md) records the
 source identity, sequence tests and remaining native/human acceptance.
+
+
+## Logistics setup
+
+The existing LOGISTICS navigation, activation and decrease/increase bindings also operate INPUTS cards and USE INPUTS. Preview prepares additional-step thresholds; APPLY POLICY submits each resource separately. No new fixed key is introduced. Ring, dock, mouse and remapped keyboard paths retain the shared selection/session guards. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.

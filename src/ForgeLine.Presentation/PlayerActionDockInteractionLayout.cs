@@ -146,7 +146,7 @@ internal static class PlayerActionDockInteractionLayout
                       units.Requests.Count
                     : 0,
             PlayerActionPanelMode.Logistics =>
-                actions?.Logistics?.Policies.Count ??
+                actions?.Logistics?.ItemCount ??
                 0,
             PlayerActionPanelMode.Supply =>
                 actions?.Supply is null

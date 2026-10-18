@@ -13,7 +13,7 @@ internal readonly record struct HoverTooltipContent(
     uint? ProductionTicks = null,
     string Requirement = "",
     IReadOnlyList<PlayerTechnologyPrerequisiteReadModel>? Prerequisites = null,
-    string WorkStatus = "", string Explanation = "", UiSkinState VisualState = UiSkinState.Normal);
+    string WorkStatus = "", string Explanation = "", UiSkinState VisualState = UiSkinState.Normal, bool WrapDetails = false);
 
 internal static class HoverTooltipResolver
 {
@@ -49,8 +49,17 @@ internal static class HoverTooltipResolver
             _ => RtsUiIconCatalog.Get(world.RoleIcon).ShortLabel
         };
         string hint = world.OwnedDetails.Count == 1 ? "LEFT CLICK TO SELECT" : string.Empty;
-        return new(world.DisplayName, role, world.ExtractionState, hint, world,
-            Explanation: (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(world.OwnedDetails.Work.BlockReason)));
+        string explanation = (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(world.OwnedDetails.Work.BlockReason));
+        if (world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } selected && selected.SessionId == snapshot.SessionId && selected.Tick == snapshot.Tick)
+        {
+            if (selected.Logistics is { } logistics && logistics.Entity == world.Entity && logistics.Cargo is { } cargo)
+                explanation = $"REGIONAL CARGO / {cargo.ResourceName} / ORDER {cargo.RequestedQuantity:0.##} / LOADED {cargo.CargoQuantity:0.##} / SOURCE {cargo.SourceName} / DESTINATION {cargo.DestinationName}; AUTOMATIC TARGET DEMAND ASSIGNS WORK. " + LogisticsStatusCatalog.ServiceDetails(logistics.Service);
+            else if (selected.Supply is { } supply && supply.Entity == world.Entity)
+                explanation = $"{LogisticsStatusCatalog.DriveTank(supply)}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
+        }
+        return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation,
+            WrapDetails: world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } owned &&
+                (owned.Logistics?.Entity == world.Entity || owned.Supply?.Entity == world.Entity));
     }
 
     private static HoverTooltipContent? ResolveDock(PresentationSnapshot snapshot, in HoverTooltipView view,
@@ -126,6 +135,37 @@ internal static class HoverTooltipResolver
                     ticks = units.Units[index].ProductionTicks;
                     requirement = units.Units[index].TechnologyUnlocked ? string.Empty : "REQUIRES TECHNOLOGY";
                     break;
+                case PlayerActionPanelMode.Logistics when actions.Logistics is { } logistics:
+                    if (index >= logistics.Policies.Count)
+                    {
+                        var input = logistics.Requirements[index - logistics.Policies.Count];
+                        costs = input.Inputs;
+                        requirement = $"{panel.LogisticsSteps} ADDITIONAL STEP(S); ACTIVE RESERVED WORK IS SEPARATE; NO EXTRA BUFFER";
+                        hint = "USE INPUTS PREPARES EDITOR; APPLY POLICY FOR EACH RESOURCE";
+                    }
+                    else
+                    {
+                        var stock = logistics.Policies[index];
+                        requirement = (panel.StockPreview.Length > 0 ? panel.StockPreview + "; " : string.Empty) + LogisticsStatusCatalog.PolicyDetails(logistics, stock) +
+                            (logistics.HasEnabledGraphNode ? "; NETWORK NODE ACTIVE; LOCAL ACCESS OBSERVED SEPARATELY" : "; NO ACTIVE NETWORK NODE");
+                        status = $"{(stock.HasPolicy ? "POLICY SAVED" : "NO SAVED POLICY")} / SOURCE {(string.IsNullOrEmpty(stock.SourceName) ? "NOT ASSIGNED" : stock.SourceName)} / {(stock.AssignedTruck.IsValid ? "CARGO TRUCK ASSIGNED" : "NO CARGO TRUCK ASSIGNED")}";
+                        hint = LogisticsStatusCatalog.Advice(stock.FailureReason);
+                        if (stock.FailureReason == LogisticsTransportRequestFailureReason.NoTruckAvailable)
+                        {
+                            var fleet = logistics.CargoFleet;
+                            requirement += $"; OWN CARGO {fleet.Total}, WORKING {fleet.Working}, BOUND {fleet.Bound}, EMPTY IDLE {fleet.EmptyIdle}, NO DRIVE FUEL {fleet.NoDriveFuel}; COUNTS OVERLAP, ROUTE ELIGIBILITY RECHECKED";
+                        }
+                    }
+                    break;
+                case PlayerActionPanelMode.Supply when actions.Supply is { } supply:
+                    if (supply.IsStaticProvider)
+                    {
+                        requirement = supply.HasLocalProviderInventory ? $"LOCAL PROVIDER FUEL {supply.LocalProviderFuel:0.##} / AMMUNITION {supply.LocalProviderAmmunition:0.##}" : "LOCAL PROVIDER INVENTORY UNAVAILABLE";
+                        hint = "LOGISTICS / APPLY POLICY REPLENISHES LOCAL PROVIDER STOCK"; break;
+                    }
+                    requirement = $"{LogisticsStatusCatalog.DriveTank(supply)}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}";
+                    hint = LogisticsStatusCatalog.ServiceDetails(supply.Service);
+                    break;
                 case PlayerActionPanelMode.Technology:
                     costs = actions.Technology[index].Costs;
                     requirement = actions.Technology[index].RequiredFacilityName;
@@ -139,11 +179,27 @@ internal static class HoverTooltipResolver
             PlayerActionPanelMode.UnitProduction when actions.UnitProduction is { } factory => PlayerActionDockHudModel.ResolveUnitProductionBlockLabel(factory.BlockReason),
             _ => string.Empty
         };
+        string explanation = (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(enabled ? workReason : state.DisabledReason));
+        if (mode == PlayerActionPanelMode.Logistics && actions.Logistics is { } logisticsHelp)
+        {
+            if (index >= 0 && index < logisticsHelp.Policies.Count)
+                explanation = "MIN TRIGGERS REFILL USING STOCK + OUTSTANDING; TARGET REFILLS TO; MAX IS SAVED POLICY, NOT A HARD CAP. " +
+                    LogisticsStatusCatalog.ServiceDetails(logisticsHelp.Policies[index].Service);
+            else explanation = "CATALOG INPUTS; SHARED CAPACITY INCLUDES LOCAL STOCK AND OUTSTANDING DELIVERY DEMAND. PREVIEW CREATES NO ORDERS.";
+            if (control is PlayerActionDockControlKind.CycleSecondary or PlayerActionDockControlKind.Increase or PlayerActionDockControlKind.Decrease)
+                hint = index >= logisticsHelp.Policies.Count ? "ADJUST ADDITIONAL STEP COUNT WITH - / +" : panel.StockThresholdField switch
+                {
+                    PlayerStockThresholdField.Minimum => "MIN: REQUEST WHEN STOCK + OUTSTANDING FALLS BELOW THIS VALUE",
+                    PlayerStockThresholdField.Maximum => "MAX: VALIDATED AND SAVED; DISPATCHER DOES NOT ENFORCE A HARD CAP",
+                    _ => "TARGET: REFILL GOAL; ACTUAL SHARED STORAGE CAPACITY STILL APPLIES"
+                };
+        }
         return new(title, PlayerActionDockHudModel.ResolveModeLabel(mode), status, hint,
             Costs: costs, Outputs: outputs, ProductionTicks: ticks, Requirement: requirement, Prerequisites: prerequisites,
             WorkStatus: ProductionContextFeedback.WorkLabel(workReason),
-            Explanation: (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(enabled ? workReason : state.DisabledReason)),
-            VisualState: EconomicCardVisual.Resolve(mode, index, actions, ContextualCommandModel.HasPending(panel, snapshot)).State);
+            Explanation: explanation,
+            VisualState: EconomicCardVisual.Resolve(mode, index, actions, ContextualCommandModel.HasPending(panel, snapshot)).State,
+            WrapDetails: mode is PlayerActionPanelMode.Logistics or PlayerActionPanelMode.Supply);
     }
 
     private static string ResolveControlTitle(PlayerActionDockControlKind control, PlayerActionPanelMode mode)

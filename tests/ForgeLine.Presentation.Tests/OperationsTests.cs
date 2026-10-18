@@ -233,6 +233,28 @@ public sealed class OperationsTests
         { Assert.InRange(vertex.Position.X, -1, 1); Assert.InRange(vertex.Position.Y, -1, 1); });
     }
 
+    [Theory]
+    [InlineData(VehicleQueueWaitReason.GeometryBlocked, true)]
+    [InlineData(VehicleQueueWaitReason.Unavailable, false)]
+    public void ConfirmedServiceBlockFocusesTheRelevantEntityThroughExistingControls(VehicleQueueWaitReason reason, bool focusBuilding)
+    {
+        var truck = new EntityId(41,2); var building = new EntityId(42,3);
+        var service = new PlayerWorkSummary(default,default,0,"","",new(building,5,VehicleQueueService.CargoPickup,1,1,
+            VehicleDockStatus.Blocked,reason,focusBuilding ? VehicleDockBlockReason.Obstructed : VehicleDockBlockReason.None,new(4)));
+        var expectedControls = focusBuilding ? PlayerActionPanelMode.Logistics : PlayerActionPanelMode.Supply;
+        var row = Facility(truck) with { Cause = LogisticsStatusCatalog.BlockedCause(service), Service = service, Controls = expectedControls };
+        var data = new OperationsSnapshot(new(1),new(4),new(1),[row],[],[],1,0);
+        var snapshot = Snapshot(data); var layout = GameplayHudLayout.Create(1600,900,96);
+        var input = new InputState(); var interaction = new PresentationInteractionState(); var controller = new OperationsController();
+        controller.Update(input,snapshot,layout,interaction);
+        controller.OpenCategory(OperationsCategory.Blocked,new(1),interaction);
+        Click(input,OperationsLayout.Control(layout,3)); controller.Update(input,snapshot,layout,interaction);
+        Assert.Equal(truck,controller.View.Selected);
+        Click(input,OperationsLayout.Control(layout,10)); var result = controller.Update(input,snapshot,layout,interaction);
+        Assert.Equal(focusBuilding ? building : truck,result.Navigate);
+        Assert.Equal(expectedControls,result.Controls);
+    }
+
     [Fact]
     public void ShortClicksSelectAndOpenExistingControlsWithoutSubmittingCommands()
     {

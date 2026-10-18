@@ -231,7 +231,7 @@ internal static class VisualReferenceCapture
                         new(display.Width * .65f, display.Height * .6f), true, display.Width, display.Height,
                         GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale).Scale,
                         panel.Mode, DockControl: 2, DockIndex: 0) : default;
-                    if (uiScenario is UiReferenceScenario.DockQueueTooltip or UiReferenceScenario.DockTechnologyTooltip)
+                    if (uiScenario is UiReferenceScenario.DockQueueTooltip or UiReferenceScenario.DockTechnologyTooltip or UiReferenceScenario.LogisticsPolicyTooltip)
                         hover = new(snapshot.SessionId,default,default,new(display.Width * .65f,display.Height * .45f),true,display.Width,display.Height,
                             GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale).Scale,
                             DockMode:panel.Mode,DockControl:2,DockIndex:panel.SelectedIndex);
