@@ -121,7 +121,9 @@
         "tests/ForgeLine.Presentation.Tests/DirectorateBuildingPresentationTests.cs",
         "tests/ForgeLine.Presentation.Tests/UiTextBatchTests.cs",
         "src/ForgeLine.Game/VehicleDockQueues.cs",
-        "tests/ForgeLine.Game.Tests/GroundMovementSystemTests.cs"
+        "tests/ForgeLine.Game.Tests/GroundMovementSystemTests.cs",
+        "src/ForgeLine.Game/TacticalTestOpponentSystem.cs",
+        "tests/ForgeLine.Game.Tests/TacticalCombatSystemTests.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",

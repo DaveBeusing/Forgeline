@@ -259,27 +259,30 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
                     : 0;
             int objectiveRank = 0;
 
+            EntityId candidate = EntityId.Invalid;
+            // An identified sensor contact can be visible infrastructure rather
+            // than a combat target. Apply the combat system's target contract
+            // before overriding a valid strategic advance with an attack.
+            // Detected-only contacts still use their observed coordinate.
             if (contact.State == IntelligenceState.Identified &&
-                _intelligence.TryResolveCurrentlyIdentifiedEntity(
-                    faction, contact.ContactKey, out EntityId identified) &&
-                context.Entities.TryGetComponent(identified, out Targetable targetable) &&
-                context.Entities.TryGetComponent(source, out WeaponState weapon) &&
-                !_weapons.GetRequired(weapon.WeaponId).Effectiveness.CanEngage(targetable.Class))
+                (!_intelligence.TryResolveCurrentlyIdentifiedEntity(
+                    faction, contact.ContactKey, out candidate) ||
+                 !context.Entities.IsAlive(candidate) ||
+                 !context.Entities.TryGetComponent(candidate, out Combatant combatant) ||
+                 combatant.Faction == faction ||
+                 !context.Entities.TryGetComponent(candidate, out HealthState health) ||
+                 health.IsDepleted ||
+                 !context.Entities.TryGetComponent(candidate, out Targetable targetable) ||
+                 !context.Entities.HasComponent<WorldTransform>(candidate) ||
+                 !context.Entities.TryGetComponent(source, out WeaponState weapon) ||
+                 !_weapons.GetRequired(weapon.WeaponId).Effectiveness.CanEngage(targetable.Class)))
             {
                 continue;
             }
 
-            if (contact.State == IntelligenceState.Identified &&
-                _intelligence.TryResolveCurrentlyIdentifiedEntity(
-                    faction,
-                    contact.ContactKey,
-                    out EntityId candidate) &&
-                context.Entities.IsAlive(candidate) &&
-                context.Entities.TryGetComponent(
-                    candidate,
-                    out CompletedBuilding completed) &&
-                completed.BuildingId ==
-                    BuildingIds.CommandCore)
+            if (candidate.IsValid &&
+                context.Entities.TryGetComponent(candidate, out CompletedBuilding completed) &&
+                completed.BuildingId == BuildingIds.CommandCore)
             {
                 objectiveRank = 1;
             }

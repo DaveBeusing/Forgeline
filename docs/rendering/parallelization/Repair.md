@@ -873,3 +873,63 @@ baseline-relative 0.1.405 increment. Earlier fixture-six native evidence remains
 valid only for its recorded sources; it does not qualify this changed fixture.
 Fresh integrated tests and a strict terminal run with an explicit save output
 are required. The prior failed performance gate remains open.
+
+
+### Current merged-master qualification and attackable-contact repair
+
+Integrated source ae6865b005c074e79e96d7c0fcd18d529c4ba25d builds the complete
+solution with zero warnings/errors (1m47.97s). Its complete serial-module suite
+passes 2,810 tests, zero failures, 17 explicit optional skips / 2,827 total,
+17m13.059s. Its unchanged strict 80,000-tick run still fails Active / Running;
+both command cores have 1,200 HP. This run includes an explicit authoritative
+save, retained for endpoint diagnosis. No save/replay verification is bypassed.
+
+The endpoint shows western tank 143:159 at (2432.6096, 7.429023, 1282.683),
+health 1, fuel 0.8516721487529358 and ammunition 1, repeatedly ordered to attack
+power plant 95:2. That current identified contact has no Combatant, HealthState
+or Targetable component. TacticalTestOpponentSystem allows that sensor contact
+to replace a valid strategic advance; TacticalCombatSystem then correctly clears
+the weapon target, prohibits movement and waits for legitimate intelligence.
+Its last fire-ready tick is 69,257; the invalid order persists at tick 79,991.
+
+The candidate applies the existing combat-target contract before an identified
+contact can override strategic movement: living hostile combatant, non-depleted
+health, target class, transform and compatible source weapon. This check occurs
+only after current identification resolves the entity. Detected-only contacts
+retain their coordinate behavior; no hidden information, building health,
+weapon range or artificial damage is introduced. Both exact existing tactical
+files are added to serial ownership under the user's gameplay repair scope.
+
+Eight cases reproduce the original wrong target or lost strategic advance.
+An initial additional damage assertion was unsupported by the pure tactical
+fixture (four such assertions fail although target selection is corrected).
+The final identical before/after fixture registers normal combat execution and
+damage resolution: unchanged runtime fails all eight cases; corrected runtime
+passes all eight, including real damage to a legitimate alternate target and
+preserved strategic advance when only non-combat infrastructure is identified.
+The complete updated Game suite passes all 605 cases, zero failures/skips,
+105.018s. The strict terminal check for this candidate remains pending.
+
+### Fixed fixture-seven B-A-A-B performance qualification
+
+The new-master protocol compares unmodified 617312bb against captured renderer
+source ae6865b0, both with reference fixture seven and identical runtime assets.
+Both binaries are frozen with hashes. The predeclared protocol uses all six
+original world cases, High 1920x1080, 128 warmups / 512 samples / two readbacks,
+in B-A-A-B order. It starts only after local tests and headless work finish.
+All four native matrices complete. Both per-cohort performance gates pass every
+CPU/GPU mean, p50, p95 and p99 comparison at the unchanged 15% threshold, with
+zero unqualified cases. The largest observed increases are 6.078949979936744%
+and 9.846532142528737% respectively. All twelve paired images are exact, with
+stable resource plateaus and healthy devices. The external two-second monitor
+records 172 observations and no matching foreign workload; shorter activity
+and unrelated OS work cannot be excluded.
+
+This qualifies the captured renderer against the changed current master; the
+older failed fixture-six comparisons remain intact and are not relabeled green.
+The added tactical-contact candidate is a subsequent Game-only change; the
+native manifest continues to identify ae6865b0, not an unmeasured later source.
+The independent human review, final-head CI and terminal gate remain open.
+The complete-summary reproducer includes all eight protocols and all 96 exact
+paired images, preserving every historical failed gate. Parallel release
+remains false until all required foundation gates are accepted.
