@@ -623,7 +623,8 @@ internal sealed class ClientApplication
                 MaximumCameraDeltaSeconds);
 
             bool wasShellBlocking = pauseMenuActive;
-            var inputGuidance = guidance.Update(renderWorld.CurrentSnapshot, true, bindings: _gameplayBindings);
+            var guidanceLayout = GameplayHudLayout.Create(window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
+            var inputGuidance = guidance.Update(renderWorld.CurrentSnapshot, true, bindings: _gameplayBindings, layout: guidanceLayout);
             guidanceInteraction.Update(inputState, renderWorld.CurrentSnapshot?.SessionId ?? SimulationSessionId.None,
                 _settings.ShowOnboarding && !smokeTest && inputGuidance.Visible,
                 GameplayHudLayout.Create(window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale),
@@ -632,8 +633,9 @@ internal sealed class ClientApplication
                 wasShellBlocking || !window.IsFocused || window.IsMinimized || selectionController.IsDragSelecting ||
                 buildingPlacementController.IsActive || tacticalTargetingController.IsActive || inputState.IsMouseButtonDown(PlatformMouseButton.Middle),
                 actionPanel.Mode == PlayerActionPanelMode.Closed && !operationsController.View.Open &&
-                _gameplayBindings.Key(GameplayAction.NextItem) == PlatformKey.Tab &&
-                !GameplayBindingRegistry.UsesCamera(_settings.CameraBindings, PlatformKey.Tab));
+                !GameplayBindingRegistry.UsesCamera(_settings.CameraBindings, _gameplayBindings.Key(GameplayAction.NextItem)),
+                detailed: !string.IsNullOrEmpty(inputGuidance.ContentKey), bindings: _gameplayBindings);
+            guidance.Navigate(guidanceInteraction.NavigationThisFrame);
             FrontendLayout modalLayout = FrontendDesign.ResolveLayout(window.ClientSize.Width, window.ClientSize.Height,
                 _settings.UiScale, window.Dpi, pauseControlsVisible);
             if (modalLifetime.Update(inputState, modalLayout.Geometry, pauseMenuActive ? (pauseSettings.Visible ? 4 : pauseControlsVisible ? 2 : 1) : 0,
@@ -1645,7 +1647,7 @@ internal sealed class ClientApplication
                 Onboarding = guidanceInteraction.View,
                 Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding,
                     simulationPaused || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
-                    tacticalTargetingView.Mode != TacticalTargetingMode.None || inputState.IsMouseButtonDown(PlatformMouseButton.Middle), _gameplayBindings),
+                    tacticalTargetingView.Mode != TacticalTargetingMode.None || inputState.IsMouseButtonDown(PlatformMouseButton.Middle), _gameplayBindings, guidanceLayout),
                 Placement = placementFeedback
             };
 

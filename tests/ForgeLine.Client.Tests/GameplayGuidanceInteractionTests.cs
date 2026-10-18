@@ -191,4 +191,27 @@ public sealed class GameplayGuidanceInteractionTests
         Assert.False(guide.Hidden);
         Assert.False(guide.BlocksGameplayThisFrame);
     }
+    [Fact]
+    public void DetailedControlsOwnShortClicksBeforeWholeCardMinimizeAndHonorRebindings()
+    {
+        var input = new InputState(); var guide = new GameplayGuidanceInteraction();
+        var bindings = new ForgeLine.Input.GameplayBindingRegistry(new ForgeLine.Input.GameplayBindings()
+            .With(ForgeLine.Input.GameplayAction.NextItem, PlatformKey.G).With(ForgeLine.Input.GameplayAction.Activate, PlatformKey.J));
+        guide.Update(input, Session, true, Layout, detailed: true, bindings: bindings);
+        var next = GuidanceCardLayout.Control(guide.View, 1);
+        Click(input, next.X + 3, next.Y + 3);
+        guide.Update(input, Session, true, Layout, TimeSpan.FromMilliseconds(1), detailed: true, bindings: bindings);
+        Assert.Equal(GuidanceNavigation.NextSection, guide.NavigationThisFrame);
+        Assert.False(guide.Hidden);
+        Assert.True(guide.BlocksGameplayThisFrame);
+        Assert.False(input.IsMouseButtonDown(PlatformMouseButton.Left));
+        Release(input);
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.G));
+        guide.Update(input, Session, true, Layout, TimeSpan.FromMilliseconds(2), detailed: true, bindings: bindings);
+        input.BeginFrame(); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.J));
+        guide.Update(input, Session, true, Layout, TimeSpan.FromMilliseconds(3), detailed: true, bindings: bindings);
+        Assert.Equal(GuidanceNavigation.Read, guide.NavigationThisFrame);
+        Assert.False(guide.Hidden);
+    }
+
 }
