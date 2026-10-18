@@ -2205,13 +2205,23 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     out SupplyTruck truck) ||
                 context.Entities.HasComponent<ResupplyOrder>(
                     candidate) ||
-                context.Entities.HasComponent<SupplyRescueAssignment>(
-                    candidate) ||
                 context.Entities.HasComponent<SupplyLoadingOrder>(candidate) ||
                 IsProtectingReconScout(
                     context,
                     candidate,
                     protectedReconScout))
+            {
+                continue;
+            }
+
+            // Supporting the same combat force is operational field supply,
+            // even while a real recipient is being rescued. Keep logistics and
+            // the reserved reconnaissance mission independent of this admission.
+            if (context.Entities.TryGetComponent(candidate, out SupplyRescueAssignment rescue) &&
+                (rescue.Recipient == protectedReconScout ||
+                 !owned.CombatUnits.Contains(rescue.Recipient) ||
+                 !context.Entities.TryGetComponent(rescue.Recipient, out ResupplyOrder recipientOrder) ||
+                 recipientOrder.Provider != candidate))
             {
                 continue;
             }

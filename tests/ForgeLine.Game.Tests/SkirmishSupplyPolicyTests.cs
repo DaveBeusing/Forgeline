@@ -11,6 +11,43 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishSupplyPolicyTests
 {
     [Theory]
+    [InlineData(0, true)]
+    [InlineData(1, false)]
+    [InlineData(2, false)]
+    public void ActiveCombatRescueCountsAsForwardSupportWithoutBorrowingLogisticsOrReconRescues(
+        int recipientKind, bool supplyReady)
+    {
+        using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(1));
+        Vector3 forward = entities.GetComponent<WorldTransform>(side.CommandCore).Position + Vector3.UnitX * 900;
+        var catalog = DirectorateContent.CreateUnitCatalog();
+        for (int index = 0; index < 3; index++)
+            scenario.UnitFactory.Create(catalog[UnitIds.MainBattleTank], forward + Vector3.UnitZ * (20 + index * 20), side.Player);
+        UnitId recipientType = recipientKind switch {
+            0 => UnitIds.MainBattleTank, 1 => UnitIds.CargoTruck, _ => UnitIds.ScoutVehicle
+        };
+        EntityId recipient = scenario.UnitFactory.Create(catalog[recipientType], forward, side.Player);
+        UnitFuelState fuel = entities.GetComponent<UnitFuelState>(recipient);
+        Assert.True(scenario.Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel,
+            scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) - fuel.Capacity * 0.01).Succeeded);
+        EntityId provider = scenario.UnitFactory.Create(catalog[UnitIds.SupplyTruck], forward + Vector3.UnitX * 300, side.Player);
+        SupplyTruck truck = entities.GetComponent<SupplyTruck>(provider);
+        Assert.True(scenario.Inventories.Add(truck.InventoryId, ResourceIds.Fuel, truck.FuelTarget).Succeeded);
+        Assert.True(scenario.Inventories.Add(truck.InventoryId, ResourceIds.Ammunition, truck.AmmunitionTarget).Succeeded);
+        var command = new ResupplyCommand(side.Player, [recipient], scenario.Simulation.CurrentTick);
+        scenario.Simulation.SubmitCommand(command, scenario.Simulation.CurrentTick.Next());
+
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, command.AcceptedTargetCount);
+        Assert.Equal(recipient, entities.GetComponent<SupplyRescueAssignment>(provider).Recipient);
+        Assert.Equal(provider, entities.GetComponent<ResupplyOrder>(recipient).Provider);
+        Assert.Equal(supplyReady, scenario.Opponents.DebugSnapshot.Single(item => item.Player == side.Player)
+            .OffensiveAdmission.ForwardSupplyReady);
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void WaitingReconnaissanceRecoversDepartureFuelWithoutChangingAnAdvancingScout(bool advancing)
