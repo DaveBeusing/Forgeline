@@ -38,6 +38,6 @@ public static class LogisticsStatusCatalog
         $"SHARED STORAGE {logistics.InventoryQuantity:0.##}/{logistics.InventoryCapacity:0.##}";
 
     public static string ServiceDetails(PlayerWorkSummary work) => work.VehicleQueue is { } queue ?
-        $"{Service(work)} / POSITION {(queue.Position > 0 ? queue.Position.ToString(System.Globalization.CultureInfo.InvariantCulture) : "N/A")} / BAY {queue.Building} / {work.BlockReason}" :
+        $"{Service(work)} / POSITION {(queue.Position > 0 ? queue.Position.ToString(System.Globalization.CultureInfo.InvariantCulture) : "N/A")} / LOADING BAY / {work.BlockReason}" :
         work.LoadingQueue is { } loading ? $"{Service(work)} / WAITING {loading.WaitingCount}" : Service(work);
 }

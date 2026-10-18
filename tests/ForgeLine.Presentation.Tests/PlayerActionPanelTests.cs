@@ -39,6 +39,11 @@ public sealed class PlayerActionPanelTests
         Assert.Equal(10, logistics.Policies[0].DesiredTarget);
         Key(PlatformKey.Tab);
         Assert.Equal(120, controller.CreateView(1600,900,snapshot.PlayerActions).StockTarget);
+        snapshot = CreateSnapshot();
+        controller.Update(input,snapshot,1600,900);
+        snapshot = CreateSnapshot(logistics: logistics);
+        controller.Update(input,snapshot,1600,900);
+        Assert.Equal(10, controller.CreateView(1600,900,snapshot.PlayerActions).StockTarget);
         snapshot = CreateSnapshot(logistics: new PlayerLogisticsActionReadModel(new(74,2), [steel,fuel], null,500,requirements:[requirement]));
         controller.Update(input,snapshot,1600,900);
         Assert.Equal(10, controller.CreateView(1600,900,snapshot.PlayerActions).StockTarget);

@@ -74,6 +74,8 @@ public sealed partial class PlayerActionPanelController
     private ResourceId _stockResourceId;
     private EntityId _stockEntity;
     private ProductionStockProposal? _stockProposal;
+    private string _stockPreviewLabel = string.Empty;
+    private bool _stockResourceFromProposal;
     private int _logisticsSteps = 1;
     private double _stockMinimum;
     private double _stockTarget;
@@ -498,7 +500,7 @@ public sealed partial class PlayerActionPanelController
             _sessionId,
             !PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection), _bindings, _contextualHoveredIndex, _contextualPressed)
         { Ring = BuildRing(actions), LogisticsSteps = _logisticsSteps,
-            StockPreview = _stockProposal is null ? string.Empty : $"INPUT PREVIEW / {_stockProposal.Steps} ADDITIONAL STEP(S) / APPLY EACH RESOURCE" };
+            StockPreview = _stockProposal is not null && _stockResourceFromProposal ? _stockPreviewLabel : string.Empty };
     }
 
     public bool TryTakeRequest(
@@ -735,6 +737,7 @@ public sealed partial class PlayerActionPanelController
             _feedbackRemaining = TimeSpan.FromSeconds(8);
             if (!proposal.FitsCapacity) return;
             _stockProposal = proposal;
+            _stockPreviewLabel = $"INPUT DRAFT / {proposal.Steps} ADDITIONAL STEP(S) / NO EXTRA BUFFER";
             _stockEntity = logistics.Entity;
             SelectedIndex = logistics.Policies.ToList().FindIndex(p => p.ResourceId == proposal.Thresholds[0].Resource);
             _stockResourceId = ResourceId.None;
@@ -979,6 +982,8 @@ public sealed partial class PlayerActionPanelController
     private void SynchronizeStockEditor(
         PlayerActionSnapshot? actions)
     {
+        if (actions?.Logistics is null)
+        { _stockProposal = null; _stockEntity = default; _stockPreviewLabel = string.Empty; }
         if (Mode != PlayerActionPanelMode.Logistics ||
             actions?.Logistics is not
                 PlayerLogisticsActionReadModel logistics ||
@@ -1000,6 +1005,7 @@ public sealed partial class PlayerActionPanelController
         }
 
         _stockResourceId = policy.ResourceId;
+        _stockResourceFromProposal = false;
         _stockMinimum = policy.DesiredMinimum;
         _stockTarget = policy.DesiredTarget;
         _stockMaximum = policy.DesiredMaximum;
@@ -1007,7 +1013,7 @@ public sealed partial class PlayerActionPanelController
         if (_stockProposal is not null)
             foreach (var threshold in _stockProposal.Thresholds)
                 if (threshold.Resource == policy.ResourceId)
-                { _stockMinimum = threshold.Minimum; _stockTarget = threshold.Target; _stockMaximum = threshold.Maximum; break; }
+                { _stockMinimum = threshold.Minimum; _stockTarget = threshold.Target; _stockMaximum = threshold.Maximum; _stockResourceFromProposal = true; break; }
     }
 
     private void SynchronizeSupplyEditor(

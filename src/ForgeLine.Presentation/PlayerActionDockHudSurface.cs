@@ -649,7 +649,7 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
 
         if (panel.SelectedIndex >= logistics.Policies.Count)
         { text.Append("ADDITIONAL STEPS "); text.Append(panel.LogisticsSteps); text.Append(" / USE INPUTS PREPARES EDITOR"); return; }
-        text.Append("POLICY ");
+        text.Append(panel.StockPreview.Length > 0 ? "DRAFT " : "POLICY ");
         text.Append(
             panel.StockMinimum,
             "F0");

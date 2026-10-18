@@ -80,12 +80,12 @@ internal static class UiReferenceStates
             UiReferenceScenario.NewGame => FrontendPresentationAdapter.NewGame(new NewGameModel()),
             UiReferenceScenario.LoadEmpty => FrontendPresentationAdapter.LoadGame(new LoadGameModel([])),
             UiReferenceScenario.LoadGame or UiReferenceScenario.LoadBroken => FrontendPresentationAdapter.LoadGame(new LoadGameModel(
-                [new("reference", "SAVE / Ãƒâ€žÃƒâ€“ÃƒÅ“ ÃƒÂ¤ÃƒÂ¶ÃƒÂ¼ ÃƒÅ¸ / " + new string('W', 96), "reference.json", 1234,
+                [new("reference", "SAVE / ÄÖÜ äöü ß / " + new string('W', 96), "reference.json", 1234,
                     state == UiReferenceScenario.LoadBroken ? LoadGameEntryState.Corrupt : LoadGameEntryState.Available)])),
             UiReferenceScenario.SettingsLong => FrontendPresentationAdapter.Settings(new SettingsModel(ClientSettingsFrontendAdapter.ToSnapshot(new ClientUserSettings()))) with
-            { DetailLines = [new("AUFLÃƒâ€“SUNG / Ãƒâ€žÃƒâ€“ÃƒÅ“ / " + new string('W', 72), "3840 X 2160 / " + new string('W', 120), IsFocused: true, CanDecrease: true, CanIncrease: true)] },
+            { DetailLines = [new("AUFLÖSUNG / ÄÖÜ / " + new string('W', 72), "3840 X 2160 / " + new string('W', 120), IsFocused: true, CanDecrease: true, CanIncrease: true)] },
             UiReferenceScenario.ControlsLong => FrontendPresentationAdapter.Controls(new RtsCameraBindings()) with
-            { DetailLines = [new("TASTATUR / Ãƒâ€žÃƒâ€“ÃƒÅ“ / " + new string('W', 120), "CTRL + SHIFT / " + new string('W', 160))] },
+            { DetailLines = [new("TASTATUR / ÄÖÜ / " + new string('W', 120), "CTRL + SHIFT / " + new string('W', 160))] },
             UiReferenceScenario.Pause => FrontendPresentationAdapter.PauseMenu(new PauseMenuModel()),
             UiReferenceScenario.Credits => FrontendPresentationAdapter.Credits(),
             UiReferenceScenario.Controls => FrontendPresentationAdapter.Controls(new RtsCameraBindings()),

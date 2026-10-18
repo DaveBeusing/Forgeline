@@ -15,6 +15,31 @@ public sealed class PlayerActionReadModelTests
     private static readonly PlayerId LocalPlayer = new(1);
 
     [Fact]
+    public void SupplyCargoAndDriveTankAreSeparateAndSupplyIsNotRegionalCargo()
+    {
+        using var scenario = CreateScenario(4310);
+        var side = scenario.GetBase(LocalPlayer);
+        var core = scenario.Simulation.Entities.GetComponent<WorldTransform>(side.CommandCore);
+        var truck = scenario.UnitFactory.Create(scenario.Services.UnitDefinitions[UnitIds.SupplyTruck],core.Position + new Vector3(45,0,45),LocalPlayer);
+        var supplyCargo = scenario.Simulation.Entities.GetComponent<SupplyTruck>(truck);
+        var drive = scenario.Simulation.Entities.GetComponent<UnitFuelState>(truck);
+        Assert.NotEqual(supplyCargo.InventoryId,drive.InventoryId);
+        var buffer = RegisterExtraction(scenario,out var interaction,out _);
+        interaction.SetSelection([truck]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var supply = Assert.IsType<PlayerSupplyActionReadModel>(snapshot.PlayerActions?.Supply);
+        Assert.True(supply.IsSupplyTruck);
+        Assert.Equal(scenario.Inventories.GetQuantity(supplyCargo.InventoryId,ResourceIds.Fuel),supply.CargoFuel);
+        Assert.Equal(scenario.Inventories.GetQuantity(supplyCargo.InventoryId,ResourceIds.Ammunition),supply.CargoAmmunition);
+        Assert.Equal(scenario.Inventories.GetQuantity(drive.InventoryId,ResourceIds.Fuel),supply.DriveFuelQuantity);
+        interaction.SetSelection([side.CommandCore]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out snapshot));
+        Assert.Equal(side.StartingUnits.Count(unit => scenario.Simulation.Entities.HasComponent<CargoTransport>(unit)),snapshot.PlayerActions!.Logistics!.CargoFleet.Total);
+    }
+
+    [Fact]
     public void ConstructionActionsMirrorCatalogAndOwnCapturedInventoryValues()
     {
         using MatchRuntime scenario =
@@ -306,6 +331,8 @@ public sealed class PlayerActionReadModelTests
             buffer.TryReadLatest(out snapshot));
         Assert.NotNull(
             snapshot.PlayerActions?.Logistics?.Cargo);
+        Assert.Equal(snapshot.PlayerExperience!.Value.Selection.Work,snapshot.PlayerActions!.Logistics!.Service);
+
 
         EntityId engineer =
             scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
