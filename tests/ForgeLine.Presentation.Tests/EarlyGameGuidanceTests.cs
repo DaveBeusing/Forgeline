@@ -11,7 +11,7 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class EarlyGameGuidanceTests
 {
     [Fact]
-    public void CanonicalStartSkipsCoreAndSupplyButStockIsNotProduction()
+    public void CanonicalStartExplainsCoreAndSupplyWithoutClaimingProductionOrDelivery()
     {
         using var scenario = WorldHoverExtractionTests.CreateScenario();
         var buffer = WorldHoverExtractionTests.Observe(scenario, new PresentationInteractionState());
@@ -22,7 +22,12 @@ public sealed class EarlyGameGuidanceTests
         Assert.True(summary.Observed.HasFlag(PlayerGuidanceMilestone.Supply));
         Assert.False(summary.Observed.HasFlag(PlayerGuidanceMilestone.SteelProcessing));
         Assert.False(summary.Observed.HasFlag(PlayerGuidanceMilestone.Scout));
-        Assert.Equal("ESTABLISH POWER", new EarlyGameGuidanceController().Update(snapshot, true).Objective);
+        var view = new EarlyGameGuidanceController().Update(snapshot, true);
+        Assert.Equal("starting-base", view.ContentKey);
+        Assert.Equal(GuidanceExplanationState.Offered, view.ExplanationState);
+        Assert.True(view.GoalConfirmed);
+        Assert.False(summary.Observed.HasFlag(PlayerGuidanceMilestone.OreDelivered));
+        Assert.False(summary.Observed.HasFlag(PlayerGuidanceMilestone.FieldSupplied));
     }
 
     [Fact]
@@ -32,12 +37,15 @@ public sealed class EarlyGameGuidanceTests
         var first = Snapshot(PlayerGuidanceMilestone.CommandCore | PlayerGuidanceMilestone.VehicleFactory | PlayerGuidanceMilestone.Scout);
         Assert.False(guide.Update(first, false).Visible);
         Assert.True(guide.Observed.HasFlag(PlayerGuidanceMilestone.Scout));
+        Assert.Equal("starting-base", guide.Update(first, true).ContentKey);
+        guide.Navigate(GuidanceNavigation.NextSection);
         Assert.Equal("ESTABLISH POWER", guide.Update(first, true).Objective);
         var second = Snapshot(PlayerGuidanceMilestone.CommandCore | PlayerGuidanceMilestone.Power |
             PlayerGuidanceMilestone.FerrousExtraction | PlayerGuidanceMilestone.SteelProcessing, tick: 2);
-        Assert.Equal("MAKE SUPPLY AVAILABLE", guide.Update(second, true).Objective);
+        Assert.True(guide.Update(second, true).GoalConfirmed);
+        Assert.True(guide.Observed.HasFlag(PlayerGuidanceMilestone.Scout));
         Assert.False(guide.Update(first, true).Visible); // Older publication cannot advance or rewind the guide.
-        Assert.Equal("ESTABLISH COMMAND CORE", guide.Update(Snapshot(0, session: 2), true).Objective);
+        Assert.Equal("starting-base", guide.Update(Snapshot(0, session: 2), true).ContentKey);
         Assert.Equal(PlayerGuidanceMilestone.None, guide.Observed);
     }
 

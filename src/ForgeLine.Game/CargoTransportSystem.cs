@@ -10,6 +10,8 @@ namespace ForgeLine.Game;
 
 public sealed class CargoTransportSystem : ISimulationSystem
 {
+    internal GameplayProgressJournal? Progress { get; set; }
+
     private const double QuantityEpsilon = 0.000000001;
     private const float LogicalTransitNodeApproachRadiusMeters = 72.0f;
 
@@ -661,6 +663,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
             else context.Entities.RemoveComponent<CargoTransportReservation>(entity);
         }
 
+        Progress?.Record(context.Tick, transport.Owner, GameplayProgressKind.CargoLoaded, entity, origin.Entity, entity,
+            order.SubmittedAtTick.Value, order.ResourceId, loadQuantity);
         CargoTransportRuntimeState loadedState =
             state with
             {
@@ -982,6 +986,9 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
         if (context.Entities.TryGetComponent(entity, out VehicleDockVisit unloadedVisit))
             VehicleDockingService.RecordTransfer(context, entity, unloadedVisit.Generation);
+        Progress?.Record(context.Tick, transport.Owner, GameplayProgressKind.CargoUnloaded, entity, entity, destination.Entity,
+            order.SubmittedAtTick.Value, order.ResourceId, unloadQuantity,
+            context.Entities.TryGetComponent(destination.Entity, out CompletedBuilding deliveredBuilding) ? deliveredBuilding.BuildingId.Value : 0);
         _deliveredQuantity += unloadQuantity;
 
         CargoTransportRuntimeState unloadedState =

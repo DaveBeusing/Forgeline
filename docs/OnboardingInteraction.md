@@ -1,44 +1,69 @@
-# Onboarding interaction
+# Early logistics guidance
 
-The optional match guide is anchored at SafeArea.X/Y and remains left aligned.
-Its compiled compact skin is tinted with alpha 0.84; text stays opaque. No blur,
-new artwork, font or settings/save schema is introduced.
+The optional opening guide stays at the top left of the available safe area. Its
+panel uses alpha 0.84 and opaque text, a 220 ms SmoothStep collapse, HINT > restore
+and Shift+F12. Reduced Motion and interrupted presentation settle the logical
+state. Guidance never submits simulation commands or blocks actions until a
+lesson has been read.
 
-Click the hint to minimize, HINT > to restore, or use Shift+F12. The entire visible
-hint is the toggle; no separate close target is required. Tab focuses it only when
-transient HUD navigation and camera keys do not own Tab. A focus rail marks the
-owner; Enter/Space toggles it. The accessible names are “Minimize onboarding hint”
-and “Restore onboarding hint”. Unfocused gameplay shortcuts keep their owners.
+## Reading and gameplay are separate
 
-Hidden means onboarding is disabled, invalid/absent copied content, or a blocked
-presentation interval. No panel, tab or input geometry is published then. This
-never completes tutorial milestones. Collapsed state persists through new
-objectives, pauses and temporary suppression in the same session. A new session
-starts expanded. There is no new saved preference.
+Eighteen stable content keys cover the starting Core and two Cargo Trucks, power,
+real Ore extraction, Smelter construction and policy, Ore delivery, Steel,
+Vehicle Factory construction and inputs, Scout production, truck roles, depot
+construction and deliveries, Supply Truck production/loading, field supply,
+recovery, scouting and continued play. The truck-roles and continued-play cards
+are explanations rather than achievable simulation goals.
 
-The published version-1 OnboardingPresentation includes translated panel, safe
-clip, visible panel intersection, tab and focus. The left safe boundary clips
-skin, dynamic/fallback geometry and native glyph UVs. The tab remains at that
-boundary and owns only its painted rectangle. Vacated areas are world space.
-The central transient owner still owns outside-click and release provenance;
-a moving hint cannot acquire a held world-origin drag or its release. Toggle
-presses are suppressed through release, so they cannot select/place/move too.
-World clicks and Escape do not minimize the guide.
+Every lesson independently records Offered, Viewed or Deferred within the
+current session. NEXT/PREV select lessons; PAGE </PAGE > traverse the complete
+text. READ traverses any remaining pages before marking the explanation Viewed;
+LATER marks it Deferred. Neither action changes gameplay progress. Minimizing
+marks nothing as read. Reading state is not persisted. A new session resets it.
 
-Bodies retain a 14 physical-pixel floor. Below 260 physical pixels of width or
-140 of height, a reduced objective/binding view replaces context/next-step rows;
-all text uses actual atlas metrics and ellipsis. Safe bounds remain at the top;
-no fullscreen modal or downward relocation is used. The tab is 56 design pixels
-wide and 48 high at unit scale. Its physical scale is bounded between 1 and 1.5
-before safe bounds clip it, keeping restore compact on large HUDs. The label has
-its own padded rectangle and 14–24 px native type; HINT and a right chevron
-identify restore.
-Clients with no usable safe region publish no target.
+Completed gameplay is observed even while minimized, disabled or temporarily
+suppressed. Confirmed goals retain their explanations and explicitly say that no
+repeat action is needed. Out-of-order commands remain available and are observed.
+An accepted policy, assigned transport, actual unloading, completed production
+and field transfer retain separate meanings. Starting Core supply is availability,
+not delivery or mobile resupply evidence.
 
-One 220 ms presentation-time SmoothStep transition can reverse from its current
-position without a jump. Resting endpoints are exact. Reduced Motion, actual
-Low/fallback quality, stalls over 250 ms, rollback, focus loss, minimize and
-geometry changes settle the logical target and discard stale gestures. Rendering
-uses the copied state without extrapolating it on another thread.
+## Layout and input
 
-[Qualification and pending acceptance](OnboardingQualification.md).
+Detailed cards use adaptive left-column height and measured word wrapping. All
+body pages, including active action, threshold, priority and adjustment bindings,
+remain reachable at a 14 physical-pixel minimum. Page construction and rendering
+use the same layout and font metrics; essential body instructions are never
+replaced by ellipsis. Supported compact displays use additional pages rather
+than hiding the explanation. Six distinct navigation targets precede the
+whole-background minimize target. The header/background still minimizes; the
+restore tab owns only its painted bounds.
+
+When no transient command surface or camera mapping owns navigation, the current
+NEXT ITEM binding cycles guide focus through its six controls and minimize. The
+current ACTIVATE binding executes the focused guide action. Active bindings are
+listed on the lesson pages, including remapped controls. The guide is temporarily suppressed while Operations owns the
+left column; its reading state and completed-tick observation continue. Mouse navigation remains
+available independently of keyboard ownership. A guide press is suppressed until
+release; an existing world-origin hold, resize, session change, modal interval or
+focus loss cannot acquire stale guide navigation. The shared copied
+OnboardingPresentation version 2 carries detailed bounds and focus to rendering.
+
+## Existing player controls
+
+Use BUILD for construction, LOGISTICS / INPUTS / USE INPUTS / APPLY POLICY for
+local production stock, PROCESS / QUEUE for Steel, and UNITS / QUEUE for vehicles.
+INPUTS costs come from the active catalog through the existing editor; the guide
+has no independent threshold calculator.
+
+To load a Supply Truck, move it near the intended stocked depot so that depot is
+the nearest eligible loading building. Select the truck, open SUPPLY, choose
+REQUEST RESUPPLY, then activate REQUEST SUPPLY. The existing action chooses a
+loading building; it is not a manual source picker. Actual queue, alignment and
+loading remain authoritative. Cargo Fuel is distinct from drive Fuel. Use the
+same existing Supply controls or automatic policy for eligible field recipients.
+OPERATIONS / BLOCKED, FOCUS FACILITY and OPEN EXISTING CONTROLS expose existing
+causes. Current selected work and logistics failures reuse their established
+help, without inventing a new diagnosis.
+
+[Evidence, recovery and qualification](OnboardingQualification.md).

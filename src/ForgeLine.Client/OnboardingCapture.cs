@@ -16,7 +16,7 @@ namespace ForgeLine.Client;
 internal static class OnboardingCapture
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-    internal static int Run(string output, string runtimeRoot)
+    internal static int Run(string output, string runtimeRoot, bool lessons = false)
     {
         try
         {
@@ -39,19 +39,74 @@ internal static class OnboardingCapture
             var world = new RenderWorld(); world.Update(publication);
             var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(scene.Target, RtsReferenceZoom.NormalGameplay));
             var records = new List<object>();
+            if (lessons)
+            {
+                foreach (var display in new[] { (1280, 720, 192u, 2f), (1920, 1080, 96u, 1f) })
+                {
+                    graphics.WaitForIdle(); graphics.Resize(display.Item1, display.Item2);
+                    var layout = GameplayHudLayout.Create(display.Item1, display.Item2, display.Item3, display.Item4);
+                    foreach (string key in new[] { "smelter-policy", "truck-roles", "mobile-loading" })
+                    {
+                        var guide = new EarlyGameGuidanceController();
+                        var card = guide.Update(snapshot, true, layout: layout);
+                        for (int i = 0; card.ContentKey != key && i < 20; i++)
+                        { guide.Navigate(GuidanceNavigation.NextSection); card = guide.Update(snapshot, true, layout: layout); }
+                        if (card.ContentKey != key) throw new InvalidDataException("Missing lesson: " + key);
+                        int pages = card.PageCount;
+                        for (int page = 0; page < pages; page++)
+                        {
+                            card = guide.Update(snapshot, true, layout: layout);
+                            var state = OnboardingPresentation.Resolve(layout, 0, detailed: true);
+                            var ux = default(PreAlphaUxView) with { ShowOnboarding = true, Guidance = card, Onboarding = state };
+                            ground.Prepare(camera, display.Item1, display.Item2);
+                            void Draw(IGraphicsCommandContext context)
+                            {
+                                ground.Render(context, camera); meshes.Render(context, camera, world, 1);
+                                context.BeginPass(GraphicsFramePass.Overlay);
+                                hud.Render(context, camera, snapshot, terrain.WorldBounds, RtsInformationLayerView.Empty,
+                                    default, default, FormationTemplate.Compact, CombatGroupOverviewView.Empty, ux, display.Item3, display.Item4);
+                            }
+                            graphics.RenderFrame(GraphicsColor.ForgeLineClear, Draw);
+                            byte[] first = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, Draw);
+                            byte[] second = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, Draw);
+                            if (!first.AsSpan().SequenceEqual(second)) throw new InvalidDataException("Lesson repeat differs.");
+                            if (!hud.TextDiagnostics.AtlasReady || hud.TextDiagnostics.MissingGlyphs != 0 || hud.TextDiagnostics.DroppedGlyphs != 0 ||
+                                hud.SkinDiagnostics.MissingAssets != 0 || hud.SkinDiagnostics.DroppedQuads != 0)
+                                throw new InvalidDataException("Incomplete lesson content.");
+                            string name = $"{display.Item1}x{display.Item2}-{key}-page{page + 1}";
+                            ReferenceCaptureImage.WritePng(Path.Combine(output, name + ".png"), display.Item1, display.Item2, first);
+                            records.Add(new { Key = name, card.ContentKey, card.Page, card.PageCount, Body = card.Context,
+                                State = state, RasterDpi = display.Item3, UiScale = display.Item4, TextSize = GuidanceCardLayout.TextSize(layout),
+                                PixelSha256 = Convert.ToHexString(SHA256.HashData(first)), Text = hud.TextDiagnostics, Skin = hud.SkinDiagnostics });
+                            guide.Navigate(GuidanceNavigation.NextPage);
+                            platform.PumpEvents();
+                        }
+                    }
+                }
+                graphics.WaitForIdle();
+                if (graphics.Diagnostics.Health.SubmissionFaultCount != 0) throw new InvalidDataException("Native lesson submission fault.");
+                File.WriteAllText(Path.Combine(output, "qualification.json"), JsonSerializer.Serialize(new
+                {
+                    Source = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+                    Device = graphics.Diagnostics.Device, Fixture = scene.Fingerprint, Cases = records, Health = graphics.Diagnostics.Health,
+                    Contract = "All pages of three logistics lessons; two exact native repeats. Authored fixture only, no world commands. Human visual and live-interaction acceptance remains pending."
+                }, JsonOptions));
+                return 0;
+            }
             foreach (var display in new[] { (1280, 720, 192u, 2f), (1920, 1080, 96u, 1f) })
             foreach (bool reduced in new[] { false, true })
             foreach (int hz in new[] { 30, 60, 144 })
             {
                 graphics.WaitForIdle(); graphics.Resize(display.Item1, display.Item2);
                 var layout = GameplayHudLayout.Create(display.Item1, display.Item2, display.Item3, display.Item4);
+                guidance = new EarlyGameGuidanceController().Update(snapshot, true, layout: layout);
                 var times = Enumerable.Range(0, (int)Math.Ceiling(.22 * hz) + 1).Select(i => Math.Min(220, i * 1000.0 / hz))
                     .Concat(new double[] { 0, 55, 110, 165, 220 }).Distinct().Order().ToArray();
                 var pixels = new Dictionary<string, byte[]>();
                 for (int repeat = 0; repeat < 2; repeat++)
                 {
                     var owner = new GameplayGuidanceInteraction(); var input = new InputState();
-                    owner.Update(input, snapshot.SessionId, true, layout, TimeSpan.Zero, !reduced);
+                    owner.Update(input, snapshot.SessionId, true, layout, TimeSpan.Zero, !reduced, detailed: true);
                     for (int direction = 0; direction < 2; direction++)
                     {
                         double start = 1 + direction * 230;
@@ -59,13 +114,13 @@ internal static class OnboardingCapture
                         input.BeginFrame();
                         input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
                             PlatformMouseButton.Left, (int)hit.X + 5, (int)hit.Y + 5));
-                        owner.Update(input, snapshot.SessionId, true, layout, TimeSpan.FromMilliseconds(start), !reduced);
+                        owner.Update(input, snapshot.SessionId, true, layout, TimeSpan.FromMilliseconds(start), !reduced, detailed: true);
                         if (!owner.BlocksGameplayThisFrame) throw new InvalidDataException("Native toggle did not retain input ownership.");
                         input.BeginFrame();
                         input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, 1, 1));
                         foreach (double ms in times)
                         {
-                            owner.Update(input, snapshot.SessionId, true, layout, TimeSpan.FromMilliseconds(start + ms), !reduced);
+                            owner.Update(input, snapshot.SessionId, true, layout, TimeSpan.FromMilliseconds(start + ms), !reduced, detailed: true);
                             input.BeginFrame();
                             var ux = default(PreAlphaUxView) with { ShowOnboarding = true, Guidance = guidance, Onboarding = owner.View };
                             // Slowly traverse the frozen permitted fixture; never mutate simulation or dispatch a command.

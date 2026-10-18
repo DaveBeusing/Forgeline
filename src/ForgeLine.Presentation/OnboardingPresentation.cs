@@ -8,7 +8,9 @@ public enum OnboardingPhase { Hidden, Expanded, Collapsing, Collapsed, Expanding
 public readonly record struct OnboardingPresentation(OnboardingPhase Phase, HudRect Panel, HudRect Clip,
     HudRect VisiblePanel, HudRect Tab, float Collapse, bool Focused = false)
 {
-    public const int ContractVersion = 1;
+    public const int ContractVersion = 2;
+    public bool Detailed { get; init; }
+    public int FocusControl { get; init; } = -1;
     public const float BackgroundAlpha = .84f;
     public const float TabWidth = 56;
     public static readonly TimeSpan Duration = TimeSpan.FromMilliseconds(220);
@@ -18,9 +20,9 @@ public readonly record struct OnboardingPresentation(OnboardingPhase Phase, HudR
     public bool Compact => Clip.Width < 260 || Clip.Height < 140;
     public bool Visible => Phase != OnboardingPhase.Hidden;
     public bool Contains(Vector2 point) => Visible && (VisiblePanel.Contains(point) || Tab.Contains(point));
-    public static OnboardingPresentation Resolve(in GameplayHudLayout layout, float collapse, bool visible = true, bool focused = false)
+    public static OnboardingPresentation Resolve(in GameplayHudLayout layout, float collapse, bool visible = true, bool focused = false, bool detailed = false)
     {
-        var clip = GameplayGuidanceLayout.Resolve(layout);
+        var clip = GameplayGuidanceLayout.Resolve(layout, detailed);
         if (!visible || clip.IsEmpty) return default;
         collapse = Math.Clamp(collapse, 0, 1);
         var panel = clip with { X = clip.X - clip.Width * collapse };
@@ -29,7 +31,7 @@ public readonly record struct OnboardingPresentation(OnboardingPhase Phase, HudR
             MathF.Min(clip.Width, TabWidth * MathF.Max(1, MathF.Min(layout.Scale, 1.5f))),
             MathF.Min(clip.Height, 48 * MathF.Max(1, MathF.Min(layout.Scale, 1.5f)))) : default;
         return new(collapse == 0 ? OnboardingPhase.Expanded : collapse == 1 ? OnboardingPhase.Collapsed : OnboardingPhase.Collapsing,
-            panel, clip, painted, tab, collapse, focused);
+            panel, clip, painted, tab, collapse, focused) { Detailed = detailed };
     }
     public static HudRect Intersect(HudRect a, HudRect b)
     {
