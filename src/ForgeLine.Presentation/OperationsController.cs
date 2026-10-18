@@ -192,7 +192,8 @@ public sealed class OperationsController
             {
                 foreach (var facility in data.Facilities)
                     if (facility.Entity == View.Selected)
-                        return new(true, facility.Entity, index == 10 ? facility.Controls : PlayerActionPanelMode.Closed);
+                        return new(true, LogisticsStatusCatalog.IsBlocked(facility.Service) && facility.Service.VehicleQueue is { WaitReason: not VehicleQueueWaitReason.Unavailable } queue
+                            ? queue.Building : facility.Entity, index == 10 ? facility.Controls : PlayerActionPanelMode.Closed);
             }
             break;
         }

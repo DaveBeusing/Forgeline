@@ -156,6 +156,11 @@ internal static class HoverTooltipResolver
                     }
                     break;
                 case PlayerActionPanelMode.Supply when actions.Supply is { } supply:
+                    if (supply.IsStaticProvider)
+                    {
+                        requirement = supply.HasLocalProviderInventory ? $"LOCAL PROVIDER FUEL {supply.LocalProviderFuel:0.##} / AMMUNITION {supply.LocalProviderAmmunition:0.##}" : "LOCAL PROVIDER INVENTORY UNAVAILABLE";
+                        hint = "LOGISTICS / APPLY POLICY REPLENISHES LOCAL PROVIDER STOCK"; break;
+                    }
                     requirement = $"{LogisticsStatusCatalog.DriveTank(supply)}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}";
                     hint = LogisticsStatusCatalog.ServiceDetails(supply.Service);
                     break;

@@ -13,6 +13,22 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class PlayerActionPanelTests
 {
     [Fact]
+    public void StaticProviderStockDoesNotOfferRecipientCommandsByMouseOrKeyboard()
+    {
+        var supply = new PlayerSupplyActionReadModel(new(50,1),default,1,1,true,.5,.5,default,default,0,0,default)
+            { IsStaticProvider = true, HasLocalProviderInventory = true, LocalProviderFuel = 75, LocalProviderAmmunition = 40 };
+        var snapshot = CreateSnapshot(supply:supply);
+        var controller = new PlayerActionPanelController(); var input = new InputState();
+        controller.Update(input,snapshot,1600,900);
+        foreach (var key in new[]{ PlatformKey.Y,PlatformKey.T,PlatformKey.M,PlatformKey.Left,PlatformKey.Right,PlatformKey.Enter })
+        { Press(input,key); controller.Update(input,snapshot,1600,900); Release(input,key); controller.Update(input,snapshot,1600,900); }
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.False(PlayerActionDockHudModel.ResolveItemState(PlayerActionPanelMode.Supply,0,snapshot.PlayerActions).CanActivate);
+        Assert.False(PlayerActionDockHudModel.CanCyclePrimary(PlayerActionPanelMode.Supply,snapshot.PlayerActions));
+        Assert.False(PlayerActionDockHudModel.CanCycleSecondary(PlayerActionPanelMode.Supply,snapshot.PlayerActions));
+    }
+
+    [Fact]
     public void ProductionInputsPreviewPreparesEachResourceWithoutDispatchingAndResetsAcrossEntities()
     {
         var steel = new PlayerStockPolicyActionReadModel(default, ResourceIds.Steel, "Steel", 0, 5, 10, 20,

@@ -377,6 +377,10 @@ public readonly record struct PlayerSupplyActionReadModel(
 {
     public PlayerWorkSummary Service { get; init; }
     public bool IsSupplyTruck { get; init; }
+    public bool IsStaticProvider { get; init; }
+    public bool HasLocalProviderInventory { get; init; }
+    public double LocalProviderFuel { get; init; }
+    public double LocalProviderAmmunition { get; init; }
     public double CargoFuel { get; init; }
     public double CargoAmmunition { get; init; }
     public double DriveFuelQuantity { get; init; }
@@ -1556,6 +1560,8 @@ internal static class PlayerActionSnapshotFactory
                 ? configuredPriority.Priority
                 : BattlefieldSupplyPriority.Normal;
 
+        bool hasLocalProvider = entities.TryGetComponent(entity, out SupplyProvider localProvider);
+        bool hasLocalInventory = hasLocalProvider && scenario.Inventories.Contains(localProvider.InventoryId);
         return new PlayerSupplyActionReadModel(
             entity,
             supplyState.Status,
@@ -1572,6 +1578,10 @@ internal static class PlayerActionSnapshotFactory
             priority)
         {
             IsSupplyTruck = entities.HasComponent<SupplyTruck>(entity),
+            IsStaticProvider = hasLocalProvider && !entities.HasComponent<SupplyTruck>(entity),
+            HasLocalProviderInventory = hasLocalInventory,
+            LocalProviderFuel = hasLocalInventory ? scenario.Inventories.GetQuantity(localProvider.InventoryId,ResourceIds.Fuel) : 0,
+            LocalProviderAmmunition = hasLocalInventory ? scenario.Inventories.GetQuantity(localProvider.InventoryId,ResourceIds.Ammunition) : 0,
             CargoFuel = entities.TryGetComponent(entity, out SupplyTruck cargoFuel) && scenario.Inventories.Contains(cargoFuel.InventoryId)
                 ? scenario.Inventories.GetQuantity(cargoFuel.InventoryId, ResourceIds.Fuel) : 0,
             CargoAmmunition = entities.TryGetComponent(entity, out SupplyTruck cargoAmmo) && scenario.Inventories.Contains(cargoAmmo.InventoryId)

@@ -4,7 +4,33 @@ namespace ForgeLine.Presentation;
 
 public static class LogisticsStatusCatalog
 {
-    public static string Service(PlayerWorkSummary work) => work.VehicleQueue is { } queue ? queue.Status switch
+    public static bool IsBlocked(PlayerWorkSummary work) => work.LoadingQueue is { ExitBlocked: true } ||
+        work.VehicleQueue is { } queue && (queue.WaitReason is VehicleQueueWaitReason.GeometryBlocked or VehicleQueueWaitReason.Unavailable ||
+            queue.DockReason is VehicleDockBlockReason.Obstructed or VehicleDockBlockReason.OutsideTerrain or VehicleDockBlockReason.ExitBlocked or
+                VehicleDockBlockReason.MissingGeometry or VehicleDockBlockReason.InvalidOwner or VehicleDockBlockReason.SourceEmpty or VehicleDockBlockReason.TargetFull);
+
+    public static string BlockedCause(PlayerWorkSummary work) => !IsBlocked(work) ? string.Empty : work.VehicleQueue is { } queue ?
+        queue.WaitReason == VehicleQueueWaitReason.Unavailable ? "NoDriveFuel" : queue.DockReason switch
+        {
+            VehicleDockBlockReason.SourceEmpty => "SourceEmpty",
+            VehicleDockBlockReason.TargetFull => "DestinationFull",
+            VehicleDockBlockReason.ExitBlocked => "LoadingExitBlocked",
+            _ => "LoadingAccessBlocked"
+        } : "LoadingExitBlocked";
+
+    public static string Service(PlayerWorkSummary work) => work.VehicleQueue is { } queue ? queue.DockReason switch
+    {
+        VehicleDockBlockReason.SourceEmpty => "NO SOURCE STOCK",
+        VehicleDockBlockReason.TargetFull => "DEST FULL",
+        VehicleDockBlockReason.ExitBlocked => "EXIT BLOCKED",
+        VehicleDockBlockReason.Obstructed or VehicleDockBlockReason.OutsideTerrain => "ACCESS BLOCKED",
+        VehicleDockBlockReason.MissingGeometry => "NO LOADING BAY",
+        VehicleDockBlockReason.InvalidOwner => "BAY UNAVAILABLE",
+        _ => VehicleService(queue)
+    } : work.LoadingQueue is { } loading ? loading.ExitBlocked ? "EXIT BLOCKED" :
+        loading.ServiceOccupied ? "BAY OCCUPIED" : "VEHICLES QUEUED" : "ACCESS NOT OBSERVED";
+
+    private static string VehicleService(PlayerVehicleQueueSummary queue) => queue.Status switch
     {
         VehicleDockStatus.Aligning => "ALIGNING",
         VehicleDockStatus.Servicing => queue.Service == VehicleQueueService.CargoDelivery ? "UNLOADING" : "LOADING",
@@ -19,8 +45,7 @@ public static class LogisticsStatusCatalog
             VehicleQueueWaitReason.OccupiedExit => "WAITING FOR EXIT",
             _ => "WAITING FOR LOADING BAY"
         }
-    } : work.LoadingQueue is { } loading ? loading.ExitBlocked ? "EXIT BLOCKED" :
-        loading.ServiceOccupied ? "BAY OCCUPIED" : "VEHICLES QUEUED" : "ACCESS NOT OBSERVED";
+    };
 
     public static string Advice(LogisticsTransportRequestFailureReason failure) => failure switch
     {

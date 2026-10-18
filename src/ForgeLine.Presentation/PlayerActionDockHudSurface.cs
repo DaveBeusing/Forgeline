@@ -692,6 +692,13 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
 
         PlayerSupplyActionReadModel value =
             supply.Value;
+        if (value.IsStaticProvider)
+        {
+            if (!value.HasLocalProviderInventory) { text.Append("PROVIDER INVENTORY UNAVAILABLE"); return; }
+            text.Append("LOCAL PROVIDER FUEL "); text.Append(value.LocalProviderFuel,"F0");
+            text.Append(" AMMO "); text.Append(value.LocalProviderAmmunition,"F0");
+            text.Append(" / LOGISTICS FOR STOCK POLICY"); return;
+        }
 
         text.Append(
             SelectionInspectorHudModel.ResolveSupplyLabel(

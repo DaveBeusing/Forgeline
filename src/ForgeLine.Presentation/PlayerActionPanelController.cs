@@ -1201,6 +1201,7 @@ public sealed partial class PlayerActionPanelController
     private void CyclePrimarySetting(
         PlayerActionSnapshot? actions)
     {
+        if (Mode == PlayerActionPanelMode.Supply && actions?.Supply is { IsStaticProvider: true }) return;
         if (Mode is
             PlayerActionPanelMode.Production or
             PlayerActionPanelMode.UnitProduction)
@@ -1259,6 +1260,7 @@ public sealed partial class PlayerActionPanelController
     private void CycleSecondarySetting(
         PlayerActionSnapshot? actions)
     {
+        if (Mode == PlayerActionPanelMode.Supply && actions?.Supply is { IsStaticProvider: true }) return;
         if (Mode ==
             PlayerActionPanelMode.Production)
         {
@@ -1306,6 +1308,7 @@ public sealed partial class PlayerActionPanelController
         PlayerActionSnapshot? actions,
         int direction)
     {
+        if (Mode == PlayerActionPanelMode.Supply && actions?.Supply is { IsStaticProvider: true }) return;
         if (direction == 0)
         {
             return;

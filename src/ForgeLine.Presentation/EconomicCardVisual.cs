@@ -45,7 +45,7 @@ internal readonly record struct EconomicCardVisual(UiSkinState State, string Lab
         if (mode == PlayerActionPanelMode.Logistics && actions.Logistics is { } logistics && index < logistics.Policies.Count)
         {
             var stock = logistics.Policies[index];
-            if (stock.Service.VehicleQueue is { }) return new(UiSkinState.Normal, LogisticsStatusCatalog.Service(stock.Service));
+            if (stock.Service.VehicleQueue is { }) return new(LogisticsStatusCatalog.IsBlocked(stock.Service) ? UiSkinState.Warning : UiSkinState.Normal, LogisticsStatusCatalog.Service(stock.Service));
             if (stock.FailureReason != LogisticsTransportRequestFailureReason.None)
                 return new(UiSkinState.Warning, PlayerActionDockHudModel.ResolveTransportFailureLabel(stock.FailureReason));
             if (stock.BottleneckReason != LogisticsBottleneckReason.None)

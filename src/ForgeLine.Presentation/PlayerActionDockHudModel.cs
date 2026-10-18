@@ -437,6 +437,7 @@ internal static class PlayerActionDockHudModel
                         "SELECT LOGISTICS");
 
             case PlayerActionPanelMode.Supply:
+                if (actions.Supply is { IsStaticProvider: true }) return PlayerActionDockItemState.Disabled("USE LOGISTICS FOR STOCK");
                 return actions.Supply.HasValue &&
                        index < 3
                     ? PlayerActionDockItemState.Enabled
@@ -604,7 +605,7 @@ internal static class PlayerActionDockHudModel
             PlayerActionPanelMode.Logistics =>
                 actions?.Logistics is not null,
             PlayerActionPanelMode.Supply =>
-                actions?.Supply is not null,
+                actions?.Supply is { IsStaticProvider: false },
             _ =>
                 false
         };
@@ -619,7 +620,7 @@ internal static class PlayerActionDockHudModel
             PlayerActionPanelMode.Logistics =>
                 actions?.Logistics is not null,
             PlayerActionPanelMode.Supply =>
-                actions?.Supply is not null,
+                actions?.Supply is { IsStaticProvider: false },
             _ =>
                 false
         };
@@ -660,7 +661,7 @@ internal static class PlayerActionDockHudModel
 
         return mode ==
                    PlayerActionPanelMode.Supply &&
-               actions.Supply.HasValue &&
+               actions.Supply is { IsStaticProvider: false } &&
                index <= 1;
     }
 

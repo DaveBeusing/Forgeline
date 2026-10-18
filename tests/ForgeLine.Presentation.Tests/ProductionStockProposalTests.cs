@@ -55,6 +55,8 @@ public sealed class ProductionStockProposalTests
     {
         var work = new PlayerWorkSummary(default,default,0,"","",new(new(70,3),9,VehicleQueueService.CargoPickup,4,8,status,reason,default,new(20)));
         Assert.Equal(expected, LogisticsStatusCatalog.Service(work));
+        Assert.Equal(reason == VehicleQueueWaitReason.GeometryBlocked,LogisticsStatusCatalog.IsBlocked(work));
+        if (!LogisticsStatusCatalog.IsBlocked(work)) Assert.Empty(LogisticsStatusCatalog.BlockedCause(work));
         Assert.Contains("POSITION 4", LogisticsStatusCatalog.ServiceDetails(work));
         Assert.Equal("ACCESS NOT OBSERVED", LogisticsStatusCatalog.Service(default));
     }

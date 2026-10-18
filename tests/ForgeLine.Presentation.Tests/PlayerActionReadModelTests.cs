@@ -70,6 +70,11 @@ public sealed class PlayerActionReadModelTests
         scenario.Simulation.AdvanceOneTick();
         Assert.True(buffer.TryReadLatest(out snapshot));
         Assert.Equal(side.StartingUnits.Count(unit => scenario.Simulation.Entities.HasComponent<CargoTransport>(unit)),snapshot.PlayerActions!.Logistics!.CargoFleet.Total);
+        var coreSupply = Assert.IsType<PlayerSupplyActionReadModel>(snapshot.PlayerActions.Supply);
+        Assert.True(coreSupply.IsStaticProvider);
+        Assert.True(coreSupply.HasLocalProviderInventory);
+        Assert.Equal(scenario.Inventories.GetQuantity(side.StartingInventory,ResourceIds.Fuel),coreSupply.LocalProviderFuel);
+        Assert.Equal(scenario.Inventories.GetQuantity(side.StartingInventory,ResourceIds.Ammunition),coreSupply.LocalProviderAmmunition);
     }
 
     [Fact]
