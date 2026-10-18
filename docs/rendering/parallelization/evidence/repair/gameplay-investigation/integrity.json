@@ -331,6 +331,26 @@
       "file": "foundation-vanguard-game-suite.log.gz",
       "rawSha256": "1e82ae821ddd49927be5868dabaaaef9abbc2d92a616a8c1c655a8ff69352d38",
       "archiveSha256": "ac590b0fa5ccb9cee24f7b3a16be262f935cde3dbd26d17fd36a9cd6f8db79b2"
+    },
+    {
+      "file": "foundation-vanguard-opponent.json.gz",
+      "rawSha256": "94ac08e0539360cbb48fb3e5192355eb52d455a7fedcc16728f75d4de611c728",
+      "archiveSha256": "172e668ffbc1169a70f27c6ffe936c7b79cf70fe70b2535cac93f2b59eb16609"
+    },
+    {
+      "file": "foundation-vanguard-opponent.save.json.gz",
+      "rawSha256": "19f434eee20b4e9bd10bd932a32cc861da8a0eec285320d134b37b8ff39d85b5",
+      "archiveSha256": "0f4f3cbd7505eec1540f0ba5d35bdb4bd2733e1413c278d3cc5c605ac6058beb"
+    },
+    {
+      "file": "foundation-vanguard-opponent-telemetry.json.gz",
+      "rawSha256": "0a76db498e91ab233f9d84a896f589b3cd0a0a0903dc9c5b441909a3f39f0dc7",
+      "archiveSha256": "4eb0dab6b066e5d590922e20cab01559d81887647398c2456dfdf0cb118c96f2"
+    },
+    {
+      "file": "foundation-vanguard-opponent.log.gz",
+      "rawSha256": "7dceed131eaa435b8975d9eb39918624d2b44fb3da34e139d650c42877aeaf58",
+      "archiveSha256": "368e50ffccb3f2a2251fb3e2abea4c07d91bc6898a8d4ea68b4fe46128c76b00"
     }
   ]
 }

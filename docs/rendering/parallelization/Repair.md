@@ -549,3 +549,20 @@ Master has subsequently advanced through PR #239 (logistics setup UI), with
 fixture 6 and product version 0.1.404. Integrate it before final qualification;
 the next PR version must be exactly 0.1.405. Fixture-5 results above retain their
 actual source identities and are not represented as fixture-6 acceptance.
+
+### Current integration checkpoint (fixture 6, product 0.1.405)
+
+Master eee4b603 (PR #239, logistics setup UI) is integrated at ad491690.
+Product 0.1.405 is one PATCH above master 0.1.404. The full combined solution
+build/test is in progress; the prior 568-case Game result predates that merge.
+The vanguard source also fails the unchanged 80,000-tick terminal gate: Active /
+Running, no winner. Its report, telemetry, save and log are retained, not counted
+as acceptance. Hosted CI 39141378113 at 7c2988d5 fails the same full-match step;
+CPU scalability, frame contracts and navigation/movement pass on that source.
+
+The retained compressed evidence reproduces all 60 paired native images exactly
+and preserves every performance failure from all five protocols. Fixture-5 p99
+still fails once (+17.65% with a 15% limit); fixture-6 performance remains pending.
+The user confirms AC operation with the performance profile. The idle 20 W reading
+therefore remains an observation, with no proven causal attribution and no system
+setting changes. Parallel release remains false and this PR remains draft.

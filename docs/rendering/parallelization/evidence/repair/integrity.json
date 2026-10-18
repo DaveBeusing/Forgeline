@@ -775,5 +775,25 @@
     "file": "gameplay-investigation/foundation-vanguard-game-suite.log.gz",
     "originalSha256": "1E82AE821DDD49927BE5868DABAAAEF9ABBC2D92A616A8C1C655A8FF69352D38",
     "compressedSha256": "AC590B0FA5CCB9CEE24F7B3A16BE262F935CDE3DBD26D17FD36A9CD6F8DB79B2"
+  },
+  {
+    "file": "gameplay-investigation/foundation-vanguard-opponent.json.gz",
+    "originalSha256": "94AC08E0539360CBB48FB3E5192355EB52D455A7FEDCC16728F75D4DE611C728",
+    "compressedSha256": "172E668FFBC1169A70F27C6FFE936C7B79CF70FE70B2535CAC93F2B59EB16609"
+  },
+  {
+    "file": "gameplay-investigation/foundation-vanguard-opponent.save.json.gz",
+    "originalSha256": "19F434EEE20B4E9BD10BD932A32CC861DA8A0EEC285320D134B37B8FF39D85B5",
+    "compressedSha256": "0F4F3CBD7505EEC1540F0BA5D35BDB4BD2733E1413C278D3CC5C605AC6058BEB"
+  },
+  {
+    "file": "gameplay-investigation/foundation-vanguard-opponent-telemetry.json.gz",
+    "originalSha256": "0A76DB498E91AB233F9D84A896F589B3CD0A0A0903DC9C5B441909A3F39F0DC7",
+    "compressedSha256": "4EB0DAB6B066E5D590922E20CAB01559D81887647398C2456DFDF0CB118C96F2"
+  },
+  {
+    "file": "gameplay-investigation/foundation-vanguard-opponent.log.gz",
+    "originalSha256": "7DCEED131EAA435B8975D9EB39918624D2B44FB3DA34E139D650C42877AEAF58",
+    "compressedSha256": "368E50FFCCB3F2A2251FB3E2ABEA4C07D91BC6898A8D4EA68B4FE46128C76B00"
   }
 ]
