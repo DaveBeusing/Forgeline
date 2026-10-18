@@ -13,7 +13,7 @@ internal readonly record struct HoverTooltipContent(
     uint? ProductionTicks = null,
     string Requirement = "",
     IReadOnlyList<PlayerTechnologyPrerequisiteReadModel>? Prerequisites = null,
-    string WorkStatus = "", string Explanation = "", UiSkinState VisualState = UiSkinState.Normal);
+    string WorkStatus = "", string Explanation = "", UiSkinState VisualState = UiSkinState.Normal, bool WrapDetails = false);
 
 internal static class HoverTooltipResolver
 {
@@ -57,7 +57,9 @@ internal static class HoverTooltipResolver
             else if (selected.Supply is { } supply && supply.Entity == world.Entity)
                 explanation = $"{LogisticsStatusCatalog.DriveTank(supply)}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
         }
-        return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation);
+        return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation,
+            WrapDetails: world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } owned &&
+                (owned.Logistics?.Entity == world.Entity || owned.Supply?.Entity == world.Entity));
     }
 
     private static HoverTooltipContent? ResolveDock(PresentationSnapshot snapshot, in HoverTooltipView view,
@@ -196,7 +198,8 @@ internal static class HoverTooltipResolver
             Costs: costs, Outputs: outputs, ProductionTicks: ticks, Requirement: requirement, Prerequisites: prerequisites,
             WorkStatus: ProductionContextFeedback.WorkLabel(workReason),
             Explanation: explanation,
-            VisualState: EconomicCardVisual.Resolve(mode, index, actions, ContextualCommandModel.HasPending(panel, snapshot)).State);
+            VisualState: EconomicCardVisual.Resolve(mode, index, actions, ContextualCommandModel.HasPending(panel, snapshot)).State,
+            WrapDetails: mode is PlayerActionPanelMode.Logistics or PlayerActionPanelMode.Supply);
     }
 
     private static string ResolveControlTitle(PlayerActionDockControlKind control, PlayerActionPanelMode mode)

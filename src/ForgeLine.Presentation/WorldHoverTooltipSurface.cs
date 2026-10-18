@@ -19,6 +19,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     private readonly TooltipVertex[] _vertices = new TooltipVertex[MaxVertices];
     private int _count;
     private int _line;
+    private bool _wrapDetails, _measuring;
     private HudRect _bounds;
     private float _scale;
     private int _width, _height;
@@ -58,8 +59,13 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (_width <= 0 || _height <= 0) return;
         _count = 0;
         _line = 0;
-        // Reserve a bounded twelve-line panel; use the measured line count for its tight final bounds.
-        int lines = CountLines(resolved);
+        // Logistics details use the same bounded word layout for measurement and drawing.
+        _wrapDetails = resolved.WrapDetails;
+        _measuring = true;
+        EmitContent(resolved);
+        int lines = _line;
+        _line = 0;
+        _measuring = false;
         _scale = MathF.Min(_scale, MathF.Min(context.Layout.SafeArea.Width / 350,
             context.Layout.SafeArea.Height / (16 + lines * 14)));
         _bounds = HoverTooltipPlacement.Resolve(view.PointerPosition, context.Layout,
@@ -70,6 +76,24 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (!_skin.Ready) Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 25 * _scale), GameplayHudVisualStyle.PanelHeader);
         Quad(new HudRect(_bounds.X, _bounds.Bottom - _scale, _bounds.Width, _scale), GameplayHudVisualStyle.QuietBorder);
         Quad(new HudRect(_bounds.X, _bounds.Y, MathF.Min(2 * _scale, _bounds.Width), _bounds.Height), GameplayHudVisualStyle.TextPrimary);
+        EmitContent(resolved);
+        if (!_buffers.TryGetValue(context.Graphics.FrameIndex, out var buffer))
+        {
+            buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload));
+            _buffers.Add(context.Graphics.FrameIndex, buffer);
+        }
+        _skin.Flush(context.Graphics);
+        buffer.SetData<TooltipVertex>(_vertices.AsSpan(0, _count));
+        context.Graphics.SetPipeline(_pipeline);
+        context.Graphics.SetVertexBuffer(buffer, 24);
+        context.Graphics.Draw(_count);
+        _text.Render(context.Graphics);
+        LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
+        LastBounds = _bounds;
+    }
+
+    private void EmitContent(in HoverTooltipContent resolved)
+    {
         Line(resolved.Title, true);
         Line(resolved.Role);
         Line(resolved.Status);
@@ -98,37 +122,6 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             }
         }
         Line(resolved.Hint);
-        if (!_buffers.TryGetValue(context.Graphics.FrameIndex, out var buffer))
-        {
-            buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload));
-            _buffers.Add(context.Graphics.FrameIndex, buffer);
-        }
-        _skin.Flush(context.Graphics);
-        buffer.SetData<TooltipVertex>(_vertices.AsSpan(0, _count));
-        context.Graphics.SetPipeline(_pipeline);
-        context.Graphics.SetVertexBuffer(buffer, 24);
-        context.Graphics.Draw(_count);
-        _text.Render(context.Graphics);
-        LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
-        LastBounds = _bounds;
-    }
-
-    private static int CountLines(in HoverTooltipContent content)
-    {
-        int count = 2 + (content.Status.Length > 0 ? 1 : 0) + (content.Hint.Length > 0 ? 1 : 0) +
-            (content.Requirement.Length > 0 ? 1 : 0) + (content.ProductionTicks.HasValue ? 1 : 0);
-        count += (content.WorkStatus.Length > 0 ? 1 : 0) + (content.Explanation.Length > 0 ? 1 : 0);
-        if (content.World is { } world)
-        {
-            var details = world.OwnedDetails;
-            count += (details.HasHealth ? 1 : 0) + (details.HasSupply ? 2 : 0) +
-                (details.HasReadiness ? 1 : 0) + (details.HasPower ? 1 : 0) +
-                (details.Work.Kind != PlayerWorkKind.None ? 2 : 0) +
-                (world.RemainingQuantity.HasValue ? 1 : 0) + (world.Requirement.Length > 0 ? 1 : 0);
-        }
-        count += Math.Min(content.Costs?.Count ?? 0, 3) + Math.Min(content.Outputs?.Count ?? 0, 2);
-        count += Math.Min(content.Prerequisites?.Count ?? 0, 2);
-        return Math.Min(count, MaxLines);
     }
 
     private void EmitWorld(in PlayerHoverSummary world)
@@ -179,7 +172,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     private void EmitAmounts(IReadOnlyList<PlayerActionResourceAmount> amounts, string label)
     {
         Span<char> text = stackalloc char[160];
-        int maximum = label == "OUT" ? 2 : 3;
+        int maximum = _wrapDetails ? 7 : label == "OUT" ? 2 : 3;
         for (int i = 0; i < Math.Min(amounts.Count, maximum); i++)
         {
             var amount = amounts[i];
@@ -190,9 +183,29 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         }
     }
 
+    internal static int WrappedPrefix(ReadOnlySpan<char> text, bool primary, bool nativeText)
+    {
+        int fit = nativeText ? UiFontMetrics.Default.FitPrefix(text, 312, UiTypography.Style(UiTextRole.Tooltip).Size, primary) : Math.Min(48, text.Length);
+        if (fit >= text.Length) return text.Length;
+        int space = text[..Math.Max(0, fit)].LastIndexOf(' ');
+        return Math.Max(1, space > 0 ? space : fit);
+    }
+
     private void Line(ReadOnlySpan<char> text, bool primary = false)
     {
-        if (text.IsEmpty || _line >= MaxLines) return;
+        if (!_wrapDetails) { SingleLine(text, primary); return; }
+        while (!text.IsEmpty && _line < 48)
+        {
+            int length = WrappedPrefix(text, primary, _text.Ready);
+            SingleLine(text[..length], primary);
+            text = text[length..].TrimStart();
+        }
+    }
+
+    private void SingleLine(ReadOnlySpan<char> text, bool primary)
+    {
+        if (text.IsEmpty || _line >= (_wrapDetails ? 48 : MaxLines)) return;
+        if (_measuring) { _line++; return; }
         float x = _bounds.X + 8 * _scale;
         float y = _bounds.Y + (8 + _line++ * 14) * _scale;
         if (y + 7 * _scale > _bounds.Bottom - 4 * _scale) return;

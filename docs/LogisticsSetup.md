@@ -40,3 +40,5 @@ ProductionStockProposalTests cover shared capacity, reservations, outstanding de
 Native LogisticsInputs and LogisticsPolicyTooltip states extend the existing reference lane. Authored UI fixtures demonstrate structure; they do not replace the actual transport regression or human motion, legibility and physical-display acceptance. Required full CI and natural terminal-match gates remain unchanged.
 
 Confirmed access obstructions, missing drive Fuel and blocked exits enter OPERATIONS / BLOCKED. Access and storage blocks focus the copied loading-building identity; a missing drive-Fuel block focuses the truck and opens Supply. Normal FIFO waiting remains informational. Static providers show their own real Fuel/Ammunition stock and use Logistics policies; recipient resupply commands are unavailable for buildings.
+
+Logistics and Supply tooltip details wrap within the viewport instead of truncating each explanation to one line. Catalog input tooltips include all four Scout materials; compact/high-DPI qualification uses the same measured wrapping as drawing.
