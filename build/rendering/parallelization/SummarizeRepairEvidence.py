@@ -88,12 +88,23 @@ def main():
     args = parser.parse_args()
     report = {"schemaVersion": 2, "cohorts": {}}
     prefixes = args.prefix or [p for p in (
-        "foundation-serial-pair", "foundation-final-pair", "foundation-current-pair", "foundation-cleared-pair", "foundation-queue-pair")
+        "foundation-serial-pair", "foundation-final-pair", "foundation-current-pair", "foundation-cleared-pair", "foundation-queue-pair", "foundation-ui-pair", "foundation-isolated-ui-pair")
         if (args.root / f"{p}1-before").exists()]
     if not prefixes:
         parser.error("No complete predefined repair protocol was found.")
     for prefix in prefixes:
         report["cohorts"][prefix] = summarize_pairs(args.root, prefix)
+        if prefix == "foundation-ui-pair":
+            report["cohorts"][prefix]["workloadIsolation"] = "Foreign native UI captures overlap both pairs; retained, not isolated acceptance."
+        elif prefix == "foundation-isolated-ui-pair":
+            monitor = args.root / "foundation-isolated-ui-process-monitor.jsonl.gz"
+            raw = gzip.decompress(monitor.read_bytes()) if monitor.exists() else monitor.with_suffix("").read_bytes()
+            observations = [json.loads(line) for line in raw.decode("utf-8-sig").splitlines()]
+            assert observations and all(not row["foreign"] for row in observations)
+            assert len({row["capture"] for row in observations}) == 4
+            report["cohorts"][prefix]["workloadIsolation"] = {
+                "processObservations": len(observations), "foreignWorkloads": 0,
+                "method": "External process samples every two seconds; cannot exclude activity shorter than the sampling interval."}
     trace = manifest(args.root, "foundation-repair-wait-trace")
     report["waitTraceSource"] = trace["commit"]
     report["waitTrace"] = []

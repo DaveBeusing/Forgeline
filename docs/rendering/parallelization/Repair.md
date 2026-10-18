@@ -585,3 +585,167 @@ refined condition passes all 82 supply and strategic tests (zero failures/skips,
 2m39.938s), including those exact deadlines. The full Game rerun and unchanged
 80,000-tick terminal check remain pending. Their eventual result must not be
 inferred from the focused pass. Parallel release remains false.
+
+### Completed local integrated and final-Game tests
+
+The combined fixture-6 source corresponding to 7e485bf9 (the build preceded that
+checkpoint commit, with the same source and product 0.1.405) completes the full
+solution: 2,775 passed, zero failed, 17 explicit optional skips, 2,792 total,
+25m15.321s. The build has zero warnings/errors (1m28.09s). Required source-contract
+checks retain the original ownership and version rules.
+
+The subsequent runtime source 25f40607 passes all 570 Game tests, zero failures or
+skips, 3m41.713s, after the independent 82-case supply/strategy pass. This is an
+affected-suite rerun after the final AI change, not a second complete-solution
+run. Its separate headless build also has zero warnings/errors. The full-match
+and fixture-6 native protocol are still pending at this checkpoint; they are not
+implied by the green component/solution results.
+
+### Fixture-6 native overlap and isolated protocol
+
+Runtime source 25f40607 also fails the unchanged terminal gate locally and in
+hosted CI 39147411406: Active / Running at 80,000 ticks, no winner. Frame contracts,
+CPU scalability and navigation/movement pass; optional native-reference is skipped.
+The complete local report, telemetry, save and log are retained.
+
+The first fixture-6 B-A-A-B protocol, foundation-ui-pair, has four and three
+performance failures respectively. Foreign native UI captures overlap both pairs,
+confirmed by request/output timestamps and observed client process arguments.
+The sanitized overlap record is retained. These measurements remain available,
+but cannot qualify isolated source attribution. No foreign process was stopped.
+
+Following user-authorized coordination, a separate fixed B-A-A-B protocol runs with
+128 warmups, 512 samples, two exact pixel captures per case and external process
+monitoring every two seconds. All 165 observations across four matrices have zero
+foreign matching clients/headless/test workloads. Activity shorter than the polling
+interval and unrelated operating-system activity are not excluded by this monitor.
+The exact orchestration script and raw process observations are retained.
+
+The isolated first pair fails only MBT Strategic medians: CPU 19.3791 -> 22.615 ms
+(+16.6979%) and GPU 16.857248 -> 21.008224 ms (+24.6243%). The CPU mean/p95/p99 all
+pass. The reverse-order second pair passes all CPU/GPU statistics and all six cases.
+The unchanged 15% gate therefore remains open; the passing cohort does not override
+the failures. No repeat-until-pass selection or threshold change is used.
+All 84 paired images across seven complete protocols are exact; per-frame texture,
+descriptor and upload plateaus and device health remain valid.
+
+A separate temporary fence-timeout logging build captures one MBT Strategic case
+under concurrent UI load. It records 512 samples, exact repeats, waits up to
+147.5865 ms and no false-return timeout log entries. The source is 25f40607 plus
+the retained diagnostic patch, not the unmodified qualification binary. The original
+runtime source was restored byte-exact after this build. This experiment does not
+qualify performance or establish a cause for every long wait. The original wait
+polling interval and 10-second failure deadline remain unchanged.
+
+### Mature cargo capacity investigation
+
+The expanded-network regression reproduces the bootstrap cargo ceiling with a
+complete four-stage processing chain and additional depots: the existing four
+trucks never request more freight capacity. A bounded additive-demand variant
+passes both focused cases but fails the existing eastern 40,000-tick offensive
+objective test in the full suite (570 passed, one failed, no skips). That broad
+variant is excluded and its runtime patch and full results are retained. The next
+candidate preserves the existing assault and mature-supply minima before expanding
+cargo capacity. It remains unqualified until its complete suite and terminal test
+finish. Parallel release remains false and PR #237 remains draft.
+
+The user's explicit scope extension, “Gameplay-Ursache hier mitbeheben”, also
+covers the necessary production-policy regression test. Its exact path is added
+to the serial foundation ownership list; parallel implementation remains disabled.
+No additional production workstream is released by this ownership update.
+
+The refined source is committed as fb6a0be6. It requires the existing scout,
+objective-pressure tank, artillery and mature supply-truck minima before the
+additional independent cargo routes can increase the target (hard ceiling eight).
+Three focused queue cases pass: baseline logistics recovery, full industry without
+an established assault fleet, and mature independent-route demand. The complete
+Game suite passes all 572 cases, zero failures/skips, 2m36.487s. Its build precedes
+the checkpoint commit with identical runtime/test source; the retained provenance
+record distinguishes this from the freshly built headless binary. The headless
+build has zero warnings/errors (59.16s). The strict terminal run is now pending.
+
+The strategic GPU time series has two descriptive duration groups in every side
+of both isolated pairs. At a descriptive 20ms split, first-pair baseline/repair
+have 267/243 fast samples and 240/267 slow samples. Their group means remain close:
+14.320/14.350ms and 23.265/23.169ms. The reverse pair also contains both groups.
+Thus a small change in group proportions can move the median across the two
+clusters. This describes the retained samples; it does not prove a hardware or
+scheduler cause, remove samples, change the gate or turn a failure into acceptance.
+The CPU Prepare/Record means decrease in the first pair (0.5240/0.8797ms to
+0.3640/0.7225ms); elapsed frame time includes GPU/frame reuse waits. No additional
+repeat of unchanged binaries is selected to obtain a passing median.
+
+The fb6a0be6 full-match check also fails: 80,000 ticks, Active / Running, no winner.
+Actual cargo completions rise from 224 to 312 and deliveries from 22,926 to
+30,997.506878 units, but this is not terminal acceptance. The complete report,
+save, telemetry and log remain retained. The western scout 83:2 is paused at
+its own position with 0.307303 fuel, above its 0.18 continuing-reconnaissance
+resupply threshold but below its 0.40 departure threshold. No resupply order or
+movement group exists. A second healthy scout remains unassigned. The saved policy
+and orders are retained in a focused endpoint record.
+
+A physical regression uses a settled world, a 30%-fuel waiting scout and a supply
+truck introduced 300m away. The unchanged source leaves it stranded at exactly
+30% after 400 ticks; a continuing scout case passes. Earlier test setups placed
+the provider in passive-transfer range and therefore did not isolate the decision
+gap; they are not counted as before/after behavior qualification. The candidate
+uses the existing departure threshold for paused/no-order reconnaissance, while
+continuing missions retain their original threshold. No new numerical readiness
+threshold or resource grant is added. Full-suite and terminal results are pending.
+
+The first departure-recovery candidate changes the recovery classification but not
+any configured numerical threshold. Its failure diagnostic at 400 ticks already
+shows HoldPosition, the 0.46 policy and an active resupply order; the provider has
+travelled toward the scout but remains outside transfer range. A 300m truck trip
+needs more than 23s even at authored maximum speed, so the new physical test uses
+one minute for travel and transfer (no existing qualification deadline changes).
+Both original and candidate sources eventually transfer within that longer window.
+Consequently, eventual fuel alone is not a discriminating regression. The test
+must also observe timely explicit provider assignment after the existing planning
+cadence; the long transfer window remains a separate physical follow-through.
+The successful long-window before run is retained and is not relabelled as a
+before failure. The candidate full Game suite is running before any test edits.
+
+The exact departure regression now checks provider assignment within two existing
+planning cadences, then allows a physical minute for the 300m trip and transfer.
+Unchanged runtime fb6a0be6 fails the assignment assertion; the continuing-scout
+control passes. The candidate passes both cases and real transfer (5.106s).
+Its complete Game suite before that final additional assertion passes 574 cases,
+zero failures/skips, 2m10.079s. The final assertion-only test refinement is rerun
+against both runtimes; no runtime code changes follow the complete-suite run.
+The fix is committed as fc86ce1e. Its strict 80,000-tick terminal check is pending.
+
+The fc86ce1e strict match also remains Active / Running at 80,000 ticks. It delivers
+31,005.006878 cargo units in 310 completed trips. The previous paused scout now has
+0.920175 fuel, demonstrating that departure recovery occurs in the real run, but
+that does not prove terminal completion. Both command cores remain at full 1,200 HP.
+The complete report/save/telemetry/log are retained; no finish is forced.
+
+The new endpoint also has loaded supply truck 194:3 actively rescuing own combat
+unit 605:1 while every alternative truck is loading. The admission helper rejects
+all trucks carrying SupplyRescueAssignment, even when that is real ongoing support
+of the same combat force. A targeted regression is being prepared with logistics
+and reserved-recon rescue controls; it is not yet an accepted runtime change.
+The built local Client and Headless binaries both identify source fc86ce1e in their
+full informational version. Client build: zero warnings/errors, 55.69s. No new GUI
+start is performed during the other checkout's ongoing native captures.
+
+### Active combat rescue and offensive support
+
+The exact regression issues a real ResupplyCommand for a fuel-starved unit and
+verifies its accepted provider and SupplyRescueAssignment after 12 ticks. Three
+healthy tanks preserve the original combat admission minima. On fc86ce1e, active
+own-tank rescue is incorrectly reported as missing forward supply; cargo-only and
+reserved-recon rescues are correctly excluded. The candidate passes all three
+cases (1.597s). It accepts only an assignment to a current owned combat unit with
+a matching live ResupplyOrder, excluding the reserved scout. Loading/self-refuelling
+trucks remain unavailable. All existing cargo and propulsion admission minima stay
+unchanged, and MaintainForwardSupplySupport continues to leave rescue movement
+untouched. The full Game suite and strict terminal run remain pending.
+
+The active-combat-rescue runtime passes all 577 Game tests, zero failures/skips,
+2m6.572s, after the independent three-case before/after regression. It is committed
+as e0481eda; the test build precedes that checkpoint with identical runtime/test
+source. No other runtime change follows that complete-suite result. The unchanged
+strict terminal run on e0481eda is pending. This checkpoint does not grant parallel
+release or native/performance acceptance. PR #237 remains draft.
