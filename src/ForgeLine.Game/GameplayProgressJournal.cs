@@ -39,6 +39,7 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
         if (player.Value <= 0 || !_entities.IsAlive(actor) || !_entities.IsAlive(target) ||
             source.IsValid && !_entities.IsAlive(source) || !double.IsFinite(quantity) || quantity <= 0 ||
             !_entities.TryGetComponent(target, out ControllableEntity recipient) || recipient.Owner != player) return;
+        if (_entities.TryGetComponent(actor, out ControllableEntity sender) && sender.Owner != player) return;
         if (!_latest.TryGetValue(player, out var ledger))
         {
             if (_latest.Count >= 16) return;
@@ -85,7 +86,7 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
     public void OnTickCompleted(SimulationContext context)
     {
         if (_observed && context.Tick.Value <= _completed.Value) return;
-        foreach (var entity in context.Entities.Query<ControllableEntity>())
+        foreach (var entity in context.Entities.Query<ControllableEntity>(QueryIterationOrder.StableByEntityIndex))
         {
             if (!context.Entities.HasComponent<ProductionFacility>(entity) && !context.Entities.HasComponent<UnitProductionFacility>(entity)) continue;
             var owner = context.Entities.GetComponent<ControllableEntity>(entity).Owner;
@@ -104,7 +105,7 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
                 Record(context.Tick, owner, GameplayProgressKind.DisruptionResolved, entity, entity, entity,
                     context.Tick.Value, default, 1);
         }
-        foreach (var entity in context.Entities.Query<LogisticsStockPolicy>())
+        foreach (var entity in context.Entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
         {
             var policy = context.Entities.GetComponent<LogisticsStockPolicy>(entity);
             if (policy.Enabled && policy.ResourceId == ResourceIds.FerrousOre &&

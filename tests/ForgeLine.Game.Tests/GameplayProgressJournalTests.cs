@@ -27,6 +27,11 @@ public sealed class GameplayProgressJournalTests
         Assert.Equal(proof, Assert.Single(journal.Capture(owner, simulation.CurrentTick)));
         journal.Record(simulation.CurrentTick, new PlayerId(2), proof.Kind, actor, actor, actor, 2, ResourceIds.Fuel, 10);
         Assert.Empty(journal.Capture(new PlayerId(2), simulation.CurrentTick));
+        var foreign = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(foreign, new ControllableEntity(new PlayerId(2), ControllableEntityCategory.Unit));
+        journal.Record(simulation.CurrentTick, owner, proof.Kind, foreign, foreign, actor, 2, ResourceIds.Fuel, 10);
+        Assert.Equal(proof, Assert.Single(journal.Capture(owner, simulation.CurrentTick)));
+        simulation.Entities.DestroyEntity(foreign);
         simulation.Entities.DestroyEntity(actor);
         var replacement = simulation.Entities.CreateEntity();
         Assert.Equal(actor.Index, replacement.Index); Assert.NotEqual(actor.Generation, replacement.Generation);
