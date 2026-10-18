@@ -21,7 +21,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
     private static readonly JsonSerializerOptions FingerprintOptions = new() { IncludeFields = true };
     public const ulong Seed = 2026;
     public const int FixedTick = 32;
-    public const int FixtureVersion = 3;
+    public const int FixtureVersion = 4;
 
     public static VisualReferenceScene Create(VisualReferenceSceneKind kind, TerrainWorld terrain, bool includeHiddenEnemy = true, RuntimeAssetCatalog? runtimeAssets = null)
     {

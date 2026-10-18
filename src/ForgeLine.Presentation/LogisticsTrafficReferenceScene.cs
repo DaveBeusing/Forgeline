@@ -30,7 +30,6 @@ internal static class LogisticsTrafficReferenceScene
         var simulation = new SimulationCoordinator(seed: VisualReferenceScene.Seed);
         var inventories = new InventoryStore();
         var network = new LogisticsNetwork();
-        var transport = new CargoTransportSystem(network, inventories);
         var buildings = DirectorateContent.CreateBuildingCatalog();
         var obstacles = new List<AxisAlignedBounds>();
         InventoryId sourceInventory = inventories.CreateInventory(new InventorySpecification(5000));
@@ -48,28 +47,37 @@ internal static class LogisticsTrafficReferenceScene
         var navigation = NavigationWorld.Build(terrain, obstacles,
             gridSettings: new NavigationGridSettings { CellSizeMeters = 4 },
             sectorSettings: new NavigationSectorSettings { SectorSizeCells = 8 });
-        simulation.RegisterSystem(new HierarchicalNavigationSystem(new HierarchicalPathfinder(navigation)));
-        simulation.RegisterSystem(new GroundMovementSystem(terrain));
+        var routing = new HierarchicalNavigationSystem(new HierarchicalPathfinder(navigation));
+        var spatial = new SpatialGridIndex();
+        var docks = new VehicleDockingService(terrain, spatial, routing);
+        var transport = new CargoTransportSystem(network, inventories, navigation: routing, docking: docks);
+        simulation.RegisterSystem(routing);
+        simulation.RegisterSystem(new SpatialIndexSystem(new SpatialIndexSynchronizer(spatial)));
+        simulation.RegisterSystem(new GroundMovementSystem(terrain, spatial));
         simulation.RegisterSystem(transport);
-        simulation.RegisterSystem(new BattlefieldSupplySystem(inventories));
+        simulation.RegisterSystem(new BattlefieldSupplySystem(inventories, docks));
         var intelligence = new FactionIntelligenceStore(new() { CellSizeMeters = 32 });
         simulation.RegisterSystem(new BattlefieldIntelligenceSystem(intelligence));
         var snapshots = new PresentationSnapshotBuffer();
         simulation.RegisterTickObserver(new PresentationExtractor(snapshots, intelligence, new(1), terrain.WorldBounds, runtimeAssets));
         var definition = DirectorateContent.CreateUnitCatalog()[UnitIds.CargoTruck];
-        Vector3 start = Ground(new(545,0,520));
+        Vector3 start = ServicePoint(source, definition.VisualScale);
         start.Y += definition.Movement.HeightOffset;
         EntityId truck = CargoTruckFactory.Create(simulation.Entities, inventories, start, new(1), transport,
             new CargoTruckDefinition(definition.Key, definition.CargoCapacity, definition.Movement, definition.VisualScale, definition.VisualId));
         simulation.Entities.AddComponent(truck, new UnitIdentity(UnitIds.CargoTruck, new(1)));
+        Align(truck);
         var supplyDefinition = DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck];
-        Vector3 supplyStart = Ground(new(750,0,538));
+        Vector3 supplyStart = ServicePoint(destination, supplyDefinition.VisualScale);
         supplyStart.Y += supplyDefinition.Movement.HeightOffset;
         EntityId supplyTruck = CargoTruckFactory.Create(simulation.Entities,inventories,supplyStart,new(1),transport,
             new CargoTruckDefinition(supplyDefinition.Key,supplyDefinition.CargoCapacity,supplyDefinition.Movement,supplyDefinition.VisualScale,supplyDefinition.VisualId));
         simulation.Entities.AddComponent(supplyTruck,new UnitIdentity(UnitIds.SupplyTruck,new(1)));
         InventoryId supplyInventory = simulation.Entities.GetComponent<CargoTransport>(supplyTruck).CargoInventory;
         simulation.Entities.AddComponent(supplyTruck,new SupplyTruck(supplyInventory,new(1),supplyDefinition.SupplyLoadRangeMeters,supplyDefinition.SupplyRangeMeters,supplyDefinition.SupplyFuelTarget,supplyDefinition.SupplyAmmunitionTarget));
+        Align(supplyTruck);
+        if (!network.TryGetNode(destination, out var supplyNode)) throw new InvalidOperationException("Missing supply source.");
+        simulation.Entities.AddComponent(supplyTruck, new SupplyLoadingOrder(supplyNode.Entity, SimulationTick.Zero));
         EntityId sensor = simulation.Entities.CreateEntity();
         simulation.Entities.AddComponent(sensor, new WorldTransform(Ground(new(675,0,560)), Quaternion.Identity, Vector3.One));
         simulation.Entities.AddComponent(sensor, new VisualSensorState(new(1), rangeMeters: 500));
@@ -81,11 +89,15 @@ internal static class LogisticsTrafficReferenceScene
         {
             simulation.AdvanceOneTick();
             state = simulation.Entities.GetComponent<CargoTransportRuntimeState>(truck);
+            bool loadingService = simulation.Entities.TryGetComponent(truck, out VehicleDockVisit cargoVisit) &&
+                cargoVisit.ServiceStartedTick > 0 && cargoVisit.ServiceProgress > 0 &&
+                inventories.GetQuantity(supplyInventory, ResourceIds.Fuel) > 0;
             if (!sustained && state.Lifecycle == requested &&
+                (requested != CargoTransportLifecycleState.Loading || loadingService) &&
                 (requested != CargoTransportLifecycleState.ToDestination || simulation.Entities.GetComponent<GroundMovementState>(truck).Velocity.LengthSquared() > .01f)) break;
             if (sustained)
             {
-                if (tick == 1023) break;
+                if (tick >= 1023 && transport.Metrics.CompletedOrderCount >= 2 && state.Lifecycle == CargoTransportLifecycleState.Idle) break;
                 if (state.Lifecycle == CargoTransportLifecycleState.Idle)
                 {
                     bool forward = inventories.GetQuantity(sourceInventory,ResourceIds.FerrousOre) >= 50;
@@ -105,7 +117,7 @@ internal static class LogisticsTrafficReferenceScene
             inventories.GetQuantity(simulation.Entities.GetComponent<CargoTransport>(truck).CargoInventory,ResourceIds.FerrousOre);
         if (Math.Abs(conserved-100)>1e-6) throw new InvalidOperationException("Traffic did not conserve inventory.");
         if (sustained && transport.Metrics.CompletedOrderCount < 2)
-            throw new InvalidOperationException("Repeated traffic did not complete two physical deliveries.");
+            throw new InvalidOperationException($"Repeated traffic completed {transport.Metrics.CompletedOrderCount} deliveries: {state}; pose={simulation.Entities.GetComponent<WorldTransform>(truck)}; dock={(simulation.Entities.TryGetComponent(truck, out VehicleDockVisit unfinished) ? unfinished.ToString() : "none")}.");
         if (inventories.GetQuantity(supplyInventory,ResourceIds.Fuel) <= 0)
             throw new InvalidOperationException("Supply truck did not physically load from its depot.");
         Vector3 target = Ground(new(675,0,560));
@@ -125,6 +137,21 @@ internal static class LogisticsTrafficReferenceScene
                 throw new InvalidOperationException("Traffic point lies outside terrain.");
             return point with { Y = height };
         }
+        Vector3 ServicePoint(LogisticsNodeId nodeId, Vector3 scale)
+        {
+            if (!network.TryGetNode(nodeId, out var node) ||
+                !VehicleDockPose.TryCreate(simulation.Entities.GetComponent<BuildingLoadingDock>(node.Entity),
+                    simulation.Entities.GetComponent<WorldTransform>(node.Entity),
+                    WorldTransform.Identity with { Scale = scale }, out var pose))
+                throw new InvalidOperationException("Traffic requires authored loading geometry.");
+            return Ground(pose.Service);
+        }
+        void Align(EntityId entity)
+        {
+            var transform = simulation.Entities.GetComponent<WorldTransform>(entity);
+            simulation.Entities.SetComponent(entity, transform with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2) });
+            simulation.Entities.SetComponent(entity, GroundMovementState.Stationary(MathF.PI / 2));
+        }
         LogisticsNodeId Building(BuildingId id, Vector3 position, InventoryId inventory, LogisticsNodeKind nodeKind)
         {
             var footprint = buildings[id].Footprint;
@@ -134,6 +161,7 @@ internal static class LogisticsTrafficReferenceScene
             simulation.Entities.AddComponent(entity,new WorldTransform(ground+new Vector3(0,scale.Y*.5f,0),Quaternion.Identity,scale));
             simulation.Entities.AddComponent(entity,new VisualIdentity(buildings[id].VisualId));
             simulation.Entities.AddComponent(entity,new CompletedBuilding(id,new(1),SimulationTick.Zero));
+            simulation.Entities.AddComponent(entity, buildings[id].LoadingDock ?? throw new InvalidOperationException("Traffic building has no dock."));
             simulation.Entities.AddComponent(entity,new ControllableEntity(new(1),ControllableEntityCategory.Building));
             simulation.Entities.AddComponent(entity,new SpatialPresence(scale*.5f,new SpatialEntryMetadata(1,0,SpatialMobility.Static)));
             simulation.Entities.AddComponent(entity,new InventoryStorage(inventory));

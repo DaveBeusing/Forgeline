@@ -212,7 +212,7 @@ public sealed class VisualReferenceSceneTests
             Assert.True(MathF.Abs(delta.X) > combined.X || MathF.Abs(delta.Z) > combined.Z);
         }
         if (kind == VisualReferenceSceneKind.LogisticsSustainedProduction)
-            Assert.Equal(1024UL, first.Snapshot.Tick.Value);
+            Assert.InRange(first.Snapshot.Tick.Value, 1024UL, 4000UL);
     }
 
     [Fact]
