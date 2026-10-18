@@ -222,6 +222,14 @@ public sealed class PlayerSelectionSummaryTests
         entities.SetComponent(truck, entry with { Position = 1, ChangedAtTick = new(12) });
         Assert.Equal(2, captured.Work.VehicleQueue.Value.Position);
         Assert.Equal(1, CaptureSelection(scenario, [truck]).Work.VehicleQueue!.Value.Position);
+        entities.AddComponent(side.CommandCore, new VehicleDockSlot(truck, 1, default, side.Player));
+        entities.SetComponent(truck, new VehicleDockVisit(side.CommandCore, 1, VehicleDockStatus.Servicing,
+            VehicleDockBlockReason.None, default));
+        Assert.Equal(0, CaptureSelection(scenario, [truck]).Work.VehicleQueue!.Value.WaitingCount);
+        Assert.Equal(0, CaptureSelection(scenario, [side.CommandCore]).Work.LoadingQueue!.Value.WaitingCount);
+        entities.RemoveComponent<VehicleDockSlot>(side.CommandCore);
+        entities.SetComponent(truck, new VehicleDockVisit(side.CommandCore, 0, VehicleDockStatus.Busy,
+            VehicleDockBlockReason.Obstructed, default));
         EntityId foreign = scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[1];
         entities.AddComponent(foreign, entry with { Owner = new(2) });
         entities.AddComponent(foreign, new VehicleDockVisit(side.CommandCore, 0, VehicleDockStatus.Busy,

@@ -773,6 +773,18 @@ public static class PlayerExperienceSnapshotFactory
         return waiting > 0 || occupied ? work with { LoadingQueue = new(entity, waiting, occupied, exitBlocked, changed) } : work;
     }
 
+    private static int CountWaitingParticipants(EntityRegistry entities, EntityId building, PlayerId owner)
+    {
+        bool occupied = entities.TryGetComponent(building, out VehicleDockSlot slot) && slot.Owner == owner;
+        int waiting = 0;
+        foreach (EntityId truck in entities.Query<VehicleQueueEntry>())
+        {
+            var entry = entities.GetComponent<VehicleQueueEntry>(truck);
+            if (entry.Building == building && entry.Owner == owner && (!occupied || slot.Truck != truck)) waiting++;
+        }
+        return waiting;
+    }
+
     private static PlayerWorkSummary CaptureWorkCore(
         EntityRegistry entities,
         EntityId entity,
@@ -787,7 +799,8 @@ public static class PlayerExperienceSnapshotFactory
             if (entities.TryGetComponent(entity, out VehicleQueueEntry entry) && entry.Building == dock.Building &&
                 entities.TryGetComponent(entry.Building, out CompletedBuilding queueBuilding) && queueBuilding.Owner == entry.Owner &&
                 VehicleDockingService.OwnsTruck(entities, entity, entry.Owner))
-                queue = new(entry.Building, entry.Generation, entry.Service, entry.Position, entry.WaitingCount,
+                queue = new(entry.Building, entry.Generation, entry.Service, entry.Position,
+                    CountWaitingParticipants(entities, entry.Building, entry.Owner),
                     dock.Status, entry.WaitReason, dock.Reason, entry.ChangedAtTick);
             else if (entities.TryGetComponent(entity, out VehicleQueueHolding holding) && holding.Building == dock.Building &&
                 entities.TryGetComponent(holding.Building, out CompletedBuilding holdingBuilding) &&
@@ -797,12 +810,7 @@ public static class PlayerExperienceSnapshotFactory
                     entities.TryGetComponent(entity, out CargoTransportRuntimeState cargo) &&
                     cargo.Lifecycle is CargoTransportLifecycleState.ToDestination or CargoTransportLifecycleState.Unloading
                         ? VehicleQueueService.CargoDelivery : VehicleQueueService.CargoPickup;
-                int waiting = 0;
-                foreach (EntityId truck in entities.Query<VehicleQueueEntry>())
-                {
-                    var participant = entities.GetComponent<VehicleQueueEntry>(truck);
-                    if (participant.Building == holding.Building && participant.Owner == holdingBuilding.Owner) waiting++;
-                }
+                int waiting = CountWaitingParticipants(entities, holding.Building, holdingBuilding.Owner);
                 queue = new(holding.Building, 0, service, 0, waiting, dock.Status, holding.Reason, dock.Reason, holding.ChangedAtTick);
             }
             string activity = dock.Status switch
