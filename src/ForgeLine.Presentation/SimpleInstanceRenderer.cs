@@ -532,7 +532,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         worldMatrix);
             }
 
-            _skinDetail = MechanicalDetailWeight(projectedDiameter, 18, _lodDiameterScale);
+            _skinDetail = MechanicalDetailWeight(projectedDiameter, 90, _lodDiameterScale);
             float motionWeight = MechanicalDetailWeight(projectedDiameter, hasBuildingDefinition ? 150 : 90, _lodDiameterScale);
             AddMechanicalBatches(instance, worldMatrix, color, usesRuntimeMesh, runtimeMesh,
                 runtimeMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);

@@ -53,8 +53,7 @@ internal static class SkinPresentationBounds
     {
         var pose = instance.MechanicalPose.Infantry;
         if (instance.UnitFeature.IsWreck && !(pose.IsSpecified && pose.Action == InfantryAction.Death)) return 2;
-        return pose.IsSpecified ? ScreenSpaceLod.Select(diameter, previous, 18, 6, scale)
-            : ScreenSpaceLod.Select(diameter, previous, diameterScale: scale);
+        return ScreenSpaceLod.Select(diameter, previous, diameterScale: scale);
     }
     internal static AxisAlignedBounds Resolve(in RenderInstance instance)
     {

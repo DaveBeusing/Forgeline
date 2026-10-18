@@ -16,7 +16,7 @@ Completed-tick snapshots copy movement speed, target, reload timing, accepted sh
 
 CPU skinning uses the existing channel sampler and instanced renderer. A shared `(mesh, action, 24 Hz phase, detail)` key produces one deformed vertex upload for all matching squads. Existing material/index resources and shadow/color pose buffers are shared. Each fence-owned frame slot retains at most sixteen variants and 16 MiB GPU upload vertices; at most four slots are accepted. Overflow reports a static fallback. Skin CPU resources are session-cached at most eight assets/32 MiB payload, alongside the existing 128-clip/16 MiB cache. CPU vertex scratch is bounded by those upload pools; two 48-matrix stack spans serve evaluation. Deformation and sampling allocate no managed memory after storage is supplied. Resource and submission diagnostics expose skin bytes, evaluated poses and fallback counts.
 
-Detail fades through three weights to bind geometry near the 18-pixel projected threshold. Actual reduced meshes remain static. The `weapon_muzzle` socket follows the right forearm palette at the completed-tick fire pose; authoritative hit trajectories remain independent. There is no foot IK, cover/prone mechanic, ragdoll or per-soldier controller.
+Detail fades through three weights to bind geometry near the existing 90-pixel projected threshold (LOD1/2 retain the existing 90/28-pixel selection with hysteresis). Actual reduced meshes remain static. The `weapon_muzzle` socket follows the right forearm palette at the completed-tick fire pose; authoritative hit trajectories remain independent. There is no foot IK, cover/prone mechanic, ragdoll or per-soldier controller.
 
 ## Author, edit and qualify
 

@@ -50,8 +50,8 @@ public sealed class InfantryAnimationTests
             UnitFeature:new(ForgeLine.Game.UnitIds.RifleSquad,UnitPresentationDamageState.Intact));
         var bounds = PresentationBounds.ResolveAxisAlignedBounds(instance);
         instance = instance with {MechanicalPose = new MechanicalPose(true,0,0,1,-1,0,0){Infantry=new(true,InfantryAction.Walk,.5,true)}};
-        Assert.Equal(0,SkinPresentationBounds.SelectLod(instance,40,0,1));
-        Assert.Equal(1,SkinPresentationBounds.SelectLod(instance,12,0,1));
+        Assert.Equal(0,SkinPresentationBounds.SelectLod(instance,200,0,1));
+        Assert.Equal(1,SkinPresentationBounds.SelectLod(instance,50,0,1));
         Assert.Equal(2,SkinPresentationBounds.SelectLod(instance,3,0,1));
         Assert.Equal(bounds,PresentationBounds.ResolveAxisAlignedBounds(instance));
         Assert.NotEqual(bounds,SkinPresentationBounds.Resolve(instance));
