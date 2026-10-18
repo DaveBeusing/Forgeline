@@ -17,6 +17,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     private static readonly ArtilleryWeaponCatalog DefaultArtilleryWeapons = DirectorateContent.CreateArtilleryWeaponCatalog();
     private readonly MechanicalPoseHistory _mechanicalHistory = new();
     private readonly HashSet<EntityId> _mechanicalShots = [];
+    private readonly HashSet<EntityId> _infantryHits = [];
+    private readonly HashSet<EntityId> _infantryDeaths = [];
+    private readonly Dictionary<string, (RuntimeSkinData Skin, RuntimeAnimationData Clip, int[] Nodes)> _infantrySockets = new(StringComparer.Ordinal);
     private readonly PresentationSnapshotBuffer _buffer;
     private readonly FactionIntelligenceStore? _intelligence;
     private readonly FactionId _viewingFaction;
@@ -127,7 +130,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
 
         _worldAudio?.Begin(_extraction?.Scenario.Simulation.SessionId ?? SimulationSessionId.None,
             _extraction?.Player ?? default, context.Tick, context.TickDuration);
-        _mechanicalShots.Clear();
+        _mechanicalShots.Clear(); _infantryHits.Clear(); _infantryDeaths.Clear();
         _mechanicalHistory.Begin(_extraction?.Scenario.Simulation.SessionId ?? SimulationSessionId.None,
             context.Tick.Value, context.TickDuration.TotalSeconds);
         _vfxPool.BeginTick(
@@ -349,7 +352,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                             buildingFeature.State == BuildingPresentationState.Operational,
                             MechanicalDoorPolicy.CanMove(buildingFeature.State,
                                 ownedProductionMotion && entities.TryGetComponent(entity, out UnitProductionFacility motionFactory) ? motionFactory.Status : null,
-                                ownedProductionMotion && entities.TryGetComponent(entity, out ProductionFacility motionProduction) ? motionProduction.Status : null)) : default);
+                                ownedProductionMotion && entities.TryGetComponent(entity, out ProductionFacility motionProduction) ? motionProduction.Status : null),
+                            ResolveInfantryAction(entities, entity, unitFeature, context.Tick, context.TickDuration.TotalSeconds)) : default);
 
             CaptureWorldAudioEntity(entities, entity, transform.Position, selectable, unitFeature, buildingFeature);
 
@@ -950,6 +954,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 continue;
             }
 
+            if (combatEvent.Type == CombatEventType.DamageApplied) _infantryHits.Add(combatEvent.Target);
+            if (combatEvent.Type == CombatEventType.EntityDestroyed) _infantryDeaths.Add(combatEvent.Target);
             CaptureWorldAudioCombat(context.Entities, combatEvent);
 
             switch (combatEvent.Type)
@@ -970,6 +976,17 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     break;
             }
         }
+    }
+
+    private InfantryActionInput ResolveInfantryAction(EntityRegistry entities, EntityId entity, UnitFeaturePresentationMetadata feature,
+        SimulationTick tick, double tickSeconds)
+    {
+        if (feature.Unit != UnitIds.RifleSquad && feature.Unit != UnitIds.CombatEngineer) return default;
+        bool hasWeapon = entities.TryGetComponent(entity, out WeaponState weapon);
+        bool reload = hasWeapon && weapon.ReloadUntilTick > tick;
+        return new(true, feature.IsWreck, feature.IsWreck && entities.TryGetComponent(entity, out UnitWreckPresentationIdentity wreck) && _infantryDeaths.Contains(wreck.SourceEntity),
+            hasWeapon && weapon.Target.IsValid, reload, reload ? (weapon.ReloadUntilTick.Value - tick.Value) * tickSeconds : 0,
+            _infantryHits.Contains(entity), entities.TryGetComponent(entity, out SuppressionState suppression) && suppression.Level != SuppressionLevel.Normal);
     }
 
     private void CaptureWorldAudioEntity(EntityRegistry entities, EntityId entity, Vector3 position,
@@ -1757,6 +1774,27 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     Quaternion.CreateFromAxisAngle(Vector3.UnitX, -ResolveAimElevation(entities, entity))) + gunPivot;
                 local = MechanicalMotionSpace.RotateOffset(local - definition.TurretPivot, transform.Scale,
                     Quaternion.CreateFromAxisAngle(Vector3.UnitY, ResolveAimYaw(entities, entity))) + definition.TurretPivot;
+            }
+            if (socketName == "weapon_muzzle" && record.SkinReference is { } skinId)
+            {
+                if (!_infantrySockets.TryGetValue(skinId, out var binding))
+                {
+                    if (_infantrySockets.Count >= 8) return fallback;
+                    var skinRecord = _runtimeAssets.Get(AssetId.Parse(skinId));
+                    var skin = RuntimeSkinData.FromPayload(_runtimeAssets.Read(AssetId.Parse(skinId)).Payload);
+                    RuntimeAnimationData? fire = null;
+                    foreach (string clipId in skinRecord.AnimationReferences)
+                    {
+                        var clip = RuntimeAnimationData.FromPayload(_runtimeAssets.Read(AssetId.Parse(clipId)).Payload);
+                        if (clip.Name == "fire") { fire = clip; break; }
+                    }
+                    if (fire is null) throw new InvalidDataException("Infantry skin has no fire clip.");
+                    binding = (skin, fire, skin.Bind(fire)); _infantrySockets.Add(skinId, binding);
+                }
+                // The shot event starts fire at phase zero in the same completed tick.
+                Span<Matrix4x4> palette = stackalloc Matrix4x4[RuntimeSkinData.MaximumJoints];
+                binding.Skin.Evaluate(binding.Clip, binding.Nodes, 0, palette);
+                local = binding.Skin.SocketPosition(socketName, palette);
             }
             local *= transform.Scale;
 

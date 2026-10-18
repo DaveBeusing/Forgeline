@@ -1,0 +1,7 @@
+{
+  "id": "animation.directorate.combat_engineer.reload",
+  "type": "animation",
+  "source": "../authoring/infantry/combat_engineer.glb",
+  "skeletalAnimation": true,
+  "animationClip": "reload"
+}

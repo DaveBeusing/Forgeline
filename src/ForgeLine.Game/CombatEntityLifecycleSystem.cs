@@ -98,7 +98,7 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
             wreck,
             new UnitWreckPresentationIdentity(
                 unit.UnitId,
-                unit.ContentFaction));
+                unit.ContentFaction) { SourceEntity = destroyedEntity });
 
         if (context.Entities.TryGetComponent(
                 destroyedEntity,

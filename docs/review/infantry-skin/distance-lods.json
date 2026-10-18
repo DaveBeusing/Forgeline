@@ -1,0 +1,501 @@
+{
+  "commit": "da261246765fceb5c31de01afaf6d26c0e789b96",
+  "buildIdentity": "0.1.399-dev+da261246765fceb5c31de01afaf6d26c0e789b96",
+  "captures": [
+    {
+      "key": "InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 120,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "instances": {
+        "totalInstances": 9,
+        "visibleInstances": 9,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 9,
+        "runtimeMeshInstances": 9,
+        "texturedRuntimeMeshInstances": 9,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 9,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 0,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 9,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 16,
+        "batchCapacity": 1,
+        "submittedInstances": 9,
+        "uploadBytes": 1008,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 36,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "pixelSha256": "98070E0C1A66F6F0F21B970B90EFBA4DAAD27238D26AA59D1789703055A2B17A",
+      "repeatPixelsEqual": true
+    },
+    {
+      "key": "InfantrySkinning-1920x1080-High-NormalGameplay-MechanicalT0.375",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "instances": {
+        "totalInstances": 9,
+        "visibleInstances": 9,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 9,
+        "runtimeMeshInstances": 9,
+        "texturedRuntimeMeshInstances": 9,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 9,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 0,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 9,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 16,
+        "batchCapacity": 1,
+        "submittedInstances": 9,
+        "uploadBytes": 1008,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 36,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "pixelSha256": "CB328C3635FC8BC9D02432B1A4F9349E5EBB4B7ED1CE25824F5318D60CF97266",
+      "repeatPixelsEqual": true
+    },
+    {
+      "key": "InfantrySkinning-1920x1080-High-Strategic-MechanicalT0.375",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 1000,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "instances": {
+        "totalInstances": 9,
+        "visibleInstances": 9,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 9,
+        "runtimeMeshInstances": 9,
+        "texturedRuntimeMeshInstances": 9,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 9,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 0,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 9,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 16,
+        "batchCapacity": 1,
+        "submittedInstances": 9,
+        "uploadBytes": 1008,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 36,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "pixelSha256": "C4D593D305F5608DBF9DB49C26973331218AB737BAC2AA14C7AA0AE9D2141C5D",
+      "repeatPixelsEqual": true
+    },
+    {
+      "key": "InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 120,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "instances": {
+        "totalInstances": 9,
+        "visibleInstances": 9,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 9,
+        "runtimeMeshInstances": 9,
+        "texturedRuntimeMeshInstances": 9,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 9,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 0,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 9,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 16,
+        "batchCapacity": 1,
+        "submittedInstances": 9,
+        "uploadBytes": 1008,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 36,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "pixelSha256": "628E8FE26F7E40ABE59E7720BE3E85231575534EC8AC891EEB0132367C51F737",
+      "repeatPixelsEqual": true
+    },
+    {
+      "key": "InfantrySkinningEngineer-1920x1080-High-NormalGameplay-MechanicalT0.375",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "instances": {
+        "totalInstances": 9,
+        "visibleInstances": 9,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 9,
+        "runtimeMeshInstances": 9,
+        "texturedRuntimeMeshInstances": 9,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 9,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 0,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 9,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 16,
+        "batchCapacity": 1,
+        "submittedInstances": 9,
+        "uploadBytes": 1008,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 36,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "pixelSha256": "39A1300E1680A1FC92791082E2AF64A9A52120B0FE7CF3CB98A349F2C8685CA9",
+      "repeatPixelsEqual": true
+    },
+    {
+      "key": "InfantrySkinningEngineer-1920x1080-High-Strategic-MechanicalT0.375",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 1000,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "instances": {
+        "totalInstances": 9,
+        "visibleInstances": 9,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 9,
+        "runtimeMeshInstances": 9,
+        "texturedRuntimeMeshInstances": 9,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 9,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 0,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 9,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 16,
+        "batchCapacity": 1,
+        "submittedInstances": 9,
+        "uploadBytes": 1008,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 36,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "pixelSha256": "9798A8EBBC2A8D982C3FA420C7DD0ACDC88B3A38D060F7DD46A5D5DD510B1DA3",
+      "repeatPixelsEqual": true
+    },
+    {
+      "key": "InfantrySkinningRepeated-1920x1080-High-CloseTactical-MechanicalT0.375",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 120,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 972,
+        "culledInstances": 28,
+        "drawCalls": 2,
+        "highLodInstances": 0,
+        "reducedLodInstances": 972,
+        "runtimeMeshInstances": 972,
+        "texturedRuntimeMeshInstances": 972,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 972,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1000,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 2048,
+        "batchCapacity": 4,
+        "submittedInstances": 972,
+        "uploadBytes": 108864,
+        "pipelineBindings": 2,
+        "textureBindings": 8,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 4800,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "pixelSha256": "19E1F135A07259DDAF3DB2E3645D8B792349B46C61CAF8C5933B34506D1D91AB",
+      "repeatPixelsEqual": true
+    },
+    {
+      "key": "InfantrySkinningRepeated-1920x1080-High-NormalGameplay-MechanicalT0.375",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 1000,
+        "culledInstances": 0,
+        "drawCalls": 2,
+        "highLodInstances": 0,
+        "reducedLodInstances": 1000,
+        "runtimeMeshInstances": 1000,
+        "texturedRuntimeMeshInstances": 1000,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 1000,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1000,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 1024,
+        "batchCapacity": 2,
+        "submittedInstances": 1000,
+        "uploadBytes": 112000,
+        "pipelineBindings": 2,
+        "textureBindings": 8,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 4800,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "pixelSha256": "7396D51C53A357CECF1DC058E6BFB29E44314CDC5D5B7080D4BEA633662BB686",
+      "repeatPixelsEqual": true
+    },
+    {
+      "key": "InfantrySkinningRepeated-1920x1080-High-Strategic-MechanicalT0.375",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 1000,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 1000,
+        "culledInstances": 0,
+        "drawCalls": 2,
+        "highLodInstances": 0,
+        "reducedLodInstances": 1000,
+        "runtimeMeshInstances": 1000,
+        "texturedRuntimeMeshInstances": 1000,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 1000,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1000,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 1024,
+        "batchCapacity": 2,
+        "submittedInstances": 1000,
+        "uploadBytes": 112000,
+        "pipelineBindings": 2,
+        "textureBindings": 8,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 4800,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "pixelSha256": "7F872540748EFA4357128310A9EEE8B1D6E568CE7DFDCD7A47CE30402056BEDD",
+      "repeatPixelsEqual": true
+    }
+  ]
+}

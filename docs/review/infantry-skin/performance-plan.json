@@ -1,0 +1,28 @@
+{
+  "samples": 128,
+  "comparisons": [
+    "skin-b vs bind-a",
+    "skin-c vs bind-d"
+  ],
+  "inspectionDistanceMeters": 40,
+  "maximumRegressionPercent": 15,
+  "zooms": [
+    "CloseTactical"
+  ],
+  "sequence": [
+    "bind-a",
+    "skin-b",
+    "skin-c",
+    "bind-d"
+  ],
+  "sourceCommit": "da261246",
+  "repeatCaptures": 2,
+  "profiles": [
+    "High"
+  ],
+  "policy": "Retain every cohort; no rerun or threshold changes to obtain a passing result.",
+  "change": "Restore existing 90/28-pixel geometry LOD and 90-pixel skin fade. Distinct 120/420/1000m LOD captures are qualified separately without inspection override.",
+  "warmups": 32,
+  "display": "1920x1080",
+  "scene": "InfantrySkinningRepeated"
+}

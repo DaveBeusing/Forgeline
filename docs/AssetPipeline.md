@@ -23,6 +23,8 @@ existing unit/building geometry, rigid ranges and socket frames in editable Blen
 projects, exporting verified glTF/GLB source clones for this same compiler. Source
 material/texture definitions stay authoritative; outputs are isolated under artifacts.
 
+The optional [infantry skinning path](InfantrySkinAssets.md) extends the shared animation sampler with bounded glTF skins, editable four-figure rigs and CPU skinning through existing instanced draws. Compiler 1.12.0 appends Skin type 6 and skeletal clip payload version 2; rigid version-1 clips and static meshes remain compatible.
+
 ## Purpose
 
 [Compiled UI atlases and skin rendering](UiAtlasRendering.md) add compiler 1.10.0

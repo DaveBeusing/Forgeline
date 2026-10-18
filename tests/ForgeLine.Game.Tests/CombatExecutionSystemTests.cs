@@ -286,6 +286,8 @@ public sealed class CombatExecutionSystemTests
             scenario.Simulation.Entities.GetComponent<UnitWreckPresentationIdentity>(
                 wreck);
 
+        Assert.Equal(scenario.Target, identity.SourceEntity);
+
         Assert.Equal(
             UnitIds.MainBattleTank,
             identity.UnitId);

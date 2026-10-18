@@ -5,7 +5,7 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.11.0";
+    public const string CompilerVersion = "1.12.0";
     public const int RuntimeVersion = RuntimeAssetIntegrity.SupportedRuntimeVersion;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
@@ -85,7 +85,7 @@ public static class AssetPipelineCompiler
             try
             {
                 var sourceHash = reporter.Measure("source-hash", () => AssetHashing.ComputeAssetSourceHash(
-                    node.DefinitionPath, node.SourcePath, normalizedSourceRoot, node.Definition.Type == RuntimeAssetType.Animation ? 8 * 1024 * 1024 : long.MaxValue),
+                    node.DefinitionPath, node.SourcePath, normalizedSourceRoot, node.Definition.Type is RuntimeAssetType.Animation or RuntimeAssetType.Skin ? 8 * 1024 * 1024 : long.MaxValue),
                     node.Id.Value, node.SourcePath, $"sourceBytes={new FileInfo(node.SourcePath).Length}");
 
                 var dependencyBuildHashes = node.Dependencies
@@ -318,9 +318,14 @@ public static class AssetPipelineCompiler
         string sourceRoot,
         List<AssetCompilerDiagnostic> diagnostics)
     {
+        if (definition.SkinSockets is null || definition.SkinReference is not null && definition.Type != RuntimeAssetType.Mesh ||
+            definition.SkeletalAnimation && definition.Type != RuntimeAssetType.Animation || definition.AnimationClip is not null && definition.Type != RuntimeAssetType.Animation ||
+            definition.Type != RuntimeAssetType.Skin && definition.SkinSockets.Count > 0)
+            diagnostics.Add(new("ASSET051", AssetCompilerDiagnosticSeverity.Error, "Skin/clip metadata is null or attached to an incompatible asset type.", id.Value));
         var extension = Path.GetExtension(sourcePath).ToLowerInvariant();
         var validExtension = definition.Type switch
         {
+            RuntimeAssetType.Skin => extension is ".gltf" or ".glb",
             RuntimeAssetType.Animation => extension is ".gltf" or ".glb",
             RuntimeAssetType.Mesh => extension is ".gltf" or ".glb",
             RuntimeAssetType.Texture => extension is ".png" or ".tga",
@@ -460,7 +465,7 @@ public static class AssetPipelineCompiler
                 ToRelativePath(sourceRoot, sourcePath)));
         }
 
-        if (definition.AnimationReferences.Count > 1 || definition.AnimationReferences.Count > 0 && definition.Type != RuntimeAssetType.Mesh)
+        if (definition.AnimationReferences.Count > (definition.Type == RuntimeAssetType.Skin ? 9 : 1) || definition.AnimationReferences.Count > 0 && definition.Type is not (RuntimeAssetType.Mesh or RuntimeAssetType.Skin))
         {
             diagnostics.Add(new AssetCompilerDiagnostic(
                 "ASSET012",
@@ -526,6 +531,7 @@ public static class AssetPipelineCompiler
     {
         var rawDependencies = new List<string>();
         rawDependencies.AddRange(definition.Dependencies);
+        if (definition.SkinReference is not null) rawDependencies.Add(definition.SkinReference);
         rawDependencies.AddRange(definition.AnimationReferences);
         rawDependencies.AddRange(definition.MaterialReferences);
         rawDependencies.AddRange(definition.TextureReferences);
@@ -599,6 +605,7 @@ public static class AssetPipelineCompiler
     {
         foreach (var node in nodes.Values)
         {
+            if (node.Definition.SkinReference is not null) ValidateTypedReferences(node, [node.Definition.SkinReference], RuntimeAssetType.Skin, "skin", nodes, diagnostics);
             ValidateTypedReferences(node, node.Definition.AnimationReferences, RuntimeAssetType.Animation, "animation", nodes, diagnostics);
             foreach (var dependency in node.Dependencies)
             {
@@ -921,9 +928,20 @@ public static class AssetPipelineCompiler
                 node.SourcePath,
                 sourceRoot,
                 node.Definition.MaterialReferences,
-                requirements);
+                requirements, allowSkin: node.Definition.SkinReference is not null);
             MechanicalMeshValidation.Validate(node.Definition.MechanicalParts, node.Definition.Sockets,
                 RuntimeMeshData.FromPayload(imported.Payload).Indices.Count);
+            if (node.Definition.SkinReference is { } skinReference)
+            {
+                if (node.Definition.MechanicalParts.Count > 0 || node.Definition.AnimationReferences.Count > 0)
+                    throw new InvalidDataException("A skinned mesh cannot also use rigid mechanical/clip motion.");
+                var skinRecord = records[AssetId.Parse(skinReference)];
+                var skin = RuntimeSkinData.FromPayload(RuntimeAssetFile.Read(Path.Combine(runtimeRoot, skinRecord.RuntimePath), RuntimeAssetType.Skin, skinRecord.RuntimeBytes, skinRecord.RuntimeHash).Payload);
+                if (!skin.Mesh.ToPayload().AsSpan().SequenceEqual(imported.Payload)) throw new InvalidDataException("Skin and mesh compiled vertex order/materials differ.");
+                foreach (var socket in skin.Sockets)
+                    if (!node.Definition.Sockets.Any(s => s.Name == socket.Name && System.Numerics.Vector3.Distance(new(s.X,s.Y,s.Z), socket.BindPosition) < .00001f))
+                        throw new InvalidDataException("Skin and mesh canonical socket bindings differ.");
+            }
             foreach (string clipId in node.Definition.AnimationReferences)
             {
                 RuntimeAssetRecord clipRecord = records[AssetId.Parse(clipId)];
@@ -934,9 +952,20 @@ public static class AssetPipelineCompiler
             return imported;
         }
 
+        if (node.Definition.Type == RuntimeAssetType.Skin)
+        {
+            var imported = SkinImporter.Import(node.SourcePath, sourceRoot, node.Definition, GetMeshMaterialRequirements(node, nodes));
+            var skin = RuntimeSkinData.FromPayload(imported.Payload);
+            foreach (string clipId in node.Definition.AnimationReferences)
+            {
+                var record = records[AssetId.Parse(clipId)];
+                _ = skin.Bind(RuntimeAnimationData.FromPayload(RuntimeAssetFile.Read(Path.Combine(runtimeRoot, record.RuntimePath), RuntimeAssetType.Animation, record.RuntimeBytes, record.RuntimeHash).Payload));
+            }
+            return imported;
+        }
         return node.Definition.Type switch
         {
-            RuntimeAssetType.Animation => AnimationImporter.Import(node.SourcePath, sourceRoot),
+            RuntimeAssetType.Animation => AnimationImporter.Import(node.SourcePath, sourceRoot, node.Definition.SkeletalAnimation, node.Definition.AnimationClip),
             RuntimeAssetType.Texture => TextureImporter.Import(
                 node.SourcePath,
                 node.Definition.TextureColorSpace,
@@ -1028,6 +1057,7 @@ public static class AssetPipelineCompiler
                 .ToArray(),
             CollisionReference = node.Definition.CollisionReference,
             AnimationReferences = node.Definition.AnimationReferences.ToArray(),
+            SkinReference = node.Definition.SkinReference,
             MechanicalParts = node.Definition.MechanicalParts.ToArray(),
             Sockets = node.Definition.Sockets
                 .OrderBy(static socket => socket.Name, StringComparer.Ordinal)
@@ -1068,6 +1098,7 @@ public static class AssetPipelineCompiler
         {
             RuntimeAssetType.Mesh => "meshes",
             RuntimeAssetType.Animation => "animations",
+            RuntimeAssetType.Skin => "skins",
             RuntimeAssetType.Texture => "textures",
             RuntimeAssetType.Material => "materials",
             RuntimeAssetType.UiSkin => "ui-skins",

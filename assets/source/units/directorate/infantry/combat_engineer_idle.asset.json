@@ -1,0 +1,7 @@
+{
+  "id": "animation.directorate.combat_engineer.idle",
+  "type": "animation",
+  "source": "../authoring/infantry/combat_engineer.glb",
+  "skeletalAnimation": true,
+  "animationClip": "idle"
+}

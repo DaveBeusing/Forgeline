@@ -54,7 +54,7 @@ public sealed class DirectorateUnitAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                1337,
+                1357,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
@@ -115,9 +115,15 @@ public sealed class DirectorateUnitAssetAuthoringTests
                 string id = "unit.directorate." + family;
                 var primary = catalog.Get(AssetId.Parse(id));
                 Assert.Equal("unit.directorate.rifle_squad.collision", primary.CollisionReference);
-                Assert.Equal(16, primary.MechanicalParts.Count);
-                Assert.Equal(8, primary.MechanicalParts.Count(part => part.Motion == MechanicalMotionKind.InfantryStride));
-                Assert.Equal(4, primary.MechanicalParts.Count(part => part.Motion == MechanicalMotionKind.Cannon));
+                Assert.Empty(primary.MechanicalParts);
+                Assert.Equal("skin.directorate." + family, primary.SkinReference);
+                var skinRecord = catalog.Get(AssetId.Parse(primary.SkinReference!));
+                var skin = RuntimeSkinData.FromPayload(catalog.Read(AssetId.Parse(skinRecord.Id)).Payload);
+                Assert.Equal(44, skin.Joints.Count); Assert.Equal(9, skinRecord.AnimationReferences.Count);
+                foreach (string clipId in skinRecord.AnimationReferences)
+                    Assert.Equal(44, skin.Bind(RuntimeAnimationData.FromPayload(catalog.Read(AssetId.Parse(clipId)).Payload)).Length);
+                int leftArm = skin.Joints.ToList().FindIndex(j => j.Name == "member_0_forearm_left");
+                Assert.Contains(skin.Influences, v => v.A == leftArm && v.Weights.X > 0 || v.B == leftArm && v.Weights.Y > 0);
                 Assert.Contains(primary.Sockets, socket => socket.Name == "weapon_muzzle" && socket.X == .05f && socket.Y == .05f && socket.Z == .42f);
                 RuntimeMeshData[] lods = InfantryLodSuffixes.Select(suffix => RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse(id + suffix)).Payload)).ToArray();
                 Assert.True(lods[0].Indices.Count > lods[1].Indices.Count && lods[1].Indices.Count > lods[2].Indices.Count);

@@ -13,6 +13,9 @@ public readonly record struct MechanicalPose(
     float Elevation,
     float Door)
 {
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public InfantryAnimationPose Infantry { get; init; }
+
     public static MechanicalPose Interpolate(MechanicalPose previous, MechanicalPose current, float alpha)
     {
         if (!previous.IsSpecified || !current.IsSpecified) return current;
@@ -23,7 +26,8 @@ public readonly record struct MechanicalPose(
             ActiveSeconds = previous.ActiveSeconds + (current.ActiveSeconds - previous.ActiveSeconds) * t,
             Seconds = previous.Seconds + (current.Seconds - previous.Seconds) * t,
             Elevation = previous.Elevation + (current.Elevation - previous.Elevation) * (float)t,
-            Door = previous.Door + (current.Door - previous.Door) * (float)t
+            Door = previous.Door + (current.Door - previous.Door) * (float)t,
+            Infantry = InfantryAnimationPose.Interpolate(previous.Infantry, current.Infantry, (float)t)
         };
     }
 }

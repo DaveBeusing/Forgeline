@@ -9,6 +9,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
     private readonly IGraphicsDevice _graphics;
     private readonly RuntimeAssetCatalog _catalog;
     private readonly TextureDetailQuality _textureDetail;
+    private readonly Dictionary<AssetId, RuntimeSkinBinding> _skins = [];
     private readonly Dictionary<AssetId, RuntimeAnimationData> _clips = [];
     private readonly Dictionary<AssetId, RuntimeMeshBuffers> _meshes = [];
     private readonly Dictionary<AssetId, RuntimeMaterialResources> _materials = [];
@@ -21,6 +22,9 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
     private long _materialBindingFailures;
     private long _residentMeshBytes;
     private long _residentClipBytes;
+    private long _residentSkinBytes;
+    internal const int MaximumLoadedSkins = 8;
+    internal const long MaximumSkinCacheBytes = 32 * 1024 * 1024;
     internal const int MaximumLoadedClips = 128;
     internal const long MaximumClipCacheBytes = 16 * 1024 * 1024;
     private bool _disposed;
@@ -114,7 +118,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             return new RuntimeMaterialDiagnostics(
                 _materials.Count,
                 _textures.Count,
-                _materialBindingFailures) { LoadedMeshCount = _meshes.Count, ResidentMeshBytes = _residentMeshBytes, LoadedAnimationCount = _clips.Count, ResidentAnimationBytes = _residentClipBytes };
+                _materialBindingFailures) { LoadedMeshCount = _meshes.Count, ResidentMeshBytes = _residentMeshBytes, LoadedAnimationCount = _clips.Count, ResidentAnimationBytes = _residentClipBytes, LoadedSkinCount = _skins.Count, ResidentSkinBytes = _residentSkinBytes };
         }
     }
 
@@ -339,6 +343,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
 
         _meshes.Clear();
         _clips.Clear();
+        _skins.Clear(); _residentSkinBytes = 0;
         _residentClipBytes = 0;
         _materials.Clear();
         _textures.Clear();
@@ -568,6 +573,17 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             $"[graphics:material] fallback asset=\"{assetId}\" reason=\"{reason}\"");
     }
 
+    private RuntimeAnimationData ReadAnimation(AssetId id)
+    {
+        if (_clips.TryGetValue(id, out var cached)) return cached;
+        if (_catalog.Get(id).Type != RuntimeAssetType.Animation) throw new InvalidDataException("Skin clip type mismatch.");
+        byte[] payload = _catalog.Read(id).Payload;
+        if (_clips.Count >= MaximumLoadedClips || _residentClipBytes + payload.Length > MaximumClipCacheBytes)
+            throw new InvalidDataException("Animation session cache exceeds production bounds.");
+        var clip = RuntimeAnimationData.FromPayload(payload); _clips.Add(id, clip); _residentClipBytes += payload.Length;
+        return clip;
+    }
+
     private RuntimeMeshBuffers CreateMeshBuffers(
         byte[] payload, RuntimeAssetRecord record)
     {
@@ -580,6 +596,24 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             AssetSocket socket = record.Sockets.FirstOrDefault(item => item.Name == part.Socket);
             return new MechanicalPartBinding(part, new Vector3(socket.X, socket.Y, socket.Z));
         }).ToArray();
+        RuntimeSkinBinding? skin = null;
+        if (record.SkinReference is { } skinReference)
+        {
+            if (record.MechanicalParts.Count > 0 || record.AnimationReferences.Count > 0) throw new InvalidDataException("Skin conflicts with rigid articulation.");
+            var skinId = AssetId.Parse(skinReference);
+            if (!_skins.TryGetValue(skinId, out skin))
+            {
+                var skinRecord = _catalog.Get(skinId);
+                if (skinRecord.Type != RuntimeAssetType.Skin) throw new InvalidDataException("Mesh skin type mismatch.");
+                byte[] skinPayload = _catalog.Read(skinId).Payload;
+                if (_skins.Count >= MaximumLoadedSkins || _residentSkinBytes + skinPayload.Length > MaximumSkinCacheBytes)
+                    throw new InvalidDataException("Skin session cache exceeds production bounds.");
+                var skinData = RuntimeSkinData.FromPayload(skinPayload);
+                skin = new(skinData, skinRecord.AnimationReferences.Select(reference => ReadAnimation(AssetId.Parse(reference))));
+                _skins.Add(skinId, skin); _residentSkinBytes += skinPayload.Length;
+            }
+            if (!skin.Data.Mesh.ToPayload().AsSpan().SequenceEqual(payload)) throw new InvalidDataException("Mesh and skin vertex payload differ.");
+        }
         RuntimeAnimationData? clip = null;
         if (record.AnimationReferences.Count > 1) throw new InvalidDataException("Mesh supports one rigid clip.");
         foreach (string clipId in record.AnimationReferences)
@@ -676,7 +710,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
                 materialId,
                 hasMaterial,
                 usesDevelopmentFallback,
-                data.Sections.Count) { MechanicalParts = parts, Clip = clip };
+                data.Sections.Count) { MechanicalParts = parts, Clip = clip, Skin = skin };
         }
         catch
         {
@@ -701,6 +735,8 @@ public readonly record struct RuntimeMaterialDiagnostics(
 {
     public int LoadedMeshCount { get; init; }
     public long ResidentMeshBytes { get; init; }
+    public int LoadedSkinCount { get; init; }
+    public long ResidentSkinBytes { get; init; }
     public int LoadedAnimationCount { get; init; }
     public long ResidentAnimationBytes { get; init; }
 }
@@ -738,6 +774,7 @@ internal readonly record struct RuntimeMeshBuffers(
 {
     public int FirstIndex { get; init; }
     public RuntimeAnimationData? Clip { get; init; }
+    public RuntimeSkinBinding? Skin { get; init; }
     public MechanicalPartBinding[]? MechanicalParts { get; init; }
 
     public bool IsValid =>

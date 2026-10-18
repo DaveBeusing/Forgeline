@@ -76,8 +76,11 @@ public sealed class RuntimeAssetCatalog
 
         foreach (RuntimeAssetRecord record in manifest.Assets)
         {
-            if (record.AnimationReferences.Count > 1 || record.AnimationReferences.Count > 0 && record.Type != RuntimeAssetType.Mesh)
-                throw new InvalidDataException("Only meshes may reference one rigid clip.");
+            if (record.AnimationReferences.Count > (record.Type == RuntimeAssetType.Skin ? 9 : 1) || record.AnimationReferences.Count > 0 && record.Type is not (RuntimeAssetType.Mesh or RuntimeAssetType.Skin))
+                throw new InvalidDataException("Mesh/skin clip reference count or owner type is invalid.");
+            if (record.SkinReference is { } skinReference && (record.Type != RuntimeAssetType.Mesh || !record.Dependencies.Contains(skinReference, StringComparer.Ordinal) ||
+                !records.TryGetValue(AssetId.Parse(skinReference), out var skin) || skin.Type != RuntimeAssetType.Skin))
+                throw new InvalidDataException("Skin reference must be an explicit mesh-to-skin dependency.");
             foreach (string reference in record.AnimationReferences)
                 if (!record.Dependencies.Contains(reference, StringComparer.Ordinal) ||
                     !records.TryGetValue(AssetId.Parse(reference), out var clip) || clip.Type != RuntimeAssetType.Animation)

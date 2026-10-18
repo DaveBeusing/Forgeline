@@ -67,6 +67,11 @@ public sealed record SourceAssetDefinition
 
     public bool CollisionRequired { get; init; }
 
+    public string? SkinReference { get; init; }
+    public IReadOnlyList<SkinSocketSource> SkinSockets { get; init; } = [];
+    public bool SkeletalAnimation { get; init; }
+    public string? AnimationClip { get; init; }
+
     public IReadOnlyList<string> AnimationReferences { get; init; } = [];
 
     public IReadOnlyList<AssetSocket> Sockets { get; init; } = [];

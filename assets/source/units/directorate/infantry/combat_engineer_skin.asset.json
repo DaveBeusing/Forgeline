@@ -1,0 +1,105 @@
+{
+  "id": "skin.directorate.combat_engineer",
+  "type": "skin",
+  "source": "../authoring/infantry/combat_engineer.glb",
+  "materialReferences": [
+    "material.directorate.unit.rifle_squad"
+  ],
+  "animationReferences": [
+    "animation.directorate.combat_engineer.idle",
+    "animation.directorate.combat_engineer.walk",
+    "animation.directorate.combat_engineer.run",
+    "animation.directorate.combat_engineer.aim",
+    "animation.directorate.combat_engineer.fire",
+    "animation.directorate.combat_engineer.reload",
+    "animation.directorate.combat_engineer.hit",
+    "animation.directorate.combat_engineer.suppression",
+    "animation.directorate.combat_engineer.death"
+  ],
+  "sockets": [
+    {
+      "name": "weapon_muzzle",
+      "x": 0.05,
+      "y": 0.05,
+      "z": 0.42
+    },
+    {
+      "name": "member_0_hip_left",
+      "x": 0.007000000000000006,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_0_hip_right",
+      "x": 0.093,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_0_shoulder",
+      "x": 0.05,
+      "y": 0.24,
+      "z": 0.22
+    },
+    {
+      "name": "member_1_hip_left",
+      "x": -0.34299999999999997,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_1_hip_right",
+      "x": -0.257,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_1_shoulder",
+      "x": -0.3,
+      "y": 0.24,
+      "z": 0.22
+    },
+    {
+      "name": "member_2_hip_left",
+      "x": 0.257,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_2_hip_right",
+      "x": 0.34299999999999997,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_2_shoulder",
+      "x": 0.3,
+      "y": 0.24,
+      "z": -0.22
+    },
+    {
+      "name": "member_3_hip_left",
+      "x": -0.34299999999999997,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_3_hip_right",
+      "x": -0.257,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_3_shoulder",
+      "x": -0.3,
+      "y": 0.24,
+      "z": -0.22
+    }
+  ],
+  "skinSockets": [
+    {
+      "name": "weapon_muzzle",
+      "joint": "member_0_forearm_right"
+    }
+  ]
+}
