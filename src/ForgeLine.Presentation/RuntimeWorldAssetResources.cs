@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+using ForgeLine.Graphics.RenderContracts;
 using System.Numerics;
 using ForgeLine.Assets;
 using ForgeLine.Graphics;
@@ -652,24 +654,13 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
                 indices.Length *
                 sizeof(uint));
 
-        IGraphicsBuffer vertexBuffer =
-            _graphics.CreateBuffer(
-                new GraphicsBufferDescription(
-                    checked((ulong)vertexByteCount),
-                    GraphicsBufferMemory.Upload));
+        IGraphicsBuffer vertexBuffer = _graphics.CreateInitializedStaticBuffer(
+            new(checked((ulong)vertexByteCount), StaticGraphicsBufferUsage.Vertex), MemoryMarshal.AsBytes(vertices.AsSpan()));
         IGraphicsBuffer? indexBuffer = null;
         try
         {
-            indexBuffer =
-                _graphics.CreateBuffer(
-                    new GraphicsBufferDescription(
-                        checked((ulong)indexByteCount),
-                        GraphicsBufferMemory.Upload));
-
-            vertexBuffer.SetData<RuntimeMeshVertex>(
-                vertices);
-            indexBuffer.SetData<uint>(
-                indices);
+            indexBuffer = _graphics.CreateInitializedStaticBuffer(
+                new(checked((ulong)indexByteCount), StaticGraphicsBufferUsage.Index), MemoryMarshal.AsBytes(indices.AsSpan()));
 
             int[] materialSlots =
                 data.Sections

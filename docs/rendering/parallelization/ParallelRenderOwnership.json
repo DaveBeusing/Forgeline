@@ -1,0 +1,403 @@
+{
+  "schemaVersion": 1,
+  "repository": "DaveBeusing/Forgeline",
+  "analysisBaseSha": "3c61f47274f03a0ab6e3b2022f40ac8205a72eb2",
+  "analysisDate": "2026-10-18",
+  "status": "implemented-awaiting-integration-and-required-gates",
+  "parallelStartCondition": "Foundation integrated into current master, required baseline gates resolved and write ownership revalidated.",
+  "frozenParallelExact": [
+    "Directory.Build.props",
+    "Directory.Packages.props",
+    "global.json",
+    "ForgeLine.sln",
+    "ForgeLine.slnx",
+    ".github/workflows/ci.yml",
+    ".github/workflows/frame-hotpaths.yml",
+    ".github/workflows/scalability.yml",
+    "src/ForgeLine.Client/ClientRenderHost.cs",
+    "benchmarks/ForgeLine.Rendering.Benchmarks/Program.cs",
+    "src/ForgeLine.Graphics/IGraphicsDevice.cs",
+    "src/ForgeLine.Graphics/IGraphicsCommandContext.cs",
+    "src/ForgeLine.Graphics/GraphicsDiagnostics.cs",
+    "src/ForgeLine.Graphics/GraphicsTextureData.cs",
+    "src/ForgeLine.Graphics/GraphicsBufferDescription.cs",
+    "src/ForgeLine.Graphics/GraphicsPipelineDescription.cs",
+    "src/ForgeLine.Graphics/GraphicsFramePlan.cs",
+    "src/ForgeLine.Graphics/GraphicsConfiguration.cs",
+    "src/ForgeLine.Graphics/GraphicsPostProcessingSettings.cs",
+    "src/ForgeLine.Graphics/GraphicsSceneOutputSettings.cs",
+    "src/ForgeLine.Graphics/GraphicsDirectionalShadowSettings.cs",
+    "src/ForgeLine.Graphics/GraphicsAtmosphereSettings.cs",
+    "README.md",
+    "docs/Development.md",
+    "docs/Architecture.md",
+    "docs/GraphicsReferencePerformance.md",
+    "docs/AssetPipeline.md",
+    "src/ForgeLine.Client/VisualReferenceCapture.cs",
+    "src/ForgeLine.Assets/RuntimeSkinData.cs",
+    "src/ForgeLine.Assets/RuntimeAnimationData.cs"
+  ],
+  "frozenParallelPrefixes": [
+    "src/ForgeLine.Graphics/RenderContracts/",
+    "src/ForgeLine.Presentation/RenderContracts/"
+  ],
+  "frozenParallelSuffixes": [
+    ".csproj",
+    ".fsproj",
+    ".sln",
+    ".slnx"
+  ],
+  "serializedVersionException": {
+    "path": "Directory.Build.props",
+    "onePatchPerPr": true,
+    "duringParallelImplementation": false
+  },
+  "externalConflicts": [
+    {
+      "scope": "Shared material and animation authoring",
+      "exclusiveOwner": "RuntimeAssetResidencyAndTextureBudgets",
+      "hold": [
+        "assets/source/",
+        "tools/ForgeLine.AssetCompiler/"
+      ],
+      "rule": "No concurrent writes or runtime schema migrations. Revalidate every external request against this manifest."
+    },
+    {
+      "scope": "Graphics/skeleton runtime work",
+      "exclusiveOwner": "GraphicsResourceLifetimeAndUploadScheduling",
+      "rule": "No concurrent GPU buffer, root/vertex layout or device-lifecycle changes outside the assigned lane."
+    }
+  ],
+  "lanes": [
+    {
+      "name": "RenderPipelineParallelizationFoundation",
+      "phase": "foundation",
+      "dependsOn": [],
+      "writeExact": [
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.cs",
+        "src/ForgeLine.Presentation/TerrainRenderer.cs",
+        "src/ForgeLine.Presentation/RenderSnapshotIndex.cs",
+        "src/ForgeLine.Presentation/RenderWorld.cs",
+        "src/ForgeLine.Presentation/RuntimeWorldAssetResources.cs",
+        "src/ForgeLine.Client/ClientRenderHost.cs",
+        "src/ForgeLine.Graphics/IGraphicsDevice.cs",
+        "src/ForgeLine.Graphics/GraphicsDiagnostics.cs",
+        "src/ForgeLine.Graphics/GraphicsTextureData.cs",
+        "benchmarks/ForgeLine.Rendering.Benchmarks/Program.cs",
+        "Directory.Build.props",
+        "ForgeLine.sln",
+        ".github/workflows/ci.yml",
+        ".github/workflows/frame-hotpaths.yml",
+        ".github/workflows/scalability.yml",
+        "src/ForgeLine.Presentation/PresentationExtractor.cs",
+        "src/ForgeLine.Presentation/PresentationSnapshot.cs",
+        "src/ForgeLine.Presentation/PresentationSnapshotBuffer.cs",
+        "src/ForgeLine.Presentation/CombatGroupOperationalSnapshot.cs",
+        "src/ForgeLine.Presentation/InstanceMaterialPipeline.cs",
+        "src/ForgeLine.Presentation/TerrainMaterialPipeline.cs",
+        "src/ForgeLine.Presentation/InstanceVisibilityIndex.cs",
+        "src/ForgeLine.Presentation/RenderAssetSession.cs",
+        "src/ForgeLine.Client/ClientRenderPublication.cs",
+        "src/ForgeLine.Client/VisualReferenceCapture.cs"
+      ],
+      "writePrefixes": [
+        "src/ForgeLine.Presentation/RenderContracts/",
+        "src/ForgeLine.Graphics/RenderContracts/",
+        "tests/ForgeLine.Presentation.Tests/RenderParallelization/",
+        "docs/rendering/parallelization/",
+        "build/rendering/parallelization/",
+        "assets/source/",
+        "tools/ForgeLine.AssetCompiler/",
+        "tests/ForgeLine.Client.Tests/RenderParallelization/",
+        "tests/ForgeLine.Graphics.Tests/RenderParallelization/"
+      ],
+      "branchSuggestion": "refactor/render-pipeline-boundaries"
+    },
+    {
+      "name": "GraphicsResourceLifetimeAndUploadScheduling",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderPipelineParallelizationFoundation"
+      ],
+      "writeExact": [
+        "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsBuffer.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsTexture.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsPipeline.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsCommandContext.cs",
+        "src/ForgeLine.Graphics/D3D12DescriptorAllocator.cs",
+        "src/ForgeLine.Graphics/GraphicsResourceRetirement.cs",
+        "src/ForgeLine.Graphics/GraphicsSurfaceLifecycleState.cs",
+        "src/ForgeLine.Graphics/GraphicsDeviceException.cs",
+        "src/ForgeLine.Graphics/DxcShaderCompiler.cs",
+        "src/ForgeLine.Graphics/D3D12SceneComposition.cs",
+        "src/ForgeLine.Graphics/D3D12DirectionalShadows.cs",
+        "src/ForgeLine.Graphics/D3D12Atmosphere.cs",
+        "src/ForgeLine.Graphics/D3D12Particles.cs",
+        "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
+        "src/ForgeLine.Presentation/SkinFrameCache.cs"
+      ],
+      "writePrefixes": [
+        "src/ForgeLine.Graphics/ResourceScheduling/",
+        "tests/ForgeLine.Graphics.Tests/ResourceScheduling/",
+        "docs/rendering/resource-scheduling/",
+        "build/rendering/resource-scheduling/"
+      ],
+      "branchSuggestion": "performance/gpu-lifecycle"
+    },
+    {
+      "name": "RenderSnapshotPublicationAndAllocationControl",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderPipelineParallelizationFoundation"
+      ],
+      "writeExact": [
+        "src/ForgeLine.Presentation/PresentationExtractor.cs",
+        "src/ForgeLine.Presentation/PresentationSnapshot.cs",
+        "src/ForgeLine.Presentation/PresentationSnapshotBuffer.cs",
+        "src/ForgeLine.Presentation/RenderSnapshotIndex.cs",
+        "src/ForgeLine.Presentation/RenderWorld.cs",
+        "src/ForgeLine.Presentation/CombatGroupOperationalSnapshot.cs",
+        "src/ForgeLine.Client/ClientRenderPublication.cs"
+      ],
+      "writePrefixes": [
+        "src/ForgeLine.Presentation/SnapshotPublication/",
+        "tests/ForgeLine.Presentation.Tests/SnapshotPublication/",
+        "tests/ForgeLine.Client.Tests/SnapshotPublication/",
+        "docs/rendering/snapshot-publication/",
+        "build/rendering/snapshot-publication/"
+      ],
+      "branchSuggestion": "performance/snapshot-publication"
+    },
+    {
+      "name": "InstanceVisibilityBatchingAndSubmission",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderPipelineParallelizationFoundation"
+      ],
+      "writeExact": [
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.cs",
+        "src/ForgeLine.Presentation/InstanceVisibilityIndex.cs"
+      ],
+      "writePrefixes": [
+        "src/ForgeLine.Presentation/RenderSubmission/",
+        "tests/ForgeLine.Presentation.Tests/RenderSubmission/",
+        "docs/rendering/instance-submission/",
+        "build/rendering/instance-submission/"
+      ],
+      "branchSuggestion": "performance/instance-submission"
+    },
+    {
+      "name": "RuntimeAssetResidencyAndTextureBudgets",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderPipelineParallelizationFoundation"
+      ],
+      "writeExact": [
+        "src/ForgeLine.Presentation/RuntimeWorldAssetResources.cs",
+        "src/ForgeLine.Presentation/RenderAssetSession.cs"
+      ],
+      "writePrefixes": [
+        "src/ForgeLine.Presentation/AssetResidency/",
+        "assets/source/",
+        "tools/ForgeLine.AssetCompiler/",
+        "tests/ForgeLine.Assets.Tests/AssetResidency/",
+        "tests/ForgeLine.Presentation.Tests/AssetResidency/",
+        "docs/rendering/asset-residency/",
+        "build/rendering/asset-residency/"
+      ],
+      "branchSuggestion": "performance/asset-residency"
+    },
+    {
+      "name": "PbrLightingAndShadowQuality",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderPipelineParallelizationFoundation"
+      ],
+      "writeExact": [
+        "src/ForgeLine.Presentation/PbrMaterialShader.cs",
+        "src/ForgeLine.Presentation/DirectionalShadowProjection.cs",
+        "src/ForgeLine.Presentation/DirectionalShadowShader.cs",
+        "src/ForgeLine.Presentation/DirectionalShadowCasterPipeline.cs",
+        "src/ForgeLine.Presentation/InstanceMaterialPipeline.cs",
+        "src/ForgeLine.Presentation/TerrainMaterialPipeline.cs"
+      ],
+      "writePrefixes": [
+        "src/ForgeLine.Presentation/MaterialQuality/",
+        "tests/ForgeLine.Presentation.Tests/MaterialQuality/",
+        "docs/rendering/material-quality/",
+        "build/rendering/material-quality/"
+      ],
+      "branchSuggestion": "rendering/material-shadow-quality"
+    },
+    {
+      "name": "TerrainGeometryAndResidencyPerformance",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderPipelineParallelizationFoundation"
+      ],
+      "writeExact": [
+        "src/ForgeLine.Presentation/TerrainRenderer.cs"
+      ],
+      "writePrefixes": [
+        "src/ForgeLine.Presentation/TerrainResidency/",
+        "tests/ForgeLine.Presentation.Tests/TerrainResidency/",
+        "docs/rendering/terrain-residency/",
+        "build/rendering/terrain-residency/"
+      ],
+      "branchSuggestion": "performance/terrain-residency"
+    },
+    {
+      "name": "SceneCompositionAndParticleEfficiency",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderPipelineParallelizationFoundation"
+      ],
+      "writeExact": [
+        "src/ForgeLine.Graphics/SceneCompositeShader.cs",
+        "src/ForgeLine.Graphics/GpuParticleRenderer.cs",
+        "src/ForgeLine.Presentation/ParticleVfxRenderer.cs"
+      ],
+      "writePrefixes": [
+        "src/ForgeLine.Graphics/SceneComposition/",
+        "src/ForgeLine.Presentation/EffectSubmission/",
+        "tests/ForgeLine.Graphics.Tests/SceneComposition/",
+        "tests/ForgeLine.Presentation.Tests/EffectSubmission/",
+        "docs/rendering/composition-effects/",
+        "build/rendering/composition-effects/"
+      ],
+      "branchSuggestion": "performance/composition-effects"
+    },
+    {
+      "name": "RenderPerformanceAndVisualQualification",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderPipelineParallelizationFoundation"
+      ],
+      "writeExact": [
+        ".github/workflows/render-qualification.yml"
+      ],
+      "writePrefixes": [
+        "build/rendering/qualification/",
+        "tests/ForgeLine.Presentation.Tests/RenderQualification/",
+        "tests/ForgeLine.Graphics.Tests/RenderQualification/",
+        "tests/ForgeLine.Client.Tests/RenderQualification/",
+        "docs/rendering/qualification/"
+      ],
+      "branchSuggestion": "testing/render-performance-qualification"
+    },
+    {
+      "name": "RenderIntegrationAndReleaseQualification",
+      "phase": "integration",
+      "dependsOn": [
+        "GraphicsResourceLifetimeAndUploadScheduling",
+        "RenderSnapshotPublicationAndAllocationControl",
+        "InstanceVisibilityBatchingAndSubmission",
+        "RuntimeAssetResidencyAndTextureBudgets",
+        "PbrLightingAndShadowQuality",
+        "TerrainGeometryAndResidencyPerformance",
+        "SceneCompositionAndParticleEfficiency",
+        "RenderPerformanceAndVisualQualification"
+      ],
+      "writeExact": [
+        "Directory.Build.props",
+        "ForgeLine.sln",
+        ".github/workflows/ci.yml",
+        ".github/workflows/frame-hotpaths.yml",
+        ".github/workflows/scalability.yml",
+        "src/ForgeLine.Client/ClientRenderHost.cs",
+        "benchmarks/ForgeLine.Rendering.Benchmarks/Program.cs",
+        "docs/Development.md",
+        "docs/Architecture.md",
+        "docs/GraphicsReferencePerformance.md",
+        "docs/AssetPipeline.md",
+        "README.md"
+      ],
+      "writePrefixes": [
+        "docs/rendering/integration/",
+        "build/rendering/integration/",
+        "tests/ForgeLine.Client.Tests/RenderIntegration/"
+      ],
+      "branchSuggestion": "integration/render-performance-validation"
+    }
+  ],
+  "parallelReleased": false,
+  "integratedFoundationSha": null,
+  "integratedAuthoringPrerequisites": [
+    {
+      "area": "Blender toolchain",
+      "mergedPr": 227
+    },
+    {
+      "area": "Source round trip",
+      "mergedPr": 228
+    },
+    {
+      "area": "Material and LOD preparation",
+      "mergedPr": 229
+    },
+    {
+      "area": "Mechanical authoring",
+      "mergedPr": 230
+    },
+    {
+      "area": "Tank source production",
+      "mergedPr": 231
+    },
+    {
+      "area": "Rigid animation runtime",
+      "mergedPr": 232
+    },
+    {
+      "area": "Infantry skinning",
+      "mergedPr": 234
+    },
+    {
+      "area": "Procedural texture production",
+      "mergedPr": 235
+    }
+  ],
+  "plannedNewExact": [
+    ".github/workflows/render-qualification.yml"
+  ],
+  "plannedNewPrefixes": [
+    "build/rendering/asset-residency/",
+    "build/rendering/composition-effects/",
+    "build/rendering/instance-submission/",
+    "build/rendering/material-quality/",
+    "build/rendering/qualification/",
+    "build/rendering/resource-scheduling/",
+    "build/rendering/snapshot-publication/",
+    "build/rendering/terrain-residency/",
+    "docs/rendering/asset-residency/",
+    "docs/rendering/composition-effects/",
+    "docs/rendering/instance-submission/",
+    "docs/rendering/material-quality/",
+    "docs/rendering/qualification/",
+    "docs/rendering/resource-scheduling/",
+    "docs/rendering/snapshot-publication/",
+    "docs/rendering/terrain-residency/",
+    "src/ForgeLine.Graphics/ResourceScheduling/",
+    "src/ForgeLine.Graphics/SceneComposition/",
+    "src/ForgeLine.Presentation/AssetResidency/",
+    "src/ForgeLine.Presentation/EffectSubmission/",
+    "src/ForgeLine.Presentation/MaterialQuality/",
+    "src/ForgeLine.Presentation/RenderSubmission/",
+    "src/ForgeLine.Presentation/SnapshotPublication/",
+    "src/ForgeLine.Presentation/TerrainResidency/",
+    "tests/ForgeLine.Assets.Tests/AssetResidency/",
+    "tests/ForgeLine.Client.Tests/RenderQualification/",
+    "tests/ForgeLine.Client.Tests/SnapshotPublication/",
+    "tests/ForgeLine.Graphics.Tests/RenderQualification/",
+    "tests/ForgeLine.Graphics.Tests/ResourceScheduling/",
+    "tests/ForgeLine.Graphics.Tests/SceneComposition/",
+    "tests/ForgeLine.Presentation.Tests/AssetResidency/",
+    "tests/ForgeLine.Presentation.Tests/EffectSubmission/",
+    "tests/ForgeLine.Presentation.Tests/MaterialQuality/",
+    "tests/ForgeLine.Presentation.Tests/RenderQualification/",
+    "tests/ForgeLine.Presentation.Tests/RenderSubmission/",
+    "tests/ForgeLine.Presentation.Tests/SnapshotPublication/",
+    "tests/ForgeLine.Presentation.Tests/TerrainResidency/"
+  ],
+  "foundationImplementationSha": "c3ded4538c8eb4350189e7b8d2b1577ea904ffb1"
+}

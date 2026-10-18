@@ -1,3 +1,4 @@
+using ForgeLine.Presentation.RenderContracts;
 using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
@@ -301,6 +302,24 @@ internal static class VisualReferenceCapture
                             Math.Max(1, (int)Math.Ceiling(display.Width * (double)profile.ResolutionScale)),
                             Math.Max(1, (int)Math.Ceiling(display.Height * (double)profile.ResolutionScale)),
                             profile.Shadows.Enabled ? DirectionalShadowProjection.Create(camera.CaptureState(), lighting, profile.Shadows) : null);
+                        if (materialReference is null && !meshes.AssetsPrepared) meshes.Prepare(camera, world, new(
+                            Math.Max(1, (int)Math.Ceiling(display.Width * (double)profile.ResolutionScale)),
+                            Math.Max(1, (int)Math.Ceiling(display.Height * (double)profile.ResolutionScale)), 1,
+                            profile.Shadows.Enabled ? DirectionalShadowProjection.Create(camera.CaptureState(), lighting, profile.Shadows) : null,
+                            profile.Shadows.MaximumCasters, captureVisualSeconds, true), particles);
+                    }
+                    void RecordFrame()
+                    {
+                        if (!meshes.AssetsPrepared) PrepareTerrain();
+                        graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                        meshes.Submit(); meshes.Retire();
+                    }
+                    byte[] CaptureFrame()
+                    {
+                        if (!meshes.AssetsPrepared) PrepareTerrain();
+                        byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                        meshes.Submit(); meshes.Retire();
+                        return pixels;
                     }
                     PrepareTerrain();
                     double setupMilliseconds = Stopwatch.GetElapsedTime(setupStart).TotalMilliseconds;
@@ -309,7 +328,7 @@ internal static class VisualReferenceCapture
                     for (int i = 0; i < warmupFrames; i++)
                     {
                         if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
-                        graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                        RecordFrame();
                     }
                     graphics.WaitForIdle();
                     var beforeSamples = graphics.Diagnostics;
@@ -322,12 +341,12 @@ internal static class VisualReferenceCapture
                         if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
                         camera.ApplyState(ReferencePerformanceSamples.CameraPose(initialCamera, request.CameraPath, i, request.Samples));
                         long allocationStart = GC.GetAllocatedBytesForCurrentThread();
-                        long start = Stopwatch.GetTimestamp(); PrepareTerrain(); graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                        long start = Stopwatch.GetTimestamp(); PrepareTerrain(); RecordFrame();
                         cpu[i] = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
                         long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocationStart;
                         var sampleDiagnostics = graphics.Diagnostics;
                         performance.AddCpu(i, cpu[i], allocatedBytes, sampleDiagnostics,
-                            new { objects = meshes.SubmissionMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics });
+                            new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics });
                         if (sampleDiagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
                         {
                             lastFence = frame.GpuSubmissionFence;
@@ -343,7 +362,7 @@ internal static class VisualReferenceCapture
                     PrepareTerrain();
                     // Restore fixed pose and settle history only after the timed window.
                     if (request.CameraPath != ReferenceCameraPath.Fixed)
-                        for (int i = 0; i < 3; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                        for (int i = 0; i < 3; i++) RecordFrame();
                     if (measured.Surface.Width != display.Width || measured.Surface.Height != display.Height)
                         throw new InvalidOperationException("Actual native surface dimensions differ from the capture request.");
                     if (measured.Resources.TextureBindingFailureCount != 0 || meshes.MaterialDiagnostics.BindingFailureCount != 0 ||
@@ -352,7 +371,7 @@ internal static class VisualReferenceCapture
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
                     captureState = new { key, stage = "first-readback", surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
-                    byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                    byte[] rgba = CaptureFrame();
                     bool repeatPixelsEqual = true;
                     var repeatFailures = new List<object>();
                     ReadOnlyMemory<byte> shadowDepth = graphics.CaptureShadowDepth;
@@ -361,7 +380,7 @@ internal static class VisualReferenceCapture
                     for (int repetition = 1; repetition < request.RepeatCaptures; repetition++)
                     {
                         captureState = new { key, stage = "repeat-readback", repetition, surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
-                        byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                        byte[] repeated = CaptureFrame();
                         captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
                             shadowFingerprint = graphics.CaptureShadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(graphics.CaptureShadowDepth.Span)) });
                         if (!rgba.AsSpan().SequenceEqual(repeated))
@@ -401,7 +420,7 @@ internal static class VisualReferenceCapture
                             PrepareTerrain();
                             string motionImage = $"{key}-motion-{step:D2}.png";
                             captureState = new { key, stage = "camera-pose-readback", step, surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
-                            byte[] motion = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                            byte[] motion = CaptureFrame();
                             ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, motionImage), display.Width, display.Height, motion);
                             motionImages.Add(new { image = motionImage, imageSha256 = FileHash(Path.Combine(request.OutputRoot, motionImage)), camera = camera.CaptureState() });
                         }

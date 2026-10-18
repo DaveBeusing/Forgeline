@@ -1,3 +1,5 @@
+using ForgeLine.Graphics.RenderContracts;
+
 namespace ForgeLine.Graphics;
 
 public interface IGraphicsDevice : IDisposable
@@ -47,6 +49,18 @@ public interface IGraphicsDevice : IDisposable
     IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description);
 
     IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description);
+
+    // Upload-heap compatibility implementation. Input is consumed before return, on
+    // this device's owner. The same queue stream can bind it immediately. Disposing
+    // invalidates its wrapper; existing last-use fence retirement releases native data.
+    IGraphicsBuffer CreateInitializedStaticBuffer(InitializedStaticBufferDescription description, ReadOnlySpan<byte> initialData)
+    {
+        description.Validate(initialData.Length);
+        IGraphicsBuffer buffer = CreateBuffer(new(description.SizeInBytes, GraphicsBufferMemory.Upload));
+        try { buffer.SetData(initialData); return buffer; }
+        catch { buffer.Dispose(); throw; }
+    }
+
 
     IGraphicsTexture CreateTexture(
         GraphicsTextureData texture) =>

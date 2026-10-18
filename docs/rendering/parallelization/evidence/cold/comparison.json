@@ -1,0 +1,29 @@
+{
+  "imageGateRequested": false,
+  "captures": [
+    {
+      "gpuMeanMs": 13.627288,
+      "regionChanges": null,
+      "equivalentHardware": false,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": null,
+      "pixelComparison": null,
+      "visualReview": "pending",
+      "structural": "pass",
+      "comparison": "no-matched-baseline",
+      "key": "MainBattleTankProduction-1920x1080-High-CloseTactical-RendererCold",
+      "cpuMeanMs": 103.6674625,
+      "sameSource": false
+    }
+  ],
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0,
+  "channelTolerance": 0,
+  "imageFailures": [],
+  "commit": "2dfd86d318271decfc87c5234ef461e1e7714bb4",
+  "structural": "pass",
+  "baselineCommit": null,
+  "pixelComparisonRequested": false,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "visualAcceptance": "pending"
+}

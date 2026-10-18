@@ -1,0 +1,139 @@
+# Render foundation qualification
+
+Status: **implemented, not yet accepted**. Parallel start is blocked. No integration,
+protection change, tag or release is performed by this qualification.
+
+## Identity and immutable behavior
+
+Baseline: master `3c61f47274f03a0ab6e3b2022f40ac8205a72eb2`, 0.1.400.
+Changed native binary: `2dfd86d318271decfc87c5234ef461e1e7714bb4`, 0.1.401.
+Both use .NET 10.0.12/SDK 10.0.401, Release, Windows x64 and the same sealed assets.
+Runtime-directory fingerprint:
+`EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590`.
+The standard development build reports zero compiled and 1,357 unchanged records.
+
+All three factory method bodies retain their baseline hashes after only the private
+-> internal access change. This includes exact shader literals, defines, target
+profiles, layouts, material/texture bindings and pipeline flags. The checked-in
+factory-source regression passes. The frozen ABI and initialized-buffer transfer,
+failed replacement, phase/owner errors, suspended callback recovery, large snapshots,
+conservative bounds and retained publication readers have dedicated executable tests.
+
+Release solution build: zero warnings/errors. Acyclic project graph: 45 projects.
+New namespace: 13 boundary contracts pass. Ownership/factory source: four tests pass.
+Complete affected suites: Presentation 1,271 passed/12 optional skips, Client 419/2,
+Graphics 78/2. After final read-interface wiring, the complete solution passes:
+**2,588 successful, zero failed, 16 explicit optional skips, 2,604 total** (11m16.537s).
+This includes the full combat-group allocation suite; the historical full-suite
+allocation failure is not reproduced. Optional skips remain explicitly optional
+Blender/hardware qualification, not silently reclassified passes.
+
+The existing null-graphics frame-hotpath benchmark completes ten cases with 1,024
+warmups and 8,192 samples each. Snapshot indexing and culled rendering allocate zero;
+other warmed rendering cases report 0.05859375 bytes/operation. Extraction and copied
+publication intentionally retain their existing owned allocations (241,182.11 and
+15,456 bytes/operation). These are CPU observations, not GPU or FPS qualification.
+The separate combat-group benchmark passes its allocation contracts in all 24 cases:
+eight retained HUD/input cases allocate zero, while eight summary and eight owned
+snapshot/index cases satisfy their existing bounded-storage contracts. Its unchanged
+128 warmups/256 samples and observational timings are retained in the raw report.
+Both benchmark reports retain the harness assembly identity 0.1.0.0; the executed
+Release binaries came from the changed source identity above, without relabeling
+that existing harness metadata as a product version.
+
+## Native equality and bounded resources
+
+Actual NVIDIA RTX PRO 5000 Blackwell laptop GPU, feature level 12_1,
+driver 32.0.15.9653; hardware adapter, debug layer unavailable/disabled. Native High
+1920x1080, eight warmups, 32 samples, two readbacks, fixed actual 120/420/1000m
+bookmarks. Baseline and changed tank/industrial matrices each complete six cases.
+Every before/after image has the identical pixel SHA256. Repeated images are exact.
+No mesh fallback, material/texture binding failure or submission fault is recorded.
+This proves sampled native image equality, not independent art approval or every
+possible scene/camera/driver state. No golden image was regenerated as an approval.
+
+| Scene | Camera | Instance draws before/after | Logical texture bytes before/after |
+| --- | --- | ---: | ---: |
+| Tank | 120m | 27 / 27 | 47,912,856 / 47,912,856 |
+| Tank | 420m | 28 / 28 | 47,912,856 / 47,912,856 |
+| Tank | 1000m | 29 / 29 | 47,935,736 / 47,935,736 |
+| Industrial | 120m | 23 / 23 | 47,912,856 / 47,912,856 |
+| Industrial | 420m | 37 / 37 | 47,912,856 / 47,912,856 |
+| Industrial | 1000m | 41 / 41 | 47,935,736 / 47,935,736 |
+
+Mesh-cache counts also match per case (42/35/28 and 49/45/40). Across all 32 warmed
+samples per case, texture count, resident bytes, descriptors, upload count and live
+resource count are constant. Live counts are 368/354/352 and 382/374/376 respectively;
+pending retirement and submission faults remain zero. This is a measured warmed
+plateau, beyond a successful single frame. It is not an unlimited-session leak proof.
+
+The initialized Upload-buffer fallback is active for real fallback, runtime mesh
+and terrain geometry in these captures. CPU-input copy and failed-candidate disposal
+have separate tests; existing native resource lifetime rules remain in the device.
+Cold tank and three BattlefieldCombat VFX viewpoints also pass native structural,
+repeat-readback and binding checks. The cold run reconstructs its renderer with zero
+warmup frames; it does not claim OS/driver cache eviction. Masks, decals, particles,
+main/shadow passes and offscreen coverage retain existing production paths.
+
+The unchanged window-mode script passed on the baseline and the integrated code,
+including borderless 5120x2160. Compiled gameplay texture bytes are 57,665,206 under
+the unchanged 56 MiB limit; studio startup is 1,786,417 bytes under 3 MiB. No texture
+source/profile change, quality reduction or larger limit was needed.
+
+## CPU preparation and performance acceptance
+
+The unchanged 15% comparison **fails seven CPU distributions** across the six cases;
+zero cases are unqualified under the comparison tool. Failures include tank-close
+mean/p95/p99, tank-normal mean/p99 and industrial-close mean/p99. The failed report
+is retained. There are no GPU distributions over this comparison threshold, but
+that is not a sustained GPU performance guarantee. No rerun was used to replace a
+failed cohort, and no unsupported FPS improvement is claimed.
+
+| Scene / camera | CPU mean before -> after ms | GPU mean before -> after ms | Prepare mean ms |
+| --- | ---: | ---: | ---: |
+| Tank / 120m | 38.007 -> 56.008 | 19.430 -> 14.616 | 11.632 |
+| Tank / 420m | 15.725 -> 25.991 | 17.267 -> 11.934 | 0.512 |
+| Tank / 1000m | 18.885 -> 11.267 | 19.960 -> 12.292 | 0.325 |
+| Industrial / 120m | 19.618 -> 28.162 | 20.671 -> 14.726 | 0.324 |
+| Industrial / 420m | 16.365 -> 11.096 | 16.920 -> 12.119 | 0.349 |
+| Industrial / 1000m | 18.638 -> 11.937 | 20.523 -> 13.058 | 0.465 |
+
+Initial synchronous preparation repeats conservative selection before recording.
+Its real additional CPU work is measured separately; the first tank-close cohort
+also has large timing tails. The data do not establish a single cause for every
+outlier. Telemetry records P8/180MHz and an active 20W software power cap against
+a default 115W. Global power/driver settings were not changed. Native CPU/frame-time
+acceptance stays open; this foundation is not represented as a render speedup.
+
+Prepare and Record times are sampled explicitly. Submit/Retire fields measure CPU
+phase bookkeeping after actual device submission. Present/wait times and upload
+byte counts are unavailable/null; no invented zero GPU timing is introduced. DXGI
+usage, logical bytes, texture counts and device health remain separate observations.
+The disabled-meter regression performs 1,024 frame sequences without per-frame
+allocation or diagnostics/clock queries.
+
+## Existing gate failures and release condition
+
+Historical CI 38928699407 failed at 99,608,050 compiled gameplay texture bytes; the
+integrated content-budget fix already resolves that exact unchanged local gate.
+Older master CI 39086554073 failed the audio heartbeat test; the complete local
+Client suite now passes, without an audio change or claim of fixing its timing.
+Current-master CI 39094375378 instead fails native WARP at its unchanged ten-second
+GPU-fence deadline. Full logs identify this pre-existing software-adapter timeout.
+It is not attributed to this refactor and its deadline is not raised. PR CI must
+complete and any introduced failure must be repaired before integration.
+
+The manifest records a functional implementation SHA and a null integrated SHA.
+Only a checked, authorized integration into master and resolution/acceptance of the
+open required gates can update that status and release the eight parallel owners.
+Human native review, the CPU-performance failures and required CI remain explicit.
+
+## Reproduction
+
+Exact scope and commands are in [contracts](Contracts.md). Executed isolated build
+and test outputs were under `artifacts/render-foundation`; the corresponding native
+capture request includes all settings, source identities and command exit status.
+Raw manifests, all reference images, per-frame resource/health/CPU/GPU observations,
+failed performance comparison and GPU telemetry are retained in [evidence](evidence/).
+Metadata evidence retains its original bytes through a directory-local attributes
+file. Runtime source files and compiled asset formats are unchanged.
