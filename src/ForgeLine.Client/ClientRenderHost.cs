@@ -142,7 +142,8 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly SimulationSessionId? _expectedSession;
     private readonly ClientFrontendRenderHost? _frontendOwner;
     private readonly Func<ClientSimulationTelemetry>? _simulationTelemetry;
-    private readonly object _frameGate = new();
+    private readonly ClientRenderPublication _publication = new();
+    private object _frameGate => _publication.Gate;
     private ObjectActionRingView _latestActionRing;
     public ObjectActionRingView LatestActionRing { get { lock (_frameGate) return _latestActionRing; } }
     private readonly object _disposeGate = new();
@@ -162,7 +163,6 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly ManualResetEventSlim _faulted = new(false);
     private readonly Thread _thread;
 
-    private ClientRenderFrame? _latestFrame;
     private ClientVisualQualificationSnapshot? _latestQualification;
     private ExceptionDispatchInfo? _failure;
     private int _stopping;
@@ -295,26 +295,7 @@ internal sealed class ClientRenderHost : IDisposable
         ThrowIfDisposed();
         ThrowIfFaulted();
 
-        ClientRenderFrame copied =
-            frame with
-            {
-                GameplayLines =
-                    frame.GameplayLines.ToArray(),
-                GameplayLabels =
-                    frame.GameplayLabels.ToArray(),
-                DebugLines =
-                    frame.DebugLines.ToArray(),
-                DebugLabels =
-                    frame.DebugLabels.ToArray(),
-                InformationLayer =
-                    frame.InformationLayer with
-                    {
-                        SelectedEntities =
-                            frame.InformationLayer.SelectedEntities?
-                                .ToArray() ??
-                            []
-                    }
-            };
+        ClientRenderFrame copied = ClientRenderPublication.Copy(frame);
 
         lock (_frameGate)
         {
@@ -324,7 +305,7 @@ internal sealed class ClientRenderHost : IDisposable
             {
                 return false;
             }
-            _latestFrame = copied;
+            _publication.StoreCopied(copied);
             Interlocked.Increment(ref _publishedFrames);
             _signal.Set();
         }
@@ -905,13 +886,7 @@ internal sealed class ClientRenderHost : IDisposable
         }
     }
 
-    private ClientRenderFrame? TakeLatestFrame()
-    {
-        lock (_frameGate)
-        {
-            return _latestFrame;
-        }
-    }
+    private ClientRenderFrame? TakeLatestFrame() => _publication.ReadLatest();
 
     internal static ClientVisualQualificationSnapshot CompleteGpuQualification(
         in ClientVisualQualificationSnapshot snapshot,
