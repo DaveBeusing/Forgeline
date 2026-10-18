@@ -166,6 +166,44 @@ public sealed class GroundMovementPrecisionTests
         Assert.InRange(position.Z, 8.474f, 8.476f);
     }
 
+    [Theory]
+    [InlineData(10)]
+    [InlineData(20)]
+    [InlineData(60)]
+    public void PreciseTruckTurnConvergesFromObservedExitOrbit(int ticksPerSecond)
+    {
+        var simulation = new SimulationCoordinator(ticksPerSecond);
+        Vector3 target = new(517.60004f, 5.925199f, 1550.5f);
+        Vector3 initial = new(517.8571f, 5.9237876f, 1550.5386f);
+        EntityId entity = AddUnit(simulation, initial);
+        var movement = new GroundMovement(14.5f, 7, 10, 2.5f, 1.9f, 1, 5.5f, 8, 24, 1.1f);
+        simulation.Entities.SetComponent(entity, movement);
+        simulation.Entities.SetComponent(entity, GroundMovementState.Stationary(0.4568448f) with
+        {
+            Velocity = new Vector3(0.44067383f, 0.003709793f, 0.8984375f)
+        });
+        simulation.Entities.AddComponent(entity, new MovementOrder(Player, target, SimulationTick.Zero,
+            new SimulationTick(1), MovementOrderKind.LocalApproach, MathF.PI / 2));
+        simulation.RegisterSystem(new GroundMovementSystem());
+        for (int tick = 0; tick < ticksPerSecond * 20 && simulation.Entities.HasComponent<MovementOrder>(entity); tick++)
+        {
+            float previousHeading = simulation.Entities.GetComponent<GroundMovementState>(entity).HeadingRadians;
+            Vector3 previous = simulation.Entities.GetComponent<WorldTransform>(entity).Position;
+            simulation.AdvanceOneTick();
+            var current = simulation.Entities.GetComponent<GroundMovementState>(entity);
+            Assert.InRange(MathF.Abs(GroundMovementState.NormalizeAngle(current.HeadingRadians - previousHeading)),
+                0, movement.TurnRateRadiansPerSecond / ticksPerSecond + 0.0001f);
+            Assert.InRange(Vector3.Distance(previous, simulation.Entities.GetComponent<WorldTransform>(entity).Position),
+                0, movement.MaximumSpeed / ticksPerSecond + 0.0001f);
+        }
+        var final = simulation.Entities.GetComponent<GroundMovementState>(entity);
+        Assert.False(simulation.Entities.HasComponent<MovementOrder>(entity),
+            $"Truck kept orbiting: {simulation.Entities.GetComponent<WorldTransform>(entity).Position}; {final}.");
+        Assert.InRange(Vector3.Distance(target, simulation.Entities.GetComponent<WorldTransform>(entity).Position), 0, 0.111f);
+        Assert.InRange(MathF.Abs(GroundMovementState.NormalizeAngle(final.HeadingRadians - MathF.PI / 2)), 0, MathF.PI / 90);
+        Assert.Equal(Vector3.Zero, final.Velocity);
+    }
+
     private static SimulationCoordinator CreateSpatialSimulation(int ticksPerSecond)
     {
         var worldSettings = new WorldGridSettings

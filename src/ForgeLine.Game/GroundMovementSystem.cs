@@ -351,7 +351,13 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         float maximumSpeed = order.TargetHeadingRadians.HasValue && distanceToTarget <= 1
             ? MathF.Min(2, movement.MaximumSpeed) : movement.MaximumSpeed;
         if (order.TargetHeadingRadians.HasValue && MathF.Abs(GroundMovementState.NormalizeAngle(desiredHeading - state.HeadingRadians)) > MathF.PI / 30)
-            maximumSpeed = MathF.Min(maximumSpeed, 1);
+        {
+            // A fixed crawl speed still has a finite turning radius and can
+            // orbit a precise target forever. Shrink that radius with the
+            // remaining approach distance while keeping normal braking/turn limits.
+            float turningSpeed = remainingDistance * movement.TurnRateRadiansPerSecond * 0.5f;
+            maximumSpeed = MathF.Min(maximumSpeed, MathF.Min(1, turningSpeed));
+        }
 
         if (entities.TryGetComponent(
                 entity,
