@@ -10,6 +10,7 @@ using Xunit;
 
 namespace ForgeLine.Client.Tests;
 
+[Collection("Exclusive native and timing qualification")]
 public sealed class ClientSessionLoadingNativeTests
 {
     [Fact]

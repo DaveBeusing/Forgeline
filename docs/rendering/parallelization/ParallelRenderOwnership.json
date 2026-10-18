@@ -102,7 +102,11 @@
         "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
         "tests/ForgeLine.Client.Tests/WorldAudioMixerTests.cs",
         "src/ForgeLine.Client/ClientApplication.cs",
-        "src/ForgeLine.Client/RenderQualification/SmokeRuntimeRateObserver.cs"
+        "src/ForgeLine.Client/RenderQualification/SmokeRuntimeRateObserver.cs",
+        "tests/ForgeLine.Client.Tests/ClientStartupNativeTests.cs",
+        "tests/ForgeLine.Client.Tests/ClientSessionLoadingNativeTests.cs",
+        "tests/ForgeLine.Client.Tests/StudioVideoDecoderTests.cs",
+        "tests/ForgeLine.Client.Tests/UiAudioReliabilityTests.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",

@@ -13,6 +13,7 @@ using static ForgeLine.Client.WaveOutUiVoice;
 
 namespace ForgeLine.Client.Tests;
 
+[Collection("Exclusive native and timing qualification")]
 public sealed class WorldAudioMixerTests
 {
     private static AudioListener Listener => new(Vector3.Zero, Vector3.UnitX, 300);

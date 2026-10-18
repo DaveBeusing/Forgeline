@@ -204,3 +204,38 @@ Retain the first 16 warning/error/corruption IDs and descriptions in diagnostic
 stderr while continuing to count every message. No severity is filtered, warning
 is waived or debug layer disabled. The next hosted run must identify and resolve
 the actual warning before CI acceptance; the local debug layer remains unavailable.
+
+## Combined-suite isolation failure
+
+The first complete combined-tree execution retains five Client failures: an expired
+single-cue audio-owner probe, allocation observation, decoder startup, branded frame
+presentation and loading handoff. Presentation and Game complete successfully in
+that run. Native Client classes previously ran concurrently with each other and the
+allocation probe; desktop/video resources and time-sensitive observations require
+exclusive process-local qualification. Assign these classes to one existing-runner
+exclusive collection. No test, deadline, zero-allocation assertion or quality gate
+is removed. Other test modules remain governed by the unchanged solution runner.
+The audio-owner test now offers fresh actual-timestamp requests while waiting for
+its blocking output to enter, within the same five-second bound. A request's real
+150 ms expiry remains valid behavior; this ownership test no longer assumes that
+one request survives arbitrary scheduling delay. Stop, disposal, owner-thread and
+queue assertions are unchanged. These exact test paths are serialized foundation
+CI repairs. The failed full run is retained independently of subsequent validation.
+
+The current fixture-4 cohorts compare base `d3f5c9cd` with combined repair `4f4bf273`,
+with 128 warmups/512 samples/two readbacks, before/after then after/before. All 12
+comparisons are pixel-identical and all resources plateau. The unchanged gate
+reports 3 failures in pair 1 and 8 in pair 2, with zero unqualified cases. Pair 1
+fails tank-normal CPU p50 and GPU p50, plus industrial-close GPU p50. Pair 2 fails
+tank-close CPU p95/p99; tank-strategic CPU mean/GPU mean; industrial-close CPU p95/
+GPU p95; industrial-normal CPU p95/p99. These include mean and GPU regressions,
+not only CPU tails. Earlier successful cohorts do not override these failures.
+The two complete current cohorts and failed reports are retained in repair evidence.
+Reproduce all three protocols with the same helper and repeated `--prefix` values:
+`foundation-serial-pair`, `foundation-final-pair`, `foundation-current-pair`.
+
+After exclusive Client qualification and the fresh-request ownership test change,
+the entire Client suite passes: 423 successful, zero failed, two optional skips,
+425 total, 37.108 seconds. The zero-allocation assertion passes unchanged. This is
+affected-suite validation; it does not erase the five failed assertions from the
+previous complete solution run or certify a complete solution rerun.
