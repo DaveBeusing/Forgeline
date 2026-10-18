@@ -1,3 +1,4 @@
+using ForgeLine.Presentation.RenderContracts;
 using ForgeLine.Graphics.RenderContracts;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -26,7 +27,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly IGraphicsPipeline? _texturedPipeline;
     private readonly IGraphicsBuffer _vertexBuffer;
     private readonly IGraphicsBuffer _indexBuffer;
-    private readonly RuntimeWorldAssetResources? _runtimeAssets;
+    private readonly RenderAssetSession? _runtimeAssets;
     private readonly SceneLightingSettings _lighting;
     private readonly float _lodDiameterScale;
     private readonly bool _vegetationMotion;
@@ -73,7 +74,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             _runtimeAssets =
                 runtimeAssets is null
                     ? null
-                    : new RuntimeWorldAssetResources(
+                    : new RenderAssetSession(
                         graphics,
                         runtimeAssets, textureDetail);
             _texturedPipeline =
@@ -145,6 +146,36 @@ public sealed class SimpleInstanceRenderer : IDisposable
         }
     }
 
+    public bool AssetsPrepared => _runtimeAssets?.IsPrepared == true;
+    public RenderAssetFrameMetrics? AssetFrameMetrics => _runtimeAssets?.Metrics;
+
+    public void Prepare(RtsCamera camera, RenderWorld world, in RenderPreparationRequest request, ParticleVfxRenderer? particles = null)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(camera);
+        ArgumentNullException.ThrowIfNull(world);
+        if (_graphics.IsRecording) throw new InvalidOperationException("Prepare assets before command recording.");
+        if (request.Width < 1 || request.Height < 1) throw new ArgumentOutOfRangeException(nameof(request));
+        if (_runtimeAssets is null) return;
+        _runtimeAssets.MetricsEnabled = request.MetricsEnabled;
+        _runtimeAssets.BeginPrepare(world.CurrentSnapshot?.SessionId ?? default, world.CurrentSnapshot?.Tick.Value ?? 0);
+        try
+        {
+            RenderCore(null, camera, world, request.Alpha, presentationSeconds: request.PresentationSeconds,
+                particles: particles, prepareWidth: request.Width, prepareHeight: request.Height);
+            if (request.Shadow is { } shadow)
+            {
+                shadow.Validate();
+                RenderCore(null, camera, world, request.Alpha, shadow.ViewProjection, request.MaximumShadowCasters,
+                    presentationSeconds: request.PresentationSeconds, prepareWidth: request.Width, prepareHeight: request.Height);
+            }
+            _runtimeAssets.EndPrepare();
+        }
+        catch { _runtimeAssets.AbortPrepare(); throw; }
+    }
+    public void Submit() { if (_runtimeAssets?.FrameActive == true) _runtimeAssets.Submit(); }
+    public void Retire() { if (_runtimeAssets?.FrameActive == true) _runtimeAssets.Retire(); }
+
     public InstanceRenderDiagnostics LastDiagnostics { get; private set; }
 
     public InstanceSubmissionMetrics SubmissionMetrics
@@ -180,7 +211,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
         float alpha,
         double? presentationSeconds = null,
         ParticleVfxRenderer? particles = null)
-        => RenderCore(context, camera, world, alpha, presentationSeconds: presentationSeconds, particles: particles);
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        _runtimeAssets?.BeginRecord();
+        try { RenderCore(context, camera, world, alpha, presentationSeconds: presentationSeconds, particles: particles); }
+        finally { _runtimeAssets?.EndRecord(); }
+    }
 
     public void RenderShadow(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,
         GraphicsDirectionalShadowFrame frame, int maximumCasters, int maximumDraws, double? presentationSeconds = null)
@@ -189,35 +225,43 @@ public sealed class SimpleInstanceRenderer : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegative(maximumCasters);
         ArgumentOutOfRangeException.ThrowIfNegative(maximumDraws);
         InstanceRenderDiagnostics prior = LastDiagnostics;
-        RenderCore(context, camera, world, alpha, frame.ViewProjection, maximumCasters, maximumDraws, presentationSeconds);
+        ArgumentNullException.ThrowIfNull(context);
+        _runtimeAssets?.BeginRecord();
+        try { RenderCore(context, camera, world, alpha, frame.ViewProjection, maximumCasters, maximumDraws, presentationSeconds); }
+        finally { _runtimeAssets?.EndRecord(); }
         LastDiagnostics = prior;
     }
 
-    private void RenderCore(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,
+    private void RenderCore(IGraphicsCommandContext? context, RtsCamera camera, RenderWorld world, float alpha,
         Matrix4x4? shadowProjection = null, int maximumCasters = int.MaxValue, int maximumDraws = int.MaxValue,
-        double? presentationSeconds = null, ParticleVfxRenderer? particles = null)
+        double? presentationSeconds = null, ParticleVfxRenderer? particles = null, int prepareWidth = 0, int prepareHeight = 0)
     {
         ThrowIfDisposed();
-        ArgumentNullException.ThrowIfNull(context);
+        bool preparing = context is null;
+        int viewportWidth = context?.Width ?? prepareWidth;
+        int viewportHeight = context?.Height ?? prepareHeight;
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(world);
         if (presentationSeconds is { } seconds && (!double.IsFinite(seconds) || seconds < 0))
             throw new ArgumentOutOfRangeException(nameof(presentationSeconds));
 
-        _skinContextFrame = context.FrameIndex; _skinContextShadow = shadowProjection.HasValue;
+        if (!preparing) { _skinContextFrame = context!.FrameIndex; _skinContextShadow = shadowProjection.HasValue; }
         _snapshotIndexBytes = world.IndexRetainedBytes;
         if (!_vegetationMotion) presentationSeconds = null;
 
         CameraMatrices matrices =
             camera.GetMatrices(
-                context.Width,
-                context.Height);
+                viewportWidth,
+                viewportHeight);
         ViewFrustum frustum =
             ViewFrustum.FromViewProjection(
                 shadowProjection ?? matrices.ViewProjection);
-        ResetScratch(shadowProjection.HasValue);
-        _skinFrames?.Begin(context.FrameIndex, shadowProjection.HasValue);
-        if (!shadowProjection.HasValue) _currentLods.Clear();
+        if (!preparing)
+        {
+            ResetScratch(shadowProjection.HasValue);
+            _skinFrames?.Begin(context!.FrameIndex, shadowProjection.HasValue);
+            if (!shadowProjection.HasValue) _currentLods.Clear();
+        }
         var batchLookup = _batchLookup;
         var batches = _batches;
 
@@ -293,10 +337,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
             float projectedDiameter = ScreenSpaceLod.ProjectedDiameter(
                 instance.Transform.Position,
                 PresentationBounds.ResolveLocalHalfExtents(instance).Length(),
-                matrices, context.Height);
+                matrices, viewportHeight);
             var lodKey = (instance.Entity, instance.DebugIdentity);
             bool hasLodIdentity = instance.Entity.IsValid || instance.DebugIdentity != 0;
-            var lodHistory = shadowProjection.HasValue ? _currentLods : _previousLods;
+            var lodHistory = preparing || shadowProjection.HasValue ? _currentLods : _previousLods;
             int previousLod = hasLodIdentity && lodHistory.TryGetValue(lodKey, out int retainedLod) ? retainedLod : 0;
             UnitAssetLod unitLod =
                 UnitAssetLod.Lod0;
@@ -313,7 +357,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 unitLod =
                     (UnitAssetLod)SkinPresentationBounds.SelectLod(instance, projectedDiameter, previousLod, _lodDiameterScale);
-                if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)unitLod;
+                if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)unitLod;
                 unitDefinition =
                     UnitPresentationCatalog.Get(
                         instance.UnitFeature.Unit);
@@ -340,7 +384,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     unitLod = UnitAssetLod.Lod0;
                     usesRuntimeMesh = _runtimeAssets.TryGetMesh(unitDefinition.MeshAssetId,
                         out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
-                    if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)unitLod;
+                    if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)unitLod;
                 }
                 if (unitLod == UnitAssetLod.Lod1) lod1Instances++;
                 if (unitLod == UnitAssetLod.Lod2) lod2Instances++;
@@ -360,7 +404,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     instance.BuildingFeature.IsConstruction || instance.BuildingFeature.IsDestroyed
                         ? BuildingAssetLod.Lod0
                         : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, 150.0f, 45.0f, _lodDiameterScale);
-                if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)buildingLod;
+                if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)buildingLod;
                 hasBuildingDefinition =
                     BuildingPresentationCatalog.TryGet(
                         instance.BuildingFeature.Building,
@@ -388,7 +432,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     usesRuntimeMesh = _runtimeAssets.TryGetMesh(
                         BuildingPresentationCatalog.ResolveMeshAssetId(instance.BuildingFeature, buildingLod),
                         out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
-                    if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)buildingLod;
+                    if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)buildingLod;
                 }
 
                 if (buildingLod == BuildingAssetLod.Lod1) lod1Instances++;
@@ -458,7 +502,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 WorldAssetLod worldLod =
                     ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f, _lodDiameterScale) > 0
                         ? WorldAssetLod.Reduced : WorldAssetLod.High;
-                if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
+                if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&
@@ -528,7 +572,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
             _skinDetail = MechanicalDetailWeight(projectedDiameter, 90, _lodDiameterScale);
             float motionWeight = MechanicalDetailWeight(projectedDiameter, hasBuildingDefinition ? 150 : 90, _lodDiameterScale);
-            AddMechanicalBatches(instance, worldMatrix, color, usesRuntimeMesh, runtimeMesh,
+            if (!preparing) AddMechanicalBatches(instance, worldMatrix, color, usesRuntimeMesh, runtimeMesh,
                 runtimeMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
             if (hasUnitDefinition &&
                 unitLod == UnitAssetLod.Lod0 &&
@@ -541,7 +585,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     out AssetId turretMeshId) &&
                 turretMesh.IsValid)
             {
-                AddMechanicalBatches(instance,
+                if (!preparing) AddMechanicalBatches(instance,
                     CreateArticulatedTransform(worldMatrix, unitDefinition.TurretPivot, instance.UnitFeature.AimYawRadians * motionWeight),
                     color, true, turretMesh, turretMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
             }
@@ -551,7 +595,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 _runtimeAssets.TryGetMesh(unitStateAssetId, out RuntimeMeshBuffers unitStateMesh, out AssetId unitStateMeshId) &&
                 unitStateMesh.IsValid)
             {
-                AddMechanicalBatches(instance, worldMatrix, color, true, unitStateMesh,
+                if (!preparing) AddMechanicalBatches(instance, worldMatrix, color, true, unitStateMesh,
                     unitStateMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
             }
             string? buildingStateAssetId =
@@ -568,6 +612,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     out AssetId stateMeshId) &&
                 stateMesh.IsValid)
             {
+                if (preparing) continue;
                 var stateKey =
                     new InstanceBatchKey(
                         true,
@@ -598,6 +643,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         runtimeMaterial));
             }
         }
+
+        if (context is null) return;
 
         if (visible == 0 || _activeBatchCount == 0)
         {

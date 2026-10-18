@@ -1,3 +1,4 @@
+using ForgeLine.Presentation.RenderContracts;
 using ForgeLine.Audio;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
@@ -44,6 +45,7 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     int TerrainMaximumTextureSamplesPerPixel = 0,
     double TerrainCpuSubmissionMilliseconds = 0.0)
 {
+    public RenderAssetFrameMetrics? AssetPreparation { get; init; }
     public bool GpuTimingAvailable { get; init; }
     public GraphicsFrameDiagnostics? FramePasses { get; init; }
     public GraphicsDirectionalShadowDiagnostics? DirectionalShadows { get; init; }
@@ -662,6 +664,12 @@ internal sealed class ClientRenderHost : IDisposable
                 terrainRenderer.Prepare(renderCamera, Math.Max(1, (int)Math.Ceiling(width * (double)qualityProfile.ResolutionScale)),
                     Math.Max(1, (int)Math.Ceiling(height * (double)qualityProfile.ResolutionScale)),
                     shadowSettings.Enabled ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null);
+                instanceRenderer.Prepare(renderCamera, renderWorld, new(
+                    Math.Max(1, (int)Math.Ceiling(width * (double)qualityProfile.ResolutionScale)),
+                    Math.Max(1, (int)Math.Ceiling(height * (double)qualityProfile.ResolutionScale)), renderAlpha,
+                    shadowSettings.Enabled ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null,
+                    shadowSettings.MaximumCasters,
+                    (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency, current.MetricsActive), particleRenderer);
                 ObjectActionRingView inputRing = default;
                 graphics.RenderFrame(
                     GraphicsColor.ForgeLineClear,
@@ -767,6 +775,9 @@ internal sealed class ClientRenderHost : IDisposable
                     Volatile.Write(ref _gameplayPresented, 1);
                 }
 
+                instanceRenderer.Submit();
+                instanceRenderer.Retire();
+
                 long renderFinishedAt =
                     Stopwatch.GetTimestamp();
                 Interlocked.Increment(ref _completedFrames);
@@ -799,6 +810,9 @@ internal sealed class ClientRenderHost : IDisposable
                     renderWorld.InstanceCount,
                     lighting, gameplayHudRenderer.State, gameplayHudRenderer.LastRenderedVertexCount,
                     runtimeMetrics, lastMeasuredRunningRates,particleRenderer.Diagnostics, qualityProfile);
+                lock (_frameGate)
+                    if (_latestQualification is { } measured)
+                        _latestQualification = measured with { AssetPreparation = instanceRenderer.AssetFrameMetrics };
 
                 if (StopwatchElapsed(
                         nextDiagnosticAt,
