@@ -202,3 +202,14 @@ provide attribution evidence, without turning blocked elapsed time into measured
 thread CPU or overriding the failed gate. All complete datasets and failed reports
 are in [repair evidence](evidence/repair/). Human native-image review, tail-performance
 acceptance and final required CI remain required. No subsequent package is released.
+
+The optimized-clear repair retains all four predefined protocols, including the
+final remaining tank-normal CPU/frame-elapsed p99 failure (+15.38% against 15%).
+Both reversed-order final cohorts retain exact images and stable resources; one
+cohort fails that single tail while the other passes. No threshold is rounded away.
+Hosted native proof in `evidence/repair/ci-39114608164-*` verifies actual debug-enabled
+zero-warning/error output in both window modes at the equivalent runtime-source
+tree. The superseded overall run is not represented as full CI success. Final
+workflow-head/serial-module suite results are recorded in PR #237; performance
+acceptance, independent image review and authorized integration remain prerequisites
+for releasing later owners.

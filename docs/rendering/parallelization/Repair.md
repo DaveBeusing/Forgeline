@@ -298,3 +298,23 @@ executes every module serially with the same built source and unchanged tests.
 CI 39114608164 at runtime source `11049693` now passes the previously failing
 Windows window-mode/visual qualification step after the HDR clear correction.
 Final workflow-head CI and the complete serial-module run still must finish.
+
+## Retained hosted native proof and final acceptance boundary
+
+The hosted native proof is retained under `ci-39114608164-*`. Its checked-out
+synthetic merge is `ae066f896e12430742b22a1677dde179981d5e75`, with parents d3f5c9cd
+and 11049693; the Git tree equals PR head 11049693 exactly. Native WARP, apphost
+completion and both-window qualification steps pass. Both actual window reports
+have debug layer enabled, zero warnings and zero errors, with 67 and 62 successful
+presentations respectively. The overall run was superseded by the module-isolation
+workflow update and is not labeled a successful full CI run.
+
+The summary helper now includes every present predefined protocol by default and
+reproduces the same complete result from raw and compressed data. All 48 paired
+comparisons are pixel-identical. The final performance pair remains failed only at
+tank-normal CPU/frame-elapsed p99 +15.38%; the reversed final pair passes. Neither
+rounding nor successful subsets change that result. CPU/frame acceptance and human
+native review remain open; subsequent rendering packages remain blocked. Full local
+serial-module and final workflow-head validation were still running when this
+native evidence snapshot was committed; their completed results belong to the PR
+validation record and must not be inferred from this snapshot.

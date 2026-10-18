@@ -70,7 +70,12 @@ def main():
     parser.add_argument("--prefix", action="append", help="Paired dataset prefix; repeat to include multiple protocols.")
     args = parser.parse_args()
     report = {"schemaVersion": 2, "cohorts": {}}
-    for prefix in (args.prefix or ["foundation-serial-pair", "foundation-final-pair"]):
+    prefixes = args.prefix or [p for p in (
+        "foundation-serial-pair", "foundation-final-pair", "foundation-current-pair", "foundation-cleared-pair")
+        if (args.root / f"{p}1-before").exists()]
+    if not prefixes:
+        parser.error("No complete predefined repair protocol was found.")
+    for prefix in prefixes:
         report["cohorts"][prefix] = summarize_pairs(args.root, prefix)
     trace = manifest(args.root, "foundation-repair-wait-trace")
     report["waitTraceSource"] = trace["commit"]

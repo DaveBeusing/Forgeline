@@ -1,0 +1,41 @@
+{
+  "headSha": "11049693dd232aefa30cb35989c3c4ada7c17e46",
+  "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39114608164",
+  "overallConclusion": "cancelled",
+  "scope": "Only the three completed native qualification steps; overall run superseded by CI module-isolation update.",
+  "steps": [
+    {
+      "completedAt": "2026-10-18T09:31:58Z",
+      "conclusion": "success",
+      "name": "Native WARP reference capture",
+      "number": 47,
+      "startedAt": "2026-10-18T09:31:13Z",
+      "status": "completed"
+    },
+    {
+      "completedAt": "2026-10-18T09:32:30Z",
+      "conclusion": "success",
+      "name": "Windows apphost reference completion contract",
+      "number": 48,
+      "startedAt": "2026-10-18T09:31:58Z",
+      "status": "completed"
+    },
+    {
+      "completedAt": "2026-10-18T09:33:08Z",
+      "conclusion": "success",
+      "name": "Windows window mode and visual qualification smoke",
+      "number": 49,
+      "startedAt": "2026-10-18T09:32:30Z",
+      "status": "completed"
+    }
+  ],
+  "checkedOutCommit": {
+    "parents": [
+      "d3f5c9cdc7a1a5df55741c30e94512beb493798e",
+      "11049693dd232aefa30cb35989c3c4ada7c17e46"
+    ],
+    "sha": "ae066f896e12430742b22a1677dde179981d5e75",
+    "tree": "003e3b41e6326bbbbb95b234bf4e05db35c93377"
+  },
+  "checkedOutTreeEqualsHeadTree": true
+}
