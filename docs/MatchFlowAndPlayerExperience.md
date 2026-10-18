@@ -14,25 +14,33 @@ The vertical-slice match flow turns the existing FORGELINE simulation systems in
 
 The current playable configuration uses the Central Divide prototype battlefield, Player 1 as the local Directorate side, Player 2 as the computer-controlled opposing side, and a seeded simulation.
 
-## Early-game guidance observations
+## Early-game guidance and completed-action evidence
 
-`PresentationExtractor` publishes a bounded `PlayerGuidanceSummary` at completed ticks. It contains only observing player, session, tick and milestone bits. Operational component and inventory reads follow local ownership validation; opponent progress comes from current faction-specific opaque/identified contacts, with no hostile ECS query. `EarlyGameGuidanceController` retains observed bits within one session, skips out-of-order completion, rejects older/incoherent snapshots, and suppresses terminal output. It neither submits commands nor changes simulation/save state. Static guidance text lives in `EarlyGameGuidanceCatalog`.
+PresentationExtractor publishes a player/session/tick-bound PlayerGuidanceSummary
+from completed ticks. It combines authorized current building/power/input facts
+with the bounded MatchRuntime GameplayProgressJournal. Actual extraction,
+loading, unloading, Steel output, unit production and mobile field transfers
+remain distinguishable from configuration, assignment and available starting
+stock. The journal records full entity generations and positive committed
+amounts, condenses evidence independently of rendering and publishes immutable
+copies. A real Scout completion can also establish prior local-input readiness
+when a queued order started between presentation frames. Current contacts remain
+faction-authorized scouting evidence without hostile ECS inspection.
 
-| Goal | Implemented source / observation |
-| --- | --- |
-| Command Core | Owned completed Command Core; already supplied at canonical start |
-| Power | Owned completed Power Plant with enabled, generating `PowerGenerator` |
-| Ferrous extraction | Owned Ferrous Ore extractor in a post-tick productive extraction state, including output/power-constrained extraction |
-| Steel | Owned authored Steel-only Smelter with a completed processing cycle; starting stock and queued requests do not count |
-| Vehicle Factory | Owned completed Vehicle Factory, not a submitted command or construction site |
-| Field Scout | Existing owned Scout Vehicle identity; this describes field presence rather than a simulated production achievement |
-| Supply available | Enabled owned provider with available Fuel and Ammunition; Supply Depots also require Operational state. This is availability, not proof of a completed delivery or route coverage |
-| Scout opponent | Current permitted detected/identified contact; opaque detection is sufficient and does not disclose identity |
-| Defeat Command Core | Advisory objective only; victory/defeat remains the authoritative match result and suppresses guidance |
+EarlyGameGuidanceController retains observed milestones within one session and
+rejects incoherent, older, foreign or stale-session evidence. Its eighteen stable
+content keys have independent Offered/Viewed/Deferred reading state. Confirmed
+actions keep their explanations reachable. Minimizing never marks a page read,
+and no action waits for a tutorial acknowledgement. Adaptive pages share copied
+layout, active bindings and control focus with the input owner. Conditional work
+and logistics help reuses existing source-of-truth reason catalogs.
 
-Buildings, production, supply and intelligence mechanics are already implemented. Their minimum guidance evidence requires the narrow completed-tick summary above because selection/action snapshots intentionally describe only the selected facility. Observation is not persistent achievement history: restoration rebuilds from remaining authorized state/counters, and previously destroyed objects or unobserved past contacts are not invented. Exact per-resource historical extraction totals and per-unit historical production achievements are not added.
-
-Placement feedback and the guide share a compact information region through `PreAlphaUxView`. Immutable frame views retain session identity; placement quantities also retain tick identity. Shared hover resolvers explain copied processing/unit-production block reasons: deliver inputs for NoInput, add power for NoPower, move stored output for OutputFull, and inspect/cancel a paused request. Disabled material/technology choices retain their source-of-truth eligibility. An executable queue request may coexist with blocked current work; the explanation does not redefine queue authority or interpret a click as acceptance. Existing accepted/partial/rejected HUD command feedback remains authoritative.
+Existing transactional save/replay recovery rebuilds available committed history
+into a fresh session. It does not infer deliveries from inventories or persist
+reading preferences. No new simulation authority, resource pool, transport
+controller or settings schema is introduced. See [interaction](OnboardingInteraction.md)
+and [evidence and qualification](OnboardingQualification.md) for exact semantics,
+normal-start journey and remaining human/CI acceptance.
 
 ## Match configuration and initialization
 
