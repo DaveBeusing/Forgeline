@@ -216,7 +216,16 @@ public sealed class VisualReferenceSceneTests
         var buildings = instances.Where(x => x.BuildingFeature.IsSpecified).ToArray();
         var vehicles = instances.Where(x => x.UnitFeature.IsSpecified).ToArray();
         Assert.Equal(3, buildings.Length);
-        Assert.Equal(kind == VisualReferenceSceneKind.LogisticsLoadingProduction ? 3 : 2, vehicles.Length);
+        Assert.Equal(kind == VisualReferenceSceneKind.LogisticsLoadingProduction ? 4 : 2, vehicles.Length);
+        if (kind == VisualReferenceSceneKind.LogisticsLoadingProduction)
+        {
+            var cargo = vehicles.Where(x => x.UnitFeature.Unit == UnitIds.CargoTruck).OrderBy(x => x.Transform.Position.X).ToArray();
+            Assert.Equal(3, cargo.Length);
+            var movement = DirectorateContent.CreateUnitCatalog()[UnitIds.CargoTruck].Movement;
+            for (int index = 1; index < cargo.Length; index++)
+                Assert.True(cargo[index].Transform.Position.X - cargo[index - 1].Transform.Position.X >=
+                    (cargo[index].Transform.Scale.Z + cargo[index - 1].Transform.Scale.Z) * .5f + movement.SeparationRadius - .001f);
+        }
         Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.CargoTruck);
         Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.SupplyTruck);
         if (kind != VisualReferenceSceneKind.LogisticsSustainedProduction)

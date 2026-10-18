@@ -22,7 +22,7 @@ public sealed class CargoTransportApproachTests
 
         // A detour changes which edge point is closest, not the requested visit.
         fixture.Simulation.Entities.SetComponent(fixture.Truck,
-            fixture.Simulation.Entities.GetComponent<WorldTransform>(fixture.Truck) with { Position = new(0, 0, 90) });
+            fixture.Simulation.Entities.GetComponent<WorldTransform>(fixture.Truck) with { Position = new(0, 0, 900) });
         fixture.Simulation.AdvanceOneTick();
 
         Assert.Equal(original, fixture.Simulation.Entities.GetComponent<MovementOrder>(fixture.Truck));
@@ -34,7 +34,7 @@ public sealed class CargoTransportApproachTests
     }
 
     [Fact]
-    public void InterruptedDockApproachKeepsTheAuthoredEntry()
+    public void InterruptedAdmissionResumesAtTheConfirmedQueueTarget()
     {
         var fixture = new Fixture();
         fixture.Simulation.AdvanceOneTick();
@@ -43,10 +43,13 @@ public sealed class CargoTransportApproachTests
         fixture.Simulation.Entities.SetComponent(fixture.Truck,
             fixture.Simulation.Entities.GetComponent<WorldTransform>(fixture.Truck) with { Position = new(0, 0, 90) });
         fixture.Simulation.AdvanceOneTick();
-
+        Assert.True(fixture.Simulation.Entities.HasComponent<VehicleQueueEntry>(fixture.Truck));
+        var entry = fixture.Simulation.Entities.GetComponent<VehicleQueueEntry>(fixture.Truck);
+        fixture.Simulation.AdvanceOneTick();
         MovementOrder replacement = fixture.Simulation.Entities.GetComponent<MovementOrder>(fixture.Truck);
-        Assert.Equal(original.WorldTarget, replacement.WorldTarget);
-        Assert.Equal(fixture.Simulation.CurrentTick, replacement.AcceptedAtTick);
+        Assert.NotEqual(original.WorldTarget, replacement.WorldTarget);
+        Assert.Equal(entry.Target, replacement.WorldTarget);
+        Assert.Equal(entry.RegisteredAtTick, replacement.AcceptedAtTick);
         Assert.Equal(100.0, fixture.Inventories.GetQuantity(fixture.SourceInventory, ResourceIds.Steel));
     }
 

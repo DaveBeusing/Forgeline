@@ -14,6 +14,9 @@ public class CargoTransportBenchmarks
 {
     private SimulationCoordinator _simulation = null!;
     private CargoTransportSystem _transportSystem = null!;
+    private HierarchicalNavigationSystem _navigation = null!;
+    internal ulong MeasuredTicks => _simulation.CurrentTick.Value;
+    internal HierarchicalNavigationDiagnosticsSnapshot NavigationDiagnostics => _navigation.LastDiagnostics;
 
     [Params(100, 500)]
     public int TransportCount { get; set; }
@@ -51,10 +54,8 @@ public class CargoTransportBenchmarks
                 network,
                 inventories);
 
-        _simulation.RegisterSystem(
-            new HierarchicalNavigationSystem(
-                new HierarchicalPathfinder(
-                    navigationWorld)));
+        _navigation = new HierarchicalNavigationSystem(new HierarchicalPathfinder(navigationWorld));
+        _simulation.RegisterSystem(_navigation);
         _simulation.RegisterSystem(
             new GroundMovementSystem(
                 terrain));

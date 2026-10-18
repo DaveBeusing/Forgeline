@@ -1,5 +1,11 @@
 # Logistics Capacity and Disruption
 
+The [vehicle loading queue](VehicleQueues.md) controls local physical admission.
+It is separate from graph throughput, warehouse stock reservations and the
+distribution order backlog. A free throughput window does not imply a free
+waiting place or service bay. Cancellation removes the logical assignment;
+physical exclusion persists while a vehicle or wreck obstructs entry or exit.
+
 ## Purpose
 
 FORGELINE logistics throughput is constrained by the authoritative logistics graph rather than by presentation-only utilization values.

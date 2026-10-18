@@ -193,9 +193,10 @@ retries between planning decisions cannot postpone a new source indefinitely.
 
 ## Persistence and presentation
 
-Dock components are authoritative ECS state. Save payload schema 3 and
-authoritative checkpoint schema 2 mark the changed simulation semantics.
-Pre-docking saves and replays are rejected explicitly before reconstruction;
+Dock components are authoritative ECS state. Docking introduced save payload
+schema 3 and authoritative checkpoint schema 2. The current [vehicle queue
+contract](VehicleQueues.md) uses payload schema 4 and checkpoint schema 3.
+Pre-queue saves and replays are rejected explicitly before reconstruction;
 historical fixtures and checksums remain unchanged. Envelope format 1 remains
 supported. See [Save, Load, Replay and Recovery](SaveLoadReplayAndRecovery.md).
 
