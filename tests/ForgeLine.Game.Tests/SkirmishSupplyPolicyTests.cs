@@ -44,8 +44,9 @@ public sealed class SkirmishSupplyPolicyTests
     [InlineData(0, 0, false, false)]
     [InlineData(54, 80, false, false)]
     [InlineData(100, 29, false, false)]
-    [InlineData(100, 80, true, false)]
-    public void ExhaustedLoadCompletesWithDispatchableCargoWhenNoSourceCanFillTheRemainder(
+    [InlineData(100, 80, true, true)]
+    [InlineData(54, 80, true, false)]
+    public void ExhaustedLoadCompletesWithDispatchableCargoBeforeSeekingAnotherSource(
         double fuel, double ammunition, bool stockedAlternative, bool completed)
     {
         using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
@@ -74,7 +75,7 @@ public sealed class SkirmishSupplyPolicyTests
         Assert.Equal(!completed, entities.HasComponent<SupplyLoadingOrder>(truck));
         Assert.Equal(fuel, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel));
         Assert.Equal(ammunition, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition));
-        if (stockedAlternative)
+        if (stockedAlternative && !completed)
             Assert.Equal(side.CommandCore, entities.GetComponent<SupplyLoadingOrder>(truck).Source);
         if (completed)
         {
@@ -110,7 +111,7 @@ public sealed class SkirmishSupplyPolicyTests
         EntityId truck = scenario.UnitFactory.Create(DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck],
             position + Vector3.UnitZ * 30, side.Player);
         var supply = entities.GetComponent<SupplyTruck>(truck);
-        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, 100).Succeeded);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, sourceEmpty && coreStocked ? 54 : 100).Succeeded);
         Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, 80).Succeeded);
         var original = new SupplyLoadingOrder(depot, SimulationTick.Zero,
             sourceEmpty ? VehicleDockBlockReason.SourceEmpty : VehicleDockBlockReason.TargetFull,
@@ -129,7 +130,7 @@ public sealed class SkirmishSupplyPolicyTests
             Assert.Equal(sourceEmpty && coreStocked ? side.CommandCore : depot, current.Source);
             if (current.Source == side.CommandCore) Assert.Equal(VehicleDockBlockReason.None, current.WaitReason);
         }
-        Assert.Equal(100, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel));
+        Assert.Equal(sourceEmpty && coreStocked ? 54 : 100, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel));
         Assert.Equal(80, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition));
     }
 

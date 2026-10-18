@@ -2867,16 +2867,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 _inventories.GetQuantity(
                     truck.InventoryId,
                     ResourceIds.Fuel) <
-                truck.FuelTarget * (reconsiderSource ? 1 : 0.50) - 1e-9;
+                truck.FuelTarget * 0.50 - 1e-9;
             bool needsAmmunition =
                 _inventories.GetQuantity(
                     truck.InventoryId,
                     ResourceIds.Ammunition) <
-                truck.AmmunitionTarget * (reconsiderSource ? 1 : 0.25) - 1e-9;
+                truck.AmmunitionTarget * 0.25 - 1e-9;
 
             if (!needsFuel && !needsAmmunition)
             {
-                if (loadingMovement)
+                if (loadingMovement && !context.Entities.HasComponent<SupplyRescueAssignment>(entity))
                 {
                     new StopMovementCommand(
                         truck.Owner,
@@ -2885,6 +2885,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         .Execute(context);
                 }
 
+                // Physical loading has finished and this provider already meets
+                // dispatch requirements. Do not start another trip just to top up.
+                if (reconsiderSource)
+                    context.Entities.RemoveComponent<SupplyLoadingOrder>(entity);
                 continue;
             }
 
@@ -3002,19 +3006,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 }
             }
 
-            // An exhausted trip need not bind an already usable field provider
-            // forever. Keep the existing dispatch thresholds and finish only
-            // after physical exit, when no source can satisfy the remaining load.
-            if (reconsiderSource && !bestCoversCargo &&
-                _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel) >= truck.FuelTarget * 0.50 - 1e-9 &&
-                _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition) >= truck.AmmunitionTarget * 0.25 - 1e-9)
-            {
-                if (loadingMovement && !context.Entities.HasComponent<SupplyRescueAssignment>(entity))
-                    new StopMovementCommand(truck.Owner, [entity], context.Tick).Execute(context);
-                if (context.Entities.HasComponent<SupplyLoadingOrder>(entity))
-                    context.Entities.RemoveComponent<SupplyLoadingOrder>(entity);
-                continue;
-            }
             if (!float.IsFinite(bestDistance))
             {
                 continue;

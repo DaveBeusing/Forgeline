@@ -216,6 +216,26 @@
       "file": "foundation-core-ammo-game-suite.log.gz",
       "rawSha256": "d29c4a4a0599e7612ce569a2a25057f895d8d87cdb520c68250404b48a9c0785",
       "archiveSha256": "9b495a1c6587f9b4d386aa9a1b586ac8e15dabe361e99225ad86d6ab9918032b"
+    },
+    {
+      "file": "foundation-core-ammo-opponent.json.gz",
+      "rawSha256": "00d9d519c55c3b856531814d0b440ab115270647d7d452928447d03436f2e4aa",
+      "archiveSha256": "6f349cb5a3e79d2b1afc932ef94c6063245d963dadb776d323427cff1069119d"
+    },
+    {
+      "file": "foundation-core-ammo-opponent.save.json.gz",
+      "rawSha256": "2101a0210a206377403254008c00131c4f25cb6c780bce9924e264cffc1fe716",
+      "archiveSha256": "383603f45a953fa2ae5564d4f0981624c3548f8e1dc3657f892b42a8d576c2af"
+    },
+    {
+      "file": "foundation-core-ammo-terminal.log.gz",
+      "rawSha256": "23ea9db2ec3af26a48c8b3af0907368c71a0382961b2474e190e52d52dafbb53",
+      "archiveSha256": "a2d301d58e6cb6e34ac72bf5e52d55ddacaea6f3fb6794d58443a369f13beecf"
+    },
+    {
+      "file": "foundation-trip-game-suite.log.gz",
+      "rawSha256": "3df1b2464fedbcd3ff3f3001bf58dbef0b1af807ec59b7724f297ccfcd07fd4a",
+      "archiveSha256": "b9113c1a00656c9e1fbb8bc87a1517c2b70a2b822ac6e8d08489c28788b84a17"
     }
   ]
 }

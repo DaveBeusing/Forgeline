@@ -462,3 +462,32 @@ nonterminal full-match state remain archived. The initial experimental dispatch
 test also had a wrong conservation expectation (200 instead of the actual 300
 including source Fuel); it is excluded together with that global change. None
 of these failed variants is part of the final runtime.
+
+
+## Dispatch-complete exhausted trips
+
+The 05ee10bf full match remains nonterminal. Its actual ammunition transfer rises
+from 2,705 to 3,376 units; artillery shots rise from 79 to 158. East retains three
+tanks, but multiple providers still take long full-cargo replacement trips after
+a partial source is exhausted. The full-refill rule for an existing SourceEmpty
+order disagrees with the ordinary 50% Fuel / 25% Ammunition dispatch rule.
+
+Use the same existing dispatch requirement when reconsidering an exhausted trip.
+After physical exit, finish that loading obligation once both cargo minimums are
+met, before seeking another source solely for a top-up. Retain full-source search
+for below-minimum trucks. The existing dock/queue guard is unchanged; active
+rescue movement is preserved. The source-selection regression now uses a truck
+below the Fuel minimum, so it still demonstrates required replacement loading.
+The loaded replacement-source case now asserts completed dispatch instead of an
+unnecessary replacement trip. A seventh case covers the below-minimum/full-source
+boundary. All 555 Game tests pass, zero failures/skips, 143.413 seconds, retaining
+all strategic deadlines. The original full-match qualification is still running
+at this commit; no terminal success is claimed.
+
+The earlier no-debug-capture CLI probe cannot provide a result: its report tries
+to select a missing debug read model. The standard diagnosis-enabled run is used
+for acceptance. A premature rebuild of its in-use Headless directory encountered
+file locks; the subsequent build succeeds with zero warnings/errors. These are
+not reported as successful match or source qualification. The 05ee10bf package
+0.1.404-dev passes reproducibility and runtime asset/package validation; later
+source identities must be recorded separately.
