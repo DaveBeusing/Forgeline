@@ -216,7 +216,7 @@ public sealed class VisualReferenceSceneTests
         var buildings = instances.Where(x => x.BuildingFeature.IsSpecified).ToArray();
         var vehicles = instances.Where(x => x.UnitFeature.IsSpecified).ToArray();
         Assert.Equal(3, buildings.Length);
-        Assert.Equal(2, vehicles.Length);
+        Assert.Equal(kind == VisualReferenceSceneKind.LogisticsLoadingProduction ? 3 : 2, vehicles.Length);
         Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.CargoTruck);
         Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.SupplyTruck);
         foreach (var vehicle in vehicles)

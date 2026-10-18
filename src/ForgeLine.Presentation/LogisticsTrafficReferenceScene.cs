@@ -84,6 +84,19 @@ internal static class LogisticsTrafficReferenceScene
         if (!transport.TryAssignOrder(simulation.Entities, truck,
                 new CargoTransportOrder(source,destination,ResourceIds.FerrousOre,50,SimulationTick.Zero),SimulationTick.Zero))
             throw new InvalidOperationException("Traffic order was rejected.");
+        EntityId waitingTruck = EntityId.Invalid;
+        if (kind == VisualReferenceSceneKind.LogisticsLoadingProduction)
+        {
+            Vector3 waitingPosition = ServicePoint(source, definition.VisualScale) - Vector3.UnitX * 30;
+            waitingPosition.Y += definition.Movement.HeightOffset;
+            waitingTruck = CargoTruckFactory.Create(simulation.Entities, inventories, waitingPosition, new(1), transport,
+                new CargoTruckDefinition(definition.Key, definition.CargoCapacity, definition.Movement, definition.VisualScale, definition.VisualId));
+            simulation.Entities.AddComponent(waitingTruck, new UnitIdentity(UnitIds.CargoTruck, new(1)));
+            Align(waitingTruck);
+            if (!transport.TryAssignOrder(simulation.Entities, waitingTruck,
+                    new CargoTransportOrder(source, destination, ResourceIds.FerrousOre, 20, SimulationTick.Zero), SimulationTick.Zero))
+                throw new InvalidOperationException("Waiting traffic order was rejected.");
+        }
         CargoTransportRuntimeState state = CargoTransportRuntimeState.Idle;
         for (int tick = 0; tick < 4000; tick++)
         {
@@ -111,10 +124,17 @@ internal static class LogisticsTrafficReferenceScene
         }
         if (!sustained && state.Lifecycle != requested)
             throw new InvalidOperationException($"Traffic did not reach {requested}: {state.Lifecycle}/{state.WaitReason}.");
+        if (waitingTruck.IsValid &&
+            (!simulation.Entities.TryGetComponent(waitingTruck, out VehicleDockVisit waiting) || waiting.Status != VehicleDockStatus.Busy ||
+             simulation.Entities.GetComponent<GroundMovementState>(waitingTruck).Velocity.LengthSquared() > 0.05f * 0.05f ||
+             simulation.Entities.GetComponent<VehicleDockVisit>(truck).Pose.Contains(simulation.Entities.GetComponent<WorldTransform>(waitingTruck).Position, waiting.Pose.HalfLength)))
+            throw new InvalidOperationException("The second truck must wait outside the exclusive lane.");
         if (!snapshots.TryReadLatest(out var snapshot)) throw new InvalidOperationException("Traffic snapshot was not published.");
         double conserved = inventories.GetQuantity(sourceInventory,ResourceIds.FerrousOre) +
             inventories.GetQuantity(destinationInventory,ResourceIds.FerrousOre) +
             inventories.GetQuantity(simulation.Entities.GetComponent<CargoTransport>(truck).CargoInventory,ResourceIds.FerrousOre);
+        if (waitingTruck.IsValid) conserved += inventories.GetQuantity(
+            simulation.Entities.GetComponent<CargoTransport>(waitingTruck).CargoInventory, ResourceIds.FerrousOre);
         if (Math.Abs(conserved-100)>1e-6) throw new InvalidOperationException("Traffic did not conserve inventory.");
         if (sustained && transport.Metrics.CompletedOrderCount < 2)
             throw new InvalidOperationException($"Repeated traffic completed {transport.Metrics.CompletedOrderCount} deliveries: {state}; pose={simulation.Entities.GetComponent<WorldTransform>(truck)}; dock={(simulation.Entities.TryGetComponent(truck, out VehicleDockVisit unfinished) ? unfinished.ToString() : "none")}.");
