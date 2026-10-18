@@ -15,12 +15,14 @@ internal static class InfantrySkinReferenceScene
     {
         bool repeated = kind == VisualReferenceSceneKind.InfantrySkinningRepeated;
         Vector3 target = new(650, 0, 520);
+        if (!terrain.TrySampleHeight(target.X, target.Z, out float ground)) throw new InvalidOperationException("Infantry target lies outside terrain.");
+        target.Y = ground + .9f;
         var instances = new RenderInstance[repeated ? 1000 : 9];
         for (int i = 0; i < instances.Length; i++)
         {
             var family = repeated ? (i % 2 == 0 ? UnitIds.RifleSquad : UnitIds.CombatEngineer) : kind == VisualReferenceSceneKind.InfantrySkinningEngineer ? UnitIds.CombatEngineer : UnitIds.RifleSquad;
             Vector3 position = target + (repeated ? new Vector3((i % 40 - 19.5f) * 3.2f, 0, (i / 40 - 12) * 3.2f)
-                : new Vector3((i % 3 - 1) * 5, 0, (i / 3 - 1) * 6));
+                : new Vector3((i % 3 - 1) * 3.2f, 0, (i / 3 - 1) * 4));
             if (!terrain.TrySampleHeight(position.X, position.Z, out float height)) throw new InvalidOperationException("Infantry reference lies outside terrain.");
             position.Y = height + .9f;
             InfantryAction action = repeated ? InfantryAction.Walk : (InfantryAction)i;
