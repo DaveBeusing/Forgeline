@@ -149,10 +149,17 @@ internal static class CommandDockCapture
             [new(UnitIds.MainBattleTank, "Main Battle Tank / armored production", cost, 80),
              new(UnitIds.CombatEngineer, "Combat Engineer", cost, 40, false, TechnologyCapabilityIds.FieldEngineering)],
             [new(request, UnitIds.MainBattleTank, "Main Battle Tank", ProductionPriority.Normal, false, true)], new Vector3(500,0,500));
+        var resources = InitialResourceDefinitions.CreateCatalog();
+        var scoutDefinition = DirectorateContent.CreateUnitCatalog()[UnitIds.ScoutVehicle];
+        var scoutInputs = scoutDefinition.Costs.Select(c => new PlayerActionResourceAmount(c.ResourceId,
+            resources[c.ResourceId].DisplayName, c.Quantity, 0)).ToArray();
         var logistics = new PlayerLogisticsActionReadModel(entity,
-            [new(new(30,1), ResourceIds.Steel, "Steel", 12, 20, 100, 180, LogisticsStockPriority.Normal, true,
+            scoutInputs.Select((c,i) => new PlayerStockPolicyActionReadModel(new((uint)(30+i),1), c.ResourceId, c.DisplayName,
+                i == 0 ? 12 : 0, 5, 10, 20, LogisticsStockPriority.Normal, true,
                 blocked ? PlayerDistributionActionState.Waiting : PlayerDistributionActionState.Traveling,
-                blocked ? LogisticsTransportRequestFailureReason.NoRoute : LogisticsTransportRequestFailureReason.None, LogisticsBottleneckReason.None, new(31,1))], null);
+                blocked ? LogisticsTransportRequestFailureReason.NoRoute : LogisticsTransportRequestFailureReason.None,
+                LogisticsBottleneckReason.None, new(31,1)) { ReservedQuantity = i == 0 ? 4 : 0, RequestedQuantity = 30, AnnouncedQuantity = blocked ? 0 : 20 }).ToArray(),
+            null, 1000, 12, requirements: [new(2,scoutDefinition.Id.Value,scoutDefinition.DisplayName,scoutInputs)]);
         var supply = new PlayerSupplyActionReadModel(entity, BattlefieldSupplyStatus.Critical, .15, .08, true, .4, .5,
             new(31,1), blocked ? PlayerSupplyProviderState.Blocked : PlayerSupplyProviderState.Traveling, 50, 40, default);
         var tactical = new PlayerTacticalActionReadModel([entity], 2, 1, 1, 1, 0, false, true, default, default,

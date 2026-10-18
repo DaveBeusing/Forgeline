@@ -55,7 +55,7 @@ internal static class HoverTooltipResolver
             if (selected.Logistics is { } logistics && logistics.Entity == world.Entity && logistics.Cargo is { } cargo)
                 explanation = $"REGIONAL CARGO / SOURCE {cargo.Source} / DESTINATION {cargo.Destination}; AUTOMATIC TARGET DEMAND ASSIGNS WORK. " + LogisticsStatusCatalog.ServiceDetails(logistics.Service);
             else if (selected.Supply is { } supply && supply.Entity == world.Entity)
-                explanation = $"DRIVE TANK {supply.FuelFraction:P0}; FIELD CARGO FUEL {supply.ProviderFuel:0.##} / AMMUNITION {supply.ProviderAmmunition:0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
+                explanation = $"DRIVE TANK {supply.FuelFraction:P0}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {supply.ProviderFuel:0.##} / AMMUNITION {supply.ProviderAmmunition:0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
         }
         return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation);
     }
@@ -156,7 +156,7 @@ internal static class HoverTooltipResolver
                     }
                     break;
                 case PlayerActionPanelMode.Supply when actions.Supply is { } supply:
-                    requirement = $"DRIVE TANK {supply.FuelFraction:P0}; FIELD CARGO FUEL {supply.ProviderFuel:0.##} / AMMUNITION {supply.ProviderAmmunition:0.##}";
+                    requirement = $"DRIVE TANK {supply.FuelFraction:P0}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {supply.ProviderFuel:0.##} / AMMUNITION {supply.ProviderAmmunition:0.##}";
                     hint = LogisticsStatusCatalog.ServiceDetails(supply.Service);
                     break;
                 case PlayerActionPanelMode.Technology:

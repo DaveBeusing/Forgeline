@@ -371,6 +371,7 @@ public readonly record struct PlayerSupplyActionReadModel(
     BattlefieldSupplyPriority Priority = BattlefieldSupplyPriority.Normal)
 {
     public PlayerWorkSummary Service { get; init; }
+    public bool IsSupplyTruck { get; init; }
 }
 
 public readonly record struct PlayerTacticalTargetReadModel(
@@ -1542,6 +1543,7 @@ internal static class PlayerActionSnapshotFactory
             rejections,
             priority)
         {
+            IsSupplyTruck = entities.HasComponent<SupplyTruck>(entity),
             Service = PlayerExperienceSnapshotFactory.CaptureWork(entities, entity, scenario.Production, scenario.UnitProduction,
                 scenario.Services.UnitDefinitions, scenario.Services.BuildingDefinitions)
         };
@@ -1636,13 +1638,15 @@ internal static class PlayerActionSnapshotFactory
 
         LogisticsTransportRequestReadModel selected =
             best.Value;
+        if (selected.State == LogisticsTransportRequestState.Completed) return;
         failure = selected.FailureReason;
         bottleneck = selected.BottleneckReason;
-        assignedTruck = selected.AssignedTruck;
+        assignedTruck = selected.State is LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit
+            ? selected.AssignedTruck : EntityId.Invalid;
 
-        if (selected.AssignedTruck.IsValid &&
+        if (assignedTruck.IsValid &&
             entities.TryGetComponent(
-                selected.AssignedTruck,
+                assignedTruck,
                 out CargoTransportRuntimeState transport))
         {
             state =

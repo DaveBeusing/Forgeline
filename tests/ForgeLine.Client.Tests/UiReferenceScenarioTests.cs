@@ -137,6 +137,14 @@ public sealed class UiReferenceScenarioTests
             if (state == UiReferenceScenario.DockPending) Assert.True(panel.ContextualPending);
             if (state == UiReferenceScenario.ProductionQueue) { Assert.Equal(PlayerActionPanelMode.Production,panel.Mode); Assert.Equal(1,panel.SelectedIndex); }
             if (state == UiReferenceScenario.LogisticsBlocked) Assert.Equal(PlayerActionPanelMode.Logistics,panel.Mode);
+            if (state == UiReferenceScenario.LogisticsInputs)
+            {
+                var logistics = Assert.IsType<PlayerLogisticsActionReadModel>(snapshot.PlayerActions!.Logistics);
+                Assert.Equal(logistics.Policies.Count, panel.SelectedIndex);
+                Assert.True(ProductionStockProposal.Create(logistics,Assert.Single(logistics.Requirements),1).FitsCapacity);
+                Assert.Equal("USE INPUTS",PlayerActionDockHudModel.ResolvePrimaryActionLabel(panel.Mode,panel.SelectedIndex,snapshot.PlayerActions));
+            }
+
             if (state == UiReferenceScenario.SupplyPolicy) Assert.Equal(PlayerActionPanelMode.Supply,panel.Mode);
             if (state == UiReferenceScenario.TechnologyBlocked) Assert.Equal(PlayerTechnologyState.Locked,snapshot.PlayerActions!.Technology[0].State);
             if (state == UiReferenceScenario.Operations) Assert.Single(snapshot.Operations!.Facilities);
