@@ -155,6 +155,9 @@ stock targets or throughput limits.
 
 During a power shortage, unrelated construction waits while partial deliveries
 accumulate for the next required power plant. Its input policies remain Critical
+before a blackout when the existing 20-unit power reserve is missing. Funding,
+power-plant scheduling and construction admission use the same capacity rule;
+another consumer cannot spend those partial deliveries in the meantime.
 through cost reservation, preventing another dispatch from claiming a completed
 construction load before the build command books it. Tactical support continues.
 Home placement candidates leave 96 m between neighboring sites so coarse navigation

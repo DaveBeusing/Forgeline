@@ -85,8 +85,10 @@ public sealed class SkirmishSupplyPolicyTests
         scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
         Assert.Equal(useCore ? side.CommandCore : depot, entities.GetComponent<SupplyLoadingOrder>(truck).Source);
     }
-    [Fact]
-    public void PowerRecoveryKeepsPartialTruckloadsInsteadOfBuildingMoreUnpoweredExtractors()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void PowerRecoveryKeepsPartialTruckloadsInsteadOfBuildingMoreUnpoweredExtractors(bool alreadyUnderpowered)
     {
         var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
         using var scenario = CentralDivideScenario.Create(settings with
@@ -123,9 +125,17 @@ public sealed class SkirmishSupplyPolicyTests
             entities.AddComponent(entity, new CompletedBuilding(id, side.Player, SimulationTick.Zero));
             entities.AddComponent(entity, membership);
             if (id == BuildingIds.PowerPlant) entities.AddComponent(entity, new PowerGenerator(catalog[id].PowerGeneration));
-            else entities.AddComponent(entity, new PowerConsumer(100_000, PowerPriority.Industrial));
+            else entities.AddComponent(entity, new PowerConsumer(alreadyUnderpowered ? 100_000 :
+                catalog[BuildingIds.PowerPlant].PowerGeneration - catalog[BuildingIds.CommandCore].PowerDemand - 9,
+                PowerPriority.Industrial));
         }
         scenario.Simulation.RunTicks(4, TestContext.Current.CancellationToken);
+        if (!alreadyUnderpowered)
+        {
+            var economy = scenario.Opponents.DebugSnapshot.Single(item => item.Player == side.Player).Economy;
+            Assert.Equal(9, economy.PowerGeneration - economy.PowerDemand);
+            Assert.Equal(0, economy.OfflineConsumers);
+        }
         Assert.Equal(partial, scenario.Inventories.GetQuantity(side.StartingInventory, ResourceIds.FerrousOre));
         var sites = new List<ConstructionSite>();
         foreach (EntityId entity in entities.Query<ConstructionSite>())

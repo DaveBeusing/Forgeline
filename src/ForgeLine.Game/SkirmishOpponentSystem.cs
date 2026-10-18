@@ -920,6 +920,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 cadence);
     }
 
+    private static bool RequiresPowerConstruction(OwnedState owned) =>
+        owned.PowerDemand > 0 &&
+        (owned.PowerGeneration < owned.PowerDemand + 20 || owned.OfflineConsumers > 0);
+
     private bool TryRespondToCriticalEconomy(
         SimulationContext context,
         SkirmishOpponentController controller,
@@ -927,8 +931,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         in SkirmishEconomyAssessment economy,
         out SkirmishStrategicGoal goal)
     {
-        if (economy.PowerConstrained ||
-            economy.OfflineConsumers > 0)
+        if (RequiresPowerConstruction(owned))
         {
             if (GetBuildingCount(
                     owned,
@@ -3051,11 +3054,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         OwnedState owned,
         SkirmishOpponentConfiguration configuration)
     {
-        bool powerRecoveryRequired =
-            owned.PowerDemand > 0.0 &&
-            (owned.PowerGeneration <
-                 owned.PowerDemand + 20.0 ||
-             owned.OfflineConsumers > 0);
+        bool powerRecoveryRequired = RequiresPowerConstruction(owned);
         bool fuelProductionRecoveryRequired =
             !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage coreStorage) ||
             _inventories.GetAvailableQuantity(coreStorage.InventoryId, ResourceIds.Fuel) < 360;
@@ -4517,7 +4516,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         int powerPlants = GetBuildingCount(owned, BuildingIds.PowerPlant);
         if (buildingId != BuildingIds.PowerPlant && powerPlants < MaximumRecoveryPowerPlants &&
-            (powerPlants == 0 || owned.PowerGeneration < owned.PowerDemand || owned.OfflineConsumers > 0))
+            (powerPlants == 0 || RequiresPowerConstruction(owned)))
         {
             // Preserve partial deliveries for the required power plant while
             // tactical recovery and field support continue independently.
