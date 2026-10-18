@@ -19,6 +19,8 @@ public sealed class VehicleDockingIntegrationTests
     [InlineData(20, false, 2, false, false)]
     [InlineData(20, false, 1, true, false)]
     [InlineData(20, false, 2, false, true)]
+    [InlineData(10, false, 4, false, true)]
+    [InlineData(20, false, 4, false, true)]
     public void CargoDeliveryIncludesStationaryServiceAndPhysicalExit(int ticksPerSecond, bool viaBuilding, int truckCount, bool invalidateRoute, bool withSpatial)
     {
         var simulation = new SimulationCoordinator(ticksPerSecond);
@@ -31,7 +33,8 @@ public sealed class VehicleDockingIntegrationTests
         simulation.RegisterSystem(cargo);
         var source = CreateBuilding(simulation, inventories, Vector3.Zero);
         var destination = CreateBuilding(simulation, inventories, new(120, 0, 0));
-        Assert.True(inventories.Add(source.Inventory, ResourceIds.Steel, 100).Succeeded);
+        int sourceStock = Math.Max(100, truckCount * 40 + 20);
+        Assert.True(inventories.Add(source.Inventory, ResourceIds.Steel, sourceStock).Succeeded);
         var origin = network.AddNode(source.Entity, Vector3.Zero, LogisticsNodeKind.StorageDepot,
             LogisticsNodeCapabilities.CargoSource | LogisticsNodeCapabilities.CargoDestination);
         var target = network.AddNode(destination.Entity, new(120, 0, 0), LogisticsNodeKind.StorageDepot,
@@ -51,9 +54,9 @@ public sealed class VehicleDockingIntegrationTests
         simulation.Entities.SetComponent(truck, GroundMovementState.Stationary(MathF.PI / 2));
         Assert.True(cargo.TryAssignOrder(simulation.Entities, truck, new(origin, target, ResourceIds.Steel, 40, SimulationTick.Zero), SimulationTick.Zero));
         var trucks = new List<EntityId> { truck };
-        if (truckCount == 2)
+        for (int index = 1; index < truckCount; index++)
         {
-            var second = CargoTruckFactory.Create(simulation.Entities, inventories, new(-60, 1, 30), new(1), cargo);
+            var second = CargoTruckFactory.Create(simulation.Entities, inventories, new(-60 - index * 12, 1, 30 + index * 10), new(1), cargo);
             Assert.True(cargo.TryAssignOrder(simulation.Entities, second, new(origin, target, ResourceIds.Steel, 40, SimulationTick.Zero), SimulationTick.Zero));
             trucks.Add(second);
         }
@@ -91,7 +94,7 @@ public sealed class VehicleDockingIntegrationTests
         foreach (var entity in trucks)
             Assert.False(simulation.Entities.HasComponent<CargoTransportOrder>(entity), VisitDescription(simulation, entity));
         Assert.Equal(40 * truckCount, inventories.GetQuantity(destination.Inventory, ResourceIds.Steel));
-        Assert.Equal(100 - 40 * truckCount, inventories.GetQuantity(source.Inventory, ResourceIds.Steel));
+        Assert.Equal(sourceStock - 40 * truckCount, inventories.GetQuantity(source.Inventory, ResourceIds.Steel));
         Assert.True(serviceTicks >= ticksPerSecond);
         Assert.True(sawExit);
         if (invalidateRoute) { Assert.True(changedRoute); Assert.True(cargo.Metrics.RerouteCount > 0); }
