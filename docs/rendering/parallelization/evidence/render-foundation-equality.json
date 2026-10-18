@@ -1,0 +1,357 @@
+{
+  "schemaVersion": 1,
+  "baseline": "3c61f47274f03a0ab6e3b2022f40ac8205a72eb2",
+  "changed": "2dfd86d318271decfc87c5234ef461e1e7714bb4",
+  "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+  "allSixPixelsExact": true,
+  "rows": [
+    {
+      "key": "MainBattleTankProduction-1920x1080-High-CloseTactical",
+      "pixelExact": true,
+      "draws": [
+        27,
+        27
+      ],
+      "residentTextureBytes": [
+        47912856,
+        47912856
+      ],
+      "sourceMeshCache": [
+        42,
+        42
+      ],
+      "cpuMeanMs": [
+        38.00659375,
+        56.00817187500001
+      ],
+      "gpuMeanMs": [
+        19.429757866666666,
+        14.615854857142855
+      ],
+      "prepareMeanMs": 11.632040625,
+      "recordMeanMs": 12.326606250000001,
+      "resourcesAcross32Samples": {
+        "loadedTextureCount": {
+          "minimum": 82,
+          "maximum": 82
+        },
+        "residentTextureBytes": {
+          "minimum": 47912856,
+          "maximum": 47912856
+        },
+        "textureUploadCount": {
+          "minimum": 82,
+          "maximum": 82
+        },
+        "shaderResourceDescriptorsUsed": {
+          "minimum": 89,
+          "maximum": 89
+        }
+      },
+      "healthAcross32Samples": {
+        "liveResourceCount": {
+          "minimum": 368,
+          "maximum": 368
+        },
+        "pendingRetirementCount": {
+          "minimum": 0,
+          "maximum": 0
+        },
+        "submissionFaultCount": {
+          "minimum": 0,
+          "maximum": 0
+        }
+      }
+    },
+    {
+      "key": "MainBattleTankProduction-1920x1080-High-NormalGameplay",
+      "pixelExact": true,
+      "draws": [
+        28,
+        28
+      ],
+      "residentTextureBytes": [
+        47912856,
+        47912856
+      ],
+      "sourceMeshCache": [
+        35,
+        35
+      ],
+      "cpuMeanMs": [
+        15.725059374999997,
+        25.990906250000002
+      ],
+      "gpuMeanMs": [
+        17.2670528,
+        11.934310399999998
+      ],
+      "prepareMeanMs": 0.5119,
+      "recordMeanMs": 0.8767875,
+      "resourcesAcross32Samples": {
+        "loadedTextureCount": {
+          "minimum": 82,
+          "maximum": 82
+        },
+        "residentTextureBytes": {
+          "minimum": 47912856,
+          "maximum": 47912856
+        },
+        "textureUploadCount": {
+          "minimum": 164,
+          "maximum": 164
+        },
+        "shaderResourceDescriptorsUsed": {
+          "minimum": 89,
+          "maximum": 89
+        }
+      },
+      "healthAcross32Samples": {
+        "liveResourceCount": {
+          "minimum": 354,
+          "maximum": 354
+        },
+        "pendingRetirementCount": {
+          "minimum": 0,
+          "maximum": 0
+        },
+        "submissionFaultCount": {
+          "minimum": 0,
+          "maximum": 0
+        }
+      }
+    },
+    {
+      "key": "MainBattleTankProduction-1920x1080-High-Strategic",
+      "pixelExact": true,
+      "draws": [
+        29,
+        29
+      ],
+      "residentTextureBytes": [
+        47935736,
+        47935736
+      ],
+      "sourceMeshCache": [
+        28,
+        28
+      ],
+      "cpuMeanMs": [
+        18.885356249999994,
+        11.266640625
+      ],
+      "gpuMeanMs": [
+        19.959533866666664,
+        12.292073600000002
+      ],
+      "prepareMeanMs": 0.32549375,
+      "recordMeanMs": 0.5107875,
+      "resourcesAcross32Samples": {
+        "loadedTextureCount": {
+          "minimum": 86,
+          "maximum": 86
+        },
+        "residentTextureBytes": {
+          "minimum": 47935736,
+          "maximum": 47935736
+        },
+        "textureUploadCount": {
+          "minimum": 250,
+          "maximum": 250
+        },
+        "shaderResourceDescriptorsUsed": {
+          "minimum": 93,
+          "maximum": 93
+        }
+      },
+      "healthAcross32Samples": {
+        "liveResourceCount": {
+          "minimum": 352,
+          "maximum": 352
+        },
+        "pendingRetirementCount": {
+          "minimum": 0,
+          "maximum": 0
+        },
+        "submissionFaultCount": {
+          "minimum": 0,
+          "maximum": 0
+        }
+      }
+    },
+    {
+      "key": "IndustrialBase-1920x1080-High-CloseTactical",
+      "pixelExact": true,
+      "draws": [
+        23,
+        23
+      ],
+      "residentTextureBytes": [
+        47912856,
+        47912856
+      ],
+      "sourceMeshCache": [
+        49,
+        49
+      ],
+      "cpuMeanMs": [
+        19.617549999999998,
+        28.161878125
+      ],
+      "gpuMeanMs": [
+        20.671147733333335,
+        14.726361379310344
+      ],
+      "prepareMeanMs": 0.323865625,
+      "recordMeanMs": 0.5123875,
+      "resourcesAcross32Samples": {
+        "loadedTextureCount": {
+          "minimum": 82,
+          "maximum": 82
+        },
+        "residentTextureBytes": {
+          "minimum": 47912856,
+          "maximum": 47912856
+        },
+        "textureUploadCount": {
+          "minimum": 332,
+          "maximum": 332
+        },
+        "shaderResourceDescriptorsUsed": {
+          "minimum": 89,
+          "maximum": 89
+        }
+      },
+      "healthAcross32Samples": {
+        "liveResourceCount": {
+          "minimum": 382,
+          "maximum": 382
+        },
+        "pendingRetirementCount": {
+          "minimum": 0,
+          "maximum": 0
+        },
+        "submissionFaultCount": {
+          "minimum": 0,
+          "maximum": 0
+        }
+      }
+    },
+    {
+      "key": "IndustrialBase-1920x1080-High-NormalGameplay",
+      "pixelExact": true,
+      "draws": [
+        37,
+        37
+      ],
+      "residentTextureBytes": [
+        47912856,
+        47912856
+      ],
+      "sourceMeshCache": [
+        45,
+        45
+      ],
+      "cpuMeanMs": [
+        16.364712500000003,
+        11.096118749999999
+      ],
+      "gpuMeanMs": [
+        16.91988373333333,
+        12.118779733333334
+      ],
+      "prepareMeanMs": 0.349403125,
+      "recordMeanMs": 0.5708875,
+      "resourcesAcross32Samples": {
+        "loadedTextureCount": {
+          "minimum": 82,
+          "maximum": 82
+        },
+        "residentTextureBytes": {
+          "minimum": 47912856,
+          "maximum": 47912856
+        },
+        "textureUploadCount": {
+          "minimum": 414,
+          "maximum": 414
+        },
+        "shaderResourceDescriptorsUsed": {
+          "minimum": 89,
+          "maximum": 89
+        }
+      },
+      "healthAcross32Samples": {
+        "liveResourceCount": {
+          "minimum": 374,
+          "maximum": 374
+        },
+        "pendingRetirementCount": {
+          "minimum": 0,
+          "maximum": 0
+        },
+        "submissionFaultCount": {
+          "minimum": 0,
+          "maximum": 0
+        }
+      }
+    },
+    {
+      "key": "IndustrialBase-1920x1080-High-Strategic",
+      "pixelExact": true,
+      "draws": [
+        41,
+        41
+      ],
+      "residentTextureBytes": [
+        47935736,
+        47935736
+      ],
+      "sourceMeshCache": [
+        40,
+        40
+      ],
+      "cpuMeanMs": [
+        18.637718750000005,
+        11.936925
+      ],
+      "gpuMeanMs": [
+        20.52272,
+        13.057669333333335
+      ],
+      "prepareMeanMs": 0.465140625,
+      "recordMeanMs": 0.71928125,
+      "resourcesAcross32Samples": {
+        "loadedTextureCount": {
+          "minimum": 86,
+          "maximum": 86
+        },
+        "residentTextureBytes": {
+          "minimum": 47935736,
+          "maximum": 47935736
+        },
+        "textureUploadCount": {
+          "minimum": 500,
+          "maximum": 500
+        },
+        "shaderResourceDescriptorsUsed": {
+          "minimum": 93,
+          "maximum": 93
+        }
+      },
+      "healthAcross32Samples": {
+        "liveResourceCount": {
+          "minimum": 376,
+          "maximum": 376
+        },
+        "pendingRetirementCount": {
+          "minimum": 0,
+          "maximum": 0
+        },
+        "submissionFaultCount": {
+          "minimum": 0,
+          "maximum": 0
+        }
+      }
+    }
+  ]
+}
