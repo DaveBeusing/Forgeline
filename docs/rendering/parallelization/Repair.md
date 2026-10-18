@@ -1015,3 +1015,46 @@ must still run this combined configuration. Renderer/Game source, native image
 parity, both successful fixed performance cohorts and the tick-64,536 terminal
 victory are unaffected by this test-host-only change. Independent human native
 review remains required and parallel release is not granted.
+
+
+### Separate exact-allocation benchmark hosts use the same controlled policy
+
+On c439c7c5, the previously failing integrated interaction/display and command-dock
+blocks pass hosted CI. Frame run 39167820278 proceeds to the separate rebound
+HUD executable and fails with 5,480 warm bytes at 1024x720/DPI96, scale one,
+one entity, Pending. That child process does not use the Presentation.Tests
+runtimeconfig. Its complete failed log is retained. One fixed local default-GC
+run and one process-local blocking-GC run of the same existing benchmark DLL
+both complete all 120 cases with zero warm allocations; the hosted occurrence
+is not reproduced locally and neither run overrides its failed status.
+
+The two exact-zero HUD allocation guard steps now set DOTNET_gcConcurrent=0
+only in their own process environment, retaining existing TieredCompilation=0.
+The benchmark entry point requires blocking-GC mode for exactly typography,
+rebound gameplay UI and alert/map allocation guards and fails before measurement
+if omitted. It does not configure the runtime or change native/scalability/
+frame-timing modes. The typography reproduction saves/restores its shell settings
+around both synthetic guard invocations, before any production client capture.
+Warmups, samples, zero-byte bounds and upload assertions remain unchanged.
+The official per-process option is documented at
+https://learn.microsoft.com/dotnet/core/runtime-config/garbage-collector .
+
+The complete corrected guard executable builds with zero warnings/errors.
+An explicit missing-policy control fails with the required diagnostic before
+measurement. The configured full gameplay, alert/map and typography guards all
+exit zero. All full JSON matrices, outputs, contexts and failed hosted evidence
+are retained. Workflow, benchmark entry point and typography documentation are
+included in serial foundation ownership under the authorized CI-repair scope.
+Production Game/renderer source, the actual default-GC native performance pairs,
+final-code image parity and tick-64,536 terminal victory remain unchanged.
+
+Complete guard coverage: gameplay 120 cases, alert-map 56 cases, typography 30 cases.
+
+
+The complete final local solution run on clean source c439c7c55114914a2c4df2d0681a763190fb0a50
+passes 2,820 tests, zero failures, 17 explicit optional skips / 2,837 total,
+22m52.114s. Its complete build has zero warnings/errors (1m6.84s). Both full logs
+are retained. Only the subsequently verified allocation-guard tool/workflow and
+documentation changes follow; no production runtime or test-host code changes.
+The final hosted CI must verify the resulting head; human native review remains
+separate and parallelReleased stays false.

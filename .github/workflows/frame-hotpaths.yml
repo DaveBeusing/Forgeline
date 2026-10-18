@@ -72,10 +72,12 @@ jobs:
       - name: Guard actionable alerts and strategic map allocation bounds
         env:
           DOTNET_TieredCompilation: 0
+          DOTNET_gcConcurrent: 0
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --alert-map-hotpaths artifacts/alert-map-hotpaths.json
       - name: Guard rebound gameplay UI allocations and upload requests
         env:
           DOTNET_TieredCompilation: 0
+          DOTNET_gcConcurrent: 0
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --gameplay-ui-hotpaths artifacts/gameplay-ui-hotpaths.json
       - name: Capture CPU frame measurements
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --frame-hotpaths artifacts/frame-hotpaths.json

@@ -1136,6 +1136,96 @@
       "file": "foundation-blocking-gc-ci-filter.log.gz",
       "rawSha256": "9d123bef92b00c9fd9fdece24f0589441923a41932e857f14dd63445fb32ae7b",
       "archiveSha256": "9de492ad30a8ba55163cd1898ba44785d43409d9050f74d614b51c38c1eed1ff"
+    },
+    {
+      "file": "foundation-c439-frame-ci-failed.log.gz",
+      "rawSha256": "9f30082c4010925faf2114de1d86f299c7d32a3ebbaf8b690adf0dd5b0e28319",
+      "archiveSha256": "5a35465fc71adf771a99a9acc7dd30cc901441b19601464ec9f3464bbd717c54"
+    },
+    {
+      "file": "foundation-gameplay-ui-default.json.gz",
+      "rawSha256": "210430f8ce34dd33580dfb61e2b545c2d032bcf264bc550a16bb25ab3b03e8fd",
+      "archiveSha256": "203a981c3576121ef942c064d2e03941bd5a8dc2d118acd8b96f81ec186240e0"
+    },
+    {
+      "file": "foundation-gameplay-ui-default.log.gz",
+      "rawSha256": "4dc2cb0052281980701acbbcb979100d5526216a17097a7bdea615aa4602d610",
+      "archiveSha256": "a9573e04c38f3b01a1aa57af8061fa0417b369476ba04cf2e525c042a89b2445"
+    },
+    {
+      "file": "foundation-gameplay-ui-blocking.json.gz",
+      "rawSha256": "98f72dbc6e269e535f7c15d98998940ac650a4d228f3314f95ec10a0a4a0a7bc",
+      "archiveSha256": "10f68b0bfd450440c582468a0432f9badfa873a13cf56c8ebc3a6d39abbf1140"
+    },
+    {
+      "file": "foundation-gameplay-ui-blocking.log.gz",
+      "rawSha256": "4dc2cb0052281980701acbbcb979100d5526216a17097a7bdea615aa4602d610",
+      "archiveSha256": "a9573e04c38f3b01a1aa57af8061fa0417b369476ba04cf2e525c042a89b2445"
+    },
+    {
+      "file": "foundation-gameplay-ui-gc-context.json.gz",
+      "rawSha256": "cb64707e4eb5509f9a4c73c14f315b5ce75fcabb3faa1a91cecbf61507c105d2",
+      "archiveSha256": "fecb76b6ec9dd50aedc32682e2e4ee86bbd06101eab111ba0c395c8bffe34c01"
+    },
+    {
+      "file": "foundation-allocation-guards-build.log.gz",
+      "rawSha256": "e78b0c900d365fba7a7f4e8e58a3d2833f623e1bf1f3818dc0dc4900f358178a",
+      "archiveSha256": "9346c79516e8db0f262ce5e4be1cd703811d97799d9491e10d49118f6aa99047"
+    },
+    {
+      "file": "foundation-allocation-guards-final-build.log.gz",
+      "rawSha256": "1ee5419ee6302b2460fe176db33a96fcd58df37e597f0b65014e4ea7df48618c",
+      "archiveSha256": "4f0905f324a17a6787bcf61b86870205c802cca268be4d1c85816fa117a7edbb"
+    },
+    {
+      "file": "foundation-allocation-guards-missing-policy.log.gz",
+      "rawSha256": "95c00d68723b2a95d3f04101bd771691b9706f781d4e0194b271041efb2d35c1",
+      "archiveSha256": "f044ab61efe2de8e5915c39402e1893db2d9b25f09c5848c12d8fc68cb7ef54b"
+    },
+    {
+      "file": "foundation-allocation-guards-gameplay.json.gz",
+      "rawSha256": "8a215b2bb61075a57e2d601f3f2626a1db7c594a03bca1e3ed97f1bace9c2a79",
+      "archiveSha256": "71ea4d32d1f20632af2d15b008deaf47b89e908b3b599d9d89e4004b2b7c3326"
+    },
+    {
+      "file": "foundation-allocation-guards-gameplay.log.gz",
+      "rawSha256": "4dc2cb0052281980701acbbcb979100d5526216a17097a7bdea615aa4602d610",
+      "archiveSha256": "a9573e04c38f3b01a1aa57af8061fa0417b369476ba04cf2e525c042a89b2445"
+    },
+    {
+      "file": "foundation-allocation-guards-alert-map.json.gz",
+      "rawSha256": "73173ed8b28eeba9b8466a83007210252d75c8d8114e08c9225bdf46e9a79f78",
+      "archiveSha256": "7472dda9a9490f8a5e410f1b1c521931850b04d76feb5ba1522aa0c296c088a7"
+    },
+    {
+      "file": "foundation-allocation-guards-alert-map.log.gz",
+      "rawSha256": "d010ccc5bbd79ec9544307b36fe7fa1bc2aed1beb47d427e4bdb01c463224aba",
+      "archiveSha256": "5eafcbbfdfabe2d4e4d48961b8af289ee95640f2943b8fcc195eaf2e171bee41"
+    },
+    {
+      "file": "foundation-allocation-guards-typography.json.gz",
+      "rawSha256": "f9acd0c65f94c83d1722c23bddfd73f2867c167cbdce40af449f4c4e1a51e7ee",
+      "archiveSha256": "d64ff77af7b97b914a61693c0b8146337371d6f9742aff2950f1bcdba4c7d0ca"
+    },
+    {
+      "file": "foundation-allocation-guards-typography.log.gz",
+      "rawSha256": "c54afff973820f7735ecde726212781c327b5975907d9ec951e5631003ba9388",
+      "archiveSha256": "aed0dd1c1b749925d20a8d35a388f0451593403ebc968ba69616dd95d34a80ab"
+    },
+    {
+      "file": "foundation-allocation-guards-context.json.gz",
+      "rawSha256": "c224f87321114872b975de0dcf075617ca40af4c77254e3d00fc636858cb0772",
+      "archiveSha256": "4407b5fce29dbc8eee470567728ff49d5447e6b869b8e73ec8f2318c1cffc74f"
+    },
+    {
+      "file": "foundation-c439-solution-build.log.gz",
+      "rawSha256": "61d60af15487a11e8a8e84acde4caa5cd985c25f7f830ca04bbcb8569c72d1d0",
+      "archiveSha256": "6dfed3c8e2e52cc4c23feacb608871902bded4e557d97de1facb60a53b76e696"
+    },
+    {
+      "file": "foundation-c439-solution-tests.log.gz",
+      "rawSha256": "184a6a38a5685874177bd72bcb5b732fe96725666de111ef3265aa083021fb7e",
+      "archiveSha256": "77aaa97618437f2398497d7769a65eb27756eaf262036346a3d50466f9ffe49f"
     }
   ]
 }

@@ -125,7 +125,8 @@
         "src/ForgeLine.Game/TacticalTestOpponentSystem.cs",
         "tests/ForgeLine.Game.Tests/TacticalCombatSystemTests.cs",
         "tests/ForgeLine.Presentation.Tests/GuidancePresentationTests.cs",
-        "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj"
+        "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj",
+        "docs/UiTypography.md"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",
