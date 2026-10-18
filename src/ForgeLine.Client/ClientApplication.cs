@@ -630,7 +630,7 @@ internal sealed class ClientApplication
                 GameplayHudLayout.Create(window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale),
                 _platform.Clock.GetElapsedTime(startedAt, now),
                 _settings.CreateUiFeedbackSettings().Animate(renderHost.LatestQualification?.QualityProfile.Active ?? RenderQuality.Low),
-                wasShellBlocking || !window.IsFocused || window.IsMinimized || selectionController.IsDragSelecting ||
+                wasShellBlocking || operationsController.View.Open || !window.IsFocused || window.IsMinimized || selectionController.IsDragSelecting ||
                 buildingPlacementController.IsActive || tacticalTargetingController.IsActive || inputState.IsMouseButtonDown(PlatformMouseButton.Middle),
                 actionPanel.Mode == PlayerActionPanelMode.Closed && !operationsController.View.Open &&
                 !GameplayBindingRegistry.UsesCamera(_settings.CameraBindings, _gameplayBindings.Key(GameplayAction.NextItem)),
@@ -1646,7 +1646,7 @@ internal sealed class ClientApplication
                 InteractionHint = buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
                 Onboarding = guidanceInteraction.View,
                 Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding,
-                    simulationPaused || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
+                    simulationPaused || operationsController.View.Open || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
                     tacticalTargetingView.Mode != TacticalTargetingMode.None || inputState.IsMouseButtonDown(PlatformMouseButton.Middle), _gameplayBindings, guidanceLayout),
                 Placement = placementFeedback
             };

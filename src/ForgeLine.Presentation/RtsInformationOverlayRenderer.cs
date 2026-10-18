@@ -1197,21 +1197,31 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             if (control.IsEmpty) continue;
             if (!_skin.Panel(control, "control.button_compact", OnboardingPresentation.BackgroundAlpha))
                 EmitQuad(control.X, control.Y, control.Width, control.Height, GameplayHudVisualStyle.PanelRaised with { W = OnboardingPresentation.BackgroundAlpha }, width, height);
-            _text.AddCentered(GuidanceCardLayout.Label(i), control, 14, GameplayHudVisualStyle.TextPrimary, width, height);
+            if (!_text.AddCentered(GuidanceCardLayout.Label(i), control, 14, GameplayHudVisualStyle.TextPrimary, width, height))
+                EmitText(GuidanceCardLayout.Label(i), control.X + 4, control.Y + 6, control.Right - 4,
+                    GameplayHudVisualStyle.TextPrimary, 14 / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
             if (state.Focused && state.FocusControl == i) EmitQuad(control.X, control.Y, control.Width, 2, GameplayHudVisualStyle.Focus, width, height);
         }
         Span<char> buffer = stackalloc char[96];
         var label = new HudTextBuilder(buffer);
         label.Append("SECTION "); label.Append(view.Guidance.Section + 1); label.Append(" / "); label.Append(EarlyGameGuidanceCatalog.Steps.Length);
         label.Append("   PAGE "); label.Append(view.Guidance.Page + 1); label.Append(" / "); label.Append(view.Guidance.PageCount);
-        _text.Add(label.Written, panel.X + 10, panel.Bottom - 13, 14, GameplayHudVisualStyle.TextPrimary, width, height, MathF.Max(1, panel.Width - 20));
+        if (!_text.Add(label.Written, panel.X + 10, panel.Bottom - 15, 14, GameplayHudVisualStyle.TextPrimary, width, height, MathF.Max(1, panel.Width - 20)))
+            EmitText(label.Written, panel.X + 10, panel.Bottom - 15, panel.Right - 10,
+                GameplayHudVisualStyle.TextPrimary, 14 / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
         _text.Clip = state.Clip; _guidanceClip = state.Clip;
         if (!state.Tab.IsEmpty)
         {
-            _skin.Panel(state.Tab, "control.button_compact", OnboardingPresentation.BackgroundAlpha);
-            _text.AddCentered("HINT", state.TabLabelBounds, state.TabTextSize, GameplayHudVisualStyle.TextPrimary, width, height);
-            _text.Add(">", state.Tab.X + 10, state.Tab.Y + state.Tab.Height / 2, state.TabTextSize,
-                GameplayHudVisualStyle.TextPrimary, width, height, state.Tab.Width - 12);
+            if (!_skin.Panel(state.Tab, "control.button_compact", OnboardingPresentation.BackgroundAlpha))
+                EmitQuad(state.Tab.X, state.Tab.Y, state.Tab.Width, state.Tab.Height,
+                    GameplayHudVisualStyle.PanelRaised with { W = OnboardingPresentation.BackgroundAlpha }, width, height);
+            if (!_text.AddCentered("HINT", state.TabLabelBounds, state.TabTextSize, GameplayHudVisualStyle.TextPrimary, width, height))
+                EmitText("HINT", state.TabLabelBounds.X, state.TabLabelBounds.Y, state.TabLabelBounds.Right,
+                    GameplayHudVisualStyle.TextPrimary, state.TabTextSize / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
+            if (!_text.Add(">", state.Tab.X + 10, state.Tab.Y + state.Tab.Height / 2, state.TabTextSize,
+                GameplayHudVisualStyle.TextPrimary, width, height, state.Tab.Width - 12))
+                EmitText(">", state.Tab.X + 10, state.Tab.Y + state.Tab.Height / 2, state.Tab.Right,
+                    GameplayHudVisualStyle.TextPrimary, state.TabTextSize / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
         }
         if (state.Focused && (state.FocusControl == 6 || !state.Tab.IsEmpty))
         {

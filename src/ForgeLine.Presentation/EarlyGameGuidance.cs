@@ -76,9 +76,9 @@ public sealed class EarlyGameGuidanceController
         if (layout.SafeArea.IsEmpty) layout = GameplayHudLayout.Create(1920, 1080, 96);
         var step = EarlyGameGuidanceCatalog.Steps[_section];
         bool confirmed = step.Milestone != 0 && (_observed & step.Milestone) == step.Milestone;
-        string help = experience.Selection.Work.State == ForgeLine.Game.PlayerWorkState.Blocked
+        string help = experience.Tick == snapshot.Tick && experience.Selection.Work.State == ForgeLine.Game.PlayerWorkState.Blocked
             ? bindings.Text(ProductionContextFeedback.Explain(experience.Selection.Work.BlockReason)) : "";
-        if (snapshot.PlayerActions?.Logistics is { } logistics)
+        if (snapshot.PlayerActions is { } actions && actions.SessionId == snapshot.SessionId && actions.Tick == snapshot.Tick && actions.Logistics is { } logistics)
             foreach (var policy in logistics.Policies)
                 if (policy.FailureReason != ForgeLine.Game.LogisticsTransportRequestFailureReason.None)
                 { help = LogisticsStatusCatalog.Advice(policy.FailureReason); break; }
@@ -91,11 +91,16 @@ public sealed class EarlyGameGuidanceController
                 bindings.Prompt(GameplayAction.Activate) + " ACTIVATE / " + bindings.Prompt(GameplayAction.NextItem) + " NEXT ITEM / " +
                 bindings.Prompt(GameplayAction.SecondarySetting) + " THRESHOLD / " + bindings.Prompt(GameplayAction.PrimarySetting) + " PRIORITY / " +
                 bindings.Prompt(GameplayAction.Decrease) + " - / " + bindings.Prompt(GameplayAction.Increase) + " +";
-            _pages = GuidanceCardLayout.Pages((confirmed ? "Already confirmed: use this explanation as a reference; no repeat action is required. " : "") + step.Context + (help.Length > 0 ? " CURRENT HELP: " + help : "") + " CONTROLS: " + _binding, layout);
+            _pages = GuidanceCardLayout.Pages((confirmed ? "Already confirmed: use this explanation as a reference; no repeat action is required. " : "") + step.Context + (help.Length > 0 ? " CURRENT SELECTION HELP: " + help : "") + " CONTROLS: " + _binding, layout);
         }
         _page = Math.Clamp(_page, 0, Math.Max(0, _pages.Count - 1));
         return new(true, step.Objective, _pages.Count > 0 ? _pages[_page] : "", _binding,
-            step.Milestone == 0 ? "EXPLANATION ONLY / NO SIMULATION ACHIEVEMENT" : Status(confirmed, _reading[_section]),
+            step.Milestone == 0 ? _reading[_section] switch
+            {
+                GuidanceExplanationState.Viewed => "EXPLANATION VIEWED / NO SIMULATION GOAL",
+                GuidanceExplanationState.Deferred => "EXPLANATION DEFERRED / NO SIMULATION GOAL",
+                _ => "EXPLANATION OFFERED / NO SIMULATION GOAL"
+            } : Status(confirmed, _reading[_section]),
             _session, step.Key, _section, _page, _pages.Count, _reading[_section], confirmed);
     }
 }
