@@ -11,7 +11,7 @@ No matching checksum grants typography, AAA quality or physical-display acceptan
 
 ## Reproduce a candidate
 
-The complete current graphical interface has 86 named states. Use the bounded
+The complete current graphical interface has 88 named states. Use the bounded
 matrix orchestrator after committing, building and qualifying runtime assets:
 
 ```powershell
