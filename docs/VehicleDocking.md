@@ -51,6 +51,10 @@ service or release. The actual claim happens at the outside maneuver area. Nearb
 If another truck claims the slot during strategic travel, the second truck
 stops outside and reports `Busy` without replanning into the occupied lane.
 
+A validated dock approach takes motion ownership from the truck's previous
+formation membership and formation speed constraint. Other formation members
+keep their orders. A denied owner cannot detach the requested truck.
+
 Cancellation revokes the job and movement. It does not release a physically
 occupied corridor. Cleanup checks actual occupancy; neither a timeout nor a stale
 release can give another truck the same occupied lane. Destroyed or cancelled
@@ -189,3 +193,8 @@ at least two completed physical deliveries and tick 1024, within the existing
 identity; they are not silently requalified against the changed fixture.
 Native images and a human review of entry, stationary wheels, aligned body,
 physical exit and the waiting second truck remain separate acceptance evidence.
+Loading and unloading inspection targets follow the Cargo Truck; the transit
+inspection follows the concurrently loading Supply Truck. The sustained view
+keeps its traffic overview. Targets participate in the fixture fingerprint.
+See [qualification](VehicleDockingQualification.md) for source-bound evidence
+and remaining gates.
