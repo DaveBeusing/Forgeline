@@ -120,12 +120,22 @@ public readonly record struct PlayerIntelligenceSummary(
     int VisibleCells,
     int KnownContacts);
 
+public readonly record struct PlayerVehicleQueueSummary(
+    EntityId Building, ulong Generation, VehicleQueueService Service, int Position, int WaitingCount,
+    VehicleDockStatus Status, VehicleQueueWaitReason WaitReason, VehicleDockBlockReason DockReason,
+    SimulationTick ChangedAtTick);
+
+public readonly record struct PlayerLoadingQueueSummary(EntityId Building, int WaitingCount, bool ServiceOccupied,
+    bool ExitBlocked, SimulationTick ChangedAtTick);
+
 public readonly record struct PlayerWorkSummary(
     PlayerWorkKind Kind,
     PlayerWorkState State,
     double Progress,
     string Activity,
-    string BlockReason)
+    string BlockReason,
+    PlayerVehicleQueueSummary? VehicleQueue = null,
+    PlayerLoadingQueueSummary? LoadingQueue = null)
 {
     public static PlayerWorkSummary None =>
         new(
@@ -746,8 +756,55 @@ public static class PlayerExperienceSnapshotFactory
         UnitDefinitionCatalog units,
         BuildingDefinitionCatalog buildings)
     {
+        var work = CaptureWorkCore(entities, entity, production, unitProduction, units, buildings);
+        if (!entities.TryGetComponent(entity, out CompletedBuilding building)) return work;
+        bool occupied = entities.TryGetComponent(entity, out VehicleDockSlot slot) && slot.Owner == building.Owner;
+        int waiting = 0;
+        SimulationTick changed = default;
+        foreach (EntityId truck in entities.Query<VehicleQueueEntry>())
+        {
+            var entry = entities.GetComponent<VehicleQueueEntry>(truck);
+            if (entry.Building != entity || entry.Owner != building.Owner) continue;
+            if (!occupied || slot.Truck != truck) waiting++;
+            if (entry.ChangedAtTick.Value > changed.Value) changed = entry.ChangedAtTick;
+        }
+        bool exitBlocked = occupied && entities.TryGetComponent(slot.Truck, out VehicleDockVisit visit) &&
+            visit.Building == entity && visit.Generation == slot.Generation && visit.Reason == VehicleDockBlockReason.ExitBlocked;
+        return waiting > 0 || occupied ? work with { LoadingQueue = new(entity, waiting, occupied, exitBlocked, changed) } : work;
+    }
+
+    private static PlayerWorkSummary CaptureWorkCore(
+        EntityRegistry entities,
+        EntityId entity,
+        ProductionSystem production,
+        UnitProductionSystem unitProduction,
+        UnitDefinitionCatalog units,
+        BuildingDefinitionCatalog buildings)
+    {
         if (entities.TryGetComponent(entity, out VehicleDockVisit dock))
         {
+            PlayerVehicleQueueSummary? queue = null;
+            if (entities.TryGetComponent(entity, out VehicleQueueEntry entry) && entry.Building == dock.Building &&
+                entities.TryGetComponent(entry.Building, out CompletedBuilding queueBuilding) && queueBuilding.Owner == entry.Owner &&
+                VehicleDockingService.OwnsTruck(entities, entity, entry.Owner))
+                queue = new(entry.Building, entry.Generation, entry.Service, entry.Position, entry.WaitingCount,
+                    dock.Status, entry.WaitReason, dock.Reason, entry.ChangedAtTick);
+            else if (entities.TryGetComponent(entity, out VehicleQueueHolding holding) && holding.Building == dock.Building &&
+                entities.TryGetComponent(holding.Building, out CompletedBuilding holdingBuilding) &&
+                VehicleDockingService.OwnsTruck(entities, entity, holdingBuilding.Owner))
+            {
+                var service = entities.HasComponent<SupplyLoadingOrder>(entity) ? VehicleQueueService.SupplyLoading :
+                    entities.TryGetComponent(entity, out CargoTransportRuntimeState cargo) &&
+                    cargo.Lifecycle is CargoTransportLifecycleState.ToDestination or CargoTransportLifecycleState.Unloading
+                        ? VehicleQueueService.CargoDelivery : VehicleQueueService.CargoPickup;
+                int waiting = 0;
+                foreach (EntityId truck in entities.Query<VehicleQueueEntry>())
+                {
+                    var participant = entities.GetComponent<VehicleQueueEntry>(truck);
+                    if (participant.Building == holding.Building && participant.Owner == holdingBuilding.Owner) waiting++;
+                }
+                queue = new(holding.Building, 0, service, 0, waiting, dock.Status, holding.Reason, dock.Reason, holding.ChangedAtTick);
+            }
             string activity = dock.Status switch
             {
                 VehicleDockStatus.Busy => "Loading bay busy",
@@ -774,8 +831,20 @@ public static class PlayerExperienceSnapshotFactory
                 VehicleDockBlockReason.None => string.Empty,
                 _ => dock.Reason.ToString()
             };
+            if (queue.HasValue && dock.Generation == 0)
+                reason = queue.Value.WaitReason switch
+                {
+                    VehicleQueueWaitReason.Predecessor => "Waiting for preceding vehicle",
+                    VehicleQueueWaitReason.OccupiedExit => "Waiting for exit clearance",
+                    VehicleQueueWaitReason.Full => "Waiting area full",
+                    VehicleQueueWaitReason.GeometryBlocked => "No safe waiting position",
+                    VehicleQueueWaitReason.Unavailable => "Vehicle out of fuel",
+                    _ => dock.Status == VehicleDockStatus.Blocked ? reason : string.Empty
+                };
             return new(PlayerWorkKind.Docking, blocked ? PlayerWorkState.Blocked : PlayerWorkState.Running,
-                dock.ServiceProgress, activity, reason);
+                dock.ServiceProgress, queue.HasValue && dock.Generation == 0
+                    ? queue.Value.Position > 0 ? $"Loading queue · position {queue.Value.Position}" : "Waiting for loading queue" : activity,
+                reason, queue);
         }
         if (entities.TryGetComponent(entity, out SupplyLoadingOrder loading) && loading.WaitReason != VehicleDockBlockReason.None)
             return new(PlayerWorkKind.Docking, PlayerWorkState.Blocked, 0, "Waiting for loading bay",
