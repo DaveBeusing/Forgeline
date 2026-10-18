@@ -175,8 +175,6 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
                     continue;
                 }
 
-                if (!behavior.AllowDistantAdvance && contactDistanceSquared > leashSquared) continue;
-
                 IssueAttackMoveIntent(
                     context,
                     entity,
