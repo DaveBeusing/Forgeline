@@ -1,10 +1,63 @@
 # Vehicle docking qualification
 
-The change is not merge-ready. The natural strategic progression and terminal-match
-gates remain open. Current source-specific results and CI status are maintained in
+The change is not merge-ready. Terminal-match qualification, required CI and human
+motion acceptance remain open. Current source-specific results and CI status are maintained in
 [PR #233](https://github.com/DaveBeusing/Forgeline/pull/233).
 This record distinguishes earlier executed evidence from subsequent corrections;
 it does not promote old binaries or images to a new source revision.
+
+## Current production evidence
+
+Source `6e7a7aa6eb78b5c74ea79fab3d62b0de5158c701` integrates master
+`17810ee192fac495173a7e9da44c973595833f2b` and uses version **0.1.402**,
+exactly one PATCH above that master. Release solution build completed with zero
+warnings/errors. The 44-project reference graph, SemVer, render ownership and its
+four source-contract tests passed. No production Game or Headless source changed
+between the funding correction `54292aa` and this integration.
+
+The complete solution run finished with **2,702 tests: 2,684 passed, 16 skipped,
+two failed**. All 508 Game tests and the complete Presentation module passed,
+including the unchanged natural 40,000-tick progression and 30,000-tick
+identified-intelligence scenario. The failures were the Asset writer cleanup
+lock and `ClientSessionLoadingNativeTests`' diagnostics-enabled session handoff
+timeout. The latter retains its 30-second limit. Isolated reruns at the same
+binaries passed 1/1 Asset case and all 3/3 native session cases. Those isolated
+successes do not turn the failed complete run into a passing gate.
+The [current machine-readable record](review/vehicle-docking/qualification-6e7.json)
+pins logs, assemblies, package provenance, native images and baseline evidence.
+Earlier machine-readable evidence remains unchanged.
+
+Map qualification, 1,000/10,000-entity smoke and 256-tick save/load/replay passed.
+Recovery and replay both reproduced
+`0926CF2AAC79E06A25AB9792DBDB6D10F186B11E3E1CBA7FED97A272B99521DD`.
+The reproducible clean-source package is `0.1.402-dev`, archive SHA-256
+`74FCE5F02517668FBF54E4304F9CAB5F5DC48BE40E7EEB45C682A06321A0C975`.
+Fresh explicit settings, two startup/menu/icon launches after one warmup and
+runtime asset qualification passed. The compiler remains 1.12.0, with 1,357
+assets and 75,122,812 runtime bytes.
+
+Three Full-HD High phase views from source and installed package passed
+structural/repeated-image checks and exact pixel/fixture comparison. All 1,358
+common runtime files matched; 63 declared playback sidecars account for the
+installed tree's different whole-runtime fingerprint. An additional source view
+shows the loading owner and the second truck waiting outside the reserved lane.
+These seven frozen images do not grant human motion acceptance. Separate pending
+review records retain that distinction.
+
+The original seed-2026 80,000-tick match remains **Active/Running**: 158 completed
+deliveries, 16,218 cargo units and no failed cargo orders or route failures. West
+is Mobilizing/PrepareOffensive and East Mobilizing/Scout. The saved endpoint
+includes western source traffic holding input deliveries; this is not terminal
+qualification or proof that all long-running traffic is resolved.
+
+An independently built, unchanged master `3c61f47274f03a0ab6e3b2022f40ac8205a72eb2`
+also failed the same terminal gate at 80,000 ticks: Active/Running, both opponents
+Mobilizing/PrepareOffensive, 376 deliveries and 31,950.7 cargo units, zero cargo
+or route failures. Game and Headless sources are unchanged from that baseline
+through integrated master `17810ee`. This establishes a pre-existing terminal
+failure; it does not classify every changed traffic endpoint as unrelated.
+The baseline checkout was verified clean and removed after preserving reports.
+No timing/performance comparison is claimed from these concurrently loaded runs.
 
 ## Attributable evidence
 
@@ -109,12 +162,12 @@ one failed before the correction. All 35 supply-policy cases passed afterward.
 That correction requires its own complete qualification; earlier evidence is
 not promoted to its binaries.
 
-- `SkirmishOpponentTests.BoundedHeadlessSkirmishProgressesThroughStrategicLoop`
-  fails within its unchanged 40,000 ticks. The eastern factory is still waiting
-  on inputs, with no live scout or tank and only its home hub at the deadline.
-  Trace seed 2026 factory `156:1`, its Steel/Fuel requests and physical bay visits
-  through the initial production sequence. Baseline master passed all 26 natural
-  progression tests; this remains an integration regression.
+- The earlier `BoundedHeadlessSkirmishProgressesThroughStrategicLoop` regression
+  passed after consistent power headroom and eligible expansion funding were
+  implemented. Its original 40,000-tick deadline and tactical assertions remain
+  unchanged. The funding preflight passed all 508 Game tests, including the
+  original 30,000-tick identified-intelligence scenario. Source-bound integrated
+  suite results are recorded separately; earlier failed runs remain historical.
 - The original 80,000-tick terminal match must pass on the final production code.
   Successful delivery quantities do not satisfy victory or lifecycle completion.
 - CI at `2ee5458` failed

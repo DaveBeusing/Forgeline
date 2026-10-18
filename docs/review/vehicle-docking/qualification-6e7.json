@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "6e7a7aa6eb78b5c74ea79fab3d62b0de5158c701",
+  "integratedMaster": "17810ee192fac495173a7e9da44c973595833f2b",
+  "productVersion": "0.1.402",
+  "mergeReady": false,
+  "metadata": {
+    "assemblyVersion": "0.1.0.0",
+    "fileVersion": "0.1.402.0",
+    "informationalVersion": "0.1.402-dev+6e7a7aa6eb78b5c74ea79fab3d62b0de5158c701",
+    "sdk": "10.0.401"
+  },
+  "releaseBuild": {
+    "warnings": 0,
+    "errors": 0,
+    "projectCount": 44,
+    "log": "artifacts/docking/build-qualified-approach.txt",
+    "sha256": "56FDCF34645523B04B76236F1FD5DE61BB5003DA9738AF473496B4919072D7E5"
+  },
+  "runtimeAssets": {
+    "compiler": "1.12.0",
+    "count": 1357,
+    "runtimeBytes": 75122812,
+    "manifestSha256": "D1786170F593B6D32FE1CF4FCE85514CAB7681F52132D47F15EF2612A3D76870"
+  },
+  "package": {
+    "version": "0.1.402-dev",
+    "sourceTreeClean": true,
+    "reproducible": true,
+    "archive": "artifacts/docking/p6e7/FORGELINE-0.1.402-dev-win-x64.zip",
+    "sha256": "74FCE5F02517668FBF54E4304F9CAB5F5DC48BE40E7EEB45C682A06321A0C975",
+    "provenanceSha256": "812302B16A9C303E2DC47FD9473753BF8643A353CF6A77B1C5177EC09A77AE7B",
+    "freshSettingsSmoke": true,
+    "startupMeasuredLaunches": 2,
+    "startupWarmups": 1,
+    "applicationIcons": true
+  },
+  "native": [
+    {
+      "path": "artifacts/docking/n6e7-phase/manifest.json",
+      "sha256": "F6B95D9855563F09E9F4665B6B21FE554B385F231D4813FF08D7BBDB23C6E332",
+      "commit": "6e7a7aa6eb78b5c74ea79fab3d62b0de5158c701",
+      "status": "structural-pass",
+      "runtimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+      "captures": [
+        {
+          "key": "LogisticsLoadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30",
+          "image": "LogisticsLoadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30.png",
+          "imageSha256": "E2322B40FE90BF390A24893E59A23208F5BD590E8CA11BD693CA631C14057708",
+          "pixelSha256": "F9C18D32A410AD2BDD12700B596F2C23A30E59AC357FA8E301170EDAA8EA8B7E",
+          "fingerprint": "31CC523F113F3C1B64DBD8DA6DC69368139BCD1F36C3C9E4574A2A380F28A71E",
+          "tick": 11,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsTransitProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30",
+          "image": "LogisticsTransitProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30.png",
+          "imageSha256": "633BDE356CA6F27FC378BC5A69199ACF9E3F0A9A9630682B6211B0260033F90A",
+          "pixelSha256": "21EEE2DF51548BE9B5A978DC71730110562017DE60E58B57E3DB66845EBB68AB",
+          "fingerprint": "BFDF5B6644F1E82C27978FDA8DEC4A6C4122C5F3D8909BB6C529CC4E58EB3F07",
+          "tick": 18,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsUnloadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30",
+          "image": "LogisticsUnloadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30.png",
+          "imageSha256": "064798645D211F5CC1196DA133FD464FED9D86D2277F3BA2B4968A3EFC2DB35F",
+          "pixelSha256": "74A5D8BE0678B6DAD7E9ABBE72948F5E4C5AF1BA3F492F71C0A904512837EE38",
+          "fingerprint": "D76030E0A356E1A4960E5ED5B99446652739208EEDCC927A54937D8E92356918",
+          "tick": 578,
+          "visualReview": "pending"
+        }
+      ]
+    },
+    {
+      "path": "artifacts/docking/n6e7-package/manifest.json",
+      "sha256": "AB264F479683AB80BFF7B0314731E9022E05571C8832D805F79619EDC7F4471D",
+      "commit": "6e7a7aa6eb78b5c74ea79fab3d62b0de5158c701",
+      "status": "structural-pass",
+      "runtimeFingerprint": "40D36FC7EE9FD7BB8C60D716EA99B2A0EFE79EF37A9122F20B2BA4C75DC193E1",
+      "captures": [
+        {
+          "key": "LogisticsLoadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30",
+          "image": "LogisticsLoadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30.png",
+          "imageSha256": "E2322B40FE90BF390A24893E59A23208F5BD590E8CA11BD693CA631C14057708",
+          "pixelSha256": "F9C18D32A410AD2BDD12700B596F2C23A30E59AC357FA8E301170EDAA8EA8B7E",
+          "fingerprint": "31CC523F113F3C1B64DBD8DA6DC69368139BCD1F36C3C9E4574A2A380F28A71E",
+          "tick": 11,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsTransitProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30",
+          "image": "LogisticsTransitProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30.png",
+          "imageSha256": "633BDE356CA6F27FC378BC5A69199ACF9E3F0A9A9630682B6211B0260033F90A",
+          "pixelSha256": "21EEE2DF51548BE9B5A978DC71730110562017DE60E58B57E3DB66845EBB68AB",
+          "fingerprint": "BFDF5B6644F1E82C27978FDA8DEC4A6C4122C5F3D8909BB6C529CC4E58EB3F07",
+          "tick": 18,
+          "visualReview": "pending"
+        },
+        {
+          "key": "LogisticsUnloadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30",
+          "image": "LogisticsUnloadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection30.png",
+          "imageSha256": "064798645D211F5CC1196DA133FD464FED9D86D2277F3BA2B4968A3EFC2DB35F",
+          "pixelSha256": "74A5D8BE0678B6DAD7E9ABBE72948F5E4C5AF1BA3F492F71C0A904512837EE38",
+          "fingerprint": "D76030E0A356E1A4960E5ED5B99446652739208EEDCC927A54937D8E92356918",
+          "tick": 578,
+          "visualReview": "pending"
+        }
+      ]
+    },
+    {
+      "path": "artifacts/docking/n6e7-busy/manifest.json",
+      "sha256": "713624914CD413E50D364E85D8A63898FDBA1BE5458FD1D56B3B1776FDDFCAEE",
+      "commit": "6e7a7aa6eb78b5c74ea79fab3d62b0de5158c701",
+      "status": "structural-pass",
+      "runtimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+      "captures": [
+        {
+          "key": "LogisticsLoadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection90",
+          "image": "LogisticsLoadingProduction-1920x1080-High-CloseTactical-Yaw225-Inspection90.png",
+          "imageSha256": "43146B742AD8820A80A8CFE57FA4F645DAFF3765E81D05DD2C65503EC66A68B5",
+          "pixelSha256": "27BC4EECC02C87E895CB2B502D16017A083CE58E1F556D69FD69417BED7ECFCC",
+          "fingerprint": "31CC523F113F3C1B64DBD8DA6DC69368139BCD1F36C3C9E4574A2A380F28A71E",
+          "tick": 11,
+          "visualReview": "pending"
+        }
+      ]
+    }
+  ],
+  "installedParity": {
+    "compiledRuntimeFiles": 1358,
+    "declaredPlaybackSidecars": 63,
+    "exactPhasePairs": 3,
+    "report": "artifacts/docking/installed-parity-6e7.json",
+    "sha256": "A9891E0E19DC322AB7316D7C50E823FCE3AD74C96087D8FCB1E3EFDA36B00F19",
+    "humanMotionAcceptance": "pending"
+  },
+  "recovery": {
+    "ticks": 256,
+    "seed": 4242,
+    "saveLoad": true,
+    "replay": true,
+    "stateSha256": "0926CF2AAC79E06A25AB9792DBDB6D10F186B11E3E1CBA7FED97A272B99521DD"
+  },
+  "fullMatch": {
+    "seed": 2026,
+    "ticks": 80000,
+    "terminal": false,
+    "cargoDelivered": 16218,
+    "cargoCompleted": 158,
+    "cargoFailed": 0,
+    "routeFailures": 0,
+    "supplyFuel": 10436.3,
+    "supplyAmmunition": 1687,
+    "artilleryShots": 0,
+    "stateSha256": "4B7D66A071A0137DA14A547754D8828FA78C23529643F345A82067A2C18F9F34",
+    "result": "Active/Running; West Mobilizing/PrepareOffensive, East Mobilizing/Scout. Western source traffic holds factory input deliveries.",
+    "report": "artifacts/docking/match-6e7.json",
+    "reportSha256": "A4BD82FD03E0242B2ECEF4FB0AA3C4077B3E9A471ED984183E0D0EDD3874443E"
+  },
+  "unchangedMasterBaseline": {
+    "sourceRevision": "3c61f47274f03a0ab6e3b2022f40ac8205a72eb2",
+    "gameAndHeadlessUnchangedThrough": "17810ee192fac495173a7e9da44c973595833f2b",
+    "sourceTreeClean": true,
+    "seed": 2026,
+    "ticks": 80000,
+    "terminal": false,
+    "cargoDelivered": 31950.7,
+    "cargoCompleted": 376,
+    "cargoFailed": 0,
+    "routeFailures": 0,
+    "report": "artifacts/docking/baseline-3c-terminal.json",
+    "reportSha256": "A37CF8CC7769889474008DC4A2CB2F092A8B5B99D3463629A50F7CDA9F3C8A5D",
+    "performanceComparisonClaimed": false
+  },
+  "game": {
+    "total": 508,
+    "passed": 508,
+    "failed": 0,
+    "originalStrategicTickBudget": 40000,
+    "originalIntelligenceTickBudget": 30000,
+    "testAssemblySha256": "F970372E4023BEEFE9E1EE0A1AFD7006C4E688B501AE0F6BC49026AECBF39D29",
+    "gameAssemblySha256": "E59D87761CD0A5C592252BB1D0C89FE3039467AFF204E4173128ED5E5FD85AD6"
+  },
+  "presentationModulePassed": true,
+  "isolated": {
+    "assetWriterLock": {
+      "passed": 1,
+      "total": 1,
+      "reportSha256": "EBB358BE263434EC2B7132859E1BE7980AEED272799B90FF43DC4CB3CBF505A5"
+    },
+    "nativeSessionHandoff": {
+      "passed": 3,
+      "total": 3,
+      "unchangedTimeoutSeconds": 30,
+      "reportSha256": "8AACFEC75E525B79D0145B3020C3CA368AE9DC5D9FDCE0F625E04E48507846BA"
+    }
+  },
+  "requiredCi": "Inspect the final documentation head in PR #233; local evidence remains bound to this production revision.",
+  "completeSuite": {
+    "total": 2702,
+    "passed": 2684,
+    "skipped": 16,
+    "failed": 2,
+    "result": "Failed; isolated reruns do not qualify the complete run.",
+    "failures": [
+      "ForgeLine.Assets.Tests.AssetPipelineTests.FollowingCleanWriterWaitsUntilBuildQualificationCompletes",
+      "ForgeLine.Client.Tests.ClientSessionLoadingNativeTests.LoadingPresentationDoesNotActivateGameplayBeforeVerifiedSnapshotPresentation(diagnosticsEnabled: True)"
+    ],
+    "log": "artifacts/docking/solution-6e7.txt",
+    "logSha256": "6AEBA7024FDB7171E71372682A42AC780A5B79EA20DBE1D41824D9BC0F9E0C13"
+  }
+}
