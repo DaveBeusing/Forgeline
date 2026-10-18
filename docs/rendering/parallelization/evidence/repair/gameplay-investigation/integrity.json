@@ -351,6 +351,26 @@
       "file": "foundation-vanguard-opponent.log.gz",
       "rawSha256": "7dceed131eaa435b8975d9eb39918624d2b44fb3da34e139d650c42877aeaf58",
       "archiveSha256": "368e50ffccb3f2a2251fb3e2abea4c07d91bc6898a8d4ea68b4fe46128c76b00"
+    },
+    {
+      "file": "foundation-escort-loss-before.log.gz",
+      "rawSha256": "e472ff0e51550df6c8feffef03b3b900e55b544bd317c81856e1d0b17c4bc4e9",
+      "archiveSha256": "d49319a509573c36794a143f8f323a09a72ff1ded31239ecac6b814163f7c497"
+    },
+    {
+      "file": "foundation-escort-loss-broad-game-suite.log.gz",
+      "rawSha256": "f85bbe070c0b2abb9484612c178fa7837e3d4e9c1d1c14ccddd73df7b4d7706f",
+      "archiveSha256": "89483eef6ffeebf93c133e06692df4808ed8e1f87acb1236c254fbfed4b5abe0"
+    },
+    {
+      "file": "foundation-escort-loss-refined-focused.log.gz",
+      "rawSha256": "e306afa00b0db6005c8cb2eab12541db2fb140e3a620d811a6e41c5c2befdaa4",
+      "archiveSha256": "55541eff075a5526f8a755d00009504711319ee989509fbc367078d39231d1a6"
+    },
+    {
+      "file": "foundation-timeline-seed2026.jsonl.gz",
+      "rawSha256": "3c891fa7ec0d2d0d39cafe3b11e55c7cfc320032f1d3b65ad8c0ecaf45b14857",
+      "archiveSha256": "0bb28a472551bf438bc8ece80ebba16310689b7a3b796dff6d036f357d54586f"
     }
   ]
 }

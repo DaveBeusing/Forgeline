@@ -566,3 +566,22 @@ still fails once (+17.65% with a 15% limit); fixture-6 performance remains pendi
 The user confirms AC operation with the performance profile. The idle 20 W reading
 therefore remains an observation, with no proven causal attribution and no system
 setting changes. Parallel release remains false and this PR remains draft.
+
+### Reconnaissance with no available replacement escort
+
+An isolated timeline observer records the fixture-6 source at fixed 2,000-tick
+intervals. It uses seed 2026 and debug capture but leaves simulation diagnostics
+disabled; it is exploratory evidence, not the required terminal qualification.
+An orphaned reconnaissance route can keep advancing after its escort is lost.
+A physical escort-destruction regression demonstrates 57.29 m of unescorted travel
+within 100 ticks. With no eligible replacement, pause the scout at its current
+position until the existing escort selection can assemble a supported route.
+An available replacement keeps the previous pursuit behavior. No new component,
+resource grant, readiness/cargo threshold or strategic deadline is introduced.
+
+The broader unconditional pause passes the supply cases but fails two existing
+strategic deadlines in the complete 570-case Game suite; it is excluded. The
+refined condition passes all 82 supply and strategic tests (zero failures/skips,
+2m39.938s), including those exact deadlines. The full Game rerun and unchanged
+80,000-tick terminal check remain pending. Their eventual result must not be
+inferred from the focused pass. Parallel release remains false.

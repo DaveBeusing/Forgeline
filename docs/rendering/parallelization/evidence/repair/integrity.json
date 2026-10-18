@@ -795,5 +795,25 @@
     "file": "gameplay-investigation/foundation-vanguard-opponent.log.gz",
     "originalSha256": "7DCEED131EAA435B8975D9EB39918624D2B44FB3DA34E139D650C42877AEAF58",
     "compressedSha256": "368E50FFCCB3F2A2251FB3E2ABEA4C07D91BC6898A8D4EA68B4FE46128C76B00"
+  },
+  {
+    "file": "gameplay-investigation/foundation-escort-loss-before.log.gz",
+    "originalSha256": "E472FF0E51550DF6C8FEFFEF03B3B900E55B544BD317C81856E1D0B17C4BC4E9",
+    "compressedSha256": "D49319A509573C36794A143F8F323A09A72FF1DED31239ECAC6B814163F7C497"
+  },
+  {
+    "file": "gameplay-investigation/foundation-escort-loss-broad-game-suite.log.gz",
+    "originalSha256": "F85BBE070C0B2ABB9484612C178FA7837E3D4E9C1D1C14CCDDD73DF7B4D7706F",
+    "compressedSha256": "89483EEF6FFEEBF93C133E06692DF4808ED8E1F87ACB1236C254FBFED4B5ABE0"
+  },
+  {
+    "file": "gameplay-investigation/foundation-escort-loss-refined-focused.log.gz",
+    "originalSha256": "E306AFA00B0DB6005C8CB2EAB12541DB2FB140E3A620D811A6E41C5C2BEFDAA4",
+    "compressedSha256": "55541EFF075A5526F8A755D00009504711319EE989509FBC367078D39231D1A6"
+  },
+  {
+    "file": "gameplay-investigation/foundation-timeline-seed2026.jsonl.gz",
+    "originalSha256": "3C891FA7EC0D2D0D39CAFE3B11E55C7CFC320032F1D3B65AD8C0ECAF45B14857",
+    "compressedSha256": "0BB28A472551BF438BC8ECE80EBBA16310689B7A3B796DFF6D036F357D54586F"
   }
 ]

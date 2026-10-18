@@ -10,6 +10,34 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class SkirmishSupplyPolicyTests
 {
+    [Fact]
+    public void ReconnaissanceWaitsForReplacementAfterItsPhysicalEscortIsLost()
+    {
+        using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(2));
+        Vector3 home = entities.GetComponent<WorldTransform>(side.CommandCore).Position;
+        Vector3 forward = home - Vector3.UnitX * 900;
+        var catalog = DirectorateContent.CreateUnitCatalog();
+        EntityId scout = scenario.UnitFactory.Create(catalog[UnitIds.ScoutVehicle], forward, side.Player);
+        EntityId escort = scenario.UnitFactory.Create(catalog[UnitIds.SupplyTruck], forward + Vector3.UnitZ * 10, side.Player);
+        SupplyTruck supply = entities.GetComponent<SupplyTruck>(escort);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, supply.FuelTarget).Succeeded);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, supply.AmmunitionTarget).Succeeded);
+        scenario.Simulation.RunTicks(30, TestContext.Current.CancellationToken);
+        Assert.Equal(entities.GetComponent<MovementGroupMember>(scout).Group,
+            entities.GetComponent<MovementGroupMember>(escort).Group);
+        Assert.True(entities.DestroyEntity(escort));
+        Vector3 waiting = entities.GetComponent<WorldTransform>(scout).Position;
+
+        scenario.Simulation.RunTicks(100, TestContext.Current.CancellationToken);
+
+        Vector3 position = entities.GetComponent<WorldTransform>(scout).Position;
+        Assert.InRange(Vector2.Distance(new Vector2(waiting.X, waiting.Z), new Vector2(position.X, position.Z)), 0, 4);
+        Assert.True(entities.GetComponent<UnitCombatReadiness>(scout).Fuel > 0.5);
+        Assert.False(entities.HasComponent<ResupplyOrder>(scout));
+    }
+
     [Theory]
     [InlineData(2, 1, true, true)]
     [InlineData(1, 2, true, true)]

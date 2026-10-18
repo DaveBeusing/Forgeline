@@ -2063,6 +2063,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             }
         }
 
+        // With no available escort, preserve the scout's fuel instead of
+        // continuing an orphaned route while all providers are loading or rescuing.
+        if (!TrySelectReconSupplyEscort(context, owned, scout, out _) &&
+            context.Entities.TryGetComponent(scout, out WorldTransform scoutTransform) &&
+            !HaveCombatOrder(context, [scout], CombatOrderKind.AttackMove, scoutTransform.Position))
+        {
+            new AttackMoveCommand(controller.Player, [scout], scoutTransform.Position,
+                context.Tick, FormationTemplate.Column,
+                pursuitLeashMeters: ReconnaissancePursuitLeashMeters).Execute(context);
+        }
+
         MaintainForwardSupplySupport(
             context,
             owned,
