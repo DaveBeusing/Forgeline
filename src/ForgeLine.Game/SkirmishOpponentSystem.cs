@@ -2727,7 +2727,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             new TacticalTestOpponent(
                 configuration.ResupplyThreshold,
                 configuration.RetreatThreshold,
-                configuration.ObjectivePressureLeashMeters) { AllowDistantAdvance = false };
+                configuration.ObjectivePressureLeashMeters);
         var combatResupplyPolicy =
             new AutomaticResupplyPolicy(
                 ammunitionThreshold:
@@ -3385,7 +3385,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         double needed = Math.Max(UnitCost(plannedUnit, resource), UnitCost(facility.ActiveUnit, resource));
         UnitId successor = ResolveQueuedSuccessor(context.Entities, entity, facility);
         if (successor.IsSpecified)
-            needed = (facility.InputsReserved ? 0 : UnitCost(facility.ActiveUnit, resource)) + UnitCost(successor, resource);
+            needed = UnitCost(facility.ActiveUnit, resource) + UnitCost(successor, resource);
         minimum = Math.Max(minimum, needed);
         target = Math.Max(target, minimum);
         maximum = Math.Max(maximum, target);

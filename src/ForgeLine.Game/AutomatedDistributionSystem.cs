@@ -285,7 +285,7 @@ public sealed class AutomatedDistributionSystem
             RequestState? existing = FindActiveRequest(policyState.PolicyEntity);
             if (existing is not null) existing.Priority = policy.Priority;
             double currentQuantity =
-                GetPolicyStock(context.Entities, destinationNode, destinationInventory, policy);
+                _inventories.GetQuantity(destinationInventory, policy.ResourceId);
             double outstandingQuantity =
                 GetOutstandingQuantity(policyState.PolicyEntity);
             double projectedQuantity =
@@ -937,7 +937,7 @@ public sealed class AutomatedDistributionSystem
             _network.TryGetNode(request.Destination, out LogisticsNode destination) &&
             entities.HasComponent<BuildingLoadingDock>(destination.Entity) &&
             TryResolveDestinationInventory(entities, destination, out InventoryId inventory) &&
-            GetPolicyStock(entities, destination, inventory, policy) + QuantityEpsilon >= policy.DesiredMinimum)
+            _inventories.GetQuantity(inventory, policy.ResourceId) + QuantityEpsilon >= policy.DesiredMinimum)
             basePriority = (int)LogisticsStockPriority.High;
         ulong age = tick.Value >= request.WaitingSinceTick.Value
             ? tick.Value - request.WaitingSinceTick.Value
@@ -958,11 +958,6 @@ public sealed class AutomatedDistributionSystem
         return basePriority - boundedAging;
     }
 
-    private double GetPolicyStock(EntityRegistry entities, in LogisticsNode destination, InventoryId inventory, in LogisticsStockPolicy policy) =>
-        policy.Priority == LogisticsStockPriority.Critical && entities.HasComponent<BuildingLoadingDock>(destination.Entity) &&
-        entities.HasComponent<UnitProductionFacility>(destination.Entity)
-            ? _inventories.GetAvailableQuantity(inventory, policy.ResourceId)
-            : _inventories.GetQuantity(inventory, policy.ResourceId);
     private void CaptureFuelDemand(EntityRegistry entities)
     {
         _fuelDemandTargets.Clear();
@@ -1073,7 +1068,7 @@ public sealed class AutomatedDistributionSystem
         }
 
         double currentQuantity =
-            GetPolicyStock(context.Entities, destination, destinationInventory, policy);
+            _inventories.GetQuantity(destinationInventory, policy.ResourceId);
         double remaining =
             Math.Max(
                 0.0,

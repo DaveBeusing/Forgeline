@@ -440,9 +440,9 @@ public sealed class VehicleDockingIntegrationTests
         Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(destination.Entity));
     }
     [Theory]
-    [InlineData(LogisticsStockPriority.Critical, true)]
-    [InlineData(LogisticsStockPriority.High, false)]
-    public void CriticalPhysicalFactoryDemandDoesNotCountInputsAlreadyReservedForProduction(LogisticsStockPriority priority, bool dispatch)
+    [InlineData(LogisticsStockPriority.Critical)]
+    [InlineData(LogisticsStockPriority.High)]
+    public void PhysicalFactoryPoliciesKeepTheirDeclaredTotalStockMeaningWhileInputsAreReserved(LogisticsStockPriority priority)
     {
         var simulation = new SimulationCoordinator();
         var inventories = new InventoryStore();
@@ -463,8 +463,7 @@ public sealed class VehicleDockingIntegrationTests
         simulation.Entities.AddComponent(policy, new LogisticsStockPolicy(factory.Entity, ResourceIds.Fuel, 20, 60, 100, priority));
         EntityId truck = CargoTruckFactory.Create(simulation.Entities, inventories, Vector3.Zero, new(1), cargo);
         simulation.AdvanceOneTick();
-        Assert.Equal(dispatch, simulation.Entities.HasComponent<CargoTransportOrder>(truck));
-        if (dispatch) Assert.Equal(60, simulation.Entities.GetComponent<CargoTransportOrder>(truck).RequestedQuantity);
+        Assert.False(simulation.Entities.HasComponent<CargoTransportOrder>(truck));
         Assert.Equal(200, inventories.GetQuantity(source.Inventory, ResourceIds.Fuel));
         Assert.Equal(20, inventories.GetQuantity(factory.Inventory, ResourceIds.Fuel));
         Assert.Equal(20, inventories.GetReservedQuantity(factory.Inventory, ResourceIds.Fuel));
