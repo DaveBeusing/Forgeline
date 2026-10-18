@@ -140,7 +140,19 @@ internal static class LogisticsTrafficReferenceScene
             throw new InvalidOperationException($"Repeated traffic completed {transport.Metrics.CompletedOrderCount} deliveries: {state}; pose={simulation.Entities.GetComponent<WorldTransform>(truck)}; dock={(simulation.Entities.TryGetComponent(truck, out VehicleDockVisit unfinished) ? unfinished.ToString() : "none")}.");
         if (inventories.GetQuantity(supplyInventory,ResourceIds.Fuel) <= 0)
             throw new InvalidOperationException("Supply truck did not physically load from its depot.");
-        Vector3 target = Ground(new(675,0,560));
+        if (kind == VisualReferenceSceneKind.LogisticsTransitProduction &&
+            (!simulation.Entities.HasComponent<SupplyLoadingOrder>(supplyTruck) ||
+             !simulation.Entities.TryGetComponent(supplyTruck, out VehicleDockVisit supplyVisit) ||
+             supplyVisit.Status is not (VehicleDockStatus.Docked or VehicleDockStatus.Servicing)))
+            throw new InvalidOperationException("The transit inspection requires concurrent physical supply loading.");
+        Vector3 target = kind switch
+        {
+            VisualReferenceSceneKind.LogisticsLoadingProduction or VisualReferenceSceneKind.LogisticsUnloadingProduction =>
+                Ground(simulation.Entities.GetComponent<WorldTransform>(truck).Position),
+            VisualReferenceSceneKind.LogisticsTransitProduction =>
+                Ground(simulation.Entities.GetComponent<WorldTransform>(supplyTruck).Position),
+            _ => Ground(new(675,0,560))
+        };
         string fingerprint = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
         {
             version = VisualReferenceScene.FixtureVersion, kind, target, seed = VisualReferenceScene.Seed,

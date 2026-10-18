@@ -219,6 +219,12 @@ public sealed class VisualReferenceSceneTests
         Assert.Equal(kind == VisualReferenceSceneKind.LogisticsLoadingProduction ? 3 : 2, vehicles.Length);
         Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.CargoTruck);
         Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.SupplyTruck);
+        if (kind != VisualReferenceSceneKind.LogisticsSustainedProduction)
+        {
+            var focus = kind == VisualReferenceSceneKind.LogisticsTransitProduction ? UnitIds.SupplyTruck : UnitIds.CargoTruck;
+            Assert.Contains(vehicles, x => x.UnitFeature.Unit == focus &&
+                MathF.Pow(x.Transform.Position.X - first.Target.X, 2) + MathF.Pow(x.Transform.Position.Z - first.Target.Z, 2) < .01f);
+        }
         foreach (var vehicle in vehicles)
         foreach (var building in buildings)
         {
