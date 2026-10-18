@@ -8,6 +8,7 @@ using Xunit;
 
 namespace ForgeLine.Assets.Tests;
 
+[Collection(AssetWriterQualificationGroup.Name)]
 public sealed class AssetPipelineTests
 {
     [Fact]

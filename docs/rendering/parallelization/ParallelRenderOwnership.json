@@ -111,7 +111,8 @@
         "tests/ForgeLine.Assets.Tests/AssetPipelineTests.cs",
         "tests/ForgeLine.Graphics.Tests/D3D12SceneCompositionTests.cs",
         "src/ForgeLine.Game/GroundMovementSystem.cs",
-        "tests/ForgeLine.Game.Tests/GroundMovementPrecisionTests.cs"
+        "tests/ForgeLine.Game.Tests/GroundMovementPrecisionTests.cs",
+        "tests/ForgeLine.Assets.Tests/AssetWriterQualificationGroup.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",

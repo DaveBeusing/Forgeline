@@ -1,0 +1,146 @@
+{
+  "purpose": "Retained completed gameplay/CI investigation attempts; exploratory variants are not qualification of the final production code.",
+  "headlessPerformanceQualified": false,
+  "files": [
+    {
+      "file": "foundation-ci-39119601649-status.json.gz",
+      "rawSha256": "75efa91610768e7310161a69d99e4df98068880d6cfa2fc18ecf5a653710f8dc",
+      "archiveSha256": "df0d14f5dd5322bc555af7422170356a0e19e3cf74f76787907b2046926ec8de"
+    },
+    {
+      "file": "foundation-final-opponent.json.gz",
+      "rawSha256": "65b332c94fecd612f1444b97108344686816ea5eaee39d7a839cb4f0be486cad",
+      "archiveSha256": "b6260a68b60c3ac67045a15674d4275a0880044782f677af14a5b6db4ad253b0"
+    },
+    {
+      "file": "foundation-master-opponent.json.gz",
+      "rawSha256": "521b61b85fabbe5dbadfbff4f62a69e66418da440e41484fe10651804b830ebd",
+      "archiveSha256": "19dd39a08c7eeb71aece96f228d940716d4decd9c1d1497f026191bf2159a74a"
+    },
+    {
+      "file": "foundation-inherited-terminal-comparison.json.gz",
+      "rawSha256": "2f744f9a4738c99966eab6544010814469337b3d74a97f5a4e9c1993ccae49ae",
+      "archiveSha256": "24ced929dd21ec1da1d4feba5a4b71929a399b7e040b38acd11d559d6bcb53af"
+    },
+    {
+      "file": "gameplay-stall-before.save.json.gz",
+      "rawSha256": "c6ceee4dd810a29a0e12fe2f1ff1d0c26afd963ff7b0fb9924d5eef5a5f378ff",
+      "archiveSha256": "308dceb531d033a042322206c81ecdcf92a0ab4e32fc73765cbf98d92a4295aa"
+    },
+    {
+      "file": "gameplay-stall-before.log.gz",
+      "rawSha256": "9b72c586d83437e49d0d7bf00a28a8248943f80138444de02516c72d5e1aea54",
+      "archiveSha256": "6583ea3b9d8d06ad657c5b484ee619cf0c03fccdcff311a6c0a18e85d412a850"
+    },
+    {
+      "file": "gameplay-detour-before.log.gz",
+      "rawSha256": "fe519c076e030dd534af4c393c89f98d1917629d96756c0f9fecba4ebc3f2a53",
+      "archiveSha256": "8b80764c3083663dc01a4420e77617b11f556dc923a6db69c9aac856cb0bed77"
+    },
+    {
+      "file": "gameplay-detour-game-suite.log.gz",
+      "rawSha256": "f7ec0014b8d1cdca871872639ca32daaf2ad191334b702fd6de8270cb9345c0f",
+      "archiveSha256": "f3cb2a4d0c233daa97fbf574ec88f5d5c6971d7d5e7f5dc7a835d3710163ced7"
+    },
+    {
+      "file": "gameplay-detour-match.json.gz",
+      "rawSha256": "d3d9b1927e9e9c0779c75cf0270d2def406feb96006574fb25da4cbbe2b86469",
+      "archiveSha256": "35f63bd6da8cea888b96dc60697933580aac815bb376189fe31f6510f81fc5b4"
+    },
+    {
+      "file": "gameplay-refined-tests.log.gz",
+      "rawSha256": "3b290b6b21ec2f2a97f2c0df8a98f24782e2f9d2edf11cea051d141022a73b43",
+      "archiveSha256": "424dcdd3e9c107da210aa95c649137bfc974b89a0f38d93e4af7972689e3aa2e"
+    },
+    {
+      "file": "gameplay-refined-match.json.gz",
+      "rawSha256": "926ad993328b46492281b531b3ab74b0b997a9f14118e16e74c1379a77195a72",
+      "archiveSha256": "3b63effa7cdc8494dbaa316a44e73cbbc64c042380b31e42a5a8d8ab2e1d3db7"
+    },
+    {
+      "file": "gameplay-power-game-suite.log.gz",
+      "rawSha256": "088b92c16ee16e30c3b11ffbc71cb68cdfdb9c3f27b6a6a8ecf7d1c4116006dc",
+      "archiveSha256": "5d9e4f1e5b9d1d67fbb35c8fa3e8ddd7061dfa53b9586f3776b9cc65d03961d8"
+    },
+    {
+      "file": "gameplay-power-match.json.gz",
+      "rawSha256": "6971bd08b8ef011e2e90cdf63e702c774cc628b8e0edd9afcc07c8a10b795276",
+      "archiveSha256": "7c5b344a275b97c6baf9491509abf6f068f91d382019e274a6a7dbc1b897e99a"
+    },
+    {
+      "file": "gameplay-power-30000.save.json.gz",
+      "rawSha256": "dde70693b6f8e531cb751252c105d0c9f3c56e9ea425d5acb5f5c52b3bfcdf8e",
+      "archiveSha256": "ec479fc73bc8747daf8f542f533409ce495bbbbff7eaed15f50fad70543cda2f"
+    },
+    {
+      "file": "gameplay-power-exit-observation.jsonl.gz",
+      "rawSha256": "c3cefaf42990a14b1ebc8cd8a7e40bd09c800b85a01df3b5de9fb21a0128bfda",
+      "archiveSha256": "c8f749cedbfacb95116db4d38c25d3e55040bbdbe0754fc6ecf25bf300b6bd89"
+    },
+    {
+      "file": "gameplay-orbit-before.log.gz",
+      "rawSha256": "0caccc802475a74a2be20ad9ce3dabdf2dc0820884c2b77533ed3dcf005ed9e3",
+      "archiveSha256": "6a680657f71b308a753c2f69dbf75364a665e461162647cb33dfd9e1b5ee96fc"
+    },
+    {
+      "file": "gameplay-orbit-game-suite.log.gz",
+      "rawSha256": "e646c09a3340f97a3e8b62cd4f445596de288a00c833996b6cf7fc813df13813",
+      "archiveSha256": "810142815e3ed15286abde652a5ddc33dbfd6b17b89e338bd181174bede27199"
+    },
+    {
+      "file": "gameplay-orbit-match.json.gz",
+      "rawSha256": "e812d81c61917bf8f689a1c437e4cedb7f84c1046bf5af72f93e74e452890c65",
+      "archiveSha256": "03d81c56151f52db09a5776b98d0ab69ad433ccdf8fa30248130f1b2ce3a1696"
+    },
+    {
+      "file": "gameplay-minimal-game-suite.log.gz",
+      "rawSha256": "034eb3e49cddfafbba8f4e4acb4d141f5bc8242a5a499ea60844eadbfb80336f",
+      "archiveSha256": "72b38791fc0c910fe3a877149c8fb1100bff0b8c4b590400198486706f2b854a"
+    },
+    {
+      "file": "gameplay-orbit-only-game-suite.log.gz",
+      "rawSha256": "9f28b90aaa76f83d43269a22923d13566f0f574206f74acb59e72efa4bdde63c",
+      "archiveSha256": "47ab4698d0d2064c64f7828ccf32cc36def8d5a3c4521574a1c02ee21111519f"
+    },
+    {
+      "file": "gameplay-orbit-only-match.json.gz",
+      "rawSha256": "013c14642da5f1bb13afa14f7d3565066a99278062002c3fcb2ff9f1439e1771",
+      "archiveSha256": "da9013f4dcd0a21748402ce9c1a697f807d912610765d5a3ad0c3173111baad7"
+    },
+    {
+      "file": "gameplay-yield-before.log.gz",
+      "rawSha256": "9cf5f8c1bb05db03046137621d49f9ce77970612ea0951f9a10de9ba0b328ccb",
+      "archiveSha256": "57a0f6846a2febb98e41beea14fc9295b9dc508551365e61e571c2d1605f73d7"
+    },
+    {
+      "file": "gameplay-yield-game-suite.log.gz",
+      "rawSha256": "f671b6a92993d29986894d8c64d3bfe96d2b4a14fe9cec122f16f262dd387b7e",
+      "archiveSha256": "a4522e89de9921dcec701b94aaf834b4bc8fd41a9fb153c788cdc81003044869"
+    },
+    {
+      "file": "gameplay-asset-writer-focused.log.gz",
+      "rawSha256": "8bc3ce13ef6dd9eb66f3c00bc2f5e447e5978275cd159026b76c4c1dbfd9f8be",
+      "archiveSha256": "118015654f74805ab66d648c77a4248df8b45bb2ea6639442590df99db966bc6"
+    },
+    {
+      "file": "gameplay-yield-match.json.gz",
+      "rawSha256": "aacfb35efaa3b0cf3276c069e4ee102e7e8dcdd597cd8e60a470052cace0cdd9",
+      "archiveSha256": "ca4135fffb420207f98ecfc77bbd76a698f2b0f41eb32d795a195de995e90c88"
+    },
+    {
+      "file": "gameplay-yield-telemetry.json.gz",
+      "rawSha256": "28bb2d1f21a9d49b66dfbbcfee352169b768312e92b4741e07d73a24608b43e4",
+      "archiveSha256": "bbace137b0c2916d684f9837d125f9d1fe4b9d11804ba11a952b54a8a0e12a5d"
+    },
+    {
+      "file": "gameplay-yield-match.save.json.gz",
+      "rawSha256": "7c83d844374c231d16d18069e49db4261f2d85620feb16beab62af56187b1ef1",
+      "archiveSha256": "6a0a1b56dbab92564392d721dce02d453badf4b7fbd414394495157cecb894d7"
+    },
+    {
+      "file": "gameplay-final-full-solution.log.gz",
+      "rawSha256": "b8cb8d6372905067a90c4f49918bed2a5b088706ec68de3b7e8ef8e95617c249",
+      "archiveSha256": "1fba9545d1901cafd45b661f509267fd8334848cd46e169fe9fd167e1fbeb61b"
+    }
+  ]
+}

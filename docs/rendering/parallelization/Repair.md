@@ -334,3 +334,66 @@ composed pixel comparisons, overlay equality, resource and resize checks, and th
 unchanged tolerances. Default-selection cases also run their full comparisons on
 CI instead of being skipped or mislabeled as hardware coverage. No production
 adapter-selection behavior changes. The exact test path is a serial CI repair.
+
+
+## Required full-match and physical docking investigation
+
+Hosted run 39119601649 at head 1dc0a1c6 passes all 2,694 tests with 16 optional
+skips (2,710 total), the native steps, benchmarks, reproducible package and both
+packaged startup checks. Its only failing step is the original seed-2026,
+80,000-tick terminal match. All three separate quality workflows pass. The run
+status is retained in `evidence/repair/gameplay-investigation` with lossless raw
+reports and archive hashes. This is a failed overall CI run, not a green gate.
+
+The same logical endpoint was reproduced on unchanged current master d3f5c9cd
+and the renderer repair. A saved state exposes a vacant reserved approach whose
+owner cannot advance past a staged truck. The staged truck cannot cross the
+reservation to its waiting point. Normal route retries preserve this cycle.
+The experimental repair only yields a physically vacant approach when its owner is Stuck and
+another staged truck is TacticallyPaused on a route crossing that approach.
+The existing release operation still checks full identities, visit generation
+and actual owner/neighbor occupancy. An authoritative admission-yield component
+keeps the former owner from reclaiming the lane until the crossing route clears;
+cancellation or suspension clears that state. No occupied lane is released by a
+timeout, and healthy approaches keep their existing behavior. Four new cases
+cover vacant yield, occupied owner, occupied traffic and a non-stuck owner. One
+case fails before the change; all four pass afterward.
+
+A separate seed-17 observation at tick 30,000 exposes a precise exit orbit with
+no nearby collider: the truck remains outside the 0.1 m arrival region at its
+fixed crawl speed. Its exact recorded pose/velocity reproduces the failure at
+10, 20 and 60 Hz. Runtime source 44a1e2e bounds turning speed by the remaining
+approach distance and authored turn rate. All three cases then converge without
+relaxed position/heading limits, unbounded rotation or positional snapping. Its
+complete 511-test Game suite passes. The seed-2026 match still has the original
+nonterminal endpoint, proving that this independent correction alone does not
+resolve the reserved-approach cycle.
+
+Exploratory broad staging-route and prospective power-planning variants are
+excluded from the final implementation. Their completed failed suites and match
+reports remain separately archived; a terminal result from one such variant does
+not qualify the selected repair. Headless timings were collected during other
+qualification work and do not constitute a throughput/performance comparison.
+The targeted vacant-approach experiment passes all 515 Game tests, including
+existing strategic deadlines, but its full 80,000-tick match still fails to end
+(219 deliveries, 21,429 cargo units). It is not a qualified final implementation.
+
+Master fb78998c then integrates PR #238 with physical FIFO admission, new queue
+state, save schema 4 / authoritative schema 3, and native fixture 5. The previous
+vacant-yield experiment is excluded when incorporating that authoritative queue
+lifecycle. Retained pre-queue states and fixture-4 measurements are historical;
+they cannot certify a fixture-5 binary. Revalidate current-master compatibility,
+version delta, full tests/match and native comparisons on the combined source.
+
+The next whole-solution execution at source 44a1e2e also exposes a remaining
+Asset writer test dependency: TextureImporter acquires the process-wide
+Bc7TextureEncoder.TextureSlot even for tiny fixtures. A concurrent large import
+can hold that slot beyond the unchanged five-second qualification-entry wait.
+LongRunning workers avoid thread-pool starvation but do not isolate that encoder
+permit. Put AssetPipelineTests in an exclusive xUnit collection, preserving both
+writers, their cleanup, the five/ten-second deadlines and the lock assertions.
+All 25 focused pipeline cases pass after that policy change. A subsequent full
+solution run must include the concurrent large-import classes as well.
+
+The previous frame-elapsed p99 +15.38% failure and independent native review remain
+open. None of these gameplay/CI results release the later parallel workstreams.
