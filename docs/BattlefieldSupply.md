@@ -1,5 +1,12 @@
 # Battlefield Supply
 
+Building loading joins the same [physical queue](VehicleQueues.md) as cargo
+service. Supply Trucks keep their supply inventories and battlefield role. Queue
+membership does not turn them into regional Cargo Trucks, and battlefield
+recipient resupply does not require a building bay. A fuel-starved participant
+requires physical rescue or a new valid order; it cannot disappear from an
+occupied conflict area to admit a successor.
+
 ## Purpose
 
 Battlefield supply connects industrial production to operational military capability through physical Fuel and Ammunition inventories.

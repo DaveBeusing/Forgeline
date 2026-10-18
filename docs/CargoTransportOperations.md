@@ -15,6 +15,9 @@ Cargo remains an aggregate quantity inside a Cargo Truck inventory. Resources mo
 The transport lifecycle runs in the fixed-tick simulation and does not depend on rendering, UI, audio, or wall-clock time.
 
 Building service uses the shared [vehicle docking contract](VehicleDocking.md).
+Confirmed local arrivals use the shared [physical loading queue](VehicleQueues.md).
+Queue position is independent of stock and graph reservations; only its head can
+enter a free bay, and the departing vehicle must physically clear the exit.
 Logical transit nodes retain their existing semantics. A building encountered as
 an intermediate route node also retains its slot until confirmed exit.
 
