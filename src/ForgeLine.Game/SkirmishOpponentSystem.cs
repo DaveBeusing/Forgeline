@@ -4497,7 +4497,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller,
                 buildingId,
                 requestedPosition,
-                out Vector3 position))
+                out Vector3 position, out BuildingOrientation orientation))
         {
             return false;
         }
@@ -4507,7 +4507,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller.Player,
                 buildingId,
                 position,
-                BuildingOrientation.North,
+                orientation,
                 source,
                 context.Tick);
         command.Execute(context);
@@ -4680,22 +4680,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SkirmishOpponentController controller,
         BuildingId buildingId,
         Vector3? requestedPosition,
-        out Vector3 placement)
+        out Vector3 placement, out BuildingOrientation orientation)
     {
+        orientation = BuildingOrientation.North;
         if (requestedPosition.HasValue)
         {
             BuildingPlacementResult direct =
-                _placement.Evaluate(
-                    context.Entities,
-                    controller.Player,
-                    buildingId,
-                    requestedPosition.Value,
-                    BuildingOrientation.North);
+                EvaluateLoadingPlacement(context, controller, buildingId, requestedPosition.Value);
 
             if (direct.IsValid)
             {
                 placement =
                     direct.GroundPosition;
+                orientation = direct.Orientation;
                 return true;
             }
 
@@ -4736,17 +4733,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         offset.Y);
 
                 BuildingPlacementResult nearby =
-                    _placement.Evaluate(
-                        context.Entities,
-                        controller.Player,
-                        buildingId,
-                        candidate,
-                        BuildingOrientation.North);
+                    EvaluateLoadingPlacement(context, controller, buildingId, candidate);
 
                 if (nearby.IsValid)
                 {
                     placement =
                         nearby.GroundPosition;
+                    orientation = nearby.Orientation;
                     return true;
                 }
             }
@@ -4802,13 +4795,27 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             new(-440.0f, 60.0f)
         ];
 
+        bool loadingBuilding = _buildings[buildingId].LoadingDock.HasValue;
+        if (loadingBuilding)
+        {
+            Vector2[] nearbyAccess =
+            [
+                new(0, 64), new(64, 0), new(-64, 0), new(0, -64),
+                new(64, 64), new(-64, 64), new(64, -64), new(-64, -64),
+                new(0, 128), new(128, 0), new(-128, 0), new(0, -128),
+                new(64, 128), new(-64, 128), new(128, 64), new(-128, 64),
+                new(64, -128), new(-64, -128), new(128, -64), new(-128, -64)
+            ];
+            offsets = nearbyAccess.Concat(offsets).ToArray();
+        }
+
         for (int index = 0;
              index < offsets.Length;
              index++)
         {
             Vector2 offset =
                 offsets[
-                    (index +
+                    loadingBuilding ? index : (index +
                      (int)buildingId.Value) %
                     offsets.Length];
 
@@ -4820,23 +4827,37 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     offset.Y);
 
             BuildingPlacementResult result =
-                _placement.Evaluate(
-                    context.Entities,
-                    controller.Player,
-                    buildingId,
-                    candidate,
-                    BuildingOrientation.North);
+                EvaluateLoadingPlacement(context, controller, buildingId, candidate);
 
             if (result.IsValid)
             {
                 placement =
                     result.GroundPosition;
+                orientation = result.Orientation;
                 return true;
             }
         }
 
         placement = default;
         return false;
+    }
+
+    private BuildingPlacementResult EvaluateLoadingPlacement(SimulationContext context,
+        SkirmishOpponentController controller, BuildingId buildingId, Vector3 position)
+    {
+        var definition = _buildings[buildingId];
+        if (buildingId == BuildingIds.Extractor || definition.LoadingDock is not BuildingLoadingDock dock)
+            return _placement.Evaluate(context.Entities, controller.Player, buildingId, position, BuildingOrientation.North);
+        BuildingOrientation preferred = dock.OrientationToward(controller.HomePosition - position);
+        var first = _placement.Evaluate(context.Entities, controller.Player, buildingId, position, preferred);
+        if (first.IsValid) return first;
+        for (int index = 1; index < 4; index++)
+        {
+            var candidate = _placement.Evaluate(context.Entities, controller.Player, buildingId, position,
+                (BuildingOrientation)(((int)preferred + index) % 4));
+            if (candidate.IsValid) return candidate;
+        }
+        return first;
     }
 
     private static bool HasPendingBuildRequest(

@@ -20,6 +20,21 @@ public enum VehicleDockBlockReason : byte
 /// <summary>Metres in building-local coordinates; the lane follows the loading facade.</summary>
 public readonly record struct BuildingLoadingDock(Vector3 ServicePosition, Vector3 Forward, float ApproachLength)
 {
+    public BuildingOrientation OrientationToward(Vector3 direction)
+    {
+        Vector3 outward = new(-Forward.Z, 0, Forward.X);
+        if (Vector3.Dot(outward, ServicePosition) < 0) outward = -outward;
+        float best = float.NegativeInfinity;
+        var selected = BuildingOrientation.North;
+        for (int index = 0; index < 4; index++)
+        {
+            var orientation = (BuildingOrientation)index;
+            float score = Vector3.Dot(Vector3.Transform(outward, BuildingFootprint.GetRotation(orientation)), direction);
+            if (score > best + 0.00001f) { best = score; selected = orientation; }
+        }
+        return selected;
+    }
+
     public bool IsValid => Finite(ServicePosition) && Finite(Forward) &&
         MathF.Abs(Forward.Y) < 0.001f && MathF.Abs(Forward.LengthSquared() - 1) < 0.001f &&
         float.IsFinite(ApproachLength) && ApproachLength >= 12;
@@ -405,7 +420,7 @@ public sealed class VehicleDockingService
         if (pose.Contains(transform.Position, 0)) return false;
 
         Vector3 forward = new(MathF.Sin(pose.Heading), 0, MathF.Cos(pose.Heading));
-        float margin = pose.HalfLength + movement.Radius + movement.StopRadius + 2;
+        float margin = 2 * MathF.Sqrt(pose.HalfLength * pose.HalfLength + pose.HalfWidth * pose.HalfWidth) + movement.StopRadius + 2.5f;
         float distance = MathF.Max(8, margin);
         if (_navigation is not null) distance += _navigation.World.Grid.Settings.CellSizeMeters;
         if (entities.TryGetComponent(building, out VehicleDockSlot occupied) && occupied.Pose.ApproachStart is Vector3 approach)
@@ -417,7 +432,9 @@ public sealed class VehicleDockingService
             bool found = false;
             for (int step = 1; step <= 6 && !found; step++)
             {
-                staging = pose.Entry - forward * MathF.Max(distance, step * grid.Settings.CellSizeMeters);
+                Vector3 coarseStart = pose.Entry - forward * (step * grid.Settings.CellSizeMeters);
+                if (!grid.TryWorldToCell(coarseStart, out var approachCell) || !grid.IsTraversable(approachCell, agent.Capabilities)) continue;
+                staging = coarseStart - forward * margin;
                 found = grid.TryWorldToCell(staging, out var cell) && grid.IsTraversable(cell, agent.Capabilities);
             }
             if (!found) return false;

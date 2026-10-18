@@ -391,6 +391,41 @@ public sealed class VehicleDockingTests
         Assert.True(pose.IntersectsLane(new AxisAlignedBounds(new(-18.5f, -1, -4.3f), new(-18, 1, -3.8f))));
     }
 
+    [Theory]
+    [InlineData(0, 1, BuildingOrientation.North)]
+    [InlineData(1, 0, BuildingOrientation.East)]
+    [InlineData(0, -1, BuildingOrientation.South)]
+    [InlineData(-1, 0, BuildingOrientation.West)]
+    public void LoadingFacadeFacesTheSelectedAccessSide(float x, float z, BuildingOrientation expected)
+    {
+        var dock = new BuildingLoadingDock(new(0, 0, 14), Vector3.UnitX, 12);
+        Assert.Equal(expected, dock.OrientationToward(new(x, 0, z)));
+    }
+
+    [Theory]
+    [InlineData(11, BuildingOrientation.North)]
+    [InlineData(11, BuildingOrientation.East)]
+    [InlineData(11, BuildingOrientation.South)]
+    [InlineData(11, BuildingOrientation.West)]
+    [InlineData(12, BuildingOrientation.North)]
+    [InlineData(12, BuildingOrientation.East)]
+    [InlineData(12, BuildingOrientation.South)]
+    [InlineData(12, BuildingOrientation.West)]
+    public void ProductionSpawnsPreserveTheEntireLoadingLane(uint buildingId, BuildingOrientation orientation)
+    {
+        var building = DirectorateContent.CreateBuildingCatalog()[new BuildingId(buildingId)];
+        var transform = new WorldTransform(Vector3.Zero, BuildingFootprint.GetRotation(orientation), Vector3.One);
+        Assert.True(VehicleDockPose.TryCreate(Assert.IsType<BuildingLoadingDock>(building.LoadingDock), transform,
+            WorldTransform.Identity with { Scale = new(3.4f, 2.5f, 6.8f) }, out var pose));
+        Vector3 spawn = Vector3.Transform(building.UnitSpawnOffset, transform.Rotation);
+        foreach (var unit in DirectorateContent.CreateUnitCatalog().Definitions)
+        {
+            float radius = MathF.Sqrt(unit.VisualScale.X * unit.VisualScale.X + unit.VisualScale.Z * unit.VisualScale.Z) * 0.5f;
+            Vector3 half = new(radius, unit.VisualScale.Y * 0.5f, radius);
+            Assert.False(pose.IntersectsLane(new AxisAlignedBounds(spawn - half, spawn + half)), $"{buildingId}/{orientation}: {unit.Id}");
+        }
+    }
+
     private sealed class Fixture : ISimulationSystem
     {
         private Action<SimulationContext>? _action;

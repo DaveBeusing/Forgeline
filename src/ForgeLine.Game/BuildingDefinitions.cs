@@ -695,7 +695,7 @@ public static class InitialBuildingDefinitions
                     UnitProductionCapabilities =
                         UnitProductionCapability.Infantry,
                     UnitProductionInputCapacity = 2_000.0,
-                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 14.0f)
+                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 22.0f)
                 },
                 new BuildingDefinition
                 {
@@ -719,7 +719,7 @@ public static class InitialBuildingDefinitions
                         UnitProductionCapability.Vehicle |
                         UnitProductionCapability.Logistics,
                     UnitProductionInputCapacity = 4_000.0,
-                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 20.0f)
+                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 32.0f)
                 },
                 new BuildingDefinition
                 {
