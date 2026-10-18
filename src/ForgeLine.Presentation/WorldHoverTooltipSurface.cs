@@ -39,6 +39,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     public GameplayHudRegion Regions => GameplayHudRegion.GlobalOverlay;
     public int LastRenderedVertexCount { get; private set; }
     internal HudRect LastBounds { get; private set; }
+    internal int LastLayoutLineCount { get; private set; }
 
     public void Render(in GameplayHudRenderContext context)
     {
@@ -47,6 +48,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (context.Graphics.Width > 0 && context.Graphics.Height > 0) _skin.Begin(context.Graphics);
         LastRenderedVertexCount = 0;
         LastBounds = default;
+        LastLayoutLineCount = 0;
         var view = context.HoverTooltip;
         if (context.Graphics.Width != view.ViewportWidth || context.Graphics.Height != view.ViewportHeight ||
             context.Layout.Scale != view.Scale || context.InformationLayer.IsDragSelecting ||
@@ -64,10 +66,20 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         _measuring = true;
         EmitContent(resolved);
         int lines = _line;
+        LastLayoutLineCount = lines;
         _line = 0;
         _measuring = false;
         _scale = MathF.Min(_scale, MathF.Min(context.Layout.SafeArea.Width / 350,
             context.Layout.SafeArea.Height / (16 + lines * 14)));
+        if (_wrapDetails)
+        {
+            var safe = context.Layout.SafeArea;
+            float gap = 18 * context.Layout.Scale;
+            float besidePointer = MathF.Max(MathF.Max(0, safe.Bottom - view.PointerPosition.Y - gap),
+                MathF.Max(0, view.PointerPosition.Y - gap - safe.Y));
+            _scale = MathF.Min(_scale, besidePointer / (16 + lines * 14));
+            if (_scale <= 0) return;
+        }
         _bounds = HoverTooltipPlacement.Resolve(view.PointerPosition, context.Layout,
             330 * _scale, (16 + lines * 14) * _scale);
         if (_bounds.IsEmpty) return;

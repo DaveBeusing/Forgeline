@@ -111,9 +111,10 @@ public sealed class HoverTooltipRenderingTests
     }
 
     [Theory]
-    [InlineData(1920, 1080, 96u, 1f)]
-    [InlineData(1280, 720, 192u, 2f)]
-    public void LogisticsCatalogDetailsWrapWithinViewportAndRetainAllFourInputs(int width, int height, uint dpi, float scale)
+    [InlineData(1920, 1080, 96u, 1f, false)]
+    [InlineData(1280, 720, 192u, 2f, false)]
+    [InlineData(1280, 720, 192u, 2f, true)]
+    public void LogisticsCatalogDetailsWrapWithinViewportAndRetainAllFourInputs(int width, int height, uint dpi, float scale, bool centered)
     {
         var inputs = new[] {
             new PlayerActionResourceAmount(ResourceIds.Steel, "Steel", 70, 0),
@@ -126,7 +127,7 @@ public sealed class HoverTooltipRenderingTests
         var snapshot = HoverTooltipTests.Snapshot(actions: actions);
         var panel = default(PlayerActionPanelView) with { Mode = PlayerActionPanelMode.Logistics };
         var layout = GameplayHudLayout.Create(width, height, dpi, scale);
-        var view = new HoverTooltipView(snapshot.SessionId, default, default, new Vector2(width - 1, height - 1),
+        var view = new HoverTooltipView(snapshot.SessionId, default, default, new Vector2(width - 1, centered ? height / 2 : height - 1),
             true, width, height, layout.Scale, panel.Mode, (int)PlayerActionDockControlKind.Item, 0);
         var content = Assert.IsType<HoverTooltipContent>(HoverTooltipResolver.Resolve(snapshot, view, panel));
         Assert.True(content.WrapDetails);
@@ -151,6 +152,8 @@ public sealed class HoverTooltipRenderingTests
         // The panel may reduce its scale to fit a high-DPI viewport.
         float fittedScale = surface.LastBounds.Width / 330;
         Assert.True(surface.LastBounds.Height > 12 * fittedScale * 14);
+        Assert.InRange(surface.LastBounds.Height / fittedScale,
+            16 + surface.LastLayoutLineCount * 14 - .1f, 16 + surface.LastLayoutLineCount * 14 + .1f);
     }
 
     private static GameplayHudRenderContext Context(IGraphicsCommandContext graphics, PresentationSnapshot snapshot,
