@@ -40,3 +40,16 @@ Run the unchanged WARP required capture on the repaired client, including the
 two-logical-processor process-affinity diagnostic. Then run Release, full solution
 tests, reference graph, ownership/factory contracts and unchanged window qualification.
 Hosted CI and human image review remain independent required acceptance steps.
+
+## Additional CI completion race
+
+Repair CI 39104862208 stopped earlier than native qualification at the existing
+`OwnerHeartbeatStopsNativeQueueAfterRenderPublicationStalls` test. Its output Stop
+counter increments before the audio owner publishes updated mixer diagnostics.
+Observing that independent counter is therefore not a completion barrier for the
+following voice-count assertion. The bounded wait now observes both the native
+stop and published zero voices before asserting the same zero value. The deadline
+remains five seconds, all stop/disposal assertions remain, and no production audio
+code is changed. All 23 non-explicit mixer tests pass; the real-device listening
+test remains explicitly optional. This serial gate repair is added to the foundation
+owner's exact test-file list; subsequent parallel work is still not released.

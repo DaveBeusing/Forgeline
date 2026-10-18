@@ -99,7 +99,8 @@
         "src/ForgeLine.Presentation/RenderAssetSession.cs",
         "src/ForgeLine.Client/ClientRenderPublication.cs",
         "src/ForgeLine.Client/VisualReferenceCapture.cs",
-        "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs"
+        "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
+        "tests/ForgeLine.Client.Tests/WorldAudioMixerTests.cs"
       ],
       "writePrefixes": [
         "src/ForgeLine.Presentation/RenderContracts/",

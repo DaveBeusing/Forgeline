@@ -105,8 +105,8 @@ A later coordinated ABI revision is possible; it cannot be hidden in an owner br
 snapshot tick/session, Prepare/Record CPU time, CPU Submit/Retire bookkeeping,
 observed submission fence, device texture-upload count delta, logical resident
 texture bytes, optional DXGI local usage and existing failure status. Device texture
-deltas cover the object-prepare-to-submit interval; earlier terrain preparation has
-its existing diagnostics. Submit/Retire times are not native Present/fence-wait time.
+deltas cover consecutive supplied observations, including terrain preparation. The
+first observation establishes a baseline; missing observations remain unavailable. Submit/Retire times are not native Present/fence-wait time.
 Present time, wait time and upload byte counts are currently unavailable/null rather
 than synthetic zero. Existing graphics pass/GPU/health diagnostics remain authoritative.
 With measurement disabled, the new meter does not query diagnostics or run clocks;
