@@ -7,6 +7,7 @@ public enum RuntimeAssetType
     Material = 3,
     UiSkin = 4,
     Animation = 5,
+    Skin = 6,
 }
 
 public readonly record struct AssetBounds(
@@ -71,6 +72,9 @@ public sealed record RuntimeAssetRecord
     public IReadOnlyList<AssetLodReference> Lods { get; init; } = [];
 
     public string? CollisionReference { get; init; }
+
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? SkinReference { get; init; }
 
     public IReadOnlyList<string> AnimationReferences { get; init; } = [];
 

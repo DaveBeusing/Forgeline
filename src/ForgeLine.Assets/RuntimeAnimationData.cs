@@ -44,25 +44,28 @@ public sealed class AnimationChannel
 /// <summary>Immutable cosmetic rigid-node clip. All coordinates are meter-space deltas around mesh sockets.</summary>
 public sealed class RuntimeAnimationData
 {
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 1, SkeletalVersion = 2;
     public const int MaximumNodes = 64, MaximumChannels = 128, MaximumKeysPerChannel = 1024, MaximumKeys = 8192;
     public const int MaximumPayloadBytes = 1_048_576;
     public const float MaximumDuration = 120;
 
-    public RuntimeAnimationData(string name, IReadOnlyList<AnimationNode> nodes, IReadOnlyList<AnimationChannel> channels)
+    public RuntimeAnimationData(string name, IReadOnlyList<AnimationNode> nodes, IReadOnlyList<AnimationChannel> channels, string? skeletonSignature = null)
     {
-        Name = name;
+        Name = name; SkeletonSignature = skeletonSignature;
         Nodes = Array.AsReadOnly(nodes.ToArray()); Channels = Array.AsReadOnly(channels.ToArray());
         Validate();
         Duration = Channels.Max(c => c.Times[^1]);
     }
     public string Name { get; }
+    public string? SkeletonSignature { get; }
     public IReadOnlyList<AnimationNode> Nodes { get; }
     public IReadOnlyList<AnimationChannel> Channels { get; }
     public float Duration { get; }
 
     private void Validate()
     {
+        if (SkeletonSignature is not null && (SkeletonSignature.Length != 64 || SkeletonSignature.Any(c => !char.IsAsciiHexDigit(c))))
+            throw new InvalidDataException("Invalid skeletal bind signature.");
         if (string.IsNullOrWhiteSpace(Name) || Encoding.UTF8.GetByteCount(Name) > 128 ||
             Nodes.Count is < 1 or > MaximumNodes || Channels.Count is < 1 or > MaximumChannels)
             throw new InvalidDataException("Clip name, node or channel count exceeds the rigid animation contract.");
@@ -101,7 +104,9 @@ public sealed class RuntimeAnimationData
     {
         using var stream = new MemoryStream();
         using var writer = new BinaryWriter(stream, Encoding.UTF8, true);
-        writer.Write(CurrentVersion); writer.Write(Name); writer.Write(Nodes.Count); writer.Write(Channels.Count);
+        writer.Write(SkeletonSignature is null ? CurrentVersion : SkeletalVersion);
+        if (SkeletonSignature is not null) writer.Write(SkeletonSignature);
+        writer.Write(Name); writer.Write(Nodes.Count); writer.Write(Channels.Count);
         foreach (var node in Nodes) { writer.Write(node.Name); writer.Write(node.Parent); }
         foreach (var channel in Channels)
         {
@@ -122,7 +127,9 @@ public sealed class RuntimeAnimationData
         {
             using var stream = new MemoryStream(payload, false);
             using var reader = new BinaryReader(stream, Encoding.UTF8, true);
-            if (reader.ReadInt32() != CurrentVersion) throw new InvalidDataException("Unsupported rigid clip version; recompile source assets.");
+            int version = reader.ReadInt32();
+            if (version is not (CurrentVersion or SkeletalVersion)) throw new InvalidDataException("Unsupported clip version; recompile source assets.");
+            string? signature = version == SkeletalVersion ? ReadName(reader) : null;
             string name = ReadName(reader);
             int nodes = reader.ReadInt32(), channels = reader.ReadInt32();
             if (nodes is < 1 or > MaximumNodes || channels is < 1 or > MaximumChannels)
@@ -141,7 +148,7 @@ public sealed class RuntimeAnimationData
                 channelTable[c] = new(node, path, interpolation, times, values);
             }
             if (stream.Position != stream.Length) throw new InvalidDataException("Trailing clip data.");
-            return new(name, nodeTable, channelTable);
+            return new(name, nodeTable, channelTable, signature);
         }
         catch (Exception e) when (e is EndOfStreamException or FormatException or DecoderFallbackException)
         { throw new InvalidDataException("Truncated or malformed rigid clip.", e); }

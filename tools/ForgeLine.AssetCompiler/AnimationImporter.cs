@@ -6,30 +6,30 @@ namespace ForgeLine.AssetCompiler;
 
 internal static class AnimationImporter
 {
-    public static ImportedAssetPayload Import(string path, string sourceRoot)
+    public static ImportedAssetPayload Import(string path, string sourceRoot, bool skeletal = false, string? clipName = null)
     {
-        try { return Read(path, sourceRoot); }
+        try { return Read(path, sourceRoot, skeletal, clipName); }
         catch (Exception e) when (e is KeyNotFoundException or InvalidOperationException or IndexOutOfRangeException or FormatException)
         { throw new InvalidDataException("Malformed rigid animation glTF: " + e.Message, e); }
     }
 
-    private static ImportedAssetPayload Read(string path, string sourceRoot)
+    private static ImportedAssetPayload Read(string path, string sourceRoot, bool skeletal, string? clipName)
     {
         using var gltf = GltfImporter.Load(path, sourceRoot, 8 * 1024 * 1024);
         JsonElement root = gltf.Document.RootElement;
         if (root.GetProperty("asset").GetProperty("version").GetString() != "2.0" ||
-            root.TryGetProperty("skins", out _) || root.TryGetProperty("extensionsRequired", out var required) && required.GetArrayLength() > 0)
+            !skeletal && root.TryGetProperty("skins", out _) || root.TryGetProperty("extensionsRequired", out var required) && required.GetArrayLength() > 0)
             throw new InvalidDataException("Rigid clips require glTF 2.0 without skins or required extensions.");
         JsonElement nodes = root.GetProperty("nodes"), animations = root.GetProperty("animations");
-        if (nodes.GetArrayLength() is < 1 or > RuntimeAnimationData.MaximumNodes || animations.GetArrayLength() != 1)
+        if (nodes.GetArrayLength() < 1 || nodes.GetArrayLength() > (skeletal ? RuntimeAnimationData.MaximumNodes : 32) || animations.GetArrayLength() < 1 || animations.GetArrayLength() > 9 || clipName is null && animations.GetArrayLength() != 1)
             throw new InvalidDataException("A clip asset requires one animation and 1..32 nodes.");
         int count = nodes.GetArrayLength(); var parents = Enumerable.Repeat(-1, count).ToArray();
         for (int i = 0; i < count; i++)
         {
             JsonElement node = nodes[i];
-            if (node.TryGetProperty("matrix", out _) || node.TryGetProperty("skin", out _) || node.TryGetProperty("weights", out _))
+            if (node.TryGetProperty("matrix", out _) || !skeletal && node.TryGetProperty("skin", out _) || node.TryGetProperty("weights", out _))
                 throw new InvalidDataException("Rigid clips reject matrix, skin and morph node transforms.");
-            CheckRest(node, "translation", [0, 0, 0]); CheckRest(node, "rotation", [0, 0, 0, 1]); CheckRest(node, "scale", [1, 1, 1]);
+            if (!skeletal) { CheckRest(node, "translation", [0, 0, 0]); CheckRest(node, "rotation", [0, 0, 0, 1]); } CheckRest(node, "scale", [1, 1, 1]);
             if (node.TryGetProperty("children", out var children))
                 foreach (var child in children.EnumerateArray())
                 {
@@ -48,15 +48,18 @@ internal static class AnimationImporter
         for (int i = 0; i < count; i++) Visit(i);
         int[] map = new int[count]; for (int i = 0; i < count; i++) map[order[i]] = i;
         var table = order.Select(i => new AnimationNode(nodes[i].GetProperty("name").GetString()!, parents[i] < 0 ? -1 : map[parents[i]])).ToArray();
-        var animation = animations[0]; var sourceChannels = animation.GetProperty("channels"); var samplers = animation.GetProperty("samplers");
-        if (sourceChannels.GetArrayLength() is < 1 or > RuntimeAnimationData.MaximumChannels || samplers.GetArrayLength() > RuntimeAnimationData.MaximumChannels)
+        var matches = animations.EnumerateArray().Where(a => clipName is null || a.GetProperty("name").GetString() == clipName).ToArray();
+        if (matches.Length != 1) throw new InvalidDataException("Animation clip name must select exactly one authored clip.");
+        var animation = matches[0]; var sourceChannels = animation.GetProperty("channels"); var samplers = animation.GetProperty("samplers");
+        if (sourceChannels.GetArrayLength() < 1 || sourceChannels.GetArrayLength() > (skeletal ? 192 : 64) || samplers.GetArrayLength() > (skeletal ? 192 : 64))
             throw new InvalidDataException("Clip channel/sampler count exceeds 64.");
         var channels = new List<AnimationChannel>(); int total = 0;
         foreach (var channel in sourceChannels.EnumerateArray())
         {
             var target = channel.GetProperty("target"); int node = target.GetProperty("node").GetInt32();
             if ((uint)node >= count) throw new InvalidDataException("Clip targets a missing node.");
-            AnimationPath channelPath = target.GetProperty("path").GetString() switch
+            bool unitScale = skeletal && target.GetProperty("path").GetString() == "scale";
+            AnimationPath channelPath = (unitScale ? "translation" : target.GetProperty("path").GetString()) switch
             {
                 "translation" => AnimationPath.Translation, "rotation" => AnimationPath.Rotation,
                 _ => throw new InvalidDataException("Only rigid translation and rotation channels are supported; scale and morph animation are unsupported.")
@@ -86,9 +89,22 @@ internal static class AnimationImporter
                 }
                 values[i] = v;
             }
+            if (unitScale)
+            {
+                float previous = -1;
+                for (int i = 0; i < times.Length; i++)
+                {
+                    if (!float.IsFinite(times[i]) || times[i] < 0 || times[i] <= previous || times[i] > RuntimeAnimationData.MaximumDuration ||
+                        i == 0 && times[i] != 0 || !float.IsFinite(values[i].LengthSquared()) || Vector3.Distance(new(values[i].X, values[i].Y, values[i].Z), Vector3.One) > .000001f)
+                        throw new InvalidDataException("Only finite constant unit-scale skeletal channels are supported.");
+                    previous = times[i];
+                }
+                continue;
+            }
             channels.Add(new(map[node], channelPath, interpolation, times, values));
         }
-        var result = new RuntimeAnimationData(animation.GetProperty("name").GetString()!, table, channels);
+        string? signature = skeletal ? RuntimeSkinData.RigSignature(SkinImporter.ReadRig(root, gltf.Buffers, out _)) : null;
+        var result = new RuntimeAnimationData(animation.GetProperty("name").GetString()!, table, channels, signature);
         return new(result.ToPayload(), null, []);
     }
     private static void CheckRest(JsonElement node, string property, float[] identity)

@@ -76,6 +76,9 @@ public static class RuntimeAssetFile
         if (type == RuntimeAssetType.Animation && (metadataLength > 65536 || payloadLength > RuntimeAnimationData.MaximumPayloadBytes))
             throw new InvalidDataException("Rigid animation sections exceed production limits.");
 
+        if (type == RuntimeAssetType.Skin && (metadataLength > 65536 || payloadLength > RuntimeSkinData.MaximumPayloadBytes))
+            throw new InvalidDataException("Skin container exceeds production limits.");
+
         var remaining = stream.Length - stream.Position;
         var expectedRemaining = (long)metadataLength + payloadLength;
         if (remaining != expectedRemaining)

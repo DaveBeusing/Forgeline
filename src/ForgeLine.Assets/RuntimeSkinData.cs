@@ -1,6 +1,8 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ForgeLine.Assets;
 
@@ -19,6 +21,8 @@ public sealed class RuntimeSkinData
     public RuntimeSkinData(RuntimeMeshData mesh, IReadOnlyList<SkinJoint> joints,
         IReadOnlyList<SkinInfluence> influences, IReadOnlyList<SkinSocket> sockets)
     {
+        ArgumentNullException.ThrowIfNull(mesh); ArgumentNullException.ThrowIfNull(joints); ArgumentNullException.ThrowIfNull(influences); ArgumentNullException.ThrowIfNull(sockets);
+        if (joints.Count > MaximumJoints || influences.Count > MaximumVertices || sockets.Count > 32) throw new InvalidDataException("Skin declared collections exceed limits.");
         Mesh = mesh; Joints = Array.AsReadOnly(joints.ToArray());
         Influences = Array.AsReadOnly(influences.ToArray()); Sockets = Array.AsReadOnly(sockets.ToArray());
         Validate();
@@ -33,11 +37,25 @@ public sealed class RuntimeSkinData
         if (Joints.Count is < 1 or > MaximumJoints || Mesh.Vertices.Count > MaximumVertices || Mesh.Indices.Count > MaximumIndices ||
             Influences.Count != Mesh.Vertices.Count || Sockets.Count > 32 || !Mesh.HasNormals || !Mesh.HasUv0 || !Mesh.HasTangents)
             throw new InvalidDataException("Skin exceeds joint/vertex/index/socket limits or lacks complete vertex attributes.");
+        ValidateRig(Joints);
+        foreach (var v in Influences)
+            if ((uint)v.A >= Joints.Count || (uint)v.B >= Joints.Count || (uint)v.C >= Joints.Count || (uint)v.D >= Joints.Count ||
+                !float.IsFinite(v.Weights.LengthSquared()) || v.Weights.X < 0 || v.Weights.Y < 0 || v.Weights.Z < 0 || v.Weights.W < 0 ||
+                MathF.Abs(v.Weights.X + v.Weights.Y + v.Weights.Z + v.Weights.W - 1) > .0001f)
+                throw new InvalidDataException("Skin weights must be finite, nonnegative, normalized and reference existing joints.");
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var socket in Sockets)
+            if (socket is null || string.IsNullOrWhiteSpace(socket.Name) || !names.Add(socket.Name) || (uint)socket.Joint >= Joints.Count || !Finite(socket.BindPosition))
+                throw new InvalidDataException("Skin socket binding is invalid.");
+    }
+    private static void ValidateRig(IReadOnlyList<SkinJoint> joints)
+    {
+        if (joints.Count is < 1 or > MaximumJoints) throw new InvalidDataException("Skin joint count exceeds limits.");
         Span<Matrix4x4> bind = stackalloc Matrix4x4[MaximumJoints];
         var names = new HashSet<string>(StringComparer.Ordinal);
-        for (int i = 0; i < Joints.Count; i++)
+        for (int i = 0; i < joints.Count; i++)
         {
-            var joint = Joints[i];
+            var joint = joints[i];
             if (joint is null || string.IsNullOrWhiteSpace(joint.Name) || joint.Name.Length > 128 || !names.Add(joint.Name) ||
                 joint.Parent < -1 || joint.Parent >= i || !Finite(joint.Translation) || joint.Translation.Length() > 2 ||
                 !float.IsFinite(joint.Rotation.LengthSquared()) || MathF.Abs(joint.Rotation.LengthSquared() - 1) > .0001f ||
@@ -47,18 +65,24 @@ public sealed class RuntimeSkinData
             if (joint.Parent >= 0) bind[i] *= bind[joint.Parent];
             if (!NearIdentity(joint.InverseBind * bind[i])) throw new InvalidDataException("Skin inverse bind does not match the declared bind hierarchy.");
         }
-        foreach (var v in Influences)
-            if ((uint)v.A >= Joints.Count || (uint)v.B >= Joints.Count || (uint)v.C >= Joints.Count || (uint)v.D >= Joints.Count ||
-                !float.IsFinite(v.Weights.LengthSquared()) || v.Weights.X < 0 || v.Weights.Y < 0 || v.Weights.Z < 0 || v.Weights.W < 0 ||
-                MathF.Abs(v.Weights.X + v.Weights.Y + v.Weights.Z + v.Weights.W - 1) > .0001f)
-                throw new InvalidDataException("Skin weights must be finite, nonnegative, normalized and reference existing joints.");
-        names.Clear();
-        foreach (var socket in Sockets)
-            if (socket is null || string.IsNullOrWhiteSpace(socket.Name) || !names.Add(socket.Name) || (uint)socket.Joint >= Joints.Count || !Finite(socket.BindPosition))
-                throw new InvalidDataException("Skin socket binding is invalid.");
+    }
+    public static string RigSignature(IReadOnlyList<SkinJoint> joints)
+    {
+        ValidateRig(joints);
+        using var stream = new MemoryStream(); using var writer = new BinaryWriter(stream, Encoding.UTF8, true);
+        foreach (var joint in joints)
+        {
+            writer.Write(joint.Name); writer.Write(joint.Parent);
+            writer.Write(joint.Translation.X);writer.Write(joint.Translation.Y);writer.Write(joint.Translation.Z);
+            writer.Write(joint.Rotation.X);writer.Write(joint.Rotation.Y);writer.Write(joint.Rotation.Z);writer.Write(joint.Rotation.W);
+            Matrix4x4 matrix = joint.InverseBind;
+            foreach (float value in MemoryMarshal.Cast<Matrix4x4,float>(MemoryMarshal.CreateReadOnlySpan(ref matrix,1))) writer.Write(value);
+        }
+        return Convert.ToHexStringLower(SHA256.HashData(stream.ToArray()));
     }
     public int[] Bind(RuntimeAnimationData clip)
     {
+        if (clip.SkeletonSignature != RigSignature(Joints)) throw new InvalidDataException("Clip bind signature does not match this skin; retargeting is unsupported.");
         var map = new int[Joints.Count];
         for (int i = 0; i < map.Length; i++)
         {
@@ -107,8 +131,9 @@ public sealed class RuntimeSkinData
         for (int i = 0; i < Joints.Count; i++)
         {
             var joint = Joints[i]; Vector3 translation = joint.Translation; Quaternion rotation = joint.Rotation;
-            foreach (var channel in clip.Channels)
+            for (int c = 0; c < clip.Channels.Count; c++)
             {
+                var channel = clip.Channels[c];
                 if (channel.Node != nodeMap[i]) continue;
                 var value = channel.Evaluate(time);
                 if (channel.Path == AnimationPath.Translation) translation = new(value.X, value.Y, value.Z);
@@ -155,6 +180,17 @@ public sealed class RuntimeSkinData
         if (bytes.Length > MaximumPayloadBytes) throw new InvalidDataException("Skin payload exceeds 8MiB.");
         try
         {
+            var reader = new Utf8JsonReader(bytes, new JsonReaderOptions { MaxDepth = 32 });
+            while (reader.Read())
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName || reader.CurrentDepth != 1) continue;
+                int limit = reader.ValueTextEquals("Joints") ? MaximumJoints : reader.ValueTextEquals("Influences") ? MaximumVertices : reader.ValueTextEquals("Sockets") ? 32 : -1;
+                if (limit < 0) continue;
+                if (!reader.Read() || reader.TokenType != JsonTokenType.StartArray) throw new InvalidDataException("Skin collection must be an array.");
+                int count = 0;
+                while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                { if (++count > limit) throw new InvalidDataException("Skin collection exceeds its allocation limit."); reader.Skip(); }
+            }
             var data = JsonSerializer.Deserialize<Payload>(bytes, Options) ?? throw new InvalidDataException("Empty skin payload.");
             if (data.Version != CurrentVersion || data.Mesh is null || data.Mesh.Length < 24 || data.Joints is null || data.Influences is null || data.Sockets is null ||
                 BitConverter.ToInt32(data.Mesh, 8) is < 1 or > MaximumVertices || BitConverter.ToInt32(data.Mesh, 12) is < 3 or > MaximumIndices)
