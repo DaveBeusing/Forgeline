@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -10,6 +11,63 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class SkirmishSupplyPolicyTests
 {
+    [Theory]
+    [InlineData(54.0, 120.0, 0.8, 1.0, true, true, false)]
+    [InlineData(110.0, 29.0, 1.0, 0.8, true, true, false)]
+    [InlineData(0.0, 120.0, 0.1, 1.0, true, true, true)]
+    [InlineData(110.0, 0.0, 1.0, 0.1, true, true, true)]
+    [InlineData(54.0, 120.0, 1.0, 1.0, false, true, true)]
+    [InlineData(110.0, 29.0, 1.0, 1.0, false, true, true)]
+    [InlineData(54.0, 120.0, 1.0, 1.0, true, false, true)]
+    [InlineData(110.0, 29.0, 1.0, 1.0, true, false, true)]
+    public void CommittedReconnaissanceDoesNotAbandonSupportedScoutForOptionalCargoTopUps(
+        double cargoFuel, double cargoAmmo, double scoutFuel, double scoutAmmo, bool committed, bool offensiveCommitted, bool loading)
+    {
+        using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(2));
+        foreach (EntityId controller in entities.Query<SkirmishOpponentController, SkirmishOpponentState>())
+            if (entities.GetComponent<SkirmishOpponentController>(controller).Player == side.Player)
+                entities.SetComponent(controller, entities.GetComponent<SkirmishOpponentState>(controller) with
+                    { DeepOffensiveCommitted = offensiveCommitted });
+        Vector3 forward = entities.GetComponent<WorldTransform>(side.CommandCore).Position - Vector3.UnitX * 600;
+        var catalog = DirectorateContent.CreateUnitCatalog();
+        EntityId scout = scenario.UnitFactory.Create(catalog[UnitIds.ScoutVehicle], forward, side.Player);
+        EntityId escort = scenario.UnitFactory.Create(catalog[UnitIds.SupplyTruck], forward + Vector3.UnitZ * 5, side.Player);
+        SupplyTruck truck = entities.GetComponent<SupplyTruck>(escort);
+        SetStock(truck.InventoryId, ResourceIds.Fuel, truck.FuelTarget);
+        SetStock(truck.InventoryId, ResourceIds.Ammunition, truck.AmmunitionTarget);
+        scenario.Simulation.RunTicks(30, TestContext.Current.CancellationToken);
+        EntityId group = entities.GetComponent<MovementGroupMember>(scout).Group;
+        Assert.Equal(group, entities.GetComponent<MovementGroupMember>(escort).Group);
+        UnitFuelState fuel = entities.GetComponent<UnitFuelState>(scout);
+        AmmunitionState ammunition = entities.GetComponent<AmmunitionState>(scout);
+        SetStock(fuel.InventoryId, ResourceIds.Fuel, fuel.Capacity * scoutFuel);
+        SetStock(ammunition.InventoryId, ResourceIds.Ammunition, ammunition.Capacity * scoutAmmo);
+        SetStock(truck.InventoryId, ResourceIds.Fuel, cargoFuel);
+        SetStock(truck.InventoryId, ResourceIds.Ammunition, cargoAmmo);
+        if (!committed)
+            scenario.Simulation.SubmitCommand(new StopMovementCommand(side.Player, [escort], scenario.Simulation.CurrentTick),
+                scenario.Simulation.CurrentTick.Next());
+
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+
+        Assert.Equal(loading, entities.HasComponent<SupplyLoadingOrder>(escort));
+        if (!loading)
+        {
+            Assert.Equal(group, entities.GetComponent<MovementGroupMember>(escort).Group);
+            Assert.Equal(group, entities.GetComponent<MovementGroupMember>(scout).Group);
+            Assert.InRange(scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) / fuel.Capacity,
+                scenario.RuntimeSettings.Scenario.OpponentConfigurations[side.Player.Value].ResupplyThreshold, 1.0);
+        }
+        void SetStock(InventoryId inventory, ResourceId resource, double quantity)
+        {
+            double current = scenario.Inventories.GetQuantity(inventory, resource);
+            if (current > quantity) Assert.True(scenario.Inventories.Remove(inventory, resource, current - quantity).Succeeded);
+            else if (current < quantity) Assert.True(scenario.Inventories.Add(inventory, resource, quantity - current).Succeeded);
+        }
+    }
+
     [Theory]
     [InlineData(0, true)]
     [InlineData(1, false)]

@@ -166,7 +166,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             CaptureOwnedState(
                 context,
                 controllerEntity,
-                controller);
+                controller,
+                state.DeepOffensiveCommitted);
 
         if (!decisionDue)
         {
@@ -244,7 +245,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         EnsureSupplyTrucksLoaded(
             context,
             controller,
-            owned);
+            owned,
+            configuration);
         EnsureReconSupplySupport(
             context,
             controller,
@@ -462,7 +464,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private OwnedState CaptureOwnedState(
         SimulationContext context,
         EntityId controllerEntity,
-        SkirmishOpponentController controller)
+        SkirmishOpponentController controller,
+        bool deepOffensiveCommitted)
     {
         _ownedStateCaptures++;
 
@@ -485,6 +488,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller.Player,
                 controller.Faction);
         }
+
+        owned.DeepOffensiveCommitted = deepOffensiveCommitted;
 
         foreach (EntityId entity in
                  context.Entities.Query<CompletedBuilding>(
@@ -2862,10 +2867,44 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
+    private bool HasSupportedReconnaissanceMission(
+        SimulationContext context, OwnedState owned, EntityId provider, in SupplyTruck truck,
+        SkirmishOpponentConfiguration configuration)
+    {
+        // Preserve the initial army's replenishment priority. Continuation
+        // support applies after a real offensive stage has been secured.
+        if (!owned.DeepOffensiveCommitted) return false;
+        if (!context.Entities.TryGetComponent(provider, out MovementGroupMember providerMember) ||
+            !context.Entities.IsAlive(providerMember.Group)) return false;
+        double cargoFuel = _inventories.GetAvailableQuantity(truck.InventoryId, ResourceIds.Fuel);
+        double cargoAmmo = _inventories.GetAvailableQuantity(truck.InventoryId, ResourceIds.Ammunition);
+        if (cargoFuel <= 1e-9 && cargoAmmo <= 1e-9) return false;
+        foreach (var unit in owned.UnitByEntity)
+        {
+            if (unit.Value != UnitIds.ScoutVehicle ||
+                !context.Entities.TryGetComponent(unit.Key, out MovementGroupMember scoutMember) ||
+                scoutMember.Group != providerMember.Group ||
+                !context.Entities.TryGetComponent(unit.Key, out CombatOrderState order) ||
+                order.Kind != CombatOrderKind.AttackMove ||
+                order.PursuitLeashMeters != ReconnaissancePursuitLeashMeters) continue;
+            if (context.Entities.TryGetComponent(unit.Key, out UnitCombatReadiness readiness) &&
+                readiness.Health < configuration.RetreatThreshold) return false;
+            bool fuelCovered = !context.Entities.TryGetComponent(unit.Key, out UnitFuelState fuel) ||
+                _inventories.GetAvailableQuantity(fuel.InventoryId, ResourceIds.Fuel) + cargoFuel + 1e-9 >=
+                    fuel.Capacity * configuration.ResupplyThreshold;
+            bool ammunitionCovered = !context.Entities.TryGetComponent(unit.Key, out AmmunitionState ammunition) ||
+                _inventories.GetAvailableQuantity(ammunition.InventoryId, ResourceIds.Ammunition) + cargoAmmo + 1e-9 >=
+                    ammunition.Capacity * configuration.ResupplyThreshold;
+            return fuelCovered && ammunitionCovered;
+        }
+        return false;
+    }
+
     private void EnsureSupplyTrucksLoaded(
         SimulationContext context,
         SkirmishOpponentController controller,
-        OwnedState owned)
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration)
     {
         foreach (EntityId entity in owned.Units)
         {
@@ -2920,6 +2959,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     context.Entities.RemoveComponent<SupplyLoadingOrder>(entity);
                 continue;
             }
+
+            // Launch reserves do not require an already committed convoy to
+            // abandon its supported scout for optional mid-mission top-ups.
+            // New missions still require the existing 50% / 25% dispatch stock.
+            if (!reconsiderSource && HasSupportedReconnaissanceMission(context, owned, entity, truck, configuration))
+                continue;
 
             bool servingRecipient = false;
             foreach (EntityId recipient in context.Entities.Query<ResupplyOrder>())
@@ -6143,6 +6188,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         public List<EntityId> Buildings { get; } = new();
 
+        public bool DeepOffensiveCommitted { get; set; }
+
         public Dictionary<BuildingId, int> BuildingCounts { get; } = new();
 
         public HashSet<BuildingId> PendingBuildings { get; } = new();
@@ -6184,6 +6231,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             Player = player;
             Faction = faction;
 
+            DeepOffensiveCommitted = false;
             Clear(Buildings);
             Clear(BuildingCounts);
             Clear(PendingBuildings);
