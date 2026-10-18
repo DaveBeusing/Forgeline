@@ -1,7 +1,7 @@
 # Infantry and battlefield production
 
 Rifle Squad and Combat Engineer now have distinct editable four-member figure
-kits, individual leader equipment, three physical LODs, rigid motion ranges and
+kits, individual leader equipment, three physical LODs, optional skeletal motion and
 dedicated damaged/critical/discarded-equipment meshes. Four other existing unit
 families gain collapsed vehicle wrecks. Broken roads/bridges, fractured rubble,
 a scorched barrier and a burst pipe extend existing environment conventions.
@@ -30,7 +30,8 @@ and infrastructure assemblies. Both are editable geometry recipes, not images.
 `build/Author-InfantryBattlefield.py` exports 58 inspectable glTFs: 26 runtime
 assemblies and 32 separately inspectable figure component groups. glTF extras
 retain component/module names and triangle ranges; the runtime remains one
-material section, not a new scene-graph or skeleton resource system.
+material section. The production LOD0 definitions select their editable skeletal
+masters; the static exporter preserves those bindings.
 
 All sources use +Y up/+Z forward. The unchanged game scale is 1.8 m, movement
 height offset .9 m and radius .9 m for both infantry roles. Boots reach local
@@ -61,14 +62,12 @@ mapping remains Operational/intact, Restoring/damaged, Disabled/destroyed.
 
 ## Motion, state and intelligence
 
-LOD0 has sixteen contiguous rigid groups: body, two legs and arms/weapon per
-figure. Eight hip groups use bounded InfantryStride; four shoulder groups reuse
-existing Cannon elevation/recoil. Hip rotation depends on copied TravelMeters,
-not wall time; stationary completed-tick history freezes phase. Wrecks disable
-motion; existing projected detail fade and LOD1/2 static geometry remain in force.
-This is rigid cosmetic articulation, not a skeletal gait, foot-IK, animation
-retargeting or a per-member aim/weapon controller. None of those is promised.
-Animation asset references remain rejected by the existing compiler.
+LOD0 now uses the [bounded skeletal path](InfantrySkinAssets.md), with eleven
+joints per figure and nine shared action clips. Existing component recipes and
+static bind exports remain available for reconstruction; LOD1/2 and discarded
+equipment stay static. The original rigid stride/elevation ranges have been
+removed from the two skinned LOD0 definitions. Gameplay authority stays at squad
+level; no IK, ragdolls, retargeting or per-member targeting is introduced.
 
 Infantry damaged/critical attachments remain present through LOD2, so state
 geometry is not intentionally reduced to tint at strategic zoom. Vehicle/MBT

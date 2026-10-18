@@ -31,6 +31,9 @@ public sealed record RuntimeAssetQualificationReport
 
     public required int MaterialCount { get; init; }
 
+    public int SkinCount { get; init; }
+    public long SkinRuntimeBytes { get; init; }
+
     public int AnimationCount { get; init; }
     public long AnimationRuntimeBytes { get; init; }
 
@@ -111,7 +114,8 @@ public static class RuntimeAssetQualification
         long materialBytes = 0;
         long skinBytes = 0;
         int skinCount = 0, animationCount = 0;
-        long animationBytes = 0;
+        long animationBytes = 0, skinBytesCount = 0;
+        int skinAssets = 0;
         int meshCount = 0;
         int textureCount = 0;
         int materialCount = 0;
@@ -156,6 +160,15 @@ public static class RuntimeAssetQualification
                 {
                     case RuntimeAssetType.Mesh:
                         var mesh = RuntimeMeshData.FromPayload(content.Payload);
+                        if (record.SkinReference is { } skinReference)
+                        {
+                            var skinDataMesh = RuntimeSkinData.FromPayload(catalog.Read(AssetId.Parse(skinReference)).Payload);
+                            if (record.MechanicalParts.Count > 0 || record.AnimationReferences.Count > 0 || !skinDataMesh.Mesh.ToPayload().AsSpan().SequenceEqual(content.Payload))
+                                throw new InvalidDataException("Skinned mesh payload or rigid motion conflicts with its skin.");
+                            foreach (var socket in skinDataMesh.Sockets)
+                                if (!record.Sockets.Any(s => s.Name == socket.Name && System.Numerics.Vector3.Distance(new(s.X,s.Y,s.Z), socket.BindPosition) < .00001f))
+                                    throw new InvalidDataException("Skin and mesh canonical sockets differ.");
+                        }
                         if (record.AnimationReferences.Count > 1) throw new InvalidDataException("Mesh supports one clip.");
                         foreach (string clipId in record.AnimationReferences)
                         {
@@ -163,6 +176,11 @@ public static class RuntimeAssetQualification
                                 throw new InvalidDataException("Clip must be an explicit animation dependency.");
                             RigidAnimationBinding.Validate(RuntimeAnimationData.FromPayload(catalog.Read(AssetId.Parse(clipId)).Payload), record.MechanicalParts, record.Sockets, mesh);
                         }
+                        break;
+                    case RuntimeAssetType.Skin:
+                        var skinData = RuntimeSkinData.FromPayload(content.Payload);
+                        foreach (string clipId in record.AnimationReferences)
+                            _ = skinData.Bind(RuntimeAnimationData.FromPayload(catalog.Read(AssetId.Parse(clipId)).Payload));
                         break;
                     case RuntimeAssetType.Animation:
                         _ = RuntimeAnimationData.FromPayload(content.Payload);
@@ -242,6 +260,9 @@ public static class RuntimeAssetQualification
                     }
                     break;
 
+                case RuntimeAssetType.Skin:
+                    skinAssets++; skinBytesCount = checked(skinBytesCount + runtimeBytes);
+                    break;
                 case RuntimeAssetType.Animation:
                     animationCount++; animationBytes = checked(animationBytes + runtimeBytes);
                     break;
@@ -268,6 +289,7 @@ public static class RuntimeAssetQualification
 
         return new RuntimeAssetQualificationReport
         {
+            SkinCount = skinAssets, SkinRuntimeBytes = skinBytesCount,
             AnimationCount = animationCount, AnimationRuntimeBytes = animationBytes,
             UiSkinCount = skinCount, UiSkinRuntimeBytes = skinBytes,
             AssetCount =

@@ -1,0 +1,7 @@
+{
+  "id": "animation.directorate.rifle_squad.reload",
+  "type": "animation",
+  "source": "../authoring/infantry/rifle_squad.glb",
+  "skeletalAnimation": true,
+  "animationClip": "reload"
+}

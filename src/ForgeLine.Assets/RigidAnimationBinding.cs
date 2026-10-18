@@ -8,6 +8,8 @@ public static class RigidAnimationBinding
     public static int[] Validate(RuntimeAnimationData clip, IReadOnlyList<MechanicalMeshPart> parts,
         IReadOnlyList<AssetSocket> sockets, RuntimeMeshData mesh)
     {
+        if (clip.SkeletonSignature is not null) throw new InvalidDataException("Skeletal clips cannot bind to rigid ranges.");
+        if (clip.Nodes.Count > 32 || clip.Channels.Count > 64) throw new InvalidDataException("Rigid clips retain 32-node/64-channel limits.");
         MechanicalMeshValidation.Validate(parts, sockets, mesh.Indices.Count);
         if (parts.Count == 0 || parts.Any(p => p.Motion != MechanicalMotionKind.Static))
             throw new InvalidDataException("Clip meshes require static named mechanical ranges; code-driven parts cannot share a clip mesh.");

@@ -53,8 +53,8 @@ internal sealed class RenderSnapshotIndex
     private static bool TrySweptBounds(in RenderInstance current, RenderInstance? previous, out AxisAlignedBounds bounds)
     {
         Vector3 start = previous?.Transform.Position ?? current.Transform.Position;
-        float radius = PresentationBounds.ResolveLocalHalfExtents(current).Length();
-        if (previous is { } prior) radius = MathF.Max(radius, PresentationBounds.ResolveLocalHalfExtents(current with { Transform = prior.Transform }).Length());
+        float radius = SkinPresentationBounds.Radius(current);
+        if (previous is { } prior) radius = MathF.Max(radius, SkinPresentationBounds.Radius(current with { Transform = prior.Transform }));
         // A sphere bounds every intermediate quaternion rotation. Vegetation pivots
         // at its root, so include the full authored height and wind sweep.
         if (VegetationVisualMotion.Applies(current))

@@ -84,6 +84,8 @@ def author(output, update):
             if update:
                 metadata = unit_source/'infantry'/(family+(f'_lod{lod}' if lod else '')+'.asset.json')
                 definition = json.loads(metadata.read_text(encoding='utf-8-sig')) if metadata.exists() else dict(id='unit.directorate.'+family+(f'.lod{lod}' if lod else ''),type='mesh')
+                if lod == 0 and definition.get('skinReference'):
+                    continue  # Editable skeletal master owns the production bind mesh.
                 definition['materialReferences']=['material.directorate.unit.rifle_squad']
                 if lod == 0:
                     definition.update(lods=[dict(level=i,assetId='unit.directorate.'+family+f'.lod{i}',maxDistance=80 if i==1 else 220) for i in (1,2)],collisionRequired=True,collisionReference=rifle_primary['collisionReference'],sockets=recipe['sockets'],mechanicalParts=entry['groups'])

@@ -161,3 +161,7 @@ Use Invoke-BlenderMotion.ps1 and Test-BlenderMotion.ps1 for the existing tank/fa
 Saved Directorate tank production: [authoring and recovery](../../docs/BlenderTankProduction.md). Use `Invoke-BlenderTank.ps1` for isolated exports and `Test-BlenderTank.ps1` for reopened-source, edit rejection and compiler integrity checks.
 
 Independent rigid clips: [supported assets and native review](../../docs/RigidClipAssets.md). `Test-BlenderRigidClips.ps1` compares the committed fixture with two actual exports and source-less compiled validation.
+
+## Infantry skeletal masters
+
+`infantry_skin.py` reconstructs the four-figure Directorate rigs from retained component geometry. `Test-BlenderInfantry.ps1` reopens production masters, checks repeated compiled payload parity, performs an actual key edit and validates source-less loading. See [skin contracts and commands](../../docs/InfantrySkinAssets.md).

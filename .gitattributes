@@ -30,3 +30,9 @@ docs/qualification/graphical-operations/evidence.json text eol=lf
 docs/qualification/graphical-tactical/evidence.json text eol=lf
 docs/qualification/graphical-tactical/*.png binary
 docs/qualification/graphical-tactical/*.zip binary
+
+# Preserve native skeletal qualification identities and original image hashes.
+docs/review/infantry-skin/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/review/infantry-skin/gpu-*.txt -text -whitespace
+docs/review/infantry-skin/poses/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/review/infantry-skin/poses/*.png binary

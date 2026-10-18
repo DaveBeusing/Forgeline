@@ -16,7 +16,7 @@ internal static class GltfImporter
         string path,
         string sourceRoot,
         IReadOnlyList<string> materialIds,
-        IReadOnlyList<MeshMaterialRequirement> materialRequirements)
+        IReadOnlyList<MeshMaterialRequirement> materialRequirements, bool allowSkin = false)
     {
         ArgumentNullException.ThrowIfNull(materialIds);
         ArgumentNullException.ThrowIfNull(materialRequirements);
@@ -29,6 +29,7 @@ internal static class GltfImporter
 
         using var gltf = Load(path, sourceRoot);
         JsonElement root = gltf.Document.RootElement;
+        if (!allowSkin && root.TryGetProperty("skins", out _)) throw new InvalidDataException("Skinned input requires a validated skinReference.");
 
         if (!root.TryGetProperty("asset", out JsonElement asset) ||
             !asset.TryGetProperty("version", out JsonElement version) ||
@@ -1029,6 +1030,7 @@ internal static class GltfImporter
         int components =
             expectedType switch
             {
+                "MAT4" => 16,
                 "SCALAR" => 1,
                 "VEC2" => 2,
                 "VEC3" => 3,

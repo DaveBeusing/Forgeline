@@ -1,0 +1,397 @@
+{
+  "sequence": [
+    "bind-a",
+    "skin-b",
+    "skin-c",
+    "bind-d"
+  ],
+  "samples": 128,
+  "warmups": 32,
+  "repeatCaptures": 2,
+  "cohorts": [
+    {
+      "name": "bind-a",
+      "manifestSha256": "c218bb05f9858365bf8d5883fe85ff47f6a5874612a01992bc3170963c578877",
+      "commit": "da261246765fceb5c31de01afaf6d26c0e789b96",
+      "runtimeFingerprint": "C263AA5B85D8601DD267E838093ED9AF1E1C8E47866332514B8B518D2F014D6C",
+      "buildIdentity": "0.1.399-dev+da261246765fceb5c31de01afaf6d26c0e789b96",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 40,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "fixtureFingerprint": "8625B7C86BD74197353E4C8FE24DC2A6E7A8345F99400B38BC7B5E2B6CBAE77D",
+      "cpu": {
+        "samples": 128,
+        "mean": 519.9421921875,
+        "p50": 528.6671,
+        "p95": 558.0107,
+        "p99": 838.6122
+      },
+      "gpu": {
+        "samples": 126,
+        "mean": 531.1636546031746,
+        "p50": 529.279296,
+        "p95": 549.118912,
+        "p99": 552.288704
+      },
+      "submission": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 1024,
+        "batchCapacity": 2,
+        "submittedInstances": 551,
+        "uploadBytes": 61712,
+        "pipelineBindings": 2,
+        "textureBindings": 8,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 4800,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 551,
+        "culledInstances": 449,
+        "drawCalls": 2,
+        "highLodInstances": 551,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 551,
+        "texturedRuntimeMeshInstances": 551,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 1,
+        "clusterCulledInstances": 8,
+        "instanceBoundsTests": 992,
+        "skippedDecalResources": 0
+      },
+      "materials": {
+        "loadedMaterialCount": 1,
+        "loadedAssetTextureCount": 3,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 2,
+        "residentMeshBytes": 1422912,
+        "loadedSkinCount": 0,
+        "residentSkinBytes": 0,
+        "loadedAnimationCount": 0,
+        "residentAnimationBytes": 0
+      },
+      "repeatPixelsEqual": true,
+      "pixelSha256": "43D4A3391FEDFF744ED20E8FDC9EF0C631A999602073E139BA6235B79A81EAF2",
+      "health": {
+        "liveResourceCount": 275,
+        "pendingRetirementCount": 0,
+        "peakPendingRetirementCount": 3,
+        "releasedResourceCount": 244,
+        "fenceWaitCount": 191,
+        "submissionFaultCount": 0,
+        "failureReasonCode": null
+      }
+    },
+    {
+      "name": "skin-b",
+      "manifestSha256": "de138dec2b84bab5ad342281e587af981ed0abd74406d02a9c8a2501f77739f1",
+      "commit": "da261246765fceb5c31de01afaf6d26c0e789b96",
+      "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+      "buildIdentity": "0.1.399-dev+da261246765fceb5c31de01afaf6d26c0e789b96",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 40,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "fixtureFingerprint": "8625B7C86BD74197353E4C8FE24DC2A6E7A8345F99400B38BC7B5E2B6CBAE77D",
+      "cpu": {
+        "samples": 128,
+        "mean": 531.4157812500001,
+        "p50": 540.3897,
+        "p95": 771.4977,
+        "p99": 981.9654
+      },
+      "gpu": {
+        "samples": 124,
+        "mean": 544.0139948387098,
+        "p50": 539.52944,
+        "p95": 560.919008,
+        "p99": 562.136608
+      },
+      "submission": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 1536,
+        "batchCapacity": 8,
+        "submittedInstances": 551,
+        "uploadBytes": 61712,
+        "pipelineBindings": 8,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 6,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 11451456,
+        "snapshotIndexBytes": 4800,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 551,
+        "culledInstances": 449,
+        "drawCalls": 8,
+        "highLodInstances": 551,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 551,
+        "texturedRuntimeMeshInstances": 551,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 1,
+        "clusterCulledInstances": 8,
+        "instanceBoundsTests": 992,
+        "skippedDecalResources": 0
+      },
+      "materials": {
+        "loadedMaterialCount": 1,
+        "loadedAssetTextureCount": 3,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 2,
+        "residentMeshBytes": 1422912,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "repeatPixelsEqual": true,
+      "pixelSha256": "8D31866EAD12028AF808BA59E89836F53E8C91B13CBC2947176139B91CB610ED",
+      "health": {
+        "liveResourceCount": 293,
+        "pendingRetirementCount": 0,
+        "peakPendingRetirementCount": 3,
+        "releasedResourceCount": 244,
+        "fenceWaitCount": 189,
+        "submissionFaultCount": 0,
+        "failureReasonCode": null
+      }
+    },
+    {
+      "name": "skin-c",
+      "manifestSha256": "e00df6b84822e47f2c13febcdfc8c122f841208a670a91eb6f0718141c5d493d",
+      "commit": "da261246765fceb5c31de01afaf6d26c0e789b96",
+      "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+      "buildIdentity": "0.1.399-dev+da261246765fceb5c31de01afaf6d26c0e789b96",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 40,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "fixtureFingerprint": "8625B7C86BD74197353E4C8FE24DC2A6E7A8345F99400B38BC7B5E2B6CBAE77D",
+      "cpu": {
+        "samples": 128,
+        "mean": 519.2845859374999,
+        "p50": 538.2778,
+        "p95": 791.5891,
+        "p99": 993.6453
+      },
+      "gpu": {
+        "samples": 123,
+        "mean": 543.1915137560977,
+        "p50": 539.672416,
+        "p95": 561.286496,
+        "p99": 562.616416
+      },
+      "submission": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 1536,
+        "batchCapacity": 8,
+        "submittedInstances": 551,
+        "uploadBytes": 61712,
+        "pipelineBindings": 8,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 6,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 11451456,
+        "snapshotIndexBytes": 4800,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 551,
+        "culledInstances": 449,
+        "drawCalls": 8,
+        "highLodInstances": 551,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 551,
+        "texturedRuntimeMeshInstances": 551,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 1,
+        "clusterCulledInstances": 8,
+        "instanceBoundsTests": 992,
+        "skippedDecalResources": 0
+      },
+      "materials": {
+        "loadedMaterialCount": 1,
+        "loadedAssetTextureCount": 3,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 2,
+        "residentMeshBytes": 1422912,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "repeatPixelsEqual": true,
+      "pixelSha256": "8D31866EAD12028AF808BA59E89836F53E8C91B13CBC2947176139B91CB610ED",
+      "health": {
+        "liveResourceCount": 293,
+        "pendingRetirementCount": 0,
+        "peakPendingRetirementCount": 3,
+        "releasedResourceCount": 244,
+        "fenceWaitCount": 187,
+        "submissionFaultCount": 0,
+        "failureReasonCode": null
+      }
+    },
+    {
+      "name": "bind-d",
+      "manifestSha256": "974a8328837ca38bf7400f51f3a5cfcdacefd4a379c40577fe2348c7943bfb1c",
+      "commit": "da261246765fceb5c31de01afaf6d26c0e789b96",
+      "runtimeFingerprint": "C263AA5B85D8601DD267E838093ED9AF1E1C8E47866332514B8B518D2F014D6C",
+      "buildIdentity": "0.1.399-dev+da261246765fceb5c31de01afaf6d26c0e789b96",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 7.1121564,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 40,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "fixtureFingerprint": "8625B7C86BD74197353E4C8FE24DC2A6E7A8345F99400B38BC7B5E2B6CBAE77D",
+      "cpu": {
+        "samples": 128,
+        "mean": 516.0255695312499,
+        "p50": 526.6806,
+        "p95": 754.518,
+        "p99": 972.702
+      },
+      "gpu": {
+        "samples": 125,
+        "mean": 528.9371415039999,
+        "p50": 527.97072,
+        "p95": 548.958304,
+        "p99": 552.892224
+      },
+      "submission": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 1024,
+        "batchCapacity": 2,
+        "submittedInstances": 551,
+        "uploadBytes": 61712,
+        "pipelineBindings": 2,
+        "textureBindings": 8,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 4800,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 551,
+        "culledInstances": 449,
+        "drawCalls": 2,
+        "highLodInstances": 551,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 551,
+        "texturedRuntimeMeshInstances": 551,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 1,
+        "clusterCulledInstances": 8,
+        "instanceBoundsTests": 992,
+        "skippedDecalResources": 0
+      },
+      "materials": {
+        "loadedMaterialCount": 1,
+        "loadedAssetTextureCount": 3,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 2,
+        "residentMeshBytes": 1422912,
+        "loadedSkinCount": 0,
+        "residentSkinBytes": 0,
+        "loadedAnimationCount": 0,
+        "residentAnimationBytes": 0
+      },
+      "repeatPixelsEqual": true,
+      "pixelSha256": "43D4A3391FEDFF744ED20E8FDC9EF0C631A999602073E139BA6235B79A81EAF2",
+      "health": {
+        "liveResourceCount": 275,
+        "pendingRetirementCount": 0,
+        "peakPendingRetirementCount": 3,
+        "releasedResourceCount": 244,
+        "fenceWaitCount": 190,
+        "submissionFaultCount": 0,
+        "failureReasonCode": null
+      }
+    }
+  ]
+}

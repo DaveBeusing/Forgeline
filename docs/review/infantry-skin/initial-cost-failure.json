@@ -1,0 +1,9 @@
+{
+  "sourceCommit": "7ce49b6bd3040dc2e2a2538dc2076bea39685d56",
+  "status": "aborted-for-implementation-correction",
+  "reason": "An unintended 18/6 pixel geometry selection expanded the dense LOD0 workload. Restore the existing 90/28 pixel geometry thresholds and matching fade before qualification.",
+  "baselineGpuMeanMs": 531.6615974400002,
+  "baselineCpuMeanMs": 521.6658406250001,
+  "retained": "infantry-perf-bind-a",
+  "remainingCohorts": "not executed"
+}
