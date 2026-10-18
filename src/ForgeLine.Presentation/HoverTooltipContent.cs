@@ -53,9 +53,9 @@ internal static class HoverTooltipResolver
         if (world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } selected && selected.SessionId == snapshot.SessionId && selected.Tick == snapshot.Tick)
         {
             if (selected.Logistics is { } logistics && logistics.Entity == world.Entity && logistics.Cargo is { } cargo)
-                explanation = $"REGIONAL CARGO / SOURCE {cargo.SourceName} / DESTINATION {cargo.DestinationName}; AUTOMATIC TARGET DEMAND ASSIGNS WORK. " + LogisticsStatusCatalog.ServiceDetails(logistics.Service);
+                explanation = $"REGIONAL CARGO / {cargo.ResourceName} / ORDER {cargo.RequestedQuantity:0.##} / LOADED {cargo.CargoQuantity:0.##} / SOURCE {cargo.SourceName} / DESTINATION {cargo.DestinationName}; AUTOMATIC TARGET DEMAND ASSIGNS WORK. " + LogisticsStatusCatalog.ServiceDetails(logistics.Service);
             else if (selected.Supply is { } supply && supply.Entity == world.Entity)
-                explanation = $"DRIVE TANK {supply.DriveFuelQuantity:0.##}/{supply.DriveFuelCapacity:0.##}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
+                explanation = $"{LogisticsStatusCatalog.DriveTank(supply)}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
         }
         return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation);
     }
@@ -156,7 +156,7 @@ internal static class HoverTooltipResolver
                     }
                     break;
                 case PlayerActionPanelMode.Supply when actions.Supply is { } supply:
-                    requirement = $"DRIVE TANK {supply.DriveFuelQuantity:0.##}/{supply.DriveFuelCapacity:0.##}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}";
+                    requirement = $"{LogisticsStatusCatalog.DriveTank(supply)}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}";
                     hint = LogisticsStatusCatalog.ServiceDetails(supply.Service);
                     break;
                 case PlayerActionPanelMode.Technology:

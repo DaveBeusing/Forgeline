@@ -25,7 +25,7 @@ INPUTS cards prepare drafts only. A draft target includes materials for the sele
 
 ## Read the actual material path
 
-Selected owned Cargo Trucks expose their real source/destination and copied service state. Policies show the selected source and assigned Cargo Truck when known. Details never reveal a foreign source inventory or hidden unit. Unobserved access remains explicitly unobserved: an enabled network node does not certify a route, physical approach or free bay.
+Selected owned Cargo Trucks expose the catalog material, trip quantity, actually loaded cargo, real source/destination and copied service state. Policies show the selected source and assigned Cargo Truck when known. Details never reveal a foreign source inventory or hidden unit. Unobserved access remains explicitly unobserved: an enabled network node does not certify a route, physical approach or free bay.
 
 WAITING FOR LOADING BAY, ALIGNING, LOADING, UNLOADING and LEAVING BAY use confirmed simulation queue/dock data. Queue position is not inferred from distance. An ordinary resource WAITING state is not a queue slot. Operations retains production queue counts separately from loading-bay waiting counts; regular FIFO waiting is not introduced as a new error notification.
 

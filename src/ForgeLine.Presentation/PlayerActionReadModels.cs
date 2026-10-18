@@ -303,6 +303,8 @@ public readonly record struct PlayerCargoStatusReadModel(
     public ResourceId Resource { get; init; }
     public string SourceName { get; init; } = string.Empty;
     public string DestinationName { get; init; } = string.Empty;
+    public string ResourceName { get; init; } = string.Empty;
+    public double RequestedQuantity { get; init; }
 }
 
 public readonly record struct PlayerCargoFleet(int Total, int Working, int Bound, int EmptyIdle, int NoDriveFuel);
@@ -1282,7 +1284,10 @@ internal static class PlayerActionSnapshotFactory
                     SourceName = entities.TryGetComponent(entity, out CargoTransportOrder sourceNameOrder) ? Name(OwnedNode(sourceNameOrder.Origin)) : "NO SOURCE ASSIGNED",
                     DestinationName = entities.TryGetComponent(entity, out CargoTransportOrder destinationNameOrder) ? Name(OwnedNode(destinationNameOrder.Destination)) : "NO DESTINATION ASSIGNED",
                     Destination = entities.TryGetComponent(entity, out CargoTransportOrder destinationOrder) ? OwnedNode(destinationOrder.Destination) : default,
-                    Resource = entities.TryGetComponent(entity, out CargoTransportOrder resourceOrder) ? resourceOrder.ResourceId : default
+                    Resource = entities.TryGetComponent(entity, out CargoTransportOrder resourceOrder) ? resourceOrder.ResourceId : default,
+                    ResourceName = entities.TryGetComponent(entity, out CargoTransportOrder namedOrder) &&
+                        scenario.Services.Resources.TryGet(namedOrder.ResourceId, out var resourceDefinition) ? resourceDefinition.DisplayName : string.Empty,
+                    RequestedQuantity = entities.TryGetComponent(entity, out CargoTransportOrder quantityOrder) ? quantityOrder.RequestedQuantity : 0
                 };
         }
 

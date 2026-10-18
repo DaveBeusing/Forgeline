@@ -32,6 +32,9 @@ public static class LogisticsStatusCatalog
         _ => "OPERATIONS / BLOCKED / OPEN EXISTING CONTROLS"
     };
 
+    public static string DriveTank(PlayerSupplyActionReadModel supply) => supply.DriveFuelCapacity > 0
+        ? $"DRIVE TANK {supply.DriveFuelQuantity:0.##}/{supply.DriveFuelCapacity:0.##}" : "NO DRIVE TANK";
+
     public static string PolicyDetails(PlayerLogisticsActionReadModel logistics, PlayerStockPolicyActionReadModel stock) =>
         $"LOCAL {stock.CurrentQuantity:0.##} / FREE {stock.AvailableQuantity:0.##} / RESERVED {stock.ReservedQuantity:0.##}; " +
         $"REQUESTED {stock.RequestedQuantity:0.##} / ASSIGNED INCOMING {stock.AnnouncedQuantity:0.##}; " +

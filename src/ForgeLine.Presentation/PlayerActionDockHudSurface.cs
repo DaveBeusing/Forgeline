@@ -617,6 +617,7 @@ internal sealed partial class PlayerActionDockHudRenderer : IDisposable
             PlayerCargoStatusReadModel cargo)
         {
             text.Append("CARGO ");
+            if (!string.IsNullOrEmpty(cargo.ResourceName)) { text.Append(cargo.ResourceName); text.Append(" "); }
             text.Append(
                 cargo.CargoQuantity,
                 "F0");

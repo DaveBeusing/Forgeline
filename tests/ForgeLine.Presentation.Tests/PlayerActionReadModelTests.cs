@@ -15,6 +15,39 @@ public sealed class PlayerActionReadModelTests
     private static readonly PlayerId LocalPlayer = new(1);
 
     [Fact]
+    public void CargoOrderShowsCatalogMaterialAndTripQuantityWithOwnedEndpoints()
+    {
+        using var scenario = CreateScenario(4311);
+        scenario.Simulation.AdvanceOneTick();
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(LocalPlayer);
+        var core = entities.GetComponent<WorldTransform>(side.CommandCore);
+        var destination = entities.CreateEntity();
+        var inventory = scenario.Inventories.CreateInventory(new InventorySpecification(500));
+        entities.AddComponent(destination,new ControllableEntity(LocalPlayer,ControllableEntityCategory.Building));
+        entities.AddComponent(destination,new WorldTransform(core.Position + new Vector3(100,0,0),Quaternion.Identity,Vector3.One));
+        entities.AddComponent(destination,new InventoryStorage(inventory));
+        var target = scenario.Logistics.AddNode(destination,core.Position + new Vector3(100,0,0),
+            ForgeLine.Logistics.LogisticsNodeKind.StorageDepot,ForgeLine.Logistics.LogisticsNodeCapabilities.CargoDestination);
+        Assert.True(scenario.Logistics.TryGetNodeForEntity(side.CommandCore,out var source));
+        scenario.Logistics.AddEdge(source,target,ForgeLine.Logistics.LogisticsTransportMode.GroundRoad,100,1,100);
+        var truck = side.StartingUnits.First(unit => entities.HasComponent<CargoTransport>(unit));
+        Assert.True(scenario.CargoTransport.TryAssignOrder(entities,truck,
+            new CargoTransportOrder(source,target,ResourceIds.Steel,50,scenario.Simulation.CurrentTick),scenario.Simulation.CurrentTick));
+        var buffer = RegisterExtraction(scenario,out var interaction,out _);
+        interaction.SetSelection([truck]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var cargo = Assert.IsType<PlayerCargoStatusReadModel>(snapshot.PlayerActions!.Logistics!.Cargo);
+        Assert.Equal(ResourceIds.Steel,cargo.Resource);
+        Assert.Equal(scenario.Services.Resources[ResourceIds.Steel].DisplayName,cargo.ResourceName);
+        Assert.Equal(50,cargo.RequestedQuantity);
+        Assert.Equal(side.CommandCore,cargo.Source);
+        Assert.Equal(destination,cargo.Destination);
+        Assert.Equal(scenario.Services.BuildingDefinitions[BuildingIds.CommandCore].DisplayName,cargo.SourceName);
+    }
+
+    [Fact]
     public void SupplyCargoAndDriveTankAreSeparateAndSupplyIsNotRegionalCargo()
     {
         using var scenario = CreateScenario(4310);
