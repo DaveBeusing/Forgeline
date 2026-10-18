@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+using ForgeLine.Graphics.RenderContracts;
 using System.Diagnostics;
 using System.Numerics;
 using ForgeLine.Assets;
@@ -209,21 +211,10 @@ public sealed class TerrainRenderer : IDisposable
                     (ulong)mesh.Indices.Length *
                     sizeof(uint));
 
-            vertexBuffer =
-                _graphics.CreateBuffer(
-                    new GraphicsBufferDescription(
-                        vertexBytes,
-                        GraphicsBufferMemory.Upload));
-            indexBuffer =
-                _graphics.CreateBuffer(
-                    new GraphicsBufferDescription(
-                        indexBytes,
-                        GraphicsBufferMemory.Upload));
-
-            vertexBuffer.SetData<TerrainRenderVertex>(
-                renderVertices);
-            indexBuffer.SetData<uint>(
-                mesh.Indices);
+            vertexBuffer = _graphics.CreateInitializedStaticBuffer(
+                new(vertexBytes, StaticGraphicsBufferUsage.Vertex), MemoryMarshal.AsBytes(renderVertices.AsSpan()));
+            indexBuffer = _graphics.CreateInitializedStaticBuffer(
+                new(indexBytes, StaticGraphicsBufferUsage.Index), MemoryMarshal.AsBytes(mesh.Indices.AsSpan()));
 
             return
                 new TerrainChunkRenderResource(

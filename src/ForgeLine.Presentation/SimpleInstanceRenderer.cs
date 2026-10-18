@@ -1,3 +1,4 @@
+using ForgeLine.Graphics.RenderContracts;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using ForgeLine.Assets;
@@ -124,19 +125,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
             20, 21, 22, 20, 22, 23
             ];
 
-            _vertexBuffer = graphics.CreateBuffer(
-                new GraphicsBufferDescription(
-                    checked((ulong)vertices.Length * FallbackVertexStride),
-                    GraphicsBufferMemory.Upload));
-            _indexBuffer = graphics.CreateBuffer(
-                new GraphicsBufferDescription(
-                    checked((ulong)indices.Length * sizeof(ushort)),
-                    GraphicsBufferMemory.Upload));
-
-            _vertexBuffer.SetData<SimpleVertex>(
-                vertices);
-            _indexBuffer.SetData<ushort>(
-                indices);
+            _vertexBuffer = graphics.CreateInitializedStaticBuffer(
+                new(checked((ulong)vertices.Length * FallbackVertexStride), StaticGraphicsBufferUsage.Vertex),
+                MemoryMarshal.AsBytes(vertices.AsSpan()));
+            _indexBuffer = graphics.CreateInitializedStaticBuffer(
+                new(checked((ulong)indices.Length * sizeof(ushort)), StaticGraphicsBufferUsage.Index),
+                MemoryMarshal.AsBytes(indices.AsSpan()));
         }
         catch
         {
