@@ -476,7 +476,7 @@ public sealed class BattlefieldRuntime
                 -delta.X /
                     horizontalLength);
 
-        CreateInfrastructurePresentationEntity(
+        EntityId surface = CreateInfrastructurePresentationEntity(
             entities,
             midpoint,
             rotation,
@@ -487,6 +487,7 @@ public sealed class BattlefieldRuntime
             InfrastructurePresentationKind.RoadSegment,
             roadEdge.Key,
             visualId);
+        entities.AddComponent(surface, new RoadTrafficCorridor(sourcePosition, destinationPosition, RoadSurfaceWidth * .5f));
 
         float shoulderOffset =
             RoadSurfaceWidth *
@@ -757,7 +758,7 @@ public sealed class BattlefieldRuntime
             stem.Z);
     }
 
-    private static void CreateInfrastructurePresentationEntity(
+    private static EntityId CreateInfrastructurePresentationEntity(
         EntityRegistry entities,
         Vector3 position,
         Quaternion rotation,
@@ -783,6 +784,7 @@ public sealed class BattlefieldRuntime
             new InfrastructurePresentationIdentity(
                 kind,
                 key));
+        return entity;
     }
 
     private static InfrastructurePresentationKind ResolveCrossingPresentationKind(

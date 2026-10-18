@@ -70,7 +70,8 @@ public sealed class VehicleDockingIntegrationTests
             if (waypointBuilding.IsValid)
                 Assert.False(simulation.Entities.HasComponent<VehicleDockSlot>(waypointBuilding));
             if (invalidateRoute && !changedRoute && simulation.Entities.TryGetComponent(truck, out VehicleDockVisit pendingDock) &&
-                pendingDock.Building == destination.Entity && pendingDock.Status == VehicleDockStatus.Reserved)
+                pendingDock.Building == destination.Entity &&
+                simulation.Entities.HasComponent<VehicleQueueEntry>(truck))
             {
                 var unrelated = simulation.Entities.CreateEntity();
                 network.AddNode(unrelated, new(300, 0, 100), LogisticsNodeKind.LogisticsHub, LogisticsNodeCapabilities.Storage);
@@ -428,7 +429,11 @@ public sealed class VehicleDockingIntegrationTests
                 var a = simulation.Entities.GetComponent<VehicleDockVisit>(trucks[first]).Pose.ApproachStart;
                 var b = simulation.Entities.GetComponent<VehicleDockVisit>(trucks[second]).Pose.ApproachStart;
                 Assert.True(a.HasValue && b.HasValue);
-                Assert.True(Vector3.Distance(a.GetValueOrDefault(), b.GetValueOrDefault()) >= profile.Movement.SeparationRadius * 2);
+                Assert.True(Vector3.Distance(a.GetValueOrDefault(), b.GetValueOrDefault()) >= profile.Movement.SeparationRadius * 2,
+                    $"Waiting points overlap: {trucks[first]}:{a} / {trucks[second]}:{b}; separation={profile.Movement.SeparationRadius * 2}; " +
+                    string.Join("; ", trucks.Select(id => $"{id}:" +
+                        (simulation.Entities.TryGetComponent(id, out VehicleQueueEntry queued) ? queued.ToString() : "unregistered") +
+                        (simulation.Entities.TryGetComponent(id, out VehicleQueueHolding hold) ? hold.ToString() : ""))));
             }
         for (int tick = 1; tick < ticksPerSecond * 180 && trucks.Any(entity => simulation.Entities.HasComponent<CargoTransportOrder>(entity)); tick++)
             simulation.AdvanceOneTick();

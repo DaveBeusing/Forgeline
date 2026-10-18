@@ -223,6 +223,7 @@ public sealed class VehicleDockingTests
             Assert.Equal(new Vector3(0, 0, 14), order.WorldTarget);
             Assert.Equal(MovementOrderKind.LocalApproach, order.Kind);
         });
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1))));
         fixture.Step(context => Assert.True(fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1))));
     }
 
@@ -356,11 +357,15 @@ public sealed class VehicleDockingTests
         Assert.False((staged.Pose with { ApproachStart = null }).Contains(move.WorldTarget, 0));
         fixture.SetTruck(move.WorldTarget, 0, 0);
         fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1))));
+        Assert.False(fixture.Simulation.Entities.HasComponent<VehicleDockSlot>(fixture.Building));
+        var entry = fixture.Simulation.Entities.GetComponent<VehicleQueueEntry>(fixture.Truck);
+        fixture.SetTruck(entry.Target, entry.Heading, 0);
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.Truck, fixture.Building, new(1))));
         Assert.Equal(fixture.Truck, fixture.Simulation.Entities.GetComponent<VehicleDockSlot>(fixture.Building).Truck);
     }
 
     [Fact]
-    public void SecondArrivalStopsItsOutsideApproachWhenAnotherTruckClaimsTheBay()
+    public void SecondArrivalCanAdvanceOutsideAnOccupiedBayButNeverEnterItsLane()
     {
         var fixture = new Fixture();
         fixture.Simulation.RegisterSystem(new GroundMovementSystem());
@@ -374,16 +379,14 @@ public sealed class VehicleDockingTests
         Assert.Equal(move, entities.GetComponent<MovementOrder>(fixture.OtherTruck));
         fixture.Step(context => Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out _)));
         for (int tick = 0; tick < 200; tick++)
+        {
             fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
+            var slot = entities.GetComponent<VehicleDockSlot>(fixture.Building);
+            Vector3 position = entities.GetComponent<WorldTransform>(fixture.OtherTruck).Position;
+            Assert.False(slot.Pose.Contains(position, 0));
+        }
         Assert.Equal(VehicleDockStatus.Busy, entities.GetComponent<VehicleDockVisit>(fixture.OtherTruck).Status);
-        Assert.Equal(GroundMovementStatus.TacticallyPaused, entities.GetComponent<GroundMovementState>(fixture.OtherTruck).Status);
-        Vector3 waiting = entities.GetComponent<WorldTransform>(fixture.OtherTruck).Position;
-        var slot = entities.GetComponent<VehicleDockSlot>(fixture.Building);
-        Assert.True(waiting.X > slot.Pose.Exit.X + slot.Pose.HalfLength * 4 + 3);
-        for (int tick = 0; tick < 120; tick++)
-            fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
-        Assert.Equal(waiting, entities.GetComponent<WorldTransform>(fixture.OtherTruck).Position);
-        Assert.Equal(move, entities.GetComponent<MovementOrder>(fixture.OtherTruck));
+        Assert.True(entities.HasComponent<VehicleQueueEntry>(fixture.OtherTruck));
         Assert.Equal(fixture.Truck, entities.GetComponent<VehicleDockSlot>(fixture.Building).Truck);
     }
 
@@ -495,7 +498,13 @@ public sealed class VehicleDockingTests
         entities.SetComponent(fixture.OtherTruck, entities.GetComponent<WorldTransform>(fixture.OtherTruck) with
             { Position = waitingPoint.GetValueOrDefault() });
         fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
-        Assert.Equal(waitingPoint, entities.GetComponent<VehicleDockVisit>(fixture.OtherTruck).Pose.ApproachStart);
+        var queued = entities.GetComponent<VehicleQueueEntry>(fixture.OtherTruck);
+        entities.SetComponent(fixture.OtherTruck, entities.GetComponent<WorldTransform>(fixture.OtherTruck) with
+            { Position = queued.Target, Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, queued.Heading) });
+        entities.SetComponent(fixture.OtherTruck, GroundMovementState.Stationary(queued.Heading));
+        fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
+        Assert.Equal(queued.Target, entities.GetComponent<VehicleQueueEntry>(fixture.OtherTruck).Target);
+        Assert.Equal(fixture.Truck, entities.GetComponent<VehicleDockSlot>(fixture.Building).Truck);
         fixture.SetTruck(new(100, 0, 100), 0, 0);
         fixture.Step(context =>
         {

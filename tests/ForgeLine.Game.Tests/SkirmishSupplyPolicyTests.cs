@@ -91,8 +91,14 @@ public sealed class SkirmishSupplyPolicyTests
         using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation), seed: 2026);
         var entities = scenario.Simulation.Entities;
         var side = scenario.GetBase(new PlayerId(2));
-        Assert.True(scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, side.Player),
-            24_000, TestContext.Current.CancellationToken));
+        bool funded = scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, side.Player),
+            24_000, TestContext.Current.CancellationToken);
+        var queueDiagnostics = new List<string>();
+        if (!funded)
+            foreach (var truck in entities.Query<VehicleDockVisit, WorldTransform>())
+                queueDiagnostics.Add($"{truck}: {entities.GetComponent<WorldTransform>(truck).Position}; {entities.GetComponent<VehicleDockVisit>(truck)}; " +
+                    (entities.TryGetComponent(truck, out VehicleQueueEntry entry) ? entry.ToString() : "unregistered"));
+        Assert.True(funded, string.Join("\n", queueDiagnostics));
         void SetAvailable(ResourceId resource, double quantity)
         {
             double current = scenario.Inventories.GetAvailableQuantity(side.StartingInventory, resource);

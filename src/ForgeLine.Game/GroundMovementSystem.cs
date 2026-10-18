@@ -350,6 +350,16 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         // braking distance; precision approach and turns stay slow.
         float maximumSpeed = order.TargetHeadingRadians.HasValue && distanceToTarget <= 1
             ? MathF.Min(2, movement.MaximumSpeed) : movement.MaximumSpeed;
+        if (entities.TryGetComponent(entity, out VehicleQueueMotion queueMotion) &&
+            entities.TryGetComponent(entity, out VehicleQueueEntry queueEntry) && queueEntry.Generation == queueMotion.Generation &&
+            queueEntry.Position > 1)
+        {
+            Vector3 queueSide = new(MathF.Cos(queueMotion.Heading), 0, -MathF.Sin(queueMotion.Heading));
+            float localRange = transform.Scale.Z * 2 + movement.SeparationRadius;
+            if (MathF.Abs(Vector3.Dot(position - queueMotion.Front, queueSide)) <= movement.Radius + 2 &&
+                VehicleDockPose.HorizontalDistanceSquared(position, queueEntry.Target) <= localRange * localRange)
+                maximumSpeed = MathF.Min(maximumSpeed, 2);
+        }
         if (order.TargetHeadingRadians.HasValue && MathF.Abs(GroundMovementState.NormalizeAngle(desiredHeading - state.HeadingRadians)) > MathF.PI / 30)
             maximumSpeed = MathF.Min(maximumSpeed, 1);
 

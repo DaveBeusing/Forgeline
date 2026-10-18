@@ -1,4 +1,5 @@
 using ForgeLine.Core;
+using ForgeLine.Combat;
 using ForgeLine.Ecs;
 using ForgeLine.Simulation;
 using Xunit;
@@ -86,6 +87,45 @@ public sealed class VehicleQueueCoordinatorTests
         Assert.True(queue.TryRegister(entities, replacement, building, new(1), new(3), VehicleQueueService.CargoPickup));
         Assert.False(VehicleQueueCoordinator.Remove(entities, first, building, previous.Generation));
         Assert.True(queue.IsHead(entities, second, building, new(4)));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void CancellationAndDeathRemoveOnlyTheMatchingParticipant(int position)
+    {
+        var entities = new EntityRegistry();
+        var queue = new VehicleQueueCoordinator();
+        EntityId building = Building(entities);
+        EntityId[] trucks = Enumerable.Range(0, 3).Select(_ => Truck(entities)).ToArray();
+        foreach (EntityId truck in trucks)
+        {
+            entities.AddComponent(truck, new SupplyLoadingOrder(building, SimulationTick.Zero));
+            Assert.True(queue.TryRegister(entities, truck, building, new(1), new(10), VehicleQueueService.SupplyLoading));
+        }
+        EntityId removed = trucks[position];
+        entities.AddComponent(removed, new HealthState(0, 100));
+        queue.Cleanup(entities);
+        Assert.Equal(trucks.Where(id => id != removed), queue.Collect(entities, building));
+        Assert.False(queue.TryRegister(entities, removed, building, new(1), new(11), VehicleQueueService.SupplyLoading));
+        Assert.True(entities.IsAlive(removed)); // Wreck removal is a separate physical lifecycle.
+        foreach (EntityId truck in trucks.Where(id => id != removed)) VehicleDockingService.Cancel(entities, truck);
+        Assert.Empty(queue.Collect(entities, building));
+    }
+
+    [Fact]
+    public void DestroyedOrRecapturedBuildingInvalidatesTheRoster()
+    {
+        var entities = new EntityRegistry();
+        var queue = new VehicleQueueCoordinator();
+        EntityId building = Building(entities), truck = Truck(entities);
+        entities.AddComponent(truck, new SupplyLoadingOrder(building, SimulationTick.Zero));
+        Assert.True(queue.TryRegister(entities, truck, building, new(1), new(10), VehicleQueueService.SupplyLoading));
+        entities.SetComponent(building, new CompletedBuilding(BuildingIds.StorageDepot, new(2), SimulationTick.Zero));
+        queue.Cleanup(entities);
+        Assert.Empty(queue.Collect(entities, building));
+        Assert.False(entities.HasComponent<VehicleQueueEntry>(truck));
     }
 
     private static EntityId Building(EntityRegistry entities)

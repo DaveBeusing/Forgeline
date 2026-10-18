@@ -211,7 +211,7 @@ public readonly record struct SupplyLoadingOrder(EntityId Source, SimulationTick
     VehicleDockBlockReason WaitReason = VehicleDockBlockReason.None, ulong RetryAtTick = 0);
 
 /// <summary>One exclusive lane owner shared by cargo and supply service. No queue or timeout release.</summary>
-public sealed class VehicleDockingService
+public sealed partial class VehicleDockingService
 {
     private readonly ITerrainQuery? _terrain;
     private readonly SpatialGridIndex? _spatial;
@@ -278,11 +278,24 @@ public sealed class VehicleDockingService
             }
         }
 
+        if (entities.TryGetComponent(truck, out VehicleQueueEntry queued) && queued.Building == building)
+        {
+            if (!_queues.IsHead(entities, truck, building, context.Tick)) return false;
+            if (!queued.ArrivedAtService)
+                pose = pose with { ApproachStart = entities.GetComponent<VehicleQueueLane>(building).Front };
+        }
+        else if (_queues.Collect(entities, building).Count > 0)
+            return Reject(entities, truck, building, VehicleDockBlockReason.Obstructed, out visit);
         if (_navigation is not null && entities.TryGetComponent(truck, out NavigationAgent agent))
         {
             var grid = _navigation.World.Grid;
             Vector3 direction = new(MathF.Sin(pose.Heading), 0, MathF.Cos(pose.Heading));
-            if (!grid.TryWorldToCell(pose.Entry, out var entryCell) || !grid.IsTraversable(entryCell, agent.Capabilities))
+            if (pose.ApproachStart is Vector3 queueStart)
+            {
+                if (!grid.TryWorldToCell(queueStart, out var queueCell) || !grid.IsTraversable(queueCell, agent.Capabilities))
+                    return Reject(entities, truck, building, VehicleDockBlockReason.Obstructed, out visit);
+            }
+            else if (!grid.TryWorldToCell(pose.Entry, out var entryCell) || !grid.IsTraversable(entryCell, agent.Capabilities))
             {
                 Vector3 outward = new(-direction.Z, 0, direction.X);
                 if (Vector3.Dot(outward, pose.Service - buildingTransform.Position) < 0) outward = -outward;
@@ -325,6 +338,7 @@ public sealed class VehicleDockingService
         visit = new(building, generation, VehicleDockStatus.Reserved, VehicleDockBlockReason.None, pose,
             DepartureDistance: departure);
         Put(entities, building, new VehicleDockSlot(truck, generation, pose, owner));
+        if (entities.HasComponent<VehicleQueueMotion>(truck)) entities.RemoveComponent<VehicleQueueMotion>(truck);
         Put(entities, truck, visit);
         return true;
     }
@@ -408,124 +422,9 @@ public sealed class VehicleDockingService
         return false;
     }
 
-    private bool StageBeforeReservation(SimulationContext context, EntityId truck, EntityId building, PlayerId owner)
-    {
-        var entities = context.Entities;
-        if (!OwnsTruck(entities, truck, owner) || !Operational(entities, building) ||
-            !entities.TryGetComponent(building, out CompletedBuilding completed) || completed.Owner != owner ||
-            !entities.TryGetComponent(building, out BuildingLoadingDock definition) ||
-            !entities.TryGetComponent(building, out WorldTransform buildingTransform) ||
-            !entities.TryGetComponent(truck, out WorldTransform transform) ||
-            !entities.TryGetComponent(truck, out GroundMovement movement) ||
-            !entities.TryGetComponent(truck, out GroundMovementState motion) ||
-            !VehicleDockPose.TryCreate(definition, buildingTransform, transform, out var pose)) return false;
-        ClearFormationMembership(entities, truck);
-        if (pose.Contains(transform.Position, 0)) return false;
-
-        Vector3 forward = new(MathF.Sin(pose.Heading), 0, MathF.Cos(pose.Heading));
-        float margin = 2 * MathF.Sqrt(pose.HalfLength * pose.HalfLength + pose.HalfWidth * pose.HalfWidth) + movement.StopRadius + 2.5f;
-        float waitingSeparation = margin + movement.SeparationRadius;
-        float distance = MathF.Max(8, margin);
-        if (_navigation is not null) distance += _navigation.World.Grid.Settings.CellSizeMeters;
-        if (entities.TryGetComponent(building, out VehicleDockSlot occupied) && occupied.Pose.ApproachStart is Vector3 approach)
-            distance = MathF.Max(distance, Vector3.Dot(pose.Entry - approach, forward) + margin);
-        Vector3 staging = pose.Entry - forward * distance;
-        if (_navigation is not null && entities.TryGetComponent(truck, out NavigationAgent agent))
-        {
-            var grid = _navigation.World.Grid;
-            bool found = false;
-            for (int step = 1; step <= 6 && !found; step++)
-            {
-                Vector3 outward = new(-forward.Z, 0, forward.X);
-                if (Vector3.Dot(outward, pose.Service - buildingTransform.Position) < 0) outward = -outward;
-                for (int candidate = 0; candidate < 3 && !found; candidate++)
-                {
-                    Vector3 offset = candidate switch { 0 => -forward, 1 => outward, _ => outward - forward };
-                    Vector3 coarseStart = pose.Entry + offset * (step * grid.Settings.CellSizeMeters);
-                    if (!grid.TryWorldToCell(coarseStart, out var approachCell) || !grid.IsTraversable(approachCell, agent.Capabilities)) continue;
-                    Vector3 proposed = coarseStart - forward * margin;
-                    if (!grid.TryWorldToCell(proposed, out var cell) || !grid.IsTraversable(cell, agent.Capabilities) ||
-                        !StagingPointAvailable(entities, truck, proposed, waitingSeparation) ||
-                        pose.Contains(proposed, pose.HalfLength) ||
-                        entities.TryGetComponent(building, out VehicleDockSlot activeLane) && activeLane.Pose.Contains(proposed, pose.HalfLength)) continue;
-                    staging = proposed;
-                    found = true;
-                }
-            }
-            if (!found)
-            {
-                StopDockMotion(entities, truck);
-                Put(entities, truck, new VehicleDockVisit(building, 0, VehicleDockStatus.Blocked, VehicleDockBlockReason.Obstructed, pose));
-                return true;
-            }
-        }
-        if (entities.TryGetComponent(truck, out VehicleDockVisit pending) && pending.Generation == 0 && pending.Building == building &&
-            pending.Pose.ApproachStart is Vector3 previous && float.IsFinite(previous.X) && float.IsFinite(previous.Y) && float.IsFinite(previous.Z) &&
-            VehicleDockPose.HorizontalDistanceSquared(pending.Pose.Service, pose.Service) < 0.001f &&
-            StagingPointAvailable(entities, truck, previous, waitingSeparation) &&
-            !pose.Contains(previous, pose.HalfLength) &&
-            (!entities.TryGetComponent(building, out VehicleDockSlot activeSlot) || !activeSlot.Pose.Contains(previous, pose.HalfLength)) &&
-            (_navigation is null || !entities.TryGetComponent(truck, out NavigationAgent previousAgent) ||
-             _navigation.World.Grid.TryWorldToCell(previous, out var previousCell) && _navigation.World.Grid.IsTraversable(previousCell, previousAgent.Capabilities)))
-            staging = previous - Vector3.UnitY * movement.HeightOffset;
-        if (!StagingPointAvailable(entities, truck, staging, waitingSeparation))
-        {
-            Vector3 outward = new(-forward.Z, 0, forward.X);
-            if (Vector3.Dot(outward, pose.Service - buildingTransform.Position) < 0) outward = -outward;
-            bool found = false;
-            for (int step = 1; step <= 6 && !found; step++)
-            {
-                Vector3 candidate = staging + outward * (step * waitingSeparation);
-                if (pose.Contains(candidate, pose.HalfLength) ||
-                    entities.TryGetComponent(building, out VehicleDockSlot lane) && lane.Pose.Contains(candidate, pose.HalfLength) ||
-                    !StagingPointAvailable(entities, truck, candidate, waitingSeparation)) continue;
-                staging = candidate;
-                found = true;
-            }
-            if (!found)
-            {
-                StopDockMotion(entities, truck);
-                Put(entities, truck, new VehicleDockVisit(building, 0, VehicleDockStatus.Blocked, VehicleDockBlockReason.Obstructed, pose));
-                return true;
-            }
-        }
-        if (_terrain is not null)
-        {
-            if (!_terrain.TrySampleHeight(staging.X, staging.Z, out float height)) return false;
-            staging.Y = height;
-        }
-        staging.Y += movement.HeightOffset;
-        float tolerance = movement.StopRadius + 0.5f;
-        if (VehicleDockPose.HorizontalDistanceSquared(transform.Position, staging) <= tolerance * tolerance &&
-            motion.Velocity.LengthSquared() <= 0.05f * 0.05f) return false;
-
-        // Strategic travel stays outside the entry. A distant truck must not
-        // monopolize the bay while another truck could already use it.
-        if (!TacticalCommandUtilities.TryGetMovementIntent(context, truck, out MovementOrder intent) ||
-            VehicleDockPose.HorizontalDistanceSquared(intent.WorldTarget, staging) > 0.01f)
-        {
-            StopDockMotion(entities, truck);
-            Put(entities, truck, new MovementOrder(owner, staging, context.Tick, context.Tick));
-        }
-        bool busy = entities.TryGetComponent(building, out VehicleDockSlot active) && active.Truck != truck;
-        Put(entities, truck, new VehicleDockVisit(building, 0, busy ? VehicleDockStatus.Busy : VehicleDockStatus.Reserved,
-            busy ? VehicleDockBlockReason.Obstructed : VehicleDockBlockReason.None, pose with { ApproachStart = staging }));
-        return true;
-    }
-
-    private static bool StagingPointAvailable(EntityRegistry entities, EntityId truck, Vector3 point, float separation)
-    {
-        foreach (EntityId other in entities.Query<VehicleDockVisit>())
-        {
-            if (other == truck) continue;
-            var visit = entities.GetComponent<VehicleDockVisit>(other);
-            if (visit.Generation == 0 && visit.Pose.ApproachStart is Vector3 waiting &&
-                VehicleDockPose.HorizontalDistanceSquared(point, waiting) < separation * separation) return false;
-        }
-        return true;
-    }
     internal static bool BlocksStagingStep(EntityRegistry entities, EntityId truck, in WorldTransform current, in WorldTransform next)
     {
+        if (BlocksQueueStep(entities, truck, current, next)) return true;
         if (!entities.TryGetComponent(truck, out VehicleDockVisit visit) || visit.Generation != 0 ||
             !entities.TryGetComponent(visit.Building, out VehicleDockSlot slot) || slot.Truck == truck) return false;
         var first = VehicleBounds(current);
@@ -583,6 +482,7 @@ public sealed class VehicleDockingService
 
     public static void Suspend(EntityRegistry entities, EntityId truck)
     {
+        RemoveQueueAssignment(entities, truck);
         if (!entities.HasComponent<VehicleDockVisit>(truck)) return;
         StopDockMotion(entities, truck);
         entities.RemoveComponent<VehicleDockVisit>(truck);
@@ -592,8 +492,9 @@ public sealed class VehicleDockingService
     public static void Cancel(EntityRegistry entities, EntityId truck)
     {
         bool docking = entities.HasComponent<VehicleDockVisit>(truck) || entities.HasComponent<SupplyLoadingOrder>(truck) ||
-            entities.HasComponent<CargoTransportOrder>(truck);
+            entities.HasComponent<CargoTransportOrder>(truck) || entities.HasComponent<VehicleQueueEntry>(truck);
         if (!docking) return;
+        RemoveQueueAssignment(entities, truck);
         StopDockMotion(entities, truck);
         if (entities.HasComponent<VehicleDockVisit>(truck)) entities.RemoveComponent<VehicleDockVisit>(truck);
         if (entities.HasComponent<SupplyLoadingOrder>(truck)) entities.RemoveComponent<SupplyLoadingOrder>(truck);
@@ -618,6 +519,7 @@ public sealed class VehicleDockingService
 
     public void Cleanup(EntityRegistry entities)
     {
+        _queues.Cleanup(entities);
         _occupiedBuildings.Clear();
         foreach (EntityId building in entities.Query<VehicleDockSlot>(QueryIterationOrder.StableByEntityIndex))
             _occupiedBuildings.Add(building);
@@ -686,6 +588,7 @@ public sealed class VehicleDockingService
         if (!entities.TryGetComponent(building, out VehicleDockSlot slot) || slot.Truck != truck || slot.Generation != generation || OwnerInLane(entities, slot) ||
             !LaneClear(entities, building, slot.Truck, slot.Pose)) return false;
         entities.RemoveComponent<VehicleDockSlot>(building);
+        RemoveQueueAssignment(entities, truck);
         if (entities.TryGetComponent(truck, out VehicleDockVisit visit) && visit.Building == building && visit.Generation == generation)
         {
             if (visit.Status == VehicleDockStatus.Exiting) StopDockMotion(entities, truck);
@@ -766,10 +669,10 @@ public sealed class VehicleDockingService
         return new AxisAlignedBounds(transform.Position - half, transform.Position + half);
     }
 
-    private static bool Operational(EntityRegistry entities, EntityId entity) =>
+    internal static bool Operational(EntityRegistry entities, EntityId entity) =>
         entities.IsAlive(entity) && (!entities.TryGetComponent(entity, out HealthState health) || !health.IsDepleted);
 
-    private static bool OwnsTruck(EntityRegistry entities, EntityId truck, PlayerId owner) =>
+    internal static bool OwnsTruck(EntityRegistry entities, EntityId truck, PlayerId owner) =>
         Operational(entities, truck) &&
         (!entities.TryGetComponent(truck, out ControllableEntity control) || control.Owner == owner && control.IsControllable) &&
         (!entities.TryGetComponent(truck, out CargoTransport cargo) || cargo.Owner == owner) &&

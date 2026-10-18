@@ -16,7 +16,7 @@ public readonly record struct VehicleQueueEntry(
     VehicleQueueService Service, int Position = 0, int WaitingCount = 0,
     Vector3 Target = default, float Heading = 0, EntityId Predecessor = default,
     VehicleQueueWaitReason WaitReason = VehicleQueueWaitReason.Predecessor,
-    SimulationTick ChangedAtTick = default);
+    SimulationTick ChangedAtTick = default, bool ArrivedAtService = false);
 
 public readonly record struct VehicleQueueLane(Vector3 Front, float Heading, int Capacity);
 
@@ -28,9 +28,10 @@ public sealed class VehicleQueueCoordinator
     public bool TryRegister(EntityRegistry entities, EntityId truck, EntityId building, PlayerId owner,
         SimulationTick tick, VehicleQueueService service, int capacity = 20)
     {
-        if (capacity <= 0 || !entities.IsAlive(truck) ||
+        if (capacity <= 0 || !VehicleDockingService.OwnsTruck(entities, truck, owner) ||
+            !VehicleDockingService.Operational(entities, building) ||
             !entities.TryGetComponent(building, out CompletedBuilding completed) || completed.Owner != owner ||
-            !entities.TryGetComponent(truck, out ControllableEntity control) || control.Owner != owner || !control.IsControllable)
+            entities.TryGetComponent(truck, out ControllableEntity control) && (control.Owner != owner || !control.IsControllable))
             return false;
         if (entities.TryGetComponent(truck, out VehicleQueueEntry existing))
             return existing.Building == building && existing.Owner == owner && existing.Service == service;
@@ -73,6 +74,7 @@ public sealed class VehicleQueueCoordinator
         if (!entities.TryGetComponent(truck, out VehicleQueueEntry entry) || entry.Building != building || entry.Generation != generation)
             return false;
         entities.RemoveComponent<VehicleQueueEntry>(truck);
+        if (entities.HasComponent<VehicleQueueMotion>(truck)) entities.RemoveComponent<VehicleQueueMotion>(truck);
         return true;
     }
 
@@ -82,11 +84,17 @@ public sealed class VehicleQueueCoordinator
         foreach (EntityId truck in entities.Query<VehicleQueueEntry>())
         {
             var entry = entities.GetComponent<VehicleQueueEntry>(truck);
-            if (!entities.TryGetComponent(entry.Building, out CompletedBuilding building) || building.Owner != entry.Owner ||
-                !entities.TryGetComponent(truck, out ControllableEntity control) || control.Owner != entry.Owner || !control.IsControllable ||
+            if (!VehicleDockingService.OwnsTruck(entities, truck, entry.Owner) ||
+                !VehicleDockingService.Operational(entities, entry.Building) ||
+                !entities.TryGetComponent(entry.Building, out CompletedBuilding building) || building.Owner != entry.Owner ||
+                entities.TryGetComponent(truck, out ControllableEntity control) && (control.Owner != entry.Owner || !control.IsControllable) ||
                 !entities.HasComponent<VehicleDockVisit>(truck) && !entities.HasComponent<CargoTransportOrder>(truck) &&
                 !entities.HasComponent<SupplyLoadingOrder>(truck)) _members.Add(truck);
         }
-        foreach (EntityId truck in _members) entities.RemoveComponent<VehicleQueueEntry>(truck);
+        foreach (EntityId truck in _members)
+        {
+            entities.RemoveComponent<VehicleQueueEntry>(truck);
+            if (entities.HasComponent<VehicleQueueMotion>(truck)) entities.RemoveComponent<VehicleQueueMotion>(truck);
+        }
     }
 }
