@@ -11,6 +11,34 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishSupplyPolicyTests
 {
     [Theory]
+    [InlineData(0.0, 30.0)]
+    [InlineData(29.0, 1.0)]
+    [InlineData(30.0, 0.0)]
+    public void CoreLoadingSourceRequestsPhysicalAmmunitionForWaitingSupplyTrucks(double cargo, double minimum)
+    {
+        using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var side = scenario.GetBase(new PlayerId(1));
+        Assert.True(scenario.Inventories.Remove(side.StartingInventory, ResourceIds.Ammunition,
+            scenario.Inventories.GetAvailableQuantity(side.StartingInventory, ResourceIds.Ammunition)).Succeeded);
+        Vector3 position = entities.GetComponent<WorldTransform>(side.CommandCore).Position + Vector3.UnitX * 200;
+        EntityId truck = scenario.UnitFactory.Create(DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck], position, side.Player);
+        SupplyTruck supply = entities.GetComponent<SupplyTruck>(truck);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, supply.FuelTarget).Succeeded);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, cargo).Succeeded);
+        entities.AddComponent(truck, new SupplyLoadingOrder(side.CommandCore, SimulationTick.Zero,
+            VehicleDockBlockReason.SourceEmpty, 1_000));
+
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+
+        LogisticsStockPolicy policy = FindStockPolicy(entities, side.CommandCore, ResourceIds.Ammunition);
+        Assert.Equal(minimum, policy.DesiredMinimum);
+        Assert.Equal(minimum > 0 ? LogisticsStockPriority.Critical : LogisticsStockPriority.High, policy.Priority);
+        Assert.Equal(0.0, scenario.Inventories.GetQuantity(side.StartingInventory, ResourceIds.Ammunition));
+        Assert.Equal(cargo, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition));
+    }
+
+    [Theory]
     [InlineData(100, 80, false, true)]
     [InlineData(55, 30, false, true)]
     [InlineData(0, 0, false, false)]

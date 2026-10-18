@@ -502,5 +502,45 @@
     "file": "gameplay-investigation/foundation-queue-dispatch-game-suite.log.gz",
     "originalSha256": "A8452ECF958E66BCFEC2C0CDC7E1A935F21C2957B1EAF2D055CD07CF6D3EBDE4",
     "compressedSha256": "77645D3F6E1CCE96AE381CC5BDB4FD300BF426A7D808C5A2A72597596C9B41C6"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-dispatch-opponent.json.gz",
+    "originalSha256": "2736CB372089EB4DCD9359C29B8A54C4988D5016BE4C433C00F35CD28CFFF0AB",
+    "compressedSha256": "F265A98B129955D35EC55A9F29626392B99E1FE140FD3A8C3E90BD58FB03E13B"
+  },
+  {
+    "file": "gameplay-investigation/foundation-queue-dispatch-opponent.save.json.gz",
+    "originalSha256": "DD57D9B20F38BA2CEA24B7BBB12FEDA9394A56FA57B96296B12E2A5D848E0D00",
+    "compressedSha256": "25B66289B8D8F1D9988219B7C4ED38D957DAE44E1D441322CC6C634E413FB2EA"
+  },
+  {
+    "file": "gameplay-investigation/foundation-processor-before.log.gz",
+    "originalSha256": "3B496CD097C733E77F87A8C0C3AEB5DCB6F34E00F649F04B0CB41556960502E2",
+    "compressedSha256": "0F65E84866DB1AF877B0E0A9C0394D53B78DBCD400CDAF3F7D85D096BEC9A6F1"
+  },
+  {
+    "file": "gameplay-investigation/foundation-processor-game-suite.log.gz",
+    "originalSha256": "93240D056325D1C986576A4235D773AE44E0A973087F723B98168DFCBB46747B",
+    "compressedSha256": "9402A04B5BFED50574BF9E4CC6085C08763E41D43B1D23284786FC9A366F975D"
+  },
+  {
+    "file": "gameplay-investigation/foundation-processor-opponent.json.gz",
+    "originalSha256": "DF9B06BCE5368DAE115374D35C9333EFC2D4FA1207DAB50370294CA5194ACD28",
+    "compressedSha256": "E35D00D589BCE3C35AD6EE21993774D3FC0234250DFF493244C669DC3800D8E6"
+  },
+  {
+    "file": "gameplay-investigation/foundation-processor-opponent.save.json.gz",
+    "originalSha256": "88375D912CCF6CF7791BB20AEC42C4E5CA1F7CA100470549D72315D0212B0713",
+    "compressedSha256": "A58FECD74C1BE123486D2C1F5BB22123E221E36E1C16751997C4AAA74A16423D"
+  },
+  {
+    "file": "gameplay-investigation/foundation-electronics-game-suite.log.gz",
+    "originalSha256": "1C1B1E0138EAD8AD1054CDCBD29CFF2D76FEA3F2CD051EF355611A09AA3B0192",
+    "compressedSha256": "3182421921B3A6A6CD39D36258F1501D32A656737B1F2B06115E0968F028CC89"
+  },
+  {
+    "file": "gameplay-investigation/foundation-core-ammo-game-suite.log.gz",
+    "originalSha256": "D29C4A4A0599E7612CE569A2A25057F895D8D87CDB520C68250404B48A9C0785",
+    "compressedSha256": "9B495A1C6587F9B4D386AA9A1B586AC8E15DABE361E99225AD86D6AB9918032B"
   }
 ]

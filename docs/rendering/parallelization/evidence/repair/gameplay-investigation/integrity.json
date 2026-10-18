@@ -176,6 +176,46 @@
       "file": "foundation-queue-dispatch-game-suite.log.gz",
       "rawSha256": "a8452ecf958e66bcfec2c0cdc7e1a935f21c2957b1eaf2d055cd07cf6d3ebde4",
       "archiveSha256": "77645d3f6e1cce96ae381cc5bdb4fd300bf426a7d808c5a2a72597596c9b41c6"
+    },
+    {
+      "file": "foundation-queue-dispatch-opponent.json.gz",
+      "rawSha256": "2736cb372089eb4dcd9359c29b8a54c4988d5016be4c433c00f35cd28cfff0ab",
+      "archiveSha256": "f265a98b129955d35ec55a9f29626392b99e1fe140fd3a8c3e90bd58fb03e13b"
+    },
+    {
+      "file": "foundation-queue-dispatch-opponent.save.json.gz",
+      "rawSha256": "dd57d9b20f38ba2cea24b7bbb12feda9394a56fa57b96296b12e2a5d848e0d00",
+      "archiveSha256": "25b66289b8d8f1d9988219b7c4ed38d957dae44e1d441322cc6c634e413fb2ea"
+    },
+    {
+      "file": "foundation-processor-before.log.gz",
+      "rawSha256": "3b496cd097c733e77f87a8c0c3aeb5dcb6f34e00f649f04b0cb41556960502e2",
+      "archiveSha256": "0f65e84866db1af877b0e0a9c0394d53b78dbcd400cdaf3f7d85d096bec9a6f1"
+    },
+    {
+      "file": "foundation-processor-game-suite.log.gz",
+      "rawSha256": "93240d056325d1c986576a4235d773ae44e0a973087f723b98168dfcbb46747b",
+      "archiveSha256": "9402a04b5bfed50574bf9e4cc6085c08763e41d43b1d23284786fc9a366f975d"
+    },
+    {
+      "file": "foundation-processor-opponent.json.gz",
+      "rawSha256": "df9b06bce5368dae115374d35c9333efc2d4fa1207dab50370294ca5194acd28",
+      "archiveSha256": "e35d00d589bce3c35ad6ee21993774d3fc0234250dff493244c669dc3800d8e6"
+    },
+    {
+      "file": "foundation-processor-opponent.save.json.gz",
+      "rawSha256": "88375d912ccf6cf7791bb20aec42c4e5ca1f7ca100470549d72315d0212b0713",
+      "archiveSha256": "a58fecd74c1be123486d2c1f5bb22123e221e36e1c16751997c4aaa74a16423d"
+    },
+    {
+      "file": "foundation-electronics-game-suite.log.gz",
+      "rawSha256": "1c1b1e0138ead8ad1054cdcbd29cff2d76fea3f2cd051ef355611a09aa3b0192",
+      "archiveSha256": "3182421921b3a6a6cd39d36258f1501d32a656737b1f2b06115e0968f028cc89"
+    },
+    {
+      "file": "foundation-core-ammo-game-suite.log.gz",
+      "rawSha256": "d29c4a4a0599e7612ce569a2a25057f895d8d87cdb520c68250404b48a9c0785",
+      "archiveSha256": "9b495a1c6587f9b4d386aa9a1b586ac8e15dabe361e99225ad86d6ab9918032b"
     }
   ]
 }

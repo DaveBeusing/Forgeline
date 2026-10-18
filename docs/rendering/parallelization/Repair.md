@@ -433,3 +433,32 @@ The required 80,000-tick terminal match remains to be rerun on this source.
 Fixture-5 native pairs use the current unchanged master, retaining the same
 128 warmups / 512 samples, B-A-A-B order, two readbacks and 15% gate. Earlier
 failed fixture-3/4 protocols remain historical evidence and are not reclassified.
+
+
+## Physical ammunition replenishment of the core loading source
+
+Source 7b07ea8d still reaches Active/Running at the original 80,000-tick limit.
+Its saved state contains ammunition in the ammunition factories, while several
+Supply Trucks wait at the command cores with no cargo ammunition. Core stocks
+contain plentiful Fuel but no Ammunition. The AI recognizes the core as a loading
+source but installs no ammunition stock policy there. Thus consuming the initial
+stock leaves no inbound physical distribution request for this loading source.
+
+Add a demand-driven core ammunition policy from its own waiting loading trucks.
+The critical minimum is the sum of their deficits below the existing 25% dispatch
+threshold; the target is their remaining full cargo requirement. No demand means
+a zero minimum/target, and ordinary surplus remains High. Actual deliveries still
+require available producer stock, cargo trucks, physical docks and reservations.
+No resource is created, no fleet bounds or readiness/deadline contract changes.
+Three cases cover empty cargo and either side of the dispatch boundary, asserting
+unchanged physical inventories. All 554 Game tests pass, zero failures/skips,
+204.122 seconds. Client/headless builds have zero warnings/errors. Full terminal
+qualification and final-source CI remain pending at this commit.
+
+The broader processor-priority experiments are excluded. Prioritizing every
+powered NoInput processor fails six existing strategic tests; promoting only
+Electronics input fails two. Their complete results and the broad variant's
+nonterminal full-match state remain archived. The initial experimental dispatch
+test also had a wrong conservation expectation (200 instead of the actual 300
+including source Fuel); it is excluded together with that global change. None
+of these failed variants is part of the final runtime.

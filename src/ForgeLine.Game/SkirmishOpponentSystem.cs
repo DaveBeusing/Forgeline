@@ -3159,6 +3159,25 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 LogisticsStockPriority.High);
         }
 
+        // The core is also a field-supply loading source. Its ammunition must
+        // have a physical inbound request when waiting trucks cannot dispatch.
+        double coreAmmunitionMinimum = 0.0;
+        double coreAmmunitionTarget = 0.0;
+        foreach (EntityId truckEntity in owned.Units)
+        {
+            if (!context.Entities.TryGetComponent(truckEntity, out SupplyLoadingOrder loading) ||
+                loading.Source != controller.PreferredConstructionSource ||
+                !context.Entities.TryGetComponent(truckEntity, out SupplyTruck supply) ||
+                !_inventories.Contains(supply.InventoryId)) continue;
+            double cargo = _inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition);
+            coreAmmunitionMinimum += Math.Max(0.0, supply.AmmunitionTarget * 0.25 - cargo);
+            coreAmmunitionTarget += Math.Max(0.0, supply.AmmunitionTarget - cargo);
+        }
+        SetStockPolicy(context, controller.Player, controller.PreferredConstructionSource,
+            ResourceIds.Ammunition, coreAmmunitionMinimum, coreAmmunitionTarget,
+            Math.Max(240.0, coreAmmunitionTarget),
+            coreAmmunitionMinimum > 1e-9 ? LogisticsStockPriority.Critical : LogisticsStockPriority.High);
+
         for (int index = 0;
              index < owned.ProductionFacilities.Count;
              index++)
