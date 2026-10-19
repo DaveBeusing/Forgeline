@@ -99,6 +99,43 @@ public sealed class LogisticsZoneOverlayTests
         Assert.Empty(strokes);
     }
 
+    [Fact]
+    public void OwnedDockAndAssignedQueueExtractOnlyCurrentAuthorizedFootprints()
+    {
+        var entities = new ForgeLine.Ecs.EntityRegistry();
+        var building = entities.CreateEntity();
+        var truck = entities.CreateEntity();
+        var secondTruck = entities.CreateEntity();
+        entities.AddComponent(building, new CompletedBuilding(BuildingIds.StorageDepot,
+            new(1), SimulationTick.Zero));
+        entities.AddComponent(building, new VisualIdentity(1));
+        entities.AddComponent(truck, new ControllableEntity(new(1), ControllableEntityCategory.Unit));
+        entities.AddComponent(truck, new VisualIdentity(2));
+        entities.AddComponent(truck, new WorldTransform(new(12, 0, 10), Quaternion.Identity, new(3.2f, 2.4f, 6.4f)));
+        entities.AddComponent(secondTruck, new ControllableEntity(new(1), ControllableEntityCategory.Unit));
+        entities.AddComponent(secondTruck, new VisualIdentity(3));
+        entities.AddComponent(secondTruck, new WorldTransform(new(5, 0, 10), Quaternion.Identity, new(4, 2.4f, 8)));
+        var pose = new VehicleDockPose(new(4, 0, 10), new(14, 0, 10), new(24, 0, 10),
+            MathF.PI * .5f, 3.2f, 1.6f);
+        entities.AddComponent(building, new VehicleDockSlot(truck, 1, pose, new(1)));
+        entities.AddComponent(secondTruck, new VehicleQueueEntry(building, new(1), 1, new(2),
+            VehicleQueueService.CargoDelivery, Position: 1, Target: new(1, 0, 10),
+            Heading: MathF.PI * .5f));
+
+        var captured = LogisticsZoneSnapshot.Capture(entities, new(1), Terrain);
+        Assert.Contains(captured.Strokes.ToArray(), item => item.Kind == LogisticsZoneKind.Loading &&
+            item.Building == building && item.Vehicle == truck);
+        Assert.Contains(captured.Strokes.ToArray(), item => item.Kind == LogisticsZoneKind.Holding &&
+            item.Building == building && item.Vehicle == secondTruck);
+        Assert.Empty(LogisticsZoneSnapshot.Capture(entities, new(2), Terrain).Strokes.ToArray());
+
+        entities.SetComponent(secondTruck, new VisualIdentity(3, VisualVisibilityMask.None));
+        Assert.DoesNotContain(LogisticsZoneSnapshot.Capture(entities, new(1), Terrain).Strokes.ToArray(),
+            item => item.Vehicle == secondTruck);
+        entities.DestroyEntity(building);
+        Assert.Empty(LogisticsZoneSnapshot.Capture(entities, new(1), Terrain).Strokes.ToArray());
+    }
+
     private sealed class PlaneTerrain : ITerrainQuery
     {
         public AxisAlignedBounds WorldBounds => new(new(-1000, -10, -1000), new(1000, 100, 1000));
