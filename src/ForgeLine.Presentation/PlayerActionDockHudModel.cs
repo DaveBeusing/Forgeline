@@ -491,6 +491,8 @@ internal static class PlayerActionDockHudModel
         actions is not null && actions.PendingCommandCount == 0 &&
         !(panel.ContextualPending && panel.ContextualActivationTick == actions.Tick &&
           panel.ContextualSessionId == actions.SessionId) &&
+        !(mode == PlayerActionPanelMode.Logistics && actions.Logistics is { } orders &&
+          index >= orders.OrderStartIndex) &&
         control switch
         {
             PlayerActionDockControlKind.Activate =>
