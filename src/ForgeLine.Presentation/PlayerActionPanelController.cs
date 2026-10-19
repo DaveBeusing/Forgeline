@@ -1147,6 +1147,8 @@ public sealed partial class PlayerActionPanelController
     private void CyclePrimarySetting(
         PlayerActionSnapshot? actions)
     {
+        if (Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } orders &&
+            SelectedIndex >= orders.OrderStartIndex) return;
         if (Mode == PlayerActionPanelMode.Supply && actions?.Supply is { IsStaticProvider: true }) return;
         if (Mode is
             PlayerActionPanelMode.Production or
@@ -1206,6 +1208,8 @@ public sealed partial class PlayerActionPanelController
     private void CycleSecondarySetting(
         PlayerActionSnapshot? actions)
     {
+        if (Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } orders &&
+            SelectedIndex >= orders.OrderStartIndex) return;
         if (Mode == PlayerActionPanelMode.Supply && actions?.Supply is { IsStaticProvider: true }) return;
         if (Mode ==
             PlayerActionPanelMode.Production)
