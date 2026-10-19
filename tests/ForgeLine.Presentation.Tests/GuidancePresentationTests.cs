@@ -71,6 +71,41 @@ public sealed class GuidancePresentationTests
         Assert.True(renderer.LastGuidanceVertexCount > 0);
     }
 
+    [Theory]
+    [InlineData(PlacementContextState.Valid)]
+    [InlineData(PlacementContextState.Stale)]
+    [InlineData(PlacementContextState.Pending)]
+    [InlineData(PlacementContextState.Invalid)]
+    [InlineData(PlacementContextState.MissingMaterials)]
+    public void PlacementContextUsesOneCenteredTranslucentBarWithoutOldPanelHitArea(PlacementContextState state)
+    {
+        using var device = new RecordingDevice();
+        using var renderer = new RtsInformationOverlayRenderer(device);
+        var snapshot = EarlyGameGuidanceTests.Snapshot(0);
+        var viewport = new RecordingContext { Width = 1920, Height = 1080 };
+        var layout = GameplayHudLayout.Create(viewport.Width, viewport.Height, 96);
+        var ux = default(PreAlphaUxView) with
+        {
+            Placement = new(state, "Vehicle Factory", "PLACEMENT CHECK",
+                "Move to the intended construction location", SessionId: snapshot.SessionId, Tick: snapshot.Tick)
+        };
+        renderer.Render(viewport, new RtsCamera(), snapshot, default,
+            RtsInformationLayerView.Empty, CombatGroupOverviewView.Empty, 96,
+            preAlphaUx: ux, presentationTime: TimeSpan.FromSeconds(1));
+        var bar = renderer.LastGuidanceBounds;
+        Assert.True(renderer.LastGuidanceVertexCount > 0);
+        Assert.InRange(bar.Height, 25, 50);
+        Assert.True(bar.Width > 200);
+        Assert.Equal(OnboardingPresentation.Resolve(layout, 0).Panel.Y, bar.Y);
+        Assert.True(bar.Bottom < OnboardingPresentation.Resolve(layout, 0).Panel.Bottom);
+        Assert.Equal(.30f, NotificationSurfaceVisuals.BackgroundOpacity);
+        var outside = new Vector2(bar.X + 10, bar.Bottom + 10);
+        Assert.False(HudInteractionContext.CapturesWorldPointer(new InputState(), layout, false,
+            guidanceVisible: false, onboarding: null));
+        Assert.True(OnboardingPresentation.Resolve(layout, 0).Panel.Contains(outside));
+        Assert.False(bar.Contains(outside));
+    }
+
     [Fact]
     public void PointerDoesNotDrawAnAdditionalMouseCursor()
     {

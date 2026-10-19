@@ -207,7 +207,8 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
             context.Layout,
             context.RuntimeMetrics,
             context.ShowRuntimeMetrics,
-            dockExpanded: context.ActionPanel.DockExpanded, localFeedback: context.PreAlphaUx.Placement.Visible ? "" : context.PreAlphaUx.InteractionHint);
+            dockExpanded: context.ActionPanel.DockExpanded, localFeedback: context.PreAlphaUx.Placement.Visible ? "" : context.PreAlphaUx.InteractionHint,
+            presentationTime: context.PresentationTime, animateNotifications: context.AnimateNotifications);
 
     public void RenderWaiting(IGraphicsCommandContext graphics, in GameplayHudLayout layout,
         in RuntimeMetricsView metrics, bool showRuntimeMetrics = false) =>
@@ -242,6 +243,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
     private readonly RuntimeUiIconPalette? _runtimePalette;
+    private readonly NotificationSurfaceMotion _notificationMotion = new();
 
     private int _vertexCount;
     private float _scale = 1.0f;
@@ -277,7 +279,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         PresentationSnapshot? snapshot,
         in GameplayHudLayout layout,
         in RuntimeMetricsView metrics = default,
-        bool showRuntimeMetrics = false, bool hideNotifications = false, bool dockExpanded = false, string localFeedback = "")
+        bool showRuntimeMetrics = false, bool hideNotifications = false, bool dockExpanded = false, string localFeedback = "",
+        TimeSpan presentationTime = default, bool animateNotifications = false)
     {
         ThrowIfDisposed();
         _text.Begin();
@@ -302,7 +305,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 EmitTopStatusBar(experience, layout.TopStatusBar, graphics.Width, graphics.Height);
                 if (!hideNotifications)
                 {
-                    EmitNotificationStack(snapshot, experience, layout, dockExpanded, graphics.Width, graphics.Height, localFeedback);
+                    EmitNotificationStack(snapshot, experience, layout, dockExpanded, graphics.Width, graphics.Height, localFeedback,
+                        presentationTime, animateNotifications);
                 }
             }
             else
@@ -446,10 +450,12 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     }
 
     private void EmitNotificationStack(PresentationSnapshot? snapshot, in PlayerExperienceSnapshot experience,
-        in GameplayHudLayout layout, bool expanded, int width, int height, string localFeedback)
+        in GameplayHudLayout layout, bool expanded, int width, int height, string localFeedback,
+        TimeSpan presentationTime, bool animateNotifications)
     {
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
         var stack = ActionableAlertLayout.Resolve(snapshot, layout, expanded, localFeedback);
+        _notificationMotion.Update(stack, snapshot?.SessionId ?? default, layout, presentationTime, animateNotifications);
         Span<char> buffer = stackalloc char[2048];
         Span<char> ellipsis = stackalloc char[2052];
         _scale = stack.FontSize / 12;
@@ -457,56 +463,59 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         {
             var card = stack.Card(i);
             var item = card.Item;
+            float visibility = _notificationMotion.Opacity(i);
             var color = NotificationText.Severity(experience, item);
-            if (!_skin.Panel(card.Bounds, "panel.raised")) EmitQuad(card.Bounds.X, card.Bounds.Y,
-                card.Bounds.Width, card.Bounds.Height, GameplayHudVisualStyle.PanelRaised, width, height);
-            _skin.State(card.Bounds, color == HudAlertSeverity.Critical ? UiSkinState.Error : color == HudAlertSeverity.Warning ? UiSkinState.Warning : UiSkinState.Normal);
+            if (!_skin.Panel(card.Bounds, "panel.raised", NotificationSurfaceVisuals.BackgroundOpacity * visibility))
+                EmitQuad(card.Bounds.X, card.Bounds.Y, card.Bounds.Width, card.Bounds.Height,
+                    GameplayHudVisualStyle.PanelRaised with { W = NotificationSurfaceVisuals.BackgroundOpacity * visibility }, width, height);
             EmitQuad(card.Bounds.X, card.Bounds.Y, color == HudAlertSeverity.Critical ? 5 : 3,
-                card.Bounds.Height, SeverityColor(color), width, height);
-            if (item.Hidden == 0) EmitIcon(item.Feedback ? CommandIcon(experience.Feedback.Kind) : AlertIcon(item.Kind),
-                card.Bounds.X + 8 * ActionableAlertLayout.Scale(layout), card.Bounds.Y + 4 * ActionableAlertLayout.Scale(layout),
-                stack.FontSize, width, height);
-            var text = NotificationText.Format(experience, alerts, item, buffer, localFeedback);
-            float y = card.Text.Y;
-            float lineHeight = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * stack.FontSize;
-            while (text.Length > 0 && y + stack.FontSize <= card.Text.Bottom)
-            {
-                var line = NotificationText.Line(text, card.Text.Width, stack.FontSize, out int consumed);
-                if (card.Truncated && y + lineHeight + stack.FontSize > card.Text.Bottom)
-                {
-                    float suffixWidth = UiFontMetrics.Default.Measure("...", stack.FontSize);
-                    int prefix = UiFontMetrics.Default.FitPrefix(line, MathF.Max(0, card.Text.Width - suffixWidth), stack.FontSize, false);
-                    line[..prefix].CopyTo(ellipsis); "...".AsSpan().CopyTo(ellipsis[prefix..]);
-                    line = ellipsis[..(prefix + 3)];
-                }
-                if (!_text.Add(line, card.Text.X, y, stack.FontSize, TextColor, width, height, card.Text.Width))
-                    EmitText(line[..Math.Min(line.Length, (int)(card.Text.Width / (GlyphAdvance * _scale)))],
-                        card.Text.X, y, TextColor, width, height);
-                text = text[consumed..];
-                y += lineHeight;
-            }
+                card.Bounds.Height, SeverityColor(color) with { W = visibility }, width, height);
+            float iconSize = stack.FontSize;
+            EmitIcon(item.Hidden > 0 ? RtsUiIcon.StatusAlert :
+                item.Feedback ? CommandIcon(experience.Feedback.Kind) : item.Local ? RtsUiIcon.StatusAlert : AlertIcon(item.Kind),
+                card.Bounds.X + (5 + 4) * ActionableAlertLayout.Scale(layout),
+                card.Bounds.Y + (card.Bounds.Height - iconSize) * .5f,
+                iconSize, width, height, visibility);
+            var message = NotificationText.Format(experience, alerts, item, buffer, localFeedback);
+            var visible = NotificationText.Ellipsized(message, card.Text.Width, stack.FontSize, ellipsis);
+            if (!_text.AddCentered(visible, card.Text, stack.FontSize, TextColor with { W = visibility }, width, height))
+                EmitText(visible, card.Text.X, card.Text.Y, TextColor with { W = visibility }, width, height);
             if (!card.Action.IsEmpty && item.Hidden == 0)
             {
-                string label = item.Feedback || item.Local ? "MORE" : "OPS";
-                if (alerts is not null)
+                bool collapsedMore = card.Truncated && card.Action == card.Details;
+                string label = collapsedMore || item.Feedback || item.Local ? "MORE" : "OPS";
+                if (!collapsedMore && alerts is not null)
                     for (int a = 0; a < alerts.Alerts.Count; a++)
                         if (alerts.Alerts[a].Identity.Kind == item.Kind && alerts.Alerts[a].Target.IsValid) label = "FOCUS";
-                EmitNotificationAction(label, card.Action, stack.FontSize, width, height);
+                EmitNotificationAction(label, card.Action, stack.FontSize, width, height, visibility);
             }
-            if (card.Truncated && !card.Details.IsEmpty)
-            { EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height); }
+            if (card.Truncated && !card.Details.IsEmpty && card.Details != card.Action && item.Hidden == 0)
+                EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height, visibility);
+        }
+        // Retired cards paint only a short-lived, noninteractive background. Their old
+        // text and targets never cross a resolved/session boundary.
+        for (int i = 0; i < _notificationMotion.RetiredCount; i++)
+        {
+            var (bounds, alpha) = _notificationMotion.Retired(i);
+            bool overlaps = false;
+            for (int active = 0; active < stack.Count; active++)
+                if (bounds.Intersects(stack.Card(active).Bounds)) { overlaps = true; break; }
+            if (!overlaps && alpha > 0)
+                EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
+                    GameplayHudVisualStyle.PanelRaised with { W = NotificationSurfaceVisuals.BackgroundOpacity * alpha },
+                    width, height);
         }
         _scale = layout.Scale;
     }
 
-    private void EmitNotificationAction(string label, in HudRect bounds, float fontSize, int width, int height)
+    private void EmitNotificationAction(string label, in HudRect bounds, float fontSize, int width, int height, float visibility)
     {
-        if (!_skin.Control(bounds)) EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
-            GameplayHudVisualStyle.PanelRaised, width, height);
-        if (!_text.AddCentered(label, bounds, fontSize, TextColor, width, height))
+        if (!_skin.Panel(bounds, "control.button_compact", visibility)) EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
+            GameplayHudVisualStyle.PanelRaised with { W = visibility }, width, height);
+        if (!_text.AddCentered(label, bounds, fontSize, TextColor with { W = visibility }, width, height))
         {
             int count = Math.Min(label.Length, Math.Max(0, (int)(bounds.Width / (GlyphAdvance * _scale))));
-            EmitText(label.AsSpan(0, count), bounds.X, bounds.Y, TextColor, width, height);
+            EmitText(label.AsSpan(0, count), bounds.X, bounds.Y, TextColor with { W = visibility }, width, height);
         }
     }
 
@@ -837,9 +846,10 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         float y,
         float size,
         int width,
-        int height)
+        int height,
+        float visibility = 1)
     {
-        if (_skin.Icon(icon, x, y, size)) return;
+        if (_skin.Icon(icon, x, y, size, new Vector4(1, 1, 1, visibility))) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
@@ -849,6 +859,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         Vector4 color =
             ResolveColor(
                 icon);
+        color.W *= visibility;
         float pixel =
             MathF.Max(
                 1.0f,
@@ -1081,6 +1092,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                         8)
                 ],
                 CullMode = GraphicsCullMode.None,
+                AlphaBlendEnabled = true,
                 DepthEnabled = false
             });
     }

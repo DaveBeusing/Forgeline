@@ -13,6 +13,10 @@ policy retain their separate lifecycle.
 
 The shared action-ring backgrounds have an effective settled alpha of 0.30, independent of the foreground/icon opacity and independent of the 160 ms presentation fade. Disabled, hover, pressed and locally pending fills use the established palette with the same background alpha ceiling. A reversed open/close track starts at its currently rendered alpha and does not move its hit region. Logical closure immediately frees input; no fading quad participates in hit testing. Invalid projected geometry is discarded rather than fading stale world content. Reduced motion, Low quality, paused/suspended presentation, resized viewport, changed DPI/UI scale, clock stall or rollback settle the target immediately. Native captures for this revision are not automatically qualified by earlier UI feedback evidence.
 
+## Notification and context-hint motion
+
+Notifications, local command feedback and the separate placement-context hint use bounded 180 ms SmoothStep alpha tracks per displayed lifecycle/content identity. Their container background is independently tinted to a 0.30 opacity ceiling; foreground glyphs, icons, rails, and buttons retain independent contrast. New/revised content fades in on presentation time; a resolved row immediately disappears from the interactive stack, with only an optional short-lived noninteractive background remnant. Critically active alerts never time out merely because their animation completes. Reduced UI motion, Low quality, focus/minimize/pause suppression, session/display changes, stalled or reversed presentation time settle to the logical state immediately. This does not animate or change any input hit geometry.
+
 ## Motion vocabulary
 
 The existing 140 ms screen-entry interval is a short accent-line reveal within the
