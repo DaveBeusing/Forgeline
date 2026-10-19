@@ -720,6 +720,13 @@ internal sealed class ClientRenderHost : IDisposable
                             gameplayDraw,
                             RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
                         var ringLayout = GameplayHudLayout.Create(context.Width, context.Height, current.Dpi, current.UiScale);
+                        if (current.InformationLayer.MinimapEnabled &&
+                            !current.InformationLayer.MinimapBounds.IsEmpty &&
+                            current.InformationLayer.MinimapBounds.X >= ringLayout.SafeArea.X &&
+                            current.InformationLayer.MinimapBounds.Y >= ringLayout.SafeArea.Y &&
+                            current.InformationLayer.MinimapBounds.Right <= ringLayout.SafeArea.Right &&
+                            current.InformationLayer.MinimapBounds.Bottom <= ringLayout.SafeArea.Bottom)
+                            ringLayout = ringLayout with { Minimap = current.InformationLayer.MinimapBounds };
                         Span<HudRect> occupied = stackalloc HudRect[8];
                         RadialActionLayout.ResolveObstacles(occupied,ringLayout,current.PreAlphaUx.Onboarding,current.Operations,current.CombatGroups,
                             ActionableAlertLayout.Resolve(snapshot,ringLayout,localFeedback:current.PreAlphaUx.Placement.Visible ? "" : current.PreAlphaUx.InteractionHint));
