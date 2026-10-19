@@ -1,6 +1,6 @@
 # Gameplay Input and Visual Qualification
 
-Own single selections use [world anchored action rings](WorldAnchoredActionMenus.md). Click/release selects an object and opens categories. Category keys and the global bar reopen its ring. Click an item to act; use Parameters and Next item for pre-activation editing, queue cancellation and existing setting shortcuts. The inner hole, empty sectors and gaps remain world input. Outside click and Escape dismiss centrally; targeting uses the next world click once. Group controls retain their current dock.
+Own single selections use [world anchored action rings](WorldAnchoredActionMenus.md). Click/release selects an object and opens categories. Existing category keys reopen its ring. The rectangular mode bar and inspector are removed. Click an item to act; use Parameters and Next item for pre-activation editing, queue cancellation and existing setting shortcuts. The inner hole, empty sectors and gaps remain world input. Outside click and Escape dismiss centrally; targeting uses the next world click once. Group tools use the same ring, and copied selection/group status appears in its read-only tooltip.
 
 Gameplay shortcuts share `GameplayBindingRegistry` in the input boundary. The registry captures immutable keys, captions and cached English fallback prompts; the platform now recognizes every Latin letter. Camera mapping stays in the existing `RtsCameraBindings` contract and is consulted for conflicts. Selection, navigation and commands still use the existing presentation controllers and authoritative request gateway.
 
@@ -8,7 +8,7 @@ Gameplay shortcuts share `GameplayBindingRegistry` in the input boundary. The re
 
 Open Settings from the main menu or Pause → Settings. Up/Down moves focus, Left/Right selects GAMEPLAY ACTION or changes GAMEPLAY KEY, and Enter/APPLY saves. The key row scrolls into the existing seven-row viewport. Pointer adjustment uses those same visible row identities. The editor shows each candidate, including a rejected candidate and its reason; rejection leaves the valid draft unchanged and disables APPLY. Move to another candidate or action to resolve it. A gameplay binding change uses the existing settings restart path before starting a match. ESC/BACK discards unsaved edits. During a paused match, binding changes are saved for the next match; the active controllers retain their current mapping.
 
-Twenty-five actions are configurable: seven dock modes, next item, two setting cycles, decrease/increase, activate/cancel job, base focus, formation, strategic layer, minimap, pause, five building shortcuts and placement rotation. Defaults remain B/P/U/L/Y/K/H, Tab/T/M/Left/Right/Enter/C, Home/F3/F10/F11/Space and F4–F9. Unknown/numeric undefined keys, duplicate actions, duplicate command keys, modifier keys, control-group digits and reserved help/developer/cancel keys are rejected. Assignment to a conflicting camera key is rejected for global actions. Dock-only keys intentionally replace camera navigation while the dock owns keyboard focus; global mode keys stay distinct from dock keys.
+Twenty-five actions are configurable: seven action modes, next item, two setting cycles, decrease/increase, activate/cancel job, base focus, formation, strategic layer, minimap, pause, five building shortcuts and placement rotation. Defaults remain B/P/U/L/Y/K/H, Tab/T/M/Left/Right/Enter/C, Home/F3/F10/F11/Space and F4–F9. Unknown/numeric undefined keys, duplicate actions, duplicate command keys, modifier keys, control-group digits and reserved help/developer/cancel keys are rejected. Assignment to a conflicting camera key is rejected for global actions. Menu-only keys intentionally replace camera navigation while a ring owns keyboard focus; global mode keys stay distinct from menu editing keys.
 
 Escape cancellation/pause, mouse selection/targeting, Shift selection/repeat placement, Ctrl/digit group actions, modified developer/guide shortcuts and terminal R restart are fixed entries in the registry. They remain discoverable but are not arbitrary chord/mouse rebinding features. Camera drag and movement continue to use their existing settings.
 
@@ -16,15 +16,15 @@ Schema 1 migrates to schema 2 with default gameplay mappings and the saved camer
 
 ## Prompts and feedback
 
-Command cards, mode tabs, controls help, onboarding, placement/production explanations, hover hints, formation and map hints read the session registry. Captions and combined prompts are retained, not formatted during every HUD rebuild. The current UI language is English; the fallback prompt catalog is the shared source for key substitution, without claiming additional language packs. Supported Windows logical-key captions describe the key actually routed by the platform.
+Ring items, controls help, onboarding, placement/production explanations, hover hints, formation and map hints read the session registry. Captions and combined prompts are retained, not formatted during every HUD rebuild. The current UI language is English; the fallback prompt catalog is the shared source for key substitution, without claiming additional language packs. Supported Windows logical-key captions describe the key actually routed by the platform.
 
-Contextual controls now use the same fill and shape policy as dock cards: hover outline, focus rail, pressed underline and disabled double rail. HOVER/FOCUS/PRESS text accompanies shortcut prompts, while disabled and pending controls retain the actual reason. Accepted/partial/rejected feedback continues to use authoritative result text and counts. Escape closes the complete transient menu stack before Pause and submits no request. Targeting/placement cancellation retains its existing controls and preview clearing; local intent remains separate from accepted execution.
+Ring sectors retain the existing hover/pressed fills, disabled labels and shortcut prompts. Their tooltips preserve actual disabled/pending reasons. Accepted/partial/rejected feedback continues to use authoritative result text and counts. Escape closes the complete transient menu stack before Pause and submits no request. Targeting/placement cancellation retains its existing controls and preview clearing; local intent remains separate from accepted execution.
 
 Short key taps are consumed once. Resize, session replacement, focus loss and modal suppression consume retained edges; held keys must be physically released before a fresh activation. Existing pointer ownership, minimap targeting, selection identity and intelligence masking remain intact.
 
 ## Automated fixtures and profiling
 
-`GameplayUiFixtureTests` checks 135 command-surface combinations: 1024×720, 16:9, 16:10, ultrawide and 4K, 96/144/192 DPI, UI scale .75/1/2, long labels, focus/hover/press, missing materials, pending, accepted/rejected results and closed cancellation state. One renderer is reused across the matrix to exercise state/display rebuilding and avoid repeated large buffer setup. The fixture collection runs separately from concurrent tests so setup/render exports do not overlap allocation-sensitive measurements. Checked-in vertex counts and SHA-256 geometry fixtures detect changes in positions, glyphs, colors and shape cues. Repeat rendering must match and all coordinates must remain finite inside the viewport. These are native renderer geometry contracts, not arbitrary-terrain contrast or screenshot acceptance.
+`GameplayUiFixtureTests` checks 135 ring geometry combinations: 1024×720, 16:9, 16:10, ultrawide and 4K, 96/144/192 DPI, UI scale .75/1/2, long labels, focus/hover/press, missing materials, pending, accepted/rejected results and closed cancellation state. One renderer is reused across the matrix to exercise state/display rebuilding and avoid repeated large buffer setup. The fixture collection runs separately from concurrent tests so setup/render exports do not overlap allocation-sensitive measurements. The current `action-ring-geometry.json` fixture records vertex counts and SHA-256 geometry hashes for sector positions and state colors. Native text and status/privacy are checked separately. Accepted/rejected feedback belongs to notifications and the status tooltip; it does not recolor unrelated ring sectors. Repeat rendering must match and all coordinates must remain finite inside the viewport. These are native renderer geometry contracts, not arbitrary-terrain contrast or screenshot acceptance.
 
 Run the presentation tests normally to compare the checked-in fixture. For deliberate review, set `FORGELINE_UI_FIXTURE_BASELINE` to an explicit replacement file and `FORGELINE_UI_VISUAL_OUTPUT` to an explicit preview directory. Only reviewed replacements should enter source control. The latter exports SVGs built from the renderer's triangles; they exclude native textures, terrain and GPU rasterization. Clear those environment variables before validating the committed fixture. Existing display/minimap/intelligence and client journey suites remain gates.
 
@@ -40,26 +40,25 @@ Also exercise save/load/restart, alt-tab/held inputs, moving between monitors, h
 
 ## Nonmodal gameplay menus
 
-`TransientHudMenuController` coordinates the existing dock and Operations before
+`TransientHudMenuController` coordinates the existing action rings and Operations before
 controller actions and world input. A world-origin press dismisses every transient
 menu, then the original retained input reaches the existing selection, move,
 placement or targeting owner exactly once. No synthetic event is injected.
 Selection and target intent are not menu state. Right click during placement or
 targeting cancels that intent and is reserved from movement on the same frame.
 
-Dock tabs, actual cards (including disabled cards), paging and footer controls
-own input. Empty card capacity, decorative dock background and gaps do not.
+Only published, present ring sectors (including disabled sectors) own menu input.
+Centers, gaps, tethers, absent sectors and the former rectangular panel areas do not.
 The visible Operations information panel deliberately owns its entire background
 so its readable content cannot conceal a world command. Status, minimap, alerts,
-selection controls and onboarding retain their independent input owners.
+onboarding retain their independent input owners; selection status is read-only.
 
 Menu-origin gestures retain ownership through release outside the panel. A brief
-press/release outside cancels before UI activation. An action already activated
-on pointer-down is not replayed or rolled back on release. Closing is logical and
+press/release outside cancels before UI activation. A ring action validates its original item and menu identity on release. Closing is logical and
 immediate: animation opacity never adds capture. Escape closes the whole transient
 stack before target cancellation or Pause; true modal/settings/display states keep
 priority. Focus loss, display/layout, selection identity and session transitions
-clear transient ownership and cancel retained gestures. Dock keyboard focus applies
+clear transient ownership and cancel retained gestures. Ring keyboard focus applies
 only over its controls, leaving free-world camera input available.
 
 Later context/ring menus register `ITransientHudMenu` with this coordinator (four
@@ -75,4 +74,4 @@ source identity, sequence tests and remaining native/human acceptance.
 
 ## Logistics setup
 
-The existing LOGISTICS navigation, activation and decrease/increase bindings also operate INPUTS cards and USE INPUTS. Preview prepares additional-step thresholds; APPLY POLICY submits each resource separately. No new fixed key is introduced. Ring, dock, mouse and remapped keyboard paths retain the shared selection/session guards. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
+The existing LOGISTICS navigation, activation and decrease/increase bindings also operate INPUTS cards and USE INPUTS. Preview prepares additional-step thresholds; APPLY POLICY submits each resource separately. No new fixed key is introduced. Ring, mouse and remapped keyboard paths retain the shared selection/session guards. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.

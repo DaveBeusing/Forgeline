@@ -200,19 +200,14 @@ The following gameplay keys are defaults; command cards and help show the active
 
 The player-facing HUD is rendered through the existing lightweight overlay path but is independent from the Shift + F1 development metrics toggle.
 
-Detailed statistics are toggled with Shift + F1. The normal resource/action HUD
-contains no FPS/SIM/TPS readout or reserved metrics column. Measurement remains
-active while the diagnostic overlay is hidden; sampler readiness still supports
-startup/window qualification. The resource strip shares the right edge of the
-bounded action dock and exposes separate top-left guidance and below-dock
-notification reservations through `GameplayHudLayout`. See
-[responsive HUD qualification](ResponsiveHudQualification.md).
-
-Selection commands occupy a shared adaptive panel beside the selection inspector.
-Combat actions activate by click; Command Core and copied facility capabilities open
-the existing advanced Action Dock. Disabled reasons use captured availability, and
-pending intent is distinct from command results. B/P/U/L/Y/K/H remain the defaults and can be rebound through Settings.
-See [Player Action Dock](PlayerActionDock.md).
+Detailed statistics remain on Shift+F1 and F2 remains world diagnostics.
+The shared version 4 layout publishes the right resource strip, notifications
+immediately below it, minimap and left guidance/group/Operations column. It has
+no rectangular command dock or selection inspector. Selection release opens
+single/group action rings; B/P/U/L/Y/K/H retain their defaults and can be rebound.
+Global actions without selection use the same shortcuts. The existing tooltip
+beside an open ring displays copied selection/group status and command results.
+See [current parity and qualification](HudSurfaceConsolidation.md).
 
 The HUD explicitly waits for a snapshot or player data before rendering authoritative resources. Screen-space panels and glyphs disable face culling and depth testing; the world renders first, followed by gameplay HUD, optional development diagnostics and modal frontend. Empty selection keeps its existing guidance, and contextual actions remain backed by the copied gameplay read models.
 
@@ -280,14 +275,17 @@ A terminal completed-tick snapshot freezes normal simulation ticks while event p
 
 See [Client Execution Ownership](adr/ClientExecutionOwnership.md).
 
-### Selected combat-group card
+### Selected combat-group ring
 
-Multiple selected entities show a compact inspector card with total, live owned unit and combat-eligible counts, type cells, component-covered means and critical-member focus controls. Click type cells to narrow the presentation selection; Ctrl+digits and recall retain their existing assignments. Focus controls move only the camera. F3/NEXT changes the intended formation for subsequent orders. Pause/help, focus loss, resize, placement/targeting and session changes consume pending card presses.
-
+Group tools provide existing type filters, damaged/unsupplied focus, formation
+and group focus. Aggregate counts, composition and covered means are read-only
+in the ring tooltip. Ctrl+digits and recall preserve saved assignments. Focus
+moves the camera only. Modal, focus, display, session and membership transitions
+cancel pending ring gestures.
 
 ## Optional operations surface
 
-The operations panel shares HUD safe-area/DPI bounds and retained upload resources. It occupies the left column above selection; the Action Dock, minimap and world remain available. The tab reserves the guidance bottom band. Client render frames carry immutable operations interaction state; completed-tick snapshots carry copied facility and route facts. Help/pause frames that skip normal gameplay explicitly cancel retained dashboard clicks. No second UI framework or simulation write path is introduced. See [operations controls and qualification](ProductionAndLogisticsOperations.md).
+The operations panel shares HUD safe-area/DPI bounds and retained upload resources. It occupies the shared left column; minimap and free world regions remain available. The tab reserves the guidance bottom band. Client render frames carry immutable operations interaction state; completed-tick snapshots carry copied facility and route facts. Help/pause frames that skip normal gameplay explicitly cancel retained dashboard clicks. No second UI framework or simulation write path is introduced. See [operations controls and qualification](ProductionAndLogisticsOperations.md).
 
 ## Alert and strategic-layer controls
 
@@ -323,26 +321,25 @@ creates a fresh frontend owner. See [policy and qualification](CinematicFrontend
 
 ## Nonmodal gameplay menus
 
-`TransientHudMenuController` coordinates the existing dock and Operations before
+`TransientHudMenuController` coordinates the existing action rings and Operations before
 controller actions and world input. A world-origin press dismisses every transient
 menu, then the original retained input reaches the existing selection, move,
 placement or targeting owner exactly once. No synthetic event is injected.
 Selection and target intent are not menu state. Right click during placement or
 targeting cancels that intent and is reserved from movement on the same frame.
 
-Dock tabs, actual cards (including disabled cards), paging and footer controls
-own input. Empty card capacity, decorative dock background and gaps do not.
+Only published, present ring sectors (including disabled sectors) own menu input.
+Centers, gaps, tethers, absent sectors and the former rectangular panel areas do not.
 The visible Operations information panel deliberately owns its entire background
 so its readable content cannot conceal a world command. Status, minimap, alerts,
-selection controls and onboarding retain their independent input owners.
+onboarding retain their independent input owners; selection status is read-only.
 
 Menu-origin gestures retain ownership through release outside the panel. A brief
-press/release outside cancels before UI activation. An action already activated
-on pointer-down is not replayed or rolled back on release. Closing is logical and
+press/release outside cancels before UI activation. A ring action validates its original item and menu identity on release. Closing is logical and
 immediate: animation opacity never adds capture. Escape closes the whole transient
 stack before target cancellation or Pause; true modal/settings/display states keep
 priority. Focus loss, display/layout, selection identity and session transitions
-clear transient ownership and cancel retained gestures. Dock keyboard focus applies
+clear transient ownership and cancel retained gestures. Ring keyboard focus applies
 only over its controls, leaving free-world camera input available.
 
 Later context/ring menus register `ITransientHudMenu` with this coordinator (four

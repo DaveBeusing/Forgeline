@@ -1,5 +1,10 @@
 # Player Action Dock
 
+The rectangular dock described here is historical. Current player controls use
+the existing action rings and shared status tooltip, with no rectangular fallback
+or mode bar. See [current surface ownership and parity](HudSurfaceConsolidation.md).
+
+
 ## Purpose
 
 The production player action dock replaces the former text-oriented player action palette with one RTS-specific visual and interaction surface while preserving the existing presentation-to-game request boundary.

@@ -94,7 +94,7 @@ A branded native startup surface appears before settings and graphics initializa
 | Move units | Right click |
 | Pause | Space |
 | Build / industrial production / unit production | B / P / U |
-| Logistics / supply / combat commands | L / Y / K |
+| Logistics / supply / combat / technology | L / Y / K / H |
 | Strategic overlays | F10 |
 | Controls help | F1 or F12 |
 | Development metrics | Shift + F1 |
@@ -102,9 +102,9 @@ A branded native startup surface appears before settings and graphics initializa
 
 Gameplay shortcuts can be changed in Settings through GAMEPLAY ACTION and GAMEPLAY KEY. Conflicts block APPLY with an explanation; saved camera mappings retain priority. Mouse selection, control-group digits, help and Escape remain fixed. See [input binding rules](docs/GameplayInputAccessibilityAndQualification.md).
 
-Multi-selection supports owned-unit type filters, operational averages, and damaged/critical-supply member focus. Saved control groups remain available; F3/NEXT on the group card cycles the formation. See [group-card controls](docs/FormationMovementAndGroupOrders.md#current-selection-group-card).
+Owned selections use the existing single/group action rings. Their read-only tooltip preserves selection details, covered group averages and exact command results. Group tools retain type filters, attention focus and formation; saved control groups remain available. The rectangular action bar and selection inspector are removed. Existing mode shortcuts also open available global actions without selection. See [HUD controls and parity](docs/HudSurfaceConsolidation.md).
 
-The optional **OPERATIONS** tab inspects local production, stock, power and logistics bottlenecks. Resource/power-strip, alert and facility-inspector clicks open relevant views. Alerts marked **FOCUS** select and center an authorized target; **OPS** and **MORE** open operations filters. Strategic-map layers have full names and shape legends. See [operations](docs/ProductionAndLogisticsOperations.md) and [actionable alerts and strategic map](docs/ActionableAlertsAndStrategicMap.md).
+The optional **OPERATIONS** tab inspects local production, stock, power and logistics bottlenecks. Resource/power-strip and populated alert controls open relevant views. Alerts marked **FOCUS** select and center an authorized target; **OPS** and **MORE** open operations filters. Strategic-map layers have full names and shape legends. See [operations](docs/ProductionAndLogisticsOperations.md) and [actionable alerts and strategic map](docs/ActionableAlertsAndStrategicMap.md).
 
 Frontend and HUD use the shared [Command Interface Visual Language](docs/CommandInterfaceVisualLanguage.md). Further interaction details are in [Windows Client](docs/WindowsClient.md) and [Camera and Input](docs/CameraAndInput.md).
 
