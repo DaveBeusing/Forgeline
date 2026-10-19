@@ -1390,8 +1390,7 @@ internal sealed class ClientApplication
                 // A contextual owner consumes Q/E before camera navigation. Saved
                 // camera bindings are otherwise left exactly as configured.
                 if (buildingPlacementController.IsActive ||
-                    actionPanel.OwnsRadialPaging(
-                        PlayerActionDockHudModel.ResolveActions(inputSnapshot)))
+                    actionPanel.OwnsRadialPaging(inputSnapshot?.PlayerActions))
                     cameraInput = cameraInput with { Rotation = 0 };
 
                 camera.Update(
