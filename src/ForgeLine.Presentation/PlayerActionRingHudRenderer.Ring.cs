@@ -34,9 +34,8 @@ internal sealed partial class PlayerActionRingHudRenderer
             bool enabled = slot.Enabled && (slot.Navigation == ActionRingNavigation.GroupControl ? ring.Group?.Participants(target.ItemIndex) > 0 : navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
                 panel.Mode, target.ItemIndex, panel, actions));
             bool hovered = ring.Open && ring.HoveredSlot == i;
-            Vector4 fill = enabled ? new(.045f, .075f, .10f, .82f) : new(.04f, .045f, .055f, .82f);
-            if (hovered) fill = ring.Pressed ? new(.15f, .30f, .34f, .94f) : new(.10f, .22f, .27f, .90f);
-            fill.W *= opacity;
+            bool pending = panel.ContextualPending && item && panel.SelectedIndex == target.ItemIndex;
+            Vector4 fill = RadialActionVisuals.Background(enabled, hovered, ring.Pressed && hovered, pending, opacity);
             RingSegment(geometry, i, fill, width, height);
             Vector2 center = geometry.LabelCenter(i);
             float iconSize = 20 * scale, halfWidth = geometry.LabelHalfWidth;
