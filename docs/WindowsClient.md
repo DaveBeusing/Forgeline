@@ -351,3 +351,7 @@ activation path still requires a fresh gesture. Registration lasts for one match
 
 [Executed interaction qualification](NonModalHudQualification.md) records the
 source identity, sequence tests and remaining native/human acceptance.
+
+## Minimap display lifecycle
+
+The platform owner computes minimap hover motion using monotonic elapsed UI time, actual pointer location, DPI and UI scale. Each `ClientRenderFrame` carries the resolved physical-pixel rectangle to the render owner; drawing and pointer capture do not use competing scales. Focus/minimize/pause suppression, session change, display-resize or DPI/scale transition and motion-clock interruption clear stale animated state. Reduced-motion and Low quality settle immediately. The target remains within the HUD safe area and accounts for notifications, the top resource strip, lower-left secondary view and any published radial action ring. Native 720p/4K/ultrawide and mixed-DPI visual approval remains a separate qualification step rather than a property proven by geometry unit tests.

@@ -49,3 +49,7 @@ See [production/operations contracts](GraphicalProductionAndOperations.md) and [
 ## Graphical tactical integration
 
 [Production minimap/layer/marker and world feedback](GraphicalTacticalInterface.md) now uses the shared atlas over live geometry. Contacts keep faction-filtered identity and stored-position rules; map frames do not alter click transforms. Camera-footprint rays remain presentation geometry. Ranges/routes/coverage/placement retain their existing authority and shapes. [Source-bound qualification](GraphicalTacticalInterfaceQualification.md) records native pixel repeatability, copied private-fact exclusions, cursor hotspots and remaining gates.
+
+## Minimap hover and alert coexistence
+
+The minimap grows only within free safe-area space, preserving the right-aligned resource/notification stack and the lower-left secondary region. The currently resolved action ring also limits expansion, while action-ring placement reserves the published map bounds. The map responds to pointer hover with 180 ms reversible motion (up to 1.35 times baseline); the same published map geometry drives selector clicks and map input. Alert cards keep their existing precise hit regions and priority, and no new intelligence or gameplay command channel is introduced.

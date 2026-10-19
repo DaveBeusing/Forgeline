@@ -1316,12 +1316,24 @@ internal sealed class ClientApplication
                     informationLayer.MinimapEnabled,
                 inputBlocked:
                     hudInteraction.PointerCaptured ||
-                    hudInteraction.KeyboardCaptured);
+                    hudInteraction.KeyboardCaptured,
+                presentationTime: _platform.Clock.GetElapsedTime(startedAt, now),
+                expandOnHover: true,
+                animateHover: _settings.CreateUiFeedbackSettings().Animate(
+                    renderHost.LatestQualification?.QualityProfile.Active ?? RenderQuality.Low),
+                presentationActive: window.IsFocused && !window.IsMinimized &&
+                    !simulationPaused && !modalFrame,
+                ringBounds: actionPanel.PresentedRingBounds);
             hudInteraction.CapturePointer(
                 minimapInteraction.PointerCaptured);
 
+            GameplayHudLayout mapInteractionLayout = interactionLayout with
+            {
+                Minimap = minimapInteraction.DisplayedBounds.IsEmpty
+                    ? interactionLayout.Minimap : minimapInteraction.DisplayedBounds
+            };
             hudInteraction.CapturePointer(HudInteractionContext.CapturesWorldPointer(
-                inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.DockExpanded,
+                inputState, mapInteractionLayout, informationLayer.MinimapEnabled, actionPanel.DockExpanded,
                 buildingPlacementController.IsActive, includeActionDock: false,
                 onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View, includePrimaryCommands: !actionPanel.ObjectActions));
 
@@ -1637,6 +1649,7 @@ internal sealed class ClientApplication
                     MinimapCameraDragging:
                         minimapInteraction.View.IsCameraDragging)
                 {
+                    MinimapBounds = minimapInteraction.DisplayedBounds,
                     MovementFeedback = selectionController.CommandFeedback.View,
                     TacticalFeedback = tacticalTargetingController.CommandFeedback.View
                 };
