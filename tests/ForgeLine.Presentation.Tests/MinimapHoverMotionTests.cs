@@ -106,6 +106,34 @@ public sealed class MinimapHoverMotionTests
         Assert.False(RtsMinimapInteractionLayout.IsInteractiveSurface(gap, animatedLayout));
     }
 
+    [Fact]
+    public void RingOccupancyCapsExpansionWithoutCoveringControls()
+    {
+        GameplayHudLayout layout = GameplayHudLayout.Create(1600, 900, 96);
+        var motion = new MinimapHoverMotion();
+        Vector2 pointer = Center(RtsMinimapInteractionLayout.GetMapRect(layout));
+        HudRect ring = new(layout.Minimap.X - 70, layout.Minimap.Y - 70, 50, 50);
+        HudRect bounded = motion.Update(layout, pointer, true, TimeSpan.Zero, true, false, ringBounds: ring);
+        Assert.True(bounded.Width >= layout.Minimap.Width);
+        Assert.True(bounded.Width < layout.Minimap.Width * MinimapHoverMotion.DesiredScale);
+        Assert.False(bounded.Intersects(ring));
+    }
+
+    [Fact]
+    public void WarmSteadyHoverDoesNotAllocateManagedMemory()
+    {
+        GameplayHudLayout layout = GameplayHudLayout.Create(1600, 900, 96);
+        var motion = new MinimapHoverMotion();
+        Vector2 pointer = Center(RtsMinimapInteractionLayout.GetMapRect(layout));
+        for (int i = 0; i < 512; i++)
+            motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(i), true, true);
+
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 512; i < 1512; i++)
+            motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(i), true, true);
+        Assert.Equal(before, GC.GetAllocatedBytesForCurrentThread());
+    }
+
     private static Vector2 Center(in HudRect bounds) =>
         new(bounds.X + bounds.Width * .5f, bounds.Y + bounds.Height * .5f);
 }
