@@ -455,6 +455,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     {
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
         var stack = ActionableAlertLayout.Resolve(snapshot, layout, expanded, localFeedback);
+        _notificationMotion.Update(stack, snapshot?.SessionId ?? default, layout, presentationTime, animateNotifications);
         Span<char> buffer = stackalloc char[2048];
         Span<char> ellipsis = stackalloc char[2052];
         _scale = stack.FontSize / 12;
@@ -462,44 +463,58 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         {
             var card = stack.Card(i);
             var item = card.Item;
+            float visibility = _notificationMotion.Opacity(i);
             var color = NotificationText.Severity(experience, item);
-            if (!_skin.Panel(card.Bounds, "panel.raised", NotificationSurfaceVisuals.BackgroundOpacity))
+            if (!_skin.Panel(card.Bounds, "panel.raised", NotificationSurfaceVisuals.BackgroundOpacity * visibility))
                 EmitQuad(card.Bounds.X, card.Bounds.Y, card.Bounds.Width, card.Bounds.Height,
-                    GameplayHudVisualStyle.PanelRaised with { W = NotificationSurfaceVisuals.BackgroundOpacity }, width, height);
+                    GameplayHudVisualStyle.PanelRaised with { W = NotificationSurfaceVisuals.BackgroundOpacity * visibility }, width, height);
             EmitQuad(card.Bounds.X, card.Bounds.Y, color == HudAlertSeverity.Critical ? 5 : 3,
-                card.Bounds.Height, SeverityColor(color), width, height);
+                card.Bounds.Height, SeverityColor(color) with { W = visibility }, width, height);
             float iconSize = stack.FontSize;
             EmitIcon(item.Hidden > 0 ? RtsUiIcon.StatusAlert :
                 item.Feedback ? CommandIcon(experience.Feedback.Kind) : item.Local ? RtsUiIcon.StatusAlert : AlertIcon(item.Kind),
                 card.Bounds.X + (5 + 4) * ActionableAlertLayout.Scale(layout),
                 card.Bounds.Y + (card.Bounds.Height - iconSize) * .5f,
-                iconSize, width, height);
+                iconSize, width, height, visibility);
             var message = NotificationText.Format(experience, alerts, item, buffer, localFeedback);
             var visible = NotificationText.Ellipsized(message, card.Text.Width, stack.FontSize, ellipsis);
-            if (!_text.AddCentered(visible, card.Text, stack.FontSize, TextColor, width, height))
-                EmitText(visible, card.Text.X, card.Text.Y, TextColor, width, height);
+            if (!_text.AddCentered(visible, card.Text, stack.FontSize, TextColor with { W = visibility }, width, height))
+                EmitText(visible, card.Text.X, card.Text.Y, TextColor with { W = visibility }, width, height);
             if (!card.Action.IsEmpty && item.Hidden == 0)
             {
                 string label = item.Feedback || item.Local ? "MORE" : "OPS";
                 if (alerts is not null)
                     for (int a = 0; a < alerts.Alerts.Count; a++)
                         if (alerts.Alerts[a].Identity.Kind == item.Kind && alerts.Alerts[a].Target.IsValid) label = "FOCUS";
-                EmitNotificationAction(label, card.Action, stack.FontSize, width, height);
+                EmitNotificationAction(label, card.Action, stack.FontSize, width, height, visibility);
             }
             if (card.Truncated && !card.Details.IsEmpty && item.Hidden == 0)
-                EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height);
+                EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height, visibility);
+        }
+        // Retired cards paint only a short-lived, noninteractive background. Their old
+        // text and targets never cross a resolved/session boundary.
+        for (int i = 0; i < _notificationMotion.RetiredCount; i++)
+        {
+            var (bounds, alpha) = _notificationMotion.Retired(i);
+            bool overlaps = false;
+            for (int active = 0; active < stack.Count; active++)
+                if (bounds.Intersects(stack.Card(active).Bounds)) { overlaps = true; break; }
+            if (!overlaps && alpha > 0)
+                EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
+                    GameplayHudVisualStyle.PanelRaised with { W = NotificationSurfaceVisuals.BackgroundOpacity * alpha },
+                    width, height);
         }
         _scale = layout.Scale;
     }
 
-    private void EmitNotificationAction(string label, in HudRect bounds, float fontSize, int width, int height)
+    private void EmitNotificationAction(string label, in HudRect bounds, float fontSize, int width, int height, float visibility)
     {
-        if (!_skin.Control(bounds)) EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
-            GameplayHudVisualStyle.PanelRaised, width, height);
-        if (!_text.AddCentered(label, bounds, fontSize, TextColor, width, height))
+        if (!_skin.Panel(bounds, "control.button_compact", visibility)) EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
+            GameplayHudVisualStyle.PanelRaised with { W = visibility }, width, height);
+        if (!_text.AddCentered(label, bounds, fontSize, TextColor with { W = visibility }, width, height))
         {
             int count = Math.Min(label.Length, Math.Max(0, (int)(bounds.Width / (GlyphAdvance * _scale))));
-            EmitText(label.AsSpan(0, count), bounds.X, bounds.Y, TextColor, width, height);
+            EmitText(label.AsSpan(0, count), bounds.X, bounds.Y, TextColor with { W = visibility }, width, height);
         }
     }
 
@@ -830,9 +845,10 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         float y,
         float size,
         int width,
-        int height)
+        int height,
+        float visibility = 1)
     {
-        if (_skin.Icon(icon, x, y, size)) return;
+        if (_skin.Icon(icon, x, y, size, new Vector4(1, 1, 1, visibility))) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
@@ -842,6 +858,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         Vector4 color =
             ResolveColor(
                 icon);
+        color.W *= visibility;
         float pixel =
             MathF.Max(
                 1.0f,
