@@ -21,6 +21,28 @@ public sealed class RtsCameraInputTests
     }
 
     [Fact]
+    public void ContextOwnsOnlyQAndEWhileSavedOtherRotationBindingsStillWork()
+    {
+        var input = new InputState();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.Q));
+        var regular = new RtsCameraActionMapper();
+        Assert.Equal(-1, regular.Map(input).Rotation);
+        Assert.Equal(0, regular.Map(input, contextOwnsQe: true).Rotation);
+
+        var remapped = new RtsCameraActionMapper(new RtsCameraBindings
+        {
+            RotateLeft = PlatformKey.Z,
+            RotateRight = PlatformKey.X
+        });
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.X));
+        Assert.Equal(1, remapped.Map(input, contextOwnsQe: true).Rotation);
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.X));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.Z));
+        Assert.Equal(-1, remapped.Map(input, contextOwnsQe: true).Rotation);
+    }
+
+    [Fact]
     public void HudPointerCaptureSuppressesWheelDragAndEdgePanButPreservesKeyboardPan()
     {
         var state = new InputState();
