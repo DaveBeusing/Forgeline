@@ -239,7 +239,7 @@ public sealed class ObjectActionRingTests
         var source = Snapshot(mode, "Ready");
         var a = source.PlayerActions!;
         var actions = new PlayerActionSnapshot(a.SessionId, a.Tick, a.Construction,
-            a.PendingCommandCount, technology: a.Technology);
+            a.PendingCommandCount, null, null, technology: a.Technology);
         var snapshot = new PresentationSnapshot(source.Tick, source.TickDuration,
             source.SimulationEntityCount, source.Instances,
             sessionId: source.SessionId, playerExperience: source.PlayerExperience!.Value with
@@ -273,7 +273,7 @@ public sealed class ObjectActionRingTests
         var source = Snapshot(PlayerActionPanelMode.Construction, "Ready");
         var a = source.PlayerActions!;
         var actions = new PlayerActionSnapshot(a.SessionId, a.Tick, a.Construction,
-            a.PendingCommandCount, technology: a.Technology);
+            a.PendingCommandCount, null, null, technology: a.Technology);
         var snapshot = new PresentationSnapshot(source.Tick, source.TickDuration,
             source.SimulationEntityCount, source.Instances,
             sessionId: source.SessionId, playerExperience: source.PlayerExperience!.Value with
