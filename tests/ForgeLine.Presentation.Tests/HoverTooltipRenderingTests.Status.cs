@@ -57,6 +57,19 @@ public sealed partial class HoverTooltipRenderingTests
     }
 
     [Fact]
+    public void SingleStatusCannotInferOperationalFactsFromAnUnrelatedGroupCache()
+    {
+        var snapshot=StatusSnapshot();var panel=StatusPanel(snapshot);
+        var member=SelectedCombatGroupTests.Member(new(11,1),UnitIds.MainBattleTank,true);
+        var selected=new SelectionSet();selected.SetSingle(member.Entity);
+        var cached=SelectedCombatGroup.Create(new CombatGroupOperationalSnapshot(snapshot.Tick,[member],snapshot.SessionId),selected);
+        var content=Assert.IsType<HoverTooltipContent>(HoverTooltipResolver.Resolve(snapshot,
+            StatusView(snapshot,GameplayHudLayout.Create(1600,900,96)),panel,cached));
+        Assert.Null(content.Group);
+        Assert.Equal(snapshot.PlayerExperience!.Value.Selection,content.Selection);
+    }
+
+    [Fact]
     public void KeyboardRingExposesReadOnlyStatusWithoutPointerAndClearsOnModalOrHeldGesture()
     {
         var snapshot = StatusSnapshot();

@@ -287,7 +287,7 @@ internal static class VisualReferenceCapture
                         {
                             var ringLayout=GameplayHudLayout.Create(context.Width,context.Height,rasterDpi,uiScale);
                             Span<HudRect> ringOccupied=stackalloc HudRect[8];
-                            RadialActionLayout.ResolveObstacles(ringOccupied,ringLayout,captureUx.Onboarding,operations);
+                            RadialActionLayout.ResolveObstacles(ringOccupied,ringLayout,captureUx.Onboarding,operations,groups);
                             panel=panel with { Ring=panel.Ring.Project(world,camera,1,snapshot,ringLayout,ringOccupied) };
                         }
                         if (panel.Ring is { Open:true,Resolved:true,Geometry.IsValid:true } ring &&

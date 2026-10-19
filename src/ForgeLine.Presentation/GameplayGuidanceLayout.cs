@@ -10,14 +10,6 @@ public static class GameplayGuidanceLayout
             MathF.Min(region.Height, detailed ? 500 * MathF.Min(layout.Scale, 1.25f) : 156 * layout.Scale));
     }
 
-    internal static HudRect Remaining(in GameplayHudLayout layout, bool occupied, HudRect? occupiedBounds = null)
-    {
-        var region = Available(layout, occupiedBounds.HasValue && occupiedBounds.Value.Height > layout.OnboardingBounds.Height);
-        if (!occupied) return region;
-        var guide = occupiedBounds ?? Resolve(layout);
-        float y = guide.Bottom + 4 * layout.Scale;
-        return new(region.X, y, region.Width, MathF.Max(0, region.Bottom - y));
-    }
     private static HudRect Available(in GameplayHudLayout layout, bool detailed = false)
     {
         var region = layout.OnboardingBounds;

@@ -115,7 +115,8 @@ public sealed class UiReferenceScenarioTests
             Assert.True(original.Instances.SequenceEqual(snapshot.Instances));
             Assert.Equal(original.SessionId,snapshot.SessionId);
             Assert.Equal(original.Tick,snapshot.Tick);
-            if(ObjectActionRingCapture.IsRing(state) && state < UiReferenceScenario.GroupRing)
+            if(ObjectActionRingCapture.IsRing(state) && state < UiReferenceScenario.GroupRing &&
+                state is not (UiReferenceScenario.SelectedGroup or UiReferenceScenario.MixedSelection))
             {
                 var entity=snapshot.PlayerExperience!.Value.Selection.PrimaryEntity;
                 var actor=Assert.Single(snapshot.Instances.ToArray(),i=>i.Entity==entity);
@@ -124,7 +125,7 @@ public sealed class UiReferenceScenarioTests
                 Assert.NotEqual(ControllableEntityCategory.None,actor.Selectable.Category & expected);
                 Assert.Equal(1,snapshot.PlayerExperience.Value.Selection.Count);
             }
-            if (state == UiReferenceScenario.SelectedGroup)
+            if (state is UiReferenceScenario.SelectedGroup or UiReferenceScenario.MixedSelection)
             {
                 var members = Assert.IsType<CombatGroupOperationalSnapshot>(SelectedCombatGroup.Resolve(snapshot));
                 Assert.Equal(snapshot.PlayerExperience!.Value.Selection.Count, members.Members.Count);

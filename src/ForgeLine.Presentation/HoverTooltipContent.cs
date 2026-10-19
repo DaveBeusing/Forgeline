@@ -38,7 +38,7 @@ internal static class HoverTooltipResolver
             return new(experience.Selection.Count == 0 ? "COMMANDS" : experience.Selection.DisplayName,
                 SelectionInspectorHudModel.ResolveKindLabel(experience.Selection.Kind), "", "READ-ONLY STATUS",
                 WrapDetails: true, Selection: experience.Selection,
-                Group: group?.Tick == snapshot.Tick && group.TotalCount == experience.Selection.Count ? group : null,
+                Group: ring.Group is not null && group?.Tick == snapshot.Tick && group.TotalCount == experience.Selection.Count ? group : null,
                 Formation: formation, Feedback: experience.Feedback);
         }
         if (view.DockControl != 0) return ResolveDock(snapshot, view, panel);

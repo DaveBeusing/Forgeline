@@ -26,6 +26,30 @@ public sealed class ResponsiveHudLayoutTests
             Assert.Equal(layout.NotificationBounds(false),layout.NotificationBounds(true));
         }
     }
+    [Theory]
+    [InlineData(1280,720,96u,.75f)]
+    [InlineData(1280,720,192u,2f)]
+    [InlineData(3440,1440,144u,1f)]
+    public void AssignedGroupOverviewUsesPublishedLeftBoundsAndCannotCoverRingOrOperations(int width,int height,uint dpi,float scale)
+    {
+        var layout=GameplayHudLayout.Create(width,height,dpi,scale);
+        var empty=CombatGroupOverviewView.Empty;
+        Assert.True(layout.GroupOverviewBounds(empty).IsEmpty);
+        var groups=new CombatGroupOverviewView([default(CombatGroupSummaryReadModel) with {Slot=1,MemberCount=3,Label="Armoured support"}],[]);
+        var bounds=layout.GroupOverviewBounds(groups);
+        Assert.False(bounds.IsEmpty);
+        Assert.True(layout.SecondaryView.Contains(new(bounds.X,bounds.Y)));
+        Assert.True(layout.SecondaryView.Contains(new(bounds.Right,bounds.Bottom)));
+        Assert.False(bounds.Intersects(OperationsLayout.Entry(layout)));
+        Assert.False(bounds.Intersects(GameplayGuidanceLayout.Resolve(layout,true)));
+        Span<HudRect> occupied=stackalloc HudRect[8];
+        RadialActionLayout.ResolveObstacles(occupied,layout,groups:groups);
+        Assert.Equal(bounds,occupied[1]);
+        var ring=RadialActionLayout.Fit(new(width/2f,height/2f),0,layout,occupied);
+        Assert.True(ring.IsValid);
+        var nearest=new Vector2(Math.Clamp(ring.Center.X,bounds.X,bounds.Right),Math.Clamp(ring.Center.Y,bounds.Y,bounds.Bottom));
+        Assert.True(Vector2.Distance(nearest,ring.Center)>=ring.OuterRadius);
+    }
     [Fact]
     public void ClosedRingDoesNotAllocateGeometryOrDrawAnyReplacementPanel()
     {

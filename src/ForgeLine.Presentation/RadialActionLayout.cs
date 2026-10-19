@@ -29,11 +29,11 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
 
     /// <summary>One obstacle contract for gameplay, fixture preparation and native recording.</summary>
     public static void ResolveObstacles(Span<HudRect> occupied, in GameplayHudLayout layout,
-        OnboardingPresentation? onboarding = null, OperationsView operations = default)
+        OnboardingPresentation? onboarding = null, OperationsView operations = default, CombatGroupOverviewView? groups = null)
     {
         if (occupied.Length != 8) throw new ArgumentException("Ring obstacle storage must contain eight rectangles.",nameof(occupied));
         occupied[0]=layout.TopStatusBar;
-        occupied[1]=default;
+        occupied[1]=layout.GroupOverviewBounds(groups);
         occupied[2]=layout.Minimap;
         occupied[3]=default;
         occupied[4]=layout.NotificationBounds(false);

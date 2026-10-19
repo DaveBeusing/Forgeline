@@ -131,8 +131,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         if (contextVisible) EmitContextGuidance(preAlphaUx, placementVisible, layout, context.Width, context.Height);
         EmitCombatGroupOverview(
             combatGroups,
-            GameplayGuidanceLayout.Remaining(layout, contextVisible, placementVisible ? null : preAlphaUx.Onboarding?.Clip),
-            scale,
+            layout.GroupOverviewBounds(combatGroups),
+            layout.GroupOverviewScale,
             context.Width,
             context.Height);
         EmitSystemOverlay(

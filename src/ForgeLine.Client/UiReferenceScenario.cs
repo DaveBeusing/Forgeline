@@ -156,15 +156,13 @@ internal static class UiReferenceStates
             PointerPressed = state == UiReferenceScenario.DockPressed };
         if (state == UiReferenceScenario.LogisticsInputs)
             panel = panel with { SelectedIndex = snapshot.PlayerActions!.Logistics!.Policies.Count, LogisticsSteps = 1 };
-        if (state is UiReferenceScenario.ResourcePressure or UiReferenceScenario.LowPower or UiReferenceScenario.SupplyCritical or UiReferenceScenario.MixedSelection)
+        if (state is UiReferenceScenario.ResourcePressure or UiReferenceScenario.LowPower or UiReferenceScenario.SupplyCritical)
         {
             snapshot = BattlefieldHudCapture.State(snapshot, state == UiReferenceScenario.SupplyCritical ? "Supply" :
-                state == UiReferenceScenario.MixedSelection ? "Mixed" : "Production");
+                "Production");
             if (state == UiReferenceScenario.ResourcePressure)
                 snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with { Resources = new(0, 1, 0, 2, 0, 0, 0) });
-            if (state == UiReferenceScenario.MixedSelection)
-                snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
-                { Selection = PlayerSelectionSummary.Empty with { Count = 3, Kind = PlayerSelectionKind.Mixed, DisplayName = "Mixed selection" } });
+
         }
         if (state is UiReferenceScenario.SelectionUnit or UiReferenceScenario.SelectionBuilding or UiReferenceScenario.SelectionLongName)
         {
@@ -185,25 +183,6 @@ internal static class UiReferenceStates
             snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
                 snapshot.Intelligence, snapshot.SessionId, snapshot.PlayerExperience, playerActions: snapshot.PlayerActions,
                 guidance: new PlayerGuidanceSummary(snapshot.SessionId, snapshot.Tick, snapshot.PlayerExperience!.Value.Player, default));
-        if (state == UiReferenceScenario.SelectedGroup)
-        {
-            var experience = snapshot.PlayerExperience!.Value;
-            var owned = snapshot.Instances.ToArray().Where(i => i.Selectable.Owner == experience.Player &&
-                i.Selectable.Category == ControllableEntityCategory.Unit).Take(3).ToArray();
-            if (owned.Length < 2) throw new InvalidDataException("Group fixture requires existing owned unit identities.");
-            var members = owned.Select((instance, index) => default(CombatGroupMemberReadModel) with
-            {
-                Entity = instance.Entity, Category = ControllableEntityCategory.Unit, Unit = instance.UnitFeature.Unit,
-                CombatEligible = true, HasHealth = true, HealthFraction = index == 0 ? .2 : .8,
-                HasSupply = true, SupplyStatus = index == 0 ? BattlefieldSupplyStatus.Critical : BattlefieldSupplyStatus.Supplied,
-                FuelFraction = .3, AmmunitionFraction = .4, HasReadiness = true, Readiness = .6
-            }).ToArray();
-            snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
-                snapshot.Intelligence, snapshot.SessionId, experience with { Selection = PlayerSelectionSummary.Empty with
-                { Count = members.Length, Kind = PlayerSelectionKind.Unit, DisplayName = "Selected combat group" } },
-                playerActions: snapshot.PlayerActions, vfxMetrics: snapshot.VfxMetrics,
-                combatGroups: new CombatGroupOperationalSnapshot(snapshot.Tick, members, snapshot.SessionId));
-        }
         if (state is UiReferenceScenario.Operations or UiReferenceScenario.OperationsEmpty or UiReferenceScenario.OperationsMissing)
         {
             snapshot = BattlefieldHudCapture.State(snapshot, "Production");

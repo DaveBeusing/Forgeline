@@ -41,6 +41,18 @@ public readonly record struct GameplayHudLayout(
     public float Gap => MathF.Min(GameplayHudVisualStyle.ResolveSafeMargin(Scale), 16);
     public HudRect NotificationBounds(bool expanded = false) => AlertStack;
     public float NotificationScale => MathF.Min(Scale, AlertStack.Width / 608);
+    public float GroupOverviewScale => MathF.Min(Scale, 1.25f);
+    public HudRect GroupOverviewBounds(CombatGroupOverviewView? groups)
+    {
+        if(groups is null || SecondaryView.IsEmpty) return default;
+        int assigned=0;
+        for(int i=0;i<groups.Groups.Count;i++) if(groups.Groups[i].IsAssigned) assigned++;
+        float scale=GroupOverviewScale;
+        float available=MathF.Max(0,SecondaryView.Height-OperationsLayout.EntryBand(this));
+        int rows=Math.Min(assigned,Math.Max(0,(int)MathF.Floor((available-28*scale)/(43*scale))));
+        return rows==0 ? default : SecondaryView with {Height=(28+43*rows)*scale};
+    }
+
     public HudRect OnboardingBounds => SafeArea.IsEmpty ? default : new(SafeArea.X, SafeArea.Y,
         MathF.Max(0, TopStatusBar.X - Gap - SafeArea.X),
         MathF.Min(156 * MathF.Min(Scale, 1.5f), MathF.Max(0, SecondaryView.Y - Gap - SafeArea.Y)));
