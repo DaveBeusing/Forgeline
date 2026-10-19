@@ -181,8 +181,16 @@ public sealed partial class PlayerActionPanelController
         }
         else
         {
+            bool readonlyOrder = Mode == PlayerActionPanelMode.Logistics &&
+                actions?.Logistics is { } logistics && SelectedIndex >= logistics.OrderStartIndex;
             for (int i = 0; i < 6; i++)
             {
+                if (readonlyOrder)
+                {
+                    slots[i] = new(new(PlayerActionDockControlKind.Page, Mode, SelectedIndex),
+                        ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions), Enabled: false);
+                    continue;
+                }
                 var kind = PlayerActionDockInteractionLayout.FooterControl(i);
                 slots[i] = new(new(kind, Mode, SelectedIndex), ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions),
                     Present: PlayerActionDockHudModel.ResolveFooterLabel(kind, Mode).Length > 0);
