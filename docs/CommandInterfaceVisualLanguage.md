@@ -122,3 +122,7 @@ The [compiled skin path](UiAtlasRendering.md) prepares core pages. The
 [graphical frontend](GraphicalFrontend.md) now migrates every normal menu/settings
 surface with separate state art and existing live text. Battlefield HUD migration
 and human visual acceptance remain separate work.
+
+## Battlefield selection markers and drag marquee
+
+The player-facing selection vocabulary is grounded in `RtsSelectionVisualStyle.Selected` (RGB 0.25/1.0/0.35), shared by owned unit/building L-corners and the drag box. Four terrain-conforming, rotated footprint corners replace the former 24-segment selection ellipses; selected groups retain a separate marker per visible member. Hover uses diagonal corner notches; permitted foreign objects use the existing contrast tint plus outward ticks. The drag rectangle is intentionally light: 0.12-alpha green fill, 0.92-alpha green border and 1.25 physical pixels of single-stroke thickness. These geometry changes do not change picking, drag thresholds, HUD capture, F2 technical circles, collision/build placement previews or ordered player commands. Physical-monitor readability under bright and dark terrain remains an explicit art-review gate.
