@@ -62,22 +62,6 @@ public sealed class HoverTooltipController
                 DockIndex = radial.Navigation == ActionRingNavigation.GroupControl ? -100 - radial.Target.ItemIndex :
                     radial.Navigation == ActionRingNavigation.Group ? -99 : target.ItemIndex };
         }
-        else if (!panel.Ring.UsesRing && ContextualCommandModel.TryHit(pointer, snapshot, layout, out var command,
-                localPending: ContextualCommandModel.HasPending(panel, snapshot), selectionPending: panel.SelectionPending))
-        {
-            next = next with { DockMode = command.Mode,
-                DockControl = (int)(command.OpensMode ? PlayerActionDockControlKind.Mode : PlayerActionDockControlKind.Item),
-                DockIndex = command.ItemIndex, Contextual = true };
-        }
-        else if (PlayerActionDockInteractionLayout.TryHit(pointer, layout, panel.DockExpanded, count, out var hit, panel.SelectedIndex))
-        {
-            next = next with
-            {
-                DockMode = hit.Kind == PlayerActionDockControlKind.Mode ? hit.Mode : panel.Mode,
-                DockControl = (int)hit.Kind,
-                DockIndex = hit.Kind == PlayerActionDockControlKind.Item ? hit.ItemIndex : panel.SelectedIndex
-            };
-        }
         else if (statusAvailable && !worldPointerCaptured)
         {
             next = next with { SelectionStatus = true, SelectionRevision = panel.Ring.SelectionRevision,
@@ -170,7 +154,7 @@ internal static class HoverTooltipPlacement
         float x = pointer.X + gap;
         float y = pointer.Y + gap;
         if (x + width > safe.Right) x = pointer.X - gap - width;
-        if (y + height > safe.Bottom || (layout.ActionDock.Contains(pointer) && above >= height))
+        if (y + height > safe.Bottom)
             y = pointer.Y - gap - height;
         return new(Math.Clamp(x, safe.X, safe.Right - width), Math.Clamp(y, safe.Y, safe.Bottom - height), width, height);
     }

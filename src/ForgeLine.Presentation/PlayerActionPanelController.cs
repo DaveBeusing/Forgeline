@@ -304,7 +304,7 @@ public sealed partial class PlayerActionPanelController
         if (Mode != PlayerActionPanelMode.Closed && input.HasPointerPosition &&
             ContainsControl(input.PointerPosition, snapshot, layout) && input.WheelDelta != 0 && itemCount > 0)
         {
-            int capacity = _ringContext ? 4 : PlayerActionDockInteractionLayout.MaximumVisibleItems(layout);
+            int capacity = 4;
             SelectedIndex = Math.Clamp(SelectedIndex + (input.WheelDelta > 0 ? -capacity : capacity), 0, itemCount - 1);
             _desiredStockQuantity = 0.0;
             _stockResourceId = ResourceId.None;
@@ -345,12 +345,6 @@ public sealed partial class PlayerActionPanelController
                 adjustment);
         }
 
-        if (!_ringContext && input.HasPointerPosition)
-            for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out _); i++)
-                if (ContextualCommandModel.Button(layout, i).Contains(input.PointerPosition))
-                    _contextualHoveredIndex = i;
-        _contextualPressed = _contextualHoveredIndex >= 0 && input.IsMouseButtonDown(PlatformMouseButton.Left);
-
         PlayerActionPanelView view =
             CreateView(
                 viewportWidth,
@@ -367,71 +361,7 @@ public sealed partial class PlayerActionPanelController
         {
             UpdateRingPointer(input, snapshot, actions, layout, view, freshPress);
         }
-        else
-        {
-        PointerCaptured =
-            input.HasPointerPosition &&
-            (layout.PrimaryCommands.Contains(input.PointerPosition) || PlayerActionDockInteractionLayout.CapturesPointer(
-                input.PointerPosition,
-                layout,
-                view.IsOpen, itemCount, SelectedIndex, Mode, actions));
-
-        bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
-        var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
-        bool clicked = input.WheelDelta == 0 && !displayChanged && !sessionChanged && freshPress && hasPress && input.HasPointerPosition;
-        if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command,
-                localPending: ContextualCommandModel.HasPending(view, snapshot), selectionPending: view.SelectionPending))
-        {
-            PointerCaptured = true;
-            if (command.Availability.CanActivate)
-            {
-                if (command.OpensMode) ToggleMode(command.Mode);
-                else
-                {
-                    Mode = command.Mode;
-                    SelectedIndex = command.ItemIndex;
-                    ActivateSelected(ContextualCommandModel.ResolveActions(snapshot));
-                    _contextualActivationTick = snapshot!.Tick;
-                }
-            }
-            _leftWasDown = leftDown;
-            PointerCaptured = true;
-            _ = Pressed(input, _bindings.Key(GameplayAction.Activate));
-            _ = Pressed(input, _bindings.Key(GameplayAction.CancelJob));
-            return;
-        }
-
-        PlayerActionDockHitTarget hit =
-            default;
-        bool hasHit =
-            PointerCaptured &&
-            PlayerActionDockInteractionLayout.TryHit(
-                input.PointerPosition,
-                layout,
-                view.IsOpen,
-                itemCount,
-                out hit, SelectedIndex, Mode, actions);
-        _hoveredIndex =
-            hasHit &&
-            hit.Kind ==
-                PlayerActionDockControlKind.Item
-                ? hit.ItemIndex
-                : -1;
-        _pointerPressed =
-            hasHit &&
-            leftDown;
-
-        if (clicked && PlayerActionDockInteractionLayout.TryHit(clickPosition, layout,
-                view.IsOpen, itemCount, out var clickHit, SelectedIndex, Mode, actions))
-        {
-            HandlePointerHit(
-                clickHit,
-                actions,
-                view);
-            PointerCaptured = true;
-        }
-
-        }
+        else PointerCaptured = false;
 
         bool activate =
             Mode != PlayerActionPanelMode.Closed &&
@@ -495,8 +425,8 @@ public sealed partial class PlayerActionPanelController
             _automaticFuelThreshold,
             _automaticAmmunitionThreshold,
             PointerCaptured,
-            layout.ActionDock.X,
-            layout.ActionDock.Y,
+            layout.SafeArea.X,
+            layout.SafeArea.Y,
             _supplyPriority,
             _hoveredIndex,
             _pointerPressed,
@@ -525,10 +455,7 @@ public sealed partial class PlayerActionPanelController
 
     public bool ContainsControl(System.Numerics.Vector2 point, PresentationSnapshot? snapshot, in GameplayHudLayout layout)
     {
-        var actions = PlayerActionDockHudModel.ResolveActions(snapshot);
-        if (!PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection)) actions = null;
-        return (_ringContext ? _presentedRing.TryHit(point, out _) : layout.PrimaryCommands.Contains(point)) || PlayerActionDockInteractionLayout.CapturesPointer(point, layout,
-            DockExpanded, PlayerActionDockInteractionLayout.GetItemCount(Mode, actions), SelectedIndex, Mode, actions);
+        return _ringContext && _presentedRing.TryHit(point, out _);
     }
 
     public void DismissTransient(InputState input, bool preserveSelectionGesture = false)

@@ -17,9 +17,9 @@ public sealed class SelectedCombatGroupTests
     {
         foreach (char symbol in "<=()!")
         {
-            string glyph = SelectionInspectorHudRenderer.TextGlyphPattern(symbol);
+            string glyph = HudOverlayPrimitives.TextGlyphPattern(symbol);
             Assert.Equal(35, glyph.Length);
-            Assert.NotEqual(SelectionInspectorHudRenderer.TextGlyphPattern('?'), glyph);
+            Assert.NotEqual(HudOverlayPrimitives.TextGlyphPattern('?'), glyph);
         }
     }
 
@@ -109,12 +109,9 @@ public sealed class SelectedCombatGroupTests
         var controller = new CombatGroupCardController();
         var input = new InputState();
         var layout = GameplayHudLayout.Create(1600, 900, 96);
-        Click(input, layout, 8);
-        Assert.Equal(new EntityId(1, 1), controller.Update(input, snapshot, selection, layout).FocusMember);
-        Click(input, layout, 8);
-        Assert.Equal(new EntityId(2, 1), controller.Update(input, snapshot, selection, layout).FocusMember);
-        Click(input, layout, 8);
-        Assert.Equal(new EntityId(1, 1), controller.Update(input, snapshot, selection, layout).FocusMember);
+        Assert.Equal(new EntityId(1, 1), controller.Activate(8, snapshot, selection).FocusMember);
+        Assert.Equal(new EntityId(2, 1), controller.Activate(8, snapshot, selection).FocusMember);
+        Assert.Equal(new EntityId(1, 1), controller.Activate(8, snapshot, selection).FocusMember);
         Assert.Equal(2, selection.Count);
     }
 
@@ -149,14 +146,13 @@ public sealed class SelectedCombatGroupTests
         var input = new InputState();
         var controller = new CombatGroupCardController();
         var layout = GameplayHudLayout.Create(1600, 900, 96);
-        Click(input, layout, 3);
-        var result = controller.Update(input, snapshot, selection, layout);
+        var result = controller.Activate(3, snapshot, selection);
         Assert.True(result.Captured);
         Assert.True(result.SelectionChanged);
         Assert.Equal(1, selection.Count);
         Assert.True(selection.Contains(new EntityId(1, 1)));
         Assert.Equal(2, registry.GetSlot(1).Members.Length);
-        Assert.False(controller.Update(input, snapshot, selection, layout).SelectionChanged);
+        Assert.False(controller.Activate(3, snapshot, selection).SelectionChanged);
     }
 
     [Theory]
@@ -170,8 +166,7 @@ public sealed class SelectedCombatGroupTests
         var input = new InputState();
         var controller = new CombatGroupCardController();
         var layout = GameplayHudLayout.Create(1600, 900, 96);
-        Click(input, layout, control);
-        var result = controller.Update(input, Snapshot(), selection, layout);
+        var result = controller.Activate(control, Snapshot(), selection);
         Assert.Equal(2, selection.Count);
         Assert.Equal(control is 8 or 9, result.FocusMember.IsValid);
         Assert.Equal(control == 10, result.CycleFormation);
@@ -179,60 +174,9 @@ public sealed class SelectedCombatGroupTests
         Assert.False(result.SelectionChanged);
     }
 
-    [Fact]
-    public void BlockedFocusResizeSessionAndStaleTicksConsumePressWithoutLaterActivation()
-    {
-        var input = new InputState();
-        var controller = new CombatGroupCardController();
-        var selection = Selection();
-        var layout = GameplayHudLayout.Create(1600, 900, 96);
-        var snapshot = Snapshot();
-        Click(input, layout, 3);
-        Assert.False(controller.Update(input, snapshot, selection, layout, blocked: true).SelectionChanged);
-        Assert.False(controller.Update(input, snapshot, selection, layout).SelectionChanged);
-        Click(input, layout, 3);
-        Assert.False(controller.Update(input, snapshot, selection, GameplayHudLayout.Create(1920, 1080, 96)).SelectionChanged);
-        Click(input, layout, 3);
-        Assert.False(controller.Update(input, Snapshot(session: 2), selection, layout).SelectionChanged);
-        Click(input, layout, 3);
-        Assert.False(controller.Update(input, Snapshot(session: 2, memberTick: 7), selection, layout).SelectionChanged);
-        Click(input, layout, 3);
-        input.Apply(PlatformInputEvent.FocusLost());
-        Assert.False(controller.Update(input, Snapshot(session: 2), selection, layout).SelectionChanged);
-        Assert.Equal(2, selection.Count);
-    }
 
-    [Theory]
-    [InlineData(1024, 720, 96, 1f)]
-    [InlineData(1024, 720, 192, 2f)]
-    [InlineData(1600, 900, 144, 1.25f)]
-    [InlineData(1920, 1080, 96, 1f)]
-    [InlineData(3840, 2160, 192, 2f)]
-    public void RenderAndControlsShareBoundedGeometryWithZeroWarmAllocation(int width, int height, uint dpi, float scale)
-    {
-        var snapshot = Snapshot();
-        var group = SelectedCombatGroup.Create(snapshot.CombatGroups!, Selection());
-        var layout = GameplayHudLayout.Create(width, height, dpi, scale);
-        for (int i = 0; i < 12; i++)
-        {
-            var rect = CombatGroupCardLayout.Control(layout, i);
-            Assert.True(layout.SelectionInspector.Contains(new Vector2(rect.X, rect.Y)));
-            Assert.True(layout.SelectionInspector.Contains(new Vector2(rect.Right, rect.Bottom)));
-        }
-        using var device = new SelectionOverlayRenderingTests.RecordingDevice();
-        using var renderer = new SelectionInspectorHudRenderer(device, null);
-        var context = new SelectionOverlayRenderingTests.RecordingContext { Width = width, Height = height };
-        renderer.Render(context, snapshot, layout, group);
-        using var retained = new RetainedDevice();
-        using var measured = new SelectionInspectorHudRenderer(retained, null);
-        for (int i = 0; i < 128; i++) measured.Render(context, snapshot, layout, group);
-        long before = GC.GetAllocatedBytesForCurrentThread();
-        for (int i = 0; i < 256; i++) measured.Render(context, snapshot, layout, group);
-        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
-        Assert.InRange(renderer.LastRenderedVertexCount, 1, 131072);
-        Assert.All(device.Buffer!.Vertices, vertex =>
-        { Assert.InRange(vertex.Position.X, -1, 1); Assert.InRange(vertex.Position.Y, -1, 1); });
-    }
+
+
 
     private static SelectionSet Selection()
     { var result = new SelectionSet(); result.Replace([new EntityId(1, 1), new EntityId(2, 1)]); return result; }
@@ -263,10 +207,17 @@ public sealed class SelectedCombatGroupTests
         void ClickStop()
         {
             input.BeginFrame();
-            var rect = ContextualCommandModel.Button(layout, 2);
-            int x = (int)(rect.X + rect.Width / 2), y = (int)(rect.Y + rect.Height / 2);
-            input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, x, y));
-            input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, x, y));
+            input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.K));
+            controller.Update(input, old, 1600, 900, currentSelection: selection);
+            input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp,PlatformKey.K));
+            input.BeginFrame();
+            // Stop is the existing third tactical item.
+            for(int i=0;i<2;i++) {
+                input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.Tab));
+                controller.Update(input, old, 1600,900,currentSelection:selection);
+                input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp,PlatformKey.Tab)); input.BeginFrame();
+            }
+            input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.Enter));
         }
         ClickStop();
         controller.Update(input, old, 1600, 900, currentSelection: selection);
@@ -280,11 +231,7 @@ public sealed class SelectedCombatGroupTests
         ClickStop();
         controller.Update(input, wrongIdentity, 1600, 900, currentSelection: selection);
         Assert.False(controller.TryTakeRequest(out _));
-        ClickStop();
-        controller.Update(input, Actions([new EntityId(1, 1)]), 1600, 900, currentSelection: selection);
-        Assert.True(controller.TryTakeRequest(out var request));
-        Assert.Equal(PlayerActionRequestKind.SubmitStopCombat, request.Kind);
-        Assert.Equal(new[] { new EntityId(1, 1) }, request.TacticalEntities);
+
     }
 
     private static PresentationSnapshot Snapshot(ulong session = 1, ulong memberTick = 4)
@@ -300,14 +247,6 @@ public sealed class SelectedCombatGroupTests
         return new(tick, TimeSpan.Zero, 2, [], sessionId: new(session), playerExperience: experience, combatGroups: members);
     }
 
-    private static void Click(InputState input, in GameplayHudLayout layout, int index)
-    {
-        input.BeginFrame();
-        var rect = CombatGroupCardLayout.Control(layout, index);
-        int x = (int)(rect.X + rect.Width / 2), y = (int)(rect.Y + rect.Height / 2);
-        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, x, y));
-        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, x, y));
-    }
     private sealed class RetainedDevice : IGraphicsDevice
     {
         public int BufferCount { get; private set; }

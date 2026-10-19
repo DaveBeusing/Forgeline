@@ -117,31 +117,7 @@ public sealed class EconomicInterfaceSkinTests
             { _ = EconomicCardVisual.Resolve(PlayerActionPanelMode.UnitProduction, index, actions, false); _ = EconomicCardVisual.Portrait(PlayerActionPanelMode.UnitProduction, index, actions); }
         }
     }
-    [Theory]
-    [InlineData(1280, 720)]
-    [InlineData(1920, 1080)]
-    public void SelectedQueueProgressRemainsVisibleAboveTheFocusBorder(int outputWidth, int outputHeight)
-    {
-        using var platform = new WindowsPlatform(); using IWindow window = platform.CreateWindow(new("FORGELINE selected queue",outputWidth,outputHeight));
-        using var device = GraphicsDeviceFactory.CreateForWindow(window,new() { ForceSoftwareAdapter = true,EnableVSync = false });
-        using var renderer = new PlayerActionDockHudRenderer(device,RuntimeAssetCatalog.Load(Path.Combine(Root(),"assets/runtime")));
-        HudRect card = default; int width = 0; float scale = 1;
-        byte[] Capture(double progress) => device.CaptureFrame(GraphicsColor.ForgeLineClear,c =>
-        {
-            var layout = GameplayHudLayout.Create(c.Width,c.Height,96,1); width = c.Width;
-            scale = PlayerActionDockInteractionLayout.Scale(layout);
-            card = PlayerActionDockInteractionLayout.GetCardRect(layout,0);
-            renderer.Render(c,Snapshot(actions:Processing(ProductionBlockReason.None,progress:progress)),
-                default(PlayerActionPanelView) with { Mode = PlayerActionPanelMode.Production,SelectedIndex = 0 },default,FormationTemplate.Compact,layout);
-        });
-        var empty = Capture(0); var full = Capture(1);
-        int changes = 0;
-        // The progress lane sits above the full-width selected border and below card details.
-        for (int y = (int)(card.Bottom - 10 * scale); y < (int)(card.Bottom - 4 * scale); y++)
-        for (int x = (int)(card.X + 8 * scale); x < (int)(card.Right - 8 * scale); x++)
-        { int pixel = (y * width + x) * 4; if (!empty.AsSpan(pixel,4).SequenceEqual(full.AsSpan(pixel,4))) changes++; }
-        Assert.True(changes > 0,"Selected border obscured the production progress fill.");
-    }
+
     [Fact]
     public void NativeThinMetersRetainVisibleClippedFillAndUnknownNeverLooksCompleted()
     {

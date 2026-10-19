@@ -65,8 +65,8 @@ public sealed class DevelopmentOverlayRendererTests : IDisposable
     public void ScreenSpaceHudPipelinesNeverCullPanelsOrGlyphs()
     {
         using var resources = new ResourcePowerHudSurface(_graphics, null);
-        using var selection = new SelectionInspectorHudSurface(_graphics, null);
-        using var actions = new PlayerActionDockHudSurface(_graphics, null);
+        using var tooltip = new WorldHoverTooltipSurface(_graphics, null);
+        using var actions = new PlayerActionRingHudSurface(_graphics, null);
         using var information = new RtsInformationHudSurface(_graphics, null);
         using var development = new DevelopmentOverlayRenderer(_graphics);
         Assert.Equal(5, _graphics.Pipelines.Count);

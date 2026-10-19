@@ -43,7 +43,7 @@ public sealed class GuidancePresentationTests
         var panel = renderer.LastGuidanceBounds;
         Assert.True(layout.SafeArea.Contains(new Vector2(panel.X, panel.Y)));
         Assert.True(layout.SafeArea.Contains(new Vector2(panel.Right, panel.Bottom)));
-        foreach (var other in new[] { layout.AlertStack, layout.ActionDock, layout.SelectionInspector, layout.PrimaryCommands, layout.Minimap, layout.TopStatusBar })
+        foreach (var other in new[] { layout.AlertStack, layout.SecondaryView, layout.Minimap, layout.TopStatusBar })
             Assert.False(panel.Intersects(other));
         Assert.All(device.Buffers.SelectMany(buffer => buffer.Vertices), vertex =>
         {
@@ -67,7 +67,7 @@ public sealed class GuidancePresentationTests
         renderer.Render(context, new RtsCamera(), snapshot, default, RtsInformationLayerView.Empty,
             CombatGroupOverviewView.Empty, dpi, 2, Ux(new EarlyGameGuidanceController().Update(snapshot, true)));
         Assert.True(renderer.LastGuidanceTextSize >= 14);
-        Assert.False(renderer.LastGuidanceBounds.Intersects(layout.PrimaryCommands));
+        Assert.False(renderer.LastGuidanceBounds.Intersects(layout.SecondaryView));
         Assert.True(renderer.LastGuidanceVertexCount > 0);
     }
 

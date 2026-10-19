@@ -28,7 +28,7 @@ public sealed class RadialActionLayoutTests
     public void FitKeepsCompleteRingInsideSafeAreaAndAvoidsControls(uint dpi, float scale)
     {
         var hud = GameplayHudLayout.Create(3840,2160,dpi,scale);
-        HudRect[] obstacles = [hud.TopStatusBar, hud.SelectionInspector, hud.Minimap, hud.VisibleActionDock(false), hud.OnboardingBounds];
+        HudRect[] obstacles = [hud.TopStatusBar, hud.Minimap, hud.OnboardingBounds];
         foreach (Vector2 anchor in new Vector2[] { new(hud.SafeArea.X + 1,hud.SafeArea.Y + 1), new(1900,1000), new(hud.SafeArea.Right-1,hud.SafeArea.Bottom-1) })
         {
             var fit = RadialActionLayout.Fit(anchor, 500, hud, obstacles);
@@ -54,8 +54,8 @@ public sealed class RadialActionLayoutTests
     public void ExpandedOnboardingAtCompactMaximumDensityKeepsNativeTypeAndExactSectorLabels()
     {
         var hud=GameplayHudLayout.Create(1280,720,192,2);
-        var ring=RadialActionLayout.Fit(new(640,360),0,hud,[hud.TopStatusBar,hud.SelectionInspector,hud.Minimap,
-            hud.VisibleActionDock(false),hud.NotificationBounds(false),hud.OnboardingBounds,OperationsLayout.Entry(hud)]);
+        var ring=RadialActionLayout.Fit(new(640,360),0,hud,[hud.TopStatusBar,hud.Minimap,
+            hud.NotificationBounds(false),hud.OnboardingBounds,OperationsLayout.Entry(hud)]);
         Assert.True(ring.IsValid);
         Assert.True(ring.OuterRadius-ring.InnerRadius>=96);
         for(int slot=0;slot<8;slot++)
@@ -67,7 +67,7 @@ public sealed class RadialActionLayoutTests
     public void CompactHighDpiRingKeepsReadableLabelsAndAvoidsTheActualHud()
     {
         var hud=GameplayHudLayout.Create(1280,720,192,2);
-        var fit=RadialActionLayout.Fit(new(640,360),500,hud,[hud.TopStatusBar,hud.SelectionInspector,hud.Minimap,hud.VisibleActionDock(false),hud.NotificationBounds(false),OperationsLayout.Entry(hud)]);
+        var fit=RadialActionLayout.Fit(new(640,360),500,hud,[hud.TopStatusBar,hud.Minimap,hud.NotificationBounds(false),OperationsLayout.Entry(hud)]);
         Assert.True(fit.IsValid);
         Assert.InRange((fit.OuterRadius-fit.InnerRadius)/96,1,1.75f);
     }

@@ -8,7 +8,7 @@ namespace ForgeLine.Presentation;
 
 public sealed partial class PlayerActionPanelController
 {
-    public bool SingleObjectActions => _ringContext && _ringGroup is null;
+    public bool SingleObjectActions => _ringContext && !_ringGlobal && _ringGroup is null;
     public bool ObjectActions => _ringContext;
     private GroupActionRingContext? _ringGroup;
     private SimulationTick? _groupTick;
@@ -208,13 +208,12 @@ public sealed partial class PlayerActionPanelController
         _presentedRing = _presentedRing with { HoveredSlot = hover };
         _hoveredIndex = -1;
         _pointerPressed = hasHit && input.IsMouseButtonDown(PlatformMouseButton.Left);
-        PointerCaptured = hasHit || PlayerActionDockInteractionLayout.CapturesPointer(input.PointerPosition, layout, false);
+        PointerCaptured = hasHit;
         if (freshPress && input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin))
         {
             _ringArmed = _presentedRing.TryHit(origin, out _pressedRingSlot) && _pressedRingSlot.Enabled;
             _pressedRing = _presentedRing;
-            if (!_ringArmed && PlayerActionDockInteractionLayout.TryHit(origin, layout, false, 0, out var mode))
-            { HandlePointerHit(mode, actions, panel); PointerCaptured = true; }
+
         }
         if (!input.WasMouseButtonReleased(PlatformMouseButton.Left)) return;
         bool armed = _ringArmed; _ringArmed = false;

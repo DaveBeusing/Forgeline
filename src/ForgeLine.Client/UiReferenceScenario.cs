@@ -243,8 +243,8 @@ internal static class UiReferenceStates
         }
         else
         {
-            Add("resources", hud.TopStatusBar); Add("selection", hud.SelectionInspector);
-            Add("action-dock", hud.VisibleActionDock(expanded)); Add("alerts", hud.NotificationBounds(expanded)); Add("minimap", hud.Minimap);
+            Add("resources", hud.TopStatusBar);
+            Add("alerts", hud.NotificationBounds(expanded)); Add("minimap", hud.Minimap);
             void Add(string name, HudRect r) => regions.Add((name, r.X, r.Y, r.Width, r.Height));
         }
         return regions.Select(r =>

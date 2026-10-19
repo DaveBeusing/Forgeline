@@ -11,7 +11,7 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed partial class HoverTooltipRenderingTests
 {
-    private static PresentationSnapshot StatusSnapshot()
+    internal static PresentationSnapshot StatusSnapshot()
     {
         var original = HoverTooltipTests.Snapshot();
         var tick = new SimulationTick(1);
@@ -29,11 +29,11 @@ public sealed partial class HoverTooltipRenderingTests
             sessionId: original.SessionId, playerExperience: experience);
     }
 
-    private static PlayerActionPanelView StatusPanel(PresentationSnapshot snapshot) =>
+    internal static PlayerActionPanelView StatusPanel(PresentationSnapshot snapshot) =>
         default(PlayerActionPanelView) with { Ring = new(new EntityId(11, 1), snapshot.SessionId,
             9, 10, true, true, new(new Vector2(800, 450), new Vector2(800, 450), 40, 120, 8), true) };
 
-    private static HoverTooltipView StatusView(PresentationSnapshot snapshot, GameplayHudLayout layout) =>
+    internal static HoverTooltipView StatusView(PresentationSnapshot snapshot, GameplayHudLayout layout) =>
         new(snapshot.SessionId, default, default, new Vector2(800, 450), true,
             layout.ViewportWidth, layout.ViewportHeight, layout.Scale,
             SelectionStatus: true, SelectionRevision: 9, MenuRevision: 10);

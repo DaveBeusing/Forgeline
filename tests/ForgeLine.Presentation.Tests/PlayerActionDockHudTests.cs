@@ -10,66 +10,7 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class PlayerActionDockHudTests
 {
-    [Fact]
-    public void InteractionLayoutProvidesStableModeCardAndFooterHits()
-    {
-        GameplayHudLayout layout =
-            GameplayHudLayout.Create(
-                1600,
-                900,
-                96);
 
-        HudRect tacticalButton =
-            PlayerActionDockInteractionLayout.GetModeButtonRect(
-                layout,
-                5);
-        Assert.True(
-            PlayerActionDockInteractionLayout.TryHit(
-                Center(tacticalButton),
-                layout,
-                isOpen: false,
-                itemCount: 0,
-                out PlayerActionDockHitTarget modeHit));
-        Assert.Equal(
-            PlayerActionDockControlKind.Mode,
-            modeHit.Kind);
-        Assert.Equal(
-            PlayerActionPanelMode.Tactical,
-            modeHit.Mode);
-
-        HudRect firstCard =
-            PlayerActionDockInteractionLayout.GetCardRect(
-                layout,
-                0);
-        Assert.True(
-            PlayerActionDockInteractionLayout.TryHit(
-                Center(firstCard),
-                layout,
-                isOpen: true,
-                itemCount: 3,
-                out PlayerActionDockHitTarget cardHit));
-        Assert.Equal(
-            PlayerActionDockControlKind.Item,
-            cardHit.Kind);
-        Assert.Equal(
-            0,
-            cardHit.ItemIndex);
-
-        HudRect activate =
-            PlayerActionDockInteractionLayout.GetFooterButtonRect(
-                layout,
-                0);
-        Assert.True(
-            PlayerActionDockInteractionLayout.TryHit(
-                Center(activate),
-                layout,
-                isOpen: true,
-                itemCount: 3,
-                out PlayerActionDockHitTarget footerHit));
-        Assert.Equal(
-            PlayerActionDockControlKind.Activate,
-            footerHit.Kind);
-    }
 
     [Fact]
     public void MissingKnownInputsDisableProductionAndUnitCards()
@@ -313,50 +254,7 @@ public sealed class PlayerActionDockHudTests
                 actions));
     }
 
-    [Fact]
-    public void LayoutRemainsBoundedAcrossCompactAndScaledHud()
-    {
-        foreach ((int width, int height, uint dpi, float uiScale) in
-                 new[]
-                 {
-                     (1280, 720, 96u, 1.0f),
-                     (1920, 1080, 144u, 1.0f),
-                     (2560, 1440, 96u, 1.35f)
-                 })
-        {
-            GameplayHudLayout layout =
-                GameplayHudLayout.Create(
-                    width,
-                    height,
-                    dpi,
-                    uiScale);
 
-            Assert.False(
-                layout.ActionDock.IsEmpty);
-            Assert.True(
-                PlayerActionDockInteractionLayout.MaximumVisibleItems(
-                    layout) >
-                0);
-
-            for (int index = 0;
-                 index <
-                     PlayerActionDockInteractionLayout.ModeButtonCount;
-                 index++)
-            {
-                HudRect rect =
-                    PlayerActionDockInteractionLayout.GetModeButtonRect(
-                        layout,
-                        index);
-                Assert.True(
-                    rect.X >=
-                    layout.ActionDock.X);
-                Assert.True(
-                    rect.Right <=
-                    layout.ActionDock.Right +
-                    0.01f);
-            }
-        }
-    }
 
 
     [Fact]
@@ -367,21 +265,7 @@ public sealed class PlayerActionDockHudTests
                 1600,
                 900,
                 96);
-        HudRect technologyButton =
-            PlayerActionDockInteractionLayout.GetModeButtonRect(
-                layout,
-                6);
-
-        Assert.True(
-            PlayerActionDockInteractionLayout.TryHit(
-                Center(technologyButton),
-                layout,
-                isOpen: false,
-                itemCount: 0,
-                out PlayerActionDockHitTarget modeHit));
-        Assert.Equal(
-            PlayerActionPanelMode.Technology,
-            modeHit.Mode);
+        Assert.Equal(PlayerActionPanelMode.Technology, PlayerActionDockInteractionLayout.ModeForButton(6));
 
         var technology =
             new PlayerTechnologyActionReadModel(

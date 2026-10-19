@@ -49,11 +49,6 @@ public sealed class HudInteractionContext
     public static bool BlocksWorldPointer(
         Vector2 position, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false, bool includeActionDock = true, OnboardingPresentation? onboarding = null, bool includePrimaryCommands = true) =>
         layout.TopStatusBar.Contains(position) ||
-        layout.SelectionInspector.Contains(position) ||
-        (includePrimaryCommands && layout.PrimaryCommands.Contains(position)) ||
-        (includeActionDock && (actionDockExpanded
-            ? layout.ActionDock.Contains(position)
-            : PlayerActionDockInteractionLayout.GetCollapsedRect(layout).Contains(position))) ||
         (minimapEnabled && layout.Minimap.Contains(position)) ||
         (onboarding?.Contains(position) ?? (guidanceVisible && GameplayGuidanceLayout.Resolve(layout).Contains(position)));
 

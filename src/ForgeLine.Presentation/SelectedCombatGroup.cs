@@ -84,20 +84,3 @@ public sealed class SelectedCombatGroup
     }
 }
 
-public static class CombatGroupCardLayout
-{
-    public static float Scale(in GameplayHudLayout layout) =>
-        MathF.Min(layout.Scale, MathF.Min(layout.SelectionInspector.Width / 360, layout.SelectionInspector.Height / 112));
-
-    public static HudRect Control(in GameplayHudLayout layout, int index)
-    {
-        if (index is < 0 or > 11 || layout.SelectionInspector.IsEmpty) return default;
-        float scale = Scale(layout);
-        HudRect area = layout.SelectionInspector;
-        int columns = index < 8 ? 4 : 2;
-        int column = index < 8 ? index % 4 : (index - 8) % 2;
-        float y = index < 8 ? 42 + index / 4 * 12 : index < 10 ? 68 : 82;
-        float width = (area.Width - 12 * scale) / columns;
-        return new(area.X + 6 * scale + column * width, area.Y + y * scale, width - 2 * scale, 11 * scale);
-    }
-}

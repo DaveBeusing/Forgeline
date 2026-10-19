@@ -30,10 +30,10 @@ public sealed class GameplayHudLayoutIntegrationTests
                 uiScale: uiScale);
 
         Assert.Equal(
-            layout.ActionDock.X,
+            layout.SafeArea.X,
             view.OriginX);
         Assert.Equal(
-            layout.ActionDock.Y,
+            layout.SafeArea.Y,
             view.OriginY);
     }
 }

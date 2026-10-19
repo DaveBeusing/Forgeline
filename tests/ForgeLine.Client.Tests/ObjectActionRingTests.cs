@@ -48,7 +48,7 @@ public sealed class ObjectActionRingTests
         var layout=GameplayHudLayout.Create(1920,1080,96);
         Assert.False(controller.ContainsControl(Geometry.Center,snapshot,layout));
         Assert.False(controller.ContainsControl(Geometry.Center+RadialActionLayout.Direction(Geometry.Start(0)-RadialActionLayout.GapRadians/2)*100,snapshot,layout));
-        Assert.False(controller.ContainsControl(new(layout.PrimaryCommands.X+5,layout.PrimaryCommands.Y+5),snapshot,layout));
+        Assert.False(controller.ContainsControl(new(layout.SafeArea.X+370,layout.SafeArea.Bottom-50),snapshot,layout));
         Assert.False(controller.DockExpanded); Assert.True(controller.SingleObjectActions);
     }
 
@@ -197,6 +197,31 @@ public sealed class ObjectActionRingTests
         input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonUp,new(600,400));
         controller.SynchronizeObjectRing(input,snapshot,world,selection,true,selectionResolved:true);
         Assert.False(View(controller,snapshot).Ring.Open);
+    }
+
+    [Fact]
+    public void EmptySelectionKeepsExistingGlobalTechnologyShortcutAndDispatchesOnce()
+    {
+        var source=Snapshot(PlayerActionPanelMode.Technology,"Ready");
+        var a=source.PlayerActions!;
+        var actions=new PlayerActionSnapshot(a.SessionId,a.Tick,a.Construction,a.PendingCommandCount,
+            null,null,technology:a.Technology);
+        var snapshot=new PresentationSnapshot(source.Tick,source.TickDuration,source.SimulationEntityCount,source.Instances,
+            sessionId:source.SessionId,playerExperience:source.PlayerExperience!.Value with {Selection=PlayerSelectionSummary.Empty},playerActions:actions);
+        var selection=new SelectionSet();var input=new InputState();var controller=new PlayerActionPanelController();
+        controller.Update(input,snapshot,1920,1080,currentSelection:selection);
+        controller.SynchronizeObjectRing(input,snapshot,World(snapshot),selection,true,true);
+        Assert.False(View(controller,snapshot).Ring.Open);
+        input.BeginFrame();input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.H));
+        controller.Update(input,snapshot,1920,1080,currentSelection:selection);
+        Assert.True(View(controller,snapshot).Ring.Global);
+        Assert.True(View(controller,snapshot).Ring.Open);
+        Assert.False(View(controller,snapshot).Ring.SingleOwned);
+        input.BeginFrame();input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp,PlatformKey.H));
+        ClickSlot(controller,input,snapshot,selection,0);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(PlayerActionRequestKind.StartTechnologyResearch,request.Kind);
+        Assert.False(controller.TryTakeRequest(out _));
     }
 
     private static (PlayerActionPanelController,InputState,PresentationSnapshot,SelectionSet) Open(PlayerActionPanelMode mode,PlatformKey key,string state="Ready")

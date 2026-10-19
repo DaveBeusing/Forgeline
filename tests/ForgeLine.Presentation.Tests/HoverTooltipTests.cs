@@ -80,7 +80,12 @@ public sealed class HoverTooltipTests
             [new PlayerConstructionActionReadModel(BuildingIds.Extractor, "Mine / Extractor", costs, true)], 0, null, null);
         var snapshot = Snapshot(actions: actions);
         var panel = default(PlayerActionPanelView) with { Mode = PlayerActionPanelMode.Construction };
-        var card = PlayerActionDockInteractionLayout.GetCardRect(Layout, 0);
+        var geometry = new RadialActionLayout(new(800,450),new(800,450),80,176,8);
+        ActionRingSlots slots=default;
+        slots[0]=new(new(PlayerActionDockControlKind.Item, panel.Mode, 0), ObjectActionRingView.ItemKey(panel.Mode,0,actions));
+        panel=panel with { Ring=new(Entity,Session,1,1,true,true,geometry,true) { Slots=slots } };
+        var point=geometry.LabelCenter(0);
+        var card=new HudRect(point.X-1,point.Y-1,2,2);
         var input = PointerAt((int)(card.X + card.Width / 2), (int)(card.Y + card.Height / 2));
         var controller = new HoverTooltipController();
         controller.Update(input, snapshot, Entity, new RtsCamera(), Layout, panel, false, true, TimeSpan.Zero);

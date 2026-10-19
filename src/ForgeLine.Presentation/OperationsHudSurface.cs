@@ -23,7 +23,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     private bool _disposed;
     public OperationsHudSurface(IGraphicsDevice graphics, RuntimeAssetCatalog? runtimeAssets = null)
     {
-        _graphics = graphics; _text = new(graphics); _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true);
+        _graphics = graphics; _text = new(graphics); _pipeline = HudOverlayPrimitives.CreatePipeline(graphics, alphaBlendEnabled: true);
         try { _skin = new(graphics, runtimeAssets, icons: true); }
         catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
@@ -241,7 +241,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
             MathF.Max(0, _bounds.Right - 8f * _scale - x), bold: primary)) return;
         for (int i = 0; i < Math.Min(text.Length, characters); i++)
         {
-            string pattern = SelectionInspectorHudRenderer.TextGlyphPattern(char.ToUpperInvariant(text[i]));
+            string pattern = HudOverlayPrimitives.TextGlyphPattern(char.ToUpperInvariant(text[i]));
             if (pattern.Length != 35) continue;
             for (int pixel = 0; pixel < 35; pixel++)
                 if (pattern[pixel] == '1')

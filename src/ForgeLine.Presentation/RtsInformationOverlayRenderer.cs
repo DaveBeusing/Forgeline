@@ -214,7 +214,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float scale = layout.Scale;
         if (!_skin.Ready || snapshot.PlayerExperience is not { IsMatchComplete: false } experience || experience.Tick != snapshot.Tick) return;
         HudRect worldClip = new(0, layout.TopStatusBar.Bottom, width,
-            MathF.Max(0, MathF.Min(layout.SelectionInspector.Y, layout.Minimap.Y) - layout.TopStatusBar.Bottom));
+            MathF.Max(0, layout.Minimap.Y - layout.TopStatusBar.Bottom));
         _skin.IconClip(worldClip);
         _skin.PanelClip(worldClip);
         var selection = experience.Selection;
@@ -1300,7 +1300,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             GameplayHudVisualStyle.CompactGap *
             scale;
         float x =
-            layout.SelectionInspector.Right +
+            layout.SecondaryView.Right +
             gap;
         float right =
             layout.Minimap.X -

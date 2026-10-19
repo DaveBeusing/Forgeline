@@ -30,7 +30,7 @@ internal sealed class GameplayHudSkin : IDisposable
         get
         {
             var core = _panels?.Diagnostics ?? default; var icons = _symbols?.Diagnostics ?? default; var portraits = _images?.Diagnostics ?? default;
-            return new(core.PageBytes, icons.PageBytes, portraits.PageBytes, (Ready ? 1 : 0) + (_symbols is null ? 0 : 1) + (_images is null ? 0 : 1),
+            return new(core.PageBytes, icons.PageBytes, portraits.PageBytes, (_panels is null ? 0 : 1) + (_symbols is null ? 0 : 1) + (_images is null ? 0 : 1),
                 core.BufferCount + icons.BufferCount + portraits.BufferCount, core.Draws + icons.Draws + portraits.Draws,
                 core.Vertices + icons.Vertices + portraits.Vertices, core.VertexUploadBytes + icons.VertexUploadBytes + portraits.VertexUploadBytes,
                 core.MissingAssets + icons.MissingAssets + portraits.MissingAssets, core.DroppedQuads + icons.DroppedQuads + portraits.DroppedQuads);
@@ -38,17 +38,20 @@ internal sealed class GameplayHudSkin : IDisposable
     }
     internal bool Ready => _panels is not null;
     internal int Vertices => (_panels?.Diagnostics.Vertices ?? 0) + (_symbols?.Diagnostics.Vertices ?? 0) + (_images?.Diagnostics.Vertices ?? 0);
-    internal GameplayHudSkin(IGraphicsDevice graphics, RuntimeAssetCatalog? catalog, bool icons = false, bool portraits = false, int maximumIcons = 256)
+    internal GameplayHudSkin(IGraphicsDevice graphics, RuntimeAssetCatalog? catalog, bool icons = false, bool portraits = false, int maximumIcons = 256, bool panels = true)
     {
         if (catalog is null || !graphics.SupportsUiText) return;
         try
         {
+            if (panels)
+            {
             _core = new(graphics, catalog);
             foreach (string role in new[] { "panel.primary", "panel.resource", "panel.raised", "panel.compact", "panel.inset", "panel.portrait", "panel.tooltip", "panel.minimap",
                 "control.button_compact", "control.tab", "progress.progress_track", "progress.progress_fill",
                 "overlay.hover", "overlay.pressed", "overlay.focus", "overlay.selected", "overlay.disabled", "overlay.warning", "overlay.error", "overlay.pending", "overlay.accepted" })
                 _ = _core.Sprite("ui.skin.directorate." + role);
             _panels = new(graphics, _core, maximumQuads: 1024);
+            }
             if (icons)
             {
                 _icons = new(graphics, catalog, UiSkinGroup.Icons);

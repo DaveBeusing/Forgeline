@@ -88,71 +88,11 @@ public sealed class SelectionInspectorHudTests : IDisposable
                 PlayerWorkState.Blocked));
     }
 
-    [Fact]
-    public void SurfaceOwnsOnlySelectionInspectorRegion()
-    {
-        using var surface =
-            new SelectionInspectorHudSurface(
-                _graphics,
-                runtimeAssets: null);
 
-        Assert.Equal(
-            GameplayHudRegion.SelectionInspector,
-            surface.Regions);
-    }
 
-    [Fact]
-    public void RendererDoesNotRetainClearedSelection()
-    {
-        using var renderer =
-            new SelectionInspectorHudRenderer(
-                _graphics,
-                runtimeAssets: null);
-        var context =
-            new FakeGraphicsCommandContext();
-        GameplayHudLayout layout =
-            GameplayHudLayout.Create(
-                context.Width,
-                context.Height,
-                96);
 
-        renderer.Render(
-            context,
-            Snapshot(
-                CreateSelection(
-                    PlayerSelectionKind.Unit,
-                    commonUnitId:
-                        UnitIds.MainBattleTank)),
-            layout);
 
-        Assert.True(
-            renderer.LastRenderedVertexCount >
-            0);
 
-        renderer.Render(
-            context,
-            Snapshot(
-                PlayerSelectionSummary.Empty),
-            layout);
-
-        Assert.Equal(
-            0,
-            renderer.LastRenderedVertexCount);
-    }
-
-    [Fact]
-    public void StaleCapturedTickCannotDisplaySelectionDetails()
-    {
-        using var renderer = new SelectionInspectorHudRenderer(_graphics, null);
-        var context = new FakeGraphicsCommandContext();
-        var valid = Snapshot(CreateSelection(PlayerSelectionKind.Unit, commonUnitId: UnitIds.MainBattleTank));
-        var stale = new PresentationSnapshot(new SimulationTick(valid.Tick.Value + 1), valid.TickDuration,
-            valid.SimulationEntityCount, valid.Instances, playerExperience: valid.PlayerExperience);
-        renderer.Render(context, valid, GameplayHudLayout.Create(context.Width, context.Height, 96));
-        Assert.True(renderer.LastRenderedVertexCount > 0);
-        renderer.Render(context, stale, GameplayHudLayout.Create(context.Width, context.Height, 96));
-        Assert.Equal(0, renderer.LastRenderedVertexCount);
-    }
 
     [Fact]
     public void MultiSelectionRendersWithoutSingleEntityDetails()

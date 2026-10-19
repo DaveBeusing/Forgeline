@@ -28,7 +28,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     public WorldHoverTooltipSurface(IGraphicsDevice graphics, RuntimeAssetCatalog? runtimeAssets = null)
     {
         _graphics = graphics;
-        _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true);
+        _pipeline = HudOverlayPrimitives.CreatePipeline(graphics, alphaBlendEnabled: true);
         _text = new UiTextBatch(graphics);
         try { _skin = new(graphics, runtimeAssets); }
         catch { _text.Dispose(); _pipeline.Dispose(); throw; }
@@ -291,7 +291,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             _bounds.Right - 8 * _scale - x, primary)) return;
         for (int i = 0; i < Math.Min(text.Length, characters); i++)
         {
-            string pattern = SelectionInspectorHudRenderer.TextGlyphPattern(char.ToUpperInvariant(text[i]));
+            string pattern = HudOverlayPrimitives.TextGlyphPattern(char.ToUpperInvariant(text[i]));
             if (pattern.Length != 35) continue;
             for (int pixel = 0; pixel < 35; pixel++)
                 if (pattern[pixel] == '1')

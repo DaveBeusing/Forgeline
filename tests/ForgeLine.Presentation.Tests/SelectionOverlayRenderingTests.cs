@@ -83,15 +83,11 @@ public sealed class SelectionOverlayRenderingTests
     [InlineData(192)]
     public void SharedHudGeometryBlocksWorldInputButLeavesTheWorldAvailable(uint dpi)
     {
-        var layout = GameplayHudLayout.Create(1920, 1080, dpi);
-        foreach (var rect in new[] { layout.TopStatusBar, layout.SelectionInspector, layout.ActionDock, layout.Minimap })
-        {
-            Assert.True(HudInteractionContext.BlocksWorldPointer(new(rect.X + 1, rect.Y + 1), layout, true));
-        }
-        Assert.False(HudInteractionContext.BlocksWorldPointer(new(960, 540), layout, true));
-        Vector2 beneathCollapsedDock = new(layout.ActionDock.X + 1, layout.ActionDock.Y + 70f * layout.Scale);
-        Assert.False(HudInteractionContext.BlocksWorldPointer(beneathCollapsedDock, layout, true, actionDockExpanded: false));
-        Assert.True(HudInteractionContext.BlocksWorldPointer(beneathCollapsedDock, layout, true));
+        var layout = GameplayHudLayout.Create(1920,1080,dpi);
+        foreach(var rect in new[]{layout.TopStatusBar,layout.Minimap})
+            Assert.True(HudInteractionContext.BlocksWorldPointer(new(rect.X+1,rect.Y+1),layout,true));
+        Assert.False(HudInteractionContext.BlocksWorldPointer(new(960,540),layout,true));
+        Assert.False(HudInteractionContext.BlocksWorldPointer(new(30,1050),layout,true));
     }
 
     [StructLayout(LayoutKind.Sequential)]

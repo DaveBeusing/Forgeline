@@ -115,28 +115,7 @@ public sealed class BattlefieldProductionSkinTests
         }
         finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
     }
-    [Fact]
-    public void NativeHiddenOperationalFieldsDoNotChangePixelsAndEmptySelectionClearsSkinCommands()
-    {
-        using var platform = new WindowsPlatform(); using IWindow window = platform.CreateWindow(new("FORGELINE selection privacy", 1280, 720));
-        using var device = GraphicsDeviceFactory.CreateForWindow(window, new() { ForceSoftwareAdapter = true, EnableVSync = false });
-        using var inspector = new SelectionInspectorHudRenderer(device, RuntimeAssetCatalog.Load(RuntimeRoot()));
-        var hidden = Selection with { HasHealth = false, HasSupply = false, HasReadiness = false, HasPower = false };
-        byte[] Capture(PlayerSelectionSummary selection) => device.CaptureFrame(GraphicsColor.ForgeLineClear, c =>
-            inspector.Render(c, new PresentationSnapshot(new(1), TimeSpan.FromMilliseconds(50), 0, [],
-                playerExperience: default(PlayerExperienceSnapshot) with { Tick = new(1), Selection = selection }),
-                GameplayHudLayout.Create(c.Width, c.Height, 96)));
-        var before = Capture(hidden);
-        var after = Capture(hidden with { HealthFraction = .99, FuelFraction = .99, AmmunitionFraction = .99,
-            Readiness = .99, InventoryQuantity = 100000, PowerState = PowerOperationalState.Brownout });
-        Assert.True(before.AsSpan().SequenceEqual(after));
-        var longName = Capture(hidden with { DisplayName = new string('W', 300) });
-        var emptyName = Capture(hidden with { DisplayName = string.Empty });
-        Assert.False(longName.AsSpan().SequenceEqual(emptyName));
-        Capture(PlayerSelectionSummary.Empty);
-        Assert.Equal(0, inspector.LastRenderedVertexCount);
-        Assert.Equal(0, inspector.SkinDiagnostics.Vertices);
-    }
+
     [Fact]
     public void PreparedSkinGeometryDoesNotAllocateOrUploadTexturesDuringWarmRecording()
     {

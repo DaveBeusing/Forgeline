@@ -30,8 +30,7 @@ public sealed class GameplayHudRenderer : IDisposable
         {
             _statusSurface = new ResourcePowerHudSurface(graphics, runtimeAssets);
             prepared.Add(_statusSurface);
-            prepared.Add(new SelectionInspectorHudSurface(graphics, runtimeAssets));
-            prepared.Add(new PlayerActionDockHudSurface(graphics, runtimeAssets));
+            prepared.Add(new PlayerActionRingHudSurface(graphics, runtimeAssets));
             prepared.Add(new RtsInformationHudSurface(graphics, runtimeAssets));
             prepared.Add(new WorldHoverTooltipSurface(graphics, runtimeAssets));
             prepared.Add(new OperationsHudSurface(graphics, runtimeAssets));

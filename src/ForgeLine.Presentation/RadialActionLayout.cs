@@ -33,9 +33,9 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
     {
         if (occupied.Length != 8) throw new ArgumentException("Ring obstacle storage must contain eight rectangles.",nameof(occupied));
         occupied[0]=layout.TopStatusBar;
-        occupied[1]=layout.SelectionInspector;
+        occupied[1]=default;
         occupied[2]=layout.Minimap;
-        occupied[3]=layout.VisibleActionDock(false);
+        occupied[3]=default;
         occupied[4]=layout.NotificationBounds(false);
         occupied[5]=onboarding?.VisiblePanel ?? default;
         occupied[6]=onboarding?.Tab ?? default;

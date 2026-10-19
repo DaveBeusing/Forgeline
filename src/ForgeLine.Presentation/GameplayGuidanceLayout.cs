@@ -23,17 +23,11 @@ public static class GameplayGuidanceLayout
         var region = layout.OnboardingBounds;
         if (detailed && !region.IsEmpty)
         {
-            float bottom = layout.SelectionInspector.Y - layout.Gap;
+            float bottom = layout.SecondaryView.Y - layout.Gap;
             var operations = OperationsLayout.Entry(layout);
             if (!operations.IsEmpty) bottom = MathF.Min(bottom, operations.Y - layout.Gap);
             region = region with { Height = MathF.Max(0, bottom - region.Y) };
         }
-        // The compact inspector can be shorter than the independently scaled
-        // command band. Keep the guide in the left column when those bands overlap.
-        var commands = layout.PrimaryCommands;
-        if (region.Intersects(commands))
-            region = region with { Width = MathF.Max(0, commands.X -
-                GameplayHudVisualStyle.ResolveSafeMargin(layout.Scale) - region.X) };
         return region;
     }
 }

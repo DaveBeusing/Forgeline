@@ -22,7 +22,7 @@ public static class ActionableAlertLayout
 {
     public const int ContractVersion = 3;
     public const int MaximumCards = 3;
-    public static float Scale(in GameplayHudLayout layout) => MathF.Max(1, layout.DockContentScale);
+    public static float Scale(in GameplayHudLayout layout) => MathF.Max(1, layout.NotificationScale);
     public static NotificationStackLayout Resolve(PresentationSnapshot? snapshot, in GameplayHudLayout layout, bool expanded = false, string localFeedback = "") =>
         snapshot?.PlayerExperience is { } experience && experience.Tick == snapshot.Tick
             ? Resolve(experience, layout, expanded, ActionableAlertSnapshot.Resolve(snapshot), localFeedback) : default;
