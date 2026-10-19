@@ -208,6 +208,11 @@ public sealed partial class PlayerActionPanelController
             return;
         }
 
+        if (_ringGlobal && !_ringOpen)
+            _globalAnchor = input.HasPointerPosition && layout.SafeArea.Contains(input.PointerPosition)
+                ? input.PointerPosition : new(layout.SafeArea.X + layout.SafeArea.Width / 2,
+                    layout.SafeArea.Y + layout.SafeArea.Height / 2);
+
         if (Pressed(input, _bindings.Key(GameplayAction.Build)))
         {
             ToggleMode(

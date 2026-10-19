@@ -32,6 +32,7 @@ internal static class HoverTooltipResolver
                 ring.Session != snapshot.SessionId || ring.Revision != view.MenuRevision ||
                 ring.SelectionRevision != view.SelectionRevision || experience.Tick != snapshot.Tick ||
                 (ring.SingleOwned && experience.Selection.PrimaryEntity != ring.Entity) ||
+                (ring.Global && experience.Selection.Count != 0) ||
                 (ring.Group is not null && !ring.Group.MatchesSelection(snapshot.PlayerActions?.Tactical?.SelectedEntities))) return null;
             return new(experience.Selection.Count == 0 ? "COMMANDS" : experience.Selection.DisplayName,
                 SelectionInspectorHudModel.ResolveKindLabel(experience.Selection.Kind), "", "READ-ONLY STATUS",

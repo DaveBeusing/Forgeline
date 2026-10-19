@@ -172,4 +172,21 @@ public sealed class RadialActionLayoutTests
         Assert.Equal(0,motion.Update(open with { Open=false },start+TimeSpan.FromMilliseconds(176),true).Opacity);
         Assert.Equal(1,motion.Update(open,start+TimeSpan.FromMilliseconds(192),false).Opacity);
     }
+    [Fact]
+    public void GlobalRingUsesCopiedEmptySelectionAndRejectsReplacementSessionOrSelection()
+    {
+        var layout = GameplayHudLayout.Create(1920,1080,96);
+        var experience = default(PlayerExperienceSnapshot) with { Player=new(1), Tick=new(1) };
+        PresentationSnapshot Snapshot(PlayerExperienceSnapshot value, SimulationSessionId session) =>
+            new(new(1),TimeSpan.FromMilliseconds(50),1,[],sessionId:session,playerExperience:value);
+        var snapshot=Snapshot(experience,new(1));
+        var ring=new ObjectActionRingView(default,new(1),1,1,false,true) { Global=true, GlobalAnchor=new(900,500) };
+        var world=new RenderWorld(); var camera=new RtsCamera();
+        Assert.True(ring.UsesRing);
+        Assert.True(ring.Project(world,camera,1,snapshot,layout,[]).Geometry.IsValid);
+        Assert.False(ring.Project(world,camera,1,Snapshot(experience,new(2)),layout,[]).Geometry.IsValid);
+        Assert.False(ring.Project(world,camera,1,Snapshot(experience with {Selection=PlayerSelectionSummary.Empty with {Count=1}},new(1)),layout,[]).Geometry.IsValid);
+        Assert.False(ring.Project(world,camera,1,Snapshot(experience with {Tick=new(2)},new(1)),layout,[]).Geometry.IsValid);
+    }
+
 }
