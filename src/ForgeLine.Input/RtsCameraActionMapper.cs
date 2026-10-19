@@ -19,12 +19,12 @@ public sealed class RtsCameraActionMapper
 
         float panX =
             Axis(
-                IsEitherDown(state, Bindings.PanRight, Bindings.PanRightAlternate),
-                IsEitherDown(state, Bindings.PanLeft, Bindings.PanLeftAlternate));
+                IsEitherDown(state, Bindings.PanRight, Bindings.PanRightAlternate, contextOwnsQe),
+                IsEitherDown(state, Bindings.PanLeft, Bindings.PanLeftAlternate, contextOwnsQe));
         float panY =
             Axis(
-                IsEitherDown(state, Bindings.PanForward, Bindings.PanForwardAlternate),
-                IsEitherDown(state, Bindings.PanBackward, Bindings.PanBackwardAlternate));
+                IsEitherDown(state, Bindings.PanForward, Bindings.PanForwardAlternate, contextOwnsQe),
+                IsEitherDown(state, Bindings.PanBackward, Bindings.PanBackwardAlternate, contextOwnsQe));
 
         var pan = new Vector2(panX, panY);
         if (pan.LengthSquared() > 1.0f)
@@ -36,8 +36,8 @@ public sealed class RtsCameraActionMapper
             RotationKeyDown(state, Bindings.RotateRight, contextOwnsQe),
             RotationKeyDown(state, Bindings.RotateLeft, contextOwnsQe));
         float pitch = Axis(
-            state.IsKeyDown(Bindings.PitchUp),
-            state.IsKeyDown(Bindings.PitchDown));
+            RotationKeyDown(state, Bindings.PitchUp, contextOwnsQe),
+            RotationKeyDown(state, Bindings.PitchDown, contextOwnsQe));
 
         return new RtsCameraInputFrame(
             pan,
@@ -57,8 +57,9 @@ public sealed class RtsCameraActionMapper
     private static bool IsEitherDown(
         InputState state,
         PlatformKey primary,
-        PlatformKey alternate) =>
-        state.IsKeyDown(primary) || state.IsKeyDown(alternate);
+        PlatformKey alternate, bool contextOwnsQe) =>
+        RotationKeyDown(state, primary, contextOwnsQe) ||
+        RotationKeyDown(state, alternate, contextOwnsQe);
 
     private static float Axis(bool positive, bool negative) =>
         (positive ? 1.0f : 0.0f) - (negative ? 1.0f : 0.0f);
