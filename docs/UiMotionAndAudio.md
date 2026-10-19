@@ -9,6 +9,10 @@ remain immediate. Leaving a panel switches to current content immediately, witho
 waiting for an outgoing animation. Startup, the studio compositor and its skip
 policy retain their separate lifecycle.
 
+## World-anchored radial visual track
+
+The shared action-ring backgrounds have an effective settled alpha of 0.30, independent of the foreground/icon opacity and independent of the 160 ms presentation fade. Disabled, hover, pressed and locally pending fills use the established palette with the same background alpha ceiling. A reversed open/close track starts at its currently rendered alpha and does not move its hit region. Logical closure immediately frees input; no fading quad participates in hit testing. Invalid projected geometry is discarded rather than fading stale world content. Reduced motion, Low quality, paused/suspended presentation, resized viewport, changed DPI/UI scale, clock stall or rollback settle the target immediately. Native captures for this revision are not automatically qualified by earlier UI feedback evidence.
+
 ## Motion vocabulary
 
 The existing 140 ms screen-entry interval is a short accent-line reveal within the
