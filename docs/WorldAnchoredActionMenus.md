@@ -1,5 +1,11 @@
 # World anchored action menus
 
+## Current sector hover and selection inspector
+
+A hovered ring sector receives a lower-luminance fill at the same 0.30 material alpha and a dedicated high-contrast 1.5–4 physical-pixel arc inside **only** its outer radius. Pressed, disabled and pending retain distinct visual identities. This arc is decorative: input remains the published annular sector geometry, and inactive animation owns no pointer capture.
+
+For an authorized object or selection group, the existing status/tooltip owner retains the inspector while the pointer moves over a ring sector. An inspector-aware ring fit reserves available right-hand safe-area width; a bounded placement fallback avoids the minimap, alerts, guidance, operations and ring hit surfaces. The card uses 0.38 background alpha and high-contrast text with one blank row after its title. Its snapshot-bound health/supply/work/stock/progress, valid action-model logistics/production/queue summary, and last command results are read-only. Missing capability facts are omitted; an available numeric field with invalid data is rendered N/A instead of a guessed value. Existing global rings do not manufacture an object inspector. All native current-source UI qualification and human contrast acceptance remain outstanding.
+
 Current single/group rings have no rectangular mode bar, dock or selection inspector. Existing mode shortcuts and selection release open the rings; the shared tooltip preserves authorized status and results. See [current HUD parity and qualification](HudSurfaceConsolidation.md).
 
 Current validation and remaining gates: [qualification report](WorldAnchoredActionMenuQualification.md). Checkpoints below retain their original source identities.
