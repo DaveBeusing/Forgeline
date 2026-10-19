@@ -84,6 +84,24 @@ public sealed class NotificationRowMotionTests
         Assert.Equal(1, motion.Opacity(0));
     }
 
+    [Fact]
+    public void NarrowAlertFallsBackToOneMoreControlWithoutHiddenOverlappingButtons()
+    {
+        var layout = GameplayHudLayout.Create(1920, 1080, 96);
+        layout = layout with { AlertStack = layout.AlertStack with { Width = 64 } };
+        var experience = default(PlayerExperienceSnapshot) with
+        {
+            Tick = new(1), Player = new(1), Alerts = PlayerAlertState.SupplyCritical
+        };
+        var stack = ActionableAlertLayout.Resolve(experience, layout);
+        Assert.True(stack.Count > 0);
+        var row = stack.First;
+        Assert.True(row.Truncated);
+        Assert.True(row.Text.Right <= row.Action.X);
+        Assert.Equal(row.Action, row.Details);
+        Assert.True(row.Action.Right <= row.Bounds.Right);
+    }
+
     [Theory]
     [InlineData(1280, 720, 96u, .75f)]
     [InlineData(1920, 1080, 144u, 1f)]
