@@ -19,7 +19,10 @@ public readonly record struct HoverTooltipView(
     PlayerActionPanelMode DockMode = PlayerActionPanelMode.Closed,
     int DockControl = 0,
     int DockIndex = -1,
-    bool Contextual = false);
+    bool Contextual = false,
+    bool SelectionStatus = false,
+    ulong SelectionRevision = 0,
+    ulong MenuRevision = 0);
 
 public sealed class HoverTooltipController
 {
@@ -35,7 +38,9 @@ public sealed class HoverTooltipController
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(camera);
         Vector2 pointer = input.PointerPosition;
-        if (blocked || input.FocusLostThisFrame || !input.HasPointerPosition ||
+        bool statusAvailable = panel.Ring is { Open: true, Resolved: true, Geometry.IsValid: true };
+        if (!input.HasPointerPosition && statusAvailable) pointer = panel.Ring.Geometry.Center;
+        if (blocked || input.FocusLostThisFrame || (!input.HasPointerPosition && !statusAvailable) ||
             input.IsMouseButtonDown(PlatformMouseButton.Left) ||
             input.IsMouseButtonDown(PlatformMouseButton.Middle) ||
             input.IsMouseButtonDown(PlatformMouseButton.Right) || input.WheelDelta != 0 ||
@@ -73,6 +78,11 @@ public sealed class HoverTooltipController
                 DockIndex = hit.Kind == PlayerActionDockControlKind.Item ? hit.ItemIndex : panel.SelectedIndex
             };
         }
+        else if (statusAvailable && !worldPointerCaptured)
+        {
+            next = next with { SelectionStatus = true, SelectionRevision = panel.Ring.SelectionRevision,
+                MenuRevision = panel.Ring.Revision, PointerPosition = panel.Ring.Geometry.Center };
+        }
         else if (!worldPointerCaptured &&
             !HudInteractionContext.BlocksWorldPointer(pointer, layout, true, panel.DockExpanded, includePrimaryCommands: !panel.Ring.UsesRing))
         {
@@ -95,12 +105,13 @@ public sealed class HoverTooltipController
                 }
             }
         }
-        if (!next.Entity.IsValid && !next.Contact.IsSpecified && next.DockControl == 0) return Reset();
+        if (!next.SelectionStatus && !next.Entity.IsValid && !next.Contact.IsSpecified && next.DockControl == 0) return Reset();
 
         bool changed = next.SessionId != _candidate.SessionId || next.Entity != _candidate.Entity ||
             next.Contact != _candidate.Contact || next.DockMode != _candidate.DockMode ||
             next.DockControl != _candidate.DockControl || next.DockIndex != _candidate.DockIndex ||
-            next.Contextual != _candidate.Contextual ||
+            next.Contextual != _candidate.Contextual || next.SelectionStatus != _candidate.SelectionStatus ||
+            next.SelectionRevision != _candidate.SelectionRevision || next.MenuRevision != _candidate.MenuRevision ||
             next.ViewportWidth != _candidate.ViewportWidth || next.ViewportHeight != _candidate.ViewportHeight ||
             next.Scale != _candidate.Scale || Vector2.DistanceSquared(pointer, _anchor) > 9 * layout.Scale * layout.Scale;
         if (changed)
@@ -110,7 +121,7 @@ public sealed class HoverTooltipController
         }
         else if (elapsed > TimeSpan.Zero && elapsed <= TimeSpan.FromMilliseconds(250)) _stable += elapsed;
         else if (elapsed < TimeSpan.Zero || elapsed > TimeSpan.FromMilliseconds(250)) _stable = TimeSpan.Zero;
-        _candidate = next with { Ready = _stable >= DefaultDelay };
+        _candidate = next with { Ready = next.SelectionStatus || _stable >= DefaultDelay };
         return _candidate;
     }
 
@@ -124,6 +135,26 @@ public sealed class HoverTooltipController
 
 internal static class HoverTooltipPlacement
 {
+    public static HudRect BesideRing(in RadialActionLayout ring, in GameplayHudLayout layout, float width, float height)
+    {
+        var safe = layout.SafeArea;
+        if (safe.IsEmpty || width <= 0 || height <= 0) return default;
+        width = MathF.Min(width, safe.Width); height = MathF.Min(height, safe.Height);
+        float gap = layout.Gap;
+        var center = ring.Center;
+        Span<HudRect> candidates =
+        [
+            new(center.X + ring.OuterRadius + gap, center.Y - height / 2, width, height),
+            new(center.X - ring.OuterRadius - gap - width, center.Y - height / 2, width, height),
+            new(center.X - width / 2, center.Y + ring.OuterRadius + gap, width, height),
+            new(center.X - width / 2, center.Y - ring.OuterRadius - gap - height, width, height)
+        ];
+        foreach (var candidate in candidates)
+            if (candidate.X >= safe.X && candidate.Right <= safe.Right && candidate.Y >= safe.Y && candidate.Bottom <= safe.Bottom &&
+                !candidate.Intersects(layout.TopStatusBar) && !candidate.Intersects(layout.Minimap)) return candidate;
+        return new(safe.X, Math.Clamp(center.Y - height / 2, safe.Y, safe.Bottom - height), width, height);
+    }
+
     public static HudRect Resolve(Vector2 pointer, in GameplayHudLayout layout, float width, float height)
     {
         var safe = layout.SafeArea;

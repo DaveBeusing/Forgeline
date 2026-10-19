@@ -53,11 +53,12 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (context.Graphics.Width != view.ViewportWidth || context.Graphics.Height != view.ViewportHeight ||
             context.Layout.Scale != view.Scale || context.InformationLayer.IsDragSelecting ||
             context.TacticalTargeting.Mode != TacticalTargetingMode.None) return;
-        var content = HoverTooltipResolver.Resolve(context.Snapshot, view, context.ActionPanel);
+        var content = HoverTooltipResolver.Resolve(context.Snapshot, view, context.ActionPanel,
+            context.CombatGroups.Selection, context.ActiveFormation);
         if (content is not { } resolved) return;
         _width = context.Graphics.Width;
         _height = context.Graphics.Height;
-        _scale = context.Layout.Scale;
+        _scale = view.SelectionStatus ? Math.Clamp(context.Layout.Scale, 1, 1.25f) : context.Layout.Scale;
         if (_width <= 0 || _height <= 0) return;
         _count = 0;
         _line = 0;
@@ -71,7 +72,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         _measuring = false;
         _scale = MathF.Min(_scale, MathF.Min(context.Layout.SafeArea.Width / 350,
             context.Layout.SafeArea.Height / (16 + lines * 14)));
-        if (_wrapDetails)
+        if (_wrapDetails && !view.SelectionStatus)
         {
             var safe = context.Layout.SafeArea;
             float gap = 18 * context.Layout.Scale;
@@ -80,8 +81,11 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             _scale = MathF.Min(_scale, besidePointer / (16 + lines * 14));
             if (_scale <= 0) return;
         }
-        _bounds = HoverTooltipPlacement.Resolve(view.PointerPosition, context.Layout,
-            330 * _scale, (16 + lines * 14) * _scale);
+        _bounds = view.SelectionStatus
+            ? HoverTooltipPlacement.BesideRing(context.ActionPanel.Ring.Geometry, context.Layout,
+                330 * _scale, (16 + lines * 14) * _scale)
+            : HoverTooltipPlacement.Resolve(view.PointerPosition, context.Layout,
+                330 * _scale, (16 + lines * 14) * _scale);
         if (_bounds.IsEmpty) return;
         if (!_skin.Panel(_bounds, "panel.tooltip")) Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
         _skin.State(_bounds, resolved.VisualState);
@@ -111,6 +115,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         Line(resolved.Status);
         Line(resolved.WorkStatus);
         Line(resolved.Explanation);
+        if (resolved.Selection is { } selection) EmitSelectionStatus(selection, resolved.Group, resolved.Formation);
+        if (resolved.Feedback is { State: not PlayerCommandFeedbackState.None } feedback) EmitCommandFeedback(feedback);
         if (resolved.World is { } world) EmitWorld(world);
         if (resolved.Costs is { } costs) EmitAmounts(costs, "NEED");
         if (resolved.Outputs is { } outputs) EmitAmounts(outputs, "OUT");
@@ -134,6 +140,64 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             }
         }
         Line(resolved.Hint);
+    }
+
+    private void EmitSelectionStatus(in PlayerSelectionSummary selection, SelectedCombatGroup? group, FormationTemplate formation)
+    {
+        Span<char> buffer = stackalloc char[256];
+        var text = new TooltipTextBuilder(buffer);
+        text.Append("SELECTED "); text.Number(selection.Count, "0");
+        if (group is not null)
+        {
+            text.Append(" / LIVE "); text.Number(group.LiveCount, "0");
+            text.Append(" / COMBAT "); text.Number(group.CombatCount, "0");
+            Line(text.Written);
+            Covered("AVG HEALTH", group.Health, group.HealthCount);
+            Covered("AVG READINESS", group.Readiness, group.ReadinessCount);
+            Covered("AVG FUEL", group.Fuel, group.SupplyCount);
+            Covered("AVG AMMUNITION", group.Ammunition, group.SupplyCount);
+            for (int row = 0; row < 2; row++)
+            {
+                text = new(buffer);
+                for (int index = row * 4; index < row * 4 + 4; index++)
+                {
+                    if (index % 4 != 0) text.Append(" / ");
+                    text.Append(SelectedCombatGroup.TypeLabel(index)); text.Append(" "); text.Number(group.Composition(index), "0");
+                }
+                Line(text.Written);
+            }
+            text = new(buffer); text.Append("DAMAGED "); text.Number(group.DamagedCount, "0");
+            text.Append(" / UNSUPPLIED "); text.Number(group.UnsuppliedCount, "0"); Line(text.Written);
+            Line(formation switch { FormationTemplate.Line => "FORMATION LINE", FormationTemplate.Column => "FORMATION COLUMN",
+                FormationTemplate.Wedge => "FORMATION WEDGE", _ => "FORMATION COMPACT" });
+            return;
+        }
+        Line(text.Written);
+        if (!selection.HasSingleEntityDetails) return;
+        var details = new PlayerHoverSummary(selection.PrimaryEntity, default, default, default,
+            selection.DisplayName, default, selection);
+        EmitWorld(details);
+        if (selection.HasInventory)
+        {
+            text = new(buffer); text.Append("LOCAL INVENTORY "); text.Number(selection.InventoryQuantity, "N0"); Line(text.Written);
+        }
+    }
+
+    private void Covered(string label, double value, int count)
+    {
+        Span<char> buffer = stackalloc char[128]; var text = new TooltipTextBuilder(buffer);
+        text.Append(label); text.Append(" ");
+        if (count == 0) text.Append("UNAVAILABLE"); else text.Number(value, "P0");
+        text.Append(" / KNOWN "); text.Number(count, "0"); Line(text.Written);
+    }
+
+    private void EmitCommandFeedback(in PlayerCommandFeedback feedback)
+    {
+        Span<char> buffer = stackalloc char[192]; var text = new TooltipTextBuilder(buffer);
+        text.Append("LAST "); text.Append(PlayerActionDockHudModel.ResolveFeedbackStateLabel(feedback.State));
+        text.Append(" / OK "); text.Number(feedback.AcceptedTargets, "0");
+        text.Append(" / REJECTED "); text.Number(feedback.RejectedTargets, "0"); Line(text.Written);
+        Line(PlayerActionDockHudModel.ResolveCommandFeedbackReason(feedback));
     }
 
     private void EmitWorld(in PlayerHoverSummary world)
