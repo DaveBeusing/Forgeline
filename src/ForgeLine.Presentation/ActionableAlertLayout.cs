@@ -60,7 +60,9 @@ public static class ActionableAlertLayout
             float reserved = actionRequired ? controlWidth + gap : 0;
             float textWidth = MathF.Max(1, available - reserved);
             bool truncated = NotificationText.Truncated(value, textWidth, font);
-            if (truncated && actionRequired)
+            bool separateDetails = truncated && actionRequired &&
+                available >= 2 * (controlWidth + gap) + 16 * scale;
+            if (separateDetails)
                 textWidth = MathF.Max(1, available - 2 * (controlWidth + gap));
             else if (truncated)
                 textWidth = MathF.Max(1, available - controlWidth - gap);
@@ -72,7 +74,9 @@ public static class ActionableAlertLayout
             var action = actionRequired || truncated
                 ? new HudRect(rect.Right - padding - controlWidth, content.Y, controlWidth, line) : default;
             var details = truncated && actionRequired
-                ? new HudRect(action.X - gap - controlWidth, content.Y, controlWidth, line) : default;
+                ? separateDetails ? new HudRect(action.X - gap - controlWidth, content.Y, controlWidth, line)
+                    : action
+                : default;
             AlertIdentity identity = default;
             if (alerts is not null && !item.Feedback && !item.Local)
                 for (int a = 0; a < alerts.Alerts.Count; a++)
