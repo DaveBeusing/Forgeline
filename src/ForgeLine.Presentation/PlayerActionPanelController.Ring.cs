@@ -50,8 +50,8 @@ public sealed partial class PlayerActionPanelController
         EntityId entity = default;
         if (selection.Count == 1) foreach (var selected in selection.Entities) entity = selected;
         else if (context is not null) entity = context.Representative;
-        bool global = selection.Count == 0 && snapshot?.PlayerExperience is { IsMatchComplete: false } current &&
-            current.Tick == snapshot.Tick && current.Selection.Count == 0;
+        bool global = session.IsSpecified && selection.Count == 0 && snapshot?.PlayerExperience is { IsMatchComplete: false } current &&
+            current.Player.IsSpecified && current.Tick == snapshot.Tick && current.Selection.Count == 0;
         bool eligible = global || context is { Count: > 1 } || selection.Count == 1 &&
             snapshot?.PlayerExperience is { IsMatchComplete: false } experience &&
             world.TryGetInterpolatedInstance(entity, 1, out var instance) && (instance.Visibility & RenderVisibilityMask.World) != 0 &&

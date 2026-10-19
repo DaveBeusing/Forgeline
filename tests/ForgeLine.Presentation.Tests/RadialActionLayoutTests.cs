@@ -184,6 +184,8 @@ public sealed class RadialActionLayoutTests
         var world=new RenderWorld(); var camera=new RtsCamera();
         Assert.True(ring.UsesRing);
         Assert.True(ring.Project(world,camera,1,snapshot,layout,[]).Geometry.IsValid);
+        Assert.False(ring.Project(world,camera,1,Snapshot(experience with {Player=default},new(1)),layout,[]).Geometry.IsValid);
+        Assert.False((ring with {Session=default}).Project(world,camera,1,Snapshot(experience,default),layout,[]).Geometry.IsValid);
         Assert.False(ring.Project(world,camera,1,Snapshot(experience,new(2)),layout,[]).Geometry.IsValid);
         Assert.False(ring.Project(world,camera,1,Snapshot(experience with {Selection=PlayerSelectionSummary.Empty with {Count=1}},new(1)),layout,[]).Geometry.IsValid);
         Assert.False(ring.Project(world,camera,1,Snapshot(experience with {Tick=new(2)},new(1)),layout,[]).Geometry.IsValid);

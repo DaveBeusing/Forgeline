@@ -42,7 +42,7 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
         Vector2 anchor; float radius = 0; int visible = 0;
         if (Global)
         {
-            if (experience.Tick != snapshot.Tick || experience.Selection.Count != 0)
+            if (!Session.IsSpecified || !experience.Player.IsSpecified || experience.Tick != snapshot.Tick || experience.Selection.Count != 0)
                 return this with { Geometry = default, Resolved = true };
             anchor = layout.SafeArea.Contains(GlobalAnchor) ? GlobalAnchor :
                 new Vector2(layout.SafeArea.X + layout.SafeArea.Width / 2, layout.SafeArea.Y + layout.SafeArea.Height / 2);
