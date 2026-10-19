@@ -261,7 +261,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     {
         Span<char> buffer = stackalloc char[128]; var text = new TooltipTextBuilder(buffer);
         text.Append(label); text.Append(" ");
-        if (count == 0) text.Append("UNAVAILABLE"); else text.Number(value, "P0");
+        if (count == 0 || !double.IsFinite(value)) text.Append("N/A"); else text.Number(value, "P0");
         text.Append(" / KNOWN "); text.Number(count, "0"); Line(text.Written);
     }
 
@@ -283,8 +283,12 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         {
             Line(SelectionInspectorHudModel.ResolveSupplyLabel(details.SupplyStatus));
             var builder = new TooltipTextBuilder(text);
-            builder.Append("FUEL "); builder.Number(details.FuelFraction, "P0");
-            builder.Append(" / AMMO "); builder.Number(details.AmmunitionFraction, "P0");
+            builder.Append("FUEL ");
+            if (double.IsFinite(details.FuelFraction)) builder.Number(details.FuelFraction, "P0");
+            else builder.Append("N/A");
+            builder.Append(" / AMMO ");
+            if (double.IsFinite(details.AmmunitionFraction)) builder.Number(details.AmmunitionFraction, "P0");
+            else builder.Append("N/A");
             Line(builder.Written);
         }
         if (details.HasReadiness) Percent("READINESS", details.Readiness);
@@ -292,7 +296,9 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (details.Work.Kind != PlayerWorkKind.None)
         {
             var builder = new TooltipTextBuilder(text);
-            builder.Append(details.Work.Activity); builder.Append(" "); builder.Number(details.Work.Progress, "P0");
+            builder.Append(details.Work.Activity); builder.Append(" ");
+            if (double.IsFinite(details.Work.Progress)) builder.Number(details.Work.Progress, "P0");
+            else builder.Append("N/A");
             Line(builder.Written);
             if(includeWorkState)
             {
