@@ -290,7 +290,8 @@ public sealed class RtsMinimapInteractionController
         TimeSpan presentationTime = default,
         bool expandOnHover = false,
         bool animateHover = false,
-        bool presentationActive = true)
+        bool presentationActive = true,
+        HudRect ringBounds = default)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(camera);
