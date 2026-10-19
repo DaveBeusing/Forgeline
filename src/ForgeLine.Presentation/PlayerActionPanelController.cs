@@ -272,6 +272,7 @@ public sealed partial class PlayerActionPanelController
         }
 
         SynchronizeRingParameter(actions);
+        UpdateRadialPaging(input, actions);
         int itemCount =
             PlayerActionDockInteractionLayout.GetItemCount(
                 Mode,
