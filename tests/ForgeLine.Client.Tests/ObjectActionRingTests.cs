@@ -267,7 +267,7 @@ public sealed class ObjectActionRingTests
     [Fact]
     public void CurrentPagedRingAcceptsQAndEEdgesWithoutPhantomPages()
     {
-        var (controller, input, snapshot, selection) = Open(PlayerActionPanelMode.Construction, PlatformKey.B);
+        var (controller, input, snapshot, selection) = Open(PlayerActionPanelMode.Tactical, PlatformKey.K);
         Assert.True(controller.OwnsRadialPaging(snapshot.PlayerActions));
         Assert.Equal(0, View(controller, snapshot).Ring.Slots[0].Target.ItemIndex);
         input.BeginFrame();
