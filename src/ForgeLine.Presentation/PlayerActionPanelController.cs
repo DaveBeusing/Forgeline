@@ -218,6 +218,9 @@ public sealed partial class PlayerActionPanelController
         if (_ringGlobal && !_ringOpen && _globalAnchorValid)
             _globalAnchor = input.PointerPosition;
 
+        SynchronizeRingParameter(actions);
+        if (!globalShortcutsBlocked) UpdateRadialPaging(input, actions);
+
         if (Pressed(input, _bindings.Key(GameplayAction.Build)) && !globalShortcutsBlocked)
         {
             ToggleMode(
@@ -272,8 +275,6 @@ public sealed partial class PlayerActionPanelController
             _ = Pressed(input, PlatformKey.Escape);
         }
 
-        SynchronizeRingParameter(actions);
-        UpdateRadialPaging(input, actions);
         int itemCount =
             PlayerActionDockInteractionLayout.GetItemCount(
                 Mode,
