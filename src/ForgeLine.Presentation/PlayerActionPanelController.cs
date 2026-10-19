@@ -674,6 +674,7 @@ public sealed partial class PlayerActionPanelController
         {
             return;
         }
+        if (SelectedIndex >= logistics.OrderStartIndex) return;
         if (SelectedIndex >= logistics.Policies.Count)
         {
             var requirement = logistics.Requirements[SelectedIndex - logistics.Policies.Count];
@@ -1322,7 +1323,7 @@ public sealed partial class PlayerActionPanelController
         PlayerActionSnapshot? actions,
         int direction)
     {
-        if (actions?.Logistics is { } logistics && SelectedIndex >= logistics.Policies.Count && SelectedIndex < logistics.ItemCount)
+        if (actions?.Logistics is { } logistics && SelectedIndex >= logistics.Policies.Count && SelectedIndex < logistics.OrderStartIndex)
         { _logisticsSteps = Math.Clamp(_logisticsSteps + direction, 1, 100); return; }
         if (actions?.Logistics is null ||
             SelectedIndex < 0 ||
