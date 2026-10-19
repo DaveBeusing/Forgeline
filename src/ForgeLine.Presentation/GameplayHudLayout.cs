@@ -48,7 +48,7 @@ public readonly record struct GameplayHudLayout(
         int assigned=0;
         for(int i=0;i<groups.Groups.Count;i++) if(groups.Groups[i].IsAssigned) assigned++;
         float scale=GroupOverviewScale;
-        float available=MathF.Max(0,SecondaryView.Height-OperationsLayout.EntryBand(this));
+        float available=MathF.Max(0,SecondaryView.Height);
         int rows=Math.Min(assigned,Math.Max(0,(int)MathF.Floor((available-28*scale)/(43*scale))));
         return rows==0 ? default : SecondaryView with {Height=(28+43*rows)*scale};
     }
