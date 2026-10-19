@@ -4,6 +4,12 @@ Current single/group rings have no rectangular mode bar, dock or selection inspe
 
 Current validation and remaining gates: [qualification report](WorldAnchoredActionMenuQualification.md). Checkpoints below retain their original source identities.
 
+## Current radial material and motion contract
+
+Single, group, category, item and parameter rings render through the same radial sector pipeline. Every settled background sector uses straight-alpha compositing with effective alpha **0.30** (70% transparency), including disabled, hovered, pressed and pending tint states. Color-state tints come from the shared command-interface palette; icons and text retain independently specified contrast and receive only the presentation visibility factor. The one-pixel inner/outer alpha fringe does not introduce another opaque background pass.
+
+A 160 ms SmoothStep animates the visible ring alpha without changing the published annular input geometry. Closing dismisses hit ownership immediately even while the previous frame fades. Reversal reuses the current alpha as its starting point. Reduced UI motion, Low quality, pause/suspended presentation, invalid projection, presentation clock rollback/stall, and viewport/DPI/UI-scale changes settle or discard stale visuals immediately. Entity, session and selection changes never leave a clickable outgoing ring. Native display/physical-monitor acceptance remains a separate qualification gate; previous screenshots and measurements are historical, not evidence for this revision.
+
 ## Action parity
 
 Single owned entities use the same PlayerActionPanelController dispatcher and copied PlayerActionSnapshot as the previous dock. Existing global shortcuts remain available, including empty-selection global actions. Groups use the same ring with their existing tools.

@@ -4,6 +4,10 @@ Current surface ownership: [HUD consolidation](HudSurfaceConsolidation.md). Orig
 
 Historical integration baseline: `1ef23a9fc7ab9195d0d1bdadd97081016ea97861`. Branch: `ui/group-action-rings`. Version: `0.1.388-dev`, one PATCH.
 
+## Shared radial presentation
+
+Group, category and command pages use the same sector material as the single-object ring: 0.30 settled background alpha, separate text/icon contrast and a bounded 160 ms reversible SmoothStep visual track. Group hover, disabled and pending sectors retain distinct command-interface tints, with no additional overlapping opaque sector backing. A closed or invalid group ring never retains input simply because its decoration is still fading. Display-context changes settle the visual track; membership, copied authority, session and visibility rules remain unchanged. Current revision graphics and hands-on review must be qualified independently of historical group-ring captures.
+
 ## Behavior and parity
 
 The existing object ring also owns multiple selected objects. It is one context, not one control per soldier. An immutable selected-identity set and component-covered group facts cross the input/render boundary. The first category is Tactical. The Group sector exposes all eight existing composition filters, damaged/supply focus, formation cycling and camera focus through three pages. Current categories use ring sectors or existing mode shortcuts. Group facts and exact accepted/rejected feedback are read-only in the shared ring tooltip; the old rectangular group buttons are no longer dispatched or drawn during gameplay.
