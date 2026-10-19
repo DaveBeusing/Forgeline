@@ -355,3 +355,7 @@ source identity, sequence tests and remaining native/human acceptance.
 ## Minimap display lifecycle
 
 The platform owner computes minimap hover motion using monotonic elapsed UI time, actual pointer location, DPI and UI scale. Each `ClientRenderFrame` carries the resolved physical-pixel rectangle to the render owner; drawing and pointer capture do not use competing scales. Focus/minimize/pause suppression, session change, display-resize or DPI/scale transition and motion-clock interruption clear stale animated state. Reduced-motion and Low quality settle immediately. The target remains within the HUD safe area and accounts for notifications, the top resource strip, lower-left secondary view and any published radial action ring. Native 720p/4K/ultrawide and mixed-DPI visual approval remains a separate qualification step rather than a property proven by geometry unit tests.
+
+## Context-specific gameplay shortcuts
+
+The game uses saved gameplay bindings for category invocation. Unselected B/P/U/L/Y/K/H open the corresponding ring at a valid live pointer, not at an inferred unit or automatically chosen screen center. Q/E rotate a current building preview counterclockwise/clockwise; the existing F9 clockwise binding remains available. An open paginated ring submenu uses Q/E to step between actual pages. Otherwise Q/E continue to rotate the RTS camera with existing saved bindings. The active input owner prevents the same key edge from producing both operations. The disabled/empty category ring explains which building or unit must first be selected.
