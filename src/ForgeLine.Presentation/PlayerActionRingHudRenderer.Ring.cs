@@ -44,7 +44,8 @@ internal sealed partial class PlayerActionRingHudRenderer
                 PlayerActionDockHudModel.ResolveModeIcon(panel.Mode);
             _skin.Icon(icon, center.X - iconSize / 2, center.Y - 28 * scale, iconSize,
                 new Vector4(enabled ? 1 : .55f, enabled ? 1 : .55f, enabled ? 1 : .55f, opacity));
-            string label = slot.Navigation switch
+            bool unavailableGlobal = ring.Global && slot.Key.Kind == 255;
+            string label = unavailableGlobal ? "No target" : slot.Navigation switch
             {
                 ActionRingNavigation.Group => "Group", ActionRingNavigation.GroupControl => GroupActionRingContext.Label(target.ItemIndex),
                 ActionRingNavigation.Back => "Back", ActionRingNavigation.Close => "Close",
@@ -69,6 +70,9 @@ internal sealed partial class PlayerActionRingHudRenderer
             { if (group.HasOperationalFacts && ring.GroupFactsCurrent) value.Append(group.Participants(target.ItemIndex)); else value.Append("Updating"); value.Append(" / "); value.Append(group.SelectedCount); }
             else if (slot.Navigation == ActionRingNavigation.Group && ring.Group is { } summary)
                 value.Append(ring.VisibleMembers < summary.Count ? "Part visible" : "Selection tools");
+            else if (unavailableGlobal) value.Append(
+                panel.Mode is PlayerActionPanelMode.Tactical or PlayerActionPanelMode.Supply
+                    ? "SELECT UNIT" : "SELECT BUILDING");
             else if (item && panel.Mode == PlayerActionPanelMode.Tactical && ring.Group is { } participants && actions?.Tactical is { } tactical)
             {
                 if (!participants.MatchesSelection(tactical.SelectedEntities)) value.Append("Updating");
