@@ -80,7 +80,8 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
                 continue;
             }
             if (!selectionCurrent) { slots[i] = saved with { Enabled = saved.Navigation != ActionRingNavigation.None }; continue; }
-            if (!saved.Present || saved.Navigation != ActionRingNavigation.None || saved.Target.Kind == PlayerActionDockControlKind.Mode) continue;
+            if (!saved.Present || saved.Key.Kind == 255 ||
+                saved.Navigation != ActionRingNavigation.None || saved.Target.Kind == PlayerActionDockControlKind.Mode) continue;
             int resolved = -1;
             int count = PlayerActionDockInteractionLayout.GetItemCount(saved.Target.Mode, actions);
             for (int item = 0; item < count; item++)
