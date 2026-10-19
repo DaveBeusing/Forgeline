@@ -216,6 +216,7 @@ public sealed class RepeatPlacementTests
         Press(PlatformKey.E);
         Press(PlatformKey.E);
         Press(PlatformKey.E);
+        Press(PlatformKey.E);
         Assert.Equal(BuildingOrientation.East, fixture.Controller.Orientation);
         Assert.Contains("Q LEFT / E RIGHT", fixture.Controller.InteractionHint);
     }
