@@ -171,6 +171,9 @@ public sealed partial class PlayerActionPanelController
                 // Removed requests leave an empty sector; surviving IDs do not jump into another position.
                 if (saved.Present && index >= 0) slots[i] = saved with { Target = saved.Target with { ItemIndex = index } };
             }
+            if (count == 0 && _ringGlobal)
+                slots[0] = new(new(PlayerActionDockControlKind.Item, Mode),
+                    new(255, 0), Enabled: false);
             slots[4] = new(default, default, ActionRingNavigation.Previous, first > 0);
             slots[5] = new(default, default, ActionRingNavigation.Next, first + 4 < count);
             slots[6] = new(default, default, ActionRingNavigation.Parameters, count > 0);
