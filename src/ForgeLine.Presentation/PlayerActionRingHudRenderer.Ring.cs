@@ -31,8 +31,15 @@ internal sealed partial class PlayerActionRingHudRenderer
             bool navigation = slot.Navigation != ActionRingNavigation.None;
             bool mode = target.Kind == PlayerActionDockControlKind.Mode;
             bool item = target.Kind == PlayerActionDockControlKind.Item;
+            bool orderItem = item && panel.Mode == PlayerActionPanelMode.Logistics &&
+                actions?.Logistics is { } orderList && target.ItemIndex >= orderList.OrderStartIndex &&
+                target.ItemIndex < orderList.ItemCount;
+            bool orderDetail = ring.Level == ActionRingLevel.Parameters && panel.Mode == PlayerActionPanelMode.Logistics &&
+                actions?.Logistics is { } detailList && panel.SelectedIndex >= detailList.OrderStartIndex &&
+                panel.SelectedIndex < detailList.ItemCount && i < 6;
             bool enabled = slot.Enabled && (slot.Navigation == ActionRingNavigation.GroupControl ? ring.Group?.Participants(target.ItemIndex) > 0 : navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
                 panel.Mode, target.ItemIndex, panel, actions));
+            if (orderItem || orderDetail) enabled = true;
             bool hovered = ring.Open && ring.HoveredSlot == i;
             bool pending = panel.ContextualPending && item && panel.SelectedIndex == target.ItemIndex;
             Vector4 fill = RadialActionVisuals.Background(enabled, hovered, ring.Pressed && hovered, pending, opacity);
@@ -45,7 +52,11 @@ internal sealed partial class PlayerActionRingHudRenderer
             _skin.Icon(icon, center.X - iconSize / 2, center.Y - 28 * scale, iconSize,
                 new Vector4(enabled ? 1 : .55f, enabled ? 1 : .55f, enabled ? 1 : .55f, opacity));
             bool unavailableGlobal = ring.Global && slot.Key.Kind == 255;
-            string label = unavailableGlobal ? "No target" : slot.Navigation switch
+            string label = orderDetail ? i switch
+            {
+                0 => "ORDER ID", 1 => "STATUS", 2 => "RESOURCE", 3 => "QUANTITY",
+                4 => "SOURCE", _ => "DESTINATION"
+            } : orderItem ? "ORDER" : unavailableGlobal ? "No target" : slot.Navigation switch
             {
                 ActionRingNavigation.Group => "Group", ActionRingNavigation.GroupControl => GroupActionRingContext.Label(target.ItemIndex),
                 ActionRingNavigation.Back => "Back", ActionRingNavigation.Close => "Close",
@@ -80,11 +91,21 @@ internal sealed partial class PlayerActionRingHudRenderer
                 else { value.Append(target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append("/");
                     value.Append(participants.SelectedCount); value.Append(geometry.LabelHalfWidth < 38 * scale ? " elig" : " eligible"); }
             }
+            else if (orderDetail && actions?.Logistics is { } details)
+                AppendOrderDetail(ref value, details.Orders[panel.SelectedIndex - details.OrderStartIndex], i);
+            else if (orderItem && actions?.Logistics is { } itemOrders)
+            {
+                var order = itemOrders.Orders[target.ItemIndex - itemOrders.OrderStartIndex];
+                value.Append("#"); value.Append(order.RequestId.Value);
+                value.Append(" "); value.Append(OrderState(order.State));
+            }
             else if (!navigation && !mode && !item && panel.Mode == PlayerActionPanelMode.Logistics &&
                 actions?.Logistics is { } requirements && panel.SelectedIndex >= requirements.Policies.Count &&
                 target.Kind is PlayerActionDockControlKind.Decrease or PlayerActionDockControlKind.Increase)
             { value.Append("STEPS "); value.Append(panel.LogisticsSteps); }
             else if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
+            else if (mode && target.Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } summary)
+            { value.Append("ORDERS "); value.Append(summary.TotalOrderCount); }
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
             else if (item)
             {
@@ -105,6 +126,49 @@ internal sealed partial class PlayerActionRingHudRenderer
             var selected = geometry.LabelCenter(6);
             _text.AddCentered(text.Written, new(selected.X - geometry.LabelHalfWidth, selected.Y + 12 * scale, geometry.LabelHalfWidth * 2, 16 * scale),
                 12 * scale, MutedTextColor with { W = MutedTextColor.W * opacity }, width, height);
+        }
+    }
+
+    private static string OrderState(ForgeLine.Game.LogisticsTransportRequestState state) => state switch
+    {
+        ForgeLine.Game.LogisticsTransportRequestState.Pending => "PENDING",
+        ForgeLine.Game.LogisticsTransportRequestState.Assigned => "ASSIGNED",
+        ForgeLine.Game.LogisticsTransportRequestState.InTransit => "IN TRANSIT",
+        ForgeLine.Game.LogisticsTransportRequestState.RetryPending => "RETRY",
+        ForgeLine.Game.LogisticsTransportRequestState.Failed => "FAILED",
+        _ => "UNKNOWN"
+    };
+
+    private static void AppendOrderDetail(ref HudTextBuilder value, in PlayerLogisticsOrderReadModel order, int slot)
+    {
+        switch (slot)
+        {
+            case 0:
+                value.Append("#"); value.Append(order.RequestId.Value);
+                break;
+            case 1:
+                value.Append(OrderState(order.State));
+                if (order.FailureReason != ForgeLine.Game.LogisticsTransportRequestFailureReason.None)
+                {
+                    value.Append(" ");
+                    value.Append(PlayerActionDockHudModel.ResolveTransportFailureLabel(order.FailureReason));
+                }
+                break;
+            case 2:
+                value.Append(order.ResourceName);
+                break;
+            case 3:
+                value.Append(order.RequestedQuantity, "F0");
+                value.Append(" / LOAD "); value.Append(order.LoadedQuantity, "F0");
+                if (order.AssignedTruck.IsValid)
+                { value.Append(" TRK "); value.Append(order.AssignedTruck.Index); }
+                break;
+            case 4:
+                value.Append(order.OriginName);
+                break;
+            case 5:
+                value.Append(order.DestinationName);
+                break;
         }
     }
 
