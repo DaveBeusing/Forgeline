@@ -335,7 +335,7 @@ public sealed class RtsMinimapInteractionController
         HudRect minimapBounds = expandOnHover
             ? _hoverMotion.Update(layout, input.PointerPosition, input.HasPointerPosition,
                 presentationTime, presentationActive && !inputBlocked, animateHover,
-                _primaryGestureOwned || _secondaryGestureOwned || _cameraDragging)
+                _primaryGestureOwned || _secondaryGestureOwned || _cameraDragging, ringBounds)
             : layout.Minimap;
         if (!expandOnHover) _hoverMotion.Reset();
         DisplayedBounds = minimapBounds;
