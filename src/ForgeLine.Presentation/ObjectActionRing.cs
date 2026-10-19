@@ -44,8 +44,9 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
         {
             if (!Session.IsSpecified || !experience.Player.IsSpecified || experience.Tick != snapshot.Tick || experience.Selection.Count != 0)
                 return this with { Geometry = default, Resolved = true };
-            anchor = layout.SafeArea.Contains(GlobalAnchor) ? GlobalAnchor :
-                new Vector2(layout.SafeArea.X + layout.SafeArea.Width / 2, layout.SafeArea.Y + layout.SafeArea.Height / 2);
+            if (!layout.SafeArea.Contains(GlobalAnchor))
+                return this with { Geometry = default, Resolved = true };
+            anchor = GlobalAnchor;
         }
         else if (Group is not null)
         {
