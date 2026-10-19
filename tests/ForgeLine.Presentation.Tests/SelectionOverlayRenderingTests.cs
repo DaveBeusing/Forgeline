@@ -32,7 +32,7 @@ public sealed class SelectionOverlayRenderingTests
         renderer.Render(context, camera, snapshot, bounds, view, CombatGroupOverviewView.Empty, dpi);
         Assert.True(graphics.Pipeline!.AlphaBlendEnabled);
         Vertex[] vertices = graphics.Buffer!.Vertices;
-        Vertex[] fill = vertices.Where(v => v.Color.W == 0.10f).ToArray();
+        Vertex[] fill = vertices.Where(v => v.Color.W == RtsSelectionVisualStyle.MarqueeFillOpacity).ToArray();
         Assert.Equal(6, fill.Length);
         Assert.Contains(fill, v => v.Position == new Vector2(-1, 1));
         Assert.Contains(fill, v => v.Position == new Vector2(1, -1));
@@ -41,16 +41,54 @@ public sealed class SelectionOverlayRenderingTests
             Assert.InRange(v.Position.X, -1f, 1f);
             Assert.InRange(v.Position.Y, -1f, 1f);
         });
-        Assert.Equal(24, vertices.Count(v => v.Color.W == 0.95f));
-        Assert.True(vertices.Count(v => v.Color.W == 1.0f) >= 24);
+        Vertex[] border = vertices.Where(v => v.Color.W == RtsSelectionVisualStyle.MarqueeBorderOpacity).ToArray();
+        Assert.Equal(24, border.Length);
+        Assert.Equal(30, vertices.Length);
+        Assert.All(fill, v => Assert.Equal(new Vector3(RtsSelectionVisualStyle.Selected.X,
+            RtsSelectionVisualStyle.Selected.Y, RtsSelectionVisualStyle.Selected.Z),
+            new Vector3(v.Color.X, v.Color.Y, v.Color.Z)));
+        Assert.All(border, v => Assert.Equal(new Vector3(RtsSelectionVisualStyle.Selected.X,
+            RtsSelectionVisualStyle.Selected.Y, RtsSelectionVisualStyle.Selected.Z),
+            new Vector3(v.Color.X, v.Color.Y, v.Color.Z)));
+        Assert.InRange(RtsSelectionVisualStyle.MarqueeBorderPixels, 1f, 1.5f);
+        Assert.Equal(1f - 2f * RtsSelectionVisualStyle.MarqueeBorderPixels / context.Height,
+            border[1].Position.Y, 0.00001f);
         var buffer = graphics.Buffer;
         renderer.Render(context, camera, snapshot, bounds, view with { IsDragSelecting = false }, CombatGroupOverviewView.Empty, dpi);
         if (renderer.LastRenderedVertexCount > 0)
         {
-            Assert.DoesNotContain(graphics.Buffer!.Vertices, v => v.Color.W == 0.10f);
+            Assert.DoesNotContain(graphics.Buffer!.Vertices,
+                v => v.Color.W == RtsSelectionVisualStyle.MarqueeFillOpacity);
         }
         renderer.Render(context, camera, snapshot, bounds, view, CombatGroupOverviewView.Empty, dpi);
         Assert.Same(buffer, graphics.Buffer);
+    }
+
+    [Fact]
+    public void MarqueeColorAlwaysMatchesPlayerSelectionForAnyDpiOrUiScale()
+    {
+        Assert.Equal(new Vector4(.25f, 1f, .35f, 1f), RtsSelectionVisualStyle.Selected);
+        Assert.InRange(RtsSelectionVisualStyle.MarqueeFillOpacity, .10f, .14f);
+        Assert.InRange(RtsSelectionVisualStyle.MarqueeBorderOpacity, .8f, 1f);
+        foreach (uint dpi in new uint[] { 96, 144, 192 })
+        foreach (float uiScale in new[] { .75f, 1f, 2f })
+        {
+            using var graphics = new RecordingDevice();
+            using var renderer = new RtsInformationOverlayRenderer(graphics);
+            var context = new RecordingContext();
+            var snapshot = new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 0, []);
+            var view = RtsInformationLayerView.Empty with
+            {
+                MinimapEnabled = false, IsDragSelecting = true,
+                DragStart = new(30, 40), DragCurrent = new(230, 240)
+            };
+            renderer.Render(context, new RtsCamera(), snapshot, new AxisAlignedBounds(new(-100f), new(100f)),
+                view, CombatGroupOverviewView.Empty, dpi, uiScale);
+            var vertices = graphics.Buffer!.Vertices;
+            Assert.Equal(30, vertices.Length);
+            Assert.Equal(6, vertices.Count(v => v.Color.W == RtsSelectionVisualStyle.MarqueeFillOpacity));
+            Assert.Equal(24, vertices.Count(v => v.Color.W == RtsSelectionVisualStyle.MarqueeBorderOpacity));
+        }
     }
 
     [Fact]
