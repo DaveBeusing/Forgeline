@@ -451,7 +451,7 @@ internal static class VisualReferenceCapture
                             notifications = frontend is null ? ActionableAlertLayout.Resolve(snapshot,
                                 GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen) : (NotificationStackLayout?)null,
                             skin = frontend?.SkinDiagnostics, battlefieldSkin = frontend is null ? hud.SkinDiagnostics : (GameplayHudSkinDiagnostics?)null, skinState = frontend?.SkinState, skinnedControls = frontend?.LastSkinnedControlCount, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",
-                            tooltipBounds = hud.LastHoverTooltipBounds, ringGeometry = panel.Ring.Geometry,
+                            tooltipBounds = hud.LastHoverTooltipBounds, ringGeometry = panel.Ring.Geometry.IsValid ? panel.Ring.Geometry : (RadialActionLayout?)null,
                             interaction = new { panel.Mode, panel.SelectedIndex, panel.HoveredIndex, panel.PointerPressed,
                                 panel.ContextualHoveredIndex, panel.ContextualPressed, panel.ContextualPending, targetingMode = targeting.Mode },
                             captureOffset = uiScenario == UiReferenceScenario.MenuReveal ? "Authored half-reveal; live motion reviewed separately" : "Settled fixed state",
