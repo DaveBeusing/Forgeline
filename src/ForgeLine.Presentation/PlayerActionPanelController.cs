@@ -1331,46 +1331,27 @@ public sealed partial class PlayerActionPanelController
             return;
         }
 
-        double step =
-            Math.Max(
-                1.0,
-                Math.Ceiling(
-                    _stockTarget *
-                    0.1));
-        double delta =
-            direction *
-            step;
-
+        // Policies retain their exact previous values until the player edits one field.
+        // The three thresholds remain independently editable and always ordered.
         switch (StockThresholdField)
         {
             case PlayerStockThresholdField.Minimum:
-                _stockMinimum =
-                    Math.Clamp(
-                        _stockMinimum + delta,
-                        0.0,
-                        _stockTarget);
+                _stockMinimum = LogisticsQuantityEditor.Adjust(
+                    _stockMinimum, direction, upper: _stockTarget);
                 break;
 
             case PlayerStockThresholdField.Target:
-                _stockTarget =
-                    Math.Max(
-                        1.0,
-                        _stockTarget + delta);
-                _stockMinimum =
-                    Math.Min(
-                        _stockMinimum,
-                        _stockTarget);
-                _stockMaximum =
-                    Math.Max(
-                        _stockMaximum,
-                        _stockTarget);
+                _stockTarget = LogisticsQuantityEditor.Adjust(
+                    _stockTarget, direction, lower: Math.Max(LogisticsQuantityEditor.Minimum, _stockMinimum),
+                    upper: _stockMaximum);
                 break;
 
             case PlayerStockThresholdField.Maximum:
-                _stockMaximum =
-                    Math.Max(
-                        _stockTarget,
-                        _stockMaximum + delta);
+                _stockMaximum = LogisticsQuantityEditor.Adjust(
+                    _stockMaximum, direction, lower: Math.Max(LogisticsQuantityEditor.Minimum, _stockTarget),
+                    upper: actions.Logistics.InventoryCapacity > 0
+                        ? Math.Max(_stockMaximum, actions.Logistics.InventoryCapacity)
+                        : double.MaxValue);
                 break;
         }
     }
