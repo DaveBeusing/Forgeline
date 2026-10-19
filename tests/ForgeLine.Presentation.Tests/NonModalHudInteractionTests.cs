@@ -80,36 +80,9 @@ public sealed class NonModalHudInteractionTests
         f.Input.BeginFrame(); f.Frame(); Assert.Equal(cancel ? 0 : 1, f.Actions);
     }
 
-    [Fact]
-    public void DisabledControlAndMenuOriginReleaseCannotLeakIntoWorld()
-    {
-        var f = new Fixture(); f.Open();
-        var control = PlayerActionDockInteractionLayout.GetFooterButtonRect(f.Layout, 0);
-        f.Button(PlatformMouseButton.Left, true, (int)(control.X + 2), (int)(control.Y + 2)); f.Frame();
-        Assert.True(f.Menus.PointerCaptured);
-        Assert.False(f.Dock.TryTakeRequest(out _));
-        f.Input.BeginFrame(); f.Button(PlatformMouseButton.Left, false, 800, 450); f.Frame();
-        Assert.True(f.Menus.PointerCaptured);
-        Assert.False(f.Selection.IsDragSelecting);
-        Assert.Equal(0, f.Moves); Assert.Equal(0, f.Actions);
-        f.Input.BeginFrame(); f.Frame(); Assert.False(f.Menus.PointerCaptured);
-    }
 
-    [Fact]
-    public void EmptyDockGapClosesButVisibleTabConsumesItsGesture()
-    {
-        var f = new Fixture(); f.Open();
-        var gap = PlayerActionDockInteractionLayout.GetCardsRect(f.Layout);
-        Assert.False(f.Dock.ContainsControl(new(gap.X + 2, gap.Y + 2), f.Snapshot, f.Layout));
-        f.Button(PlatformMouseButton.Left, true, (int)(gap.X + 2), (int)(gap.Y + 2)); f.Frame();
-        Assert.False(f.Menus.HasOpenMenus(f.Dock, f.Operations));
-        Assert.False(f.Menus.PointerCaptured);
-        f.Input.BeginFrame(); f.Button(PlatformMouseButton.Left, false, 800, 450); f.Frame();
-        f.Input.BeginFrame(); var tab = PlayerActionDockInteractionLayout.GetModeButtonRect(f.Layout, 0);
-        f.Button(PlatformMouseButton.Left, true, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
-        Assert.Equal(PlayerActionPanelMode.Construction, f.Dock.Mode);
-        Assert.True(f.Menus.PointerCaptured);
-    }
+
+
 
     [Theory]
     [InlineData("focus")]
@@ -190,16 +163,7 @@ public sealed class NonModalHudInteractionTests
         Assert.Equal(0, f.Moves);
     }
 
-    [Fact]
-    public void BriefMenuPressReleasedOutsideCancelsBeforeActivatingAndDoesNotMove()
-    {
-        var f = new Fixture(); var tab = PlayerActionDockInteractionLayout.GetModeButtonRect(f.Layout, 0);
-        f.Button(PlatformMouseButton.Left, true, (int)(tab.X + 2), (int)(tab.Y + 2));
-        f.Button(PlatformMouseButton.Left, false, 800, 450); f.Frame();
-        Assert.True(f.Menus.PointerCaptured);
-        Assert.Equal(PlayerActionPanelMode.Closed, f.Dock.Mode);
-        Assert.False(f.Dock.TryTakeRequest(out _)); Assert.Equal(0, f.Moves);
-    }
+
 
     [Fact]
     public void RepeatedWorldGesturesRemainDistinctAndButtonChangesNeverDuplicateOrders()
@@ -268,48 +232,11 @@ public sealed class NonModalHudInteractionTests
         Assert.False(f.Targeting.IsActive); Assert.False(f.Targeting.TryTakeRequest(out _));
     }
 
-    [Fact]
-    public void StaleSelectionCardsAreNotInvisiblePointerBlockers()
-    {
-        var f = new Fixture();
-        var tab = PlayerActionDockInteractionLayout.GetModeButtonRect(f.Layout, 0);
-        f.Button(PlatformMouseButton.Left, true, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
-        var actions = new PlayerActionSnapshot(new(1), new(1),
-            [new PlayerConstructionActionReadModel(BuildingIds.PowerPlant, "Power Plant", [], false)], 0, null, null);
-        var snapshot = new PresentationSnapshot(new(1), TimeSpan.FromMilliseconds(50), 0, [], sessionId: new(1), playerActions: actions);
-        var card = PlayerActionDockInteractionLayout.GetCardRect(f.Layout, 0);
-        Assert.False(f.Dock.ContainsControl(new(card.X + 2, card.Y + 2), snapshot, f.Layout));
-    }
 
-    [Fact]
-    public void UndrawnFooterSlotsAreFreeWorldRatherThanInvisibleControls()
-    {
-        var f = new Fixture(); var tab = PlayerActionDockInteractionLayout.GetModeButtonRect(f.Layout, 0);
-        f.Button(PlatformMouseButton.Left, true, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
-        f.Input.BeginFrame(); f.Button(PlatformMouseButton.Left, false, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
-        var empty = PlayerActionDockInteractionLayout.GetFooterButtonRect(f.Layout, 2);
-        var point = new Vector2(empty.X + 2, empty.Y + 2);
-        Assert.False(f.Dock.ContainsControl(point, f.Snapshot, f.Layout));
-        f.Input.BeginFrame(); f.Button(PlatformMouseButton.Left, true, (int)point.X, (int)point.Y); f.Frame();
-        Assert.Equal(PlayerActionPanelMode.Closed, f.Dock.Mode); Assert.False(f.Menus.PointerCaptured);
-    }
 
-    [Fact]
-    public void WheelOverDockGapZoomsWorldWithoutPagingTheMenu()
-    {
-        var f = new Fixture(); var tab = PlayerActionDockInteractionLayout.GetModeButtonRect(f.Layout, 0);
-        f.Button(PlatformMouseButton.Left, true, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
-        f.Input.BeginFrame(); f.Button(PlatformMouseButton.Left, false, (int)(tab.X + 2), (int)(tab.Y + 2)); f.Frame();
-        var tactical = new PlayerTacticalActionReadModel([f.Entity], 1, 1, 0, 0, 0, false, false, default, default, [], []);
-        var items = Enumerable.Range(0, 40).Select(_ => new PlayerConstructionActionReadModel(BuildingIds.PowerPlant, "Power Plant", [], false)).ToArray();
-        var actions = new PlayerActionSnapshot(new(1), new(1), items, 0, null, null, tactical: tactical);
-        f.Snapshot = new(new(1), TimeSpan.FromMilliseconds(50), 0, [], sessionId: new(1), playerActions: actions);
-        f.Input.BeginFrame(); f.Input.Apply(PlatformInputEvent.MouseWheel((int)(tab.Right + 1), (int)(tab.Y + 2), -120)); f.Frame();
-        Assert.Equal(0, f.Dock.SelectedIndex); Assert.False(f.Dock.PointerCaptured);
-        var before = f.Camera.Distance;
-        f.Camera.Update(new RtsCameraActionMapper().Map(f.Input, f.Menus.PointerCaptured), 1f / 60, 1600, 900);
-        Assert.NotEqual(before, f.Camera.Distance);
-    }
+
+
+
 
     private sealed class RingMenu : ITransientHudMenu
     {

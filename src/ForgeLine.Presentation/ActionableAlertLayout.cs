@@ -10,6 +10,7 @@ public readonly record struct NotificationStackLayout(HudRect Bounds, float Font
     NotificationCardLayout First = default, NotificationCardLayout Second = default,
     NotificationCardLayout Third = default, NotificationCardLayout Overflow = default, int Revision = 0)
 {
+    public HudRect PaintedBounds => Count==0 ? default : Bounds with {Height=Card(Count-1).Bounds.Bottom-Bounds.Y};
     public NotificationCardLayout Card(int index) => index >= 0 && index < Count ? index switch
     { 0 => First, 1 => Second, 2 => Third, _ => Overflow } : default;
     public int Hit(Vector2 point)
@@ -22,7 +23,7 @@ public static class ActionableAlertLayout
 {
     public const int ContractVersion = 3;
     public const int MaximumCards = 3;
-    public static float Scale(in GameplayHudLayout layout) => MathF.Max(1, layout.DockContentScale);
+    public static float Scale(in GameplayHudLayout layout) => MathF.Max(1, layout.NotificationScale);
     public static NotificationStackLayout Resolve(PresentationSnapshot? snapshot, in GameplayHudLayout layout, bool expanded = false, string localFeedback = "") =>
         snapshot?.PlayerExperience is { } experience && experience.Tick == snapshot.Tick
             ? Resolve(experience, layout, expanded, ActionableAlertSnapshot.Resolve(snapshot), localFeedback) : default;

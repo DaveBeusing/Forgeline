@@ -28,7 +28,7 @@ public sealed class RadialActionLayoutTests
     public void FitKeepsCompleteRingInsideSafeAreaAndAvoidsControls(uint dpi, float scale)
     {
         var hud = GameplayHudLayout.Create(3840,2160,dpi,scale);
-        HudRect[] obstacles = [hud.TopStatusBar, hud.SelectionInspector, hud.Minimap, hud.VisibleActionDock(false), hud.OnboardingBounds];
+        HudRect[] obstacles = [hud.TopStatusBar, hud.Minimap, hud.OnboardingBounds];
         foreach (Vector2 anchor in new Vector2[] { new(hud.SafeArea.X + 1,hud.SafeArea.Y + 1), new(1900,1000), new(hud.SafeArea.Right-1,hud.SafeArea.Bottom-1) })
         {
             var fit = RadialActionLayout.Fit(anchor, 500, hud, obstacles);
@@ -54,8 +54,8 @@ public sealed class RadialActionLayoutTests
     public void ExpandedOnboardingAtCompactMaximumDensityKeepsNativeTypeAndExactSectorLabels()
     {
         var hud=GameplayHudLayout.Create(1280,720,192,2);
-        var ring=RadialActionLayout.Fit(new(640,360),0,hud,[hud.TopStatusBar,hud.SelectionInspector,hud.Minimap,
-            hud.VisibleActionDock(false),hud.NotificationBounds(false),hud.OnboardingBounds,OperationsLayout.Entry(hud)]);
+        var ring=RadialActionLayout.Fit(new(640,360),0,hud,[hud.TopStatusBar,hud.Minimap,
+            hud.NotificationBounds(false),hud.OnboardingBounds,OperationsLayout.Entry(hud)]);
         Assert.True(ring.IsValid);
         Assert.True(ring.OuterRadius-ring.InnerRadius>=96);
         for(int slot=0;slot<8;slot++)
@@ -67,7 +67,7 @@ public sealed class RadialActionLayoutTests
     public void CompactHighDpiRingKeepsReadableLabelsAndAvoidsTheActualHud()
     {
         var hud=GameplayHudLayout.Create(1280,720,192,2);
-        var fit=RadialActionLayout.Fit(new(640,360),500,hud,[hud.TopStatusBar,hud.SelectionInspector,hud.Minimap,hud.VisibleActionDock(false),hud.NotificationBounds(false),OperationsLayout.Entry(hud)]);
+        var fit=RadialActionLayout.Fit(new(640,360),500,hud,[hud.TopStatusBar,hud.Minimap,hud.NotificationBounds(false),OperationsLayout.Entry(hud)]);
         Assert.True(fit.IsValid);
         Assert.InRange((fit.OuterRadius-fit.InnerRadius)/96,1,1.75f);
     }
@@ -172,4 +172,23 @@ public sealed class RadialActionLayoutTests
         Assert.Equal(0,motion.Update(open with { Open=false },start+TimeSpan.FromMilliseconds(176),true).Opacity);
         Assert.Equal(1,motion.Update(open,start+TimeSpan.FromMilliseconds(192),false).Opacity);
     }
+    [Fact]
+    public void GlobalRingUsesCopiedEmptySelectionAndRejectsReplacementSessionOrSelection()
+    {
+        var layout = GameplayHudLayout.Create(1920,1080,96);
+        var experience = default(PlayerExperienceSnapshot) with { Player=new(1), Tick=new(1) };
+        PresentationSnapshot Snapshot(PlayerExperienceSnapshot value, SimulationSessionId session) =>
+            new(new(1),TimeSpan.FromMilliseconds(50),1,[],sessionId:session,playerExperience:value);
+        var snapshot=Snapshot(experience,new(1));
+        var ring=new ObjectActionRingView(default,new(1),1,1,false,true) { Global=true, GlobalAnchor=new(900,500) };
+        var world=new RenderWorld(); var camera=new RtsCamera();
+        Assert.True(ring.UsesRing);
+        Assert.True(ring.Project(world,camera,1,snapshot,layout,[]).Geometry.IsValid);
+        Assert.False(ring.Project(world,camera,1,Snapshot(experience with {Player=default},new(1)),layout,[]).Geometry.IsValid);
+        Assert.False((ring with {Session=default}).Project(world,camera,1,Snapshot(experience,default),layout,[]).Geometry.IsValid);
+        Assert.False(ring.Project(world,camera,1,Snapshot(experience,new(2)),layout,[]).Geometry.IsValid);
+        Assert.False(ring.Project(world,camera,1,Snapshot(experience with {Selection=PlayerSelectionSummary.Empty with {Count=1}},new(1)),layout,[]).Geometry.IsValid);
+        Assert.False(ring.Project(world,camera,1,Snapshot(experience with {Tick=new(2)},new(1)),layout,[]).Geometry.IsValid);
+    }
+
 }

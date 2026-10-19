@@ -1,113 +1,78 @@
 # Graphical battlefield HUD
 
-Current multi-selection controls use the shared [group action ring](GroupActionMenus.md). Rectangular group controls below describe historical parity; the inspector now retains read-only facts and exact command results.
+The player HUD contains the right-aligned resource/power strip, notifications,
+minimap, guidance, assigned-group overview, Operations and the existing single/group
+action rings. The rectangular ActionBar/Action Dock, global mode bar, contextual
+command band and SelectionPanel/selection inspector have been removed from
+render composition, pointer capture and layout. They have no hidden hit targets
+or reserved rectangles. See [parity and current qualification](HudSurfaceConsolidation.md).
 
-Own single buildings and units now use [world anchored action rings](WorldAnchoredActionMenus.md). Selection release opens categories; the global mode bar and bound keys open the same ring. Click an item to act immediately. Parameters exposes existing priority, mode, thresholds and queue cancellation before activation; Next item selects the edited item. Back / previous / next page remain fixed controls. The inner hole and gaps allow world input; outside clicks dismiss centrally. The inspector remains informational. Group selection temporarily retains the existing rectangular controls. Closed/fading rings own no input; alpha transitions last 160 ms and reduced/Low modes settle immediately.
+Selection release opens existing ring categories. B/P/U/L/Y/K/H open Build,
+Process, Units, Logistics, Supply, Combat and Technology in the same ring.
+Without an owned selection, existing global shortcuts open a ring for the copied
+available global actions; no new key binding is introduced. Mouse item release
+executes its existing action once. Parameters, Next item, Back and paging retain
+the established request/controller semantics. Missing sectors, center and gaps
+remain world input. Central outside dismissal preserves the original world gesture.
 
-Rectangular action-card/footer/pagination descriptions below apply to the temporary group/global fallback. Earlier single-object qualification captures are historical; current single-owned controls and evidence are defined by the linked ring-menu specification and qualification report.
+## Selection and result information
 
-The right-aligned status strip and action dock share a versioned physical-pixel
-layout. Compact guidance uses the reserved top-left bounds with input capture and
-reserves the primary command band. Text fitting accounts for wrapped objective/binding/context
-and next-step rows before selecting type size. See the
-[qualification and original comparisons](GraphicalInterfaceQualification.md).
+The existing noninteractive tooltip beside an open ring carries authorized copied
+single-selection identity, count, health, supply/Fuel/Ammunition, readiness, power,
+work/block reason and inventory. Group status uses the cached selected-group
+aggregate: total/live/combat counts, eight type counts, covered means, damaged and
+unsupplied counts and current formation. Missing coverage says UNAVAILABLE.
+Exact accepted/rejected counts and the last authoritative result remain visible.
+Keyboard invocation exposes the same status without requiring a pointer position.
+Hovering a sector replaces status with its existing action explanation after the
+175 ms delay. Closing the logical ring immediately removes its status tooltip.
 
-The battlefield HUD reads the existing copied `PlayerExperienceSnapshot`, action,
-selection and combat-group views. It adds no simulation state, selection members,
-visibility decisions, resources or population limits. Layout and input ownership
-remain `GameplayHudLayout`, `ResourceStripLayout`, `CombatGroupCardLayout`,
-`PlayerActionDockInteractionLayout` and the existing controllers.
-
-## Rendering and asset ownership
-
-`GameplayHudSkin` prepares compiled atlas leases on the render thread, through
-`UiSkinResources`. It performs no source-image decode, filesystem discovery,
-authoring JSON parse or device creation during recording. `GameplayHudArtwork`
-contains explicit bindings derived from the existing Directorate artwork catalog;
-qualification compares those IDs with both the packed sprites and real roster
-identities. It deliberately excludes unavailable patrol art and cursor families.
-Cursor rendering belongs to the tactical interface.
-
-Each owner records its skin before its remaining dynamic geometry and live
-`UiTextBatch` output. This preserves opaque domain-card contents above the shell,
-severity/selection rails above skin, and readable live values above both. Core
-panels are nine-sliced; icons and square native model portraits retain their
-aspect. No reference-board pixels, example values or embedded labels are used.
-
-| Surface | Production binding | Preserved copied behavior |
-| --- | --- | --- |
-| Waiting/resource strip | `panel.resource`; `resource.ferrous_ore/volatiles/silicates/steel/fuel/electronics/ammunition` | All seven existing quantities; compact two-row layout; finite zero versus unavailable; no added rate or population model |
-| Power | `panel.resource`, `overlay.warning` | Generation/demand and explicit constrained/stable text |
-| Single selection | `panel.primary`, `panel.portrait`, identity portrait, role/status icons | Name, kind/count and permitted health, fuel, ammunition, supply, readiness, power and work |
-| State bars | `progress.progress_track`, `progress.progress_fill` | Health/readiness fractions; two supply bars below the fuel/ammunition labels; finite fills clamped to [0,1], unknown fill omitted |
-| Mixed/common-type selection | `panel.primary` and semantic selection icon | Existing count/common-type versus aggregate text; no invented primary portrait |
-| Selected combat-group card | `panel.primary`, `control.button_compact`, `overlay.disabled` | Composition filters, damaged/unsupplied focus, formation cycling, group focus, covered aggregates and command result counts |
-| Assigned group overview | `panel.compact`, button and selected/focus overlays | Existing assigned slots, active/selected flags, copied status/formation/order summaries |
-| Primary commands/dock shell | `panel.primary/compact/raised`, `control.button_compact` | Current contextual availability, rebound shortcuts, page/footer controls and collapsed status |
-| Dock modes/results | `control.tab`; selected/focus/disabled/hover/pressed/pending/accepted/error/warning overlays | Existing seven mode IDs, pending requests, accepted/rejected/partial results; accepted never means completed work |
-| Gameplay tooltip/guidance | `panel.tooltip/compact` | Existing delay, copied permissions, viewport fitting, onboarding option and targeting/drag suppression |
-
-Panel/control/progress/overlay names above have prefix `ui.skin.directorate.`.
-Artwork names have prefix `ui.artwork.directorate.` and select existing pixel-size
-variants. Portraits are `portrait.unit_<id>.p<size>` or
-`portrait.building_<id>.p<size>`, using only a single identified permitted selection
-with the corresponding `CommonUnitId`/`CommonBuildingId`. Construction, empty,
-mixed and absent identities do not invent a roster portrait. Known enemy identity
-and permission to show operational facts remain independent: rendering respects
-the existing `HasHealth`, `HasSupply`, `HasReadiness` and `HasPower` flags, without
-looking up entities or private gameplay data. Work continues to use the copied
-`PlayerWorkSummary`, including its real block reason and percentage.
-
-Shared hit regions follow the revised responsive geometry. Command submission,
-readiness/work authority and input confirmation retain their existing behavior.
-Production/operations cards and alerts retain their existing domain owners;
-notifications consume the shared right-dock geometry. Minimap,
-cursor, world markers and dynamic tactical geometry are outside this migration.
-Normal HUD surfaces do not draw or reserve FPS/SIM/TPS counters. Detailed
-statistics remain available through Shift+F1, independently of resource rendering.
-Telemetry collection and emergency bitmap/text diagnostics retain their owners.
+Tooltips retain session, tick, full entity generation, selection revision and menu
+revision guards. They never capture input or mutate simulation. Held gestures,
+dragging, placement/targeting and modal state suppress them. Notifications retain
+the existing authoritative feedback lifetime; intent is distinct from execution.
 
 ## Shared responsive layout
 
-`GameplayHudLayout.ContractVersion` is 3. `TopStatusBar.Right`,
-`ActionDock.Right` and `NotificationBounds(expanded).Right` equal `SafeArea.Right`.
-The resource strip is at most twice the common dock width and leaves a separate
-left column. The dock begins one `Gap` below the strip. Gap is a physical-pixel
-value capped at 16; DPI and user scaling are resolved once by `Create`.
+`GameplayHudLayout.ContractVersion` is 4. Its published persistent bounds are
+`SafeArea`, `TopStatusBar`, `AlertStack`, `Minimap` and `SecondaryView`.
+Notifications begin one capped physical-pixel `Gap` below the resource strip and
+fit above the minimap. Their bounds do not change with ring open/close state.
+Guidance uses the left top column; group overview and Operations entry use the
+remaining left column. Operations owns its own panel/control geometry. The
+minimap retains its own map and selector geometry. Ring placement considers the
+remaining published obstacles and the actual translated onboarding panel/tab.
 
-`ActionDock` is the bounded expanded capacity. `VisibleActionDock(expanded)` is
-the actual expanded or collapsed region; input uses the same collapsed geometry.
-`NotificationBounds(expanded)` begins one gap below that visible region and is
-clamped above the minimap. The notification renderer consumes those bounds through
-`ActionableAlertLayout.Resolve`. Up to three cards and a compact MORE row fit within
-a 224-pixel design-height cap; constrained clients display fewer cards. Text stays
-at least 14 physical pixels. Shared card geometry supplies drawing and input.
-See [notification stack qualification](NotificationStackQualification.md).
-`OnboardingBounds` reserves the top-left corner and is consumed by guidance;
-`OnboardingPresentation` publishes the same translated panel, safe clip and visible
-tab for rendering and input. The existing session interaction owner retains the
-minimized target until a new match. See [onboarding interaction](OnboardingInteraction.md).
+Resource names, quantities and existing power state retain the 1064/640 design
+width density rules. All seven resources remain visible. DPI and UI scale are
+resolved once; clients below 320 by 240 expose no input geometry. Resize, focus,
+session and layout changes invalidate retained gestures. Normal HUD has no
+FPS/SIM/TPS reservation; F2 and Shift+F1 remain unchanged diagnostics.
 
-Resource density shares 1064/640 design-width thresholds between geometry and
-rendering. Full resource names retain captions of at least 11 physical pixels and
-values of at least 12 pixels across the required matrix. It uses one row or two
-rows while preserving all seven quantities and the existing generation/demand
-state. Live quantities and labels use separate
-font-sized lines; icon/text groups are centered together. Dock tabs and footer
-controls center labels and current bindings in separate rows. Header title slots
-are symmetric around paging controls. `UiTextBatch.AddCentered` uses logical font
-line height, advances and ink overhang, with ellipsis for long lines. General text
-alignment retains its existing contract. Compact cards retain progress meters.
-No source assets, font atlas or world-resolution policy changes are introduced.
+## Rendering and asset ownership
 
-Clients below 320 by 240 expose empty regions instead of invisible input targets.
-Resize, DPI and scale resolve the same geometry for rendering and hit tests. See
-[responsive HUD qualification](ResponsiveHudQualification.md) for executed checks
-and pending native/human evidence.
+`GameplayHudRenderer` composes `ResourcePowerHudSurface`, `PlayerActionRingHudSurface`,
+`RtsInformationHudSurface`, `WorldHoverTooltipSurface` and `OperationsHudSurface`.
+`PlayerActionRingHudRenderer` retains the existing ring skin and motion policy.
+Its geometry buffer is bounded at 4,096 vertices (previous combined renderer:
+262,144). Its skin prepares eight icon quads, with no unused panel or portrait
+batch. Other owners retain the compiled assets they actually use.
 
-## Resource and failure contract
+`HudOverlayPrimitives` owns shared overlay shaders and fallback glyphs formerly
+nested inside the inspector. `SelectionInspectorHudModel` remains a semantic
+status/icon model used by copied tooltips; it is not a rendered inspector.
+`GameplayHudSkin` prepares compiled atlas resources on the render owner and
+records bounded batches without source-asset discovery during gameplay.
+Missing required production assets fail preparation explicitly. Resource/glyph
+counters remain collected independently of diagnostic visibility.
 
-All five participating owners share a single core page, two icon pages and four
+Existing 160 ms ring alpha tracks retain fixed geometry. Logical close releases
+capture immediately; reduced motion and Low/fallback settle directly. Current
+qualification is separate from the source-bound historical measurements below.
+
+## Historical resource qualification
+
+At the initial integration, five participating owners shared a single core page, two icon pages and four
 portrait pages per device/catalog signature: 28 MiB total atlas residency. A
 frontend holding the same core lease does not duplicate that page. Each owner
 uses a bounded recording batch: five core batches at 1,024 quads, two icon batches
@@ -135,4 +100,4 @@ checks, immutable captures, measured costs and remaining acceptance gates.
 
 ## Subsequent tactical integration
 
-[Map/cursor/world consumers](GraphicalTacticalInterface.md) now share the same pages. Current composed preparation is 13 batches / 52 buffers / 8,749,056 reserved upload bytes; the increase is bounded information-symbol recording capacity. Historical HUD/economic evidence retains its original source and figures.
+[Map/cursor/world consumers](GraphicalTacticalInterface.md) now share the same pages. The later tactical integration recorded 13 batches / 52 buffers / 8,749,056 reserved upload bytes; the increase is bounded information-symbol recording capacity. Historical HUD/economic evidence retains its original source and figures.

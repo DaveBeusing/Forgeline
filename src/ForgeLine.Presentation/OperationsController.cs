@@ -32,12 +32,10 @@ public static class OperationsLayout
     {
         float gap = 8 * MathF.Min(layout.Scale, 1.25f);
         float y = layout.TopStatusBar.Bottom + gap;
-        float height = MathF.Max(0, layout.SelectionInspector.Y - y - gap);
+        float height = MathF.Max(0, layout.SafeArea.Bottom - y - gap);
         float width = MathF.Min(450 * layout.Scale,
-            MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - gap));
+            MathF.Max(0, layout.TopStatusBar.X - layout.SafeArea.X - gap));
         float panelHeight = MathF.Min(height, 374 * layout.Scale);
-        if (y + panelHeight > layout.PrimaryCommands.Y)
-            width = MathF.Min(width, MathF.Max(0, layout.PrimaryCommands.X - layout.SafeArea.X - gap));
         return new(layout.SafeArea.X, y, width, panelHeight);
     }
     // Narrow columns fit horizontally without shrinking text and row height.
@@ -145,15 +143,8 @@ public sealed class OperationsController
         {
             View = new(!View.Open, Session: _session); interaction.SetOperationsOpen(View.Open); return new(true);
         }
-        if (!View.Open && snapshot?.PlayerExperience is { } experience && !experience.IsMatchComplete &&
-            (layout.TopStatusBar.Contains(origin) ||
-                layout.SelectionInspector.Contains(origin) && experience.Selection.HasSingleEntityDetails &&
-                (experience.Selection.HasInventory || experience.Selection.HasSupply || experience.Selection.Work.Kind != PlayerWorkKind.None)))
-        {
-            var filter = layout.SelectionInspector.Contains(origin) ? experience.Selection.HasSupply ? OperationsCategory.Supply :
-                    experience.Selection.Work.Kind != PlayerWorkKind.None ? OperationsCategory.Production : OperationsCategory.Logistics : OperationsCategory.All;
-            View = new(true, filter, Session: _session); interaction.SetOperationsOpen(true); return new(true);
-        }
+        if (!View.Open && layout.TopStatusBar.Contains(origin))
+        { View = new(true, Session: _session); interaction.SetOperationsOpen(true); return new(true); }
         if (!View.Open || !panel.Contains(origin)) return new(captured);
         if (View.Notifications)
         {

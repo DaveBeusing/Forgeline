@@ -24,7 +24,8 @@ public sealed class UiReferenceScenarioTests
             Assert.True(panel.Ring.Open);Assert.True(panel.Ring.Geometry.IsValid,$"{state} {display} {density}");
             Assert.False(panel.DockExpanded);Assert.NotNull(panel.Ring.Group);
             var occupied=new HudRect[8];
-            RadialActionLayout.ResolveObstacles(occupied,layout,OnboardingPresentation.Resolve(layout,0));
+            RadialActionLayout.ResolveObstacles(occupied,layout,OnboardingPresentation.Resolve(layout,0),
+                notifications:ActionableAlertLayout.Resolve(snapshot,layout));
             foreach(var rect in occupied)
             {
                 if(rect.IsEmpty) continue;
@@ -115,7 +116,8 @@ public sealed class UiReferenceScenarioTests
             Assert.True(original.Instances.SequenceEqual(snapshot.Instances));
             Assert.Equal(original.SessionId,snapshot.SessionId);
             Assert.Equal(original.Tick,snapshot.Tick);
-            if(ObjectActionRingCapture.IsRing(state) && state < UiReferenceScenario.GroupRing)
+            if(ObjectActionRingCapture.IsRing(state) && state < UiReferenceScenario.GroupRing &&
+                state is not (UiReferenceScenario.SelectedGroup or UiReferenceScenario.MixedSelection))
             {
                 var entity=snapshot.PlayerExperience!.Value.Selection.PrimaryEntity;
                 var actor=Assert.Single(snapshot.Instances.ToArray(),i=>i.Entity==entity);
@@ -124,7 +126,7 @@ public sealed class UiReferenceScenarioTests
                 Assert.NotEqual(ControllableEntityCategory.None,actor.Selectable.Category & expected);
                 Assert.Equal(1,snapshot.PlayerExperience.Value.Selection.Count);
             }
-            if (state == UiReferenceScenario.SelectedGroup)
+            if (state is UiReferenceScenario.SelectedGroup or UiReferenceScenario.MixedSelection)
             {
                 var members = Assert.IsType<CombatGroupOperationalSnapshot>(SelectedCombatGroup.Resolve(snapshot));
                 Assert.Equal(snapshot.PlayerExperience!.Value.Selection.Count, members.Members.Count);

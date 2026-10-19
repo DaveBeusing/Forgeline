@@ -45,44 +45,15 @@ public sealed class GameplayHudFoundationTests
         int height,
         uint dpi)
     {
-        GameplayHudLayout layout =
-            GameplayHudLayout.Create(
-                width,
-                height,
-                dpi);
-
-        Assert.False(
-            layout.TopStatusBar.Intersects(
-                layout.ActionDock));
-        Assert.False(
-            layout.TopStatusBar.Intersects(
-                layout.AlertStack));
-        Assert.False(
-            layout.VisibleActionDock(false).Intersects(
-                layout.AlertStack));
-        Assert.False(
-            layout.ActionDock.Intersects(
-                layout.Minimap));
-        Assert.False(
-            layout.SelectionInspector.Intersects(
-                layout.Minimap));
-        Assert.False(
-            layout.SelectionInspector.Intersects(
-                layout.SecondaryView));
-        Assert.False(
-            layout.AlertStack.Intersects(
-                layout.SecondaryView));
-
-        Assert.True(
-            layout.SafeArea.Contains(
-                new Vector2(
-                    layout.Minimap.X,
-                    layout.Minimap.Y)));
-        Assert.True(
-            layout.SafeArea.Contains(
-                new Vector2(
-                    layout.Minimap.Right,
-                    layout.Minimap.Bottom)));
+        var layout = GameplayHudLayout.Create(width, height, dpi);
+        HudRect[] regions = [layout.TopStatusBar, layout.AlertStack, layout.Minimap, layout.SecondaryView];
+        foreach (var rect in regions) {
+            Assert.False(rect.IsEmpty);
+            Assert.True(layout.SafeArea.Contains(new(rect.X, rect.Y)));
+            Assert.True(layout.SafeArea.Contains(new(rect.Right, rect.Bottom)));
+        }
+        for (int i=0;i<regions.Length;i++) for(int j=i+1;j<regions.Length;j++)
+            Assert.False(regions[i].Intersects(regions[j]));
     }
 
     [Theory]
@@ -276,13 +247,13 @@ public sealed class GameplayHudFoundationTests
         Assert.True(
             HudInteractionContext.HitTest(
                 new Vector2(
-                    layout.ActionDock.X + 1.0f,
-                    layout.ActionDock.Y + 1.0f),
-                layout.ActionDock));
+                    layout.TopStatusBar.X + 1.0f,
+                    layout.TopStatusBar.Y + 1.0f),
+                layout.TopStatusBar));
         Assert.False(
             HudInteractionContext.HitTest(
                 Vector2.Zero,
-                layout.ActionDock));
+                layout.TopStatusBar));
     }
     [Fact]
     public void HudTextGlyphPatternsHaveValidFiveBySevenDimensions()

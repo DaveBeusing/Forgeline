@@ -13,7 +13,7 @@ using static ForgeLine.Presentation.Tests.SelectionOverlayRenderingTests;
 
 namespace ForgeLine.Presentation.Tests;
 
-public sealed class HoverTooltipRenderingTests
+public sealed partial class HoverTooltipRenderingTests
 {
     [Theory]
     [InlineData(1600, 900, 96u, .75f)]

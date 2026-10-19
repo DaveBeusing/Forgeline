@@ -17,57 +17,28 @@ public sealed class GameplayHudVisualQualificationTests
         int height,
         uint dpi)
     {
-        GameplayHudLayout layout =
-            GameplayHudLayout.Create(
-                width,
-                height,
-                dpi);
-
-        AssertRegionInside(
-            layout.SafeArea,
-            layout.TopStatusBar);
-        AssertRegionInside(
-            layout.SafeArea,
-            layout.SelectionInspector);
-        AssertRegionInside(
-            layout.SafeArea,
-            layout.ActionDock);
-        AssertRegionInside(
-            layout.SafeArea,
-            layout.AlertStack);
-        AssertRegionInside(
-            layout.SafeArea,
-            layout.Minimap);
-        AssertRegionInside(
-            layout.SafeArea,
-            layout.SecondaryView);
-
-        Assert.False(
-            layout.TopStatusBar.Intersects(
-                layout.ActionDock));
-        Assert.False(
-            layout.ActionDock.Intersects(
-                layout.Minimap));
-        Assert.False(
-            layout.SelectionInspector.Intersects(
-                layout.Minimap));
-        Assert.True(
-            PlayerActionDockInteractionLayout.MaximumVisibleItems(
-                layout) >
-            0);
+        var layout = GameplayHudLayout.Create(width, height, dpi);
+        HudRect[] regions = [layout.TopStatusBar, layout.AlertStack, layout.Minimap, layout.SecondaryView];
+        foreach (var rect in regions) {
+            Assert.False(rect.IsEmpty);
+            Assert.True(layout.SafeArea.Contains(new(rect.X, rect.Y)));
+            Assert.True(layout.SafeArea.Contains(new(rect.Right, rect.Bottom)));
+        }
+        for (int i=0;i<regions.Length;i++) for(int j=i+1;j<regions.Length;j++)
+            Assert.False(regions[i].Intersects(regions[j]));
     }
 
     [Theory]
     [InlineData(1920, 1080, 96)]
     [InlineData(2560, 1440, 144)]
-    public void StatusAndDockUseTheVersionedRightAlignedContract(int width, int height, uint dpi)
+    public void StatusAndNotificationsUseTheVersionedRightAlignedContract(int width, int height, uint dpi)
     {
         var layout = GameplayHudLayout.Create(width, height, dpi);
-        Assert.Equal(3, GameplayHudLayout.ContractVersion);
+        Assert.Equal(4, GameplayHudLayout.ContractVersion);
         Assert.Equal(layout.SafeArea.Right, layout.TopStatusBar.Right, 3);
-        Assert.Equal(layout.SafeArea.Right, layout.ActionDock.Right, 3);
+        Assert.Equal(layout.SafeArea.Right, layout.AlertStack.Right, 3);
         Assert.Equal(layout.SafeArea.Y, layout.TopStatusBar.Y);
-        Assert.True(layout.TopStatusBar.Width <= 2 * layout.ActionDock.Width);
+        Assert.True(layout.TopStatusBar.Width <= 2 * layout.AlertStack.Width);
         Assert.False(layout.OnboardingBounds.Intersects(layout.TopStatusBar));
         AssertRegionInside(layout.SafeArea, layout.OnboardingBounds);
     }

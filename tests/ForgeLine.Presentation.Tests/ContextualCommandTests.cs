@@ -11,37 +11,18 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class ContextualCommandTests
 {
-    [Fact]
-    public void CoreBuildControlOpensExistingDockAndRetainsEveryAdvancedMode()
-    {
-        var snapshot = Snapshot(kind: PlayerSelectionKind.Building, eligible: 0, core: true);
-        Assert.Equal(1, ContextualCommandModel.Count(snapshot));
-        Assert.True(ContextualCommandModel.TryGet(snapshot, 0, out var command));
-        Assert.True(command.OpensMode);
-        Assert.Equal("B", command.Shortcut);
-        var input = new InputState();
-        var controller = new PlayerActionPanelController();
-        Click(input, 0);
-        controller.Update(input, snapshot, 1600, 900);
-        Assert.Equal(PlayerActionPanelMode.Construction, controller.Mode);
-        Assert.False(controller.TryTakeRequest(out _));
-        Assert.Equal(7, PlayerActionDockInteractionLayout.ModeButtonCount);
-    }
+
 
     [Fact]
     public void PrimaryGeometryRendersInsideClipSpaceWithBoundedRetainedBuffers()
     {
         using var device = new SelectionOverlayRenderingTests.RecordingDevice();
-        using var renderer = new PlayerActionDockHudRenderer(device, null);
-        var context = new SelectionOverlayRenderingTests.RecordingContext { Width = 1024, Height = 720 };
-        var layout = GameplayHudLayout.Create(1024, 720, 192, 2);
-        renderer.Render(context, Snapshot(), default, default, FormationTemplate.Compact, layout);
-        Assert.InRange(renderer.LastRenderedVertexCount, 1, 262144);
-        Assert.All(device.Buffer!.Vertices, vertex =>
-        {
-            Assert.InRange(vertex.Position.X, -1, 1);
-            Assert.InRange(vertex.Position.Y, -1, 1);
-        });
+        using var renderer = new PlayerActionRingHudRenderer(device,null);
+        var context = new SelectionOverlayRenderingTests.RecordingContext { Width=1024, Height=720 };
+        var layout = GameplayHudLayout.Create(1024,720,192,2);
+        renderer.Render(context,Snapshot(),default,default,FormationTemplate.Compact,layout);
+        Assert.Equal(0,renderer.LastRenderedVertexCount);
+        Assert.Empty(device.Buffers);
     }
 
     [Fact]
@@ -59,30 +40,7 @@ public sealed class ContextualCommandTests
         Assert.Equal(60, metrics.FramesPerSecond);
     }
 
-    [Theory]
-    [InlineData(1024, 720, 96, 1f)]
-    [InlineData(1024, 720, 192, 2f)]
-    [InlineData(1600, 900, 144, 1.25f)]
-    [InlineData(1920, 1080, 96, 1f)]
-    [InlineData(3840, 2160, 192, 2f)]
-    public void GeometryCaptureAndRenderedButtonsShareBounds(int width, int height, uint dpi, float scale)
-    {
-        var layout = GameplayHudLayout.Create(width, height, dpi, scale);
-        var snapshot = Snapshot();
-        Assert.False(layout.PrimaryCommands.IsEmpty);
-        Assert.False(layout.PrimaryCommands.Intersects(layout.SelectionInspector));
-        Assert.False(layout.PrimaryCommands.Intersects(layout.Minimap));
-        Assert.False(layout.PrimaryCommands.Intersects(layout.ActionDock));
-        for (int i = 0; i < 6; i++)
-        {
-            var button = ContextualCommandModel.Button(layout, i);
-            Assert.True(layout.PrimaryCommands.Contains(Center(button)));
-            Assert.True(button.Bottom <= layout.PrimaryCommands.Bottom);
-            Assert.True(HudInteractionContext.BlocksWorldPointer(Center(button), layout, true, false));
-            Assert.True(ContextualCommandModel.TryHit(Center(button), snapshot, layout, out var command));
-            Assert.Equal(i, command.ItemIndex);
-        }
-    }
+
 
     [Fact]
     public void AvailabilityUsesExistingTacticalReasonsAndMixedEligibility()
@@ -113,48 +71,9 @@ public sealed class ContextualCommandTests
         Assert.Equal("MATCH COMPLETE", ContextualCommandModel.Status(Snapshot(terminal: true)));
     }
 
-    [Fact]
-    public void QuickPressDispatchesOnceAndPendingSnapshotDisablesIt()
-    {
-        var snapshot = Snapshot();
-        var controller = new PlayerActionPanelController();
-        var input = new InputState();
-        Click(input, 2);
-        controller.Update(input, snapshot, 1600, 900);
-        Assert.True(controller.PointerCaptured);
-        Assert.True(controller.TryTakeRequest(out var request));
-        Assert.Equal(PlayerActionRequestKind.SubmitStopCombat, request.Kind);
-        var view = controller.CreateView(1600, 900, snapshot.PlayerActions);
-        Assert.True(ContextualCommandModel.HasPending(view, snapshot));
-        Assert.True(ContextualCommandModel.TryGet(snapshot, 2, out var localPending,
-            ContextualCommandModel.HasPending(view, snapshot)));
-        Assert.Equal("REQUEST PENDING", localPending.Availability.DisabledReason);
-        Assert.False(ContextualCommandModel.HasPending(view, Snapshot(sessionValue: 2, actionSession: 2)));
-        input.BeginFrame();
-        Click(input, 2);
-        controller.Update(input, snapshot, 1600, 900);
-        Assert.False(controller.TryTakeRequest(out _));
-        Assert.True(ContextualCommandModel.TryGet(Snapshot(pending: 1), 2, out var pending));
-        Assert.Equal("REQUEST PENDING", pending.Availability.DisabledReason);
-    }
 
-    [Fact]
-    public void DisabledResizeAndStalePressesNeverSubmit()
-    {
-        var controller = new PlayerActionPanelController();
-        var input = new InputState();
-        Click(input, 0);
-        controller.Update(input, Snapshot(), 1600, 900);
-        Assert.False(controller.TryTakeRequest(out _));
-        input.BeginFrame();
-        Click(input, 2);
-        controller.Update(input, Snapshot(), 1920, 1080);
-        Assert.False(controller.TryTakeRequest(out _));
-        input.BeginFrame();
-        Click(input, 2);
-        controller.Update(input, Snapshot(actionTick: 3), 1600, 900);
-        Assert.False(controller.TryTakeRequest(out _));
-    }
+
+
 
     [Fact]
     public void ContextualTooltipExplainsDisabledReasonWithoutOpeningAdvancedDock()
@@ -168,26 +87,7 @@ public sealed class ContextualCommandTests
         Assert.Null(HoverTooltipResolver.Resolve(Snapshot(actionTick: 3), view, default));
     }
 
-    [Fact]
-    public void SuppressionFocusLossAndSessionChangeDiscardRecordedEdges()
-    {
-        var controller = new PlayerActionPanelController();
-        var input = new InputState();
-        controller.Update(input, Snapshot(), 1600, 900);
-        Click(input, 2);
-        input.SuppressHeldInput();
-        controller.Update(input, Snapshot(), 1600, 900);
-        Assert.False(controller.TryTakeRequest(out _));
-        input.Reset();
-        Click(input, 2);
-        input.Apply(PlatformInputEvent.FocusLost());
-        controller.Update(input, Snapshot(), 1600, 900);
-        Assert.False(controller.TryTakeRequest(out _));
-        input.BeginFrame();
-        Click(input, 2);
-        controller.Update(input, Snapshot(sessionValue: 2, actionSession: 2), 1600, 900);
-        Assert.False(controller.TryTakeRequest(out _));
-    }
+
 
     [Fact]
     public void RepeatedContextMappingHasNoWarmAllocations()
@@ -222,12 +122,4 @@ public sealed class ContextualCommandTests
 
     private static Vector2 Center(HudRect rect) => new(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
 
-    private static void Click(InputState input, int index)
-    {
-        var point = Center(ContextualCommandModel.Button(GameplayHudLayout.Create(1600, 900, 96), index));
-        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
-            PlatformMouseButton.Left, (int)point.X, (int)point.Y));
-        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp,
-            PlatformMouseButton.Left, (int)point.X, (int)point.Y));
-    }
 }

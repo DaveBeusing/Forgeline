@@ -33,7 +33,7 @@ internal static class GameplayUiMeasurements
                             Alerts = (PlayerAlertState)31,
                             CriticalSupplyUnits = count,
                             BlockedProductionFacilities = count,
-                            Selection = PlayerSelectionSummary.Empty with { Count = 1, Kind = PlayerSelectionKind.Building, CommonBuildingId = BuildingIds.CommandCore }
+                            Selection = PlayerSelectionSummary.Empty with { Count = 1, PrimaryEntity=instances[0].Entity, Kind = PlayerSelectionKind.Unit }
                         };
                         var actions = new PlayerActionSnapshot(new(1), new(4),
                             [new(BuildingIds.PowerPlant, "Power Plant", [], false), new(BuildingIds.VehicleFactory, "Vehicle Factory with a deliberately long qualification label", [], false)], state == "Pending" ? 1 : 0, null, null);
@@ -43,18 +43,37 @@ internal static class GameplayUiMeasurements
                         using var renderer = new GameplayHudRenderer(device);
                         var graphics = new PresentationBenchmarks.NullGraphicsCommandContext { Width = display.Item1, Height = display.Item2 };
                         var camera = new RtsCamera(); var controller = new PlayerActionPanelController(bindings); var input = new InputState();
+                        var selection=new SelectionSet();selection.SetSingle(instances[0].Entity);
+                        camera.CenterOn(instances[0].Transform.Position);
+                        var buffer=new PresentationSnapshotBuffer();buffer.Publish(snapshot);var world=new RenderWorld();world.Update(buffer);
+                        controller.Update(input,snapshot,display.Item1,display.Item2,display.Item3,scale,selection);
+                        controller.SynchronizeObjectRing(input,snapshot,world,selection,false);
                         input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.G));
-                        controller.Update(input, snapshot, display.Item1, display.Item2, display.Item3, scale);
+                        controller.Update(input, snapshot, display.Item1, display.Item2, display.Item3, scale, selection);
                         input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.G)); input.BeginFrame();
                         var panel = controller.CreateView(display.Item1, display.Item2, actions, display.Item3, scale) with
                         { ContextualHoveredIndex = state is "Hover" or "Pressed" ? 0 : -1, ContextualPressed = state == "Pressed" };
+                        var layout=GameplayHudLayout.Create(display.Item1,display.Item2,display.Item3,scale);
+                        var occupied=new HudRect[8];RadialActionLayout.ResolveObstacles(occupied,layout);
+                        var ring=panel.Ring.Project(world,camera,1,snapshot,layout,occupied);
+                        if(!ring.Geometry.IsValid) throw new InvalidOperationException("Gameplay benchmark requires an active ring.");
+                        panel=panel with {Ring=ring with {HoveredSlot=state is "Hover" or "Pressed" ? 0 : -1,Pressed=state=="Pressed"}};
+                        controller.AdoptPresentedRing(ring);
+                        if(state is "Hover" or "Pressed") {
+                            var point=ring.Geometry.LabelCenter(0);
+                            input.Apply(PlatformInputEvent.PointerMoved((int)point.X,(int)point.Y));
+                            if(state=="Pressed") input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
+                                PlatformMouseButton.Left,(int)point.X,(int)point.Y));
+                        }
+                        var hoverController=new HoverTooltipController();
                         var ux = default(PreAlphaUxView) with { Bindings = bindings, ShowOnboarding = true };
                         var bounds = new AxisAlignedBounds(Vector3.Zero, new(2048, 100, 2048));
                         void Frame()
                         {
-                            controller.Update(input, snapshot, display.Item1, display.Item2, display.Item3, scale);
+                            controller.Update(input, snapshot, display.Item1, display.Item2, display.Item3, scale, selection);
+                            var hover=hoverController.Update(input,snapshot,default,camera,layout,panel,false,false,TimeSpan.FromMilliseconds(16));
                             renderer.Render(graphics, camera, snapshot, bounds, RtsInformationLayerView.Empty, panel, default,
-                                default, CombatGroupOverviewView.Empty, ux, display.Item3, scale);
+                                default, CombatGroupOverviewView.Empty, ux, display.Item3, scale,hoverTooltip:hover);
                         }
                         for (int i = 0; i < warmup; i++) Frame();
                         var times = new double[samples];

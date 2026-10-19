@@ -27,16 +27,34 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
         return local >= GapRadians / 2 && local <= Step - GapRadians / 2 ? slot : -1;
     }
 
+    /// <summary>Conservative physical bounds of a painted sector, including its one-pixel soft edges.</summary>
+    public HudRect SectorBounds(int slot)
+    {
+        if(!IsValid || slot<0 || slot>=Count) return default;
+        float start=Start(slot),end=End(slot);
+        Span<float> angles=stackalloc float[11];angles[0]=start;angles[1]=end;int count=2;
+        for(int cardinal=-4;cardinal<=4;cardinal++) {
+            float angle=cardinal*MathF.PI/2;
+            if(angle>=start && angle<=end) angles[count++]=angle;
+        }
+        var minimum=new Vector2(float.PositiveInfinity);var maximum=new Vector2(float.NegativeInfinity);
+        for(int i=0;i<count;i++) for(int edge=0;edge<2;edge++) {
+            var point=Center+Direction(angles[i])*(edge==0 ? MathF.Max(0,InnerRadius-1) : OuterRadius+1);
+            minimum=Vector2.Min(minimum,point);maximum=Vector2.Max(maximum,point);
+        }
+        return new(minimum.X,minimum.Y,maximum.X-minimum.X,maximum.Y-minimum.Y);
+    }
+
     /// <summary>One obstacle contract for gameplay, fixture preparation and native recording.</summary>
     public static void ResolveObstacles(Span<HudRect> occupied, in GameplayHudLayout layout,
-        OnboardingPresentation? onboarding = null, OperationsView operations = default)
+        OnboardingPresentation? onboarding = null, OperationsView operations = default, CombatGroupOverviewView? groups = null, NotificationStackLayout? notifications = null)
     {
         if (occupied.Length != 8) throw new ArgumentException("Ring obstacle storage must contain eight rectangles.",nameof(occupied));
         occupied[0]=layout.TopStatusBar;
-        occupied[1]=layout.SelectionInspector;
+        occupied[1]=layout.GroupOverviewBounds(groups);
         occupied[2]=layout.Minimap;
-        occupied[3]=layout.VisibleActionDock(false);
-        occupied[4]=layout.NotificationBounds(false);
+        occupied[3]=default;
+        occupied[4]=notifications?.PaintedBounds ?? layout.NotificationBounds();
         occupied[5]=onboarding?.VisiblePanel ?? default;
         occupied[6]=onboarding?.Tab ?? default;
         occupied[7]=operations.Open ? OperationsLayout.Panel(layout) : OperationsLayout.Entry(layout);

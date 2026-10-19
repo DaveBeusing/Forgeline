@@ -22,7 +22,7 @@ internal enum UiReferenceScenario
     OnboardingClosing25, OnboardingClosing50, OnboardingClosing75, OnboardingCollapsed,
     OnboardingOpening25, OnboardingOpening50, OnboardingOpening75,
     RingConstruction, RingProduction, RingUnits, RingLogistics, RingSupply, RingTactical, RingTechnology, RingParameters,
-    RingPending, RingEdge, RingTooltip, RingOpening50, RingClosing50, RingOffscreen, GroupRing, GroupRingTools, GroupRingPartial, GroupRingEdge
+    RingPending, RingEdge, RingTooltip, RingOpening50, RingClosing50, RingOffscreen, RingSelectionStatus, GroupRing, GroupRingTools, GroupRingPartial, GroupRingEdge, GroupRingStatus
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -144,22 +144,25 @@ internal static class UiReferenceStates
             state == UiReferenceScenario.Targeting ? PlayerActionPanelMode.Tactical :
             state is UiReferenceScenario.Contacts or UiReferenceScenario.DockFocus or UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed
                 ? PlayerActionPanelMode.Construction : PlayerActionPanelMode.UnitProduction;
-        var (snapshot, panel) = CommandDockCapture.Fixture(source, mode, dockState, width, height, dpi, scale);
+        var owner=source.PlayerExperience!.Value.Player;
+        var category=mode is PlayerActionPanelMode.Supply or PlayerActionPanelMode.Tactical
+            ? ControllableEntityCategory.Unit : ControllableEntityCategory.Building;
+        var anchor=source.Instances.ToArray().First(i=>i.Selectable.IsSelectable && i.Selectable.Owner==owner &&
+            (i.Selectable.Category & category)!=0).Entity;
+        var (snapshot, panel) = CommandDockCapture.Fixture(source, mode, dockState, width, height, dpi, scale, anchor);
         panel = panel with { SelectedIndex = state == UiReferenceScenario.DockFocus || state == UiReferenceScenario.ProductionQueue ? 1 :
             state is UiReferenceScenario.QueueBlocked or UiReferenceScenario.DockQueueTooltip ? 2 : 0,
             HoveredIndex = state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed ? 1 : -1,
             PointerPressed = state == UiReferenceScenario.DockPressed };
         if (state == UiReferenceScenario.LogisticsInputs)
             panel = panel with { SelectedIndex = snapshot.PlayerActions!.Logistics!.Policies.Count, LogisticsSteps = 1 };
-        if (state is UiReferenceScenario.ResourcePressure or UiReferenceScenario.LowPower or UiReferenceScenario.SupplyCritical or UiReferenceScenario.MixedSelection)
+        if (state is UiReferenceScenario.ResourcePressure or UiReferenceScenario.LowPower or UiReferenceScenario.SupplyCritical)
         {
             snapshot = BattlefieldHudCapture.State(snapshot, state == UiReferenceScenario.SupplyCritical ? "Supply" :
-                state == UiReferenceScenario.MixedSelection ? "Mixed" : "Production");
+                "Production");
             if (state == UiReferenceScenario.ResourcePressure)
                 snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with { Resources = new(0, 1, 0, 2, 0, 0, 0) });
-            if (state == UiReferenceScenario.MixedSelection)
-                snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
-                { Selection = PlayerSelectionSummary.Empty with { Count = 3, Kind = PlayerSelectionKind.Mixed, DisplayName = "Mixed selection" } });
+
         }
         if (state is UiReferenceScenario.SelectionUnit or UiReferenceScenario.SelectionBuilding or UiReferenceScenario.SelectionLongName)
         {
@@ -180,25 +183,6 @@ internal static class UiReferenceStates
             snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
                 snapshot.Intelligence, snapshot.SessionId, snapshot.PlayerExperience, playerActions: snapshot.PlayerActions,
                 guidance: new PlayerGuidanceSummary(snapshot.SessionId, snapshot.Tick, snapshot.PlayerExperience!.Value.Player, default));
-        if (state == UiReferenceScenario.SelectedGroup)
-        {
-            var experience = snapshot.PlayerExperience!.Value;
-            var owned = snapshot.Instances.ToArray().Where(i => i.Selectable.Owner == experience.Player &&
-                i.Selectable.Category == ControllableEntityCategory.Unit).Take(3).ToArray();
-            if (owned.Length < 2) throw new InvalidDataException("Group fixture requires existing owned unit identities.");
-            var members = owned.Select((instance, index) => default(CombatGroupMemberReadModel) with
-            {
-                Entity = instance.Entity, Category = ControllableEntityCategory.Unit, Unit = instance.UnitFeature.Unit,
-                CombatEligible = true, HasHealth = true, HealthFraction = index == 0 ? .2 : .8,
-                HasSupply = true, SupplyStatus = index == 0 ? BattlefieldSupplyStatus.Critical : BattlefieldSupplyStatus.Supplied,
-                FuelFraction = .3, AmmunitionFraction = .4, HasReadiness = true, Readiness = .6
-            }).ToArray();
-            snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
-                snapshot.Intelligence, snapshot.SessionId, experience with { Selection = PlayerSelectionSummary.Empty with
-                { Count = members.Length, Kind = PlayerSelectionKind.Unit, DisplayName = "Selected combat group" } },
-                playerActions: snapshot.PlayerActions, vfxMetrics: snapshot.VfxMetrics,
-                combatGroups: new CombatGroupOperationalSnapshot(snapshot.Tick, members, snapshot.SessionId));
-        }
         if (state is UiReferenceScenario.Operations or UiReferenceScenario.OperationsEmpty or UiReferenceScenario.OperationsMissing)
         {
             snapshot = BattlefieldHudCapture.State(snapshot, "Production");
@@ -243,8 +227,8 @@ internal static class UiReferenceStates
         }
         else
         {
-            Add("resources", hud.TopStatusBar); Add("selection", hud.SelectionInspector);
-            Add("action-dock", hud.VisibleActionDock(expanded)); Add("alerts", hud.NotificationBounds(expanded)); Add("minimap", hud.Minimap);
+            Add("resources", hud.TopStatusBar);
+            Add("alerts", hud.NotificationBounds(expanded)); Add("minimap", hud.Minimap);
             void Add(string name, HudRect r) => regions.Add((name, r.X, r.Y, r.Width, r.Height));
         }
         return regions.Select(r =>

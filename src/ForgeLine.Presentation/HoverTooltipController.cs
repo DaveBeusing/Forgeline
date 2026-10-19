@@ -19,7 +19,10 @@ public readonly record struct HoverTooltipView(
     PlayerActionPanelMode DockMode = PlayerActionPanelMode.Closed,
     int DockControl = 0,
     int DockIndex = -1,
-    bool Contextual = false);
+    bool Contextual = false,
+    bool SelectionStatus = false,
+    ulong SelectionRevision = 0,
+    ulong MenuRevision = 0);
 
 public sealed class HoverTooltipController
 {
@@ -35,7 +38,9 @@ public sealed class HoverTooltipController
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(camera);
         Vector2 pointer = input.PointerPosition;
-        if (blocked || input.FocusLostThisFrame || !input.HasPointerPosition ||
+        bool statusAvailable = panel.Ring is { Open: true, Resolved: true, Geometry.IsValid: true };
+        if (!input.HasPointerPosition && statusAvailable) pointer = panel.Ring.Geometry.Center;
+        if (blocked || input.FocusLostThisFrame || (!input.HasPointerPosition && !statusAvailable) ||
             input.IsMouseButtonDown(PlatformMouseButton.Left) ||
             input.IsMouseButtonDown(PlatformMouseButton.Middle) ||
             input.IsMouseButtonDown(PlatformMouseButton.Right) || input.WheelDelta != 0 ||
@@ -57,21 +62,10 @@ public sealed class HoverTooltipController
                 DockIndex = radial.Navigation == ActionRingNavigation.GroupControl ? -100 - radial.Target.ItemIndex :
                     radial.Navigation == ActionRingNavigation.Group ? -99 : target.ItemIndex };
         }
-        else if (!panel.Ring.UsesRing && ContextualCommandModel.TryHit(pointer, snapshot, layout, out var command,
-                localPending: ContextualCommandModel.HasPending(panel, snapshot), selectionPending: panel.SelectionPending))
+        else if (statusAvailable && !worldPointerCaptured)
         {
-            next = next with { DockMode = command.Mode,
-                DockControl = (int)(command.OpensMode ? PlayerActionDockControlKind.Mode : PlayerActionDockControlKind.Item),
-                DockIndex = command.ItemIndex, Contextual = true };
-        }
-        else if (PlayerActionDockInteractionLayout.TryHit(pointer, layout, panel.DockExpanded, count, out var hit, panel.SelectedIndex))
-        {
-            next = next with
-            {
-                DockMode = hit.Kind == PlayerActionDockControlKind.Mode ? hit.Mode : panel.Mode,
-                DockControl = (int)hit.Kind,
-                DockIndex = hit.Kind == PlayerActionDockControlKind.Item ? hit.ItemIndex : panel.SelectedIndex
-            };
+            next = next with { SelectionStatus = true, SelectionRevision = panel.Ring.SelectionRevision,
+                MenuRevision = panel.Ring.Revision, PointerPosition = panel.Ring.Geometry.Center };
         }
         else if (!worldPointerCaptured &&
             !HudInteractionContext.BlocksWorldPointer(pointer, layout, true, panel.DockExpanded, includePrimaryCommands: !panel.Ring.UsesRing))
@@ -95,12 +89,13 @@ public sealed class HoverTooltipController
                 }
             }
         }
-        if (!next.Entity.IsValid && !next.Contact.IsSpecified && next.DockControl == 0) return Reset();
+        if (!next.SelectionStatus && !next.Entity.IsValid && !next.Contact.IsSpecified && next.DockControl == 0) return Reset();
 
         bool changed = next.SessionId != _candidate.SessionId || next.Entity != _candidate.Entity ||
             next.Contact != _candidate.Contact || next.DockMode != _candidate.DockMode ||
             next.DockControl != _candidate.DockControl || next.DockIndex != _candidate.DockIndex ||
-            next.Contextual != _candidate.Contextual ||
+            next.Contextual != _candidate.Contextual || next.SelectionStatus != _candidate.SelectionStatus ||
+            next.SelectionRevision != _candidate.SelectionRevision || next.MenuRevision != _candidate.MenuRevision ||
             next.ViewportWidth != _candidate.ViewportWidth || next.ViewportHeight != _candidate.ViewportHeight ||
             next.Scale != _candidate.Scale || Vector2.DistanceSquared(pointer, _anchor) > 9 * layout.Scale * layout.Scale;
         if (changed)
@@ -110,7 +105,7 @@ public sealed class HoverTooltipController
         }
         else if (elapsed > TimeSpan.Zero && elapsed <= TimeSpan.FromMilliseconds(250)) _stable += elapsed;
         else if (elapsed < TimeSpan.Zero || elapsed > TimeSpan.FromMilliseconds(250)) _stable = TimeSpan.Zero;
-        _candidate = next with { Ready = _stable >= DefaultDelay };
+        _candidate = next with { Ready = next.SelectionStatus || _stable >= DefaultDelay };
         return _candidate;
     }
 
@@ -124,6 +119,43 @@ public sealed class HoverTooltipController
 
 internal static class HoverTooltipPlacement
 {
+    public static HudRect BesideRing(in ObjectActionRingView ring, in GameplayHudLayout layout,
+        ReadOnlySpan<HudRect> published, float width, float height)
+    {
+        if(published.Length>8) throw new ArgumentException("Tooltip supports the eight published HUD obstacles.",nameof(published));
+        var safe=layout.SafeArea;
+        if(safe.IsEmpty || width<=0 || height<=0 || width>safe.Width || height>safe.Height || !ring.Geometry.IsValid) return default;
+        Span<HudRect> occupied=stackalloc HudRect[16];int count=0;
+        foreach(var rectangle in published) if(!rectangle.IsEmpty) occupied[count++]=rectangle;
+        for(int slot=0;slot<ring.Geometry.Count;slot++) if(ring.Slots[slot].Present)
+            occupied[count++]=ring.Geometry.SectorBounds(slot);
+        float gap=MathF.Min(layout.Gap,8);
+        Span<float> xs=stackalloc float[40];Span<float> ys=stackalloc float[40];
+        var center=ring.Geometry.Center;
+        xs[0]=center.X+ring.Geometry.OuterRadius+gap;xs[1]=center.X-ring.Geometry.OuterRadius-gap-width;
+        xs[2]=center.X-width/2;xs[3]=safe.X;xs[4]=safe.Right-width;
+        ys[0]=center.Y-height/2;ys[1]=center.Y+ring.Geometry.OuterRadius+gap;
+        ys[2]=center.Y-ring.Geometry.OuterRadius-gap-height;ys[3]=safe.Y;ys[4]=safe.Bottom-height;
+        int xCount=5,yCount=5;
+        for(int i=0;i<count;i++) {
+            xs[xCount++]=occupied[i].Right+gap;xs[xCount++]=occupied[i].X-gap-width;
+            ys[yCount++]=occupied[i].Bottom+gap;ys[yCount++]=occupied[i].Y-gap-height;
+        }
+        HudRect best=default;float score=float.PositiveInfinity;
+        for(int x=0;x<xCount;x++) for(int y=0;y<yCount;y++) {
+            var candidate=new HudRect(Math.Clamp(xs[x],safe.X,safe.Right-width),Math.Clamp(ys[y],safe.Y,safe.Bottom-height),width,height);
+            float distance=Vector2.DistanceSquared(new(candidate.X+width/2,candidate.Y+height/2),center);
+            if(distance>=score) continue;
+            bool clear=true;
+            for(int i=0;i<count;i++) {
+                var obstacle=occupied[i];
+                if(candidate.Intersects(new(obstacle.X-gap,obstacle.Y-gap,obstacle.Width+gap*2,obstacle.Height+gap*2))) {clear=false;break;}
+            }
+            if(clear) {best=candidate;score=distance;}
+        }
+        return best;
+    }
+
     public static HudRect Resolve(Vector2 pointer, in GameplayHudLayout layout, float width, float height)
     {
         var safe = layout.SafeArea;
@@ -139,7 +171,7 @@ internal static class HoverTooltipPlacement
         float x = pointer.X + gap;
         float y = pointer.Y + gap;
         if (x + width > safe.Right) x = pointer.X - gap - width;
-        if (y + height > safe.Bottom || (layout.ActionDock.Contains(pointer) && above >= height))
+        if (y + height > safe.Bottom)
             y = pointer.Y - gap - height;
         return new(Math.Clamp(x, safe.X, safe.Right - width), Math.Clamp(y, safe.Y, safe.Bottom - height), width, height);
     }

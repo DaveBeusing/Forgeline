@@ -19,7 +19,7 @@ public sealed class GameplayHudRuntimeTests
     {
         GameplayHudLayout layout = GameplayHudLayout.Create(width, height, dpi, scale);
         Assert.Equal(layout.SafeArea.Right, layout.TopStatusBar.Right, 3);
-        Assert.True(layout.TopStatusBar.Width <= 2 * layout.ActionDock.Width);
+        Assert.True(layout.TopStatusBar.Width <= 2 * layout.AlertStack.Width);
 
         using var device = new RecordingDevice();
         using var renderer = new ResourcePowerHudRenderer(device, null);

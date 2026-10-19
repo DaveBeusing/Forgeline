@@ -1,12 +1,12 @@
 # World anchored action menus
 
-Current multi-selection controls use the shared [group action ring](GroupActionMenus.md). Rectangular group controls below describe historical parity; the inspector now retains read-only facts and exact command results.
+Current single/group rings have no rectangular mode bar, dock or selection inspector. Existing mode shortcuts and selection release open the rings; the shared tooltip preserves authorized status and results. See [current HUD parity and qualification](HudSurfaceConsolidation.md).
 
 Current validation and remaining gates: [qualification report](WorldAnchoredActionMenuQualification.md). Checkpoints below retain their original source identities.
 
 ## Action parity
 
-Single owned entities use the same PlayerActionPanelController dispatcher and copied PlayerActionSnapshot as the previous dock. The global mode bar stays available. Group selection retains its existing dock and contextual commands.
+Single owned entities use the same PlayerActionPanelController dispatcher and copied PlayerActionSnapshot as the previous dock. Existing global shortcuts remain available, including empty-selection global actions. Groups use the same ring with their existing tools.
 
 | Category | Item identity | Immediate action | Parameter / queue controls | Target and result |
 |---|---|---|---|---|

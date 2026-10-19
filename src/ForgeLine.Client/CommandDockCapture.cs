@@ -34,7 +34,7 @@ internal static class CommandDockCapture
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
             var scene = VisualReferenceScene.Create(VisualReferenceSceneKind.BattlefieldCombat, terrain, runtimeAssets: assets);
             using var platform = new WindowsPlatform();
-            using IWindow window = platform.CreateWindow(new("FORGELINE Command Dock Qualification", 1280, 720));
+            using IWindow window = platform.CreateWindow(new("FORGELINE Command Ring Qualification", 1280, 720));
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new() { EnableVSync = false, EnableMemoryDiagnostics = true });
             using var hud = new GameplayHudRenderer(graphics, assets);
             using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: assets,
@@ -58,9 +58,16 @@ internal static class CommandDockCapture
                         foreach (string state in reference ? new[] { "Ready", "Blocked", "Pending", "Queue", "Empty", "Accepted", "Rejected" } : new[] { "Ready" })
                         {
                             if (state == "Queue" && mode is not (PlayerActionPanelMode.Production or PlayerActionPanelMode.UnitProduction or PlayerActionPanelMode.Technology)) continue;
-                            var (snapshot, panel) = Fixture(scene.Snapshot, mode, state, display.Item1, display.Item2, dpi, scale);
+                            var category=mode is PlayerActionPanelMode.Tactical or PlayerActionPanelMode.Supply
+                                ? ControllableEntityCategory.Unit : ControllableEntityCategory.Building;
+                            var entity=scene.Snapshot.Instances.ToArray().First(i=>i.Selectable.IsSelectable &&
+                                i.Selectable.Owner==scene.Snapshot.PlayerExperience!.Value.Player && (i.Selectable.Category & category)!=0).Entity;
+                            var (snapshot, panel) = Fixture(scene.Snapshot, mode, state, display.Item1, display.Item2, dpi, scale,entity);
                             var published = new PresentationSnapshotBuffer(); published.Publish(snapshot);
                             var world = new RenderWorld(); world.Update(published);
+                            panel=ObjectActionRingCapture.Present(snapshot,panel,world,camera,
+                                GameplayHudLayout.Create(display.Item1,display.Item2,dpi,scale),dpi,scale);
+                            if(!panel.Ring.Geometry.IsValid) throw new InvalidDataException("Command capture requires a visible ring.");
                             if (reference) ground.Prepare(camera, display.Item1, display.Item2);
                             void Overlay(IGraphicsCommandContext c)
                             {
@@ -76,7 +83,7 @@ internal static class CommandDockCapture
                             for (int i = 0; i < 4; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, Record);
                             byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, Record);
                             byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, Record);
-                            if (!pixels.AsSpan().SequenceEqual(repeated)) throw new InvalidDataException("Dock pixels changed between fixed repeats.");
+                            if (!pixels.AsSpan().SequenceEqual(repeated)) throw new InvalidDataException("Ring pixels changed between fixed repeats.");
                             var text = hud.TextDiagnostics;
                             if (!text.AtlasReady || text.MissingGlyphs != 0 || text.DroppedGlyphs != 0)
                                 throw new InvalidDataException("Incomplete command text.");
@@ -162,7 +169,7 @@ internal static class CommandDockCapture
             null, 1000, 12, requirements: [new(2,scoutDefinition.Id.Value,scoutDefinition.DisplayName,scoutInputs)]);
         var supply = new PlayerSupplyActionReadModel(entity, BattlefieldSupplyStatus.Critical, .15, .08, true, .4, .5,
             new(31,1), blocked ? PlayerSupplyProviderState.Blocked : PlayerSupplyProviderState.Traveling, 50, 40, default);
-        var tactical = new PlayerTacticalActionReadModel([entity], 2, 1, 1, 1, 0, false, true, default, default,
+        var tactical = new PlayerTacticalActionReadModel([entity], 1, 1, 1, 1, 0, false, true, default, default,
             [], [new(entity, blocked ? 0 : 15, 20, 10, 500, FireMissionStatus.Complete, 0, 3)]);
         var technology = new PlayerTechnologyActionReadModel(TechnologyIds.MechanizedSystems, "directorate.technology.mechanized_systems",
             "Mechanized Systems", TechnologyDomain.Warfare, TechnologyPhase.MechanizedWarfare, 180, cost,
@@ -184,7 +191,7 @@ internal static class CommandDockCapture
         var experience = source.PlayerExperience!.Value with
         {
             Selection = empty ? PlayerSelectionSummary.Empty : PlayerSelectionSummary.Empty with
-            { Count = mode == PlayerActionPanelMode.Tactical ? 2 : 1, PrimaryEntity = entity,
+            { Count = 1, PrimaryEntity = entity,
                 DisplayName = mode == PlayerActionPanelMode.Production ? "Smelter" : mode == PlayerActionPanelMode.Tactical ? "Mixed tactical selection" : "Vehicle Factory",
                 Kind = mode == PlayerActionPanelMode.Tactical ? PlayerSelectionKind.Mixed : PlayerSelectionKind.Building },
             Feedback = state is "Accepted" or "Rejected" ? PlayerCommandFeedback.None with

@@ -8,7 +8,7 @@ namespace ForgeLine.Presentation;
 
 public sealed partial class PlayerActionPanelController
 {
-    public bool SingleObjectActions => _ringContext && _ringGroup is null;
+    public bool SingleObjectActions => _ringContext && !_ringGlobal && _ringGroup is null;
     public bool ObjectActions => _ringContext;
     private GroupActionRingContext? _ringGroup;
     private SimulationTick? _groupTick;
@@ -16,7 +16,8 @@ public sealed partial class PlayerActionPanelController
     private CombatGroupCardResult _groupResult;
     private readonly CombatGroupCardController _ringCard = new();
     public CombatGroupCardResult TakeGroupResult() { var result = _groupResult; _groupResult = default; return result; }
-    private bool _ringContext, _ringOpen;
+    private bool _ringContext, _ringOpen, _ringGlobal;
+    private Vector2 _globalAnchor;
     private EntityId _ringEntity;
     private SimulationSessionId _ringSession;
     private ulong _ringSelection, _ringRevision;
@@ -49,7 +50,9 @@ public sealed partial class PlayerActionPanelController
         EntityId entity = default;
         if (selection.Count == 1) foreach (var selected in selection.Entities) entity = selected;
         else if (context is not null) entity = context.Representative;
-        bool eligible = context is { Count: > 1 } || selection.Count == 1 &&
+        bool global = session.IsSpecified && selection.Count == 0 && snapshot?.PlayerExperience is { IsMatchComplete: false } current &&
+            current.Player.IsSpecified && current.Tick == snapshot.Tick && current.Selection.Count == 0;
+        bool eligible = global || context is { Count: > 1 } || selection.Count == 1 &&
             snapshot?.PlayerExperience is { IsMatchComplete: false } experience &&
             world.TryGetInterpolatedInstance(entity, 1, out var instance) && (instance.Visibility & RenderVisibilityMask.World) != 0 &&
             instance.Selectable.IsSelectable && instance.Selectable.Owner == experience.Player;
@@ -62,6 +65,7 @@ public sealed partial class PlayerActionPanelController
             if (!sessionChanged && eligible && (context is { Count: > 1 } || wasGroup)) _reopenSelection = true;
         }
         _ringContext = eligible;
+        _ringGlobal = global;
         _ringGroup = eligible && context is { Count: > 1 } ? context : null;
         _ringEntity = eligible ? entity : default;
         _ringSession = session;
@@ -71,7 +75,7 @@ public sealed partial class PlayerActionPanelController
         if (sequence != _selectionClickSequence && input.TryGetMousePressPosition(PlatformMouseButton.Left, out _))
             _selectionOpenArmed = allowSelectionOpen;
         bool released = input.WasMouseButtonReleased(PlatformMouseButton.Left);
-        if (eligible && allowSelectionOpen && (_reopenSelection || _selectionOpenArmed && released && sequence != _selectionClickSequence))
+        if (eligible && !global && allowSelectionOpen && (_reopenSelection || _selectionOpenArmed && released && sequence != _selectionClickSequence))
         {
             _reopenSelection = false; _ringOpen = true; _ringLevel = ActionRingLevel.Categories; Mode = PlayerActionPanelMode.Closed;
             _itemSlotsPage = -1;
@@ -103,9 +107,9 @@ public sealed partial class PlayerActionPanelController
 
     private ObjectActionRingView BuildRing(PlayerActionSnapshot? actions)
     {
-        var ring = new ObjectActionRingView(_ringEntity, _ringSession, _ringSelection, _ringRevision, _ringContext && _ringGroup is null,
+        var ring = new ObjectActionRingView(_ringEntity, _ringSession, _ringSelection, _ringRevision, _ringContext && !_ringGlobal && _ringGroup is null,
             _ringOpen, _presentedRing.Geometry, _presentedRing.Resolved, HoveredSlot: _presentedRing.Resolved ? _presentedRing.HoveredSlot : -1, Pressed: _pointerPressed)
-            { Level = _ringLevel, Group = _ringGroup, VisibleMembers = _presentedRing.VisibleMembers, GroupFactsCurrent = _presentedRing.GroupFactsCurrent };
+            { Global = _ringGlobal, GlobalAnchor = _globalAnchor, Level = _ringLevel, Group = _ringGroup, VisibleMembers = _presentedRing.VisibleMembers, GroupFactsCurrent = _presentedRing.GroupFactsCurrent };
         if (!_ringContext || !_ringOpen) return ring;
         ActionRingSlots slots = default;
         if (_ringLevel == ActionRingLevel.Categories)
@@ -204,13 +208,16 @@ public sealed partial class PlayerActionPanelController
         _presentedRing = _presentedRing with { HoveredSlot = hover };
         _hoveredIndex = -1;
         _pointerPressed = hasHit && input.IsMouseButtonDown(PlatformMouseButton.Left);
-        PointerCaptured = hasHit || PlayerActionDockInteractionLayout.CapturesPointer(input.PointerPosition, layout, false);
+        PointerCaptured = hasHit;
         if (freshPress && input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin))
         {
-            _ringArmed = _presentedRing.TryHit(origin, out _pressedRingSlot) && _pressedRingSlot.Enabled;
+            _ringArmed = _presentedRing.TryHit(origin, out _pressedRingSlot) && _pressedRingSlot.Enabled &&
+                (_pressedRingSlot.Navigation != ActionRingNavigation.None || _pressedRingSlot.Target.Kind == PlayerActionDockControlKind.Mode ||
+                    PlayerActionDockHudModel.CanUseControl(_pressedRingSlot.Target.Kind == PlayerActionDockControlKind.Item
+                        ? PlayerActionDockControlKind.Activate : _pressedRingSlot.Target.Kind,
+                        _pressedRingSlot.Target.Mode, _pressedRingSlot.Target.ItemIndex, panel, actions));
             _pressedRing = _presentedRing;
-            if (!_ringArmed && PlayerActionDockInteractionLayout.TryHit(origin, layout, false, 0, out var mode))
-            { HandlePointerHit(mode, actions, panel); PointerCaptured = true; }
+
         }
         if (!input.WasMouseButtonReleased(PlatformMouseButton.Left)) return;
         bool armed = _ringArmed; _ringArmed = false;

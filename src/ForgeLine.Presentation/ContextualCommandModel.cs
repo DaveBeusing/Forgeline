@@ -73,26 +73,4 @@ internal static class ContextualCommandModel
         return true;
     }
 
-    public static float TextScale(in GameplayHudLayout layout) =>
-        MathF.Min(layout.Scale, MathF.Min(layout.PrimaryCommands.Width / 360, layout.PrimaryCommands.Height / 112));
-
-    public static HudRect Button(in GameplayHudLayout layout, int index)
-    {
-        if (index < 0 || index >= 6 || layout.PrimaryCommands.IsEmpty) return default;
-        HudRect region = layout.PrimaryCommands;
-        float scale = TextScale(layout);
-        float gap = 4 * scale;
-        float width = (region.Width - 4 * gap) / 3;
-        return new(region.X + gap + index % 3 * (width + gap),
-            region.Y + 24 * scale + index / 3 * 34 * scale, width, 30 * scale);
-    }
-
-    public static bool TryHit(Vector2 pointer, PresentationSnapshot? snapshot,
-        in GameplayHudLayout layout, out ContextualCommand command, bool localPending = false, bool selectionPending = false)
-    {
-        for (int i = 0; TryGet(snapshot, i, out command, localPending, selectionPending); i++)
-            if (Button(layout, i).Contains(pointer)) return true;
-        command = default;
-        return false;
-    }
 }

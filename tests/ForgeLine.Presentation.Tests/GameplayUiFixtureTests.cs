@@ -25,7 +25,7 @@ public sealed class GameplayUiFixtureTests
         var fixtures = new SortedDictionary<string, Fixture>(StringComparer.Ordinal);
         var bindings = new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Build, ForgeLine.Platform.PlatformKey.G));
         using var device = new RecordingDevice();
-        using var renderer = new PlayerActionDockHudRenderer(device, null);
+        using var renderer = new PlayerActionRingHudRenderer(device, null);
         foreach (var profile in new[] { (1024, 720, 96u), (1920, 1080, 144u), (1920, 1200, 192u), (3440, 1440, 144u), (3840, 2160, 192u) })
             foreach (float scale in new[] { .75f, 1f, 2f })
                 foreach (string state in new[] { "Ready", "Focus", "Hover", "Pressed", "Disabled", "Pending", "Accepted", "Rejected", "Cancelled" })
@@ -67,9 +67,10 @@ public sealed class GameplayUiFixtureTests
                             });
                     var context = new RecordingContext { Width = profile.Item1, Height = profile.Item2 };
                     var layout = GameplayHudLayout.Create(profile.Item1, profile.Item2, profile.Item3, scale);
+                    panel=ActionRingFixture.Present(snapshot,layout,panel);
                     renderer.Render(context, snapshot, panel, default, FormationTemplate.Compact, layout);
-                    var vertices = device.Buffers.SelectMany(x => x.Vertices).ToArray();
-                    Assert.InRange(vertices.Length, 1, 262144);
+                    var vertices = renderer.LastRenderedVertexCount == 0 ? Array.Empty<Vertex>() : device.Buffers.SelectMany(x => x.Vertices).ToArray();
+                    Assert.InRange(vertices.Length, state == "Cancelled" ? 0 : 1, PlayerActionRingHudRenderer.MaxVertices);
                     Assert.All(vertices, vertex =>
                     {
                         Assert.True(float.IsFinite(vertex.Position.X) && float.IsFinite(vertex.Position.Y));
@@ -79,13 +80,13 @@ public sealed class GameplayUiFixtureTests
                     string hash = Convert.ToHexString(SHA256.HashData(MemoryMarshal.AsBytes(vertices.AsSpan())));
                     fixtures.Add(name, new(vertices.Length, hash));
                     renderer.Render(context, snapshot, panel, default, FormationTemplate.Compact, layout);
-                    Assert.Equal(hash, Convert.ToHexString(SHA256.HashData(MemoryMarshal.AsBytes(device.Buffers.SelectMany(x => x.Vertices).ToArray().AsSpan()))));
+                    Assert.Equal(hash, Convert.ToHexString(SHA256.HashData(MemoryMarshal.AsBytes((renderer.LastRenderedVertexCount == 0 ? Array.Empty<Vertex>() : device.Buffers.SelectMany(x => x.Vertices).ToArray()).AsSpan()))));
                     string? visualRoot = Environment.GetEnvironmentVariable("FORGELINE_UI_VISUAL_OUTPUT");
                     if (!string.IsNullOrEmpty(visualRoot) && scale == 1 && state != "Cancelled")
                         WriteSvg(Path.Combine(visualRoot, name + ".svg"), vertices, profile.Item1, profile.Item2);
                 }
         Assert.NotEqual(fixtures["1920x1080-144dpi-1.00-Ready"], fixtures["1920x1080-144dpi-1.00-Disabled"]);
-        Assert.NotEqual(fixtures["1920x1080-144dpi-1.00-Ready"], fixtures["1920x1080-144dpi-1.00-Accepted"]);
+        Assert.Equal(fixtures["1920x1080-144dpi-1.00-Ready"], fixtures["1920x1080-144dpi-1.00-Accepted"]);
         string actual = JsonSerializer.Serialize(fixtures, JsonOptions);
         string? baselineOutput = Environment.GetEnvironmentVariable("FORGELINE_UI_FIXTURE_BASELINE");
         if (!string.IsNullOrEmpty(baselineOutput))
@@ -95,7 +96,7 @@ public sealed class GameplayUiFixtureTests
         }
         else
         {
-            string baseline = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "command-dock-geometry.json"));
+            string baseline = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "action-ring-geometry.json"));
             var expected = JsonSerializer.Deserialize<SortedDictionary<string, Fixture>>(baseline, JsonOptions)!;
             Assert.Equal(expected.Count, fixtures.Count);
             foreach (var fixture in fixtures) Assert.Equal(expected[fixture.Key], fixture.Value);

@@ -1,22 +1,29 @@
 # Selection and Command Interaction
 
-Owned single objects and multiple selections use one world anchored action ring. The informational inspector remains; the global category bar opens modes in that ring. Shared sectors, gaps, clipping and tooltips use the published render geometry. Clicking an available item starts its existing action immediately; targeting still uses the existing world-target rule. K/Tab/Enter remains the keyboard alternative, without an extra confirmation for pointer actions.
+Owned single objects and groups use the existing world anchored action rings.
+The rectangular inspector, mode bar and command dock have been removed. Shared
+published geometry drives rendering and sector hits. Item release submits once;
+existing targeting still owns its world confirmation. B/P/U/L/Y/K/H and
+Tab/T/M/Left/Right/Enter/C retain their bindings. Empty-selection global actions
+remain reachable through those existing mode shortcuts.
 
-Groups retain the entire intended authorized selection through the existing dispatcher and shared-route path. Partial capabilities show eligible/selected counts; exact authoritative accepted/rejected results remain visible. Type filters, attention focus, formation cycling and group focus use the existing adapter and preserve saved group slots. Outside clicks close every transient level and reach the world once. Session, generation, ownership and membership changes invalidate pressed actions; two to one changes ring context and zero closes it.
-
-See [world anchored menus](WorldAnchoredActionMenus.md), [group menus](GroupActionMenus.md) and [current qualification / open gates](GroupActionMenuQualification.md). Global controls without an object context retain their existing fallback.
+Groups retain the full authorized selection and existing dispatcher/shared-route
+path. Partial capabilities show eligible/selected counts; type filters, attention,
+formation and focus preserve saved groups. Outside dismissal reaches the world
+once. Session, generation, ownership and membership changes invalidate presses.
+See [current parity and qualification](HudSurfaceConsolidation.md).
 
 ## Hover tooltips
 
-Keeping the pointer on a world object or Action Dock control for 175 ms reveals a compact, noninteractive tooltip. The delay uses elapsed presentation time, independently of simulation ticks; moving more than three scaled pixels, changing target, or changing viewport/DPI/UI scale starts a new delay. Long frame gaps clear the delay. Tooltips never capture pointer input or issue commands.
+Keeping the pointer on a world object or ring sector for 175 ms reveals a compact, noninteractive tooltip. The delay uses elapsed presentation time, independently of simulation ticks; moving more than three scaled pixels, changing target, or changing viewport/DPI/UI scale starts a new delay. Long frame gaps clear the delay. Tooltips never capture pointer input or issue commands.
 
 Owned units, buildings and construction sites show their authored identity/semantic role and available Health, supply/Fuel/Ammunition, readiness, power and work facts. Missing facts are omitted. Visible deposits show resource identity, copied remaining quantity, locally owned extraction state where present and the existing Mine / Extractor requirement. Unexplored or no-longer-visible deposits show nothing; foreign extractor operational state is not copied.
 
 Current detected contacts are picked near their copied opaque world position and display only `UNKNOWN CONTACT / DETECTED`. Identified hostile entities may show authored identity, with no health, inventory, supply, readiness, production or orders. Losing current intelligence immediately removes the applicable tooltip at the next published snapshot.
 
-Action Dock hits take precedence over world hover and use exactly the dock's mode/card/footer geometry and captured availability model. Tooltips explain disabled reasons, authored costs and copied availability, recipe outputs, production ticks, deposit/technology/facility prerequisites, panel shortcuts and supported control actions. Availability is a captured observation; command execution still revalidates through the authoritative command boundary. Closing or switching the dock invalidates old card/footer tooltips.
+Ring sector hits take precedence over world hover and use exactly the published angular geometry and captured availability model. Tooltips explain disabled reasons, authored costs and copied availability, recipe outputs, production ticks, deposit/technology/facility prerequisites, panel shortcuts and supported control actions. Availability is a captured observation; command execution still revalidates through the authoritative command boundary. Closing or changing ring context invalidates old action tooltips. The open ring also exposes copied single/group status in this existing read-only tooltip, including keyboard invocation without a pointer.
 
-Drag selection, held pointer buttons/camera drag, wheel motion, placement, tactical targeting, modal help/pause, focus loss, minimization, terminal state and session replacement suppress hover. The panel flips/clamps inside the DPI-aware safe area and fits the available vertical space to keep clear of the cursor; extreme scale or tiny viewports can shorten the visible text. Compact text is bounded to twelve lines and 48 characters per line, including up to three cost rows, two output rows and two prerequisite rows. The existing inspector/dock remains the detailed view. Per-user tooltip settings and top-bar hover are deferred; no settings/save migration is introduced.
+Drag selection, held pointer buttons/camera drag, wheel motion, placement, tactical targeting, modal help/pause, focus loss, minimization, terminal state and session replacement suppress hover. The panel flips/clamps inside the DPI-aware safe area and fits the available vertical space to keep clear of the cursor; extreme scale or tiny viewports can shorten the visible text. Compact text is bounded to twelve lines and 48 characters per line, including up to three cost rows, two output rows and two prerequisite rows. Ring status and detailed action explanations use bounded wrapping up to 48 rows, measured before fitting; no inspector or dock remains as a secondary view. Per-user tooltip settings and top-bar hover are deferred; no settings/save migration is introduced.
 
 ## Purpose
 
@@ -172,15 +179,13 @@ At execution time it revalidates every target against the live ECS and owner. A 
 
 The command exposes accepted/rejected target counts and execution tick for development diagnostics.
 
-## Production selection inspector
+## Read-only selection status
 
-World-space selection rings, hover markers, placement footprints and tactical target markers remain separate from screen-space inspection. The selected set continues to be presentation-owned interaction state, while `PlayerExperienceSnapshotFactory` copies only authorized owned selection facts at the completed-tick boundary.
-
-`PlayerSelectionSummary` now distinguishes safe common identity from single-entity detail. A single authorized entity may publish its concrete unit/building identity and operational values. A multi-selection publishes an exact common UnitId or BuildingId only when all authorized members share it; heterogeneous same-kind selections use a generic kind summary and mixed categories use `Mixed Selection`.
-
-Per-entity Health, supply, Fuel, Ammunition, readiness, power, inventory, and work data is available only when exactly one authorized entity remains after alive/ownership filtering. This prevents a primary entity from being presented as if its status represented the entire selected group. Foreign-owned, destroyed, or generation-stale entities do not contribute to the inspector summary.
-
-`SelectionInspectorHudSurface` owns the DPI-aware `SelectionInspector` HUD region and resolves existing semantic unit/building/status icons through `RtsUiIconCatalog`. Operational meaning is also expressed through explicit labels such as `SUPPLIED`, `CRITICAL`, `POWERED`, `BROWNOUT`, `RUNNING`, and `BLOCKED`, rather than color alone.
+`WorldHoverTooltipSurface` displays copied single/group status beside the open
+ring. It preserves inventory, work/block reasons, component-covered group means,
+composition, formation and exact command-result counts. No persistent inspector
+or inspector click target remains. The semantic `SelectionInspectorHudModel`
+continues to supply authorized labels/icons without a rendering owner.
 
 ## Feedback and Diagnostics
 
@@ -222,21 +227,22 @@ See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md) fo
 
 The full solution build, project-reference validation, Windows client smoke test, headless smoke tests, and complete test suite remain the CI gate.
 
-## Production player action dock
+## Player action rings
 
-`PlayerActionPanelController` remains the presentation-owned interaction state for the player command surface, while `PlayerActionDockHudSurface` owns the DPI-aware `ActionDock` HUD region. The dock is a visual/interaction replacement for the former text palette; it does not introduce a second command path.
+`PlayerActionPanelController` retains request/editor state. `PlayerActionRingHudSurface`
+draws only the existing single/group/global rings. B/P/U/L/Y/K/H open their seven
+modes. Parameters exposes the existing priority, repeat, stock and resupply
+settings and cancellation. Tab, Enter, C, T, M and Left/Right retain their actions.
+Pointer activation validates the published ring revision and stable item key on
+release. Disabled sectors own only their actual sector and cannot arm requests.
 
-The six contextual modes are Build (`B`), Process (`P`), Units (`U`), Logistics (`L`), Supply (`Y`), and Combat (`K`). `Tab` changes the selected card, `Enter` activates it, `C` cancels/removes the selected queue or policy item where supported, `T` cycles the primary setting, `M` cycles the secondary setting, and Left/Right adjust the currently editable numeric setting. Pointer input hits the same mode/card/footer model; clicking a card selects it, and the explicit `ACT` footer control performs the same activation represented by `Enter`.
-
-Pointer capture is derived from the shared `GameplayHudLayout.ActionDock` geometry. A pointer press inside the dock is consumed before world selection, movement, building placement, or tactical targeting can interpret that same click. Disabled controls use the same availability model in rendering and controller dispatch, so a disabled footer button cannot submit an action merely because it was clicked.
-
-The dock only exposes currently implemented actions. Semantic icons may exist for Patrol, Repair, or other future commands, but those actions are not placed in the dock until gameplay and request/command support exists. All visible actions continue to create `PlayerActionRequest` values and cross the existing dispatcher/gateway boundary; UI activation is submission intent, not proof of authoritative success.
-
-Session replacement closes the dock and clears pending presentation-owned requests/editor state. A terminal player-experience snapshot closes and suppresses the dock entirely so no post-result Build, Process, Unit, Logistics, Supply, or Combat request can be authored from this surface.
+All gameplay mutations remain `PlayerActionRequest` values crossing the existing
+dispatcher/gateway. Terminal state and session replacement close menus and clear
+pending local intent. No rectangular fallback or global mode bar remains.
 
 ## Tactical Targeting
 
-Owned selection and enemy targeting remain separate interactions. `K` opens the Combat mode of the production player action dock for the current owned selection. Attack, AttackMove, Retreat, and Fire Mission enter a transient targeting mode; `Escape`, focus loss, session replacement, terminal match state, or opening another action mode cancels that targeting state.
+Owned selection and enemy targeting remain separate interactions. `K` opens the Combat mode of the action ring for the current owned selection. Attack, AttackMove, Retreat, and Fire Mission enter a transient targeting mode; `Escape`, focus loss, session replacement, terminal match state, or opening another action mode cancels that targeting state.
 
 Attack picking never scans foreign render instances or live ECS transforms. Presentation receives only current identified enemy candidates copied into `PlayerTacticalActionReadModel`; each candidate contains the authoritative entity identifier needed for the later command plus its intelligence-approved last-known position and compatibility count. The target controller projects only those copied positions for hit testing.
 
@@ -258,12 +264,15 @@ Resize and DPI/UI-scale changes cancel an active selection gesture; a still-held
 
 ## Multi-selection group controls
 
-The inspector shows per-type owned unit composition and component-covered HP/readiness/fuel/ammunition means for multi-selection. Click a nonzero type cell to select that subgroup; saved Ctrl+digit assignments stay intact. HP<=25% and SUPPLY! focus controls cycle authorized live members needing attention, without orders or selection changes. FOCUS GROUP and the existing F3 formation cycle are available in the same card. See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md#current-selection-group-card) for aggregation and partial-command semantics.
-
+The existing group ring exposes type filters, damaged/unsupplied attention,
+formation and group focus through `CombatGroupCardController.Activate`.
+Read-only aggregates appear in the shared ring tooltip. The old card geometry
+and its separate pointer controller path have been removed. Saved groups and
+simulation movement groups remain independent. See [group menus](GroupActionMenus.md).
 
 ## Operations overview
 
-Click OPERATIONS above the inspector, the resource/power strip, a reported alert or the selected facility inspector to open the nonmodal operations view. Filter and page copied local facilities, inspect reported causes, focus facilities/adjacent route endpoints and open their existing Action Dock controls. Focus issues no orders; control entry waits for the exact new selection capture. Targeting hides the view temporarily; modal, pause, focus and resize transitions consume clicks. See [operations authority and limits](ProductionAndLogisticsOperations.md).
+Click the OPERATIONS entry in the shared left column, the resource/power strip or a populated alert control to open the nonmodal operations view. Filter and page copied local facilities, inspect reported causes, focus facilities/adjacent route endpoints and open their existing ring controls. Focus issues no orders; control entry waits for the exact new selection capture. Targeting hides the view temporarily; modal, pause, focus and resize transitions consume clicks. See [operations authority and limits](ProductionAndLogisticsOperations.md).
 
 ## Actionable alerts
 
@@ -271,26 +280,22 @@ Alert clicks reuse owned full-generation camera focus and selection inspection. 
 
 ## Gameplay shortcuts and interaction feedback
 
-Dock mode, navigation, activation and cancellation shortcuts are configurable through the shared registry. Contextual cards and help display that mapping. Focus rails, hover outlines, pressed underlines and disabled double rails accompany text; command results retain authoritative accepted/partial/rejected counts. Escape closing a dock reports CANCELLED - PANEL CLOSED for three seconds without submitting an order. Resize, focus loss, modal transitions and session replacement consume key edges and held inputs. See [binding and feedback rules](GameplayInputAccessibilityAndQualification.md).
+Action mode, navigation, activation and cancellation shortcuts are configurable through the shared registry. Ring sectors, tooltips and help display that mapping. Existing hover/press cues and disabled explanations accompany text; command results retain authoritative accepted/partial/rejected counts. Escape closes the ring without submitting an order. Resize, focus loss, modal transitions and session replacement consume key edges and held inputs. See [binding and feedback rules](GameplayInputAccessibilityAndQualification.md).
 
 ## HUD content density and alert capture
 
-Inspector content fits its available width and rejects a player summary from a different
-completed tick. Mixed selections retain aggregate-only facts; current group aggregates
-retain their existing owned-member/session checks. Compact inspector height releases
-unused vertical space without moving the separate established command-dock band.
+Copied selection details require the current completed tick and matching ring
+identity/revisions. Group status preserves component coverage and owned membership.
+Only populated notification cards capture pointer origins/current positions;
+gaps and unused capacity remain world input. Held card presses retain existing
+identity/session/layout checks. Informational result cards remain non-actionable.
 
-Alert drawing and navigation share bounded row rectangles and fitted scale.
-Only populated cards capture pointer origins/current positions; gaps, empty rows and the
-area right of a card do not open Operations or block world selection. A held card press
-retains ownership until release, with existing identity/session/layout revalidation.
-Informational command result cards remain non-actionable.
+## Adaptive ring navigation
 
-## Adaptive command dock
-
-The selected card determines the visible dock page. Rebound NextItem, wheel and header arrows navigate without simulation requests. Rendering, pointer hits and hover share the visible window; hidden cards cannot be clicked. Wheel suppresses simultaneous clicks. Collapsed ownership follows the visible strip. Existing session/tick/selection/terminal guards remain in force.
-
-See [dock qualification](CommandDockQualification.md) for the interaction checks, native reference coverage and remaining live acceptance.
+Existing four-item ring pages use stable keys. Tab, wheel over an actual sector,
+Previous and Next navigate without simulation requests. Hidden/absent sectors
+cannot be clicked. Wheel suppresses simultaneous activation. Current source and
+qualification are recorded in [HUD consolidation](HudSurfaceConsolidation.md).
 
 ## Graphical world feedback
 

@@ -12,41 +12,11 @@ public readonly record struct CombatGroupCardResult(bool Captured, bool Selectio
 /// <summary>Presentation selection/focus only. Never edits saved slots or issues simulation orders.</summary>
 public sealed class CombatGroupCardController
 {
-    private ulong _pressSequence;
     private SimulationSessionId _session;
-    private GameplayHudLayout _layout;
-    private bool _hasLayout;
     private readonly List<EntityId> _filtered = [];
     private EntityId _lastDamaged;
     private EntityId _lastUnsupplied;
 
-    public CombatGroupCardResult Update(InputState input, PresentationSnapshot? snapshot,
-        SelectionSet selection, in GameplayHudLayout layout, bool blocked = false)
-    {
-        ArgumentNullException.ThrowIfNull(input);
-        ArgumentNullException.ThrowIfNull(selection);
-        ulong sequence = input.MousePressSequence(PlatformMouseButton.Left);
-        bool fresh = sequence != _pressSequence;
-        _pressSequence = sequence;
-        bool transition = _hasLayout && (_layout != layout || _session != snapshot?.SessionId);
-        _layout = layout;
-        _hasLayout = true;
-        if (transition || blocked || input.FocusLostThisFrame) { _lastDamaged = default; _lastUnsupplied = default; }
-        _session = snapshot?.SessionId ?? default;
-        bool captured = input.HasPointerPosition && layout.SelectionInspector.Contains(input.PointerPosition);
-        bool pressedInside = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin) &&
-            layout.SelectionInspector.Contains(origin);
-        captured |= pressedInside;
-        if (blocked || transition || input.FocusLostThisFrame || !input.HasPointerPosition || !fresh ||
-            !pressedInside || selection.Count < 2 || snapshot?.PlayerExperience?.Selection.Count != selection.Count || SelectedCombatGroup.Resolve(snapshot) is not { } operational)
-            return new(captured);
-        for (int index = 0; index < 12; index++)
-        {
-            if (!CombatGroupCardLayout.Control(layout, index).Contains(origin)) continue;
-            return Activate(index, snapshot, selection);
-        }
-        return new(captured);
-    }
     /// <summary>Shared selection/focus adapter for the ring. No gameplay command is submitted here.</summary>
     public CombatGroupCardResult Activate(int index, PresentationSnapshot? snapshot, SelectionSet selection)
     {

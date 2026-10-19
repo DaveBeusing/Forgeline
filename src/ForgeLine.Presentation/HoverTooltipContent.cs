@@ -13,15 +13,34 @@ internal readonly record struct HoverTooltipContent(
     uint? ProductionTicks = null,
     string Requirement = "",
     IReadOnlyList<PlayerTechnologyPrerequisiteReadModel>? Prerequisites = null,
-    string WorkStatus = "", string Explanation = "", UiSkinState VisualState = UiSkinState.Normal, bool WrapDetails = false);
+    string WorkStatus = "", string Explanation = "", UiSkinState VisualState = UiSkinState.Normal, bool WrapDetails = false,
+    PlayerSelectionSummary? Selection = null, SelectedCombatGroup? Group = null,
+    FormationTemplate Formation = default, PlayerCommandFeedback? Feedback = null);
 
 internal static class HoverTooltipResolver
 {
     public static HoverTooltipContent? Resolve(PresentationSnapshot snapshot, in HoverTooltipView view,
-        in PlayerActionPanelView panel)
+        in PlayerActionPanelView panel, SelectedCombatGroup? group = null, FormationTemplate formation = default)
     {
         if (!view.Ready || view.SessionId != snapshot.SessionId ||
             snapshot.PlayerExperience is not { IsMatchComplete: false }) return null;
+        if (view.SelectionStatus)
+        {
+            var ring = panel.Ring;
+            var experience = snapshot.PlayerExperience.Value;
+            if (!ring.UsesRing || !ring.Open || !ring.Resolved || !ring.Geometry.IsValid || panel.SelectionPending ||
+                ring.Session != snapshot.SessionId || ring.Revision != view.MenuRevision ||
+                ring.SelectionRevision != view.SelectionRevision || experience.Tick != snapshot.Tick ||
+                (ring.SingleOwned && (experience.Selection.Count != 1 || experience.Selection.PrimaryEntity != ring.Entity)) ||
+                (ring.Global && experience.Selection.Count != 0) ||
+                (ring.Group is not null && (experience.Selection.Count != ring.Group.SelectedCount ||
+                    !ring.Group.MatchesSelection(snapshot.PlayerActions?.Tactical?.SelectedEntities)))) return null;
+            return new(experience.Selection.Count == 0 ? "COMMANDS" : experience.Selection.DisplayName,
+                SelectionInspectorHudModel.ResolveKindLabel(experience.Selection.Kind), "", "READ-ONLY STATUS",
+                WrapDetails: true, Selection: experience.Selection,
+                Group: ring.Group is not null && group?.Tick == snapshot.Tick && group.TotalCount == experience.Selection.Count ? group : null,
+                Formation: formation, Feedback: experience.Feedback);
+        }
         if (view.DockControl != 0) return ResolveDock(snapshot, view, panel);
         if (view.Contact.IsSpecified)
         {

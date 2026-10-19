@@ -210,9 +210,7 @@ public sealed class OperationsTests
     {
         var layout = GameplayHudLayout.Create(width, height, dpi, uiScale);
         var panel = OperationsLayout.Panel(layout);
-        Assert.False(panel.Intersects(layout.ActionDock)); Assert.False(panel.Intersects(layout.Minimap));
-        Assert.False(panel.Intersects(layout.SelectionInspector));
-        Assert.False(panel.Intersects(layout.PrimaryCommands));
+        Assert.False(panel.Intersects(layout.AlertStack)); Assert.False(panel.Intersects(layout.Minimap));
         for (int index = 0; index < 12; index++)
         {
             var control = OperationsLayout.Control(layout, index);

@@ -3,7 +3,7 @@ using ForgeLine.Input;
 
 namespace ForgeLine.Presentation;
 
-internal sealed partial class PlayerActionDockHudRenderer
+internal sealed partial class PlayerActionRingHudRenderer
 {
     private void EmitObjectRing(in PlayerActionPanelView panel, PlayerActionSnapshot? actions,
         in GameplayHudLayout layout, int width, int height)

@@ -21,7 +21,9 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
     public GroupActionRingContext? Group { get; init; }
     public bool GroupFactsCurrent { get; init; }
     public int VisibleMembers { get; init; }
-    public bool UsesRing => SingleOwned || Group is not null;
+    public bool Global { get; init; }
+    public Vector2 GlobalAnchor { get; init; }
+    public bool UsesRing => SingleOwned || Group is not null || Global;
     internal ActionRingSlots Slots { get; init; }
     internal ActionRingLevel Level { get; init; }
     internal bool TryHit(Vector2 point, out ActionRingSlot slot)
@@ -38,7 +40,14 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
         if (snapshot.SessionId != Session || snapshot.PlayerExperience is not { IsMatchComplete: false } experience)
             return this with { Geometry = default, Resolved = true };
         Vector2 anchor; float radius = 0; int visible = 0;
-        if (Group is not null)
+        if (Global)
+        {
+            if (!Session.IsSpecified || !experience.Player.IsSpecified || experience.Tick != snapshot.Tick || experience.Selection.Count != 0)
+                return this with { Geometry = default, Resolved = true };
+            anchor = layout.SafeArea.Contains(GlobalAnchor) ? GlobalAnchor :
+                new Vector2(layout.SafeArea.X + layout.SafeArea.Width / 2, layout.SafeArea.Y + layout.SafeArea.Height / 2);
+        }
+        else if (Group is not null)
         {
             if (!Group.TryAnchor(world, camera, alpha, experience.Player, layout, out anchor, out visible))
                 return this with { Geometry = default, Resolved = true };

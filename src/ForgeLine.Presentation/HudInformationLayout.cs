@@ -31,9 +31,6 @@ internal readonly record struct ResourceStripLayout(HudRect Bounds, float Scale,
 
 internal static class HudInformationLayout
 {
-    public static float InspectorScale(in GameplayHudLayout layout) =>
-        MathF.Min(layout.Scale, MathF.Min(layout.SelectionInspector.Width / 360, layout.SelectionInspector.Height / 112));
-
     public static float MinimapScale(in GameplayHudLayout layout) =>
         MathF.Min(layout.Scale, layout.Minimap.Width / GameplayHudVisualStyle.MinimapSize);
 

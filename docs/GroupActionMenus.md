@@ -1,12 +1,12 @@
 # Group action menus
 
-Final source-bound outcomes, originals and remaining gates: [group action menu qualification](GroupActionMenuQualification.md). Earlier checkpoints below remain historical.
+Current surface ownership: [HUD consolidation](HudSurfaceConsolidation.md). Original group integration outcomes and remaining gates: [group action menu qualification](GroupActionMenuQualification.md). Earlier checkpoints below remain historical.
 
-Base master: `1ef23a9fc7ab9195d0d1bdadd97081016ea97861`. Branch: `ui/group-action-rings`. Version: `0.1.388-dev`, one PATCH.
+Historical integration baseline: `1ef23a9fc7ab9195d0d1bdadd97081016ea97861`. Branch: `ui/group-action-rings`. Version: `0.1.388-dev`, one PATCH.
 
 ## Behavior and parity
 
-The existing object ring also owns multiple selected objects. It is one context, not one control per soldier. An immutable selected-identity set and component-covered group facts cross the input/render boundary. The first category is Tactical. The Group sector exposes all eight existing composition filters, damaged/supply focus, formation cycling and camera focus through three pages. Single-object categories remain on the global bar. Group inspector facts and exact accepted/rejected feedback remain informational; the old rectangular group buttons are no longer dispatched or drawn during gameplay.
+The existing object ring also owns multiple selected objects. It is one context, not one control per soldier. An immutable selected-identity set and component-covered group facts cross the input/render boundary. The first category is Tactical. The Group sector exposes all eight existing composition filters, damaged/supply focus, formation cycling and camera focus through three pages. Current categories use ring sectors or existing mode shortcuts. Group facts and exact accepted/rejected feedback are read-only in the shared ring tooltip; the old rectangular group buttons are no longer dispatched or drawn during gameplay.
 
 Attack, AttackMove, Stop, Hold, Retreat, artillery targeting/cancel and recovery use the existing tactical request adapter with the entire intended selection. Eligibility is displayed before activation; authoritative partial results remain authoritative. Ordinary Move continues through the existing single right-click movement dispatcher and shared-route contract. Formation changes the existing local formation choice for subsequent commands. Supply policy remains the existing single-entity policy; there is no invented group Repair or Supply mutation. Type filters alter only current selection, never saved control-group membership or simulation movement groups.
 

@@ -19,10 +19,10 @@ public sealed class NotificationStackTests
         {
             var layout = GameplayHudLayout.Create(display.Item1, display.Item2, dpi, scale);
             var stack = ActionableAlertLayout.Resolve(Snapshot(), layout, expanded);
-            var dock = layout.VisibleActionDock(expanded);
-            Assert.Equal(dock.Right, stack.Bounds.Right, 3);
+            var dock = layout.TopStatusBar;
+            Assert.Equal(layout.SafeArea.Right, stack.Bounds.Right, 3);
             Assert.Equal(dock.Bottom + layout.Gap, stack.Bounds.Y, 3);
-            Assert.Equal(14*MathF.Max(1,layout.DockContentScale),stack.FontSize);
+            Assert.Equal(14*MathF.Max(1,layout.NotificationScale),stack.FontSize);
             Assert.InRange(stack.Count,0,4);
             Assert.False(stack.Bounds.Intersects(layout.Minimap));
             int detailRows=OperationsLayout.NotificationRows(layout);
@@ -56,6 +56,9 @@ public sealed class NotificationStackTests
     public void CriticalSeveritySurvivesSummaryOnlySpace()
     {
         var snapshot=Snapshot(); var layout=GameplayHudLayout.Create(1280,720,192,2);
+        float scale=ActionableAlertLayout.Scale(layout);
+        float summary=UiFontMetrics.Default.Description.LineHeight/UiFontMetrics.Default.Description.PixelSize*14*scale+8*scale;
+        layout=layout with {AlertStack=layout.AlertStack with {Height=summary}};
         var stack=ActionableAlertLayout.Resolve(snapshot,layout,true);
         Assert.Equal(1,stack.Count); Assert.Equal(5,stack.First.Item.Hidden);
         Assert.Equal(HudAlertSeverity.Critical,NotificationText.Severity(snapshot.PlayerExperience!.Value,stack.First.Item));
@@ -136,7 +139,7 @@ public sealed class NotificationStackTests
     }
 
     [Fact]
-    public void NewSessionAndChangedDockRejectPendingGesture()
+    public void NewSessionAndChangedDisplayRejectPendingGesture()
     {
         var snapshot=Snapshot(); var layout=GameplayHudLayout.Create(1920,1080,96);
         var input=new InputState(); var controller=new ActionableAlertController();
@@ -144,7 +147,7 @@ public sealed class NotificationStackTests
         var rect=ActionableAlertLayout.Resolve(snapshot,layout).Overflow.Bounds;
         Press(input,rect,true); controller.Update(input,snapshot,layout);
         input.BeginFrame(); Press(input,rect,false);
-        Assert.False(controller.Update(input,snapshot,layout,dockExpanded:true).OpenOperations);
+        Assert.False(controller.Update(input,snapshot,GameplayHudLayout.Create(2560,1440,96)).OpenOperations);
         var next=Snapshot(session:2);
         controller.Update(input,next,layout);
         Click(input,rect);
