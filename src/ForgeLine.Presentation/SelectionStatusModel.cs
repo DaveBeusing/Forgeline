@@ -113,4 +113,3 @@ internal static class SelectionInspectorHudModel
                 RtsUiIcon.CursorSelect
         };
 }
-
