@@ -299,6 +299,35 @@ public sealed class ObjectActionRingTests
     }
 
     [Fact]
+    public void RadialPagingWinsWhenSavedCategoryRemapUsesTheSameKey()
+    {
+        var camera = new RtsCameraBindings { RotateRight = PlatformKey.Z };
+        var bindings = new GameplayBindingRegistry(new GameplayBindings()
+            .With(GameplayAction.Build, PlatformKey.E), camera);
+        var snapshot = Snapshot(PlayerActionPanelMode.Tactical, "Ready");
+        var selection = new SelectionSet();
+        selection.SetSingle(Entity);
+        var input = new InputState();
+        var controller = new PlayerActionPanelController(bindings);
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        controller.SynchronizeObjectRing(input, snapshot, World(snapshot), selection, false);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.K));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.K));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(PlayerActionPanelMode.Tactical, controller.Mode);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.E));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(PlayerActionPanelMode.Tactical, controller.Mode);
+        Assert.Equal(4, View(controller, snapshot).Ring.Slots[0].Target.ItemIndex);
+        Assert.False(input.IsKeyDown(PlatformKey.E));
+        Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Fact]
     public void GlobalCategoryNeedsCurrentPointerAndNeverCreatesAnEntityAnchor()
     {
         var source = Snapshot(PlayerActionPanelMode.Construction, "Ready");
