@@ -143,7 +143,8 @@ public sealed partial class PlayerActionPanelController
         int viewportHeight,
         uint dpi = 96,
         float uiScale = 1.0f,
-        SelectionSet? currentSelection = null)
+        SelectionSet? currentSelection = null,
+        bool globalShortcutsBlocked = false)
     {
         _currentSelection = currentSelection;
         _contextualHoveredIndex = -1;
@@ -217,43 +218,43 @@ public sealed partial class PlayerActionPanelController
         if (_ringGlobal && !_ringOpen && _globalAnchorValid)
             _globalAnchor = input.PointerPosition;
 
-        if (Pressed(input, _bindings.Key(GameplayAction.Build)))
+        if (Pressed(input, _bindings.Key(GameplayAction.Build)) && !globalShortcutsBlocked)
         {
             ToggleMode(
                 PlayerActionPanelMode.Construction);
         }
 
-        if (Pressed(input, _bindings.Key(GameplayAction.Process)))
+        if (Pressed(input, _bindings.Key(GameplayAction.Process)) && !globalShortcutsBlocked)
         {
             ToggleMode(
                 PlayerActionPanelMode.Production);
         }
 
-        if (Pressed(input, _bindings.Key(GameplayAction.Units)))
+        if (Pressed(input, _bindings.Key(GameplayAction.Units)) && !globalShortcutsBlocked)
         {
             ToggleMode(
                 PlayerActionPanelMode.UnitProduction);
         }
 
-        if (Pressed(input, _bindings.Key(GameplayAction.Logistics)))
+        if (Pressed(input, _bindings.Key(GameplayAction.Logistics)) && !globalShortcutsBlocked)
         {
             ToggleMode(
                 PlayerActionPanelMode.Logistics);
         }
 
-        if (Pressed(input, _bindings.Key(GameplayAction.Supply)))
+        if (Pressed(input, _bindings.Key(GameplayAction.Supply)) && !globalShortcutsBlocked)
         {
             ToggleMode(
                 PlayerActionPanelMode.Supply);
         }
 
-        if (Pressed(input, _bindings.Key(GameplayAction.Combat)))
+        if (Pressed(input, _bindings.Key(GameplayAction.Combat)) && !globalShortcutsBlocked)
         {
             ToggleMode(
                 PlayerActionPanelMode.Tactical);
         }
 
-        if (Pressed(input, _bindings.Key(GameplayAction.Technology)))
+        if (Pressed(input, _bindings.Key(GameplayAction.Technology)) && !globalShortcutsBlocked)
         {
             ToggleMode(
                 PlayerActionPanelMode.Technology);
