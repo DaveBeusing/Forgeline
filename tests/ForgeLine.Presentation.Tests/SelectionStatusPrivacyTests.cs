@@ -10,27 +10,40 @@ namespace ForgeLine.Presentation.Tests;
 [Collection("Native scene output")]
 public sealed class SelectionStatusPrivacyTests
 {
-    [Fact]
-    public void NativeRingOpacityChangesScenePixelsAndZeroOpacityLeavesNoPaint()
+    [Theory]
+    [InlineData(1600,900)]
+    [InlineData(1028,749)]
+    public void NativeRingOpacityChangesScenePixelsAndZeroOpacityLeavesNoPaint(int width,int height)
     {
         using var platform=new WindowsPlatform();
         using var window=platform.CreateWindow(new("FORGELINE ring opacity",1600,900));
         using var device=GraphicsDeviceFactory.CreateForWindow(window,new(){ForceSoftwareAdapter=true,EnableVSync=false});
+        device.Resize(width,height);
+        device.RenderFrame(GraphicsColor.ForgeLineClear);
+        device.WaitForIdle();
         using var renderer=new PlayerActionRingHudRenderer(device,null);
         var snapshot=HoverTooltipRenderingTests.StatusSnapshot();
-        var layout=GameplayHudLayout.Create(1600,900,96);
-        var geometry=new RadialActionLayout(new(800,450),new(800,450),60,150,8);
         ActionRingSlots slots=default;
         slots[0]=new(default,default,ActionRingNavigation.Back);
-        var ring=new ObjectActionRingView(new(11,1),snapshot.SessionId,1,1,true,true,geometry,true) {Slots=slots};
-        var panel=default(PlayerActionPanelView) with {Ring=ring};
+        int frameWidth=0,frameHeight=0;
+        Vector2 point=default;
         byte[] Capture(float opacity) => device.CaptureFrame(new GraphicsColor(.8f,.7f,.6f,1),c=>{
+            frameWidth=c.Width;frameHeight=c.Height;
+            var layout=GameplayHudLayout.Create(c.Width,c.Height,96);
+            var center=new Vector2(c.Width/2f,c.Height/2f);
+            var geometry=new RadialActionLayout(center,center,60,150,8);
+            var ring=new ObjectActionRingView(new(11,1),snapshot.SessionId,1,1,true,true,geometry,true) {Slots=slots};
+            var panel=default(PlayerActionPanelView) with {Ring=ring with {Opacity=opacity}};
+            point=geometry.Center+RadialActionLayout.Direction(geometry.Start(0)+.1f)*(geometry.InnerRadius+10);
             c.BeginPass(GraphicsFramePass.Overlay);
-            renderer.Render(c,snapshot,panel with {Ring=ring with {Opacity=opacity}},default,default,layout);
+            renderer.Render(c,snapshot,panel,default,default,layout);
         });
         var clear=Capture(0);var full=Capture(1);var half=Capture(.5f);
-        var point=geometry.Center+RadialActionLayout.Direction(geometry.Start(0)+.1f)*(geometry.InnerRadius+10);
-        int offset=((int)point.Y*1600+(int)point.X)*4;
+        Assert.Equal(frameWidth*frameHeight*4,clear.Length);
+        Assert.Equal(clear.Length,full.Length);
+        Assert.Equal(clear.Length,half.Length);
+        int offset=((int)point.Y*frameWidth+(int)point.X)*4;
+        Assert.InRange(offset,0,clear.Length-4);
         for(int channel=0;channel<3;channel++) {
             Assert.True(full[offset+channel]<half[offset+channel]);
             Assert.True(half[offset+channel]<clear[offset+channel]);

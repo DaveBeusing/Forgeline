@@ -90,7 +90,7 @@ rechecked at `09b5f1ae51164dadeb56d2d37249c114f509a5dc`. No tag or release was c
 | Release solution build | Zero warnings/errors | `nonoverlap-build2.txt` |
 | Project reference graph | 46 projects, no cycles or boundary violations | `Validate-ProjectReferences.ps1` |
 | Version contract | 0.1.408, one PATCH above current master 0.1.407 | `Validate-SemVer.ps1 -BaseRef origin/master` |
-| Full Presentation project | 1,292 passed, 12 skipped, 0 failed (1,304 total) | `presentation-full-tests3.txt` |
+| Full Presentation project | 1,293 passed, 12 skipped, 0 failed (1,305 total) | `presentation-full-tests4.txt` |
 | Full Client project | 429 passed, 2 skipped, 0 failed (431 total) | `client-full-tests3.txt` |
 | Native resource regression | 6 passed after correcting obsolete expectations downward | `native-resource-tests.txt` |
 | Native ring alpha regression | 12 passed, including real full/half/zero-opacity pixels | `ring-alpha-tests.txt` |
@@ -200,3 +200,27 @@ bright/dark terrain and sustained target-refresh load. Physical DPI 96/192 monit
 moves, human motion/readability/accessibility approval and that live playthrough
 have not been performed. The PR remains draft for these explicit acceptance gates;
 no merge/release approval is implied by the automated/native results.
+
+
+### CI viewport regression
+
+[CI run 39300039286](https://github.com/DaveBeusing/Forgeline/actions/runs/39300039286)
+on `75b3d526ac551b04d5ad39c660cb3e619d16a5a9` passed asset compilation and the atlas
+contracts, then reported 26 passes and one failure in the native HUD skin step.
+The new opacity test hardcoded a 1600-pixel row stride and a 1600x900 layout;
+the runner's actual window/backbuffer was 1028x749. It sampled a different pixel.
+The same assertion failure is reproduced locally after settling an explicit
+1028x749 resize (`ci-opacity-repro2.txt`); the original 1600x900 case passes.
+The first local resize attempt, before settling the surface, is also retained in
+`ci-opacity-repro.txt` and is not treated as the pixel-assertion reproducer.
+
+The native test now creates layout, ring center and sample coordinates from the
+actual capture context, uses the actual row stride, and checks framebuffer length
+and pixel index. Both 1600x900 and 1028x749 are explicit cases. Full/half/zero alpha
+ordering remains strict in all RGB channels; no assertion, native gate or budget
+was weakened. All three native opacity/privacy cases pass (`ci-opacity-fixed.txt`).
+This is a test-coordinate correction; production rendering and the 121 source-pinned
+native captures above are unchanged. Final per-head CI is tracked on the PR.
+
+The complete Presentation project was rerun after the viewport correction:
+1,293 passed, 12 skipped, zero failed out of 1,305 (`presentation-full-tests4.txt`).
