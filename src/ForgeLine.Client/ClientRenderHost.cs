@@ -727,7 +727,9 @@ internal sealed class ClientRenderHost : IDisposable
                             renderAlpha, snapshot, ringLayout, occupied) };
                         inputRing = animatedPanel.Ring;
                         animatedPanel = animatedPanel with { Ring = ringMotion.Update(animatedPanel.Ring, uiNow,
-                            current.MetricsActive && current.FeedbackSettings.Animate(qualityProfile.Active)) };
+                            current.MetricsActive && !current.SurfaceSuspended && current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
+                            current.FeedbackSettings.Animate(qualityProfile.Active),
+                            new RingMotionViewport(context.Width, context.Height, current.Dpi, current.UiScale)) };
                         gameplayHudRenderer.Render(
                             context,
                             renderCamera,
