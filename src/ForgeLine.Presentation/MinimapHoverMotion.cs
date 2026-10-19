@@ -30,7 +30,7 @@ internal sealed class MinimapHoverMotion
     internal HudRect Bounds { get; private set; }
 
     internal HudRect Update(in GameplayHudLayout layout, Vector2 pointer, bool hasPointer,
-        TimeSpan now, bool active, bool animate, bool ownsGesture = false)
+        TimeSpan now, bool active, bool animate, bool ownsGesture = false, HudRect ringBounds = default)
     {
         HudRect original = layout.Minimap;
         if (!active || original.IsEmpty || layout.SafeArea.IsEmpty || now < TimeSpan.Zero)
