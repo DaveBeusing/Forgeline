@@ -142,7 +142,7 @@ internal static class HoverTooltipPlacement
         float gap=MathF.Min(layout.Gap,8);
         Span<float> xs=stackalloc float[40];Span<float> ys=stackalloc float[40];
         var center=ring.Geometry.Center;
-        xs[0]=center.X+ring.Geometry.OuterRadius+gap;xs[1]=center.X-ring.Geometry.OuterRadius-gap-width;
+        xs[0]=center.X+ring.Geometry.OuterRadius+gap+2;xs[1]=center.X-ring.Geometry.OuterRadius-gap-width-2;
         xs[2]=center.X-width/2;xs[3]=safe.X;xs[4]=safe.Right-width;
         ys[0]=center.Y-height/2;ys[1]=center.Y+ring.Geometry.OuterRadius+gap;
         ys[2]=center.Y-ring.Geometry.OuterRadius-gap-height;ys[3]=safe.Y;ys[4]=safe.Bottom-height;
