@@ -2,6 +2,10 @@
 
 Constructing a building spends Command Core construction stock. It does not fill the new building's local production inventory. Cargo Trucks replenish building inputs through regional distribution; Supply Trucks carry Fuel/Ammunition for field recipients and use a separate drive tank. A Supply Truck is not an available regional Cargo Truck.
 
+## World loading and holding visualization
+
+When an owned logistics building or assigned vehicle is selected or hovered, the game can show its currently validated loading area (yellow diagonal hatch) and assigned queue/holding positions (cyan reverse hatch). A blocked or unavailable copied assignment uses a warning tint; the hatch itself is visual guidance, not a new route or placement command. The active Logistics context may reveal a bounded subset of these current, authoritative zones without permanently painting all yards. No hatch is created for an empty/unvalidated loading bay or an unassigned vehicle, and the printed shape is never used to determine occupancy. Existing `WAITING FOR LOADING BAY`, `ALIGNING`, `LOADING` and `LEAVING BAY` statuses remain authoritative.
+
 ## First production chain
 
 1. Use BUILD to construct power, a Smelter and a Vehicle Factory at valid sites. Suitable buildings connect automatically to nearby road nodes. There is no manual CONNECT ROUTE step.

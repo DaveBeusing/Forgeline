@@ -1,5 +1,7 @@
 # Vehicle loading queues
 
+The presentation-only world overlay displays cyan, oppositely hatched holding rectangles for actual `VehicleQueueEntry.Target` positions using the currently registered truck's physical width/length and heading. Valid `VehicleQueueHolding.Target` positions are also shown where applicable, but geometry-blocked targets are omitted. Blocked/unavailable copied queue reasons use a distinct warning tint. No speculative empty queue spaces are filled, and the queue still owns its target, generation, capacity, and movement behavior. A missing/destroyed/foreign building or truck cannot supply an overlay; no new navigation costs or reservations are introduced. Native source review remains outstanding.
+
 Building loading uses one FIFO roster shared by Cargo Trucks and Supply Trucks
 and the existing exclusive `VehicleDockingService`. The roster does not own a
 second service bay. The current building catalog provides one compatible bay per
