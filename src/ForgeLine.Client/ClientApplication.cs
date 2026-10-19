@@ -2151,18 +2151,8 @@ internal sealed class ClientApplication
         selectionController.CommandFeedback.Draw(gameplayDraw);
         tacticalFeedback.Draw(gameplayDraw);
 
-        Vector4 selectedColor =
-            new(
-                0.25f,
-                1.0f,
-                0.35f,
-                1.0f);
-        Vector4 hoveredColor =
-            new(
-                0.15f,
-                0.85f,
-                1.0f,
-                1.0f);
+        Vector4 selectedColor = RtsSelectionVisualStyle.Selected;
+        Vector4 hoveredColor = RtsSelectionVisualStyle.Hovered;
         Vector4 placementValidColor =
             new(
                 0.15f,
@@ -2265,7 +2255,7 @@ internal sealed class ClientApplication
                 gameplayDraw,
                 hoveredInstance,
                 hoveredInstance.Selectable.Owner.IsSpecified && hoveredInstance.Selectable.Owner != LocalPlayer
-                    ? new Vector4(1.0f, 0.45f, 0.2f, 1.0f) : hoveredColor,
+                    ? RtsSelectionVisualStyle.ForeignHover : hoveredColor,
                 terrain,
                 minimumMarkerRadius,
                 foreignOwned: hoveredInstance.Selectable.Owner.IsSpecified && hoveredInstance.Selectable.Owner != LocalPlayer);

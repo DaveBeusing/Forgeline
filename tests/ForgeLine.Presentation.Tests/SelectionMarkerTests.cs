@@ -11,43 +11,59 @@ public sealed class SelectionMarkerTests
     [Theory]
     [InlineData(ControllableEntityCategory.Unit, 8f, 12f)]
     [InlineData(ControllableEntityCategory.Building, 60f, 90f)]
-    public void OrientedEllipseFitsEachFootprintAxisAndSamplesSlopedTerrain(
+    public void SelectedCornerMarkersRespectOrientedFootprintsAndSlopedTerrain(
         ControllableEntityCategory category, float width, float depth)
     {
         RenderInstance instance = Instance(category, new(width, 10f, depth));
         var draw = new DebugDraw { Enabled = true };
         RtsWorldMarkerVisualization.DrawSelected(draw, instance, Vector4.One, new SlopedTerrain());
-        Assert.Equal(24, draw.Lines.Length);
-        float radiusX = width * .55f, radiusZ = depth * .55f;
+        Assert.Equal(8, draw.Lines.Length);
+        for (int corner = 0; corner < 4; corner++)
+        {
+            Vector3 expected = TacticalFootprint.Corner(instance, corner, terrain: new SlopedTerrain());
+            Assert.Equal(expected, draw.Lines[corner * 2].Start);
+            Assert.Equal(expected, draw.Lines[corner * 2 + 1].Start);
+        }
         foreach (DebugLine line in draw.Lines)
         {
-            Vector3 p = line.Start;
-            Assert.InRange(p.X * p.X / (radiusX * radiusX) + p.Z * p.Z / (radiusZ * radiusZ), .999f, 1.001f);
-            Assert.InRange(p.Y, p.X * 0.1f + p.Z * 0.2f + 0.079f, p.X * 0.1f + p.Z * 0.2f + 0.081f);
+            foreach (Vector3 point in new[] { line.Start, line.End })
+            {
+                Assert.InRange(point.X, -width * .55f - .01f, width * .55f + .01f);
+                Assert.InRange(point.Z, -depth * .55f - .01f, depth * .55f + .01f);
+                Assert.InRange(point.Y, point.X * .1f + point.Z * .2f + .079f,
+                    point.X * .1f + point.Z * .2f + .081f);
+            }
         }
     }
 
     [Fact]
-    public void HiddenObjectsEmitNoMarkerAndHoverUsesBrokenRing()
+    public void HiddenObjectsEmitNoMarkerAndHoverUsesFourDiagonalNotches()
     {
         var draw = new DebugDraw { Enabled = true };
         RenderInstance instance = Instance(ControllableEntityCategory.Unit, new(8f));
         RtsWorldMarkerVisualization.DrawHover(draw, instance, Vector4.One);
-        Assert.Equal(12, draw.Lines.Length);
+        Assert.Equal(4, draw.Lines.Length);
         draw.Clear();
         RtsWorldMarkerVisualization.DrawSelected(draw, instance with { Visibility = RenderVisibilityMask.None }, Vector4.One);
         Assert.Empty(draw.Lines.ToArray());
     }
 
     [Fact]
-    public void MinimumZoomRadiusAndForeignHoverRemainDistinctWithoutColor()
+    public void ForeignHoverUsesExtraOutwardTicksWithoutAnEllipse()
     {
         var draw = new DebugDraw { Enabled = true };
         RenderInstance instance = Instance(ControllableEntityCategory.Unit, new(1f));
         RtsWorldMarkerVisualization.DrawHover(draw, instance, Vector4.One, minimumRadius: 8f, foreignOwned: true);
-        Assert.Equal(16, draw.Lines.Length);
-        Assert.All(draw.Lines.ToArray(), line =>
-            Assert.InRange(new Vector2(line.Start.X, line.Start.Z).Length(), 7.999f, 8.001f));
+        Assert.Equal(8, draw.Lines.Length);
+        Assert.All(draw.Lines.ToArray(), line => Assert.True(Vector3.Distance(line.Start, line.End) > 0));
+        for (int corner = 0; corner < 4; corner++)
+        {
+            Assert.Equal(draw.Lines[corner * 2].Start, draw.Lines[corner * 2 + 1].Start);
+            Assert.True(new Vector2(draw.Lines[corner * 2 + 1].End.X,
+                draw.Lines[corner * 2 + 1].End.Z).LengthSquared() >
+                new Vector2(draw.Lines[corner * 2 + 1].Start.X,
+                    draw.Lines[corner * 2 + 1].Start.Z).LengthSquared());
+        }
     }
 
     [Fact]
@@ -58,7 +74,7 @@ public sealed class SelectionMarkerTests
         {
             RtsWorldMarkerVisualization.DrawSelected(draw, Instance(ControllableEntityCategory.Unit, new(8f)), Vector4.One);
         }
-        Assert.Equal(24_000, draw.Lines.Length);
+        Assert.Equal(8_000, draw.Lines.Length);
         Assert.True(draw.Lines.Length < 32_768);
     }
 
@@ -76,6 +92,17 @@ public sealed class SelectionMarkerTests
         Assert.InRange(Vector3.Distance(a,b),13.199f,13.201f);
         var slope = TacticalFootprint.Corner(instance,0,terrain:new SlopedTerrain());
         Assert.InRange(slope.Y,slope.X*.1f+slope.Z*.2f+.079f,slope.X*.1f+slope.Z*.2f+.081f);
+    }
+
+    [Fact]
+    public void TechnicalRangeCirclesAndTargetFeedbackRemainAvailable()
+    {
+        var draw = new DebugDraw { Enabled = true };
+        draw.Circle(new Vector3(2, 0, 3), 10, Vector4.One, 24);
+        Assert.Equal(24, draw.Lines.Length);
+        draw.Clear();
+        RtsWorldMarkerVisualization.DrawTarget(draw, Vector3.Zero, true, Vector4.One, Vector4.One);
+        Assert.Equal(22, draw.Lines.Length);
     }
 
     private static RenderInstance Instance(ControllableEntityCategory category, Vector3 scale) =>

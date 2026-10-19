@@ -176,9 +176,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             EmitSelectionRectangle(
                 view.DragStart,
                 view.DragCurrent,
-                ResolveColor(
-                    RtsUiIcon.CursorDragSelect),
-                scale,
                 context.Width,
                 context.Height);
         }
@@ -266,7 +263,9 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 {
                     LastWorldCorners++;
                     _skin.Projected("ui.artwork.directorate.world.selection_corner.p32", a.Position, b.Position, c.Position, d.Position,
-                        primary ? new Vector4(.25f,1,.35f,1) : new Vector4(.15f,.85f,1,1));
+                        primary ? RtsSelectionVisualStyle.Selected :
+                            instance.Selectable.Owner.IsSpecified && instance.Selectable.Owner != experience.Player
+                                ? RtsSelectionVisualStyle.ForeignHover : RtsSelectionVisualStyle.Hovered);
                 }
             }
             // Aggregate selection values must never be painted onto one member of a group.
@@ -279,7 +278,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             {
                 LastWorldMeters++;
                 Vector4 healthColor = facts.HealthFraction <= .25 ? ForgeLineUiPalette.Critical :
-                    facts.HealthFraction <= .5 ? ForgeLineUiPalette.Warning : new(.25f,1,.35f,1);
+                    facts.HealthFraction <= .5 ? ForgeLineUiPalette.Warning : RtsSelectionVisualStyle.Selected;
                 _skin.Bar(new(x,y,48*scale,4*scale), facts.HealthFraction, healthColor);
             }
             if (facts.HasSupply && double.IsFinite(facts.FuelFraction) && double.IsFinite(facts.AmmunitionFraction))
@@ -1838,8 +1837,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     private void EmitSelectionRectangle(
         Vector2 first,
         Vector2 second,
-        Vector4 color,
-        float scale,
         int width,
         int height)
     {
@@ -1851,10 +1848,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             Vector2.Max(
                 first,
                 second);
-        float thickness =
-            Math.Max(
-                1.0f,
-                2.0f * scale);
+        // Physical client pixels: independent of UI zoom and monitor DPI.
+        float thickness = RtsSelectionVisualStyle.MarqueeBorderPixels;
 
         minimum = Vector2.Clamp(minimum, Vector2.Zero, new Vector2(width, height));
         maximum = Vector2.Clamp(maximum, Vector2.Zero, new Vector2(width, height));
@@ -1865,10 +1860,9 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         }
 
         EmitQuad(minimum.X, minimum.Y, maximum.X - minimum.X, maximum.Y - minimum.Y,
-            new Vector4(color.X, color.Y, color.Z, 0.10f), width, height);
-        EmitRectangleOutline(minimum, maximum, thickness + 2.0f * scale,
-            new Vector4(0.01f, 0.02f, 0.03f, 0.95f), width, height);
-        EmitRectangleOutline(minimum, maximum, thickness, color, width, height);
+            RtsSelectionVisualStyle.MarqueeFill, width, height);
+        EmitRectangleOutline(minimum, maximum, thickness,
+            RtsSelectionVisualStyle.MarqueeBorder, width, height);
     }
 
     private void EmitRectangleOutline(
