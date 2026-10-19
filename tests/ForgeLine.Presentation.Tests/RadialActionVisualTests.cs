@@ -44,6 +44,25 @@ public sealed class RadialActionVisualTests
         Assert.True(GameplayHudVisualStyle.TextSecondary.W > .30f);
     }
 
+    [Theory]
+    [InlineData(true, false, false)]
+    [InlineData(false, false, false)]
+    [InlineData(true, true, false)]
+    [InlineData(true, false, true)]
+    public void HoverDarkensOnlySegmentBackgroundWhileRetainingAlphaAndStatusContrast(
+        bool enabled, bool pressed, bool pending)
+    {
+        var idle = RadialActionVisuals.Background(enabled, false, pressed, pending, 1);
+        var hovered = RadialActionVisuals.Background(enabled, true, pressed, pending, 1);
+        Assert.Equal(.30f, hovered.W);
+        Assert.True(hovered.X < idle.X && hovered.Y < idle.Y && hovered.Z < idle.Z);
+        var outline = RadialActionVisuals.HoverArc(enabled, pressed, pending, 1);
+        Assert.True(outline.W > hovered.W);
+        Assert.Equal(0, RadialActionVisuals.HoverArc(enabled, pressed, pending, 0).W);
+        Assert.InRange(RadialActionVisuals.HoverArcWidth(1), 1.5f, 4);
+        Assert.True(GameplayHudVisualStyle.TextPrimary.W > hovered.W);
+    }
+
     [Fact]
     public void DirectionReversalKeepsContinuousAlphaAndReleasesWorldInput()
     {
