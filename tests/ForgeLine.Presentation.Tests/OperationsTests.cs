@@ -409,6 +409,45 @@ public sealed class OperationsTests
         Assert.False(controller.Update(input, snapshot, layout, interaction).Captured);
     }
 
+    [Fact]
+    public void AlertDetailsAndFilteredOperationsRemainAvailableWithoutPersistentStrip()
+    {
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var controller = new OperationsController();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var snapshot = Snapshot();
+        controller.Update(input, snapshot, layout, interaction);
+
+        controller.OpenNotifications(snapshot.SessionId, interaction);
+        Assert.True(controller.View.Open);
+        Assert.True(controller.View.Notifications);
+        Assert.True(controller.ContainsSurface(
+            new Vector2(OperationsLayout.Panel(layout).X + 12,
+                OperationsLayout.Panel(layout).Y + 35), layout));
+
+        controller.Close(input, interaction);
+        controller.OpenCategory(OperationsCategory.Blocked, snapshot.SessionId, interaction);
+        Assert.Equal(OperationsCategory.Blocked, controller.View.Filter);
+        Assert.True(interaction.Capture().OperationsOpen);
+        Assert.True(controller.View.Open);
+    }
+
+    [Fact]
+    public void StrategicOverlaySelectionAndMinimapVisibilityAreIndependentOfOperations()
+    {
+        var overlays = new RtsInformationLayerController();
+        Assert.True(overlays.MinimapEnabled);
+        overlays.CycleOverlay();
+        Assert.Equal(StrategicOverlayMode.Logistics, overlays.OverlayMode);
+        Assert.False(string.IsNullOrWhiteSpace(RtsStrategicOverlayHudModel.Legend(overlays.OverlayMode)));
+        overlays.ToggleMinimap();
+        Assert.False(overlays.MinimapEnabled);
+        overlays.ToggleMinimap();
+        Assert.True(overlays.MinimapEnabled);
+        Assert.Equal(StrategicOverlayMode.Logistics, overlays.OverlayMode);
+    }
+
     private static OperationsFacility Facility(EntityId entity) => new(entity, "FACILITY", OperationsCategory.Production,
         "NoInput", "NoInput", "INPUT STOCK INSUFFICIENT", 2, null, null, null, null, null, null, PlayerActionPanelMode.Production);
     private static PresentationSnapshot Snapshot(OperationsSnapshot? data = null, ulong tick = 4, ulong session = 1, uint player = 1, bool terminal = false)
