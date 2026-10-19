@@ -33,11 +33,11 @@ public sealed class RtsCameraActionMapper
         }
 
         float rotation = Axis(
-            RotationKeyDown(state, Bindings.RotateRight, contextOwnsQe),
-            RotationKeyDown(state, Bindings.RotateLeft, contextOwnsQe));
+            ContextKeyDown(state, Bindings.RotateRight, contextOwnsQe),
+            ContextKeyDown(state, Bindings.RotateLeft, contextOwnsQe));
         float pitch = Axis(
-            RotationKeyDown(state, Bindings.PitchUp, contextOwnsQe),
-            RotationKeyDown(state, Bindings.PitchDown, contextOwnsQe));
+            ContextKeyDown(state, Bindings.PitchUp, contextOwnsQe),
+            ContextKeyDown(state, Bindings.PitchDown, contextOwnsQe));
 
         return new RtsCameraInputFrame(
             pan,
@@ -50,7 +50,7 @@ public sealed class RtsCameraActionMapper
             pointerCaptured ? Vector2.Zero : state.PointerDelta);
     }
 
-    private static bool RotationKeyDown(InputState state, PlatformKey key, bool contextOwnsQe) =>
+    private static bool ContextKeyDown(InputState state, PlatformKey key, bool contextOwnsQe) =>
         (!contextOwnsQe || key is not (PlatformKey.Q or PlatformKey.E)) &&
         state.IsKeyDown(key);
 
@@ -58,8 +58,8 @@ public sealed class RtsCameraActionMapper
         InputState state,
         PlatformKey primary,
         PlatformKey alternate, bool contextOwnsQe) =>
-        RotationKeyDown(state, primary, contextOwnsQe) ||
-        RotationKeyDown(state, alternate, contextOwnsQe);
+        ContextKeyDown(state, primary, contextOwnsQe) ||
+        ContextKeyDown(state, alternate, contextOwnsQe);
 
     private static float Axis(bool positive, bool negative) =>
         (positive ? 1.0f : 0.0f) - (negative ? 1.0f : 0.0f);
