@@ -482,13 +482,14 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 EmitText(visible, card.Text.X, card.Text.Y, TextColor with { W = visibility }, width, height);
             if (!card.Action.IsEmpty && item.Hidden == 0)
             {
-                string label = item.Feedback || item.Local ? "MORE" : "OPS";
-                if (alerts is not null)
+                bool collapsedMore = card.Truncated && card.Action == card.Details;
+                string label = collapsedMore || item.Feedback || item.Local ? "MORE" : "OPS";
+                if (!collapsedMore && alerts is not null)
                     for (int a = 0; a < alerts.Alerts.Count; a++)
                         if (alerts.Alerts[a].Identity.Kind == item.Kind && alerts.Alerts[a].Target.IsValid) label = "FOCUS";
                 EmitNotificationAction(label, card.Action, stack.FontSize, width, height, visibility);
             }
-            if (card.Truncated && !card.Details.IsEmpty && item.Hidden == 0)
+            if (card.Truncated && !card.Details.IsEmpty && card.Details != card.Action && item.Hidden == 0)
                 EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height, visibility);
         }
         // Retired cards paint only a short-lived, noninteractive background. Their old
