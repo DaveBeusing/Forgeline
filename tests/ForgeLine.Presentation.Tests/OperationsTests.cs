@@ -329,6 +329,60 @@ public sealed class OperationsTests
         Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
         Assert.InRange(renderer.LastRenderedVertexCount, 1, OperationsHudSurface.MaxVertices);
     }
+    [Fact]
+    public void PersistentOperationsToggleOpensAndClosesTheSamePanelOncePerPress()
+    {
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var controller = new OperationsController();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var snapshot = Snapshot();
+        HudRect entry = OperationsLayout.Entry(layout);
+        Assert.False(entry.IsEmpty);
+
+        Click(input, entry);
+        Assert.True(controller.Update(input, snapshot, layout, interaction).Captured);
+        Assert.True(controller.View.Open);
+        controller.Update(input, snapshot, layout, interaction);
+        Assert.True(controller.View.Open);
+        Assert.True(interaction.Capture().OperationsOpen);
+
+        Click(input, entry);
+        Assert.True(controller.Update(input, snapshot, layout, interaction).Captured);
+        Assert.False(controller.View.Open);
+        controller.Update(input, snapshot, layout, interaction);
+        Assert.False(controller.View.Open);
+        Assert.False(interaction.Capture().OperationsOpen);
+
+        Click(input, entry);
+        controller.Update(input, snapshot, layout, interaction);
+        Assert.True(controller.View.Open);
+    }
+
+    [Fact]
+    public void EmptyOpenedPanelAreaCapturesPointerWhileClosedAreaIsWorldAccessible()
+    {
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var controller = new OperationsController();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var snapshot = Snapshot();
+        controller.Update(input, snapshot, layout, interaction);
+        var panel = OperationsLayout.Panel(layout);
+        var emptySpace = new System.Numerics.Vector2(panel.X + panel.Width * .5f, panel.Y + 50);
+        Assert.False(controller.ContainsSurface(emptySpace, layout));
+
+        controller.OpenCategory(OperationsCategory.Power, snapshot.SessionId, interaction);
+        Assert.True(controller.ContainsSurface(emptySpace, layout));
+        input.Apply(PlatformInputEvent.PointerMoved((int)emptySpace.X, (int)emptySpace.Y));
+        Assert.True(controller.Update(input, snapshot, layout, interaction).Captured);
+        Assert.Equal(OperationsCategory.Power, controller.View.Filter);
+
+        controller.Close(input, interaction);
+        Assert.False(controller.ContainsSurface(emptySpace, layout));
+        Assert.False(controller.Update(input, snapshot, layout, interaction).Captured);
+    }
+
     private static OperationsFacility Facility(EntityId entity) => new(entity, "FACILITY", OperationsCategory.Production,
         "NoInput", "NoInput", "INPUT STOCK INSUFFICIENT", 2, null, null, null, null, null, null, PlayerActionPanelMode.Production);
     private static PresentationSnapshot Snapshot(OperationsSnapshot? data = null, ulong tick = 4, ulong session = 1, uint player = 1, bool terminal = false)

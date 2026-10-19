@@ -132,7 +132,7 @@ public sealed class OperationsController
             return new(input.HasPointerPosition && tab.Contains(input.PointerPosition));
         }
         interaction.SetOperationsOpen(View.Open);
-        var entry = View.Open ? default : OperationsLayout.Entry(layout);
+        var entry = OperationsLayout.Entry(layout);
         var panel = OperationsLayout.Panel(layout);
         bool captured = input.HasPointerPosition && (entry.Contains(input.PointerPosition) || View.Open && panel.Contains(input.PointerPosition));
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
@@ -141,7 +141,9 @@ public sealed class OperationsController
             !snapshot.SessionId.IsSpecified || snapshot.PlayerExperience.Value.IsMatchComplete) return new(captured);
         if (entry.Contains(origin))
         {
-            View = new(!View.Open, Session: _session); interaction.SetOperationsOpen(View.Open); return new(true);
+            if (View.Open) Close(input, interaction);
+            else { View = new(true, Session: _session); interaction.SetOperationsOpen(true); }
+            return new(true);
         }
         if (!View.Open && layout.TopStatusBar.Contains(origin))
         { View = new(true, Session: _session); interaction.SetOperationsOpen(true); return new(true); }
