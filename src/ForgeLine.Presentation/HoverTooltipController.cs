@@ -55,7 +55,10 @@ public sealed class HoverTooltipController
         int count = panel.SelectionPending ? 0 : PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
         // The selected-object inspector is persistent while its ring is open;
         // hovering an action sector must not replace the authorized object facts.
-        if (statusAvailable && !panel.Ring.Global && !panel.SelectionPending)
+        if (statusAvailable && !panel.Ring.Global && !panel.SelectionPending &&
+            snapshot.PlayerExperience is { } selectedExperience &&
+            selectedExperience.Selection.Count > 0 &&
+            (!panel.Ring.SingleOwned || selectedExperience.Selection.PrimaryEntity == panel.Ring.Entity))
         {
             next = next with { SelectionStatus = true, SelectionRevision = panel.Ring.SelectionRevision,
                 MenuRevision = panel.Ring.Revision, PointerPosition = panel.Ring.Geometry.Center };
