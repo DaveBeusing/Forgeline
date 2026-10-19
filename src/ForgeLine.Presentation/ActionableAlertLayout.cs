@@ -4,7 +4,7 @@ using ForgeLine.Game;
 namespace ForgeLine.Presentation;
 
 public readonly record struct NotificationCardLayout(AlertNotification Item, HudRect Bounds, HudRect Text,
-    HudRect Action, HudRect Details, bool Truncated, ulong Revision = 0);
+    HudRect Action, HudRect Details, bool Truncated, ulong Revision = 0, AlertIdentity Identity = default);
 
 public readonly record struct NotificationStackLayout(HudRect Bounds, float FontSize, int Count,
     NotificationCardLayout First = default, NotificationCardLayout Second = default,
@@ -73,7 +73,12 @@ public static class ActionableAlertLayout
                 ? new HudRect(rect.Right - padding - controlWidth, content.Y, controlWidth, line) : default;
             var details = truncated && actionRequired
                 ? new HudRect(action.X - gap - controlWidth, content.Y, controlWidth, line) : default;
-            cards[count++] = new(item, rect, content, action, details, truncated, NotificationText.Revision(value));
+            AlertIdentity identity = default;
+            if (alerts is not null && !item.Feedback && !item.Local)
+                for (int a = 0; a < alerts.Alerts.Count; a++)
+                    if (alerts.Alerts[a].Identity.Kind == item.Kind)
+                    { identity = alerts.Alerts[a].Identity; break; }
+            cards[count++] = new(item, rect, content, action, details, truncated, NotificationText.Revision(value), identity);
             consumed++; y += height + gap;
         }
         if (consumed < total && y + summary <= bounds.Bottom)
