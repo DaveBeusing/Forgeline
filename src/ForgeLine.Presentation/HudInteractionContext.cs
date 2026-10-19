@@ -49,7 +49,7 @@ public sealed class HudInteractionContext
     public static bool BlocksWorldPointer(
         Vector2 position, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false, bool includeActionDock = true, OnboardingPresentation? onboarding = null, bool includePrimaryCommands = true) =>
         layout.TopStatusBar.Contains(position) ||
-        (minimapEnabled && layout.Minimap.Contains(position)) ||
+        (minimapEnabled && RtsMinimapInteractionLayout.IsInteractiveSurface(position, layout)) ||
         (onboarding?.Contains(position) ?? (guidanceVisible && GameplayGuidanceLayout.Resolve(layout).Contains(position)));
 
     public static bool CapturesWorldPointer(

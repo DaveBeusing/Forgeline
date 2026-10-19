@@ -10,6 +10,11 @@ public sealed partial class PlayerActionPanelController
 {
     public bool SingleObjectActions => _ringContext && !_ringGlobal && _ringGroup is null;
     public bool ObjectActions => _ringContext;
+    public HudRect PresentedRingBounds => _presentedRing.Open && _presentedRing.Resolved && _presentedRing.Geometry.IsValid
+        ? new HudRect(_presentedRing.Geometry.Center.X - _presentedRing.Geometry.OuterRadius - 2,
+            _presentedRing.Geometry.Center.Y - _presentedRing.Geometry.OuterRadius - 2,
+            (_presentedRing.Geometry.OuterRadius + 2) * 2, (_presentedRing.Geometry.OuterRadius + 2) * 2)
+        : default;
     private GroupActionRingContext? _ringGroup;
     private SimulationTick? _groupTick;
     private bool _reopenSelection;
