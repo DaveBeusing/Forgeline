@@ -594,6 +594,45 @@ public sealed class RtsMinimapInteractionTests
     }
 
     [Fact]
+    public void RightClickInExpandedOnlyMapUsesPublishedPointerTransformExactlyOnce()
+    {
+        var controller = new RtsMinimapInteractionController();
+        var input = new InputState();
+        var terrain = new FlatTerrain();
+        var camera = new RtsCamera(new RtsCameraSettings { EdgeScrollEnabled = false });
+        GameplayHudLayout layout = GameplayHudLayout.Create(1600, 900, 96);
+        Vector2 hover = Center(RtsMinimapInteractionLayout.GetMapRect(layout));
+        MovePointer(input, hover);
+        controller.Update(input, camera, terrain, Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.Zero, expandOnHover: true, animateHover: true);
+        input.BeginFrame();
+        controller.Update(input, camera, terrain, Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.FromMilliseconds(180), expandOnHover: true, animateHover: true);
+
+        GameplayHudLayout expanded = layout with { Minimap = controller.DisplayedBounds };
+        HudRect map = RtsMinimapInteractionLayout.GetMapRect(expanded);
+        Vector2 click = new(map.X + 18, map.Y + map.Height * .5f);
+        Assert.False(RtsMinimapInteractionLayout.IsInteractiveSurface(click, layout));
+        Assert.True(RtsMinimapInteractionLayout.TryMapPointerToWorld(
+            click, expanded, terrain.WorldBounds, out Vector3 expected));
+        Assert.InRange(expected.X, 0, terrain.WorldBounds.Maximum.X);
+
+        input.BeginFrame();
+        MovePointer(input, click);
+        SetSecondary(input, true, click);
+        EntityId selected = new(82, 1);
+        controller.Update(input, camera, terrain, Snapshot(), layout, [selected],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.FromMilliseconds(200), expandOnHover: true, animateHover: true);
+        Assert.True(controller.PointerCaptured);
+        Assert.True(controller.TryTakeMovementRequest(out MovementOrderRequest request));
+        Assert.Equal(new[] { selected }, request.Entities.ToArray());
+        Assert.False(controller.TryTakeMovementRequest(out _));
+    }
+
+    [Fact]
     public void MinimapDragKeepsInputUntilReleaseBeyondAnimatedBounds()
     {
         var controller = new RtsMinimapInteractionController();
