@@ -451,6 +451,8 @@ internal sealed class ClientRenderHost : IDisposable
                 new DebugDrawRenderer(
                     graphics,
                     depthEnabled: true);
+            using var dockingZoneRenderer =
+                new DebugDrawRenderer(graphics, depthEnabled: true, lineWidthPixels: 2.0f);
             using var gameplayHudRenderer =
                 new GameplayHudRenderer(
                     graphics,
@@ -473,6 +475,7 @@ internal sealed class ClientRenderHost : IDisposable
                 new DebugDraw();
             var debugDraw =
                 new DebugDraw();
+            var dockingZoneDraw = new DebugDraw { Enabled = true };
             var frameTimingTracker =
                 new FrameTimingTracker();
             var runtimeMetricsSampler = new RuntimeMetricsSampler();
@@ -627,6 +630,12 @@ internal sealed class ClientRenderHost : IDisposable
                     current.DebugOverlay.Enabled,
                     current.DebugLines,
                     current.DebugLabels);
+                dockingZoneDraw.Clear();
+                if (current.MetricsActive && current.PreAlphaUx.Mode == PreAlphaUxMode.None)
+                    LogisticsZoneOverlay.Draw(dockingZoneDraw, snapshot,
+                        current.InformationLayer.SelectedEntities,
+                        snapshot.Hover?.Entity ?? default,
+                        current.ActionPanel.Mode == PlayerActionPanelMode.Logistics);
 
                 terrainRenderer.DebugChunksEnabled =
                     current.DebugOverlay.IsEnabled(
@@ -714,6 +723,7 @@ internal sealed class ClientRenderHost : IDisposable
                                 Stopwatch.GetTimestamp())
                             .TotalMilliseconds;
 
+                        dockingZoneRenderer.Render(context, renderCamera, dockingZoneDraw);
                         gameplayOverlayRenderer.Render(
                             context,
                             renderCamera,
