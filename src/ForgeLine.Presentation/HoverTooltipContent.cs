@@ -15,7 +15,8 @@ internal readonly record struct HoverTooltipContent(
     IReadOnlyList<PlayerTechnologyPrerequisiteReadModel>? Prerequisites = null,
     string WorkStatus = "", string Explanation = "", UiSkinState VisualState = UiSkinState.Normal, bool WrapDetails = false,
     PlayerSelectionSummary? Selection = null, SelectedCombatGroup? Group = null,
-    FormationTemplate Formation = default, PlayerCommandFeedback? Feedback = null);
+    FormationTemplate Formation = default, PlayerCommandFeedback? Feedback = null,
+    PlayerActionSnapshot? OwnedActions = null);
 
 internal static class HoverTooltipResolver
 {
@@ -39,7 +40,15 @@ internal static class HoverTooltipResolver
                 SelectionInspectorHudModel.ResolveKindLabel(experience.Selection.Kind), "", "READ-ONLY STATUS",
                 WrapDetails: true, Selection: experience.Selection,
                 Group: ring.Group is not null && group?.Tick == snapshot.Tick && group.TotalCount == experience.Selection.Count ? group : null,
-                Formation: formation, Feedback: experience.Feedback);
+                Formation: formation, Feedback: experience.Feedback,
+                OwnedActions: experience.Selection.Count == 1 &&
+                    snapshot.PlayerActions is { } actions &&
+                    actions.SessionId == snapshot.SessionId && actions.Tick == snapshot.Tick &&
+                    (actions.Logistics?.Entity == experience.Selection.PrimaryEntity ||
+                     actions.Supply?.Entity == experience.Selection.PrimaryEntity ||
+                     actions.Production?.Entity == experience.Selection.PrimaryEntity ||
+                     actions.UnitProduction?.Entity == experience.Selection.PrimaryEntity)
+                    ? actions : null);
         }
         if (view.DockControl != 0) return ResolveDock(snapshot, view, panel);
         if (view.Contact.IsSpecified)

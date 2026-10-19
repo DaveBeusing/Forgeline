@@ -1,5 +1,9 @@
 # FORGELINE Command Interface Visual Language
 
+## Ring hover and contextual object detail hierarchy
+
+Radial hover is indicated by an isolated darker wedge and thin bright outer arc, not by fading its text/icon or changing gameplay hit geometry. The adjoining read-only object panel uses a lightly translucent backing, an emphasized object name, a full empty row after the name and structured fact labels. Its right-hand placement is prioritized inside the existing safe-area and obstacle layout. It does not add a second inventory, simulation, or command system; valid current single-object and group read models are the only data sources. DPI, narrow layouts, screenshot contrast and actual D3D12 review require current-source acceptance separate from historical UI evidence.
+
 ## Scope and Current Audit
 
 The Windows frontend is rendered by `FrontendOverlayRenderer` over the existing Direct3D 12 graphics device. The UI is intentionally independent of game authority, and `ForgeLine.UI` owns navigation/focus and pointer hit testing. The gameplay HUD uses distinct, modular surfaces composed by `GameplayHudRenderer`.

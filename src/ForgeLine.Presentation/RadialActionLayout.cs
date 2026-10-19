@@ -79,6 +79,31 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
         return TryFit(anchor, 60, 156, hud.SafeArea, occupied, count);
     }
 
+    /// <summary>Favor space for a noninteractive status card to the right of an owned ring.</summary>
+    public static RadialActionLayout FitWithRightInspector(Vector2 anchor, float footprintRadius,
+        in GameplayHudLayout hud, ReadOnlySpan<HudRect> occupied, float inspectorWidth)
+    {
+        var ordinary = Fit(anchor, footprintRadius, hud, occupied);
+        if (!ordinary.IsValid || !float.IsFinite(inspectorWidth) || inspectorWidth <= 0) return ordinary;
+        float gap = MathF.Max(10, hud.Gap + 2);
+        if (ordinary.Center.X + ordinary.OuterRadius + gap + inspectorWidth <= hud.SafeArea.Right)
+            return ordinary;
+        var restricted = hud.SafeArea with
+        {
+            Width = MathF.Max(0, hud.SafeArea.Width - inspectorWidth - gap)
+        };
+        float preferred = Math.Clamp(hud.Scale, 1, 1.75f);
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            float scale = preferred + (1 - preferred) * attempt / 4;
+            float inner = Math.Clamp(footprintRadius + 10 * scale, 80 * scale, (100 - attempt * 5) * scale);
+            var fit = TryFit(anchor, inner, inner + 96 * scale, restricted, occupied, 8);
+            if (fit.IsValid) return fit;
+        }
+        var compact = TryFit(anchor, 60, 156, restricted, occupied, 8);
+        return compact.IsValid ? compact : ordinary;
+    }
+
     private static RadialActionLayout TryFit(Vector2 anchor, float inner, float outer, in HudRect safe,
         ReadOnlySpan<HudRect> occupied, int count)
     {

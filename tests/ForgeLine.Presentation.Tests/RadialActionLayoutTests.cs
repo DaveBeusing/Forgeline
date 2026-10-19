@@ -42,6 +42,29 @@ public sealed class RadialActionLayoutTests
             }
         }
     }
+    [Theory]
+    [InlineData(1280,720,96u,.75f)]
+    [InlineData(1920,1080,144u,1f)]
+    [InlineData(3440,1440,192u,2f)]
+    public void InspectorAwareFitMovesRingLeftOnlyWhenPhysicalSafeAreaPermits(
+        int width, int height, uint dpi, float scale)
+    {
+        var layout = GameplayHudLayout.Create(width,height,dpi,scale);
+        var anchor = new Vector2(layout.SafeArea.Right - 12, layout.SafeArea.Y + layout.SafeArea.Height * .55f);
+        float cardWidth = 330 * Math.Clamp(layout.Scale,1,1.25f);
+        var standard = RadialActionLayout.Fit(anchor,0,layout,[]);
+        var adjusted = RadialActionLayout.FitWithRightInspector(anchor,0,layout,[],cardWidth);
+        Assert.True(standard.IsValid);
+        Assert.True(adjusted.IsValid);
+        Assert.True(layout.SafeArea.Contains(adjusted.Center - new Vector2(adjusted.OuterRadius)));
+        Assert.True(layout.SafeArea.Contains(adjusted.Center + new Vector2(adjusted.OuterRadius)));
+        Assert.Equal(anchor,adjusted.Anchor);
+        Assert.Equal(0,adjusted.Hit(adjusted.LabelCenter(0)));
+        Assert.True(adjusted.Center.X <= standard.Center.X);
+        if (layout.SafeArea.Width >= cardWidth + 2*adjusted.OuterRadius + 8)
+            Assert.True(adjusted.Center.X+adjusted.OuterRadius+MathF.Max(8,layout.Gap)+cardWidth <= layout.SafeArea.Right+1);
+    }
+
     [Fact]
     public void CompactTacticalTitlesRemainDistinctBeforeTooltipExpansion()
     {

@@ -1,5 +1,9 @@
 # Group action menus
 
+## Shared hover and group inspector details
+
+Hovered group and object sectors use the same darkened 0.30-alpha backing and a high-contrast arc constrained to the selected sector's outer edge. The read-only inspector remains visible while the group ring is used, preferring free space on the right and falling back to valid safe-area placement without taking input. Group composition, known-count averages, damage/supply and formation are still copied from the same current authorized group snapshot. Missing group/selection evidence is never inferred from render entities, and aggregate facts do not expose individual hostile metrics.
+
 Current surface ownership: [HUD consolidation](HudSurfaceConsolidation.md). Original group integration outcomes and remaining gates: [group action menu qualification](GroupActionMenuQualification.md). Earlier checkpoints below remain historical.
 
 Historical integration baseline: `1ef23a9fc7ab9195d0d1bdadd97081016ea97861`. Branch: `ui/group-action-rings`. Version: `0.1.388-dev`, one PATCH.

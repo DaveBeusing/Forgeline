@@ -124,6 +124,62 @@ public sealed partial class HoverTooltipRenderingTests
     }
 
     [Fact]
+    public void RingSectorHoverKeepsOwnedObjectDetailsInsteadOfReplacingWithControlTooltip()
+    {
+        var snapshot = StatusSnapshot();
+        var panel = StatusPanel(snapshot);
+        var layout = GameplayHudLayout.Create(1600,900,96);
+        var sectorPoint = panel.Ring.Geometry.LabelCenter(0);
+        var input = new InputState();
+        input.Apply(PlatformInputEvent.PointerMoved((int)sectorPoint.X,(int)sectorPoint.Y));
+        var view = new HoverTooltipController().Update(input,snapshot,new EntityId(11,1),
+            new RtsCamera(),layout,panel,false,true,TimeSpan.Zero);
+        Assert.True(view.Ready);
+        Assert.True(view.SelectionStatus);
+        var content = Assert.IsType<HoverTooltipContent>(HoverTooltipResolver.Resolve(snapshot,view,panel));
+        Assert.Equal("Main Battle Tank",content.Title);
+    }
+
+    [Fact]
+    public void SingleObjectDetailsAcceptOnlyCurrentMatchingProductionAndLogisticsSnapshots()
+    {
+        var snapshot=StatusSnapshot();var identity=new EntityId(11,1);
+        var actions=new PlayerActionSnapshot(snapshot.SessionId,snapshot.Tick,[],0,null,null,
+            logistics:new PlayerLogisticsActionReadModel(identity,[],null,inventoryCapacity:240,inventoryQuantity:70));
+        var current=new PresentationSnapshot(snapshot.Tick,snapshot.TickDuration,1,snapshot.Instances,
+            sessionId:snapshot.SessionId,playerExperience:snapshot.PlayerExperience,playerActions:actions);
+        var layout=GameplayHudLayout.Create(1600,900,96);
+        var panel=StatusPanel(current);var view=StatusView(current,layout);
+        var selected=Assert.IsType<HoverTooltipContent>(HoverTooltipResolver.Resolve(current,view,panel));
+        Assert.Same(actions,selected.OwnedActions);
+        using var device=new RetainedDevice();using var surface=new WorldHoverTooltipSurface(device);
+        surface.Render(Context(new RecordingContext(),current,layout,view) with { ActionPanel=panel });
+        int withFacts=surface.LastLayoutLineCount;
+        Assert.True(withFacts>0);
+        var stale=new PresentationSnapshot(snapshot.Tick,snapshot.TickDuration,1,snapshot.Instances,
+            sessionId:snapshot.SessionId,playerExperience:snapshot.PlayerExperience,
+            playerActions:new PlayerActionSnapshot(snapshot.SessionId,new(100),[],0,null,null,
+                logistics:new PlayerLogisticsActionReadModel(identity,[],null,inventoryCapacity:240,inventoryQuantity:70)));
+        Assert.Null(HoverTooltipResolver.Resolve(stale,view,StatusPanel(stale))?.OwnedActions);
+        surface.Render(Context(new RecordingContext(),stale,layout,view) with { ActionPanel=StatusPanel(stale) });
+        Assert.True(surface.LastLayoutLineCount<withFacts);
+    }
+
+    [Fact]
+    public void InspectorPlacementPrefersRightOfOuterArcAndAvoidsAllSectorHitBounds()
+    {
+        var snapshot=StatusSnapshot();
+        var panel=StatusPanel(snapshot);
+        var layout=GameplayHudLayout.Create(1920,1080,96);
+        var card=HoverTooltipPlacement.BesideRing(panel.Ring,layout,[],330,300);
+        Assert.False(card.IsEmpty);
+        Assert.True(card.X>panel.Ring.Geometry.Center.X+panel.Ring.Geometry.OuterRadius);
+        for (int slot=0;slot<panel.Ring.Geometry.Count;slot++)
+            Assert.False(card.Intersects(panel.Ring.Geometry.SectorBounds(slot)));
+        Assert.True(layout.SafeArea.Contains(new Vector2(card.Right,card.Bottom)));
+    }
+
+    [Fact]
     public void WarmSelectionStatusUsesRetainedBuffersWithoutManagedAllocations()
     {
         var snapshot = StatusSnapshot();
