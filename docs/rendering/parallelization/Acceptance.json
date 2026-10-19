@@ -1,0 +1,303 @@
+{
+  "schemaVersion": 1,
+  "checkedDate": "2026-10-19",
+  "integratedRepairSha": "d4c7b62077c98500d6309cdd6c6dbf5e6bd6490c",
+  "repairPr": 237,
+  "repairHeadSha": "5b621693346b17dabf9d598ff96c41ff333d548a",
+  "productVersion": "0.1.406",
+  "repairTreeEqualsIntegratedMaster": true,
+  "masterCi": {
+    "runId": 39175397659,
+    "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39175397659",
+    "source": "d4c7b62077c98500d6309cdd6c6dbf5e6bd6490c",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Check out repository",
+        "conclusion": "success"
+      },
+      {
+        "name": "Assign validation build identity",
+        "conclusion": "success"
+      },
+      {
+        "name": "Validate one version increment per PR",
+        "conclusion": "success"
+      },
+      {
+        "name": "Version and metadata contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up .NET",
+        "conclusion": "success"
+      },
+      {
+        "name": "Restore",
+        "conclusion": "success"
+      },
+      {
+        "name": "Validate project references",
+        "conclusion": "success"
+      },
+      {
+        "name": "Validate bundled UI font resources",
+        "conclusion": "success"
+      },
+      {
+        "name": "UI motion, optional sound and preference contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "World audio playback catalog",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up source-contract Python",
+        "conclusion": "success"
+      },
+      {
+        "name": "Blender source geometry contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Render boundary ownership and shader source contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Render boundary and publication contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Rigid motion lifecycle and allocation contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Rigid clip compilation and deployment contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Blender launcher protocol contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "UI audio reliability and industrial source contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "World audio extraction, visibility and deterministic publication contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Graphics budget gate input contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "UI qualification matrix coverage contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Compile and qualify canonical map",
+        "conclusion": "success"
+      },
+      {
+        "name": "Adaptive frontend geometry and interaction contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Battlefield HUD hierarchy and interaction contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "UI motion and feedback interaction contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Native UI typography contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Native material BRDF and HDR contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Graphics quality and display contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Single object ring interaction contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Compile and qualify runtime assets",
+        "conclusion": "success"
+      },
+      {
+        "name": "Runtime asset process contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Compiled UI atlas and ordered skin contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Graphical battlefield skin identity and native lifetime contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Directorate skin package integrity and source exclusion",
+        "conclusion": "success"
+      },
+      {
+        "name": "Graphical economy work states and operations privacy contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Tactical artwork privacy and native pointer ownership",
+        "conclusion": "success"
+      },
+      {
+        "name": "Graphical frontend skin and pointer contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Cinematic menu image and native lifecycle contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "World environment and terrain residency contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Combat industrial effects and decal contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Reference evidence report contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Reference performance and image contracts without GPU",
+        "conclusion": "success"
+      },
+      {
+        "name": "UI reference geometry and input contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Software UI reference smoke (no physical visual acceptance)",
+        "conclusion": "success"
+      },
+      {
+        "name": "Native WARP reference capture",
+        "conclusion": "success"
+      },
+      {
+        "name": "Windows apphost reference completion contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "Windows window mode and visual qualification smoke",
+        "conclusion": "success"
+      },
+      {
+        "name": "Rendering benchmark qualification",
+        "conclusion": "success"
+      },
+      {
+        "name": "Headless diagnostics smoke test",
+        "conclusion": "success"
+      },
+      {
+        "name": "Lightweight entity stress smoke",
+        "conclusion": "success"
+      },
+      {
+        "name": "Save and replay recovery smoke",
+        "conclusion": "success"
+      },
+      {
+        "name": "Test",
+        "conclusion": "success"
+      },
+      {
+        "name": "Publish reproducible pre-alpha package",
+        "conclusion": "success"
+      },
+      {
+        "name": "Packaged client fresh-install smoke",
+        "conclusion": "success"
+      },
+      {
+        "name": "Packaged startup menu lifecycle",
+        "conclusion": "success"
+      },
+      {
+        "name": "Two-opponent full-match validation",
+        "conclusion": "success"
+      },
+      {
+        "name": "Upload pre-alpha package",
+        "conclusion": "success"
+      },
+      {
+        "name": "Upload engine diagnostic artifacts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up source-contract Python",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up .NET",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Check out repository",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "tests": {
+    "passed": 2821,
+    "failed": 0,
+    "skipped": 16,
+    "total": 2837
+  },
+  "terminal": {
+    "status": "Ended",
+    "lifecycle": "Completed",
+    "outcome": "Victory",
+    "reason": "CommandCoreDestroyed",
+    "winner": 1,
+    "tick": 64536,
+    "limit": 80000
+  },
+  "performance": {
+    "summary": "evidence/repair/foundation-repair-complete-summary.json",
+    "cohort": "foundation-fixture7-pair",
+    "maximumRegressionPercent": 15,
+    "bothPairsPassed": true,
+    "exactPairedImages": 12
+  },
+  "nativeReview": {
+    "status": "pending",
+    "imageRoot": "evidence/repair/foundation-final-native-correctness",
+    "cases": 6,
+    "captureSource": "0cf888b047cd79b91ef9c8466f7b4082cd2f15d0",
+    "runtimeAndAssetTreesEqualIntegratedMaster": true
+  },
+  "parallelReleased": false
+}

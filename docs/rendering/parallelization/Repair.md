@@ -1,6 +1,8 @@
 # Render foundation timing and software admission repair
 
-Status: implementation under qualification. Parallel release remains blocked.
+Status: integrated by PR #237; technical qualification passed. Human native review
+remains pending and parallel release stays blocked. See [current acceptance](Acceptance.md).
+The chronological entries below retain their original checkpoint states.
 Base master: `17810ee192fac495173a7e9da44c973595833f2b`, version 0.1.401.
 The existing qualification follow-up is continued; one PR delta remains 0.1.402.
 
@@ -1058,3 +1060,21 @@ are retained. Only the subsequently verified allocation-guard tool/workflow and
 documentation changes follow; no production runtime or test-host code changes.
 The final hosted CI must verify the resulting head; human native review remains
 separate and parallelReleased stays false.
+
+
+## Integrated technical acceptance checkpoint
+
+Repair PR #237 is merged into master d4c7b62077c98500d6309cdd6c6dbf5e6bd6490c,
+version 0.1.406. Its tree is identical to the final qualified PR head
+5b621693346b17dabf9d598ff96c41ff333d548a. All four final-head workflows passed.
+The integrated master independently passes main CI 39175397659 and movement
+39175397640. Its full suite reports 2,821 passed, zero failed, 16 optional skips
+and 2,837 total. Native WARP, original window/budget checks, rendering benchmark,
+reproducible package and installed startup/menu smokes all pass. The unchanged
+80,000-tick terminal gate again produces Victory / CommandCoreDestroyed at tick
+64,536, winner one. No historical failed cohort is relabelled or discarded.
+
+The current state and the six native review images are linked in
+[Acceptance](Acceptance.md), with a machine-readable source/CI checkpoint.
+Independent human review is the remaining foundation release condition.
+parallelReleased stays false until that decision is explicitly recorded.

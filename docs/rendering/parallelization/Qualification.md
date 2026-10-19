@@ -1,7 +1,9 @@
 # Render foundation qualification
 
-Status: **implemented, not yet accepted**. Parallel start is blocked. No further integration,
-protection change, tag or release is performed by this qualification.
+Status: **integrated; technical gates passed; human native review pending**. Parallel start
+remains blocked until that review is explicitly recorded. The current acceptance
+checkpoint is [Acceptance](Acceptance.md); the measurements below retain their
+original historical source identities and failed results.
 
 ## Identity and immutable behavior
 

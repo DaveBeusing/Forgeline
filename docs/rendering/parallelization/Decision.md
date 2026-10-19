@@ -1,6 +1,7 @@
 # Decision: serial render boundaries before independent implementations
 
-Status: implemented; integration and acceptance pending.
+Status: implemented and integrated. Technical qualification passes; explicit human
+native review remains pending. See [current acceptance](Acceptance.md).
 
 The renderer already has functional instancing, immutable snapshots, native fence
 retirement, material caches and quality gates. Independent changes need separate

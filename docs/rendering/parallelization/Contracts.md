@@ -1,8 +1,9 @@
 # Render ownership and frame contracts
 
-Status: implemented, not yet accepted. Parallel implementation remains blocked until
-this foundation is integrated into master, required checks pass and native equality
-is reviewed. A feature branch or this document never substitutes for integration.
+Status: implemented and integrated; required technical checks pass. Parallel
+implementation remains blocked until human native equality review is explicitly
+recorded. See [current acceptance](Acceptance.md). A feature branch or this document
+never substitutes for integration or review.
 The machine-readable [ownership manifest](ParallelRenderOwnership.json) contains
 exact files, explicit new files, separate test/document/build prefixes and a validated
 acyclic dependency graph. Its eight parallel write sets are disjoint.
