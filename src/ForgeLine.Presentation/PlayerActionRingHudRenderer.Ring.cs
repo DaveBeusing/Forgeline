@@ -37,6 +37,9 @@ internal sealed partial class PlayerActionRingHudRenderer
             bool pending = panel.ContextualPending && item && panel.SelectedIndex == target.ItemIndex;
             Vector4 fill = RadialActionVisuals.Background(enabled, hovered, ring.Pressed && hovered, pending, opacity);
             RingSegment(geometry, i, fill, width, height);
+            if (hovered)
+                RingHoverArc(geometry, i, RadialActionVisuals.HoverArc(enabled, ring.Pressed, pending, opacity),
+                    RadialActionVisuals.HoverArcWidth(scale), width, height);
             Vector2 center = geometry.LabelCenter(i);
             float iconSize = 20 * scale, halfWidth = geometry.LabelHalfWidth;
             var icon = mode ? PlayerActionDockHudModel.ResolveModeIcon(target.Mode) :
@@ -152,6 +155,22 @@ internal sealed partial class PlayerActionRingHudRenderer
                 color, clear, clear, color, width, height);
         }
     }
+    private void RingHoverArc(in RadialActionLayout geometry, int slot, Vector4 color, float thickness, int width, int height)
+    {
+        const int steps = 20;
+        float outer = geometry.OuterRadius - 1;
+        float inner = MathF.Max(geometry.InnerRadius + 1, outer - thickness);
+        float start = geometry.Start(slot), end = geometry.End(slot);
+        for (int i = 0; i < steps; i++)
+        {
+            float a = start + (end - start) * i / steps;
+            float b = start + (end - start) * (i + 1) / steps;
+            Vector2 da = RadialActionLayout.Direction(a), db = RadialActionLayout.Direction(b), c = geometry.Center;
+            RingQuad(c + da * inner, c + da * outer, c + db * outer, c + db * inner,
+                color, width, height);
+        }
+    }
+
     private void RingQuad(Vector2 a, Vector2 b, Vector2 c, Vector2 d, Vector4 color, int width, int height) =>
         RingQuadGradient(a, b, c, d, color, color, color, color, width, height);
     private void RingQuadGradient(Vector2 a, Vector2 b, Vector2 c, Vector2 d, Vector4 ca, Vector4 cb, Vector4 cc, Vector4 cd, int width, int height)
