@@ -458,33 +458,21 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             var card = stack.Card(i);
             var item = card.Item;
             var color = NotificationText.Severity(experience, item);
-            if (!_skin.Panel(card.Bounds, "panel.raised")) EmitQuad(card.Bounds.X, card.Bounds.Y,
-                card.Bounds.Width, card.Bounds.Height, GameplayHudVisualStyle.PanelRaised, width, height);
-            _skin.State(card.Bounds, color == HudAlertSeverity.Critical ? UiSkinState.Error : color == HudAlertSeverity.Warning ? UiSkinState.Warning : UiSkinState.Normal);
+            if (!_skin.Panel(card.Bounds, "panel.raised", NotificationSurfaceVisuals.BackgroundOpacity))
+                EmitQuad(card.Bounds.X, card.Bounds.Y, card.Bounds.Width, card.Bounds.Height,
+                    GameplayHudVisualStyle.PanelRaised with { W = NotificationSurfaceVisuals.BackgroundOpacity }, width, height);
             EmitQuad(card.Bounds.X, card.Bounds.Y, color == HudAlertSeverity.Critical ? 5 : 3,
                 card.Bounds.Height, SeverityColor(color), width, height);
-            if (item.Hidden == 0) EmitIcon(item.Feedback ? CommandIcon(experience.Feedback.Kind) : AlertIcon(item.Kind),
-                card.Bounds.X + 8 * ActionableAlertLayout.Scale(layout), card.Bounds.Y + 4 * ActionableAlertLayout.Scale(layout),
-                stack.FontSize, width, height);
-            var text = NotificationText.Format(experience, alerts, item, buffer, localFeedback);
-            float y = card.Text.Y;
-            float lineHeight = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * stack.FontSize;
-            while (text.Length > 0 && y + stack.FontSize <= card.Text.Bottom)
-            {
-                var line = NotificationText.Line(text, card.Text.Width, stack.FontSize, out int consumed);
-                if (card.Truncated && y + lineHeight + stack.FontSize > card.Text.Bottom)
-                {
-                    float suffixWidth = UiFontMetrics.Default.Measure("...", stack.FontSize);
-                    int prefix = UiFontMetrics.Default.FitPrefix(line, MathF.Max(0, card.Text.Width - suffixWidth), stack.FontSize, false);
-                    line[..prefix].CopyTo(ellipsis); "...".AsSpan().CopyTo(ellipsis[prefix..]);
-                    line = ellipsis[..(prefix + 3)];
-                }
-                if (!_text.Add(line, card.Text.X, y, stack.FontSize, TextColor, width, height, card.Text.Width))
-                    EmitText(line[..Math.Min(line.Length, (int)(card.Text.Width / (GlyphAdvance * _scale)))],
-                        card.Text.X, y, TextColor, width, height);
-                text = text[consumed..];
-                y += lineHeight;
-            }
+            float iconSize = stack.FontSize;
+            EmitIcon(item.Hidden > 0 ? RtsUiIcon.StatusAlert :
+                item.Feedback ? CommandIcon(experience.Feedback.Kind) : item.Local ? RtsUiIcon.StatusAlert : AlertIcon(item.Kind),
+                card.Bounds.X + (5 + 4) * ActionableAlertLayout.Scale(layout),
+                card.Bounds.Y + (card.Bounds.Height - iconSize) * .5f,
+                iconSize, width, height);
+            var message = NotificationText.Format(experience, alerts, item, buffer, localFeedback);
+            var visible = NotificationText.Ellipsized(message, card.Text.Width, stack.FontSize, ellipsis);
+            if (!_text.AddCentered(visible, card.Text, stack.FontSize, TextColor, width, height))
+                EmitText(visible, card.Text.X, card.Text.Y, TextColor, width, height);
             if (!card.Action.IsEmpty && item.Hidden == 0)
             {
                 string label = item.Feedback || item.Local ? "MORE" : "OPS";
@@ -493,8 +481,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                         if (alerts.Alerts[a].Identity.Kind == item.Kind && alerts.Alerts[a].Target.IsValid) label = "FOCUS";
                 EmitNotificationAction(label, card.Action, stack.FontSize, width, height);
             }
-            if (card.Truncated && !card.Details.IsEmpty)
-            { EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height); }
+            if (card.Truncated && !card.Details.IsEmpty && item.Hidden == 0)
+                EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height);
         }
         _scale = layout.Scale;
     }
@@ -1081,6 +1069,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                         8)
                 ],
                 CullMode = GraphicsCullMode.None,
+                AlphaBlendEnabled = true,
                 DepthEnabled = false
             });
     }
