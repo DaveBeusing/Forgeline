@@ -36,6 +36,10 @@ internal static class ObjectActionRingCapture
             a.Tactical?.Targets ?? [],a.Tactical?.Artillery ?? []);
         var actions=new PlayerActionSnapshot(a.SessionId,a.Tick,a.Construction,a.PendingCommandCount,a.Production,a.UnitProduction,a.Logistics,a.Supply,tactical,a.Technology);
         var e=fixture.Snapshot.PlayerExperience!.Value;
+        if(state==UiReferenceScenario.RingSelectionStatus)
+            e=e with {Selection=e.Selection with {HasHealth=true,HealthFraction=.72,HasInventory=true,InventoryQuantity=123,
+                HasPower=true,PowerState=ForgeLine.Economy.PowerOperationalState.Brownout,
+                Work=new(PlayerWorkKind.Processing,PlayerWorkState.Blocked,.35,"Steel","NO INPUT")}};
         return (new(source.Tick,source.TickDuration,source.SimulationEntityCount,source.Instances,source.Intelligence,source.SessionId,
             e with { Selection=e.Selection with { Count=1,PrimaryEntity=entity,Kind=unit ? PlayerSelectionKind.Unit : PlayerSelectionKind.Building,DisplayName=unit ? "Selected unit" : "Selected building" } },playerActions:actions,vfxMetrics:source.VfxMetrics),default);
     }

@@ -17,7 +17,7 @@ function Get-UiQualificationScenarios {
       'LogisticsInputs','LogisticsPolicyTooltip',
       'NotificationsCollapsed','NotificationsExpanded','NotificationDetails',
       'RingConstruction','RingProduction','RingUnits','RingLogistics','RingSupply','RingTactical','RingTechnology','RingParameters',
-      'RingPending','RingEdge','RingTooltip','RingOpening50','RingClosing50','RingOffscreen','GroupRing','GroupRingTools','GroupRingPartial','GroupRingEdge')
+      'RingPending','RingEdge','RingTooltip','RingOpening50','RingClosing50','RingOffscreen','RingSelectionStatus','GroupRing','GroupRingTools','GroupRingPartial','GroupRingEdge','GroupRingStatus')
 }
 
 function Assert-UiQualificationUnion {

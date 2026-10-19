@@ -4,6 +4,7 @@ using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
+using ForgeLine.Input;
 using ForgeLine.Platform.Windows;
 using ForgeLine.Presentation;
 
@@ -33,14 +34,22 @@ internal static class ObjectActionRingRuntimeCapture
             {
                 var snapshot=ObjectActionRingCapture.Fixture(scene.Snapshot,state,1920,1080,96,1).Snapshot;
                 var buffer=new PresentationSnapshotBuffer();buffer.Publish(snapshot);var world=new RenderWorld();world.Update(buffer);
-                return (Snapshot:snapshot,Panel:ObjectActionRingCapture.View(snapshot,state,world,camera,layout));
+                var selection=new SelectionSet();
+                if(snapshot.PlayerActions?.Tactical is {} tactical) selection.Replace(tactical.SelectedEntities.ToArray());
+                var groups=SelectedCombatGroup.Resolve(snapshot) is {} members
+                    ? new CombatGroupOverviewView([],[],SelectedCombatGroup.Create(members,selection)) : CombatGroupOverviewView.Empty;
+                return (Snapshot:snapshot,Panel:ObjectActionRingCapture.View(snapshot,state,world,camera,layout),Groups:groups);
             }).ToArray();
-            var active=frames[0];
+            var active=frames[0];bool showStatus=true;
             void Record(IGraphicsCommandContext c)
             {
                 c.BeginPass(GraphicsFramePass.Overlay);
+                var ring=active.Panel.Ring;
+                var hover=showStatus && ring.Open && ring.Geometry.IsValid
+                    ? new HoverTooltipView(active.Snapshot.SessionId,default,default,ring.Geometry.Center,true,c.Width,c.Height,layout.Scale,
+                        SelectionStatus:true,SelectionRevision:ring.SelectionRevision,MenuRevision:ring.Revision) : default;
                 hud.Render(c,camera,active.Snapshot,terrain.WorldBounds,RtsInformationLayerView.Empty,active.Panel,
-                    default,FormationTemplate.Compact,CombatGroupOverviewView.Empty,default,96,1);
+                    default,FormationTemplate.Compact,active.Groups,default,96,1,hoverTooltip:hover);
             }
             for(int i=0;i<64;i++) { active=frames[i%frames.Length];graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record); }
             graphics.WaitForIdle();
@@ -49,8 +58,8 @@ internal static class ObjectActionRingRuntimeCapture
             for(int kind=0;kind<6;kind++)
             {
                 active=kind>=3 ? frames[8] : frames[1];
-                if(kind is 0 or 5) active=(active.Snapshot,active.Panel with { Ring=default }); // previous expanded dock
-                if(kind is 1 or 3) active=(active.Snapshot,active.Panel with { Mode=PlayerActionPanelMode.Closed,Ring=active.Panel.Ring with { Open=false,Geometry=default } });
+                showStatus=kind is 2 or 5;
+                if(kind is 0 or 3) active=(active.Snapshot,active.Panel with { Mode=PlayerActionPanelMode.Closed,Ring=default },active.Groups);
                 for(int i=0;i<32;i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
                 graphics.WaitForIdle();
                 ulong lastFence=graphics.Diagnostics.Frame?.GpuSubmissionFence ?? 0;
@@ -64,7 +73,7 @@ internal static class ObjectActionRingRuntimeCapture
                     { lastFence=frame.GpuSubmissionFence;gpu.Add(ms); }
                 }
                 graphics.WaitForIdle();Array.Sort(cpu);gpu.Sort();
-                comparisons.Add(new { Kind=kind==0 ? "LegacyExpandedDock":kind==1 ? "SingleObjectClosed":kind==2 ? "SingleObjectRing":kind==3 ? "GroupClosed":kind==4 ? "GroupRing":"GroupExpandedDockReference",
+                comparisons.Add(new { Kind=kind==0 ? "SingleClosed":kind==1 ? "SingleRing":kind==2 ? "SingleRingWithStatus":kind==3 ? "GroupClosed":kind==4 ? "GroupRing":"GroupRingWithStatus",
                     Warmups=32,Samples=128,CpuSubmitP50Microseconds=cpu[64],CpuSubmitP95Microseconds=cpu[121],
                     GpuSamples=gpu.Count,GpuP50Milliseconds=gpu.Count>0 ? (double?)gpu[gpu.Count/2]:null,
                     Skin=hud.SkinDiagnostics,Text=hud.TextDiagnostics,Vertices=hud.LastRenderedVertexCount });
@@ -83,7 +92,7 @@ internal static class ObjectActionRingRuntimeCapture
                         double ms=Math.Min(160,i*1000.0/hz);
                         var visual=motion.Update(ring with {Open=direction==0},TimeSpan.FromMilliseconds(10+direction*180+ms),!reduced);
                         intermediate |= visual.Opacity is > 0 and < 1;
-                        active=(frames[motionContext].Snapshot,frames[motionContext].Panel with {Ring=visual});graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
+                        active=(frames[motionContext].Snapshot,frames[motionContext].Panel with {Ring=visual},frames[motionContext].Groups);graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
                         transitions.Add(new {Group=motionContext==8,InjectedHz=hz,ReducedMotion=reduced,Direction=direction,Milliseconds=ms,visual.Opacity,visual.Open});
                     }
                     if (!reduced && !intermediate) throw new InvalidDataException("Ring opening/closing skipped its continuous alpha track.");
@@ -93,7 +102,7 @@ internal static class ObjectActionRingRuntimeCapture
             for(int cycle=0;cycle<128;cycle++)
             {
                 active=frames[cycle%frames.Length];graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
-                active=(active.Snapshot,active.Panel with {Ring=active.Panel.Ring with {Open=false,Geometry=default},Mode=PlayerActionPanelMode.Closed});
+                active=(active.Snapshot,active.Panel with {Ring=active.Panel.Ring with {Open=false,Geometry=default},Mode=PlayerActionPanelMode.Closed},active.Groups);
                 graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);platform.PumpEvents();
             }
             graphics.WaitForIdle();var after=graphics.Diagnostics;var skin=hud.SkinDiagnostics;
@@ -103,7 +112,7 @@ internal static class ObjectActionRingRuntimeCapture
                 throw new InvalidDataException("Ring context churn changed retained resources or lost content.");
             File.WriteAllText(Path.Combine(output,"qualification.json"),JsonSerializer.Serialize(new {
                 Source=typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
-                Contract="Same-device clear/HUD/text comparison, world excluded; CPU includes waits/Present. Sampling Hz is injected presentation time, not measured FPS. Human motion/visual acceptance pending.",
+                Contract="Same-device current closed/ring/status HUD comparison, world excluded; CPU includes waits/Present. Sampling Hz is injected presentation time, not measured FPS. Human motion/visual acceptance pending.",
                 GroupAggregation=GroupActionRingMeasurements.Capture(),ContextCycles=128,Before=before,After=after,BeforeSkin=beforeSkin,AfterSkin=skin,Comparisons=comparisons,Transitions=transitions },JsonOptions));
             return 0;
         }

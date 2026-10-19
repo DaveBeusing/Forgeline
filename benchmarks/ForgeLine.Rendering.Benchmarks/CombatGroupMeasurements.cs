@@ -36,9 +36,11 @@ internal static class CombatGroupMeasurements
                 {
                     Tick = tick,
                     Player = new(1),
-                    Selection = PlayerSelectionSummary.Empty with { Count = count, Kind = PlayerSelectionKind.Unit }
+                    Selection = PlayerSelectionSummary.Empty with { Count = count, PrimaryEntity=members[0].Entity, Kind = PlayerSelectionKind.Unit }
                 };
-                var snapshot = new PresentationSnapshot(tick, TimeSpan.Zero, count, [], sessionId: session,
+                var instances=members.Select(member=>new RenderInstance(member.Entity,RenderTransform.Identity,default,default,
+                    RenderVisibilityMask.World,Selectable:new(new PlayerId(1),ControllableEntityCategory.Unit))).ToArray();
+                var snapshot = new PresentationSnapshot(tick, TimeSpan.Zero, count, instances, sessionId: session,
                     playerExperience: experience, combatGroups: operational,
                     playerActions: new PlayerActionSnapshot(session, tick, [], 0, null, null,
                         tactical: new PlayerTacticalActionReadModel(members.Select(static member => member.Entity).ToArray(),
@@ -47,18 +49,23 @@ internal static class CombatGroupMeasurements
                 using var renderer = new GameplayHudRenderer(device);
                 var graphics = new PresentationBenchmarks.NullGraphicsCommandContext();
                 var camera = new RtsCamera();
-                var controller = new CombatGroupCardController();
                 var actionPanel = new PlayerActionPanelController();
                 var input = new InputState();
                 var layout = GameplayHudLayout.Create(1600, 900, 96);
                 var bounds = new AxisAlignedBounds(System.Numerics.Vector3.Zero, new(2048, 100, 2048));
+                // Status recording consumes the retained aggregate; rebuilding it is measured separately.
+                var geometry=new RadialActionLayout(new(800,450),new(800,450),80,176,8);
+                var buffer=new PresentationSnapshotBuffer();buffer.Publish(snapshot);var world=new RenderWorld();world.Update(buffer);
+                var context=count>1 ? GroupActionRingContext.Capture(snapshot,world,selection) : null;
+                var statusPanel=default(PlayerActionPanelView) with {Ring=new(members[0].Entity,session,selection.Revision,1,count==1,true,geometry,true) {Group=context}};
+                var hover=new HoverTooltipView(session,default,default,geometry.Center,true,1600,900,layout.Scale,
+                    SelectionStatus:true,SelectionRevision:selection.Revision,MenuRevision:1);
                 void Frame()
                 {
-                    _ = controller.Update(input, snapshot, selection, layout);
                     actionPanel.Update(input, snapshot, 1600, 900, currentSelection: selection);
-                    var panel = actionPanel.CreateView(1600, 900, snapshot.PlayerActions);
+                    var panel = actionPanel.CreateView(1600, 900, snapshot.PlayerActions) with {Ring=statusPanel.Ring};
                     renderer.Render(graphics, camera, snapshot, bounds, RtsInformationLayerView.Empty,
-                        panel, default, FormationTemplate.Compact, view, default, 96, 1);
+                        panel, default, FormationTemplate.Compact, view, default, 96, 1,hoverTooltip:hover);
                 }
                 results.Add(Measure("HUD and idle input", count, mixed, Frame, 0));
                 results.Add(Measure("Selection summary rebuild", count, mixed,

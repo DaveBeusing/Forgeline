@@ -50,6 +50,8 @@ public sealed partial class HoverTooltipRenderingTests
         Assert.Null(HoverTooltipResolver.Resolve(snapshot, view with { MenuRevision = 11 }, panel));
         Assert.Null(HoverTooltipResolver.Resolve(snapshot, view with { SelectionRevision = 11 }, panel));
         Assert.Null(HoverTooltipResolver.Resolve(snapshot, view, panel with { SelectionPending = true }));
+        Assert.Null(HoverTooltipResolver.Resolve(snapshot, view, panel with {Ring=panel.Ring with {SingleOwned=false}}));
+        Assert.Null(HoverTooltipResolver.Resolve(snapshot, view, panel with {Ring=panel.Ring with {SingleOwned=false,Global=true}}));
         Assert.Null(HoverTooltipResolver.Resolve(snapshot, view, panel with { Ring = panel.Ring with { Open = false } }));
         Assert.Null(HoverTooltipResolver.Resolve(snapshot, view, panel with { Ring = panel.Ring with { Entity = new(11, 2) } }));
     }
