@@ -70,8 +70,9 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         LastLayoutLineCount = lines;
         _line = 0;
         _measuring = false;
-        _scale = MathF.Min(_scale, MathF.Min(context.Layout.SafeArea.Width / 350,
+        float fitted = MathF.Min(_scale, MathF.Min(context.Layout.SafeArea.Width / 350,
             context.Layout.SafeArea.Height / (16 + lines * 14)));
+        _scale = view.SelectionStatus ? MathF.Max(1, fitted) : fitted;
         if (_wrapDetails && !view.SelectionStatus)
         {
             var safe = context.Layout.SafeArea;
@@ -90,7 +91,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
                 context.CombatGroups,notifications);
             float preferred=_scale;
             for(int attempt=0;attempt<5;attempt++) {
-                _scale=MathF.Max(MathF.Min(.75f,preferred),preferred-attempt*.125f);
+                _scale=MathF.Max(1,preferred-attempt*.125f);
                 _bounds=HoverTooltipPlacement.BesideRing(context.ActionPanel.Ring,context.Layout,occupied,
                     330*_scale,(16+lines*14)*_scale);
                 if(!_bounds.IsEmpty) break;
@@ -98,8 +99,10 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         }
         else _bounds=HoverTooltipPlacement.Resolve(view.PointerPosition,context.Layout,330*_scale,(16+lines*14)*_scale);
         if (_bounds.IsEmpty) return;
-        if (!_skin.Panel(_bounds, "panel.tooltip")) Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
-        _skin.State(_bounds, resolved.VisualState);
+        float backgroundOpacity = view.SelectionStatus ? .38f : 1;
+        if (!_skin.Panel(_bounds, "panel.tooltip", backgroundOpacity))
+            Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = backgroundOpacity });
+        if (!view.SelectionStatus) _skin.State(_bounds, resolved.VisualState);
         if (!_skin.Ready) Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 25 * _scale), GameplayHudVisualStyle.PanelHeader);
         Quad(new HudRect(_bounds.X, _bounds.Bottom - _scale, _bounds.Width, _scale), GameplayHudVisualStyle.QuietBorder);
         Quad(new HudRect(_bounds.X, _bounds.Y, MathF.Min(2 * _scale, _bounds.Width), _bounds.Height), GameplayHudVisualStyle.TextPrimary);
@@ -122,11 +125,17 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     private void EmitContent(in HoverTooltipContent resolved)
     {
         Line(resolved.Title, true);
+        if (resolved.Selection is not null) BlankLine();
         Line(resolved.Role);
         Line(resolved.Status);
         Line(resolved.WorkStatus);
         Line(resolved.Explanation);
-        if (resolved.Selection is { } selection) EmitSelectionStatus(selection, resolved.Group, resolved.Formation);
+        if (resolved.Selection is { } selection)
+        {
+            EmitSelectionStatus(selection, resolved.Group, resolved.Formation);
+            if (selection.Count == 1 && resolved.OwnedActions is { } actions)
+                EmitOperationalDetails(actions, selection.PrimaryEntity);
+        }
         if (resolved.Feedback is { State: not PlayerCommandFeedbackState.None } feedback) EmitCommandFeedback(feedback);
         if (resolved.World is { } world) EmitWorld(world);
         if (resolved.Costs is { } costs) EmitAmounts(costs, "NEED");
@@ -194,6 +203,59 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         }
     }
 
+    private void EmitOperationalDetails(PlayerActionSnapshot actions, ForgeLine.Core.EntityId selected)
+    {
+        Span<char> buffer = stackalloc char[192];
+        if (actions.Production is { } production && production.Entity == selected)
+        {
+            Line("PRODUCTION");
+            var text = new TooltipTextBuilder(buffer);
+            text.Append("REQUESTS "); text.Number(production.Requests.Count, "0");
+            Line(text.Written);
+        }
+        if (actions.UnitProduction is { } units && units.Entity == selected)
+        {
+            Line("UNIT PRODUCTION");
+            var text = new TooltipTextBuilder(buffer);
+            text.Append("QUEUE "); text.Number(units.Requests.Count, "0");
+            Line(text.Written);
+        }
+        if (actions.Logistics is { } logistics && logistics.Entity == selected)
+        {
+            Line("LOGISTICS");
+            var text = new TooltipTextBuilder(buffer);
+            text.Append("STOCK "); text.Number(logistics.InventoryQuantity, "N0");
+            text.Append(" / CAPACITY ");
+            if (logistics.InventoryCapacity > 0) text.Number(logistics.InventoryCapacity, "N0");
+            else text.Append("N/A");
+            Line(text.Written);
+            if (logistics.Cargo is { } cargo)
+            {
+                text = new(buffer); text.Append("CARGO "); text.Number(cargo.CargoQuantity, "N0");
+                Line(text.Written);
+            }
+        }
+        if (actions.Supply is { } supply && supply.Entity == selected)
+        {
+            Line("SUPPLY");
+            var text = new TooltipTextBuilder(buffer);
+            text.Append("DRIVE FUEL ");
+            if (supply.DriveFuelCapacity > 0)
+            {
+                text.Number(supply.DriveFuelQuantity, "N0");
+                text.Append(" / "); text.Number(supply.DriveFuelCapacity, "N0");
+            }
+            else text.Append("N/A");
+            Line(text.Written);
+            if (supply.IsSupplyTruck)
+            {
+                text = new(buffer); text.Append("FIELD FUEL "); text.Number(supply.CargoFuel, "N0");
+                text.Append(" / AMMO "); text.Number(supply.CargoAmmunition, "N0");
+                Line(text.Written);
+            }
+        }
+    }
+
     private void Covered(string label, double value, int count)
     {
         Span<char> buffer = stackalloc char[128]; var text = new TooltipTextBuilder(buffer);
@@ -257,7 +319,9 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     {
         Span<char> text = stackalloc char[64];
         var builder = new TooltipTextBuilder(text);
-        builder.Append(label); builder.Append(": "); builder.Number(value, "P0");
+        builder.Append(label); builder.Append(": ");
+        if (double.IsFinite(value)) builder.Number(value, "P0");
+        else builder.Append("N/A");
         Line(builder.Written);
     }
 
@@ -292,6 +356,11 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             SingleLine(text[..length], primary);
             text = text[length..].TrimStart();
         }
+    }
+
+    private void BlankLine()
+    {
+        if (_line < 48) _line++;
     }
 
     private void SingleLine(ReadOnlySpan<char> text, bool primary)
