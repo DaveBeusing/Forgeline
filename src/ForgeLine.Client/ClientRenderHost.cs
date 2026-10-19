@@ -748,7 +748,11 @@ internal sealed class ClientRenderHost : IDisposable
                             runtimeMetrics,
                             current.HoverTooltip,
                             showRuntimeMetrics: false,
-                            operations: current.Operations);
+                            operations: current.Operations,
+                            presentationTime: uiNow,
+                            animateNotifications: current.MetricsActive && !current.SurfaceSuspended &&
+                                current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
+                                current.FeedbackSettings.Animate(qualityProfile.Active));
                         developmentOverlayRenderer.Render(
                             context,
                             overlayMetrics,
