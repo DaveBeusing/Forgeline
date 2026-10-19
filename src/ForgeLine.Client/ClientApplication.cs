@@ -1211,7 +1211,11 @@ internal sealed class ClientApplication
                     window.ClientSize.Height,
                     window.Dpi,
                     _settings.UiScale,
-                    currentSelection: selectionController.Selection);
+                    currentSelection: selectionController.Selection,
+                    globalShortcutsBlocked: modalFrame || simulationPaused ||
+                        !window.IsFocused || window.IsMinimized ||
+                        buildingPlacementController.IsActive ||
+                        tacticalTargetingController.IsActive);
 
                 if (actionPanel.TryTakeRequest(
                         out PlayerActionRequest actionRequest))
@@ -1383,8 +1387,13 @@ internal sealed class ClientApplication
 
             if (!hudInteraction.KeyboardCaptured)
             {
+                // The active placement or paginated ring owns only Q/E. Other
+                // stored camera rotation bindings must remain functional.
+                bool contextOwnsQe = buildingPlacementController.IsActive ||
+                    actionPanel.OwnsRadialPaging(inputSnapshot?.PlayerActions);
                 RtsCameraInputFrame cameraInput =
-                    actionMapper.Map(inputState, hudInteraction.PointerCaptured);
+                    actionMapper.Map(inputState, hudInteraction.PointerCaptured,
+                        contextOwnsQe: contextOwnsQe);
 
                 camera.Update(
                     cameraInput,

@@ -212,7 +212,8 @@ public sealed class ObjectActionRingTests
         controller.Update(input,snapshot,1920,1080,currentSelection:selection);
         controller.SynchronizeObjectRing(input,snapshot,World(snapshot),selection,true,true);
         Assert.False(View(controller,snapshot).Ring.Open);
-        input.BeginFrame();input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.H));
+        input.BeginFrame();input.Apply(PlatformInputEvent.PointerMoved(600,400));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.H));
         controller.Update(input,snapshot,1920,1080,currentSelection:selection);
         Assert.True(View(controller,snapshot).Ring.Global);
         Assert.True(View(controller,snapshot).Ring.Open);
@@ -222,6 +223,169 @@ public sealed class ObjectActionRingTests
         Assert.True(controller.TryTakeRequest(out var request));
         Assert.Equal(PlayerActionRequestKind.StartTechnologyResearch,request.Kind);
         Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Theory]
+    [InlineData(PlatformKey.B, PlayerActionPanelMode.Construction, false)]
+    [InlineData(PlatformKey.P, PlayerActionPanelMode.Production, true)]
+    [InlineData(PlatformKey.U, PlayerActionPanelMode.UnitProduction, true)]
+    [InlineData(PlatformKey.L, PlayerActionPanelMode.Logistics, true)]
+    [InlineData(PlatformKey.Y, PlayerActionPanelMode.Supply, true)]
+    [InlineData(PlatformKey.K, PlayerActionPanelMode.Tactical, true)]
+    [InlineData(PlatformKey.H, PlayerActionPanelMode.Technology, false)]
+    public void EveryGlobalCategoryKeyOpensAtCursorAndRequiresRealOwnedTargetsForActions(
+        PlatformKey key, PlayerActionPanelMode mode, bool unavailable)
+    {
+        var source = Snapshot(mode, "Ready");
+        var a = source.PlayerActions!;
+        var actions = new PlayerActionSnapshot(a.SessionId, a.Tick, a.Construction,
+            a.PendingCommandCount, null, null, technology: a.Technology);
+        var snapshot = new PresentationSnapshot(source.Tick, source.TickDuration,
+            source.SimulationEntityCount, source.Instances,
+            sessionId: source.SessionId, playerExperience: source.PlayerExperience!.Value with
+            { Selection = PlayerSelectionSummary.Empty }, playerActions: actions);
+        var input = new InputState();
+        var selection = new SelectionSet();
+        var controller = new PlayerActionPanelController();
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        controller.SynchronizeObjectRing(input, snapshot, World(snapshot), selection, false);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerMoved(650, 440));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, key));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(mode, controller.Mode);
+        var ring = View(controller, snapshot).Ring;
+        Assert.True(ring.Open && ring.Global);
+        Assert.Equal(new Vector2(650, 440), ring.GlobalAnchor);
+        if (unavailable)
+        {
+            Assert.True(ring.Slots[0].Present);
+            Assert.False(ring.Slots[0].Enabled);
+            Assert.Equal((byte)255, ring.Slots[0].Key.Kind);
+        }
+        else Assert.NotEqual((byte)255, ring.Slots[0].Key.Kind);
+        Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Fact]
+    public void RemappedGlobalConstructionShortcutUsesRegistryRatherThanHardcodedLetter()
+    {
+        var source = Snapshot(PlayerActionPanelMode.Construction, "Ready");
+        var a = source.PlayerActions!;
+        var actions = new PlayerActionSnapshot(a.SessionId, a.Tick, a.Construction,
+            a.PendingCommandCount, null, null, technology: a.Technology);
+        var snapshot = new PresentationSnapshot(source.Tick, source.TickDuration,
+            source.SimulationEntityCount, source.Instances,
+            sessionId: source.SessionId, playerExperience: source.PlayerExperience!.Value with
+            { Selection = PlayerSelectionSummary.Empty }, playerActions: actions);
+        var bindings = new GameplayBindingRegistry(new GameplayBindings()
+            .With(GameplayAction.Build, PlatformKey.G));
+        var controller = new PlayerActionPanelController(bindings);
+        var input = new InputState();
+        var selection = new SelectionSet();
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        controller.SynchronizeObjectRing(input, snapshot, World(snapshot), selection, false);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerMoved(540, 330));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.B));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.False(View(controller, snapshot).Ring.Open);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.B));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.G));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(PlayerActionPanelMode.Construction, controller.Mode);
+        Assert.True(View(controller, snapshot).Ring.Global);
+    }
+
+    [Fact]
+    public void RadialPagingWinsWhenSavedCategoryRemapUsesTheSameKey()
+    {
+        var camera = new RtsCameraBindings { RotateRight = PlatformKey.Z };
+        var bindings = new GameplayBindingRegistry(new GameplayBindings()
+            .With(GameplayAction.Build, PlatformKey.E), camera);
+        var snapshot = Snapshot(PlayerActionPanelMode.Tactical, "Ready");
+        var selection = new SelectionSet();
+        selection.SetSingle(Entity);
+        var input = new InputState();
+        var controller = new PlayerActionPanelController(bindings);
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        controller.SynchronizeObjectRing(input, snapshot, World(snapshot), selection, false);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.K));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.K));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(PlayerActionPanelMode.Tactical, controller.Mode);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.E));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(PlayerActionPanelMode.Tactical, controller.Mode);
+        Assert.Equal(4, View(controller, snapshot).Ring.Slots[0].Target.ItemIndex);
+        Assert.False(input.IsKeyDown(PlatformKey.E));
+        Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Fact]
+    public void GlobalCategoryNeedsCurrentPointerAndNeverCreatesAnEntityAnchor()
+    {
+        var source = Snapshot(PlayerActionPanelMode.Construction, "Ready");
+        var exp = source.PlayerExperience!.Value with { Selection = PlayerSelectionSummary.Empty };
+        var snapshot = new PresentationSnapshot(source.Tick, source.TickDuration,
+            source.SimulationEntityCount, source.Instances,
+            sessionId: source.SessionId, playerExperience: exp,
+            playerActions: source.PlayerActions);
+        var selection = new SelectionSet();
+        var input = new InputState();
+        var controller = new PlayerActionPanelController();
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        controller.SynchronizeObjectRing(input, snapshot, World(snapshot), selection, false);
+
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.B));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.False(View(controller, snapshot).Ring.Open);
+        Assert.Equal(PlayerActionPanelMode.Closed, controller.Mode);
+        Assert.Contains("POINTER", controller.Feedback);
+
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.B));
+        input.Apply(PlatformInputEvent.PointerMoved(600, 400));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.B));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        var ring = View(controller, snapshot).Ring;
+        Assert.True(ring.Global && ring.Open);
+        Assert.False(ring.Entity.IsValid);
+        Assert.Equal(new Vector2(600, 400), ring.GlobalAnchor);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerLeft());
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.False(View(controller, snapshot).Ring.Open);
+    }
+
+    [Fact]
+    public void CurrentPagedRingAcceptsQAndEEdgesWithoutPhantomPages()
+    {
+        var (controller, input, snapshot, selection) = Open(PlayerActionPanelMode.Tactical, PlatformKey.K);
+        Assert.True(controller.OwnsRadialPaging(snapshot.PlayerActions));
+        Assert.Equal(0, View(controller, snapshot).Ring.Slots[0].Target.ItemIndex);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.E));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(4, View(controller, snapshot).Ring.Slots[0].Target.ItemIndex);
+        Assert.False(input.IsKeyDown(PlatformKey.E));
+
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.E));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.Q));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(0, View(controller, snapshot).Ring.Slots[0].Target.ItemIndex);
+        Assert.False(input.IsKeyDown(PlatformKey.Q));
+        controller.Close();
+        Assert.False(controller.OwnsRadialPaging(snapshot.PlayerActions));
     }
 
     [Fact]

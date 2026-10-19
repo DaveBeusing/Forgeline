@@ -12,18 +12,19 @@ public sealed class RtsCameraActionMapper
 
     public RtsCameraBindings Bindings { get; }
 
-    public RtsCameraInputFrame Map(InputState state, bool pointerCaptured = false)
+    public RtsCameraInputFrame Map(InputState state, bool pointerCaptured = false,
+        bool contextOwnsQe = false)
     {
         ArgumentNullException.ThrowIfNull(state);
 
         float panX =
             Axis(
-                IsEitherDown(state, Bindings.PanRight, Bindings.PanRightAlternate),
-                IsEitherDown(state, Bindings.PanLeft, Bindings.PanLeftAlternate));
+                IsEitherDown(state, Bindings.PanRight, Bindings.PanRightAlternate, contextOwnsQe),
+                IsEitherDown(state, Bindings.PanLeft, Bindings.PanLeftAlternate, contextOwnsQe));
         float panY =
             Axis(
-                IsEitherDown(state, Bindings.PanForward, Bindings.PanForwardAlternate),
-                IsEitherDown(state, Bindings.PanBackward, Bindings.PanBackwardAlternate));
+                IsEitherDown(state, Bindings.PanForward, Bindings.PanForwardAlternate, contextOwnsQe),
+                IsEitherDown(state, Bindings.PanBackward, Bindings.PanBackwardAlternate, contextOwnsQe));
 
         var pan = new Vector2(panX, panY);
         if (pan.LengthSquared() > 1.0f)
@@ -32,11 +33,11 @@ public sealed class RtsCameraActionMapper
         }
 
         float rotation = Axis(
-            state.IsKeyDown(Bindings.RotateRight),
-            state.IsKeyDown(Bindings.RotateLeft));
+            ContextKeyDown(state, Bindings.RotateRight, contextOwnsQe),
+            ContextKeyDown(state, Bindings.RotateLeft, contextOwnsQe));
         float pitch = Axis(
-            state.IsKeyDown(Bindings.PitchUp),
-            state.IsKeyDown(Bindings.PitchDown));
+            ContextKeyDown(state, Bindings.PitchUp, contextOwnsQe),
+            ContextKeyDown(state, Bindings.PitchDown, contextOwnsQe));
 
         return new RtsCameraInputFrame(
             pan,
@@ -49,11 +50,16 @@ public sealed class RtsCameraActionMapper
             pointerCaptured ? Vector2.Zero : state.PointerDelta);
     }
 
+    private static bool ContextKeyDown(InputState state, PlatformKey key, bool contextOwnsQe) =>
+        (!contextOwnsQe || key is not (PlatformKey.Q or PlatformKey.E)) &&
+        state.IsKeyDown(key);
+
     private static bool IsEitherDown(
         InputState state,
         PlatformKey primary,
-        PlatformKey alternate) =>
-        state.IsKeyDown(primary) || state.IsKeyDown(alternate);
+        PlatformKey alternate, bool contextOwnsQe) =>
+        ContextKeyDown(state, primary, contextOwnsQe) ||
+        ContextKeyDown(state, alternate, contextOwnsQe);
 
     private static float Axis(bool positive, bool negative) =>
         (positive ? 1.0f : 0.0f) - (negative ? 1.0f : 0.0f);

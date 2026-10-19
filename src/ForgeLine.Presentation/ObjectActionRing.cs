@@ -44,8 +44,9 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
         {
             if (!Session.IsSpecified || !experience.Player.IsSpecified || experience.Tick != snapshot.Tick || experience.Selection.Count != 0)
                 return this with { Geometry = default, Resolved = true };
-            anchor = layout.SafeArea.Contains(GlobalAnchor) ? GlobalAnchor :
-                new Vector2(layout.SafeArea.X + layout.SafeArea.Width / 2, layout.SafeArea.Y + layout.SafeArea.Height / 2);
+            if (!layout.SafeArea.Contains(GlobalAnchor))
+                return this with { Geometry = default, Resolved = true };
+            anchor = GlobalAnchor;
         }
         else if (Group is not null)
         {
@@ -79,7 +80,8 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
                 continue;
             }
             if (!selectionCurrent) { slots[i] = saved with { Enabled = saved.Navigation != ActionRingNavigation.None }; continue; }
-            if (!saved.Present || saved.Navigation != ActionRingNavigation.None || saved.Target.Kind == PlayerActionDockControlKind.Mode) continue;
+            if (!saved.Present || saved.Key.Kind == 255 ||
+                saved.Navigation != ActionRingNavigation.None || saved.Target.Kind == PlayerActionDockControlKind.Mode) continue;
             int resolved = -1;
             int count = PlayerActionDockInteractionLayout.GetItemCount(saved.Target.Mode, actions);
             for (int item = 0; item < count; item++)

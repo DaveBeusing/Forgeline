@@ -184,6 +184,43 @@ public sealed class RepeatPlacementTests
         Assert.False(f.Controller.TryTakePlacementRequest(out _));
     }
 
+    [Fact]
+    public void ContextualQAndERotationIsReversibleAndF9StaysClockwise()
+    {
+        var fixture = new Fixture();
+        fixture.Prime();
+        Assert.Equal(BuildingOrientation.North, fixture.Controller.Orientation);
+        void Press(PlatformKey key)
+        {
+            fixture.Input.BeginFrame();
+            fixture.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, key));
+            fixture.Update(fixture.Snapshot());
+            // Autorepeat cannot rotate a second time for an unchanged physical press.
+            fixture.Input.BeginFrame();
+            fixture.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, key));
+            fixture.Update(fixture.Snapshot());
+            fixture.Input.BeginFrame();
+            fixture.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, key));
+            fixture.Update(fixture.Snapshot());
+        }
+        Press(PlatformKey.E);
+        Assert.Equal(BuildingOrientation.East, fixture.Controller.Orientation);
+        Press(PlatformKey.Q);
+        Assert.Equal(BuildingOrientation.North, fixture.Controller.Orientation);
+        Press(PlatformKey.Q);
+        Assert.Equal(BuildingOrientation.West, fixture.Controller.Orientation);
+        Press(PlatformKey.E);
+        Assert.Equal(BuildingOrientation.North, fixture.Controller.Orientation);
+        Press(PlatformKey.F9);
+        Assert.Equal(BuildingOrientation.East, fixture.Controller.Orientation);
+        Press(PlatformKey.E);
+        Press(PlatformKey.E);
+        Press(PlatformKey.E);
+        Press(PlatformKey.E);
+        Assert.Equal(BuildingOrientation.East, fixture.Controller.Orientation);
+        Assert.Contains("Q LEFT / E RIGHT", fixture.Controller.InteractionHint);
+    }
+
     private sealed class Fixture
     {
         internal InputState Input { get; } = new();

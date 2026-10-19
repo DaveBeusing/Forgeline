@@ -80,3 +80,9 @@ The existing LOGISTICS navigation, activation and decrease/increase bindings als
 Current removed-surface layout, interaction and native evidence is recorded in
 [HUD surface consolidation](HudSurfaceConsolidation.md#integrated-qualification-19-october-2026).
 Earlier dock/inspector measurements on this page remain historical.
+
+## Contextual keyboard ownership
+
+Global action categories use the active `GameplayBindingRegistry`: B / P / U / L / Y / K / H (or saved valid remaps) open the corresponding copied action-ring category at the last currently valid client pointer position. No valid pointer inside the HUD safe area means no menu opens and a guidance message is issued; no synthetic world entity or viewport-center anchor is created. Without an authorized selected owner, selection-dependent controls render a disabled `No target` sector with the reason to select a building or unit. Global construction/technology items still use existing authorized action snapshots and request dispatch.
+
+Context arbitration is modal/help/settings/pause suppression first, then active building placement, then a genuinely paginated radial item/group level, and then camera. While placing, Q is a 90-degree counterclockwise turn and E a clockwise turn; the existing remapped F9 compatibility key remains clockwise. Placement orientation and authoritative preview-revision checks use the same four `BuildingOrientation` states. While a paginated radial page is open, Q moves backward and E forward by one real four-item page, clamped at the first and last page; an unpaged root does not own Q/E. On dismissal, camera rotation again uses the unchanged stored camera bindings. A keydown/key-up gesture cannot dispatch to both the ring/placement and camera. Release suppression, modal ownership and target validity remain unchanged.

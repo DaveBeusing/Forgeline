@@ -274,3 +274,7 @@ Pointer input inside the action palette is captured before placement and world-s
 The Directorate building baseline is documented in [Directorate Building and Infrastructure Assets](DirectorateBuildingAssets.md). It maps the existing construction, power, production, damage, and destruction state into immutable render metadata after each completed tick.
 
 Presentation changes do not modify `BuildingFootprint`, `SpatialPresence`, placement validity, power allocation, construction progress, production state, or combat damage. LOD and shared collision asset references are renderer/tooling contracts only.
+
+## Rotation during active placement
+
+With a valid active building placement, Q rotates 90 degrees counterclockwise and E 90 degrees clockwise. F9 (or the configured `RotatePlacement` key) remains a clockwise shortcut. Each accepted edge changes the existing four-state `BuildingOrientation`, invalidates the prior preview request and requires a fresh matching snapshot before an authoritative build request can be submitted. Awaiting an already issued build result does not accept a late rotation. Simultaneous Q/E edges cancel one another; key repeats do not produce extra turns. The placement HUD prompt now displays the actual contextual controls.
