@@ -1359,7 +1359,7 @@ public sealed class AutomatedDistributionSystem
         LastDebugSnapshot =
             new AutomatedDistributionDebugSnapshot(
                 Metrics,
-                readModels);
+                readModels) { Tick = context.Tick };
     }
 
     private void PruneTerminalRequests(SimulationTick tick)
