@@ -59,13 +59,18 @@ public sealed class GameplayDisplayQualificationTests
             Assert.InRange(vertex.Color.W, 0f, 1f);
         });
         var informationVertices = Assert.Single(device.Buffers,
-            buffer => buffer.Vertices.Any(vertex => vertex.Color.W == .10f)).Vertices;
-        Assert.Equal(6, informationVertices.Count(vertex => vertex.Color.W == .10f));
-        Assert.Equal(24, informationVertices.Count(vertex => vertex.Color.W == .95f));
+            buffer => buffer.Vertices.Any(vertex =>
+                vertex.Color.W == RtsSelectionVisualStyle.MarqueeFillOpacity)).Vertices;
+        Assert.Equal(6, informationVertices.Count(vertex =>
+            vertex.Color.W == RtsSelectionVisualStyle.MarqueeFillOpacity));
+        Assert.Equal(24, informationVertices.Count(vertex =>
+            vertex.Color.W == RtsSelectionVisualStyle.MarqueeBorderOpacity));
+        Assert.Equal(30, informationVertices.Length);
         var buffers = device.Buffers.ToArray();
         hud.Render(context, camera, snapshot, bounds, view with { IsDragSelecting = false }, default, default,
             FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, dpi, 1);
         Assert.Equal(buffers, device.Buffers);
-        Assert.DoesNotContain(device.Buffers.SelectMany(buffer => buffer.Vertices), vertex => vertex.Color.W == .10f);
+        Assert.DoesNotContain(device.Buffers.SelectMany(buffer => buffer.Vertices),
+            vertex => vertex.Color.W == RtsSelectionVisualStyle.MarqueeFillOpacity);
     }
 }
