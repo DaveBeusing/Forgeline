@@ -52,6 +52,12 @@ internal sealed class MinimapHoverMotion
         }
 
         float allowed = MaxScale(layout, ringBounds);
+        // A newly occupied region takes precedence over decorative easing.
+        if (_value > allowed)
+        {
+            _value = _from = allowed;
+            _started = now;
+        }
         HudRect visible = Expand(original, _value);
         bool hovering = ownsGesture ||
             (hasPointer && (_retained
