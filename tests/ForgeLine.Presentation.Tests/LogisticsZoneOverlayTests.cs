@@ -122,6 +122,16 @@ public sealed class LogisticsZoneOverlayTests
             VehicleQueueService.CargoDelivery, Position: 1, Target: new(1, 0, 10),
             Heading: MathF.PI * .5f));
 
+        Assert.Empty(LogisticsZoneSnapshot.Capture(entities, new(1), Terrain,
+            Array.Empty<EntityId>()).Strokes.ToArray());
+        Assert.Empty(LogisticsZoneSnapshot.Capture(entities, new(1), Terrain,
+            [new EntityId(999, 1)]).Strokes.ToArray());
+        var selectedCapture = LogisticsZoneSnapshot.Capture(entities, new(1), Terrain, [building]);
+        Assert.Contains(selectedCapture.Strokes.ToArray(), item => item.Kind == LogisticsZoneKind.Loading);
+        Assert.Contains(selectedCapture.Strokes.ToArray(), item => item.Kind == LogisticsZoneKind.Holding);
+        var hoveredCapture = LogisticsZoneSnapshot.Capture(entities, new(1), Terrain,
+            Array.Empty<EntityId>(), building);
+        Assert.True(hoveredCapture.Strokes.Length > 0);
         var captured = LogisticsZoneSnapshot.Capture(entities, new(1), Terrain);
         Assert.Contains(captured.Strokes.ToArray(), item => item.Kind == LogisticsZoneKind.Loading &&
             item.Building == building && item.Vehicle == truck);
