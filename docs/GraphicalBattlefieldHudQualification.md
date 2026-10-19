@@ -141,3 +141,8 @@ are not passes. Full-match, release and human-review gates remain required.
 Local ZIP: `artifacts/graphical-battlefield-current-package/FORGELINE-0.1.377-dev-win-x64.zip` (39981298 bytes).
 SHA-256: `2bf265986da748e939d54fafbbefaea55491ce2e7f7297dfffb6e6c2d936ddd9`.
 The package is a local validation artifact; no release/upload/tag was created.
+
+
+Current removed-surface layout, interaction and native evidence is recorded in
+[HUD surface consolidation](HudSurfaceConsolidation.md#integrated-qualification-19-october-2026).
+Earlier dock/inspector measurements on this page remain historical.

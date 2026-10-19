@@ -75,3 +75,8 @@ source identity, sequence tests and remaining native/human acceptance.
 ## Logistics setup
 
 The existing LOGISTICS navigation, activation and decrease/increase bindings also operate INPUTS cards and USE INPUTS. Preview prepares additional-step thresholds; APPLY POLICY submits each resource separately. No new fixed key is introduced. Ring, mouse and remapped keyboard paths retain the shared selection/session guards. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
+
+
+Current removed-surface layout, interaction and native evidence is recorded in
+[HUD surface consolidation](HudSurfaceConsolidation.md#integrated-qualification-19-october-2026).
+Earlier dock/inspector measurements on this page remain historical.
