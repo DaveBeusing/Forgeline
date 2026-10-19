@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 
 namespace ForgeLine.Presentation;
@@ -13,7 +14,7 @@ internal enum MinimapHoverPhase : byte
 /// <summary>Presentation-only, monotonic minimap expansion with a fixed bottom-right anchor.</summary>
 internal sealed class MinimapHoverMotion
 {
-    internal const float DesiredScale = 1.35f;
+    internal const float DesiredScale = 1.50f;
     internal static readonly TimeSpan Duration = TimeSpan.FromMilliseconds(180);
     private static readonly TimeSpan ClockStall = TimeSpan.FromMilliseconds(250);
 
@@ -25,9 +26,11 @@ internal sealed class MinimapHoverMotion
     private float _target = 1;
     private bool _initialized;
     private bool _retained;
+    private float _reportedLimit = float.NaN;
 
     internal MinimapHoverPhase Phase { get; private set; }
     internal HudRect Bounds { get; private set; }
+    internal float MaximumScale { get; private set; } = 1;
 
     internal HudRect Update(in GameplayHudLayout layout, Vector2 pointer, bool hasPointer,
         TimeSpan now, bool active, bool animate, bool ownsGesture = false, HudRect ringBounds = default)
@@ -52,6 +55,17 @@ internal sealed class MinimapHoverMotion
         }
 
         float allowed = MaxScale(layout, ringBounds);
+        MaximumScale = allowed;
+        if (allowed < DesiredScale - .01f &&
+            (float.IsNaN(_reportedLimit) || MathF.Abs(allowed - _reportedLimit) > .01f))
+        {
+            Debug.WriteLine($"Minimap hover capped at {allowed:F2}x (requested {DesiredScale:F2}x) by occupied HUD geometry.");
+            _reportedLimit = allowed;
+        }
+        else if (allowed >= DesiredScale - .01f)
+        {
+            _reportedLimit = float.NaN;
+        }
         // A newly occupied region takes precedence over decorative easing.
         if (_value > allowed)
         {
@@ -90,6 +104,8 @@ internal sealed class MinimapHoverMotion
         _base = Bounds = default;
         _last = _started = TimeSpan.Zero;
         _from = _value = _target = 1;
+        MaximumScale = 1;
+        _reportedLimit = float.NaN;
         _initialized = _retained = false;
         Phase = MinimapHoverPhase.Idle;
     }

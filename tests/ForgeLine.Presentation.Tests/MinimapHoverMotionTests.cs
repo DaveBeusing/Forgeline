@@ -19,7 +19,8 @@ public sealed class MinimapHoverMotionTests
         Assert.True(midway.Width > initial.Width);
         Assert.True(midway.Width < expanded.Width);
         Assert.Equal(MinimapHoverPhase.Expanded, motion.Phase);
-        Assert.InRange(expanded.Width / initial.Width, 1.34f, 1.36f);
+        Assert.InRange(expanded.Width / initial.Width, 1.49f, 1.51f);
+        Assert.Equal(MinimapHoverMotion.DesiredScale, motion.MaximumScale);
         Assert.Equal(initial.Right, expanded.Right);
         Assert.Equal(initial.Bottom, expanded.Bottom);
 
@@ -117,6 +118,92 @@ public sealed class MinimapHoverMotionTests
         Assert.True(bounded.Width >= layout.Minimap.Width);
         Assert.True(bounded.Width < layout.Minimap.Width * MinimapHoverMotion.DesiredScale);
         Assert.False(bounded.Intersects(ring));
+    }
+
+    [Theory]
+    [InlineData(30)]
+    [InlineData(60)]
+    [InlineData(144)]
+    public void ExpansionRemainsMonotonicAcrossRenderRates(int framesPerSecond)
+    {
+        GameplayHudLayout layout = GameplayHudLayout.Create(1920, 1080, 96);
+        var motion = new MinimapHoverMotion();
+        Vector2 pointer = Center(RtsMinimapInteractionLayout.GetMapRect(layout));
+        HudRect previous = motion.Update(layout, pointer, true, TimeSpan.Zero, true, true);
+
+        for (int frame = 1; frame * 1000.0 / framesPerSecond < 180; frame++)
+        {
+            TimeSpan now = TimeSpan.FromSeconds(frame / (double)framesPerSecond);
+            HudRect current = motion.Update(layout, pointer, true, now, true, true);
+            Assert.True(current.Width >= previous.Width);
+            Assert.InRange(MathF.Abs(current.Right - layout.Minimap.Right), 0, .01f);
+            Assert.InRange(MathF.Abs(current.Bottom - layout.Minimap.Bottom), 0, .01f);
+            previous = current;
+        }
+
+        HudRect final = motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(180), true, true);
+        Assert.InRange(final.Width / layout.Minimap.Width, 1.49f, 1.51f);
+        Assert.Equal(MinimapHoverPhase.Expanded, motion.Phase);
+    }
+
+    [Fact]
+    public void MidFlightReversalPreservesCurrentGeometryAndCanResume()
+    {
+        GameplayHudLayout layout = GameplayHudLayout.Create(1600, 900, 96);
+        var motion = new MinimapHoverMotion();
+        Vector2 pointer = Center(RtsMinimapInteractionLayout.GetMapRect(layout));
+        motion.Update(layout, pointer, true, TimeSpan.Zero, true, true);
+        HudRect growing = motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(75), true, true);
+        HudRect reversed = motion.Update(layout, Vector2.Zero, true, TimeSpan.FromMilliseconds(85), true, true);
+        Assert.Equal(growing, reversed);
+        Assert.Equal(MinimapHoverPhase.Shrinking, motion.Phase);
+
+        HudRect shrinking = motion.Update(layout, Vector2.Zero, true, TimeSpan.FromMilliseconds(125), true, true);
+        Assert.True(shrinking.Width < growing.Width);
+        HudRect resumed = motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(135), true, true);
+        Assert.Equal(shrinking, resumed);
+        HudRect final = motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(315), true, true);
+        Assert.InRange(final.Width / layout.Minimap.Width, 1.49f, 1.51f);
+    }
+
+    [Fact]
+    public void OccupiedAlertAreaReportsAndEnforcesActualExpansionLimit()
+    {
+        GameplayHudLayout layout = GameplayHudLayout.Create(1600, 900, 96);
+        HudRect baseMap = layout.Minimap;
+        HudRect alert = new(baseMap.Right - 310, baseMap.Y - 95, 180, 70);
+        GameplayHudLayout occupied = layout with { AlertStack = alert };
+        var motion = new MinimapHoverMotion();
+        Vector2 pointer = Center(RtsMinimapInteractionLayout.GetMapRect(layout));
+
+        HudRect bounded = motion.Update(occupied, pointer, true, TimeSpan.Zero, true, false);
+        Assert.InRange(motion.MaximumScale, 1, MinimapHoverMotion.DesiredScale - .01f);
+        Assert.False(bounded.Intersects(alert));
+        Assert.InRange(bounded.Width / baseMap.Width, motion.MaximumScale - .001f, motion.MaximumScale + .001f);
+
+        HudRect unoccupied = motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(20), true, false);
+        Assert.InRange(unoccupied.Width / baseMap.Width, 1.49f, 1.51f);
+        Assert.Equal(MinimapHoverMotion.DesiredScale, motion.MaximumScale);
+    }
+
+    [Fact]
+    public void NewlyOccupiedRingClampsImmediatelyWithoutAnimatedOverlap()
+    {
+        GameplayHudLayout layout = GameplayHudLayout.Create(1600, 900, 96);
+        var motion = new MinimapHoverMotion();
+        Vector2 pointer = Center(RtsMinimapInteractionLayout.GetMapRect(layout));
+        motion.Update(layout, pointer, true, TimeSpan.Zero, true, true);
+        HudRect full = motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(180), true, true);
+        HudRect ring = new(layout.Minimap.X - 70, layout.Minimap.Y - 70, 50, 50);
+
+        HudRect clamped = motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(190),
+            true, true, ringBounds: ring);
+        Assert.True(clamped.Width < full.Width);
+        Assert.False(clamped.Intersects(ring));
+        Assert.True(motion.MaximumScale < MinimapHoverMotion.DesiredScale);
+        HudRect recovered = motion.Update(layout, pointer, true, TimeSpan.FromMilliseconds(200),
+            true, false);
+        Assert.InRange(recovered.Width / layout.Minimap.Width, 1.49f, 1.51f);
     }
 
     [Fact]
