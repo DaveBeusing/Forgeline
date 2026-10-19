@@ -1385,13 +1385,13 @@ internal sealed class ClientApplication
 
             if (!hudInteraction.KeyboardCaptured)
             {
+                // The active placement or paginated ring owns only Q/E. Other
+                // stored camera rotation bindings must remain functional.
+                bool contextOwnsQe = buildingPlacementController.IsActive ||
+                    actionPanel.OwnsRadialPaging(inputSnapshot?.PlayerActions);
                 RtsCameraInputFrame cameraInput =
-                    actionMapper.Map(inputState, hudInteraction.PointerCaptured);
-                // A contextual owner consumes Q/E before camera navigation. Saved
-                // camera bindings are otherwise left exactly as configured.
-                if (buildingPlacementController.IsActive ||
-                    actionPanel.OwnsRadialPaging(inputSnapshot?.PlayerActions))
-                    cameraInput = cameraInput with { Rotation = 0 };
+                    actionMapper.Map(inputState, hudInteraction.PointerCaptured,
+                        contextOwnsQe: contextOwnsQe);
 
                 camera.Update(
                     cameraInput,
