@@ -15,7 +15,7 @@ The shared action-ring backgrounds have an effective settled alpha of 0.30, inde
 
 ## Notification and context-hint motion
 
-Notifications and the local contextual hint share a bounded 180 ms SmoothStep alpha track per displayed lifecycle/content identity. Their container background is independently tinted to a 0.30 opacity ceiling; foreground glyphs, icons, rails, and buttons retain independent contrast. New/revised content fades in on presentation time; a resolved row immediately disappears from the interactive stack, with only an optional short-lived noninteractive background remnant. Critically active alerts never time out merely because their animation completes. Reduced UI motion, Low quality, focus/minimize/pause suppression, session/display changes, stalled or reversed presentation time settle to the logical state immediately. This does not animate or change any input hit geometry.
+Notifications, local command feedback and the separate placement-context hint use bounded 180 ms SmoothStep alpha tracks per displayed lifecycle/content identity. Their container background is independently tinted to a 0.30 opacity ceiling; foreground glyphs, icons, rails, and buttons retain independent contrast. New/revised content fades in on presentation time; a resolved row immediately disappears from the interactive stack, with only an optional short-lived noninteractive background remnant. Critically active alerts never time out merely because their animation completes. Reduced UI motion, Low quality, focus/minimize/pause suppression, session/display changes, stalled or reversed presentation time settle to the logical state immediately. This does not animate or change any input hit geometry.
 
 ## Motion vocabulary
 
