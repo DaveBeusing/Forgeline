@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Game;
 using ForgeLine.Simulation;
 using Xunit;
 
