@@ -1322,7 +1322,8 @@ internal sealed class ClientApplication
                 animateHover: _settings.CreateUiFeedbackSettings().Animate(
                     renderHost.LatestQualification?.QualityProfile.Active ?? RenderQuality.Low),
                 presentationActive: window.IsFocused && !window.IsMinimized &&
-                    !simulationPaused && !modalFrame);
+                    !simulationPaused && !modalFrame,
+                ringBounds: actionPanel.PresentedRingBounds);
             hudInteraction.CapturePointer(
                 minimapInteraction.PointerCaptured);
 
