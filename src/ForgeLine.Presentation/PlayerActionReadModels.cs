@@ -657,7 +657,7 @@ internal static class PlayerActionSnapshotFactory
                 ? CaptureLogistics(
                     context.Entities,
                     scenario,
-                    selectedFacility, production, unitProduction)
+                    selectedFacility, production, unitProduction, context.Tick)
                 : null;
 
         PlayerSupplyActionReadModel? supply =
@@ -1273,7 +1273,8 @@ internal static class PlayerActionSnapshotFactory
         MatchRuntime scenario,
         EntityId entity,
         PlayerProductionFacilityActionReadModel? production,
-        PlayerUnitProductionFacilityActionReadModel? units)
+        PlayerUnitProductionFacilityActionReadModel? units,
+        SimulationTick tick)
     {
         bool hasInventory =
             TryResolveDistributionInventory(
@@ -1286,7 +1287,7 @@ internal static class PlayerActionSnapshotFactory
         var distribution = scenario.AutomatedDistribution.LastDebugSnapshot;
         var orderRows = new List<PlayerLogisticsOrderReadModel>();
         int orderTotal = 0;
-        if (distribution.Tick == scenario.Simulation.CurrentTick)
+        if (distribution.Tick == tick)
         {
             foreach (var request in distribution.Requests)
             {
