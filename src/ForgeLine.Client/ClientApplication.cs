@@ -1211,7 +1211,9 @@ internal sealed class ClientApplication
                     window.ClientSize.Height,
                     window.Dpi,
                     _settings.UiScale,
-                    currentSelection: selectionController.Selection);
+                    currentSelection: selectionController.Selection,
+                    globalShortcutsBlocked: buildingPlacementController.IsActive ||
+                        tacticalTargetingController.IsActive);
 
                 if (actionPanel.TryTakeRequest(
                         out PlayerActionRequest actionRequest))
@@ -1385,6 +1387,12 @@ internal sealed class ClientApplication
             {
                 RtsCameraInputFrame cameraInput =
                     actionMapper.Map(inputState, hudInteraction.PointerCaptured);
+                // A contextual owner consumes Q/E before camera navigation. Saved
+                // camera bindings are otherwise left exactly as configured.
+                if (buildingPlacementController.IsActive ||
+                    actionPanel.OwnsRadialPaging(
+                        PlayerActionDockHudModel.ResolveActions(inputSnapshot)))
+                    cameraInput = cameraInput with { Rotation = 0 };
 
                 camera.Update(
                     cameraInput,
