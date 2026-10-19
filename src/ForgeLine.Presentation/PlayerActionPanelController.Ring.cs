@@ -190,6 +190,43 @@ public sealed partial class PlayerActionPanelController
         return ring with { Slots = slots };
     }
 
+    public bool OwnsRadialPaging(PlayerActionSnapshot? actions)
+    {
+        if (!_ringContext || !_ringOpen) return false;
+        if (_ringLevel == ActionRingLevel.Group) return _ringGroup is not null;
+        return _ringLevel == ActionRingLevel.Items &&
+            PlayerActionDockInteractionLayout.GetItemCount(Mode, actions) > 4;
+    }
+
+    private void UpdateRadialPaging(InputState input, PlayerActionSnapshot? actions)
+    {
+        if (!OwnsRadialPaging(actions)) return;
+        bool previous = input.WasKeyPressed(PlatformKey.Q);
+        bool next = input.WasKeyPressed(PlatformKey.E);
+        if (!previous && !next) return;
+        // Opposite keys in one input frame cancel rather than issue two page changes.
+        int direction = previous == next ? 0 : previous ? -1 : 1;
+        int count = _ringLevel == ActionRingLevel.Group ? 12 :
+            PlayerActionDockInteractionLayout.GetItemCount(Mode, actions);
+        int maximumPage = Math.Max(0, (count - 1) / 4);
+        int page = Math.Clamp(_ringPage + direction, 0, maximumPage);
+        if (page != _ringPage)
+        {
+            _ringPage = page;
+            if (_ringLevel == ActionRingLevel.Items)
+            {
+                SelectedIndex = Math.Clamp(page * 4, 0, count - 1);
+                _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions);
+                _itemSlotsPage = -1;
+            }
+            _ringArmed = false;
+            _ringRevision++;
+            _presentedRing = default;
+        }
+        if (previous) input.SuppressKeyUntilRelease(PlatformKey.Q);
+        if (next) input.SuppressKeyUntilRelease(PlatformKey.E);
+    }
+
     private int FindRingItem(ActionRingKey key, PlayerActionSnapshot? actions)
     {
         if (key == default) return -1;
