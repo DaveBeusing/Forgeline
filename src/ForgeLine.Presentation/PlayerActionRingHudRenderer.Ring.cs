@@ -104,8 +104,8 @@ internal sealed partial class PlayerActionRingHudRenderer
                 target.Kind is PlayerActionDockControlKind.Decrease or PlayerActionDockControlKind.Increase)
             { value.Append("STEPS "); value.Append(panel.LogisticsSteps); }
             else if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
-            else if (mode && target.Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } summary)
-            { value.Append("ORDERS "); value.Append(summary.TotalOrderCount); }
+            else if (mode && target.Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } logisticsSummary)
+            { value.Append("ORDERS "); value.Append(logisticsSummary.TotalOrderCount); }
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
             else if (item)
             {
