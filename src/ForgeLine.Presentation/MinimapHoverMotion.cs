@@ -51,7 +51,7 @@ internal sealed class MinimapHoverMotion
             _from = _value = _target = 1;
         }
 
-        float allowed = MaxScale(layout);
+        float allowed = MaxScale(layout, ringBounds);
         HudRect visible = Expand(original, _value);
         bool hovering = ownsGesture ||
             (hasPointer && (_retained
@@ -88,7 +88,7 @@ internal sealed class MinimapHoverMotion
         Phase = MinimapHoverPhase.Idle;
     }
 
-    private static float MaxScale(in GameplayHudLayout layout)
+    private static float MaxScale(in GameplayHudLayout layout, in HudRect ringBounds)
     {
         HudRect original = layout.Minimap;
         HudRect safe = layout.SafeArea;
@@ -107,6 +107,17 @@ internal sealed class MinimapHoverMotion
         if (!layout.SecondaryView.IsEmpty &&
             layout.SecondaryView.Bottom > original.Bottom - original.Height * DesiredScale)
             limit = MathF.Min(limit, (original.Right - layout.SecondaryView.Right - gap) / original.Width);
+
+        if (!ringBounds.IsEmpty &&
+            ringBounds.X < original.Right && ringBounds.Y < original.Bottom &&
+            ringBounds.Right > original.Right - original.Width * DesiredScale &&
+            ringBounds.Bottom > original.Bottom - original.Height * DesiredScale)
+        {
+            // Keep the existing ring fixed; shrinking either axis can prevent overlap.
+            float widthFit = (original.Right - ringBounds.Right - gap) / original.Width;
+            float heightFit = (original.Bottom - ringBounds.Bottom - gap) / original.Height;
+            limit = MathF.Min(limit, MathF.Max(widthFit, heightFit));
+        }
 
         return Math.Clamp(float.IsFinite(limit) ? limit : 1, 1, DesiredScale);
     }
