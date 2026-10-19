@@ -22,10 +22,16 @@ public sealed class LogisticsZoneSnapshot
     internal LogisticsZoneSnapshot(LogisticsZoneStroke[] strokes) => _strokes = strokes;
     public ReadOnlySpan<LogisticsZoneStroke> Strokes => _strokes;
 
-    internal static LogisticsZoneSnapshot Capture(EntityRegistry entities, PlayerId player, ITerrainQuery terrain)
+    internal static LogisticsZoneSnapshot Capture(EntityRegistry entities, PlayerId player, ITerrainQuery terrain,
+        IReadOnlyList<EntityId>? selected = null, EntityId hovered = default)
     {
         ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(terrain);
+        if (selected is { Count: 0 } && !hovered.IsValid) return new([]);
+        HashSet<EntityId>? interest = selected is { Count: > 0 } ? new(selected) : null;
+        bool Interested(EntityId building, EntityId vehicle) =>
+            selected is null && !hovered.IsValid || hovered == building || hovered == vehicle ||
+            (interest?.Contains(building) ?? false) || (interest?.Contains(vehicle) ?? false);
         List<LogisticsZoneStroke>? strokes = null;
         HashSet<EntityId>? publishedBays = null;
         int zones = 0;
@@ -35,7 +41,8 @@ public sealed class LogisticsZoneSnapshot
             if (zones >= MaximumZones) break;
             if (!OwnedBuilding(entities, building, player)) continue;
             var slot = entities.GetComponent<VehicleDockSlot>(building);
-            if (slot.Owner != player || !OwnedVehicle(entities, slot.Truck, player)) continue;
+            if (slot.Owner != player || !OwnedVehicle(entities, slot.Truck, player) ||
+                !Interested(building, slot.Truck)) continue;
             strokes ??= new(128);
             publishedBays ??= [];
             if (!AddLoading(strokes, terrain, building, slot.Truck, slot.Pose)) continue;
@@ -49,6 +56,7 @@ public sealed class LogisticsZoneSnapshot
             if (!OwnedVehicle(entities, truck, player)) continue;
             var visit = entities.GetComponent<VehicleDockVisit>(truck);
             if (visit.Status is VehicleDockStatus.Busy or VehicleDockStatus.Blocked ||
+                !Interested(visit.Building, truck) ||
                 !OwnedBuilding(entities, visit.Building, player) ||
                 publishedBays?.Contains(visit.Building) == true) continue;
             strokes ??= new(128);
@@ -63,7 +71,7 @@ public sealed class LogisticsZoneSnapshot
             if (zones >= MaximumZones) break;
             if (!OwnedVehicle(entities, truck, player)) continue;
             var queue = entities.GetComponent<VehicleQueueEntry>(truck);
-            if (queue.Owner != player || queue.ArrivedAtService ||
+            if (queue.Owner != player || !Interested(queue.Building, truck) || queue.ArrivedAtService ||
                 queue.WaitReason == VehicleQueueWaitReason.GeometryBlocked ||
                 !OwnedBuilding(entities, queue.Building, player) ||
                 !entities.TryGetComponent(truck, out WorldTransform vehicle)) continue;
@@ -80,6 +88,7 @@ public sealed class LogisticsZoneSnapshot
             if (!OwnedVehicle(entities, truck, player)) continue;
             var holding = entities.GetComponent<VehicleQueueHolding>(truck);
             if (holding.Reason == VehicleQueueWaitReason.GeometryBlocked ||
+                !Interested(holding.Building, truck) ||
                 !OwnedBuilding(entities, holding.Building, player) ||
                 entities.HasComponent<VehicleQueueEntry>(truck) ||
                 !entities.TryGetComponent(truck, out WorldTransform vehicle)) continue;
