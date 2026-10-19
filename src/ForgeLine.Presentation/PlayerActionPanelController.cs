@@ -1355,7 +1355,8 @@ public sealed partial class PlayerActionPanelController
                 _stockMaximum = LogisticsQuantityEditor.Adjust(
                     _stockMaximum, direction, lower: Math.Max(LogisticsQuantityEditor.Minimum, _stockTarget),
                     upper: actions.Logistics.InventoryCapacity > 0
-                        ? Math.Max(_stockMaximum, actions.Logistics.InventoryCapacity)
+                        ? direction > 0 ? actions.Logistics.InventoryCapacity
+                            : Math.Max(_stockMaximum, actions.Logistics.InventoryCapacity)
                         : double.MaxValue);
                 break;
         }
