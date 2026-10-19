@@ -158,7 +158,12 @@ internal static class HoverTooltipPlacement
                 var obstacle=occupied[i];
                 if(candidate.Intersects(new(obstacle.X-gap,obstacle.Y-gap,obstacle.Width+gap*2,obstacle.Height+gap*2))) {clear=false;break;}
             }
-            if(clear) {best=candidate;score=distance;}
+            if (clear)
+            {
+                // The card belongs to the free area on the ring's right whenever feasible.
+                if (x == 0) return candidate;
+                best = candidate; score = distance;
+            }
         }
         return best;
     }
