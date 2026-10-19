@@ -293,11 +293,16 @@
     "exactPairedImages": 12
   },
   "nativeReview": {
-    "status": "pending",
+    "status": "approved",
     "imageRoot": "evidence/repair/foundation-final-native-correctness",
     "cases": 6,
     "captureSource": "0cf888b047cd79b91ef9c8466f7b4082cd2f15d0",
-    "runtimeAndAssetTreesEqualIntegratedMaster": true
+    "runtimeAndAssetTreesEqualIntegratedMaster": true,
+    "reviewer": "Project owner",
+    "reviewDate": "2026-10-19",
+    "decision": "Visual equality approved for all six foundation review images."
   },
-  "parallelReleased": false
+  "parallelReleased": true,
+  "releaseRecordPr": 241,
+  "releaseEffectiveWhen": "This acceptance and ownership record is integrated into master; dependent implementations start from that master."
 }

@@ -1,7 +1,8 @@
 # Render foundation timing and software admission repair
 
-Status: integrated by PR #237; technical qualification passed. Human native review
-remains pending and parallel release stays blocked. See [current acceptance](Acceptance.md).
+Status: integrated by PR #237; technical qualification and explicit human native
+review passed. The parallel release record takes effect after PR #241 is integrated
+into master. See [current acceptance](Acceptance.md).
 The chronological entries below retain their original checkpoint states.
 Base master: `17810ee192fac495173a7e9da44c973595833f2b`, version 0.1.401.
 The existing qualification follow-up is continued; one PR delta remains 0.1.402.
@@ -1078,3 +1079,13 @@ The current state and the six native review images are linked in
 [Acceptance](Acceptance.md), with a machine-readable source/CI checkpoint.
 Independent human review is the remaining foundation release condition.
 parallelReleased stays false until that decision is explicitly recorded.
+
+
+### Explicit native equality approval
+
+On 19 October 2026 the project owner explicitly approved visual equality for the
+six final native images linked in Acceptance.md. The acceptance checkpoint and
+ownership manifest record that decision and parallelReleased=true. This release
+record takes effect after PR #241 is integrated into master. Earlier pending-review
+entries remain chronological history. No dependent implementation, merge, tag or
+release is performed by recording the approval.

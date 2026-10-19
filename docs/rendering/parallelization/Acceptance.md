@@ -1,7 +1,10 @@
 # Integrated render foundation acceptance
 
-Status: **technical qualification passed; human native review pending**.
-`parallelReleased` remains false. No dependent implementation has started.
+Status: **technical qualification passed; human native review approved**.
+The project owner explicitly approved visual equality of all six images on
+**19 October 2026**. `parallelReleased=true` records that decision. The release
+record takes effect after integration of PR #241 into master; dependent
+implementations must start from that master. No dependent implementation has started.
 
 ## Integrated source and required checks
 
@@ -49,7 +52,9 @@ The [machine-readable checkpoint](Acceptance.json) names the integrated source a
 The following are the original hardware readbacks, High 1920x1080, fixed cameras
 at 120/420/1000 metres. Review both scenes for missing geometry, materials, shadows,
 effects, readability and unexpected changes against their retained exact baseline.
-Pixel equality is automated; human image review has not been recorded.
+Pixel equality is automated. The project owner approved the complete six-image
+review set on 19 October 2026; approval covers foundation visual equality, without
+claiming new artwork-quality or performance targets.
 
 ### Tank, 120 metres
 
@@ -77,10 +82,12 @@ Pixel equality is automated; human image review has not been recorded.
 
 ## Release condition
 
-The implementation and technical qualification are integrated. The remaining
-condition is explicit human approval of this six-image native comparison.
-Record the decision with reviewer/date and source before setting
-`parallelReleased=true`. A generic continuation instruction does not supply that
-specific image-review decision. Revalidate ownership against the then-current
-master and begin each dependent implementation from that integrated master.
-This checkpoint neither starts the eight implementations nor merges, tags or releases.
+The implementation, repair and technical qualification are integrated. Explicit
+human approval of this six-image native comparison was received from the project
+owner on 19 October 2026. The ownership manifest now records
+`parallelReleased=true`. The release record must be integrated through PR #241
+before dependent implementations start from master. Required checks for that PR
+remain separate from the already successful integrated-runtime checks above.
+Revalidate ownership against the then-current master and preserve the frozen
+interfaces. This approval does not start the eight implementations, merge a PR,
+create a tag or publish a release.

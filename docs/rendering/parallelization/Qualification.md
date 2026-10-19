@@ -1,7 +1,7 @@
 # Render foundation qualification
 
-Status: **integrated; technical gates passed; human native review pending**. Parallel start
-remains blocked until that review is explicitly recorded. The current acceptance
+Status: **integrated; technical gates passed; human native review approved**. The
+parallel release record takes effect when PR #241 is integrated into master. The current acceptance
 checkpoint is [Acceptance](Acceptance.md); the measurements below retain their
 original historical source identities and failed results.
 

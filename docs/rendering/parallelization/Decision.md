@@ -1,7 +1,8 @@
 # Decision: serial render boundaries before independent implementations
 
-Status: implemented and integrated. Technical qualification passes; explicit human
-native review remains pending. See [current acceptance](Acceptance.md).
+Status: implemented and integrated. Technical qualification and explicit human
+native review pass. The parallel release record takes effect after PR #241 is
+integrated into master. See [current acceptance](Acceptance.md).
 
 The renderer already has functional instancing, immutable snapshots, native fence
 retirement, material caches and quality gates. Independent changes need separate
