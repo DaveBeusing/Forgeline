@@ -1,6 +1,6 @@
 namespace ForgeLine.Presentation;
 
-internal readonly record struct RingMotionViewport(int Width, int Height, uint Dpi, float UiScale);
+public readonly record struct RingMotionViewport(int Width, int Height, uint Dpi, float UiScale);
 
 /// <summary>One bounded alpha track. Geometry never scales or moves because of animation.</summary>
 public sealed class ObjectActionRingMotion
