@@ -2,7 +2,13 @@
 
 The alert stack keeps the existing critical/warning/information text, icons and command-result cards. Current Core Destroyed, Core Damaged, Critical Supply, Blocked Production and Constrained Power conditions have at most five copied records. Their identity is session, player, condition and onset tick. Repeated completed ticks keep the identity; resolution removes the record, recurrence starts another identity. Fresh sessions or tick rollback reset lifecycle state. Pausing preserves the last completed capture. Terminal alerts remain visible but cannot activate navigation. No history, sound, dismissal command or per-tick popup is introduced.
 
-## Navigation and relevance
+## Current notification and context-hint presentation
+
+The existing notification stack remains the only owner of both authoritative alert cards and the local contextual hint row. Cards have one horizontal, vertically centered icon/text/action flow with measured typography and a one-line ellipsis. A truncated alert exposes MORE alongside the existing FOCUS/OPS navigation when space permits; authorized full content remains available through Operations Notifications. Local contextual messages also use the same bounded row and full-detail path.
+
+The background material uses 0.30 alpha independently from full-opacity severity rails, icons, text and compact action buttons. A bounded 180 ms SmoothStep runs on monotone presentation time for changed/current visual identities. Resolved cards relinquish capture immediately; any outgoing decoration contains only a noninteractive panel, never stale alert text or target details. Reduced Motion, Low mode, focus/pause suppression, clock discontinuity and display/session change settle immediately. Alert prioritization, lifecycle identities and simulation requests are unchanged. Real D3D12 capture and human readability acceptance for this revision must be recorded separately from historical evidence.
+
+ Navigation and relevance
 
 FOCUS means a captured locally owned candidate exists. Clicking focuses and selects it for the existing inspector, after current world visibility, ownership and full entity generation are checked again. The Command Core destination is the configured local core. Supply, factory and power destinations choose the first eligible owned live candidate in stable entity order whose existing component reports the relevant condition. Aggregate counts remain visible. This chooses a representative affected target; it does not claim every contributing cause belongs to that one entity.
 
