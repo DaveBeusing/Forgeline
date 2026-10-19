@@ -23,6 +23,7 @@ public sealed partial class PlayerActionPanelController
     public CombatGroupCardResult TakeGroupResult() { var result = _groupResult; _groupResult = default; return result; }
     private bool _ringContext, _ringOpen, _ringGlobal;
     private Vector2 _globalAnchor;
+    private bool _globalAnchorValid;
     private EntityId _ringEntity;
     private SimulationSessionId _ringSession;
     private ulong _ringSelection, _ringRevision;
