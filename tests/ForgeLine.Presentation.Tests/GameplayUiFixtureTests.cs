@@ -99,6 +99,8 @@ public sealed class GameplayUiFixtureTests
             string baseline = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "action-ring-geometry.json"));
             var expected = JsonSerializer.Deserialize<SortedDictionary<string, Fixture>>(baseline, JsonOptions)!;
             Assert.Equal(expected.Count, fixtures.Count);
+            if (!string.Equals(JsonSerializer.Serialize(expected, JsonOptions), actual, StringComparison.Ordinal))
+                throw new InvalidOperationException("RADIAL_FIXTURE_BEGIN\n" + actual + "\nRADIAL_FIXTURE_END");
             foreach (var fixture in fixtures) Assert.Equal(expected[fixture.Key], fixture.Value);
         }
     }
