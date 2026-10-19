@@ -60,6 +60,7 @@ public sealed class ResponsiveHudLayoutTests
             GameplayHudLayout.Create(context.Width,context.Height,96));
         Assert.Equal(0,renderer.LastRenderedVertexCount);
         Assert.Empty(device.Buffers);
+        Assert.True(device.Pipeline!.AlphaBlendEnabled);
         Assert.DoesNotContain(typeof(GameplayHudLayout).GetProperties(),p=>p.Name is "ActionDock" or "SelectionInspector" or "PrimaryCommands");
     }
     [Theory] [InlineData(0,0)] [InlineData(0,720)] [InlineData(1280,0)] [InlineData(1,1)] [InlineData(200,160)]

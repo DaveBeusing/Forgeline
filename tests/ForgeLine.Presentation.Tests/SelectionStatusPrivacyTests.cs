@@ -11,6 +11,33 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class SelectionStatusPrivacyTests
 {
     [Fact]
+    public void NativeRingOpacityChangesScenePixelsAndZeroOpacityLeavesNoPaint()
+    {
+        using var platform=new WindowsPlatform();
+        using var window=platform.CreateWindow(new("FORGELINE ring opacity",1600,900));
+        using var device=GraphicsDeviceFactory.CreateForWindow(window,new(){ForceSoftwareAdapter=true,EnableVSync=false});
+        using var renderer=new PlayerActionRingHudRenderer(device,null);
+        var snapshot=HoverTooltipRenderingTests.StatusSnapshot();
+        var layout=GameplayHudLayout.Create(1600,900,96);
+        var geometry=new RadialActionLayout(new(800,450),new(800,450),60,150,8);
+        ActionRingSlots slots=default;
+        slots[0]=new(default,default,ActionRingNavigation.Back);
+        var ring=new ObjectActionRingView(new(11,1),snapshot.SessionId,1,1,true,true,geometry,true) {Slots=slots};
+        var panel=default(PlayerActionPanelView) with {Ring=ring};
+        byte[] Capture(float opacity) => device.CaptureFrame(new GraphicsColor(.8f,.7f,.6f,1),c=>{
+            c.BeginPass(GraphicsFramePass.Overlay);
+            renderer.Render(c,snapshot,panel with {Ring=ring with {Opacity=opacity}},default,default,layout);
+        });
+        var clear=Capture(0);var full=Capture(1);var half=Capture(.5f);
+        var point=geometry.Center+RadialActionLayout.Direction(geometry.Start(0)+.1f)*(geometry.InnerRadius+10);
+        int offset=((int)point.Y*1600+(int)point.X)*4;
+        for(int channel=0;channel<3;channel++) {
+            Assert.True(full[offset+channel]<half[offset+channel]);
+            Assert.True(half[offset+channel]<clear[offset+channel]);
+        }
+    }
+
+    [Fact]
     public void NativeHiddenOperationalFieldsDoNotChangeTooltipPixelsAndEmptySelectionClearsCommands()
     {
         using var platform=new WindowsPlatform();

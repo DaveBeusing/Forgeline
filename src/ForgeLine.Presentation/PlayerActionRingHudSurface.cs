@@ -259,6 +259,7 @@ internal sealed partial class PlayerActionRingHudRenderer : IDisposable
                         8)
                 ],
                 CullMode = GraphicsCullMode.None,
+                AlphaBlendEnabled = true,
                 DepthEnabled = false
             });
     }
