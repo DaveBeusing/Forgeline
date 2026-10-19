@@ -203,6 +203,9 @@ internal static class VisualReferenceCapture
                     var world = new RenderWorld(); world.Update(buffer);
                     if (ObjectActionRingCapture.IsRing(uiScenario))
                         panel=ObjectActionRingCapture.View(snapshot,uiScenario,world,camera,GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale),rasterDpi,uiScale);
+                    else if (panel.IsOpen)
+                        panel=ObjectActionRingCapture.Present(snapshot,panel,world,camera,
+                            GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale),rasterDpi,uiScale);
                     particles.Prepare(world, camera, display.Width, display.Height, 0);
                     particles.Prepare(world, camera, display.Width, display.Height, .1);
                     particles.Prepare(world, camera, display.Width, display.Height, .1);
@@ -280,13 +283,18 @@ internal static class VisualReferenceCapture
                         particles.Render(context, camera);
                         context.BeginPass(GraphicsFramePass.Overlay);
                         selection.Render(context, camera, indicators);
-                        if (ObjectActionRingCapture.IsRing(uiScenario))
+                        if (panel.Ring.UsesRing)
                         {
                             var ringLayout=GameplayHudLayout.Create(context.Width,context.Height,rasterDpi,uiScale);
                             Span<HudRect> ringOccupied=stackalloc HudRect[8];
                             RadialActionLayout.ResolveObstacles(ringOccupied,ringLayout,captureUx.Onboarding,operations);
                             panel=panel with { Ring=panel.Ring.Project(world,camera,1,snapshot,ringLayout,ringOccupied) };
                         }
+                        if (panel.Ring is { Open:true,Resolved:true,Geometry.IsValid:true } ring &&
+                            (hover.DockControl==0 || hover.SelectionStatus))
+                            hover=new(snapshot.SessionId,default,default,ring.Geometry.Center,true,context.Width,context.Height,
+                                GameplayHudLayout.Create(context.Width,context.Height,rasterDpi,uiScale).Scale,
+                                SelectionStatus:true,SelectionRevision:ring.SelectionRevision,MenuRevision:ring.Revision);
                         hud.Render(context, camera, snapshot, terrain.WorldBounds, information, panel, targeting,
                             FormationTemplate.Compact, groups, captureUx, rasterDpi, uiScale,
                             hoverTooltip: hover,
@@ -436,7 +444,7 @@ internal static class VisualReferenceCapture
                         frontendView?.Layout, GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen);
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
                         pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fingerprint = fixture.Fingerprint,
-                        ui = new { scenario = uiScenario, fixtureVersion = 2,
+                        ui = new { scenario = uiScenario, fixtureVersion = 3, layoutContract = GameplayHudLayout.ContractVersion,
                             notifications = frontend is null ? ActionableAlertLayout.Resolve(snapshot,
                                 GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen) : (NotificationStackLayout?)null,
                             skin = frontend?.SkinDiagnostics, battlefieldSkin = frontend is null ? hud.SkinDiagnostics : (GameplayHudSkinDiagnostics?)null, skinState = frontend?.SkinState, skinnedControls = frontend?.LastSkinnedControlCount, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",

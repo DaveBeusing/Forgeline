@@ -22,7 +22,7 @@ internal enum UiReferenceScenario
     OnboardingClosing25, OnboardingClosing50, OnboardingClosing75, OnboardingCollapsed,
     OnboardingOpening25, OnboardingOpening50, OnboardingOpening75,
     RingConstruction, RingProduction, RingUnits, RingLogistics, RingSupply, RingTactical, RingTechnology, RingParameters,
-    RingPending, RingEdge, RingTooltip, RingOpening50, RingClosing50, RingOffscreen, GroupRing, GroupRingTools, GroupRingPartial, GroupRingEdge
+    RingPending, RingEdge, RingTooltip, RingOpening50, RingClosing50, RingOffscreen, RingSelectionStatus, GroupRing, GroupRingTools, GroupRingPartial, GroupRingEdge, GroupRingStatus
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -144,7 +144,12 @@ internal static class UiReferenceStates
             state == UiReferenceScenario.Targeting ? PlayerActionPanelMode.Tactical :
             state is UiReferenceScenario.Contacts or UiReferenceScenario.DockFocus or UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed
                 ? PlayerActionPanelMode.Construction : PlayerActionPanelMode.UnitProduction;
-        var (snapshot, panel) = CommandDockCapture.Fixture(source, mode, dockState, width, height, dpi, scale);
+        var owner=source.PlayerExperience!.Value.Player;
+        var category=mode is PlayerActionPanelMode.Supply or PlayerActionPanelMode.Tactical
+            ? ControllableEntityCategory.Unit : ControllableEntityCategory.Building;
+        var anchor=source.Instances.ToArray().First(i=>i.Selectable.IsSelectable && i.Selectable.Owner==owner &&
+            (i.Selectable.Category & category)!=0).Entity;
+        var (snapshot, panel) = CommandDockCapture.Fixture(source, mode, dockState, width, height, dpi, scale, anchor);
         panel = panel with { SelectedIndex = state == UiReferenceScenario.DockFocus || state == UiReferenceScenario.ProductionQueue ? 1 :
             state is UiReferenceScenario.QueueBlocked or UiReferenceScenario.DockQueueTooltip ? 2 : 0,
             HoveredIndex = state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed ? 1 : -1,

@@ -9,7 +9,7 @@ namespace ForgeLine.Client;
 /// <summary>Reference states use the production menu/controller and copied permitted render instances.</summary>
 internal static class ObjectActionRingCapture
 {
-    internal static bool IsRing(UiReferenceScenario state) => state is >= UiReferenceScenario.RingConstruction and <= UiReferenceScenario.GroupRingEdge;
+    internal static bool IsRing(UiReferenceScenario state) => state is >= UiReferenceScenario.RingConstruction and <= UiReferenceScenario.GroupRingStatus;
     internal static PlayerActionPanelMode Mode(UiReferenceScenario state) => state switch
     {
         UiReferenceScenario.RingConstruction or UiReferenceScenario.RingOpening50 or UiReferenceScenario.RingClosing50 or
@@ -77,4 +77,36 @@ internal static class ObjectActionRingCapture
         return panel with { Ring=ring with { Opacity=state is UiReferenceScenario.RingOpening50 or UiReferenceScenario.RingClosing50 ? .5f:1,
             Open=state!=UiReferenceScenario.RingClosing50 } };
     }
+    internal static PlayerActionPanelView Present(PresentationSnapshot snapshot, in PlayerActionPanelView authored,
+        RenderWorld world, RtsCamera camera, in GameplayHudLayout layout, uint dpi, float scale)
+    {
+        if (!authored.IsOpen || snapshot.PlayerExperience is not { Selection.Count: 1 } experience ||
+            !world.TryGetInterpolatedInstance(experience.Selection.PrimaryEntity,1,out var actor) ||
+            !actor.Selectable.IsSelectable || actor.Selectable.Owner != experience.Player) return authored;
+        camera.CenterOn(actor.Transform.Position);
+        var selection=new SelectionSet();selection.SetSingle(experience.Selection.PrimaryEntity);
+        var input=new InputState();var controller=new PlayerActionPanelController(authored.Bindings);
+        controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,dpi,scale,selection);
+        controller.SynchronizeObjectRing(input,snapshot,world,selection,false);
+        var action=authored.Mode switch {
+            PlayerActionPanelMode.Construction=>GameplayAction.Build,PlayerActionPanelMode.Production=>GameplayAction.Process,
+            PlayerActionPanelMode.UnitProduction=>GameplayAction.Units,PlayerActionPanelMode.Logistics=>GameplayAction.Logistics,
+            PlayerActionPanelMode.Supply=>GameplayAction.Supply,PlayerActionPanelMode.Tactical=>GameplayAction.Combat,_=>GameplayAction.Technology };
+        input.BeginFrame();input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,
+            (authored.Bindings??GameplayBindingRegistry.Default).Key(action)));
+        controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,dpi,scale,selection);
+        for(int i=0;i<authored.SelectedIndex;i++) {
+            input.BeginFrame();input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,
+                (authored.Bindings??GameplayBindingRegistry.Default).Key(GameplayAction.NextItem)));
+            controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,dpi,scale,selection);
+            input.BeginFrame();input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp,
+                (authored.Bindings??GameplayBindingRegistry.Default).Key(GameplayAction.NextItem)));
+            controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,dpi,scale,selection);
+        }
+        var panel=controller.CreateView(layout.ViewportWidth,layout.ViewportHeight,snapshot.PlayerActions,dpi,scale);
+        Span<HudRect> occupied=stackalloc HudRect[8];RadialActionLayout.ResolveObstacles(occupied,layout);
+        return authored with {Ring=panel.Ring.Project(world,camera,1,snapshot,layout,occupied) with {
+            HoveredSlot=authored.HoveredIndex,Pressed=authored.PointerPressed}};
+    }
+
 }
