@@ -53,7 +53,7 @@ public sealed class BattlefieldProductionSkinTests
         Assert.Null(GameplayHudArtwork.Icon(RtsUiIcon.CommandPatrol, 16));
     }
     [Fact]
-    public void NativeHudSharesSevenPagesAndReleasesEveryResourceAcrossSessionsAndSelectionChanges()
+    public void NativeHudUsesOnlyRequiredPagesAndReleasesEveryResourceAcrossSessionsAndSelectionChanges()
     {
         using var platform = new WindowsPlatform();
         using IWindow window = platform.CreateWindow(new("FORGELINE battlefield skin", 1280, 720));
@@ -66,10 +66,11 @@ public sealed class BattlefieldProductionSkinTests
             using (var hud = new GameplayHudRenderer(device, catalog))
             {
                 Assert.True(hud.SkinDiagnostics.Prepared);
-                Assert.Equal(16 * 1024 * 1024, hud.SkinDiagnostics.ResidentPageBytes); // three RGBA8 + four BC7 pages
-                Assert.Equal(8, device.Diagnostics.Resources.LoadedTextureCount); // seven shared atlas pages plus one shared font
-                Assert.Equal(13, hud.SkinDiagnostics.Batches);
-                Assert.Equal(52, hud.SkinDiagnostics.Buffers);
+                Assert.Equal(12 * 1024 * 1024, hud.SkinDiagnostics.ResidentPageBytes); // three required RGBA8 pages; no HUD portraits
+                Assert.Equal(0, hud.SkinDiagnostics.PortraitBytes);
+                Assert.Equal(4, device.Diagnostics.Resources.LoadedTextureCount); // three shared atlas pages plus one shared font
+                Assert.Equal(8, hud.SkinDiagnostics.Batches);
+                Assert.Equal(32, hud.SkinDiagnostics.Buffers);
                 long uploads = device.Diagnostics.Resources.TextureUploadCount;
                 var camera = new RtsCamera();
                 foreach (var selected in new[] { Selection, Selection with { DisplayName = new string('W', 300) },
