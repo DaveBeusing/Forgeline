@@ -93,7 +93,8 @@ public static class ActionableAlertLayout
                 if (NotificationText.Severity(experience, candidate) > NotificationText.Severity(experience, representative)) representative = candidate;
             }
             cards[count++] = new(representative with { Hidden = total - consumed }, rect,
-                new(rect.X + padding, rect.Y + (rect.Height - line) * .5f, rect.Width - 2 * padding, line), rect, rect, false);
+                new(rect.X + 5 * scale + padding + font + gap, rect.Y + (rect.Height - line) * .5f,
+                    MathF.Max(1, rect.Width - 5 * scale - 2 * padding - font - gap), line), rect, rect, false);
         }
         return new(bounds, font, count, cards[0], cards[1], cards[2], cards[3], revision.ToHashCode());
     }
