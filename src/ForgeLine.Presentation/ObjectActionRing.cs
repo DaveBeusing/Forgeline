@@ -87,7 +87,7 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
             for (int item = 0; item < count; item++)
                 if (ItemKey(saved.Target.Mode,item,actions) == saved.Key) { resolved = item; break; }
             slots[i] = resolved < 0 ? saved with { Present = false } : saved with { Target = saved.Target with { ItemIndex = resolved },
-                Enabled = saved.Target.Kind != PlayerActionDockControlKind.Item || PlayerActionDockHudModel.ResolveItemState(saved.Target.Mode,resolved,actions,false).CanActivate };
+                Enabled = saved.Enabled && (saved.Target.Kind != PlayerActionDockControlKind.Item || PlayerActionDockHudModel.ResolveItemState(saved.Target.Mode,resolved,actions,false).CanActivate) };
         }
         return this with { Geometry = RadialActionLayout.Fit(anchor, radius, layout, occupied), Resolved = true, Slots = slots, VisibleMembers = visible, GroupFactsCurrent = groupFactsCurrent };
     }
