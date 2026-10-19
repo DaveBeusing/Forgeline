@@ -207,7 +207,8 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
             context.Layout,
             context.RuntimeMetrics,
             context.ShowRuntimeMetrics,
-            dockExpanded: context.ActionPanel.DockExpanded, localFeedback: context.PreAlphaUx.Placement.Visible ? "" : context.PreAlphaUx.InteractionHint);
+            dockExpanded: context.ActionPanel.DockExpanded, localFeedback: context.PreAlphaUx.Placement.Visible ? "" : context.PreAlphaUx.InteractionHint,
+            presentationTime: context.PresentationTime, animateNotifications: context.AnimateNotifications);
 
     public void RenderWaiting(IGraphicsCommandContext graphics, in GameplayHudLayout layout,
         in RuntimeMetricsView metrics, bool showRuntimeMetrics = false) =>
@@ -242,6 +243,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
     private readonly RuntimeUiIconPalette? _runtimePalette;
+    private readonly NotificationSurfaceMotion _notificationMotion = new();
 
     private int _vertexCount;
     private float _scale = 1.0f;
@@ -277,7 +279,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         PresentationSnapshot? snapshot,
         in GameplayHudLayout layout,
         in RuntimeMetricsView metrics = default,
-        bool showRuntimeMetrics = false, bool hideNotifications = false, bool dockExpanded = false, string localFeedback = "")
+        bool showRuntimeMetrics = false, bool hideNotifications = false, bool dockExpanded = false, string localFeedback = "",
+        TimeSpan presentationTime = default, bool animateNotifications = false)
     {
         ThrowIfDisposed();
         _text.Begin();
@@ -302,7 +305,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 EmitTopStatusBar(experience, layout.TopStatusBar, graphics.Width, graphics.Height);
                 if (!hideNotifications)
                 {
-                    EmitNotificationStack(snapshot, experience, layout, dockExpanded, graphics.Width, graphics.Height, localFeedback);
+                    EmitNotificationStack(snapshot, experience, layout, dockExpanded, graphics.Width, graphics.Height, localFeedback,
+                        presentationTime, animateNotifications);
                 }
             }
             else
@@ -446,7 +450,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     }
 
     private void EmitNotificationStack(PresentationSnapshot? snapshot, in PlayerExperienceSnapshot experience,
-        in GameplayHudLayout layout, bool expanded, int width, int height, string localFeedback)
+        in GameplayHudLayout layout, bool expanded, int width, int height, string localFeedback,
+        TimeSpan presentationTime, bool animateNotifications)
     {
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
         var stack = ActionableAlertLayout.Resolve(snapshot, layout, expanded, localFeedback);
