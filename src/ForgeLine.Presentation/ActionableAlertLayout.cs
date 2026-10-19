@@ -21,7 +21,7 @@ public readonly record struct NotificationStackLayout(HudRect Bounds, float Font
 /// <summary>Bounded copied notifications; the same card geometry drives rendering and input.</summary>
 public static class ActionableAlertLayout
 {
-    public const int ContractVersion = 3;
+    public const int ContractVersion = 4;
     public const int MaximumCards = 3;
     public static float Scale(in GameplayHudLayout layout) => MathF.Max(1, layout.NotificationScale);
     public static NotificationStackLayout Resolve(PresentationSnapshot? snapshot, in GameplayHudLayout layout, bool expanded = false, string localFeedback = "") =>
@@ -32,7 +32,7 @@ public static class ActionableAlertLayout
     {
         localFeedback ??= "";
         var bounds = layout.NotificationBounds(expanded);
-        float font = 14 * Scale(layout), padding = 4 * Scale(layout), gap = 4 * Scale(layout);
+        float scale = Scale(layout), font = 14 * scale, padding = 4 * scale, gap = 4 * scale;
         float line = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * font;
         float summary = line + 2 * padding;
         int total = ResourcePowerHudModel.ResolveNotificationCount(experience) + (localFeedback.Length > 0 ? 1 : 0);
@@ -52,21 +52,27 @@ public static class ActionableAlertLayout
         {
             var item = i == ResourcePowerHudModel.ResolveNotificationCount(experience) ? new AlertNotification(default, Local: true) : Ordered(experience, i);
             var value = NotificationText.Format(experience, alerts, item, text, localFeedback);
-            float textWidth = MathF.Max(1, bounds.Width - 32 * Scale(layout) - 2 * padding);
-            int offset = 0, lines = 0;
-            while (offset < value.Length && lines < 2)
-            { _ = NotificationText.Line(value[offset..], textWidth, font, out int used); offset += used; lines++; }
-            bool truncated = offset < value.Length || value.Length == text.Length;
-            float actionHeight = (item.Feedback || item.Local) && !truncated ? 0 : line;
-            float height = Math.Max(1, lines) * line + actionHeight + 2 * padding;
-            bool moreAfter = i + 1 < total;
-            float required = height + (moreAfter ? gap + summary : 0);
+            float height = summary;
+            float rail = 5 * scale, icon = font, controlWidth = MathF.Min(86 * scale, MathF.Max(28 * scale, bounds.Width * .23f));
+            float textStart = bounds.X + rail + padding + icon + gap;
+            float available = MathF.Max(1, bounds.Right - padding - textStart);
+            bool actionRequired = !item.Feedback && !item.Local;
+            float reserved = actionRequired ? controlWidth + gap : 0;
+            float textWidth = MathF.Max(1, available - reserved);
+            bool truncated = NotificationText.Truncated(value, textWidth, font);
+            if (truncated && actionRequired)
+                textWidth = MathF.Max(1, available - 2 * (controlWidth + gap));
+            else if (truncated)
+                textWidth = MathF.Max(1, available - controlWidth - gap);
+            truncated = NotificationText.Truncated(value, textWidth, font);
+            float required = height + (i + 1 < total ? gap + summary : 0);
             if (y + required > bounds.Bottom) break;
             var rect = new HudRect(bounds.X, y, bounds.Width, height);
-            var content = new HudRect(rect.X + 28 * Scale(layout), rect.Y + padding, textWidth, lines * line);
-            var action = actionHeight > 0 ? new HudRect(rect.Right - MathF.Min(90 * Scale(layout), rect.Width * .35f),
-                rect.Bottom - padding - line, MathF.Min(86 * Scale(layout), rect.Width * .33f), line) : default;
-            var details = truncated && !item.Feedback && !item.Local ? new HudRect(rect.X + padding, action.Y, MathF.Min(86 * Scale(layout), rect.Width * .33f), line) : default;
+            var content = new HudRect(textStart, rect.Y + (height - line) * .5f, textWidth, line);
+            var action = actionRequired || truncated
+                ? new HudRect(rect.Right - padding - controlWidth, content.Y, controlWidth, line) : default;
+            var details = truncated && actionRequired
+                ? new HudRect(action.X - gap - controlWidth, content.Y, controlWidth, line) : default;
             cards[count++] = new(item, rect, content, action, details, truncated, NotificationText.Revision(value));
             consumed++; y += height + gap;
         }
@@ -82,7 +88,7 @@ public static class ActionableAlertLayout
                 if (NotificationText.Severity(experience, candidate) > NotificationText.Severity(experience, representative)) representative = candidate;
             }
             cards[count++] = new(representative with { Hidden = total - consumed }, rect,
-                new(rect.X + padding, rect.Y + padding, rect.Width - 2 * padding, line), rect, rect, false);
+                new(rect.X + padding, rect.Y + (rect.Height - line) * .5f, rect.Width - 2 * padding, line), rect, rect, false);
         }
         return new(bounds, font, count, cards[0], cards[1], cards[2], cards[3], revision.ToHashCode());
     }
@@ -139,6 +145,24 @@ internal static class NotificationText
         item.Local ? HudAlertSeverity.Information : item.Feedback ? experience.Feedback.State switch
         { PlayerCommandFeedbackState.Rejected => HudAlertSeverity.Critical, PlayerCommandFeedbackState.Partial => HudAlertSeverity.Warning, _ => HudAlertSeverity.Information }
         : ResourcePowerHudModel.ResolveAlertSeverity(item.Kind);
+
+    public static bool Truncated(ReadOnlySpan<char> text, float width, float size)
+    {
+        if (text.IndexOfAny('\r', '\n') >= 0) return true;
+        return UiFontMetrics.Default.FitPrefix(text, MathF.Max(1, width), size, false) < text.Length;
+    }
+
+    public static ReadOnlySpan<char> Ellipsized(ReadOnlySpan<char> text, float width, float size, Span<char> output)
+    {
+        int newline = text.IndexOfAny('\r', '\n');
+        var first = newline >= 0 ? text[..newline] : text;
+        bool clipped = newline >= 0 || UiFontMetrics.Default.FitPrefix(first, MathF.Max(1, width), size, false) < first.Length;
+        float allowance = clipped ? MathF.Max(0, width - UiFontMetrics.Default.Measure("…", size)) : width;
+        int count = Math.Min(output.Length - (clipped ? 1 : 0), UiFontMetrics.Default.FitPrefix(first, allowance, size, false));
+        first[..count].CopyTo(output);
+        if (clipped) output[count++] = '…';
+        return output[..count];
+    }
 
     public static ulong Revision(ReadOnlySpan<char> text)
     { ulong hash = 14695981039346656037; foreach (char c in text) hash = unchecked((hash ^ c) * 1099511628211); return hash; }
