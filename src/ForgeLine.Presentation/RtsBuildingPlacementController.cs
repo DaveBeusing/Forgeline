@@ -63,7 +63,7 @@ public sealed class RtsBuildingPlacementController
 
         _issuer = issuer;
         _bindings = bindings ?? GameplayBindingRegistry.Default;
-        _placementHint = $"SHIFT + CLICK REPEAT AFTER ACCEPTANCE / {_bindings.Prompt(GameplayAction.RotatePlacement)} ROTATE / ESC CANCEL";
+        _placementHint = $"SHIFT + CLICK REPEAT AFTER ACCEPTANCE / Q LEFT / E RIGHT / {_bindings.Prompt(GameplayAction.RotatePlacement)} RIGHT / ESC CANCEL";
         _selectionKeys.Clear();
         for (int i = (int)GameplayAction.CorePlacement; i <= (int)GameplayAction.SmelterPlacement; i++)
             _selectionKeys.TryAdd(_bindings.Key((GameplayAction)i), false);
@@ -132,21 +132,27 @@ public sealed class RtsBuildingPlacementController
             input.IsKeyDown(
                 _bindings.Key(GameplayAction.RotatePlacement));
 
-        if (rotateDown &&
-            !_rotateWasDown &&
-            !shiftDown &&
-            IsActive && !_awaitingResult)
-        {
-            Orientation =
-                (BuildingOrientation)
-                (((int)Orientation + 1) % 4);
-            _rememberedBuilding = ActiveBuilding;
-            _rememberedOrientation = Orientation;
-            ResetPreviewRequest(
-                interaction);
-        }
-
+        bool clockwise = input.WasKeyPressed(PlatformKey.E);
+        bool counterclockwise = input.WasKeyPressed(PlatformKey.Q);
+        bool legacyClockwise = rotateDown && !_rotateWasDown;
         _rotateWasDown = rotateDown;
+
+        if (!shiftDown && IsActive && !_awaitingResult &&
+            (counterclockwise || clockwise || legacyClockwise))
+        {
+            // A simultaneous opposite edge is neutral, and the compatibility
+            // shortcut never applies a second rotation during the same frame.
+            int direction = counterclockwise == clockwise
+                ? counterclockwise ? 0 : 1
+                : counterclockwise ? -1 : 1;
+            if (direction != 0)
+            {
+                Orientation = (BuildingOrientation)(((int)Orientation + direction + 4) % 4);
+                _rememberedBuilding = ActiveBuilding;
+                _rememberedOrientation = Orientation;
+                ResetPreviewRequest(interaction);
+            }
+        }
 
         bool escapeDown =
             input.IsKeyDown(
