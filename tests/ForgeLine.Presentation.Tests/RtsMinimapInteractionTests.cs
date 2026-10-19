@@ -615,9 +615,9 @@ public sealed class RtsMinimapInteractionTests
         HudRect map = RtsMinimapInteractionLayout.GetMapRect(expanded);
         Vector2 click = new(map.X + 18, map.Y + map.Height * .5f);
         Assert.False(RtsMinimapInteractionLayout.IsInteractiveSurface(click, layout));
+        Vector2 rasterPointer = new(MathF.Round(click.X), MathF.Round(click.Y));
         Assert.True(RtsMinimapInteractionLayout.TryMapPointerToWorld(
-            click, expanded, terrain.WorldBounds, out Vector3 expected));
-        Assert.InRange(expected.X, 0, terrain.WorldBounds.Maximum.X);
+            rasterPointer, expanded, terrain.WorldBounds, out Vector3 expected));
 
         input.BeginFrame();
         MovePointer(input, click);
@@ -629,6 +629,7 @@ public sealed class RtsMinimapInteractionTests
         Assert.True(controller.PointerCaptured);
         Assert.True(controller.TryTakeMovementRequest(out MovementOrderRequest request));
         Assert.Equal(new[] { selected }, request.Entities.ToArray());
+        Assert.InRange(Vector3.Distance(new Vector3(expected.X, 5, expected.Z), request.WorldTarget), 0, .01f);
         Assert.False(controller.TryTakeMovementRequest(out _));
     }
 
