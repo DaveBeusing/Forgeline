@@ -89,7 +89,11 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
             slots[i] = resolved < 0 ? saved with { Present = false } : saved with { Target = saved.Target with { ItemIndex = resolved },
                 Enabled = saved.Target.Kind != PlayerActionDockControlKind.Item || PlayerActionDockHudModel.ResolveItemState(saved.Target.Mode,resolved,actions,false).CanActivate };
         }
-        return this with { Geometry = RadialActionLayout.Fit(anchor, radius, layout, occupied), Resolved = true, Slots = slots, VisibleMembers = visible, GroupFactsCurrent = groupFactsCurrent };
+        var geometry = Global
+            ? RadialActionLayout.Fit(anchor, radius, layout, occupied)
+            : RadialActionLayout.FitWithRightInspector(anchor, radius, layout, occupied,
+                330 * Math.Clamp(layout.Scale, 1, 1.25f));
+        return this with { Geometry = geometry, Resolved = true, Slots = slots, VisibleMembers = visible, GroupFactsCurrent = groupFactsCurrent };
     }
 
     internal static ActionRingKey ItemKey(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions)

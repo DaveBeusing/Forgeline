@@ -53,7 +53,17 @@ public sealed class HoverTooltipController
         var next = new HoverTooltipView(snapshot.SessionId, EntityId.Invalid, default, pointer,
             false, layout.ViewportWidth, layout.ViewportHeight, layout.Scale);
         int count = panel.SelectionPending ? 0 : PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
-        if (panel.Ring.TryHit(pointer, out var radial))
+        // The selected-object inspector is persistent while its ring is open;
+        // hovering an action sector must not replace the authorized object facts.
+        if (statusAvailable && !panel.Ring.Global && !panel.SelectionPending &&
+            snapshot.PlayerExperience is { } selectedExperience &&
+            selectedExperience.Selection.Count > 0 &&
+            (!panel.Ring.SingleOwned || selectedExperience.Selection.PrimaryEntity == panel.Ring.Entity))
+        {
+            next = next with { SelectionStatus = true, SelectionRevision = panel.Ring.SelectionRevision,
+                MenuRevision = panel.Ring.Revision, PointerPosition = panel.Ring.Geometry.Center };
+        }
+        else if (panel.Ring.TryHit(pointer, out var radial))
         {
             var target = radial.Navigation is ActionRingNavigation.Parameters or ActionRingNavigation.NextItem
                 ? new PlayerActionDockHitTarget(PlayerActionDockControlKind.Item,panel.Mode,panel.SelectedIndex)
@@ -132,7 +142,7 @@ internal static class HoverTooltipPlacement
         float gap=MathF.Min(layout.Gap,8);
         Span<float> xs=stackalloc float[40];Span<float> ys=stackalloc float[40];
         var center=ring.Geometry.Center;
-        xs[0]=center.X+ring.Geometry.OuterRadius+gap;xs[1]=center.X-ring.Geometry.OuterRadius-gap-width;
+        xs[0]=center.X+ring.Geometry.OuterRadius+gap+2;xs[1]=center.X-ring.Geometry.OuterRadius-gap-width-2;
         xs[2]=center.X-width/2;xs[3]=safe.X;xs[4]=safe.Right-width;
         ys[0]=center.Y-height/2;ys[1]=center.Y+ring.Geometry.OuterRadius+gap;
         ys[2]=center.Y-ring.Geometry.OuterRadius-gap-height;ys[3]=safe.Y;ys[4]=safe.Bottom-height;
@@ -151,7 +161,12 @@ internal static class HoverTooltipPlacement
                 var obstacle=occupied[i];
                 if(candidate.Intersects(new(obstacle.X-gap,obstacle.Y-gap,obstacle.Width+gap*2,obstacle.Height+gap*2))) {clear=false;break;}
             }
-            if(clear) {best=candidate;score=distance;}
+            if (clear)
+            {
+                // The card belongs to the free area on the ring's right whenever feasible.
+                if (x == 0) return candidate;
+                best = candidate; score = distance;
+            }
         }
         return best;
     }
