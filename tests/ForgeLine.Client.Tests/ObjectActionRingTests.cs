@@ -212,7 +212,8 @@ public sealed class ObjectActionRingTests
         controller.Update(input,snapshot,1920,1080,currentSelection:selection);
         controller.SynchronizeObjectRing(input,snapshot,World(snapshot),selection,true,true);
         Assert.False(View(controller,snapshot).Ring.Open);
-        input.BeginFrame();input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.H));
+        input.BeginFrame();input.Apply(PlatformInputEvent.PointerMoved(600,400));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.H));
         controller.Update(input,snapshot,1920,1080,currentSelection:selection);
         Assert.True(View(controller,snapshot).Ring.Global);
         Assert.True(View(controller,snapshot).Ring.Open);
@@ -222,6 +223,67 @@ public sealed class ObjectActionRingTests
         Assert.True(controller.TryTakeRequest(out var request));
         Assert.Equal(PlayerActionRequestKind.StartTechnologyResearch,request.Kind);
         Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Fact]
+    public void GlobalCategoryNeedsCurrentPointerAndNeverCreatesAnEntityAnchor()
+    {
+        var source = Snapshot(PlayerActionPanelMode.Construction, "Ready");
+        var exp = source.PlayerExperience!.Value with { Selection = PlayerSelectionSummary.Empty };
+        var snapshot = new PresentationSnapshot(source.Tick, source.TickDuration,
+            source.SimulationEntityCount, source.Instances,
+            sessionId: source.SessionId, playerExperience: exp,
+            playerActions: source.PlayerActions);
+        var selection = new SelectionSet();
+        var input = new InputState();
+        var controller = new PlayerActionPanelController();
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        controller.SynchronizeObjectRing(input, snapshot, World(snapshot), selection, false);
+
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.B));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.False(View(controller, snapshot).Ring.Open);
+        Assert.Equal(PlayerActionPanelMode.Closed, controller.Mode);
+        Assert.Contains("POINTER", controller.Feedback);
+
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.B));
+        input.Apply(PlatformInputEvent.PointerMoved(600, 400));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.B));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        var ring = View(controller, snapshot).Ring;
+        Assert.True(ring.Global && ring.Open);
+        Assert.False(ring.Entity.IsValid);
+        Assert.Equal(new Vector2(600, 400), ring.GlobalAnchor);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerLeft());
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.False(View(controller, snapshot).Ring.Open);
+    }
+
+    [Fact]
+    public void CurrentPagedRingAcceptsQAndEEdgesWithoutPhantomPages()
+    {
+        var (controller, input, snapshot, selection) = Open(PlayerActionPanelMode.Construction, PlatformKey.B);
+        Assert.True(controller.OwnsRadialPaging(snapshot.PlayerActions));
+        Assert.Equal(0, View(controller, snapshot).Ring.Slots[0].Target.ItemIndex);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.E));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(4, View(controller, snapshot).Ring.Slots[0].Target.ItemIndex);
+        Assert.False(input.IsKeyDown(PlatformKey.E));
+
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.E));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.Q));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(0, View(controller, snapshot).Ring.Slots[0].Target.ItemIndex);
+        Assert.False(input.IsKeyDown(PlatformKey.Q));
+        controller.Close();
+        Assert.False(controller.OwnsRadialPaging(snapshot.PlayerActions));
     }
 
     [Fact]
