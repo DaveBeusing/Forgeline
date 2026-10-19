@@ -99,6 +99,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 context.Height,
                 dpi,
                 uiScale);
+        if (view.MinimapEnabled && !view.MinimapBounds.IsEmpty &&
+            view.MinimapBounds.X >= layout.SafeArea.X &&
+            view.MinimapBounds.Y >= layout.SafeArea.Y &&
+            view.MinimapBounds.Right <= layout.SafeArea.Right &&
+            view.MinimapBounds.Bottom <= layout.SafeArea.Bottom)
+            layout = layout with { Minimap = view.MinimapBounds };
         float scale =
             layout.Scale;
 
