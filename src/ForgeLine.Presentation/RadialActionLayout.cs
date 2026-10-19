@@ -85,7 +85,7 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
     {
         var ordinary = Fit(anchor, footprintRadius, hud, occupied);
         if (!ordinary.IsValid || !float.IsFinite(inspectorWidth) || inspectorWidth <= 0) return ordinary;
-        float gap = MathF.Max(8, hud.Gap);
+        float gap = MathF.Max(10, hud.Gap + 2);
         if (ordinary.Center.X + ordinary.OuterRadius + gap + inspectorWidth <= hud.SafeArea.Right)
             return ordinary;
         var restricted = hud.SafeArea with
