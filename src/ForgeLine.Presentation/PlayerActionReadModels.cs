@@ -1414,14 +1414,14 @@ internal static class PlayerActionSnapshotFactory
                 hasPolicy
                     ? policy.DesiredTarget
                     : Math.Max(
-                        LogisticsQuantityEditor.Minimum,
-                        Math.Ceiling(currentQuantity / LogisticsQuantityEditor.Step) * LogisticsQuantityEditor.Step);
+                        10.0,
+                        Math.Ceiling(currentQuantity));
             double minimum =
                 hasPolicy
                     ? policy.DesiredMinimum
                     : Math.Min(
                         target,
-                        LogisticsQuantityEditor.Minimum);
+                        target * 0.5);
             double maximum =
                 hasPolicy
                     ? policy.DesiredMaximum
