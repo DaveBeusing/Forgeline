@@ -17,6 +17,7 @@ public sealed class LogisticsZoneSnapshot
 {
     internal const int MaximumZones = 128;
     internal const int MaximumStrokes = 4096;
+    internal static LogisticsZoneSnapshot Empty { get; } = new([]);
     private readonly LogisticsZoneStroke[] _strokes;
 
     internal LogisticsZoneSnapshot(LogisticsZoneStroke[] strokes) => _strokes = strokes;
@@ -27,11 +28,18 @@ public sealed class LogisticsZoneSnapshot
     {
         ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(terrain);
-        if (selected is { Count: 0 } && !hovered.IsValid) return new([]);
-        HashSet<EntityId>? interest = selected is { Count: > 0 } ? new(selected) : null;
-        bool Interested(EntityId building, EntityId vehicle) =>
-            selected is null && !hovered.IsValid || hovered == building || hovered == vehicle ||
-            (interest?.Contains(building) ?? false) || (interest?.Contains(vehicle) ?? false);
+        if (selected is { Count: 0 } && !hovered.IsValid) return Empty;
+        HashSet<EntityId>? interest = selected is { Count: > 8 } ? new(selected) : null;
+        bool Interested(EntityId building, EntityId vehicle)
+        {
+            if (selected is null && !hovered.IsValid || hovered == building || hovered == vehicle)
+                return true;
+            if (interest is not null) return interest.Contains(building) || interest.Contains(vehicle);
+            if (selected is not null)
+                for (int i = 0; i < selected.Count; i++)
+                    if (selected[i] == building || selected[i] == vehicle) return true;
+            return false;
+        }
         List<LogisticsZoneStroke>? strokes = null;
         HashSet<EntityId>? publishedBays = null;
         int zones = 0;
@@ -102,7 +110,7 @@ public sealed class LogisticsZoneSnapshot
             zones++;
         }
 
-        return new((strokes is { Count: > 0 } ? strokes.ToArray() : []));
+        return strokes is { Count: > 0 } ? new(strokes.ToArray()) : Empty;
     }
 
     private static bool OwnedBuilding(EntityRegistry entities, EntityId building, PlayerId player) =>
