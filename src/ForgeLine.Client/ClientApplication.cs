@@ -1212,7 +1212,9 @@ internal sealed class ClientApplication
                     window.Dpi,
                     _settings.UiScale,
                     currentSelection: selectionController.Selection,
-                    globalShortcutsBlocked: buildingPlacementController.IsActive ||
+                    globalShortcutsBlocked: modalFrame || simulationPaused ||
+                        !window.IsFocused || window.IsMinimized ||
+                        buildingPlacementController.IsActive ||
                         tacticalTargetingController.IsActive);
 
                 if (actionPanel.TryTakeRequest(
