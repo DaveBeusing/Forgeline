@@ -1322,7 +1322,7 @@ internal sealed class ClientApplication
 
             hudInteraction.CapturePointer(HudInteractionContext.CapturesWorldPointer(
                 inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.DockExpanded,
-                buildingPlacementController.IsActive, includeActionDock: false,
+                guidanceVisible: false, includeActionDock: false,
                 onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View, includePrimaryCommands: !actionPanel.ObjectActions));
 
             if (minimapInteraction.TryTakeMovementRequest(
