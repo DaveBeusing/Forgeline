@@ -2099,6 +2099,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         Vector4 color =
             ResolveColor(
                 icon);
+        color.W *= opacity;
         float pixel =
             Math.Max(
                 1.0f,
