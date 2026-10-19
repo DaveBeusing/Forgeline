@@ -176,8 +176,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             EmitSelectionRectangle(
                 view.DragStart,
                 view.DragCurrent,
-                RtsSelectionVisualStyle.Selected,
-                scale,
                 context.Width,
                 context.Height);
         }
@@ -1839,8 +1837,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     private void EmitSelectionRectangle(
         Vector2 first,
         Vector2 second,
-        Vector4 color,
-        float scale,
         int width,
         int height)
     {
@@ -1852,10 +1848,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             Vector2.Max(
                 first,
                 second);
-        float thickness =
-            Math.Max(
-                1.0f,
-                2.0f * scale);
+        // Physical client pixels: independent of UI zoom and monitor DPI.
+        float thickness = RtsSelectionVisualStyle.MarqueeBorderPixels;
 
         minimum = Vector2.Clamp(minimum, Vector2.Zero, new Vector2(width, height));
         maximum = Vector2.Clamp(maximum, Vector2.Zero, new Vector2(width, height));
@@ -1866,10 +1860,9 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         }
 
         EmitQuad(minimum.X, minimum.Y, maximum.X - minimum.X, maximum.Y - minimum.Y,
-            new Vector4(color.X, color.Y, color.Z, 0.10f), width, height);
-        EmitRectangleOutline(minimum, maximum, thickness + 2.0f * scale,
-            new Vector4(0.01f, 0.02f, 0.03f, 0.95f), width, height);
-        EmitRectangleOutline(minimum, maximum, thickness, color, width, height);
+            RtsSelectionVisualStyle.MarqueeFill, width, height);
+        EmitRectangleOutline(minimum, maximum, thickness,
+            RtsSelectionVisualStyle.MarqueeBorder, width, height);
     }
 
     private void EmitRectangleOutline(
