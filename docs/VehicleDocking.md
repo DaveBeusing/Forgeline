@@ -4,6 +4,12 @@ Building cargo pickup, cargo delivery and Supply Truck loading share one
 simulation-owned loading lane. Logical logistics transit nodes retain their
 existing movement semantics.
 
+## Loading-lane world overlay
+
+The presentation layer copies only currently owned, world-visible loading visits or exclusive slots from the authoritative tick snapshot. It uses `VehicleDockPose.Entry`, `Exit`, `Heading`, `HalfLength` and `HalfWidth` to trace a rotated, rectangular service corridor (including the existing 1 m lane clearance). An unoccupied building with no valid truck pose has no invented service rectangle. The overlay is a yellow industrial diagonal hatch with outlined loading boundaries and no gameplay/collision authority. Every stroke endpoint is sampled on the source terrain with a small visual depth offset; inaccessible sample endpoints are omitted rather than fabricated. Selected/hovered owned buildings or vehicles and the active Logistics context control its visibility.
+
+The new world overlay uses a separate depth-tested line batch, capped at 512 displayed strokes; nothing modifies docking admission, exit or movement. New source-qualified native captures and physical-display approval are still required; historical vehicle docking qualification is not evidence for this change.
+
 ## Geometry and ownership
 
 `BuildingLoadingDock` is authored in the existing C# building definition catalog.
