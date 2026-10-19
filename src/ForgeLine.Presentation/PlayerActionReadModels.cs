@@ -1305,7 +1305,14 @@ internal static class PlayerActionSnapshotFactory
                 EntityId origin = OwnedNode(request.Origin);
                 EntityId destination = OwnedNode(request.Destination);
                 EntityId truck = Owned(request.AssignedTruck) ? request.AssignedTruck : EntityId.Invalid;
-                double loaded = truck.IsValid && entities.TryGetComponent(truck, out CargoTransportRuntimeState state)
+                // A recycled truck cannot lend the new request stale cargo progress.
+                double loaded = truck.IsValid &&
+                    request.State is (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
+                    entities.TryGetComponent(truck, out CargoTransportOrder liveOrder) &&
+                    liveOrder.Origin == request.Origin &&
+                    liveOrder.Destination == request.Destination &&
+                    liveOrder.ResourceId == request.ResourceId &&
+                    entities.TryGetComponent(truck, out CargoTransportRuntimeState state)
                     ? Math.Max(0, state.LoadedQuantity - state.DeliveredQuantity)
                     : 0;
                 string resourceName = scenario.Services.Resources.TryGet(request.ResourceId, out ResourceDefinition? resource)
