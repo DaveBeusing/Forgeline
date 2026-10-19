@@ -333,3 +333,7 @@ activation path still requires a fresh gesture. Registration lasts for one match
 
 [Executed interaction qualification](NonModalHudQualification.md) records the
 source identity, sequence tests and remaining native/human acceptance.
+
+## Minimap hover expansion (current implementation)
+
+The player-facing minimap grows toward the upper-left from a fixed lower-right anchor when the pointer enters its drawn map, selector or legend. The presentation owner uses a reversible 180 ms SmoothStep transition and a maximum of 1.35 times the resting size; the shared HUD safe rectangle and occupied upper, lower-left and live action-ring regions cap the actual size. The controller publishes the animated physical-pixel minimap rectangle together with the information view. The renderer, F10 selector, legend, camera footprint, map-to-world mapping, F11 visibility and map click/drag/right-click interactions all use that geometry. Hover retention prevents boundary oscillation; captured map gestures remain owned until button release, including outside the map. Decorative bands and gaps do not block world actions. Resize, DPI/UI scale changes, new sessions, focus loss and nonmonotonic/stalled presentation clocks clear or settle motion. Reduced-motion and Low quality render directly at the final geometry; fixed-tick simulation and visibility filtering are unchanged.
