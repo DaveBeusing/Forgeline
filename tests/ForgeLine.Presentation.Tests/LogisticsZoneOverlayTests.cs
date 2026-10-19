@@ -59,9 +59,9 @@ public sealed class LogisticsZoneOverlayTests
         var loadLine = a[4];
         var holdLine = b[4];
         Assert.True((loadLine.End.X - loadLine.Start.X) *
-                    (loadLine.End.Z - loadLine.Start.Z) < 0);
+                    (loadLine.End.Z - loadLine.Start.Z) > 0);
         Assert.True((holdLine.End.X - holdLine.Start.X) *
-                    (holdLine.End.Z - holdLine.Start.Z) > 0);
+                    (holdLine.End.Z - holdLine.Start.Z) < 0);
         Assert.All(b, s => Assert.True(s.Unavailable));
     }
 
