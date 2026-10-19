@@ -78,7 +78,7 @@ jobs:
       - name: Logistics order identity and quantity contracts
         shell: pwsh
         run: |
-          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.RadialLogisticsOrderTests
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.RadialLogisticsOrderTests ForgeLine.Presentation.Tests.PlayerActionPanelTests ForgeLine.Presentation.Tests.PlayerActionReadModelTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.AutomatedDistributionSystemTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
