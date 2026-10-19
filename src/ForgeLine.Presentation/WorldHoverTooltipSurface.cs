@@ -81,11 +81,22 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             _scale = MathF.Min(_scale, besidePointer / (16 + lines * 14));
             if (_scale <= 0) return;
         }
-        _bounds = view.SelectionStatus
-            ? HoverTooltipPlacement.BesideRing(context.ActionPanel.Ring.Geometry, context.Layout,
-                330 * _scale, (16 + lines * 14) * _scale)
-            : HoverTooltipPlacement.Resolve(view.PointerPosition, context.Layout,
-                330 * _scale, (16 + lines * 14) * _scale);
+        if(view.SelectionStatus)
+        {
+            Span<HudRect> occupied=stackalloc HudRect[8];
+            var notifications=ActionableAlertLayout.Resolve(context.Snapshot,context.Layout,
+                localFeedback:context.PreAlphaUx.Placement.Visible ? "" : context.PreAlphaUx.InteractionHint);
+            RadialActionLayout.ResolveObstacles(occupied,context.Layout,context.PreAlphaUx.Onboarding,context.Operations,
+                context.CombatGroups,notifications);
+            float preferred=_scale;
+            for(int attempt=0;attempt<5;attempt++) {
+                _scale=MathF.Max(MathF.Min(.75f,preferred),preferred-attempt*.125f);
+                _bounds=HoverTooltipPlacement.BesideRing(context.ActionPanel.Ring,context.Layout,occupied,
+                    330*_scale,(16+lines*14)*_scale);
+                if(!_bounds.IsEmpty) break;
+            }
+        }
+        else _bounds=HoverTooltipPlacement.Resolve(view.PointerPosition,context.Layout,330*_scale,(16+lines*14)*_scale);
         if (_bounds.IsEmpty) return;
         if (!_skin.Panel(_bounds, "panel.tooltip")) Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
         _skin.State(_bounds, resolved.VisualState);
@@ -176,7 +187,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (!selection.HasSingleEntityDetails) return;
         var details = new PlayerHoverSummary(selection.PrimaryEntity, default, default, default,
             selection.DisplayName, default, selection);
-        EmitWorld(details);
+        EmitWorld(details, includeWorkState: true);
         if (selection.HasInventory)
         {
             text = new(buffer); text.Append("LOCAL INVENTORY "); text.Number(selection.InventoryQuantity, "N0"); Line(text.Written);
@@ -200,7 +211,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         Line(PlayerActionDockHudModel.ResolveCommandFeedbackReason(feedback));
     }
 
-    private void EmitWorld(in PlayerHoverSummary world)
+    private void EmitWorld(in PlayerHoverSummary world, bool includeWorkState = false)
     {
         var details = world.OwnedDetails;
         Span<char> text = stackalloc char[160];
@@ -220,7 +231,12 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             var builder = new TooltipTextBuilder(text);
             builder.Append(details.Work.Activity); builder.Append(" "); builder.Number(details.Work.Progress, "P0");
             Line(builder.Written);
-            Line(details.Work.State == PlayerWorkState.Blocked ? details.Work.BlockReason :
+            if(includeWorkState)
+            {
+                Line(SelectionInspectorHudModel.ResolveWorkStateLabel(details.Work.State));
+                if(!string.IsNullOrWhiteSpace(details.Work.BlockReason)) Line(details.Work.BlockReason);
+            }
+            else Line(details.Work.State == PlayerWorkState.Blocked ? details.Work.BlockReason :
                 SelectionInspectorHudModel.ResolveWorkStateLabel(details.Work.State));
         }
         if (world.RemainingQuantity is { } remaining)

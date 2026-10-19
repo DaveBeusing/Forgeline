@@ -10,6 +10,7 @@ public readonly record struct NotificationStackLayout(HudRect Bounds, float Font
     NotificationCardLayout First = default, NotificationCardLayout Second = default,
     NotificationCardLayout Third = default, NotificationCardLayout Overflow = default, int Revision = 0)
 {
+    public HudRect PaintedBounds => Count==0 ? default : Bounds with {Height=Card(Count-1).Bounds.Bottom-Bounds.Y};
     public NotificationCardLayout Card(int index) => index >= 0 && index < Count ? index switch
     { 0 => First, 1 => Second, 2 => Third, _ => Overflow } : default;
     public int Hit(Vector2 point)

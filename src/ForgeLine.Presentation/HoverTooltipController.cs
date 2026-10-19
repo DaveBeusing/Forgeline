@@ -119,24 +119,41 @@ public sealed class HoverTooltipController
 
 internal static class HoverTooltipPlacement
 {
-    public static HudRect BesideRing(in RadialActionLayout ring, in GameplayHudLayout layout, float width, float height)
+    public static HudRect BesideRing(in ObjectActionRingView ring, in GameplayHudLayout layout,
+        ReadOnlySpan<HudRect> published, float width, float height)
     {
-        var safe = layout.SafeArea;
-        if (safe.IsEmpty || width <= 0 || height <= 0) return default;
-        width = MathF.Min(width, safe.Width); height = MathF.Min(height, safe.Height);
-        float gap = layout.Gap;
-        var center = ring.Center;
-        Span<HudRect> candidates =
-        [
-            new(center.X + ring.OuterRadius + gap, center.Y - height / 2, width, height),
-            new(center.X - ring.OuterRadius - gap - width, center.Y - height / 2, width, height),
-            new(center.X - width / 2, center.Y + ring.OuterRadius + gap, width, height),
-            new(center.X - width / 2, center.Y - ring.OuterRadius - gap - height, width, height)
-        ];
-        foreach (var candidate in candidates)
-            if (candidate.X >= safe.X && candidate.Right <= safe.Right && candidate.Y >= safe.Y && candidate.Bottom <= safe.Bottom &&
-                !candidate.Intersects(layout.TopStatusBar) && !candidate.Intersects(layout.Minimap)) return candidate;
-        return new(safe.X, Math.Clamp(center.Y - height / 2, safe.Y, safe.Bottom - height), width, height);
+        if(published.Length>8) throw new ArgumentException("Tooltip supports the eight published HUD obstacles.",nameof(published));
+        var safe=layout.SafeArea;
+        if(safe.IsEmpty || width<=0 || height<=0 || width>safe.Width || height>safe.Height || !ring.Geometry.IsValid) return default;
+        Span<HudRect> occupied=stackalloc HudRect[16];int count=0;
+        foreach(var rectangle in published) if(!rectangle.IsEmpty) occupied[count++]=rectangle;
+        for(int slot=0;slot<ring.Geometry.Count;slot++) if(ring.Slots[slot].Present)
+            occupied[count++]=ring.Geometry.SectorBounds(slot);
+        float gap=MathF.Min(layout.Gap,8);
+        Span<float> xs=stackalloc float[40];Span<float> ys=stackalloc float[40];
+        var center=ring.Geometry.Center;
+        xs[0]=center.X+ring.Geometry.OuterRadius+gap;xs[1]=center.X-ring.Geometry.OuterRadius-gap-width;
+        xs[2]=center.X-width/2;xs[3]=safe.X;xs[4]=safe.Right-width;
+        ys[0]=center.Y-height/2;ys[1]=center.Y+ring.Geometry.OuterRadius+gap;
+        ys[2]=center.Y-ring.Geometry.OuterRadius-gap-height;ys[3]=safe.Y;ys[4]=safe.Bottom-height;
+        int xCount=5,yCount=5;
+        for(int i=0;i<count;i++) {
+            xs[xCount++]=occupied[i].Right+gap;xs[xCount++]=occupied[i].X-gap-width;
+            ys[yCount++]=occupied[i].Bottom+gap;ys[yCount++]=occupied[i].Y-gap-height;
+        }
+        HudRect best=default;float score=float.PositiveInfinity;
+        for(int x=0;x<xCount;x++) for(int y=0;y<yCount;y++) {
+            var candidate=new HudRect(Math.Clamp(xs[x],safe.X,safe.Right-width),Math.Clamp(ys[y],safe.Y,safe.Bottom-height),width,height);
+            float distance=Vector2.DistanceSquared(new(candidate.X+width/2,candidate.Y+height/2),center);
+            if(distance>=score) continue;
+            bool clear=true;
+            for(int i=0;i<count;i++) {
+                var obstacle=occupied[i];
+                if(candidate.Intersects(new(obstacle.X-gap,obstacle.Y-gap,obstacle.Width+gap*2,obstacle.Height+gap*2))) {clear=false;break;}
+            }
+            if(clear) {best=candidate;score=distance;}
+        }
+        return best;
     }
 
     public static HudRect Resolve(Vector2 pointer, in GameplayHudLayout layout, float width, float height)

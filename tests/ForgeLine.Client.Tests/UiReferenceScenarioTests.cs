@@ -24,7 +24,8 @@ public sealed class UiReferenceScenarioTests
             Assert.True(panel.Ring.Open);Assert.True(panel.Ring.Geometry.IsValid,$"{state} {display} {density}");
             Assert.False(panel.DockExpanded);Assert.NotNull(panel.Ring.Group);
             var occupied=new HudRect[8];
-            RadialActionLayout.ResolveObstacles(occupied,layout,OnboardingPresentation.Resolve(layout,0));
+            RadialActionLayout.ResolveObstacles(occupied,layout,OnboardingPresentation.Resolve(layout,0),
+                notifications:ActionableAlertLayout.Resolve(snapshot,layout));
             foreach(var rect in occupied)
             {
                 if(rect.IsEmpty) continue;

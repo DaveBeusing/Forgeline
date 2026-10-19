@@ -64,7 +64,7 @@ internal static class ObjectActionRingCapture
         controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,currentSelection:selection);
         var panel=controller.CreateView(layout.ViewportWidth,layout.ViewportHeight,snapshot.PlayerActions);
         var occupied=new HudRect[8];
-        RadialActionLayout.ResolveObstacles(occupied,layout);
+        RadialActionLayout.ResolveObstacles(occupied,layout,notifications:ActionableAlertLayout.Resolve(snapshot,layout));
         var ring=panel.Ring.Project(world,camera,1,snapshot,layout,occupied);
         if (state==UiReferenceScenario.RingParameters && ring.Geometry.IsValid)
         {
@@ -108,7 +108,7 @@ internal static class ObjectActionRingCapture
             controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,dpi,scale,selection);
         }
         var panel=controller.CreateView(layout.ViewportWidth,layout.ViewportHeight,snapshot.PlayerActions,dpi,scale);
-        Span<HudRect> occupied=stackalloc HudRect[8];RadialActionLayout.ResolveObstacles(occupied,layout);
+        Span<HudRect> occupied=stackalloc HudRect[8];RadialActionLayout.ResolveObstacles(occupied,layout,notifications:ActionableAlertLayout.Resolve(snapshot,layout));
         return authored with {Ring=panel.Ring.Project(world,camera,1,snapshot,layout,occupied) with {
             HoveredSlot=authored.HoveredIndex,Pressed=authored.PointerPressed}};
     }

@@ -107,6 +107,23 @@ public sealed partial class HoverTooltipRenderingTests
     }
 
     [Fact]
+    public void SelectionStatusRetainsWorkStateAndReasonEvenWhenTheReasonIsNotBlocked()
+    {
+        var original=StatusSnapshot();var experience=original.PlayerExperience!.Value;
+        PresentationSnapshot Snapshot(string reason) => new(original.Tick,original.TickDuration,1,original.Instances,
+            sessionId:original.SessionId,playerExperience:experience with {Selection=experience.Selection with {
+                Work=experience.Selection.Work with {State=PlayerWorkState.Running,BlockReason=reason}}});
+        using var graphics=new RetainedDevice();using var surface=new WorldHoverTooltipSurface(graphics);
+        var layout=GameplayHudLayout.Create(1600,900,96);
+        var withReason=Snapshot("WAITING FOR NEXT STEP");
+        surface.Render(Context(new RecordingContext(),withReason,layout,StatusView(withReason,layout)) with {ActionPanel=StatusPanel(withReason)});
+        int lines=surface.LastLayoutLineCount;
+        var noReason=Snapshot("");
+        surface.Render(Context(new RecordingContext(),noReason,layout,StatusView(noReason,layout)) with {ActionPanel=StatusPanel(noReason)});
+        Assert.Equal(lines-1,surface.LastLayoutLineCount);
+    }
+
+    [Fact]
     public void WarmSelectionStatusUsesRetainedBuffersWithoutManagedAllocations()
     {
         var snapshot = StatusSnapshot();

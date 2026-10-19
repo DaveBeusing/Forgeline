@@ -721,7 +721,8 @@ internal sealed class ClientRenderHost : IDisposable
                             RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
                         var ringLayout = GameplayHudLayout.Create(context.Width, context.Height, current.Dpi, current.UiScale);
                         Span<HudRect> occupied = stackalloc HudRect[8];
-                        RadialActionLayout.ResolveObstacles(occupied,ringLayout,current.PreAlphaUx.Onboarding,current.Operations,current.CombatGroups);
+                        RadialActionLayout.ResolveObstacles(occupied,ringLayout,current.PreAlphaUx.Onboarding,current.Operations,current.CombatGroups,
+                            ActionableAlertLayout.Resolve(snapshot,ringLayout,localFeedback:current.PreAlphaUx.Placement.Visible ? "" : current.PreAlphaUx.InteractionHint));
                         animatedPanel = animatedPanel with { Ring = animatedPanel.Ring.Project(renderWorld, renderCamera,
                             renderAlpha, snapshot, ringLayout, occupied) };
                         inputRing = animatedPanel.Ring;

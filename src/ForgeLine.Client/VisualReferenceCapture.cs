@@ -287,7 +287,7 @@ internal static class VisualReferenceCapture
                         {
                             var ringLayout=GameplayHudLayout.Create(context.Width,context.Height,rasterDpi,uiScale);
                             Span<HudRect> ringOccupied=stackalloc HudRect[8];
-                            RadialActionLayout.ResolveObstacles(ringOccupied,ringLayout,captureUx.Onboarding,operations,groups);
+                            RadialActionLayout.ResolveObstacles(ringOccupied,ringLayout,captureUx.Onboarding,operations,groups,ActionableAlertLayout.Resolve(snapshot,ringLayout));
                             panel=panel with { Ring=panel.Ring.Project(world,camera,1,snapshot,ringLayout,ringOccupied) };
                         }
                         if (panel.Ring is { Open:true,Resolved:true,Geometry.IsValid:true } ring &&
@@ -300,6 +300,9 @@ internal static class VisualReferenceCapture
                             hoverTooltip: hover,
                             runtimeMetrics: new RuntimeMetricsView(60, 20, RuntimeSimulationState.Running),
                             showRuntimeMetrics: false, operations: operations);
+                        if(hover.SelectionStatus && targeting.Mode==TacticalTargetingMode.None && !information.IsDragSelecting &&
+                            hud.LastHoverTooltipVertexCount==0)
+                            throw new InvalidDataException("Visible ring status has no nonoverlapping tooltip placement.");
                         if (frontend is not null && frontendView is { } pause)
                             frontend.Render(context, pause);
                     };
@@ -448,6 +451,7 @@ internal static class VisualReferenceCapture
                             notifications = frontend is null ? ActionableAlertLayout.Resolve(snapshot,
                                 GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen) : (NotificationStackLayout?)null,
                             skin = frontend?.SkinDiagnostics, battlefieldSkin = frontend is null ? hud.SkinDiagnostics : (GameplayHudSkinDiagnostics?)null, skinState = frontend?.SkinState, skinnedControls = frontend?.LastSkinnedControlCount, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",
+                            tooltipBounds = hud.LastHoverTooltipBounds, ringGeometry = panel.Ring.Geometry,
                             interaction = new { panel.Mode, panel.SelectedIndex, panel.HoveredIndex, panel.PointerPressed,
                                 panel.ContextualHoveredIndex, panel.ContextualPressed, panel.ContextualPending, targetingMode = targeting.Mode },
                             captureOffset = uiScenario == UiReferenceScenario.MenuReveal ? "Authored half-reveal; live motion reviewed separately" : "Settled fixed state",
