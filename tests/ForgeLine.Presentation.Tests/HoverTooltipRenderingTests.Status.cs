@@ -166,6 +166,20 @@ public sealed partial class HoverTooltipRenderingTests
     }
 
     [Fact]
+    public void InspectorPlacementPrefersRightOfOuterArcAndAvoidsAllSectorHitBounds()
+    {
+        var snapshot=StatusSnapshot();
+        var panel=StatusPanel(snapshot);
+        var layout=GameplayHudLayout.Create(1920,1080,96);
+        var card=HoverTooltipPlacement.BesideRing(panel.Ring,layout,[],330,300);
+        Assert.False(card.IsEmpty);
+        Assert.True(card.X>panel.Ring.Geometry.Center.X+panel.Ring.Geometry.OuterRadius);
+        for (int slot=0;slot<panel.Ring.Geometry.Count;slot++)
+            Assert.False(card.Intersects(panel.Ring.Geometry.SectorBounds(slot)));
+        Assert.True(layout.SafeArea.Contains(new Vector2(card.Right,card.Bottom)));
+    }
+
+    [Fact]
     public void WarmSelectionStatusUsesRetainedBuffersWithoutManagedAllocations()
     {
         var snapshot = StatusSnapshot();
