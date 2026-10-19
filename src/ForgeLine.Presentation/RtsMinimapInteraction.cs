@@ -148,6 +148,11 @@ internal static class RtsMinimapInteractionLayout
                     top));
     }
 
+    public static bool IsInteractiveSurface(Vector2 pointer, in GameplayHudLayout layout) =>
+        GetMapRect(layout).Contains(pointer) ||
+        GetSelectorRect(layout).Contains(pointer) ||
+        GetLegendRect(layout).Contains(pointer);
+
     public static bool TryMapPointerToWorld(
         Vector2 pointer,
         in GameplayHudLayout layout,
@@ -257,11 +262,16 @@ public sealed class RtsMinimapInteractionController
     private bool _primaryWasDown;
     private bool _secondaryWasDown;
     private bool _cameraDragging;
+    private bool _primaryGestureOwned;
+    private bool _secondaryGestureOwned;
+    private readonly MinimapHoverMotion _hoverMotion = new();
     private MovementOrderRequest? _pendingMovement;
     private PlayerActionRequest? _pendingAction;
     private StrategicOverlayMode? _pendingOverlay;
 
     public bool PointerCaptured { get; private set; }
+
+    public HudRect DisplayedBounds { get; private set; }
 
     public RtsMinimapInteractionView View { get; private set; } =
         RtsMinimapInteractionView.Empty;
@@ -276,7 +286,11 @@ public sealed class RtsMinimapInteractionController
         TacticalTargetingMode targetingMode,
         FormationTemplate formation,
         bool minimapEnabled = true,
-        bool inputBlocked = false)
+        bool inputBlocked = false,
+        TimeSpan presentationTime = default,
+        bool expandOnHover = false,
+        bool animateHover = false,
+        bool presentationActive = true)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(camera);
@@ -303,6 +317,9 @@ public sealed class RtsMinimapInteractionController
 
         if (!minimapEnabled)
         {
+            _hoverMotion.Reset();
+            DisplayedBounds = default;
+            _primaryGestureOwned = _secondaryGestureOwned = false;
             _cameraDragging = false;
             PointerCaptured = false;
             _primaryWasDown =
@@ -314,28 +331,44 @@ public sealed class RtsMinimapInteractionController
             return;
         }
 
+        HudRect minimapBounds = expandOnHover
+            ? _hoverMotion.Update(layout, input.PointerPosition, input.HasPointerPosition,
+                presentationTime, presentationActive && !inputBlocked, animateHover,
+                _primaryGestureOwned || _secondaryGestureOwned || _cameraDragging)
+            : layout.Minimap;
+        if (!expandOnHover) _hoverMotion.Reset();
+        DisplayedBounds = minimapBounds;
+        GameplayHudLayout mapLayout = layout with { Minimap = minimapBounds };
+
         bool pointerInHud =
             input.HasPointerPosition &&
-            layout.Minimap.Contains(
-                input.PointerPosition);
+            RtsMinimapInteractionLayout.IsInteractiveSurface(input.PointerPosition, mapLayout);
         bool pointerInMap =
             input.HasPointerPosition &&
             RtsMinimapInteractionLayout.GetMapRect(
-                layout).Contains(
+                mapLayout).Contains(
                 input.PointerPosition);
         bool pointerInSelector =
             input.HasPointerPosition &&
             RtsMinimapInteractionLayout.GetSelectorRect(
-                layout).Contains(
+                mapLayout).Contains(
                 input.PointerPosition);
 
-        bool primaryStartedInMap = !hasPrimaryPress || RtsMinimapInteractionLayout.GetMapRect(layout).Contains(primaryOrigin);
-        bool secondaryStartedInMap = !hasSecondaryPress || RtsMinimapInteractionLayout.GetMapRect(layout).Contains(secondaryOrigin);
-        bool primaryStartedInSelector = !hasPrimaryPress || RtsMinimapInteractionLayout.GetSelectorRect(layout).Contains(primaryOrigin);
+        bool primaryStartedInMap = !hasPrimaryPress || RtsMinimapInteractionLayout.GetMapRect(mapLayout).Contains(primaryOrigin);
+        bool secondaryStartedInMap = !hasSecondaryPress || RtsMinimapInteractionLayout.GetMapRect(mapLayout).Contains(secondaryOrigin);
+        bool primaryStartedInSelector = !hasPrimaryPress || RtsMinimapInteractionLayout.GetSelectorRect(mapLayout).Contains(primaryOrigin);
+
+        if (primaryPressed)
+            _primaryGestureOwned = hasPrimaryPress &&
+                RtsMinimapInteractionLayout.IsInteractiveSurface(primaryOrigin, mapLayout);
+        if (secondaryPressed)
+            _secondaryGestureOwned = hasSecondaryPress &&
+                RtsMinimapInteractionLayout.IsInteractiveSurface(secondaryOrigin, mapLayout);
 
         PointerCaptured =
-            pointerInHud ||
-            _cameraDragging;
+            pointerInHud || _cameraDragging ||
+            (_primaryGestureOwned && (primaryDown || input.WasMouseButtonReleased(PlatformMouseButton.Left))) ||
+            (_secondaryGestureOwned && (secondaryDown || input.WasMouseButtonReleased(PlatformMouseButton.Right)));
 
         Vector3 flatTarget = default;
         float terrainHeight = 0.0f;
@@ -343,7 +376,7 @@ public sealed class RtsMinimapInteractionController
             pointerInMap &&
             RtsMinimapInteractionLayout.TryMapPointerToWorld(
                 input.PointerPosition,
-                layout,
+                mapLayout,
                 terrain.WorldBounds,
                 out flatTarget) &&
             terrain.TrySampleHeight(
@@ -371,7 +404,7 @@ public sealed class RtsMinimapInteractionController
                  pointerInSelector &&
                  RtsMinimapInteractionLayout.TryHitOverlay(
                      input.PointerPosition,
-                     layout,
+                     mapLayout,
                      out StrategicOverlayMode overlay))
         {
             _cameraDragging = false;
@@ -392,7 +425,7 @@ public sealed class RtsMinimapInteractionController
                     targetingMode,
                     worldTarget,
                     terrain.WorldBounds,
-                    layout,
+                    mapLayout,
                     formation,
                     out PlayerActionRequest request))
             {
@@ -438,6 +471,8 @@ public sealed class RtsMinimapInteractionController
             }
         }
 
+        if (!primaryDown) _primaryGestureOwned = false;
+        if (!secondaryDown) _secondaryGestureOwned = false;
         _primaryWasDown =
             primaryDown;
         _secondaryWasDown =
@@ -456,7 +491,7 @@ public sealed class RtsMinimapInteractionController
                     snapshot,
                     worldTarget,
                     terrain.WorldBounds,
-                    layout));
+                    mapLayout));
     }
 
     public bool TryTakeMovementRequest(
@@ -515,6 +550,9 @@ public sealed class RtsMinimapInteractionController
         _primaryWasDown = false;
         _secondaryWasDown = false;
         _cameraDragging = false;
+        _primaryGestureOwned = _secondaryGestureOwned = false;
+        _hoverMotion.Reset();
+        DisplayedBounds = default;
         _pendingMovement = null;
         _pendingAction = null;
         _pendingOverlay = null;
@@ -538,6 +576,9 @@ public sealed class RtsMinimapInteractionController
         _primaryWasDown = false;
         _secondaryWasDown = false;
         _cameraDragging = false;
+        _primaryGestureOwned = _secondaryGestureOwned = false;
+        _hoverMotion.Reset();
+        DisplayedBounds = default;
         _pendingMovement = null;
         _pendingAction = null;
         _pendingOverlay = null;
