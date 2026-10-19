@@ -303,7 +303,8 @@ public sealed partial class PlayerActionPanelController
             case ActionRingNavigation.Parameters: _ringLevel = ActionRingLevel.Parameters; _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions); break;
             case ActionRingNavigation.NextItem:
                 if (count > 0) { SelectedIndex = (SelectedIndex + 1) % count; _ringPage = SelectedIndex / 4;
-                    _stockResourceId = ResourceId.None; _desiredStockQuantity = 0; SynchronizeStockEditor(actions); SynchronizeSupplyEditor(actions);
+                    _stockResourceId = ResourceId.None; _desiredStockQuantity = 0; _logisticsSteps = 1;
+                    SynchronizeStockEditor(actions); SynchronizeSupplyEditor(actions);
                     _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions); }
                 break;
             default:
