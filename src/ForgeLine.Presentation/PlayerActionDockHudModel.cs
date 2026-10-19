@@ -43,6 +43,8 @@ internal static class PlayerActionDockHudModel
 
     public static string ResolveRingItemTitle(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions, bool compact)
     {
+        if (mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } logistics &&
+            index >= logistics.OrderStartIndex && index < logistics.ItemCount) return "ORDER";
         if (mode != PlayerActionPanelMode.Tactical) return ResolveItemTitle(mode,index,actions);
         return index switch
         {
