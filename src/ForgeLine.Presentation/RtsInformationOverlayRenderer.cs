@@ -176,8 +176,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             EmitSelectionRectangle(
                 view.DragStart,
                 view.DragCurrent,
-                ResolveColor(
-                    RtsUiIcon.CursorDragSelect),
+                RtsSelectionVisualStyle.Selected,
                 scale,
                 context.Width,
                 context.Height);
@@ -266,7 +265,9 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 {
                     LastWorldCorners++;
                     _skin.Projected("ui.artwork.directorate.world.selection_corner.p32", a.Position, b.Position, c.Position, d.Position,
-                        primary ? new Vector4(.25f,1,.35f,1) : new Vector4(.15f,.85f,1,1));
+                        primary ? RtsSelectionVisualStyle.Selected :
+                            instance.Selectable.Owner.IsSpecified && instance.Selectable.Owner != experience.Player
+                                ? RtsSelectionVisualStyle.ForeignHover : RtsSelectionVisualStyle.Hovered);
                 }
             }
             // Aggregate selection values must never be painted onto one member of a group.
@@ -279,7 +280,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             {
                 LastWorldMeters++;
                 Vector4 healthColor = facts.HealthFraction <= .25 ? ForgeLineUiPalette.Critical :
-                    facts.HealthFraction <= .5 ? ForgeLineUiPalette.Warning : new(.25f,1,.35f,1);
+                    facts.HealthFraction <= .5 ? ForgeLineUiPalette.Warning : RtsSelectionVisualStyle.Selected;
                 _skin.Bar(new(x,y,48*scale,4*scale), facts.HealthFraction, healthColor);
             }
             if (facts.HasSupply && double.IsFinite(facts.FuelFraction) && double.IsFinite(facts.AmmunitionFraction))
