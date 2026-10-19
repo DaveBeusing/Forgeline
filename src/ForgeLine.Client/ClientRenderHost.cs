@@ -769,6 +769,9 @@ internal sealed class ClientRenderHost : IDisposable
                             presentationTime: uiNow,
                             animateNotifications: current.MetricsActive && !current.SurfaceSuspended &&
                                 current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
+                                current.FeedbackSettings.Animate(qualityProfile.Active),
+                            animateOperations: current.MetricsActive && !current.SurfaceSuspended &&
+                                current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
                                 current.FeedbackSettings.Animate(qualityProfile.Active));
                         developmentOverlayRenderer.Render(
                             context,

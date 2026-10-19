@@ -149,3 +149,7 @@ hit regions. One transition reverses immediately without queues or simulation ti
 Reduced Motion, Low/fallback quality, a gap over 250 ms, rollback, focus loss,
 minimize and viewport changes settle to the current logical target. Geometry changes
 cancel stale gestures. No decorative timing gates input or readiness.
+
+## Operations panel skin motion
+
+The single `OPERATIONS` entry stays visible and occupies its existing shared safe-area rectangle; an active rail distinguishes its open and closed states. Both entry and panel container backgrounds use 0.30 effective alpha with native alpha blending, independent of text/icon/button foregrounds. The existing panel's skin uses a reversible 180 ms SmoothStep alpha track driven by monotonic render-owner presentation time. Open/close intent, filters, pages, focus, notification details and existing-controls actions remain logically immediate. A closed panel may leave a short fading background rectangle, but that remnant has no hit region, data content or command authority. A newly opened panel owns its whole unchanged `OperationsLayout.Panel` rectangle during the incoming fade. Motion settles immediately on Reduced Motion, Low quality, focus/pause/minimize suppression, session/viewport/DPI/UI-scale changes and 250 ms clock interruption or rollback. This adds no simulation timer, snapshot data, graphics dependency or authoring asset.

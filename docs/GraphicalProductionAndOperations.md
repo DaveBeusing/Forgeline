@@ -41,7 +41,7 @@ The command dock now renders its existing domain cards from prepared production 
 
 Frames use `ui.skin.directorate.control.button_compact`, `panel.primary`, `panel.raised`, `panel.inset`, `panel.portrait` and `panel.tooltip`, with existing `overlay.*` and `progress.progress_track` / `progress.progress_fill` sprites. No source, definition, atlas or compiled asset is changed. Reference sheets remain reference-only.
 
-The owners record skin, remaining dynamic geometry, then live text. Operations first submits an opaque underlay from its existing upload buffer, then the skin and dynamic rails/text. Alert drawing continues in the right stack while Operations owns its separate left panel. No decorative hit region is added. Shared resources and optional catalog-free bootstrap paths retain their original lifetime rules.
+The owners record skin, remaining dynamic geometry, then live text. Operations renders its main panel and its one persistent OPERATIONS toggle using 0.30-opacity alpha-blended skin backgrounds; the former fully opaque upload-buffer underlay has been removed. Its header/inset/control backplates use bounded alpha, while text, category icons, status and selection rails are independently rendered for readability. The fixed 180 ms reversible panel-skin transition never changes layout or input hit geometry. Alert drawing continues in the right stack while Operations owns its separate left panel. No decorative hit region is added. Shared resources and optional catalog-free bootstrap paths retain their original lifetime rules.
 
 Below the track's authored twelve-pixel height, the complete progress sprite is resampled so compressed nine-slice borders do not remove its centre. Filling clips actual width/UVs and never stretches a fraction across the entire track. Normal cards place progress above selection decoration; compact cards retain numeric progress and avoid overlaying cost text.
 
@@ -62,9 +62,9 @@ Stock, demand/allocation, configured generation capacity and measured utilizatio
 
 ## Bounded resources and qualification
 
-The composed HUD shares seven atlas pages (28 MiB): one Core, two Icons and four Portraits. Twelve bounded batches prepare 48 upload buffers, reserving 5,603,328 bytes: six Core batches at 1,024 quads, four icon batches at 256, and two portrait batches at 64. Pages are shared across surfaces; per-frame recording performs no texture preparation. Operations reuses its existing legacy geometry buffer for the opaque underlay.
+The composed HUD shares seven atlas pages (28 MiB): one Core, two Icons and four Portraits. Twelve bounded batches prepare 48 upload buffers, reserving 5,603,328 bytes: six Core batches at 1,024 quads, four icon batches at 256, and two portrait batches at 64. Pages are shared across surfaces; per-frame recording performs no texture preparation. Operations retains its legacy geometry upload buffer only for fallback primitives and foreground rails; no opaque underlay is uploaded.
 
-`EconomicInterfaceSkinTests` covers work/availability independence, shortages, output/power/inventory blocking, queued versus active units, cancel-only controls, technology completion/identity, missing routes/providers, stale tooltips, current Operations selection, zero warm allocation, native thin/selected progress visibility and opaque ownership. Existing Operations, alert, tooltip, strict bitmap geometry and client tests remain in place. The complete CI job remains required.
+`EconomicInterfaceSkinTests` covers work/availability independence, shortages, output/power/inventory blocking, queued versus active units, cancel-only controls, technology completion/identity, missing routes/providers, stale tooltips, current Operations selection, zero warm allocation, native thin/selected progress visibility and input ownership independent of decorative background opacity. Existing Operations, alert, tooltip, strict bitmap geometry and client tests remain in place. The complete CI job remains required.
 
 See [source-bound qualification, package and remaining gates](GraphicalProductionAndOperationsQualification.md). Automated repeatability does not grant human art, readability, accessibility or physical-monitor acceptance.
 
@@ -78,3 +78,7 @@ compact panels reduce visible line count instead of font size.
 Next Message Page cycles all text and Facilities returns to the existing facility
 view. Current snapshots replace resolved/expired facts instead of keeping history.
 See [notification qualification](NotificationStackQualification.md).
+
+## Operations toggle and panel transition
+
+The compact toggle has exactly one `OPERATIONS` label, a narrow open-state rail, and no extra heading or duplicate side panel. It remains visible while the existing Operations panel is open. The panel's full real rectangle is interactive only while logically open. The panel skin transitions from/to the current presentation alpha over 180 ms using shared SmoothStep, but close immediately discards actionable content and its capture. Renderer- and controller-side geometry is unchanged and sourced from the same `OperationsLayout`; the UI does not modify fixed-tick gameplay authority, facility data, notifications, or production routes. Reduced Motion/Low quality, invalid display geometry, session changes, focus loss or interrupted clocks immediately settle the logical target. Earlier opaque-panel screenshots remain historical rather than current qualification evidence.

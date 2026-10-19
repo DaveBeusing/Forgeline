@@ -36,11 +36,11 @@ While open, extraction runs at the existing fixed-tick cadence (20 Hz in the can
 
 Native startup smoke qualifies HUD composition and window modes. It does not establish active operations interaction, terrain contrast, text readability on every monitor, live DPI transitions, mixed-route focus journeys or steady-state GPU acceptance. Those remain manual acceptance items until exercised.
 
-The HUD information update fits the opaque Operations panel inside its available space and clear of selection commands. The separate entry is hidden while the panel is open; CLOSE remains available. Selected and blocked rows have distinct rails plus text. See [HUD evidence](BattlefieldHudQualification.md).
+The HUD information layout fits the Operations panel inside the existing safe-area column, clear of selection commands. The separate compact OPERATIONS toggle remains visible and can close the existing panel; the panel's CLOSE control remains available. The toggle and panel use 0.30-opacity backgrounds with separate readable labels and status rails. A reversible 180 ms SmoothStep track animates the panel skin without moving hit bounds. Closing immediately releases the entire panel rectangle, even while a noninteractive background remnant fades. Selected and blocked rows retain distinct rails plus text. See [HUD evidence](BattlefieldHudQualification.md) for historical reference captures.
 
 ## Graphical operations integration
 
-The [production/operations interface](GraphicalProductionAndOperations.md) now uses shared compiled panels, category icons, state controls and the selected inspector. The panel retains an opaque backing; current visible Operations suppresses underlying alert drawing. Filters, paging, copied diagnostics, privacy and focus/open-controls semantics remain unchanged. [Qualification](GraphicalProductionAndOperationsQualification.md) records source-bound tests, native cases, packaging and pending acceptance.
+The [production/operations interface](GraphicalProductionAndOperations.md) now uses shared compiled panels, category icons, state controls and the selected inspector. The panel has a 0.30-opacity blended backing instead of the previous opaque underlay; the right alert stack remains in its independent owner. Filters, paging, copied diagnostics, privacy and focus/open-controls semantics remain unchanged. [Qualification](GraphicalProductionAndOperationsQualification.md) records source-bound tests, native cases, packaging and pending acceptance.
 
 
 ## Logistics setup
@@ -48,3 +48,7 @@ The [production/operations interface](GraphicalProductionAndOperations.md) now u
 NO INPUT and reported transport failures open existing Logistics controls. Regular loading-bay waits retain their confirmed queue position and are distinct from production queues, graph throughput and true blocked access. Focus changes no orders. Source/destination names and quantities are restricted to owned copied facts. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
 
 The [opening logistics guide](OnboardingInteraction.md) explains these same controls and uses [completed-action evidence](OnboardingQualification.md). Reading a card, starting stock, an accepted policy or a provider assignment never substitutes for an actual delivery or field transfer.
+
+## Current toggle and panel lifecycle
+
+The sole compact entry is labeled `OPERATIONS` in both open and closed states; a narrow active rail differentiates them. Clicking it toggles the existing panel once per retained press sequence, while its header CLOSE control, filters, paging, notification details, OPS navigation, and authorized Open Existing Controls path remain intact. The open panel captures its entire logical rectangle. A close intent drops input capture and the copied-data request immediately; the optional 180 ms outgoing background is decorative only. Session, viewport/DPI/UI scale, focus, pause, presentation-clock interruption, Low quality and Reduced Motion settle the visible state without retaining stale snapshot text. Operations stays a presentation-only consumer of authorized completed-tick data.
