@@ -43,6 +43,25 @@ public sealed class RtsCameraInputTests
     }
 
     [Fact]
+    public void ContextualQeAlsoRejectsCameraPitchAndPanRemapsOnTheSameKeys()
+    {
+        var mapper = new RtsCameraActionMapper(new RtsCameraBindings
+        {
+            PanForward = PlatformKey.E,
+            PitchUp = PlatformKey.Q
+        });
+        var input = new InputState();
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.Q));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.E));
+        Assert.True(mapper.Map(input).Pan.Y > 0);
+        Assert.True(mapper.Map(input).Pitch > 0);
+        var contextual = mapper.Map(input, contextOwnsQe: true);
+        Assert.Equal(Vector2.Zero, contextual.Pan);
+        Assert.Equal(0, contextual.Pitch);
+        Assert.Equal(0, contextual.Rotation);
+    }
+
+    [Fact]
     public void HudPointerCaptureSuppressesWheelDragAndEdgePanButPreservesKeyboardPan()
     {
         var state = new InputState();
