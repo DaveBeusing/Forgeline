@@ -208,10 +208,14 @@ public sealed partial class PlayerActionPanelController
             return;
         }
 
-        if (_ringGlobal && !_ringOpen)
-            _globalAnchor = input.HasPointerPosition && layout.SafeArea.Contains(input.PointerPosition)
-                ? input.PointerPosition : new(layout.SafeArea.X + layout.SafeArea.Width / 2,
-                    layout.SafeArea.Y + layout.SafeArea.Height / 2);
+        _globalAnchorValid = input.HasPointerPosition && layout.SafeArea.Contains(input.PointerPosition);
+        if (_ringGlobal && _ringOpen && !_globalAnchorValid)
+        {
+            Close();
+            return;
+        }
+        if (_ringGlobal && !_ringOpen && _globalAnchorValid)
+            _globalAnchor = input.PointerPosition;
 
         if (Pressed(input, _bindings.Key(GameplayAction.Build)))
         {
@@ -496,6 +500,12 @@ public sealed partial class PlayerActionPanelController
     private void ToggleMode(
         PlayerActionPanelMode requested)
     {
+        if (_ringGlobal && !_ringOpen && !_globalAnchorValid)
+        {
+            Feedback = "MOVE POINTER INTO PLAY AREA";
+            _feedbackRemaining = TimeSpan.FromSeconds(3);
+            return;
+        }
         Feedback = string.Empty;
         Mode =
             Mode == requested
