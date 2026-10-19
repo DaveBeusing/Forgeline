@@ -53,7 +53,14 @@ public sealed class HoverTooltipController
         var next = new HoverTooltipView(snapshot.SessionId, EntityId.Invalid, default, pointer,
             false, layout.ViewportWidth, layout.ViewportHeight, layout.Scale);
         int count = panel.SelectionPending ? 0 : PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
-        if (panel.Ring.TryHit(pointer, out var radial))
+        // The selected-object inspector is persistent while its ring is open;
+        // hovering an action sector must not replace the authorized object facts.
+        if (statusAvailable && !panel.Ring.Global && !panel.SelectionPending)
+        {
+            next = next with { SelectionStatus = true, SelectionRevision = panel.Ring.SelectionRevision,
+                MenuRevision = panel.Ring.Revision, PointerPosition = panel.Ring.Geometry.Center };
+        }
+        else if (panel.Ring.TryHit(pointer, out var radial))
         {
             var target = radial.Navigation is ActionRingNavigation.Parameters or ActionRingNavigation.NextItem
                 ? new PlayerActionDockHitTarget(PlayerActionDockControlKind.Item,panel.Mode,panel.SelectedIndex)
