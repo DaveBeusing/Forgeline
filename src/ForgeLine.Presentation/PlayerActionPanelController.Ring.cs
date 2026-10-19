@@ -211,7 +211,11 @@ public sealed partial class PlayerActionPanelController
         PointerCaptured = hasHit;
         if (freshPress && input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin))
         {
-            _ringArmed = _presentedRing.TryHit(origin, out _pressedRingSlot) && _pressedRingSlot.Enabled;
+            _ringArmed = _presentedRing.TryHit(origin, out _pressedRingSlot) && _pressedRingSlot.Enabled &&
+                (_pressedRingSlot.Navigation != ActionRingNavigation.None || _pressedRingSlot.Target.Kind == PlayerActionDockControlKind.Mode ||
+                    PlayerActionDockHudModel.CanUseControl(_pressedRingSlot.Target.Kind == PlayerActionDockControlKind.Item
+                        ? PlayerActionDockControlKind.Activate : _pressedRingSlot.Target.Kind,
+                        _pressedRingSlot.Target.Mode, _pressedRingSlot.Target.ItemIndex, panel, actions));
             _pressedRing = _presentedRing;
 
         }

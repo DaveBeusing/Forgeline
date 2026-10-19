@@ -224,6 +224,30 @@ public sealed class ObjectActionRingTests
         Assert.False(controller.TryTakeRequest(out _));
     }
 
+    [Fact]
+    public void LocallyPendingPressCannotActivateAfterTheNextSnapshotMakesTheItemAvailable()
+    {
+        var (controller,input,snapshot,selection)=Open(PlayerActionPanelMode.Production,PlatformKey.P);
+        ClickSlot(controller,input,snapshot,selection,0);
+        Assert.True(controller.TryTakeRequest(out _));
+        Assert.True(View(controller,snapshot).ContextualPending);
+        Present(controller,snapshot);
+        input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonDown,Geometry.LabelCenter(0));
+        controller.Update(input,snapshot,1920,1080,currentSelection:selection);
+        var a=snapshot.PlayerActions!;var tick=new SimulationTick(snapshot.Tick.Value+1);
+        var actions=new PlayerActionSnapshot(a.SessionId,tick,a.Construction,0,a.Production,a.UnitProduction,a.Logistics,a.Supply,a.Tactical,a.Technology);
+        var next=new PresentationSnapshot(tick,snapshot.TickDuration,snapshot.SimulationEntityCount,snapshot.Instances,
+            sessionId:snapshot.SessionId,playerExperience:snapshot.PlayerExperience!.Value with {Tick=tick},playerActions:actions);
+        Present(controller,next);
+        input.BeginFrame();Mouse(input,PlatformInputEventKind.MouseButtonUp,Geometry.LabelCenter(0));
+        controller.Update(input,next,1920,1080,currentSelection:selection);
+        Assert.False(controller.TryTakeRequest(out _));
+        ClickSlot(controller,input,next,selection,0);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(PlayerActionRequestKind.QueueProduction,request.Kind);
+        Assert.False(controller.TryTakeRequest(out _));
+    }
+
     private static (PlayerActionPanelController,InputState,PresentationSnapshot,SelectionSet) Open(PlayerActionPanelMode mode,PlatformKey key,string state="Ready")
     {
         var snapshot=Snapshot(mode,state); var selection=new SelectionSet(); selection.SetSingle(Entity);
