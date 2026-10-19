@@ -564,6 +564,81 @@ public sealed class RtsMinimapInteractionTests
     }
 
     [Fact]
+    public void HoverExpansionPublishesIdenticalGeometryForInputAndMapCommands()
+    {
+        var controller = new RtsMinimapInteractionController();
+        var input = new InputState();
+        var camera = new RtsCamera(new RtsCameraSettings { EdgeScrollEnabled = false, InitialTarget = Vector3.Zero });
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        Vector2 center = Center(RtsMinimapInteractionLayout.GetMapRect(layout));
+        MovePointer(input, center);
+        controller.Update(input, camera, new FlatTerrain(), Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.Zero, expandOnHover: true, animateHover: true);
+        input.BeginFrame();
+        controller.Update(input, camera, new FlatTerrain(), Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.FromMilliseconds(180), expandOnHover: true, animateHover: true);
+
+        Assert.True(controller.DisplayedBounds.Width > layout.Minimap.Width);
+        var published = layout with { Minimap = controller.DisplayedBounds };
+        Vector2 target = Center(RtsMinimapInteractionLayout.GetMapRect(published));
+        MovePointer(input, target);
+        SetPrimary(input, true, target);
+        controller.Update(input, camera, new FlatTerrain(), Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.FromMilliseconds(200), expandOnHover: true, animateHover: true);
+        Assert.True(controller.PointerCaptured);
+        Assert.True(controller.View.PointerWorldValid);
+        Assert.True(camera.Target != Vector3.Zero);
+    }
+
+    [Fact]
+    public void MinimapDragKeepsInputUntilReleaseBeyondAnimatedBounds()
+    {
+        var controller = new RtsMinimapInteractionController();
+        var input = new InputState();
+        var camera = new RtsCamera(new RtsCameraSettings { EdgeScrollEnabled = false });
+        var terrain = new FlatTerrain();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        Vector2 inside = Center(RtsMinimapInteractionLayout.GetMapRect(layout));
+        MovePointer(input, inside);
+        controller.Update(input, camera, terrain, Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.Zero, expandOnHover: true, animateHover: true);
+        input.BeginFrame();
+        controller.Update(input, camera, terrain, Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.FromMilliseconds(180), expandOnHover: true, animateHover: true);
+        SetPrimary(input, true, inside);
+        controller.Update(input, camera, terrain, Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.FromMilliseconds(185), expandOnHover: true, animateHover: true);
+        Assert.True(controller.View.IsCameraDragging);
+
+        input.BeginFrame();
+        Vector2 outside = new(500, 300);
+        MovePointer(input, outside);
+        controller.Update(input, camera, terrain, Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.FromMilliseconds(200), expandOnHover: true, animateHover: true);
+        Assert.True(controller.PointerCaptured);
+        Assert.True(controller.View.IsCameraDragging);
+
+        input.BeginFrame();
+        SetPrimary(input, false, outside);
+        controller.Update(input, camera, terrain, Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.FromMilliseconds(220), expandOnHover: true, animateHover: true);
+        Assert.True(controller.PointerCaptured);
+        input.BeginFrame();
+        controller.Update(input, camera, terrain, Snapshot(), layout, [],
+            TacticalTargetingMode.None, FormationTemplate.Compact,
+            presentationTime: TimeSpan.FromMilliseconds(240), expandOnHover: true, animateHover: true);
+        Assert.False(controller.PointerCaptured);
+    }
+
+    [Fact]
     public void OverlayCycleIncludesPowerBeforeAll()
     {
         var controller =
