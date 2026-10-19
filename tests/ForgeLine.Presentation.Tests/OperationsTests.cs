@@ -367,6 +367,7 @@ public sealed class OperationsTests
         var controller = new OperationsController();
         var layout = GameplayHudLayout.Create(1600, 900, 96);
         var snapshot = Snapshot();
+        controller.Update(input, snapshot, layout, interaction);
         var panel = OperationsLayout.Panel(layout);
         var emptySpace = new System.Numerics.Vector2(panel.X + panel.Width * .5f, panel.Y + 50);
         Assert.False(controller.ContainsSurface(emptySpace, layout));
