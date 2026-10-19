@@ -236,7 +236,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction) : null,
                 _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience) : null) { DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
                     DockingZones = _extraction is null ? null : LogisticsZoneSnapshot.Capture(
-                        context.Entities, _extraction.Player, _extraction.Scenario.Terrain) });
+                        context.Entities, _extraction.Player, _extraction.Scenario.Terrain,
+                        interaction.SelectedEntities,
+                        interaction.HoverSessionId == _extraction.Scenario.Simulation.SessionId
+                            ? interaction.HoveredEntity : default) });
     }
 
     private RenderInstance[] CaptureRenderInstances(
