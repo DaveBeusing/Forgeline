@@ -116,7 +116,9 @@ public sealed class GameplayHudRenderer : IDisposable
         RuntimeMetricsView runtimeMetrics = default,
         HoverTooltipView hoverTooltip = default,
         bool showRuntimeMetrics = false,
-        OperationsView operations = default)
+        OperationsView operations = default,
+        TimeSpan presentationTime = default,
+        bool animateNotifications = false)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -161,7 +163,9 @@ public sealed class GameplayHudRenderer : IDisposable
                 runtimeMetrics,
                 hoverTooltip,
                 showRuntimeMetrics,
-                operations);
+                operations,
+                presentationTime,
+                animateNotifications);
 
         foreach (IGameplayHudSurface surface in _surfaces)
         {
