@@ -53,6 +53,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
     private HudRect? _guidanceClip;
+    private readonly NotificationSurfaceMotion _placementMotion = new();
     internal HudRect LastGuidanceBounds { get; private set; }
     internal float LastGuidanceTextSize { get; private set; }
     public int LastGuidanceVertexCount { get; private set; }
@@ -69,7 +70,9 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         uint dpi,
         float uiScale = 1.0f,
         PreAlphaUxView preAlphaUx = default,
-        TacticalTargetingView targeting = default)
+        TacticalTargetingView targeting = default,
+        TimeSpan presentationTime = default,
+        bool animateNotifications = false)
     {
         ThrowIfDisposed();
         _text.Begin();
@@ -128,7 +131,26 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         bool contextVisible = preAlphaUx.Mode == PreAlphaUxMode.None && !view.IsDragSelecting && snapshot.PlayerExperience is { IsMatchComplete: false } &&
             ((preAlphaUx.Guidance.Visible && preAlphaUx.Guidance.SessionId == snapshot.SessionId) ||
                 placementVisible);
-        if (contextVisible) EmitContextGuidance(preAlphaUx, placementVisible, layout, context.Width, context.Height);
+        if (contextVisible)
+        {
+            if (placementVisible)
+                EmitPlacementHintBar(preAlphaUx.Placement, layout, context.Width, context.Height,
+                    presentationTime, animateNotifications);
+            else EmitContextGuidance(preAlphaUx, false, layout, context.Width, context.Height);
+        }
+        if (!placementVisible)
+        {
+            _placementMotion.Update(default, snapshot.SessionId, layout, presentationTime, animateNotifications);
+            if (!contextVisible)
+                for (int i = 0; i < _placementMotion.RetiredCount; i++)
+                {
+                    var (bounds, opacity) = _placementMotion.Retired(i);
+                    if (!_skin.Panel(bounds, "panel.compact", NotificationSurfaceVisuals.BackgroundOpacity * opacity))
+                        EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
+                            GameplayHudVisualStyle.PanelBackground with
+                            { W = NotificationSurfaceVisuals.BackgroundOpacity * opacity }, context.Width, context.Height);
+                }
+        }
         EmitCombatGroupOverview(
             combatGroups,
             layout.GroupOverviewBounds(combatGroups),
@@ -1075,6 +1097,62 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 width,
                 height);
         }
+    }
+
+    private void EmitPlacementHintBar(in PlacementContextFeedbackView placement, in GameplayHudLayout layout,
+        int width, int height, TimeSpan now, bool animate)
+    {
+        var state = OnboardingPresentation.Resolve(layout, 0);
+        if (!state.Visible) return;
+        float scale = MathF.Max(.875f, MathF.Min(layout.Scale, state.Panel.Height / 36));
+        float font = 14 * scale, padding = 6 * scale;
+        float line = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * font;
+        var bounds = state.Panel with { Height = MathF.Min(state.Panel.Height, line + 2 * padding) };
+        if (bounds.IsEmpty) return;
+        ulong revision = unchecked((uint)HashCode.Combine(placement.State, placement.Title, placement.Reason, placement.Hint));
+        var visual = new NotificationStackLayout(bounds, font, 1,
+            new(new(default, Local: true), bounds, default, default, default, false, revision));
+        _placementMotion.Update(visual, placement.SessionId, layout, now, animate);
+        float opacity = _placementMotion.Opacity(0);
+        _guidanceClip = bounds; _text.Clip = bounds; _skin.PanelClip(bounds);
+        int vertexStart = _vertexCount;
+        LastGuidanceBounds = bounds; LastGuidanceTextSize = font;
+        if (!_skin.Panel(bounds, "panel.compact", NotificationSurfaceVisuals.BackgroundOpacity * opacity))
+            EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
+                GameplayHudVisualStyle.PanelBackground with { W = NotificationSurfaceVisuals.BackgroundOpacity * opacity },
+                width, height);
+        Vector4 rail = placement.State switch
+        {
+            PlacementContextState.Invalid => GameplayHudVisualStyle.Critical,
+            PlacementContextState.MissingMaterials or PlacementContextState.Stale => GameplayHudVisualStyle.Warning,
+            PlacementContextState.Valid => GameplayHudVisualStyle.Focus,
+            _ => GameplayHudVisualStyle.Border
+        };
+        rail.W *= opacity;
+        EmitQuad(bounds.X, bounds.Y, 3 * scale, bounds.Height, rail, width, height);
+        float iconSize = font;
+        EmitIcon(placement.State is PlacementContextState.Invalid or PlacementContextState.MissingMaterials
+            ? RtsUiIcon.StatusAlert : RtsUiIcon.CommandBuild, bounds.X + padding,
+            bounds.Y + (bounds.Height - iconSize) * .5f, iconSize, width, height, opacity);
+        Span<char> buffer = stackalloc char[512];
+        var text = new HudTextBuilder(buffer);
+        text.Append(placement.Title ?? "");
+        text.Append(" / ");
+        text.Append(placement.Reason ?? "");
+        text.Append(" / ");
+        text.Append(placement.Hint ?? "");
+        var content = new HudRect(bounds.X + padding * 2 + iconSize,
+            bounds.Y + (bounds.Height - line) * .5f,
+            MathF.Max(1, bounds.Width - padding * 3 - iconSize), line);
+        Span<char> shortText = stackalloc char[512];
+        var ellipsized = NotificationText.Ellipsized(text.Written, content.Width, font, shortText);
+        if (!_text.AddCentered(ellipsized, content, font,
+            GameplayHudVisualStyle.TextPrimary with { W = opacity }, width, height))
+            EmitText(ellipsized, content.X, content.Y, content.Right,
+                GameplayHudVisualStyle.TextPrimary with { W = opacity }, scale, width, height);
+        LastGuidanceVertexCount = _vertexCount - vertexStart;
+        _guidanceClip = null; _text.Clip = null;
+        _skin.PanelClip(new HudRect(0, 0, width, height));
     }
 
     private void EmitContextGuidance(in PreAlphaUxView view, bool placement, in GameplayHudLayout layout, int width, int height)
