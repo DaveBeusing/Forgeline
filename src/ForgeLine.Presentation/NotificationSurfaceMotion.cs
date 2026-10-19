@@ -2,6 +2,11 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Presentation;
 
+internal static class NotificationSurfaceVisuals
+{
+    internal const float BackgroundOpacity = .30f;
+}
+
 /// <summary>Decorative, bounded notification visibility. The controller always uses the live layout.</summary>
 internal sealed class NotificationSurfaceMotion
 {
