@@ -12,7 +12,7 @@ public static class RtsWorldMarkerVisualization
         ITerrainQuery? terrain = null,
         float minimumRadius = 1.0f)
     {
-        DrawRing(draw, instance, color, terrain, dashed: false, minimumRadius);
+        DrawCorners(draw, instance, color, terrain, minimumRadius, hovered: false, foreignOwned: false);
     }
 
     public static void DrawHover(
@@ -23,71 +23,49 @@ public static class RtsWorldMarkerVisualization
         float minimumRadius = 1.0f,
         bool foreignOwned = false)
     {
-        DrawRing(draw, instance, color, terrain, dashed: true, minimumRadius);
-        if (foreignOwned && draw.Enabled && (instance.Visibility & RenderVisibilityMask.World) != 0 &&
-            instance.Mesh.IsValid && instance.Material.IsValid)
-        {
-            Vector3 extents = PresentationBounds.ResolveLocalHalfExtents(instance);
-            float radius = MathF.Max(minimumRadius, new Vector2(extents.X, extents.Z).Length() * 1.08f);
-            Vector3 center = instance.Transform.Position;
-            float fallbackHeight = PresentationBounds.ResolveGroundPlaneY(instance);
-            for (int index = 0; index < 4; index++)
-            {
-                float angle = index * MathF.PI * 0.5f;
-                Vector2 direction = new(MathF.Cos(angle), MathF.Sin(angle));
-                draw.Line(GroundPoint(center.X + direction.X * radius, center.Z + direction.Y * radius, fallbackHeight, terrain),
-                    GroundPoint(center.X + direction.X * radius * 1.2f, center.Z + direction.Y * radius * 1.2f, fallbackHeight, terrain), color);
-            }
-        }
+        DrawCorners(draw, instance, color, terrain, minimumRadius, hovered: true, foreignOwned);
     }
 
-    private static void DrawRing(
+    // Selected members retain four oriented L-corners. Hover uses diagonal corner
+    // notches, with an outward tick for foreign-owned objects. No ellipse is emitted.
+    private static void DrawCorners(
         DebugDraw draw,
         in RenderInstance instance,
         Vector4 color,
         ITerrainQuery? terrain,
-        bool dashed,
-        float minimumRadius)
+        float minimumRadius,
+        bool hovered,
+        bool foreignOwned)
     {
         ArgumentNullException.ThrowIfNull(draw);
         if (!draw.Enabled || (instance.Visibility & RenderVisibilityMask.World) == 0 ||
             !instance.Mesh.IsValid || !instance.Material.IsValid)
-        {
             return;
-        }
 
         Vector3 extents = PresentationBounds.ResolveLocalHalfExtents(instance);
-        Vector3 center = instance.Transform.Position;
-        float fallbackHeight = PresentationBounds.ResolveGroundPlaneY(instance);
-        const int segments = 24;
-        float minimum = float.IsFinite(minimumRadius) ? MathF.Max(1, minimumRadius) : 1;
-        Vector2 axes = new(MathF.Max(minimum, extents.X * 1.1f), MathF.Max(minimum, extents.Z * 1.1f));
-        Quaternion rotation = PresentationBounds.ResolveRotation(instance.Transform.Rotation);
-        Vector3 first = Vector3.Transform(new Vector3(axes.X, 0, 0), rotation);
-        Vector3 previous = GroundPoint(center.X + first.X, center.Z + first.Z, fallbackHeight, terrain);
-        for (int index = 1; index <= segments; index++)
-        {
-            float angle = index * (MathF.Tau / segments);
-            Vector3 offset = Vector3.Transform(new Vector3(MathF.Cos(angle) * axes.X, 0, MathF.Sin(angle) * axes.Y), rotation);
-            Vector3 next = GroundPoint(
-                center.X + offset.X,
-                center.Z + offset.Z,
-                fallbackHeight,
-                terrain);
-            if (!dashed || (index & 1) != 0)
-            {
-                draw.Line(previous, next, color);
-            }
-            previous = next;
-        }
-    }
+        float minimum = float.IsFinite(minimumRadius) ? MathF.Max(0.5f, minimumRadius) : 1f;
+        float insetX = MathF.Min(extents.X * 0.6f, MathF.Max(extents.X * 0.28f, minimum * 0.5f));
+        float insetZ = MathF.Min(extents.Z * 0.6f, MathF.Max(extents.Z * 0.28f, minimum * 0.5f));
 
-    private static Vector3 GroundPoint(float x, float z, float fallbackHeight, ITerrainQuery? terrain)
-    {
-        float height = terrain is not null && terrain.TrySampleHeight(x, z, out float sampled) && float.IsFinite(sampled)
-            ? sampled
-            : fallbackHeight;
-        return new Vector3(x, height + 0.08f, z);
+        for (int corner = 0; corner < 4; corner++)
+        {
+            Vector3 outer = TacticalFootprint.Corner(instance, corner, terrain: terrain);
+            if (hovered)
+            {
+                draw.Line(outer,
+                    TacticalFootprint.Corner(instance, corner, insetX, insetZ, terrain), color);
+                if (foreignOwned)
+                    draw.Line(outer,
+                        TacticalFootprint.Corner(instance, corner, -insetX * 0.4f, -insetZ * 0.4f, terrain), color);
+            }
+            else
+            {
+                draw.Line(outer,
+                    TacticalFootprint.Corner(instance, corner, insetX, 0, terrain), color);
+                draw.Line(outer,
+                    TacticalFootprint.Corner(instance, corner, 0, insetZ, terrain), color);
+            }
+        }
     }
 
     public static void DrawTarget(
