@@ -299,6 +299,7 @@ public sealed partial class PlayerActionPanelController
                     itemCount;
                 _desiredStockQuantity = 0.0;
                 _stockResourceId = ResourceId.None;
+                _logisticsSteps = 1;
                 _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions);
                 if (_ringContext) { _ringPage = SelectedIndex / 4; _ringRevision++; _presentedRing = default; }
             }
@@ -315,6 +316,7 @@ public sealed partial class PlayerActionPanelController
             SelectedIndex = Math.Clamp(SelectedIndex + (input.WheelDelta > 0 ? -capacity : capacity), 0, itemCount - 1);
             _desiredStockQuantity = 0.0;
             _stockResourceId = ResourceId.None;
+            _logisticsSteps = 1;
             if (_ringContext) { _ringPage = SelectedIndex / 4; _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions); _ringRevision++; _presentedRing = default; }
         }
         SynchronizeStockEditor(actions);
@@ -1042,6 +1044,7 @@ public sealed partial class PlayerActionPanelController
 
             case PlayerActionDockControlKind.Page:
             case PlayerActionDockControlKind.Item:
+                if (SelectedIndex != hit.ItemIndex) _logisticsSteps = 1;
                 SelectedIndex =
                     hit.ItemIndex;
                 _desiredStockQuantity = 0.0;
