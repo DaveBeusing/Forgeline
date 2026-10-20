@@ -118,6 +118,11 @@ public sealed class CargoFleetShortageTracker
         // blocked states are not evidence of an inadequate fleet size.
         bool candidate = backlog > 0 && active > 0 && idle == 0 && blocked == 0;
         var observed = new CargoFleetCapacityObservation(backlog, active, idle, active + idle, facility);
+        // Never publish a cached destination after it is destroyed, captured,
+        // recycled or replaced by another owned facility.
+        if (_active && (!IsOwnedTarget(entities, player, _last.AffectedFacility) ||
+            candidate && _last.AffectedFacility != facility))
+            ResetEvidence();
         return Advance(session, player, context.Tick, context.TickDuration, observed,
             candidate && IsOwnedTarget(entities, player, facility));
     }
