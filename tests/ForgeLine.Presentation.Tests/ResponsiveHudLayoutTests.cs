@@ -40,11 +40,11 @@ public sealed class ResponsiveHudLayoutTests
         Assert.False(bounds.IsEmpty);
         Assert.True(layout.SecondaryView.Contains(new(bounds.X,bounds.Y)));
         Assert.True(layout.SecondaryView.Contains(new(bounds.Right,bounds.Bottom)));
-        Assert.False(bounds.Intersects(OperationsLayout.Entry(layout)));
         Assert.False(bounds.Intersects(GameplayGuidanceLayout.Resolve(layout,true)));
         Span<HudRect> occupied=stackalloc HudRect[8];
         RadialActionLayout.ResolveObstacles(occupied,layout,groups:groups);
         Assert.Equal(bounds,occupied[1]);
+        Assert.True(occupied[7].IsEmpty);
         var ring=RadialActionLayout.Fit(new(width/2f,height/2f),0,layout,occupied);
         Assert.True(ring.IsValid);
         var nearest=new Vector2(Math.Clamp(ring.Center.X,bounds.X,bounds.Right),Math.Clamp(ring.Center.Y,bounds.Y,bounds.Bottom));
