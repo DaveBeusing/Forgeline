@@ -226,3 +226,7 @@ inspection follows the concurrently loading Supply Truck. The sustained view
 keeps its traffic overview. Targets participate in the fixture fingerprint.
 See [qualification](VehicleDockingQualification.md) for source-bound evidence
 and remaining gates.
+
+## Cargo propulsion Fuel visits
+
+Autonomous Cargo Truck propulsion refueling is a separate FIFO service category (`CargoRefueling`) and reuses the same exclusive building slot, pose, stationary service confirmation, timed throughput and physical exit as cargo pickup/delivery and Supply Truck loading. An eligible local Fuel provider must have real accessible inventory stock, matching owner and a compatible `BuildingLoadingDock`. Service never creates a second slot or transfers stock merely because a truck is nearby. The original cargo order and reserved shipment remain paused until a completed fuel-service exit. An empty or unreachable provider is reported instead of silently releasing an occupied lane.
