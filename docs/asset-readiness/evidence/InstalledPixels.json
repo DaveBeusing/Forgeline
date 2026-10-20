@@ -1,0 +1,75 @@
+{
+  "baselineCommit": "e822ec063c91cb103d3dace66b458fd9ec418b59",
+  "captures": [
+    {
+      "comparison": "exact-file-match",
+      "cpuMeanDeltaMs": 6.512862500000002,
+      "cpuMeanMs": 20.2998,
+      "equivalentHardware": true,
+      "gpuMeanMs": 8.842664,
+      "key": "CommandCoreProduction-1920x1080-High-NormalGameplay",
+      "pixelComparison": {
+        "ChangedPixelFraction": 0.0,
+        "ChangedPixels": 0,
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null,
+      "sameRuntime": false,
+      "sameSource": true,
+      "structural": "pass",
+      "visualReview": "pending"
+    },
+    {
+      "comparison": "exact-file-match",
+      "cpuMeanDeltaMs": -3.4880625000000016,
+      "cpuMeanMs": 8.635662499999999,
+      "equivalentHardware": true,
+      "gpuMeanMs": 8.357712,
+      "key": "MainBattleTankProduction-1920x1080-High-NormalGameplay",
+      "pixelComparison": {
+        "ChangedPixelFraction": 0.0,
+        "ChangedPixels": 0,
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null,
+      "sameRuntime": false,
+      "sameSource": true,
+      "structural": "pass",
+      "visualReview": "pending"
+    },
+    {
+      "comparison": "exact-file-match",
+      "cpuMeanDeltaMs": 1.5051375,
+      "cpuMeanMs": 11.052412499999999,
+      "equivalentHardware": true,
+      "gpuMeanMs": 11.567258666666666,
+      "key": "IndustrialBase-1920x1080-High-NormalGameplay",
+      "pixelComparison": {
+        "ChangedPixelFraction": 0.0,
+        "ChangedPixels": 0,
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null,
+      "sameRuntime": false,
+      "sameSource": true,
+      "structural": "pass",
+      "visualReview": "pending"
+    }
+  ],
+  "channelTolerance": 0,
+  "commit": "e822ec063c91cb103d3dace66b458fd9ec418b59",
+  "imageFailures": [],
+  "imageGateRequested": false,
+  "maximumChangedPixelFraction": 0.0,
+  "pixelComparisonRequested": true,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "schemaVersion": 1,
+  "structural": "pass",
+  "visualAcceptance": "pending"
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.command_core",
+      "assets": ["building.directorate.command_core", "building.directorate.command_core.critical", "building.directorate.command_core.damaged", "building.directorate.command_core.destroyed", "building.directorate.command_core.foundation", "building.directorate.command_core.lod1", "building.directorate.command_core.lod2", "building.directorate.command_core.partial_shell", "building.directorate.command_core.structural_frame", "building.directorate.command_core.unpowered"],
+      "instanceScale": [20, 12, 20],
+      "instanceTranslation": [17, 5, -29],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "unit.directorate.main_battle_tank",
+      "assets": ["unit.directorate.main_battle_tank", "unit.directorate.main_battle_tank.collision", "unit.directorate.main_battle_tank.critical", "unit.directorate.main_battle_tank.damaged", "unit.directorate.main_battle_tank.lod1", "unit.directorate.main_battle_tank.lod2", "unit.directorate.main_battle_tank.turret", "unit.directorate.main_battle_tank.wreck"],
+      "instanceScale": [4, 3, 7.2],
+      "instanceTranslation": [17, 5, -29],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.crate",
+      "assets": ["mesh.world.prop.crate", "mesh.world.prop.crate_lod1"],
+      "instanceScale": [2, 1.5, 2],
+      "instanceTranslation": [17, 5, -29],
+      "instanceYawDegrees": 37
+    }
+  ]
+}
