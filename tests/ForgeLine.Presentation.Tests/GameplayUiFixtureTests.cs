@@ -87,6 +87,20 @@ public sealed class GameplayUiFixtureTests
                 }
         Assert.NotEqual(fixtures["1920x1080-144dpi-1.00-Ready"], fixtures["1920x1080-144dpi-1.00-Disabled"]);
         Assert.Equal(fixtures["1920x1080-144dpi-1.00-Ready"], fixtures["1920x1080-144dpi-1.00-Accepted"]);
+        // The selected-sector highlight adds exactly one bounded 20-quad arc;
+        // inactive states must not gain decoration or hit surface geometry.
+        foreach (var profile in new[] { (1024, 720, 96u), (1920, 1080, 144u), (1920, 1200, 192u), (3440, 1440, 144u), (3840, 2160, 192u) })
+            foreach (float scale in new[] { .75f, 1f, 2f })
+            {
+                string prefix = FormattableString.Invariant($"{profile.Item1}x{profile.Item2}-{profile.Item3}dpi-{scale:0.00}");
+                Fixture ready = fixtures[prefix + "-Ready"];
+                Fixture hover = fixtures[prefix + "-Hover"];
+                Assert.Equal(ready.Vertices + 120, hover.Vertices);
+                Assert.NotEqual(ready.GeometrySha256, hover.GeometrySha256);
+                Assert.Equal(ready.Vertices, fixtures[prefix + "-Pressed"].Vertices);
+                Assert.Equal(ready.Vertices, fixtures[prefix + "-Pending"].Vertices);
+                Assert.Equal(ready.Vertices, fixtures[prefix + "-Disabled"].Vertices);
+            }
         string actual = JsonSerializer.Serialize(fixtures, JsonOptions);
         string? baselineOutput = Environment.GetEnvironmentVariable("FORGELINE_UI_FIXTURE_BASELINE");
         if (!string.IsNullOrEmpty(baselineOutput))
