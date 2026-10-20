@@ -29,6 +29,17 @@ public sealed class AssetResidencyTests
     }
 
     [Fact]
+    public void PreparedTexturePublicationUsesTheExistingDeferredSameQueueUploadContract()
+    {
+        using var fixture = new ResidencyFixture(); using var graphics = new ResidencyDevice();
+        using var resources = new RuntimeWorldAssetResources(graphics,fixture.Catalog());
+        resources.PrepareRequiredAssets(CancellationToken.None);
+        var texture = resources.ResolveMaterial("material.residency.main").BaseColorTexture;
+        Assert.True(texture.Description.DeferUploadWait);
+        Assert.Equal(AssetResidencyState.Ready,resources.Residency.State);
+    }
+
+    [Fact]
     public void PreparedWarmAccessNeedsNeitherFilesNorAdditionalGpuResourcesOrAllocations()
     {
         using var fixture = new ResidencyFixture(); using var graphics = new ResidencyDevice();

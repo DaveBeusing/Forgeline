@@ -120,6 +120,7 @@ internal static class VisualReferenceCapture
             using var capturePower = new ReferenceCapturePowerLease();
             using var platform = new WindowsPlatform();
             using IWindow window = platform.CreateWindow(new("FORGELINE Reference Capture", 1280, 720));
+            using var assetPreparation = new AssetPreparationScope(() => !platform.PumpEvents());
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new()
             { EnableVSync = false, EnableMemoryDiagnostics = true, ForceSoftwareAdapter = request.Software,
                 AllowSoftwareAdapterFallback = request.Software });
@@ -343,7 +344,7 @@ internal static class VisualReferenceCapture
                     }
                     graphics.WaitForIdle();
                     var beforeSamples = graphics.Diagnostics;
-                    meshes.ObserveFrameDiagnostics(beforeSamples);
+                    if (warmupFrames > 0) meshes.ObserveFrameDiagnostics(beforeSamples);
                     var performance = new ReferencePerformanceSamples(request.Samples, beforeSamples.Frame?.GpuSubmissionFence ?? 0);
                     var initialCamera = camera.CaptureState();
                     var cpu = new double[request.Samples]; var gpu = new List<double>(); ulong lastFence = 0;

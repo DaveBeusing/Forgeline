@@ -576,7 +576,7 @@ internal sealed class ResidentAssetStore : IDisposable
             new GraphicsTextureDescription(first.Width, first.Height,
                 data.Format == RuntimeTextureFormat.Bc7Unorm ? GraphicsTextureFormat.Bc7Unorm : GraphicsTextureFormat.Rgba8Unorm,
                 data.ColorSpace == RuntimeTextureColorSpace.Srgb ? GraphicsTextureColorSpace.Srgb : GraphicsTextureColorSpace.Linear,
-                data.Mips.Count - skip),
+                data.Mips.Count - skip) { DeferUploadWait = true },
             data.Mips.Skip(skip).Select(static mip => new GraphicsTextureMipData(mip.Width, mip.Height, mip.RowPitch, mip.Pixels))));
         _residentTextureMipBytes += bytes;
         return texture;

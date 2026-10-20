@@ -39,9 +39,11 @@ No public ABI, runtime container format, source master, global quality cap or sh
 An owner-thread preparation scope is prepared to consume host stop requests at each CPU read
 and GPU publication boundary, including the boundary immediately before Ready. Nested rebuilds
 restore their predecessor scope in reverse order; foreign-thread disposal cannot remove it.
-The real client/reference host bindings require a separately approved serial edit because both
-host files are outside this area's file ownership. Until integrated and tested, cancellation in
-the running client is an explicit acceptance blocker rather than a claimed product feature.
+The separately approved client/reference host bindings consume the normal render-host stop flag
+and reference-window close signal. Expected client stop cancellation signals startup completion
+without turning it into a render fault. A separately approved reference correction skips only
+the pre-sample diagnostic observation when there were zero submitted warmups; the first actual
+sample retains the normal Prepare/Record/Submit/Retire and diagnostic sequence.
 
 Final native retirement also clears the prepared typed dictionaries, even if a resource wrapper
 throws during disposal. The encoded-payload cap bounds admitted source data, not exact managed
@@ -60,3 +62,8 @@ upload-arena capacity/backpressure and DXGI process usage. Staging capacity is n
 Default-heap occupancy; the frozen public interface exposes no exact Default-heap byte counter.
 Cross-source zero-delta pixels are a technical comparison, with human image approval still
 required; the existing same-source accepted-golden gate is not repurposed for different code.
+
+Prepared material textures use the existing deferred same-queue upload flag. Initial data is copied
+by the existing device implementation before CreateTexture returns; GPU consumption remains after
+its queue-ordered transfer and barrier. Required startup publication therefore does not issue one
+blocking fence wait per material texture. No backend queue, barrier or fence semantics are changed.

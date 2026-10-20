@@ -80,3 +80,38 @@ to master. Their failures are retained baseline blockers, not repaired or waived
 The complete standalone Assets suite on the earlier 15a0c56e source passes all 170 cases
 (7m46.274s); the full solution subsequently covers the committed semantic refinement.
 Native measurements wait for an explicitly coordinated exclusive CPU/GPU window.
+
+
+## First native cohort and approved host integration
+
+Source f04cbaf4e8b3ea00777370fe2c583fc958e2fef5 builds with zero warnings/errors
+(1m15.78s, fresh source metadata). Presentation passes 1,432 cases with twelve optional skips
+/ 1,444 total (52.741s); Client passes 450 with two optional skips / 452 total (16.670s).
+The runtime-only player package passes asset, UI skin, icon and audio validation. Its first
+invocation used an unsupported absolute output argument and was rejected before publication;
+the normal relative-output invocation succeeds. Both outputs remain evidence.
+
+The declared native B-A-A-B sequence records four complete High/1920x1080 six-case matrices.
+All twelve matched images have zero channel delta. The unchanged 15-percent warm gate fails:
+nine metric/statistic observations in pair one and eighteen in pair two. In particular,
+MainBattleTankProduction/CloseTactical CPU p50 rises 1.2682 to 1.9311 ms and 1.3193 to 1.9732 ms.
+These are failed acceptance observations, not an accepted FPS improvement. Per-frame managed
+allocations for that fixture remain 152 bytes on both sources; resource counts are stable.
+Setup rises from 1,058.7271/1,294.9939 ms to 2,014.5371/1,818.3938 ms for the first case;
+its setup allocations rise from about 212.7 MB to 294.5 MB. The closed superset pins more mesh
+buffers and retains more preparation data, while sharing reduces native texture count from
+78 to 76. This is a measured startup/residency tradeoff and remains visible.
+
+The original master's RendererCold fails before its first sample: initial Prepare leaves a
+prepared asset frame, then VisualReferenceCapture observes diagnostics before any submission.
+The original sequence stops there; it is not a successful cold pair. Failure metadata and all
+four warm matrices are retained. No scene, quality, warmup count or threshold is reduced.
+
+Serial scope approval explicitly includes ClientRenderHost.cs and VisualReferenceCapture.cs
+for real stop/window-close preparation cancellation, and the reference's zero-warmup diagnostic
+correction. Frozen renderer/graphics ABI, phases and fence semantics remain unchanged. The
+subsequent build has zero warnings/errors (18.23s); thirty focused residency/boundary cases pass
+(2.853s), and all 450 Client cases pass with two optional skips (17.314s). The runtime material
+texture publisher now uses the existing same-queue deferred upload contract instead of issuing
+one startup fence wait per texture. The initial failed warm measurements remain the first cohort;
+final cold/upload/plateau evidence and human image approval are still pending.

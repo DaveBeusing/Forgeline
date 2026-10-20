@@ -385,6 +385,8 @@ internal sealed class ClientRenderHost : IDisposable
                 return;
             }
 
+            using var assetPreparation = new AssetPreparationScope(() => Volatile.Read(ref _stopping) != 0);
+
             GraphicsWindowTarget initialTarget =
                 _initialTarget ??
                 throw new InvalidOperationException(
@@ -891,6 +893,10 @@ internal sealed class ClientRenderHost : IDisposable
                     _latestQualification = CompleteGpuQualification(qualification, completedGraphics);
                 }
             }
+        }
+        catch (OperationCanceledException) when (Volatile.Read(ref _stopping) != 0)
+        {
+            _started.Set();
         }
         catch (Exception exception)
         {
