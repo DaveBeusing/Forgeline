@@ -78,6 +78,9 @@ jobs:
       - name: Cargo propulsion Fuel and docking contracts
         run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.CargoAutonomousFuelServiceTests ForgeLine.Game.Tests.CargoDeliveryFuelTests ForgeLine.Game.Tests.CargoDeliveryRouteFuelTests
 
+      - name: Distribution FIFO and dispatch fairness contracts
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.AutomatedDistributionSystemTests
+
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 

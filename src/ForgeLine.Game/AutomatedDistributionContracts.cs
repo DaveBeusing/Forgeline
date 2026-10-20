@@ -183,7 +183,8 @@ public enum LogisticsTransportRequestFailureReason : byte
     TransportFailed = 7,
     RetryLimitReached = 8,
     CapacitySaturated = 9,
-    DestinationFull = 10
+    DestinationFull = 10,
+    NoDriveFuel = 11
 }
 
 public enum LogisticsBottleneckReason : byte
@@ -195,7 +196,8 @@ public enum LogisticsBottleneckReason : byte
     DisconnectedRoute = 4,
     DestinationFull = 5,
     DestinationUnavailable = 6,
-    TransportFailure = 7
+    TransportFailure = 7,
+    DriveFuelUnavailable = 8
 }
 
 public readonly record struct CargoTransportReservation
@@ -265,7 +267,11 @@ public readonly record struct LogisticsTransportRequestReadModel(
     SimulationTick CreatedAtTick,
     SimulationTick StateChangedAtTick,
     LogisticsBottleneckReason BottleneckReason,
-    LogisticsThroughputReservationId CapacityReservationId);
+    LogisticsThroughputReservationId CapacityReservationId,
+    SimulationTick WaitingSinceTick = default,
+    SimulationTick NextAttemptTick = default,
+    SimulationTick LastEvaluatedAtTick = default,
+    VehicleDockBlockReason PhysicalDockBlockReason = VehicleDockBlockReason.None);
 
 public readonly record struct AutomatedDistributionMetrics(
     int PolicyCount,
@@ -283,7 +289,15 @@ public readonly record struct AutomatedDistributionMetrics(
     ulong MaximumDeliveryLatencyTicks,
     int BacklogRequestCount,
     double BacklogQuantity,
-    int CapacityBlockedRequestCount);
+    int CapacityBlockedRequestCount,
+    ulong OldestBacklogWaitTicks = 0,
+    int SourceBlockedRequestCount = 0,
+    int RouteBlockedRequestCount = 0,
+    int TruckBlockedRequestCount = 0,
+    int FuelBlockedRequestCount = 0,
+    int DockBlockedTransportCount = 0,
+    int CommittedDispatchCountThisTick = 0,
+    double CommittedDispatchQuantityThisTick = 0);
 
 public sealed class AutomatedDistributionDebugSnapshot
 {
