@@ -16,6 +16,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
     private const float LogicalTransitNodeApproachRadiusMeters = 72.0f;
 
     private readonly VehicleDockingService _docks;
+    private readonly CargoFuelServiceController _fuelService;
     private readonly LogisticsNetwork _network;
     private readonly InventoryStore _inventories;
     private readonly HierarchicalNavigationSystem? _navigation;
@@ -41,6 +42,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             throw new ArgumentNullException(nameof(inventories));
         _navigation = navigation;
         _docks = docking ?? new VehicleDockingService();
+        _fuelService = new CargoFuelServiceController(inventories, _docks, navigation);
     }
 
     public SimulationPhase Phase =>
@@ -100,6 +102,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 out CargoTransport transport) ||
             !_inventories.Contains(transport.CargoInventory) ||
             entities.HasComponent<SupplyLoadingOrder>(transportEntity) ||
+            entities.HasComponent<CargoFuelServiceState>(transportEntity) ||
             entities.HasComponent<ResupplyOrder>(transportEntity) ||
             entities.HasComponent<SupplyRescueAssignment>(transportEntity) ||
             entities.HasComponent<VehicleDockVisit>(transportEntity) ||
@@ -207,6 +210,9 @@ public sealed class CargoTransportSystem : ISimulationSystem
             PrepareDockFuelBudget(context, entity);
             return;
         }
+
+        if (!_fuelService.Process(context, entity, transport))
+            return;
 
         if (!_inventories.Contains(
                 transport.CargoInventory))
