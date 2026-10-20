@@ -453,10 +453,10 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
 
     private void EmitNotificationStack(PresentationSnapshot? snapshot, in PlayerExperienceSnapshot experience,
         in GameplayHudLayout layout, bool expanded, int width, int height, string localFeedback,
-        TimeSpan presentationTime, bool animateNotifications)
+        TimeSpan presentationTime, bool animateNotifications, NotificationExpansion expansion)
     {
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
-        var stack = ActionableAlertLayout.Resolve(snapshot, layout, expanded, localFeedback);
+        var stack = ActionableAlertLayout.Resolve(snapshot, layout, expanded, localFeedback, expansion);
         _notificationMotion.Update(stack, snapshot?.SessionId ?? default, layout, presentationTime, animateNotifications);
         Span<char> buffer = stackalloc char[2048];
         Span<char> ellipsis = stackalloc char[2052];
