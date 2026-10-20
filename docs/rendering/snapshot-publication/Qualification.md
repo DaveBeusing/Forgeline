@@ -124,17 +124,30 @@ was removed with the obsolete inspector in PR 242 (`09425dc`); current summary g
 already has a 512-byte/operation bound. That existing bound is not widened. New warmed
 measurements exclude fixture setup, use the current producer thread and validate the
 counter with a deliberately allocating 4-KiB positive control. Tiering stays enabled by
-default; process GC counts are not attributed to an operation. There is no proven
-historical root cause or claim to have fixed an absent renderer. Historical error closure
-remains open pending an authoritative reproduction/resolution by the responsible surface.
+default; process GC counts are not attributed to an operation. The integrated foundation already documents a Windows x64 .NET 10.0.12 counter
+accounting diagnosis: concurrent GC charges unused allocation-context bytes to empty
+intervals. Its retained same-binary control has five nonzero intervals under background
+GC and zero with blocking GC; real 64-byte allocations remain detected. See
+[the existing diagnosis](../parallelization/Repair.md#final-allocation-diagnosis-background-gc-counter-accounting)
+and [the upstream accounting correction](https://github.com/dotnet/runtime/pull/134855).
+Presentation.Tests already disables concurrent GC only in its own runtimeconfig and
+contains configuration and allocating guards. This existing repair is reused; no project
+configuration or production GC policy changes here. It explains why the historical
+exact-zero failure cannot simply be replayed in today's controlled host. It does not
+supply an allocation stack for the removed inspector's specific old 8,104-byte event,
+nor is a new renderer repair claimed. The original individual-event attribution remains
+unverified; the existing counter-policy resolution must be distinguished from that limit.
 
 ## Consumer allocation observations
 
 The coordinated ratio-7 candidate-A window at tick 103 records 7,920 bytes; the extended
 warmup records 3,528 and 6,712 at ticks 583 and 635. Candidate-B and ratios 1/3 are zero.
 Retained index/visibility capacity stays 4,546 bytes; these are not explained by observed
-scratch growth. Their origin remains unestablished and requires allocation-stack
-attribution over the exact update/interpolation window. No assertion links them to the
+scratch growth. Client.Tests does not use Presentation.Tests' blocking-GC runtimeconfig. The integrated
+foundation's known accounting issue is therefore a concrete diagnostic lead for these
+counter readings and the intermittent UI feedback measurement. Their individual origin
+remains unestablished and requires a controlled empty/positive diagnostic or allocation
+stacks over the exact update/interpolation window. No assertion links them to the
 historical 8,104-byte failure, and no tolerance or tiering switch conceals them. Raw
 samples remain in Measurements. This is a further open allocation/performance finding,
 not a claim of global zero-byte gameplay or render frames.

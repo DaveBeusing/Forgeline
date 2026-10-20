@@ -52,7 +52,13 @@ capacity remains 4,546 bytes in and around all three windows, with 550–551 ins
 there is no observed capacity growth explaining them. Aggregate ratio-7 candidate means
 are 30.94 and 40 bytes/tick-window respectively. These windows include seven render
 reads and their complete update/interpolation calls. The cause is **not established**;
-allocation stacks are required to distinguish code/runtime/framework activity. Neither
+controlled empty/positive diagnostics or allocation stacks are required to distinguish
+code/runtime/framework activity. The integrated foundation already corroborates the
+.NET 10.0.12 background-GC counter issue on Windows x64 and isolates Presentation.Tests
+accordingly ([existing diagnosis](../parallelization/Repair.md#final-allocation-diagnosis-background-gc-counter-accounting)).
+The Client test host used here keeps its default production-like GC policy; performance
+cohorts are not silently switched to blocking GC. That known issue is a diagnostic lead,
+not proof of each individual event's cause. Neither
 JIT nor the historical 8,104-byte report is asserted as the cause. Existing focused
 zero-warm-allocation contracts still pass; no global per-frame zero-byte claim follows.
 
