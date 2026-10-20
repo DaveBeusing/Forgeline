@@ -30,9 +30,13 @@ public sealed class RuntimeDecalMaterialTests
         Assert.Equal(1, renderer.LastDiagnostics.SkippedDecalResources);
     }
 
-    [Fact]
-    public void CriticalBuildingUploadsItsStateMaterialInsteadOfTheStaticMeshMaterial()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CriticalBuildingUploadsItsStateMaterialInsteadOfTheStaticMeshMaterial(bool commandCore)
     {
+        BuildingId building = commandCore ? BuildingIds.CommandCore : BuildingIds.VehicleFactory;
+        string materialId = commandCore ? "material.directorate.building.command_core.critical" : BuildingPresentationCatalog.CriticalMaterialAssetId;
         string root = Path.Combine(Path.GetTempPath(), "forgeline-building-state-material-" + Guid.NewGuid().ToString("N"));
         try
         {
@@ -43,9 +47,9 @@ public sealed class RuntimeDecalMaterialTests
                 [0, 2, 1], [BuildingPresentationCatalog.StructuralMaterialAssetId], [new(0, 3, 0)]);
             RuntimeAssetRecord[] records =
             [
-                Write(root, "building.directorate.command_core", RuntimeAssetType.Mesh, mesh.ToPayload()),
+                Write(root, BuildingPresentationCatalog.Get(building).MeshAssetId, RuntimeAssetType.Mesh, mesh.ToPayload()),
                 Write(root, BuildingPresentationCatalog.StructuralMaterialAssetId, RuntimeAssetType.Material, "{}"u8.ToArray()),
-                Write(root, BuildingPresentationCatalog.CriticalMaterialAssetId, RuntimeAssetType.Material,
+                Write(root, materialId, RuntimeAssetType.Material,
                     """{"uvScale":[0.214,0.214],"uvOffset":[0.018,0.518],"emissiveMultiplier":0.35}"""u8.ToArray())
             ];
             File.WriteAllText(Path.Combine(root, RuntimeAssetCatalog.ManifestFileName),
@@ -53,7 +57,7 @@ public sealed class RuntimeDecalMaterialTests
                     RuntimeAssetCatalog.CreateJsonOptions()));
             var instance = new RenderInstance(new EntityId(1, 1), RenderTransform.Identity,
                 new RenderMeshHandle(1), RenderMaterialHandle.Default, RenderVisibilityMask.Default,
-                BuildingFeature: new(BuildingIds.CommandCore, BuildingPresentationState.Critical));
+                BuildingFeature: new(building, BuildingPresentationState.Critical));
             var snapshots = new PresentationSnapshotBuffer();
             snapshots.Publish(new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 1, [instance]));
             var world = new RenderWorld();
