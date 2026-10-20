@@ -1,0 +1,67 @@
+{
+  "productSource": "19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+  "baseSource": "bfc16a953d731a844321a0848a2ebadc71c5875f",
+  "version": "0.1.424",
+  "sdk": "10.0.401",
+  "configuration": "Release",
+  "build": {
+    "exit": 0,
+    "warnings": 0,
+    "errors": 0,
+    "seconds": 186.94,
+    "originalLogSha256": "DB359FAC9C8D099708B9AA481594F0A327A14A944A05C1C3D361CB59E4AFEA24"
+  },
+  "focusedTerrain": {
+    "exit": 0,
+    "passed": 33,
+    "originalLogSha256": "4F5CFBA32597CF61FFAD869097574B6B6E389021E3C0267733B3F7E87F44504E"
+  },
+  "requiredExisting": {
+    "exit": 0,
+    "passed": 26,
+    "originalLogSha256": "8EF0A3643FE885FF2FE7E4E4B79B3AF1C5B2666EA5B6EAB5054412DF462A1927"
+  },
+  "unchangedNativeWarpResidency": {
+    "exit": 0,
+    "passed": 2,
+    "originalLogSha256": "42AD7DDBE3E557942FE793A728BA41F088FA89BF7E48768B3FB08FBB4105F234"
+  },
+  "fullSuite": {
+    "exit": 2,
+    "total": 3130,
+    "passed": 3107,
+    "failed": 5,
+    "skipped": 18,
+    "seconds": 844.635,
+    "failures": [
+      "ForgeLine.Game.Tests.BattlefieldSupplySystemTests.SupplyTruckFinishesRefuelingBeforeRescuingImmobileUnit",
+      "ForgeLine.Game.Tests.TacticalCombatSystemTests.ActiveCargoTransportRefuelsWithoutDroppingDeliveryOrder",
+      "ForgeLine.Game.Tests.VehicleDockingIntegrationTests.DockedSupplyKeepsCargoSeparateFromOptionalDriveTopupsButAllowsRequiredRecovery(initialDriveFuel: 0, expectedDriveFuel: 80)",
+      "ForgeLine.Game.Tests.SkirmishSupplyPolicyTests.ExpansionFundingKeepsPartialHubCostsAheadOfOptionalExtractors",
+      "ForgeLine.Game.Tests.SkirmishOpponentTests.EastOffensiveObjectiveAdvancesIntoOpponentHalfAgainstStationaryBase"
+    ],
+    "presentation": "passed",
+    "graphics": "passed",
+    "client": "passed",
+    "assets": "passed",
+    "originalLogSha256": "386095AB7B6DDE2FE1BFEF573E66E0356D00D00B78D95696345BC6F7BBAA2FFC"
+  },
+  "runtimeDevelopment": {
+    "exit": 0,
+    "compiled": 0,
+    "unchanged": 1357,
+    "containerBytes": 75122812,
+    "isolatedCopy": true,
+    "originalLogSha256": "A6F01406DA3F49FED206048FC19788244D2BEA7DD590464FA3922724665B1647"
+  },
+  "projectReferences": {
+    "exit": 0,
+    "projects": 46
+  },
+  "ownership": {
+    "exit": 0,
+    "functionalPaths": 19,
+    "serializedVersionException": "Directory.Build.props"
+  },
+  "acceptance": "Implemented, not yet accepted; CI, isolated hardware and human image gates tracked separately."
+}

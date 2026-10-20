@@ -1,0 +1,35 @@
+{
+  "structural": "pass",
+  "pixelComparisonRequested": true,
+  "channelTolerance": 0,
+  "baselineCommit": "bfc16a953d731a844321a0848a2ebadc71c5875f",
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0,
+  "imageGateRequested": false,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "commit": "d8abff95e1134f9986d2b3f90de0eef846340527",
+  "imageFailures": [],
+  "visualAcceptance": "pending",
+  "captures": [
+    {
+      "equivalentHardware": true,
+      "structural": "pass",
+      "key": "DaylightTerrain-1920x1080-High-Strategic-Dpi96-RendererCold",
+      "cpuMeanDeltaMs": -2.506137499999994,
+      "visualReview": "pending",
+      "comparison": "pixels-require-human-review",
+      "pixelComparison": {
+        "MaximumChannelDelta": 56,
+        "MeanAbsoluteChannelDelta": 0.01306737075617284,
+        "ChangedPixels": 92086,
+        "ChangedPixelFraction": 0.04440875771604938,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "gpuMeanMs": 9.362528,
+      "regionChanges": null,
+      "cpuMeanMs": 33.758875,
+      "sameRuntime": true
+    }
+  ]
+}

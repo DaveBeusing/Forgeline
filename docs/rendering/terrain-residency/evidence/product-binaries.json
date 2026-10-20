@@ -1,0 +1,102 @@
+[
+  {
+    "file": "ForgeLine.AI.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "A37F0C40DDD6608D6C4C2723085E483CF53FA36470499C484954C4314C08BDC8"
+  },
+  {
+    "file": "ForgeLine.Assets.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "8A4D24422F4D78BCD4D69B97368753F0B723B6C1A60EFE7FCF8C95615DCB53BE"
+  },
+  {
+    "file": "ForgeLine.Audio.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "A3C3C3D053D0173505CC634C1C168C79728820CAE2D478571FBEA206EC71C76E"
+  },
+  {
+    "file": "ForgeLine.Client.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "1C3124D835DF08862269841AC62AB5251E405CAE42EC4C83C3C75F1C1D81753C"
+  },
+  {
+    "file": "ForgeLine.Combat.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "BF02EFF2EB079653BEA707AAAA39D17785BE2CE88B9FD238A36FAC6C5B39CA41"
+  },
+  {
+    "file": "ForgeLine.Core.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "66D88FBDBA04C7DA92BC33D91FBBE2D35FED2535E619198A8D83BDF464F61CAD"
+  },
+  {
+    "file": "ForgeLine.Economy.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "58E9504B9C4B95D3E810BED575462B8632012DBED65BFFDC5C79D38A3C34131A"
+  },
+  {
+    "file": "ForgeLine.Ecs.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "DC91651F06C2C15AD1DA86FE52FAF2CC6270519591079E2F6A89A9B272CD1C01"
+  },
+  {
+    "file": "ForgeLine.Game.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "0C8E3BA4548D3CE6A27F713BF2D9DD7456522AF1333840353B3DFCFF60A5F1B9"
+  },
+  {
+    "file": "ForgeLine.Graphics.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "EF2B17E89E3F3C2CBCF8F827D0ABF34B2FBCB6B75E3B205C4ACAB99B43DC0F6E"
+  },
+  {
+    "file": "ForgeLine.Input.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "8A94485714AD78448A9940040B443EFAE5EFE2EE45A1BEC77039925C484C7ECA"
+  },
+  {
+    "file": "ForgeLine.Intelligence.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "930030C157951C09732EC506F6925D2AB8F80A2AF47FF8EEC6F3E9C1D837B239"
+  },
+  {
+    "file": "ForgeLine.Jobs.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "05AE05B2A221AA2205DA06484866D867BBD46F80460A4530DCFC301C725EAD14"
+  },
+  {
+    "file": "ForgeLine.Logistics.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "39CE2E186E247825CAC7122BC3653AA7C22718C31C42BD5266283D37A7750684"
+  },
+  {
+    "file": "ForgeLine.Navigation.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "75980DDC80DADF4A87F6F83B752F0A3FFA690D06FF28B96C1D664DA8C9617D9D"
+  },
+  {
+    "file": "ForgeLine.Platform.Windows.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "DC4C06138643FF5F11DAE709A73AC56F5935BC27431E5A8BB99A92EF4078246F"
+  },
+  {
+    "file": "ForgeLine.Presentation.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "1D2E2162DB7147B4955ED92CF2E96FAF21406602051A7BDBEEDB8DCA8492E094"
+  },
+  {
+    "file": "ForgeLine.Simulation.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "EF56F13F751968F50BCB05F36944E027586C5CE4A7A1EAD7238BC51F410451D5"
+  },
+  {
+    "file": "ForgeLine.UI.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "85B3B5581F312869FDFAB770E33D56ADEA262DED5E174D9F7A4218B32A23AF0A"
+  },
+  {
+    "file": "ForgeLine.World.dll",
+    "productVersion": "0.1.424-dev+19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+    "sha256": "AD84FDFF96D6B029F8C2982AEECD6DAC2F8ADFA01F7332BED49ECFA7DC9F34B8"
+  }
+]

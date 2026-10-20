@@ -1,0 +1,175 @@
+{
+  "baselineCommit": "bfc16a953d731a844321a0848a2ebadc71c5875f",
+  "imageGateRequested": false,
+  "channelTolerance": 0,
+  "captures": [
+    {
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true,
+      "key": "DaylightTerrain-1920x1080-High-CloseTactical-Dpi96-Sweep",
+      "regionChanges": null,
+      "gpuMeanMs": 9.735507779527556,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -0.8548425781249964,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.9290123456790124E-06,
+        "ChangedPixels": 16,
+        "ChangedPixelFraction": 7.71604938271605E-06,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "sameRuntime": true,
+      "cpuMeanMs": 12.666356640625004,
+      "structural": "pass"
+    },
+    {
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true,
+      "key": "DaylightTerrain-1920x1080-High-Strategic-Dpi96-Sweep",
+      "regionChanges": null,
+      "gpuMeanMs": 10.519166847999998,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": 0.2503421875000047,
+      "pixelComparison": {
+        "MaximumChannelDelta": 56,
+        "MeanAbsoluteChannelDelta": 0.01306737075617284,
+        "ChangedPixels": 92086,
+        "ChangedPixelFraction": 0.04440875771604938,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "sameRuntime": true,
+      "cpuMeanMs": 14.587427734374998,
+      "structural": "pass"
+    },
+    {
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true,
+      "key": "LogisticsCorridor-1920x1080-High-CloseTactical-Dpi96-Sweep",
+      "regionChanges": null,
+      "gpuMeanMs": 11.973221795275595,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -1.0683511718749994,
+      "pixelComparison": {
+        "MaximumChannelDelta": 2,
+        "MeanAbsoluteChannelDelta": 0.0005006992669753087,
+        "ChangedPixels": 3972,
+        "ChangedPixelFraction": 0.0019155092592592592,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "sameRuntime": true,
+      "cpuMeanMs": 13.863166015625001,
+      "structural": "pass"
+    },
+    {
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true,
+      "key": "LogisticsCorridor-1920x1080-High-Strategic-Dpi96-Sweep",
+      "regionChanges": null,
+      "gpuMeanMs": 12.007297396825397,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -2.2659082031249973,
+      "pixelComparison": {
+        "MaximumChannelDelta": 50,
+        "MeanAbsoluteChannelDelta": 0.03761308834876543,
+        "ChangedPixels": 51600,
+        "ChangedPixelFraction": 0.02488425925925926,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "sameRuntime": true,
+      "cpuMeanMs": 14.078808984375002,
+      "structural": "pass"
+    },
+    {
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true,
+      "key": "DaylightTerrain-1920x1080-Low-CloseTactical-Dpi96-Sweep",
+      "regionChanges": null,
+      "gpuMeanMs": 5.321064474308301,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -0.43704843749999966,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 4.581404320987654E-06,
+        "ChangedPixels": 38,
+        "ChangedPixelFraction": 1.8325617283950617E-05,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.284865625000002,
+      "structural": "pass"
+    },
+    {
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true,
+      "key": "DaylightTerrain-1920x1080-Low-Strategic-Dpi96-Sweep",
+      "regionChanges": null,
+      "gpuMeanMs": 6.403231746031739,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": 0.09110976562500994,
+      "pixelComparison": {
+        "MaximumChannelDelta": 89,
+        "MeanAbsoluteChannelDelta": 0.008153211805555555,
+        "ChangedPixels": 55642,
+        "ChangedPixelFraction": 0.0268335262345679,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.889793750000004,
+      "structural": "pass"
+    },
+    {
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true,
+      "key": "LogisticsCorridor-1920x1080-Low-CloseTactical-Dpi96-Sweep",
+      "regionChanges": null,
+      "gpuMeanMs": 6.521065106719367,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -0.3970472656249999,
+      "pixelComparison": {
+        "MaximumChannelDelta": 21,
+        "MeanAbsoluteChannelDelta": 0.0005310812114197531,
+        "ChangedPixels": 4250,
+        "ChangedPixelFraction": 0.0020495756172839506,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.541819140625,
+      "structural": "pass"
+    },
+    {
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true,
+      "key": "LogisticsCorridor-1920x1080-Low-Strategic-Dpi96-Sweep",
+      "regionChanges": null,
+      "gpuMeanMs": 6.640575748031496,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -0.4664832031249926,
+      "pixelComparison": {
+        "MaximumChannelDelta": 63,
+        "MeanAbsoluteChannelDelta": 0.003107638888888889,
+        "ChangedPixels": 23699,
+        "ChangedPixelFraction": 0.01142891589506173,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.519307812500006,
+      "structural": "pass"
+    }
+  ],
+  "imageFailures": [],
+  "schemaVersion": 1,
+  "pixelComparisonRequested": true,
+  "commit": "d8abff95e1134f9986d2b3f90de0eef846340527",
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "maximumChangedPixelFraction": 0.0,
+  "visualAcceptance": "pending",
+  "structural": "pass"
+}
