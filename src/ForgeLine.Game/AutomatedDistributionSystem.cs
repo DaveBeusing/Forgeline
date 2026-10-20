@@ -114,6 +114,19 @@ public sealed class AutomatedDistributionSystem
                     LogisticsThroughputReservationId.None;
             }
 
+            // Pending work does not survive removal, disabling, or retargeting
+            // of its authoritative stock policy. In-flight cargo is not canceled.
+            if (request.State is LogisticsTransportRequestState.Pending or
+                LogisticsTransportRequestState.RetryPending &&
+                (!context.Entities.TryGetComponent(request.PolicyEntity, out LogisticsStockPolicy currentPolicy) ||
+                 !currentPolicy.Enabled || currentPolicy.ResourceId != request.ResourceId ||
+                 !_network.TryGetNodeForEntity(currentPolicy.TargetEntity, out LogisticsNodeId currentNode) ||
+                 currentNode != request.Destination))
+            {
+                RetireUnneededRequest(request, context.Tick);
+                continue;
+            }
+
             if (request.State == LogisticsTransportRequestState.RetryPending &&
                 context.Tick >= request.NextAttemptTick)
             {
@@ -287,6 +300,25 @@ public sealed class AutomatedDistributionSystem
             if (existing is not null) existing.Priority = policy.Priority;
             double currentQuantity =
                 _inventories.GetQuantity(destinationInventory, policy.ResourceId);
+
+            if (existing is not null && existing.State is
+                LogisticsTransportRequestState.Pending or LogisticsTransportRequestState.RetryPending)
+            {
+                // Pending/retrying quantity is a desired target, not committed
+                // inbound stock. Reconcile it against the live policy without
+                // resetting RequestId, CreatedAtTick, or WaitingSinceTick.
+                double required = Math.Max(0.0, policy.DesiredTarget - currentQuantity);
+                if (required <= QuantityEpsilon)
+                    RetireUnneededRequest(existing, context.Tick);
+                else
+                {
+                    existing.RequestedQuantity = required;
+                    existing.Destination = destinationNodeId;
+                    _unservedDeficitCount++;
+                }
+                continue;
+            }
+
             double outstandingQuantity =
                 GetOutstandingQuantity(policyState.PolicyEntity);
             double projectedQuantity =
@@ -1101,6 +1133,20 @@ public sealed class AutomatedDistributionSystem
             LogisticsTransportRequestFailureReason.None;
         request.StateChangedAtTick = context.Tick;
         request.NextAttemptTick = context.Tick;
+    }
+
+    private void RetireUnneededRequest(RequestState request, SimulationTick tick)
+    {
+        ReleaseReservationIfPresent(request);
+        ReleaseCapacityReservationIfPresent(request);
+        request.State = LogisticsTransportRequestState.Completed;
+        request.FailureReason = LogisticsTransportRequestFailureReason.None;
+        request.AssignedTruck = EntityId.Invalid;
+        request.Origin = LogisticsNodeId.None;
+        request.StateChangedAtTick = tick;
+        request.NextAttemptTick = tick;
+        // Stock recovered without a shipment. Do not count a delivery or
+        // consume a new truck/route/source reservation.
     }
 
     private void MarkCompleted(
