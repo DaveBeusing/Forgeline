@@ -39,8 +39,8 @@ and the current ownership manifest before promoting these sources.
 Use the repository-pinned .NET SDK and Blender 5.2.2 x64:
 
 ```powershell
-dotnet restore tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj
-dotnet build tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-restore
+dotnet restore ForgeLine.sln
+dotnet build ForgeLine.sln --configuration Release --no-restore
 pwsh ./tools/blender/Invoke-Blender.ps1 -Action Check -OutputRoot artifacts/industrial-check
 pwsh ./build/blender/industrial/Qualify-Masters.ps1 -OutputRoot artifacts/industrial-masters -TimeoutSeconds 480
 ```
@@ -66,6 +66,8 @@ The qualifier:
 - Compiles baseline, both independent exports, reopened output and the edited
   test output, then validates each catalog with an absent source root.
 - Checks that the complete production source tree is unchanged.
+- Reuses the typed runtime comparison for all three families: geometry, generated
+  tangents, material/dependency identity, sockets, states, LODs and batching.
 
 `master/authoring.blend` is the preserved master. `master/edit-test.blend`
 demonstrates edit persistence only; it is not production art. Existing source

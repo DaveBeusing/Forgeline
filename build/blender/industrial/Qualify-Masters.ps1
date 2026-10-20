@@ -13,6 +13,8 @@ $root = Resolve-BlenderOutput -Path $OutputRoot -RepositoryRoot $repo
 if (Test-Path -LiteralPath $root) { throw 'Qualification requires a fresh artifacts directory.' }
 $compiler = Join-Path $repo 'tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll'
 if (-not (Test-Path -LiteralPath $compiler -PathType Leaf)) { throw 'Build the Release asset compiler first.' }
+$tests = Join-Path $repo 'tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj'
+if (-not (Test-Path -LiteralPath (Join-Path $repo 'tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll'))) { throw 'Build the Release solution, including presentation tests, first.' }
 $contract = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot 'families.json') | ConvertFrom-Json
 New-Item -ItemType Directory -Path $root | Out-Null
 function Tree([string]$Path) {
@@ -62,11 +64,19 @@ foreach ($family in $contract.families) {
     }
 }
 if (Compare-Object $before (Tree (Join-Path $repo 'assets/source'))) { throw 'Production source tree changed.' }
+$previousIndustrialRoot = $env:FORGELINE_INDUSTRIAL_BLENDER_ROOT
+try {
+    $env:FORGELINE_INDUSTRIAL_BLENDER_ROOT = $root
+    & dotnet test --project $tests --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests 2>&1 | Out-File -LiteralPath (Join-Path $root 'typed-runtime.log') -Encoding utf8NoBOM
+    if ($LASTEXITCODE -ne 0) { throw 'Typed compiled geometry/material/socket/state/LOD comparison failed.' }
+}
+finally { $env:FORGELINE_INDUSTRIAL_BLENDER_ROOT = $previousIndustrialRoot }
 @{
     schemaVersion = 1
     sourceSha = (& git -C $repo rev-parse HEAD)
     families = $reports
     productionSourceUnchanged = $true
+    typedCompiledContracts = 'passed'
     productionPromotion = 'blocked-render-qualification'
     nativeRenderer = 'pending'
     liveLogisticsAndRotations = 'pending'
