@@ -281,7 +281,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         in GameplayHudLayout layout,
         in RuntimeMetricsView metrics = default,
         bool showRuntimeMetrics = false, bool hideNotifications = false, bool dockExpanded = false, string localFeedback = "",
-        TimeSpan presentationTime = default, bool animateNotifications = false)
+        TimeSpan presentationTime = default, bool animateNotifications = false,
+        NotificationExpansion expansion = default)
     {
         ThrowIfDisposed();
         _text.Begin();
