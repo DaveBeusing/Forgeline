@@ -78,7 +78,7 @@ public sealed class RadialActionLayoutTests
     {
         var hud=GameplayHudLayout.Create(1280,720,192,2);
         var ring=RadialActionLayout.Fit(new(640,360),0,hud,[hud.TopStatusBar,hud.Minimap,
-            hud.NotificationBounds(false),hud.OnboardingBounds,OperationsLayout.Entry(hud)]);
+            hud.NotificationBounds(false),hud.OnboardingBounds]);
         Assert.True(ring.IsValid);
         Assert.True(ring.OuterRadius-ring.InnerRadius>=96);
         for(int slot=0;slot<8;slot++)
@@ -90,10 +90,32 @@ public sealed class RadialActionLayoutTests
     public void CompactHighDpiRingKeepsReadableLabelsAndAvoidsTheActualHud()
     {
         var hud=GameplayHudLayout.Create(1280,720,192,2);
-        var fit=RadialActionLayout.Fit(new(640,360),500,hud,[hud.TopStatusBar,hud.Minimap,hud.NotificationBounds(false),OperationsLayout.Entry(hud)]);
+        var fit=RadialActionLayout.Fit(new(640,360),500,hud,[hud.TopStatusBar,hud.Minimap,hud.NotificationBounds(false)]);
         Assert.True(fit.IsValid);
         Assert.InRange((fit.OuterRadius-fit.InnerRadius)/96,1,1.75f);
     }
+    [Theory]
+    [InlineData(1280, 720, 96u, .75f)]
+    [InlineData(1920, 1080, 144u, 1f)]
+    [InlineData(3440, 1440, 192u, 2f)]
+    public void OperationsObstacleExistsOnlyWhileThePanelIsVisible(
+        int width, int height, uint dpi, float uiScale)
+    {
+        var hud = GameplayHudLayout.Create(width, height, dpi, uiScale);
+        Span<HudRect> occupied = stackalloc HudRect[8];
+
+        RadialActionLayout.ResolveObstacles(occupied, hud);
+        Assert.True(occupied[7].IsEmpty);
+
+        RadialActionLayout.ResolveObstacles(occupied, hud,
+            operations: new OperationsView(true));
+        Assert.Equal(OperationsLayout.Panel(hud), occupied[7]);
+
+        RadialActionLayout.ResolveObstacles(occupied, hud,
+            operations: new OperationsView(true, Suppressed: true));
+        Assert.True(occupied[7].IsEmpty);
+    }
+
     [Theory] [InlineData(80)] [InlineData(100)]
     public void HorizontalIconLabelAndValueBoundsRemainInsideEverySector(float inner)
     {
