@@ -31,7 +31,7 @@ public sealed class ActionableAlertSnapshot
         alerts.Player == experience.Player ? alerts : null;
 }
 
-/// <summary>Five aggregate identities avoid per-tick notification storms; resolution removes a condition immediately.</summary>
+/// <summary>Six aggregate identities avoid per-tick notification storms; resolution removes a condition immediately.</summary>
 public sealed class AlertLifecycleTracker
 {
     private readonly SimulationTick[] _started = new SimulationTick[6];
