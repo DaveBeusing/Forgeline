@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json;
 using ForgeLine.Assets;
 using Xunit;
 
@@ -57,6 +58,31 @@ public sealed class IndustrialPlantMasterTests
                     Assert.Equal(x.TangentW, y.TangentW);
                 }
             }
+        }
+        string? seed = Environment.GetEnvironmentVariable("FORGELINE_INDUSTRIAL_PLANT_RUNTIME_SEED");
+        if (!string.IsNullOrWhiteSpace(seed))
+        {
+            var original = RuntimeAssetCatalog.Load(seed);
+            var replacement = RuntimeAssetCatalog.Load(Path.Combine(root, "second/runtime"));
+            var replacements = replacement.Manifest.Assets.ToDictionary(x => x.Id);
+            string target = Path.Combine(root, "overlay/runtime");
+            Directory.CreateDirectory(target);
+            foreach (var record in original.Manifest.Assets)
+            {
+                bool replaced = replacements.TryGetValue(record.Id, out var changed);
+                var chosen = replaced ? changed! : record;
+                string source = replaced ? Path.Combine(root, "second/runtime") : seed;
+                string path = Path.Combine(target, chosen.RuntimePath);
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                File.Copy(Path.Combine(source, chosen.RuntimePath), path, overwrite: false);
+            }
+            var manifest = RuntimeAssetIntegrity.SealManifest(original.Manifest with
+            {
+                Assets = original.Manifest.Assets.Select(x => replacements.GetValueOrDefault(x.Id, x)).ToArray()
+            });
+            File.WriteAllBytes(Path.Combine(target, RuntimeAssetCatalog.ManifestFileName),
+                JsonSerializer.SerializeToUtf8Bytes(manifest, RuntimeAssetCatalog.CreateJsonOptions()));
+            Assert.True(RuntimeAssetQualification.Run(target, requireIntegrity: true).Success);
         }
     }
 }
