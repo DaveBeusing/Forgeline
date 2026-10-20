@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-20T18:17:53.887428+00:00",
+  "reviewer": "project owner",
+  "decision": "approved-and-applied",
+  "paths": [
+    "build/rendering/parallelization/test_ownership.py",
+    "docs/rendering/parallelization/Contracts.md"
+  ],
+  "patchSha256": "72ae426bca2032a7be6beec5e69a22f02e97882213318f3d00200d530246aef1",
+  "actualDiscoveryTests": 9,
+  "passed": 9,
+  "exitCode": 0,
+  "scope": "Exactly two shared files; one Contracts paragraph. Historical fixture hashes and current C#/shader declarations preserved. No performance, gameplay or CI waiver."
+}

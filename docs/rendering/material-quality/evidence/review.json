@@ -3,8 +3,8 @@
   "baselineSource": "bfc16a953d731a844321a0848a2ebadc71c5875f",
   "candidateSource": "57fa863f540f283ffbed742923de3e9fa6b3f80c",
   "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
-  "materialDecision": "pending",
-  "shadowContactDecision": "pending",
+  "materialDecision": "approved",
+  "shadowContactDecision": "approved",
   "performanceDecision": "not-accepted",
   "captures": [
     {

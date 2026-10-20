@@ -1,6 +1,6 @@
 # Material and shadow candidate review
 
-Status: **human material and shadow-contact decisions pending**. Numerical/structural success does not approve material appearance or GPU cost.
+Status: **human material and shadow-contact decisions approved** for the six final image pairs, version 0.1.424. The [recorded approval](evidence/visual-approval.json) identifies their source and image hashes. Strict timing gates, gameplay failures and CI remain independent and unresolved.
 
 Baseline `bfc16a953d731a844321a0848a2ebadc71c5875f` (0.1.423); candidate production source `57fa863f540f283ffbed742923de3e9fa6b3f80c` (0.1.424).
 High, 1920x1080, fixed lighting and assets; close/normal/strategic cameras are 120/420/1000 metres. Original goldens are unchanged.

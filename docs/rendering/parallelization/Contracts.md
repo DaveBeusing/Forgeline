@@ -96,8 +96,14 @@ material1 at 96, per-instance input slot 1. Mesh and terrain vertices stay 48 by
 Mesh position/normal/UV/tangent offsets remain 0/12/24/32. Instance root constants stay
 35 floats, terrain 51; terrain binds 13 textures, and directional shadows retain t15
 and b1. Material slots, sRGB Base Color, linear tangent Normal and AO/Roughness/Metallic
-packing remain unchanged. Pipeline target profiles, defines, layouts and exact source
-bodies are frozen by [factory hashes](FactorySources.json) and executable contracts.
+packing remain unchanged. Pipeline target profiles, defines, layouts, registers,
+constant-buffer/input declarations and C# factory configuration remain frozen.
+The [factory hashes](FactorySources.json) certify the mechanical extraction at
+`integratedFoundationSha`; the executable source contract checks that immutable
+historical source against the original hashes. Current factory checks preserve
+all C# configuration and shader declarations while allowing only HLSL function
+implementation statements to evolve in their assigned material/shadow ownership.
+Compiled variant/ABI tests and native quality/cost review remain required.
 A later coordinated ABI revision is possible; it cannot be hidden in an owner branch.
 
 ## Observations

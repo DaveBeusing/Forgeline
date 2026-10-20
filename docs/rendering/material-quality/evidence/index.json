@@ -184,12 +184,12 @@
     },
     {
       "artifact": "final-status.json",
-      "originalSha256": "851a017f40088ddd07a85cd82af793b2dbe17423b93ae8225997dd779593c758",
-      "retainedSha256": "851a017f40088ddd07a85cd82af793b2dbe17423b93ae8225997dd779593c758",
-      "storedSha256": "c99ab2e20a1edc682e1f62bd72e7d007156a93ee62eafcc69ee994ed078f9aac",
-      "object": "objects/851a017f40088ddd07a85cd82af793b2dbe17423b93ae8225997dd779593c758.gz",
-      "originalBytes": 737,
-      "retainedBytes": 737,
+      "originalSha256": "a4c5788194b9ebf31932969fe025fff8e9a95a9f8d2e04a75e3c7b9bc0a4465c",
+      "retainedSha256": "a4c5788194b9ebf31932969fe025fff8e9a95a9f8d2e04a75e3c7b9bc0a4465c",
+      "storedSha256": "9630fe86b5797c57eccb75b33a2b7558ccd0049fea9713a91021d85612eb846c",
+      "object": "objects/a4c5788194b9ebf31932969fe025fff8e9a95a9f8d2e04a75e3c7b9bc0a4465c.gz",
+      "originalBytes": 818,
+      "retainedBytes": 818,
       "redacted": false
     },
     {
@@ -2000,6 +2000,16 @@
       "object": "objects/66f070b04091c498d78ef3ea6320bbc94b97d0caac355392a8b46893a3df0294.gz",
       "originalBytes": 180335,
       "retainedBytes": 180335,
+      "redacted": false
+    },
+    {
+      "artifact": "serial-factory-contract-tests.log",
+      "originalSha256": "fc83f12b2a6862e79cc29ca68bce605de7bef54935e9d49752368bb799099941",
+      "retainedSha256": "fc83f12b2a6862e79cc29ca68bce605de7bef54935e9d49752368bb799099941",
+      "storedSha256": "02178e3fc58f4748a0c147fcd165178fd29158eddf39033f91d4e832e233b243",
+      "object": "objects/fc83f12b2a6862e79cc29ca68bce605de7bef54935e9d49752368bb799099941.gz",
+      "originalBytes": 1579,
+      "retainedBytes": 1579,
       "redacted": false
     },
     {

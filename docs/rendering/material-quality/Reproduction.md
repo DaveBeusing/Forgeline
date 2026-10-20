@@ -93,3 +93,8 @@ The evidence index is an artifact locator, not an acceptance certificate.
 
 Original goldens are never replaced. Human material and shadow-contact decisions
 are separate from numerical correctness, visibility contracts and timing gates.
+
+The approved serial contract correction is validated with the actual existing CI
+unittest discovery: `python -X utf8 -m unittest discover -s build/rendering/parallelization -p 'test_*.py' -v` (9/9, exit 0).
+The two shared paths are explicit serial exceptions to the material ownership lane;
+the ownership manifest and historical FactorySources.json remain unchanged.

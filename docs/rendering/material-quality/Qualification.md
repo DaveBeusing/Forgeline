@@ -1,6 +1,6 @@
 # Material and shadow qualification
 
-Status: **implemented, not accepted**. Strict timing gates fail; human material/shadow decisions and final CI remain open.
+Status: **implemented, not accepted**. Strict timing gates fail; human material/shadow decisions are approved and final CI remains open.
 
 ## Baseline
 
@@ -146,20 +146,22 @@ counts may include additional evidence records. The existing independent
 implementation, reproducible helpers, native images and raw evidence. Required
 CI was in progress when the draft was created; no green CI claim is made.
 Remaining gates are the strict CPU/GPU timings, baseline gameplay failures,
-final CI and separate human material/shadow-contact decisions. No merge, tag or
+final CI. The project owner approved material appearance and shadow contact for all six final image pairs; see [approval](evidence/visual-approval.json). No merge, tag or
 release is performed. See [reproduction](Reproduction.md) and [review](Review.md).
 
-## Current CI stop and prepared serial correction
+## Serial CI contract correction and visual approval
 
-The final published CI run fails in `test_pipeline_factories_are_mechanically_identical_to_the_frozen_baseline`:
-its full-source comparison rejects the authorized private HLSL implementation
-changes before later checks run. This is a new explicit CI blocker, separate
-from the five known Game failures. The older master CI outcomes do not describe
-this earlier stop. The contradictory full-source freeze should have been found
-in the pre-check.
+The previous [CI run](https://github.com/DaveBeusing/Forgeline/actions/runs/39468545297/job/118786233490)
+stopped at the full-factory source hash comparison, before later checks. The
+project owner explicitly approved a serial correction to exactly the shared
+ownership test and one Contracts paragraph. The [applied correction](SerialContractReview.md)
+preserves immutable historical extraction hashes and current C#/shader declarations,
+while permitting private HLSL function-body changes. Actual CI unittest discovery
+passes **9/9, exit 0**. No hash fixture, image golden, budget threshold or workflow
+was changed. The next remote CI result remains a separate gate.
 
-A [two-file serial correction](SerialContractReview.md) is fully prepared and
-passes nine tests as a copy, preserving historical hashes and current shader
-interfaces. The shared test and Contracts paragraph remain untouched pending
-explicit scope approval. No hash fixture, image golden, threshold or workflow
-is changed. The implementation remains draft/not accepted.
+The project owner separately approved material appearance and shadow contact
+for all six final image pairs at version 0.1.424. The [approval record](evidence/visual-approval.json)
+binds these decisions to the measured production source and image hashes. It
+waives neither strict timing failures nor the five baseline Game failures.
+The implementation remains draft/not accepted.
