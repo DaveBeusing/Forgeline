@@ -24,6 +24,28 @@ public sealed class RadialActionLayoutTests
             Assert.Equal(-1, geometry.Hit(geometry.Center + RadialActionLayout.Direction(geometry.Start(i) + .1f) * 151));
         }
     }
+    [Theory]
+    [InlineData(80f, 176f, .75f)]
+    [InlineData(80f, 176f, 1f)]
+    [InlineData(80f, 176f, 2f)]
+    [InlineData(60f, 156f, 2f)]
+    public void HoverArcRemainsInsideThePublishedAnnularHitSector(float inner, float outer, float scale)
+    {
+        var ring = new RadialActionLayout(new(500, 400), new(500, 400), inner, outer, 8);
+        float thickness = RadialActionVisuals.HoverArcWidth(scale);
+        float arcOuter = ring.OuterRadius - 1;
+        float arcInner = MathF.Max(ring.InnerRadius + 1, arcOuter - thickness);
+        Assert.True(arcInner > ring.InnerRadius);
+        Assert.True(arcOuter < ring.OuterRadius);
+        for (int slot = 0; slot < ring.Count; slot++)
+            for (int segment = 0; segment < 20; segment++)
+            {
+                float angle = ring.Start(slot) + (ring.End(slot) - ring.Start(slot)) * (segment + .5f) / 20;
+                foreach (float radius in new[] { arcInner, arcOuter })
+                    Assert.Equal(slot, ring.Hit(ring.Center + RadialActionLayout.Direction(angle) * radius));
+            }
+    }
+
     [Theory] [InlineData(96,1)] [InlineData(144,1.25f)] [InlineData(192,2)]
     public void FitKeepsCompleteRingInsideSafeAreaAndAvoidsControls(uint dpi, float scale)
     {
