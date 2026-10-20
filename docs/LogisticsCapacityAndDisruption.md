@@ -99,9 +99,20 @@ Pending and retry-pending requests form the current backlog.
 
 Backlog metrics expose:
 
-- request count;
-- requested quantity;
-- requests specifically blocked by capacity saturation.
+- pending and retry-pending count and unreserved requested quantity;
+- oldest original waiting age in completed simulation ticks;
+- distinct last-evaluated stock, structural route, truck, drive-fuel, and capacity reasons;
+- current-tick actually committed dispatch count and reserved shipment quantity;
+- observed physical docking obstruction on assigned/in-transit trucks, independently of the unassigned request backlog.
+
+Per-request diagnostic records retain `WaitingSinceTick`, `NextAttemptTick` and
+`LastEvaluatedAtTick` so older work can be distinguished from a recent
+retry. A retry reason is explicitly the **last assessment**, not proof that
+the same physical obstruction remains at the present tick. Only a successful
+current-tick truck plus stock plus route reservation is counted as a
+committed dispatch; quantities in transit are **not** counted as delivered
+inventory. This evidence avoids interpreting an empty fleet, an
+underfueled idle fleet, and a busy physical loading lane as the same cause.
 
 Backlog is not converted into synthetic deliveries. Recovery occurs only when the existing request can pass source, capacity, route, truck, and destination checks and can be executed through the normal Cargo Truck lifecycle.
 
@@ -115,7 +126,13 @@ Distribution diagnostics map the current limiting condition to a stable bottlene
 - `DisconnectedRoute`;
 - `DestinationFull`;
 - `DestinationUnavailable`;
-- `TransportFailure`.
+- `TransportFailure`;
+- `DriveFuelUnavailable` when an otherwise idle eligible truck cannot fund the trip.
+
+The shared physical dock's `Obstructed` / `ExitBlocked` state is observed
+separately on an assigned transport. Request dispatch does **not** claim
+to reserve or predict a free physical dock, and a bay wait never
+silently changes a route or source booking.
 
 Diagnostics explain current state. They do not alter priorities, add resources, create routes, or repair infrastructure.
 

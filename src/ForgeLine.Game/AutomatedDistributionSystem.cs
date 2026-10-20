@@ -33,6 +33,8 @@ public sealed class AutomatedDistributionSystem
     private ulong _totalDeliveryLatencyTicks;
     private ulong _maximumDeliveryLatencyTicks;
     private int _unservedDeficitCount;
+    private int _committedDispatchCountThisTick;
+    private double _committedDispatchQuantityThisTick;
 
     public AutomatedDistributionSystem(
         LogisticsNetwork network,
@@ -112,6 +114,19 @@ public sealed class AutomatedDistributionSystem
             {
                 request.CapacityReservationId =
                     LogisticsThroughputReservationId.None;
+            }
+
+            // Pending work does not survive removal, disabling, or retargeting
+            // of its authoritative stock policy. In-flight cargo is not canceled.
+            if (request.State is LogisticsTransportRequestState.Pending or
+                LogisticsTransportRequestState.RetryPending &&
+                (!context.Entities.TryGetComponent(request.PolicyEntity, out LogisticsStockPolicy currentPolicy) ||
+                 !currentPolicy.Enabled || currentPolicy.ResourceId != request.ResourceId ||
+                 !_network.TryGetNodeForEntity(currentPolicy.TargetEntity, out LogisticsNodeId currentNode) ||
+                 currentNode != request.Destination))
+            {
+                RetireUnneededRequest(request, context.Tick);
+                continue;
             }
 
             if (request.State == LogisticsTransportRequestState.RetryPending &&
@@ -287,6 +302,25 @@ public sealed class AutomatedDistributionSystem
             if (existing is not null) existing.Priority = policy.Priority;
             double currentQuantity =
                 _inventories.GetQuantity(destinationInventory, policy.ResourceId);
+
+            if (existing is not null && existing.State is
+                LogisticsTransportRequestState.Pending or LogisticsTransportRequestState.RetryPending)
+            {
+                // Pending/retrying quantity is a desired target, not committed
+                // inbound stock. Reconcile it against the live policy without
+                // resetting RequestId, CreatedAtTick, or WaitingSinceTick.
+                double required = Math.Max(0.0, policy.DesiredTarget - currentQuantity);
+                if (required <= QuantityEpsilon)
+                    RetireUnneededRequest(existing, context.Tick);
+                else
+                {
+                    existing.RequestedQuantity = required;
+                    existing.Destination = destinationNodeId;
+                    _unservedDeficitCount++;
+                }
+                continue;
+            }
+
             double outstandingQuantity =
                 GetOutstandingQuantity(policyState.PolicyEntity);
             double projectedQuantity =
@@ -345,6 +379,8 @@ public sealed class AutomatedDistributionSystem
     private void DispatchPendingRequests(SimulationContext context)
     {
         _dispatchCandidates.Clear();
+        _committedDispatchCountThisTick = 0;
+        _committedDispatchQuantityThisTick = 0;
 
         for (int index = 0; index < _requests.Count; index++)
         {
@@ -395,6 +431,9 @@ public sealed class AutomatedDistributionSystem
         SimulationContext context,
         RequestState request)
     {
+        // One feasibility attempt per eligible pending request per tick.
+        // RetryPending requests retain their place without reserving anything.
+        request.LastEvaluatedAtTick = context.Tick;
         if (!_network.TryGetNode(
                 request.Destination,
                 out LogisticsNode destination) ||
@@ -521,6 +560,8 @@ public sealed class AutomatedDistributionSystem
         request.State = LogisticsTransportRequestState.Assigned;
         request.FailureReason = LogisticsTransportRequestFailureReason.None;
         request.StateChangedAtTick = context.Tick;
+        _committedDispatchCountThisTick++;
+        _committedDispatchQuantityThisTick += selection.Quantity;
     }
 
     private DispatchSelection SelectDispatchCandidate(
@@ -539,6 +580,7 @@ public sealed class AutomatedDistributionSystem
         bool hadSurplus = false;
         bool hadStructuralRoute = false;
         bool hadAvailableTruck = false;
+        bool hadUnderfueledTruck = false;
         bool hadCapacityBlockedRoute = false;
 
         for (int index = 0; index < nodes.Count; index++)
@@ -608,8 +650,10 @@ public sealed class AutomatedDistributionSystem
                     structuralRoute.Route,
                     request.ResourceId,
                     out EntityId truckEntity,
-                    out CargoTransport truck))
+                    out CargoTransport truck,
+                    out bool fuelBlocked))
             {
+                hadUnderfueledTruck |= fuelBlocked;
                 continue;
             }
 
@@ -676,7 +720,9 @@ public sealed class AutomatedDistributionSystem
                 : !hadStructuralRoute
                     ? LogisticsTransportRequestFailureReason.NoRoute
                     : !hadAvailableTruck
-                        ? LogisticsTransportRequestFailureReason.NoTruckAvailable
+                        ? hadUnderfueledTruck
+                            ? LogisticsTransportRequestFailureReason.NoDriveFuel
+                            : LogisticsTransportRequestFailureReason.NoTruckAvailable
                         : hadCapacityBlockedRoute
                             ? LogisticsTransportRequestFailureReason.CapacitySaturated
                             : LogisticsTransportRequestFailureReason.AssignmentFailed;
@@ -740,10 +786,12 @@ public sealed class AutomatedDistributionSystem
         LogisticsRoute route,
         ResourceId resource,
         out EntityId selectedEntity,
-        out CargoTransport selectedTransport)
+        out CargoTransport selectedTransport,
+        out bool fuelBlocked)
     {
         selectedEntity = EntityId.Invalid;
         selectedTransport = default;
+        fuelBlocked = false;
         _pendingFuelServiceDemands.Clear();
 
         bool hasOwner =
@@ -813,7 +861,10 @@ public sealed class AutomatedDistributionSystem
                 // Preserve the physical shipment; request real service instead of treating
                 // an underfueled, otherwise free truck as permanently undispatchable.
                 if (entities.HasComponent<UnitFuelState>(entity))
+                {
+                    fuelBlocked = true;
                     _pendingFuelServiceDemands.Add(entity);
+                }
                 continue;
             }
 
@@ -1103,6 +1154,20 @@ public sealed class AutomatedDistributionSystem
         request.NextAttemptTick = context.Tick;
     }
 
+    private void RetireUnneededRequest(RequestState request, SimulationTick tick)
+    {
+        ReleaseReservationIfPresent(request);
+        ReleaseCapacityReservationIfPresent(request);
+        request.State = LogisticsTransportRequestState.Completed;
+        request.FailureReason = LogisticsTransportRequestFailureReason.None;
+        request.AssignedTruck = EntityId.Invalid;
+        request.Origin = LogisticsNodeId.None;
+        request.StateChangedAtTick = tick;
+        request.NextAttemptTick = tick;
+        // Stock recovered without a shipment. Do not count a delivery or
+        // consume a new truck/route/source reservation.
+    }
+
     private void MarkCompleted(
         RequestState request,
         SimulationTick tick)
@@ -1198,6 +1263,8 @@ public sealed class AutomatedDistributionSystem
                 LogisticsBottleneckReason.InsufficientSourceStock,
             LogisticsTransportRequestFailureReason.NoTruckAvailable =>
                 LogisticsBottleneckReason.InsufficientTruckCapacity,
+            LogisticsTransportRequestFailureReason.NoDriveFuel =>
+                LogisticsBottleneckReason.DriveFuelUnavailable,
             LogisticsTransportRequestFailureReason.CapacitySaturated =>
                 LogisticsBottleneckReason.SaturatedLinkOrHub,
             LogisticsTransportRequestFailureReason.NoRoute =>
@@ -1235,6 +1302,12 @@ public sealed class AutomatedDistributionSystem
         int retryPending = 0;
         int backlogRequests = 0;
         int capacityBlockedRequests = 0;
+        int sourceBlockedRequests = 0;
+        int routeBlockedRequests = 0;
+        int truckBlockedRequests = 0;
+        int fuelBlockedRequests = 0;
+        int dockBlockedTransports = 0;
+        ulong oldestBacklogWait = 0;
         double backlogQuantity = 0.0;
         double reservedCargo = 0.0;
 
@@ -1268,6 +1341,41 @@ public sealed class AutomatedDistributionSystem
                         capacityBlockedRequests++;
                     }
                     break;
+            }
+
+            if (request.State is LogisticsTransportRequestState.Pending or
+                LogisticsTransportRequestState.RetryPending)
+            {
+                ulong waitAge = context.Tick.Value >= request.WaitingSinceTick.Value
+                    ? context.Tick.Value - request.WaitingSinceTick.Value : 0;
+                oldestBacklogWait = Math.Max(oldestBacklogWait, waitAge);
+                switch (request.FailureReason)
+                {
+                    case LogisticsTransportRequestFailureReason.NoSourceSurplus:
+                        sourceBlockedRequests++;
+                        break;
+                    case LogisticsTransportRequestFailureReason.NoRoute:
+                        routeBlockedRequests++;
+                        break;
+                    case LogisticsTransportRequestFailureReason.NoTruckAvailable:
+                        truckBlockedRequests++;
+                        break;
+                    case LogisticsTransportRequestFailureReason.NoDriveFuel:
+                        fuelBlockedRequests++;
+                        break;
+                }
+            }
+
+            VehicleDockBlockReason dockReason = VehicleDockBlockReason.None;
+            if (request.State is LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit &&
+                request.AssignedTruck.IsValid &&
+                context.Entities.TryGetComponent(request.AssignedTruck, out VehicleDockVisit dockVisit) &&
+                (dockVisit.Status is VehicleDockStatus.Busy or VehicleDockStatus.Blocked ||
+                 dockVisit.Status == VehicleDockStatus.Exiting &&
+                 dockVisit.Reason == VehicleDockBlockReason.ExitBlocked))
+            {
+                dockReason = dockVisit.Reason;
+                dockBlockedTransports++;
             }
 
             reservedCargo += request.ReservedQuantity;
@@ -1304,7 +1412,11 @@ public sealed class AutomatedDistributionSystem
                     request.CreatedAtTick,
                     request.StateChangedAtTick,
                     ResolveBottleneckReason(request.FailureReason),
-                    request.CapacityReservationId);
+                    request.CapacityReservationId,
+                    request.WaitingSinceTick,
+                    request.NextAttemptTick,
+                    request.LastEvaluatedAtTick,
+                    dockReason);
         }
 
         int idleTrucks = 0;
@@ -1358,7 +1470,15 @@ public sealed class AutomatedDistributionSystem
             _maximumDeliveryLatencyTicks,
             backlogRequests,
             backlogQuantity,
-            capacityBlockedRequests);
+            capacityBlockedRequests,
+            oldestBacklogWait,
+            sourceBlockedRequests,
+            routeBlockedRequests,
+            truckBlockedRequests,
+            fuelBlockedRequests,
+            dockBlockedTransports,
+            _committedDispatchCountThisTick,
+            _committedDispatchQuantityThisTick);
 
         LastCapacityDebugSnapshot =
             _capacityTracker.CaptureDebugSnapshot(
@@ -1590,6 +1710,8 @@ public sealed class AutomatedDistributionSystem
         public SimulationTick StateChangedAtTick { get; set; }
 
         public SimulationTick NextAttemptTick { get; set; }
+
+        public SimulationTick LastEvaluatedAtTick { get; set; }
 
         public LogisticsTransportRequestState State { get; set; }
 

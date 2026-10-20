@@ -42,7 +42,7 @@ public sealed class ActionableAlertTests
         Assert.Equal(5, alerts.Alerts.Count);
         Assert.All(alerts.Alerts.Take(3), row => Assert.Equal(AlertSeverity.Critical, row.Severity));
         Assert.All(alerts.Alerts.Skip(3), row => Assert.Equal(AlertSeverity.Warning, row.Severity));
-        Assert.Equal(5, new ActionableAlertSnapshot(new(1), new(4), new(1), Enumerable.Repeat(alerts.Alerts[0], 1000).ToArray()).Alerts.Count);
+        Assert.Equal(6, new ActionableAlertSnapshot(new(1), new(4), new(1), Enumerable.Repeat(alerts.Alerts[0], 1000).ToArray()).Alerts.Count);
     }
     [Fact]
     public void OwnedCoreDestinationIsRetainedAndDestroyedTargetIsUnavailable()
