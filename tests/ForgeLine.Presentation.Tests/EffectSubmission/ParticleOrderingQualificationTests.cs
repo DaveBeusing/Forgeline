@@ -64,7 +64,9 @@ public sealed class ParticleOrderingQualificationTests
                     count, visual = visual.ToString(), cohort,
                     implementation = optimized ? "production-view-depth-key-permutation" : "reference-anchor-distance-heap",
                     startedUtc, completedUtc, warmups = 64, samplesMilliseconds = samples,
-                    meanMilliseconds = samples.Average(), p50Milliseconds = sorted[127], p95Milliseconds = sorted[242], p99Milliseconds = sorted[253],
+                    meanMilliseconds = samples.Average(), p50Milliseconds = sorted[(samples.Length - 1) / 2],
+                    p95Milliseconds = sorted[(int)Math.Ceiling(samples.Length * .95) - 1],
+                    p99Milliseconds = sorted[(int)Math.Ceiling(samples.Length * .99) - 1],
                     currentThreadAllocatedBytes = threadBytes, allThreadAllocatedBytes = totalBytes,
                     exactParticlePayloadBytes = count * 64, payloadParity = true, gpuMilliseconds = (double?)null
                 });

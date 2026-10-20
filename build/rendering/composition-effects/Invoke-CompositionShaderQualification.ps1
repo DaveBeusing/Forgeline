@@ -38,7 +38,7 @@ Native source preparation:
 Existing native entry points (run separately on Windows x64 after source-less builds are prepared):
   build/Invoke-RtsReferenceQualification.ps1 -Capture
     -Antialiasing Disabled|Low|High -AtmosphereQuality Disabled|Distance|Height
-    -ResolutionScale 1|0.75 -LocalizedHaze (only when atmosphere is enabled)
+    -ResolutionScale 1|0.75|0.5 -LocalizedHaze (only when atmosphere is enabled)
     -Scenes IndustrialBase,DamageDestruction,BattlefieldCombat
     -Zooms CloseTactical,NormalGameplay,Strategic -Displays 1920x1080,3840x2160
     -RunProfile Warm -CameraPath Fixed|Sweep|Traverse -Warmups 64 -Samples 512 -RepeatCaptures 2
