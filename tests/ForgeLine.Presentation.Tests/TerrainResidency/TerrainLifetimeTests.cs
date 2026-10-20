@@ -8,6 +8,23 @@ namespace ForgeLine.Presentation.Tests.TerrainResidency;
 public sealed class TerrainLifetimeTests
 {
     [Fact]
+    public void RetainedLruEvictsCorrectSortedSlotsAfterOutOfOrderTouches()
+    {
+        using var device = new TerrainTestDevice();
+        using var renderer = new TerrainRenderer(device, TerrainPreparationTests.FlatWorld(4), residency: new(true, 4),
+            preparation: new() { PrefetchEnabled = false });
+        var camera = new RtsCamera(new() { InitialDistance = 12 }); var context = new TerrainTestContext();
+        foreach (float x in new[] { 128f, 384, 640, 896, 384, 1152, 128, 640 })
+        {
+            camera.ApplyState(camera.CaptureState() with { Target = new(x, 0, 128) });
+            renderer.Prepare(camera, 1600, 900); renderer.Render(context, camera);
+            Assert.Equal(1, renderer.LastDiagnostics.VisibleChunks); Assert.InRange(renderer.WorkMetrics.ResidentChunks, 1, 4);
+        }
+        Assert.Equal(3, renderer.LastDiagnostics.ChunkEvictions); Assert.Equal(3, renderer.WorkMetrics.EvictionCandidateVisits);
+        Assert.Equal(5, renderer.WorkMetrics.MeshBuilds); Assert.Equal(7, renderer.LastDiagnostics.ChunkUploads);
+    }
+
+    [Fact]
     public void DisposalObservesCancelledCpuWorkAndCannotPublishIntoTheNextMap()
     {
         using var entered = new ManualResetEventSlim();

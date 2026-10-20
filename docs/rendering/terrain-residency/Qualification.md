@@ -70,6 +70,12 @@ qualification in an isolated copied cache reports 0 compiled / 1,357 unchanged,
 309 meshes, 900 textures, 127 materials, 18 animations, two skins and 75,122,812
 container bytes. Canonical runtime inputs are not modified.
 
+Eviction now locates the sorted draw-list slot by binary search as well as
+choosing its LRU candidate in O(1); only the list's bounded removal shift remains
+linear. An out-of-order multi-resident regression verifies eviction after middle
+slot removal and retained touches. All 33 owned cases pass (22.192s); the focused
+Release build has zero warnings/errors (1m08.63s).
+
 ## Reproduction
 
 Use the pinned SDK, Release, and isolated artifact directories. Restore before

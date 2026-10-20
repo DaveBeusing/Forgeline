@@ -37,7 +37,7 @@ resource mutation. Required over capacity is a controlled failure, never a ready
 view with holes. Partial GPU failures invalidate readiness and can be retried.
 Unchanged plans reuse matrices and masks. GPU LRU nodes are intrusive; required
 chunks move behind retained nonrequired chunks. Each eviction chooses the oldest
-candidate once. The sorted draw list still has bounded insertion/removal shifts;
+candidate once. Sorted draw-list slots use binary search; the list still has bounded insertion/removal shifts;
 no O(1) claim is made for those operations. Warm Prepare has no transient lists
 or sorting.
 
@@ -113,7 +113,9 @@ Defaults: CPU prepared payload 32 MiB / 256 chunks, per-chunk preparation guard
 8 MiB, GPU geometry payload 128 MiB, control payload 8 MiB. Shared index bytes are
 charged once to CPU and GPU respectively. Optional in-flight work is separately
 bounded by `PrefetchChunksPerStep * MaximumChunkPreparationBytes` (default 16 MiB
-worst-case guard), not hidden in retained-cache bytes. Fixed map source tables,
+worst-case guard), not hidden in retained-cache bytes. A synchronous required
+build also has one guarded temporary chunk; retained payload limits are not a
+hard process-heap limit. Fixed map source tables,
 LRU/draw metadata, CLR object headers and allocator overhead are not payload
 bytes. A full process-memory plateau must be measured separately. GPU metrics
 are logical live payload, not physical DXGI allocation or fence-retirement peaks.

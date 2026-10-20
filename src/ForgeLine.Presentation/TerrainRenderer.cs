@@ -291,7 +291,7 @@ public sealed class TerrainRenderer : IDisposable
     }
     private void Evict(TerrainChunkRenderResource resource)
     {
-        Unlink(resource); _resources.Remove(resource); _resident[resource.ChunkIndex] = null;
+        Unlink(resource); _resources.RemoveAt(FindResourceSlot(resource.ChunkIndex)); _resident[resource.ChunkIndex] = null;
         _geometryEvictionBytes += (long)resource.VertexBuffer.Description.SizeInBytes;
         _controlEvictionBytes += resource.ControlBytes;
         resource.Dispose(); ReleasePalette(resource.PaletteKey); _evictions++;
@@ -434,10 +434,13 @@ public sealed class TerrainRenderer : IDisposable
         _worker.Start(planned[..count].ToArray(), _buildCpu);
     }
     private void InsertSorted(TerrainChunkRenderResource resource)
+        => _resources.Insert(FindResourceSlot(resource.ChunkIndex), resource);
+
+    private int FindResourceSlot(int chunkIndex)
     {
         int low = 0, high = _resources.Count;
-        while (low < high) { int middle = (low + high) / 2; if (_resources[middle].ChunkIndex < resource.ChunkIndex) low = middle + 1; else high = middle; }
-        _resources.Insert(low, resource);
+        while (low < high) { int middle = (low + high) / 2; if (_resources[middle].ChunkIndex < chunkIndex) low = middle + 1; else high = middle; }
+        return low;
     }
     private void Touch(TerrainChunkRenderResource resource)
     {
