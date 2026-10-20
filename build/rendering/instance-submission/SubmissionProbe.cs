@@ -46,7 +46,7 @@ internal static class SubmissionProbe
         shadowWork = Work(renderer);
         var movingRoots = Enumerable.Range(0, world.InstanceCount).Select(index =>
         {
-            RenderInstance root = world.CurrentSnapshot!.GetInstance(index);
+            RenderInstance root = world.GetInterpolatedInstance(index, 1);
             return root with { Transform = root.Transform with { Position = root.Transform.Position + new Vector3(.125f, 0, .125f),
                 Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, .1f) },
                 UnitFeature = root.UnitFeature with { AimYawRadians = .6f } };
