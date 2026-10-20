@@ -771,6 +771,7 @@ public sealed class AutomatedDistributionSystem
             }
 
             if (entities.HasComponent<CargoTransportOrder>(entity) ||
+                entities.HasComponent<CargoFuelServiceState>(entity) ||
                 entities.HasComponent<CargoTransportReservation>(entity) ||
                 entities.HasComponent<ResupplyOrder>(entity) ||
                 !entities.TryGetComponent(
