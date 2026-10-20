@@ -172,6 +172,10 @@ public sealed class CargoFleetShortageTracker
         if (candidate)
         {
             _clearingTicks = 0;
+            // A decreasing backlog signals progress; require another complete
+            // observation window before inferring insufficient fleet capacity.
+            if (!_active && _qualifyingTicks > 0 && backlog < _initialBacklog)
+                _qualifyingTicks = 0;
             if (_qualifyingTicks == 0) _initialBacklog = backlog;
             _qualifyingTicks = Math.Min(activationTicks, _qualifyingTicks + 1);
             if (!_active && tick.Value >= _cooldownUntilTick &&
