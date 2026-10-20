@@ -93,9 +93,11 @@ two-thirds of the configured pixel limit; retain it only up to that limit.
 Default maximum is 0.5 pixel, normal deviation 0.02, macro tint deviation 0.002.
 Hysteresis never raises the maximum pixel error.
 
-Boundary normals sample adjacent immutable heightfields. Outer map edges use
-one-sided derivatives. This corrects the old edge-clamped half derivative and
-can visibly change lighting; image review remains required. Bounds remain the
+Boundary normals sample adjacent immutable heightfields. Away from an available
+neighbour the original heightfield derivative kernel and arithmetic are retained
+bit for bit, including its existing one-sided treatment at outer map edges.
+Shared boundaries choose a common source spacing, including differently sampled
+neighbours. Boundary lighting can change; image review remains required. Bounds remain the
 original full heightfield bounds, conservative for all selected triangles.
 Positions, world sampling, control pixels, local UV convention and authoritative
 terrain/navigation data remain unchanged. Material UVs use world coordinates.

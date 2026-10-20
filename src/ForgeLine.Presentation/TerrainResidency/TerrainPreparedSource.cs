@@ -50,7 +50,7 @@ internal sealed class TerrainPreparedSource
         long start = Stopwatch.GetTimestamp();
         TerrainChunk chunk = Chunks[index];
         var vertices = new RenderVertex[checked(_samples * _samples)];
-        float size = chunk.Heightfield.ChunkSizeMeters, step = size / (_samples - 1);
+        float size = chunk.Heightfield.ChunkSizeMeters;
         for (int z = 0; z < _samples; z++)
         {
             cancellation.ThrowIfCancellationRequested(); AssetPreparationScope.ThrowIfStopped();
@@ -60,15 +60,7 @@ internal sealed class TerrainPreparedSource
                 float localX = x / (float)(_samples - 1) * size;
                 Vector3 position = new(chunk.Coordinate.X * size + localX,
                     chunk.Heightfield.SampleHeight(localX, localZ), chunk.Coordinate.Z * size + localZ);
-                // Sample both sides of an immutable chunk boundary; both neighbours get the same normal.
-                float left = Height(chunk, localX - step, localZ), right = Height(chunk, localX + step, localZ);
-                float back = Height(chunk, localX, localZ - step), forward = Height(chunk, localX, localZ + step);
-                float spanX = 2 * step, spanZ = 2 * step;
-                if (localX < step && Neighbour(index, -1, 0) < 0) spanX -= step - localX;
-                if (localX + step > size && Neighbour(index, 1, 0) < 0) spanX -= localX + step - size;
-                if (localZ < step && Neighbour(index, 0, -1) < 0) spanZ -= step - localZ;
-                if (localZ + step > size && Neighbour(index, 0, 1) < 0) spanZ -= localZ + step - size;
-                Vector3 normal = Vector3.Normalize(new((left - right) / spanX, 1, (back - forward) / spanZ));
+                Vector3 normal = SampleNormal(index, chunk, localX, localZ);
                 if (!float.IsFinite(position.X) || !float.IsFinite(position.Y) || !float.IsFinite(position.Z) ||
                     !float.IsFinite(normal.X) || !float.IsFinite(normal.Y) || !float.IsFinite(normal.Z))
                     throw new InvalidDataException("Terrain interpolation produced a nonfinite render vertex.");
@@ -131,6 +123,37 @@ internal sealed class TerrainPreparedSource
                     protectedSurface |= splat.Mips[0].Pixels[pixel] >= 16;
         protectedSurface |= chunk.Bounds.Minimum.Y < 0 && chunk.Bounds.Maximum.Y >= 0;
         return new(vertices, splat, errors, normals, tints, protectedSurface, meshTime, Stopwatch.GetElapsedTime(start).TotalMilliseconds);
+    }
+
+    private Vector3 SampleNormal(int index, TerrainChunk chunk, float x, float z)
+    {
+        float size = chunk.Heightfield.ChunkSizeMeters, step = chunk.Heightfield.SampleSpacing;
+        int left = x < step ? Neighbour(index, -1, 0) : -1;
+        int right = x + step > size ? Neighbour(index, 1, 0) : -1;
+        int back = z < step ? Neighbour(index, 0, -1) : -1;
+        int forward = z + step > size ? Neighbour(index, 0, 1) : -1;
+        // Keep the original derivative kernel and arithmetic wherever its window
+        // does not cross an available neighbour, including outer map boundaries.
+        if (left < 0 && right < 0 && back < 0 && forward < 0)
+            return chunk.Heightfield.SampleNormal(x, z);
+        if (x == 0 || x == size || z == 0 || z == size)
+        {
+            // Both sides choose the same spacing even for differently sampled
+            // immutable heightfields. Corners include the diagonal source.
+            for (int dz = z == 0 ? -1 : 0; dz <= (z == size ? 1 : 0); dz++)
+                for (int dx = x == 0 ? -1 : 0; dx <= (x == size ? 1 : 0); dx++)
+                {
+                    int neighbour = Neighbour(index, dx, dz);
+                    if (neighbour >= 0) step = Math.Min(step, Chunks[neighbour].Heightfield.SampleSpacing);
+                }
+        }
+        float spanX = (right >= 0 ? x + step : Math.Min(x + step, size)) -
+            (left >= 0 ? x - step : Math.Max(x - step, 0));
+        float spanZ = (forward >= 0 ? z + step : Math.Min(z + step, size)) -
+            (back >= 0 ? z - step : Math.Max(z - step, 0));
+        float derivativeX = (Height(chunk, x + step, z) - Height(chunk, x - step, z)) / Math.Max(spanX, float.Epsilon);
+        float derivativeZ = (Height(chunk, x, z + step) - Height(chunk, x, z - step)) / Math.Max(spanZ, float.Epsilon);
+        return Vector3.Normalize(new(-derivativeX, 1, -derivativeZ));
     }
 
     private float Height(TerrainChunk chunk, float x, float z)

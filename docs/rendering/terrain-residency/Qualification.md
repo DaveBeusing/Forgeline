@@ -76,6 +76,26 @@ linear. An out-of-order multi-resident regression verifies eviction after middle
 slot removal and retained touches. All 33 owned cases pass (22.192s); the focused
 Release build has zero warnings/errors (1m08.63s).
 
+The complete solution at `19c072cb6dd32d74bf7e8cee7cca9672d172dd10` builds with
+zero warnings/errors (3m06.94s). Its full suite completes in 14m04.635s:
+3,130 total, 3,107 pass, five known Game failures, 18 explicit opt-in/debug-layer
+skips. Assets, Presentation, Client and Graphics pass in full. Portable results
+and original log hashes are in [functional-checks.json](evidence/functional-checks.json).
+Twenty compiled client assemblies all identify that source, with hashes in
+[product-binaries.json](evidence/product-binaries.json).
+
+Before hardware execution, a source review identified unintended normal smoothing:
+the earlier candidate used render-mesh spacing for its finite difference instead
+of the original heightfield spacing. No hardware performance evidence from that
+candidate was accepted. The correction preserves the original interior and outer
+boundary sampling exactly and only crosses available immutable neighbours at
+shared boundaries. Direct bit-pattern comparisons against the existing world
+mesh generator and a mixed-heightfield-spacing seam case cover this regression.
+The earlier description of a baseline half derivative was incorrect: the existing
+heightfield already implements one-sided outer-edge derivatives. The decision
+document is corrected accordingly. Final correction checks and new source-bound
+hardware evidence follow below.
+
 ## Reproduction
 
 Use the pinned SDK, Release, and isolated artifact directories. Restore before

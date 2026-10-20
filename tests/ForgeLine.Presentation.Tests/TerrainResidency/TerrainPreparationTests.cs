@@ -35,6 +35,12 @@ public sealed class TerrainPreparationTests
                 Assert.Equal(expected.Vertices[i].Position, data.Vertices[i].Position);
                 Assert.Equal(expected.Vertices[i].LocalUv, data.Vertices[i].LocalUv);
                 Assert.InRange(data.Vertices[i].Normal.Length(), .99999f, 1.00001f);
+                if (i % 33 is > 0 and < 32 && i / 33 is > 0 and < 32)
+                {
+                    Assert.Equal(BitConverter.SingleToInt32Bits(expected.Vertices[i].Normal.X), BitConverter.SingleToInt32Bits(data.Vertices[i].Normal.X));
+                    Assert.Equal(BitConverter.SingleToInt32Bits(expected.Vertices[i].Normal.Y), BitConverter.SingleToInt32Bits(data.Vertices[i].Normal.Y));
+                    Assert.Equal(BitConverter.SingleToInt32Bits(expected.Vertices[i].Normal.Z), BitConverter.SingleToInt32Bits(data.Vertices[i].Normal.Z));
+                }
             }
             var splat = TerrainSplatMapBuilder.Build(chunk, profile);
             Assert.Equal(splat.Palette, data.Splat.Palette);

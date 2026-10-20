@@ -1,0 +1,18 @@
+{
+  "referenceProductSource": "19c072cb6dd32d74bf7e8cee7cca9672d172dd10",
+  "referencePresentationSha256": "1D2E2162DB7147B4955ED92CF2E96FAF21406602051A7BDBEEDB8DCA8492E094",
+  "testAssemblySha256": "95B753FD2883FCF169F7E12C792DC9D772C9D22D780B8A30E81DA9EBF8D5E0EE",
+  "referenceRunner": "direct xUnit v3 runner; -class verified from local --help",
+  "referenceExit": 1,
+  "referenceTotal": 8,
+  "referenceFailed": 1,
+  "expectedFailure": "ImmutablePreparationPreservesPositionsUvSplatAndAuthoritativeHeights",
+  "expectedNormalBits": 992583386,
+  "observedNormalBits": 992569177,
+  "referenceLogSha256": "66E570C7D3993F87315F06D896E9E18ED54E21F40AD08609BF7CCEE9E1F8BA54",
+  "correctedMtpExit": 0,
+  "correctedPassed": 34,
+  "correctedLogSha256": "9DE364E966CAAB7B8D96BA728804FC70976ABAC73F46EA2B36ADA48F96E64560",
+  "initialDirectInvocationExit": 3,
+  "initialInvocation": "SDK/MTP filter flags are not direct-runner flags; rejected before tests, corrected using local help."
+}

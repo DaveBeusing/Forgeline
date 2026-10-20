@@ -73,6 +73,23 @@ public sealed class TerrainGeometryTests
     }
 
     [Fact]
+    public void DifferentHeightfieldResolutionsShareTheSameBoundaryDerivative()
+    {
+        var chunks = new List<TerrainChunk>();
+        for (int cx = 0; cx < 2; cx++)
+        {
+            int samples = cx == 0 ? 65 : 33; var heights = new float[samples * samples];
+            for (int z = 0; z < samples; z++)
+                for (int x = 0; x < samples; x++)
+                    heights[z * samples + x] = 20 + MathF.Sin((cx * 256 + x * 256f / (samples - 1)) * .023f);
+            chunks.Add(new(new(cx, 0), new TerrainHeightfield(samples, 256, heights)));
+        }
+        var source = new TerrainPreparedSource(new(new(), chunks), new(), new([]), new());
+        var left = source.Build(0, CancellationToken.None); var right = source.Build(1, CancellationToken.None);
+        for (int z = 0; z < 33; z++) Assert.Equal(left.Vertices[z * 33 + 32].Normal, right.Vertices[z * 33].Normal);
+    }
+
+    [Fact]
     public void ResidualBoundContainsActualFineAndCoarseTriangleInterpolation()
     {
         var source = new TerrainPreparedSource(CurvedWorld(), new(), new([]), new());
