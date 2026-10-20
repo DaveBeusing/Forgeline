@@ -85,8 +85,9 @@ public sealed class ActionableAlertController
         _expansionPosition = settleDetails ? requested : Math.Clamp(_expansionPosition +
             (float)Math.Max(0, seconds) / .2f * (requested > _expansionPosition ? 1 : -1), 0, 1);
         if (!_expansion.Open && _expansionPosition == 0) _expansion = default;
-        var stack = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback,
-            Expansion);
+        var stack = _expansion.Open || _expansionPosition > 0
+            ? ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback, Expansion)
+            : plain;
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
         bool captured = _pending || input.HasPointerPosition && stack.Contains(input.PointerPosition) || fresh && originValid && stack.Contains(origin);
         if (changed) { _pending = false; return new(captured); }
