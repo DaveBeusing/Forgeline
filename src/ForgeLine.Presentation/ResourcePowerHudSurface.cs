@@ -466,12 +466,19 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             var card = stack.Card(i);
             var item = card.Item;
             float visibility = _notificationMotion.Opacity(i);
+            HudRect incoming = _notificationMotion.EnteringBounds(card.Bounds, i);
             var color = NotificationText.Severity(experience, item);
-            if (!_skin.Panel(card.Bounds, "panel.raised", NotificationSurfaceVisuals.BackgroundOpacity * visibility))
-                EmitQuad(card.Bounds.X, card.Bounds.Y, card.Bounds.Width, card.Bounds.Height,
-                    GameplayHudVisualStyle.PanelRaised with { W = NotificationSurfaceVisuals.BackgroundOpacity * visibility }, width, height);
-            EmitQuad(card.Bounds.X, card.Bounds.Y, color == HudAlertSeverity.Critical ? 5 : 3,
-                card.Bounds.Height, SeverityColor(color) with { W = visibility }, width, height);
+            if (!incoming.IsEmpty)
+            {
+                if (!_skin.Panel(incoming, "panel.raised", NotificationSurfaceVisuals.BackgroundOpacity * visibility))
+                    EmitQuad(incoming.X, incoming.Y, incoming.Width, incoming.Height,
+                        GameplayHudVisualStyle.PanelRaised with { W = NotificationSurfaceVisuals.BackgroundOpacity * visibility }, width, height);
+                EmitQuad(incoming.X, incoming.Y, MathF.Min(incoming.Width, color == HudAlertSeverity.Critical ? 5 : 3),
+                    incoming.Height, SeverityColor(color) with { W = visibility }, width, height);
+            }
+            // Text, icons and controls use the settled authorized geometry. During
+            // entrance only the clipped material advances across the safe area.
+            if (visibility < .999f) continue;
             float iconSize = stack.FontSize;
             EmitIcon(item.Hidden > 0 ? RtsUiIcon.StatusAlert :
                 item.Feedback ? CommandIcon(experience.Feedback.Kind) : item.Local ? RtsUiIcon.StatusAlert : AlertIcon(item.Kind),
@@ -493,6 +500,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             }
             if (card.Truncated && !card.Details.IsEmpty && card.Details != card.Action && item.Hidden == 0)
                 EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height, visibility);
+            if (expansion.Matches(card) && !card.ExpansionBounds.IsEmpty)
+                EmitExpandedNotification(card.ExpansionBounds, expansion, stack.FontSize, width, height);
         }
         // Retired cards paint only a short-lived, noninteractive background. Their old
         // text and targets never cross a resolved/session boundary.
@@ -508,6 +517,52 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                     width, height);
         }
         _scale = layout.Scale;
+    }
+
+    private void EmitExpandedNotification(in HudRect bounds, in NotificationExpansion expansion,
+        float fontSize, int width, int height)
+    {
+        float progress = Math.Clamp(expansion.Progress, 0, 1);
+        if (!_skin.Panel(bounds, "panel.raised", NotificationSurfaceVisuals.BackgroundOpacity * progress))
+            EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height,
+                GameplayHudVisualStyle.PanelRaised with { W = NotificationSurfaceVisuals.BackgroundOpacity * progress }, width, height);
+        if (progress < .999f || expansion.Content.Length == 0) return;
+        float padding = MathF.Max(5, fontSize * .45f);
+        float size = fontSize * .88f;
+        float heightPerLine = UiFontMetrics.Default.Description.LineHeight /
+            UiFontMetrics.Default.Description.PixelSize * size;
+        float textWidth = MathF.Max(1, bounds.Width - padding * 2);
+        int perPage = Math.Clamp((int)((bounds.Height - padding * 2) / heightPerLine) - 1, 1, 5);
+        ReadOnlySpan<char> content = expansion.Content.AsSpan();
+        int totalLines = 0, offset = 0;
+        while (offset < content.Length)
+        {
+            _ = NotificationText.Line(content[offset..], textWidth, size, out int consumed);
+            offset += Math.Max(1, consumed);
+            totalLines++;
+        }
+        int pages = Math.Max(1, (totalLines + perPage - 1) / perPage);
+        int page = (int)((uint)expansion.Page % (uint)pages);
+        int first = page * perPage;
+        offset = 0;
+        for (int line = 0; line < first + perPage && offset < content.Length; line++)
+        {
+            ReadOnlySpan<char> value = NotificationText.Line(content[offset..], textWidth, size, out int consumed);
+            if (line >= first)
+            {
+                var rect = new HudRect(bounds.X + padding,
+                    bounds.Y + padding + (line - first) * heightPerLine, textWidth, heightPerLine);
+                if (!_text.AddCentered(value, rect, size, TextColor, width, height))
+                    EmitText(value, rect.X, rect.Y, TextColor, width, height);
+            }
+            offset += Math.Max(1, consumed);
+        }
+        Span<char> pageBuffer = stackalloc char[48];
+        var label = new HudTextBuilder(pageBuffer);
+        label.Append("PAGE "); label.Append(page + 1); label.Append("/"); label.Append(pages); label.Append("  NEXT: CLICK");
+        var footer = new HudRect(bounds.X + padding, bounds.Bottom - padding - heightPerLine, textWidth, heightPerLine);
+        if (!_text.AddCentered(label.Written, footer, size, MutedTextColor, width, height))
+            EmitText(label.Written, footer.X, footer.Y, MutedTextColor, width, height);
     }
 
     private void EmitNotificationAction(string label, in HudRect bounds, float fontSize, int width, int height, float visibility)
