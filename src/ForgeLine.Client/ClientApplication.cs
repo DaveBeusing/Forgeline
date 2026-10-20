@@ -1192,7 +1192,8 @@ internal sealed class ClientApplication
             transientMenus.Update(inputState, inputSnapshot, interactionLayout, selectionController.Selection,
                 actionPanel, operationsController, presentationInteraction, informationLayer.MinimapEnabled,
                 buildingPlacementController.IsActive,
-                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback, onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View);
+                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback, onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View,
+                expansion: alertController.Expansion);
             hudInteraction.CapturePointer(transientMenus.PointerCaptured);
             actionPanel.SynchronizeObjectRing(inputState, inputSnapshot, renderWorld, selectionController.Selection, false);
             actionPanel.AdoptPresentedRing(renderHost.LatestActionRing);
