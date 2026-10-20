@@ -44,3 +44,11 @@ cover equal-aspect viewport changes, interrupted plans, independent geometry and
 control budgets, one eviction-candidate visit per eviction, and no optional GPU
 publication. Native measurement windows are serialized with other render work;
 functional results are not presented as performance measurements.
+
+Boundary-preserving geometry selection builds with zero warnings/errors
+(6m35.74s) and passes all 31 owned cases (13.237s). Coverage, 32-bit indices,
+winding, continuous height-error bounds, boundary positions/normals/UVs,
+independent main/light triangle counts, strict pixel-limit hysteresis, protected
+road/coast geometry, cancelled worker disposal, frame abort and repeated whole-map
+payload plateau are covered. The three required existing classes, full affected
+suites, native hardware evidence and final CI are the next gates.

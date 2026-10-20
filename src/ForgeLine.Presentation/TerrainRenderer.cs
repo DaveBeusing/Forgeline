@@ -48,7 +48,10 @@ public sealed class TerrainRenderer : IDisposable
     private TerrainChunkRenderResource? _oldest, _newest;
     private Vector3 _lastTarget, _prefetchTarget;
     private bool _hasTarget, _prefetchExhausted;
-    private long _evictionVisits, _preparationSteps;
+    private long _evictionVisits, _preparationSteps, _lastShadowTriangles;
+    private int _lastTextureBindings, _lastMaterialBindings, _reducedMainChunks, _reducedShadowChunks;
+    private readonly int[] _mainLods, _shadowLods;
+    private RtsCamera? _lodCamera;
     private readonly Func<int, CancellationToken, PreparedTerrainChunk> _buildCpu;
     private readonly RuntimeWorldAssetResources? _runtimeAssets;
     private readonly IGraphicsTexture? _fallbackBaseColor;
@@ -88,6 +91,7 @@ public sealed class TerrainRenderer : IDisposable
         _required = new bool[_chunks.Count];
         _mainRequired = new bool[_chunks.Count]; _scratchRequired = new bool[_chunks.Count]; _scratchMain = new bool[_chunks.Count];
         _prefetchTried = new bool[_chunks.Count]; _prefetchRejected = new bool[_chunks.Count];
+        _mainLods = new int[_chunks.Count]; _shadowLods = new int[_chunks.Count];
         _residency = residency ?? TerrainResidencySettings.Eager;
         _residency.Validate();
         WorldEnvironmentSettings appearance = environment ?? new();
@@ -241,7 +245,7 @@ public sealed class TerrainRenderer : IDisposable
             TerrainIndexRange full = _source.Patterns.Ranges[0];
             return new(chunk.Coordinate, chunk.Bounds, vertex, _sharedIndices!, control, palette.Layers,
                 full.IndexCount, full.IndexCount / 3, chunkIndex, prepared.ControlBytes)
-            { PaletteKey = palette.Key, HeightErrors = prepared.HeightErrors, NormalErrors = prepared.NormalErrors };
+            { PaletteKey = palette.Key, HeightErrors = prepared.HeightErrors, NormalErrors = prepared.NormalErrors, TintErrors = prepared.TintErrors, ProtectedSurface = prepared.ProtectedSurface };
         }
         catch
         {
@@ -306,7 +310,8 @@ public sealed class TerrainRenderer : IDisposable
         UploadMilliseconds = _uploadMilliseconds, MaterialMilliseconds = _materialMilliseconds,
         PrepareMilliseconds = _residencyMilliseconds, OptionalCpuMilliseconds = _worker.CpuMilliseconds,
         EvictionCandidateVisits = _evictionVisits, PreparationSteps = _preparationSteps,
-        IsPrepared = IsPrepared
+        IsPrepared = IsPrepared, TextureBindings = _lastTextureBindings, MaterialBindings = _lastMaterialBindings,
+        ShadowTriangles = _lastShadowTriangles, ReducedMainChunks = _reducedMainChunks, ReducedShadowChunks = _reducedShadowChunks
     };
 
     /// <summary>Drain bounded preparation steps on the render owner before recording. No partial view is published.</summary>
@@ -401,7 +406,7 @@ public sealed class TerrainRenderer : IDisposable
     private void ScheduleOptional()
     {
         if (!_preparation.PrefetchEnabled || _worker.Busy || _prefetchExhausted) return;
-        long chunkBytes = VertexBytesPerChunk + ControlBytesPerChunk + _source.Patterns.Ranges.Length * 8;
+        long chunkBytes = VertexBytesPerChunk + ControlBytesPerChunk + _source.Patterns.Ranges.Length * 12;
         if (_preparation.MaximumPreparedChunks < _requiredCount + _preparation.PrefetchChunksPerStep ||
             chunkBytes * (_requiredCount + _preparation.PrefetchChunksPerStep) + _source.Patterns.Bytes > _preparation.MaximumPreparedBytes)
         { _prefetchExhausted = true; return; }
@@ -480,6 +485,9 @@ public sealed class TerrainRenderer : IDisposable
         if (_residency.Enabled && (_preparedView != matrices.ViewProjection || _preparedWidth != context.Width || _preparedHeight != context.Height))
             throw new InvalidOperationException("Terrain camera or viewport changed without preparing residency.");
 
+        if (!ReferenceEquals(_lodCamera, camera)) { Array.Clear(_mainLods); _lodCamera = camera; }
+        int textureBindings = 0, materialBindings = 0; _reducedMainChunks = 0;
+        TerrainLayerResource[]? boundLayers = null;
         int visibleChunks = 0;
         int drawCalls = 0;
         long submittedTriangles = 0;
@@ -497,6 +505,9 @@ public sealed class TerrainRenderer : IDisposable
             constants[
                 TerrainBaseRootConstantCount..]);
 
+        constants[16] = BitConverter.Int32BitsToSingle(((int)DebugVisualizationMode << 1) | (DebugChunksEnabled ? 1 : 0));
+        constants[17] = camera.Position.X; constants[19] = camera.Position.Y; constants[50] = camera.Position.Z;
+        context.SetIndexBuffer(_sharedIndices!, GraphicsIndexFormat.ThirtyTwoBit);
         foreach (TerrainChunkRenderResource resource in _resources)
         {
             if (!frustum.Intersects(
@@ -506,33 +517,21 @@ public sealed class TerrainRenderer : IDisposable
             }
 
             visibleChunks++;
-            submittedTriangles +=
-                resource.TriangleCount;
-
-            constants[16] = BitConverter.Int32BitsToSingle(((int)DebugVisualizationMode << 1) | (DebugChunksEnabled ? 1 : 0));
-            constants[17] = camera.Position.X;
-            constants[18] = 0;
-            constants[19] = camera.Position.Y;
-            constants[50] = camera.Position.Z;
-            WriteLayerConstants(
-                resource.Layers,
-                constants);
-
-            context.SetVertexConstants(
-                constants);
-            context.SetVertexBuffer(
-                resource.VertexBuffer,
-                TerrainRenderVertex.SizeInBytes);
-            context.SetIndexBuffer(
-                resource.IndexBuffer,
-                GraphicsIndexFormat.ThirtyTwoBit);
-
-            BindTerrainTextures(
-                context,
-                resource);
-
-            context.DrawIndexed(
-                resource.IndexCount);
+            int level = TerrainLodSelector.Select(resource.HeightErrors, resource.NormalErrors, resource.TintErrors,
+                TerrainLodProjection.Main(resource.Bounds, matrices, context.Width, context.Height), _preparation,
+                _mainLods[resource.ChunkIndex], resource.ProtectedSurface);
+            _mainLods[resource.ChunkIndex] = level; if (level > 0) _reducedMainChunks++;
+            TerrainIndexRange range = _source.Patterns.Ranges[level];
+            submittedTriangles += range.IndexCount / 3;
+            bool materialChanged = !ReferenceEquals(boundLayers, resource.Layers);
+            if (materialChanged)
+            {
+                WriteLayerConstants(resource.Layers, constants); context.SetVertexConstants(constants);
+                boundLayers = resource.Layers; materialBindings++;
+            }
+            context.SetVertexBuffer(resource.VertexBuffer, TerrainRenderVertex.SizeInBytes);
+            textureBindings += BindTerrainTextures(context, resource, materialChanged);
+            context.DrawIndexed(range.IndexCount, range.FirstIndex);
             drawCalls++;
         }
 
@@ -541,6 +540,7 @@ public sealed class TerrainRenderer : IDisposable
                     startedAt)
                 .TotalMilliseconds;
 
+        _lastTextureBindings = textureBindings; _lastMaterialBindings = materialBindings;
         LastDiagnostics =
             new TerrainRenderDiagnostics(
                 _chunks.Count,
@@ -578,7 +578,7 @@ public sealed class TerrainRenderer : IDisposable
         {
             resource.Dispose();
         }
-        _resources.Clear(); Array.Clear(_resident); _oldest = _newest = null; _preparedView = _preparedShadow = null;
+        _resources.Clear(); Array.Clear(_resident); _oldest = _newest = null; _lodCamera = null; _preparedView = _preparedShadow = null;
         _worker.Dispose(); _prepared.Clear(); _palettes.Clear(); _source.Patterns.ReleaseCpuIndices();
         _sharedIndices?.Dispose(); _sharedIndices = null;
         _fallbackOrm?.Dispose();
@@ -603,16 +603,22 @@ public sealed class TerrainRenderer : IDisposable
         WriteMatrix(frame.ViewProjection, constants);
         context.SetVertexConstants(constants);
         ViewFrustum frustum = ViewFrustum.FromViewProjection(frame.ViewProjection);
-        int draws = 0;
+        int draws = 0; long triangles = 0; _reducedShadowChunks = 0;
+        context.SetIndexBuffer(_sharedIndices!, GraphicsIndexFormat.ThirtyTwoBit);
+        TerrainLodProjection lightProjection = TerrainLodProjection.Shadow(frame.ViewProjection, _graphics.DirectionalShadows.Resolution);
         foreach (TerrainChunkRenderResource resource in _resources)
         {
             if (draws >= maximumDraws) break;
             if (!frustum.Intersects(resource.Bounds)) continue;
+            int level = TerrainLodSelector.Select(resource.HeightErrors, resource.NormalErrors, resource.TintErrors,
+                lightProjection, _preparation, _shadowLods[resource.ChunkIndex], resource.ProtectedSurface);
+            _shadowLods[resource.ChunkIndex] = level; if (level > 0) _reducedShadowChunks++;
+            TerrainIndexRange range = _source.Patterns.Ranges[level];
             context.SetVertexBuffer(resource.VertexBuffer, TerrainRenderVertex.SizeInBytes);
-            context.SetIndexBuffer(resource.IndexBuffer, GraphicsIndexFormat.ThirtyTwoBit);
-            context.DrawIndexed(resource.IndexCount);
+            context.DrawIndexed(range.IndexCount, range.FirstIndex); triangles += range.IndexCount / 3;
             draws++;
         }
+        _lastShadowTriangles = triangles;
         return draws;
     }
 
@@ -678,14 +684,14 @@ public sealed class TerrainRenderer : IDisposable
             Vector2.One,
             false);
 
-    private static void BindTerrainTextures(
+    private static int BindTerrainTextures(
         IGraphicsCommandContext context,
-        TerrainChunkRenderResource resource)
+        TerrainChunkRenderResource resource, bool bindMaterial)
     {
         context.SetPixelTexture(
             0,
             resource.ControlTexture);
-
+        if (!bindMaterial) return 1;
         for (int layer = 0;
              layer < LayerCount;
              layer++)
@@ -707,38 +713,7 @@ public sealed class TerrainRenderer : IDisposable
                 layer,
                 material.OrmTexture);
         }
-    }
-
-    private static TerrainRenderVertex[] CreateRenderVertices(
-        TerrainVertex[] vertices)
-    {
-        var result =
-            new TerrainRenderVertex[
-                vertices.Length];
-
-        for (int index = 0;
-             index < result.Length;
-             index++)
-        {
-            TerrainVertex vertex =
-                vertices[index];
-            float macro =
-                CalculateMacroVariation(
-                    vertex.Position);
-
-            result[index] =
-                new TerrainRenderVertex(
-                    vertex.Position,
-                    vertex.Normal,
-                    vertex.LocalUv,
-                    new Vector4(
-                        macro,
-                        macro,
-                        macro,
-                        1.0f));
-        }
-
-        return result;
+        return TerrainTextureCount;
     }
 
     internal static float CalculateMacroVariation(
@@ -994,11 +969,11 @@ public sealed class TerrainRenderer : IDisposable
 
         internal TerrainChunkRenderResource? Previous, Next;
         internal bool InLru;
+        internal bool ProtectedSurface { get; init; }
         internal uint PaletteKey { get; init; }
         internal float[] HeightErrors { get; init; } = [];
         internal float[] NormalErrors { get; init; } = [];
-        internal int MainLod { get; set; }
-        internal int ShadowLod { get; set; }
+        internal float[] TintErrors { get; init; } = [];
         internal int ChunkIndex { get; }
         internal long ControlBytes { get; }
         internal long LastRequired { get; set; }

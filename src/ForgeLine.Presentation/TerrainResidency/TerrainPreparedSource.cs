@@ -6,11 +6,11 @@ using RenderVertex = ForgeLine.Presentation.TerrainRenderer.TerrainRenderVertex;
 namespace ForgeLine.Presentation.TerrainResidency;
 
 internal sealed record PreparedTerrainChunk(RenderVertex[] Vertices, TerrainChunkSplatData Splat,
-    float[] HeightErrors, float[] NormalErrors, double MeshMilliseconds, double SplatMilliseconds)
+    float[] HeightErrors, float[] NormalErrors, float[] TintErrors, bool ProtectedSurface, double MeshMilliseconds, double SplatMilliseconds)
 {
     internal long ControlBytes => Splat.Mips.Sum(static m => (long)m.Pixels.Length);
     internal long Bytes => (long)Vertices.Length * RenderVertex.SizeInBytes + ControlBytes +
-        (HeightErrors.Length + NormalErrors.Length) * sizeof(float);
+        (HeightErrors.Length + NormalErrors.Length + TintErrors.Length) * sizeof(float);
 }
 
 /// <summary>One immutable source generation: copied chunk table, immutable heightfields, fixed mesh/profile.</summary>
@@ -58,7 +58,12 @@ internal sealed class TerrainPreparedSource
                 // Sample both sides of an immutable chunk boundary; both neighbours get the same normal.
                 float left = Height(chunk, localX - step, localZ), right = Height(chunk, localX + step, localZ);
                 float back = Height(chunk, localX, localZ - step), forward = Height(chunk, localX, localZ + step);
-                Vector3 normal = Vector3.Normalize(new(left - right, 2 * step, back - forward));
+                float spanX = 2 * step, spanZ = 2 * step;
+                if (localX < step && Neighbour(index, -1, 0) < 0) spanX -= step - localX;
+                if (localX + step > size && Neighbour(index, 1, 0) < 0) spanX -= localX + step - size;
+                if (localZ < step && Neighbour(index, 0, -1) < 0) spanZ -= step - localZ;
+                if (localZ + step > size && Neighbour(index, 0, 1) < 0) spanZ -= localZ + step - size;
+                Vector3 normal = Vector3.Normalize(new((left - right) / spanX, 1, (back - forward) / spanZ));
                 if (!float.IsFinite(position.X) || !float.IsFinite(position.Y) || !float.IsFinite(position.Z) ||
                     !float.IsFinite(normal.X) || !float.IsFinite(normal.Y) || !float.IsFinite(normal.Z))
                     throw new InvalidDataException("Terrain interpolation produced a nonfinite render vertex.");
@@ -67,7 +72,7 @@ internal sealed class TerrainPreparedSource
                     new(x / (float)(_samples - 1), z / (float)(_samples - 1)), new(macro, macro, macro, 1));
             }
         }
-        var errors = new float[Patterns.Ranges.Length]; var normals = new float[errors.Length];
+        var errors = new float[Patterns.Ranges.Length]; var normals = new float[errors.Length]; var tints = new float[errors.Length];
         for (int level = 1; level < errors.Length; level++)
         {
             int stride = Patterns.Ranges[level].Step;
@@ -79,6 +84,14 @@ internal sealed class TerrainPreparedSource
                     double sx = (vertices[z * _samples + x + stride].Position.Y - origin) / stride;
                     double sz = (vertices[(z + stride) * _samples + x].Position.Y - origin) / stride;
                     double min = 0, max = 0;
+                    float tintOrigin = vertices[z * _samples + x].MacroTint.X;
+                    float tintX = (vertices[z * _samples + x + stride].MacroTint.X - tintOrigin) / stride;
+                    float tintZ = (vertices[(z + stride) * _samples + x].MacroTint.X - tintOrigin) / stride;
+                    float tintLow = 0, tintHigh = 0;
+                    Vector3 normalOrigin = vertices[z * _samples + x].Normal;
+                    Vector3 normalX = (vertices[z * _samples + x + stride].Normal - normalOrigin) / stride;
+                    Vector3 normalZ = (vertices[(z + stride) * _samples + x].Normal - normalOrigin) / stride;
+                    Vector3 residualLow = Vector3.Zero, residualHigh = Vector3.Zero;
                     Vector3 low = new(float.PositiveInfinity), high = new(float.NegativeInfinity);
                     for (int dz = 0; dz <= stride; dz++)
                         for (int dx = 0; dx <= stride; dx++)
@@ -87,18 +100,32 @@ internal sealed class TerrainPreparedSource
                             double residual = v.Position.Y - (origin + dx * sx + dz * sz);
                             min = Math.Min(min, residual); max = Math.Max(max, residual);
                             low = Vector3.Min(low, v.Normal); high = Vector3.Max(high, v.Normal);
+                            Vector3 normalResidual = v.Normal - (normalOrigin + dx * normalX + dz * normalZ);
+                            residualLow = Vector3.Min(residualLow, normalResidual); residualHigh = Vector3.Max(residualHigh, normalResidual);
+                            float tintResidual = v.MacroTint.X - (tintOrigin + dx * tintX + dz * tintZ);
+                            tintLow = Math.Min(tintLow, tintResidual); tintHigh = Math.Max(tintHigh, tintResidual);
                         }
                     // Subtracting an affine plane preserves interpolation. Both triangulations' residuals
                     // are convex combinations inside this range, including intersections between edges.
                     errors[level] = Math.Max(errors[level], MathF.BitIncrement((float)(max - min)));
-                    normals[level] = Math.Max(normals[level], (high - low).Length());
+                    float minimumNormalLength = .99999f - (high - low).Length();
+                    float normalError = minimumNormalLength <= 0 ? float.PositiveInfinity :
+                        2 * (residualHigh - residualLow).Length() / minimumNormalLength;
+                    normals[level] = Math.Max(normals[level], MathF.BitIncrement(normalError));
+                    tints[level] = Math.Max(tints[level], MathF.BitIncrement(tintHigh - tintLow));
                 }
         }
         double meshTime = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
         cancellation.ThrowIfCancellationRequested(); start = Stopwatch.GetTimestamp();
         TerrainChunkSplatData splat = TerrainSplatMapBuilder.Build(chunk, _profile);
         cancellation.ThrowIfCancellationRequested();
-        return new(vertices, splat, errors, normals, meshTime, Stopwatch.GetElapsedTime(start).TotalMilliseconds);
+        bool protectedSurface = _profile.SurfaceMarkPriority(chunk.Bounds) != 0;
+        for (int layer = 0; layer < splat.Palette.Count; layer++)
+            if (splat.Palette[layer] is TerrainMaterialSlot.Gravel or TerrainMaterialSlot.Concrete or TerrainMaterialSlot.IndustrialGround)
+                for (int pixel = layer; pixel < splat.Mips[0].Pixels.Length; pixel += 4)
+                    protectedSurface |= splat.Mips[0].Pixels[pixel] >= 16;
+        protectedSurface |= chunk.Bounds.Minimum.Y < 0 && chunk.Bounds.Maximum.Y >= 0;
+        return new(vertices, splat, errors, normals, tints, protectedSurface, meshTime, Stopwatch.GetElapsedTime(start).TotalMilliseconds);
     }
 
     private float Height(TerrainChunk chunk, float x, float z)

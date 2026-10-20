@@ -13,6 +13,7 @@ public sealed record TerrainPreparationSettings
     public int PrefetchChunksPerStep { get; init; } = 2;
     public float MaximumPixelError { get; init; } = .5f;
     public float MaximumNormalDeviation { get; init; } = .02f;
+    public float MaximumTintDeviation { get; init; } = .002f;
 
     internal void Validate()
     {
@@ -20,7 +21,8 @@ public sealed record TerrainPreparationSettings
             MaximumChunkPreparationBytes is <= 0 or > 16 * 1024 * 1024 || MaximumChunkPreparationBytes > MaximumPreparedBytes ||
             MaximumGeometryBytes is <= 0 or > 512 * 1024 * 1024 || MaximumControlBytes is <= 0 or > 32 * 1024 * 1024 || PrefetchChunksPerStep is < 1 or > 4 ||
             !float.IsFinite(MaximumPixelError) || MaximumPixelError is <= 0 or > 1 ||
-            !float.IsFinite(MaximumNormalDeviation) || MaximumNormalDeviation is < 0 or > .1f)
+            !float.IsFinite(MaximumNormalDeviation) || MaximumNormalDeviation is < 0 or > .1f ||
+            !float.IsFinite(MaximumTintDeviation) || MaximumTintDeviation is < 0 or > .01f)
             throw new ArgumentOutOfRangeException(nameof(TerrainPreparationSettings));
     }
 }
@@ -46,6 +48,8 @@ public readonly record struct TerrainWorkMetrics
     public int IndexPatterns { get; init; }
     public int TextureBindings { get; init; }
     public int MaterialBindings { get; init; }
+    public int ReducedMainChunks { get; init; }
+    public int ReducedShadowChunks { get; init; }
     public long MainTriangles { get; init; }
     public long ShadowTriangles { get; init; }
     public bool IsPrepared { get; init; }
