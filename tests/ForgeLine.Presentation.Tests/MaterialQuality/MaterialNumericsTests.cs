@@ -37,14 +37,14 @@ public sealed class MaterialNumericsTests
     }
 
     [Fact]
-    public void TwoAxisVarianceFiltersTheSquaredSlopeAndCannotWashOutASeam()
+    public void TwoAxisVarianceKeepsTheRoughnessDomainAndCannotWashOutASeam()
     {
         byte[] pixels=MaterialCapture.Capture("""
             float4 PSMain(float4 p:SV_Position):SV_Target {
                 float a=PbrSpecularRoughness(.2,float3(.2,0,0),float3(0,.2,0));
                 float b=PbrSpecularRoughness(.2,float3(20,0,0),float3(0,20,0));
-                float expected=pow(.2*.2*.2*.2+.02,.25);
-                return float4(abs(a-expected)<1e-5,b<.46,b>a,1);
+                float expected=sqrt(.2*.2+.02);
+                return float4(abs(a-expected)<1e-5,b<.29,b>a,1);
             }
             """);
         Assert.Equal(new byte[] {255,255,255,255},pixels[..4]);
