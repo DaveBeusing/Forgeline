@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using ForgeLine.Core;
 using ForgeLine.Presentation;
 
@@ -28,11 +29,13 @@ internal sealed class ClientRenderPublication
         };
     }
 
-    private static T[] CopyValues<T>(T[] source, ref T[]? cached) where T : IEquatable<T>
+    // Bitwise equality is conservative: differing NaN/zero representations may copy again,
+    // but no caller value is omitted. These channels contain only unmanaged values.
+    private static T[] CopyValues<T>(T[] source, ref T[]? cached) where T : unmanaged
     {
         ArgumentNullException.ThrowIfNull(source);
         if (source.Length == 0) { cached = null; return []; }
-        if (cached is not null && !ReferenceEquals(source, cached) && source.AsSpan().SequenceEqual(cached))
+        if (cached is not null && !ReferenceEquals(source, cached) && MemoryMarshal.AsBytes(source.AsSpan()).SequenceEqual(MemoryMarshal.AsBytes(cached.AsSpan())))
             return cached;
         T[] copy = source.ToArray();
         cached = copy.Length <= MaximumCachedElements ? copy : null;
@@ -41,13 +44,17 @@ internal sealed class ClientRenderPublication
 
     private static DebugLabel[] CopyLabels(DebugLabel[] source, ref DebugLabel[]? cached)
     {
-        DebugLabel[]? prior = cached;
-        var result = CopyValues(source, ref cached);
-        if (cached is not null && !ReferenceEquals(prior, cached))
+        ArgumentNullException.ThrowIfNull(source);
+        if (source.Length == 0) { cached = null; return []; }
+        if (cached is not null && !ReferenceEquals(source, cached) && source.AsSpan().SequenceEqual(cached))
+            return cached;
+        DebugLabel[] result = source.ToArray();
+        cached = null;
+        if (result.Length <= MaximumCachedElements)
         {
             long characters = 0;
-            foreach (var label in cached) characters += label.Text?.Length ?? 0;
-            if (characters > MaximumCachedLabelCharacters) cached = null;
+            foreach (var label in result) characters += label.Text?.Length ?? 0;
+            if (characters <= MaximumCachedLabelCharacters) cached = result;
         }
         return result;
     }

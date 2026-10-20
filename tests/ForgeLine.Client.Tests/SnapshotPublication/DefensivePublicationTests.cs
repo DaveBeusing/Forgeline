@@ -39,6 +39,24 @@ public sealed class DefensivePublicationTests
     }
 
     [Fact]
+    public void BitwiseComparisonPreservesNaNPayloadAndSignedZeroFromCaller()
+    {
+        ClientRenderPublication.ResetThreadCopies();
+        var caller = Frame();
+        caller.GameplayLines[0] = new(new(float.NaN, 0f, 0f), Vector3.Zero, Vector4.One);
+        var retained = ClientRenderPublication.Copy(caller);
+        var unchanged = ClientRenderPublication.Copy(caller);
+        Assert.Same(retained.GameplayLines, unchanged.GameplayLines);
+        float otherNaN = BitConverter.Int32BitsToSingle(unchecked((int)0x7fc00042));
+        caller.GameplayLines[0] = new(new(otherNaN, -0f, 0f), Vector3.Zero, Vector4.One);
+        var changed = ClientRenderPublication.Copy(caller);
+        Assert.NotSame(retained.GameplayLines, changed.GameplayLines);
+        Assert.Equal(BitConverter.SingleToInt32Bits(otherNaN), BitConverter.SingleToInt32Bits(changed.GameplayLines[0].Start.X));
+        Assert.Equal(unchecked((int)0x80000000), BitConverter.SingleToInt32Bits(changed.GameplayLines[0].Start.Y));
+        Assert.Equal(0, BitConverter.SingleToInt32Bits(retained.GameplayLines[0].Start.Y));
+    }
+
+    [Fact]
     public void WarmUnchangedPublicationAllocatesNothingAndCacheDropsOversizedInputs()
     {
         ClientRenderPublication.ResetThreadCopies();
