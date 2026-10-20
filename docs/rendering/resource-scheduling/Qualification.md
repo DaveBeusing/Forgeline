@@ -1,7 +1,7 @@
 # Graphics resource scheduling qualification
 
-Status: implementation under qualification; native performance, complete suites and
-required PR checks remain pending. No integration, tag or release is performed.
+Status: implemented, not accepted. The final fixed performance cohort retains
+an open CPU-tail gate; complete repaired suites and required PR checks are pending. No integration, tag or release is performed.
 
 ## Baseline and scope
 
@@ -49,16 +49,19 @@ retention remain in force. Device disposal releases the pool only at the same
 safe shutdown boundary as other native objects.
 
 Context objects remain per callback: reusing one would let stale references regain
-validity. Only identical pipeline rebinding is cached, with the existing frame,
-shadow, particle and pass invalidations; buffers, offsets, descriptors and frame
-constants are not elided. Memory-budget queries are sampled at most every 250 ms;
+validity. Identical pipeline and texture-table bindings are cached, with frame,
+root, shadow, particle and pass invalidation. A bounded sixteen-reference texture
+cache is device-owned; a context retains only a heap-bound flag. Ownership and
+lifetime checks precede cache lookup. Buffers, offsets and frame constants are
+not elided. Memory-budget queries are sampled at most every 250 ms;
 internal upload diagnostics report sample age separately without changing public
 metrics or querying DXGI for individual counters.
 
 FORGELINE_DRED=1 opts into process-wide breadcrumb/page-fault configuration before
 device creation. Unsupported interfaces are reported. On actual removal, bounded
-HRESULT status telemetry is emitted once; no addresses, object names or memory
-are dumped. Detailed breadcrumb operation traversal is not implemented. Run this
+HRESULT status and bounded copied breadcrumb/allocation-type metadata are emitted
+once; no addresses, object names, native objects or memory are dumped. Traversal
+is capped at sixteen nodes and sixteen operations per node. Run this
 opt-in in a separate process; it is excluded from performance baselines.
 
 ## Executed checks
@@ -171,4 +174,50 @@ f2be6532 production binaries. Their production source/assets/compiler trees equa
 current base e42f4e75, and these four test files are unchanged by this PR. Both
 original-binary processes fail with the same assertions (three Presentation, one
 Client). These are demonstrated baseline failures, not waived gates. Their files
-are outside resource-scheduling ownership; serial repair authorization is pending.
+were outside resource-scheduling ownership. Explicit serial repair authorization
+was granted for these four test files; no UI product source change is necessary.
+
+
+## Current fixed cohort and serial UI contract repair
+
+The coordinated B-A-A-B cohort uses the original f2be6532 production binaries and
+09eb021bf810f58cd5162717aef64203e2c7c493, with the same six cases, 128 warmups,
+512 samples, two readbacks, High quality and 1920x1080. All twelve paired images
+match exactly and all structural/resource cases qualify. The competing workload
+was explicitly paused; the process monitor records no observed competing workload
+within these captures. This does not exclude unrelated operating-system activity.
+
+Pair one passes every unchanged 15% CPU/GPU mean/p50/p95/p99 threshold. Pair two
+fails IndustrialBase NormalGameplay CPU p95 (2.6423 -> 3.9429 ms, +49.22%) and p99
+(3.2563 -> 6.0598 ms, +86.09%). Its CPU mean improves 1.687842 -> 1.669008 ms and
+median 1.5967 -> 1.2561 ms; spikes occur across world, overlay and shadow recording.
+These observations do not establish a scheduling or product-code cause. No GPU
+frame metric fails. Neither cohort is replaced or discarded. Performance
+acceptance therefore remains open despite the measured upload benefit.
+
+The two upload pairs allocate 67,531,680 -> 157,696 and 67,531,680 -> 159,280
+managed bytes. Recording is 302.0631 -> 95.6000 and 310.1906 -> 136.3535 ms;
+final drain is separately 0.0052 -> 1.9520 and 0.0050 -> 3.1740 ms. Changed runs
+retain two slots / 8 MiB with no backpressure waits and return registered live,
+retired and descriptor counts to zero. Empty frames remain 56 bytes each. GPU
+copy time remains unavailable, not zero. These are workload observations, not
+universal FPS claims.
+
+Four serially authorized test repairs restore current documented UI contracts:
+
+- Controls include four placement/ring paging rows, now checked explicitly as
+  well as the complete row count, unique labels and registered gameplay prompts.
+- Notification gaps up to and including 250 ms are continuous; a newly visible
+  row begins its fade. Gaps above 250 ms settle, as do reversed clocks. The test
+  now exercises both sides of the existing threshold without changing product code.
+- Selection uses four oriented L-corners (eight segments); hover uses four diagonal
+  notches. Invalid targets retain two diagonals and the invalid color contract.
+- Operations uses the documented 0.30-opacity background. Native captures verify
+  both world contribution and panel contribution, an untouched exterior pixel,
+  stale-data rejection, selection refresh and no repeated texture uploads.
+
+The exact additional paths are MainMenuModelTests.cs in Client.Tests and
+NotificationRowMotionTests.cs, RtsInformationLayerTests.cs and
+EconomicInterfaceSkinTests.cs in Presentation.Tests. No global ownership manifest,
+UI source, golden image or performance threshold is modified. The explicit
+Directory.Build.props serial exception still provides exactly one PATCH.

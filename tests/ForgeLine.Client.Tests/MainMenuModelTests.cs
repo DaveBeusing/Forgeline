@@ -73,7 +73,12 @@ public sealed class MainMenuModelTests
                 new RtsCameraBindings());
 
         Assert.Equal("CONTROLS", view.Title);
-        Assert.Equal(24 + GameplayBindingRegistry.Definitions.Count, view.DetailLines.Count);
+        Assert.Equal(28 + GameplayBindingRegistry.Definitions.Count, view.DetailLines.Count);
+        Assert.Contains(view.DetailLines, line => line.Label == "PLACE TURN LEFT" && line.Value == "Q (WHILE PLACING)");
+        Assert.Contains(view.DetailLines, line => line.Label == "PLACE TURN RIGHT" &&
+            line.Value == "E / " + GameplayBindingRegistry.Default.Prompt(GameplayAction.RotatePlacement) + " (WHILE PLACING)");
+        Assert.Contains(view.DetailLines, line => line.Label == "RING PAGE PREV" && line.Value == "Q (PAGED SUBMENU)");
+        Assert.Contains(view.DetailLines, line => line.Label == "RING PAGE NEXT" && line.Value == "E (PAGED SUBMENU)");
         Assert.Equal(view.DetailLines.Count, view.DetailLines.Select(line => line.Label).Distinct().Count());
         foreach (var definition in GameplayBindingRegistry.Definitions)
             Assert.Contains(view.DetailLines, line => line.Label == definition.Label &&
