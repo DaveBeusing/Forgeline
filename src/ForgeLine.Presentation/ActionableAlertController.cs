@@ -42,6 +42,7 @@ public sealed class ActionableAlertController
     private bool _pressFocus;
     private bool _pressPaging;
     private float _expansionPosition;
+    private EntityId _expandedTarget;
     private NotificationExpansion _expansion;
     public NotificationExpansion Expansion => _expansion with { Progress = _expansionPosition };
     public string Feedback { get; private set; } = string.Empty;
@@ -63,7 +64,9 @@ public sealed class ActionableAlertController
         if (blocked || input.FocusLostThisFrame || snapshot?.PlayerExperience is not { IsMatchComplete: false } experience)
         { _pending = false; _expansionPosition = _expansion.Open ? 1 : 0; return default; }
         var plain = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback);
-        if ((_expansion.Open || _expansionPosition > 0) && !HasExpandedCard(plain))
+        var alerts = ActionableAlertSnapshot.Resolve(snapshot);
+        if ((_expansion.Open || _expansionPosition > 0) &&
+            (!HasExpandedCard(plain) || !ExpandedSourceCurrent(alerts)))
         { _expansion = default; _expansionPosition = 0; }
         float requested = _expansion.Open ? 1 : 0;
         _expansionPosition = Math.Clamp(_expansionPosition +
@@ -74,7 +77,6 @@ public sealed class ActionableAlertController
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
         bool captured = _pending || input.HasPointerPosition && stack.Contains(input.PointerPosition) || fresh && originValid && stack.Contains(origin);
         if (changed) { _pending = false; _expansionPosition = _expansion.Open ? 1 : 0; return new(captured); }
-        var alerts = ActionableAlertSnapshot.Resolve(snapshot);
         if (fresh)
         {
             _pending = false; _identity = default;
@@ -122,6 +124,7 @@ public sealed class ActionableAlertController
             {
                 _expansion = new(item, releasedCard.Identity, releasedCard.Revision, true,
                     _expansionPosition, 0, BuildDetail(experience, alerts, item, localFeedback));
+                _expandedTarget = _target;
                 _expansionPosition = 0;
             }
             return new(true);
@@ -133,22 +136,35 @@ public sealed class ActionableAlertController
             if (alerts.Alerts[i].Identity == _identity && alerts.Alerts[i].Target == _target &&
                 alerts.Alerts[i].Identity.Kind == item.Kind) { stillCurrent = true; break; }
         if (!stillCurrent) return new(true);
-        // Cycle only through currently published, locally authorized, focusable cards.
+        if (!_target.IsValid)
+        {
+            Unavailable();
+            return new(true, OpenOperations: true, Category: AlertLifecycleTracker.Category(item.Kind));
+        }
+        // Cycle only through currently published, locally authorized, focusable conditions.
         // Count/order/target revisions reset the cursor instead of reusing a stale index.
         bool advance = _hasFocusCursor && _focusRevision == plain.Revision;
-        int start = _row;
-        if (advance)
-            for (int i = 0; i < plain.Count; i++)
-                if (plain.Card(i).Identity == _focusCursor) { start = (i + 1) % plain.Count; break; }
-        for (int offset = 0; offset < plain.Count; offset++)
+        int count = ResourcePowerHudModel.ResolveNotificationCount(experience);
+        int start = 0;
+        for (int i = 0; i < count; i++)
         {
-            var candidate = plain.Card((start + offset) % plain.Count);
-            if (candidate.Item.Hidden > 0 || candidate.Item.Feedback || candidate.Item.Local) continue;
+            var candidate = ActionableAlertLayout.Ordered(experience, i);
+            if ((advance && candidate.Kind == _focusCursor.Kind) ||
+                (!advance && candidate.Kind == item.Kind))
+            {
+                start = advance ? (i + 1) % count : i;
+                break;
+            }
+        }
+        for (int offset = 0; offset < count; offset++)
+        {
+            var candidate = ActionableAlertLayout.Ordered(experience, (start + offset) % count);
+            if (candidate.Feedback || candidate.Kind == PlayerAlertState.None) continue;
             for (int a = 0; a < alerts.Alerts.Count; a++)
-                if (alerts.Alerts[a].Identity == candidate.Identity &&
+                if (alerts.Alerts[a].Identity.Kind == candidate.Kind &&
                     alerts.Alerts[a].Target.IsValid)
                 {
-                    _focusCursor = candidate.Identity;
+                    _focusCursor = alerts.Alerts[a].Identity;
                     _hasFocusCursor = true;
                     _focusRevision = plain.Revision;
                     return new(true, alerts.Alerts[a].Target, Category: alerts.Alerts[a].Operations);
@@ -163,6 +179,16 @@ public sealed class ActionableAlertController
     {
         for (int i = 0; i < stack.Count; i++)
             if ((_expansion with { Progress = _expansionPosition }).Matches(stack.Card(i))) return true;
+        return false;
+    }
+
+    private bool ExpandedSourceCurrent(ActionableAlertSnapshot? alerts)
+    {
+        if (_expansion.Item.Feedback || _expansion.Item.Local) return true;
+        if (alerts is null) return false;
+        for (int i = 0; i < alerts.Alerts.Count; i++)
+            if (alerts.Alerts[i].Identity == _expansion.Identity &&
+                alerts.Alerts[i].Target == _expandedTarget) return true;
         return false;
     }
 
@@ -204,5 +230,6 @@ public sealed class ActionableAlertController
         _focusRevision = 0;
         _expansion = default;
         _expansionPosition = 0;
+        _expandedTarget = default;
     }
 }
