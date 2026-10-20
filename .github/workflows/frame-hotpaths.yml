@@ -23,7 +23,7 @@ jobs:
       - name: Capture candidate action-ring geometry
         shell: pwsh
         run: |
-          $env:FORGELINE_UI_FIXTURE_BASELINE = "artifacts/action-ring-geometry-candidate.json"
+          $env:FORGELINE_UI_FIXTURE_BASELINE = Join-Path $env:GITHUB_WORKSPACE "artifacts/action-ring-geometry-candidate.json"
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GameplayUiFixtureTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Get-Content $env:FORGELINE_UI_FIXTURE_BASELINE -Raw
