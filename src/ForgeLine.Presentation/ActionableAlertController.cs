@@ -25,6 +25,7 @@ public sealed class ActionableAlertController
 {
     private ulong _press;
     private SimulationSessionId _session;
+    private PlayerId _player;
     private SimulationTick _tick;
     private GameplayHudLayout _layout;
     private bool _initialized;
@@ -61,10 +62,14 @@ public sealed class ActionableAlertController
         _feedbackSeconds = Math.Max(0, _feedbackSeconds - Math.Max(0, seconds));
         if (_feedbackSeconds == 0) Feedback = string.Empty;
         ulong press = input.MousePressSequence(PlatformMouseButton.Left); bool fresh = press != _press; _press = press;
-        bool changed = _initialized && (_layout != layout || _session != snapshot?.SessionId);
+        PlayerId currentPlayer = snapshot?.PlayerExperience?.Player ?? default;
+        bool changed = _initialized && (_layout != layout || _session != snapshot?.SessionId ||
+            _player != currentPlayer);
         _initialized = true; _layout = layout;
-        if (_session != snapshot?.SessionId) { Feedback = string.Empty; _feedbackSeconds = 0; ResetTransient(); }
+        if (_session != snapshot?.SessionId || _player != currentPlayer)
+        { Feedback = string.Empty; _feedbackSeconds = 0; ResetTransient(); }
         _session = snapshot?.SessionId ?? default;
+        _player = currentPlayer;
         _tick = snapshot?.Tick ?? default;
         if (blocked || input.FocusLostThisFrame || snapshot?.PlayerExperience is not { IsMatchComplete: false } experience)
         { _pending = false; _expansionPosition = _expansion.Open ? 1 : 0; return default; }
