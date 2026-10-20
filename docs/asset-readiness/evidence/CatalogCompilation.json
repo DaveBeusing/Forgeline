@@ -1,0 +1,83 @@
+{
+  "animationCount": 18,
+  "animationRuntimeBytes": 189114,
+  "assetCount": 1357,
+  "assetReadDuration": "00:00:01.5851575",
+  "catalogLoadDuration": "00:00:00.0462003",
+  "issues": [],
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "runtimeBytes": 5587812,
+      "type": "texture"
+    },
+    {
+      "assetId": "ui.atlas.directorate.icons.p1",
+      "runtimeBytes": 4195048,
+      "type": "texture"
+    },
+    {
+      "assetId": "ui.atlas.directorate.icons.p2",
+      "runtimeBytes": 4195048,
+      "type": "texture"
+    },
+    {
+      "assetId": "ui.atlas.directorate.core.p1",
+      "runtimeBytes": 4195045,
+      "type": "texture"
+    },
+    {
+      "assetId": "branding.forgeline.menu.directorate",
+      "runtimeBytes": 3146855,
+      "type": "texture"
+    },
+    {
+      "assetId": "skin.directorate.combat_engineer",
+      "runtimeBytes": 2129106,
+      "type": "skin"
+    },
+    {
+      "assetId": "skin.directorate.rifle_squad",
+      "runtimeBytes": 1501305,
+      "type": "skin"
+    },
+    {
+      "assetId": "texture.world.terrain.crushed_gravel",
+      "runtimeBytes": 1399111,
+      "type": "texture"
+    },
+    {
+      "assetId": "texture.world.terrain.concrete_base",
+      "runtimeBytes": 1399108,
+      "type": "texture"
+    },
+    {
+      "assetId": "texture.world.terrain.cracked_earth",
+      "runtimeBytes": 1399108,
+      "type": "texture"
+    },
+    {
+      "assetId": "texture.world.terrain.rocky_scrub",
+      "runtimeBytes": 1399102,
+      "type": "texture"
+    },
+    {
+      "assetId": "texture.world.terrain.dark_ash",
+      "runtimeBytes": 1399093,
+      "type": "texture"
+    }
+  ],
+  "materialCount": 127,
+  "materialRuntimeBytes": 155002,
+  "meshCount": 309,
+  "meshRuntimeBytes": 11597010,
+  "skinCount": 2,
+  "skinRuntimeBytes": 3630411,
+  "studioSplashTextureRuntimeBytes": 1786417,
+  "success": true,
+  "textureCount": 900,
+  "textureRuntimeBytes": 59451623,
+  "totalRuntimeBytes": 75122812,
+  "uiSkinCount": 1,
+  "uiSkinRuntimeBytes": 99652
+}

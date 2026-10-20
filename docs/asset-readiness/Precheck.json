@@ -1,0 +1,499 @@
+{
+  "schemaVersion": 1,
+  "repository": "DaveBeusing/Forgeline",
+  "integrationBranch": "master",
+  "sourceSha": "2b4b61ece625d1311c9ee5564cf513dadf2d1123",
+  "trackedVersion": "0.1.425",
+  "relatedBranches": [
+    "testing/render-performance-qualification"
+  ],
+  "pullRequests": [
+    {
+      "number": 228,
+      "title": "Preserve production asset contracts through Blender source round trips",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/228",
+      "merged": true,
+      "draft": false,
+      "headSha": "3380781e344521db8310b28820abedc0936a61f1",
+      "branch": "tools/blender-roundtrip",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 229,
+      "title": "Add bounded Blender material and LOD production",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/229",
+      "merged": true,
+      "draft": false,
+      "headSha": "81678c2f2aac40b22859e68081f9da8042578d1f",
+      "branch": "tools/blender-surfaces",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 230,
+      "title": "Add Blender rigid mechanical authoring and runtime qualification",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/230",
+      "merged": true,
+      "draft": false,
+      "headSha": "4e7d5f1ce89c76a93adb7a476ede163c280ae430",
+      "branch": "tools/blender-rigid-motion",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 231,
+      "title": "Modernize the Directorate tank with saved Blender production sources",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/231",
+      "merged": true,
+      "draft": false,
+      "headSha": "3d5bbd2b176c57266e5ce26263d414d6075cfe69",
+      "branch": "art/directorate-tank",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 232,
+      "title": "Add bounded rigid animation assets and snapshot-driven playback",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/232",
+      "merged": true,
+      "draft": false,
+      "headSha": "bb69d4f62a74c6ca602fe7b5ca4e4871c839d0ed",
+      "branch": "feat/rigid-clips",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 234,
+      "title": "Add bounded skeletal infantry animation and editable Blender rigs",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/234",
+      "merged": true,
+      "draft": false,
+      "headSha": "99d04943374c69cdec4cf0dc45cc2e0338487e84",
+      "branch": "feat/infantry-skinning",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 235,
+      "title": "Add deterministic Blender PBR atlas production and editable 4K masters",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/235",
+      "merged": true,
+      "draft": false,
+      "headSha": "441e981e19f0f4ca035d631fa2cfe31a8186d5fa",
+      "branch": "tools/procedural-pbr",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 263,
+      "title": "Reduce instance submission work with spatial candidates and complete shadow roots",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/263",
+      "merged": true,
+      "draft": false,
+      "headSha": "c8d41165c005f228615f8ad737b554c3a87df866",
+      "branch": "performance/instance-submission",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 264,
+      "title": "Prepare bounded shared runtime asset residency",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/264",
+      "merged": true,
+      "draft": false,
+      "headSha": "92365246fba54c9b319c60416e1780d035701bb7",
+      "branch": "performance/asset-residency",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 265,
+      "title": "Bound terrain preparation and preserve shared boundaries across geometry LOD",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/265",
+      "merged": true,
+      "draft": false,
+      "headSha": "ddee4360ad237e25450c0f2fe05d006fa519c3d8",
+      "branch": "performance/terrain-residency",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "failure"
+        }
+      ]
+    },
+    {
+      "number": 266,
+      "title": "Stabilize material normals and directional shadow receivers",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/266",
+      "merged": true,
+      "draft": false,
+      "headSha": "c8c50a42e749dc8e291c20c0326c66cf1fd45fc0",
+      "branch": "rendering/material-shadow-quality",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "build-test",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "frame-contracts",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 267,
+      "title": "Stabilize scaled composition and reduce particle ordering work",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/267",
+      "merged": true,
+      "draft": false,
+      "headSha": "ae727d6b17d664ee242cfad8ce44d722aa0c4cb6",
+      "branch": "performance/composition-effects",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "build-test",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "name": "cpu-scale",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "name": "frame-contracts",
+          "status": "in_progress",
+          "conclusion": null
+        }
+      ]
+    },
+    {
+      "number": 268,
+      "title": "Add render performance and visual qualification",
+      "url": "https://github.com/DaveBeusing/Forgeline/pull/268",
+      "merged": false,
+      "draft": true,
+      "headSha": "f4f3bed845e1106972f5c32fe903df2f251592c1",
+      "branch": "testing/render-performance-qualification",
+      "inlineReviewComments": 0,
+      "checks": [
+        {
+          "name": "build-test",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "name": "native-reference",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "cpu-scale",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "name": "navigation-movement",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Evidence, ownership and sample contracts",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "name": "frame-contracts",
+          "status": "in_progress",
+          "conclusion": null
+        }
+      ]
+    }
+  ],
+  "integrationDecision": "pending-renderer-qualification-and-source-specific-native-evidence"
+}

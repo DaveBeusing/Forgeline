@@ -1,0 +1,738 @@
+{
+  "files": {
+    "catalog-build.log": {
+      "bytes": 9788244,
+      "sha256": "b3f65d1764d404d853ea2d1ed0d1b98f228aef08329a7aec42575628ab50e7bc"
+    },
+    "catalog-progress.jsonl": {
+      "bytes": 13257233,
+      "sha256": "fb1bb8bedb18f9dd4b46a59a75a527d3d68117c55f628c2616061b20510bb6ec"
+    },
+    "catalog-qualification.json": {
+      "bytes": 2110,
+      "sha256": "0f8b8fd8a1f5757f50433372ced5bfbb8d92cc20ec71a3888595a16534ba15c5"
+    },
+    "catalog-source-less.json": {
+      "bytes": 2110,
+      "sha256": "716dabf544db168be75315def511c59e92809092c82bc5a2db4a41c6afb2dee6"
+    },
+    "catalog-source-less.log": {
+      "bytes": 2080,
+      "sha256": "5c7fd079fd7ca464e91435a118a05120420b40d159fbb6818a23774053570647"
+    },
+    "catalog.compile.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "compiled-inventory.json": {
+      "bytes": 921811,
+      "sha256": "d6c419b1460343eccfaadb599b3a8a954d33c17c2e3a30d0e6269348d9ba22fd"
+    },
+    "complete-source-inventory.json": {
+      "bytes": 764187,
+      "sha256": "072d15d5846489d32f78807fbf8fef2a66ae8eb9c2a04abc7d3fdf918453b1b3"
+    },
+    "contracts-final.log": {
+      "bytes": 210,
+      "sha256": "2e30f9830b856ed4a99ba70b8b4abbf62700cf5d38b8f6c0d43dde2d8f139440"
+    },
+    "installed-pixels.json": {
+      "bytes": 2462,
+      "sha256": "911db130c406446f72b84e9cdd9afd54c201954e167921018e98f23ef9fab15d"
+    },
+    "installed-verification.json": {
+      "bytes": 360,
+      "sha256": "36fe50c81215aad8a2be739a72fbd36c93a82129ac07752863e4af13f8be090c"
+    },
+    "installed/ForgeLine.AI.dll": {
+      "bytes": 3584,
+      "sha256": "e94f8fa926953419093f9ef851613e7c1c3d6dcb63778d24b5fe2b9d4b1ac386"
+    },
+    "installed/ForgeLine.AI.pdb": {
+      "bytes": 11844,
+      "sha256": "65fcbaccc7db3a90df05711bc6d999fd792a67562d6817a3dc5256c0cfc526bd"
+    },
+    "installed/ForgeLine.Assets.dll": {
+      "bytes": 137728,
+      "sha256": "59bc123dadba9005e9203d8537f640097a343080ffd6161714a892e0eef11da7"
+    },
+    "installed/ForgeLine.Assets.pdb": {
+      "bytes": 39380,
+      "sha256": "177c31d047d15cd8820256c01c57f1abb7dfdb04759c3e5bd4ce3247016a9bc0"
+    },
+    "installed/ForgeLine.Audio.dll": {
+      "bytes": 20480,
+      "sha256": "0d37130dd4ef5c45e24c54930632b74d75b145080ae1cbdb5b70e4cc52a17996"
+    },
+    "installed/ForgeLine.Audio.pdb": {
+      "bytes": 15840,
+      "sha256": "eaa80b2036f84b47ff94f12c8b5c6c07cf83b4c46b182f9bc62f4c808d844b18"
+    },
+    "installed/ForgeLine.Client.deps.json": {
+      "bytes": 16913,
+      "sha256": "98aa8097c868c5423757de69c78769a97fa15bc7f473099d324dbc5abb0bfff0"
+    },
+    "installed/ForgeLine.Client.dll": {
+      "bytes": 614912,
+      "sha256": "654689ed03861997c250449ecf29d0ce358bc9d7cfb61ad1d78f2269ff20be02"
+    },
+    "installed/ForgeLine.Client.exe": {
+      "bytes": 166400,
+      "sha256": "66ef3b4dd454ebad147c8020ad831aa383f2c6ba7b3b05bf066995abebc5a6fe"
+    },
+    "installed/ForgeLine.Client.pdb": {
+      "bytes": 111176,
+      "sha256": "5650836a073fbb5c74876fa8ee47eaa66fe44052f24e95a7b5e8cd04d2a65ed6"
+    },
+    "installed/ForgeLine.Client.runtimeconfig.json": {
+      "bytes": 399,
+      "sha256": "3e965cd7cfd553c2ff4e842d8d8019aaae2da0a21d92ff85a87573dd8d1b95c6"
+    },
+    "installed/ForgeLine.Combat.dll": {
+      "bytes": 51712,
+      "sha256": "7cbe2935eb53cb0316537985c1f07b6360ff63efce3642f781f54718d218af88"
+    },
+    "installed/ForgeLine.Combat.pdb": {
+      "bytes": 21344,
+      "sha256": "10acc221843d675b3ce175c21c215cca27cdbc2a1a1366e05965f7f60fa319c4"
+    },
+    "installed/ForgeLine.Core.dll": {
+      "bytes": 11776,
+      "sha256": "9024d10c8046962e595ef9cc73963a13fbcb37dcf74f1a7de0566a667a5de6c1"
+    },
+    "installed/ForgeLine.Core.pdb": {
+      "bytes": 13920,
+      "sha256": "51bdebe51362d9c9e5649b94b9cf4769dddef9cd7814f1d56a1a6ae8d60927cb"
+    },
+    "installed/ForgeLine.Economy.dll": {
+      "bytes": 135168,
+      "sha256": "162dcd64cdc23f5f472e98c67908ab4bcd69722e314f84131db3c4776151c28d"
+    },
+    "installed/ForgeLine.Economy.pdb": {
+      "bytes": 41028,
+      "sha256": "f6a4377ff60ffb8bbff99fb8372cae10ed8de5345ae286bb3f6479182417209f"
+    },
+    "installed/ForgeLine.Ecs.dll": {
+      "bytes": 24064,
+      "sha256": "80339912848af0c640438dc8405fe4023cb2ecd4a65fc1ac25332257e1799a86"
+    },
+    "installed/ForgeLine.Ecs.pdb": {
+      "bytes": 17512,
+      "sha256": "a66aec05131dfcd985a292558eedcb425c2681874bc7c5bbe1b917d8107ef7ea"
+    },
+    "installed/ForgeLine.Game.dll": {
+      "bytes": 1360384,
+      "sha256": "15ff142aa4d5c12c4b4df75e752f9c4089df91338ae72e763b2d06acece47d5c"
+    },
+    "installed/ForgeLine.Game.pdb": {
+      "bytes": 324988,
+      "sha256": "34dbe00d7dee1b135ffb2d20e90daf3f0d9da404702d8f6f305fadc66eee6750"
+    },
+    "installed/ForgeLine.Graphics.dll": {
+      "bytes": 264192,
+      "sha256": "f7abde8517470ff2e83959c7f73f909a87278edb7349222d02b7c3172e5770f6"
+    },
+    "installed/ForgeLine.Graphics.pdb": {
+      "bytes": 53552,
+      "sha256": "956c82facb0052a7d734075c3d2b5293e9984659879541e1810ed0bff47fa43b"
+    },
+    "installed/ForgeLine.Input.dll": {
+      "bytes": 33280,
+      "sha256": "e04372e8f8dcfe83419896fdbbf0ce71160d41b23cd77dcc7886442887ba3982"
+    },
+    "installed/ForgeLine.Input.pdb": {
+      "bytes": 16700,
+      "sha256": "965e29398708591030714dbb98f386ab88c9cdaa831225b078ec01d087aa6e15"
+    },
+    "installed/ForgeLine.Intelligence.dll": {
+      "bytes": 26624,
+      "sha256": "9605c24e01762db43e6b989c96591e77a6d31aafa0b3a4e6d70487fa22c55d6a"
+    },
+    "installed/ForgeLine.Intelligence.pdb": {
+      "bytes": 16844,
+      "sha256": "29c93f3a1a27e0a4c598da1fea9f41a6fb2d5b022fb569fe2b3b467210117907"
+    },
+    "installed/ForgeLine.Jobs.dll": {
+      "bytes": 24576,
+      "sha256": "eea0748aca02de916cf35e3aaf04bae56b1a32980909106c4861fe3c0a454c52"
+    },
+    "installed/ForgeLine.Jobs.pdb": {
+      "bytes": 17028,
+      "sha256": "61c28b65d1d5868c454655a48d1d3210048636c158883917aefdac20146bb491"
+    },
+    "installed/ForgeLine.Logistics.dll": {
+      "bytes": 74240,
+      "sha256": "8e106e7106dedf3b3a37e03d2dd986cd20ac24927cebe164f7afff3b876ade74"
+    },
+    "installed/ForgeLine.Logistics.pdb": {
+      "bytes": 28624,
+      "sha256": "a05b9ac13784b95c9330a078548412f451fc4cdaf03a92eb8e4927832d6d3588"
+    },
+    "installed/ForgeLine.Navigation.dll": {
+      "bytes": 51200,
+      "sha256": "088eca5d3b52988a40abb505d9fa8909a4f5dd296ee32544806d2d418deab43d"
+    },
+    "installed/ForgeLine.Navigation.pdb": {
+      "bytes": 24392,
+      "sha256": "19cddf42af6c9a199f70cdc5d3ffe6d24c639181aa20d5b513841892488dd87f"
+    },
+    "installed/ForgeLine.Platform.Windows.dll": {
+      "bytes": 65024,
+      "sha256": "2be7119a71187ef3081f3236c4099b1f1b2998affbeb1f83bfd5a38a2b946ff5"
+    },
+    "installed/ForgeLine.Platform.Windows.pdb": {
+      "bytes": 29368,
+      "sha256": "3d8378a67f6546e76dcb2d1745d00d57970dc79aad6b03d13184ff622b29e1c0"
+    },
+    "installed/ForgeLine.Presentation.dll": {
+      "bytes": 2430976,
+      "sha256": "e0222b6a0900217e2c8b636ece6db9c41a9abba6d3152a9b8d2c0136d33976e3"
+    },
+    "installed/ForgeLine.Presentation.pdb": {
+      "bytes": 388036,
+      "sha256": "94c06de889d651aa077a71fcb8f5a5d27c79e56af5f7c345ad909998b8a0d1db"
+    },
+    "installed/ForgeLine.Simulation.dll": {
+      "bytes": 37888,
+      "sha256": "8b5e21bab82bad7b0756458099b94f10c3d8ac68b916ca33dafceaa481ca325d"
+    },
+    "installed/ForgeLine.Simulation.pdb": {
+      "bytes": 20496,
+      "sha256": "41677f0f69794ed100b6e7d33d02a3cdccaedd73ebf144a4c031dc16e92ebe04"
+    },
+    "installed/ForgeLine.UI.dll": {
+      "bytes": 65536,
+      "sha256": "6fbbc057306e2bc1f759e0eb9cc2f1b85d25c5fbf043e611271b311c0f19f713"
+    },
+    "installed/ForgeLine.UI.pdb": {
+      "bytes": 23932,
+      "sha256": "1f6f4b59ff931a67168a5bc62ab83d9ab072d4a7eeea3429b191a8cd48dab706"
+    },
+    "installed/ForgeLine.World.dll": {
+      "bytes": 50176,
+      "sha256": "c615d6686dc28cc97fff9c434cf41f1bfeffd7dfd35c95159a2cdd51799293a7"
+    },
+    "installed/ForgeLine.World.pdb": {
+      "bytes": 24388,
+      "sha256": "9e558e512f6cd066aa9a61e85411c040d64405a7b20bca0c1c634ee966b50718"
+    },
+    "installed/PreAlphaVerificationChecklist.md": {
+      "bytes": 12664,
+      "sha256": "71cfbbcc85508b899856dca613360ed44ea40fedd0027ebdbf941d660c5a6141"
+    },
+    "installed/README.md": {
+      "bytes": 16641,
+      "sha256": "0fb562d8092f6f5f7b4a1a79e49ef0e48a724d3f61f4d9c8ae00747465dc86b2"
+    },
+    "installed/RuntimeNotices.md": {
+      "bytes": 3089,
+      "sha256": "5d9b1879fd13a2c923594d12748f633c7cbfb60c5d459578da35e0235f2797e5"
+    },
+    "installed/SharpGen.Runtime.COM.dll": {
+      "bytes": 168960,
+      "sha256": "35282958014c210bfde28399c9fa3841b6d51f81ff1da23ad0edad985dfa5b0c"
+    },
+    "installed/SharpGen.Runtime.dll": {
+      "bytes": 79872,
+      "sha256": "0dc12ab829852555ccc9d8193e4422cd4ca389741de0a54a189de8a1c9b6bf4a"
+    },
+    "installed/ThirdPartyNotices/DejaVuFonts.txt": {
+      "bytes": 9003,
+      "sha256": "3f1a11bc99a21ddb62d0eb9f3ed2e1b530ed13230fc79e5aa68be2a0a1a8082f"
+    },
+    "installed/ThirdPartyNotices/IndustrialAudio.txt": {
+      "bytes": 835,
+      "sha256": "b2aeb9ec56d94d5f826ab79e489556992e79fd1191c7ed7fe4e359540f789bb0"
+    },
+    "installed/ThirdPartyNotices/UiAudio.txt": {
+      "bytes": 835,
+      "sha256": "b2aeb9ec56d94d5f826ab79e489556992e79fd1191c7ed7fe4e359540f789bb0"
+    },
+    "installed/Vortice.DXGI.dll": {
+      "bytes": 91648,
+      "sha256": "6e381eaab77257ee63c20a654a2ac51875bd38f24c5a7d44dd2e4b8e122e8623"
+    },
+    "installed/Vortice.Direct3D12.dll": {
+      "bytes": 512512,
+      "sha256": "7421025d83be2dcfb4eee1176cac88904028ddade853e493b1478f1c82ace8c0"
+    },
+    "installed/Vortice.DirectX.dll": {
+      "bytes": 365056,
+      "sha256": "100b3a02ea5fd5bb8db39c24dd58dead5669fa5a46d1ebcd61d4a9d82f812c12"
+    },
+    "installed/Vortice.Dxc.dll": {
+      "bytes": 65536,
+      "sha256": "aa88d25f90dde955826743b6af8390eecbaaef9254ad01aaa153ac84ae205568"
+    },
+    "installed/Vortice.Mathematics.dll": {
+      "bytes": 123904,
+      "sha256": "944622612d0c9f658bb92ff29036e5a9b12db9daabddae68e5fd56655a72f446"
+    },
+    "installed/Vortice.MediaFoundation.dll": {
+      "bytes": 531968,
+      "sha256": "52afb8cfa5e61eb9915a556eb817a387ff12a3671ea63a4a4e53923c4eea56a8"
+    },
+    "installed/build-provenance.json": {
+      "bytes": 729,
+      "sha256": "ada982fded2fc310b1bab2c5a1468d171a69ce722d67a5910838a03babfa59ff"
+    },
+    "installed/dxcompiler.dll": {
+      "bytes": 17951808,
+      "sha256": "b86a738ece4c05dbe2d9bbb29668a2ccb28a0740773c9b027cdc61e8d07b4d75"
+    },
+    "installed/dxil.dll": {
+      "bytes": 1503304,
+      "sha256": "058f2f52a680c38b223a5615b7df969def21f77e577562e5099d971dede992de"
+    },
+    "installed/manifest.sha256": {
+      "bytes": 202907,
+      "sha256": "a51872a4f328c40b3f78ba55a568eee09f5e83831450cb637dbbcbba7a00ea6b"
+    },
+    "logs/build.log": {
+      "bytes": 8809,
+      "sha256": "0b632a2dbe369fdaf29ff40f9774c2431fb8ecc3f2d24f4c94d99017e6b114c6"
+    },
+    "logs/final-build.log": {
+      "bytes": 8809,
+      "sha256": "e5a953c7e7b65b6ae68aa17213db5db2a6b627cc664d488bc595c7a1d288545b"
+    },
+    "logs/restore.log": {
+      "bytes": 8329,
+      "sha256": "5f998dc5086504d335b7991030b722ab397dff190a2d33624d1807995e1e65a9"
+    },
+    "native-after.log": {
+      "bytes": 794,
+      "sha256": "1b6ac1ba4e9112ef72d1881ba08d48e0803be89af3dd0c9e4a607c6ab6e67e06"
+    },
+    "native-after.request.json": {
+      "bytes": 1544,
+      "sha256": "f4278e52c878a905a5af4ba9deadbea31835bb1bdcaae274cad5bd43ac618775"
+    },
+    "native-after/CommandCoreProduction-1920x1080-High-NormalGameplay.png": {
+      "bytes": 4882270,
+      "sha256": "356ce6829b8c05bac43da3622a0c84b4f5ffcfb102726f3ab6e9a4e45e4bab48"
+    },
+    "native-after/IndustrialBase-1920x1080-High-NormalGameplay.png": {
+      "bytes": 4874407,
+      "sha256": "9624375dd914d46c102fff27ceff60c020f847346a77f6e6177bbde021662a79"
+    },
+    "native-after/MainBattleTankProduction-1920x1080-High-NormalGameplay.png": {
+      "bytes": 4856347,
+      "sha256": "5c38a87a4601df860515198ec0905bb97ee7f500ce0dde705a3b48a9388f54ba"
+    },
+    "native-after/comparison.json": {
+      "bytes": 1879,
+      "sha256": "00711d3129e68588b225fc262dbdf2c32e3f44a60d4af4a70421b3bb58c12dae"
+    },
+    "native-after/manifest.json": {
+      "bytes": 234878,
+      "sha256": "451cae9c5e26d63a92e3aa2c75ddd4400f710ab2250136e6a2941a8899f29568"
+    },
+    "native-before.log": {
+      "bytes": 794,
+      "sha256": "1b6ac1ba4e9112ef72d1881ba08d48e0803be89af3dd0c9e4a607c6ab6e67e06"
+    },
+    "native-before.request.json": {
+      "bytes": 1529,
+      "sha256": "4eb2e51f7a8a4ab980db0f1cc42baf4ea4618f2a87809539d8cd0d5a90de1bc5"
+    },
+    "native-before/CommandCoreProduction-1920x1080-High-NormalGameplay.png": {
+      "bytes": 4882270,
+      "sha256": "356ce6829b8c05bac43da3622a0c84b4f5ffcfb102726f3ab6e9a4e45e4bab48"
+    },
+    "native-before/IndustrialBase-1920x1080-High-NormalGameplay.png": {
+      "bytes": 4874407,
+      "sha256": "9624375dd914d46c102fff27ceff60c020f847346a77f6e6177bbde021662a79"
+    },
+    "native-before/MainBattleTankProduction-1920x1080-High-NormalGameplay.png": {
+      "bytes": 4856347,
+      "sha256": "5c38a87a4601df860515198ec0905bb97ee7f500ce0dde705a3b48a9388f54ba"
+    },
+    "native-before/comparison.json": {
+      "bytes": 1865,
+      "sha256": "73b943640768c0c9e25054c745fe719d99f9733812f830e1e22d06873cb56cf6"
+    },
+    "native-before/manifest.json": {
+      "bytes": 234801,
+      "sha256": "c893b5a05430ef1df7e10d2c89933e670a07ae0688dadb58293b5419e730d6f1"
+    },
+    "native-installed.log": {
+      "bytes": 68,
+      "sha256": "ac7cd11e99629adf8c4104b203a75e41de8eb389024da7e35d47c3c8ed3edfa4"
+    },
+    "native-installed.request.json": {
+      "bytes": 1551,
+      "sha256": "58617f83b8d264ec7a4ae519006a5ddf0f45d01da3e10d6c83892f96f318d494"
+    },
+    "native-installed/CommandCoreProduction-1920x1080-High-NormalGameplay.png": {
+      "bytes": 4882270,
+      "sha256": "356ce6829b8c05bac43da3622a0c84b4f5ffcfb102726f3ab6e9a4e45e4bab48"
+    },
+    "native-installed/IndustrialBase-1920x1080-High-NormalGameplay.png": {
+      "bytes": 4874407,
+      "sha256": "9624375dd914d46c102fff27ceff60c020f847346a77f6e6177bbde021662a79"
+    },
+    "native-installed/MainBattleTankProduction-1920x1080-High-NormalGameplay.png": {
+      "bytes": 4856347,
+      "sha256": "5c38a87a4601df860515198ec0905bb97ee7f500ce0dde705a3b48a9388f54ba"
+    },
+    "native-installed/comparison.json": {
+      "bytes": 1858,
+      "sha256": "f67e7a14a2270e41a0bcc1150f52f701a74ce0e0b974cdc46dc91c6a46ddd594"
+    },
+    "native-installed/manifest.json": {
+      "bytes": 235481,
+      "sha256": "b931e0a6cd7f1296a42d905cb0be03ac7e23c21d0de6ab476f0aeb361d140ef8"
+    },
+    "native-pixels.json": {
+      "bytes": 2493,
+      "sha256": "9ff2c5609073c4fa5fc5bf687b51ac7bb30ff9753d1ee377fa14659a79ea6e7f"
+    },
+    "package.log": {
+      "bytes": 4484,
+      "sha256": "14e85ff13a2c31bbee936c9471dea2dfee9676e7caa2a27995a28d48ad237a14"
+    },
+    "pilot.log": {
+      "bytes": 953,
+      "sha256": "635d07448c64e8fbc3fcc64ad16cbe8d65b017f275e64394351ef900e652a7de"
+    },
+    "pilot/baseline-compile.json": {
+      "bytes": 2112,
+      "sha256": "2eb61e48223428cea019d4c38ed90ea37346fe91922153a4c02f50f04b710899"
+    },
+    "pilot/baseline-compile.log": {
+      "bytes": 248827,
+      "sha256": "fbc3907705c8b2efe2b0621403b02be715899179a42530f7874967ef0539df6d"
+    },
+    "pilot/baseline-source-less.json": {
+      "bytes": 2112,
+      "sha256": "ed960cf2beb4cd6a53cf9269099ec471682fc8f07db70bc537cec41089978686"
+    },
+    "pilot/baseline-source-less.log": {
+      "bytes": 2110,
+      "sha256": "3638fafc85790af63f912fd7916dbfd3fce6df71ea34f5ba7a87998b68f3591e"
+    },
+    "pilot/baseline/runtime.compile.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/first-compile.json": {
+      "bytes": 2112,
+      "sha256": "153c03ab13d92a203af9c64595c000929b8b54e9beff277d82042d7b7fd7f8ef"
+    },
+    "pilot/first-compile.log": {
+      "bytes": 246875,
+      "sha256": "026b89d456bb7d8df3ed3c0544657c57731cc4fe825f0f404bb49d634647f2d6"
+    },
+    "pilot/first-source-less.json": {
+      "bytes": 2112,
+      "sha256": "7ef0ad421fa05aed810f14b4ec5a55cb7d0097991a49c9638f447f9ef8004c4d"
+    },
+    "pilot/first-source-less.log": {
+      "bytes": 2107,
+      "sha256": "2281c3e75de27cf68fdc399c0924d2e0371cd09b3b93170ef38916fd0dc0fb3f"
+    },
+    "pilot/first/.blender.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/first/authoring.blend": {
+      "bytes": 478959,
+      "sha256": "88035f6ac242319aeb3298bfdd13c143ec104dbcf037469cf97f371b503621a2"
+    },
+    "pilot/first/report.json": {
+      "bytes": 807,
+      "sha256": "a9c48bf570d12d914867c4a5589424f9f073f44180bb4e1d059919119e3507e2"
+    },
+    "pilot/first/roundtrip-report.json": {
+      "bytes": 48230,
+      "sha256": "5419bf102d010e15098b95ecf66cfe7a647e44b526062c681ce2073af27469dc"
+    },
+    "pilot/first/runs/53bff525b872408695bdd17e6cdacb8d/probe.json": {
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    "pilot/first/runs/53bff525b872408695bdd17e6cdacb8d/probe.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/first/runs/53bff525b872408695bdd17e6cdacb8d/probe.stdout.log": {
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    "pilot/first/runs/53bff525b872408695bdd17e6cdacb8d/report.json": {
+      "bytes": 807,
+      "sha256": "a9c48bf570d12d914867c4a5589424f9f073f44180bb4e1d059919119e3507e2"
+    },
+    "pilot/first/runs/53bff525b872408695bdd17e6cdacb8d/request.json": {
+      "bytes": 763,
+      "sha256": "948ae439b5c60e2293dfde7ef593464de786244f6286df79c69f484c16bad9b8"
+    },
+    "pilot/first/runs/53bff525b872408695bdd17e6cdacb8d/script.stderr.log": {
+      "bytes": 648,
+      "sha256": "a9cae0e8a290a49acc6e6387ad29e2794abad02d890866c497283852a4830c79"
+    },
+    "pilot/first/runs/53bff525b872408695bdd17e6cdacb8d/script.stdout.log": {
+      "bytes": 112,
+      "sha256": "ecec5f1950c97d8b159f9da9211134f0de409caf8ce1471c95eeea9a22329dcb"
+    },
+    "pilot/first/runs/53bff525b872408695bdd17e6cdacb8d/version.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/first/runs/53bff525b872408695bdd17e6cdacb8d/version.stdout.log": {
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    "pilot/first/runtime.compile.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/native-contracts/.blender.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/native-contracts/native-contracts.json": {
+      "bytes": 2755,
+      "sha256": "86177dc337c229c840f88e8309aea3fac2ad43ab58c960c3097b6ff23038a07e"
+    },
+    "pilot/native-contracts/report.json": {
+      "bytes": 818,
+      "sha256": "6272d7dc6b1cdbc5f7e686161876dff8e64b74f5d0ba0ce77750cc5cdb149ed1"
+    },
+    "pilot/native-contracts/runs/782eefdce87e4d31b1b5efc5fe6895b9/probe.json": {
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    "pilot/native-contracts/runs/782eefdce87e4d31b1b5efc5fe6895b9/probe.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/native-contracts/runs/782eefdce87e4d31b1b5efc5fe6895b9/probe.stdout.log": {
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    "pilot/native-contracts/runs/782eefdce87e4d31b1b5efc5fe6895b9/report.json": {
+      "bytes": 818,
+      "sha256": "6272d7dc6b1cdbc5f7e686161876dff8e64b74f5d0ba0ce77750cc5cdb149ed1"
+    },
+    "pilot/native-contracts/runs/782eefdce87e4d31b1b5efc5fe6895b9/request.json": {
+      "bytes": 898,
+      "sha256": "2723aeced9b827b1c30746d024b28eb4675f8e6cb0287ca00413fab03617477b"
+    },
+    "pilot/native-contracts/runs/782eefdce87e4d31b1b5efc5fe6895b9/script.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/native-contracts/runs/782eefdce87e4d31b1b5efc5fe6895b9/script.stdout.log": {
+      "bytes": 3232,
+      "sha256": "f902c16b93828fb01ea141540db8ba6fbc681e7a31b823d633304c96b2efa837"
+    },
+    "pilot/native-contracts/runs/782eefdce87e4d31b1b5efc5fe6895b9/version.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/native-contracts/runs/782eefdce87e4d31b1b5efc5fe6895b9/version.stdout.log": {
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    "pilot/native-contracts/synthetic-fixture.json": {
+      "bytes": 333,
+      "sha256": "24676472454a579337a75f9830bb123a847548e8208f184711d52d41930aa333"
+    },
+    "pilot/native-contracts/synthetic-source/first.asset.json": {
+      "bytes": 91,
+      "sha256": "fa97b6c1749d27fb20bed8a34c3f4407083f79794a426c18ba52d93c9c767fd1"
+    },
+    "pilot/native-contracts/synthetic-source/first.material.json": {
+      "bytes": 4,
+      "sha256": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f"
+    },
+    "pilot/native-contracts/synthetic-source/mesh.asset.json": {
+      "bytes": 155,
+      "sha256": "04013201f679ecf0e33307507cfa3add9adf2369b683114ecc6e738e24084f00"
+    },
+    "pilot/native-contracts/synthetic-source/mesh.glb": {
+      "bytes": 1824,
+      "sha256": "7f8811e6794462537411f5c141df0e765bc0c2ce82d9ce1b28ecadb373e2bbad"
+    },
+    "pilot/native-contracts/synthetic-source/second.asset.json": {
+      "bytes": 93,
+      "sha256": "433d95d76575a6c7ff12e8fb57d45d2d4dc53fc8e67f0c7e1b6757e85efe1b0e"
+    },
+    "pilot/native-contracts/synthetic-source/second.material.json": {
+      "bytes": 4,
+      "sha256": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f"
+    },
+    "pilot/qualification.json": {
+      "bytes": 461,
+      "sha256": "075eb86022c68f910caa06f9098283f006fa5b19b3442321a8a88f1ee32b935d"
+    },
+    "pilot/reopened-compile.json": {
+      "bytes": 2112,
+      "sha256": "fe327fb6e7dad30da8a441a4e1593c36eb28b63051cc913c1c7370f1af031aa1"
+    },
+    "pilot/reopened-compile.log": {
+      "bytes": 246950,
+      "sha256": "41e14377e6ad7c49b13aaedb10efc5cd40fa41e13f2b9a0883ea99fe421bc352"
+    },
+    "pilot/reopened-source-less.json": {
+      "bytes": 2112,
+      "sha256": "6e0f149052ac5b685197227a3023f129e4fae68bdcd8996a8e402763f250299e"
+    },
+    "pilot/reopened-source-less.log": {
+      "bytes": 2108,
+      "sha256": "f3fdb591df6cfbcec6819adf044aa3749e796f6fd245e28e014a95ef1117ae8f"
+    },
+    "pilot/reopened/.blender.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/reopened/report.json": {
+      "bytes": 810,
+      "sha256": "0ed025d90500d474198847b581bd772f892b1c289801c3e43563b49ec9982c91"
+    },
+    "pilot/reopened/roundtrip-report.json": {
+      "bytes": 48227,
+      "sha256": "9a9c0e4f2d4ffa9a3a19b3eb79a5ebd2a7363c7e609a7f8f7ca59f00d3f97a76"
+    },
+    "pilot/reopened/runs/cfb769874ceb41859b5296a62f111acc/probe.json": {
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    "pilot/reopened/runs/cfb769874ceb41859b5296a62f111acc/probe.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/reopened/runs/cfb769874ceb41859b5296a62f111acc/probe.stdout.log": {
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    "pilot/reopened/runs/cfb769874ceb41859b5296a62f111acc/report.json": {
+      "bytes": 810,
+      "sha256": "0ed025d90500d474198847b581bd772f892b1c289801c3e43563b49ec9982c91"
+    },
+    "pilot/reopened/runs/cfb769874ceb41859b5296a62f111acc/request.json": {
+      "bytes": 954,
+      "sha256": "7b208a156ecc9360b80fa14ee9278c9ca1f176bc5cbda5f5904870fdac0b5156"
+    },
+    "pilot/reopened/runs/cfb769874ceb41859b5296a62f111acc/script.stderr.log": {
+      "bytes": 345,
+      "sha256": "fd31fae8c415724ed9ae1336f4a5b0a04e6f7bc8b0e5f78f0451c69fa7d045d7"
+    },
+    "pilot/reopened/runs/cfb769874ceb41859b5296a62f111acc/script.stdout.log": {
+      "bytes": 270,
+      "sha256": "51690b0ece8c551cf57e2498b0e8b60d629fb1bfc1025e28d2800f4a6d0aaf18"
+    },
+    "pilot/reopened/runs/cfb769874ceb41859b5296a62f111acc/version.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/reopened/runs/cfb769874ceb41859b5296a62f111acc/version.stdout.log": {
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    "pilot/reopened/runtime.compile.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/runtime-comparison.json": {
+      "bytes": 697,
+      "sha256": "7009400234f62ca2be476626f760aaf09d1a8759d7b55935dafb2a66c62169b9"
+    },
+    "pilot/runtime-comparison.log": {
+      "bytes": 1896,
+      "sha256": "56a6ecbbe873e59b86e13ab2664f7658f775cf35e7cf1a301f515f56b5012712"
+    },
+    "pilot/second-compile.json": {
+      "bytes": 2112,
+      "sha256": "ca087ab135e10f5e3385a1dfab1ae32559479bc9b527737e0e17ecb266286fa2"
+    },
+    "pilot/second-compile.log": {
+      "bytes": 247916,
+      "sha256": "7cd7d212e0287c0152c1e2f62ec61aa3adfaa7356e4b1bc26be7d98ce2da3bda"
+    },
+    "pilot/second-source-less.json": {
+      "bytes": 2112,
+      "sha256": "371c834307c992ff4321ff55d371f89d770db0133ecc4b1695fe2a1f9425fd65"
+    },
+    "pilot/second-source-less.log": {
+      "bytes": 2108,
+      "sha256": "0d8970e97bff884099c822551e2d8940992100f702107a8e102876c3398d5efc"
+    },
+    "pilot/second/.blender.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/second/authoring.blend": {
+      "bytes": 478839,
+      "sha256": "66c5ba7776a0e90e70cc0b3b6b1419dae657bb2e752617598746f1dd7dc78c79"
+    },
+    "pilot/second/report.json": {
+      "bytes": 808,
+      "sha256": "89e48c943696ae6245866a4b47ec08fe2c4cee4fa18b8b7ff14e684bfe65bd40"
+    },
+    "pilot/second/roundtrip-report.json": {
+      "bytes": 48230,
+      "sha256": "5419bf102d010e15098b95ecf66cfe7a647e44b526062c681ce2073af27469dc"
+    },
+    "pilot/second/runs/575e842a899a4c948c47b994c39b3374/probe.json": {
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    "pilot/second/runs/575e842a899a4c948c47b994c39b3374/probe.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/second/runs/575e842a899a4c948c47b994c39b3374/probe.stdout.log": {
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    "pilot/second/runs/575e842a899a4c948c47b994c39b3374/report.json": {
+      "bytes": 808,
+      "sha256": "89e48c943696ae6245866a4b47ec08fe2c4cee4fa18b8b7ff14e684bfe65bd40"
+    },
+    "pilot/second/runs/575e842a899a4c948c47b994c39b3374/request.json": {
+      "bytes": 765,
+      "sha256": "0c7206462e4a1fd65465ffb95486f5cca578bbb16a8264ea657ec6e80436664e"
+    },
+    "pilot/second/runs/575e842a899a4c948c47b994c39b3374/script.stderr.log": {
+      "bytes": 648,
+      "sha256": "a9cae0e8a290a49acc6e6387ad29e2794abad02d890866c497283852a4830c79"
+    },
+    "pilot/second/runs/575e842a899a4c948c47b994c39b3374/script.stdout.log": {
+      "bytes": 112,
+      "sha256": "ecec5f1950c97d8b159f9da9211134f0de409caf8ce1471c95eeea9a22329dcb"
+    },
+    "pilot/second/runs/575e842a899a4c948c47b994c39b3374/version.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pilot/second/runs/575e842a899a4c948c47b994c39b3374/version.stdout.log": {
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    "pilot/second/runtime.compile.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retain_evidence.py": {
+      "bytes": 3496,
+      "sha256": "110b50b11f3d7a7e54970a1a3997467849c909ca42cdee8159a6b4ee598e8334"
+    },
+    "source-inventory.json": {
+      "bytes": 754692,
+      "sha256": "99121b16e26ffab65533a3a66fab6862e0902c33e5cc36edc9954ca76d1664d0"
+    },
+    "tests-build.log": {
+      "bytes": 3770,
+      "sha256": "2f8de399594ec704b0426d52fa73e58e81644ffa1d2b382d50c2a96c4fe67f1b"
+    },
+    "verify_installation.py": {
+      "bytes": 1483,
+      "sha256": "eae735e563647d5e034756b7d5d29518f90920a90a62c82f644fd23da8a27364"
+    }
+  },
+  "root": "artifacts/readiness",
+  "schemaVersion": 1
+}
