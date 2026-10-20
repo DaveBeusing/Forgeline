@@ -1277,6 +1277,17 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             }
         }
 
+        // Long authorized alert labels must remain representable as bounded
+        // summaries instead of silently disappearing when the buffer fills.
+        public void Append(ReadOnlySpan<char> value)
+        {
+            int count = Math.Min(value.Length, _buffer.Length - _length);
+            if (count <= 0) return;
+            value[..count].CopyTo(_buffer[_length..]);
+            _length += count;
+            if (count < value.Length) _buffer[_length - 1] = '…';
+        }
+
         public void Append(
             int value)
         {
