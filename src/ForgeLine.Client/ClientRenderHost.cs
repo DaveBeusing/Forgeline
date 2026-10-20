@@ -128,7 +128,8 @@ internal readonly record struct ClientRenderFrame(
     CombatGroupOverviewView? CombatGroups = null,
     bool MetricsActive = true,
     HoverTooltipView HoverTooltip = default,
-    OperationsView Operations = default, UiFeedbackSettings FeedbackSettings = default, WorldAudioSettings WorldAudio = default);
+    OperationsView Operations = default, UiFeedbackSettings FeedbackSettings = default, WorldAudioSettings WorldAudio = default,
+    NotificationExpansion NotificationExpansion = default);
 
 internal sealed class ClientRenderHost : IDisposable
 {
