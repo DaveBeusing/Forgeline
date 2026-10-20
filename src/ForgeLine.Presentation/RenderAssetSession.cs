@@ -35,7 +35,10 @@ internal sealed class RenderAssetSession : IDisposable
     {
         _graphics = graphics;
         _resources = new(graphics, catalog, quality);
+        try { _resources.PrepareRequiredAssets(CancellationToken.None); }
+        catch { _resources.Dispose(); throw; }
     }
+    internal AssetResidencyProgress Residency => _resources.Residency;
     internal bool MetricsEnabled { get; set; }
     internal bool IsPrepared => _phase == Phase.Prepared;
     internal bool FrameActive => _phase != Phase.Idle;
@@ -70,7 +73,7 @@ internal sealed class RenderAssetSession : IDisposable
     internal void BeginRecord()
     {
         CheckOwner();
-        if (!_explicitFrames) return; // Unchanged legacy Render callers retain synchronous cache resolution.
+        if (!_explicitFrames) return; // Legacy Render callers retain their implicit frame lifecycle.
         if (_phase is not (Phase.Prepared or Phase.Recording))
             throw new InvalidOperationException("Recording requires a prepared asset frame.");
         _phase = Phase.Recording;

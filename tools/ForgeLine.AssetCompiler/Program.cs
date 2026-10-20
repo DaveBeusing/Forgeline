@@ -19,6 +19,7 @@ internal static class Program
         string runtimeRoot = Path.Combine("assets", "runtime");
         string? qualificationOutput = null;
         string? progressLog = null;
+        string? residencyInventoryOutput = null;
         var clean = false;
         string mode = "development";
 
@@ -44,6 +45,9 @@ internal static class Program
                         break;
                     case "--qualification-output":
                         qualificationOutput = ReadValue(args, ref index, argument);
+                        break;
+                    case "--residency-inventory-output":
+                        residencyInventoryOutput = ReadValue(args, ref index, argument);
                         break;
                     case "--clean":
                         clean = true;
@@ -156,6 +160,22 @@ internal static class Program
                 qualification);
         }
 
+        if (residencyInventoryOutput is not null)
+        {
+            try
+            {
+                var inventory = AssetResidencyInventory.Create(RuntimeAssetCatalog.Load(runtimeRoot));
+                string output = Path.GetFullPath(residencyInventoryOutput);
+                Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+                File.WriteAllText(output, JsonSerializer.Serialize(inventory, RuntimeAssetCatalog.CreateJsonOptions()));
+            }
+            catch (Exception exception) when (exception is IOException or InvalidDataException or ArgumentException or KeyNotFoundException or JsonException)
+            {
+                Console.Error.WriteLine($"ASSET102: Residency inventory failed: {exception.Message}");
+                return 1;
+            }
+        }
+
         return qualification.Success
             ? 0
             : 1;
@@ -204,6 +224,6 @@ internal static class Program
     {
         Console.WriteLine(
             "ForgeLine.AssetCompiler [--source <assets/source>] [--runtime <assets/runtime>] " +
-            "[--mode <development|build|validate>] [--clean] [--qualification-output <report.json>] [--progress-log <progress.jsonl>]");
+            "[--mode <development|build|validate>] [--clean] [--qualification-output <report.json>] [--progress-log <progress.jsonl>] [--residency-inventory-output <inventory.json>]");
     }
 }

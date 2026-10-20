@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "reviewedAtUtc": "2026-10-20T15:02:29.201417+00:00",
+  "reviewer": "Project owner",
+  "decision": "accepted-visual-equality",
+  "source": "21650bad0584bdf390b33117b86e0833f0caee8c",
+  "baselineBuildSource": "b69e5f72a1444bbffce149c6a71b7551a27044a4",
+  "equivalentCurrentMaster": "cd62153ef77b6a5dda754381a0aa4b7346b32b29",
+  "runtimeFingerprint": "EE9B03122F04718874D7B2CDBBEDB4B74F6D907082D56C1A399C01545B2D9590",
+  "currentManifestSha256": "9cae955a77c6a9ce0e01f0f174c30bc55b346a0b96f2c1322b6b7eb0299fd40d",
+  "baselineManifestSha256": "74b53c0b5d49c11bc84d77eba8298ae15486c3135ef1736a37c7b86209d51dfe",
+  "scope": "Human approval of six final image comparisons; does not waive failed timing gates or baseline gameplay failures. Both fixed pairs remain exact pixel comparisons.",
+  "captures": [
+    {
+      "key": "MainBattleTankProduction-1920x1080-High-CloseTactical",
+      "imageSha256": "C091B5B91419DD6808BA1358FC5A58068681FB64451311F79BA5618A99497320",
+      "decision": "accepted"
+    },
+    {
+      "key": "MainBattleTankProduction-1920x1080-High-NormalGameplay",
+      "imageSha256": "F156028D99A9D5CA869306B7AB30B6AAE4EF4A22A84639560A09D252D54D3AE0",
+      "decision": "accepted"
+    },
+    {
+      "key": "MainBattleTankProduction-1920x1080-High-Strategic",
+      "imageSha256": "573ECFEAD47910B9AA0A13202505FDCC3F5338D02FA91008E304563613CE036A",
+      "decision": "accepted"
+    },
+    {
+      "key": "IndustrialBase-1920x1080-High-CloseTactical",
+      "imageSha256": "555F1271216BEFA60296F390DCC123E3993117B8CFB4F8A6C92864A9A0CDB69F",
+      "decision": "accepted"
+    },
+    {
+      "key": "IndustrialBase-1920x1080-High-NormalGameplay",
+      "imageSha256": "54930583F7E8ADFB1E233249234E589E82FFECE34B25B6BE80ED2D6D639A262C",
+      "decision": "accepted"
+    },
+    {
+      "key": "IndustrialBase-1920x1080-High-Strategic",
+      "imageSha256": "0488EE1D61FC565F9A2D83C8376FD6A3FE716A602078C24CFFA0B975CBC47264",
+      "decision": "accepted"
+    }
+  ]
+}
