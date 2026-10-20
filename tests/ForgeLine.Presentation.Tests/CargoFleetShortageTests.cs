@@ -123,6 +123,35 @@ public sealed class CargoFleetShortageTests
     }
 
     [Fact]
+    public void FleetWarningIsReachableThroughExistingOverflowAndOwnedFocus()
+    {
+        var player = default(PlayerExperienceSnapshot) with
+        {
+            Player = new(1), Tick = new(210),
+            MatchStatus = PlayerMatchStatus.Active,
+            Alerts = (PlayerAlertState)63
+        };
+        var target = new EntityId(17, 2);
+        var targets = new EntityId[6] { default, default, default, default, default, target };
+        var alerts = new AlertLifecycleTracker().Capture(new(1), player, targets, Busy);
+        Assert.Equal(6, alerts.Alerts.Count);
+        var snapshot = new PresentationSnapshot(new SimulationTick(210),
+            TimeSpan.FromMilliseconds(50), 0, [], sessionId: new(1),
+            playerExperience: player, alerts: alerts);
+        var layout = GameplayHudLayout.Create(1920, 1080, 96);
+        var stack = ActionableAlertLayout.Resolve(snapshot, layout);
+        Assert.True(stack.Count > 0);
+        Assert.True(stack.Card(stack.Count - 1).Item.Hidden > 0);
+        Assert.Contains(Enumerable.Range(0, ResourcePowerHudModel.ResolveNotificationCount(player)),
+            i => ActionableAlertLayout.Ordered(player, i).Kind == PlayerAlertState.CargoFleetShortage);
+        Assert.Contains(alerts.Alerts, a => a.Identity.Kind == PlayerAlertState.CargoFleetShortage &&
+            a.Target == target && a.Fleet == Busy);
+        Assert.Null(ActionableAlertSnapshot.Resolve(new PresentationSnapshot(new SimulationTick(210),
+            TimeSpan.FromMilliseconds(50), 0, [], sessionId: new(2),
+            playerExperience: player, alerts: alerts)));
+    }
+
+    [Fact]
     public void TypedAlertKeepsAuthorizedFacilityAndExactFleetFacts()
     {
         var fleet = Busy;
