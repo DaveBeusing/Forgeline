@@ -81,10 +81,10 @@ validation-root prefixes in retained logs were normalized; original hashes remai
 | Complete dependency restore | Passed after fetching omitted same-commit tool/benchmark projects into the sparse checkout. The first attempt failed on the incomplete checkout, not on a source repair. |
 | Release solution build | Final functional source `8331e384` passed in 103.93 s; after the master reconciliation, `e121263a` passed in 98.81 s. Both exit 0 with zero warnings/errors. Earlier runs and source-file hashes remain retained. |
 | Project references | Existing validator passed all 44 projects, without a cycle. |
-| Ownership and formatting | All 53 functional/evidence paths pass the current ownership validator; whitespace checks pass. `Directory.Build.props` is validated separately as the isolated version exception. |
+| Ownership and formatting | All 57 functional/evidence paths pass the current ownership validator; whitespace checks pass. `Directory.Build.props` is validated separately as the isolated version exception. |
 | New portable particle classes | 21 regression cases passed. The final measured run added the opt-in qualification case: 22/22 passed, zero failed/skipped. All 21 regressions passed again after the current-master reconciliation. Coverage includes full snapshot admission, saturation, visibility, pause/session reset, deterministic sorting and warm allocations. |
 | Required existing three-class Presentation selection | 26 executed: 13 passed and 13 failed. Every failing SimpleInstanceRenderer case stops in the unchanged native DXC call with `error: invalid profile` on this Linux host. This is a failed local run, not a passed Windows gate. |
-| New native composition cases | 21 cases compile; Windows/WARP execution remains open. Actual 4K product capture is distinct from virtual 4K coordinate probes. |
+| New native composition cases | 21 cases compile; Windows/WARP execution remains open. A subsequent fixture review guarded atmosphere-camera submission when atmosphere is disabled; the affected Graphics test project rebuilt with zero warnings/errors in 9.92 s. All cases and assertions remain intact. Actual 4K product capture is distinct from virtual 4K coordinate probes. |
 | Static DXC matrix | 98/98 compiled with production Release flags. Complete source, HLSL, DXIL, disassembly, compiler hashes and per-case results are retained. |
 | CPU ordering qualification | Exact payload parity and allocation windows are retained separately from timing acceptance; see [CPUQualification.md](CPUQualification.md). |
 
@@ -132,6 +132,25 @@ observations; their repairs were inherited through the current-master merge.
 The draft PR records its exact final head, current CI runs and conclusions. A
 running workflow or an earlier green commit is not final-head acceptance. No
 complete Windows-suite or physical-GPU success is claimed by these local records.
+
+The first PR #267 main run
+[39490676772](https://github.com/DaveBeusing/Forgeline/actions/runs/39490676772/job/118862700932)
+at `1d658d51522bf510a9f0e54ef1dce0fbd46d1e24` passed version validation and the
+Release build, then failed at step 25 in the existing
+`UiInteractionFeedbackTests.WarmCopiedFeedbackRetainsZeroAllocation` assertion:
+expected zero, observed 3,008 allocated bytes. The filtered Client group recorded
+62 total, 59 passed, one failed and two skipped. Full Test and the new native
+composition cases were not reached. The
+[exact failure record](evidence/local-validation/pr267-initial-ci.json) retains
+the source/run identity, raw-log hash and failure excerpt; no cause is inferred
+from the allocation count alone.
+
+Separately, pre-execution review found that two new product-capture helpers
+called `SetAtmosphereView` while atmosphere was disabled, which the existing
+native contract rejects. Those calls now depend on `graphics.Atmosphere.Enabled`.
+This corrects the setup of five cases without changing product code or weakening
+their assertions. It does not repair or explain the unrelated UI allocation
+assertion. The revised head must execute the full Windows gates afresh.
 
 Remaining mandatory gates:
 

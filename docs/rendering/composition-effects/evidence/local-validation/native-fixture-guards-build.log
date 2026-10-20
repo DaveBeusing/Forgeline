@@ -1,0 +1,10 @@
+  ForgeLine.Core -> <validation-root>/Forgeline/src/ForgeLine.Core/bin/Release/net10.0/ForgeLine.Core.dll
+  ForgeLine.Platform.Windows -> <validation-root>/Forgeline/src/ForgeLine.Platform.Windows/bin/Release/net10.0-windows/ForgeLine.Platform.Windows.dll
+  ForgeLine.Graphics -> <validation-root>/Forgeline/src/ForgeLine.Graphics/bin/Release/net10.0-windows/ForgeLine.Graphics.dll
+  ForgeLine.Graphics.Tests -> <validation-root>/Forgeline/tests/ForgeLine.Graphics.Tests/bin/Release/net10.0-windows/ForgeLine.Graphics.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:09.67

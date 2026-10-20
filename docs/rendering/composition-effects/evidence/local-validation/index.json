@@ -179,6 +179,20 @@
       "retainedSha256": "86b06fc0f62273c054ee317e0b040cc5cabe064a8626f56f5915b7c462d039b1",
       "bytes": 414,
       "normalizationOccurrences": 2
+    },
+    {
+      "path": "native-fixture-guards-build.json",
+      "originalSha256": "586c9a75896acddf1c807ba1f16383298c2e395ef1ca19ebdb48b66c38775156",
+      "retainedSha256": "c5c8c9988a168b2440fb14272d828b382bcedc5562e6df88d75173147926db1e",
+      "bytes": 2071,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "native-fixture-guards-build.log",
+      "originalSha256": "2e52f5966c32dba4e4c9ec969e9edf0d5917e4793cdf934dbee380febca6832d",
+      "retainedSha256": "8254aa7649bc03aeb806f8f42541ec5b0da312c7a6e7c49be3a667f422ae15b0",
+      "bytes": 604,
+      "normalizationOccurrences": 4
     }
   ],
   "cpuModel": "AMD EPYC 9V74 80-Core Processor",
@@ -196,5 +210,30 @@
   },
   "runtimeAssetFingerprint": null,
   "runtimeAssetsUsed": false,
-  "assetApplicability": "Synthetic CPU and static compiler qualification load no runtime assets. Native source-less captures and their asset identity remain open."
+  "assetApplicability": "Synthetic CPU and static compiler qualification load no runtime assets. Native source-less captures and their asset identity remain open.",
+  "ciObservations": [
+    {
+      "path": "pr267-initial-ci.json",
+      "sha256": "6dc1ea9f5190150fc9dd0adbe0e98ee2e864107a40bdb5d442497a187ba1a0c8",
+      "sourceHead": "1d658d51522bf510a9f0e54ef1dce0fbd46d1e24",
+      "runId": 39490676772,
+      "jobId": 118862700932
+    }
+  ],
+  "postCommitFixtureReview": {
+    "sourceHeadBeforeFix": "1d658d51522bf510a9f0e54ef1dce0fbd46d1e24",
+    "buildRecord": "native-fixture-guards-build.json",
+    "productionSourceChanged": false,
+    "nativeExecution": "pending",
+    "change": "Guard atmosphere-camera submission in two native test capture helpers when atmosphere is disabled."
+  },
+  "latestOwnership": {
+    "checkedUtc": "2026-10-20T20:25:53.240997+00:00",
+    "pathFile": "ownership-fixture-paths.txt",
+    "pathCount": 57,
+    "pathSha256": "e7c434adf73c401fd5662ff678dae4e3b861ad9a7f249fca2528366d346b5c1a",
+    "exitCode": 0,
+    "output": "VALID: 10 workstreams, 8 mutually disjoint parallel lanes; dependency graph valid.\nVALID: 57 changed paths belong to SceneCompositionAndParticleEfficiency.\nThis is a path/dependency check, not a semantic, runtime, or merge-approval guarantee.",
+    "versionException": "Directory.Build.props, separately validated as exactly master PATCH plus one."
+  }
 }

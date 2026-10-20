@@ -89,7 +89,8 @@ public sealed class CompositionProductNativeTests
 
         byte[] Capture() => graphics.CaptureFrame(new(0, 0, 0, 1), context =>
         {
-            context.SetAtmosphereView(new(Matrix4x4.Identity, Vector3.UnitZ * 10, 420));
+            if (graphics.Atmosphere.Enabled)
+                context.SetAtmosphereView(new(Matrix4x4.Identity, Vector3.UnitZ * 10, 420));
             context.SetPipeline(world);
             context.Draw(3);
             context.BeginPass(GraphicsFramePass.Overlay);
@@ -166,7 +167,8 @@ public sealed class CompositionProductNativeTests
 
         byte[] Capture() => graphics.CaptureFrame(new(0, 0, 0, 1), context =>
         {
-            context.SetAtmosphereView(new(Matrix4x4.CreateScale(1, 1, 1000), Vector3.Zero, 420));
+            if (graphics.Atmosphere.Enabled)
+                context.SetAtmosphereView(new(Matrix4x4.CreateScale(1, 1, 1000), Vector3.Zero, 420));
             context.SetPipeline(world);
             context.Draw(3);
         });
