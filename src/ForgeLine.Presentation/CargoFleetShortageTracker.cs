@@ -120,7 +120,7 @@ public sealed class CargoFleetShortageTracker
         // Only a fully occupied, currently productive fleet can support a fleet
         // expansion recommendation. Zero vehicles, rescue, full bays and other
         // blocked states are not evidence of an inadequate fleet size.
-        bool candidate = backlog > 0 && active > 0 && idle == 0 && blocked == 0;
+        bool candidate = Qualifies(backlog, active, idle, blocked);
         var observed = new CargoFleetCapacityObservation(backlog, active, idle, active + idle, facility);
         // Never publish a cached destination after it is destroyed, captured,
         // recycled or replaced by another owned facility.
@@ -130,6 +130,9 @@ public sealed class CargoFleetShortageTracker
         return Advance(session, player, context.Tick, context.TickDuration, observed,
             candidate && IsOwnedTarget(entities, player, facility));
     }
+
+    internal static bool Qualifies(int backlog, int active, int idle, int blocked) =>
+        backlog > 0 && active > 0 && idle == 0 && blocked == 0;
 
     // Pure fixed-tick state contract, also used to validate hysteresis without
     // constructing world entities or a renderer.
