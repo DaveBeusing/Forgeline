@@ -35,6 +35,9 @@ public readonly record struct CargoFuelServiceState(
     SimulationTick StartedAtTick,
     ulong RetryAtTick = 0);
 
+/// <summary>Tagged when an otherwise available cargo vehicle cannot afford a dispatched route.</summary>
+public readonly record struct CargoFuelServiceDemand(SimulationTick ObservedAtTick);
+
 /// <summary>Independent service owner using the existing physical loading bay and InventoryStore.</summary>
 internal sealed class CargoFuelServiceController(
     InventoryStore inventories,
@@ -79,8 +82,15 @@ internal sealed class CargoFuelServiceController(
             }
         }
 
+        bool dispatchNeedsFuel = entities.HasComponent<CargoFuelServiceDemand>(truck);
+        if (available + Epsilon >= fuel.Capacity && dispatchNeedsFuel)
+        {
+            entities.RemoveComponent<CargoFuelServiceDemand>(truck);
+            dispatchNeedsFuel = false;
+        }
         if (available >= fuel.Capacity * StartFraction &&
-            !entities.HasComponent<CargoDeliveryFuelDeferral>(truck))
+            !entities.HasComponent<CargoDeliveryFuelDeferral>(truck) &&
+            !dispatchNeedsFuel)
             return true;
         if (entities.HasComponent<ResupplyOrder>(truck) ||
             entities.HasComponent<SupplyRescueAssignment>(truck))
@@ -203,6 +213,8 @@ internal sealed class CargoFuelServiceController(
             }
             ClearServiceMovement(entities, truck);
             entities.RemoveComponent<CargoFuelServiceState>(truck);
+            if (entities.HasComponent<CargoFuelServiceDemand>(truck))
+                entities.RemoveComponent<CargoFuelServiceDemand>(truck);
             return;
         }
 
