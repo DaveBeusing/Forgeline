@@ -29,6 +29,13 @@ observations, and asserts the exact bounded delta and unchanged other
 states. The temporary candidate-export CI step is removed so Frame hot
 paths once again checks the committed fixture directly.
 
+The wider 64-case display matrix also checks selection-marquee geometry inside
+the combined HUD renderer. After strict fixture comparison was restored, it
+exposed an outdated assertion that the entire shared vertex buffer contains
+only the marquee's 30 vertices. The authoritative 6-fill/24-border checks,
+viewport clipping, alpha bounds and disappearance on selection end remain
+unchanged; only the mistaken exclusive-buffer assumption is corrected.
+
 These are source-geometry findings, not approval of native screenshots,
 physical DPI/monitor readability, contrast or the human visual golden.
 Those gates remain independent of a passing structural fixture.
