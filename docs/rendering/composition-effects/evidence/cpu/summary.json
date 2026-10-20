@@ -1,0 +1,169 @@
+{
+  "rawFile": "particle-ordering-warmed.json",
+  "rawSha256": "2e07a10eddf5fed1090535f18480045a14bba68df95b73e166cc7c5038486c5c",
+  "derivation": "Each implementation pools its two 256-sample cohorts (512 observations); means are arithmetic, p50 is the lower median, p95/p99 use nearest rank ceil(n*p)-1. No sample discarded.",
+  "groups": [
+    {
+      "count": 512,
+      "visual": "Spark",
+      "reference": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.07126328125,
+        "p50Milliseconds": 0.066,
+        "p95Milliseconds": 0.1027,
+        "p99Milliseconds": 0.1418,
+        "cohortMeanMilliseconds": [
+          0.07204609374999986,
+          0.07048046874999989
+        ]
+      },
+      "candidate": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.018713671875,
+        "p50Milliseconds": 0.0172,
+        "p95Milliseconds": 0.0204,
+        "p99Milliseconds": 0.0649,
+        "cohortMeanMilliseconds": [
+          0.018967578124999974,
+          0.018459765624999982
+        ]
+      },
+      "meanReductionPercent": 73.74009230735498
+    },
+    {
+      "count": 512,
+      "visual": "Smoke",
+      "reference": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.071234765625,
+        "p50Milliseconds": 0.0674,
+        "p95Milliseconds": 0.0861,
+        "p99Milliseconds": 0.1509,
+        "cohortMeanMilliseconds": [
+          0.06972617187500002,
+          0.07274335937499997
+        ]
+      },
+      "candidate": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.02006796875,
+        "p50Milliseconds": 0.0188,
+        "p95Milliseconds": 0.0204,
+        "p99Milliseconds": 0.0545,
+        "cohortMeanMilliseconds": [
+          0.02038671875000002,
+          0.019749218749999995
+        ]
+      },
+      "meanReductionPercent": 71.82840629301222
+    },
+    {
+      "count": 2048,
+      "visual": "Spark",
+      "reference": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.3518640625,
+        "p50Milliseconds": 0.3384,
+        "p95Milliseconds": 0.4346,
+        "p99Milliseconds": 0.512,
+        "cohortMeanMilliseconds": [
+          0.35529492187500006,
+          0.34843320312500003
+        ]
+      },
+      "candidate": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.091789453125,
+        "p50Milliseconds": 0.0855,
+        "p95Milliseconds": 0.1352,
+        "p99Milliseconds": 0.1723,
+        "cohortMeanMilliseconds": [
+          0.09341367187499995,
+          0.09016523437499997
+        ]
+      },
+      "meanReductionPercent": 73.91337652591332
+    },
+    {
+      "count": 2048,
+      "visual": "Smoke",
+      "reference": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.365757421875,
+        "p50Milliseconds": 0.3412,
+        "p95Milliseconds": 0.4599,
+        "p99Milliseconds": 0.6101,
+        "cohortMeanMilliseconds": [
+          0.35309375000000026,
+          0.37842109374999994
+        ]
+      },
+      "candidate": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.1013392578125,
+        "p50Milliseconds": 0.0912,
+        "p95Milliseconds": 0.1707,
+        "p99Milliseconds": 0.2169,
+        "cohortMeanMilliseconds": [
+          0.10020781249999988,
+          0.10247070312500013
+        ]
+      },
+      "meanReductionPercent": 72.29331470760056
+    },
+    {
+      "count": 4096,
+      "visual": "Spark",
+      "reference": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.873882421875,
+        "p50Milliseconds": 0.7855,
+        "p95Milliseconds": 1.1779,
+        "p99Milliseconds": 2.6858,
+        "cohortMeanMilliseconds": [
+          0.9732152343750003,
+          0.7745496093750001
+        ]
+      },
+      "candidate": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.40642734375,
+        "p50Milliseconds": 0.3764,
+        "p95Milliseconds": 0.5563,
+        "p99Milliseconds": 0.8476,
+        "cohortMeanMilliseconds": [
+          0.439143359375,
+          0.3737113281249999
+        ]
+      },
+      "meanReductionPercent": 53.49175889383717
+    },
+    {
+      "count": 4096,
+      "visual": "Smoke",
+      "reference": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.7668501953125,
+        "p50Milliseconds": 0.7616,
+        "p95Milliseconds": 0.7954,
+        "p99Milliseconds": 0.8107,
+        "cohortMeanMilliseconds": [
+          0.7607070312500003,
+          0.772993359375
+        ]
+      },
+      "candidate": {
+        "sampleCount": 512,
+        "meanMilliseconds": 0.3857345703125,
+        "p50Milliseconds": 0.3835,
+        "p95Milliseconds": 0.4157,
+        "p99Milliseconds": 0.4313,
+        "cohortMeanMilliseconds": [
+          0.38520625000000003,
+          0.38626289062499997
+        ]
+      },
+      "meanReductionPercent": 49.69883653021579
+    }
+  ]
+}

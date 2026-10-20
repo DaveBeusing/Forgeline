@@ -1,0 +1,34 @@
+{
+  "command": [
+    "<validation-root>/tooling/run-validation.sh",
+    "dotnet",
+    "test",
+    "--project",
+    "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj",
+    "--configuration",
+    "Release",
+    "--no-build",
+    "--",
+    "--filter-class",
+    "ForgeLine.Presentation.Tests.EffectSubmission.ParticleDepthOrderingTests",
+    "ForgeLine.Presentation.Tests.EffectSubmission.ParticleEffectSubmissionTests",
+    "--parallel",
+    "none"
+  ],
+  "startedUtc": "2026-10-20T20:12:40.311892+00:00",
+  "sourceFiles": {
+    "src/ForgeLine.Graphics/SceneCompositeShader.cs": "b3752472dcc3d1d6bae32ae7c91d9347a99eed924807a6b1f637a351abe3094a",
+    "src/ForgeLine.Presentation/ParticleVfxRenderer.cs": "a8f6055eb48077d862978699b3c921ed15ba06241c96fec65f95875ef3b3f1b8",
+    "src/ForgeLine.Presentation/EffectSubmission/ParticleEffectSubmission.cs": "067e5defb3d01f06c4665b5cc5dd8aab7886a5615d5d7f1fefa45270a1c77be7",
+    "src/ForgeLine.Presentation/EffectSubmission/ParticleDepthOrdering.cs": "f8ba1416fc40af63d052275b7de0df2f437e36b03dd6276445ee339b431d2ee7",
+    "src/ForgeLine.Presentation/EffectSubmission/ParticleEffectDefinition.cs": "8ae25542e3ffc74e8ae812d4ee4212402bbe34994964fa37072eb45f61e20939",
+    "tests/ForgeLine.Graphics.Tests/SceneComposition/CompositionShaderNativeTests.cs": "d05e066987c560192d5a0e1bb1cfbba435af2a56ec1e5a3fcbcadbb0e9135e76",
+    "tests/ForgeLine.Graphics.Tests/SceneComposition/CompositionProductNativeTests.cs": "b4ed8c1d511c1cfb8a9f9ab47832e5fa79a4c05708ab99d97d8ed3bb829bffae",
+    "tests/ForgeLine.Graphics.Tests/SceneComposition/CompositionNumericsNativeTests.cs": "9aacc12f4d93ff8a8909aa1999911df5b01b45a342fb19501b90156e13979a7b",
+    "tests/ForgeLine.Presentation.Tests/EffectSubmission/ParticleEffectSubmissionTests.cs": "b9506f92906076785ae3abda0344808f46601deffe405e0cf28638f8cfd9900f",
+    "tests/ForgeLine.Presentation.Tests/EffectSubmission/ParticleDepthOrderingTests.cs": "bbdbfaff6c655d4305e522bac9c3479016bdf8cb65f412e792d6b476d27733ba",
+    "tests/ForgeLine.Presentation.Tests/EffectSubmission/ParticleOrderingQualificationTests.cs": "34bf8e1fa85a0313ad47705044be49e9b425ed92eef21cf00289bf08d57ab151"
+  },
+  "exitCode": 0,
+  "elapsedSeconds": 2.0282343720000426
+}

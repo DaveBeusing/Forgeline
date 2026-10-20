@@ -1,0 +1,133 @@
+Running tests from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RepeatedDirectorateBuildingsUseSharedInstancingPath (18ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RepeatedDirectorateBuildingsUseSharedInstancingPath() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:423
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.ClusterCullingMatchesReferenceUploadsAndSkipsOffscreenWork (3ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.ClusterCullingMatchesReferenceUploadsAndSkipsOffscreenWork() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:531
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RenderDiagnosticsMatchVisibleFixtureCounts (1ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : Internal Compiler error:
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RenderDiagnosticsMatchVisibleFixtureCounts() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:211
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.FailedUploadGrowthRetainsPreviousBufferAndRecovers (2ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.FailedUploadGrowthRetainsPreviousBufferAndRecovers() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:91
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.WarmSubmissionDoesNotAllocatePerFrameScratch (1ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.WarmSubmissionDoesNotAllocatePerFrameScratch() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:154
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.CloseWreckReportsTheReducedLodUsedByItsMesh (1ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.CloseWreckReportsTheReducedLodUsedByItsMesh() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:56
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RepeatedVfxWithoutRuntimeCatalogUsesBoundedSharedFallbackBatch (1ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RepeatedVfxWithoutRuntimeCatalogUsesBoundedSharedFallbackBatch() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:504
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.OversizedScratchIsReleasedBeforeNextSmallFrame (1ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.OversizedScratchIsReleasedBeforeNextSmallFrame() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:68
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RepeatedDirectorateUnitsRemainSingleBatchAtRepresentativeCount (1ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RepeatedDirectorateUnitsRemainSingleBatchAtRepresentativeCount() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:339
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.PartialBufferInitializationReleasesPreviouslyCreatedResources (2ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Assert.Throws() Failure: Exception type was not an exact match
+  Expected: typeof(System.InvalidOperationException)
+  Actual:   typeof(ForgeLine.Graphics.GraphicsShaderCompilationException)
+  ---- ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.PartialBufferInitializationReleasesPreviouslyCreatedResources() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:166
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+    ----- Inner Stack Trace -----
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.<PartialBufferInitializationReleasesPreviouslyCreatedResources>b__7_0() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:166
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RepeatedVisibleInstancesShareOneInstancedDraw (1ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.RepeatedVisibleInstancesShareOneInstancedDraw() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:257
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.AnimatedVegetationKeepsOneBatchAndHiddenInstancesOutOfUploads (1ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.AnimatedVegetationKeepsOneBatchAndHiddenInstancesOutOfUploads() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:29
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+failed ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.GrowthEmptyFramesAndRecoveryPreserveExactSubmission (1ms)
+  from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Xunit.MicrosoftTestingPlatform.XunitException: ForgeLine.Graphics.GraphicsShaderCompilationException : error: invalid profile
+    at ForgeLine.Graphics.DxcShaderCompiler.Compile(String source, GraphicsShaderStage stage, String entryPoint, String sourceName) in <validation-root>/Forgeline/src/ForgeLine.Graphics/DxcShaderCompiler.cs:53
+    at ForgeLine.Presentation.InstanceMaterialPipeline.CreatePipeline(IGraphicsDevice graphics, WorldEnvironmentSettings environment) in <validation-root>/Forgeline/src/ForgeLine.Presentation/InstanceMaterialPipeline.cs:128
+    at ForgeLine.Presentation.SimpleInstanceRenderer..ctor(IGraphicsDevice graphics, RuntimeAssetCatalog runtimeAssets, Nullable`1 lighting, Single lodDiameterScale, TextureDetailQuality textureDetail, Boolean vegetationMotion, Nullable`1 environment, Nullable`1 vegetation, Boolean clusterCulling) in <validation-root>/Forgeline/src/ForgeLine.Presentation/SimpleInstanceRenderer.cs:88
+    at ForgeLine.Presentation.Tests.SimpleInstanceRendererTests.GrowthEmptyFramesAndRecoveryPreserveExactSubmission() in <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs:119
+    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+<validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64) failed with 13 error(s) (629ms)
+Exit code: 2
+
+Test run summary: Failed!
+  total: 26
+  failed: 13
+  succeeded: 13
+  skipped: 0
+  duration: 842ms
+Test run completed with non-success exit code: 2 (see: https://aka.ms/testingplatform/exitcodes)

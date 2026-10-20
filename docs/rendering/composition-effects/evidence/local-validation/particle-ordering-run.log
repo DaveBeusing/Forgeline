@@ -1,0 +1,9 @@
+Running tests from <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64)
+<validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll (net10.0|x64) passed (2s 715ms)
+
+Test run summary: Passed!
+  total: 1
+  failed: 0
+  succeeded: 1
+  skipped: 0
+  duration: 2s 931ms

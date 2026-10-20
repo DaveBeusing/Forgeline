@@ -1,0 +1,3 @@
+VALID: 10 workstreams, 8 mutually disjoint parallel lanes; dependency graph valid.
+VALID: 53 changed paths belong to SceneCompositionAndParticleEfficiency.
+This is a path/dependency check, not a semantic, runtime, or merge-approval guarantee.
