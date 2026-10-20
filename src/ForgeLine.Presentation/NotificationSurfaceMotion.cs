@@ -72,8 +72,23 @@ internal sealed class NotificationSurfaceMotion
             int match = -1;
             for (int j = 0; j < previousCount; j++)
                 if (previous[j].Key == key) { match = j; break; }
-            var track = match < 0 ? new Track(key, card.Bounds, 0, 0, now) :
-                previous[match] with { Bounds = card.Bounds };
+            Track track;
+            if (match >= 0)
+                track = previous[match] with { Bounds = card.Bounds };
+            else
+            {
+                float inherited = 0;
+                for (int j = 0; j < _retiredCount; j++)
+                    if (_retired[j].Key == key)
+                    {
+                        inherited = _retired[j].Opacity;
+                        _retired[j] = _retired[--_retiredCount];
+                        break;
+                    }
+                // Resuming a live identity reverses the outgoing fade and
+                // slide from its last progress instead of jumping to zero.
+                track = new Track(key, card.Bounds, inherited, inherited, now);
+            }
             track = track with { Opacity = Interpolate(track.From, 1, now - track.Start) };
             _current[i] = track;
             _opacities[i] = track.Opacity;
