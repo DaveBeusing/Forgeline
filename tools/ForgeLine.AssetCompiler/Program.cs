@@ -169,7 +169,7 @@ internal static class Program
                 Directory.CreateDirectory(Path.GetDirectoryName(output)!);
                 File.WriteAllText(output, JsonSerializer.Serialize(inventory, RuntimeAssetCatalog.CreateJsonOptions()));
             }
-            catch (Exception exception) when (exception is IOException or ArgumentException or KeyNotFoundException)
+            catch (Exception exception) when (exception is IOException or InvalidDataException or ArgumentException or KeyNotFoundException)
             {
                 Console.Error.WriteLine($"ASSET102: Residency inventory failed: {exception.Message}");
                 return 1;

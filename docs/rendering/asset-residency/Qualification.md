@@ -1,6 +1,6 @@
 # Asset residency qualification
 
-Status: inventory implementation; runtime residency implementation and acceptance are pending.
+Status: implementation under qualification; complete affected suites, native cold/warm evidence and CI acceptance are pending.
 
 Baseline master is 47f4230f487e37f699b6572354e89f800476c513, version 0.1.420.
 The accepted render foundation and initialized static-buffer implementation are integrated.
@@ -33,3 +33,21 @@ Seven inventory contracts pass (3.170s), including full-container positive/negat
 studio-prefix exclusion. The first run had one invalid test fixture (DisplayImage
 incorrectly declared sRGB); the fixture now follows the existing linear rule and
 both logs remain retained. Inventory compilation has zero warnings/errors.
+
+
+The real RuntimeWorldAssetResources facade now leases one render-owner device/catalog/profile
+store shared by terrain and instances. A closed mesh/material dependency plan prepares typed
+payloads before first-frame publication, in bounded startup steps; the session constructor
+publishes all required GPU resources using the existing initialized-buffer API. Normal and
+reference starts already construct this same session, so no frozen host/renderer ABI changes
+are needed. Scope details and limits are recorded in Decision.md. There is no background GPU
+work or unbounded streaming/LRU cache.
+
+The first residency build passes with zero warnings/errors. Existing boundary/material contracts
+pass all fourteen tests; expanded residency plus original boundary contracts pass all 21 cases
+(2.706s). The tests delete prepared container files, then verify 1,024 warm lookups add no managed
+allocations, file reads, buffers or textures; shared wrappers survive first-owner disposal, profile
+and device wrappers stay distinct, pinned generations reject excess admission, missing/hash-damaged
+main containers fail, cancellation never publishes partial readiness, and a retirement exception
+still releases remaining wrappers without double-decrementing the scope. These are functional
+contracts, not native timing or physical heap acceptance.
