@@ -4,6 +4,7 @@ internal static class SubmissionGraphics
 {
     internal sealed class FakeGraphicsDevice : IGraphicsDevice
     {
+        public GraphicsDirectionalShadowSettings DirectionalShadows { get; set; }
         public bool CaptureUploads { get; set; }
         public int FailBufferCreation { get; set; }
         public List<FakeGraphicsBuffer> Buffers { get; } = [];

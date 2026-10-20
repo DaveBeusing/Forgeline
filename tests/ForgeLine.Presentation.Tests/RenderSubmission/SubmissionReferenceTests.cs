@@ -23,7 +23,7 @@ public sealed class SubmissionReferenceTests
         var random = new Random(7241);
         var instances = Enumerable.Range(0, count).Select(i => Root(i,
             camera.Target + new Vector3(random.Next(-600, 600), 0, random.Next(-600, 600)))).ToArray();
-        var world = World(instances);
+        var world = CreateWorld(instances);
         foreach (float distance in new[] { 120f, 420f, 900f })
         {
             camera.ApplyState(camera.CaptureState() with { Distance = distance });
@@ -40,7 +40,7 @@ public sealed class SubmissionReferenceTests
         new(position, Quaternion.Identity, Vector3.One), new(1), RenderMaterialHandle.Default,
         RenderVisibilityMask.World, (uint)index + 1);
 
-    internal static RenderWorld World(RenderInstance[] instances)
+    internal static RenderWorld CreateWorld(RenderInstance[] instances)
     {
         var buffer = new PresentationSnapshotBuffer();
         buffer.Publish(new(new SimulationTick(1), TimeSpan.FromMilliseconds(50), instances.Length, instances));

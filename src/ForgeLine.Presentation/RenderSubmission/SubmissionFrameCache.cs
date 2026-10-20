@@ -50,4 +50,7 @@ internal readonly record struct PreparedRoot(RenderInstance Instance, AxisAligne
 
 public readonly record struct SubmissionWorkMetrics(int SnapshotRoots, int Candidates, int Interpolations,
     int PoseCacheHits, int BoundsTests, int MeshResolutions, int MaterialResolutions,
-    int AcceptedRoots, int UploadedParts, int DrawnParts, int PipelineBindings, int TextureBindings);
+    int AcceptedRoots, int UploadedParts, int DrawnParts, int PipelineBindings, int TextureBindings)
+{
+    public int DrawnRoots { get; init; }
+}

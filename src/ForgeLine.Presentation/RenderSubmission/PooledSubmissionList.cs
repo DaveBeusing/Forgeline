@@ -8,6 +8,8 @@ internal sealed class PooledSubmissionList<T> where T : unmanaged
     private T[] _items = [];
     internal int Count { get; private set; }
     internal int Capacity => _items.Length;
+    internal T this[int index] { get => _items[index]; set => _items[index] = value; }
+    internal void Truncate(int count) => Count = count;
     internal void Add(T item)
     {
         if (Count == _items.Length)

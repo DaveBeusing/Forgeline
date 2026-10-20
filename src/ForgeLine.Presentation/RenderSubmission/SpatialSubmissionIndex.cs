@@ -6,6 +6,7 @@ namespace ForgeLine.Presentation.RenderSubmission;
 // The permutation is private. Candidates are consumed in original snapshot order.
 internal sealed class SpatialSubmissionIndex
 {
+    internal const int MaximumRetainedRoots = 262144;
     private PresentationSnapshot? _current, _previous;
     private ulong[] _order = [];
     private AxisAlignedBounds[] _bounds = [], _clusters = [];
