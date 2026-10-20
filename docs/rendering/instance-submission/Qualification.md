@@ -1,6 +1,6 @@
 # Instance submission qualification
 
-Status: implementation in progress; acceptance open.
+Status: implemented, not yet accepted (implementiert, noch nicht abgenommen).
 
 Base: `47f4230f487e37f699b6572354e89f800476c513`, tracked version 0.1.420.
 The remote had only master and no open PR at pre-check. Snapshot publication
@@ -20,7 +20,9 @@ acyclic. Native qualification and human image review remain required.
 
 ## Executed functional checks
 
-Product source: `cfab93d1c12c691c2f3fd6404d24d680fde99876`.
+Measured corrected source: `63fada7afaf610ea91af3a8c6d283dd1d4093975`.
+Final functional binaries: `60724f1204cffbc850cbbfbc0a381cd62b0f23a1`.
+The later public-API fix changes only the standalone measurement adapter.
 The complete solution Release build passes, zero warnings/errors. The reference
 master build also passes. The project-reference validator and functional
 ownership check pass; the serialized version diff is only 420 to 421.
@@ -51,6 +53,43 @@ allocation cases. The remaining six are reproduced against unchanged master
 - SkirmishOpponentTests.EastOffensiveObjectiveAdvancesIntoOpponentHalfAgainstStationaryBase
 - SkirmishOpponentTests.DirectCombatTargetsRequireCurrentIdentifiedIntelligence
 
+After candidate enumeration and endpoint corrections, the complete Release
+solution build passes with zero warnings/errors. The complete Presentation
+project passes **1,452 total, 1,440 passed, 12 optional skips**, exit 0, 50.3s;
+52 focused renderer/extraction/index/owned cases pass. These checks refer to
+63fada7a. On final source 60724f12, Release solution build again passes with
+zero warnings/errors (98.98s), and full Presentation passes **1,453 total,
+1,441 passed, 12 optional skips**, exit 0 (65.3s). The 21 safety cases, including
+large-to-small pose-cache reclamation, pass separately. Original log hashes
+and commands are in [functional checks](evidence/functional-checks.json).
+
+Portable raw CPU evidence, exact adapter/controller source and hashes are in
+[evidence](evidence/). [Measurements](Measurements.md) separates reproducible
+CPU reductions from mixed mechanical timings and pending GPU/image results.
+
 Game, logistics, simulation, economy and their existing tests are unchanged.
-These failures remain outside this change's write ownership. Native checks,
-final CI and human review remain open. No acceptance is inferred from subsets.
+These failures remain outside this change's write ownership. No complete
+solution green result is claimed.
+
+Native capture runs complete on hardware against the same source/assets:
+18 cases per side; all six capture exits zero. Fifteen image pairs are exact,
+three tactical vehicle views exceed zero pixel tolerance and require human
+shadow review. The unchanged 15% performance gates fail 31/7/7 metric comparisons
+for fixed/sweep/Low; details and raw frames are in [Measurements](Measurements.md).
+Final CI, the complete-suite baseline failures, native performance, sweep
+memory plateau and human image acceptance remain open. No acceptance is inferred
+from successful subsets or structural image exits.
+
+
+The longer ABBA repeat completes with 1,024 warmup / 512 measured frames,
+eight zero capture exits, 16 stable product resource plateaus and no detected
+foreign workloads. Tactical repeated-vehicle CPU medians improve in both pairs;
+the earlier slowdown is not stable across cohorts. Nevertheless the unchanged
+performance gate still fails 7/2/12/1 metric comparisons (A High/A Low/B High/B
+Low), so performance acceptance stays open. Twelve of 16 image pairs are exact;
+the same tactical shadow selection differences require human review.
+
+The final project-reference validator passes 46 projects with no cycles. Final
+source ownership and one-PATCH validation are required before publishing the
+final PR head. All product paths are unchanged after the measured 60724f12;
+subsequent commits contain measurement helpers and evidence/documentation only.

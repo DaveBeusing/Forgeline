@@ -29,8 +29,12 @@ is exact current/previous snapshot identity, alpha and presentation time. A
 renderer lifetime fixes lighting, quality, vegetation settings, texture detail
 and the asset-catalog/session generation. Native handles never enter this cache.
 A new renderer is required for a new asset generation or quality construction.
-Session changes clear pages. Overflow roots are prepared directly without
-extending retained pages. Only interpolated pose, conservative bounds and base
+Session changes clear pages. A drop to at most one quarter of the root ceiling
+releases the unused tail when the cache previously exceeded that quarter.
+Oscillation around 65,536 roots keeps the pages; return to a small scene
+reclaims them. Overflow roots are prepared directly without extending retained
+pages. WorkMetrics reports retained page payload and spatial-index bytes;
+object headers, the small page directory and process-pool storage are separate. Only interpolated pose, conservative bounds and base
 transform are shared: camera projection, LOD/hysteresis, distance density, wind
 LOD amplitude and mechanical-detail weight remain per pass. LOD histories are isolated by weak RenderWorld and camera
 identity, and reset for a changed session; another camera cannot seed hysteresis.
@@ -70,7 +74,7 @@ roots, uploaded parts and drawn parts are separate WorkMetrics fields.
 
 ## Validation and integration
 
-Tests in RenderSubmission compare exact opaque uploads with uncullled reference,
+Tests in RenderSubmission compare exact opaque uploads with unculled reference,
 exercise swept/nonfinite bounds, separate light queries, cache key changes,
 65,535/65,536/65,537 roots and simultaneous 257-batch leases. Existing renderer,
 LOD, animation and asset tests remain unchanged. Null graphics proves CPU and

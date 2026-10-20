@@ -1,0 +1,34 @@
+{
+  "source": "60724f1204cffbc850cbbfbc0a381cd62b0f23a1",
+  "releaseSolutionBuild": {
+    "exit": 0,
+    "warnings": 0,
+    "errors": 0,
+    "seconds": 98.98
+  },
+  "presentationSuite": {
+    "exit": 0,
+    "total": 1453,
+    "passed": 1441,
+    "failed": 0,
+    "optionalSkipped": 12,
+    "seconds": 65.301
+  },
+  "retentionSafetyFocus": {
+    "exit": 0,
+    "total": 21,
+    "passed": 21,
+    "failed": 0
+  },
+  "commands": [
+    "dotnet build ForgeLine.sln -c Release --no-restore --artifacts-path artifacts/instance-submission/verification -m:2 -nodeReuse:false -p:UseSharedCompilation=false",
+    "dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj -c Release --artifacts-path artifacts/instance-submission/verification --no-build"
+  ],
+  "originalLocalLogSha256": {
+    "final-source-build.log": "ca46d35e3affc6829274298c7adc1c49cf53de0848d699de73f1927b569a1761",
+    "final-source-presentation.log": "c8f4c26887f340962a50236c4478e2675fbe94d342652cc8fdb073ff73f0c2f4",
+    "retention-tests.log": "aa207b9e3e89ee1241431916a891e59f36262d76f7fd44378e4aa50e2f850bc6",
+    "instance-submission-master-game-failures.log": "23ae7a074a930f4db4352fd6f7bf3d5099cb0c63edd010303ae45a224111d88a"
+  },
+  "limitations": "Complete solution suite previously failed six unchanged Game tests reproduced on master plus three allocation cases subsequently fixed by nonparallel shared-pool test collection. No complete-solution green result claimed. Initial separate measurement-adapter compile failed on an internal member; corrected to public RenderWorld API and compiled against both exact sources."
+}
