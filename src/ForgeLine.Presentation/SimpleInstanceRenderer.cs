@@ -1,3 +1,5 @@
+using System.Buffers;
+using ForgeLine.Presentation.RenderSubmission;
 using ForgeLine.Presentation.RenderContracts;
 using ForgeLine.Graphics.RenderContracts;
 using System.Numerics;
@@ -20,6 +22,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private const int MinimumInstanceCapacity = 64;
     private const int MaximumRetainedScratchInstances = 65_536;
     private const int MaximumRetainedScratchBatches = 256;
+    private const int MaximumRetainedBatchSlots = MaximumRetainedScratchBatches * 4;
+    private bool _stagingPooled;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
@@ -40,6 +44,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private Dictionary<(EntityId Entity, uint Identity), int> _previousLods = [];
     private Dictionary<(EntityId Entity, uint Identity), int> _currentLods = [];
     private InstanceRenderData[] _instanceStaging = [];
+    private readonly SpatialSubmissionIndex _spatialVisibility = new();
+    private readonly SubmissionFrameCache _preparedRoots = new();
+    private readonly Dictionary<string, (bool Found, RuntimeMeshBuffers Mesh, AssetId Id)> _passMeshes = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, RuntimeMaterialResources> _passMaterials = new(StringComparer.Ordinal);
+    private int _meshResolutions, _materialResolutions;
+    public SubmissionWorkMetrics WorkMetrics { get; private set; }
+
     private int _activeBatchCount;
     private long _snapshotIndexBytes;
     private bool _disposed;
@@ -204,7 +215,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 if (_batches[i].UsesRuntimeMaterial) textured++;
             int submitted = LastDiagnostics.RuntimeMeshInstances + LastDiagnostics.FallbackMeshInstances;
             return new InstanceSubmissionMetrics(_instanceStaging.Length, retained, _batches.Count,
-                submitted, (long)submitted * InstanceStride, LastDiagnostics.DrawCalls, textured * 4)
+                submitted, (long)submitted * InstanceStride, WorkMetrics.PipelineBindings, WorkMetrics.TextureBindings)
             { SnapshotIndexBytes = _snapshotIndexBytes, MechanicalPartInstances = mechanical, MechanicalTransformScratchBytes = MechanicalMeshValidation.MaximumParts * 64, SkinEvaluatedPoses = _skinFrames?.EvaluatedPoses ?? 0, SkinStaticFallbacks = _skinFrames?.StaticFallbacks ?? 0, SkinUploadBytes = _skinFrames?.ResidentBytes ?? 0 };
         }
     }
@@ -277,7 +288,18 @@ public sealed class SimpleInstanceRenderer : IDisposable
         var batchLookup = _batchLookup;
         var batches = _batches;
 
-        int clusterTests = 0, rejectedClusters = 0, clusterCulled = 0, instanceTests = 0;
+        if (_clusterCulling)
+        {
+            _spatialVisibility.Update(world);
+            _spatialVisibility.Query(frustum, world.InstanceCount);
+        }
+        int clusterTests = _clusterCulling ? _spatialVisibility.ClusterCount : 0;
+        int rejectedClusters = _clusterCulling ? _spatialVisibility.RejectedClusters : 0;
+        int clusterCulled = _clusterCulling ? _spatialVisibility.RejectedRoots : 0, instanceTests = 0;
+        _preparedRoots.Begin(world, alpha, presentationSeconds);
+        _passMeshes.Clear(); _passMaterials.Clear();
+        _meshResolutions = _materialResolutions = 0;
+        int candidates = 0;
         int visible = 0;
         int animatedVegetation = 0;
         int visibleVegetation = 0;
@@ -291,20 +313,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
         for (int index = 0; index < world.InstanceCount; index++)
         {
             if (visible >= maximumCasters) break;
-            if (_clusterCulling && world.InstanceCount >= RenderSnapshotIndex.ClusterSize && index % RenderSnapshotIndex.ClusterSize == 0)
-            {
-                clusterTests++;
-                if (!world.ClusterVisible(index, frustum))
-                {
-                    int skipped = Math.Min(RenderSnapshotIndex.ClusterSize, world.InstanceCount - index);
-                    rejectedClusters++; clusterCulled += skipped; index += skipped - 1;
-                    continue;
-                }
-            }
-            RenderInstance instance =
-                world.GetInterpolatedInstance(
-                    index,
-                    alpha);
+            if (_clusterCulling && !_spatialVisibility.IsCandidate(index)) continue;
+            candidates++;
+            PreparedRoot preparedRoot = _preparedRoots.Get(world, index);
+            RenderInstance instance = preparedRoot.Instance;
             if (shadowProjection.HasValue && (instance.VfxFeature.IsSpecified || instance.DecalFeature.IsSpecified)) continue;
 
 
@@ -319,14 +331,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
             if (instance.VfxFeature.IsSpecified && ++effectRequests > PresentationExtractor.MaximumSnapshotEffects) continue;
             if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
             if (instance.VfxFeature.IsSpecified && ++meshFallbackEffects > (particles?.MaximumMeshFallbackEffects ?? 128)) continue;
-            AxisAlignedBounds bounds =
-                instance.MechanicalPose.Infantry.IsSpecified ? SkinPresentationBounds.Resolve(instance) :
-                presentationSeconds.HasValue ? VegetationVisualMotion.CullingBounds(instance) :
-                    SkinPresentationBounds.Resolve(instance);
+            AxisAlignedBounds bounds = preparedRoot.Bounds;
 
             instanceTests++;
-            if (!frustum.Intersects(
-                    bounds))
+            if (Finite(bounds.Minimum) && Finite(bounds.Maximum) && !frustum.Intersects(bounds))
             {
                 continue;
             }
@@ -385,7 +393,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&
-                    _runtimeAssets.TryGetMesh(
+                    TryGetMesh(
                         meshAssetId,
                         out runtimeMesh,
                         out runtimeMeshId) &&
@@ -394,7 +402,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 if (!usesRuntimeMesh && _runtimeAssets is not null && unitLod != UnitAssetLod.Lod0 && !instance.UnitFeature.IsWreck)
                 {
                     unitLod = UnitAssetLod.Lod0;
-                    usesRuntimeMesh = _runtimeAssets.TryGetMesh(unitDefinition.MeshAssetId,
+                    usesRuntimeMesh = TryGetMesh(unitDefinition.MeshAssetId,
                         out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
                     if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)unitLod;
                 }
@@ -432,7 +440,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&
-                    _runtimeAssets.TryGetMesh(
+                    TryGetMesh(
                         meshAssetId,
                         out runtimeMesh,
                         out runtimeMeshId) &&
@@ -441,7 +449,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 if (!usesRuntimeMesh && _runtimeAssets is not null && buildingLod != BuildingAssetLod.Lod0)
                 {
                     buildingLod = BuildingAssetLod.Lod0;
-                    usesRuntimeMesh = _runtimeAssets.TryGetMesh(
+                    usesRuntimeMesh = TryGetMesh(
                         BuildingPresentationCatalog.ResolveMeshAssetId(instance.BuildingFeature, buildingLod),
                         out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
                     if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)buildingLod;
@@ -478,7 +486,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&
-                    _runtimeAssets.TryGetMesh(
+                    TryGetMesh(
                         definition.MeshAssetId,
                         out runtimeMesh,
                         out runtimeMeshId) &&
@@ -497,7 +505,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&
-                    _runtimeAssets.TryGetMesh(
+                    TryGetMesh(
                         meshAssetId,
                         out runtimeMesh,
                         out runtimeMeshId) &&
@@ -518,7 +526,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&
-                    _runtimeAssets.TryGetMesh(
+                    TryGetMesh(
                         instance.WorldFeature,
                         worldLod,
                         out runtimeMesh,
@@ -553,7 +561,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 materialAssetId is not null;
             RuntimeMaterialResources runtimeMaterial =
                 hasRuntimeMaterial
-                    ? _runtimeAssets!.ResolveMaterial(
+                    ? ResolveMaterial(
                         materialAssetId!)
                     : default;
             bool usesRuntimeMaterial =
@@ -571,13 +579,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 {
                     if (hasUnitDefinition && unitLod == UnitAssetLod.Lod0 &&
                         !instance.UnitFeature.IsWreck && unitDefinition.HasArticulatedTurret)
-                        preparedAssets.TryGetMesh(unitDefinition.TurretMeshAssetId!, out _);
+                        TryGetMesh(unitDefinition.TurretMeshAssetId!, out _);
                     string? preparedUnitState = hasUnitDefinition
                         ? UnitPresentationCatalog.ResolveStateAttachmentAssetId(instance.UnitFeature, unitLod) : null;
-                    if (preparedUnitState is not null) preparedAssets.TryGetMesh(preparedUnitState, out _);
+                    if (preparedUnitState is not null) TryGetMesh(preparedUnitState, out _);
                     string? preparedBuildingState = hasBuildingDefinition
                         ? BuildingPresentationCatalog.ResolveStateAttachmentAssetId(instance.BuildingFeature) : null;
-                    if (preparedBuildingState is not null) preparedAssets.TryGetMesh(preparedBuildingState, out _);
+                    if (preparedBuildingState is not null) TryGetMesh(preparedBuildingState, out _);
                 }
                 continue;
             }
@@ -590,7 +598,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             if (instance.DecalFeature.IsSpecified) color.W *= Math.Clamp(instance.DecalFeature.Opacity, 0, .65f);
             Matrix4x4 worldMatrix =
                 presentationSeconds.HasValue ? VegetationVisualMotion.Transform(instance, projectedDiameter, presentationSeconds.Value) :
-                    instance.Transform.ToMatrix();
+                    preparedRoot.Transform;
             if (presentationSeconds.HasValue && projectedDiameter > 18 && VegetationVisualMotion.Applies(instance)) animatedVegetation++;
 
             if (instance.InfrastructureFeature.IsSpecified)
@@ -610,7 +618,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 !instance.UnitFeature.IsWreck &&
                 unitDefinition.HasArticulatedTurret &&
                 _runtimeAssets is not null &&
-                _runtimeAssets.TryGetMesh(
+                TryGetMesh(
                     unitDefinition.TurretMeshAssetId!,
                     out RuntimeMeshBuffers turretMesh,
                     out AssetId turretMeshId) &&
@@ -623,7 +631,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             string? unitStateAssetId = hasUnitDefinition
                 ? UnitPresentationCatalog.ResolveStateAttachmentAssetId(instance.UnitFeature, unitLod) : null;
             if (unitStateAssetId is not null && _runtimeAssets is not null &&
-                _runtimeAssets.TryGetMesh(unitStateAssetId, out RuntimeMeshBuffers unitStateMesh, out AssetId unitStateMeshId) &&
+                TryGetMesh(unitStateAssetId, out RuntimeMeshBuffers unitStateMesh, out AssetId unitStateMeshId) &&
                 unitStateMesh.IsValid)
             {
                 if (!preparing) AddMechanicalBatches(instance, worldMatrix, color, true, unitStateMesh,
@@ -637,7 +645,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
             if (buildingStateAssetId is not null &&
                 _runtimeAssets is not null &&
-                _runtimeAssets.TryGetMesh(
+                TryGetMesh(
                     buildingStateAssetId,
                     out RuntimeMeshBuffers stateMesh,
                     out AssetId stateMeshId) &&
@@ -675,6 +683,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
         }
 
+        WorkMetrics = new(world.InstanceCount, candidates, _preparedRoots.Interpolations, _preparedRoots.Hits,
+            instanceTests, _meshResolutions, _materialResolutions, visible, 0, 0, 0, 0);
         if (context is null) return;
 
         if (visible == 0 || _activeBatchCount == 0)
@@ -745,7 +755,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
         {
             int capacity = Math.Max(MinimumInstanceCapacity, _instanceStaging.Length);
             while (capacity < submittedInstances) capacity = checked(capacity * 2);
-            _instanceStaging = new InstanceRenderData[capacity];
+            if (_stagingPooled) ArrayPool<InstanceRenderData>.Shared.Return(_instanceStaging);
+            _stagingPooled = capacity > MaximumRetainedScratchInstances;
+            _instanceStaging = _stagingPooled ? ArrayPool<InstanceRenderData>.Shared.Rent(capacity) : new InstanceRenderData[capacity];
         }
         var instanceData = _instanceStaging;
         int writeOffset = 0;
@@ -781,7 +793,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
         constants[32] = camera.Position.X; constants[33] = camera.Position.Y; constants[34] = camera.Position.Z;
 
         int draws = 0;
-        int shadowSubmitted = 0;
+        int shadowSubmitted = 0, pipelineBindings = 0, textureBindings = 0;
+        IGraphicsPipeline? boundPipeline = null;
+        AssetId boundMaterial = default;
+        bool materialBound = false;
 
         for (int batchIndex = 0;
              batchIndex < _activeBatchCount;
@@ -796,13 +811,17 @@ public sealed class SimpleInstanceRenderer : IDisposable
                       throw new InvalidOperationException(
                           "The textured instance pipeline is unavailable.")
                     : _pipeline;
-            context.SetPipeline(
-                pipeline);
-            context.SetVertexConstants(
-                shadowProjection.HasValue ? constants[..16] : constants);
-
-            if (batch.UsesRuntimeMaterial && !shadowProjection.HasValue)
+            if (!ReferenceEquals(boundPipeline, pipeline))
             {
+                context.SetPipeline(pipeline);
+                context.SetVertexConstants(shadowProjection.HasValue ? constants[..16] : constants);
+                boundPipeline = pipeline; pipelineBindings++; materialBound = false;
+            }
+
+            if (batch.UsesRuntimeMaterial && !shadowProjection.HasValue &&
+                (!materialBound || boundMaterial != batch.RuntimeMaterial.MaterialId))
+            {
+                boundMaterial = batch.RuntimeMaterial.MaterialId; materialBound = true; textureBindings += 4;
                 context.SetPixelTexture(
                     0,
                     batch.RuntimeMaterial.BaseColorTexture);
@@ -855,6 +874,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
             draws++;
         }
 
+        WorkMetrics = WorkMetrics with { UploadedParts = submittedInstances, DrawnParts = shadowSubmitted,
+            PipelineBindings = pipelineBindings, TextureBindings = textureBindings };
         LastDiagnostics =
             new InstanceRenderDiagnostics(
                 world.InstanceCount,
@@ -900,8 +921,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
         foreach (FrameInstanceBuffer frameBuffer in _shadowFrameInstanceBuffers.Values) frameBuffer.Buffer?.Dispose();
         _shadowFrameInstanceBuffers.Clear();
         _batchLookup.Clear();
+        foreach (InstanceBatch batch in _batches) batch.Instances.Release();
         _batches.Clear();
+        if (_stagingPooled) ArrayPool<InstanceRenderData>.Shared.Return(_instanceStaging);
+        _stagingPooled = false;
         _instanceStaging = [];
+        _spatialVisibility.Clear();
+        _preparedRoots.Clear(); _passMeshes.Clear(); _passMaterials.Clear();
         _previousLods.Clear();
         _currentLods.Clear();
         _runtimeAssets?.Dispose();
@@ -924,15 +950,19 @@ public sealed class SimpleInstanceRenderer : IDisposable
             retainedInstances += batch.Instances.Capacity;
             batch.Reset();
         }
-        if (_batches.Count > MaximumRetainedScratchBatches ||
-            retainedInstances > MaximumRetainedScratchInstances)
+        if (retainedInstances > MaximumRetainedScratchInstances || _batches.Count > MaximumRetainedScratchBatches)
+            foreach (InstanceBatch batch in _batches) batch.Instances.Release();
+        // Empty metadata slots are cheap; retain a bounded escape band around 256
+        // without retaining their payload leases or native resource references.
+        if (_batches.Count > MaximumRetainedBatchSlots)
         {
-            _batches.Clear();
-            _batches.TrimExcess();
-            _batchLookup.TrimExcess();
+            _batches.Clear(); _batches.TrimExcess(); _batchLookup.TrimExcess();
         }
-        if (_instanceStaging.Length > MaximumRetainedScratchInstances)
-            _instanceStaging = [];
+        if (_stagingPooled)
+        {
+            ArrayPool<InstanceRenderData>.Shared.Return(_instanceStaging);
+            _instanceStaging = []; _stagingPooled = false;
+        }
         _activeBatchCount = 0;
     }
 
@@ -1056,6 +1086,31 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 color, usesMaterial, material));
         }
     }
+    private static bool Finite(Vector3 value) => float.IsFinite(value.X) && float.IsFinite(value.Y) && float.IsFinite(value.Z);
+
+    private bool TryGetMesh(string id, out RuntimeMeshBuffers mesh, out AssetId resolved)
+    {
+        if (!_passMeshes.TryGetValue(id, out var entry))
+        {
+            _meshResolutions++;
+            bool found = _runtimeAssets!.TryGetMesh(id, out mesh, out resolved);
+            entry = (found, mesh, resolved); _passMeshes.Add(id, entry);
+        }
+        mesh = entry.Mesh; resolved = entry.Id; return entry.Found;
+    }
+    private bool TryGetMesh(string id, out RuntimeMeshBuffers mesh) => TryGetMesh(id, out mesh, out _);
+    private bool TryGetMesh(in WorldFeaturePresentationMetadata feature, WorldAssetLod lod, out RuntimeMeshBuffers mesh, out AssetId resolved)
+    {
+        _meshResolutions++;
+        return _runtimeAssets!.TryGetMesh(feature, lod, out mesh, out resolved);
+    }
+    private RuntimeMaterialResources ResolveMaterial(string id)
+    {
+        if (_passMaterials.TryGetValue(id, out var material)) return material;
+        _materialResolutions++; material = _runtimeAssets!.ResolveMaterial(id);
+        _passMaterials.Add(id, material); return material;
+    }
+
     private static Matrix4x4 CreateArticulatedTransform(
         Matrix4x4 world,
         Vector3 pivot,
@@ -1221,8 +1276,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
         public RuntimeMaterialResources RuntimeMaterial { get; set; }
 
-        public List<InstanceRenderData> Instances { get; } =
-            [];
+        public PooledSubmissionList<InstanceRenderData> Instances { get; } = new();
 
         public int InstanceOffset { get; set; }
 
