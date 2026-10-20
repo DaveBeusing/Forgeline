@@ -34,3 +34,24 @@ Raw local evidence: `artifacts/snapshot-publication/baseline/`.
 Next: prove binary-reference correspondence and indefinite snapshot ownership,
 then replace correspondence using render-owner scratch. Qualification is open;
 no performance improvement, final CI, native acceptance or release is claimed.
+
+
+## Correspondence checkpoint
+
+The new mapping uses a stable two-pointer merge. Ordered snapshots use their
+existing positions directly. The two production ascending runs are merged into
+render-owner permutations; arbitrary caller order uses eight stable uint radix
+passes, generation before index. Full EntityId equality remains authoritative.
+All normalization and correspondence are O(n+m); ambiguous duplicate previous keys
+retain the historical binary-search tie instead of changing existing caller behavior.
+Public arrays, interpolation and the independent visibility implementation are unchanged.
+Scratch grows geometrically within 65,536 entries and trims after oversized populations;
+four int arrays retain at most 1 MiB within that bound, excluding the unchanged legacy
+visibility adapter. No borrowed/published instance array is reused as mutable scratch.
+
+The initial correspondence check passes 21 new/existing mapping and foundation
+boundary cases, including mixed presentation ranges, arbitrary order, generation
+reuse, all interpolated TRS/pose/yaw values, caller mutation, retention, growth,
+empty snapshots and warm zero allocation. Raw evidence:
+`artifacts/snapshot-publication/correspondence-tests.txt`. A final recheck follows
+the capacity-trimming correction. Producer and render timing remain separate.

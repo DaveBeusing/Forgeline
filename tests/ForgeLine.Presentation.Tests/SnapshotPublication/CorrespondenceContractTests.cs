@@ -67,6 +67,34 @@ public sealed class CorrespondenceContractTests
         Assert.Equal(caller[0], world.GetInterpolatedInstance(0, .5f));
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void UnorderedCallerAndProductionDecalTailUseFullStableIdentityWithoutReordering(bool shuffled)
+    {
+        RenderInstance[] prior = [Instance(new(1, 1), 1), Instance(new(2, 1), 2),
+            Instance(new(0xE0000000, 1), 3), Instance(new(0xF0000000, 1), 4),
+            Instance(new(0xD0000000, 3), 5), Instance(new(0xD0000001, 2), 6)];
+        var current = prior.Select(v => v with { Transform = v.Transform with { Position = v.Transform.Position * 2 } }).ToArray();
+        current[1] = current[1] with { Entity = new(2, 2) };
+        if (shuffled) { new Random(61).Shuffle(prior); new Random(92).Shuffle(current); }
+        var before = Snapshot(prior, 1); var after = Snapshot(current, 2);
+        var index = new RenderSnapshotIndex(false);
+        index.Rebuild(after, before);
+        for (int i = 0; i < current.Length; i++)
+            Assert.Equal(Array.FindIndex(prior, v => v.Entity == current[i].Entity), index.PreviousIndex(i));
+        Assert.True(current.AsSpan().SequenceEqual(after.Instances));
+        for (int i = 0; i < 128; i++) index.Rebuild(after, before);
+        long bytes = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 256; i++) index.Rebuild(after, before);
+        Assert.Equal(bytes, GC.GetAllocatedBytesForCurrentThread());
+        var oversized = Snapshot(Enumerable.Range(1, 70_000).Select(i => Instance(new((uint)i, 1), i)).ToArray(), 3);
+        index.Rebuild(oversized, before);
+        index.Rebuild(after, before);
+        Assert.InRange(index.RetainedBytes, 0, 4L * 4 * 65_536);
+        index.Rebuild(Snapshot([], 4), after);
+    }
+
     internal static PresentationSnapshot Snapshot(RenderInstance[] values, ulong tick) =>
         new(new(tick), TimeSpan.FromMilliseconds(50), values.Length, values.AsSpan(), sessionId: new(1));
 
