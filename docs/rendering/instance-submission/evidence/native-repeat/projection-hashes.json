@@ -1,0 +1,10 @@
+{
+  "baseline-a-High.json": "4982b4dab8cd37109ce9c10965e6cd528215de8a5e8221fde12e17d21da34f66",
+  "candidate-a-High.json": "f775746fdbf0d100ef5a2c005ebd5f55052f5b69b43b5022cc32534a93ddb917",
+  "baseline-a-Low.json": "30c9f501daf8a74a0258517886b68fa3b9e89bbbd64ba7d6862a56ad36a2768d",
+  "candidate-a-Low.json": "e8e72c7c5f10771777c62b034b5e61f8ce2527fcc69fd8b6f5792ca56886bdd8",
+  "baseline-b-High.json": "a1ed5bed48588af2ef4f2b12a40bb2624a69644a74d896bb7011ebc22c79e464",
+  "candidate-b-High.json": "cecb721e49739360cdb3fbe8e9a17de53e5905273f9ef3cf257fd53a1ee850af",
+  "baseline-b-Low.json": "6b88343d7e72413aeb59661c6e3ca925d9b6a6eda0cf625fee78342e55f9ff84",
+  "candidate-b-Low.json": "011823aa2a23146cde91f2e79fdc926c348462afbc9c158b19705e0105d52956"
+}

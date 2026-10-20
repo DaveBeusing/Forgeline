@@ -1,0 +1,23 @@
+{
+  "baseline-Budget.json.gz": "6c6af869b020b99b93d911032e67bb6ef350d0abde989634f8a42e4d82a2d5c5",
+  "baseline-Fixed.json.gz": "b843ef8a603071b1e9dc758dedc695d36df7514c8d1d1008e6dc3bf2a0089e93",
+  "baseline-High.png": "f5a8a5889f80364e308caf0a35cab54248ecea13faa277ead247bdf44833cf18",
+  "baseline-Low.png": "499eb6eeaeb2e318cb990a72548379becb0631a12d63d0216642311b8d4a3201",
+  "baseline-Sweep.json.gz": "f2956b1bcd0fc488fb8675945819cf6685063cc0af6d3aa8587c498d8d742d90",
+  "Budget-performance.json": "cd6d809418a4ebcb1eadd3ab37a56173bb9d925e0c20b8abf8a860cf2f360347",
+  "Budget-pixels.json": "83093ef3cdf25d4ab6b7108cfcdb8f1110ee6452f87450c353fdeb3874113f5b",
+  "candidate-Budget.json.gz": "7637d98bee041a06a6b8775b483e36d849428113d96fd3ccf5a135ef3822268a",
+  "candidate-Fixed.json.gz": "13411c6d2cd761171383cee5b35257887123179645590de4327b3eacc6133f7d",
+  "candidate-High.png": "f06750c5ddbfd642e1421b5208d36719dbf91cc66eb4fe51eae8465b9142520e",
+  "candidate-Low.png": "f062b0266066a6e3a906eb3e9c8d96b12dd04c3ce2cb12081e16bb8ab19eacf4",
+  "candidate-Sweep.json.gz": "3d8bd699d45e35b35d8985f93cb2824b1b38e2add3547d12345712d7793cad08",
+  "Fixed-performance.json": "1e7b46890cd15113ceccdcbb9b758fb976a8df4ce0974e287fbbb73d8d4dbc9d",
+  "Fixed-pixels.json": "74a7eb8cef6a8f0ae3cccc73c4f1b146853930359b194770e028197964aace18",
+  "performance-exits.json": "ec01752246887ffa0f4edc6a7309d510c6edd071728d6cf98f5312ee8997ea17",
+  "projection-hashes.json": "1969d1cf6d4ea0a0f600d08d4f5e942afa21b2bb8e5b341e788a8225852321b2",
+  "quiet-window.json": "ad611679c2134483888d2fe319596aac2b65212c49ec906452c32430acbc5d03",
+  "run.json": "8f44909ebda58e23c3965e7429471e7947d5afc6fbe77f41e856e229e37f369b",
+  "summary.json": "1bf2179771a0133e1fa71d27e870682748870287648b4af928322bac8946dd51",
+  "Sweep-performance.json": "e8608521d3e79de463c51be9dc3e3568d298f9a7abb1598887a7d6ca6089ece0",
+  "Sweep-pixels.json": "944cd27a9f776900a14c42921b59428deee048fb16abf4878010ee6755420f16"
+}

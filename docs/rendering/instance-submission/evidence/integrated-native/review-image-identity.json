@@ -1,0 +1,18 @@
+{
+  "baseline-High": {
+    "sha256": "f5a8a5889f80364e308caf0a35cab54248ecea13faa277ead247bdf44833cf18",
+    "identicalToArchivedReviewPng": true
+  },
+  "baseline-Low": {
+    "sha256": "499eb6eeaeb2e318cb990a72548379becb0631a12d63d0216642311b8d4a3201",
+    "identicalToArchivedReviewPng": true
+  },
+  "candidate-High": {
+    "sha256": "f06750c5ddbfd642e1421b5208d36719dbf91cc66eb4fe51eae8465b9142520e",
+    "identicalToArchivedReviewPng": true
+  },
+  "candidate-Low": {
+    "sha256": "f062b0266066a6e3a906eb3e9c8d96b12dd04c3ce2cb12081e16bb8ab19eacf4",
+    "identicalToArchivedReviewPng": true
+  }
+}

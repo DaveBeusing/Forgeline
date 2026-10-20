@@ -1,0 +1,8 @@
+{
+  "baseline-Fixed.json": "26aa7595ec80df2cda93adb63ba6293d8187edbe3724513fc9655d9fe48dab12",
+  "baseline-Sweep.json": "8d78db7c9ec4033142f77eb271480ad54de912e358275964f7f1a2bb2d932839",
+  "baseline-Budget.json": "83b6177d13d67fd805dde150b62b22761bf893c71d1d1cbb6549f64b4bd97710",
+  "candidate-Fixed.json": "282b703fc67d597d1d4a5cc990f5ef1de18ac061836f854e793476b3cc6cfe72",
+  "candidate-Sweep.json": "8b844611836d5a90e9133f071c5d73f32d67e5c10e28de4c86567c72b7c39916",
+  "candidate-Budget.json": "402b99aa5d6498aba0f3461d2d0f4d571a0a24955a2acf7d98673380a89f55a2"
+}

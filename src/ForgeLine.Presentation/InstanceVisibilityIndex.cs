@@ -42,7 +42,7 @@ internal sealed class InstanceVisibilityIndex : IInstanceVisibilityIndex
     public bool IsVisible(int firstIndex, in ViewFrustum frustum) =>
         ClusterCount == 0 || !_validClusters[firstIndex / ClusterSize] || frustum.Intersects(_clusters[firstIndex / ClusterSize]);
 
-    private static bool TrySweptBounds(in RenderInstance current, RenderInstance? previous, out AxisAlignedBounds bounds)
+    internal static bool TrySweptBounds(in RenderInstance current, RenderInstance? previous, out AxisAlignedBounds bounds)
     {
         Vector3 start = previous?.Transform.Position ?? current.Transform.Position;
         float radius = SkinPresentationBounds.Radius(current);

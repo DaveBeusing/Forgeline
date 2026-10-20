@@ -1,0 +1,12 @@
+{
+  "qualified": true,
+  "observationsQualified": true,
+  "commandSucceeded": true,
+  "commandExit": 0,
+  "commandFailure": null,
+  "samples": 64,
+  "intervalSeconds": 2,
+  "foreignCpuThresholdSeconds": 0.1,
+  "violations": [],
+  "limitation": "Bounded process observations of foreign build/test/renderer executables; cannot exclude shorter transients or all user/OS activity. No command lines or private paths recorded."
+}

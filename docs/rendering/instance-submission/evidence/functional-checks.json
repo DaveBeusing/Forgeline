@@ -1,0 +1,86 @@
+{
+  "source": "60724f1204cffbc850cbbfbc0a381cd62b0f23a1",
+  "releaseSolutionBuild": {
+    "exit": 0,
+    "warnings": 0,
+    "errors": 0,
+    "seconds": 98.98
+  },
+  "presentationSuite": {
+    "exit": 0,
+    "total": 1453,
+    "passed": 1441,
+    "failed": 0,
+    "optionalSkipped": 12,
+    "seconds": 65.301
+  },
+  "retentionSafetyFocus": {
+    "exit": 0,
+    "total": 21,
+    "passed": 21,
+    "failed": 0
+  },
+  "commands": [
+    "dotnet build ForgeLine.sln -c Release --no-restore --artifacts-path artifacts/instance-submission/verification -m:2 -nodeReuse:false -p:UseSharedCompilation=false",
+    "dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj -c Release --artifacts-path artifacts/instance-submission/verification --no-build"
+  ],
+  "originalLocalLogSha256": {
+    "final-source-build.log": "ca46d35e3affc6829274298c7adc1c49cf53de0848d699de73f1927b569a1761",
+    "final-source-presentation.log": "c8f4c26887f340962a50236c4478e2675fbe94d342652cc8fdb073ff73f0c2f4",
+    "retention-tests.log": "aa207b9e3e89ee1241431916a891e59f36262d76f7fd44378e4aa50e2f850bc6",
+    "instance-submission-master-game-failures.log": "23ae7a074a930f4db4352fd6f7bf3d5099cb0c63edd010303ae45a224111d88a"
+  },
+  "limitations": "Complete solution suite previously failed six unchanged Game tests reproduced on master plus three allocation cases subsequently fixed by nonparallel shared-pool test collection. No complete-solution green result claimed. Initial separate measurement-adapter compile failed on an internal member; corrected to public RenderWorld API and compiled against both exact sources.",
+  "currentIntegration": {
+    "master": "a1610d1a51d4107c4b8202e234ed33edd3cfc9c9",
+    "product": "b69e5f72a1444bbffce149c6a71b7551a27044a4",
+    "version": "0.1.422-dev",
+    "releaseSolutionBuild": {
+      "exit": 0,
+      "warnings": 0,
+      "errors": 0,
+      "seconds": 104.1
+    },
+    "masterReleaseSolutionBuild": {
+      "exit": 0,
+      "warnings": 0,
+      "errors": 0,
+      "seconds": 130.52
+    },
+    "fullSuite": {
+      "exit": 2,
+      "total": 3071,
+      "passed": 3048,
+      "failed": 5,
+      "skipped": 18,
+      "seconds": 487.94
+    },
+    "masterFailureSelection": {
+      "exit": 1,
+      "total": 7,
+      "failed": 5,
+      "passed": 2,
+      "seconds": 55.367
+    },
+    "otherModules": "All pass, including Presentation, Client, Graphics and Assets; skips are retained in overall count.",
+    "originalLocalLogSha256": {
+      "integrated-build.log": "2cfc6962a3b1af8780b47e67f7e2e7bb4f5a547c14e69d49912c550d8637c4c6",
+      "integrated-reference-build.log": "3354e3d51f61472c8fd6589b67f6b237f0eb897b007cc5acda8cb5d86c0c9472",
+      "integrated-full-tests.log": "dd8efb2033b54ee47b1c6197d1002340e5d06e245030d74111f096e24c06c231",
+      "integrated-master-game-failures.log": "40c73366dfd1df17753f76efa74e7ee9b949902b1cab8322c502e18294239f99"
+    },
+    "command": "dotnet test --solution ForgeLine.sln -c Release --artifacts-path artifacts/instance-submission/verification --no-build --max-parallel-test-modules 2",
+    "projectReferenceGraph": {
+      "exit": 0,
+      "projects": 46,
+      "cycles": 0
+    },
+    "onePatchValidation": {
+      "exit": 0,
+      "master": "0.1.421",
+      "product": "0.1.422",
+      "tagsCreated": false
+    },
+    "rendererSourceUnchangedFromMeasuredCommit": "60724f1204cffbc850cbbfbc0a381cd62b0f23a1"
+  }
+}

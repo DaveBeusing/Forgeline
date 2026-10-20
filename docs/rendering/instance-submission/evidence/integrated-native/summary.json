@@ -1,0 +1,691 @@
+{
+  "master": "a1610d1a51d4107c4b8202e234ed33edd3cfc9c9",
+  "product": "b69e5f72a1444bbffce149c6a71b7551a27044a4",
+  "status": "structural pass; performance and three shadow images remain open",
+  "cases": [
+    {
+      "group": "Fixed",
+      "key": "IndustrialBase-1920x1080-High-CloseTactical-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "C911AC3438B43686806DEFDDFCA64F55B0BDDC582C5264A7896255D553083B45",
+      "candidatePixelSha256": "C911AC3438B43686806DEFDDFCA64F55B0BDDC582C5264A7896255D553083B45",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 5.851630468750002,
+        "p50": 4.6018,
+        "p95": 20.9051,
+        "p99": 21.5637
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 4.77117578125,
+        "p50": 3.627,
+        "p95": 12.088,
+        "p99": 13.2744
+      },
+      "baselineGpu": {
+        "samples": 113,
+        "mean": 1.1196389380530976,
+        "p50": 0.722048,
+        "p95": 2.893728,
+        "p99": 4.542848
+      },
+      "candidateGpu": {
+        "samples": 121,
+        "mean": 0.7779609917355377,
+        "p50": 0.814208,
+        "p95": 1.008864,
+        "p99": 1.067648
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "IndustrialBase-1920x1080-High-Strategic-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "6CF13264C478C92587870B7CE87D401F6CC046815FA3A0B580F48694308BD939",
+      "candidatePixelSha256": "6CF13264C478C92587870B7CE87D401F6CC046815FA3A0B580F48694308BD939",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 1.8041374999999997,
+        "p50": 1.312,
+        "p95": 7.8559,
+        "p99": 9.2583
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 3.4743765624999994,
+        "p50": 2.6712,
+        "p95": 12.9461,
+        "p99": 23.1506
+      },
+      "baselineGpu": {
+        "samples": 112,
+        "mean": 0.686698,
+        "p50": 0.624576,
+        "p95": 1.023648,
+        "p99": 1.475488
+      },
+      "candidateGpu": {
+        "samples": 111,
+        "mean": 1.1849830630630633,
+        "p50": 0.699584,
+        "p95": 3.49552,
+        "p99": 3.669088
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "BattlefieldCombat-1920x1080-High-CloseTactical-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "247BEBCF343D661DAC58ECEB7261A955300C694904E32AF38454031C54939698",
+      "candidatePixelSha256": "247BEBCF343D661DAC58ECEB7261A955300C694904E32AF38454031C54939698",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 2.0489687500000002,
+        "p50": 1.6102,
+        "p95": 6.395,
+        "p99": 8.8003
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 1.931696875,
+        "p50": 1.486,
+        "p95": 3.3579,
+        "p99": 10.3534
+      },
+      "baselineGpu": {
+        "samples": 107,
+        "mean": 0.588145644859813,
+        "p50": 0.5736,
+        "p95": 0.693152,
+        "p99": 0.819232
+      },
+      "candidateGpu": {
+        "samples": 113,
+        "mean": 0.5610415575221239,
+        "p50": 0.483328,
+        "p95": 0.806464,
+        "p99": 0.914304
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "BattlefieldCombat-1920x1080-High-Strategic-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "10F26C5D74C939B34DF23EAEC774C463B43C7C1F080728BBEB3060AC98026CA9",
+      "candidatePixelSha256": "10F26C5D74C939B34DF23EAEC774C463B43C7C1F080728BBEB3060AC98026CA9",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 2.692689062500001,
+        "p50": 2.4078,
+        "p95": 5.4181,
+        "p99": 9.661
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 2.11699375,
+        "p50": 1.8272,
+        "p95": 3.8243,
+        "p99": 8.4918
+      },
+      "baselineGpu": {
+        "samples": 113,
+        "mean": 0.6344070796460176,
+        "p50": 0.582176,
+        "p95": 0.922496,
+        "p99": 1.241184
+      },
+      "candidateGpu": {
+        "samples": 109,
+        "mean": 0.7508615045871562,
+        "p50": 0.742752,
+        "p95": 0.854176,
+        "p99": 1.031488
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "MainBattleTankProduction-1920x1080-High-CloseTactical-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "DB2394644E439492893EF31038EAB1A46D01BFCDAABF136D6245C303666F5F32",
+      "candidatePixelSha256": "DB2394644E439492893EF31038EAB1A46D01BFCDAABF136D6245C303666F5F32",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 1.9661984374999997,
+        "p50": 1.322,
+        "p95": 6.607,
+        "p99": 14.313
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 1.8051820312500009,
+        "p50": 1.4779,
+        "p95": 3.8207,
+        "p99": 6.6208
+      },
+      "baselineGpu": {
+        "samples": 105,
+        "mean": 0.6596870095238094,
+        "p50": 0.645792,
+        "p95": 0.805088,
+        "p99": 1.159712
+      },
+      "candidateGpu": {
+        "samples": 108,
+        "mean": 0.6398791111111114,
+        "p50": 0.615136,
+        "p95": 0.782976,
+        "p99": 1.1056
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "MainBattleTankProduction-1920x1080-High-Strategic-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "D01C870495135A1CC8478807D7AF9C48CD6D2D7597B0624BD8D780B62A1340B6",
+      "candidatePixelSha256": "D01C870495135A1CC8478807D7AF9C48CD6D2D7597B0624BD8D780B62A1340B6",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 1.9474382812500002,
+        "p50": 1.5368,
+        "p95": 4.2661,
+        "p99": 9.9223
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 1.9037460937499995,
+        "p50": 1.4897,
+        "p95": 4.0099,
+        "p99": 10.6884
+      },
+      "baselineGpu": {
+        "samples": 111,
+        "mean": 0.7034649369369368,
+        "p50": 0.683424,
+        "p95": 0.947712,
+        "p99": 1.163904
+      },
+      "candidateGpu": {
+        "samples": 108,
+        "mean": 0.7205517037037034,
+        "p50": 0.698176,
+        "p95": 0.985376,
+        "p99": 1.054688
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "CombatSupportRepeated-1920x1080-High-CloseTactical-Dpi96",
+      "exactPixels": false,
+      "baselinePixelSha256": "BF0C2EE0C6D60389E839CE99CC8B9C93B86039057223497FF64C4C3CD8B6AEF9",
+      "candidatePixelSha256": "9CE1012398E7791CB961A72932998E1031C70C96284CA23775E912C6A62AE5AA",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 4.9735765625,
+        "p50": 4.7981,
+        "p95": 6.8253,
+        "p99": 7.1926
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 4.984012500000001,
+        "p50": 4.5888,
+        "p95": 8.8137,
+        "p99": 12.011
+      },
+      "baselineGpu": {
+        "samples": 124,
+        "mean": 1.303500387096774,
+        "p50": 1.254368,
+        "p95": 2.020192,
+        "p99": 2.743296
+      },
+      "candidateGpu": {
+        "samples": 118,
+        "mean": 1.0523544406779661,
+        "p50": 1.000576,
+        "p95": 1.321024,
+        "p99": 1.675136
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "CombatSupportRepeated-1920x1080-High-Strategic-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "D769F962F175703EC65B499690F26F7C3F510E736AD534A5B37BCEFE9528A5E9",
+      "candidatePixelSha256": "D769F962F175703EC65B499690F26F7C3F510E736AD534A5B37BCEFE9528A5E9",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 2.6530367187500006,
+        "p50": 2.4681,
+        "p95": 3.9385,
+        "p99": 7.2615
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 2.2477453124999993,
+        "p50": 1.8107,
+        "p95": 7.1559,
+        "p99": 8.9148
+      },
+      "baselineGpu": {
+        "samples": 106,
+        "mean": 0.5941083773584906,
+        "p50": 0.557824,
+        "p95": 0.680544,
+        "p99": 1.003936
+      },
+      "candidateGpu": {
+        "samples": 103,
+        "mean": 0.6384055922330094,
+        "p50": 0.617952,
+        "p95": 0.734016,
+        "p99": 0.760064
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "MechanicalFiring-1920x1080-High-CloseTactical-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "331EDDF47C0C71EDFFAD1EAB5C03B534007DB4ECF022DBBBFA5AA0FB89F7257C",
+      "candidatePixelSha256": "331EDDF47C0C71EDFFAD1EAB5C03B534007DB4ECF022DBBBFA5AA0FB89F7257C",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 1.8001203125000003,
+        "p50": 1.2325,
+        "p95": 7.2577,
+        "p99": 11.7529
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 2.3564625,
+        "p50": 1.4227,
+        "p95": 11.0074,
+        "p99": 16.3506
+      },
+      "baselineGpu": {
+        "samples": 108,
+        "mean": 0.7921896296296291,
+        "p50": 0.784,
+        "p95": 1.28464,
+        "p99": 1.432896
+      },
+      "candidateGpu": {
+        "samples": 101,
+        "mean": 0.7926986138613866,
+        "p50": 0.769728,
+        "p95": 1.048032,
+        "p99": 1.822944
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "MechanicalFiring-1920x1080-High-Strategic-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "1E5BBAC2C7DCC7EAC81587E6C0E400B243883B345565D9D2EE286E1BCE66D61C",
+      "candidatePixelSha256": "1E5BBAC2C7DCC7EAC81587E6C0E400B243883B345565D9D2EE286E1BCE66D61C",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 2.08454609375,
+        "p50": 1.8016,
+        "p95": 4.2874,
+        "p99": 7.6129
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 1.6909507812499998,
+        "p50": 1.3284,
+        "p95": 2.5016,
+        "p99": 8.7493
+      },
+      "baselineGpu": {
+        "samples": 111,
+        "mean": 0.6278336576576579,
+        "p50": 0.578464,
+        "p95": 0.900128,
+        "p99": 1.053184
+      },
+      "candidateGpu": {
+        "samples": 110,
+        "mean": 0.7339115636363637,
+        "p50": 0.705216,
+        "p95": 0.897408,
+        "p99": 1.431456
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "EffectsBarrage-1920x1080-High-CloseTactical-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "E3E94429A012A8C4948AE91FA4E18351EAAA361E928018FFD308AC886D806C05",
+      "candidatePixelSha256": "E3E94429A012A8C4948AE91FA4E18351EAAA361E928018FFD308AC886D806C05",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 3.879608593750001,
+        "p50": 3.7381,
+        "p95": 5.7311,
+        "p99": 6.8722
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 3.6639359375000007,
+        "p50": 3.0347,
+        "p95": 5.7854,
+        "p99": 8.753
+      },
+      "baselineGpu": {
+        "samples": 122,
+        "mean": 0.56513468852459,
+        "p50": 0.54784,
+        "p95": 0.729792,
+        "p99": 0.79312
+      },
+      "candidateGpu": {
+        "samples": 104,
+        "mean": 0.5839993846153846,
+        "p50": 0.56,
+        "p95": 0.785056,
+        "p99": 0.998048
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "EffectsBarrage-1920x1080-High-Strategic-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "BFA4D3931E5F130D153202FDC6B0DC9AEF5D43FFF455C1BDA551FE5A35646281",
+      "candidatePixelSha256": "BFA4D3931E5F130D153202FDC6B0DC9AEF5D43FFF455C1BDA551FE5A35646281",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 3.8580671874999997,
+        "p50": 3.3544,
+        "p95": 6.743,
+        "p99": 7.7496
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 3.6697625000000005,
+        "p50": 3.4829,
+        "p95": 5.7906,
+        "p99": 6.2372
+      },
+      "baselineGpu": {
+        "samples": 120,
+        "mean": 0.6518389333333333,
+        "p50": 0.642784,
+        "p95": 0.820288,
+        "p99": 0.929984
+      },
+      "candidateGpu": {
+        "samples": 121,
+        "mean": 0.6735423471074383,
+        "p50": 0.682816,
+        "p95": 0.817344,
+        "p99": 0.929056
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "OperationalBuildingsRepeated-1920x1080-High-CloseTactical-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "0FDB4BB0208802BC47003DC7DB02B7E7C3F06806CE36165BA701A1790E2CD0B9",
+      "candidatePixelSha256": "0FDB4BB0208802BC47003DC7DB02B7E7C3F06806CE36165BA701A1790E2CD0B9",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 2.776297656249999,
+        "p50": 2.3132,
+        "p95": 4.662,
+        "p99": 7.2984
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 2.8652382812500004,
+        "p50": 2.7247,
+        "p95": 4.2876,
+        "p99": 5.7785
+      },
+      "baselineGpu": {
+        "samples": 105,
+        "mean": 0.9454893714285714,
+        "p50": 0.973696,
+        "p95": 1.109408,
+        "p99": 1.540608
+      },
+      "candidateGpu": {
+        "samples": 115,
+        "mean": 0.8754256695652172,
+        "p50": 0.901216,
+        "p95": 1.039648,
+        "p99": 1.116608
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Fixed",
+      "key": "OperationalBuildingsRepeated-1920x1080-High-Strategic-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "2DC6404173B9CE57F01CE1E0ADD43143338F267F9AC608226880FCA07D8651F2",
+      "candidatePixelSha256": "2DC6404173B9CE57F01CE1E0ADD43143338F267F9AC608226880FCA07D8651F2",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 3.9318765624999985,
+        "p50": 3.749,
+        "p95": 5.3676,
+        "p99": 5.8883
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 2.5369382812500003,
+        "p50": 2.1536,
+        "p95": 5.1581,
+        "p99": 7.4152
+      },
+      "baselineGpu": {
+        "samples": 125,
+        "mean": 0.6850214400000004,
+        "p50": 0.660896,
+        "p95": 0.797152,
+        "p99": 0.887168
+      },
+      "candidateGpu": {
+        "samples": 102,
+        "mean": 0.8104087843137251,
+        "p50": 0.798112,
+        "p95": 0.945088,
+        "p99": 1.186688
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Sweep",
+      "key": "CombatSupportRepeated-1920x1080-High-CloseTactical-Dpi96-Sweep",
+      "exactPixels": false,
+      "baselinePixelSha256": "BF0C2EE0C6D60389E839CE99CC8B9C93B86039057223497FF64C4C3CD8B6AEF9",
+      "candidatePixelSha256": "9CE1012398E7791CB961A72932998E1031C70C96284CA23775E912C6A62AE5AA",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 5.6276359375,
+        "p50": 4.7382,
+        "p95": 10.3425,
+        "p99": 18.5482
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 4.5041164062500005,
+        "p50": 4.1428,
+        "p95": 7.0685,
+        "p99": 8.8426
+      },
+      "baselineGpu": {
+        "samples": 125,
+        "mean": 1.6159293440000002,
+        "p50": 1.026688,
+        "p95": 6.08336,
+        "p99": 7.359744
+      },
+      "candidateGpu": {
+        "samples": 123,
+        "mean": 1.0979915447154474,
+        "p50": 1.051072,
+        "p95": 1.261792,
+        "p99": 2.335168
+      },
+      "resourcePlateau": false,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Sweep",
+      "key": "CombatSupportRepeated-1920x1080-High-Strategic-Dpi96-Sweep",
+      "exactPixels": true,
+      "baselinePixelSha256": "3D9590D61CC4B029C909B23DCB919B6D12C4DA625B238CC511C182D22C7E9B3D",
+      "candidatePixelSha256": "3D9590D61CC4B029C909B23DCB919B6D12C4DA625B238CC511C182D22C7E9B3D",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 2.6188828124999994,
+        "p50": 2.4173,
+        "p95": 4.6867,
+        "p99": 6.1307
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 2.3304742187499996,
+        "p50": 1.8361,
+        "p95": 5.5151,
+        "p99": 7.5629
+      },
+      "baselineGpu": {
+        "samples": 109,
+        "mean": 0.5815794495412846,
+        "p50": 0.56224,
+        "p95": 0.670176,
+        "p99": 0.699808
+      },
+      "candidateGpu": {
+        "samples": 110,
+        "mean": 0.6292206545454546,
+        "p50": 0.612992,
+        "p95": 0.722208,
+        "p99": 0.740608
+      },
+      "resourcePlateau": false,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Budget",
+      "key": "CombatSupportRepeated-1920x1080-Low-CloseTactical-Dpi96",
+      "exactPixels": false,
+      "baselinePixelSha256": "765234A78A2ECFF52209DE8884800295525F0F4934A6CEF38FADB0A0000147E2",
+      "candidatePixelSha256": "B088209F4EB717DFC2D5A4FB1B9EE3DDD8B26B9AE156A94ECA1D4738CB7E6E45",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 4.393092187499999,
+        "p50": 3.1524,
+        "p95": 9.2156,
+        "p99": 21.9469
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 3.8093859374999997,
+        "p50": 2.7942,
+        "p95": 8.6418,
+        "p99": 21.9298
+      },
+      "baselineGpu": {
+        "samples": 115,
+        "mean": 1.1040887652173914,
+        "p50": 0.533888,
+        "p95": 4.36128,
+        "p99": 4.9808
+      },
+      "candidateGpu": {
+        "samples": 103,
+        "mean": 0.9736298252427182,
+        "p50": 0.525984,
+        "p95": 4.255328,
+        "p99": 5.018464
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    },
+    {
+      "group": "Budget",
+      "key": "CombatSupportRepeated-1920x1080-Low-Strategic-Dpi96",
+      "exactPixels": true,
+      "baselinePixelSha256": "5618CFF536B9A1965352DB2DC4FA085128EEA1D8AA0C44A8B967868C332EB16C",
+      "candidatePixelSha256": "5618CFF536B9A1965352DB2DC4FA085128EEA1D8AA0C44A8B967868C332EB16C",
+      "baselineCpu": {
+        "samples": 128,
+        "mean": 4.251570312499999,
+        "p50": 3.2693,
+        "p95": 14.1501,
+        "p99": 21.4876
+      },
+      "candidateCpu": {
+        "samples": 128,
+        "mean": 2.1381773437499993,
+        "p50": 1.7382,
+        "p95": 6.7168,
+        "p99": 7.9148
+      },
+      "baselineGpu": {
+        "samples": 114,
+        "mean": 1.0799070877192982,
+        "p50": 0.408928,
+        "p95": 3.810016,
+        "p99": 4.807072
+      },
+      "candidateGpu": {
+        "samples": 107,
+        "mean": 0.42233031775700935,
+        "p50": 0.397216,
+        "p95": 0.541888,
+        "p99": 0.578528
+      },
+      "resourcePlateau": true,
+      "submissionFaults": 0,
+      "textureBindingFailures": 0
+    }
+  ]
+}
