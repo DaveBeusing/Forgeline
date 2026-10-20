@@ -545,10 +545,10 @@ public sealed class RtsInformationLayerTests
             unitSelectionLines,
             buildingSelectionLines);
         Assert.Equal(
-            24,
+            8, // Four oriented L-corners, two segments each.
             buildingSelectionLines);
         Assert.Equal(
-            12,
+            4, // Four diagonal hover notches.
             hoverLines);
         Assert.Equal(
             2,

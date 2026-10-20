@@ -170,7 +170,16 @@ public sealed class EconomicInterfaceSkinTests
             Assert.False(blue.AsSpan().SequenceEqual(red));
             var panel = OperationsLayout.Panel(GameplayHudLayout.Create(width,height,96,1));
             int pixel = ((int)(panel.Y + panel.Height * .7f) * width + (int)(panel.X + panel.Width * .5f)) * 4;
-            Assert.True(blue.AsSpan(pixel,4).SequenceEqual(red.AsSpan(pixel,4))); // Existing opaque ownership, underneath transparent artwork.
+            // The current nonmodal panel deliberately blends its 0.30-opacity artwork
+            // with the world. It must affect the pixel without hiding the world entirely.
+            Assert.False(blue.AsSpan(pixel,4).SequenceEqual(red.AsSpan(pixel,4)));
+            var blueWorld = Capture(Snapshot(operations:data),view with { Open = false },new(0,0,1,1));
+            var redWorld = Capture(Snapshot(operations:data),view with { Open = false },new(1,0,0,1));
+            Assert.False(blue.AsSpan(pixel,4).SequenceEqual(blueWorld.AsSpan(pixel,4)));
+            Assert.False(red.AsSpan(pixel,4).SequenceEqual(redWorld.AsSpan(pixel,4)));
+            // The corner outside the logical panel remains the unmodified world.
+            Assert.True(blue.AsSpan(0,4).SequenceEqual(blueWorld.AsSpan(0,4)));
+            Assert.True(red.AsSpan(0,4).SequenceEqual(redWorld.AsSpan(0,4)));
             long uploads = device.Diagnostics.Resources.TextureUploadCount;
             Capture(Snapshot(operations: data), view);
             Assert.Equal(uploads, device.Diagnostics.Resources.TextureUploadCount);

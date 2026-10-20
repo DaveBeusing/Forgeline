@@ -131,7 +131,14 @@ public sealed class NotificationRowMotionTests
         Assert.Equal(1, motion.Opacity(0));
         motion.Update(default, new(2), layout, t + TimeSpan.FromMilliseconds(64), false);
         Assert.Equal(0, motion.RetiredCount);
+        // A 236 ms gap is still a continuous presentation clock: a new row starts its fade.
         motion.Update(shown, new(2), layout, t + TimeSpan.FromMilliseconds(300), true);
+        Assert.Equal(0, motion.Opacity(0));
+        // Exactly 250 ms remains continuous, even when the row identity changes.
+        motion.Update(One(area, 3), new(2), layout, t + TimeSpan.FromMilliseconds(550), true);
+        Assert.Equal(0, motion.Opacity(0));
+        // Only a gap strictly greater than 250 ms settles to the current logical state.
+        motion.Update(shown, new(2), layout, t + TimeSpan.FromMilliseconds(801), true);
         Assert.Equal(1, motion.Opacity(0));
         motion.Update(shown, new(2), layout, t + TimeSpan.FromMilliseconds(250), true);
         Assert.Equal(1, motion.Opacity(0));
