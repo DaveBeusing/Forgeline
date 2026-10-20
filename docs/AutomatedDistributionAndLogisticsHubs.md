@@ -20,7 +20,7 @@ Regional replenishment is driven by LogisticsStockPolicy. Each policy targets on
 
 Thresholds must satisfy 0 <= minimum <= target <= maximum.
 
-The authoritative projected stock includes the destination's currently stored quantity plus the quantity of an already active request for the same policy. This prevents one deficit from creating a new request every simulation tick.
+The authoritative projected stock includes the destination's currently stored quantity and already assigned or in-transit work. One active request per stock policy prevents duplicate deficits. Pending/RetryPending quantities are **not** committed inbound stock: they are recalculated from current inventory and `DesiredTarget` on each completed simulation tick, preserving the original request identity and waiting timestamp. An obsolete pending request (destination at target, disabled/removed policy, or a changed policy destination/resource identity) becomes terminal without reserving a truck or counting a physical delivery. In-flight cargo remains owned by the transport lifecycle.
 
 Policies enter simulation through SetLogisticsStockPolicyCommand and can be removed through RemoveLogisticsStockPolicyCommand.
 
@@ -31,6 +31,23 @@ Requests move through Pending, Assigned, InTransit, RetryPending, Completed, and
 A request is created only when projected quantity falls below DesiredMinimum. Its requested quantity is the amount required to reach DesiredTarget. Requests are coalesced by stock policy, so pending or retrying work is updated instead of duplicated.
 
 Completed and failed requests remain in the diagnostic snapshot for a bounded retention period before they are removed from scheduler state.
+
+### Deterministic lifecycle and fairness matrix
+
+| Transition | FIFO age / identity | Reservation and metric behavior |
+| --- | --- | --- |
+| Deficit below minimum → Pending | New `RequestId`, `CreatedAtTick` and `WaitingSinceTick` | No stock or throughput reservation |
+| Pending/RetryPending coalesced with policy or stock change | Original identity and waiting age preserved; requested quantity follows live target | No speculative delivery or duplicated request |
+| Pending → RetryPending on NoSource, NoRoute, NoTruck, NoDriveFuel, full destination, or capacity failure | Original waiting age preserved; `StateChangedAtTick` and bounded `NextAttemptTick` update | No truck, stock, or route reservation retained |
+| RetryPending → Pending when eligible | Original FIFO age and request ID preserved | Reevaluated once by the pending dispatch pass |
+| Pending → Assigned | Original request identity remains | Exactly one accepted truck, atomic source reservation and graph capacity; only a committed assignment counts in per-tick throughput |
+| Assigned → InTransit | Source reservation consumption produces real cargo | Quantity remains accounted for in inventories and transport; no requeue |
+| Delivery with remaining target deficit → Pending | Fresh `WaitingSinceTick` **only after an actual completed shipment** to yield fairly to other deficits | Prior shipment is complete; no duplicate transfer |
+| Target fulfilled → Completed | Terminal retention is bounded | Completion after actual delivery counted once; satisfaction without shipment does **not** increment delivery totals |
+| Empty failed truck → RetryPending / retry limit → Failed | Original age retained until terminal | Release remaining source and graph reservations; obey attempt limit |
+| Removed/disabled/retargeted policy while waiting | Terminal, no reused stale identity | No new shipment; in-flight ownership stays with the cargo subsystem |
+
+Dispatcher ordering remains **effective priority → Critical recovery rank (only within Critical) → `WaitingSinceTick` → stable RequestId**. Aging promotes lower classes at most to High and never displaces an urgent Critical recovery. All eligible Pending requests are assessed once per tick in this order; a blocked oldest request records its reason and backs off without globally blocking independently feasible later demand. Physical loading-bay FIFO and truck movement are unchanged.
 
 ## Source Selection
 
@@ -70,7 +87,7 @@ Eligible trucks are evaluated in stable entity order and the truck closest to th
 
 Requests are primarily ordered Critical, High, Normal, then Low.
 
-To reduce starvation under sustained higher-priority demand, waiting requests gain an effective priority step after a configurable aging interval. Aging is bounded at Critical. Requests at the same effective priority are ordered by creation tick and then stable request ID.
+To reduce starvation under sustained higher-priority demand, waiting requests gain an effective priority step after a configurable aging interval. Aging is bounded at **High** so urgent Critical recovery retains priority. Requests at the same effective priority and Critical recovery rank are ordered by original waiting tick and then stable request ID.
 
 This policy is deliberately simple and deterministic-friendly rather than a global mathematical optimizer.
 
@@ -84,7 +101,7 @@ No failure path may leave a scheduler-owned source reservation behind.
 
 ## Diagnostics
 
-AutomatedDistributionMetrics exposes configured policies, pending/assigned/in-transit/retry requests, unserved deficits, idle and active trucks, reserved source cargo, completed and failed totals, and average/maximum delivery latency in simulation ticks.
+AutomatedDistributionMetrics exposes configured policies, pending/assigned/in-transit/retry requests, unserved deficits, idle and active trucks, reserved source cargo, completed and failed totals, and average/maximum delivery latency in simulation ticks. Bounded additional fields expose oldest backlog wait, stock/route/truck/fuel-blocked demand, observed physically blocked assigned docks, and the count/quantity of **actually committed** dispatch assignments in the current tick. A successful feasibility assessment is not an inventory transfer; physical delivery happens later at the normal loading/unloading boundaries. A zero committed-dispatch metric does not itself mean all backlog demand is physically blocked at the bay.
 
 AutomatedDistributionDebugSnapshot exposes per-request read models without granting presentation access to mutable simulation state.
 
