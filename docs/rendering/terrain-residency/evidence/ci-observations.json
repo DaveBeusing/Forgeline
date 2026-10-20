@@ -1,0 +1,25 @@
+{
+  "productSource": "d8abff95e1134f9986d2b3f90de0eef846340527",
+  "mainRun": 39472318182,
+  "mainStatus": "failure",
+  "failedStep": "Test",
+  "gameFailures": 5,
+  "otherFailures": [
+    {
+      "case": "RenderSubmission.SubmissionSafetyTests.BatchEscapeBandUsesBoundedReusablePayloadLeases",
+      "expectedBytes": 0,
+      "observedBytes": 8486912,
+      "observation": "same assertion and value as pre-change master CI"
+    },
+    {
+      "case": "FrontendMenuBackgroundTests.DeferredLoadNeverBlocksFirstMenuAndCancellationCreatesNoGpuResource",
+      "observation": "5-second entered wait rejected on hosted runner; locally isolated class passes5/5; cause not established"
+    }
+  ],
+  "frameContracts": "success",
+  "navigationMovement": "success",
+  "cpuScale": "success",
+  "nativeReference": "skipped",
+  "originalFailureLogSha256": "db14d184a70a55a4f94ef07db5ebdb4d834238578f9e31b2ff8781a7d666a6d6",
+  "testAssertionsAndThresholdsChanged": false
+}

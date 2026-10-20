@@ -1,6 +1,9 @@
 # Terrain residency qualification
 
-Status: implementation in progress; no acceptance claimed.
+Status: **implemented, not yet accepted**. Product source
+`d8abff95e1134f9986d2b3f90de0eef846340527`, version 0.1.424.
+See [final results, measured limits and individual open gates](Results.md).
+The entries below preserve the implementation/verification history.
 
 Initial master: bfc16a953d731a844321a0848a2ebadc71c5875f, version 0.1.423.
 The checkout was clean. The remote contains only master, no open terrain work;
@@ -95,6 +98,23 @@ The earlier description of a baseline half derivative was incorrect: the existin
 heightfield already implements one-sided outer-edge derivatives. The decision
 document is corrected accordingly. Final correction checks and new source-bound
 hardware evidence follow below.
+
+The corrected product builds with zero warnings/errors (2m10.46s), passes all
+34 owned cases and the complete Presentation/Client/Assets suites. Its full
+solution run records 3,131 total / 3,107 pass / 6 fail / 18 skip (16m02.586s): five
+known Game failures and one unsettled-surface Graphics capture. The unchanged
+Graphics class passes 5/5 in isolation. Hosted CI separately records five Game
+failures, the known 8,486,912-byte submission allocation and a frontend entered-wait
+timeout; that frontend class also passes 5/5 locally. No frozen test is edited.
+
+Four CPU and four direct hardware-terrain cohorts, plus twelve complete client
+matrices (68 cases), finish with exit 0. The combined process monitor rejects the
+window for one compiler-server CPU spike. Complete CPU/native protocols precede
+that event and have separate bounded quiet observations. Results retain this
+distinction rather than rewriting the original guard outcome. Pixel changes,
+eight advisory client CPU alerts and large same-binary GPU variance leave the
+performance/image gates open. Full interpretation and raw archive links are in
+[Results.md](Results.md).
 
 ## Reproduction
 

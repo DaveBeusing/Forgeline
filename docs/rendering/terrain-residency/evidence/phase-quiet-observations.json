@@ -1,0 +1,41 @@
+{
+  "combinedWindowQualified": false,
+  "originalViolations": [
+    {
+      "utc": "2026-10-20T18:39:36.3159664Z",
+      "process": {
+        "pid": 53652,
+        "name": "VBCSCompiler.exe",
+        "cpuDeltaSeconds": 1,
+        "busy": true
+      }
+    }
+  ],
+  "summarySha256": "402d559cb02085ad1ba5dc82d6b978db6d319e4efe584a282f46bac5254171d8",
+  "observationsSha256": "b9319b2059942dd59b3c028167f88d91a2b11b92c838d1cecd4bd8fb0923af1a",
+  "phases": [
+    {
+      "mode": "cpu",
+      "startedUtc": "2026-10-20T18:31:48.9187113Z",
+      "completedUtc": "2026-10-20T18:32:03.3847510Z",
+      "completeProtocol": true,
+      "observedSamples": 5,
+      "violations": [],
+      "busyObservations": [],
+      "observedQuiet": true,
+      "protocolSha256": "cee561c86d53167b989bcade82a61b5da34b51aac524f0076052f0fc1a84a27b"
+    },
+    {
+      "mode": "native",
+      "startedUtc": "2026-10-20T18:32:04.0197071Z",
+      "completedUtc": "2026-10-20T18:36:34.4915355Z",
+      "completeProtocol": true,
+      "observedSamples": 100,
+      "violations": [],
+      "busyObservations": [],
+      "observedQuiet": true,
+      "protocolSha256": "625e98a6f386a1b9e0e9b43188c224e3942b2ab30a7fbaf5207e89726ec4621e"
+    }
+  ],
+  "interpretation": "Only complete independently invoked protocols are assessed. The original combined-window failure is unchanged; client performance acceptance remains unqualified. Bounded process observations do not exclude all activity or prove thermal equivalence."
+}

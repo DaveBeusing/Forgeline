@@ -1,0 +1,233 @@
+{
+  "cohorts": {
+    "baseline-a": {
+      "sourceVersion": "0.1.423-dev+bfc16a953d731a844321a0848a2ebadc71c5875f",
+      "rawSha256": "334d00e67f72f38f90042fd5c333302a16b4f41fb75bb19fba44be7d2ae3339a",
+      "rows": [
+        {
+          "key": "stable-prepare",
+          "cpu": {
+            "count": 1024,
+            "mean": 0.0323994140625,
+            "p50": 0.032,
+            "p95": 0.0344,
+            "p99": 0.0444
+          },
+          "allocatedBytes": 0
+        },
+        {
+          "key": "whole-map-teleport-prepare",
+          "cpu": {
+            "count": 512,
+            "mean": 3.2298595703125,
+            "p50": 3.1884,
+            "p95": 3.8761,
+            "p99": 5.022
+          },
+          "allocatedBytes": 61546392
+        },
+        {
+          "key": "warm-main-record",
+          "cpu": {
+            "count": 1024,
+            "mean": 0.00361572265625,
+            "p50": 0.0035,
+            "p95": 0.0042,
+            "p99": 0.0068
+          },
+          "allocatedBytes": 0
+        }
+      ]
+    },
+    "candidate-a": {
+      "sourceVersion": "0.1.424-dev+d8abff95e1134f9986d2b3f90de0eef846340527",
+      "rawSha256": "074f7a7e919a10ca333b6048fe823309b25b59ea7e175bae0b877fdfabdccfb3",
+      "rows": [
+        {
+          "key": "stable-prepare",
+          "cpu": {
+            "count": 1024,
+            "mean": 0.00221826171875,
+            "p50": 0.0022,
+            "p95": 0.0023,
+            "p99": 0.0024
+          },
+          "allocatedBytes": 0
+        },
+        {
+          "key": "whole-map-teleport-prepare",
+          "cpu": {
+            "count": 512,
+            "mean": 0.042801953125,
+            "p50": 0.0396,
+            "p95": 0.0589,
+            "p99": 0.0793
+          },
+          "allocatedBytes": 418192
+        },
+        {
+          "key": "warm-main-record",
+          "cpu": {
+            "count": 1024,
+            "mean": 0.00539287109375,
+            "p50": 0.0053,
+            "p95": 0.006,
+            "p99": 0.0072
+          },
+          "allocatedBytes": 0
+        }
+      ]
+    },
+    "candidate-b": {
+      "sourceVersion": "0.1.424-dev+d8abff95e1134f9986d2b3f90de0eef846340527",
+      "rawSha256": "b50baf2656a02c25d497ddac251b2701ed7b655509ea037a21ece54618221d28",
+      "rows": [
+        {
+          "key": "stable-prepare",
+          "cpu": {
+            "count": 1024,
+            "mean": 0.00150869140625,
+            "p50": 0.0015,
+            "p95": 0.0016,
+            "p99": 0.0016
+          },
+          "allocatedBytes": 0
+        },
+        {
+          "key": "whole-map-teleport-prepare",
+          "cpu": {
+            "count": 512,
+            "mean": 0.0357248046875,
+            "p50": 0.0341,
+            "p95": 0.0488,
+            "p99": 0.0546
+          },
+          "allocatedBytes": 417160
+        },
+        {
+          "key": "warm-main-record",
+          "cpu": {
+            "count": 1024,
+            "mean": 0.00464287109375,
+            "p50": 0.0046,
+            "p95": 0.0049,
+            "p99": 0.0051
+          },
+          "allocatedBytes": 0
+        }
+      ]
+    },
+    "baseline-b": {
+      "sourceVersion": "0.1.423-dev+bfc16a953d731a844321a0848a2ebadc71c5875f",
+      "rawSha256": "9706c50529a734bf24dd5dc85aa0b0d45159adef45501b8e04fe95db36cecb96",
+      "rows": [
+        {
+          "key": "stable-prepare",
+          "cpu": {
+            "count": 1024,
+            "mean": 0.03155673828125,
+            "p50": 0.0293,
+            "p95": 0.0367,
+            "p99": 0.0867
+          },
+          "allocatedBytes": 0
+        },
+        {
+          "key": "whole-map-teleport-prepare",
+          "cpu": {
+            "count": 512,
+            "mean": 2.7115376953125,
+            "p50": 2.7227,
+            "p95": 3.4383,
+            "p99": 3.6438
+          },
+          "allocatedBytes": 61546392
+        },
+        {
+          "key": "warm-main-record",
+          "cpu": {
+            "count": 1024,
+            "mean": 0.00352919921875,
+            "p50": 0.0032,
+            "p95": 0.0049,
+            "p99": 0.0065
+          },
+          "allocatedBytes": 0
+        }
+      ]
+    }
+  },
+  "comparisons": {
+    "a": [
+      {
+        "key": "stable-prepare",
+        "ratios": {
+          "cpu": {
+            "mean": 0.06846610603731501,
+            "p50": 0.06875,
+            "p95": 0.06686046511627906,
+            "p99": 0.05405405405405405
+          }
+        }
+      },
+      {
+        "key": "whole-map-teleport-prepare",
+        "ratios": {
+          "cpu": {
+            "mean": 0.013251954827515539,
+            "p50": 0.01242002258185924,
+            "p95": 0.015195686385800159,
+            "p99": 0.015790521704500196
+          }
+        }
+      },
+      {
+        "key": "warm-main-record",
+        "ratios": {
+          "cpu": {
+            "mean": 1.4915057393652937,
+            "p50": 1.5142857142857142,
+            "p95": 1.4285714285714286,
+            "p99": 1.0588235294117647
+          }
+        }
+      }
+    ],
+    "b": [
+      {
+        "key": "stable-prepare",
+        "ratios": {
+          "cpu": {
+            "mean": 0.04780885124450317,
+            "p50": 0.051194539249146756,
+            "p95": 0.043596730245231606,
+            "p99": 0.01845444059976932
+          }
+        }
+      },
+      {
+        "key": "whole-map-teleport-prepare",
+        "ratios": {
+          "cpu": {
+            "mean": 0.013175108997842194,
+            "p50": 0.012524332464098138,
+            "p95": 0.014193060524096211,
+            "p99": 0.01498435698995554
+          }
+        }
+      },
+      {
+        "key": "warm-main-record",
+        "ratios": {
+          "cpu": {
+            "mean": 1.315559367995794,
+            "p50": 1.4375,
+            "p95": 1.0,
+            "p99": 0.7846153846153847
+          }
+        }
+      }
+    ]
+  },
+  "interpretation": "Raw ratios only. Existing 15% gates and human image review are unchanged. Missing GPU timing is unavailable. CPU frame time includes Present and resource reuse. Process memory is not logical payload."
+}

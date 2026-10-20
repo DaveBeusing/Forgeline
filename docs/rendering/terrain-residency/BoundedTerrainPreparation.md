@@ -122,11 +122,13 @@ LRU/draw metadata, CLR object headers and allocator overhead are not payload
 bytes. A full process-memory plateau must be measured separately. GPU metrics
 are logical live payload, not physical DXGI allocation or fence-retirement peaks.
 
-`WorkMetrics` exposes cumulative mesh/splat build counts and CPU durations,
+`WorkMetrics` exposes cumulative accepted/harvested mesh/splat build counts and CPU-phase elapsed durations,
 cache hits/evictions, pending/discarded work, index patterns, geometry/control
 upload and eviction bytes, current resident/prepared payload, candidate visits,
 last Prepare duration and step count. Optional CPU elapsed time is reported
-separately (it can overlap owner work). Mesh/splat durations from accepted worker
+separately for harvested results (it can overlap owner work). Dispose also joins
+remaining work; its wall time is included by end-to-end cold lifecycle measurement.
+Mesh/splat durations from accepted worker
 results are also their component totals: do not add those totals to optional
 elapsed time. Material acquisition is outside the upload timer and may invoke
 the global asset cache; do not charge it again as terrain generation time.

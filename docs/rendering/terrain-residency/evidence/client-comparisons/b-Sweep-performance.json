@@ -1,0 +1,649 @@
+{
+  "unqualified": [],
+  "currentCommit": "d8abff95e1134f9986d2b3f90de0eef846340527",
+  "interpretation": "Percent changes are observed variance/trends. Paired runs and repeated cohorts are required before attributing a regression. GPU subsets have explicit counts; software and changed settings cannot satisfy a hardware gate.",
+  "regressions": [
+    "DaylightTerrain-1920x1080-High-Strategic-Dpi96-Sweep/cpu/p95",
+    "DaylightTerrain-1920x1080-High-Strategic-Dpi96-Sweep/cpu/p99",
+    "LogisticsCorridor-1920x1080-High-Strategic-Dpi96-Sweep/cpu/p95",
+    "LogisticsCorridor-1920x1080-Low-CloseTactical-Dpi96-Sweep/cpu/p99"
+  ],
+  "cases": [
+    {
+      "deltas": [
+        {
+          "percent": -5.058377289679801,
+          "deltaMs": -0.6761015624999978,
+          "regressed": false,
+          "currentMs": 12.689875781250006,
+          "baselineMs": 13.365977343750004,
+          "metric": "cpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": -6.078311231709639,
+          "deltaMs": -0.8333000000000013,
+          "regressed": false,
+          "currentMs": 12.8761,
+          "baselineMs": 13.7094,
+          "metric": "cpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": -9.258206384508624,
+          "deltaMs": -2.214600000000001,
+          "regressed": false,
+          "currentMs": 21.7058,
+          "baselineMs": 23.9204,
+          "metric": "cpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -0.6678460200539644,
+          "deltaMs": -0.17970000000000041,
+          "regressed": false,
+          "currentMs": 26.7277,
+          "baselineMs": 26.9074,
+          "metric": "cpu",
+          "statistic": "p99"
+        },
+        {
+          "percent": -3.401621798666124,
+          "deltaMs": -0.33131880314960505,
+          "regressed": false,
+          "currentMs": 9.408705889763784,
+          "baselineMs": 9.740024692913389,
+          "metric": "gpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": -3.358930461944079,
+          "deltaMs": -0.368544,
+          "regressed": false,
+          "currentMs": 10.60352,
+          "baselineMs": 10.972064,
+          "metric": "gpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": -1.4158599248564543,
+          "deltaMs": -0.18172799999999967,
+          "regressed": false,
+          "currentMs": 12.65344,
+          "baselineMs": 12.835168,
+          "metric": "gpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -4.237803321747282,
+          "deltaMs": -0.5844480000000001,
+          "regressed": false,
+          "currentMs": 13.206848,
+          "baselineMs": 13.791296,
+          "metric": "gpu",
+          "statistic": "p99"
+        }
+      ],
+      "status": "comparable",
+      "key": "DaylightTerrain-1920x1080-High-CloseTactical-Dpi96-Sweep",
+      "assetPayloadChanged": false
+    },
+    {
+      "deltas": [
+        {
+          "percent": 11.386422076529426,
+          "deltaMs": 1.5082031249999908,
+          "regressed": false,
+          "currentMs": 14.753831249999992,
+          "baselineMs": 13.245628125000001,
+          "metric": "cpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": -2.185063451589606,
+          "deltaMs": -0.2965,
+          "regressed": false,
+          "currentMs": 13.2729,
+          "baselineMs": 13.5694,
+          "metric": "cpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": 57.524906073100524,
+          "deltaMs": 12.5704,
+          "regressed": true,
+          "currentMs": 34.4225,
+          "baselineMs": 21.8521,
+          "metric": "cpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": 65.19060411624965,
+          "deltaMs": 17.6175,
+          "regressed": true,
+          "currentMs": 44.6421,
+          "baselineMs": 27.0246,
+          "metric": "cpu",
+          "statistic": "p99"
+        },
+        {
+          "percent": -5.107216948440373,
+          "deltaMs": -0.5620181057367812,
+          "regressed": false,
+          "currentMs": 10.442372571428573,
+          "baselineMs": 11.004390677165354,
+          "metric": "gpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": -8.86623544631307,
+          "deltaMs": -1.0965760000000007,
+          "regressed": false,
+          "currentMs": 11.271424,
+          "baselineMs": 12.368,
+          "metric": "gpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": -7.927311480540136,
+          "deltaMs": -1.1996800000000007,
+          "regressed": false,
+          "currentMs": 13.933824,
+          "baselineMs": 15.133504,
+          "metric": "gpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -4.108377536277668,
+          "deltaMs": -0.6451520000000013,
+          "regressed": false,
+          "currentMs": 15.058176,
+          "baselineMs": 15.703328,
+          "metric": "gpu",
+          "statistic": "p99"
+        }
+      ],
+      "status": "comparable",
+      "key": "DaylightTerrain-1920x1080-High-Strategic-Dpi96-Sweep",
+      "assetPayloadChanged": false
+    },
+    {
+      "deltas": [
+        {
+          "percent": -2.8080633989025676,
+          "deltaMs": -0.3902996093749955,
+          "regressed": false,
+          "currentMs": 13.5089453125,
+          "baselineMs": 13.899244921874995,
+          "metric": "cpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": -3.890730802731031,
+          "deltaMs": -0.5539000000000005,
+          "regressed": false,
+          "currentMs": 13.6825,
+          "baselineMs": 14.2364,
+          "metric": "cpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": 0.39029121729289606,
+          "deltaMs": 0.08449999999999847,
+          "regressed": false,
+          "currentMs": 21.735,
+          "baselineMs": 21.6505,
+          "metric": "cpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -0.10103592755105302,
+          "deltaMs": -0.024499999999999744,
+          "regressed": false,
+          "currentMs": 24.2243,
+          "baselineMs": 24.2488,
+          "metric": "cpu",
+          "statistic": "p99"
+        },
+        {
+          "percent": -2.428940858393634,
+          "deltaMs": -0.2820118425196867,
+          "regressed": false,
+          "currentMs": 11.328474330708657,
+          "baselineMs": 11.610486173228344,
+          "metric": "gpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": -2.0969175140241663,
+          "deltaMs": -0.27260799999999996,
+          "regressed": false,
+          "currentMs": 12.727808,
+          "baselineMs": 13.000416,
+          "metric": "gpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": -1.6360102378927612,
+          "deltaMs": -0.24995199999999862,
+          "regressed": false,
+          "currentMs": 15.028192,
+          "baselineMs": 15.278144,
+          "metric": "gpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": 0.8388167884837334,
+          "deltaMs": 0.13257600000000025,
+          "regressed": false,
+          "currentMs": 15.937696,
+          "baselineMs": 15.80512,
+          "metric": "gpu",
+          "statistic": "p99"
+        }
+      ],
+      "status": "comparable",
+      "key": "LogisticsCorridor-1920x1080-High-CloseTactical-Dpi96-Sweep",
+      "assetPayloadChanged": false
+    },
+    {
+      "deltas": [
+        {
+          "percent": 5.922248486309532,
+          "deltaMs": 0.7956003906249958,
+          "regressed": false,
+          "currentMs": 14.229693750000004,
+          "baselineMs": 13.434093359375009,
+          "metric": "cpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": 2.543842605585662,
+          "deltaMs": 0.35350000000000037,
+          "regressed": false,
+          "currentMs": 14.2498,
+          "baselineMs": 13.8963,
+          "metric": "cpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": 16.787849170973455,
+          "deltaMs": 3.401,
+          "regressed": true,
+          "currentMs": 23.6597,
+          "baselineMs": 20.2587,
+          "metric": "cpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -0.5952290913491322,
+          "deltaMs": -0.1573999999999991,
+          "regressed": false,
+          "currentMs": 26.2862,
+          "baselineMs": 26.4436,
+          "metric": "cpu",
+          "statistic": "p99"
+        },
+        {
+          "percent": 4.040294299209973,
+          "deltaMs": 0.4573184251968492,
+          "regressed": false,
+          "currentMs": 11.776256881889765,
+          "baselineMs": 11.318938456692916,
+          "metric": "gpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": 0.4582866859988197,
+          "deltaMs": 0.0588160000000002,
+          "regressed": false,
+          "currentMs": 12.892704,
+          "baselineMs": 12.833888,
+          "metric": "gpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": -1.3431990134319807,
+          "deltaMs": -0.20633599999999852,
+          "regressed": false,
+          "currentMs": 15.1552,
+          "baselineMs": 15.361536,
+          "metric": "gpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -0.9229505129310668,
+          "deltaMs": -0.14521599999999957,
+          "regressed": false,
+          "currentMs": 15.588672,
+          "baselineMs": 15.733888,
+          "metric": "gpu",
+          "statistic": "p99"
+        }
+      ],
+      "status": "comparable",
+      "key": "LogisticsCorridor-1920x1080-High-Strategic-Dpi96-Sweep",
+      "assetPayloadChanged": false
+    },
+    {
+      "deltas": [
+        {
+          "percent": -3.2011064681102366,
+          "deltaMs": -0.36818125000000457,
+          "regressed": false,
+          "currentMs": 11.133505859375,
+          "baselineMs": 11.501687109375004,
+          "metric": "cpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": 0.23086284990150374,
+          "deltaMs": 0.01839999999999975,
+          "regressed": false,
+          "currentMs": 7.9885,
+          "baselineMs": 7.9701,
+          "metric": "cpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": -2.1216835837864907,
+          "deltaMs": -0.5672999999999995,
+          "regressed": false,
+          "currentMs": 26.1709,
+          "baselineMs": 26.7382,
+          "metric": "cpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -17.10798150261245,
+          "deltaMs": -5.6972999999999985,
+          "regressed": false,
+          "currentMs": 27.6047,
+          "baselineMs": 33.302,
+          "metric": "cpu",
+          "statistic": "p99"
+        },
+        {
+          "percent": -0.2276326825136283,
+          "deltaMs": -0.011625322834646568,
+          "regressed": false,
+          "currentMs": 5.095428157480318,
+          "baselineMs": 5.107053480314964,
+          "metric": "gpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": -3.7080477973791126,
+          "deltaMs": -0.19929599999999947,
+          "regressed": false,
+          "currentMs": 5.175392,
+          "baselineMs": 5.374688,
+          "metric": "gpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": -0.9462126390836056,
+          "deltaMs": -0.07840000000000025,
+          "regressed": false,
+          "currentMs": 8.207264,
+          "baselineMs": 8.285664,
+          "metric": "gpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -4.352125184724416,
+          "deltaMs": -0.3873280000000001,
+          "regressed": false,
+          "currentMs": 8.512416,
+          "baselineMs": 8.899744,
+          "metric": "gpu",
+          "statistic": "p99"
+        }
+      ],
+      "status": "comparable",
+      "key": "DaylightTerrain-1920x1080-Low-CloseTactical-Dpi96-Sweep",
+      "assetPayloadChanged": false
+    },
+    {
+      "deltas": [
+        {
+          "percent": -1.076537812546903,
+          "deltaMs": -0.12122890625000338,
+          "regressed": false,
+          "currentMs": 11.139769531249993,
+          "baselineMs": 11.260998437499996,
+          "metric": "cpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": 1.2103510228096694,
+          "deltaMs": 0.11520000000000152,
+          "regressed": false,
+          "currentMs": 9.6331,
+          "baselineMs": 9.5179,
+          "metric": "cpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": 3.7377011936177245,
+          "deltaMs": 0.8554999999999993,
+          "regressed": false,
+          "currentMs": 23.7439,
+          "baselineMs": 22.8884,
+          "metric": "cpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": 2.4123948757510174,
+          "deltaMs": 0.6347999999999985,
+          "regressed": false,
+          "currentMs": 26.9489,
+          "baselineMs": 26.3141,
+          "metric": "cpu",
+          "statistic": "p99"
+        },
+        {
+          "percent": -1.5673966304653235,
+          "deltaMs": -0.10056045264697389,
+          "regressed": false,
+          "currentMs": 6.315202519685041,
+          "baselineMs": 6.415762972332015,
+          "metric": "gpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": 1.629064109054267,
+          "deltaMs": 0.11430400000000063,
+          "regressed": false,
+          "currentMs": 7.130848,
+          "baselineMs": 7.016544,
+          "metric": "gpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": -3.914364315767798,
+          "deltaMs": -0.34057600000000043,
+          "regressed": false,
+          "currentMs": 8.360096,
+          "baselineMs": 8.700672,
+          "metric": "gpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -9.478976777054102,
+          "deltaMs": -0.9700800000000012,
+          "regressed": false,
+          "currentMs": 9.263936,
+          "baselineMs": 10.234016,
+          "metric": "gpu",
+          "statistic": "p99"
+        }
+      ],
+      "status": "comparable",
+      "key": "DaylightTerrain-1920x1080-Low-Strategic-Dpi96-Sweep",
+      "assetPayloadChanged": false
+    },
+    {
+      "deltas": [
+        {
+          "percent": 5.967376931642993,
+          "deltaMs": 0.6629753906250073,
+          "regressed": false,
+          "currentMs": 11.772972265625006,
+          "baselineMs": 11.109996874999998,
+          "metric": "cpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": 3.440155733244019,
+          "deltaMs": 0.32869999999999955,
+          "regressed": false,
+          "currentMs": 9.8835,
+          "baselineMs": 9.5548,
+          "metric": "cpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": 8.398620283964824,
+          "deltaMs": 1.8846000000000025,
+          "regressed": false,
+          "currentMs": 24.324,
+          "baselineMs": 22.4394,
+          "metric": "cpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": 24.09170671187419,
+          "deltaMs": 5.670199999999998,
+          "regressed": true,
+          "currentMs": 29.2061,
+          "baselineMs": 23.5359,
+          "metric": "cpu",
+          "statistic": "p99"
+        },
+        {
+          "percent": 0.11096373899896547,
+          "deltaMs": 0.0072998357972053896,
+          "regressed": false,
+          "currentMs": 6.5858775433070855,
+          "baselineMs": 6.57857770750988,
+          "metric": "gpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": 0.856286075817721,
+          "deltaMs": 0.06323200000000018,
+          "regressed": false,
+          "currentMs": 7.44768,
+          "baselineMs": 7.384448,
+          "metric": "gpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": 1.9542872342446789,
+          "deltaMs": 0.16457600000000028,
+          "regressed": false,
+          "currentMs": 8.585856,
+          "baselineMs": 8.42128,
+          "metric": "gpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": 5.311241757600511,
+          "deltaMs": 0.46601599999999976,
+          "regressed": false,
+          "currentMs": 9.24016,
+          "baselineMs": 8.774144,
+          "metric": "gpu",
+          "statistic": "p99"
+        }
+      ],
+      "status": "comparable",
+      "key": "LogisticsCorridor-1920x1080-Low-CloseTactical-Dpi96-Sweep",
+      "assetPayloadChanged": false
+    },
+    {
+      "deltas": [
+        {
+          "percent": 1.4445870997799866,
+          "deltaMs": 0.16565742187500554,
+          "regressed": false,
+          "currentMs": 11.633115625000002,
+          "baselineMs": 11.467458203124997,
+          "metric": "cpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": -0.21590757927697118,
+          "deltaMs": -0.021100000000000563,
+          "regressed": false,
+          "currentMs": 9.7516,
+          "baselineMs": 9.7727,
+          "metric": "cpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": 7.486472431266203,
+          "deltaMs": 1.7419000000000011,
+          "regressed": false,
+          "currentMs": 25.0092,
+          "baselineMs": 23.2673,
+          "metric": "cpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": 8.875015818112791,
+          "deltaMs": 2.314399999999999,
+          "regressed": false,
+          "currentMs": 28.3921,
+          "baselineMs": 26.0777,
+          "metric": "cpu",
+          "statistic": "p99"
+        },
+        {
+          "percent": -1.3989918710691647,
+          "deltaMs": -0.08979655883725979,
+          "regressed": false,
+          "currentMs": 6.328865385826774,
+          "baselineMs": 6.418661944664033,
+          "metric": "gpu",
+          "statistic": "mean"
+        },
+        {
+          "percent": -1.871723368655886,
+          "deltaMs": -0.13424000000000014,
+          "regressed": false,
+          "currentMs": 7.03776,
+          "baselineMs": 7.172,
+          "metric": "gpu",
+          "statistic": "p50"
+        },
+        {
+          "percent": -2.1864446999981824,
+          "deltaMs": -0.1916480000000007,
+          "regressed": false,
+          "currentMs": 8.573632,
+          "baselineMs": 8.76528,
+          "metric": "gpu",
+          "statistic": "p95"
+        },
+        {
+          "percent": -3.824858925943999,
+          "deltaMs": -0.36851199999999906,
+          "regressed": false,
+          "currentMs": 9.266144,
+          "baselineMs": 9.634656,
+          "metric": "gpu",
+          "statistic": "p99"
+        }
+      ],
+      "status": "comparable",
+      "key": "LogisticsCorridor-1920x1080-Low-Strategic-Dpi96-Sweep",
+      "assetPayloadChanged": false
+    }
+  ],
+  "maximumRegressionPercent": 15.0,
+  "baselineCommit": "bfc16a953d731a844321a0848a2ebadc71c5875f",
+  "schemaVersion": 1,
+  "gateRequested": false
+}

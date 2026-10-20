@@ -1,0 +1,44 @@
+{
+  "productSource": "d8abff95e1134f9986d2b3f90de0eef846340527",
+  "configuration": "Release",
+  "version": "0.1.424",
+  "build": {
+    "exit": 0,
+    "warnings": 0,
+    "errors": 0,
+    "seconds": 130.46,
+    "originalLogSha256": "CA8EABA3D864A1B36782A34D98A6C4935B2F765DFFE00740E7933DAA4377DB35"
+  },
+  "ownedTerrain": {
+    "exit": 0,
+    "passed": 34,
+    "normalInteriorBitExact": true,
+    "differentHeightfieldSpacing": true,
+    "originalLogSha256": "9DE364E966CAAB7B8D96BA728804FC70976ABAC73F46EA2B36ADA48F96E64560"
+  },
+  "fullSuite": {
+    "exit": 2,
+    "total": 3131,
+    "passed": 3107,
+    "failed": 6,
+    "skipped": 18,
+    "seconds": 962.586,
+    "failures": [
+      "ForgeLine.Game.Tests.BattlefieldSupplySystemTests.SupplyTruckFinishesRefuelingBeforeRescuingImmobileUnit",
+      "ForgeLine.Game.Tests.TacticalCombatSystemTests.ActiveCargoTransportRefuelsWithoutDroppingDeliveryOrder",
+      "ForgeLine.Game.Tests.VehicleDockingIntegrationTests.DockedSupplyKeepsCargoSeparateFromOptionalDriveTopupsButAllowsRequiredRecovery(initialDriveFuel: 0, expectedDriveFuel: 80)",
+      "ForgeLine.Graphics.Tests.D3D12AtmosphereTests.DepthExtinctionMatchesAnalyticDistanceAndPreservesClearAndOverlay(warp: True, quality: Height)",
+      "ForgeLine.Game.Tests.SkirmishSupplyPolicyTests.ExpansionFundingKeepsPartialHubCostsAheadOfOptionalExtractors",
+      "ForgeLine.Game.Tests.SkirmishOpponentTests.EastOffensiveObjectiveAdvancesIntoOpponentHalfAgainstStationaryBase"
+    ],
+    "originalLogSha256": "E42BAFCE70EC62447AA9840EC6561868C2A013DD2D076A30F7DF191EDBD72BE8"
+  },
+  "graphicsIsolated": {
+    "exit": 0,
+    "passed": 5,
+    "seconds": 8.247,
+    "originalLogSha256": "682163D69CD1CC078C6CC6EE9598E8EC81B2C8AAA94F31B11AC1EB359945BFFE",
+    "fullSuiteObservation": "One unchanged atmosphere capture rejected an unsettled surface; isolated class passes. Cause not established; original suite remains failed."
+  },
+  "statement": "Five Game failures match pre-change master. The additional graphics observation is retained separately; no assertions or thresholds changed."
+}

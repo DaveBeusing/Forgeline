@@ -1,0 +1,22 @@
+{
+  "qualified": false,
+  "observationsQualified": false,
+  "commandSucceeded": true,
+  "commandExit": 0,
+  "commandFailure": null,
+  "samples": 493,
+  "intervalSeconds": 2,
+  "foreignCpuThresholdSeconds": 0.1,
+  "violations": [
+    {
+      "utc": "2026-10-20T18:39:36.3159664Z",
+      "process": {
+        "pid": 53652,
+        "name": "VBCSCompiler.exe",
+        "cpuDeltaSeconds": 1,
+        "busy": true
+      }
+    }
+  ],
+  "limitation": "Bounded process observations of foreign build/test/renderer executables; cannot exclude shorter transients or all user/OS activity. No command lines or private paths recorded."
+}

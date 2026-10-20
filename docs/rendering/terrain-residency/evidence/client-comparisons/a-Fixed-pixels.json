@@ -1,0 +1,175 @@
+{
+  "baselineCommit": "bfc16a953d731a844321a0848a2ebadc71c5875f",
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "visualAcceptance": "pending",
+  "channelTolerance": 0,
+  "imageFailures": [],
+  "commit": "d8abff95e1134f9986d2b3f90de0eef846340527",
+  "imageGateRequested": false,
+  "structural": "pass",
+  "captures": [
+    {
+      "regionChanges": null,
+      "visualReview": "pending",
+      "gpuMeanMs": 9.88025121259842,
+      "sameRuntime": true,
+      "cpuMeanMs": 13.204247265625002,
+      "cpuMeanDeltaMs": 0.06703984375000438,
+      "key": "DaylightTerrain-1920x1080-High-CloseTactical-Dpi96",
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.9290123456790124E-06,
+        "ChangedPixels": 16,
+        "ChangedPixelFraction": 7.71604938271605E-06,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true
+    },
+    {
+      "regionChanges": null,
+      "visualReview": "pending",
+      "gpuMeanMs": 10.571753070866142,
+      "sameRuntime": true,
+      "cpuMeanMs": 14.620349609375,
+      "cpuMeanDeltaMs": -0.17988710937499697,
+      "key": "DaylightTerrain-1920x1080-High-Strategic-Dpi96",
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 56,
+        "MeanAbsoluteChannelDelta": 0.01306737075617284,
+        "ChangedPixels": 92086,
+        "ChangedPixelFraction": 0.04440875771604938,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true
+    },
+    {
+      "regionChanges": null,
+      "visualReview": "pending",
+      "gpuMeanMs": 11.403930558704449,
+      "sameRuntime": true,
+      "cpuMeanMs": 16.520087109375,
+      "cpuMeanDeltaMs": -1.2135874999999885,
+      "key": "LogisticsCorridor-1920x1080-High-CloseTactical-Dpi96",
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 2,
+        "MeanAbsoluteChannelDelta": 0.0005006992669753087,
+        "ChangedPixels": 3972,
+        "ChangedPixelFraction": 0.0019155092592592592,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true
+    },
+    {
+      "regionChanges": null,
+      "visualReview": "pending",
+      "gpuMeanMs": 12.19980787401575,
+      "sameRuntime": true,
+      "cpuMeanMs": 14.155495703125,
+      "cpuMeanDeltaMs": -1.765550781249999,
+      "key": "LogisticsCorridor-1920x1080-High-Strategic-Dpi96",
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 50,
+        "MeanAbsoluteChannelDelta": 0.03736207561728395,
+        "ChangedPixels": 49920,
+        "ChangedPixelFraction": 0.024074074074074074,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true
+    },
+    {
+      "regionChanges": null,
+      "visualReview": "pending",
+      "gpuMeanMs": 5.3000692913385805,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.282604296874998,
+      "cpuMeanDeltaMs": 0.23950273437499625,
+      "key": "DaylightTerrain-1920x1080-Low-CloseTactical-Dpi96",
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 4.581404320987654E-06,
+        "ChangedPixels": 38,
+        "ChangedPixelFraction": 1.8325617283950617E-05,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true
+    },
+    {
+      "regionChanges": null,
+      "visualReview": "pending",
+      "gpuMeanMs": 6.58836938582677,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.427212109374999,
+      "cpuMeanDeltaMs": 0.24095312499999366,
+      "key": "DaylightTerrain-1920x1080-Low-Strategic-Dpi96",
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 89,
+        "MeanAbsoluteChannelDelta": 0.008153211805555555,
+        "ChangedPixels": 55642,
+        "ChangedPixelFraction": 0.0268335262345679,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true
+    },
+    {
+      "regionChanges": null,
+      "visualReview": "pending",
+      "gpuMeanMs": 6.660577007874012,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.268044531250002,
+      "cpuMeanDeltaMs": -1.3497664062500032,
+      "key": "LogisticsCorridor-1920x1080-Low-CloseTactical-Dpi96",
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 21,
+        "MeanAbsoluteChannelDelta": 0.0005310812114197531,
+        "ChangedPixels": 4250,
+        "ChangedPixelFraction": 0.0020495756172839506,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true
+    },
+    {
+      "regionChanges": null,
+      "visualReview": "pending",
+      "gpuMeanMs": 6.631377007874015,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.445311718749997,
+      "cpuMeanDeltaMs": -0.25568398437499873,
+      "key": "LogisticsCorridor-1920x1080-Low-Strategic-Dpi96",
+      "structural": "pass",
+      "pixelComparison": {
+        "MaximumChannelDelta": 63,
+        "MeanAbsoluteChannelDelta": 0.0029124469521604936,
+        "ChangedPixels": 22206,
+        "ChangedPixelFraction": 0.010708912037037038,
+        "WithinTolerance": false
+      },
+      "sameSource": false,
+      "comparison": "pixels-require-human-review",
+      "equivalentHardware": true
+    }
+  ],
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0,
+  "pixelComparisonRequested": true
+}

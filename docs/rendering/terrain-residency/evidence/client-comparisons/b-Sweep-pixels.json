@@ -1,0 +1,175 @@
+{
+  "commit": "d8abff95e1134f9986d2b3f90de0eef846340527",
+  "maximumChangedPixelFraction": 0.0,
+  "channelTolerance": 0,
+  "captures": [
+    {
+      "structural": "pass",
+      "key": "DaylightTerrain-1920x1080-High-CloseTactical-Dpi96-Sweep",
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.9290123456790124E-06,
+        "ChangedPixels": 16,
+        "ChangedPixelFraction": 7.71604938271605E-06,
+        "WithinTolerance": false
+      },
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "sameRuntime": true,
+      "cpuMeanMs": 12.689875781250006,
+      "sameSource": false,
+      "gpuMeanMs": 9.408705889763784,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -0.6761015624999978,
+      "comparison": "pixels-require-human-review"
+    },
+    {
+      "structural": "pass",
+      "key": "DaylightTerrain-1920x1080-High-Strategic-Dpi96-Sweep",
+      "pixelComparison": {
+        "MaximumChannelDelta": 56,
+        "MeanAbsoluteChannelDelta": 0.01306737075617284,
+        "ChangedPixels": 92086,
+        "ChangedPixelFraction": 0.04440875771604938,
+        "WithinTolerance": false
+      },
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "sameRuntime": true,
+      "cpuMeanMs": 14.753831249999992,
+      "sameSource": false,
+      "gpuMeanMs": 10.442372571428573,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": 1.5082031249999908,
+      "comparison": "pixels-require-human-review"
+    },
+    {
+      "structural": "pass",
+      "key": "LogisticsCorridor-1920x1080-High-CloseTactical-Dpi96-Sweep",
+      "pixelComparison": {
+        "MaximumChannelDelta": 2,
+        "MeanAbsoluteChannelDelta": 0.0005006992669753087,
+        "ChangedPixels": 3972,
+        "ChangedPixelFraction": 0.0019155092592592592,
+        "WithinTolerance": false
+      },
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "sameRuntime": true,
+      "cpuMeanMs": 13.5089453125,
+      "sameSource": false,
+      "gpuMeanMs": 11.328474330708657,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -0.3902996093749955,
+      "comparison": "pixels-require-human-review"
+    },
+    {
+      "structural": "pass",
+      "key": "LogisticsCorridor-1920x1080-High-Strategic-Dpi96-Sweep",
+      "pixelComparison": {
+        "MaximumChannelDelta": 50,
+        "MeanAbsoluteChannelDelta": 0.03761308834876543,
+        "ChangedPixels": 51600,
+        "ChangedPixelFraction": 0.02488425925925926,
+        "WithinTolerance": false
+      },
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "sameRuntime": true,
+      "cpuMeanMs": 14.229693750000004,
+      "sameSource": false,
+      "gpuMeanMs": 11.776256881889765,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": 0.7956003906249958,
+      "comparison": "pixels-require-human-review"
+    },
+    {
+      "structural": "pass",
+      "key": "DaylightTerrain-1920x1080-Low-CloseTactical-Dpi96-Sweep",
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 4.581404320987654E-06,
+        "ChangedPixels": 38,
+        "ChangedPixelFraction": 1.8325617283950617E-05,
+        "WithinTolerance": false
+      },
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.133505859375,
+      "sameSource": false,
+      "gpuMeanMs": 5.095428157480318,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -0.36818125000000457,
+      "comparison": "pixels-require-human-review"
+    },
+    {
+      "structural": "pass",
+      "key": "DaylightTerrain-1920x1080-Low-Strategic-Dpi96-Sweep",
+      "pixelComparison": {
+        "MaximumChannelDelta": 89,
+        "MeanAbsoluteChannelDelta": 0.008153211805555555,
+        "ChangedPixels": 55642,
+        "ChangedPixelFraction": 0.0268335262345679,
+        "WithinTolerance": false
+      },
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.139769531249993,
+      "sameSource": false,
+      "gpuMeanMs": 6.315202519685041,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": -0.12122890625000338,
+      "comparison": "pixels-require-human-review"
+    },
+    {
+      "structural": "pass",
+      "key": "LogisticsCorridor-1920x1080-Low-CloseTactical-Dpi96-Sweep",
+      "pixelComparison": {
+        "MaximumChannelDelta": 21,
+        "MeanAbsoluteChannelDelta": 0.0005310812114197531,
+        "ChangedPixels": 4250,
+        "ChangedPixelFraction": 0.0020495756172839506,
+        "WithinTolerance": false
+      },
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.772972265625006,
+      "sameSource": false,
+      "gpuMeanMs": 6.5858775433070855,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": 0.6629753906250073,
+      "comparison": "pixels-require-human-review"
+    },
+    {
+      "structural": "pass",
+      "key": "LogisticsCorridor-1920x1080-Low-Strategic-Dpi96-Sweep",
+      "pixelComparison": {
+        "MaximumChannelDelta": 63,
+        "MeanAbsoluteChannelDelta": 0.003107638888888889,
+        "ChangedPixels": 23699,
+        "ChangedPixelFraction": 0.01142891589506173,
+        "WithinTolerance": false
+      },
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "sameRuntime": true,
+      "cpuMeanMs": 11.633115625000002,
+      "sameSource": false,
+      "gpuMeanMs": 6.328865385826774,
+      "visualReview": "pending",
+      "cpuMeanDeltaMs": 0.16565742187500554,
+      "comparison": "pixels-require-human-review"
+    }
+  ],
+  "schemaVersion": 1,
+  "visualAcceptance": "pending",
+  "structural": "pass",
+  "imageGateRequested": false,
+  "baselineCommit": "bfc16a953d731a844321a0848a2ebadc71c5875f",
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "pixelComparisonRequested": true,
+  "imageFailures": []
+}
