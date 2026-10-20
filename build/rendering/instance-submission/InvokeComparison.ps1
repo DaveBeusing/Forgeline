@@ -73,11 +73,16 @@ try {
             $metadata.exits['restoreReference'] = $LASTEXITCODE
             if ($LASTEXITCODE -ne 0) { throw 'Restore the dedicated reference checkout before reuse.' }
         }
+        $metadata['pixelChecks'] = [ordered]@{}
         foreach ($path in @('Fixed','Sweep','Budget')) {
             & (Join-Path $repo 'build/Compare-VisualReferenceEvidence.ps1') -CurrentRoot (Join-Path $output "candidate-$path") -BaselineRoot (Join-Path $output "baseline-$path") -ComparePixels -ReportPath (Join-Path $output "$path-pixels.json") *> (Join-Path $output "$path-pixels.log")
             $metadata.exits["$path-pixels"] = $LASTEXITCODE
-            # A visual delta is retained for review, never accepted as a golden.
-            if ($LASTEXITCODE -ne 0) { throw "Native image comparison requires review: $path" }
+            if ($LASTEXITCODE -ne 0) { throw "Native image comparison failed structurally: $path" }
+            $pixelReport = Get-Content -LiteralPath (Join-Path $output "$path-pixels.json") -Raw | ConvertFrom-Json
+            $rows = @($pixelReport.captures)
+            $outside = @($rows | Where-Object { $null -eq $_.pixelComparison -or !$_.pixelComparison.WithinTolerance }).Count
+            # Inspect row values: a structural exit and aggregate list do not certify pixels.
+            $metadata.pixelChecks[$path] = [ordered]@{ inspectedRows = $rows.Count; outsideTolerance = $outside; humanApproval = 'pending' }
         }
     }
 } finally {
