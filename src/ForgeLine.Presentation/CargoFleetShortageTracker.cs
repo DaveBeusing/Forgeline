@@ -37,27 +37,9 @@ public sealed class CargoFleetShortageTracker
         AutomatedDistributionDebugSnapshot distribution,
         InventoryStore inventories)
     {
-        if (_session != session || _player != player ||
-            context.Tick.Value < _lastTick.Value)
-        {
-            _session = session;
-            _player = player;
-            _qualifyingTicks = _clearingTicks = _initialBacklog = 0;
-            _cooldownUntilTick = 0;
-            _active = false;
-            _last = default;
-        }
-
-        if (context.Tick == _lastTick && _lastTick.Value != 0)
-            return _active ? _last : null;
-        _lastTick = context.Tick;
-
         if (!session.IsSpecified || !player.IsSpecified || distribution.Tick != context.Tick ||
             context.TickDuration.TotalSeconds <= 0)
-        {
-            ResetEvidence();
-            return null;
-        }
+            return ObserveEvidence(session, player, context.Tick, context.TickDuration, default, false);
 
         var entities = context.Entities;
         int backlog = 0;
@@ -134,16 +116,51 @@ public sealed class CargoFleetShortageTracker
         // blocked states are not evidence of an inadequate fleet size.
         bool candidate = backlog > 0 && active > 0 && idle == 0 && blocked == 0;
         var observed = new CargoFleetCapacityObservation(backlog, active, idle, active + idle, facility);
-        int activationTicks = Math.Max(1, (int)Math.Ceiling(ObservationSeconds / context.TickDuration.TotalSeconds));
-        int clearTicks = Math.Max(1, (int)Math.Ceiling(ClearSeconds / context.TickDuration.TotalSeconds));
-        int cooldownTicks = Math.Max(1, (int)Math.Ceiling(CooldownSeconds / context.TickDuration.TotalSeconds));
+        return Advance(session, player, context.Tick, context.TickDuration, observed,
+            candidate && IsOwnedTarget(entities, player, facility));
+    }
 
+    // Pure fixed-tick state contract, also used to validate hysteresis without
+    // constructing world entities or a renderer.
+    internal CargoFleetCapacityObservation? ObserveEvidence(
+        SimulationSessionId session, PlayerId player, SimulationTick tick,
+        TimeSpan tickDuration, in CargoFleetCapacityObservation observed, bool eligible) =>
+        Advance(session, player, tick, tickDuration, observed, eligible);
+
+    private CargoFleetCapacityObservation? Advance(
+        SimulationSessionId session, PlayerId player, SimulationTick tick,
+        TimeSpan tickDuration, in CargoFleetCapacityObservation observed, bool candidate)
+    {
+        if (_session != session || _player != player || tick.Value < _lastTick.Value)
+        {
+            _session = session;
+            _player = player;
+            _lastTick = default;
+            _qualifyingTicks = _clearingTicks = _initialBacklog = 0;
+            _cooldownUntilTick = 0;
+            _active = false;
+            _last = default;
+        }
+        if (tick == _lastTick && tick.Value != 0)
+            return _active ? _last : null;
+        _lastTick = tick;
+
+        if (!session.IsSpecified || !player.IsSpecified || tickDuration.TotalSeconds <= 0)
+        {
+            ResetEvidence();
+            return null;
+        }
+
+        int activationTicks = Math.Max(1, (int)Math.Ceiling(ObservationSeconds / tickDuration.TotalSeconds));
+        int clearTicks = Math.Max(1, (int)Math.Ceiling(ClearSeconds / tickDuration.TotalSeconds));
+        int cooldownTicks = Math.Max(1, (int)Math.Ceiling(CooldownSeconds / tickDuration.TotalSeconds));
+        int backlog = observed.BacklogRequests;
         if (candidate)
         {
             _clearingTicks = 0;
             if (_qualifyingTicks == 0) _initialBacklog = backlog;
             _qualifyingTicks = Math.Min(activationTicks, _qualifyingTicks + 1);
-            if (!_active && context.Tick.Value >= _cooldownUntilTick &&
+            if (!_active && tick.Value >= _cooldownUntilTick &&
                 _qualifyingTicks >= activationTicks && backlog >= _initialBacklog)
                 _active = true;
             if (_active) _last = observed;
@@ -153,13 +170,12 @@ public sealed class CargoFleetShortageTracker
             _qualifyingTicks = 0;
             _initialBacklog = 0;
             _clearingTicks++;
-            if (_active && (_clearingTicks >= clearTicks || !IsOwnedTarget(entities, player, _last.AffectedFacility)))
+            if (_active && _clearingTicks >= clearTicks)
             {
                 _active = false;
-                _cooldownUntilTick = context.Tick.Value + (ulong)cooldownTicks;
+                _cooldownUntilTick = tick.Value + (ulong)cooldownTicks;
             }
         }
-
         return _active ? _last : null;
     }
 
