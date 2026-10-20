@@ -115,3 +115,64 @@ subsequent build has zero warnings/errors (18.23s); thirty focused residency/bou
 texture publisher now uses the existing same-queue deferred upload contract instead of issuing
 one startup fence wait per texture. The initial failed warm measurements remain the first cohort;
 final cold/upload/plateau evidence and human image approval are still pending.
+
+
+On the integrated host source 16071418255c560335b17cf02a2bb681965dd1be, the complete solution
+build again has zero warnings/errors (1m48.38s), and the full Presentation suite passes 1,433
+cases with twelve optional skips / 1,445 total (49.639s). Existing Client contracts passed on
+identical code immediately before the source-metadata commit. Ownership validation accepts
+eighteen owned paths after listing the one serialized version path and two explicitly approved
+host paths separately. Project references and the exact 0.1.420 -> 0.1.421 version rule pass.
+
+The first native window and subsequent functional work ended at 13:42:39 UTC; no local build,
+test, compiler or graphics workload is run during the next independently reserved measurement
+window. Remaining native cases are explicitly separate follow-up observations, not replacement
+samples for the failed first B-A-A-B gates. The comparison host retains the normal Prepared /
+Record / Submit / Retire order; DXGI observations after retirement wait outside timed work for
+the existing 250-ms sample cache to expire.
+
+
+## Integrated native functional evidence
+
+The corrected 16071418 RendererCold records all six cases, zero warmups, exit zero. Their
+native pixels match the original master's warm-reference images exactly, with identical
+runtime fingerprint, camera and fixture. The original master's cold-sampling failure is still
+retained; fresh renderer setup costs can be compared because setup precedes warmups in both
+protocols. Current six-case setup observations are 1,552.4417, 1,460.2454, 970.2814, 988.1071,
+995.3475 and 993.4704 ms in matrix order. They do not erase either failed warm performance gate.
+
+Three original-master and three integrated load/warm/unload cycles complete successfully.
+The native facade identity is shared only on the integrated source. The current store reads
+484 required containers (38,676,681 encoded payload bytes), pins 11,230,152 mesh bytes plus
+23,564,584 texture-mip bytes (34,794,736 logical bytes), and retains two owners, then one after
+instance disposal. Warm container reads, texture uploads, static-buffer transfers and upload
+backpressure waits do not increase. Baseline has no prepared-read counter, so it remains null.
+The canonical probe observes no same-ID texture overlap between the old independent terrain
+and instance caches; sharing is not presented as a measured same-ID duplication win there.
+The explicit same-ID multi-owner contract is tested separately, and the native facades prove
+that their resource store is identical. Common fallback textures are now owned once per scope.
+
+All final owner releases return registered native resources/descriptors/pending retirements to
+their initial zero workload and clear prepared CPU payloads. The original three/six-cycle
+observations sometimes admit the existing upload arena's fourth bounded slot late. A separate
+unchanged-binary twelve-cycle observation preserves those results and shows nine consecutive
+identical retired observations: cached staging capacity 20,971,520 bytes, DXGI local usage
+17,477,632 and nonlocal usage 57,745,408 bytes. These are device-level caches/process readings,
+not per-asset Default-heap allocation. Exact Default-heap committed bytes and a measured warm
+shader-compilation counter remain unavailable; neither is reported as zero.
+
+The current runtime-only archive has 1,532 entries, no authoring/compiler files, and passes its
+own packaged-player smoke with new settings and a child PATH containing only system/.NET
+locations (exit zero, packaged runtime root confirmed). The system Blender installation is
+not removed. A real owned reference-window close at 1,718.988 ms triggers the preparation scope's
+OperationCanceledException and exits as expected (reference cancellation exit one) in 2,833.015 ms,
+without a hang. Both cancelled and successful complete captures remain retained.
+
+Source, exit codes, raw samples, images, original/retained hashes and explicit path redaction
+are recorded under evidence/. The first expanded plateau adapter build exposed a parameter-name
+analyzer error before execution; the corrected adapter builds cleanly. This failure is retained.
+
+A subsequent remote-master advance to a1610d1a51d4107c4b8202e234ed33edd3cfc9c9 integrates
+logistics/alert/CI changes and version 0.1.421. Historical measurements above remain tied to their
+actual sources. The branch must integrate that master, move its isolated delta to 0.1.422 and
+repeat integrated build/tests before any final acceptance claim.

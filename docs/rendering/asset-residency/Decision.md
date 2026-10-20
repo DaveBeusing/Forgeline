@@ -67,3 +67,8 @@ Prepared material textures use the existing deferred same-queue upload flag. Ini
 by the existing device implementation before CreateTexture returns; GPU consumption remains after
 its queue-ordered transfer and barrier. Required startup publication therefore does not issue one
 blocking fence wait per material texture. No backend queue, barrier or fence semantics are changed.
+
+The 96-MiB geometry/mip cap is per live device/catalog/profile store. With the explicit limit of
+two live generations, at most 192 MiB of that logical data can be pinned during reconstruction.
+Terrain chunks, transient frame buffers, render targets, native allocator padding and CPU decode
+storage are separately bounded/observed systems and are not silently included in that number.

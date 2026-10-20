@@ -12,9 +12,11 @@ using ForgeLine.Presentation;
 using ForgeLine.Presentation.RenderContracts;
 using ForgeLine.World;
 
-if (args.Length != 3 || File.Exists(args[0])) throw new ArgumentException("Supply a fresh result file, runtime root and expected source SHA.");
+if (args.Length is < 3 or > 4 || File.Exists(args[0])) throw new ArgumentException("Supply a fresh result file, runtime root and expected source SHA.");
 string source = typeof(SimpleInstanceRenderer).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
 if (!source.EndsWith(args[2],StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Frozen presentation source differs from the requested source.");
+int cycleCount = args.Length == 4 ? int.Parse(args[3],System.Globalization.CultureInfo.InvariantCulture) : 3;
+if (cycleCount is < 3 or > 12) throw new ArgumentOutOfRangeException(nameof(args),"Cycle count must be between three and twelve.");
 DateTimeOffset startedUtc = DateTimeOffset.UtcNow;
 long catalogStart = Stopwatch.GetTimestamp();
 var catalog = RuntimeAssetCatalog.LoadCancellable(args[1],CancellationToken.None,requireIntegrity:true);
@@ -30,7 +32,7 @@ using var graphics = GraphicsDeviceFactory.CreateForWindow(window,new()
 var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(scene.Target));
 var initial = graphics.Diagnostics;
 var cycles = new List<object>();
-for (int cycle = 0; cycle < 3; cycle++)
+for (int cycle = 0; cycle < cycleCount; cycle++)
 {
     long setupStart = Stopwatch.GetTimestamp();
     long setupAllocations = GC.GetAllocatedBytesForCurrentThread();
@@ -39,7 +41,7 @@ for (int cycle = 0; cycle < 3; cycle++)
     void Prepare()
     {
         ground.Prepare(camera,320,240);
-        meshes.Prepare(camera,world,new RenderPreparationRequest(320,240,1,PresentationSeconds:1));
+        if (!meshes.AssetsPrepared) meshes.Prepare(camera,world,new RenderPreparationRequest(320,240,1,PresentationSeconds:1));
     }
     Action<IGraphicsCommandContext> record = context => { ground.Render(context,camera); meshes.Render(context,camera,world,1,presentationSeconds:1); };
     void Frame() { Prepare(); graphics.RenderFrame(GraphicsColor.ForgeLineClear,record); meshes.Submit(); meshes.Retire(); }
@@ -82,6 +84,7 @@ for (int cycle = 0; cycle < 3; cycle++)
     ground.Prepare(camera,320,240);
     _ = graphics.CaptureFrame(GraphicsColor.ForgeLineClear,c => ground.Render(c,camera));
     ground.Dispose(); graphics.WaitForIdle();
+    Thread.Sleep(300); // Outside all timed work; expire the existing 250 ms DXGI sample cache.
     var retired = graphics.Diagnostics;
     if (retired.Resources.LoadedTextureCount != initial.Resources.LoadedTextureCount || retired.Resources.ShaderResourceDescriptorsUsed != initial.Resources.ShaderResourceDescriptorsUsed || retired.Health.LiveResourceCount != initial.Health.LiveResourceCount || retired.Health.PendingRetirementCount != 0)
         throw new InvalidOperationException("Residency did not return to its registered-resource plateau after owner disposal.");
@@ -94,7 +97,9 @@ for (int cycle = 0; cycle < 3; cycle++)
 File.WriteAllText(args[0],JsonSerializer.Serialize(new {schemaVersion=1,startedUtc,completedUtc=DateTimeOffset.UtcNow,source,
     runtime=System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
     adapter=graphics.Diagnostics.Device,catalogSignature=catalog.Manifest.ContentSignature,catalogMilliseconds,
-    protocol="Three complete load/warm/unload cycles; cold setup includes constructors and first Prepare, GPU drain separate; 64 warmups/256 frame samples; no native timing gate inferred from this functional/plateau probe.",cycles},new JsonSerializerOptions{WriteIndented=true})+Environment.NewLine);
+    presentationSha256=Hash(typeof(SimpleInstanceRenderer).Assembly.Location),graphicsSha256=Hash(typeof(IGraphicsDevice).Assembly.Location),
+    probeSha256=Hash(Assembly.GetExecutingAssembly().Location),runtimeManifestSha256=Hash(Path.Combine(args[1],"manifest.json")),
+    protocol=$"{cycleCount} complete load/warm/unload cycles; cold setup includes constructors and first Prepare, GPU drain separate; 64 warmups/256 frame samples; no native timing gate inferred from this functional/plateau probe.",cycles},new JsonSerializerOptions{WriteIndented=true})+Environment.NewLine);
 static object? Field(object owner,string name) => owner.GetType().GetField(name,BindingFlags.NonPublic|BindingFlags.Instance)?.GetValue(owner);
 static object Store(object facade) => facade.GetType().GetProperty("Store",BindingFlags.NonPublic|BindingFlags.Instance)?.GetValue(facade) ?? facade;
 static object? Progress(object facade) => facade.GetType().GetProperty("Residency",BindingFlags.NonPublic|BindingFlags.Instance)?.GetValue(facade);
@@ -110,3 +115,5 @@ static long? PreparedBytes(object store)
 static object? UploadArena(IGraphicsDevice graphics) => graphics.GetType().GetProperty("UploadDiagnostics",BindingFlags.NonPublic|BindingFlags.Instance)?.GetValue(graphics);
 
 static long? UploadCounter(object? diagnostics,string name) => diagnostics?.GetType().GetProperty(name)?.GetValue(diagnostics) is long value ? value : null;
+
+static string Hash(string path) => Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(path)));
