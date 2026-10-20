@@ -188,9 +188,10 @@ internal static class CargoDeliveryFuelPolicy
                 fuel.InventoryId,
                 ResourceIds.Fuel),
             fuel.ConsumptionPerMeter,
-            ResolveReserveFuel(
-                fuel,
-                replenishesFuelProduction),
+            entities.HasComponent<CargoFuelServiceState>(entity) ? 0.0 :
+                ResolveReserveFuel(
+                    fuel,
+                    replenishesFuelProduction),
             SimulationTick.Zero);
 
         if (entities.HasComponent<CargoDeliveryFuelBudget>(entity))
