@@ -38,6 +38,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     private ulong? _vfxTick;
     private SimulationSessionId _vfxSession;
     private readonly AlertLifecycleTracker _alerts = new();
+    private readonly CargoFleetShortageTracker _cargoFleet = new();
     private readonly List<CombatGroupMemberReadModel> _combatGroupScratch = [];
     private CombatGroupOperationalSnapshot? _previousCombatGroups;
     private readonly WorldAudioEventBridge? _worldAudio;
@@ -166,6 +167,20 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     context,
                     interaction);
 
+        CargoFleetCapacityObservation? cargoFleet = null;
+        if (_extraction is not null && playerExperience is { IsMatchComplete: false } activePlayer)
+        {
+            var scenario = _extraction.Scenario;
+            cargoFleet = _cargoFleet.Observe(context, scenario.Simulation.SessionId,
+                _extraction.Player, scenario.AutomatedDistribution.LastDebugSnapshot,
+                scenario.Inventories);
+            if (cargoFleet.HasValue)
+                playerExperience = activePlayer with
+                {
+                    Alerts = activePlayer.Alerts | PlayerAlertState.CargoFleetShortage
+                };
+        }
+
         PlayerActionSnapshot? playerActions =
             _extraction is null
                 ? null
@@ -241,7 +256,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     context, _extraction, interaction.HoveredEntity),
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
                 _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction) : null,
-                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience) : null) { DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
+                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience, cargoFleet) : null) { DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
                     DockingZones = _extraction is null ? null : LogisticsZoneSnapshot.Capture(
                         context.Entities, _extraction.Player, _extraction.Scenario.Terrain,
                         interaction.SelectedEntities,
