@@ -40,6 +40,37 @@ public sealed class NotificationRowMotionTests
         Assert.Equal(1, motion.Opacity(0));
     }
 
+    [Theory]
+    [InlineData(30)]
+    [InlineData(60)]
+    [InlineData(144)]
+    public void EnteringCardMovesFromRightEdgeWithBoundedReversibleProgress(int rate)
+    {
+        var layout = GameplayHudLayout.Create(1920, 1080, 96);
+        var area = layout.NotificationBounds() with { Height = 36 };
+        var motion = new NotificationSurfaceMotion();
+        TimeSpan start = TimeSpan.FromSeconds(1);
+        motion.Update(default, new(1), layout, start, true);
+        var card = One(area);
+        motion.Update(card, new(1), layout, start + TimeSpan.FromMilliseconds(16), true);
+        Assert.Equal(area.Right, motion.EnteringBounds(area, 0).X);
+        float lastX = area.Right;
+        for (int n = 1; n * 1000d / rate < 180; n++)
+        {
+            motion.Update(card, new(1), layout,
+                start + TimeSpan.FromMilliseconds(16) + TimeSpan.FromSeconds(n / (double)rate), true);
+            var entering = motion.EnteringBounds(area, 0);
+            Assert.InRange(entering.X, area.X, lastX);
+            Assert.Equal(area.Right, entering.Right, 3);
+            lastX = entering.X;
+        }
+        motion.Update(card, new(1), layout, start + TimeSpan.FromMilliseconds(196), true);
+        Assert.Equal(area, motion.EnteringBounds(area, 0));
+        motion.Update(default, new(1), layout, start + TimeSpan.FromMilliseconds(212), true);
+        Assert.Equal(0, motion.Opacity(0));
+        Assert.True(motion.RetiredCount > 0);
+    }
+
     [Fact]
     public void ResolvedMessageHasNoHitTargetDuringDecorativeFade()
     {
