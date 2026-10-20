@@ -913,6 +913,16 @@
       "storedSha256": "772b05791f226f721cdeb73716210a38e54bae56d5954b9375976b1830ae97ab"
     },
     {
+      "source": "artifacts/gpu-lifecycle-cpu-tail-analysis.json",
+      "originalBytes": 7869,
+      "originalSha256": "4c701e07f1c695bfea425803e749390e1583bbc8b99eb223e9cf4cf064187481",
+      "retainedBytes": 7869,
+      "retainedSha256": "4c701e07f1c695bfea425803e749390e1583bbc8b99eb223e9cf4cf064187481",
+      "redacted": false,
+      "object": "objects/4c701e07f1c695bfea425803e749390e1583bbc8b99eb223e9cf4cf064187481.gz",
+      "storedSha256": "ac6f3075f3f7281ea688f29e6b91a8afd35686f69a1f30f59efcebd4fab7102e"
+    },
+    {
       "source": "artifacts/gpu-lifecycle-current-build.log",
       "originalBytes": 10750,
       "originalSha256": "f92c7ce3df3770720295da59d60c47b64e4cf7a4601dbefa39e05cd43bc7e802",
@@ -1583,6 +1593,26 @@
       "storedSha256": "438efba19dda49f20a4aeed8d9b526bd2db475162a9b408836aa4f3999f3ab15"
     },
     {
+      "source": "artifacts/gpu-lifecycle-ownership-contracts.log",
+      "originalBytes": 107,
+      "originalSha256": "127fb999854c96dc96dff063cfd695940743a212266bcc74188e5f0315f2feac",
+      "retainedBytes": 107,
+      "retainedSha256": "127fb999854c96dc96dff063cfd695940743a212266bcc74188e5f0315f2feac",
+      "redacted": false,
+      "object": "objects/127fb999854c96dc96dff063cfd695940743a212266bcc74188e5f0315f2feac.gz",
+      "storedSha256": "f5a136d09ff11f297e9473521784e384ad3e60febad8ad84c73fc8940e0b7799"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ownership.log",
+      "originalBytes": 253,
+      "originalSha256": "55d2007f196b7146295ab6d7de52f485cf9a6676e8c6f5df6acb4b199c7d0c45",
+      "retainedBytes": 253,
+      "retainedSha256": "55d2007f196b7146295ab6d7de52f485cf9a6676e8c6f5df6acb4b199c7d0c45",
+      "redacted": false,
+      "object": "objects/55d2007f196b7146295ab6d7de52f485cf9a6676e8c6f5df6acb4b199c7d0c45.gz",
+      "storedSha256": "6ad6e822520e619ef4c85671200190f646ea17ba495a581b038cb79da85229dd"
+    },
+    {
       "source": "artifacts/gpu-lifecycle-particle-repair-tests.log",
       "originalBytes": 424,
       "originalSha256": "1e6722aed573c9214fc0de79bc7257fd1528bbe9457d1fe646da6d1977c6af50",
@@ -1653,6 +1683,36 @@
       "storedSha256": "b282b96c969ff90be37fa2d235efad229f3452fb263249fea6594e2c83ac533d"
     },
     {
+      "source": "artifacts/gpu-lifecycle-reference-verified.log",
+      "originalBytes": 95,
+      "originalSha256": "89b6b3c66e8ab994b0102ac645f070c8296f7ec0259a6677126f463457986d24",
+      "retainedBytes": 95,
+      "retainedSha256": "89b6b3c66e8ab994b0102ac645f070c8296f7ec0259a6677126f463457986d24",
+      "redacted": false,
+      "object": "objects/89b6b3c66e8ab994b0102ac645f070c8296f7ec0259a6677126f463457986d24.gz",
+      "storedSha256": "226de6e664ef4eddbdcdc637d2a1dc6d5fab7ef80f472733feddc3f04df3860b"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-reference-version-verified.json",
+      "originalBytes": 369,
+      "originalSha256": "d0fe9536a0a76105f713748c4e1165702a9d105d71da218459d3e5f4258f7e60",
+      "retainedBytes": 369,
+      "retainedSha256": "d0fe9536a0a76105f713748c4e1165702a9d105d71da218459d3e5f4258f7e60",
+      "redacted": false,
+      "object": "objects/d0fe9536a0a76105f713748c4e1165702a9d105d71da218459d3e5f4258f7e60.gz",
+      "storedSha256": "59ddb79ae212d38576a546bf13d8eb583924c4a84ef4e05ede28e6babf1fa115"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-serial-scope.json",
+      "originalBytes": 945,
+      "originalSha256": "495777a0f385ab11c22faf11fb32c04ff14743ca5b80d76b25d1a9c9d413d8b6",
+      "retainedBytes": 945,
+      "retainedSha256": "495777a0f385ab11c22faf11fb32c04ff14743ca5b80d76b25d1a9c9d413d8b6",
+      "redacted": false,
+      "object": "objects/495777a0f385ab11c22faf11fb32c04ff14743ca5b80d76b25d1a9c9d413d8b6.gz",
+      "storedSha256": "cb33ec28eec88002ca87aa5ca53a94f27b313980e47cbcbd45e59c58dfa104fc"
+    },
+    {
       "source": "artifacts/gpu-lifecycle-solution-tests.log",
       "originalBytes": 44107,
       "originalSha256": "63e3ba82e33207fee54537f77f103deb4cfafe8123a26d89c79bbef13e1d12ae",
@@ -1661,6 +1721,116 @@
       "redacted": true,
       "object": "objects/1e6b885a7582f99bbcc631e114673792e6416194c04ab2cf22ff00ce54826c0b.gz",
       "storedSha256": "88c3d733248c82b79906278b2034c88e58537c370733c2c5f45666c8eb388daf"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-source-less-assets.json",
+      "originalBytes": 2110,
+      "originalSha256": "6bfb6e5a0ef49909c85575bd1bb59ea01b3bd3011207a2a18a73cec991b9ef76",
+      "retainedBytes": 2110,
+      "retainedSha256": "6bfb6e5a0ef49909c85575bd1bb59ea01b3bd3011207a2a18a73cec991b9ef76",
+      "redacted": false,
+      "object": "objects/6bfb6e5a0ef49909c85575bd1bb59ea01b3bd3011207a2a18a73cec991b9ef76.gz",
+      "storedSha256": "61de07d340a1c7940a3b6dfc094f0d3570b5dc7ce2206c0a154adbfc1e9829c2"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-build.log",
+      "originalBytes": 6061,
+      "originalSha256": "cfc50bd79a213fa724f8153badee8b6ac14888f7e31a5be71de138421de9a7c3",
+      "retainedBytes": 6061,
+      "retainedSha256": "cfc50bd79a213fa724f8153badee8b6ac14888f7e31a5be71de138421de9a7c3",
+      "redacted": false,
+      "object": "objects/cfc50bd79a213fa724f8153badee8b6ac14888f7e31a5be71de138421de9a7c3.gz",
+      "storedSha256": "7cbce17206d0f0dc9341a83310d5b30cf3e547d1849f2247aa93046ee09c67a8"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-client-contracts.log",
+      "originalBytes": 438,
+      "originalSha256": "67aea130c18698234c96ed35625ec76cca2a30b881a3bdc1bb6c6e8417cd3e7d",
+      "retainedBytes": 438,
+      "retainedSha256": "67aea130c18698234c96ed35625ec76cca2a30b881a3bdc1bb6c6e8417cd3e7d",
+      "redacted": false,
+      "object": "objects/67aea130c18698234c96ed35625ec76cca2a30b881a3bdc1bb6c6e8417cd3e7d.gz",
+      "storedSha256": "c36c01cd19ed9368e3db5cfd7c3198383857e3baeedf0bb54058d58a59405eb4"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-dred-opt-in.log",
+      "originalBytes": 765,
+      "originalSha256": "9dbe37dd94d3914a6ab051d363068e144e5142f1a944f8fea8e8f630c2464bc4",
+      "retainedBytes": 765,
+      "retainedSha256": "9dbe37dd94d3914a6ab051d363068e144e5142f1a944f8fea8e8f630c2464bc4",
+      "redacted": false,
+      "object": "objects/9dbe37dd94d3914a6ab051d363068e144e5142f1a944f8fea8e8f630c2464bc4.gz",
+      "storedSha256": "85d101c7ea4eca2563d3fa5aa19e367563ee79662a91cc986788029ee6a9c500"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-lifetime-opt-in.log",
+      "originalBytes": 1708,
+      "originalSha256": "e55a0ad8a7d24e2df874c72e26991886cbc7776381a3e904ed30b0b0a82c0c4d",
+      "retainedBytes": 1708,
+      "retainedSha256": "e55a0ad8a7d24e2df874c72e26991886cbc7776381a3e904ed30b0b0a82c0c4d",
+      "redacted": false,
+      "object": "objects/e55a0ad8a7d24e2df874c72e26991886cbc7776381a3e904ed30b0b0a82c0c4d.gz",
+      "storedSha256": "56b90fe906ceed6816c53b7869e7ea719cd31e3707663284952b9f409d881bf7"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-presentation-contracts.log",
+      "originalBytes": 462,
+      "originalSha256": "bef970553618ca9305da720579c8c80476a756bdc66e58f076ebec015a5ce6b2",
+      "retainedBytes": 462,
+      "retainedSha256": "bef970553618ca9305da720579c8c80476a756bdc66e58f076ebec015a5ce6b2",
+      "redacted": false,
+      "object": "objects/bef970553618ca9305da720579c8c80476a756bdc66e58f076ebec015a5ce6b2.gz",
+      "storedSha256": "325a5b9023ca9ac7ae096dd2b8603c70133985ccb39e8ef83878d7d46b6012a9"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-references.log",
+      "originalBytes": 95,
+      "originalSha256": "89b6b3c66e8ab994b0102ac645f070c8296f7ec0259a6677126f463457986d24",
+      "retainedBytes": 95,
+      "retainedSha256": "89b6b3c66e8ab994b0102ac645f070c8296f7ec0259a6677126f463457986d24",
+      "redacted": false,
+      "object": "objects/89b6b3c66e8ab994b0102ac645f070c8296f7ec0259a6677126f463457986d24.gz",
+      "storedSha256": "226de6e664ef4eddbdcdc637d2a1dc6d5fab7ef80f472733feddc3f04df3860b"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-restore.log",
+      "originalBytes": 4778,
+      "originalSha256": "1d922d01e463340b22baed9736be6c3814c3bfd0ef9370f839c06885e1cba369",
+      "retainedBytes": 4778,
+      "retainedSha256": "1d922d01e463340b22baed9736be6c3814c3bfd0ef9370f839c06885e1cba369",
+      "redacted": false,
+      "object": "objects/1d922d01e463340b22baed9736be6c3814c3bfd0ef9370f839c06885e1cba369.gz",
+      "storedSha256": "a349a1a8702ba4b34fe9ecaebfbbae52eddd7f45cb25fff07dd386d6b25f32a0"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-solution.log",
+      "originalBytes": 12710,
+      "originalSha256": "4b76671adf46f40cd750063a8cb87f72892b5aa926ee4e7cca67e1940af67079",
+      "retainedBytes": 12710,
+      "retainedSha256": "4b76671adf46f40cd750063a8cb87f72892b5aa926ee4e7cca67e1940af67079",
+      "redacted": false,
+      "object": "objects/4b76671adf46f40cd750063a8cb87f72892b5aa926ee4e7cca67e1940af67079.gz",
+      "storedSha256": "1cc0a8b83debc285dfc924bccf92488d972d02b3fdf9ed06f8d573920291b789"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-source-less-assets.log",
+      "originalBytes": 2002,
+      "originalSha256": "1a3589641c334be527f10ec670b91f96028e533a2585984f2db17b59bff916a7",
+      "retainedBytes": 2002,
+      "retainedSha256": "1a3589641c334be527f10ec670b91f96028e533a2585984f2db17b59bff916a7",
+      "redacted": false,
+      "object": "objects/1a3589641c334be527f10ec670b91f96028e533a2585984f2db17b59bff916a7.gz",
+      "storedSha256": "827be315bd025513c5b25de20f87c1248cd1eee93456cbd5e09e757462399d79"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ui-repair-status.json",
+      "originalBytes": 1818,
+      "originalSha256": "ef87ee55f9bfd78582148a23900b96ce08de616b3345e8a620e5cad939c3b221",
+      "retainedBytes": 1818,
+      "retainedSha256": "ef87ee55f9bfd78582148a23900b96ce08de616b3345e8a620e5cad939c3b221",
+      "redacted": false,
+      "object": "objects/ef87ee55f9bfd78582148a23900b96ce08de616b3345e8a620e5cad939c3b221.gz",
+      "storedSha256": "ac6b80d25a0a8a91d3db356e0d2e5bcb9bf641609dd51ff026f42e6f320d01ba"
     },
     {
       "source": "artifacts/gpu-lifecycle-upload-after-1/build.log",
@@ -1821,6 +1991,26 @@
       "redacted": false,
       "object": "objects/60e1118a110d976202716e7da5afb11b5bf594c5a038a76f0c08cdddebe82ffe.gz",
       "storedSha256": "356b283fd0624a44dd72941746ad13f9da341ac32233b29f00c8e7a131b76297"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-verification-status.json",
+      "originalBytes": 1172,
+      "originalSha256": "9ba1bc1211ac596e30fdee6dd60115db7384a4084a0da1f0291f92d5c7875eec",
+      "retainedBytes": 1172,
+      "retainedSha256": "9ba1bc1211ac596e30fdee6dd60115db7384a4084a0da1f0291f92d5c7875eec",
+      "redacted": false,
+      "object": "objects/9ba1bc1211ac596e30fdee6dd60115db7384a4084a0da1f0291f92d5c7875eec.gz",
+      "storedSha256": "abf343bef8b55b019216cfd1bad8d8e2c8ee7a05f2069a44cc58cb41fb081c2f"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-version-verified.log",
+      "originalBytes": 60,
+      "originalSha256": "0252d4069d633f51e5648e058fdee7cfd2992e24b9c954b66da89af26d1992ac",
+      "retainedBytes": 60,
+      "retainedSha256": "0252d4069d633f51e5648e058fdee7cfd2992e24b9c954b66da89af26d1992ac",
+      "redacted": false,
+      "object": "objects/0252d4069d633f51e5648e058fdee7cfd2992e24b9c954b66da89af26d1992ac.gz",
+      "storedSha256": "ccf98e09adedeb6705fa02e3c459a766cbc6f74c3a7862751928bf2983da3a66"
     },
     {
       "source": "artifacts/run-gpu-lifecycle-bindings-protocol.ps1",

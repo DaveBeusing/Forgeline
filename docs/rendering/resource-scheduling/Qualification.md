@@ -1,7 +1,8 @@
 # Graphics resource scheduling qualification
 
 Status: implemented, not accepted. The final fixed performance cohort retains
-an open CPU-tail gate; complete repaired suites and required PR checks are pending. No integration, tag or release is performed.
+an open CPU-tail gate. The repaired complete local suite passes; actual debug-layer,
+human visual and required final PR checks remain open. No integration, tag or release is performed.
 
 ## Baseline and scope
 
@@ -221,3 +222,48 @@ NotificationRowMotionTests.cs, RtsInformationLayerTests.cs and
 EconomicInterfaceSkinTests.cs in Presentation.Tests. No global ownership manifest,
 UI source, golden image or performance threshold is modified. The explicit
 Directory.Build.props serial exception still provides exactly one PATCH.
+
+
+## Final local verification
+
+Source 6350b0cf5bbd38f643d90087ba216dcc907abf22 has the same production
+src/assets/tools/benchmarks trees as timed source 09eb021b; only tests, build
+measurement helpers and qualification records differ. Release restore/build pass
+with zero warnings/errors (build 31.08s). All affected classes pass: 38 Presentation
+and thirteen Client tests. The complete serial solution suite passes 2,969 tests,
+zero failures and seventeen optional skips / 2,986 total (9m09.347s). This replaces
+none of the retained earlier failed logs. All 119 Graphics cases are included;
+optional debug/lifetime cases retain their explicit opt-in policy.
+
+Source-less runtime validation passes with an explicitly absent source path.
+The native DRED opt-in process reports configured=true before device creation and
+passes its initialized-buffer image parity test. Actual removal is not forced.
+The explicit lifetime opt-in process passes the non-debug case and fails only the
+requireDebugLayer=true assertion because the local D3D12 debug layer is unavailable.
+This is an unmet environment gate, not a passed debug qualification or a disabled
+assertion. No SDK/driver/system installation or configuration is changed.
+
+The original local command wrapper incorrectly carries that optional native exit
+code into the succeeding PowerShell-only reference check, whose own log reports
+success. An independent check with explicitly reset native exit state confirms
+47 projects, no cycles and preserved architecture boundaries; the one-PATCH rule
+also passes at 0.1.420. Both the original wrapper status and the independent corrected
+results are retained. No complete suite or timing cohort is rerun to conceal this.
+
+The frozen ownership validator passes all ordinary changed paths; its four own
+contract tests pass. Five exact serial exceptions are separately enumerated in the
+retained scope record: version props and the four authorized UI test files. The
+shared ownership manifest, project references, public contracts and central workflows
+remain unchanged. The unrelated pre-existing local ignore-file edit is not staged.
+
+A post-hoc analysis of the retained IndustrialBase NormalGameplay second-pair frames
+places most changed-source peaks near indices 250-305; all phases show wider tails.
+The first/last 128-frame block means are 1.207/1.347 ms, versus 2.446 ms in the
+256-383 block. These descriptive slices do not alter the full-cohort gate and do
+not prove a cause. Raw chronological observations remain authoritative.
+
+Human review of the six original native PNGs is requested and pending. Current
+required PR checks can be followed at PR #260; no green final-CI result is inferred
+from the local suite. Final status is **implemented, not accepted**: retain the
+draft until CPU-tail, actual debug-layer, human visual and required CI gates are
+resolved. No merge, tag or release is performed.
