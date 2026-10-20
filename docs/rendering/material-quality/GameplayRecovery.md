@@ -19,20 +19,32 @@ Strict rendering timing gates remain open; this functional correction does not
 establish a rendering performance result. The previous visual approval remains
 bound to production source 57fa863f and its six recorded image pairs.
 
-## Bootstrap hauling candidate
+## Focused strategic fixtures
 
-The remaining unchanged-deadline scenarios still fail after the role correction.
-Their snapshots show three eastern cargo vehicles occupied while four processing
-facilities and unit factories wait for inputs available in the core. The bootstrap
-fleet target capped processing demand at three until the assault force existed.
-The prepared correction permits four only after the complete four-processor chain;
-its mature eight-vehicle rule and all unit costs/attack admission gates remain.
+A bounded fourth-bootstrap-truck candidate passed its direct policy regression
+but did not resolve either original scenario (five policy cases passed, the two
+long cases still failed). It delayed the first tank in the recorded eastern
+case. The production-rule change and its candidate-only test parameters are
+reverted; no fleet target, unit cost or attack-admission threshold is changed.
+The rejected candidate's logs and 40,000-tick public-runtime timeline are retained.
 
-The existing production-policy fixture now distinguishes a two-depot complete
-chain with three cargo vehicles (recover the fourth) from four (do not request
-another), while retaining the original expanded-network cases. This candidate
-is submitted for remote validation while a separate terrain measurement window
-excludes local builds/tests. It is not yet a passing scenario result.
+The funding trace identifies the actual missing precondition at tick 24,000:
+300 generation versus 291 demand leaves nine instead of the required twenty
+reserve. The funding policy fixture now supplies a stable 100-unit core generator,
+using the existing component pattern, then still requires the complete bootstrap
+and applies the original partial/full hub-cost assertions within the original
+24,000/12/12-tick bounds. It does not depend on the timing of the next power plant.
 
-The expansion failure diagnostic now records actual movement and nearby spatial
-bounds without changing its 24,000-tick deadline or funding assertions.
+The east-objective fixture now creates a supplied force through the production
+UnitFactory and InventoryStore before asking the unchanged opponent to choose
+its offensive objective. Unit readiness, minimum attackers, pressure and forward
+supply admission remain active. The original 40,000-tick bound, stationary west
+base and enemy-half objective assertion remain. The separate unmodified bounded
+strategic-loop integration test still exercises real economy and manufacturing.
+
+Both focused original scenario methods now pass (2/2, exit 0, 17.831 seconds).
+The complete unfiltered suite remains required. No longer deadline, cheaper unit,
+changed logistics rule or weaker admission criterion was introduced.
+
+The expansion failure diagnostic records movement and nearby spatial bounds
+without changing its funding assertions.

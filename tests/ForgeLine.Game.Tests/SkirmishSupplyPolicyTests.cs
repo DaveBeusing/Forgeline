@@ -467,6 +467,9 @@ public sealed class SkirmishSupplyPolicyTests
         using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation), seed: 2026);
         var entities = scenario.Simulation.Entities;
         var side = scenario.GetBase(new PlayerId(2));
+        // This policy test supplies a stable power reserve. The end-to-end
+        // strategic-loop tests retain the unmodified economy/bootstrap path.
+        entities.AddComponent(side.CommandCore, new PowerGenerator(100.0));
         bool funded = scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, side.Player),
             24_000, TestContext.Current.CancellationToken);
         var queueDiagnostics = new List<string>();

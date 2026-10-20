@@ -44,8 +44,8 @@ The table gives measured mean changes for both independent focused pairs. Raw p5
 
 ## Separate decisions
 
-- Material appearance: pending.
-- Shadow contact and receiver stability: pending.
+- Material appearance: approved; see the source-bound approval record.
+- Shadow contact and receiver stability: approved; see the source-bound approval record.
 - Additional GPU costs / timing qualification: not accepted; strict gates remain open.
 - Complete solution and CI: see [qualification](Qualification.md), including baseline failures.
 

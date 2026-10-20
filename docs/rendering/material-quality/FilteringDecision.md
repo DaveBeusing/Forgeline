@@ -1,6 +1,6 @@
 # Bounded material and shadow filtering
 
-Status: implemented numerical path; material/shadow decisions pending and strict timing qualification failed.
+Status: implemented numerical path; material/shadow decisions approved for the recorded six final image pairs and strict timing qualification failed.
 
 ## Ownership and active product wiring
 

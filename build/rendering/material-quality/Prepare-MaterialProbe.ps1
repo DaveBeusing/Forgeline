@@ -17,7 +17,7 @@ $project='<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</Outpu
 [IO.File]::WriteAllText((Join-Path $root 'MaterialWorldProbe.csproj'),$project)
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'MaterialWorldProbe.cs') -Destination (Join-Path $root 'Program.cs')
 try {
-    & dotnet build (Join-Path $root 'MaterialWorldProbe.csproj') -c Release --output (Join-Path $root 'bin') *> (Join-Path $root 'build.log')
+    & dotnet build (Join-Path $root 'MaterialWorldProbe.csproj') -c Release -p:UseSharedCompilation=false -nodeReuse:false --output (Join-Path $root 'bin') *> (Join-Path $root 'build.log')
     if($LASTEXITCODE -ne 0){throw 'Probe build failed; inspect build.log.'}
 } finally { Move-Item -LiteralPath (Join-Path $root 'MaterialWorldProbe.csproj') -Destination (Join-Path $root 'MaterialWorldProbe.csproj.txt') }
 Copy-Item -Path (Join-Path $client '*.dll') -Destination (Join-Path $root 'bin') -Force

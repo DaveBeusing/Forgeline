@@ -1,4 +1,6 @@
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Numerics;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -15,6 +17,7 @@ string source=typeof(SimpleInstanceRenderer).Assembly.GetCustomAttribute<Assembl
 if(!source.EndsWith(args[2],StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Frozen assembly source mismatch.");
 var catalog=RuntimeAssetCatalog.LoadCancellable(args[1],CancellationToken.None,requireIntegrity:true);
 var terrain=CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+using var powerRequirement=new ProbePowerRequirement();
 using var platform=new WindowsPlatform();
 using var window=platform.CreateWindow(new("FORGELINE Material World Probe",1920,1080));
 using var graphics=GraphicsDeviceFactory.CreateForWindow(window,new() {EnableVSync=false,EnableDebugLayer=false,AllowSoftwareAdapterFallback=false,EnableMemoryDiagnostics=true});
@@ -61,10 +64,15 @@ foreach(var zoom in new[] {RtsReferenceZoom.NormalGameplay})
             });
             meshes.Submit();meshes.Retire();
         }
-        for(int i=0;i<64;i++)Frame();
+        for(int i=0;i<64;i++)
+        {
+            if(!platform.PumpEvents())throw new OperationCanceledException("Probe window closed during warmup.");
+            Frame();
+        }
         graphics.WaitForIdle();warmStart=graphics.Diagnostics;
         for(int i=0;i<256;i++)
         {
+            if(!platform.PumpEvents())throw new OperationCanceledException("Probe window closed during measurement.");
             camera.ApplyState(cameraStart with {Target=cameraStart.Target+new Vector3(i*.005f,0,i*.003f)});
             long stamp=Stopwatch.GetTimestamp();Frame();cpu.Add(Stopwatch.GetElapsedTime(stamp).TotalMilliseconds);
             var d=graphics.Diagnostics;
@@ -92,8 +100,36 @@ foreach(var zoom in new[] {RtsReferenceZoom.NormalGameplay})
     Console.WriteLine($"Completed {quality}/{sceneKind}/{zoom}");
 }
 Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[0]))!);
-File.WriteAllText(args[0],JsonSerializer.Serialize(new {schemaVersion=1,source,catalogSignature=catalog.Manifest.ContentSignature,
+File.WriteAllText(args[0],JsonSerializer.Serialize(new {schemaVersion=2,windowEventsPumped=true,powerRequirement="thread-scoped-display-and-system",source,catalogSignature=catalog.Manifest.ContentSignature,
     manifestSha256=Hash(Path.Combine(args[1],"manifest.json")),presentationSha256=Hash(typeof(SimpleInstanceRenderer).Assembly.Location),
     driver=Environment.GetEnvironmentVariable("FORGELINE_BENCHMARK_DRIVER"),graphics.Diagnostics.Device,graphics.Diagnostics.Surface,rows},
     new JsonSerializerOptions {WriteIndented=true,IncludeFields=true}));
 static string Hash(string path)=>Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)));
+
+// The native window must remain responsive for every independent component run.
+// Match the client capture's scoped display/system execution requirement.
+internal sealed class ProbePowerRequirement : IDisposable
+{
+    private const uint Continuous = 0x80000000;
+    private readonly uint _previous;
+    private readonly int _owner = Environment.CurrentManagedThreadId;
+    private bool _disposed;
+    public ProbePowerRequirement()
+    {
+        _previous = SetThreadExecutionState(Continuous | 1 | 2);
+        if (_previous == 0) throw new Win32Exception(Marshal.GetLastPInvokeError());
+    }
+    public void Dispose()
+    {
+        if (_disposed) return;
+        if (Environment.CurrentManagedThreadId != _owner)
+            throw new InvalidOperationException("Restore the execution requirement on its owning thread.");
+        _disposed = true;
+        GC.SuppressFinalize(this);
+        if (SetThreadExecutionState(_previous | Continuous) == 0)
+            throw new Win32Exception(Marshal.GetLastPInvokeError());
+    }
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
+    private static extern uint SetThreadExecutionState(uint state);
+}

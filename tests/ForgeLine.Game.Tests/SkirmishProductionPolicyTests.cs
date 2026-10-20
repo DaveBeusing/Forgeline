@@ -781,13 +781,11 @@ public sealed class SkirmishProductionPolicyTests
     }
 
     [Theory]
-    [InlineData(false, false, true, 4, 3)]
-    [InlineData(true, false, false, 4, 3)]
-    [InlineData(true, true, true, 4, 3)]
-    [InlineData(true, false, true, 3, 1)]
-    [InlineData(true, false, false, 4, 1)]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, false)]
+    [InlineData(true, true, true)]
     public void ExpandedSupplyNetworkQueuesAdditionalCargoRecovery(
-        bool fullIndustry, bool assaultFleetEstablished, bool expectedCargoRecovery, int cargoFleetSize, int additionalDepots)
+        bool fullIndustry, bool assaultFleetEstablished, bool expectedCargoRecovery)
     {
         MatchRuntime scenario =
             CentralDivideScenario.Create(
@@ -799,7 +797,7 @@ public sealed class SkirmishProductionPolicyTests
             entities.GetComponent<WorldTransform>(
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
-        for (int index = 0; index < additionalDepots; index++)
+        for (int index = 0; index < 3; index++)
         {
             InventoryId depotInventory =
                 scenario.Inventories.CreateInventory(
@@ -853,7 +851,7 @@ public sealed class SkirmishProductionPolicyTests
             foreach (EntityId unit in entities.Query<ControllableEntity, UnitIdentity>())
                 if (entities.GetComponent<ControllableEntity>(unit).Owner == owner &&
                     entities.GetComponent<UnitIdentity>(unit).UnitId == UnitIds.CargoTruck) cargoCount++;
-            while (cargoCount++ < cargoFleetSize)
+            while (cargoCount++ < 4)
                 scenario.UnitFactory.Create(units[UnitIds.CargoTruck], coreTransform.Position, owner);
 
             foreach (var (building, capability) in new[] {
