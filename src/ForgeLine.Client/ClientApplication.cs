@@ -1705,7 +1705,8 @@ internal sealed class ClientApplication
                         combatGroupOverview,
                     MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
-                    Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio));
+                    Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
+                    NotificationExpansion: alertController.Expansion));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
