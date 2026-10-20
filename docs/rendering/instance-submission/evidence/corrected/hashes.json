@@ -1,0 +1,16 @@
+{
+  "baseline-a-frame.json.gz": "c62ba926dac66139f10413cfa99d4157875d4f0daef277fab049ea24f9c2f8eb",
+  "baseline-a.json.gz": "b02fe1c90b9ee0f8e3e806fd09a5237d9c2b73a5ca77559c43b432f54d1371dd",
+  "baseline-b-culled.json.gz": "ff09b043d72d5da4be185c49e9fe3cc4069e80ecf2a5963d11cb64695ac9705e",
+  "baseline-b.json.gz": "5dbdd81affbd83c5fbe641b8441bbe87f2de593b45afcd77688dd55bf27e5cdc",
+  "candidate-a-frame.json.gz": "5bc8ffeff916cd0faada53f32b902a3038e3b1da59fabb5ffb2e2c4cf5428216",
+  "candidate-a.json.gz": "95fbff37b228ca31873b5a2460258687b8903403ea51d5f59b8e762ce136caf6",
+  "candidate-b-culled.json.gz": "503e6352284778e14fb78d692cf8b170854007800c6e9ef184ba152132ffdf6f",
+  "candidate-b.json.gz": "961480f87eb04e595f0cf091ddde6ed2f23d5327425a5a0a496d49edb913228e",
+  "InvokeComparison.ps1.txt": "031d211c4159bd5998701f034145f49a6c58dff2e8abe4d6cc12170121f108d0",
+  "quiet-window.json": "e487767eca1882d728863da63c9eaf52c1aeb490c1359833286d70408ca4bd45",
+  "raw-file-hashes.json": "49aa689d36e0bf0a42a73ee64f444a90346418ce6d4c0bc20fd52c126287e00f",
+  "run.json": "790ce7493ad44d4816d640cdf8dc288e060e5a10213ed59887650dcd1c34f948",
+  "SubmissionProbe.cs.txt": "4507dc8841ec177a11aad2e9714b7e9b580770b3109fa15520b0040a6d10c3b8",
+  "summary.json": "26fdfd95af55ca94b0dd18a60123a503e737850c56c0686dd395c5167b205bd9"
+}

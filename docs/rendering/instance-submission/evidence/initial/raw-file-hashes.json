@@ -1,0 +1,10 @@
+{
+  "baseline-a-frame.json": "d5743827d244f7083dcafb335ed34af338e7d1fe27155a878f00986663618c59",
+  "baseline-a.json": "9bd42aee1fdc42b60cf5e31b87d74e52944a5577caf29de9d8ce7f758a0114dd",
+  "baseline-b-culled.json": "454525a2ab3a703c39aa96ca1f78b5ab1583b46e05782c28ea05aaedb4f57354",
+  "baseline-b.json": "77dc56c22d4f4255d178c6825042b5e908cce45d43d7d979a3c4d3826e4611fc",
+  "candidate-a-frame.json": "2b5cba6e4b2a5085d83176d544e6d0085614d4b9e3184e5f7162642f8e9fad92",
+  "candidate-a.json": "2bf00231993ac93f9ce5ea34ac60600c827d86764d46e6726410e22fe6a8228c",
+  "candidate-b-culled.json": "a0354ebbb81fcfd61f8f7b3c1f290f70d6fe6c39afeddce2dd81df68385cea14",
+  "candidate-b.json": "be0368ec5f6efc19b45ddb65cd6742c4881aff9de2e9da8bf5d4ff2d6393bbab"
+}

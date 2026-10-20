@@ -1,0 +1,55 @@
+{
+  "maximumChangedPixelFraction": 0.0,
+  "schemaVersion": 1,
+  "visualAcceptance": "pending",
+  "structural": "pass",
+  "pixelComparisonRequested": true,
+  "imageFailures": [],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "commit": "b69e5f72a1444bbffce149c6a71b7551a27044a4",
+  "channelTolerance": 0,
+  "captures": [
+    {
+      "gpuMeanMs": 1.0979915447154474,
+      "visualReview": "pending",
+      "cpuMeanMs": 4.5041164062500005,
+      "pixelComparison": {
+        "MaximumChannelDelta": 86,
+        "MeanAbsoluteChannelDelta": 0.16192322530864198,
+        "ChangedPixels": 49577,
+        "ChangedPixelFraction": 0.023908661265432098,
+        "WithinTolerance": false
+      },
+      "key": "CombatSupportRepeated-1920x1080-High-CloseTactical-Dpi96-Sweep",
+      "structural": "pass",
+      "regionChanges": null,
+      "equivalentHardware": true,
+      "sameSource": false,
+      "cpuMeanDeltaMs": -1.1235195312499995,
+      "comparison": "pixels-require-human-review",
+      "sameRuntime": true
+    },
+    {
+      "gpuMeanMs": 0.6292206545454546,
+      "visualReview": "pending",
+      "cpuMeanMs": 2.3304742187499996,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "key": "CombatSupportRepeated-1920x1080-High-Strategic-Dpi96-Sweep",
+      "structural": "pass",
+      "regionChanges": null,
+      "equivalentHardware": true,
+      "sameSource": false,
+      "cpuMeanDeltaMs": -0.28840859374999983,
+      "comparison": "exact-file-match",
+      "sameRuntime": true
+    }
+  ],
+  "baselineCommit": "a1610d1a51d4107c4b8202e234ed33edd3cfc9c9",
+  "imageGateRequested": false
+}

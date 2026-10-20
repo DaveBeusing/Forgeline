@@ -1,0 +1,20 @@
+{
+  "a-High-performance.json": "e45bdb1202053e2e9cf79149a250c072f405357d50b3140a7249e49e374d878b",
+  "a-Low-performance.json": "ca3400e8ae38533d83893b630341f652b269e9a7aed5ac5bddc6faf34614429e",
+  "b-High-performance.json": "f75fe107eca36d587bc5ebf7bf54605d818e86d9b0d443fd22e7f3d532feb545",
+  "b-Low-performance.json": "9e5ddd2de48cac77580c5f1a806d7ceafd96ece30efbc4e1800377c511d5cb40",
+  "baseline-a-High.json.gz": "bfa6338cb831197ee2e3245a10a8459b23178aeda29dcaead01f47452c044d48",
+  "baseline-a-Low.json.gz": "a30d5d3475b6c5490d3d22b60b75c7a2f519d6ef79134ec4102b1979b1c39f2e",
+  "baseline-b-High.json.gz": "0afaeda28eca03d6fc1a066eef7776c270349358ba15ab3014655c07a2c80e80",
+  "baseline-b-Low.json.gz": "1046a14071c541ce5c5b6c3f2faa381866e1b53d470b01601b28664cb1118bc7",
+  "candidate-a-High.json.gz": "332f37329df69d90c844b52b3ef2d090d0a1de13e34e9851d1218166a47663c7",
+  "candidate-a-Low.json.gz": "a6a1a5a8794673f098d2558986e4caea7c979ed7c6db176f76cd1152ceec1b32",
+  "candidate-b-High.json.gz": "d011521898c878660205ab5dd3ff13976ebc1b9460e90d93664353f4a73566ea",
+  "candidate-b-Low.json.gz": "8dfca0c1b939df710adaf2fb687ec833f5df8a12603ffee71a1ba8f48ac4460a",
+  "InvokeNativeRepeat.ps1.txt": "eecaddbfad9a9591ad40656c131be4fe8222c53da1b6d18e2138a2600f22495d",
+  "performance-exits.json": "051d26a52a6facc84304d5590eb00b9f6d321d76801346c9bd05b80eda4c08e3",
+  "projection-hashes.json": "5a0b3c8a877d5492cd256ab22162ca642dbaae423cf565fb0992b34f39489d2a",
+  "quiet-window.json": "7dd75b7f148a5bc2b2b5c5fb51359f9dbe7ef94c9e0e25129fe3b6331835be79",
+  "run.json": "f742c96920635e980349ce340e230ea035afe9ece9abe1b14f09be61707ded0a",
+  "summary.json": "4f3adde3568a3d5143381e5adbaa40c9522561bd6dc0fcd393ba7735f5580f6c"
+}
