@@ -9,8 +9,18 @@ using static ForgeLine.Presentation.Tests.RenderSubmission.SubmissionReferenceTe
 
 namespace ForgeLine.Presentation.Tests.RenderSubmission;
 
+[Collection("Instance submission allocations")]
 public sealed class SubmissionSafetyTests
 {
+    [Fact]
+    public void AllocationCounterDetectsRealPayloads()
+    {
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        byte[] payload = new byte[4096];
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        GC.KeepAlive(payload); Assert.True(allocated >= 4096);
+    }
+
     [Fact]
     public void SpatialCandidatesAreConservativeForSweptBoundsAndKeepSourceIdentity()
     {
@@ -178,3 +188,7 @@ public sealed class SubmissionSafetyTests
         Assert.Equal(1000, renderer.LastDiagnostics.VisibleInstances);
     }
 }
+
+[CollectionDefinition("Instance submission allocations", DisableParallelization = true)]
+public sealed class SubmissionAllocationGroup;
+
