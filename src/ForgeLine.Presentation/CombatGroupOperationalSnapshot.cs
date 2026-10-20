@@ -39,14 +39,18 @@ public sealed class CombatGroupOperationalSnapshot
         SimulationTick tick,
         IReadOnlyList<CombatGroupMemberReadModel> members,
         SimulationSessionId sessionId = default)
+        : this(CopyUnique(members), tick, sessionId)
     {
-        ArgumentNullException.ThrowIfNull(members);
+    }
 
+    // Capture alone transfers a fresh unaliased array; all published payload is read-only.
+    private CombatGroupOperationalSnapshot(CombatGroupMemberReadModel[] members,
+        SimulationTick tick, SimulationSessionId sessionId)
+    {
         SessionId = sessionId;
         Tick =
             tick;
-        _members =
-            members.Where(static member => member.Entity.IsValid).DistinctBy(static member => member.Entity).ToArray();
+        _members = members;
         _lookup = _members.ToDictionary(static member => member.Entity);
         _memberView = Array.AsReadOnly(_members);
         _eligibleEntities =
@@ -61,6 +65,37 @@ public sealed class CombatGroupOperationalSnapshot
                 _members[index].Entity;
         }
         _eligibleView = Array.AsReadOnly(_eligibleEntities);
+    }
+
+    private CombatGroupOperationalSnapshot(CombatGroupOperationalSnapshot previous, SimulationTick tick)
+    {
+        SessionId = previous.SessionId;
+        Tick = tick;
+        _members = previous._members;
+        _eligibleEntities = previous._eligibleEntities;
+        _lookup = previous._lookup;
+        _memberView = previous._memberView;
+        _eligibleView = previous._eligibleView;
+    }
+
+    private static CombatGroupMemberReadModel[] CopyUnique(IReadOnlyList<CombatGroupMemberReadModel> members)
+    {
+        ArgumentNullException.ThrowIfNull(members);
+        return members.Where(static member => member.Entity.IsValid).DistinctBy(static member => member.Entity).ToArray();
+    }
+
+    internal static CombatGroupOperationalSnapshot CaptureOwned(SimulationTick tick,
+        SimulationSessionId session, List<CombatGroupMemberReadModel> members,
+        CombatGroupOperationalSnapshot? previous)
+    {
+        if (previous is not null && previous.SessionId == session && previous._members.Length == members.Count)
+        {
+            bool same = true;
+            for (int i = 0; i < members.Count; i++)
+                if (previous._members[i] != members[i]) { same = false; break; }
+            if (same) return previous.Tick == tick ? previous : new(previous, tick);
+        }
+        return new(members.ToArray(), tick, session);
     }
 
     public SimulationSessionId SessionId { get; }
@@ -461,15 +496,17 @@ internal static class CombatGroupOperationalSnapshotFactory
     public static CombatGroupOperationalSnapshot Capture(
         SimulationContext context,
         PlayerId player,
-        SimulationSessionId sessionId = default)
+        SimulationSessionId sessionId = default,
+        List<CombatGroupMemberReadModel>? scratch = null,
+        CombatGroupOperationalSnapshot? previous = null)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         EntityRegistry entities =
             context.Entities;
-        var members =
-            new List<CombatGroupMemberReadModel>(
-                entities.GetComponentCount<ControllableEntity>());
+        var members = scratch ?? new List<CombatGroupMemberReadModel>(
+            entities.GetComponentCount<ControllableEntity>());
+        members.Clear();
 
         foreach (EntityId entity in
                  entities.Query<ControllableEntity>(
@@ -581,9 +618,9 @@ internal static class CombatGroupOperationalSnapshotFactory
                     entities.HasComponent<WorldTransform>(entity) && entities.HasComponent<Combatant>(entity)));
         }
 
-        return new CombatGroupOperationalSnapshot(
-            context.Tick,
-            members,
-            sessionId);
+        var snapshot = CombatGroupOperationalSnapshot.CaptureOwned(context.Tick, sessionId, members, previous);
+        if (scratch is not null && members.Count <= 65_536 && members.Capacity > 65_536)
+            members.Capacity = Math.Max(256, members.Count);
+        return snapshot;
     }
 }

@@ -34,6 +34,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     private ulong? _vfxTick;
     private SimulationSessionId _vfxSession;
     private readonly AlertLifecycleTracker _alerts = new();
+    private readonly List<CombatGroupMemberReadModel> _combatGroupScratch = [];
+    private CombatGroupOperationalSnapshot? _previousCombatGroups;
     private readonly WorldAudioEventBridge? _worldAudio;
     public const int MaximumSnapshotEffects = 4096;
     private readonly List<QueuedVfxInstance> _queuedVfx = new(256);
@@ -185,7 +187,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 : CombatGroupOperationalSnapshotFactory.Capture(
                     context,
                     _extraction.Player,
-                    _extraction.Scenario.Simulation.SessionId);
+                    _extraction.Scenario.Simulation.SessionId,
+                    _combatGroupScratch, _previousCombatGroups);
 
         BuildingPlacementPreviewReadModel? placementPreview =
             _extraction is null
@@ -240,6 +243,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                         interaction.SelectedEntities,
                         interaction.HoverSessionId == _extraction.Scenario.Simulation.SessionId
                             ? interaction.HoveredEntity : default) });
+        _previousCombatGroups = combatGroups;
     }
 
     private RenderInstance[] CaptureRenderInstances(
