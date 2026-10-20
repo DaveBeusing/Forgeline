@@ -83,7 +83,8 @@ public sealed class CargoFleetShortageTracker
         {
             var cargo = entities.GetComponent<CargoTransport>(truck);
             if (cargo.Owner != player || entities.HasComponent<SupplyTruck>(truck) ||
-                !VehicleDockingService.Operational(entities, truck)) continue;
+                !entities.IsAlive(truck) ||
+                entities.TryGetComponent(truck, out HealthState truckHealth) && truckHealth.IsDepleted) continue;
             if (!inventories.Contains(cargo.CargoInventory))
             {
                 blocked++;
