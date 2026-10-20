@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "initialCommandExit": 1,
+  "initialSummaryError": "PowerShell scalar splatting expanded the --gameplay-only option into characters. All four actual profile invocations exited 0.",
+  "originalErrorSha256": "713c5d52d42f55434dcf526c98e5805d8693b78127c4eca50deb0abfd16f9045",
+  "recoveryCommand": "python build/rendering/snapshot-publication/SummarizeMeasurements.py artifacts/snapshot-publication/extended-gameplay --gameplay-only",
+  "recoveryExit": 0,
+  "harnessSourceSha256": "A64737B8DCFAB2BABDB1C570A3F389E16838E5119CB1B41B24F0579602CEAB2D",
+  "productSource": "6db272ce089b2a298e32ec14bbcd6b68ce8f1867",
+  "probeScope": "Only the baseline-compatible gameplay probe warmup changes to 512 ticks; it was compiled in both source trees with identical bytes. Product sources and binary identities stay unchanged. The probe is committed separately after measurement.",
+  "method": "No measurement sample is edited or rerun in recovery; source/runtime/probe signatures, data shape and checksums are asserted."
+}

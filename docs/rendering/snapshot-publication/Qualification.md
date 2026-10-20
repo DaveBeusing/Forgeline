@@ -48,7 +48,14 @@ representations copy again; no input bits are lost. Labels keep complete value c
 
 ## Executed checks
 
-Product source `29bebfdc6ca59c6b98789a9a6e110e4cf263fdb9` passed Release solution
+Product source `6db272ce089b2a298e32ec14bbcd6b68ce8f1867` passes the final Release
+solution build/publish with zero warnings/errors. Its complete four-cohort CPU matrix
+passes all profile/frame/combat processes; six fresh native pairs are exact. Extended
+512-tick warmup profiles pass too, with an independently pinned probe and pure-data
+summary recovery after the retained option-splat error. No product source changes
+after this measured revision. See Measurements for every timing limit and failure.
+
+Earlier product source `29bebfdc6ca59c6b98789a9a6e110e4cf263fdb9` passed Release solution
 build with zero warnings/errors, runtime asset validation, graph and version checks.
 The later profile-only source `f797af6f65361949fa1017ce2387026ec41628f6` also passed
 Release solution build with zero warnings/errors. The refinement source above passed an
@@ -69,7 +76,8 @@ first includes an intermittent frozen settings failure described below.
 
 Earlier CPU cohorts overlap a subsequently reported concurrent solution run and are
 unqualified for isolated CPU timing; their raw data is preserved. A coordinated
-replacement with bounded process observations is required. Thread allocation windows,
+replacement and extended warmup comparison are now complete with zero detected
+foreign activity in 105 and nine bounded process observations. Thread allocation windows,
 retained payload counters,
 source/catalog hashes and native frame/resource observations are in
 [Measurements](Measurements.md). Hardware images match exactly; no global FPS or
@@ -99,7 +107,8 @@ Frame-contracts CI at product 29bebfd fails in
 `selected*24+22` lines; 24/36 cases produce `selected*8+22` (30 for one, 8,022 for 1,000).
 All 36 report zero allocation, no dropped lines and at most one draw. The same 24/36
 failure is reproduced by the e42f4e7 benchmark, exit nonzero. A separately authorized serial UI repair owns these four preexisting UI surfaces;
-this branch does not modify them. The serial owner must
+this branch does not modify them. The repair is tracked in PR 260 and is not yet
+part of this branch’s master base. The serial owner must
 reconcile the renderer's required geometry and both frozen test/benchmark contracts,
 then re-run frame-contracts. This PR does not decide that unrelated UI contract.
 Current main CI at 29bebfd fails earlier in Graphical economy work states and operations
@@ -119,6 +128,17 @@ default; process GC counts are not attributed to an operation. There is no prove
 historical root cause or claim to have fixed an absent renderer. Historical error closure
 remains open pending an authoritative reproduction/resolution by the responsible surface.
 
+## Consumer allocation observations
+
+The coordinated ratio-7 candidate-A window at tick 103 records 7,920 bytes; the extended
+warmup records 3,528 and 6,712 at ticks 583 and 635. Candidate-B and ratios 1/3 are zero.
+Retained index/visibility capacity stays 4,546 bytes; these are not explained by observed
+scratch growth. Their origin remains unestablished and requires allocation-stack
+attribution over the exact update/interpolation window. No assertion links them to the
+historical 8,104-byte failure, and no tolerance or tiering switch conceals them. Raw
+samples remain in Measurements. This is a further open allocation/performance finding,
+not a claim of global zero-byte gameplay or render frames.
+
 ## Remaining acceptance
 
 The current canonical refined Client project has 452 total / 449 passed / one failed /
@@ -126,9 +146,9 @@ two skipped (exit 2), matching the preexisting controls failure. Clean baseline 
 has 442 total / 439 passed / one failed / two skipped (exit 2). Feedback/settings classes
 pass on both sources (18/18 each); final dedicated scopes pass 12 Presentation and
 10 Client cases. The source-pinned extended host comparison is complete; it demonstrates reduced
-allocation with a small observed CPU tradeoff. Record final-head CI results and finish
-the final native recheck before acceptance. Human review of the six images remains pending. Mixed consumer
+allocation with a small observed CPU tradeoff. Record final-head CI results before acceptance. The final native recheck passes
+structurally with exact images; human review remains pending. Human review of the six images remains pending. Mixed consumer
 CPU timings need a controlled performance review; improved capture/publication allocation
-must not be presented as universal latency improvement. Reconcile the frozen UI gates
+must not be presented as universal latency improvement. Attribute the intermittent consumer counters, reconcile the frozen UI gates
 and historical allocation report serially, then re-run mandatory workflows before merge.
 No automatic merge, tag or release is authorized by this qualification.

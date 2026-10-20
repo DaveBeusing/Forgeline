@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "method": "Sequential baseline/candidate/candidate/baseline with identical real completed gameplay data, runtime assets and probe. CPU/thread bytes only; timing observational; GPU/Present unavailable. Retained index payload excludes snapshot arrays and other engine state.",
+  "results": [
+    {
+      "renderRatio": 1,
+      "samplesPerCohort": 128,
+      "sources": [
+        "0.1.419-dev+e42f4e7537b84c56c9dbdafe56f03f1e5e74270d",
+        "0.1.420-dev+6db272ce089b2a298e32ec14bbcd6b68ce8f1867"
+      ],
+      "TickMicroseconds": {
+        "beforeMean": 2144.534375,
+        "afterMean": 2296.086328125,
+        "beforeMedian": 1764.75,
+        "afterMedian": 1881.95
+      },
+      "TickAllocated": {
+        "beforeMean": 415539.09375,
+        "afterMean": 279511.4375,
+        "beforeMedian": 409272.0,
+        "afterMedian": 273696.0
+      },
+      "CaptureMicroseconds": {
+        "beforeMean": 1099.411328125,
+        "afterMean": 1157.546875,
+        "beforeMedian": 990.05,
+        "afterMedian": 1041.15
+      },
+      "CaptureAllocated": {
+        "beforeMean": 393209.65625,
+        "afterMean": 257202.625,
+        "beforeMedian": 392936.0,
+        "afterMedian": 257360.0
+      },
+      "ConsumerMicroseconds": {
+        "beforeMean": 911.853125,
+        "afterMean": 687.008203125,
+        "beforeMedian": 790.0,
+        "afterMedian": 596.95
+      },
+      "ConsumerAllocated": {
+        "beforeMean": 18.90625,
+        "afterMean": 0,
+        "beforeMedian": 0.0,
+        "afterMedian": 0.0
+      },
+      "IndexRetainedBytes": {
+        "beforeMean": 2654,
+        "afterMean": 4546,
+        "beforeMedian": 2654.0,
+        "afterMedian": 4546.0
+      },
+      "ProducerScratchRetainedBytes": {
+        "beforeMean": 0,
+        "afterMean": 246112,
+        "beforeMedian": 0.0,
+        "afterMedian": 246112.0
+      },
+      "reusedCombatPayloads": {
+        "before": [
+          0,
+          0
+        ],
+        "after": [
+          159,
+          159
+        ]
+      }
+    },
+    {
+      "renderRatio": 3,
+      "samplesPerCohort": 128,
+      "sources": [
+        "0.1.419-dev+e42f4e7537b84c56c9dbdafe56f03f1e5e74270d",
+        "0.1.420-dev+6db272ce089b2a298e32ec14bbcd6b68ce8f1867"
+      ],
+      "TickMicroseconds": {
+        "beforeMean": 1058.557421875,
+        "afterMean": 2156.54296875,
+        "beforeMedian": 812.6,
+        "afterMedian": 1770.85
+      },
+      "TickAllocated": {
+        "beforeMean": 415461.71875,
+        "afterMean": 279513.3125,
+        "beforeMedian": 409272.0,
+        "afterMedian": 273696.0
+      },
+      "CaptureMicroseconds": {
+        "beforeMean": 442.225,
+        "afterMean": 980.401171875,
+        "beforeMedian": 369.75,
+        "afterMedian": 903.45
+      },
+      "CaptureAllocated": {
+        "beforeMean": 393113.3125,
+        "afterMean": 257202.625,
+        "beforeMedian": 392936.0,
+        "afterMedian": 257360.0
+      },
+      "ConsumerMicroseconds": {
+        "beforeMean": 323.7734375,
+        "afterMean": 385.5453125,
+        "beforeMedian": 199.55,
+        "afterMedian": 429.2
+      },
+      "ConsumerAllocated": {
+        "beforeMean": 20.78125,
+        "afterMean": 0,
+        "beforeMedian": 0.0,
+        "afterMedian": 0.0
+      },
+      "IndexRetainedBytes": {
+        "beforeMean": 2654,
+        "afterMean": 4546,
+        "beforeMedian": 2654.0,
+        "afterMedian": 4546.0
+      },
+      "ProducerScratchRetainedBytes": {
+        "beforeMean": 0,
+        "afterMean": 246112,
+        "beforeMedian": 0.0,
+        "afterMedian": 246112.0
+      },
+      "reusedCombatPayloads": {
+        "before": [
+          0,
+          0
+        ],
+        "after": [
+          159,
+          159
+        ]
+      }
+    },
+    {
+      "renderRatio": 7,
+      "samplesPerCohort": 128,
+      "sources": [
+        "0.1.419-dev+e42f4e7537b84c56c9dbdafe56f03f1e5e74270d",
+        "0.1.420-dev+6db272ce089b2a298e32ec14bbcd6b68ce8f1867"
+      ],
+      "TickMicroseconds": {
+        "beforeMean": 743.67890625,
+        "afterMean": 1659.4171875,
+        "beforeMedian": 589.3499999999999,
+        "afterMedian": 1466.25
+      },
+      "TickAllocated": {
+        "beforeMean": 415271.0625,
+        "afterMean": 279792.875,
+        "beforeMedian": 409272.0,
+        "afterMedian": 273696.0
+      },
+      "CaptureMicroseconds": {
+        "beforeMean": 304.1828125,
+        "afterMean": 602.46484375,
+        "beforeMedian": 299.6,
+        "afterMedian": 572.55
+      },
+      "CaptureAllocated": {
+        "beforeMean": 392954.75,
+        "afterMean": 257448.28125,
+        "beforeMedian": 392936.0,
+        "afterMedian": 257360.0
+      },
+      "ConsumerMicroseconds": {
+        "beforeMean": 265.028515625,
+        "afterMean": 590.389453125,
+        "beforeMedian": 250.95,
+        "afterMedian": 626.6500000000001
+      },
+      "ConsumerAllocated": {
+        "beforeMean": 0,
+        "afterMean": 30.9375,
+        "beforeMedian": 0.0,
+        "afterMedian": 0.0
+      },
+      "IndexRetainedBytes": {
+        "beforeMean": 2654,
+        "afterMean": 4546,
+        "beforeMedian": 2654.0,
+        "afterMedian": 4546.0
+      },
+      "ProducerScratchRetainedBytes": {
+        "beforeMean": 0,
+        "afterMean": 246112,
+        "beforeMedian": 0.0,
+        "afterMedian": 246112.0
+      },
+      "reusedCombatPayloads": {
+        "before": [
+          0,
+          0
+        ],
+        "after": [
+          159,
+          159
+        ]
+      }
+    }
+  ],
+  "fileSha256": {
+    "baseline-a/combat-group-hotpaths.json": "ade0978c92c80f8731ad85583e4e5f844b866e39314efb298a104deb87470975",
+    "baseline-a/frame-hotpaths.json": "1ae13b074161d73925abc2a009ad62149d565dc3972e18cc0404806653d5a650",
+    "baseline-a/gameplay/gameplay-ratio-1.json": "bf305e8c698af17ce710a1f37c31bb4f76d3a843fe55d39cabc27e3bf1be86fa",
+    "baseline-a/gameplay/gameplay-ratio-3.json": "8ecd706eeec8c13ad3c37ce5b114aff2f7ca85613bf08bf0dfeb148c08ce98de",
+    "baseline-a/gameplay/gameplay-ratio-7.json": "e0d1babfe9305f97dfc13a069b295fa9a7ae4d481d197f59b0b7cdd3a47804f8",
+    "baseline-a/run.json": "7008f63c1985dcfe72f8ffb59c01c824b27f77c9c4a95cb3ba1551142683f0ed",
+    "baseline-b/combat-group-hotpaths.json": "84cf824cffe1da4707cf4080dc5c5f82aad0982116d9213d256f52db4d69649e",
+    "baseline-b/frame-hotpaths.json": "e67a422de0e32309de22077b56b16880763402cf9da6d37d1d827a65db14ff22",
+    "baseline-b/gameplay/gameplay-ratio-1.json": "34c5a619f7dfda94478db8efcb4f82467ef78e4ca2ac49c1fcd4d63b26213034",
+    "baseline-b/gameplay/gameplay-ratio-3.json": "67e628bac1dc8c6e85f7d9895205edf1804a344b1ea83eb95b703edf3378e017",
+    "baseline-b/gameplay/gameplay-ratio-7.json": "0f97de9210d5ebf91de7c084f213c63d39260566a4705e7c8614824640c32f72",
+    "baseline-b/run.json": "91c2296f1ea4b9882db7f5f35f4436fb875c76d8dc6ae9329e79fb212bbbbc7f",
+    "candidate-a/combat-group-hotpaths.json": "c5377228e24b0ca643cc904728a53fb635f85cfc382c050c8d758a1134d5697e",
+    "candidate-a/frame-hotpaths.json": "7aee70a58baf674f6d2cd284453a79e0333d2fce030ec3144122534b8a6de67e",
+    "candidate-a/gameplay/gameplay-ratio-1.json": "cd4959756bb2af8dd072459c487d13dd29acdff6fd0a09c4d84f77e4a1951394",
+    "candidate-a/gameplay/gameplay-ratio-3.json": "66a16aa5d1eadab7f61f95f17823b7bd552e16c414c5b88e1be29ff02bb16466",
+    "candidate-a/gameplay/gameplay-ratio-7.json": "1a7b6f56cbb757da14828e93a449f9c7f11e249da1bd4d577cdca9a84ceac286",
+    "candidate-a/run.json": "761b1ad26201569347794585cb159a442049258d44e172ce53737b06e9875190",
+    "candidate-b/combat-group-hotpaths.json": "88db142cf0a6980ddce5441a2d837c558827b548dd350400cf152160bbc0fffd",
+    "candidate-b/frame-hotpaths.json": "0c9d7191ce9d636fca97d3c9cb26a89ea2767bf3491fa3a2301015999e95b6b8",
+    "candidate-b/gameplay/gameplay-ratio-1.json": "fd135e555b0928784404baea482195ca9fb3f68c0d4b65d4f7ee8403763321c3",
+    "candidate-b/gameplay/gameplay-ratio-3.json": "5347d05fef47da8f7e4fc5ad75e0eb01e302065d7b9dec0af0036303a9b475f0",
+    "candidate-b/gameplay/gameplay-ratio-7.json": "c05f823f16e3ef8a927647226d5e87678a9cb19f303519e48d8a097d3ed5e5eb",
+    "candidate-b/run.json": "f43096be56380fb190e2cd4e94ae0219cea690f138c8caa31f6a22c8f8f6324e"
+  }
+}
