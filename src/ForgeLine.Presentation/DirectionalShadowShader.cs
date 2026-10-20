@@ -3,7 +3,7 @@ namespace ForgeLine.Presentation;
 internal static class DirectionalShadowShader
 {
     internal const string Disabled = "float2 SampleDirectionalShadow(float3 position, float3 normal, float3 lightDirection) { return float2(1, 1); }\n";
-    internal const string Source = """
+    internal const string Source = ShadowReceiverShader.Source + """
         Texture2D<float> DirectionalDepth : register(t15);
         cbuffer ShadowFrame : register(b1) {
             row_major float4x4 ShadowProjection;
@@ -26,16 +26,16 @@ internal static class DirectionalShadowShader
             float2 texel = uv * size - 0.5;
             int2 pixel = int2(floor(texel));
             float2 fraction = frac(texel);
-            float determinant = du.x * dv.y - du.y * dv.x;
-            float2 plane = abs(determinant) > 1e-10 ?
-                float2(dzdx * dv.y - dzdy * du.y, dzdy * du.x - dzdx * dv.x) / determinant : 0;
+            float2 plane = ShadowReceiverPlane(du,dv,dzdx,dzdy);
+            float maxCorrection = 4 * ShadowCenterRadius.w / (size * ShadowParameters.y);
             float visibility = 0;
             float contact = 0;
             [unroll] for (int y = 0; y <= 1; y++) {
                 [unroll] for (int x = 0; x <= 1; x++) {
                     float weight = (x == 0 ? 1 - fraction.x : fraction.x) * (y == 0 ? 1 - fraction.y : fraction.y);
                     float blocker = DirectionalDepth.Load(int3(clamp(pixel + int2(x, y), 0, size - 1), 0));
-                    float receiver = p.z + dot(plane, (float2(pixel + int2(x, y)) + 0.5) / size - uv);
+                    float receiver = ShadowReceiverDepth(p.z, plane,
+                        (float2(pixel + int2(x, y)) + 0.5) / size - uv, maxCorrection);
                     float gap = (receiver - blocker) * ShadowParameters.y;
                     visibility += (receiver - bias <= blocker ? 1 : 0) * weight;
                     contact += (gap > bias * ShadowParameters.y ? 1 - smoothstep(0.1, 1.5, gap) : 0) * weight;

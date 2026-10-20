@@ -377,8 +377,7 @@ internal static class InstanceMaterialPipeline
                         uv).rgb;
 
                 float3 normal =
-                    normalize(
-                        input.WorldNormal);
+                    PbrNormalize(input.WorldNormal, float3(0, 1, 0));
                 float3 tangent =
                     input.WorldTangent.xyz -
                     normal *
@@ -404,13 +403,13 @@ internal static class InstanceMaterialPipeline
                             tangent)) *
                     handedness;
                 float3 worldNormal =
-                    normalize(
+                    PbrNormalize(
                         tangent *
                         tangentNormal.x +
                         bitangent *
                         tangentNormal.y +
                         normal *
-                        tangentNormal.z);
+                        tangentNormal.z, normal);
 
                 float ambientOcclusion =
                     saturate(
@@ -428,6 +427,7 @@ internal static class InstanceMaterialPipeline
                         baseColor.rgb *
                         input.Color.rgb,
                         worldNormal,
+                        normal,
                         ambientOcclusion,
                         roughness,
                         metallic,

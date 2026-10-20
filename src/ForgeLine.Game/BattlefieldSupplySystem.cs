@@ -472,7 +472,8 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                             fuel.InventoryId,
                             ResourceIds.Fuel));
 
-                bool cargoDrive = context.Entities.HasComponent<CargoTransport>(recipient.Entity);
+                bool cargoDrive = context.Entities.HasComponent<CargoTransport>(recipient.Entity) &&
+                    !context.Entities.HasComponent<SupplyTruck>(recipient.Entity);
                 bool mobileRescue = cargoDrive && context.Entities.HasComponent<ResupplyOrder>(recipient.Entity) &&
                     (!context.Entities.TryGetComponent(recipient.Entity, out CargoFuelServiceState service) ||
                      service.Phase == CargoFuelServicePhase.AwaitingFuelRescue);
