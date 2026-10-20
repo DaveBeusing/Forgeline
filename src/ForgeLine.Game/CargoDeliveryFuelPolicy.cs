@@ -188,9 +188,10 @@ internal static class CargoDeliveryFuelPolicy
                 fuel.InventoryId,
                 ResourceIds.Fuel),
             fuel.ConsumptionPerMeter,
-            ResolveReserveFuel(
-                fuel,
-                replenishesFuelProduction),
+            entities.HasComponent<CargoFuelServiceState>(entity) ? 0.0 :
+                ResolveReserveFuel(
+                    fuel,
+                    replenishesFuelProduction),
             SimulationTick.Zero);
 
         if (entities.HasComponent<CargoDeliveryFuelBudget>(entity))
@@ -355,12 +356,13 @@ internal static class CargoDeliveryFuelPolicy
         !entities.HasComponent<SupplyTruck>(entity) &&
         !entities.HasComponent<ResupplyOrder>(entity) &&
         entities.HasComponent<CargoTransport>(entity) &&
-        entities.HasComponent<CargoTransportOrder>(entity) &&
-        entities.TryGetComponent(
-            entity,
-            out CargoTransportRuntimeState state) &&
-        (state.Lifecycle is CargoTransportLifecycleState.ToOrigin or CargoTransportLifecycleState.ToDestination ||
-         entities.HasComponent<VehicleDockVisit>(entity));
+        (entities.HasComponent<CargoFuelServiceState>(entity) ||
+         entities.HasComponent<CargoTransportOrder>(entity) &&
+         entities.TryGetComponent(
+             entity,
+             out CargoTransportRuntimeState state) &&
+         (state.Lifecycle is CargoTransportLifecycleState.ToOrigin or CargoTransportLifecycleState.ToDestination ||
+          entities.HasComponent<VehicleDockVisit>(entity)));
 
     private static void SetDeferral(
         SimulationContext context,

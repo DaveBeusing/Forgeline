@@ -357,6 +357,12 @@ public static class BattlefieldResupplyPlanner
             return ResupplyProviderRejection.SelfSupply;
         }
 
+        // A static depot is a docked fuel source for cargo vehicles, not a
+        // remote battlefield-transfer shortcut. Immobile cargo uses mobile rescue.
+        if (context.Entities.HasComponent<CargoTransport>(recipient) &&
+            !context.Entities.HasComponent<SupplyTruck>(candidate))
+            return ResupplyProviderRejection.ProviderBusy;
+
         if (!provider.Enabled)
         {
             return ResupplyProviderRejection.Disabled;

@@ -5,7 +5,7 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
 
-public enum VehicleQueueService : byte { CargoPickup, CargoDelivery, SupplyLoading }
+public enum VehicleQueueService : byte { CargoPickup, CargoDelivery, SupplyLoading, CargoRefueling }
 public enum VehicleQueueWaitReason : byte { None, Predecessor, OccupiedExit, Full, GeometryBlocked, Unavailable }
 
 public readonly record struct VehicleQueueSequence(ulong Value);
@@ -106,7 +106,8 @@ public sealed class VehicleQueueCoordinator
                 !entities.TryGetComponent(entry.Building, out CompletedBuilding building) || building.Owner != entry.Owner ||
                 entities.TryGetComponent(truck, out ControllableEntity control) && (control.Owner != entry.Owner || !control.IsControllable) ||
                 !entities.HasComponent<VehicleDockVisit>(truck) && !entities.HasComponent<CargoTransportOrder>(truck) &&
-                !entities.HasComponent<SupplyLoadingOrder>(truck)) _members.Add(truck);
+                !entities.HasComponent<SupplyLoadingOrder>(truck) &&
+                !entities.HasComponent<CargoFuelServiceState>(truck)) _members.Add(truck);
         }
         foreach (EntityId truck in _members)
         {

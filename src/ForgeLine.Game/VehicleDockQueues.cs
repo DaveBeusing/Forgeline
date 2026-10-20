@@ -43,7 +43,8 @@ public sealed partial class VehicleDockingService
         }
         entryPoint.Y += movement.HeightOffset; servicePoint.Y += movement.HeightOffset; exitPoint.Y += movement.HeightOffset;
         pose = pose with { Entry = entryPoint, Service = servicePoint, Exit = exitPoint };
-        var service = entities.HasComponent<SupplyLoadingOrder>(truck) ? VehicleQueueService.SupplyLoading :
+        var service = entities.HasComponent<CargoFuelServiceState>(truck) ? VehicleQueueService.CargoRefueling :
+            entities.HasComponent<SupplyLoadingOrder>(truck) ? VehicleQueueService.SupplyLoading :
             entities.TryGetComponent(truck, out CargoTransportRuntimeState cargo) &&
                 cargo.Lifecycle is CargoTransportLifecycleState.ToDestination or CargoTransportLifecycleState.Unloading
                 ? VehicleQueueService.CargoDelivery : VehicleQueueService.CargoPickup;

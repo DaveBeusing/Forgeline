@@ -472,12 +472,18 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                             fuel.InventoryId,
                             ResourceIds.Fuel));
 
+                bool cargoDrive = context.Entities.HasComponent<CargoTransport>(recipient.Entity);
+                bool mobileRescue = cargoDrive && context.Entities.HasComponent<ResupplyOrder>(recipient.Entity) &&
+                    (!context.Entities.TryGetComponent(recipient.Entity, out CargoFuelServiceState service) ||
+                     service.Phase == CargoFuelServicePhase.AwaitingFuelRescue);
                 if (deficit > QuantityEpsilon &&
+                    (!cargoDrive || mobileRescue) &&
                     !CargoDeliveryFuelPolicy.ShouldDeferRefueling(context.Entities, _inventories, recipient.Entity) &&
                     TrySelectProvider(
                         recipient,
                         ResourceIds.Fuel,
                         preferredProvider,
+                        cargoDrive,
                         out ProviderCandidate provider))
                 {
                     double actual = TransferAvailable(provider.Provider.InventoryId, fuel.InventoryId, ResourceIds.Fuel, deficit);
@@ -507,6 +513,7 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                         recipient,
                         ResourceIds.Ammunition,
                         preferredProvider,
+                        false,
                         out ProviderCandidate provider))
                 {
                     double actual = TransferAvailable(provider.Provider.InventoryId, ammunition.InventoryId, ResourceIds.Ammunition, deficit);
@@ -523,6 +530,7 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
         in RecipientCandidate recipient,
         ResourceId resource,
         EntityId preferredProvider,
+        bool mobileOnly,
         out ProviderCandidate selected)
     {
         selected = default;
@@ -533,7 +541,7 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
             ProviderCandidate candidate =
                 _providers[index];
 
-            if (candidate.Entity == recipient.Entity)
+            if (candidate.Entity == recipient.Entity || mobileOnly && !candidate.IsTruck)
             {
                 continue;
             }

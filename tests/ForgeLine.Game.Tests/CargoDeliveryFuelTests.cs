@@ -36,7 +36,7 @@ public sealed class CargoDeliveryFuelTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void UnaffordableDeliveryDoesNotSuppressNormalResupply(bool reserveFuel)
+    public void UnaffordableDeliveryAwaitsExplicitRescueWithoutStaticProximityTransfer(bool reserveFuel)
     {
         var fixture = new Fixture();
         fixture.RunUntilLoaded();
@@ -52,8 +52,12 @@ public sealed class CargoDeliveryFuelTests
 
         fixture.Simulation.AdvanceOneTick();
 
-        Assert.Equal(1UL, fixture.Automatic.Metrics.TotalOrdersIssued);
+        Assert.Equal(0UL, fixture.Automatic.Metrics.TotalOrdersIssued);
         Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(fixture.Truck));
+        var service = fixture.Simulation.Entities.GetComponent<CargoFuelServiceState>(fixture.Truck);
+        Assert.Equal(CargoFuelServicePhase.AwaitingFuelRescue, service.Phase);
+        Assert.Equal(CargoFuelServiceReason.NoEligibleProvider, service.Reason);
+        Assert.Equal(30.0, fixture.Inventories.GetAvailableQuantity(fixture.FuelInventory, ResourceIds.Fuel));
         Assert.Equal(0.0, fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.Steel));
         if (reserveFuel)
         {

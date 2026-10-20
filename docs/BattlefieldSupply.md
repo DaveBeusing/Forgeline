@@ -223,3 +223,7 @@ Actual Fuel and Ammunition move only in `BattlefieldSupplySystem` at legitimate 
 Supply views distinguish a selected Supply Truck's field cargo, its separate drive-tank inventory, and any assigned provider stock. Supply Trucks are excluded from regional Cargo fleet counts. Confirmed loading/queue state comes from the shared simulation service; no additional supply dispatcher or distance-derived queue is introduced. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
 
 The [opening logistics guide](OnboardingInteraction.md) explains these same controls and uses [completed-action evidence](OnboardingQualification.md). Reading a card, starting stock, an accepted policy or a provider assignment never substitutes for an actual delivery or field transfer.
+
+## Cargo Truck operational Fuel versus battlefield supply
+
+Cargo propulsion Fuel is stored in a dedicated `UnitFuelState` inventory, independently from its freight inventory and Supply Truck battlefield cargo. A static depot's proximity is not an automatic transfer into a Cargo Truck drive tank. Autonomous Cargo Truck refueling uses the real docking/FIFO/inventory service described in [Cargo Transport Operations](CargoTransportOperations.md). Existing explicit mobile Supply Truck rescue remains available for a cargo vehicle unable to reach any fueled dock, while idle or traveling Cargo Trucks do not accept passive static-range top-ups. Battlefield resupply of combat units and Supply Truck ammunition is unchanged.
