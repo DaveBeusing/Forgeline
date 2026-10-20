@@ -94,6 +94,42 @@ public sealed class AssetResidencyTests
         prepared.RequireSuccess();
     }
 
+    [Theory]
+    [InlineData(true)] [InlineData(false)]
+    public void WrongTextureUsageOrColorSpaceFailsBeforeGpuPublication(bool wrongUsage)
+    {
+        using var fixture = new ResidencyFixture(); using var graphics = new ResidencyDevice();
+        var record = fixture.Records[0];
+        var texture = RuntimeTextureData.FromRgba8(1,1,[0,0,0,255], RuntimeTextureColorSpace.Linear,
+            wrongUsage ? RuntimeTextureUsage.Normal : RuntimeTextureUsage.Color);
+        string path = Path.Combine(fixture.Root,record.RuntimePath);
+        RuntimeAssetFile.Write(path,RuntimeAssetType.Texture,[],texture.ToPayload());
+        fixture.Records[0] = RuntimeAssetIntegrity.SealRecord(path,record);
+        using var resources = new RuntimeWorldAssetResources(graphics,fixture.Catalog());
+        Assert.Throws<InvalidDataException>(() => resources.PrepareRequiredAssets(CancellationToken.None));
+        Assert.Equal(AssetResidencyState.Failed,resources.Residency.State);
+        Assert.Empty(graphics.Buffers);
+        Assert.Equal(5,graphics.Textures.Count); // Only the existing explicit fallback textures.
+    }
+
+    [Fact]
+    public void ExhaustedResidentBudgetNeverEvictsAnAlreadyReferencedTexture()
+    {
+        using var fixture = new ResidencyFixture(); using var graphics = new ResidencyDevice();
+        var original = RuntimeTextureData.FromRgba8(8,8,new byte[256], RuntimeTextureColorSpace.Srgb,RuntimeTextureUsage.Color);
+        fixture.Add("texture.residency.other",RuntimeAssetType.Texture,original.ToPayload());
+        fixture.Add("material.residency.other",RuntimeAssetType.Material,
+            """{"baseColorTexture":"texture.residency.other"}"""u8.ToArray(),["texture.residency.other"]);
+        using var store = new ResidentAssetStore(graphics,fixture.Catalog(),TextureDetailQuality.Full,400);
+        var pinned = store.ResolveMaterial("material.residency.main").BaseColorTexture;
+        Assert.True(store.ResolveMaterial("material.residency.other").UsesDevelopmentFallback);
+        Assert.False(((ResidencyDevice.Texture)pinned).Disposed);
+        Assert.Same(pinned,store.ResolveMaterial("material.residency.main").BaseColorTexture);
+        Assert.Throws<InvalidDataException>(() => store.PrepareRequiredAssets(CancellationToken.None));
+        Assert.Equal(AssetResidencyState.Failed,store.State);
+        Assert.False(((ResidencyDevice.Texture)pinned).Disposed);
+    }
+
     [Fact]
     public void LastOwnerReleaseAllowsFreshRestartGeneration()
     {

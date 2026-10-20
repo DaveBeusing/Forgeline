@@ -93,7 +93,7 @@ internal sealed class PreparedAssetSet
                         default: throw new InvalidDataException($"Unsupported visual dependency type '{record.Type}'.");
                     }
                 }
-                catch (Exception exception) when (exception is IOException or InvalidDataException or ArgumentException or KeyNotFoundException)
+                catch (Exception exception) when (exception is IOException or InvalidDataException or ArgumentException or KeyNotFoundException or System.Text.Json.JsonException)
                 { _failures.Add(id, exception); }
             }
         }
@@ -107,6 +107,29 @@ internal sealed class PreparedAssetSet
         {
             var failure = _failures.OrderBy(static x => x.Key.Value, StringComparer.Ordinal).First();
             throw new InvalidDataException($"Required visual asset '{failure.Key}' failed preparation.", failure.Value);
+        }
+    }
+    internal void ValidateBindings()
+    {
+        RequireSuccess();
+        foreach (var mesh in Meshes.Values)
+            foreach (string material in mesh.MaterialIds) _ = Get(AssetId.Parse(material), Materials);
+        foreach (var material in Materials.Values)
+        {
+            Check(material.BaseColorTexture, RuntimeTextureUsage.Color, RuntimeTextureColorSpace.Srgb);
+            Check(material.NormalTexture, RuntimeTextureUsage.Normal, RuntimeTextureColorSpace.Linear);
+            Check(material.OrmTexture, RuntimeTextureUsage.Orm, RuntimeTextureColorSpace.Linear);
+            Check(material.EmissiveTexture, RuntimeTextureUsage.Emissive, RuntimeTextureColorSpace.Srgb);
+        }
+        foreach (var id in _planned)
+            foreach (var lod in _catalog.Get(id).Lods)
+                _ = Get(AssetId.Parse(lod.AssetId), Meshes);
+        void Check(AssetId? id, RuntimeTextureUsage usage, RuntimeTextureColorSpace colorSpace)
+        {
+            if (id is not { } value) return;
+            var texture = Get(value, Textures);
+            if (texture.Usage != usage || texture.ColorSpace != colorSpace)
+                throw new InvalidDataException($"Texture '{value}' has incompatible material usage/color space.");
         }
     }
     internal T Get<T>(AssetId id, Dictionary<AssetId, T> values)

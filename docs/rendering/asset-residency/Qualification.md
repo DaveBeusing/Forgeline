@@ -51,3 +51,12 @@ and device wrappers stay distinct, pinned generations reject excess admission, m
 main containers fail, cancellation never publishes partial readiness, and a retirement exception
 still releases remaining wrappers without double-decrementing the scope. These are functional
 contracts, not native timing or physical heap acceptance.
+
+
+The full Presentation suite on 15a0c56e passes 1,424 tests, zero failures and twelve
+optional skips / 1,436 total (1m10.254s). The complete solution builds with zero
+warnings/errors (18.02s). The next narrow refinement validates texture usage/color
+space and mesh material/LOD types before any required GPU publication. Thirteen
+focused residency tests pass (6.091s), including incompatible normal/BaseColor
+bindings and a small explicit resident budget that cannot evict an active texture.
+The final full suite is rerun on the committed refinement before native qualification.

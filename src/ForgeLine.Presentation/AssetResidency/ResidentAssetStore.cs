@@ -32,6 +32,7 @@ internal sealed class ResidentAssetStore : IDisposable
     private bool _disposed;
     private readonly PreparedAssetSet _prepared;
     private long _residentTextureMipBytes;
+    private readonly long _residentBudget;
     internal const long MaximumResidentBytes = 96 * 1024 * 1024;
     internal bool RequiredReady { get; private set; }
     internal PreparedAssetSet Prepared => _prepared;
@@ -47,7 +48,7 @@ internal sealed class ResidentAssetStore : IDisposable
         long publicationStarted = System.Diagnostics.Stopwatch.GetTimestamp();
         try
         {
-            _prepared.RequireSuccess();
+            _prepared.ValidateBindings();
             State = AssetResidencyState.Uploading;
             var work = _prepared.Meshes.Keys.Select(static id => (Id: id, Mesh: true))
                 .Concat(_prepared.Materials.Keys.Select(static id => (Id: id, Mesh: false)))
@@ -79,13 +80,14 @@ internal sealed class ResidentAssetStore : IDisposable
     }
     private void Reserve(long bytes)
     {
-        if (checked(_residentMeshBytes + _residentTextureMipBytes + bytes) > MaximumResidentBytes)
+        if (checked(_residentMeshBytes + _residentTextureMipBytes + bytes) > _residentBudget)
             throw new InvalidDataException("Required pinned visual assets exceed the 96 MiB resident policy.");
     }
 
     public ResidentAssetStore(
         IGraphicsDevice graphics,
-        RuntimeAssetCatalog catalog, TextureDetailQuality textureDetail = TextureDetailQuality.Full)
+        RuntimeAssetCatalog catalog, TextureDetailQuality textureDetail = TextureDetailQuality.Full,
+        long residentBudget = MaximumResidentBytes)
     {
         _graphics =
             graphics ??
@@ -95,6 +97,9 @@ internal sealed class ResidentAssetStore : IDisposable
             throw new ArgumentNullException(nameof(catalog));
 
         if (!Enum.IsDefined(textureDetail)) throw new ArgumentOutOfRangeException(nameof(textureDetail));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(residentBudget);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(residentBudget, MaximumResidentBytes);
+        _residentBudget = residentBudget;
         _textureDetail = textureDetail;
         _prepared = new(catalog);
         while (!_prepared.PrepareStep(CancellationToken.None)) { }
@@ -516,7 +521,9 @@ internal sealed class ResidentAssetStore : IDisposable
 
             RuntimeTextureData data = _prepared.Get(id, _prepared.Textures);
 
-            if (data.Usage != expectedUsage)
+            RuntimeTextureColorSpace expectedColor = expectedUsage is RuntimeTextureUsage.Color or RuntimeTextureUsage.Emissive
+                ? RuntimeTextureColorSpace.Srgb : RuntimeTextureColorSpace.Linear;
+            if (data.Usage != expectedUsage || data.ColorSpace != expectedColor)
             {
                 hasBindingFailure =
                     true;
