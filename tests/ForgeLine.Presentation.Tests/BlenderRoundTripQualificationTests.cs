@@ -11,6 +11,16 @@ public sealed class BlenderRoundTripQualificationTests
     private static readonly JsonSerializerOptions ReportOptions = new() { WriteIndented = true };
     public static bool Enabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_ROUNDTRIP_ROOT"));
 
+    public static bool ReadinessEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_READINESS_ROOT"));
+
+    [Fact(Skip = "Set FORGELINE_BLENDER_READINESS_ROOT after the staged three-family exports.", SkipUnless = nameof(ReadinessEnabled))]
+    public void BuildingVehicleAndPropPreserveCompiledContracts()
+    {
+        CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_READINESS_ROOT")!),
+            ["first", "second", "reopened"], false, expectedTriangles: 15696,
+            expectedAssets: 32, expectedMeshes: 21, baselineFolder: "baseline/runtime");
+    }
+
     public static bool ProductionEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_PRODUCTION_ROOT"));
 
     [Fact(Skip = "Set FORGELINE_BLENDER_ROUNDTRIP_ROOT after native Blender fixture exports.", SkipUnless = nameof(Enabled))]
@@ -33,10 +43,11 @@ public sealed class BlenderRoundTripQualificationTests
         CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_MOTION_ROOT")!), ["first", "second", "reopened"], true, "_rigid/", 10536);
     }
 
-    private static void CompareExports(string root, string[] variants, bool prepared, string folder = "_prepared/", int expectedTriangles = 15640)
+    private static void CompareExports(string root, string[] variants, bool prepared, string folder = "_prepared/", int expectedTriangles = 15640,
+        int expectedAssets = 29, int expectedMeshes = 19, string baselineFolder = "baseline-runtime")
     {
-        var baseline = RuntimeAssetCatalog.Load(Path.Combine(root, "baseline-runtime"));
-        Assert.Equal(29, baseline.Manifest.Assets.Count);
+        var baseline = RuntimeAssetCatalog.Load(Path.Combine(root, baselineFolder));
+        Assert.Equal(expectedAssets, baseline.Manifest.Assets.Count);
         var reports = new List<object>();
         foreach (string name in variants)
         {
@@ -97,7 +108,7 @@ public sealed class BlenderRoundTripQualificationTests
                     Assert.True(Vector3.Distance(oldParts[i].GeometryOffset,newParts[i].GeometryOffset) <= .000001f, before.Id);
                 meshes++; triangles += a.Indices.Count/3; parts += before.MechanicalParts.Count;
             }
-            Assert.Equal(19,meshes); Assert.Equal(expectedTriangles,triangles);
+            Assert.Equal(expectedMeshes,meshes); Assert.Equal(expectedTriangles,triangles);
             reports.Add(new { variant = name, meshes, triangles, parts, maximumPositionError = positionError, maximumTangentError = tangentError, mechanicalBatchIdentityPreserved = true });
         }
         string? seed = Environment.GetEnvironmentVariable("FORGELINE_BLENDER_RUNTIME_SEED");
