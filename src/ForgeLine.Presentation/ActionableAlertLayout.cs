@@ -5,9 +5,9 @@ namespace ForgeLine.Presentation;
 
 public readonly record struct NotificationCardLayout(AlertNotification Item, HudRect Bounds, HudRect Text,
     HudRect Action, HudRect Details, bool Truncated, ulong Revision = 0, AlertIdentity Identity = default,
-    HudRect ExpansionBounds = default)
+    HudRect ExpansionBounds = default, bool ExpansionActive = false)
 {
-    public HudRect InteractiveBounds => ExpansionBounds.IsEmpty ? Bounds :
+    public HudRect InteractiveBounds => !ExpansionActive || ExpansionBounds.IsEmpty ? Bounds :
         Bounds with { Height = ExpansionBounds.Bottom - Bounds.Y };
 }
 
@@ -106,7 +106,7 @@ public static class ActionableAlertLayout
                     expandedBounds = new HudRect(rect.X, rect.Bottom, rect.Width, visibleHeight);
             }
             cards[count++] = new(item, rect, content, action, details, truncated,
-                textRevision, identity, expandedBounds);
+                textRevision, identity, expandedBounds, expansion.Open);
             consumed++; y += height + (expandedBounds.IsEmpty ? 0 : expandedBounds.Height) + gap;
         }
         if (consumed < total && y + summary <= bounds.Bottom)
