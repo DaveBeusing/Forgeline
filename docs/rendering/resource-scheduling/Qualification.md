@@ -75,3 +75,37 @@ Close/Execute/Signal upload failures. Failed and corrected logs remain distinct.
 These checks do not yet replace native before/after timing, full suites, debug-layer
 qualification, large-transfer pressure, pass changes, resize or final PR CI. No
 universal FPS improvement or device-loss recovery is claimed.
+
+
+## Integration and native root-state repair
+
+Master advanced to e42f4e7537b84c56c9dbdafe56f03f1e5e74270d during work and was
+integrated without conflicts. Its changes are version/workflow/HUD-test/documentation
+changes; the production source, assets and compiler trees are identical to f2be6532.
+The PR therefore has one PATCH from the new master 0.1.419 to 0.1.420.
+
+All 28 expanded scheduling contracts passed, zero failures/skips (9.921s).
+The complete solution Release build on 0cc31d62 passes with zero warnings/errors
+(23.69s), and runtime source compilation/qualification succeeds.
+
+A subsequent full Graphics run on that source aborts at WARP ExecuteCommandList
+with 0xC0000005 in the existing perspective-depth particle test. The new pipeline
+cache incorrectly moved ValidateParticlePipeline before SetGraphicsRootSignature;
+that method also binds a root descriptor table, so it requires the new root first.
+The original order is restored. Repeated identical pipeline bindings still execute
+the particle validation/binding against the already active matching root. A native
+particle regression covers the opaque-to-particle transition and exact repeat image.
+The complete failed log is retained and is not treated as a passed run.
+
+After repair, the focused particle/native selection passes all 22 cases. The full
+Graphics module passes 109 cases, zero failures and three optional skips / 112 total
+(20.964s). Two lifetime cases require explicit opt-in; the debug clear case reports
+the unavailable D3D12 debug layer. This is not a claim of debug-layer acceptance.
+The final regression fixture also binds a real vertex buffer for its opaque draw.
+
+The validated original-binary upload probe records 67,531,680 managed bytes for
+256 uploads and 14,336 bytes for 256 empty frames (56 bytes/frame). This preliminary
+host check is not a paired performance acceptance. Fixed clean paired measurements
+will use the committed probe, preserve chronological samples and separately record
+CPU recording, final drain and unavailable GPU-copy time. No frame-context lifetime
+is weakened to remove the semantically necessary context allocation.

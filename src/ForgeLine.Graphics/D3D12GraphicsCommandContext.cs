@@ -113,12 +113,16 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         }
 
         _owner.UseResource(d3d12Pipeline.Lifetime);
-        _owner.ValidateParticlePipeline(d3d12Pipeline);
-        if (ReferenceEquals(_pipeline, d3d12Pipeline)) return;
+        if (ReferenceEquals(_pipeline, d3d12Pipeline))
+        {
+            _owner.ValidateParticlePipeline(d3d12Pipeline);
+            return;
+        }
         _pipeline = d3d12Pipeline;
         _commandList.SetGraphicsRootSignature(d3d12Pipeline.RootSignature);
         _commandList.SetPipelineState(d3d12Pipeline.PipelineState);
         if (pipeline.Description.DirectionalShadowReceiver) _owner.BindDirectionalShadowReceiver(d3d12Pipeline);
+        _owner.ValidateParticlePipeline(d3d12Pipeline);
         _commandList.IASetPrimitiveTopology(
             d3d12Pipeline.Description.PrimitiveTopology switch
             {

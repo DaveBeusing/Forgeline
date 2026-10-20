@@ -134,6 +134,29 @@ public sealed class NativeUploadSchedulingTests
     }
 
     [Fact]
+    public void ParticleDescriptorBindsAfterPipelineRootSignature()
+    {
+        using var fixture = new NativeFixture(false);
+        fixture.Device.ConfigureParticleDepth(true);
+        using var renderer = new GpuParticleRenderer(fixture.Device, 512);
+        using IGraphicsBuffer vertices = fixture.Device.CreateInitializedStaticBuffer(new(36, StaticGraphicsBufferUsage.Vertex), NativeFixture.Vertices());
+        byte[] Capture() => fixture.Device.CaptureFrame(GraphicsColor.ForgeLineClear, context =>
+        {
+            fixture.BindSolidPipeline(context);
+            context.SetVertexBuffer(vertices, 12);
+            context.Draw(3);
+            GraphicsParticle[] particles = [new(new(0, 0, .25f, .25f), new(0, 0, 0, 1), new(0, 1, 0, 1), new(.5f, 0, 2, 0))];
+            renderer.Render(context, particles, System.Numerics.Matrix4x4.Identity,
+                System.Numerics.Vector3.UnitX, System.Numerics.Vector3.UnitY, 1, -1, 1, false, false);
+            context.BeginPass(GraphicsFramePass.Overlay);
+        });
+        byte[] image = Capture();
+        Assert.Equal(image, Capture());
+        var surface = fixture.Device.Diagnostics.Surface;
+        Assert.True(image[(surface.Height / 2 * surface.Width + surface.Width / 2) * 4 + 1] > 128);
+    }
+
+    [Fact]
     public void InitializedIndexBufferMatchesItsUploadFallback()
     {
         using var fixture = new NativeFixture(false);
@@ -258,6 +281,7 @@ public sealed class NativeUploadSchedulingTests
                 _pipelines[level] = Device.CreateGraphicsPipeline(new(vertex, pixel) { VertexElements = [new("POSITION", 0, GraphicsVertexElementFormat.Float3, 0)], CullMode = GraphicsCullMode.None, PixelTextureCount = textured ? 1 : 0 });
             }
         }
+        internal void BindSolidPipeline(IGraphicsCommandContext context) => context.SetPipeline(_pipelines[0]);
         internal static byte[] Vertices() => MemoryMarshal.AsBytes<float>(new float[] { -1, -1, 0, -1, 3, 0, 3, -1, 0 }.AsSpan()).ToArray();
         internal byte[] Capture(IGraphicsBuffer vertices, IGraphicsTexture? texture = null, int level = 0, IGraphicsBuffer? indexBuffer = null) => Device.CaptureFrame(GraphicsColor.ForgeLineClear, context =>
         {
