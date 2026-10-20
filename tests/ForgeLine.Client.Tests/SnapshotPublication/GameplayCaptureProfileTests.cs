@@ -42,6 +42,10 @@ public sealed class GameplayCaptureProfileTests
             TestContext.Current.CancellationToken);
         var extractor = new PresentationExtractor(buffer,
             new PresentationExtractionContext(scenario, new PlayerId(1), interaction, commands), assets);
+        var scratchGetter = typeof(PresentationExtractor).GetProperty("CaptureScratchRetainedBytes",
+            BindingFlags.Instance | BindingFlags.NonPublic)?.GetMethod;
+        Func<PresentationExtractor, long> retainedScratch = scratchGetter is null ? static _ => 0 :
+            scratchGetter.CreateDelegate<Func<PresentationExtractor, long>>();
         var probe = new CaptureProbe(extractor);
         scenario.Simulation.RegisterTickObserver(commands);
         scenario.Simulation.RegisterTickObserver(probe);
@@ -80,7 +84,7 @@ public sealed class GameplayCaptureProfileTests
             long consumerAllocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
             if (i >= warmup) observations.Add(new(snapshot.Tick.Value, snapshot.InstanceCount,
                 snapshot.CombatGroups.Members.Count, tickMicros, tickAllocated, probe.Microseconds,
-                probe.AllocatedBytes, consumerMicros, consumerAllocated, world.IndexRetainedBytes));
+                probe.AllocatedBytes, consumerMicros, consumerAllocated, world.IndexRetainedBytes, retainedScratch(extractor)));
             previous = snapshot;
         }
         Assert.NotNull(retained);
@@ -122,5 +126,5 @@ public sealed class GameplayCaptureProfileTests
 
     private readonly record struct Observation(ulong Tick, int Instances, int Members,
         double TickMicroseconds, long TickAllocated, double CaptureMicroseconds, long CaptureAllocated,
-        double ConsumerMicroseconds, long ConsumerAllocated, long IndexRetainedBytes);
+        double ConsumerMicroseconds, long ConsumerAllocated, long IndexRetainedBytes, long ProducerScratchRetainedBytes);
 }

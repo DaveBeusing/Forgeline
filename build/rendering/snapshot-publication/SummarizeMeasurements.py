@@ -32,7 +32,7 @@ def summarize(root):
         assert len(shapes) == 1, "Different completed gameplay data."
         assert len({p["Checksum"] for p in before + after}) == 1, "Consumer values changed."
         row = {"renderRatio": ratio, "samplesPerCohort": before[0]["Samples"], "sources": sorted({p["Source"] for p in before + after})}
-        for field in ("TickMicroseconds", "TickAllocated", "CaptureMicroseconds", "CaptureAllocated", "ConsumerMicroseconds", "ConsumerAllocated", "IndexRetainedBytes"):
+        for field in ("TickMicroseconds", "TickAllocated", "CaptureMicroseconds", "CaptureAllocated", "ConsumerMicroseconds", "ConsumerAllocated", "IndexRetainedBytes", "ProducerScratchRetainedBytes"):
             a = [x[field] for p in before for x in p["Observations"]]
             b = [x[field] for p in after for x in p["Observations"]]
             row[field] = {"beforeMean": mean(a), "afterMean": mean(b), "beforeMedian": median(a), "afterMedian": median(b)}

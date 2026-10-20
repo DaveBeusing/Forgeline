@@ -27,6 +27,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     private readonly PresentationExtractionContext? _extraction;
     private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly RenderInstance[] _staticDressing = [];
+    private RenderInstance[] _captureScratch = [];
+    internal const int MaximumRetainedCaptureInstances = 16_384;
+    internal long CaptureScratchRetainedBytes => (long)_captureScratch.Length * System.Runtime.CompilerServices.Unsafe.SizeOf<RenderInstance>() +
+        (long)_combatGroupScratch.Capacity * System.Runtime.CompilerServices.Unsafe.SizeOf<CombatGroupMemberReadModel>();
     private readonly VfxEffectPool _vfxPool = new();
     private readonly DecalPool _decals = new();
     private readonly RenderInstance[] _decalScratch = new RenderInstance[128];
@@ -260,11 +264,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
 
         _queuedVfx.Clear(); _droppedQueuedVfx = 0;
 
-        var baseInstances =
-            visualCount + _staticDressing.Length == 0
-                ? []
-                : new RenderInstance[
-                    checked(visualCount + _staticDressing.Length)];
+        int required = checked(visualCount + _staticDressing.Length);
+        bool privateScratch = _intelligence is not null && _viewingFaction.IsSpecified;
+        var baseInstances = privateScratch ? PrepareCaptureScratch(required) :
+            required == 0 ? [] : new RenderInstance[required];
         int baseIndex =
             0;
 
@@ -406,7 +409,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
         int decalCount = _decals.CopyVisibleTo(_decalScratch, context.Tick, this);
 
         // This fresh array is transferred to the snapshot and never reused.
-        if (_queuedVfx.Count == 0 && baseIndex == baseInstances.Length && decalCount == 0)
+        if (!privateScratch && _queuedVfx.Count == 0 && baseIndex == baseInstances.Length && decalCount == 0)
             return baseInstances;
 
         if (baseIndex == 0 &&
@@ -465,6 +468,20 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
 
         _decalScratch.AsSpan(0, decalCount).CopyTo(instances.AsSpan(baseIndex + _queuedVfx.Count));
         return instances;
+    }
+
+    private RenderInstance[] PrepareCaptureScratch(int count)
+    {
+        if (_captureScratch.Length > MaximumRetainedCaptureInstances && count <= MaximumRetainedCaptureInstances)
+            _captureScratch = [];
+        if (_captureScratch.Length < count)
+        {
+            int capacity = count > MaximumRetainedCaptureInstances ? count :
+                (int)System.Numerics.BitOperations.RoundUpToPowerOf2((uint)Math.Max(16, count));
+            _captureScratch = new RenderInstance[capacity];
+        }
+        else Array.Clear(_captureScratch);
+        return _captureScratch;
     }
 
     private UnitFeaturePresentationMetadata ResolveUnitPresentationState(

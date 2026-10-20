@@ -55,3 +55,12 @@ and track retained scratch independently from allowed new immutable arrays. Exer
 all identities, interpolation, old readers, mutations, concurrent publishers and host
 shutdown/fault paths. A positive allocating control must validate thread-local allocation
 measurement. Historical allocation reports are not a reproduced failure or a fix.
+
+
+Filtered extraction also assembles base instances in private producer scratch. The
+published exact-length array is always freshly allocated; the scratch array can never
+enter the owned snapshot constructor. The existing unfiltered/no-effect direct-transfer
+path remains intact. Scratch clears old references, grows geometrically up to 16,384
+retained instance slots, serves larger captures without truncation, and trims on the
+next smaller capture. Producer scratch diagnostics include that array and the combat
+capture list, separate from reader-retained snapshot arrays and render-owner indices.
