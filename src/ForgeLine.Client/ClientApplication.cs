@@ -1240,7 +1240,8 @@ internal sealed class ClientApplication
             var alertResult = alertController.Update(inputState, inputSnapshot, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive, seconds: frameElapsed.TotalSeconds, dockExpanded: actionPanel.DockExpanded,
-                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback);
+                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
+                animateDetails: !_settings.ReducedUiMotion && _settings.RenderQuality.Quality != RenderQuality.Low);
             hudInteraction.CapturePointer(alertResult.Captured);
             if (alertResult.Target.IsValid && inputSnapshot is not null)
             {
