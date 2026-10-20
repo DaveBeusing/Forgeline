@@ -1,0 +1,35 @@
+{
+  "snapshotWrittenUtc": "2026-10-20 20:14:07 UTC",
+  "currentMaster": "e42ae48346bbb1331b7a548a72fc0905ae6d184a",
+  "currentMasterProductVersion": "0.1.424",
+  "priorMaster": {
+    "sha": "cdf97fb9a8ef277cf75d451476a21128d398007c",
+    "run": 39485465207,
+    "job": 118844598273,
+    "conclusion": "cancelled",
+    "passedThroughStep": 54,
+    "cancelledStep": 55,
+    "fullTestStep59": "skipped",
+    "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39485465207/job/118844598273"
+  },
+  "currentMasterCi": {
+    "run": 39488943266,
+    "job": 118856962021,
+    "conclusion": "failure",
+    "failedStep": 4,
+    "failedStepName": "Validate one version increment per PR",
+    "exitCode": 1,
+    "productBuildAndTests": "skipped",
+    "diagnosticLines": [
+      "2026-10-20T20:07:09.8084711Z   FORGELINE_VERSION_BASE: cdf97fb9a8ef277cf75d451476a21128d398007c",
+      "2026-10-20T20:07:09.8085134Z   FORGELINE_VERSION_HEAD: e42ae48346bbb1331b7a548a72fc0905ae6d184a",
+      "2026-10-20T20:07:10.4793503Z      | Each PR requires exactly one PATCH increment: expected 0.1.425, received 0.1.424. Run Increment-PrVersion.ps1"
+    ],
+    "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39488943266/job/118856962021"
+  },
+  "movement": {
+    "run": 39488943365,
+    "conclusion": "success"
+  },
+  "scope": "Repository baseline observations only. They do not qualify the composition branch. The short current-master raw job log was read; linked Actions logs remain the source."
+}

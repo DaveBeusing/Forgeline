@@ -1,0 +1,25 @@
+  ForgeLine.Core -> <validation-root>/Forgeline/src/ForgeLine.Core/bin/Release/net10.0/ForgeLine.Core.dll
+  ForgeLine.Ecs -> <validation-root>/Forgeline/src/ForgeLine.Ecs/bin/Release/net10.0/ForgeLine.Ecs.dll
+  ForgeLine.World -> <validation-root>/Forgeline/src/ForgeLine.World/bin/Release/net10.0/ForgeLine.World.dll
+  ForgeLine.Jobs -> <validation-root>/Forgeline/src/ForgeLine.Jobs/bin/Release/net10.0/ForgeLine.Jobs.dll
+  ForgeLine.Navigation -> <validation-root>/Forgeline/src/ForgeLine.Navigation/bin/Release/net10.0/ForgeLine.Navigation.dll
+  ForgeLine.Simulation -> <validation-root>/Forgeline/src/ForgeLine.Simulation/bin/Release/net10.0/ForgeLine.Simulation.dll
+  ForgeLine.Economy -> <validation-root>/Forgeline/src/ForgeLine.Economy/bin/Release/net10.0/ForgeLine.Economy.dll
+  ForgeLine.Logistics -> <validation-root>/Forgeline/src/ForgeLine.Logistics/bin/Release/net10.0/ForgeLine.Logistics.dll
+  ForgeLine.Combat -> <validation-root>/Forgeline/src/ForgeLine.Combat/bin/Release/net10.0/ForgeLine.Combat.dll
+  ForgeLine.Intelligence -> <validation-root>/Forgeline/src/ForgeLine.Intelligence/bin/Release/net10.0/ForgeLine.Intelligence.dll
+  ForgeLine.AI -> <validation-root>/Forgeline/src/ForgeLine.AI/bin/Release/net10.0/ForgeLine.AI.dll
+  ForgeLine.Game -> <validation-root>/Forgeline/src/ForgeLine.Game/bin/Release/net10.0/ForgeLine.Game.dll
+  ForgeLine.Assets -> <validation-root>/Forgeline/src/ForgeLine.Assets/bin/Release/net10.0/ForgeLine.Assets.dll
+  ForgeLine.Platform.Windows -> <validation-root>/Forgeline/src/ForgeLine.Platform.Windows/bin/Release/net10.0-windows/ForgeLine.Platform.Windows.dll
+  ForgeLine.Graphics -> <validation-root>/Forgeline/src/ForgeLine.Graphics/bin/Release/net10.0-windows/ForgeLine.Graphics.dll
+  ForgeLine.Audio -> <validation-root>/Forgeline/src/ForgeLine.Audio/bin/Release/net10.0/ForgeLine.Audio.dll
+  ForgeLine.Input -> <validation-root>/Forgeline/src/ForgeLine.Input/bin/Release/net10.0-windows/ForgeLine.Input.dll
+  ForgeLine.Presentation -> <validation-root>/Forgeline/src/ForgeLine.Presentation/bin/Release/net10.0-windows/ForgeLine.Presentation.dll
+  ForgeLine.Presentation.Tests -> <validation-root>/Forgeline/tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:47.76
