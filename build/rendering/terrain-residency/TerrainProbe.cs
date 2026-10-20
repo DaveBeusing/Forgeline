@@ -110,7 +110,7 @@ internal static class TerrainProbe
         graphics.ConfigureSceneOutput(new(true, SceneLightingSettings.Default.Exposure, true));
         var world = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
         var catalog = RuntimeAssetCatalog.Load(assets);
-        using var renderer = Create(graphics, world, 256, catalog);
+        using var renderer = Create(graphics, world, 128, catalog);
         var camera = new RtsCamera(new() { MaximumDistance = 2000 });
         var cases = new List<object>();
         var poses = new[] { ("ridge-road", new Vector2(1536, 1536)), ("bridge", new Vector2(1536, 920)), ("industrial", new Vector2(650, 520)) };

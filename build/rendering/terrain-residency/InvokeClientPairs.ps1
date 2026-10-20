@@ -31,11 +31,15 @@ try {
         $source = if ($before) { $BaselineSource } else { $CandidateSource }
         & git -C $reference -c core.longpaths=true switch --detach $source *> (Join-Path $output "$label-checkout.log")
         if ($LASTEXITCODE -ne 0) { throw 'Cannot select exact capture source.' }
-        foreach ($path in @('Fixed','Sweep')) {
+        foreach ($path in @('Fixed','Sweep','RendererCold')) {
+            $cold = $path -eq 'RendererCold'
             $arguments = @{ Capture=$true; ClientPath=$(if($before){$baseline}else{$candidate}); RuntimeAssetRoot=$assets
-                Scenes=@('DaylightTerrain','LogisticsCorridor'); Profiles=@('High','Low'); Zooms=@('CloseTactical','Strategic')
-                Displays=@('1920x1080'); UiScenarios=@('World'); RasterDpi=96; CameraPath=$path
-                Warmups=512; Samples=256; RepeatCaptures=2; OutputRoot=(Join-Path $output "$label-$path") }
+                Scenes=$(if($cold){@('DaylightTerrain')}else{@('DaylightTerrain','LogisticsCorridor')})
+                Profiles=$(if($cold){@('High')}else{@('High','Low')}); Zooms=$(if($cold){@('Strategic')}else{@('CloseTactical','Strategic')})
+                Displays=@('1920x1080'); UiScenarios=@('World'); RasterDpi=96
+                CameraPath=$(if($cold){'Fixed'}else{$path}); RunProfile=$(if($cold){'RendererCold'}else{'Warm'})
+                Warmups=$(if($cold){3}else{512}); Samples=$(if($cold){8}else{256})
+                RepeatCaptures=2; OutputRoot=(Join-Path $output "$label-$path") }
             & (Join-Path $reference 'build/Invoke-RtsReferenceQualification.ps1') @arguments *> (Join-Path $output "$label-$path.log")
             $metadata.exits["$label-$path"] = $LASTEXITCODE
             if ($LASTEXITCODE -ne 0) { throw "Client capture failed: $label-$path" }
