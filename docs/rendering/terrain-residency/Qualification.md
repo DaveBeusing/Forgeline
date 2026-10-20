@@ -35,3 +35,12 @@ positions, UVs, control maps and authoritative height samples, bounded CPU LRU,
 GPU eviction reuse, late cancellation, static-buffer fallback and failed GPU
 publication invalidating readiness. Vertex normals deliberately sample both
 sides of immutable chunk boundaries. Native appearance review is still required.
+
+
+Bounded readiness steps, retained GPU LRU and optional CPU-only neighbour prefetch
+build with zero warnings/errors and pass 19 owned cases. The warmed Prepare test
+records exactly zero allocated bytes with a positive 4,096-byte control. Tests
+cover equal-aspect viewport changes, interrupted plans, independent geometry and
+control budgets, one eviction-candidate visit per eviction, and no optional GPU
+publication. Native measurement windows are serialized with other render work;
+functional results are not presented as performance measurements.

@@ -48,6 +48,10 @@ public readonly record struct TerrainWorkMetrics
     public int MaterialBindings { get; init; }
     public long MainTriangles { get; init; }
     public long ShadowTriangles { get; init; }
+    public bool IsPrepared { get; init; }
+    public long EvictionCandidateVisits { get; init; }
+    public long PreparationSteps { get; init; }
+    public double OptionalCpuMilliseconds { get; init; }
     public double MeshMilliseconds { get; init; }
     public double SplatMilliseconds { get; init; }
     public double UploadMilliseconds { get; init; }

@@ -77,12 +77,14 @@ internal sealed class TerrainTestDevice : IGraphicsDevice
     internal FakeGraphicsDevice Inner { get; } = new() { CaptureUploads = true };
     internal List<TerrainTestTexture> Textures { get; } = [];
     internal bool Recording;
+    private readonly int _owner = Environment.CurrentManagedThreadId;
+    private void AssertOwner() { if (_owner != Environment.CurrentManagedThreadId) throw new InvalidOperationException("GPU call left its owner."); }
     public bool IsRecording => Recording;
     public GraphicsDirectionalShadowSettings DirectionalShadows => new(DirectionalShadowQuality.High);
     public GraphicsDiagnostics Diagnostics => throw new NotSupportedException();
     public IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description) => Inner.CreateGraphicsPipeline(description);
-    public IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description) => Inner.CreateBuffer(description);
-    public IGraphicsTexture CreateTexture(GraphicsTextureData data) { var texture = new TerrainTestTexture(data); Textures.Add(texture); return texture; }
+    public IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description) { AssertOwner(); return Inner.CreateBuffer(description); }
+    public IGraphicsTexture CreateTexture(GraphicsTextureData data) { AssertOwner(); var texture = new TerrainTestTexture(data); Textures.Add(texture); return texture; }
     public void RenderFrame(GraphicsColor clear, Action<IGraphicsCommandContext>? record = null) { Recording = true; try { record?.Invoke(new TerrainTestContext()); } finally { Recording = false; } }
     public void Resize(int width, int height) { }
     public void WaitForIdle() { }

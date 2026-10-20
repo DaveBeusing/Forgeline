@@ -34,14 +34,22 @@ public sealed class TerrainRenderer : IDisposable
     private readonly IGraphicsDevice _graphics;
     private readonly IReadOnlyList<TerrainChunk> _chunks;
     private readonly TerrainChunkRenderResource?[] _resident;
-    private readonly bool[] _required;
+    private bool[] _required;
+    private bool[] _mainRequired, _scratchRequired, _scratchMain;
+    private readonly bool[] _prefetchTried, _prefetchRejected;
     private readonly TerrainMeshSettings _meshSettings;
     private readonly TerrainPresentationProfile _profile;
     private readonly TerrainResidencySettings _residency;
     private long _generation, _uploads, _evictions;
     private int _requiredCount;
     private double _residencyMilliseconds;
-    private Matrix4x4? _preparedView, _preparedShadow;
+    private Matrix4x4? _preparedView, _preparedShadow, _planView, _planShadow;
+    private int _preparedWidth, _preparedHeight, _planWidth, _planHeight, _planCursor, _missing;
+    private TerrainChunkRenderResource? _oldest, _newest;
+    private Vector3 _lastTarget, _prefetchTarget;
+    private bool _hasTarget, _prefetchExhausted;
+    private long _evictionVisits, _preparationSteps;
+    private readonly Func<int, CancellationToken, PreparedTerrainChunk> _buildCpu;
     private readonly RuntimeWorldAssetResources? _runtimeAssets;
     private readonly IGraphicsTexture? _fallbackBaseColor;
     private readonly IGraphicsTexture? _fallbackNormal;
@@ -78,6 +86,8 @@ public sealed class TerrainRenderer : IDisposable
         _chunks = world.Chunks;
         _resident = new TerrainChunkRenderResource?[_chunks.Count];
         _required = new bool[_chunks.Count];
+        _mainRequired = new bool[_chunks.Count]; _scratchRequired = new bool[_chunks.Count]; _scratchMain = new bool[_chunks.Count];
+        _prefetchTried = new bool[_chunks.Count]; _prefetchRejected = new bool[_chunks.Count];
         _residency = residency ?? TerrainResidencySettings.Eager;
         _residency.Validate();
         WorldEnvironmentSettings appearance = environment ?? new();
@@ -102,6 +112,7 @@ public sealed class TerrainRenderer : IDisposable
         _profile = resolvedProfile;
         _preparation = preparation ?? new(); _preparation.Validate();
         _source = new(world, resolvedMeshSettings, resolvedProfile, _preparation);
+        _buildCpu = _source.Build;
         _chunks = _source.Chunks;
         if (_source.Patterns.Bytes >= _preparation.MaximumPreparedBytes)
             throw new ArgumentOutOfRangeException(nameof(preparation), "Shared terrain indices exceed the CPU preparation budget.");
@@ -163,7 +174,7 @@ public sealed class TerrainRenderer : IDisposable
                 {
                     var resource = LoadChunk(index);
                     _resident[index] = resource;
-                    resources.Add(resource);
+                    resources.Add(resource); Touch(resource);
                     _uploads++;
                 }
             }
@@ -276,7 +287,7 @@ public sealed class TerrainRenderer : IDisposable
     }
     private void Evict(TerrainChunkRenderResource resource)
     {
-        _resources.Remove(resource); _resident[resource.ChunkIndex] = null;
+        Unlink(resource); _resources.Remove(resource); _resident[resource.ChunkIndex] = null;
         _geometryEvictionBytes += (long)resource.VertexBuffer.Description.SizeInBytes;
         _controlEvictionBytes += resource.ControlBytes;
         resource.Dispose(); ReleasePalette(resource.PaletteKey); _evictions++;
@@ -289,62 +300,152 @@ public sealed class TerrainRenderer : IDisposable
         DiscardedWorkerResults = _worker.Discarded, GeometryUploadBytes = _geometryUploadBytes,
         ControlUploadBytes = _controlUploadBytes, GeometryEvictionBytes = _geometryEvictionBytes,
         ControlEvictionBytes = _controlEvictionBytes, ResidentGeometryBytes = GeometryBytes(),
-        ResidentControlBytes = ControlBytes(), RequiredChunks = _requiredCount, ResidentChunks = _resources.Count,
+        ResidentControlBytes = ControlBytes(), RequiredChunks = _residency.Enabled ? _requiredCount : _resources.Count, ResidentChunks = _resources.Count,
         IndexPatterns = _source.Patterns.Ranges.Length, MainTriangles = LastDiagnostics.SubmittedTriangles,
         MeshMilliseconds = _meshMilliseconds, SplatMilliseconds = _splatMilliseconds,
         UploadMilliseconds = _uploadMilliseconds, MaterialMilliseconds = _materialMilliseconds,
-        PrepareMilliseconds = _residencyMilliseconds
+        PrepareMilliseconds = _residencyMilliseconds, OptionalCpuMilliseconds = _worker.CpuMilliseconds,
+        EvictionCandidateVisits = _evictionVisits, PreparationSteps = _preparationSteps,
+        IsPrepared = IsPrepared
     };
 
-    /// <summary>Call on the render owner before frame recording, with the world viewport and shadow coverage.</summary>
+    /// <summary>Drain bounded preparation steps on the render owner before recording. No partial view is published.</summary>
     public void Prepare(RtsCamera camera, int width, int height, GraphicsDirectionalShadowFrame? shadow = null)
     {
-        ThrowIfDisposed();
-        ArgumentNullException.ThrowIfNull(camera);
-        if (_graphics.IsRecording) throw new InvalidOperationException("Prepare terrain residency before frame recording.");
-        if (!_residency.Enabled) return;
         long started = Stopwatch.GetTimestamp();
-        ViewFrustum view = ViewFrustum.FromViewProjection(camera.GetMatrices(width, height).ViewProjection);
-        ViewFrustum? shadowView = null;
-        if (shadow is { } frame) { frame.Validate(); shadowView = ViewFrustum.FromViewProjection(frame.ViewProjection); }
-        int required = 0, missing = 0;
-        for (int index = 0; index < _chunks.Count; index++)
-        {
-            bool needed = view.Intersects(_chunks[index].Bounds) || shadowView?.Intersects(_chunks[index].Bounds) == true;
-            _required[index] = needed;
-            if (!needed) continue;
-            required++;
-            if (_resident[index] is null) missing++;
-        }
-        if (required > _residency.MaximumResidentChunks)
-            throw new InvalidOperationException($"Terrain view requires {required} chunks; residency limit is {_residency.MaximumResidentChunks}. Increase the limit before rendering; required coverage is never dropped.");
-        EnsureRequiredBudgets(required);
-        _requiredCount = required;
-        _preparedView = _preparedShadow = null;
-        long generation = ++_generation;
-        foreach (var resource in _resources)
-            if (_required[resource.ChunkIndex]) resource.LastRequired = generation;
-        while (_resources.Count + missing > ResidentLimit)
-        {
-            TerrainChunkRenderResource? oldest = null;
-            foreach (var resource in _resources)
-                if (!_required[resource.ChunkIndex] && (oldest is null || resource.LastRequired < oldest.LastRequired)) oldest = resource;
-            if (oldest is null) throw new InvalidOperationException("Terrain residency has no safe eviction candidate.");
-            Evict(oldest);
-        }
-        for (int index = 0; index < _chunks.Count; index++)
-        {
-            if (!_required[index] || _resident[index] is not null) continue;
-            var resource = LoadChunk(index);
-            resource.LastRequired = generation;
-            _resident[index] = resource;
-            _resources.Add(resource);
-            _uploads++;
-        }
-        if (missing > 0) _resources.Sort(static (a, b) => a.ChunkIndex.CompareTo(b.ChunkIndex));
-        _preparedView = camera.GetMatrices(width, height).ViewProjection;
-        _preparedShadow = shadow?.ViewProjection;
+        while (!PrepareStep(camera, width, height, shadow)) { }
         _residencyMilliseconds = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+    }
+
+    public bool IsPrepared => !_disposed && (!_residency.Enabled || _preparedView.HasValue);
+
+    /// <summary>Admit at most the requested new chunks (also a 4 MiB/4 ms soft step limit). False forbids recording this view.</summary>
+    public bool PrepareStep(RtsCamera camera, int width, int height, GraphicsDirectionalShadowFrame? shadow = null, int maximumNewChunks = 2)
+    {
+        ThrowIfDisposed(); ArgumentNullException.ThrowIfNull(camera);
+        if (maximumNewChunks is < 1 or > 4) throw new ArgumentOutOfRangeException(nameof(maximumNewChunks));
+        if (_graphics.IsRecording) throw new InvalidOperationException("Prepare terrain residency before frame recording.");
+        AssetPreparationScope.ThrowIfStopped();
+        CameraMatrices matrices = camera.GetMatrices(width, height);
+        if (shadow is { } frame) frame.Validate();
+        if (!_residency.Enabled) return true;
+        long started = Stopwatch.GetTimestamp(); _preparationSteps++;
+        HarvestOptional();
+        Matrix4x4? shadowMatrix = shadow?.ViewProjection;
+        if (_planView != matrices.ViewProjection || _planShadow != shadowMatrix || _planWidth != width || _planHeight != height)
+        {
+            ViewFrustum main = ViewFrustum.FromViewProjection(matrices.ViewProjection);
+            ViewFrustum? light = shadowMatrix.HasValue ? ViewFrustum.FromViewProjection(shadowMatrix.Value) : null;
+            int required = 0, missing = 0;
+            for (int i = 0; i < _chunks.Count; i++)
+            {
+                bool visible = main.Intersects(_chunks[i].Bounds);
+                bool needed = visible || light?.Intersects(_chunks[i].Bounds) == true;
+                _scratchMain[i] = visible; _scratchRequired[i] = needed;
+                if (needed) { required++; if (_resident[i] is null) missing++; }
+            }
+            if (required > _residency.MaximumResidentChunks)
+                throw new InvalidOperationException($"Terrain view requires {required} chunks; residency limit is {_residency.MaximumResidentChunks}. Required coverage is never dropped.");
+            EnsureRequiredBudgets(required); AssetPreparationScope.ThrowIfStopped();
+            _preparedView = _preparedShadow = null;
+            (_required, _scratchRequired) = (_scratchRequired, _required);
+            (_mainRequired, _scratchMain) = (_scratchMain, _mainRequired);
+            _requiredCount = required; _missing = missing; _planCursor = 0;
+            _planView = matrices.ViewProjection; _planShadow = shadowMatrix; _planWidth = width; _planHeight = height;
+            _generation++;
+            foreach (var resource in _resources)
+                if (_required[resource.ChunkIndex]) { resource.LastRequired = _generation; Touch(resource); }
+            Vector3 movement = _hasTarget ? camera.Target - _lastTarget : Vector3.Zero;
+            float size = _chunks[0].Heightfield.ChunkSizeMeters;
+            if (movement.LengthSquared() > size * size * 4) _worker.Cancel();
+            if (movement.LengthSquared() > size * size) movement = Vector3.Normalize(movement) * size;
+            _prefetchTarget = camera.Target + movement; _lastTarget = camera.Target; _hasTarget = true;
+            Array.Clear(_prefetchTried); _prefetchExhausted = false;
+        }
+        while (_resources.Count + _missing > ResidentLimit)
+        {
+            TerrainChunkRenderResource candidate = _oldest ?? throw new InvalidOperationException("No terrain eviction candidate.");
+            _evictionVisits++;
+            if (_required[candidate.ChunkIndex]) throw new InvalidOperationException("Required terrain cannot be evicted.");
+            Evict(candidate);
+        }
+        int admitted = 0; long bytesBefore = _geometryUploadBytes + _controlUploadBytes;
+        while (_missing > 0 && _planCursor < _chunks.Count)
+        {
+            int index = _planCursor;
+            if (!_required[index] || _resident[index] is not null) { _planCursor++; continue; }
+            AssetPreparationScope.ThrowIfStopped();
+            TerrainChunkRenderResource resource = LoadChunk(index);
+            _resident[index] = resource; InsertSorted(resource); Touch(resource);
+            resource.LastRequired = _generation; _uploads++; _missing--; _planCursor++; admitted++;
+            if (admitted >= maximumNewChunks || _geometryUploadBytes + _controlUploadBytes - bytesBefore >= 4 * 1024 * 1024 ||
+                Stopwatch.GetElapsedTime(started).TotalMilliseconds >= 4) break;
+        }
+        if (_missing == 0)
+        {
+            _preparedView = matrices.ViewProjection; _preparedShadow = shadowMatrix;
+            _preparedWidth = width; _preparedHeight = height; ScheduleOptional();
+        }
+        _residencyMilliseconds = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        return _missing == 0;
+    }
+
+    private void HarvestOptional()
+    {
+        TerrainPreparationWorker.Result? result = _worker.Harvest();
+        foreach (int failed in _worker.TakeFailures()) _prefetchRejected[failed] = true;
+        if (result is null) return;
+        for (int i = 0; i < result.Indices.Length; i++)
+        { ObserveBuild(result.Chunks[i]); _prepared.Admit(result.Indices[i], result.Chunks[i]); }
+    }
+    private void ScheduleOptional()
+    {
+        if (!_preparation.PrefetchEnabled || _worker.Busy || _prefetchExhausted) return;
+        long chunkBytes = VertexBytesPerChunk + ControlBytesPerChunk + _source.Patterns.Ranges.Length * 8;
+        if (_preparation.MaximumPreparedChunks < _requiredCount + _preparation.PrefetchChunksPerStep ||
+            chunkBytes * (_requiredCount + _preparation.PrefetchChunksPerStep) + _source.Patterns.Bytes > _preparation.MaximumPreparedBytes)
+        { _prefetchExhausted = true; return; }
+        Span<int> planned = stackalloc int[4]; int count = 0;
+        for (int item = 0; item < _preparation.PrefetchChunksPerStep; item++)
+        {
+            int best = -1; float distance = float.PositiveInfinity;
+            foreach (var resource in _resources)
+            {
+                if (!_mainRequired[resource.ChunkIndex]) continue;
+                for (int dz = -1; dz <= 1; dz++)
+                    for (int dx = -1; dx <= 1; dx++)
+                    {
+                        int next = _source.Neighbour(resource.ChunkIndex, dx, dz);
+                        if (next < 0 || _required[next] || _prefetchTried[next] || _prefetchRejected[next] || _prepared.Contains(next)) continue;
+                        var bounds = _chunks[next].Bounds;
+                        float score = Vector3.DistanceSquared((bounds.Minimum + bounds.Maximum) * .5f, _prefetchTarget);
+                        if (score < distance) { best = next; distance = score; }
+                    }
+            }
+            if (best < 0) break;
+            _prefetchTried[best] = true; planned[count++] = best;
+        }
+        if (count == 0) { _prefetchExhausted = true; return; }
+        _worker.Start(planned[..count].ToArray(), _buildCpu);
+    }
+    private void InsertSorted(TerrainChunkRenderResource resource)
+    {
+        int low = 0, high = _resources.Count;
+        while (low < high) { int middle = (low + high) / 2; if (_resources[middle].ChunkIndex < resource.ChunkIndex) low = middle + 1; else high = middle; }
+        _resources.Insert(low, resource);
+    }
+    private void Touch(TerrainChunkRenderResource resource)
+    {
+        if (resource.InLru) Unlink(resource);
+        resource.Previous = _newest; resource.Next = null; resource.InLru = true;
+        if (_newest is not null) _newest.Next = resource; else _oldest = resource;
+        _newest = resource;
+    }
+    private void Unlink(TerrainChunkRenderResource resource)
+    {
+        if (resource.Previous is { } previous) previous.Next = resource.Next; else _oldest = resource.Next;
+        if (resource.Next is { } next) next.Previous = resource.Previous; else _newest = resource.Previous;
+        resource.Previous = resource.Next = null; resource.InLru = false;
     }
     public bool DebugChunksEnabled { get; set; } = true;
 
@@ -376,7 +477,7 @@ public sealed class TerrainRenderer : IDisposable
         ViewFrustum frustum =
             ViewFrustum.FromViewProjection(
                 matrices.ViewProjection);
-        if (_residency.Enabled && _preparedView != matrices.ViewProjection)
+        if (_residency.Enabled && (_preparedView != matrices.ViewProjection || _preparedWidth != context.Width || _preparedHeight != context.Height))
             throw new InvalidOperationException("Terrain camera or viewport changed without preparing residency.");
 
         int visibleChunks = 0;
@@ -477,7 +578,7 @@ public sealed class TerrainRenderer : IDisposable
         {
             resource.Dispose();
         }
-        _resources.Clear(); Array.Clear(_resident); _preparedView = _preparedShadow = null;
+        _resources.Clear(); Array.Clear(_resident); _oldest = _newest = null; _preparedView = _preparedShadow = null;
         _worker.Dispose(); _prepared.Clear(); _palettes.Clear(); _source.Patterns.ReleaseCpuIndices();
         _sharedIndices?.Dispose(); _sharedIndices = null;
         _fallbackOrm?.Dispose();
@@ -891,6 +992,8 @@ public sealed class TerrainRenderer : IDisposable
                 triangleCount;
         }
 
+        internal TerrainChunkRenderResource? Previous, Next;
+        internal bool InLru;
         internal uint PaletteKey { get; init; }
         internal float[] HeightErrors { get; init; } = [];
         internal float[] NormalErrors { get; init; } = [];

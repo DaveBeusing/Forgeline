@@ -51,11 +51,14 @@ internal sealed class TerrainPreparedCache
 /// <summary>One bounded work item on the existing thread pool, with no private queue or GPU callback.</summary>
 internal sealed class TerrainPreparationWorker : IDisposable
 {
-    internal sealed record Result(long Generation, int[] Indices, PreparedTerrainChunk[] Chunks, Exception? Failure);
+    internal sealed record Result(long Generation, int[] Indices, PreparedTerrainChunk[] Chunks, Exception? Failure, double Milliseconds);
     private Task<Result>? _pending;
     private CancellationTokenSource? _stop;
     private long _generation;
     internal long Discarded { get; private set; }
+    internal double CpuMilliseconds { get; private set; }
+    private int[] _failedIndices = [];
+    internal int[] TakeFailures() { int[] failed = _failedIndices; _failedIndices = []; return failed; }
     internal int PendingCount { get; private set; }
     internal bool Busy => _pending is not null;
 
@@ -67,24 +70,37 @@ internal sealed class TerrainPreparationWorker : IDisposable
         PendingCount = indices.Length;
         _pending = Task.Run(() =>
         {
+            long started = System.Diagnostics.Stopwatch.GetTimestamp();
             try
             {
                 var chunks = new PreparedTerrainChunk[indices.Length];
                 for (int i = 0; i < indices.Length; i++) { token.ThrowIfCancellationRequested(); chunks[i] = build(indices[i], token); }
                 token.ThrowIfCancellationRequested();
-                return new Result(generation, indices, chunks, null);
+                return new Result(generation, indices, chunks, null, System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
             }
-            catch (Exception error) { return new Result(generation, indices, [], error); }
-        });
+            catch (Exception error) { return new Result(generation, indices, [], error, System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds); }
+        }, token);
     }
     internal Result? Harvest()
     {
         if (_pending?.IsCompleted != true) return null;
-        Result result = _pending.GetAwaiter().GetResult(); _pending = null; PendingCount = 0;
+        Result? result = _pending.IsCanceled ? null : _pending.GetAwaiter().GetResult(); _pending = null; PendingCount = 0;
         _stop?.Dispose(); _stop = null;
+        if (result is null) { Discarded++; return null; }
+        CpuMilliseconds += result.Milliseconds;
+        if (result.Failure is not null && result.Failure is not OperationCanceledException) _failedIndices = result.Indices;
         if (result.Generation != _generation || result.Failure is not null) { Discarded++; return null; }
         return result;
     }
     internal void Cancel() { _generation++; _stop?.Cancel(); }
-    public void Dispose() { Cancel(); _pending = null; PendingCount = 0; _stop?.Dispose(); _stop = null; }
+    public void Dispose()
+    {
+        Cancel();
+        // CPU-only callbacks cannot wait for the render owner. Observe completion before releasing the source.
+        if (_pending is not null)
+        {
+            try { _pending.GetAwaiter().GetResult(); } catch (OperationCanceledException) { }
+        }
+        _pending = null; PendingCount = 0; _stop?.Dispose(); _stop = null;
+    }
 }
