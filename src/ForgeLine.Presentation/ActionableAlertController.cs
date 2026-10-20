@@ -45,6 +45,7 @@ public sealed class ActionableAlertController
     private bool _pressPaging;
     private float _expansionPosition;
     private EntityId _expandedTarget;
+    private int _expandedStackRevision;
     private NotificationExpansion _expansion;
     public NotificationExpansion Expansion => _expansion with
     {
@@ -77,7 +78,8 @@ public sealed class ActionableAlertController
         var plain = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback);
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
         if ((_expansion.Open || _expansionPosition > 0) &&
-            (!HasExpandedCard(plain) || !ExpandedSourceCurrent(alerts)))
+            (!HasExpandedCard(plain) || _expandedStackRevision != plain.Revision ||
+                !ExpandedSourceCurrent(alerts)))
         { _expansion = default; _expansionPosition = 0; }
         float requested = _expansion.Open ? 1 : 0;
         bool settleDetails = !animateDetails || changed || !double.IsFinite(seconds) ||
@@ -139,6 +141,7 @@ public sealed class ActionableAlertController
                 _expansion = new(item, releasedCard.Identity, releasedCard.Revision, true,
                     _expansionPosition, 0, BuildDetail(experience, alerts, item, localFeedback));
                 _expandedTarget = _target;
+                _expandedStackRevision = plain.Revision;
                 _expansionPosition = 0;
             }
             return new(true);
@@ -245,5 +248,6 @@ public sealed class ActionableAlertController
         _expansion = default;
         _expansionPosition = 0;
         _expandedTarget = default;
+        _expandedStackRevision = 0;
     }
 }
