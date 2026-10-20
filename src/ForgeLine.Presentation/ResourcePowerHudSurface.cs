@@ -64,6 +64,8 @@ internal static class ResourcePowerHudModel
                 HudAlertSeverity.Critical,
             PlayerAlertState.ProductionBlocked =>
                 HudAlertSeverity.Warning,
+            PlayerAlertState.CargoFleetShortage =>
+                HudAlertSeverity.Warning,
             PlayerAlertState.LowPower =>
                 HudAlertSeverity.Warning,
             _ =>
@@ -106,6 +108,13 @@ internal static class ResourcePowerHudModel
         if (HasAlert(
                 alerts,
                 PlayerAlertState.CommandCoreDestroyed))
+        {
+            count++;
+        }
+
+        if (HasAlert(
+                alerts,
+                PlayerAlertState.CargoFleetShortage))
         {
             count++;
         }
@@ -607,6 +616,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 RtsUiIcon.StatusPower,
             PlayerAlertState.ProductionBlocked =>
                 RtsUiIcon.BuildingFactory,
+            PlayerAlertState.CargoFleetShortage =>
+                RtsUiIcon.UnitLogistics,
             PlayerAlertState.SupplyCritical =>
                 RtsUiIcon.SupplyCritical,
             PlayerAlertState.CommandCoreDamaged =>
