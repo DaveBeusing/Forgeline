@@ -129,10 +129,13 @@ public static class ActionableAlertLayout
     internal static AlertNotification Ordered(in PlayerExperienceSnapshot experience, int index)
     {
         int ordinal = 0;
-        for (int slot = 0; slot < 6; slot++)
+        for (int slot = 0; slot < 7; slot++)
         {
             bool feedback = slot == 3;
-            var kind = feedback ? default : AlertLifecycleTracker.Kind(slot < 3 ? slot : slot - 1);
+            // Important freight-capacity warnings precede low power, while
+            // command feedback retains its established higher-priority slot.
+            var kind = feedback ? default : AlertLifecycleTracker.Kind(
+                slot < 3 ? slot : slot == 5 ? 5 : slot == 6 ? 4 : 3);
             if (feedback ? !ResourcePowerHudModel.IsCommandFeedbackVisible(experience) : (experience.Alerts & kind) == 0) continue;
             if (ordinal++ == index) return new(kind, feedback);
         }
@@ -169,6 +172,16 @@ internal static class NotificationText
                 for (int i = 0; i < alerts.Alerts.Count; i++)
                     if (alerts.Alerts[i].Identity.Kind == item.Kind) { label = alerts.Alerts[i].Label; break; }
             b.Append(label.AsSpan());
+            if (item.Kind == PlayerAlertState.CargoFleetShortage && alerts is not null)
+                for (int i = 0; i < alerts.Alerts.Count; i++)
+                    if (alerts.Alerts[i].Identity.Kind == item.Kind && alerts.Alerts[i].Fleet is { } fleet)
+                    {
+                        b.Append(" / BACKLOG "); b.Append(fleet.BacklogRequests);
+                        b.Append(" ACTIVE "); b.Append(fleet.ActiveTrucks);
+                        b.Append(" IDLE "); b.Append(fleet.IdleTrucks);
+                        b.Append(" EFFECTIVE "); b.Append(fleet.EffectiveTrucks);
+                        break;
+                    }
             int count = item.Kind == PlayerAlertState.SupplyCritical ? experience.CriticalSupplyUnits :
                 item.Kind == PlayerAlertState.ProductionBlocked ? experience.BlockedProductionFacilities : 0;
             if (count > 0) { b.Append(" / "); b.Append(count); }
