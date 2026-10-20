@@ -1302,6 +1302,12 @@ public sealed class AutomatedDistributionSystem
         int retryPending = 0;
         int backlogRequests = 0;
         int capacityBlockedRequests = 0;
+        int sourceBlockedRequests = 0;
+        int routeBlockedRequests = 0;
+        int truckBlockedRequests = 0;
+        int fuelBlockedRequests = 0;
+        int dockBlockedTransports = 0;
+        ulong oldestBacklogWait = 0;
         double backlogQuantity = 0.0;
         double reservedCargo = 0.0;
 
@@ -1335,6 +1341,41 @@ public sealed class AutomatedDistributionSystem
                         capacityBlockedRequests++;
                     }
                     break;
+            }
+
+            if (request.State is LogisticsTransportRequestState.Pending or
+                LogisticsTransportRequestState.RetryPending)
+            {
+                ulong waitAge = context.Tick.Value >= request.WaitingSinceTick.Value
+                    ? context.Tick.Value - request.WaitingSinceTick.Value : 0;
+                oldestBacklogWait = Math.Max(oldestBacklogWait, waitAge);
+                switch (request.FailureReason)
+                {
+                    case LogisticsTransportRequestFailureReason.NoSourceSurplus:
+                        sourceBlockedRequests++;
+                        break;
+                    case LogisticsTransportRequestFailureReason.NoRoute:
+                        routeBlockedRequests++;
+                        break;
+                    case LogisticsTransportRequestFailureReason.NoTruckAvailable:
+                        truckBlockedRequests++;
+                        break;
+                    case LogisticsTransportRequestFailureReason.NoDriveFuel:
+                        fuelBlockedRequests++;
+                        break;
+                }
+            }
+
+            VehicleDockBlockReason dockReason = VehicleDockBlockReason.None;
+            if (request.State is LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit &&
+                request.AssignedTruck.IsValid &&
+                context.Entities.TryGetComponent(request.AssignedTruck, out VehicleDockVisit dockVisit) &&
+                (dockVisit.Status is VehicleDockStatus.Busy or VehicleDockStatus.Blocked ||
+                 dockVisit.Status == VehicleDockStatus.Exiting &&
+                 dockVisit.Reason == VehicleDockBlockReason.ExitBlocked))
+            {
+                dockReason = dockVisit.Reason;
+                dockBlockedTransports++;
             }
 
             reservedCargo += request.ReservedQuantity;
@@ -1371,7 +1412,11 @@ public sealed class AutomatedDistributionSystem
                     request.CreatedAtTick,
                     request.StateChangedAtTick,
                     ResolveBottleneckReason(request.FailureReason),
-                    request.CapacityReservationId);
+                    request.CapacityReservationId,
+                    request.WaitingSinceTick,
+                    request.NextAttemptTick,
+                    request.LastEvaluatedAtTick,
+                    dockReason);
         }
 
         int idleTrucks = 0;
@@ -1425,7 +1470,15 @@ public sealed class AutomatedDistributionSystem
             _maximumDeliveryLatencyTicks,
             backlogRequests,
             backlogQuantity,
-            capacityBlockedRequests);
+            capacityBlockedRequests,
+            oldestBacklogWait,
+            sourceBlockedRequests,
+            routeBlockedRequests,
+            truckBlockedRequests,
+            fuelBlockedRequests,
+            dockBlockedTransports,
+            _committedDispatchCountThisTick,
+            _committedDispatchQuantityThisTick);
 
         LastCapacityDebugSnapshot =
             _capacityTracker.CaptureDebugSnapshot(
