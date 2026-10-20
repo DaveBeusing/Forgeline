@@ -169,6 +169,30 @@ public sealed class ActionableAlertTests
     }
 
     [Fact]
+    public void FocusCyclingIncludesCurrentTargetsBehindTheMoreOverflowCard()
+    {
+        var tracker = new AlertLifecycleTracker();
+        var targets = new EntityId[]
+        {
+            new(11, 1), new(12, 1), new(13, 1), new(14, 1), new(15, 1)
+        };
+        var snapshot = Snapshot(tracker.Capture(new(1), Experience(4, (PlayerAlertState)31), targets));
+        var layout = GameplayHudLayout.Create(1920, 1080, 96);
+        var stack = ActionableAlertLayout.Resolve(snapshot, layout);
+        Assert.Equal(4, stack.Count);
+        Assert.True(stack.Overflow.Item.Hidden > 0);
+        var controller = new ActionableAlertController(); var input = new InputState();
+        controller.Update(input, snapshot, layout);
+        foreach (var expected in targets)
+        {
+            Click(input, stack.First.Action);
+            Assert.Equal(expected, controller.Update(input, snapshot, layout).Target);
+        }
+        Click(input, stack.First.Action);
+        Assert.Equal(targets[0], controller.Update(input, snapshot, layout).Target);
+    }
+
+    [Fact]
     public void CardSurfaceTogglesSingleDetailWithoutActivatingFocusOrOperations()
     {
         var alerts = new AlertLifecycleTracker().Capture(new(1),
