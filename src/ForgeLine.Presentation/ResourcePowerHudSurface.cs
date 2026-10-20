@@ -308,7 +308,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 if (!hideNotifications)
                 {
                     EmitNotificationStack(snapshot, experience, layout, dockExpanded, graphics.Width, graphics.Height, localFeedback,
-                        presentationTime, animateNotifications);
+                        presentationTime, animateNotifications, expansion);
                 }
             }
             else
