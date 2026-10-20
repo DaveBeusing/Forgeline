@@ -55,6 +55,7 @@ internal sealed class PreparedAssetSet
             while (_pending.TryPeek(out var id))
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                AssetPreparationScope.ThrowIfStopped();
                 if (!_catalog.TryGet(id, out var record) || record is null)
                 {
                     _pending.Dequeue(); count++;
@@ -131,6 +132,11 @@ internal sealed class PreparedAssetSet
             if (texture.Usage != usage || texture.ColorSpace != colorSpace)
                 throw new InvalidDataException($"Texture '{value}' has incompatible material usage/color space.");
         }
+    }
+    internal void Release()
+    {
+        Meshes.Clear(); Materials.Clear(); Textures.Clear(); Skins.Clear(); Animations.Clear();
+        _pending.Clear(); _planned.Clear(); _failures.Clear(); PayloadBytes = 0;
     }
     internal T Get<T>(AssetId id, Dictionary<AssetId, T> values)
     {

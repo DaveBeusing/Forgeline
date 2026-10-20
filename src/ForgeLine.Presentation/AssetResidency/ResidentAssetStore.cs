@@ -62,6 +62,7 @@ internal sealed class ResidentAssetStore : IDisposable
                 do
                 {
                     cancellationToken.ThrowIfCancellationRequested();
+                    AssetPreparationScope.ThrowIfStopped();
                     var asset = work[index++]; count++;
                     if (asset.Mesh) TryGetMesh(asset.Id.Value, out _);
                     else if (ResolveMaterial(asset.Id.Value).UsesDevelopmentFallback)
@@ -73,6 +74,8 @@ internal sealed class ResidentAssetStore : IDisposable
                 // Required startup work drains bounded steps before the first render frame.
                 // There is no optional prefetch and no partially ready frame publication.
             }
+            cancellationToken.ThrowIfCancellationRequested();
+            AssetPreparationScope.ThrowIfStopped();
             RequiredReady = true; State = AssetResidencyState.Ready;
         }
         catch { State = AssetResidencyState.Failed; throw; }
@@ -103,6 +106,7 @@ internal sealed class ResidentAssetStore : IDisposable
         _textureDetail = textureDetail;
         _prepared = new(catalog);
         while (!_prepared.PrepareStep(CancellationToken.None)) { }
+        AssetPreparationScope.ThrowIfStopped();
 
 
         IGraphicsTexture? whiteBaseColor = null;
@@ -384,6 +388,7 @@ internal sealed class ResidentAssetStore : IDisposable
         Release(_missingBaseColor); Release(_blackEmissive); Release(_neutralOrm);
         Release(_flatNormal); Release(_whiteBaseColor);
         _meshes.Clear(); _materials.Clear(); _textures.Clear(); _clips.Clear(); _skins.Clear();
+        _prepared.Release();
         _residentMeshBytes = _residentTextureMipBytes = _residentClipBytes = _residentSkinBytes = 0;
         _disposed = true;
         if (failure is not null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(failure).Throw();

@@ -73,7 +73,7 @@ internal sealed class RenderAssetSession : IDisposable
     internal void BeginRecord()
     {
         CheckOwner();
-        if (!_explicitFrames) return; // Unchanged legacy Render callers retain synchronous cache resolution.
+        if (!_explicitFrames) return; // Legacy Render callers retain their implicit frame lifecycle.
         if (_phase is not (Phase.Prepared or Phase.Recording))
             throw new InvalidOperationException("Recording requires a prepared asset frame.");
         _phase = Phase.Recording;

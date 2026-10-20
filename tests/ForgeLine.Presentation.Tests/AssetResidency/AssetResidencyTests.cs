@@ -172,6 +172,19 @@ public sealed class AssetResidencyTests
     }
 
     [Fact]
+    public void LastRetirementDropsPreparedCpuPayloadEvenIfTheDisposedStoreIsStillReferenced()
+    {
+        using var fixture = new ResidencyFixture(); using var graphics = new ResidencyDevice();
+        var store = new ResidentAssetStore(graphics,fixture.Catalog());
+        store.PrepareRequiredAssets(CancellationToken.None);
+        var prepared = store.Prepared;
+        Assert.True(prepared.PayloadBytes > 0);
+        store.Dispose();
+        Assert.Equal(0,prepared.PayloadBytes);
+        Assert.Empty(prepared.Meshes); Assert.Empty(prepared.Textures); Assert.Empty(prepared.Materials);
+    }
+
+    [Fact]
     public void OwnerThreadGuardPreventsForeignGpuPublication()
     {
         using var fixture = new ResidencyFixture(); using var graphics = new ResidencyDevice();
