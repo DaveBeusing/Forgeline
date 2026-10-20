@@ -59,7 +59,7 @@ def run(request):
     for aid, geometry in results.items():
         path, definition = catalog.definitions[aid]
         relative = path.relative_to(catalog.root)
-        target = Path('_edited') / (aid + '.glb')
+        target = Path('_edited') / (path.stem + '.glb')
         write_glb(source / relative.parent / target, geometry)
         updated = copy.deepcopy(definition)
         updated['source'] = target.as_posix()
