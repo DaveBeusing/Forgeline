@@ -71,7 +71,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Compiled mesh/metadata/mechanical batch comparison failed; inspect runtime-comparison.log.' }
 }
 finally { $env:FORGELINE_BLENDER_PRODUCTION_ROOT = $oldRoot; $env:FORGELINE_BLENDER_RUNTIME_SEED = $oldSeed }
-@{ success = $true; fixtures = 2; meshes = 19; assetCount = 29; repeatedSourceAndRuntimeBytes = $true;  sourceLessIntegrity = $true;
+@{ success = $true; fixtures = 2; meshes = 19; assetCount = 30; repeatedSourceAndRuntimeBytes = $true;  sourceLessIntegrity = $true;
     compiledRendererContracts = $true; generatedLodCompiled = $true; overlayAvailable = [bool]$RuntimeSeedRoot } |
     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $root 'qualification.json') -Encoding utf8NoBOM
 Write-Host "Blender surface production qualification passed: $root/qualification.json"

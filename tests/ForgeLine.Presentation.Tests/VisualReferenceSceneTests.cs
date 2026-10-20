@@ -6,6 +6,21 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class VisualReferenceSceneTests
 {
+    [Theory]
+    [InlineData(VisualReferenceSceneKind.CommandCoreSingle, 1)]
+    [InlineData(VisualReferenceSceneKind.CommandCoreRepeated, 100)]
+    public void CommandCoreWorkloadsHaveExactCountsAndDeterministicCardinalRotations(VisualReferenceSceneKind kind, int count)
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var first = VisualReferenceScene.Create(kind, terrain);
+        Assert.Equal(first.Fingerprint, VisualReferenceScene.Create(kind, terrain).Fingerprint);
+        var instances = first.Snapshot.Instances.ToArray();
+        Assert.Equal(count, instances.Length);
+        Assert.Equal(count, instances.Select(x => x.Entity).Distinct().Count());
+        Assert.All(instances, x => Assert.Equal(BuildingIds.CommandCore, x.BuildingFeature.Building));
+        Assert.Equal(count == 1 ? 1 : 4, instances.Select(x => x.Transform.Rotation).Distinct().Count());
+    }
+
     [Fact]
     public void ExplicitMechanicalTimeChangesOnlyCopiedPoseAndFingerprint()
     {

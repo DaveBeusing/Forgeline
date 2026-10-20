@@ -48,7 +48,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                1357,
+                1363,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
@@ -62,7 +62,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
             {
                 Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);
                 Assert.Single(mesh.Sections);
-                Assert.Equal("material.directorate.building.structural", Assert.Single(mesh.MaterialIds));
+                Assert.Equal("material.directorate.building.command_core", Assert.Single(mesh.MaterialIds));
                 Assert.Equal(-.505f, mesh.Vertices.Min(v => v.X), precision: 5);
                 Assert.Equal(.505f, mesh.Vertices.Max(v => v.X), precision: 5);
                 Assert.Equal(-.5f, mesh.Vertices.Min(v => v.Y), precision: 5);
@@ -99,7 +99,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                 {
                     Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);
                     Assert.Single(mesh.Sections);
-                    Assert.Equal("material.directorate.building.structural", Assert.Single(mesh.MaterialIds));
+                    Assert.Equal("material.directorate.building.command_core", Assert.Single(mesh.MaterialIds));
                     Assert.Equal(-.5f, mesh.Vertices.Min(v => v.Y), precision: 5);
                     Assert.InRange(mesh.Vertices.Max(v => v.Y), .15f, .56f);
                     Assert.All(mesh.Vertices, v => Assert.True(float.IsFinite(v.X) && float.IsFinite(v.Y) && float.IsFinite(v.Z)));

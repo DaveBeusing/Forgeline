@@ -1,5 +1,10 @@
 # Directorate Command Core production brief
 
+The current production source and reproduction workflow are documented in
+[CommandCoreBlenderProduction.md](CommandCoreBlenderProduction.md). The brief
+below records the earlier parametric-kit milestone; its triangle counts,
+source-of-truth and material restrictions describe that historical stage.
+
 The existing identity is building.directorate.command_core; gameplay footprint
 is 20 x 20 metres with 12-metre visual scale, centre pivot and +Y up/+Z access.
 LOD0 previously had 300 triangles and LOD1/2 share the same 36-triangle source.
