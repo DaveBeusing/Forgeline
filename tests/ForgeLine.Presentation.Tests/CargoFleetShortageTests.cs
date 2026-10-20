@@ -26,20 +26,26 @@ public sealed class CargoFleetShortageTests
     }
 
     [Theory]
-    [InlineData(0, 0, 0, 0)]
-    [InlineData(3, 0, 1, 1)]
-    [InlineData(3, 1, 1, 2)]
-    [InlineData(3, 1, 0, 1)]
-    public void ExplicitEvidenceRejectsUnprovenOrAvailableFleet(
-        int backlog, int active, int idle, int effective)
+    [InlineData(0, 1, 0, 0, false)] // Missing actual backlog
+    [InlineData(3, 0, 0, 0, false)] // No operational fleet
+    [InlineData(3, 1, 1, 0, false)] // One dispatchable idle truck
+    [InlineData(3, 1, 0, 1, false)] // Fuel, route or FIFO blocked
+    [InlineData(3, 1, 0, 0, true)]  // Active fleet entirely committed
+    public void CausalEvidenceDistinguishesBusyCapacityFromOtherBottlenecks(
+        int backlog, int active, int idle, int blocked, bool expected)
     {
         var tracker = new CargoFleetShortageTracker();
-        var observation = new CargoFleetCapacityObservation(backlog, active, idle, effective, new(17, 2));
-        for (ulong tick = 1; tick <= 199; tick++)
+        bool eligible = CargoFleetShortageTracker.Qualifies(backlog, active, idle, blocked);
+        Assert.Equal(expected, eligible);
+        var observation = new CargoFleetCapacityObservation(backlog, active, idle,
+            active + idle, new(17, 2));
+        for (ulong tick = 1; tick < 200; tick++)
             Assert.Null(tracker.ObserveEvidence(new(1), new(1), new(tick),
-                TimeSpan.FromMilliseconds(50), observation, false));
-        Assert.Null(tracker.ObserveEvidence(new(1), new(1), new(200),
-            TimeSpan.FromMilliseconds(50), observation, false));
+                TimeSpan.FromMilliseconds(50), observation, eligible));
+        var actual = tracker.ObserveEvidence(new(1), new(1), new(200),
+            TimeSpan.FromMilliseconds(50), observation, eligible);
+        if (expected) Assert.Equal(observation, actual);
+        else Assert.Null(actual);
     }
 
     [Fact]
