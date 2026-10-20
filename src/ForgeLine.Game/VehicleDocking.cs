@@ -493,6 +493,8 @@ public sealed partial class VehicleDockingService
             !entities.TryGetComponent(visit.Building, out VehicleDockSlot slot) ||
             slot.Truck != truck || slot.Generation != visit.Generation ||
             !entities.TryGetComponent(truck, out WorldTransform transform) ||
+            !(visit.LaneEntered || visit.Status is VehicleDockStatus.Aligning or
+                VehicleDockStatus.Docked or VehicleDockStatus.Servicing or VehicleDockStatus.Exiting) ||
             !visit.Pose.Contains(transform.Position))
             return false;
 
