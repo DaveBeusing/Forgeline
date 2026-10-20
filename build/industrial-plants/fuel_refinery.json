@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.fuel_refinery",
+      "assets": [
+        "building.directorate.fuel_refinery",
+        "building.directorate.fuel_refinery.critical",
+        "building.directorate.fuel_refinery.damaged",
+        "building.directorate.fuel_refinery.destroyed",
+        "building.directorate.fuel_refinery.foundation",
+        "building.directorate.fuel_refinery.idle",
+        "building.directorate.fuel_refinery.lod1",
+        "building.directorate.fuel_refinery.lod2",
+        "building.directorate.fuel_refinery.partial_shell",
+        "building.directorate.fuel_refinery.structural_frame",
+        "building.directorate.fuel_refinery.unpowered"
+      ],
+      "instanceScale": [
+        18,
+        10,
+        16
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}
