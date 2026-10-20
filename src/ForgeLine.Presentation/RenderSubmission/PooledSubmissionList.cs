@@ -6,7 +6,15 @@ namespace ForgeLine.Presentation.RenderSubmission;
 // Leases never escape the render owner; SetData consumes its populated prefix synchronously.
 internal sealed class PooledSubmissionList<T> where T : unmanaged
 {
+    // Shared pools retain a processor-dependent number of arrays. Small escape
+    // payloads need to cover the renderer's bounded 1,024 metadata slots even
+    // on a four-core runner. Large payloads retain the existing shared leases.
+    private const int MaximumSmallPayloadLength = 512;
+    private static readonly ArrayPool<T> SmallPayloads =
+        ArrayPool<T>.Create(MaximumSmallPayloadLength, 1024);
     private T[] _items = [];
+    private static ArrayPool<T> PoolFor(int length) =>
+        length <= MaximumSmallPayloadLength ? SmallPayloads : ArrayPool<T>.Shared;
     internal int Count { get; private set; }
     internal int Capacity => _items.Length;
     internal T this[int index] { get => _items[index]; set => _items[index] = value; }
@@ -21,16 +29,17 @@ internal sealed class PooledSubmissionList<T> where T : unmanaged
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void GrowAndAdd(in T item)
     {
-        T[] next = ArrayPool<T>.Shared.Rent(Math.Max(64, checked(Count * 2)));
+        int capacity = Math.Max(64, checked(Count * 2));
+        T[] next = PoolFor(capacity).Rent(capacity);
         _items.AsSpan(0, Count).CopyTo(next);
-        if (_items.Length > 0) ArrayPool<T>.Shared.Return(_items);
+        if (_items.Length > 0) PoolFor(_items.Length).Return(_items);
         _items = next; _items[Count++] = item;
     }
     internal void CopyTo(T[] destination, int offset) => _items.AsSpan(0, Count).CopyTo(destination.AsSpan(offset));
     internal void Clear() => Count = 0;
     internal void Release()
     {
-        if (_items.Length > 0) ArrayPool<T>.Shared.Return(_items);
+        if (_items.Length > 0) PoolFor(_items.Length).Return(_items);
         _items = []; Count = 0;
     }
 }

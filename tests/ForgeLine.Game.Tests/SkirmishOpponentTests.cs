@@ -754,6 +754,37 @@ public sealed class SkirmishOpponentTests
         scenario.Simulation.Entities.RemoveComponent<SkirmishOpponentController>(
             scenario.West.Controller);
 
+        // Isolate objective direction from the time needed to manufacture and
+        // dock-refuel the first force; full bootstrap progress has separate coverage.
+        var units = DirectorateContent.CreateUnitCatalog();
+        var configuration = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation)
+            .OpponentConfigurations[scenario.East.Player.Value];
+        Vector3 staging = scenario.Simulation.Entities.GetComponent<WorldTransform>(scenario.East.CommandCore).Position +
+            new Vector3(-180, 0, 240);
+        var force = new List<EntityId>();
+        for (int index = 0; index < configuration.MinimumObjectivePressureUnits; index++)
+            force.Add(scenario.UnitFactory.Create(units[UnitIds.MainBattleTank], staging + Vector3.UnitZ * (index * 12), scenario.East.Player));
+        for (int index = 0; index < configuration.MinimumAttackUnits; index++)
+            force.Add(scenario.UnitFactory.Create(units[UnitIds.RifleSquad], staging + new Vector3(24, 0, index * 8), scenario.East.Player));
+        force.Add(scenario.UnitFactory.Create(units[UnitIds.ScoutVehicle], staging + new Vector3(48, 0, 0), scenario.East.Player));
+        for (int index = 0; index < Math.Max(2, configuration.MinimumSupplyTrucks); index++)
+        {
+            EntityId truck = scenario.UnitFactory.Create(units[UnitIds.SupplyTruck], staging + new Vector3(72, 0, index * 12), scenario.East.Player);
+            SupplyTruck supply = scenario.Simulation.Entities.GetComponent<SupplyTruck>(truck);
+            Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, supply.FuelTarget).Succeeded);
+            Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, supply.AmmunitionTarget).Succeeded);
+            force.Add(truck);
+        }
+        foreach (EntityId unit in force)
+        {
+            if (scenario.Simulation.Entities.TryGetComponent(unit, out UnitFuelState fuel))
+                Assert.True(scenario.Inventories.Add(fuel.InventoryId, ResourceIds.Fuel,
+                    fuel.Capacity - scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel)).Succeeded);
+            if (scenario.Simulation.Entities.TryGetComponent(unit, out AmmunitionState ammunition))
+                Assert.True(scenario.Inventories.Add(ammunition.InventoryId, ResourceIds.Ammunition,
+                    ammunition.Capacity - scenario.Inventories.GetQuantity(ammunition.InventoryId, ResourceIds.Ammunition)).Succeeded);
+        }
+
         bool reachedAttack =
             scenario.RunUntil(
                 current =>

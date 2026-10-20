@@ -781,8 +781,10 @@ public sealed class TacticalCombatSystemTests
             scenario.AutomaticResupply!.Metrics.TotalOrdersIssued >= 2);
     }
 
-    [Fact]
-    public void ActiveCargoTransportRefuelsWithoutDroppingDeliveryOrder()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ActiveCargoTransportOnlyAcceptsMobileRescueWithoutDroppingDeliveryOrder(bool mobileRescue)
     {
         TacticalScenario scenario =
             CreateScenario(
@@ -864,6 +866,15 @@ public sealed class TacticalCombatSystemTests
                 BluePlayer,
                 resupplyRangeMeters: 20.0f));
 
+        if (mobileRescue)
+        {
+            scenario.Simulation.Entities.AddComponent(truck, new CargoFuelServiceState(
+                EntityId.Invalid, CargoFuelServicePhase.AwaitingFuelRescue,
+                CargoFuelServiceReason.NoEligibleProvider, scenario.Simulation.CurrentTick));
+            scenario.Simulation.Entities.AddComponent(provider, new SupplyTruck(
+                providerInventory, BluePlayer, 12.0f, 20.0f, 100.0, 0.0));
+        }
+
         scenario.Simulation.AdvanceOneTick();
 
         UnitFuelState fuel =
@@ -871,13 +882,14 @@ public sealed class TacticalCombatSystemTests
                 truck);
 
         Assert.Equal(
-            100.0,
+            mobileRescue ? 100.0 : 20.0,
             scenario.Inventories.GetQuantity(
                 fuel.InventoryId,
                 ResourceIds.Fuel),
             precision: 6);
-        Assert.True(
-            scenario.AutomaticResupply!.Metrics.TotalOrdersIssued > 0);
+        Assert.Equal(mobileRescue, scenario.AutomaticResupply!.Metrics.TotalOrdersIssued > 0);
+        Assert.Equal(mobileRescue ? 20.0 : 100.0,
+            scenario.Inventories.GetQuantity(providerInventory, ResourceIds.Fuel), precision: 6);
         Assert.True(
             scenario.Simulation.Entities.HasComponent<CargoTransportOrder>(
                 truck));

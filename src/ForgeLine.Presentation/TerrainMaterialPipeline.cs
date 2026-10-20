@@ -265,7 +265,7 @@ internal static class TerrainMaterialPipeline
 
                 float2 worldXZ =
                     input.WorldPosition.xz;
-                float3 geometricNormal = normalize(input.Normal);
+                float3 geometricNormal = PbrNormalize(input.Normal, float3(0, 1, 0));
                 float3 tangent = float3(1, 0, 0) - geometricNormal * geometricNormal.x;
                 if (dot(tangent, tangent) < .0001) tangent = float3(0, 0, 1) - geometricNormal * geometricNormal.z;
                 tangent = normalize(tangent);
@@ -351,6 +351,7 @@ internal static class TerrainMaterialPipeline
                     ApplySceneLighting(
                         color,
                         blendedNormal,
+                        geometricNormal,
                         ao,
                         roughness,
                         metallic,

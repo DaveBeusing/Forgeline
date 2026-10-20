@@ -4,7 +4,8 @@ internal static class PbrMaterialShader
 {
     internal const string Transforms = """
         float3 PbrNormalize(float3 value, float3 fallback) {
-            return dot(value,value)>1e-12 ? normalize(value) : fallback;
+            float lengthSquared=dot(value,value);
+            return isfinite(lengthSquared) && lengthSquared>1e-12 ? value*rsqrt(lengthSquared) : fallback;
         }
         float3 PbrTransformNormal(float3 normal, float3x3 basis, out float orientation) {
             float3 a=cross(basis[1],basis[2]);
@@ -15,7 +16,7 @@ internal static class PbrMaterialShader
         }
         """;
 
-    internal const string Lighting = Transforms + """
+    internal const string Lighting = Transforms + MaterialFilteringShader.Source + """
         static const float PbrPi=3.14159265359;
         float PbrPow5(float value) { float square=value*value; return square*square*value; }
         float3 PbrFresnel(float3 f0,float cosine) { return f0+(1-f0)*PbrPow5(1-saturate(cosine)); }
@@ -26,7 +27,8 @@ internal static class PbrMaterialShader
             float noH=saturate(dot(n,h)), voH=saturate(dot(v,h));
             float alpha=max(0.045,roughness); alpha*=alpha;
             float a2=alpha*alpha;
-            float denominator=noH*noH*(a2-1)+1;
+            float noH2=noH*noH;
+            float denominator=(1-noH2)+a2*noH2;
             float distribution=a2/(PbrPi*denominator*denominator);
             float visibility=0.5/max(noL*sqrt(noV*noV*(1-a2)+a2)+noV*sqrt(noL*noL*(1-a2)+a2),1e-6);
             float3 fresnel=PbrFresnel(lerp(0.04.xxx,albedo,metallic),voH);
@@ -37,11 +39,11 @@ internal static class PbrMaterialShader
             value=max(value,0);
             return lerp(value*12.92,1.055*pow(max(value,0.0031308),1.0/2.4)-0.055,step(0.0031308.xxx,value));
         }
-        float3 ApplySceneLighting(float3 albedo,float3 worldNormal,float ao,float roughness,float metallic,
+        float3 ApplySceneLighting(float3 albedo,float3 worldNormal,float3 geometricNormal,float ao,float roughness,float metallic,
             float3 emissive,float4 light,float4 directionalAmbient,float4 ambientExposure,float2 groundTone,
             float3 worldPosition,float3 viewVector) {
             float3 n=PbrNormalize(worldNormal,float3(0,1,0));
-            float3 v=PbrNormalize(viewVector,n), l=normalize(light.xyz);
+            float3 v=PbrNormalize(viewVector,n), l=PbrNormalize(light.xyz,float3(0,1,0));
             albedo=saturate(albedo); metallic=saturate(metallic); roughness=saturate(roughness);
         #if WORLD_ENVIRONMENT
             float wet=WorldWetness*saturate(n.y)*(1-metallic);
@@ -50,8 +52,8 @@ internal static class PbrMaterialShader
         #endif
             // Screen-space normal variance broadens subpixel specular lobes without history or extra samples.
             float3 dx=ddx(n), dy=ddy(n);
-            roughness=sqrt(saturate(roughness*roughness+0.25*max(dot(dx,dx),dot(dy,dy))));
-            float2 shadow=SampleDirectionalShadow(worldPosition,n,l);
+            roughness=PbrSpecularRoughness(roughness,dx,dy);
+            float2 shadow=SampleDirectionalShadow(worldPosition,PbrNormalize(geometricNormal,n),l);
         #if WORLD_ENVIRONMENT
             // A fixed world-space cloud field avoids camera-relative shimmer and adds no texture reads.
             float cloud=.5+.5*sin(worldPosition.x*.0041+worldPosition.z*.0027)*sin(worldPosition.z*.0033-worldPosition.x*.0019);
@@ -73,6 +75,12 @@ internal static class PbrMaterialShader
             else color=saturate(color);
             return PbrEncode(color);
         #endif
+        }
+        float3 ApplySceneLighting(float3 albedo,float3 worldNormal,float ao,float roughness,float metallic,
+            float3 emissive,float4 light,float4 directionalAmbient,float4 ambientExposure,float2 groundTone,
+            float3 worldPosition,float3 viewVector) {
+            return ApplySceneLighting(albedo,worldNormal,worldNormal,ao,roughness,metallic,emissive,
+                light,directionalAmbient,ambientExposure,groundTone,worldPosition,viewVector);
         }
         """;
 }

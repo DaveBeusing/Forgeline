@@ -467,13 +467,30 @@ public sealed class SkirmishSupplyPolicyTests
         using var scenario = CentralDivideScenario.Create(CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation), seed: 2026);
         var entities = scenario.Simulation.Entities;
         var side = scenario.GetBase(new PlayerId(2));
+        // This policy test supplies a stable power reserve. The end-to-end
+        // strategic-loop tests retain the unmodified economy/bootstrap path.
+        entities.AddComponent(side.CommandCore, new PowerGenerator(100.0));
         bool funded = scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, side.Player),
             24_000, TestContext.Current.CancellationToken);
         var queueDiagnostics = new List<string>();
         if (!funded)
             foreach (var truck in entities.Query<VehicleDockVisit, WorldTransform>())
-                queueDiagnostics.Add($"{truck}: {entities.GetComponent<WorldTransform>(truck).Position}; {entities.GetComponent<VehicleDockVisit>(truck)}; " +
-                    (entities.TryGetComponent(truck, out VehicleQueueEntry entry) ? entry.ToString() : "unregistered"));
+            {
+                Vector3 position = entities.GetComponent<WorldTransform>(truck).Position;
+                var neighbors = new List<string>();
+                foreach (var other in entities.Query<SpatialPresence, WorldTransform>())
+                {
+                    var otherTransform = entities.GetComponent<WorldTransform>(other);
+                    if (other == truck || Vector3.DistanceSquared(otherTransform.Position, position) >= 70 * 70) continue;
+                    var bounds = entities.GetComponent<SpatialPresence>(other).CreateEntry(other, otherTransform).Bounds;
+                    neighbors.Add($"{other}@{otherTransform.Position}: {bounds.Minimum}..{bounds.Maximum}");
+                }
+                queueDiagnostics.Add($"{truck}: {position}; {entities.GetComponent<VehicleDockVisit>(truck)}; " +
+                    (entities.TryGetComponent(truck, out VehicleQueueEntry entry) ? entry.ToString() : "unregistered") +
+                    $"; motion={entities.GetComponent<GroundMovementState>(truck)}; " +
+                    (entities.TryGetComponent(truck, out MovementOrder movement) ? movement.ToString() : "no movement") +
+                    "; neighbors=" + string.Join(" | ", neighbors));
+            }
         Assert.True(funded, string.Join("\n", queueDiagnostics));
         void SetAvailable(ResourceId resource, double quantity)
         {
