@@ -6,6 +6,12 @@ $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath('../..', $PSScriptRoot)
 Import-Module (Join-Path $repo 'tools/blender/BlenderToolchain.psm1') -Force
 $output = Resolve-BlenderOutput -Path $OutputRoot -RepositoryRoot $repo
+if ($IsWindows) {
+    foreach ($family in @('fuel_refinery', 'ammunition_plant')) {
+        $longest = Join-Path $output "$family/reopened/source/buildings/directorate/_roundtrip/building.directorate.$family.structural_frame.glb"
+        if ($longest.Length -ge 260) { throw 'Use a shorter OutputRoot: a family GLB path would exceed the Windows native path limit.' }
+    }
+}
 if (Test-Path -LiteralPath $output) { throw 'Qualification requires fresh output.' }
 $compiler = Join-Path $repo 'tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll'
 if (-not (Test-Path -LiteralPath $compiler)) { throw 'Build the Release compiler first.' }

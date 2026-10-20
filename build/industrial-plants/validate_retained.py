@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/blender'))
 from asset_contract import Catalog, compare_geometry, fixture_selection, read_geometry, require, sha
+from lineage import portable_signature
 
 
 def validate():
@@ -16,9 +17,10 @@ def validate():
         folder = ROOT / 'assets/staged/industrial-plants' / family
         lineage = json.loads((folder / 'lineage.json').read_text(encoding='utf-8'))
         require(lineage['status'] == 'staged-not-promoted', 'Unexpected production claim')
-        require(lineage['sourceSignature'] == catalog.signature(ids)[0], 'Authoritative source changed; regenerate and review')
+        require(lineage['portableSourceSignature'] == portable_signature(catalog, ids), 'Authoritative source changed; regenerate and review')
         require(lineage['fixtureSha256'] == sha(fixture), 'Family fixture changed')
         require(lineage['master'] == family + '.blend' and lineage['masterSha256'] == sha(folder / lineage['master']), 'Saved master hash mismatch')
+        require(lineage['surfaceReviewMaster'] == family + '_surfaces.blend' and lineage['surfaceReviewMasterSha256'] == sha(folder / lineage['surfaceReviewMaster']), 'Packed PBR review master hash mismatch')
         expected = set(families[0]['assets'])
         require({x['id'] for x in lineage['exports']} == expected and len(lineage['exports']) == len(expected), 'Incomplete or duplicated state/LOD exports')
         for entry in lineage['exports']:
