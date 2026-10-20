@@ -44,6 +44,30 @@ internal static class SubmissionProbe
         mainWork = Work(renderer);
         renderer.RenderShadow(context, camera, world, .5f, new(camera.GetMatrices(context.Width, context.Height).ViewProjection, camera.Target, 750, 2000), int.MaxValue, int.MaxValue, 17);
         shadowWork = Work(renderer);
+        var movingRoots = Enumerable.Range(0, world.InstanceCount).Select(index =>
+        {
+            RenderInstance root = world.CurrentSnapshot!.GetInstance(index);
+            return root with { Transform = root.Transform with { Position = root.Transform.Position + new Vector3(.125f, 0, .125f),
+                Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, .1f) },
+                UnitFeature = root.UnitFeature with { AimYawRadians = .6f } };
+        }).ToArray();
+        var interpolationSnapshots = new PresentationSnapshotBuffer();
+        interpolationSnapshots.Publish(new(new SimulationTick(33), TimeSpan.FromMilliseconds(50), movingRoots.Length, movingRoots));
+        world.Update(interpolationSnapshots);
+        results.Add(Measure("mechanical-1000-interpolated-main-and-light", i =>
+        {
+            float alpha = i % 2 == 0 ? .25f : .75f;
+            renderer.Render(context, camera, world, alpha, presentationSeconds: i / 60d);
+            renderer.RenderShadow(context, camera, world, alpha, new(camera.GetMatrices(context.Width, context.Height).ViewProjection, camera.Target, 750, 2000), int.MaxValue, int.MaxValue, i / 60d);
+        }, renderer));
+        renderer.Render(context, camera, world, .5f, presentationSeconds: 18);
+        object? interpolatedMainWork = Work(renderer);
+        renderer.RenderShadow(context, camera, world, .5f, new(camera.GetMatrices(context.Width, context.Height).ViewProjection, camera.Target, 750, 2000), int.MaxValue, int.MaxValue, 18);
+        object? interpolatedLightWork = Work(renderer);
+        context.DrawnInstances = 0;
+        renderer.RenderShadow(context, camera, world, .5f, new(camera.GetMatrices(context.Width, context.Height).ViewProjection, camera.Target, 750, 2000), 1024, 256, 18);
+        object? boundedLightWork = Work(renderer);
+        long boundedDrawnParts = context.DrawnInstances;
         var random = new Random(8462);
         var roots = Enumerable.Range(0, 10000).Select(i => new RenderInstance(new EntityId((uint)i + 1, 1),
             new(new Vector3(random.Next(-1000,1000), 0, random.Next(-1000,1000)), Quaternion.Identity, Vector3.One),
@@ -72,7 +96,9 @@ internal static class SubmissionProbe
             AssetManifestSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(Path.Combine(assets,"manifest.json")))),
             ProbeSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(Assembly.GetExecutingAssembly().Location))),
             RendererSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(SimpleInstanceRenderer).Assembly.Location))),
-            Results = results, ChangingFrameMainWork = mainWork, ChangingFrameLightWork = shadowWork }, JsonOptions));
+            Results = results, ChangingFrameMainWork = mainWork, ChangingFrameLightWork = shadowWork,
+            InterpolatedFrameMainWork = interpolatedMainWork, InterpolatedFrameLightWork = interpolatedLightWork,
+            BoundedLightWork = boundedLightWork, BoundedDrawnParts = boundedDrawnParts }, JsonOptions));
     }
     private static object? Work(SimpleInstanceRenderer renderer) => typeof(SimpleInstanceRenderer).GetProperty("WorkMetrics")?.GetValue(renderer);
     private static object Measure(string name, Action<int> frame, SimpleInstanceRenderer renderer)
@@ -105,6 +131,7 @@ internal static class SubmissionProbe
     }
     private sealed class CountingContext : IGraphicsCommandContext
     {
+        internal long DrawnInstances;
         public int Width => 1600; public int Height => 900; public int FrameIndex => 0;
         public void SetViewport(float x,float y,float w,float h) { }
         public void SetScissor(int l,int t,int r,int b) { }
@@ -115,6 +142,6 @@ internal static class SubmissionProbe
         public void SetPixelTexture(int s,IGraphicsTexture t) { }
         public void Draw(int c,int startVertex=0) { }
         public void DrawIndexed(int c,int startIndex=0,int baseVertex=0) { }
-        public void DrawIndexedInstanced(int c,int n,int startIndex=0,int baseVertex=0,int startInstance=0) { }
+        public void DrawIndexedInstanced(int c,int n,int startIndex=0,int baseVertex=0,int startInstance=0) { DrawnInstances += n; }
     }
 }

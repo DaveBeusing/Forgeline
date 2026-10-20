@@ -55,12 +55,12 @@ try {
                 if ($LASTEXITCODE -ne 0) { throw 'Cannot select exact capture source.' }
                 $clientName = if ($side -eq 'baseline') { 'reference-client' } else { 'candidate-client' }
                 $client = Join-Path $artifactRoot "$clientName/ForgeLine.Client.exe"
-                foreach ($path in @('Fixed','Sweep')) {
-                    $scenes = if ($path -eq 'Fixed') { @('IndustrialBase','BattlefieldCombat','MainBattleTankProduction','CombatSupportRepeated') } else { @('CombatSupportRepeated') }
+                foreach ($path in @('Fixed','Sweep','Budget')) {
+                    $scenes = if ($path -eq 'Fixed') { @('IndustrialBase','BattlefieldCombat','MainBattleTankProduction','CombatSupportRepeated','MechanicalFiring','EffectsBarrage','OperationalBuildingsRepeated') } else { @('CombatSupportRepeated') }
                     $arguments = @{ Capture = $true; ClientPath = $client; RuntimeAssetRoot = $assets;
-                        Scenes = $scenes; Profiles = @('High'); Zooms = @('CloseTactical','Strategic');
+                        Scenes = $scenes; Profiles = $(if ($path -eq 'Budget') { @('Low') } else { @('High') }); Zooms = @('CloseTactical','Strategic');
                         Displays = @('1920x1080'); UiScenarios = @('World'); RasterDpi = 96;
-                        Warmups = 8; Samples = 64; RepeatCaptures = 2; CameraPath = $path;
+                        Warmups = 64; Samples = 128; RepeatCaptures = 2; CameraPath = $(if ($path -eq 'Budget') { 'Fixed' } else { $path });
                         OutputRoot = (Join-Path $output "$side-$path") }
                     & (Join-Path $reference 'build/Invoke-RtsReferenceQualification.ps1') @arguments *> (Join-Path $output "$side-$path.log")
                     $metadata.exits["$side-$path"] = $LASTEXITCODE
@@ -72,7 +72,7 @@ try {
             $metadata.exits['restoreReference'] = $LASTEXITCODE
             if ($LASTEXITCODE -ne 0) { throw 'Restore the dedicated reference checkout before reuse.' }
         }
-        foreach ($path in @('Fixed','Sweep')) {
+        foreach ($path in @('Fixed','Sweep','Budget')) {
             & (Join-Path $repo 'build/Compare-VisualReferenceEvidence.ps1') -CurrentRoot (Join-Path $output "candidate-$path") -BaselineRoot (Join-Path $output "baseline-$path") -ComparePixels -ReportPath (Join-Path $output "$path-pixels.json") *> (Join-Path $output "$path-pixels.log")
             $metadata.exits["$path-pixels"] = $LASTEXITCODE
             # A visual delta is retained for review, never accepted as a golden.
