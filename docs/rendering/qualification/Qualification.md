@@ -273,3 +273,48 @@ conditions, lifecycle execution and human review remain open regardless of a
 successful hosted build. Recheck master and the net single-PATCH delta again
 before integration; no merge, tag or release follows from these checkpoints.
 
+## Asset-readiness master reconciliation
+
+Master advanced again through
+[PR #269](https://github.com/DaveBeusing/Forgeline/pull/269), from
+`2b4b61ece625d1311c9ee5564cf513dadf2d1123` to
+`d3acf9b0fb94da75ecfd26173cc387398f317096`, version `0.1.426-dev`.
+The qualification branch incorporates that complete tree and adjusts its
+isolated PATCH to **`0.1.427-dev`**. The prior `426` version file is identical
+on both sides. Qualification ownership and the current PR base now refer to
+this newer master; older cohort identities retain their original sources.
+
+This delta adds asset-readiness inventory/evidence, Blender tooling, six portable
+inventory tests and an opt-in typed Blender comparison. Its optional comparison
+parameters retain the existing defaults. It changes no production renderer,
+runtime asset source, qualification-owned path or central capture/comparison
+script. The native pilot recorded by that separate change is bound to
+`e822ec063c91cb103d3dace66b458fd9ec418b59` and uses three warmups
+and eight samples for three 1080p High/NormalGameplay scene pairs. Its repeated
+images are not independent AB/BA timing pairs. Those
+source-specific functional images do not satisfy this qualification's five
+paired repetitions, 512 warm samples, full matrix, lifecycle or human review.
+
+The preceding integrated source
+`1a0117802db3079fec315426d1b5486d7a680c34` completed all five hosted workflows
+successfully. Its
+[main CI 39502665822](https://github.com/DaveBeusing/Forgeline/actions/runs/39502665822/job/118904296158)
+passed the full suite, reproducible package, fresh-install and startup checks,
+two-opponent full-match validation and artifact uploads. The corresponding
+[master CI 39499494041](https://github.com/DaveBeusing/Forgeline/actions/runs/39499494041/job/118893071655)
+also completed successfully on `2b4b61ece625d1311c9ee5564cf513dadf2d1123`.
+
+The preceding qualification's PlanOnly artifact, ID `12302113270`, has ZIP
+SHA-256 `7f8dce6226f6c9f72c53ec79bc0afbf37612d37049b70646e02a934a69daf5ac`,
+matching GitHub metadata. It preserves 216 cases per side/pair, five pairs,
+512 warm samples, 64 warmups and 128 cold samples. It contains no native
+observations; all twelve product gates are open. These successful checks and
+the verified plan remain evidence of that preceding source, not the new merge.
+
+The PR records the new integrated head and its own actual CI results. The new
+master's exact-source main run is
+[39506391125](https://github.com/DaveBeusing/Forgeline/actions/runs/39506391125).
+No earlier successful run is substituted for either new source. The remaining
+native and serial integration requirements stay open; status remains
+**implemented, not yet accepted**.
+
