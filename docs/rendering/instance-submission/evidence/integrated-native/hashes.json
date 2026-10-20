@@ -1,0 +1,21 @@
+{
+  "baseline-Budget.json.gz": "37864a7520a19fadafe7efbc25d16ac215947c9ae732da2db364beb3d572420a",
+  "baseline-Fixed.json.gz": "dd1c33d1c1d47fad499b017b71c0a0615709318560d256dc871daf4e23fea63e",
+  "baseline-Sweep.json.gz": "49b8c59a841258c0aa78c45d8e1d2ad818a9eb36dfb3f14531db174041e2bdab",
+  "Budget-performance.json": "dbe5c7923c05049571b099319cab87fc7a313cefc8f7a65e0e922a0c26ab5172",
+  "Budget-pixels.json": "45aad87651f9e7d6e5875afe40a3cec3b2ba59ab7836e6c2af6ddad6ed96e955",
+  "candidate-Budget.json.gz": "5bbacbb84268e93b8613bdefd228dea1ac3e4d7e13a109ffd7bdf0ecaf28c43a",
+  "candidate-Fixed.json.gz": "d8ecbb1195b8f202037391ea5259a2ffc41f73f904994f87575c44169fb50b72",
+  "candidate-Sweep.json.gz": "af1d682b20862afda047744d0d9b0088688652f27c698cd60bc47ed567e5d22f",
+  "Fixed-performance.json": "f8d8c072ce1834f2df62398a38a76e057bd9dbd912cdfeebde335f1e25e42d08",
+  "Fixed-pixels.json": "b9e5d989e36102b7aeb4ff69f9e4f3142b389701fc5d89f9bde242095185cdd0",
+  "InvokeComparison.ps1.txt": "639fef223bd5505714fa6e2c47364744719aa75b436a6378bc1f364567ac391e",
+  "performance-exits.json": "d456ab0763f397e3514fa7dea78c7e1dae5f632a0aa63d7f28cfe681d99df3a4",
+  "projection-hashes.json": "5da9180aabc5bc1bc6d11bbec94a40281ac521c3abc5385c6a2421ae040e2294",
+  "quiet-window.json": "7aebd33e4d043c6df512d59dd593df9ba1ba3df1d4331d5421cbcfcb9f34ae61",
+  "review-image-identity.json": "bb3866572c00729ddadb86062bf35ebec4292e3105e686695dbeeae96d32c818",
+  "run.json": "26111e0f779e458e62163210ddcedf3e34b662272070fdd911cc8c08ee3cd1d6",
+  "summary.json": "73da4a025e8952d835862043a34509ec0f103f8da1f953d666f6bd1c97c47042",
+  "Sweep-performance.json": "1428f88c7f79cd899e282e3426d6369b13c349d5e0a77c0a7731d1e1ad494c49",
+  "Sweep-pixels.json": "8fd44f272290dbc56f46759f1c3dfbb62908afc63856138473fd13ff6679b031"
+}

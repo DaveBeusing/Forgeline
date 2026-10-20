@@ -39,12 +39,12 @@ adapter allocation sample is zero. Median ranges in microseconds:
 
 | Workload | Reference A/B | Corrected A/B |
 | --- | ---: | ---: |
-| 872 visible near roots | 239.3ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“245.4 | 150.5ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“193.4 |
-| 5,000 fully culled roots | 4.0ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“4.2 | 1.6ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2.7 |
-| 10,000 distributed roots, pan/zoom | 1,187.0ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“1,237.1 | 602.1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“655.0 |
-| 10,000 distributed roots, new snapshot pair | 2,089.4ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2,493.4 | 2,023.8ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2,140.4 |
-| Mechanical fixed 1,000 roots / 9,750 parts | 1,930.1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2,307.1 | 1,910.1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2,898.1 |
-| Changing alpha, single snapshot, main + light | 3,696.1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“3,884.5 | 3,619.6ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“4,862.6 |
+| 872 visible near roots | 239.3ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ245.4 | 150.5ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ193.4 |
+| 5,000 fully culled roots | 4.0ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ4.2 | 1.6ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ2.7 |
+| 10,000 distributed roots, pan/zoom | 1,187.0ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ1,237.1 | 602.1ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ655.0 |
+| 10,000 distributed roots, new snapshot pair | 2,089.4ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ2,493.4 | 2,023.8ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ2,140.4 |
+| Mechanical fixed 1,000 roots / 9,750 parts | 1,930.1ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ2,307.1 | 1,910.1ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ2,898.1 |
+| Changing alpha, single snapshot, main + light | 3,696.1ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ3,884.5 | 3,619.6ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ4,862.6 |
 
 Mechanical timings and CPU tails remain mixed. No general mechanical speedup,
 sustained FPS improvement, stable-clock equivalence or complete performance
@@ -176,3 +176,32 @@ CPU raw sample streams are also losslessly compressed as .json.gz.
 raw-file-hashes.json records the original decompressed bytes; hashes.json records
 the committed files. Decompress a cohort to a temporary directory before running
 SummarizeComparison.py; metadata, summaries and source archives stay directly readable.
+
+
+## Integrated current-master hardware check
+
+A final separate cohort compares current master
+a1610d1a51d4107c4b8202e234ed33edd3cfc9c9 (0.1.421-dev) against integrated
+b69e5f72a1444bbffce149c6a71b7551a27044a4 (0.1.422-dev). Both exact clients
+were rebuilt from their own source; historical cohorts are not relabelled.
+The renderer-owned implementation and owned tests are unchanged from 60724f12;
+inherited logistics/alert integration and version metadata differ.
+
+[Integrated native evidence](evidence/integrated-native/summary.json) repeats
+all 18 paired cases with the original 64-warmup/128-sample/two-repeat protocol,
+same sealed runtime assets, hardware, driver, DPI and settings. All six capture
+processes exit zero. The guard records 44 observations without detected foreign
+workload; completion is 2026-10-20T14:29:13.1250259Z.
+
+Fifteen pairs are pixel-exact; the same three tactical High fixed/sweep and Low
+shadow cases remain outside zero tolerance. The owned controller now records
+row-level outsideTolerance counts 1/1/1 explicitly in run.json. The frozen shared
+comparator remains unchanged. Review PNG byte identity is separately recorded
+in review-image-identity.json; source attribution stays in each manifest.
+
+The unchanged performance gate fails 31 fixed and two sweep metric/statistic
+comparisons, with zero unqualified cases. The Low gate passes in this cohort;
+its prior failed results remain retained. All frames have zero submission and
+texture-binding faults. All 16 fixed/Low cases have constant texture/descriptor
+resources; demand-changing sweeps still do not establish their full plateau.
+There is no complete performance or human image acceptance.

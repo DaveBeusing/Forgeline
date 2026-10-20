@@ -91,5 +91,41 @@ the same tactical shadow selection differences require human review.
 
 The final project-reference validator passes 46 projects with no cycles. Final
 source ownership and one-PATCH validation are required before publishing the
-final PR head. All product paths are unchanged after the measured 60724f12;
-subsequent commits contain measurement helpers and evidence/documentation only.
+final PR head. The renderer-owned implementation is unchanged after measured 60724f12;
+subsequent own commits contain measurement helpers and evidence/documentation.
+Inherited current-master integration changes other paths, as recorded below.
+
+
+## Current master integration
+
+Master advanced to a1610d1a51d4107c4b8202e234ed33edd3cfc9c9 while the
+source-specific measurements were being archived. PRs 261/262 add logistics and
+alert changes; no renderer-owned path conflicts. The merge preserves all
+history. A separate version commit establishes exactly 0.1.421 to 0.1.422 relative
+to this current master. Measured renderer source files remain unchanged; the
+historical source identities above are not relabelled as current binaries.
+
+Integrated product source b69e5f72 and current master both build the complete
+Release solution with zero warnings/errors (104.10s / 130.52s respectively).
+The current-master selection of the earlier six failing Game methods reports
+seven theory cases: five failed, two passed, exit 1, 55.367s. The five failures
+are the listed methods except DirectCombatTargetsRequireCurrentIdentifiedIntelligence,
+which now passes. The integrated complete suite finishes with **3,071 total, 3,048 passed,
+five failed, 18 skipped**, exit 2, 8m07.940s. Its failures are exactly those five
+reproduced current-master cases. Every other module passes, including
+Presentation, Client, Graphics and Assets. This is not a green full-suite gate.
+
+
+The final integrated hardware comparison uses the exact current-master a161
+client against b69e5f72, not the older measurement binaries. Six captures exit
+zero; all 18 pairs are structurally complete with no observed foreign workload,
+15 pixel-exact pairs and three unchanged tactical shadow deltas. Performance
+gates: fixed 31 regressions, sweep two, Low zero; no unqualified cases. The first
+failed cohorts remain archived. See [current hardware evidence](evidence/integrated-native/summary.json).
+
+Required open gates are: five reproduced current-master Game failures, final
+hosted CI completion, full native performance acceptance, sweep demand plateau
+and explicit human shadow-image approval. The shared pixel-comparator aggregate
+bug and central ADR/architecture links require serial follow-up; this PR does
+not modify shared workflows, goldens or contracts. Status remains implemented,
+not yet accepted.
