@@ -137,6 +137,7 @@ internal sealed partial class D3D12GraphicsDevice
         {
             InjectSchedulingFailure(SchedulingOperation.CloseUpload);
             batch.Commands.Close();
+            if (batch.Destinations.Count == 0) return;
             // Unknown completion remains unresettable if Execute succeeds but Signal fails.
             batch.Fence = ulong.MaxValue;
             InjectSchedulingFailure(SchedulingOperation.ExecuteUpload);

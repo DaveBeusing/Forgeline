@@ -21,7 +21,7 @@ internal static class UploadArenaLimits
         submitted != ulong.MaxValue && submitted <= completed;
 }
 
-internal enum SchedulingOperation { AllocateUpload, MapUpload, CloseUpload, ExecuteUpload, SignalUpload, ExecuteFrame, SignalFrame, Present, Resize, Dispose }
+internal enum SchedulingOperation { AllocateUpload, MapUpload, AllocateDescriptor, CloseUpload, ExecuteUpload, SignalUpload, ExecuteFrame, SignalFrame, Present, Resize, Dispose }
 
 internal readonly record struct UploadArenaDiagnostics(
     int Slots, ulong ResidentBytes, ulong PeakResidentBytes, long Allocations,

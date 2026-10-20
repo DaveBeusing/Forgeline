@@ -647,6 +647,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 lifetime,
                 uploadSize);
 
+            InjectSchedulingFailure(SchedulingOperation.AllocateDescriptor);
             descriptorIndex =
                 _shaderResourceDescriptors.Allocate();
 
