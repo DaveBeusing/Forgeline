@@ -21,6 +21,14 @@ internal sealed class NotificationSurfaceMotion
     private GameplayHudLayout _layout;
 
     internal float Opacity(int index) => index >= 0 && index < _count ? _opacities[index] : 0;
+    // The animated leading edge starts at the safe-area right edge and moves
+    // left. Hit testing continues to use the fully activated live rectangle.
+    internal HudRect EnteringBounds(in HudRect final, int index)
+    {
+        float progress = Math.Clamp(Opacity(index), 0, 1);
+        float leading = final.Width * (1 - progress);
+        return new(final.X + leading, final.Y, final.Width - leading, final.Height);
+    }
     internal int RetiredCount => _retiredCount;
     internal (HudRect Bounds, float Opacity) Retired(int index) =>
         index >= 0 && index < _retiredCount ? (_retired[index].Bounds, _retired[index].Opacity) : default;
