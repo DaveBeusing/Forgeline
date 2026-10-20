@@ -20,7 +20,7 @@ public sealed class GameplayCaptureProfileTests
     public void CompletedGameplayTicksKeepAuthorizedSnapshotsAcrossRenderRatiosAndPausedReads(int renderRatio)
     {
         string? output = Environment.GetEnvironmentVariable("FORGELINE_SNAPSHOT_PROFILE_OUTPUT");
-        int warmup = string.IsNullOrEmpty(output) ? 8 : 32;
+        int warmup = string.IsNullOrEmpty(output) ? 8 : 512;
         int samples = string.IsNullOrEmpty(output) ? 24 : 128;
         var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Gameplay);
         var runtime = CentralDivideScenario.CreateHeadless(settings.Profile, seed: 9147,

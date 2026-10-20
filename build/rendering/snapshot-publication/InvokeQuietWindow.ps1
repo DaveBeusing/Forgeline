@@ -56,16 +56,34 @@ $observer = Start-Job -ArgumentList $rootProcess,$stopPath,$observationsPath -Sc
     }
 }
 $exit = $null
+$commandSucceeded = $false
+$commandFailure = $null
 try {
     & $commandPath
     $exit = $LASTEXITCODE
     if ($exit -ne 0) { throw "Qualification command exited $exit." }
+    $commandSucceeded = $true
+}
+catch {
+    $commandFailure = $_.Exception.GetType().FullName
+    throw
 }
 finally {
     [IO.File]::WriteAllText($stopPath,'stop')
     $observer | Wait-Job | Out-Null
     $result = Receive-Job $observer -ErrorAction Stop
     Remove-Job $observer
-    $result | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $outputPath 'summary.json') -Encoding utf8
+    [ordered]@{
+        qualified=([bool]$result.qualified -and $commandSucceeded)
+        observationsQualified=[bool]$result.qualified
+        commandSucceeded=$commandSucceeded
+        commandExit=$exit
+        commandFailure=$commandFailure
+        samples=$result.samples
+        intervalSeconds=$result.intervalSeconds
+        foreignCpuThresholdSeconds=$result.foreignCpuThresholdSeconds
+        violations=@($result.violations)
+        limitation=$result.limitation
+    } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $outputPath 'summary.json') -Encoding utf8
     if (!$result.qualified) { throw 'Quiet-window observations failed; preserve this cohort as unqualified.' }
 }

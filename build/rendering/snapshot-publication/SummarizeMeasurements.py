@@ -10,14 +10,14 @@ def read(path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
-def summarize(root):
+def summarize(root, gameplay_only=False):
     runs = {}
     for label in ("baseline-a", "candidate-a", "candidate-b", "baseline-b"):
         folder = root / label
         meta = read(folder / "run.json")
         assert meta["profileExit"] == 0
-        assert meta["frameHotpathsExit"] == 0
-        assert meta["combatGroupHotpathsExit"] == 0
+        assert meta["frameHotpathsExit"] == (None if gameplay_only else 0)
+        assert meta["combatGroupHotpathsExit"] == (None if gameplay_only else 0)
         assert meta["tieredCompilation"] in (None, "1"), "Do not hide allocation behavior by disabling tiering."
         profiles = [read(folder / "gameplay" / f"gameplay-ratio-{ratio}.json") for ratio in (1, 3, 7)]
         for profile in profiles:
@@ -41,13 +41,14 @@ def summarize(root):
         row["reusedCombatPayloads"] = {"before": [p["ReusedCombatPayloads"] for p in before], "after": [p["ReusedCombatPayloads"] for p in after]}
         results.append(row)
     files = {str(p.relative_to(root)).replace("\\", "/"): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob("*.json")) if p.name != "summary.json"}
-    return {"schemaVersion": 1, "method": "Sequential baseline/candidate/candidate/baseline with identical real completed gameplay data, runtime assets and probe. CPU/thread bytes only; timing observational; GPU/Present unavailable. Retained index payload excludes snapshot arrays and other engine state.", "results": results, "fileSha256": files}
+    return {"schemaVersion": 1, "benchmarksIncluded": not gameplay_only, "method": "Sequential baseline/candidate/candidate/baseline with identical real completed gameplay data, runtime assets and probe. CPU/thread bytes only; timing observational; GPU/Present unavailable. Retained index payload excludes snapshot arrays and other engine state.", "results": results, "fileSha256": files}
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("root", type=Path)
+    parser.add_argument("--gameplay-only", action="store_true")
     args = parser.parse_args()
-    result = summarize(args.root)
+    result = summarize(args.root, args.gameplay_only)
     (args.root / "summary.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(result["results"], indent=2))

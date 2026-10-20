@@ -8,7 +8,8 @@ param(
     [Parameter(Mandatory)][string]$RuntimeAssets,
     [Parameter(Mandatory)][string]$OutputRoot,
     [string]$BaselineClient,
-    [string]$CandidateClient
+    [string]$CandidateClient,
+    [switch]$GameplayOnly
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -22,14 +23,16 @@ foreach ($label in @('baseline-a','candidate-a','candidate-b','baseline-b')) {
     $before = $label.StartsWith('baseline')
     $source = if ($before) { $baseline } else { $repository }
     $tests = if ($before) { $BaselineTests } else { $CandidateTests }
-    $benchmark = if ($before) { $BaselineBenchmark } else { $CandidateBenchmark }
+    $benchmark = if ($GameplayOnly) { $null } elseif ($before) { $BaselineBenchmark } else { $CandidateBenchmark }
     & "$PSScriptRoot/InvokeMeasurements.ps1" -Repository $source -TestExecutable $tests -RuntimeAssets $runtime -OutputRoot (Join-Path $output $label) -RenderingBenchmark $benchmark
     if ($LASTEXITCODE -ne 0) { throw "CPU cohort failed: $label" }
 }
-& python "$PSScriptRoot/SummarizeMeasurements.py" $output *> (Join-Path $output 'summary.txt')
+[string[]]$summaryOptions = if ($GameplayOnly) { @('--gameplay-only') } else { @() }
+& python "$PSScriptRoot/SummarizeMeasurements.py" $output @summaryOptions *> (Join-Path $output 'summary.txt')
 if ($LASTEXITCODE -ne 0) { throw 'Equal-work summary failed.' }
 if ([bool]$BaselineClient -ne [bool]$CandidateClient) { throw 'Provide both native clients, or neither.' }
 if ($BaselineClient) {
+    if ($GameplayOnly) { throw 'Gameplay-only comparison does not run native capture.' }
     $probeRelative = 'tests/ForgeLine.Client.Tests/SnapshotPublication/GameplayCaptureProfileTests.cs'
     $probe = Join-Path $baseline $probeRelative
     if ((Get-FileHash -LiteralPath $probe).Hash -ne (Get-FileHash -LiteralPath (Join-Path $repository $probeRelative)).Hash) { throw 'Baseline probe differs.' }
