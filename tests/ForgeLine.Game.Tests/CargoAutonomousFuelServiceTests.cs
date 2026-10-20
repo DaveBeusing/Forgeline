@@ -73,6 +73,17 @@ public sealed class CargoAutonomousFuelServiceTests
         Assert.Equal(40, f.Inventories.GetReservedQuantity(f.ProviderInventory, ResourceIds.Steel));
         Assert.Equal(0, f.Inventories.GetQuantity(f.CargoInventory, ResourceIds.Steel));
         Assert.Equal(120, f.Inventories.GetQuantity(f.DriveInventory, ResourceIds.Fuel), 5);
+
+        for (int tick = 0; tick < 6000 &&
+             f.Simulation.Entities.HasComponent<CargoTransportOrder>(f.Truck); tick++)
+            f.Simulation.AdvanceOneTick();
+
+        Assert.False(f.Simulation.Entities.HasComponent<CargoTransportOrder>(f.Truck));
+        Assert.False(f.Simulation.Entities.HasComponent<CargoFuelServiceState>(f.Truck));
+        Assert.Equal(40, f.Inventories.GetQuantity(destinationInventory, ResourceIds.Steel));
+        Assert.Equal(0, f.Inventories.GetQuantity(f.CargoInventory, ResourceIds.Steel));
+        Assert.Equal(0, f.Inventories.GetReservedQuantity(f.ProviderInventory, ResourceIds.Steel));
+        Assert.Equal(1, f.Cargo.Metrics.CompletedOrderCount);
     }
 
     [Fact]
