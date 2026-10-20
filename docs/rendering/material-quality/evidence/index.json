@@ -43,6 +43,16 @@
       "redacted": true
     },
     {
+      "artifact": "ci-final-failure.log",
+      "originalSha256": "54e47f6fe1d788dc02c9d5b404433126952d2e4b83e53ca714d4868c641ef5b6",
+      "retainedSha256": "54e47f6fe1d788dc02c9d5b404433126952d2e4b83e53ca714d4868c641ef5b6",
+      "storedSha256": "780b904885a601ea7c585e3a64af0f80e12ecdfc8c97fc5519c7dbfa6c0d9478",
+      "object": "objects/54e47f6fe1d788dc02c9d5b404433126952d2e4b83e53ca714d4868c641ef5b6.gz",
+      "originalBytes": 7501,
+      "retainedBytes": 7501,
+      "redacted": false
+    },
+    {
       "artifact": "conservative-build.log",
       "originalSha256": "7c1dc7e3511abce7f3e08e49e870100327c6d0fa9714bc857c6be3f57e9fb9ff",
       "retainedSha256": "c734ef2a408141368c9e27cb224da3b5afdd9e5139ef620dac8066746c12ab3e",
@@ -174,12 +184,12 @@
     },
     {
       "artifact": "final-status.json",
-      "originalSha256": "269ad7a7b22752f8b4e73cb3b696a71e6d1d24a2fbf9f56dc5ca42441638c79b",
-      "retainedSha256": "269ad7a7b22752f8b4e73cb3b696a71e6d1d24a2fbf9f56dc5ca42441638c79b",
-      "storedSha256": "ab603a9e45e9379bacd5142a39542e62c5dec3e68901f409f1f4550f9cb2218d",
-      "object": "objects/269ad7a7b22752f8b4e73cb3b696a71e6d1d24a2fbf9f56dc5ca42441638c79b.gz",
-      "originalBytes": 695,
-      "retainedBytes": 695,
+      "originalSha256": "851a017f40088ddd07a85cd82af793b2dbe17423b93ae8225997dd779593c758",
+      "retainedSha256": "851a017f40088ddd07a85cd82af793b2dbe17423b93ae8225997dd779593c758",
+      "storedSha256": "c99ab2e20a1edc682e1f62bd72e7d007156a93ee62eafcc69ee994ed078f9aac",
+      "object": "objects/851a017f40088ddd07a85cd82af793b2dbe17423b93ae8225997dd779593c758.gz",
+      "originalBytes": 737,
+      "retainedBytes": 737,
       "redacted": false
     },
     {
@@ -1990,6 +2000,16 @@
       "object": "objects/66f070b04091c498d78ef3ea6320bbc94b97d0caac355392a8b46893a3df0294.gz",
       "originalBytes": 180335,
       "retainedBytes": 180335,
+      "redacted": false
+    },
+    {
+      "artifact": "serial-factory-proposal-tests.log",
+      "originalSha256": "6dbbd783590148359cd3a0fb4db86a991c22098cdba30fb8da3524dd620df22b",
+      "retainedSha256": "6dbbd783590148359cd3a0fb4db86a991c22098cdba30fb8da3524dd620df22b",
+      "storedSha256": "8a9ae330976c9dda9dbeac9a6a0c16ee5e4fa7daaf44a9f05f59e2e6cf0dc494",
+      "object": "objects/6dbbd783590148359cd3a0fb4db86a991c22098cdba30fb8da3524dd620df22b.gz",
+      "originalBytes": 1525,
+      "retainedBytes": 1525,
       "redacted": false
     },
     {

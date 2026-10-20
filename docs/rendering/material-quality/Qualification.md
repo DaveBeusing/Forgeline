@@ -148,3 +148,18 @@ CI was in progress when the draft was created; no green CI claim is made.
 Remaining gates are the strict CPU/GPU timings, baseline gameplay failures,
 final CI and separate human material/shadow-contact decisions. No merge, tag or
 release is performed. See [reproduction](Reproduction.md) and [review](Review.md).
+
+## Current CI stop and prepared serial correction
+
+The final published CI run fails in `test_pipeline_factories_are_mechanically_identical_to_the_frozen_baseline`:
+its full-source comparison rejects the authorized private HLSL implementation
+changes before later checks run. This is a new explicit CI blocker, separate
+from the five known Game failures. The older master CI outcomes do not describe
+this earlier stop. The contradictory full-source freeze should have been found
+in the pre-check.
+
+A [two-file serial correction](SerialContractReview.md) is fully prepared and
+passes nine tests as a copy, preserving historical hashes and current shader
+interfaces. The shared test and Contracts paragraph remain untouched pending
+explicit scope approval. No hash fixture, image golden, threshold or workflow
+is changed. The implementation remains draft/not accepted.
