@@ -3,6 +3,7 @@
 import hashlib
 import io
 import json
+from contextlib import redirect_stdout
 from pathlib import Path
 import subprocess
 import tempfile
@@ -18,6 +19,86 @@ CANDIDATE = "b" * 40
 
 
 class ReadinessTests(unittest.TestCase):
+    def run_admission(self, inventory_token, inventory_status=200, workflow_token="example-ci-read-token"):
+        requests = []
+
+        def respond(request, timeout):
+            requests.append((request.full_url, request.get_method(), request.get_header("Authorization")))
+            url = readiness.urllib.parse.urlsplit(request.full_url)
+            if url.path.endswith("/actions/workflows/ci.yml/runs"):
+                source = readiness.urllib.parse.parse_qs(url.query)["head_sha"][0]
+                payload = {"workflow_runs": [{"id": 1, "head_sha": source, "path": ".github/workflows/ci.yml",
+                           "created_at": "2026-01-01T00:00:00Z", "status": "completed", "conclusion": "success"}]}
+            elif url.path == f"/repos/{readiness.REPOSITORY}/actions/runners":
+                if inventory_status != 200:
+                    raise urllib.error.HTTPError(request.full_url, inventory_status, "Forbidden", {}, None)
+                payload = {"runners": [{"id": 12, "status": "online", "busy": False,
+                           "labels": [{"name": label} for label in readiness.REQUIRED_LABELS]}]}
+            else:
+                self.fail("Unexpected readiness API resource")
+            return io.BytesIO(json.dumps(payload).encode())
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "readiness.json"
+            github_output = root / "github-output.txt"
+            environment = {"GITHUB_TOKEN": workflow_token, "FORGELINE_RUNNER_INVENTORY_TOKEN": inventory_token,
+                           "GITHUB_SHA": SOURCE, "GITHUB_OUTPUT": str(github_output),
+                           "QUALIFICATION_BASELINE_SHA": SOURCE, "QUALIFICATION_CANDIDATE_SHA": CANDIDATE,
+                           "QUALIFICATION_HARDWARE_SHA256": "c" * 64}
+            printed = io.StringIO()
+            with patch.dict(readiness.os.environ, environment, clear=True), \
+                    patch("sys.argv", ["check_readiness.py", "--output", str(output), "--root", str(root)]), \
+                    patch.object(readiness, "trusted_sources"), \
+                    patch.object(readiness, "hardware_evidence", return_value={"capacityMinutes": 600}), \
+                    patch.object(readiness.urllib.request, "urlopen", side_effect=respond), redirect_stdout(printed):
+                code = readiness.main()
+            result = json.loads(output.read_text())
+            persisted = "\n".join(path.read_text() for path in root.iterdir())
+            for token in (inventory_token, workflow_token):
+                if token:
+                    self.assertNotIn(token, printed.getvalue())
+                    self.assertNotIn(token, persisted)
+            self.assertEqual(f"eligible={str(result['eligible']).lower()}\n", github_output.read_text())
+            return code, result, requests
+
+    def test_missing_inventory_credential_stays_open_without_inventory_request(self):
+        code, result, requests = self.run_admission("")
+        self.assertEqual(3, code)
+        self.assertFalse(result["eligible"])
+        self.assertIn("FORGELINE_RUNNER_INVENTORY_TOKEN is not configured", result["reasons"][0])
+        self.assertIn("Administration: read", result["reasons"][0])
+        self.assertTrue(requests)
+        self.assertTrue(all("/actions/workflows/ci.yml/runs?" in url for url, _, _ in requests))
+
+    def test_inventory_403_stays_open_without_persisting_either_credential(self):
+        code, result, requests = self.run_admission("example-inventory-read-token", inventory_status=403)
+        self.assertEqual(3, code)
+        self.assertFalse(result["eligible"])
+        self.assertIn("actions/runners returned HTTP 403", result["reasons"][0])
+        self.assertEqual("Bearer example-inventory-read-token", requests[-1][2])
+
+    def test_admission_uses_distinct_ci_and_inventory_credentials(self):
+        code, result, requests = self.run_admission("example-inventory-read-token")
+        self.assertEqual(0, code)
+        self.assertTrue(result["eligible"])
+        self.assertEqual("pending-execution", result["nativeQualification"])
+        self.assertEqual(3, len(requests))
+        for url, method, authorization in requests:
+            self.assertEqual("GET", method)
+            if "/actions/workflows/ci.yml/runs?" in url:
+                self.assertEqual("Bearer example-ci-read-token", authorization)
+            else:
+                self.assertTrue(url.startswith(f"https://api.github.com/repos/{readiness.REPOSITORY}/actions/runners?"))
+                self.assertEqual("Bearer example-inventory-read-token", authorization)
+
+    def test_inventory_credential_never_substitutes_for_missing_ci_token(self):
+        code, result, requests = self.run_admission("example-inventory-read-token", workflow_token="")
+        self.assertEqual(3, code)
+        self.assertFalse(result["eligible"])
+        self.assertIn("workflow token is unavailable", result["reasons"][0])
+        self.assertEqual([], requests)
+
     def test_pr_and_noncanonical_repository_never_reach_git(self):
         with patch.object(readiness.subprocess, "run") as run:
             for repository, event, ref in (
@@ -89,7 +170,7 @@ class ReadinessTests(unittest.TestCase):
             calibration.write_text('{"raw":[1,2,3]}', encoding="utf-8")
             value = {"schemaVersion": 1, "status": "qualified", "reviewer": "Owner",
                      "reviewedAtUtc": "2026-01-01T00:00:00Z", "rationale": "Stable paired calibration retained",
-                     "hardwareIdentitySha256": "c" * 64, "serialGpu": True, "capacityMinutes": 660,
+                     "hardwareIdentitySha256": "c" * 64, "serialGpu": True, "capacityMinutes": 600,
                      "maximumRegressionPercent": 15, "powerPlan": "Balanced", "powerSource": "ac",
                      "thermalState": "stable", "qualificationRuns": [
                          {"path": "series.json", "sha256": hashlib.sha256(calibration.read_bytes()).hexdigest()}]}
@@ -97,14 +178,14 @@ class ReadinessTests(unittest.TestCase):
             review.write_text(json.dumps(value), encoding="utf-8")
             relative = review.relative_to(root).as_posix()
             digest = hashlib.sha256(review.read_bytes()).hexdigest()
-            self.assertEqual(660, readiness.hardware_evidence(root, relative, digest)["capacityMinutes"])
+            self.assertEqual(600, readiness.hardware_evidence(root, relative, digest)["capacityMinutes"])
             calibration.write_text('{"raw":[1,2,0]}', encoding="utf-8")
             with self.assertRaisesRegex(readiness.ReadinessError, "Calibration evidence digest"):
                 readiness.hardware_evidence(root, relative, digest)
             with self.assertRaisesRegex(readiness.ReadinessError, "evidence digest"):
                 readiness.hardware_evidence(root, relative, "d" * 64)
             for change in ({"schemaVersion": True}, {"qualificationRuns": []}, {"status": "pending"}, {"serialGpu": False},
-                           {"capacityMinutes": 0}, {"capacityMinutes": True}, {"capacityMinutes": 661},
+                           {"capacityMinutes": 0}, {"capacityMinutes": True}, {"capacityMinutes": 601},
                            {"capacityMinutes": 600.5}, {"maximumRegressionPercent": 16},
                            {"powerSource": "battery"}, {"thermalState": "unknown"},
                            {"reviewedAtUtc": "2200-01-01T00:00:00Z"}, {"reviewedAtUtc": "2026-01-01"}):

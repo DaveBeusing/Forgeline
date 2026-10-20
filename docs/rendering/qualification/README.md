@@ -253,10 +253,8 @@ mandatory `ci.yml` result for each exact source and the trusted workflow source,
 following pagination. It then requires an idle online runner with all four labels:
 `self-hosted`, `Windows`, `X64`, `forgeline-performance`. An inaccessible inventory,
 missing evidence, failed CI or untrusted source leaves admission open and prevents
-scheduling. The inventory endpoint may require permissions unavailable to the
-read-only workflow token; this workflow does not add a secret or install a runner
-to bypass that limitation. Availability can change after admission, so an admitted
-job is still not proof of completed execution.
+scheduling. Availability can change after admission, so an admitted job is still
+not proof of completed execution.
 
 Native execution uses read-only permissions and checkout without persisted
 credentials. PR events never schedule self-hosted execution. The dedicated
@@ -264,12 +262,43 @@ credentials. PR events never schedule self-hosted execution. The dedicated
 `--require-accepted` preserves every unresolved mandatory gate in the workflow
 outcome, and available attempt files are uploaded even after failure.
 
-The native workflow admits a reviewed integral capture capacity of at most 660
-minutes within its 720-minute job. Setup/build must finish within the reserved
-60 minutes; otherwise collection does not start. These limits stop an attempt
-that cannot fit its declared matrix; they never reduce that matrix. Local native
-execution can use a separately reviewed capacity within the script's supported
-limits.
+The native workflow admits a reviewed integral capture capacity of at most 600
+minutes within its 720-minute job. Setup/build must finish within 60 minutes;
+another 60 minutes remain for final reporting and artifact upload. Otherwise
+collection does not start. These limits stop an attempt that cannot fit its
+declared matrix; they never reduce that matrix. Local native execution can use a
+separately reviewed capacity within the script's supported limits.
+
+### Runner inventory credential
+
+GitHub's [repository runner-list API](https://docs.github.com/en/rest/actions/self-hosted-runners#list-self-hosted-runners-for-a-repository)
+requires repository **Administration: read**. That permission is absent from the
+[available `GITHUB_TOKEN` permissions](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions);
+`actions: read` cannot authorize this endpoint. Main-CI history requests continue
+to use the ordinary workflow token with `actions: read`.
+
+An authorized repository administrator can configure the optional repository
+Actions secret **`FORGELINE_RUNNER_INVENTORY_TOKEN`** with a fine-grained personal
+access token limited to `DaveBeusing/Forgeline` and repository
+**Administration: read**, plus GitHub's mandatory Metadata read access. This
+inventory token needs no Contents, Actions or write permission. A separately
+managed GitHub App installation token restricted to the same repository and
+read permission also works; this workflow does not mint installation tokens.
+GitHub documents these options under
+[additional workflow-token permissions](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token#granting-additional-permissions).
+
+Only the hosted readiness step for a trusted manual `master` dispatch receives
+this secret. `check_readiness.py` uses it only for paginated
+`GET /repos/DaveBeusing/Forgeline/actions/runners` requests. It is not passed to
+checkout, native collection or the self-hosted job, and its value is neither
+printed nor written to reports, artifacts or persisted credentials. An absent
+secret or a rejected inventory request leaves admission **OPEN** and prevents
+native scheduling. There is no fallback to a broader token or assumed runner.
+
+This change does not create or modify a repository secret, install a GitHub App
+or configure a runner. The separately documented blocked connector request
+remains the only inventory evidence from the baseline pre-check; no successful
+inventory request or credential provisioning is claimed.
 
 ## Contract checks
 

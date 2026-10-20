@@ -180,6 +180,7 @@ jobs:
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          FORGELINE_RUNNER_INVENTORY_TOKEN: ${{ secrets.FORGELINE_RUNNER_INVENTORY_TOKEN }}
           QUALIFICATION_BASELINE_SHA: ${{ inputs.baseline_sha }}
           QUALIFICATION_CANDIDATE_SHA: ${{ inputs.candidate_sha }}
           QUALIFICATION_HARDWARE_EVIDENCE: ${{ inputs.hardware_evidence_path }}
@@ -292,8 +293,8 @@ jobs:
           $hardware = Join-Path (Get-Location) $env:QUALIFICATION_HARDWARE_EVIDENCE
           $capacity = (Get-Content $hardware -Raw | ConvertFrom-Json).capacityMinutes
           $setupMinutes = ([DateTimeOffset]::UtcNow - [DateTimeOffset]::Parse($env:QUALIFICATION_JOB_START_UTC)).TotalMinutes
-          if ($setupMinutes -gt 60 -or $capacity -gt 660) {
-            throw 'The declared full capture no longer fits the admitted 720-minute job; no matrix reduction is permitted.'
+          if ($setupMinutes -gt 60 -or $capacity -gt 600) {
+            throw 'The declared full capture cannot preserve 60 minutes for reporting/upload within the 720-minute job; no matrix reduction is permitted.'
           }
           pwsh -NoProfile -File build/rendering/qualification/Invoke-RenderQualification.ps1 -AnalysisMasterSource $env:GITHUB_SHA -BaselineRoot "$env:GITHUB_WORKSPACE/qualification-baseline" -CandidateRoot "$env:GITHUB_WORKSPACE/qualification-candidate" -BaselineSource $env:QUALIFICATION_BASELINE_SHA -CandidateSource $env:QUALIFICATION_CANDIDATE_SHA -BaselinePackageRoot "$env:GITHUB_WORKSPACE/qualification-baseline/artifacts/qualification-package/win-x64/publish" -CandidatePackageRoot "$env:GITHUB_WORKSPACE/qualification-candidate/artifacts/qualification-package/win-x64/publish" -OutputRoot "$env:QUALIFICATION_OUTPUT_ROOT/capture" -Repetitions 5 -WarmSamples 512 -ColdSamples 128 -Warmups 64 -CapacityMinutes $capacity -ComparisonKind $env:QUALIFICATION_COMPARISON_KIND -HardwareQualificationEvidence $hardware
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

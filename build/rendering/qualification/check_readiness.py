@@ -18,7 +18,7 @@ import urllib.request
 
 REPOSITORY = "DaveBeusing/Forgeline"
 REQUIRED_LABELS = frozenset(("self-hosted", "windows", "x64", "forgeline-performance"))
-MAX_WORKFLOW_CAPTURE_MINUTES = 660
+MAX_WORKFLOW_CAPTURE_MINUTES = 600
 SHA = re.compile(r"[0-9a-f]{40}")
 DIGEST = re.compile(r"[0-9a-f]{64}")
 
@@ -105,7 +105,8 @@ def hardware_evidence(root: Path, relative: str, digest: str) -> dict[str, objec
     require(type(capacity) in (int, float) and math.isfinite(capacity) and capacity > 0,
             "A finite positive runner-capacity qualification is required.")
     require(type(capacity) is int and capacity <= MAX_WORKFLOW_CAPTURE_MINUTES,
-            "This workflow requires integral capture capacity of at most 660 minutes, reserving 60 minutes for setup/build in its 720-minute job.")
+            "This workflow requires integral capture capacity of at most 600 minutes, reserving 60 minutes for setup/build "
+            "and 60 minutes for final reporting/artifact upload in its 720-minute job.")
     require(value.get("serialGpu") is True and value.get("powerSource") == "ac"
             and value.get("thermalState") == "stable"
             and type(value.get("maximumRegressionPercent")) in (int, float)
@@ -159,7 +160,7 @@ def latest_ci(runs: list[dict[str, object]], sha: str) -> dict[str, object]:
 
 class GitHub:
     def __init__(self, token: str):
-        require(bool(token), "Read-only GitHub token is unavailable; runner inventory is unverified.")
+        require(bool(token), "Read-only GitHub workflow token is unavailable; required CI is unverified.")
         self.token = token
 
     def pages(self, resource: str, key: str) -> list[dict[str, object]]:
@@ -189,6 +190,13 @@ class GitHub:
         raise ReadinessError("Readiness pagination limit reached; incomplete inventory cannot admit a run.")
 
 
+def read_runner_inventory(token: str) -> list[dict[str, object]]:
+    require(bool(token), "FORGELINE_RUNNER_INVENTORY_TOKEN is not configured; repository Administration: read "
+            "is required for runner inventory. Native admission stays open.")
+    # This separate credential is used only for the fixed repository's read-only inventory endpoint.
+    return GitHub(token).pages("actions/runners", "runners")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
@@ -215,7 +223,7 @@ def main() -> int:
                 {field: run.get(field) for field in ("id", "head_sha", "status", "conclusion", "path", "event", "run_attempt", "created_at", "html_url")}
                 for run in runs]})
             latest_ci(runs, source)
-        runners = api.pages("actions/runners", "runners")
+        runners = read_runner_inventory(os.environ.get("FORGELINE_RUNNER_INVENTORY_TOKEN", ""))
         result["eligibleRunners"] = eligible_runners(runners)
         require(bool(result["eligibleRunners"]), "No idle online runner with all required physical-GPU labels was verified.")
         result["eligible"] = True
