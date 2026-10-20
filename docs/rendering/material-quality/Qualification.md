@@ -165,3 +165,25 @@ for all six final image pairs at version 0.1.424. The [approval record](evidence
 binds these decisions to the measured production source and image hashes. It
 waives neither strict timing failures nor the five baseline Game failures.
 The implementation remains draft/not accepted.
+
+## Follow-up final source ef83d2d5
+
+- Full clean isolated Release build: zero warnings/errors, 5m06.10s.
+- Complete local Game suite: 621 passed, zero failures/skips.
+- Hosted full solution: 3,127 total, 3,110 passed, zero failed, 17 skipped.
+- Main CI 39481874522 and frame/scalability/movement checks pass.
+- Two-opponent full-match validation ends normally at tick 55,210
+  (Victory, CommandCoreDestroyed), within its unchanged 80,000-tick bound.
+- Four-core original submission-pool control reproduces 8,486,912 bytes;
+  repaired source passes all 21 safety tests. Six analysis-boundary tests pass.
+- Twelve final fixed images are byte-identical to the owner's approved six
+  images across both cohorts; recovery-image-equivalence.json records hashes.
+- Ordinary-path Release build: zero warnings/errors, 2m37.06s.
+- Ordinary-path native smoke passes (exit 0): High, 2560x1440, zero fallback meshes,
+  zero pending retirements; audio failures/dropped blocks zero.
+- Native timing remains NOT ACCEPTED: responsive A/A has 17 exceedances, final
+  world/shadow pairs 18 and final full-client pairs 103. No thresholds are waived.
+
+All logs, raw timings, monitors, protocol/source identities and image hashes are
+retained through evidence/index.json. Historical failed runs remain distinct.
+This PR remains draft while native timing qualification is open.

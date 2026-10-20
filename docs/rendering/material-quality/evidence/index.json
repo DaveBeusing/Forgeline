@@ -43,6 +43,16 @@
       "redacted": true
     },
     {
+      "artifact": "ci-contract-correction-cancelled.log",
+      "originalSha256": "bf7b8c3fe858609ff4d217dfb79e36d67efb5654d7c21a45dd69cfb82fbc6087",
+      "retainedSha256": "bf7b8c3fe858609ff4d217dfb79e36d67efb5654d7c21a45dd69cfb82fbc6087",
+      "storedSha256": "3e061e776d110912e347805256dcdf09fcda08af6af3eb23bb66e33fdb1d9e27",
+      "object": "objects/bf7b8c3fe858609ff4d217dfb79e36d67efb5654d7c21a45dd69cfb82fbc6087.gz",
+      "originalBytes": 10396409,
+      "retainedBytes": 10396409,
+      "redacted": false
+    },
+    {
       "artifact": "ci-final-failure.log",
       "originalSha256": "54e47f6fe1d788dc02c9d5b404433126952d2e4b83e53ca714d4868c641ef5b6",
       "retainedSha256": "54e47f6fe1d788dc02c9d5b404433126952d2e4b83e53ca714d4868c641ef5b6",
@@ -51,6 +61,26 @@
       "originalBytes": 7501,
       "retainedBytes": 7501,
       "redacted": false
+    },
+    {
+      "artifact": "ci-recovery-checks.log",
+      "originalSha256": "43b060b2f1d7209f21367ebd03004e5c8ca30b45f7f201ac74e0f4d86361b5d8",
+      "retainedSha256": "43b060b2f1d7209f21367ebd03004e5c8ca30b45f7f201ac74e0f4d86361b5d8",
+      "storedSha256": "b5926e530ac2ad3368144fd2b2847c0897f1ef52f6a375c32d67b076b7a1555a",
+      "object": "objects/43b060b2f1d7209f21367ebd03004e5c8ca30b45f7f201ac74e0f4d86361b5d8.gz",
+      "originalBytes": 551,
+      "retainedBytes": 551,
+      "redacted": false
+    },
+    {
+      "artifact": "ci-recovery-ef83.log",
+      "originalSha256": "920e027b05916c4b5076b0527b63c1d5f100c17174b4a55a5fd9a761eae17453",
+      "retainedSha256": "fc52b457563469f747adbc41b89467875bf73789f4ad1dd0b61f33068f631d3c",
+      "storedSha256": "2935d51826d061991341f6519c67fb0331b5389e2b8a5ee1245a7da796457127",
+      "object": "objects/fc52b457563469f747adbc41b89467875bf73789f4ad1dd0b61f33068f631d3c.gz",
+      "originalBytes": 11409975,
+      "retainedBytes": 11409964,
+      "redacted": true
     },
     {
       "artifact": "conservative-build.log",
@@ -133,6 +163,16 @@
       "redacted": false
     },
     {
+      "artifact": "development-assets.jsonl",
+      "originalSha256": "21c667f9d48a291506211a6edc3dd15924585eb1ef2d1c8201afd2fbef222ef1",
+      "retainedSha256": "f47a575753ff8100dc561f70c04042e31b9a7b6148526d14c1b6d52a30e971bb",
+      "storedSha256": "e36da8b250c26c10e68a4f90d9db3ed059cbc1c42049e030050e9b2c8129050f",
+      "object": "objects/f47a575753ff8100dc561f70c04042e31b9a7b6148526d14c1b6d52a30e971bb.gz",
+      "originalBytes": 2142223,
+      "retainedBytes": 2113712,
+      "redacted": true
+    },
+    {
       "artifact": "development-assets.log",
       "originalSha256": "689097884dd02407093075c784f728ab326eeefa43b02209026edcd746811364",
       "retainedSha256": "13c1c47fd76e7f22288bc332c8f79ca1e0b65bab9a910626ac2a44cac7ac6862",
@@ -191,6 +231,166 @@
       "originalBytes": 818,
       "retainedBytes": 818,
       "redacted": false
+    },
+    {
+      "artifact": "followup-status.json",
+      "originalSha256": "5b40a566843f72980f96c2e52bd554433cb85dda5338a07341d8557e781d7e48",
+      "retainedSha256": "5b40a566843f72980f96c2e52bd554433cb85dda5338a07341d8557e781d7e48",
+      "storedSha256": "9fabd5261b45568ad05c22fb568d4af64ec2f66d77f30e6c40a79b6bd193eea0",
+      "object": "objects/5b40a566843f72980f96c2e52bd554433cb85dda5338a07341d8557e781d7e48.gz",
+      "originalBytes": 2433,
+      "retainedBytes": 2433,
+      "redacted": false
+    },
+    {
+      "artifact": "gameplay-bootstrap-repair-tests.log",
+      "originalSha256": "a92b9a3ea6b054efa8d2d849092fccfd8caedc33aea7a1dc7b3639da8d837400",
+      "retainedSha256": "0c1044653fa481336df82c6c39f71df5ecc71aebd84a5e3707df5dea51d5313b",
+      "storedSha256": "927149f0ea8191a0ba10e92c7aded5a9aa4c74f25d43372fb168374f9ce83a4c",
+      "object": "objects/0c1044653fa481336df82c6c39f71df5ecc71aebd84a5e3707df5dea51d5313b.gz",
+      "originalBytes": 15646,
+      "retainedBytes": 15616,
+      "redacted": true
+    },
+    {
+      "artifact": "gameplay-dock-diagnostic.log",
+      "originalSha256": "a4a48a65be83bbecb6d5701e559d5034cfec99fb02057fbc149c8b77a0eb80c5",
+      "retainedSha256": "89101abfa786e2683a900f2844f74fffccace4c08789f4f588a670c8e5559efe",
+      "storedSha256": "d5561abb0a56bccad0ba6558487524c8fd9209ad4a19dbd5ba0ab6589b248daa",
+      "object": "objects/89101abfa786e2683a900f2844f74fffccace4c08789f4f588a670c8e5559efe.gz",
+      "originalBytes": 8860,
+      "retainedBytes": 8840,
+      "redacted": true
+    },
+    {
+      "artifact": "gameplay-focused-fixtures-build.log",
+      "originalSha256": "a0478aaa04b8a009fbed013b42e93cce582b666f4788c7721a5af7ec6c943e3e",
+      "retainedSha256": "e70a010e74db0ce2b9130e80047eebfd9facfe3ec1938aa2e5f6dc0bf0682047",
+      "storedSha256": "f54114e9e6e8864f40a61d7c8764909944420e596b48c08b580a36dcfa0f53cb",
+      "object": "objects/e70a010e74db0ce2b9130e80047eebfd9facfe3ec1938aa2e5f6dc0bf0682047.gz",
+      "originalBytes": 1918,
+      "retainedBytes": 1853,
+      "redacted": true
+    },
+    {
+      "artifact": "gameplay-focused-fixtures-start-attempt.log",
+      "originalSha256": "6827eae328d70ca84a78691da6325b0ceb1d627409708ea96df007a1044972cc",
+      "retainedSha256": "0a48763baf186978ef9e143402c39def6de02c5c5da76f4b765fa4ec0763a41c",
+      "storedSha256": "967236eb27719f8344aebdb65d2b813989a6b8795d87dec4aa39d9b965ac1491",
+      "object": "objects/0a48763baf186978ef9e143402c39def6de02c5c5da76f4b765fa4ec0763a41c.gz",
+      "originalBytes": 466,
+      "retainedBytes": 461,
+      "redacted": true
+    },
+    {
+      "artifact": "gameplay-focused-fixtures-tests.log",
+      "originalSha256": "d043ff4be734bd795f6729806f5785e3230b562fc1159abbdfb65b5d84fc7a7e",
+      "retainedSha256": "917ce598057fc2bee9710aa3b81f0dc02a79ef06fcb951d5c11cb15059200b61",
+      "storedSha256": "104fb9b3c4b35e39dffe6aefeacf931d4f0bbf46dbbc3a63f7b5011518e30101",
+      "object": "objects/917ce598057fc2bee9710aa3b81f0dc02a79ef06fcb951d5c11cb15059200b61.gz",
+      "originalBytes": 434,
+      "retainedBytes": 424,
+      "redacted": true
+    },
+    {
+      "artifact": "gameplay-funding-probe/build.log",
+      "originalSha256": "be7da52cd7d1df296cfb22738bb1a9432898b23f3df3592ce69c75494fc53f85",
+      "retainedSha256": "4587c2f4afe2b807b01df4d47b488359085036e56335037262100a6c6efc5127",
+      "storedSha256": "fe20044ea93e4912336f5b57ae41f8ed50856d884d790d65c45879993c379709",
+      "object": "objects/4587c2f4afe2b807b01df4d47b488359085036e56335037262100a6c6efc5127.gz",
+      "originalBytes": 430,
+      "retainedBytes": 420,
+      "redacted": true
+    },
+    {
+      "artifact": "gameplay-funding-timeline.jsonl",
+      "originalSha256": "7ae313e6766606e6440ab145f1cc2bdd0cd1343d852fde9068affa48db6d0b54",
+      "retainedSha256": "7ae313e6766606e6440ab145f1cc2bdd0cd1343d852fde9068affa48db6d0b54",
+      "storedSha256": "900fceaf69620e41c59aae62ff40f75a446e9075a659a227d3b6c1aeac6f4bbc",
+      "object": "objects/7ae313e6766606e6440ab145f1cc2bdd0cd1343d852fde9068affa48db6d0b54.gz",
+      "originalBytes": 221212,
+      "retainedBytes": 221212,
+      "redacted": false
+    },
+    {
+      "artifact": "gameplay-funding-timeline.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "gameplay-recovery-probe/build.log",
+      "originalSha256": "ae155052f0ed392cc7d96a17e8944cf3d368b7de34c1c3651406b083f3c4db1a",
+      "retainedSha256": "888f2b300b1d97398eb588de2499d78d9e0f6609f876d2a262e5a29dffe3494f",
+      "storedSha256": "1b568e7b6f0a7708aef32c8d25f47822c744996adab300c4be476f6eed278776",
+      "object": "objects/888f2b300b1d97398eb588de2499d78d9e0f6609f876d2a262e5a29dffe3494f.gz",
+      "originalBytes": 1329,
+      "retainedBytes": 1304,
+      "redacted": true
+    },
+    {
+      "artifact": "gameplay-recovery-probe-v2/build.log",
+      "originalSha256": "c9b47e400b16472b53c33f2cec513be5967df00a055464bd47aa3c367ddb2bf3",
+      "retainedSha256": "99cb50b4eeabbf4943738b7696dee9d1de7fa12db495cc513447691d0a751b49",
+      "storedSha256": "97f7f7a8179f9d1e2be086062509a9c2b054bde146ba204450334cc664afb34d",
+      "object": "objects/99cb50b4eeabbf4943738b7696dee9d1de7fa12db495cc513447691d0a751b49.gz",
+      "originalBytes": 438,
+      "retainedBytes": 428,
+      "redacted": true
+    },
+    {
+      "artifact": "gameplay-recovery-timeline-summary.log",
+      "originalSha256": "44e59569c89335992b4153d3d65f6f597714c436399d635edca3194524ba05ad",
+      "retainedSha256": "44e59569c89335992b4153d3d65f6f597714c436399d635edca3194524ba05ad",
+      "storedSha256": "37eea607f67e715b869560ceccf673417778f7063c65bf336cf34ba1993fd462",
+      "object": "objects/44e59569c89335992b4153d3d65f6f597714c436399d635edca3194524ba05ad.gz",
+      "originalBytes": 11519,
+      "retainedBytes": 11519,
+      "redacted": false
+    },
+    {
+      "artifact": "gameplay-recovery-timeline.jsonl",
+      "originalSha256": "d5f7dcfb1843ca1a5898a902517a872ed2f4a412294effc9627cb340df0bc8b1",
+      "retainedSha256": "d5f7dcfb1843ca1a5898a902517a872ed2f4a412294effc9627cb340df0bc8b1",
+      "storedSha256": "27ca0f81bd7d1af9e14934c4dbd07c6fba761a4645e0ca9099d46cfaff9ceffb",
+      "object": "objects/d5f7dcfb1843ca1a5898a902517a872ed2f4a412294effc9627cb340df0bc8b1.gz",
+      "originalBytes": 234357,
+      "retainedBytes": 234357,
+      "redacted": false
+    },
+    {
+      "artifact": "gameplay-recovery-timeline.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "gameplay-repair-focused.log",
+      "originalSha256": "3de5725ddfb3058d30eafc688ae4f609d35f63447a79539f8875171da6294a97",
+      "retainedSha256": "147bf938ee4cf6f3779f0c72b5ac5d9a2c6e899bfc98c524e2d9ac327e8c27c1",
+      "storedSha256": "a0dcd577be7b090e820cdfc1cc47ac9deefeda4f23cf538ea9c6489124669865",
+      "object": "objects/147bf938ee4cf6f3779f0c72b5ac5d9a2c6e899bfc98c524e2d9ac327e8c27c1.gz",
+      "originalBytes": 391,
+      "retainedBytes": 381,
+      "redacted": true
+    },
+    {
+      "artifact": "gameplay-repair-long-scenarios.log",
+      "originalSha256": "408ed4e9dd34065528a173d95ed3459f761911a7763cef1a2d8a29643252fad1",
+      "retainedSha256": "d44a5d5d2e8c13dbad84905c11a3c99938adefce989b1eefccc4c04fc92e51d8",
+      "storedSha256": "61b37e0240f4668943ad77edbddf72fd9769847acfa8a78f0e2e7b54569abda6",
+      "object": "objects/d44a5d5d2e8c13dbad84905c11a3c99938adefce989b1eefccc4c04fc92e51d8.gz",
+      "originalBytes": 11541,
+      "retainedBytes": 11511,
+      "redacted": true
     },
     {
       "artifact": "master-ci-failure.log",
@@ -1813,6 +2013,1006 @@
       "redacted": true
     },
     {
+      "artifact": "native-recovery/after-1-fixed/IndustrialBase-1920x1080-High-CloseTactical.png",
+      "originalSha256": "13a9bb36106e1cad2d22ae011dfc03b0c924306b3ef326b8f071b13e5aa85e99",
+      "retainedSha256": "13a9bb36106e1cad2d22ae011dfc03b0c924306b3ef326b8f071b13e5aa85e99",
+      "storedSha256": "13a9bb36106e1cad2d22ae011dfc03b0c924306b3ef326b8f071b13e5aa85e99",
+      "object": "objects/13a9bb36106e1cad2d22ae011dfc03b0c924306b3ef326b8f071b13e5aa85e99.png",
+      "originalBytes": 4501852,
+      "retainedBytes": 4501852,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-fixed/IndustrialBase-1920x1080-High-NormalGameplay.png",
+      "originalSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "retainedSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "storedSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "object": "objects/34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae.png",
+      "originalBytes": 4873749,
+      "retainedBytes": 4873749,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-fixed/IndustrialBase-1920x1080-High-Strategic.png",
+      "originalSha256": "5b4e5f65ec837250af8137e8be6f706c81e22b4706ac8466ff33f4396368e011",
+      "retainedSha256": "5b4e5f65ec837250af8137e8be6f706c81e22b4706ac8466ff33f4396368e011",
+      "storedSha256": "5b4e5f65ec837250af8137e8be6f706c81e22b4706ac8466ff33f4396368e011",
+      "object": "objects/5b4e5f65ec837250af8137e8be6f706c81e22b4706ac8466ff33f4396368e011.png",
+      "originalBytes": 4723494,
+      "retainedBytes": 4723494,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-fixed/MainBattleTankProduction-1920x1080-High-CloseTactical.png",
+      "originalSha256": "510c55b2f6d79193b52625560c371dab11a606e0f1a89a445bf5a744d17bf359",
+      "retainedSha256": "510c55b2f6d79193b52625560c371dab11a606e0f1a89a445bf5a744d17bf359",
+      "storedSha256": "510c55b2f6d79193b52625560c371dab11a606e0f1a89a445bf5a744d17bf359",
+      "object": "objects/510c55b2f6d79193b52625560c371dab11a606e0f1a89a445bf5a744d17bf359.png",
+      "originalBytes": 4463573,
+      "retainedBytes": 4463573,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-fixed/MainBattleTankProduction-1920x1080-High-NormalGameplay.png",
+      "originalSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "retainedSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "storedSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "object": "objects/24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5.png",
+      "originalBytes": 4855448,
+      "retainedBytes": 4855448,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-fixed/MainBattleTankProduction-1920x1080-High-Strategic.png",
+      "originalSha256": "d19411e1a5faf1c5631894581a78f2c055fa1bebec3a53a2718d2682c311cd95",
+      "retainedSha256": "d19411e1a5faf1c5631894581a78f2c055fa1bebec3a53a2718d2682c311cd95",
+      "storedSha256": "d19411e1a5faf1c5631894581a78f2c055fa1bebec3a53a2718d2682c311cd95",
+      "object": "objects/d19411e1a5faf1c5631894581a78f2c055fa1bebec3a53a2718d2682c311cd95.png",
+      "originalBytes": 4714786,
+      "retainedBytes": 4714786,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-fixed/manifest.json",
+      "originalSha256": "8c56e1ec94218b87c62426f26c2748e7696cba32dec94a885774cddc3a608aa3",
+      "retainedSha256": "8c56e1ec94218b87c62426f26c2748e7696cba32dec94a885774cddc3a608aa3",
+      "storedSha256": "5fa0a3f71d476d9d1f71a720ba5ffa77099b63a4c4b618fcf4ab48e74a5457c6",
+      "object": "objects/8c56e1ec94218b87c62426f26c2748e7696cba32dec94a885774cddc3a608aa3.gz",
+      "originalBytes": 9614136,
+      "retainedBytes": 9614136,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-fixed.request.json",
+      "originalSha256": "dcfefa39e2101bfd5c943a2623122423ec69fe890cd53f942b80dfdab85bd211",
+      "retainedSha256": "57b24587c904c40efbb3496f928c837388341f7c3c1b49ccece1733206cad0e5",
+      "storedSha256": "7387db3b949866dafe3fdeed57f213f8cb50de01b014d74492dd76b0bffe4ed8",
+      "object": "objects/57b24587c904c40efbb3496f928c837388341f7c3c1b49ccece1733206cad0e5.gz",
+      "originalBytes": 1221,
+      "retainedBytes": 1207,
+      "redacted": true
+    },
+    {
+      "artifact": "native-recovery/after-1-fixed.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-fixed.stdout.log",
+      "originalSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "retainedSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "storedSha256": "7fe7aa6fb1dd9ce7e991d089f67fa067e9367e789962448732e2fad7f99df4fe",
+      "object": "objects/ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7.gz",
+      "originalBytes": 925,
+      "retainedBytes": 925,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep/IndustrialBase-1920x1080-High-NormalGameplay-Sweep.png",
+      "originalSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "retainedSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "storedSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "object": "objects/34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae.png",
+      "originalBytes": 4873749,
+      "retainedBytes": 4873749,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep/IndustrialBase-1920x1080-Low-NormalGameplay-Sweep.png",
+      "originalSha256": "74e820b456e221555137497dd16cc3caf62907403a051ea221bb18eb326d8b58",
+      "retainedSha256": "74e820b456e221555137497dd16cc3caf62907403a051ea221bb18eb326d8b58",
+      "storedSha256": "74e820b456e221555137497dd16cc3caf62907403a051ea221bb18eb326d8b58",
+      "object": "objects/74e820b456e221555137497dd16cc3caf62907403a051ea221bb18eb326d8b58.png",
+      "originalBytes": 5214149,
+      "retainedBytes": 5214149,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep/IndustrialBase-1920x1080-Medium-NormalGameplay-Sweep.png",
+      "originalSha256": "6f7f673541e246713c1d29f105980d2015292716d99f66baf62a9616f22d9818",
+      "retainedSha256": "6f7f673541e246713c1d29f105980d2015292716d99f66baf62a9616f22d9818",
+      "storedSha256": "6f7f673541e246713c1d29f105980d2015292716d99f66baf62a9616f22d9818",
+      "object": "objects/6f7f673541e246713c1d29f105980d2015292716d99f66baf62a9616f22d9818.png",
+      "originalBytes": 4875729,
+      "retainedBytes": 4875729,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep/IndustrialBase-1920x1080-Ultra-NormalGameplay-Sweep.png",
+      "originalSha256": "cedf5e305cc5a988a8bcabbd87e0d2f608f50bca8245fe8da9d830b04f0e9004",
+      "retainedSha256": "cedf5e305cc5a988a8bcabbd87e0d2f608f50bca8245fe8da9d830b04f0e9004",
+      "storedSha256": "cedf5e305cc5a988a8bcabbd87e0d2f608f50bca8245fe8da9d830b04f0e9004",
+      "object": "objects/cedf5e305cc5a988a8bcabbd87e0d2f608f50bca8245fe8da9d830b04f0e9004.png",
+      "originalBytes": 4874585,
+      "retainedBytes": 4874585,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep/MainBattleTankProduction-1920x1080-High-NormalGameplay-Sweep.png",
+      "originalSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "retainedSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "storedSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "object": "objects/24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5.png",
+      "originalBytes": 4855448,
+      "retainedBytes": 4855448,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep/MainBattleTankProduction-1920x1080-Low-NormalGameplay-Sweep.png",
+      "originalSha256": "8d96a7438b6726feb8b1c2a4a99ab8c0cc8b152c875ab537b4600dd1b243a063",
+      "retainedSha256": "8d96a7438b6726feb8b1c2a4a99ab8c0cc8b152c875ab537b4600dd1b243a063",
+      "storedSha256": "8d96a7438b6726feb8b1c2a4a99ab8c0cc8b152c875ab537b4600dd1b243a063",
+      "object": "objects/8d96a7438b6726feb8b1c2a4a99ab8c0cc8b152c875ab537b4600dd1b243a063.png",
+      "originalBytes": 5198097,
+      "retainedBytes": 5198097,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep/MainBattleTankProduction-1920x1080-Medium-NormalGameplay-Sweep.png",
+      "originalSha256": "89b12d635f276f3458de3e1c5a3b08a65ce74c2eca2f37bcf41dbf7cdab6b495",
+      "retainedSha256": "89b12d635f276f3458de3e1c5a3b08a65ce74c2eca2f37bcf41dbf7cdab6b495",
+      "storedSha256": "89b12d635f276f3458de3e1c5a3b08a65ce74c2eca2f37bcf41dbf7cdab6b495",
+      "object": "objects/89b12d635f276f3458de3e1c5a3b08a65ce74c2eca2f37bcf41dbf7cdab6b495.png",
+      "originalBytes": 4857797,
+      "retainedBytes": 4857797,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep/MainBattleTankProduction-1920x1080-Ultra-NormalGameplay-Sweep.png",
+      "originalSha256": "40a70806fea62ad3fa8c46d11f8fe9d5a59691186ce63f10e081ea11c339ee69",
+      "retainedSha256": "40a70806fea62ad3fa8c46d11f8fe9d5a59691186ce63f10e081ea11c339ee69",
+      "storedSha256": "40a70806fea62ad3fa8c46d11f8fe9d5a59691186ce63f10e081ea11c339ee69",
+      "object": "objects/40a70806fea62ad3fa8c46d11f8fe9d5a59691186ce63f10e081ea11c339ee69.png",
+      "originalBytes": 4856199,
+      "retainedBytes": 4856199,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep/manifest.json",
+      "originalSha256": "a17313ba49d799331d45cb1f4711caaf1ff4b02afd96338488be9b221c6e90a5",
+      "retainedSha256": "a17313ba49d799331d45cb1f4711caaf1ff4b02afd96338488be9b221c6e90a5",
+      "storedSha256": "2ab7224dfe532fa442ac78a218bf1772cd205943396fc46868f8ce114a530bb8",
+      "object": "objects/a17313ba49d799331d45cb1f4711caaf1ff4b02afd96338488be9b221c6e90a5.gz",
+      "originalBytes": 12821104,
+      "retainedBytes": 12821104,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep.request.json",
+      "originalSha256": "7d3450c38f065a696b70dff320228f4257b1e5d84a6f0d6c2c2647df610d8a3e",
+      "retainedSha256": "2939df13b8a9c5ff87f6b6201d5702c052cbf14261ae94e060d3fb8c0e7b308a",
+      "storedSha256": "131b6ec633e6e541a524309aa6d656798ca2dd43c2c5bcc7870d44a12aa252d4",
+      "object": "objects/2939df13b8a9c5ff87f6b6201d5702c052cbf14261ae94e060d3fb8c0e7b308a.gz",
+      "originalBytes": 1222,
+      "retainedBytes": 1208,
+      "redacted": true
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-1-sweep.stdout.log",
+      "originalSha256": "8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570",
+      "retainedSha256": "8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570",
+      "storedSha256": "2c3bb9f29c6d53c9f1983a88771e04c8e6f7dcfc8bfd0e007ef3cd94f571f792",
+      "object": "objects/8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570.gz",
+      "originalBytes": 1131,
+      "retainedBytes": 1131,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed/IndustrialBase-1920x1080-High-CloseTactical.png",
+      "originalSha256": "13a9bb36106e1cad2d22ae011dfc03b0c924306b3ef326b8f071b13e5aa85e99",
+      "retainedSha256": "13a9bb36106e1cad2d22ae011dfc03b0c924306b3ef326b8f071b13e5aa85e99",
+      "storedSha256": "13a9bb36106e1cad2d22ae011dfc03b0c924306b3ef326b8f071b13e5aa85e99",
+      "object": "objects/13a9bb36106e1cad2d22ae011dfc03b0c924306b3ef326b8f071b13e5aa85e99.png",
+      "originalBytes": 4501852,
+      "retainedBytes": 4501852,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed/IndustrialBase-1920x1080-High-NormalGameplay.png",
+      "originalSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "retainedSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "storedSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "object": "objects/34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae.png",
+      "originalBytes": 4873749,
+      "retainedBytes": 4873749,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed/IndustrialBase-1920x1080-High-Strategic.png",
+      "originalSha256": "5b4e5f65ec837250af8137e8be6f706c81e22b4706ac8466ff33f4396368e011",
+      "retainedSha256": "5b4e5f65ec837250af8137e8be6f706c81e22b4706ac8466ff33f4396368e011",
+      "storedSha256": "5b4e5f65ec837250af8137e8be6f706c81e22b4706ac8466ff33f4396368e011",
+      "object": "objects/5b4e5f65ec837250af8137e8be6f706c81e22b4706ac8466ff33f4396368e011.png",
+      "originalBytes": 4723494,
+      "retainedBytes": 4723494,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed/MainBattleTankProduction-1920x1080-High-CloseTactical.png",
+      "originalSha256": "510c55b2f6d79193b52625560c371dab11a606e0f1a89a445bf5a744d17bf359",
+      "retainedSha256": "510c55b2f6d79193b52625560c371dab11a606e0f1a89a445bf5a744d17bf359",
+      "storedSha256": "510c55b2f6d79193b52625560c371dab11a606e0f1a89a445bf5a744d17bf359",
+      "object": "objects/510c55b2f6d79193b52625560c371dab11a606e0f1a89a445bf5a744d17bf359.png",
+      "originalBytes": 4463573,
+      "retainedBytes": 4463573,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed/MainBattleTankProduction-1920x1080-High-NormalGameplay.png",
+      "originalSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "retainedSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "storedSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "object": "objects/24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5.png",
+      "originalBytes": 4855448,
+      "retainedBytes": 4855448,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed/MainBattleTankProduction-1920x1080-High-Strategic.png",
+      "originalSha256": "d19411e1a5faf1c5631894581a78f2c055fa1bebec3a53a2718d2682c311cd95",
+      "retainedSha256": "d19411e1a5faf1c5631894581a78f2c055fa1bebec3a53a2718d2682c311cd95",
+      "storedSha256": "d19411e1a5faf1c5631894581a78f2c055fa1bebec3a53a2718d2682c311cd95",
+      "object": "objects/d19411e1a5faf1c5631894581a78f2c055fa1bebec3a53a2718d2682c311cd95.png",
+      "originalBytes": 4714786,
+      "retainedBytes": 4714786,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed/manifest.json",
+      "originalSha256": "16b6dffa3abe3e21a2a4ee0c4d7234582af19ee3b66189deb54c1a43e6edfae3",
+      "retainedSha256": "16b6dffa3abe3e21a2a4ee0c4d7234582af19ee3b66189deb54c1a43e6edfae3",
+      "storedSha256": "411310a2e53e253d43082f8e996013b1f2fc2023601d82a1cefffec83970bbf8",
+      "object": "objects/16b6dffa3abe3e21a2a4ee0c4d7234582af19ee3b66189deb54c1a43e6edfae3.gz",
+      "originalBytes": 9616059,
+      "retainedBytes": 9616059,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed.request.json",
+      "originalSha256": "406dfe7f1aa734411603c091c5b85622db803a861f5c5321ae8ef7bf741c1852",
+      "retainedSha256": "5913a5ccd11b45f21730f20f55468eb7d03457c52eca34c4d4550bf015300db8",
+      "storedSha256": "a5de61852f3da051f16df0d9e6f1e48133de95afba72667ff13d3e08f4ce0603",
+      "object": "objects/5913a5ccd11b45f21730f20f55468eb7d03457c52eca34c4d4550bf015300db8.gz",
+      "originalBytes": 1221,
+      "retainedBytes": 1207,
+      "redacted": true
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-fixed.stdout.log",
+      "originalSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "retainedSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "storedSha256": "7fe7aa6fb1dd9ce7e991d089f67fa067e9367e789962448732e2fad7f99df4fe",
+      "object": "objects/ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7.gz",
+      "originalBytes": 925,
+      "retainedBytes": 925,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep/IndustrialBase-1920x1080-High-NormalGameplay-Sweep.png",
+      "originalSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "retainedSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "storedSha256": "34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae",
+      "object": "objects/34d6d0b624af6974597b9ba8490d7505a2b5ef4da4d2ddd998215a29d0dd7bae.png",
+      "originalBytes": 4873749,
+      "retainedBytes": 4873749,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep/IndustrialBase-1920x1080-Low-NormalGameplay-Sweep.png",
+      "originalSha256": "74e820b456e221555137497dd16cc3caf62907403a051ea221bb18eb326d8b58",
+      "retainedSha256": "74e820b456e221555137497dd16cc3caf62907403a051ea221bb18eb326d8b58",
+      "storedSha256": "74e820b456e221555137497dd16cc3caf62907403a051ea221bb18eb326d8b58",
+      "object": "objects/74e820b456e221555137497dd16cc3caf62907403a051ea221bb18eb326d8b58.png",
+      "originalBytes": 5214149,
+      "retainedBytes": 5214149,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep/IndustrialBase-1920x1080-Medium-NormalGameplay-Sweep.png",
+      "originalSha256": "6f7f673541e246713c1d29f105980d2015292716d99f66baf62a9616f22d9818",
+      "retainedSha256": "6f7f673541e246713c1d29f105980d2015292716d99f66baf62a9616f22d9818",
+      "storedSha256": "6f7f673541e246713c1d29f105980d2015292716d99f66baf62a9616f22d9818",
+      "object": "objects/6f7f673541e246713c1d29f105980d2015292716d99f66baf62a9616f22d9818.png",
+      "originalBytes": 4875729,
+      "retainedBytes": 4875729,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep/IndustrialBase-1920x1080-Ultra-NormalGameplay-Sweep.png",
+      "originalSha256": "cedf5e305cc5a988a8bcabbd87e0d2f608f50bca8245fe8da9d830b04f0e9004",
+      "retainedSha256": "cedf5e305cc5a988a8bcabbd87e0d2f608f50bca8245fe8da9d830b04f0e9004",
+      "storedSha256": "cedf5e305cc5a988a8bcabbd87e0d2f608f50bca8245fe8da9d830b04f0e9004",
+      "object": "objects/cedf5e305cc5a988a8bcabbd87e0d2f608f50bca8245fe8da9d830b04f0e9004.png",
+      "originalBytes": 4874585,
+      "retainedBytes": 4874585,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep/MainBattleTankProduction-1920x1080-High-NormalGameplay-Sweep.png",
+      "originalSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "retainedSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "storedSha256": "24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5",
+      "object": "objects/24447bb490912e759628e67f069cb9564bcff769d2dfa41e4189ccefffd73ad5.png",
+      "originalBytes": 4855448,
+      "retainedBytes": 4855448,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep/MainBattleTankProduction-1920x1080-Low-NormalGameplay-Sweep.png",
+      "originalSha256": "8d96a7438b6726feb8b1c2a4a99ab8c0cc8b152c875ab537b4600dd1b243a063",
+      "retainedSha256": "8d96a7438b6726feb8b1c2a4a99ab8c0cc8b152c875ab537b4600dd1b243a063",
+      "storedSha256": "8d96a7438b6726feb8b1c2a4a99ab8c0cc8b152c875ab537b4600dd1b243a063",
+      "object": "objects/8d96a7438b6726feb8b1c2a4a99ab8c0cc8b152c875ab537b4600dd1b243a063.png",
+      "originalBytes": 5198097,
+      "retainedBytes": 5198097,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep/MainBattleTankProduction-1920x1080-Medium-NormalGameplay-Sweep.png",
+      "originalSha256": "89b12d635f276f3458de3e1c5a3b08a65ce74c2eca2f37bcf41dbf7cdab6b495",
+      "retainedSha256": "89b12d635f276f3458de3e1c5a3b08a65ce74c2eca2f37bcf41dbf7cdab6b495",
+      "storedSha256": "89b12d635f276f3458de3e1c5a3b08a65ce74c2eca2f37bcf41dbf7cdab6b495",
+      "object": "objects/89b12d635f276f3458de3e1c5a3b08a65ce74c2eca2f37bcf41dbf7cdab6b495.png",
+      "originalBytes": 4857797,
+      "retainedBytes": 4857797,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep/MainBattleTankProduction-1920x1080-Ultra-NormalGameplay-Sweep.png",
+      "originalSha256": "40a70806fea62ad3fa8c46d11f8fe9d5a59691186ce63f10e081ea11c339ee69",
+      "retainedSha256": "40a70806fea62ad3fa8c46d11f8fe9d5a59691186ce63f10e081ea11c339ee69",
+      "storedSha256": "40a70806fea62ad3fa8c46d11f8fe9d5a59691186ce63f10e081ea11c339ee69",
+      "object": "objects/40a70806fea62ad3fa8c46d11f8fe9d5a59691186ce63f10e081ea11c339ee69.png",
+      "originalBytes": 4856199,
+      "retainedBytes": 4856199,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep/manifest.json",
+      "originalSha256": "d4ee4b90629bf855dc6e5ffadf711451833a61947cc5aeb54f12d9b106e9ac22",
+      "retainedSha256": "d4ee4b90629bf855dc6e5ffadf711451833a61947cc5aeb54f12d9b106e9ac22",
+      "storedSha256": "79bcbd2ee9cd196a0678dfe20cff54c5348c77f18c3ecd4c86e3e47580396419",
+      "object": "objects/d4ee4b90629bf855dc6e5ffadf711451833a61947cc5aeb54f12d9b106e9ac22.gz",
+      "originalBytes": 12806277,
+      "retainedBytes": 12806277,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep.request.json",
+      "originalSha256": "8b01882d09c36a31cc09fe21973dd1472ecb84acfe84d3ea5e66a9ebc56060b6",
+      "retainedSha256": "545934cf2b3073a6cb1356a9e90e2fd98e686eba2d6432ca082d0569f8b08754",
+      "storedSha256": "9939eddb4dfc2f7f9108cd25fc55e3b9a8a337c5247fd9f9bb7d6ecf784e9222",
+      "object": "objects/545934cf2b3073a6cb1356a9e90e2fd98e686eba2d6432ca082d0569f8b08754.gz",
+      "originalBytes": 1222,
+      "retainedBytes": 1208,
+      "redacted": true
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/after-2-sweep.stdout.log",
+      "originalSha256": "8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570",
+      "retainedSha256": "8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570",
+      "storedSha256": "2c3bb9f29c6d53c9f1983a88771e04c8e6f7dcfc8bfd0e007ef3cd94f571f792",
+      "object": "objects/8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570.gz",
+      "originalBytes": 1131,
+      "retainedBytes": 1131,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed/IndustrialBase-1920x1080-High-CloseTactical.png",
+      "originalSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "retainedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "storedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "object": "objects/555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f.png",
+      "originalBytes": 4500953,
+      "retainedBytes": 4500953,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed/IndustrialBase-1920x1080-High-NormalGameplay.png",
+      "originalSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "retainedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "storedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "object": "objects/54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c.png",
+      "originalBytes": 4873619,
+      "retainedBytes": 4873619,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed/IndustrialBase-1920x1080-High-Strategic.png",
+      "originalSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "retainedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "storedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "object": "objects/0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264.png",
+      "originalBytes": 4722585,
+      "retainedBytes": 4722585,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed/MainBattleTankProduction-1920x1080-High-CloseTactical.png",
+      "originalSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "retainedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "storedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "object": "objects/c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320.png",
+      "originalBytes": 4464188,
+      "retainedBytes": 4464188,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed/MainBattleTankProduction-1920x1080-High-NormalGameplay.png",
+      "originalSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "retainedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "storedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "object": "objects/f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0.png",
+      "originalBytes": 4856289,
+      "retainedBytes": 4856289,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed/MainBattleTankProduction-1920x1080-High-Strategic.png",
+      "originalSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "retainedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "storedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "object": "objects/573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a.png",
+      "originalBytes": 4714892,
+      "retainedBytes": 4714892,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed/manifest.json",
+      "originalSha256": "b635f996c0ddd99c4b20806dbb07a00b5a291c94407d6ae2b42af0b74202f292",
+      "retainedSha256": "b635f996c0ddd99c4b20806dbb07a00b5a291c94407d6ae2b42af0b74202f292",
+      "storedSha256": "bbdf4d51004cb7e19145a40a476628d81dabea8e0982f516c032e0ae64e00968",
+      "object": "objects/b635f996c0ddd99c4b20806dbb07a00b5a291c94407d6ae2b42af0b74202f292.gz",
+      "originalBytes": 9616338,
+      "retainedBytes": 9616338,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed.request.json",
+      "originalSha256": "e78e7e8d64d69698fd0105c1165231f89636de7c9a04feda381154ac74c10fc9",
+      "retainedSha256": "b37657c677d740d5ad12274923c4f05a8be8b5140fd533b629bf22c6ad943420",
+      "storedSha256": "b87a5b4067024ca9e780b5bec7e05e6faf192234a50a22557c663f46185c0983",
+      "object": "objects/b37657c677d740d5ad12274923c4f05a8be8b5140fd533b629bf22c6ad943420.gz",
+      "originalBytes": 1222,
+      "retainedBytes": 1208,
+      "redacted": true
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-fixed.stdout.log",
+      "originalSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "retainedSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "storedSha256": "7fe7aa6fb1dd9ce7e991d089f67fa067e9367e789962448732e2fad7f99df4fe",
+      "object": "objects/ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7.gz",
+      "originalBytes": 925,
+      "retainedBytes": 925,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep/IndustrialBase-1920x1080-High-NormalGameplay-Sweep.png",
+      "originalSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "retainedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "storedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "object": "objects/54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c.png",
+      "originalBytes": 4873619,
+      "retainedBytes": 4873619,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep/IndustrialBase-1920x1080-Low-NormalGameplay-Sweep.png",
+      "originalSha256": "9654e300bb01bccb3e2d1b73db9060ee85e98f39ea74c2907e4b0f973198e919",
+      "retainedSha256": "9654e300bb01bccb3e2d1b73db9060ee85e98f39ea74c2907e4b0f973198e919",
+      "storedSha256": "9654e300bb01bccb3e2d1b73db9060ee85e98f39ea74c2907e4b0f973198e919",
+      "object": "objects/9654e300bb01bccb3e2d1b73db9060ee85e98f39ea74c2907e4b0f973198e919.png",
+      "originalBytes": 5214118,
+      "retainedBytes": 5214118,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep/IndustrialBase-1920x1080-Medium-NormalGameplay-Sweep.png",
+      "originalSha256": "b2196f621ae1b5c990273cb0f100c45131af3e31d6474dc8434ac0b1f2239081",
+      "retainedSha256": "b2196f621ae1b5c990273cb0f100c45131af3e31d6474dc8434ac0b1f2239081",
+      "storedSha256": "b2196f621ae1b5c990273cb0f100c45131af3e31d6474dc8434ac0b1f2239081",
+      "object": "objects/b2196f621ae1b5c990273cb0f100c45131af3e31d6474dc8434ac0b1f2239081.png",
+      "originalBytes": 4875882,
+      "retainedBytes": 4875882,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep/IndustrialBase-1920x1080-Ultra-NormalGameplay-Sweep.png",
+      "originalSha256": "46ce6c064aea73476496db167a605ebc79328923bd3661e7b0b342e036efeb93",
+      "retainedSha256": "46ce6c064aea73476496db167a605ebc79328923bd3661e7b0b342e036efeb93",
+      "storedSha256": "46ce6c064aea73476496db167a605ebc79328923bd3661e7b0b342e036efeb93",
+      "object": "objects/46ce6c064aea73476496db167a605ebc79328923bd3661e7b0b342e036efeb93.png",
+      "originalBytes": 4874943,
+      "retainedBytes": 4874943,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep/MainBattleTankProduction-1920x1080-High-NormalGameplay-Sweep.png",
+      "originalSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "retainedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "storedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "object": "objects/f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0.png",
+      "originalBytes": 4856289,
+      "retainedBytes": 4856289,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep/MainBattleTankProduction-1920x1080-Low-NormalGameplay-Sweep.png",
+      "originalSha256": "7ef2f42da208cea4ac976449ee90ea1009dad30d011f8b42d3302220b2f90cad",
+      "retainedSha256": "7ef2f42da208cea4ac976449ee90ea1009dad30d011f8b42d3302220b2f90cad",
+      "storedSha256": "7ef2f42da208cea4ac976449ee90ea1009dad30d011f8b42d3302220b2f90cad",
+      "object": "objects/7ef2f42da208cea4ac976449ee90ea1009dad30d011f8b42d3302220b2f90cad.png",
+      "originalBytes": 5198440,
+      "retainedBytes": 5198440,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep/MainBattleTankProduction-1920x1080-Medium-NormalGameplay-Sweep.png",
+      "originalSha256": "90136f9002899e035fc07ae4eccdec534fed7cdf1bd19f7cf039a0e5ff34cb30",
+      "retainedSha256": "90136f9002899e035fc07ae4eccdec534fed7cdf1bd19f7cf039a0e5ff34cb30",
+      "storedSha256": "90136f9002899e035fc07ae4eccdec534fed7cdf1bd19f7cf039a0e5ff34cb30",
+      "object": "objects/90136f9002899e035fc07ae4eccdec534fed7cdf1bd19f7cf039a0e5ff34cb30.png",
+      "originalBytes": 4857942,
+      "retainedBytes": 4857942,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep/MainBattleTankProduction-1920x1080-Ultra-NormalGameplay-Sweep.png",
+      "originalSha256": "c54351da22136b07dbe63c6ec547aa5f94b964d0228e791e29eb26496204faad",
+      "retainedSha256": "c54351da22136b07dbe63c6ec547aa5f94b964d0228e791e29eb26496204faad",
+      "storedSha256": "c54351da22136b07dbe63c6ec547aa5f94b964d0228e791e29eb26496204faad",
+      "object": "objects/c54351da22136b07dbe63c6ec547aa5f94b964d0228e791e29eb26496204faad.png",
+      "originalBytes": 4856484,
+      "retainedBytes": 4856484,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep/manifest.json",
+      "originalSha256": "6178c8e3954206a081870d10d884c2ddd0ff163ad75593171ae6c2515b4f6996",
+      "retainedSha256": "6178c8e3954206a081870d10d884c2ddd0ff163ad75593171ae6c2515b4f6996",
+      "storedSha256": "96adc3916085bd3110db5b7766a82b5848e26b4620fc10830985ad0e08dbf6e3",
+      "object": "objects/6178c8e3954206a081870d10d884c2ddd0ff163ad75593171ae6c2515b4f6996.gz",
+      "originalBytes": 12819436,
+      "retainedBytes": 12819436,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep.request.json",
+      "originalSha256": "103c0b2831774ca3a27e02bfe928e8e1f10ae4ce5e77909aa9bdde48c98a7000",
+      "retainedSha256": "948a5969b6164da9fb4d9e70d7fcf7107ba12610bf19d2bd47c9b06fb35d47ec",
+      "storedSha256": "7e3c82cc08093ca6ff0d2a89a0d36661a69f15cf587bb7984ee0f49732b3a839",
+      "object": "objects/948a5969b6164da9fb4d9e70d7fcf7107ba12610bf19d2bd47c9b06fb35d47ec.gz",
+      "originalBytes": 1223,
+      "retainedBytes": 1209,
+      "redacted": true
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-1-sweep.stdout.log",
+      "originalSha256": "8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570",
+      "retainedSha256": "8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570",
+      "storedSha256": "2c3bb9f29c6d53c9f1983a88771e04c8e6f7dcfc8bfd0e007ef3cd94f571f792",
+      "object": "objects/8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570.gz",
+      "originalBytes": 1131,
+      "retainedBytes": 1131,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed/IndustrialBase-1920x1080-High-CloseTactical.png",
+      "originalSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "retainedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "storedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "object": "objects/555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f.png",
+      "originalBytes": 4500953,
+      "retainedBytes": 4500953,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed/IndustrialBase-1920x1080-High-NormalGameplay.png",
+      "originalSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "retainedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "storedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "object": "objects/54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c.png",
+      "originalBytes": 4873619,
+      "retainedBytes": 4873619,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed/IndustrialBase-1920x1080-High-Strategic.png",
+      "originalSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "retainedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "storedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "object": "objects/0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264.png",
+      "originalBytes": 4722585,
+      "retainedBytes": 4722585,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed/MainBattleTankProduction-1920x1080-High-CloseTactical.png",
+      "originalSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "retainedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "storedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "object": "objects/c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320.png",
+      "originalBytes": 4464188,
+      "retainedBytes": 4464188,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed/MainBattleTankProduction-1920x1080-High-NormalGameplay.png",
+      "originalSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "retainedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "storedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "object": "objects/f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0.png",
+      "originalBytes": 4856289,
+      "retainedBytes": 4856289,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed/MainBattleTankProduction-1920x1080-High-Strategic.png",
+      "originalSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "retainedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "storedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "object": "objects/573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a.png",
+      "originalBytes": 4714892,
+      "retainedBytes": 4714892,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed/manifest.json",
+      "originalSha256": "968d0798fe98ea90c844a55f9640c91cacf93acb194fedfcee66cbca147064e4",
+      "retainedSha256": "968d0798fe98ea90c844a55f9640c91cacf93acb194fedfcee66cbca147064e4",
+      "storedSha256": "d5673d5716d3282c0866cacf61229d21ae1edf4ec21bc3652a76899ac30b8ebf",
+      "object": "objects/968d0798fe98ea90c844a55f9640c91cacf93acb194fedfcee66cbca147064e4.gz",
+      "originalBytes": 9611321,
+      "retainedBytes": 9611321,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed.request.json",
+      "originalSha256": "32e84a1c7c28b69698474090ce218484348e20e41a9283da761329538befa7cd",
+      "retainedSha256": "8f75de8692d578c058eef13701b43594ce4eda0dfdcd0edca20089386432df6f",
+      "storedSha256": "7ebc5ede695bd1a0a1eef788968ab240c0dae5321c824234380208e9d4332554",
+      "object": "objects/8f75de8692d578c058eef13701b43594ce4eda0dfdcd0edca20089386432df6f.gz",
+      "originalBytes": 1222,
+      "retainedBytes": 1208,
+      "redacted": true
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-fixed.stdout.log",
+      "originalSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "retainedSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "storedSha256": "7fe7aa6fb1dd9ce7e991d089f67fa067e9367e789962448732e2fad7f99df4fe",
+      "object": "objects/ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7.gz",
+      "originalBytes": 925,
+      "retainedBytes": 925,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep/IndustrialBase-1920x1080-High-NormalGameplay-Sweep.png",
+      "originalSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "retainedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "storedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "object": "objects/54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c.png",
+      "originalBytes": 4873619,
+      "retainedBytes": 4873619,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep/IndustrialBase-1920x1080-Low-NormalGameplay-Sweep.png",
+      "originalSha256": "9654e300bb01bccb3e2d1b73db9060ee85e98f39ea74c2907e4b0f973198e919",
+      "retainedSha256": "9654e300bb01bccb3e2d1b73db9060ee85e98f39ea74c2907e4b0f973198e919",
+      "storedSha256": "9654e300bb01bccb3e2d1b73db9060ee85e98f39ea74c2907e4b0f973198e919",
+      "object": "objects/9654e300bb01bccb3e2d1b73db9060ee85e98f39ea74c2907e4b0f973198e919.png",
+      "originalBytes": 5214118,
+      "retainedBytes": 5214118,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep/IndustrialBase-1920x1080-Medium-NormalGameplay-Sweep.png",
+      "originalSha256": "b2196f621ae1b5c990273cb0f100c45131af3e31d6474dc8434ac0b1f2239081",
+      "retainedSha256": "b2196f621ae1b5c990273cb0f100c45131af3e31d6474dc8434ac0b1f2239081",
+      "storedSha256": "b2196f621ae1b5c990273cb0f100c45131af3e31d6474dc8434ac0b1f2239081",
+      "object": "objects/b2196f621ae1b5c990273cb0f100c45131af3e31d6474dc8434ac0b1f2239081.png",
+      "originalBytes": 4875882,
+      "retainedBytes": 4875882,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep/IndustrialBase-1920x1080-Ultra-NormalGameplay-Sweep.png",
+      "originalSha256": "46ce6c064aea73476496db167a605ebc79328923bd3661e7b0b342e036efeb93",
+      "retainedSha256": "46ce6c064aea73476496db167a605ebc79328923bd3661e7b0b342e036efeb93",
+      "storedSha256": "46ce6c064aea73476496db167a605ebc79328923bd3661e7b0b342e036efeb93",
+      "object": "objects/46ce6c064aea73476496db167a605ebc79328923bd3661e7b0b342e036efeb93.png",
+      "originalBytes": 4874943,
+      "retainedBytes": 4874943,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep/MainBattleTankProduction-1920x1080-High-NormalGameplay-Sweep.png",
+      "originalSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "retainedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "storedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "object": "objects/f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0.png",
+      "originalBytes": 4856289,
+      "retainedBytes": 4856289,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep/MainBattleTankProduction-1920x1080-Low-NormalGameplay-Sweep.png",
+      "originalSha256": "7ef2f42da208cea4ac976449ee90ea1009dad30d011f8b42d3302220b2f90cad",
+      "retainedSha256": "7ef2f42da208cea4ac976449ee90ea1009dad30d011f8b42d3302220b2f90cad",
+      "storedSha256": "7ef2f42da208cea4ac976449ee90ea1009dad30d011f8b42d3302220b2f90cad",
+      "object": "objects/7ef2f42da208cea4ac976449ee90ea1009dad30d011f8b42d3302220b2f90cad.png",
+      "originalBytes": 5198440,
+      "retainedBytes": 5198440,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep/MainBattleTankProduction-1920x1080-Medium-NormalGameplay-Sweep.png",
+      "originalSha256": "90136f9002899e035fc07ae4eccdec534fed7cdf1bd19f7cf039a0e5ff34cb30",
+      "retainedSha256": "90136f9002899e035fc07ae4eccdec534fed7cdf1bd19f7cf039a0e5ff34cb30",
+      "storedSha256": "90136f9002899e035fc07ae4eccdec534fed7cdf1bd19f7cf039a0e5ff34cb30",
+      "object": "objects/90136f9002899e035fc07ae4eccdec534fed7cdf1bd19f7cf039a0e5ff34cb30.png",
+      "originalBytes": 4857942,
+      "retainedBytes": 4857942,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep/MainBattleTankProduction-1920x1080-Ultra-NormalGameplay-Sweep.png",
+      "originalSha256": "c54351da22136b07dbe63c6ec547aa5f94b964d0228e791e29eb26496204faad",
+      "retainedSha256": "c54351da22136b07dbe63c6ec547aa5f94b964d0228e791e29eb26496204faad",
+      "storedSha256": "c54351da22136b07dbe63c6ec547aa5f94b964d0228e791e29eb26496204faad",
+      "object": "objects/c54351da22136b07dbe63c6ec547aa5f94b964d0228e791e29eb26496204faad.png",
+      "originalBytes": 4856484,
+      "retainedBytes": 4856484,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep/manifest.json",
+      "originalSha256": "2c5fdb0d4ec2abff53f1c1f25cd886793e2ee1ac256c33e728b855e4dad14fcd",
+      "retainedSha256": "2c5fdb0d4ec2abff53f1c1f25cd886793e2ee1ac256c33e728b855e4dad14fcd",
+      "storedSha256": "c3d77dfecf22add9944fb6e1ef11bc1644bfaa9ad7797d306146b96b3729352d",
+      "object": "objects/2c5fdb0d4ec2abff53f1c1f25cd886793e2ee1ac256c33e728b855e4dad14fcd.gz",
+      "originalBytes": 12814235,
+      "retainedBytes": 12814235,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep.request.json",
+      "originalSha256": "7f6e97dd4ad636a357de146abca82508c38ab97023d031a24366f22fd71c62e1",
+      "retainedSha256": "9278add64d911e87659da1056c04cabb1f073eed024c5e4b16724173d5a54787",
+      "storedSha256": "371585308736bc40243fa0464b61c2353e259eac34c657cb1b279b19d7919da4",
+      "object": "objects/9278add64d911e87659da1056c04cabb1f073eed024c5e4b16724173d5a54787.gz",
+      "originalBytes": 1223,
+      "retainedBytes": 1209,
+      "redacted": true
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/before-2-sweep.stdout.log",
+      "originalSha256": "8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570",
+      "retainedSha256": "8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570",
+      "storedSha256": "2c3bb9f29c6d53c9f1983a88771e04c8e6f7dcfc8bfd0e007ef3cd94f571f792",
+      "object": "objects/8ccfadcfe3abf361725e4a4c0a682320f02d59bab075688ce81c450918cb0570.gz",
+      "originalBytes": 1131,
+      "retainedBytes": 1131,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/gpu.csv",
+      "originalSha256": "1727d6cb32f32604893ddc5128c26d32e5205d90127d1cc8a8466ee3588e97be",
+      "retainedSha256": "1727d6cb32f32604893ddc5128c26d32e5205d90127d1cc8a8466ee3588e97be",
+      "storedSha256": "0d5bb563b516367cfcecc23ab4c9cc6a280b541e1b7964b53e6c2c7228338185",
+      "object": "objects/1727d6cb32f32604893ddc5128c26d32e5205d90127d1cc8a8466ee3588e97be.gz",
+      "originalBytes": 1096,
+      "retainedBytes": 1096,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/performance-1-fixed.json",
+      "originalSha256": "419e1f7d332ea81ffdc3bee500d37b8c37ad337063d03278205a52c588450013",
+      "retainedSha256": "419e1f7d332ea81ffdc3bee500d37b8c37ad337063d03278205a52c588450013",
+      "storedSha256": "a378ebc5d0d58d081e54596fdab1f3fef0d7a3f6bbb82931196488be71542352",
+      "object": "objects/419e1f7d332ea81ffdc3bee500d37b8c37ad337063d03278205a52c588450013.gz",
+      "originalBytes": 14586,
+      "retainedBytes": 14586,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/performance-1-fixed.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/performance-1-sweep.json",
+      "originalSha256": "e0beb1b88c6c1f60a923168c5cd7ab46a8d71a312a14a690f39bac0efb32491d",
+      "retainedSha256": "e0beb1b88c6c1f60a923168c5cd7ab46a8d71a312a14a690f39bac0efb32491d",
+      "storedSha256": "f735f386d191c3191995d5c85c8eea945d430362d872fbb1684f762c05ccef6a",
+      "object": "objects/e0beb1b88c6c1f60a923168c5cd7ab46a8d71a312a14a690f39bac0efb32491d.gz",
+      "originalBytes": 19261,
+      "retainedBytes": 19261,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/performance-1-sweep.log",
+      "originalSha256": "a00e96c01c4c2fb3c36dd207644c2979193fd6d513c35b3163bb42258f338dad",
+      "retainedSha256": "a00e96c01c4c2fb3c36dd207644c2979193fd6d513c35b3163bb42258f338dad",
+      "storedSha256": "b8afda249a76771ee167b368e07ba18b4793a26ab0fc2859a931b46f234243cd",
+      "object": "objects/a00e96c01c4c2fb3c36dd207644c2979193fd6d513c35b3163bb42258f338dad.gz",
+      "originalBytes": 88,
+      "retainedBytes": 88,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/performance-2-fixed.json",
+      "originalSha256": "47de788c3738f563a33cc2b81aa5b16d91d3f0cb818008ec0798664630c1a458",
+      "retainedSha256": "47de788c3738f563a33cc2b81aa5b16d91d3f0cb818008ec0798664630c1a458",
+      "storedSha256": "773eb221e788721a2421e351d9e6a9c81ca052e5fd2aedc9c0231a49ba8be638",
+      "object": "objects/47de788c3738f563a33cc2b81aa5b16d91d3f0cb818008ec0798664630c1a458.gz",
+      "originalBytes": 16771,
+      "retainedBytes": 16771,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/performance-2-fixed.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/performance-2-sweep.json",
+      "originalSha256": "58505b712393dd7d349d1b65838921f90133b275820f552542c2cbb6360bf664",
+      "retainedSha256": "58505b712393dd7d349d1b65838921f90133b275820f552542c2cbb6360bf664",
+      "storedSha256": "cca04e2e04e4a3c016084b22c91e31994e8b1178f24c85077e730e4f7be96e3d",
+      "object": "objects/58505b712393dd7d349d1b65838921f90133b275820f552542c2cbb6360bf664.gz",
+      "originalBytes": 23314,
+      "retainedBytes": 23314,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/performance-2-sweep.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/process-monitor.jsonl",
+      "originalSha256": "a92ece1077500665d7a3ab17db1769dc79915e415c1583bb5dafa498c5e7732f",
+      "retainedSha256": "a92ece1077500665d7a3ab17db1769dc79915e415c1583bb5dafa498c5e7732f",
+      "storedSha256": "425306f919e133c754a078fbfdc5876c028dcc8a262a1de0b67655ea304c1b76",
+      "object": "objects/a92ece1077500665d7a3ab17db1769dc79915e415c1583bb5dafa498c5e7732f.gz",
+      "originalBytes": 13269,
+      "retainedBytes": 13269,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/protocol.json",
+      "originalSha256": "70ec469b5a205a10a7698e54eb78c62988e574690dd05aca040fa784fc4a749e",
+      "retainedSha256": "70ec469b5a205a10a7698e54eb78c62988e574690dd05aca040fa784fc4a749e",
+      "storedSha256": "cfbb26970799d4be3a5fb8045803fd237aacbc0fab6da5a37c2f17c70046e75e",
+      "object": "objects/70ec469b5a205a10a7698e54eb78c62988e574690dd05aca040fa784fc4a749e.gz",
+      "originalBytes": 965,
+      "retainedBytes": 965,
+      "redacted": false
+    },
+    {
+      "artifact": "native-recovery/status.json",
+      "originalSha256": "69dc3e8a341abc37d22d8bc466bf98a8a3126cde4689e78f8b33cb269c11df29",
+      "retainedSha256": "69dc3e8a341abc37d22d8bc466bf98a8a3126cde4689e78f8b33cb269c11df29",
+      "storedSha256": "2f425332ecb57856182b41fb6fd34c08fd29beed373cbf0000551a31a09d6012",
+      "object": "objects/69dc3e8a341abc37d22d8bc466bf98a8a3126cde4689e78f8b33cb269c11df29.gz",
+      "originalBytes": 482,
+      "retainedBytes": 482,
+      "redacted": false
+    },
+    {
       "artifact": "numerics-build.log",
       "originalSha256": "2e5d674d6bb5bf4b220faeb0674e4912da583fbf71c3efec2684e902ecdb092c",
       "retainedSha256": "5fea2b0ffbd4716342464087f301e8c7bd8d1c35c5558410df3c6cda11ce50a2",
@@ -1831,6 +3031,16 @@
       "originalBytes": 470,
       "retainedBytes": 460,
       "redacted": true
+    },
+    {
+      "artifact": "original-control-summary.json",
+      "originalSha256": "52b7da90565203b84a30766af91b1ecf86fabc70fcad4e5f35712d80e4c84258",
+      "retainedSha256": "52b7da90565203b84a30766af91b1ecf86fabc70fcad4e5f35712d80e4c84258",
+      "storedSha256": "b814ed5a126549a8a145f4e4dbe65b7bdb501350e23fc10cbe1108ba4ee44b8b",
+      "object": "objects/52b7da90565203b84a30766af91b1ecf86fabc70fcad4e5f35712d80e4c84258.gz",
+      "originalBytes": 275,
+      "retainedBytes": 275,
+      "redacted": false
     },
     {
       "artifact": "ownership.log",
@@ -1860,6 +3070,136 @@
       "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
       "originalBytes": 0,
       "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "recovery-analysis-tests.log",
+      "originalSha256": "a8b6665f9de07f769306ad1311423ad6da03414e9bff1e1637cf96513af22ba0",
+      "retainedSha256": "a8b6665f9de07f769306ad1311423ad6da03414e9bff1e1637cf96513af22ba0",
+      "storedSha256": "3257b7c31a3024867379666165e1e5ba4dffa62e239a015c192146abd96f1b11",
+      "object": "objects/a8b6665f9de07f769306ad1311423ad6da03414e9bff1e1637cf96513af22ba0.gz",
+      "originalBytes": 979,
+      "retainedBytes": 979,
+      "redacted": false
+    },
+    {
+      "artifact": "recovery-build-server-shutdown.log",
+      "originalSha256": "8205a1b0849f89302d6f74676857d5e869040ce553f6e171c2beaaf1911a2f50",
+      "retainedSha256": "8205a1b0849f89302d6f74676857d5e869040ce553f6e171c2beaaf1911a2f50",
+      "storedSha256": "be524fce52c8233f2c0d51af4750f59a0f142623136a87c8aa097e6908e3ac5c",
+      "object": "objects/8205a1b0849f89302d6f74676857d5e869040ce553f6e171c2beaaf1911a2f50.gz",
+      "originalBytes": 206,
+      "retainedBytes": 206,
+      "redacted": false
+    },
+    {
+      "artifact": "recovery-build.log",
+      "originalSha256": "979e46550747f353f77a35dd420d95087f5bc3391ffc1be8561e7b99ef8fc385",
+      "retainedSha256": "b1459bbce316867de235181d24170321cf47adf983bfb92450d130a94f5f5fdc",
+      "storedSha256": "ea38519572db6a1d4a191cac4bde4ca273e1243c273378e9aaf123e0b0dfaa07",
+      "object": "objects/b1459bbce316867de235181d24170321cf47adf983bfb92450d130a94f5f5fdc.gz",
+      "originalBytes": 10949,
+      "retainedBytes": 10519,
+      "redacted": true
+    },
+    {
+      "artifact": "recovery-final-build.log",
+      "originalSha256": "1f95df8e3f3a25a3a0e76b7dbe70767353601cbbb08cf1321c7ba452c7a7469b",
+      "retainedSha256": "67b55659e9e9d3eaded0fa2c43fb827c9a42df062a08e10f6fb1270a6358adfc",
+      "storedSha256": "36cb306a863c4bf670bfe3c885a5ac76651dffdd20789b6c255771a861c8fac6",
+      "object": "objects/67b55659e9e9d3eaded0fa2c43fb827c9a42df062a08e10f6fb1270a6358adfc.gz",
+      "originalBytes": 11236,
+      "retainedBytes": 10806,
+      "redacted": true
+    },
+    {
+      "artifact": "recovery-final-game-tests.log",
+      "originalSha256": "e8fc5bf241053d8dec964d219e04dcb8a28c946f2c13e0d7775c2720b0f52c6d",
+      "retainedSha256": "69643dc26ee8787ca9b37fc9ef4c0566d8359900963f7c81d36d70ee667286b2",
+      "storedSha256": "8b734d09b7792e51dd5ac141dffadd318098e49f28627ccac6a13cb5959d0d88",
+      "object": "objects/69643dc26ee8787ca9b37fc9ef4c0566d8359900963f7c81d36d70ee667286b2.gz",
+      "originalBytes": 456,
+      "retainedBytes": 446,
+      "redacted": true
+    },
+    {
+      "artifact": "recovery-image-equivalence.json",
+      "originalSha256": "2ccb893fb2040b3a9a397cd00b624fab620cb83c8f847186de4ad758e42bb539",
+      "retainedSha256": "2ccb893fb2040b3a9a397cd00b624fab620cb83c8f847186de4ad758e42bb539",
+      "storedSha256": "992b71f07b02f9a5c82189bc8b80e546d5e7bcc9b14e1a420056f16c387fc057",
+      "object": "objects/2ccb893fb2040b3a9a397cd00b624fab620cb83c8f847186de4ad758e42bb539.gz",
+      "originalBytes": 3976,
+      "retainedBytes": 3976,
+      "redacted": false
+    },
+    {
+      "artifact": "recovery-normal-build.log",
+      "originalSha256": "03e4e2b72f3e61d9a37168931f57be7c9f432130741601c754cc6075542bc092",
+      "retainedSha256": "1adf7578b442bf4737387db5bd9ecce27b983257e8031d735b3f237892f7332a",
+      "storedSha256": "099b9f15dcbf33444c1c3c91bf3ab0c0e03609921d35431cde97611b127300b8",
+      "object": "objects/1adf7578b442bf4737387db5bd9ecce27b983257e8031d735b3f237892f7332a.gz",
+      "originalBytes": 7454,
+      "retainedBytes": 7139,
+      "redacted": true
+    },
+    {
+      "artifact": "recovery-normal-smoke.log",
+      "originalSha256": "8785a16e6a99c24ca6c46538669a9cfe4b8a929dc651f732d044860043c41114",
+      "retainedSha256": "f106c7501d44076ab1a10ed6521f1122e487d69c72fd5949c3869a8c3bb5b8dc",
+      "storedSha256": "9e87f8422a438f1ff64eabce4829e4541ff150fb84a8b57927e40cbe7dad2427",
+      "object": "objects/f106c7501d44076ab1a10ed6521f1122e487d69c72fd5949c3869a8c3bb5b8dc.gz",
+      "originalBytes": 3950,
+      "retainedBytes": 3932,
+      "redacted": true
+    },
+    {
+      "artifact": "recovery-ownership.log",
+      "originalSha256": "540ae7a895e869e7b869d8e543469a4ec9880b4c5bdb2fa56fff2542a5f474d6",
+      "retainedSha256": "540ae7a895e869e7b869d8e543469a4ec9880b4c5bdb2fa56fff2542a5f474d6",
+      "storedSha256": "9c0f58f6791566339c6118ddfc14bac7b10d342a39138480f63d8952c5142631",
+      "object": "objects/540ae7a895e869e7b869d8e543469a4ec9880b4c5bdb2fa56fff2542a5f474d6.gz",
+      "originalBytes": 237,
+      "retainedBytes": 237,
+      "redacted": false
+    },
+    {
+      "artifact": "recovery-probe-provenance.json",
+      "originalSha256": "47df675af0a32760443adf4d0470a35622e37b9d5d20d48cee5de6033d104aa1",
+      "retainedSha256": "47df675af0a32760443adf4d0470a35622e37b9d5d20d48cee5de6033d104aa1",
+      "storedSha256": "b10b8363d2e925d15944c44094bf306cdecb25f6056ce07dc6300ee8383ac203",
+      "object": "objects/47df675af0a32760443adf4d0470a35622e37b9d5d20d48cee5de6033d104aa1.gz",
+      "originalBytes": 2301,
+      "retainedBytes": 2301,
+      "redacted": false
+    },
+    {
+      "artifact": "recovery-project-references.log",
+      "originalSha256": "89b6b3c66e8ab994b0102ac645f070c8296f7ec0259a6677126f463457986d24",
+      "retainedSha256": "89b6b3c66e8ab994b0102ac645f070c8296f7ec0259a6677126f463457986d24",
+      "storedSha256": "226de6e664ef4eddbdcdc637d2a1dc6d5fab7ef80f472733feddc3f04df3860b",
+      "object": "objects/89b6b3c66e8ab994b0102ac645f070c8296f7ec0259a6677126f463457986d24.gz",
+      "originalBytes": 95,
+      "retainedBytes": 95,
+      "redacted": false
+    },
+    {
+      "artifact": "recovery-semver.log",
+      "originalSha256": "616d1b093ec766d9f25e94f3671b4c119c919b8a4849a939f2d31d0255f18af4",
+      "retainedSha256": "616d1b093ec766d9f25e94f3671b4c119c919b8a4849a939f2d31d0255f18af4",
+      "storedSha256": "f3573f353dadd79a13bf7cf4be5a2ed20de95d74c58f44b8207c9bfabcdf247d",
+      "object": "objects/616d1b093ec766d9f25e94f3671b4c119c919b8a4849a939f2d31d0255f18af4.gz",
+      "originalBytes": 60,
+      "retainedBytes": 60,
+      "redacted": false
+    },
+    {
+      "artifact": "recovery-serial-paths.json",
+      "originalSha256": "763cb306872cea7a04d1fe2d1ffe894b02c77d5971528ac6dd774163626e8b50",
+      "retainedSha256": "763cb306872cea7a04d1fe2d1ffe894b02c77d5971528ac6dd774163626e8b50",
+      "storedSha256": "7ba4a166e285c8e1ffdee4a4fec46d9aa33c711420e214e0e771d166a2774621",
+      "object": "objects/763cb306872cea7a04d1fe2d1ffe894b02c77d5971528ac6dd774163626e8b50.gz",
+      "originalBytes": 861,
+      "retainedBytes": 861,
       "redacted": false
     },
     {
@@ -2023,6 +3363,36 @@
       "redacted": false
     },
     {
+      "artifact": "submission-pool-four-core-after.log",
+      "originalSha256": "beb10f507d46a3180fcbba1427103fa3456cd0b7424fa21bc2833b5d34843c33",
+      "retainedSha256": "eddb5a9d6d0880b71b4a45c1d1fa746846724dd98e82c44fec0ac49e0219a223",
+      "storedSha256": "ab08872acd36e3ffc2263576e66d2f8dd6e18afd3ca6fae76e3ee628cc8678dd",
+      "object": "objects/eddb5a9d6d0880b71b4a45c1d1fa746846724dd98e82c44fec0ac49e0219a223.gz",
+      "originalBytes": 467,
+      "retainedBytes": 457,
+      "redacted": true
+    },
+    {
+      "artifact": "submission-pool-four-core-before.log",
+      "originalSha256": "752587d1149467f8301823d0a31fe0ee1ecd4295b595ca514b2be083c2373a49",
+      "retainedSha256": "03526cf653bf077ba1cc2c2704943964fc82fbc1b047c456e6e9a41a1675388f",
+      "storedSha256": "d46963ecc08aa0c9ffb1aa6f5697785515c493c8a8d871f638b015f532386109",
+      "object": "objects/03526cf653bf077ba1cc2c2704943964fc82fbc1b047c456e6e9a41a1675388f.gz",
+      "originalBytes": 1390,
+      "retainedBytes": 1370,
+      "redacted": true
+    },
+    {
+      "artifact": "submission-pool-four-core-direct-attempt.log",
+      "originalSha256": "1cd42a879ad921e12cbcf061bd017dbe7990d268ca32e51efb8df3148b871b2e",
+      "retainedSha256": "1cd42a879ad921e12cbcf061bd017dbe7990d268ca32e51efb8df3148b871b2e",
+      "storedSha256": "b5a22a451717a26d82e3fbe342acb0a945cc1235a5368e7485a45caafdb463c7",
+      "object": "objects/1cd42a879ad921e12cbcf061bd017dbe7990d268ca32e51efb8df3148b871b2e.gz",
+      "originalBytes": 40,
+      "retainedBytes": 40,
+      "redacted": false
+    },
+    {
       "artifact": "version.log",
       "originalSha256": "616d1b093ec766d9f25e94f3671b4c119c919b8a4849a939f2d31d0255f18af4",
       "retainedSha256": "616d1b093ec766d9f25e94f3671b4c119c919b8a4849a939f2d31d0255f18af4",
@@ -2043,6 +3413,16 @@
       "redacted": true
     },
     {
+      "artifact": "world-baseline-responsive/build.log",
+      "originalSha256": "69ab46cd6d98765711e38813c57d5ad442267c7691612cac8b7fb04cf2ab0f60",
+      "retainedSha256": "82f402f9cb3853b6235a7fa1b6d5bdda374eec6ad9df411aa9ca544ac2bdb634",
+      "storedSha256": "83bb931bf4f24dc43443b7d639a7c8b60a19a0dcd8a3b30a20fdba57d82ff334",
+      "object": "objects/82f402f9cb3853b6235a7fa1b6d5bdda374eec6ad9df411aa9ca544ac2bdb634.gz",
+      "originalBytes": 427,
+      "retainedBytes": 417,
+      "redacted": true
+    },
+    {
       "artifact": "world-candidate-final/build.log",
       "originalSha256": "23c8206fbb0ed64d9e0497dba777877f38d3df7bf94bb12d9a86f0cb3800e68d",
       "retainedSha256": "d6e6a5168e48e572aab04b85b91b6db6a52d7a8455290473a91b41356c7ae1d3",
@@ -2051,6 +3431,356 @@
       "originalBytes": 419,
       "retainedBytes": 409,
       "redacted": true
+    },
+    {
+      "artifact": "world-candidate-recovery/build.log",
+      "originalSha256": "fe905f26e78c18c0274dcab97aec4ce94e8a1ddb0f42f8f6f8fcfcb767710959",
+      "retainedSha256": "05b32aef2744804c6f37687285d64d28d8ef746f5ac23aab20054e6f9e50c6d6",
+      "storedSha256": "e0014b0f88fcff279d3fbdc88d7f8aeb92d77b9884bc11ea6cb1af0b3191ed70",
+      "object": "objects/05b32aef2744804c6f37687285d64d28d8ef746f5ac23aab20054e6f9e50c6d6.gz",
+      "originalBytes": 425,
+      "retainedBytes": 415,
+      "redacted": true
+    },
+    {
+      "artifact": "world-candidate-responsive/build.log",
+      "originalSha256": "6438e7f78d6cf3ad34e4551029de621bb21126ec19df296459e24916197b0789",
+      "retainedSha256": "85b82d130da51553629feb779e6c7412c7c06b51ce778ba1fd74c5ce2b8a8df0",
+      "storedSha256": "eb8d1c7c19847bbdde207b03d9218e57c04ed4b940bf86badec1f6abb14e747f",
+      "object": "objects/85b82d130da51553629feb779e6c7412c7c06b51ce778ba1fd74c5ce2b8a8df0.gz",
+      "originalBytes": 429,
+      "retainedBytes": 419,
+      "redacted": true
+    },
+    {
+      "artifact": "world-control-original/after-1.json",
+      "originalSha256": "edcf12c525cca937a59857a0055f3043c1143bc7761a6b2de7f3a561dab50cbe",
+      "retainedSha256": "edcf12c525cca937a59857a0055f3043c1143bc7761a6b2de7f3a561dab50cbe",
+      "storedSha256": "d6c5734be3d756a5cf930c2f2ca650ae3fb253615ed6ead1f3eb4b720ec22270",
+      "object": "objects/edcf12c525cca937a59857a0055f3043c1143bc7761a6b2de7f3a561dab50cbe.gz",
+      "originalBytes": 336906,
+      "retainedBytes": 336906,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/after-1.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/after-1.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/after-2.json",
+      "originalSha256": "3ca0a53ae8ccf390f76bc66e99c531eaab6cc1a2ca3531005dfdf1baebbe1ebe",
+      "retainedSha256": "3ca0a53ae8ccf390f76bc66e99c531eaab6cc1a2ca3531005dfdf1baebbe1ebe",
+      "storedSha256": "91c64bbb1fa48bbec38158d6f79b9225d796c0ae3f3ee6e50d0ec0965c131e6d",
+      "object": "objects/3ca0a53ae8ccf390f76bc66e99c531eaab6cc1a2ca3531005dfdf1baebbe1ebe.gz",
+      "originalBytes": 336217,
+      "retainedBytes": 336217,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/after-2.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/after-2.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/analysis.json",
+      "originalSha256": "8ae9792186e17d4af11c884496286cdabf030ce1849b673f306df95a9713b50c",
+      "retainedSha256": "8ae9792186e17d4af11c884496286cdabf030ce1849b673f306df95a9713b50c",
+      "storedSha256": "67edb99330448570f27e8a6edc8aee8ef74811a4a3ef261068c09475b4457554",
+      "object": "objects/8ae9792186e17d4af11c884496286cdabf030ce1849b673f306df95a9713b50c.gz",
+      "originalBytes": 49659,
+      "retainedBytes": 49659,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/before-1.json",
+      "originalSha256": "b1b0d702bf469523c5215940674cc126d8fa0b5aaedaed5d511bf27606ce39b9",
+      "retainedSha256": "b1b0d702bf469523c5215940674cc126d8fa0b5aaedaed5d511bf27606ce39b9",
+      "storedSha256": "5d4dc802969cf67493d81a4860d7a3f4e594eb1902571b004c56f753df50aff8",
+      "object": "objects/b1b0d702bf469523c5215940674cc126d8fa0b5aaedaed5d511bf27606ce39b9.gz",
+      "originalBytes": 336438,
+      "retainedBytes": 336438,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/before-1.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/before-1.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/before-2.json",
+      "originalSha256": "889a6d2904d4ef556865daecc1ce4c17f69c6c716791766739d3450a1c9a75c7",
+      "retainedSha256": "889a6d2904d4ef556865daecc1ce4c17f69c6c716791766739d3450a1c9a75c7",
+      "storedSha256": "5dff9b15aaa356efeba95f70a529a17423955fad44070abd69d764a451e90a77",
+      "object": "objects/889a6d2904d4ef556865daecc1ce4c17f69c6c716791766739d3450a1c9a75c7.gz",
+      "originalBytes": 336616,
+      "retainedBytes": 336616,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/before-2.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/before-2.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/process-monitor.jsonl",
+      "originalSha256": "334d91397b41f9f5b246bfc56597f2c80ca0acff978ad0b6c8a4943f8a86c9a5",
+      "retainedSha256": "334d91397b41f9f5b246bfc56597f2c80ca0acff978ad0b6c8a4943f8a86c9a5",
+      "storedSha256": "50a8a1d40cd1f0f2e09fcb3f00161a664747be7fe6583115ad539da8270b9c3f",
+      "object": "objects/334d91397b41f9f5b246bfc56597f2c80ca0acff978ad0b6c8a4943f8a86c9a5.gz",
+      "originalBytes": 5220,
+      "retainedBytes": 5220,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original/protocol.json",
+      "originalSha256": "2cb779cc18a33be90b3f882ce31579aeedf840974b4f672fd257363a515edc5a",
+      "retainedSha256": "2cb779cc18a33be90b3f882ce31579aeedf840974b4f672fd257363a515edc5a",
+      "storedSha256": "2cf7f7995e4dc6aaae1298e33cc4ab709fe9ce207e30ee564977d31b4e29db18",
+      "object": "objects/2cb779cc18a33be90b3f882ce31579aeedf840974b4f672fd257363a515edc5a.gz",
+      "originalBytes": 890,
+      "retainedBytes": 890,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-original-analysis.log",
+      "originalSha256": "650a33786c2918f79ba2fde61ca3617bfe84dad54711edd3402390f8e9eb7d04",
+      "retainedSha256": "650a33786c2918f79ba2fde61ca3617bfe84dad54711edd3402390f8e9eb7d04",
+      "storedSha256": "1ff8c221b3657c09c0fffaead25d8c3ef417caae309cbfcc64a9d1a30f7d64b5",
+      "object": "objects/650a33786c2918f79ba2fde61ca3617bfe84dad54711edd3402390f8e9eb7d04.gz",
+      "originalBytes": 86,
+      "retainedBytes": 86,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive/blocked-workload.json",
+      "originalSha256": "6b591714b4363c9f29969699bea8c5f3a4f5d27f312b5e8b2856b88aa103b58c",
+      "retainedSha256": "6b591714b4363c9f29969699bea8c5f3a4f5d27f312b5e8b2856b88aa103b58c",
+      "storedSha256": "242d1dc4cf8aefe1e8aa7ae46170d139f29fba6e2ea9f2a28dd33745db552a9f",
+      "object": "objects/6b591714b4363c9f29969699bea8c5f3a4f5d27f312b5e8b2856b88aa103b58c.gz",
+      "originalBytes": 380,
+      "retainedBytes": 380,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive/protocol.json",
+      "originalSha256": "06496c1974d79b169e6cfbffa157c1a64db563dfb8e4728f05003ecf13b58ed6",
+      "retainedSha256": "06496c1974d79b169e6cfbffa157c1a64db563dfb8e4728f05003ecf13b58ed6",
+      "storedSha256": "be04e23ffb3c82ed40b87d40951453844a902582226669fa3ac5a00460965d8b",
+      "object": "objects/06496c1974d79b169e6cfbffa157c1a64db563dfb8e4728f05003ecf13b58ed6.gz",
+      "originalBytes": 890,
+      "retainedBytes": 890,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/after-1.json",
+      "originalSha256": "af7c374b5f8b58eb092f09b81cda82db90fbdbb1f4ecb8ef40799849f79ca59e",
+      "retainedSha256": "af7c374b5f8b58eb092f09b81cda82db90fbdbb1f4ecb8ef40799849f79ca59e",
+      "storedSha256": "684cf1789de8d07006523d4d705289c9c4cd77e5c9d5b1d3922791568157d9ea",
+      "object": "objects/af7c374b5f8b58eb092f09b81cda82db90fbdbb1f4ecb8ef40799849f79ca59e.gz",
+      "originalBytes": 337287,
+      "retainedBytes": 337287,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/after-1.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/after-1.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/after-2.json",
+      "originalSha256": "2ff346ae2d14f84950bd46f5eee768069000da20bfbb712ae0ec7a8f5f30ba80",
+      "retainedSha256": "2ff346ae2d14f84950bd46f5eee768069000da20bfbb712ae0ec7a8f5f30ba80",
+      "storedSha256": "f8f4015cbb58ffc4b7b71c5597bded3025dd0676684ae4db9e7185522d131b17",
+      "object": "objects/2ff346ae2d14f84950bd46f5eee768069000da20bfbb712ae0ec7a8f5f30ba80.gz",
+      "originalBytes": 335867,
+      "retainedBytes": 335867,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/after-2.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/after-2.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/analysis.json",
+      "originalSha256": "b32dbaebf50745324d74dbd0df3b7a125737e1316a1b5934649b12ba5aa87544",
+      "retainedSha256": "b32dbaebf50745324d74dbd0df3b7a125737e1316a1b5934649b12ba5aa87544",
+      "storedSha256": "85a723e6da1bce56ee3279c8277525143b4c56778c0165e70307937198597378",
+      "object": "objects/b32dbaebf50745324d74dbd0df3b7a125737e1316a1b5934649b12ba5aa87544.gz",
+      "originalBytes": 51913,
+      "retainedBytes": 51913,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/before-1.json",
+      "originalSha256": "4124329d363c9e765ffb851b7a2f92c361c2376ae88528e85dee397f49cc85de",
+      "retainedSha256": "4124329d363c9e765ffb851b7a2f92c361c2376ae88528e85dee397f49cc85de",
+      "storedSha256": "a34dbdd450ecb8d024e78e7019a89aab349d96c9ea2267377023820151d23f4a",
+      "object": "objects/4124329d363c9e765ffb851b7a2f92c361c2376ae88528e85dee397f49cc85de.gz",
+      "originalBytes": 336061,
+      "retainedBytes": 336061,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/before-1.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/before-1.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/before-2.json",
+      "originalSha256": "4cd1c7525b22155a807cc8657d830768db20fd0afe8ca208398214d22be6a47e",
+      "retainedSha256": "4cd1c7525b22155a807cc8657d830768db20fd0afe8ca208398214d22be6a47e",
+      "storedSha256": "4b556b6fbc86af591552dc7032cd9c40c904a299286d7e5b2c2a07721a1808f3",
+      "object": "objects/4cd1c7525b22155a807cc8657d830768db20fd0afe8ca208398214d22be6a47e.gz",
+      "originalBytes": 336979,
+      "retainedBytes": 336979,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/before-2.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/before-2.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/process-monitor.jsonl",
+      "originalSha256": "66e439b328a526db030f983f3ff535ae09b2eb9ce695e3edf451491bb000ae43",
+      "retainedSha256": "66e439b328a526db030f983f3ff535ae09b2eb9ce695e3edf451491bb000ae43",
+      "storedSha256": "24a749cd3260127466e4608e36a8558dc30679b9df1be590f03cf4d031098bae",
+      "object": "objects/66e439b328a526db030f983f3ff535ae09b2eb9ce695e3edf451491bb000ae43.gz",
+      "originalBytes": 5365,
+      "retainedBytes": 5365,
+      "redacted": false
+    },
+    {
+      "artifact": "world-control-responsive-retry/protocol.json",
+      "originalSha256": "436be16d232de914fd769b65ddc6fb7f8f99f41d09070c868c92814134a841bb",
+      "retainedSha256": "436be16d232de914fd769b65ddc6fb7f8f99f41d09070c868c92814134a841bb",
+      "storedSha256": "e66510609e149a630d2a3c8557a9958f0756e5b7f80fbf7fe5f312e69e7bcca2",
+      "object": "objects/436be16d232de914fd769b65ddc6fb7f8f99f41d09070c868c92814134a841bb.gz",
+      "originalBytes": 890,
+      "retainedBytes": 890,
+      "redacted": false
     },
     {
       "artifact": "world-isolated/after-1.json",
@@ -2210,6 +3940,156 @@
       "object": "objects/e78e0ea0515d897827c91212e56c8919cf77eb066af8851179a683d7bf428558.gz",
       "originalBytes": 166,
       "retainedBytes": 166,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/after-1.json",
+      "originalSha256": "0647b8ffbd76f309f03de071bf81383a90398c3899ead2ccf804fcac406bc387",
+      "retainedSha256": "0647b8ffbd76f309f03de071bf81383a90398c3899ead2ccf804fcac406bc387",
+      "storedSha256": "95e29e4ebcce37bb137c9e23467d79942401814d0aa62e0fdb33f17684fc9472",
+      "object": "objects/0647b8ffbd76f309f03de071bf81383a90398c3899ead2ccf804fcac406bc387.gz",
+      "originalBytes": 336549,
+      "retainedBytes": 336549,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/after-1.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/after-1.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/after-2.json",
+      "originalSha256": "223ae86db35ec3bc1ec8c92173336d2f51f4a8de237f687518edf2356bf5dfb1",
+      "retainedSha256": "223ae86db35ec3bc1ec8c92173336d2f51f4a8de237f687518edf2356bf5dfb1",
+      "storedSha256": "9bcc75e22e64633cfb3345257442c5a23972a8e6aec9cc2eb60cf5fadf908413",
+      "object": "objects/223ae86db35ec3bc1ec8c92173336d2f51f4a8de237f687518edf2356bf5dfb1.gz",
+      "originalBytes": 336022,
+      "retainedBytes": 336022,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/after-2.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/after-2.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/analysis.json",
+      "originalSha256": "f93bdba3e2541c03f7c3d3fb47aeeeec983d260077ea5c68560c41c4e4f7f704",
+      "retainedSha256": "f93bdba3e2541c03f7c3d3fb47aeeeec983d260077ea5c68560c41c4e4f7f704",
+      "storedSha256": "10e0af53c64ead7cd552c5f38ad8e47f8e160a2b4b3191025229849ca44bf41f",
+      "object": "objects/f93bdba3e2541c03f7c3d3fb47aeeeec983d260077ea5c68560c41c4e4f7f704.gz",
+      "originalBytes": 51986,
+      "retainedBytes": 51986,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/before-1.json",
+      "originalSha256": "d20bf067a531735066b53652f7e5c735b97f6fa7538540f5a29781a50bd019cb",
+      "retainedSha256": "d20bf067a531735066b53652f7e5c735b97f6fa7538540f5a29781a50bd019cb",
+      "storedSha256": "251e0a5f180fba354abb3e46c254cb3142887f223f5afa426ff3aa9d0125e2ec",
+      "object": "objects/d20bf067a531735066b53652f7e5c735b97f6fa7538540f5a29781a50bd019cb.gz",
+      "originalBytes": 336276,
+      "retainedBytes": 336276,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/before-1.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/before-1.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/before-2.json",
+      "originalSha256": "9bd2fa6d29d708f106ae66a5d2cb2502cc5f11fa7c5a0f0f27fcf298f9df2316",
+      "retainedSha256": "9bd2fa6d29d708f106ae66a5d2cb2502cc5f11fa7c5a0f0f27fcf298f9df2316",
+      "storedSha256": "950e57c42596e56687f9211a06fad074aa66f6268ab3e5e0a562919fae418d9d",
+      "object": "objects/9bd2fa6d29d708f106ae66a5d2cb2502cc5f11fa7c5a0f0f27fcf298f9df2316.gz",
+      "originalBytes": 336179,
+      "retainedBytes": 336179,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/before-2.stderr.log",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "originalBytes": 0,
+      "retainedBytes": 0,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/before-2.stdout.log",
+      "originalSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "retainedSha256": "3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33",
+      "storedSha256": "804a2d748bbd06296223990d60ddd18cbfb0fcf486af949a275d9173c7ebac78",
+      "object": "objects/3f423a1f916ee986d6d75e8068fc575e24eb8052fee274222068360211bf2b33.gz",
+      "originalBytes": 634,
+      "retainedBytes": 634,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/process-monitor.jsonl",
+      "originalSha256": "cdbf5b7ccf3396154b5428a0b0fbdd12740796399f38e5449cf7df2678c902c9",
+      "retainedSha256": "cdbf5b7ccf3396154b5428a0b0fbdd12740796399f38e5449cf7df2678c902c9",
+      "storedSha256": "26783cd594af8228dedb8390a345006ef61a79ebc448fe85ed9fc5f8af1af490",
+      "object": "objects/cdbf5b7ccf3396154b5428a0b0fbdd12740796399f38e5449cf7df2678c902c9.gz",
+      "originalBytes": 5364,
+      "retainedBytes": 5364,
+      "redacted": false
+    },
+    {
+      "artifact": "world-recovery/protocol.json",
+      "originalSha256": "c95787a6e36de9bd8a9670795540a666a6cd5a5e20d8f9d7c0924e6a3d5c7b65",
+      "retainedSha256": "c95787a6e36de9bd8a9670795540a666a6cd5a5e20d8f9d7c0924e6a3d5c7b65",
+      "storedSha256": "0ff8c4416a4c8a81b8cd786f774782dc4394092e5cb26e0dd271c4104c5e3efd",
+      "object": "objects/c95787a6e36de9bd8a9670795540a666a6cd5a5e20d8f9d7c0924e6a3d5c7b65.gz",
+      "originalBytes": 890,
+      "retainedBytes": 890,
       "redacted": false
     }
   ]

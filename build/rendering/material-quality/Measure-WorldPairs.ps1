@@ -24,9 +24,9 @@ $sequence=@('before-1','after-1','after-2','before-2')
     ConvertTo-Json -Depth 6|Set-Content (Join-Path $root 'protocol.json') -Encoding utf8NoBOM
 function Foreign-Work([int]$OwnId=0) {
     @(Get-CimInstance Win32_Process|Where-Object {$_.ProcessId -ne $OwnId -and (
-        $_.Name -in @('ForgeLine.Client.exe','ForgeLine.Headless.exe','MaterialWorldProbe.exe') -or
+        $_.Name -in @('ForgeLine.Client.exe','ForgeLine.Headless.exe','MaterialWorldProbe.exe','GameplayRecoveryProbe.exe','ForgeLine.AssetCompiler.exe','csc.exe','VBCSCompiler.exe','MSBuild.exe','blender.exe') -or
         $_.Name -like 'ForgeLine*.Tests.exe' -or $_.Name -like 'ForgeLine*Benchmarks.exe' -or
-        ($_.Name -eq 'dotnet.exe' -and $_.CommandLine -match ' test | build |Tests[.]dll|Benchmarks'))}|
+        ($_.Name -eq 'dotnet.exe' -and $_.CommandLine -match ' test | build |Tests[.]dll|Benchmarks|VBCSCompiler|csc[.]dll|MSBuild[.]dll'))}|
         Select-Object ProcessId,Name,CreationDate)
 }
 foreach($member in $sequence) {

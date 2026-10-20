@@ -48,3 +48,12 @@ changed logistics rule or weaker admission criterion was introduced.
 
 The expansion failure diagnostic records movement and nearby spatial bounds
 without changing its funding assertions.
+
+## Final validation at ef83d2d5
+
+The complete unfiltered Game module passes all 621 tests with no failures/skips
+(2m57.348s). The full hosted solution passes 3,110 of 3,127 tests, with 17 optional
+skips and zero failures. CI run 39481874522 also completes the unchanged seed-2026
+80,000-tick-bounded two-opponent validation with Victory/CommandCoreDestroyed
+at tick 55,210. The supply-role correction and fixture repairs resolve the five
+original Game failures; the original strategic-loop integration test is retained.

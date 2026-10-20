@@ -28,8 +28,8 @@ $protocol=@{baselineSource=$BaselineSource;candidateSource=$CandidateSource;
 $protocol|ConvertTo-Json -Depth 8|Set-Content (Join-Path $root 'protocol.json') -Encoding utf8NoBOM
 foreach($member in $protocol.sequence) {
     $busy=@(Get-CimInstance Win32_Process|Where-Object {
-        $_.Name -in @('ForgeLine.Client.exe','ForgeLine.Headless.exe') -or $_.Name -like 'ForgeLine*.Tests.exe' -or $_.Name -like 'ForgeLine*Benchmarks.exe' -or
-        ($_.Name -eq 'dotnet.exe' -and $_.CommandLine -match ' test | build |Tests[.]dll|Benchmarks')})
+        $_.Name -in @('ForgeLine.Client.exe','ForgeLine.Headless.exe','GameplayRecoveryProbe.exe','ForgeLine.AssetCompiler.exe','csc.exe','VBCSCompiler.exe','MSBuild.exe','blender.exe') -or $_.Name -like 'ForgeLine*.Tests.exe' -or $_.Name -like 'ForgeLine*Benchmarks.exe' -or
+        ($_.Name -eq 'dotnet.exe' -and $_.CommandLine -match ' test | build |Tests[.]dll|Benchmarks|VBCSCompiler|csc[.]dll|MSBuild[.]dll')})
     if($busy.Count){$busy|Select-Object ProcessId,Name,CreationDate|ConvertTo-Json|Set-Content (Join-Path $root 'competing-work.json');throw 'Competing workload found; retain and stop this cohort.'}
     $client=if($member.StartsWith('before')){$before}else{$after}
     $source=if($member.StartsWith('before')){$BaselineSource}else{$CandidateSource}
@@ -56,8 +56,8 @@ foreach($member in $protocol.sequence) {
         $overlap=$false
         do {
             $foreign=@(Get-CimInstance Win32_Process|Where-Object {$_.ProcessId -ne $process.Id -and (
-                $_.Name -in @('ForgeLine.Client.exe','ForgeLine.Headless.exe') -or $_.Name -like 'ForgeLine*.Tests.exe' -or
-                $_.Name -like 'ForgeLine*Benchmarks.exe' -or ($_.Name -eq 'dotnet.exe' -and $_.CommandLine -match ' test | build |Tests[.]dll|Benchmarks'))}|
+                $_.Name -in @('ForgeLine.Client.exe','ForgeLine.Headless.exe','GameplayRecoveryProbe.exe','ForgeLine.AssetCompiler.exe','csc.exe','VBCSCompiler.exe','MSBuild.exe','blender.exe') -or $_.Name -like 'ForgeLine*.Tests.exe' -or
+                $_.Name -like 'ForgeLine*Benchmarks.exe' -or ($_.Name -eq 'dotnet.exe' -and $_.CommandLine -match ' test | build |Tests[.]dll|Benchmarks|VBCSCompiler|csc[.]dll|MSBuild[.]dll'))}|
                 Select-Object ProcessId,Name,CreationDate)
             @{utc=[DateTime]::UtcNow.ToString('o');capture=$name;foreign=$foreign}|ConvertTo-Json -Depth 5 -Compress|
                 Add-Content -LiteralPath (Join-Path $root 'process-monitor.jsonl')

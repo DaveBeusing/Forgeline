@@ -68,3 +68,56 @@ distinct from render-owned capacity and has a finite upper bound. Validation
 must include the original frozen test binary and repaired binary under
 DOTNET_PROCESSOR_COUNT=4, followed by the existing submission/full suites.
 The frozen original test reproduces exactly 8,486,912 bytes under DOTNET_PROCESSOR_COUNT=4 (one failure, exit 2). The repaired build passes all 21 SubmissionSafetyTests under the same setting (exit 0), including the unchanged zero-allocation test and large-submission cases. The full isolated Release solution builds with zero warnings/errors. Full-suite and native qualification remain separate.
+
+## Quiet-window compiler guard
+
+Probe preparation and the final build disable shared compilation and MSBuild
+node reuse. Before native measurements, shut down remaining build servers and
+verify no compiler/build/test/asset process remains. Both measurement drivers
+now also reject csc, VBCSCompiler, MSBuild, asset compilation, Blender and the
+own gameplay diagnostic, including dotnet-hosted compiler/build forms. This
+prevents an otherwise idle build server's delayed work from silently entering
+a measured window. It does not exclude any bad timing observation from a
+completed valid cohort.
+
+## Original identical-source control
+
+The original frozen baseline probe completed all four independent cohorts:
+16 paired cases, six 15% metric/statistic exceedances (two world GPU, one shadow
+GPU, two total GPU, one CPU), zero missing series. Both arms use the identical
+baseline executable/source. This demonstrates residual timing variability; it
+neither approves the candidate nor proves missing event dispatch was its cause.
+
+The responsive-control attempt stopped before its first capture because the
+regular player started after the original control's last monitor observation.
+The completed original control remains separate; no responsive result exists
+for that aborted attempt. The player must be closed before a fresh control root.
+
+## Final isolated controls and candidate observations
+
+After the owner confirmed the regular player closed, the fresh responsive A/A
+control completed four cohorts without a competing workload. Both arms use the
+same baseline source/executable: 16 paired cases, 17 exceedances (four CPU, four
+world GPU, five shadow GPU, four total GPU), zero unavailable series. Pumping
+events and holding the scoped execution requirement did not remove variability.
+This rejects the hypothesis that this probe correction alone resolves the gates.
+
+The predefined final ef83d2d5 candidate comparison completed independently:
+16 world/shadow pairs, 18 exceedances (ten CPU, two world GPU, three shadow GPU,
+three total GPU), zero unavailable series. The complete client matrix contains
+56 captures with 103 exceedances: 53 CPU and 50 GPU. Pair 1 fixed has one GPU
+exceedance and pair 1 sweep passes; pair 2 fixed has 39 and pair 2 sweep 63.
+All original limits, samples and raw failed observations remain in force.
+The strong process monitor records no competing work during these completed
+cohorts. Per-launch telemetry records idle P8 before launches; it does not
+establish the clock during rendering and is not evidence of a specific cause.
+
+These observations do not qualify native performance. Identical-source control
+variability prevents attributing every difference to shader cost, but does not
+waive any candidate failure. No additional repeat was selected for a green
+result. A reproducible timing environment and a separately declared stable
+control are required before accepting the unchanged 15% gates.
+
+The independent hosted CI is green, including render benchmarks and the complete
+solution, so its former 8,486,912-byte submission-pool allocation is resolved.
+That CI pass is distinct from the still-failed physical-GPU timing qualification.

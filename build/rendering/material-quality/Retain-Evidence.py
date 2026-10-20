@@ -21,14 +21,14 @@ def main() -> None:
     root=args.artifacts.resolve();destination=args.destination.resolve()
     objects=destination/'objects';objects.mkdir(parents=True,exist_ok=True)
     selected=set(root.glob('*.log'))|set(root.glob('*.json'))|set(root.glob('*.jsonl'))
-    for name in ('native-final','native-qualified','native-pairs','native-isolated','world-isolated','world-control-original','world-control-responsive','world-recovery','native-recovery'):
+    for name in ('native-final','native-qualified','native-pairs','native-isolated','world-isolated','world-control-original','world-control-responsive','world-control-responsive-retry','world-recovery','native-recovery'):
         directory=root/name
         if directory.exists():
             selected.update(p for p in directory.rglob('*') if p.is_file() and p.suffix in ('.json','.jsonl','.csv','.log','.png'))
     for name in ('sequences','sequences-conservative'):
         directory=root/name
         selected.update(directory.glob('*.json'));selected.update(directory.glob('*.png'))
-    for name in ('world-baseline-final','world-candidate-final','world-baseline-responsive','world-candidate-responsive','gameplay-recovery-probe','gameplay-recovery-probe-v2','gameplay-funding-probe'):
+    for name in ('world-baseline-final','world-candidate-final','world-baseline-responsive','world-candidate-responsive','world-candidate-recovery','gameplay-recovery-probe','gameplay-recovery-probe-v2','gameplay-funding-probe'):
         path=root/name/'build.log'
         if path.exists():selected.add(path)
     if args.pending_tests:

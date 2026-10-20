@@ -98,3 +98,18 @@ The approved serial contract correction is validated with the actual existing CI
 unittest discovery: `python -X utf8 -m unittest discover -s build/rendering/parallelization -p 'test_*.py' -v` (9/9, exit 0).
 The two shared paths are explicit serial exceptions to the material ownership lane;
 the ownership manifest and historical FactorySources.json remain unchanged.
+
+## Follow-up evidence
+
+The final production assembly source is ef83d2d586aa2f0059bc6b860f95a1bc085ef917.
+Use the recovery-final artifact build for final tests and candidate captures.
+The frozen baseline remains bfc16a953d731a844321a0848a2ebadc71c5875f.
+`recovery-probe-provenance.json` records source DLL and corrected probe hashes.
+The fresh roots `world-control-responsive-retry`, `world-recovery`, and
+`native-recovery` retain the four predeclared before-1/after-1/after-2/before-2
+cohorts. Analyze each component root with Analyze-WorldPairs.py; the full-client
+driver retains the unchanged Compare-ReferencePerformance.ps1 results.
+Inspect performancePassed, not just capture or analysis exit status.
+The separate world-control-responsive root contains only the blocked first
+attempt; its lack of captures is intentional, not an empty passing sample.
+`ci-recovery-ef83.log` contains the green full solution and terminal match proof.
