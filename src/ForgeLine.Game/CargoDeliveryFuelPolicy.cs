@@ -355,12 +355,13 @@ internal static class CargoDeliveryFuelPolicy
         !entities.HasComponent<SupplyTruck>(entity) &&
         !entities.HasComponent<ResupplyOrder>(entity) &&
         entities.HasComponent<CargoTransport>(entity) &&
-        entities.HasComponent<CargoTransportOrder>(entity) &&
-        entities.TryGetComponent(
-            entity,
-            out CargoTransportRuntimeState state) &&
-        (state.Lifecycle is CargoTransportLifecycleState.ToOrigin or CargoTransportLifecycleState.ToDestination ||
-         entities.HasComponent<VehicleDockVisit>(entity));
+        (entities.HasComponent<CargoFuelServiceState>(entity) ||
+         entities.HasComponent<CargoTransportOrder>(entity) &&
+         entities.TryGetComponent(
+             entity,
+             out CargoTransportRuntimeState state) &&
+         (state.Lifecycle is CargoTransportLifecycleState.ToOrigin or CargoTransportLifecycleState.ToDestination ||
+          entities.HasComponent<VehicleDockVisit>(entity)));
 
     private static void SetDeferral(
         SimulationContext context,
