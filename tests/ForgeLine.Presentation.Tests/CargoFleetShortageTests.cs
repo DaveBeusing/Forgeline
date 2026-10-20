@@ -26,21 +26,20 @@ public sealed class CargoFleetShortageTests
     }
 
     [Theory]
-    [InlineData(0, 0, 0, 0, false)]
-    [InlineData(3, 0, 1, 1, false)]
-    [InlineData(3, 1, 1, 2, false)]
-    [InlineData(3, 1, 0, 1, true)]
+    [InlineData(0, 0, 0, 0)]
+    [InlineData(3, 0, 1, 1)]
+    [InlineData(3, 1, 1, 2)]
+    [InlineData(3, 1, 0, 1)]
     public void ExplicitEvidenceRejectsUnprovenOrAvailableFleet(
-        int backlog, int active, int idle, int effective, bool eligible)
+        int backlog, int active, int idle, int effective)
     {
         var tracker = new CargoFleetShortageTracker();
         var observation = new CargoFleetCapacityObservation(backlog, active, idle, effective, new(17, 2));
         for (ulong tick = 1; tick <= 199; tick++)
             Assert.Null(tracker.ObserveEvidence(new(1), new(1), new(tick),
                 TimeSpan.FromMilliseconds(50), observation, false));
-        Assert.Equal(eligible ? observation : null,
-            tracker.ObserveEvidence(new(1), new(1), new(200),
-                TimeSpan.FromMilliseconds(50), observation, eligible && false));
+        Assert.Null(tracker.ObserveEvidence(new(1), new(1), new(200),
+            TimeSpan.FromMilliseconds(50), observation, false));
     }
 
     [Fact]
