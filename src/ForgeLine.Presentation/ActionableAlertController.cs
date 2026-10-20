@@ -44,11 +44,16 @@ public sealed class ActionableAlertController
     private float _expansionPosition;
     private EntityId _expandedTarget;
     private NotificationExpansion _expansion;
-    public NotificationExpansion Expansion => _expansion with { Progress = _expansionPosition };
+    public NotificationExpansion Expansion => _expansion with
+    {
+        Progress = UiMotionTimeline.SmoothStep(TimeSpan.FromMilliseconds(_expansionPosition * 200),
+            TimeSpan.FromMilliseconds(200))
+    };
     public string Feedback { get; private set; } = string.Empty;
     public void Unavailable() { Feedback = "TARGET UNAVAILABLE - OPEN OPERATIONS"; _feedbackSeconds = 3; }
     public void CancelInput(InputState input) { _press = input.MousePressSequence(PlatformMouseButton.Left); _pending = false; }
-    public AlertActivation Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, bool blocked = false, double seconds = 0, bool dockExpanded = false, string localFeedback = "")
+    public AlertActivation Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, bool blocked = false, double seconds = 0, bool dockExpanded = false, string localFeedback = "",
+        bool animateDetails = true)
     {
         if (_session.IsSpecified && snapshot?.SessionId is { IsSpecified: true } incoming &&
             (incoming.Value < _session.Value || incoming == _session && snapshot.Tick.Value < _tick.Value))
@@ -69,14 +74,16 @@ public sealed class ActionableAlertController
             (!HasExpandedCard(plain) || !ExpandedSourceCurrent(alerts)))
         { _expansion = default; _expansionPosition = 0; }
         float requested = _expansion.Open ? 1 : 0;
-        _expansionPosition = Math.Clamp(_expansionPosition +
+        bool settleDetails = !animateDetails || changed || !double.IsFinite(seconds) ||
+            seconds > .25;
+        _expansionPosition = settleDetails ? requested : Math.Clamp(_expansionPosition +
             (float)Math.Max(0, seconds) / .2f * (requested > _expansionPosition ? 1 : -1), 0, 1);
         if (!_expansion.Open && _expansionPosition == 0) _expansion = default;
         var stack = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback,
             Expansion);
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
         bool captured = _pending || input.HasPointerPosition && stack.Contains(input.PointerPosition) || fresh && originValid && stack.Contains(origin);
-        if (changed) { _pending = false; _expansionPosition = _expansion.Open ? 1 : 0; return new(captured); }
+        if (changed) { _pending = false; return new(captured); }
         if (fresh)
         {
             _pending = false; _identity = default;
