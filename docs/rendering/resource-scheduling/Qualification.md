@@ -1,8 +1,8 @@
 # Graphics resource scheduling qualification
 
 Status: implemented, not accepted. The final fixed performance cohort retains
-an open CPU-tail gate. The repaired complete local suite passes; actual debug-layer,
-human visual and required final PR checks remain open. No integration, tag or release is performed.
+an open CPU-tail gate. The repaired complete local suite passes and human visual
+review is approved; actual debug-layer and required final PR checks remain open. No integration, tag or release is performed.
 
 ## Baseline and scope
 
@@ -291,3 +291,20 @@ L-corners emit eight. A further explicit serial authorization includes only
 benchmarks/ForgeLine.Rendering.Benchmarks/InteractionHotPathMeasurements.cs. Its
 expected geometry is corrected to eight while fixed overhead, zero-allocation,
 draw-count and all other limits remain unchanged. Both failed CI logs are retained.
+
+
+The repair source 2ff35dce72b4e98d41615e8b9dbe7b0ab5e403cf has a successful Release solution build (zero warnings
+and errors, 29.93s), the complete Graphics suite passing 117 tests with zero
+failures and four explicit optional skips / 121 total (31.593s), and all 36
+interaction benchmark cases passing with zero allocation and dropped lines.
+The local debug-only new regression skips explicitly because the layer remains
+unavailable; the hosted debug-enabled CI must still verify that branch. The full
+2,969-pass solution run above predates this targeted repair and is not relabeled
+as a new full-solution execution.
+
+A new single-candidate native matrix verifies all six 2ff35dce image files are
+byte-identical to the explicitly approved 09eb021b originals. The visual approval
+record pins each checksum and both source identities. This is an image/structural
+verification; its raw timing observations do not replace either failed paired
+performance protocol or provide new timing acceptance. Required CI restarts on
+the repair; the PR remains draft, with CPU-tail and actual debug/CI acceptance open.
