@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using ForgeLine.Core;
 using ForgeLine.Game;
@@ -214,7 +215,7 @@ public sealed class ActionableAlertController
         if (item.Local || item.Feedback)
         {
             text.Append("REASON: ").AppendLine(item.Local ? localFeedback : ResourcePowerHudRenderer.ResolveFailureLabel(experience.Feedback));
-            text.Append("TICK: ").AppendLine((item.Feedback ? experience.Feedback.ResolvedAtTick : experience.Tick).Value.ToString());
+            text.Append("TICK: ").AppendLine((item.Feedback ? experience.Feedback.ResolvedAtTick : experience.Tick).Value.ToString(CultureInfo.InvariantCulture));
             text.AppendLine("FOCUS: N/A");
             text.AppendLine("NEXT ACTION: OPEN OPERATIONS NOTIFICATIONS");
             return text.ToString();
@@ -226,8 +227,8 @@ public sealed class ActionableAlertController
         text.Append("REASON: ").AppendLine(source?.Label ?? AlertLifecycleTracker.Label(item.Kind));
         int affected = item.Kind == PlayerAlertState.SupplyCritical ? experience.CriticalSupplyUnits :
             item.Kind == PlayerAlertState.ProductionBlocked ? experience.BlockedProductionFacilities : 0;
-        text.Append("AFFECTED: ").AppendLine(affected > 0 ? affected.ToString() : "N/A");
-        text.Append("ONSET TICK: ").AppendLine(source?.Identity.Started.Value.ToString() ?? "N/A");
+        text.Append("AFFECTED: ").AppendLine(affected > 0 ? affected.ToString(CultureInfo.InvariantCulture) : "N/A");
+        text.Append("ONSET TICK: ").AppendLine(source?.Identity.Started.Value.ToString(CultureInfo.InvariantCulture) ?? "N/A");
         text.Append("FOCUS: ").AppendLine(source is { Target.IsValid: true } ? source.Value.Target.ToString() : "N/A");
         text.Append("NEXT ACTION: ").AppendLine(source is { Target.IsValid: true } ?
             "FOCUS AFFECTED ENTITY" : "OPEN OPERATIONS DETAILS");
