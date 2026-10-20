@@ -228,4 +228,3 @@ public sealed class SubmissionSafetyTests
 
 [CollectionDefinition("Instance submission allocations", DisableParallelization = true)]
 public sealed class SubmissionAllocationGroup;
-
