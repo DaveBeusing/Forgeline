@@ -14,20 +14,6 @@ public readonly record struct OperationsInteraction(bool Captured, EntityId Navi
 public static class OperationsLayout
 {
     public const int PageSize = 6;
-    public static HudRect Entry(in GameplayHudLayout layout)
-    {
-        float band = EntryBand(layout);
-        if (band <= 0) return default;
-        float scale = MathF.Min(MathF.Min(layout.Scale, 1.25f), band / 20);
-        return new(layout.SecondaryView.X, layout.SecondaryView.Bottom - band + 2 * scale,
-            MathF.Min(126 * scale, layout.SecondaryView.Width), 16 * scale);
-    }
-    internal static float EntryBand(in GameplayHudLayout layout)
-    {
-        float scale = MathF.Min(layout.Scale, 1.25f);
-        float band = MathF.Min(20 * scale, MathF.Max(0, layout.SecondaryView.Height - 38 * scale));
-        return band >= 14 * scale ? band : 0;
-    }
     public static HudRect Panel(in GameplayHudLayout layout)
     {
         float gap = 8 * MathF.Min(layout.Scale, 1.25f);
@@ -128,23 +114,15 @@ public sealed class OperationsController
         if (View.Suppressed)
         {
             interaction.SetOperationsOpen(false);
-            var tab = OperationsLayout.Entry(layout);
-            return new(input.HasPointerPosition && tab.Contains(input.PointerPosition));
+            return default;
         }
         interaction.SetOperationsOpen(View.Open);
-        var entry = OperationsLayout.Entry(layout);
         var panel = OperationsLayout.Panel(layout);
-        bool captured = input.HasPointerPosition && (entry.Contains(input.PointerPosition) || View.Open && panel.Contains(input.PointerPosition));
+        bool captured = input.HasPointerPosition && View.Open && panel.Contains(input.PointerPosition);
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
-        captured |= fresh && originValid && (entry.Contains(origin) || View.Open && panel.Contains(origin));
+        captured |= fresh && originValid && View.Open && panel.Contains(origin);
         if (inputCaptured || transition || !fresh || !input.HasPointerPosition || !originValid || snapshot?.PlayerExperience is null ||
             !snapshot.SessionId.IsSpecified || snapshot.PlayerExperience.Value.IsMatchComplete) return new(captured);
-        if (entry.Contains(origin))
-        {
-            if (View.Open) Close(input, interaction);
-            else { View = new(true, Session: _session); interaction.SetOperationsOpen(true); }
-            return new(true);
-        }
         if (!View.Open && layout.TopStatusBar.Contains(origin))
         { View = new(true, Session: _session); interaction.SetOperationsOpen(true); return new(true); }
         if (!View.Open || !panel.Contains(origin)) return new(captured);

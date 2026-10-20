@@ -16,8 +16,6 @@ public static class GameplayGuidanceLayout
         if (detailed && !region.IsEmpty)
         {
             float bottom = layout.SecondaryView.Y - layout.Gap;
-            var operations = OperationsLayout.Entry(layout);
-            if (!operations.IsEmpty) bottom = MathF.Min(bottom, operations.Y - layout.Gap);
             region = region with { Height = MathF.Max(0, bottom - region.Y) };
         }
         return region;

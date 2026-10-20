@@ -46,24 +46,13 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         if (_width <= 0 || _height <= 0) return;
         _skin.Begin(context.Graphics);
         _count = 0; _line = 0;
-        _scale = MathF.Min(context.Layout.Scale, OperationsLayout.Entry(context.Layout).Width / 126);
-        _bounds = OperationsLayout.Entry(context.Layout);
+        _scale = OperationsLayout.Scale(context.Layout);
+        _bounds = OperationsLayout.Panel(context.Layout);
         bool panelVisible = context.Operations.Open && !context.Operations.Suppressed &&
             context.Operations.Session == context.Snapshot.SessionId;
         bool activePresentation = context.AnimateOperations && !context.PreAlphaUx.Placement.Visible;
         _panelOpacity = _motion.Update(panelVisible, context.Snapshot.SessionId,
             context.Layout, context.PresentationTime, activePresentation);
-
-        // One persistent toggle; opening never spawns a second panel.
-        if (!_bounds.IsEmpty)
-        {
-            HudRect entry = _bounds;
-            if (!_skin.Panel(entry, "control.button_compact", OperationsPanelVisuals.BackgroundOpacity))
-                Quad(entry, GameplayHudVisualStyle.PanelBackground with { W = OperationsPanelVisuals.BackgroundOpacity });
-            Quad(new HudRect(entry.X, entry.Y, MathF.Max(1, 2 * _scale), entry.Height),
-                panelVisible ? GameplayHudVisualStyle.Focus : GameplayHudVisualStyle.TextSecondary);
-            Line("OPERATIONS", true);
-        }
         var view = context.Operations;
         if (_panelOpacity > 0 && !panelVisible)
         {

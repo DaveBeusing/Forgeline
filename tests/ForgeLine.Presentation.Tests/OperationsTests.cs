@@ -18,13 +18,16 @@ public sealed class OperationsTests
     [InlineData(0, 0)]
     [InlineData(10, 10)]
     [InlineData(320, 180)]
-    public void CollapsedViewportsHaveNoOffscreenOperationsTab(int width, int height)
+    public void CollapsedViewportsHaveNoOperationsPointerReservation(int width, int height)
     {
         var layout = GameplayHudLayout.Create(width, height, 192, 2);
-        var tab = OperationsLayout.Entry(layout);
-        if (tab.IsEmpty) return;
-        Assert.True(layout.SafeArea.Contains(new(tab.X, tab.Y)));
-        Assert.True(layout.SafeArea.Contains(new(tab.Right, tab.Bottom)));
+        var controller = new OperationsController();
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var snapshot = Snapshot();
+        controller.Update(input, snapshot, layout, interaction);
+        Assert.False(controller.ContainsSurface(Vector2.Zero, layout));
+        Assert.False(controller.Update(input, snapshot, layout, interaction).Captured);
     }
     [Theory]
     [InlineData(1)]
@@ -217,7 +220,7 @@ public sealed class OperationsTests
             Assert.True(panel.Contains(new(control.X, control.Y)));
             Assert.True(panel.Contains(new(control.Right, control.Bottom)));
         }
-        Assert.False(OperationsLayout.Entry(layout).Intersects(GameplayGuidanceLayout.Resolve(layout)));
+        Assert.False(panel.Intersects(layout.Minimap));
         var data = new OperationsSnapshot(new(1), new(4), new(1), [Facility(new(1, 1))], [], [], 1, 0);
         using var device = new SelectionOverlayRenderingTests.RecordingDevice();
         using var renderer = new OperationsHudSurface(device);
@@ -262,7 +265,7 @@ public sealed class OperationsTests
         var input = new InputState(); var interaction = new PresentationInteractionState();
         var layout = GameplayHudLayout.Create(1600, 900, 96);
         controller.Update(input, snapshot, layout, interaction);
-        Click(input, OperationsLayout.Entry(layout)); controller.Update(input, snapshot, layout, interaction);
+        Click(input, layout.TopStatusBar); controller.Update(input, snapshot, layout, interaction);
         Assert.True(controller.View.Open);
         Click(input, OperationsLayout.Control(layout, 3)); controller.Update(input, snapshot, layout, interaction);
         Assert.Equal(entity, controller.View.Selected);
@@ -281,9 +284,9 @@ public sealed class OperationsTests
         var controller = new OperationsController(); var snapshot = Snapshot();
         var layout = GameplayHudLayout.Create(1600, 900, 96);
         controller.Update(input, snapshot, layout, interaction);
-        Click(input, OperationsLayout.Entry(layout)); controller.Update(input, snapshot, layout, interaction, blocked: true);
+        Click(input, layout.TopStatusBar); controller.Update(input, snapshot, layout, interaction, blocked: true);
         controller.Update(input, snapshot, layout, interaction); Assert.False(controller.View.Open);
-        Click(input, OperationsLayout.Entry(layout)); controller.Update(input, snapshot, layout, interaction);
+        Click(input, layout.TopStatusBar); controller.Update(input, snapshot, layout, interaction);
         Assert.True(controller.View.Open);
         var changed = GameplayHudLayout.Create(1920, 1080, 144);
         Click(input, OperationsLayout.Control(layout, 0)); controller.Update(input, snapshot, changed, interaction);
@@ -298,7 +301,7 @@ public sealed class OperationsTests
         var controller = new OperationsController(); var snapshot = Snapshot();
         var layout = GameplayHudLayout.Create(1600, 900, 96);
         controller.Update(input, snapshot, layout, interaction);
-        Click(input, OperationsLayout.Entry(layout)); controller.Update(input, snapshot, layout, interaction);
+        Click(input, layout.TopStatusBar); controller.Update(input, snapshot, layout, interaction);
         Assert.True(controller.View.Open);
         controller.Update(input, snapshot, layout, interaction, blocked: true);
         Assert.True(controller.View.Suppressed); Assert.False(interaction.Capture().OperationsOpen);
@@ -330,33 +333,56 @@ public sealed class OperationsTests
         Assert.InRange(renderer.LastRenderedVertexCount, 1, OperationsHudSurface.MaxVertices);
     }
     [Fact]
-    public void PersistentOperationsToggleOpensAndClosesTheSamePanelOncePerPress()
+    public void ContextualResourceEntryOpensPanelAndCloseReleasesInputImmediately()
     {
         var input = new InputState();
         var interaction = new PresentationInteractionState();
         var controller = new OperationsController();
         var layout = GameplayHudLayout.Create(1600, 900, 96);
         var snapshot = Snapshot();
-        HudRect entry = OperationsLayout.Entry(layout);
-        Assert.False(entry.IsEmpty);
-
-        Click(input, entry);
-        Assert.True(controller.Update(input, snapshot, layout, interaction).Captured);
-        Assert.True(controller.View.Open);
         controller.Update(input, snapshot, layout, interaction);
+        HudRect oldStrip = new(layout.SecondaryView.X,
+            layout.SecondaryView.Bottom - 19, 126, 18);
+        Vector2 formerToggle = new(oldStrip.X + 5, oldStrip.Y + 5);
+        input.Apply(PlatformInputEvent.PointerMoved((int)formerToggle.X, (int)formerToggle.Y));
+        Assert.False(controller.Update(input, snapshot, layout, interaction).Captured);
+        Click(input, oldStrip);
+        Assert.False(controller.Update(input, snapshot, layout, interaction).Captured);
+        Assert.False(controller.View.Open);
+
+        Click(input, layout.TopStatusBar);
+        Assert.True(controller.Update(input, snapshot, layout, interaction).Captured);
         Assert.True(controller.View.Open);
         Assert.True(interaction.Capture().OperationsOpen);
-
-        Click(input, entry);
-        Assert.True(controller.Update(input, snapshot, layout, interaction).Captured);
-        Assert.False(controller.View.Open);
-        controller.Update(input, snapshot, layout, interaction);
-        Assert.False(controller.View.Open);
-        Assert.False(interaction.Capture().OperationsOpen);
-
-        Click(input, entry);
         controller.Update(input, snapshot, layout, interaction);
         Assert.True(controller.View.Open);
+
+        Click(input, OperationsLayout.Control(layout, 0));
+        Assert.True(controller.Update(input, snapshot, layout, interaction).Captured);
+        Assert.False(controller.View.Open);
+        Assert.False(interaction.Capture().OperationsOpen);
+        Assert.False(controller.ContainsSurface(
+            new Vector2(OperationsLayout.Panel(layout).X + 10,
+                OperationsLayout.Panel(layout).Y + 50), layout));
+
+        Click(input, layout.TopStatusBar);
+        controller.Update(input, snapshot, layout, interaction);
+        Assert.True(controller.View.Open);
+    }
+
+    [Fact]
+    public void ClosedOperationsHudDoesNotDrawPersistentToggle()
+    {
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        using var device = new SelectionOverlayRenderingTests.RecordingDevice();
+        using var renderer = new OperationsHudSurface(device);
+        var graphics = new SelectionOverlayRenderingTests.RecordingContext { Width = 1600, Height = 900 };
+        var context = new GameplayHudRenderContext(graphics, new RtsCamera(), Snapshot(), default,
+            default, default, default, default, CombatGroupOverviewView.Empty, default,
+            layout, 96, 1, null);
+        renderer.Render(context);
+        Assert.Equal(0, renderer.LastRenderedVertexCount);
+        Assert.Equal(0, renderer.TextDiagnostics.Glyphs);
     }
 
     [Fact]
@@ -381,6 +407,45 @@ public sealed class OperationsTests
         controller.Close(input, interaction);
         Assert.False(controller.ContainsSurface(emptySpace, layout));
         Assert.False(controller.Update(input, snapshot, layout, interaction).Captured);
+    }
+
+    [Fact]
+    public void AlertDetailsAndFilteredOperationsRemainAvailableWithoutPersistentStrip()
+    {
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var controller = new OperationsController();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var snapshot = Snapshot();
+        controller.Update(input, snapshot, layout, interaction);
+
+        controller.OpenNotifications(snapshot.SessionId, interaction);
+        Assert.True(controller.View.Open);
+        Assert.True(controller.View.Notifications);
+        Assert.True(controller.ContainsSurface(
+            new Vector2(OperationsLayout.Panel(layout).X + 12,
+                OperationsLayout.Panel(layout).Y + 35), layout));
+
+        controller.Close(input, interaction);
+        controller.OpenCategory(OperationsCategory.Blocked, snapshot.SessionId, interaction);
+        Assert.Equal(OperationsCategory.Blocked, controller.View.Filter);
+        Assert.True(interaction.Capture().OperationsOpen);
+        Assert.True(controller.View.Open);
+    }
+
+    [Fact]
+    public void StrategicOverlaySelectionAndMinimapVisibilityAreIndependentOfOperations()
+    {
+        var overlays = new RtsInformationLayerController();
+        Assert.True(overlays.MinimapEnabled);
+        overlays.CycleOverlay();
+        Assert.Equal(StrategicOverlayMode.Logistics, overlays.OverlayMode);
+        Assert.False(string.IsNullOrWhiteSpace(RtsStrategicOverlayHudModel.Legend(overlays.OverlayMode)));
+        overlays.ToggleMinimap();
+        Assert.False(overlays.MinimapEnabled);
+        overlays.ToggleMinimap();
+        Assert.True(overlays.MinimapEnabled);
+        Assert.Equal(StrategicOverlayMode.Logistics, overlays.OverlayMode);
     }
 
     private static OperationsFacility Facility(EntityId entity) => new(entity, "FACILITY", OperationsCategory.Production,
