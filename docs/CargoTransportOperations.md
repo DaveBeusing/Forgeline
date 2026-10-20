@@ -119,6 +119,20 @@ A transport enters Failed only for conditions that cannot be handled as ordinary
 
 Failure state remains visible through diagnostics instead of silently discarding the order.
 
+When a cargo failure occurs after the vehicle has entered an exclusive loading lane, the
+failed order is removed but the physical dock visit and bay generation remain owned by
+that vehicle. The vehicle enters `Exiting` and follows the existing finite local
+departure path on later simulation ticks even though no cargo order remains. Only the
+ordinary physical exit-clearance check releases the bay and its queue membership.
+A blocked exit reports `ExitBlocked`; inventory or source loss does not allow an
+instant release, teleport, or inventory transfer. Vehicles not yet inside the lane
+retain the normal cancellation path.
+
+This recovery is independent of the destination policy retry: a failed empty truck
+cannot be reused until it physically clears the bay and returns to the idle state.
+Any cargo already loaded remains in its transport inventory, subject to the
+existing loss/accountability rules.
+
 ## Partial-Load Policy
 
 Two policies are supported.
