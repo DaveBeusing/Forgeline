@@ -1,0 +1,316 @@
+name: Render qualification
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - build/rendering/qualification/**
+      - tests/ForgeLine.Presentation.Tests/RenderQualification/**
+      - tests/ForgeLine.Graphics.Tests/RenderQualification/**
+      - tests/ForgeLine.Client.Tests/RenderQualification/**
+      - docs/rendering/qualification/**
+      - .github/workflows/render-qualification.yml
+  push:
+    branches: [master]
+    paths:
+      - build/rendering/qualification/**
+      - tests/ForgeLine.Presentation.Tests/RenderQualification/**
+      - tests/ForgeLine.Graphics.Tests/RenderQualification/**
+      - tests/ForgeLine.Client.Tests/RenderQualification/**
+      - docs/rendering/qualification/**
+      - .github/workflows/render-qualification.yml
+  workflow_dispatch:
+    inputs:
+      native:
+        description: Request the optional physical run after hosted admission checks
+        type: boolean
+        default: false
+      baseline_sha:
+        description: Full immutable baseline commit already integrated into master
+        type: string
+        required: false
+      candidate_sha:
+        description: Full immutable candidate commit already integrated into master
+        type: string
+        required: false
+      hardware_evidence_path:
+        description: Reviewed JSON below docs/rendering/qualification/hardware/ on this master
+        type: string
+        required: false
+      hardware_evidence_sha256:
+        description: SHA-256 of the exact reviewed hardware and capacity record
+        type: string
+        required: false
+      comparison_kind:
+        description: Optimization preserves runtime assets; visual-candidate needs separate review
+        type: choice
+        default: optimization
+        options: [optimization, visual-candidate]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+  TESTINGPLATFORM_TELEMETRY_OPTOUT: "1"
+
+jobs:
+  contracts:
+    name: Evidence, ownership and sample contracts
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Verify qualification ownership and isolated version change
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        shell: pwsh
+        env:
+          QUALIFICATION_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          QUALIFICATION_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $paths = @(& git diff --name-only --no-renames "$env:QUALIFICATION_BASE_SHA...$env:QUALIFICATION_HEAD_SHA")
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item artifacts -ItemType Directory -Force | Out-Null
+          $paths | Where-Object { $_ -ne 'Directory.Build.props' } | Set-Content artifacts/qualification-ownership.txt -Encoding utf8NoBOM
+          python build/rendering/parallelization/ValidateOwnership.py --package RenderPerformanceAndVisualQualification --diff-file artifacts/qualification-ownership.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($paths -contains 'Directory.Build.props') {
+            $before = (& git show "$($env:QUALIFICATION_BASE_SHA):Directory.Build.props") -join "`n"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            $after = (& git show "$($env:QUALIFICATION_HEAD_SHA):Directory.Build.props") -join "`n"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            $pattern = '<ForgeLineVersionPatch>[0-9]+</ForgeLineVersionPatch>'
+            $old = [regex]::Matches($before, $pattern)
+            $new = [regex]::Matches($after, $pattern)
+            if ($old.Count -ne 1 -or $new.Count -ne 1 -or $after.Replace($new[0].Value, $old[0].Value) -cne $before) {
+              throw 'Only the isolated product PATCH change is exempt from parallel ownership.'
+            }
+            pwsh -NoProfile -File build/Validate-SemVer.ps1 -BaseRef $env:QUALIFICATION_BASE_SHA -HeadRef $env:QUALIFICATION_HEAD_SHA
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+      - name: Evidence integrity, statistics and hardware admission negatives
+        run: python -m unittest discover -s build/rendering/qualification -p 'test_*.py' -v
+      - name: Existing ownership positive and negative contracts
+        run: python -m unittest discover -s build/rendering/parallelization -p 'test_*.py' -v
+      - name: PowerShell command journaling and orchestration contracts
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File build/rendering/qualification/Test-RenderQualification.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -NoProfile -File build/Test-ReferencePerformance.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -NoProfile -File build/Test-VisualReferenceEvidence.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve full matrix with all hardware gates open
+        shell: pwsh
+        env:
+          QUALIFICATION_PLAN_BASE: ${{ github.event.pull_request.base.sha || github.sha }}
+          QUALIFICATION_PLAN_CANDIDATE: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          pwsh -NoProfile -File build/rendering/qualification/Invoke-RenderQualification.ps1 -PlanOnly -AnalysisMasterSource $env:QUALIFICATION_PLAN_BASE -BaselineSource $env:QUALIFICATION_PLAN_BASE -CandidateSource $env:QUALIFICATION_PLAN_CANDIDATE -OutputRoot artifacts/qualification-plan
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Restore and build Release
+        shell: pwsh
+        run: |
+          dotnet restore ForgeLine.sln
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build ForgeLine.sln --configuration Release --no-restore
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -NoProfile -File build/Validate-ProjectReferences.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build qualified runtime fixtures for real renderer tests
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File build/Build-RuntimeAssets.ps1 -Mode development -NoBuild
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Real frame boundary and renderer regression contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class '*RenderQualification*' --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.SimpleInstanceRendererTests ForgeLine.Presentation.Tests.PresentationExtractionTests ForgeLine.Presentation.Tests.RenderSnapshotIndexTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Declare the hosted qualification boundary
+        if: always()
+        shell: pwsh
+        run: |
+          'Hosted evidence contracts do not constitute native timing, complete-host-frame, moving-soak or human image acceptance. Those gates remain OPEN until separately recorded.' >> $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: render-qualification-contracts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/qualification-*
+            artifacts/render-qualification-*
+          if-no-files-found: warn
+
+  native-readiness:
+    name: Verify trusted sources and physical runner availability
+    needs: contracts
+    if: github.event_name == 'workflow_dispatch' && inputs.native && github.ref == 'refs/heads/master' && github.repository == 'DaveBeusing/Forgeline'
+    runs-on: windows-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      eligible: ${{ steps.readiness.outputs.eligible }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Fail closed when trust, required CI, calibration or inventory is unavailable
+        id: readiness
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          FORGELINE_RUNNER_INVENTORY_TOKEN: ${{ secrets.FORGELINE_RUNNER_INVENTORY_TOKEN }}
+          QUALIFICATION_BASELINE_SHA: ${{ inputs.baseline_sha }}
+          QUALIFICATION_CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          QUALIFICATION_HARDWARE_EVIDENCE: ${{ inputs.hardware_evidence_path }}
+          QUALIFICATION_HARDWARE_SHA256: ${{ inputs.hardware_evidence_sha256 }}
+        run: |
+          python build/rendering/qualification/check_readiness.py --output artifacts/qualification-readiness.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Explain admission outcome
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/qualification-readiness.json) {
+            Get-Content artifacts/qualification-readiness.json -Raw >> $env:GITHUB_STEP_SUMMARY
+          }
+          'A missing or inaccessible runner inventory leaves physical qualification OPEN. No self-hosted job is admitted by assumption.' >> $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: render-qualification-readiness-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/qualification-readiness.json
+          if-no-files-found: warn
+
+  native:
+    name: Opt-in paired physical measurements
+    needs: [contracts, native-readiness]
+    if: needs.native-readiness.outputs.eligible == 'true'
+    runs-on: [self-hosted, Windows, X64, forgeline-performance]
+    timeout-minutes: 720
+    concurrency:
+      group: forgeline-performance
+      cancel-in-progress: false
+    env:
+      QUALIFICATION_BASELINE_SHA: ${{ inputs.baseline_sha }}
+      QUALIFICATION_CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      QUALIFICATION_HARDWARE_EVIDENCE: ${{ inputs.hardware_evidence_path }}
+      QUALIFICATION_HARDWARE_SHA256: ${{ inputs.hardware_evidence_sha256 }}
+      QUALIFICATION_COMPARISON_KIND: ${{ inputs.comparison_kind }}
+    steps:
+      - name: Start the bounded native job clock
+        shell: pwsh
+        run: '"QUALIFICATION_JOB_START_UTC=$([DateTimeOffset]::UtcNow.ToString(''O''))" >> $env:GITHUB_ENV'
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          path: qualification-tools
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.baseline_sha }}
+          path: qualification-baseline
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          path: qualification-candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: qualification-tools/global.json
+      - name: Revalidate reviewed evidence on the admitted runner
+        shell: pwsh
+        working-directory: qualification-tools
+        run: |
+          python -c "import os,sys; from pathlib import Path; sys.path.insert(0,'build/rendering/qualification'); import check_readiness as r; r.trusted_sources(Path.cwd(),os.environ['GITHUB_REPOSITORY'],os.environ['GITHUB_EVENT_NAME'],os.environ['GITHUB_REF'],os.environ['GITHUB_SHA'],os.environ['QUALIFICATION_BASELINE_SHA'],os.environ['QUALIFICATION_CANDIDATE_SHA']); r.hardware_evidence(Path.cwd(),os.environ['QUALIFICATION_HARDWARE_EVIDENCE'],os.environ['QUALIFICATION_HARDWARE_SHA256'])"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build clean source-less packages before capture
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $records = [Collections.Generic.List[object]]::new()
+          $recordRoot = Join-Path $env:RUNNER_TEMP "render-qualification-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
+          if (Test-Path $recordRoot) { throw 'The per-attempt qualification directory already exists.' }
+          New-Item $recordRoot -ItemType Directory | Out-Null
+          "QUALIFICATION_OUTPUT_ROOT=$recordRoot" >> $env:GITHUB_ENV
+          function Invoke-RecordedBuild([string]$Program, [string[]]$CommandArguments) {
+            $source = (& git rev-parse HEAD).Trim()
+            if ($LASTEXITCODE -ne 0) { throw 'Cannot identify the source of the package command.' }
+            $started = [DateTimeOffset]::UtcNow.ToString('O')
+            & $Program @CommandArguments
+            $code = $LASTEXITCODE
+            $records.Add(@{ source = $source; program = $Program; arguments = $CommandArguments; startedUtc = $started; endedUtc = [DateTimeOffset]::UtcNow.ToString('O'); exitCode = $code })
+            if ($code -ne 0) { throw "Required package command exited $code." }
+          }
+          try {
+            foreach ($role in @('baseline', 'candidate')) {
+              Push-Location "qualification-$role"
+              try {
+                Invoke-RecordedBuild 'dotnet' @('restore', 'ForgeLine.sln')
+                Invoke-RecordedBuild 'dotnet' @('build', 'ForgeLine.sln', '--configuration', 'Release', '--no-restore')
+                $publish = @('-NoProfile', '-File', 'build/Publish-PreAlpha.ps1', '-Configuration', 'Release', '-OutputRoot', 'artifacts/qualification-package')
+                if ($role -eq 'candidate' -and $env:QUALIFICATION_COMPARISON_KIND -eq 'optimization') {
+                  $publish += @('-RuntimeAssetRoot', "$env:GITHUB_WORKSPACE/qualification-baseline/artifacts/qualification-package/compiled-assets")
+                }
+                Invoke-RecordedBuild 'pwsh' $publish
+              }
+              finally { Pop-Location }
+            }
+          }
+          finally { $records | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $recordRoot 'build-commands.json') -Encoding utf8NoBOM }
+      - name: Run every planned paired case without overwriting failures
+        shell: pwsh
+        working-directory: qualification-tools
+        run: |
+          $hardware = Join-Path (Get-Location) $env:QUALIFICATION_HARDWARE_EVIDENCE
+          $capacity = (Get-Content $hardware -Raw | ConvertFrom-Json).capacityMinutes
+          $setupMinutes = ([DateTimeOffset]::UtcNow - [DateTimeOffset]::Parse($env:QUALIFICATION_JOB_START_UTC)).TotalMinutes
+          if ($setupMinutes -gt 60 -or $capacity -gt 600) {
+            throw 'The declared full capture cannot preserve 60 minutes for reporting/upload within the 720-minute job; no matrix reduction is permitted.'
+          }
+          pwsh -NoProfile -File build/rendering/qualification/Invoke-RenderQualification.ps1 -AnalysisMasterSource $env:GITHUB_SHA -BaselineRoot "$env:GITHUB_WORKSPACE/qualification-baseline" -CandidateRoot "$env:GITHUB_WORKSPACE/qualification-candidate" -BaselineSource $env:QUALIFICATION_BASELINE_SHA -CandidateSource $env:QUALIFICATION_CANDIDATE_SHA -BaselinePackageRoot "$env:GITHUB_WORKSPACE/qualification-baseline/artifacts/qualification-package/win-x64/publish" -CandidatePackageRoot "$env:GITHUB_WORKSPACE/qualification-candidate/artifacts/qualification-package/win-x64/publish" -OutputRoot "$env:QUALIFICATION_OUTPUT_ROOT/capture" -Repetitions 5 -WarmSamples 512 -ColdSamples 128 -Warmups 64 -CapacityMinutes $capacity -ComparisonKind $env:QUALIFICATION_COMPARISON_KIND -HardwareQualificationEvidence $hardware
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Keep unresolved mandatory gates visible
+        shell: pwsh
+        working-directory: qualification-tools
+        run: |
+          python build/rendering/qualification/qualification.py --cohort "$env:QUALIFICATION_OUTPUT_ROOT/capture/cohort.json" --output "$env:QUALIFICATION_OUTPUT_ROOT/final-qualification.json" --require-accepted
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: render-qualification-native-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/render-qualification-${{ github.run_id }}-${{ github.run_attempt }}/**
+            qualification-baseline/artifacts/qualification-package/*.json
+            qualification-candidate/artifacts/qualification-package/*.json
+          if-no-files-found: warn
+          retention-days: 30
