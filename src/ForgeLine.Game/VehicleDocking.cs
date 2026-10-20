@@ -484,6 +484,28 @@ public sealed partial class VehicleDockingService
         return false;
     }
 
+    // Preserve exclusive ownership while a failed cargo order's parked vehicle
+    // clears the actual lane. Never release the bay simply because its order ended.
+    internal static bool BeginFailureExit(EntityRegistry entities, EntityId truck)
+    {
+        if (!entities.TryGetComponent(truck, out VehicleDockVisit visit) ||
+            visit.Generation == 0 ||
+            !entities.TryGetComponent(visit.Building, out VehicleDockSlot slot) ||
+            slot.Truck != truck || slot.Generation != visit.Generation ||
+            !entities.TryGetComponent(truck, out WorldTransform transform) ||
+            !visit.Pose.Contains(transform.Position))
+            return false;
+
+        Put(entities, truck, visit with
+        {
+            Status = VehicleDockStatus.Exiting,
+            Reason = VehicleDockBlockReason.None,
+            ServiceStartedTick = 0,
+            ServiceProgress = 0
+        });
+        return true;
+    }
+
     public static void Suspend(EntityRegistry entities, EntityId truck)
     {
         RemoveQueueAssignment(entities, truck);
