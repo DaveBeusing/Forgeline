@@ -8,6 +8,8 @@ internal sealed class RenderSnapshotIndex : IRenderSnapshotCorrespondence
 {
     internal const int ClusterSize = InstanceVisibilityIndex.ClusterSize;
     private int[] _previousIndices = [];
+    private PresentationSnapshot? _currentSnapshot;
+    private bool _currentOrdered;
     private int[] _currentOrder = [], _previousOrder = [], _sortScratch = [];
     private readonly InstanceVisibilityIndex? _legacyVisibility;
 
@@ -25,11 +27,11 @@ internal sealed class RenderSnapshotIndex : IRenderSnapshotCorrespondence
         SnapshotIdentityOrder.Trim(ref _currentOrder, count);
         SnapshotIdentityOrder.Trim(ref _previousOrder, previous?.InstanceCount ?? 0);
         SnapshotIdentityOrder.Trim(ref _sortScratch, Math.Max(count, previous?.InstanceCount ?? 0));
+        _currentOrdered = SnapshotIdentityOrder.Prepare(current, ref _currentOrder, ref _sortScratch, out _);
         if (previous is null || previous.SessionId != current.SessionId)
             _previousIndices.AsSpan(0, count).Fill(-1);
         else
         {
-            bool currentOrdered = SnapshotIdentityOrder.Prepare(current, ref _currentOrder, ref _sortScratch, out _);
             bool previousOrdered = SnapshotIdentityOrder.Prepare(previous, ref _previousOrder, ref _sortScratch, out bool duplicates);
             if (duplicates)
             {
@@ -41,7 +43,7 @@ internal sealed class RenderSnapshotIndex : IRenderSnapshotCorrespondence
                 int predecessor = 0;
                 for (int ordered = 0; ordered < count; ordered++)
                 {
-                    int index = currentOrdered ? ordered : _currentOrder[ordered];
+                    int index = _currentOrdered ? ordered : _currentOrder[ordered];
                     var entity = current.Instances[index].Entity;
                     while (predecessor < previous.InstanceCount && previous.Instances[
                         previousOrdered ? predecessor : _previousOrder[predecessor]].Entity.CompareTo(entity) < 0)
@@ -52,7 +54,22 @@ internal sealed class RenderSnapshotIndex : IRenderSnapshotCorrespondence
                 }
             }
         }
+        _currentSnapshot = current;
         _legacyVisibility?.Rebuild(current, previous, this);
+    }
+    internal int FindCurrent(EntityId entity)
+    {
+        if (_currentSnapshot is not { } snapshot) return -1;
+        int low = 0, high = snapshot.InstanceCount - 1;
+        while (low <= high)
+        {
+            int middle = low + (high - low) / 2;
+            int index = _currentOrdered ? middle : _currentOrder[middle];
+            int comparison = snapshot.Instances[index].Entity.CompareTo(entity);
+            if (comparison == 0) return index;
+            if (comparison < 0) low = middle + 1; else high = middle - 1;
+        }
+        return -1;
     }
     internal bool IsVisible(int firstIndex, in ViewFrustum frustum) =>
         (_legacyVisibility ?? throw new InvalidOperationException("Visibility belongs to the separate index.")).IsVisible(firstIndex, frustum);

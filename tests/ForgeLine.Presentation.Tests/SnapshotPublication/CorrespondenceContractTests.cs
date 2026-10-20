@@ -33,6 +33,8 @@ public sealed class CorrespondenceContractTests
             foreach (float alpha in new[] { 0f, .25f, .5f, 1f })
             {
                 var actual = world.GetInterpolatedInstance(i, alpha);
+                Assert.True(world.TryGetInterpolatedInstance(current[i].Entity, alpha, out var byEntity));
+                Assert.Equal(actual, byEntity);
                 if (expected < 0) { Assert.Equal(current[i], actual); continue; }
                 var old = prior[expected];
                 Assert.Equal(RenderTransform.Interpolate(old.Transform, current[i].Transform, alpha), actual.Transform);
@@ -81,8 +83,19 @@ public sealed class CorrespondenceContractTests
         var before = Snapshot(prior, 1); var after = Snapshot(current, 2);
         var index = new RenderSnapshotIndex(false);
         index.Rebuild(after, before);
+        var buffer = new PresentationSnapshotBuffer();
+        var world = new RenderWorld();
+        buffer.Publish(before); world.Update(buffer);
+        foreach (var value in prior) Assert.True(world.TryGetInterpolatedInstance(value.Entity, .5f, out _));
+        buffer.Publish(after); world.Update(buffer);
         for (int i = 0; i < current.Length; i++)
             Assert.Equal(Array.FindIndex(prior, v => v.Entity == current[i].Entity), index.PreviousIndex(i));
+        foreach (var value in current)
+        {
+            Assert.True(world.TryGetInterpolatedInstance(value.Entity, .5f, out var found));
+            int slot = Array.FindIndex(current, v => v.Entity == value.Entity);
+            Assert.Equal(world.GetInterpolatedInstance(slot, .5f), found);
+        }
         Assert.True(current.AsSpan().SequenceEqual(after.Instances));
         for (int i = 0; i < 128; i++) index.Rebuild(after, before);
         long bytes = GC.GetAllocatedBytesForCurrentThread();
