@@ -4,31 +4,38 @@ using ForgeLine.Game;
 namespace ForgeLine.Presentation;
 
 public readonly record struct NotificationCardLayout(AlertNotification Item, HudRect Bounds, HudRect Text,
-    HudRect Action, HudRect Details, bool Truncated, ulong Revision = 0, AlertIdentity Identity = default);
+    HudRect Action, HudRect Details, bool Truncated, ulong Revision = 0, AlertIdentity Identity = default,
+    HudRect ExpansionBounds = default)
+{
+    public HudRect InteractiveBounds => ExpansionBounds.IsEmpty ? Bounds :
+        Bounds with { Height = ExpansionBounds.Bottom - Bounds.Y };
+}
 
 public readonly record struct NotificationStackLayout(HudRect Bounds, float FontSize, int Count,
     NotificationCardLayout First = default, NotificationCardLayout Second = default,
     NotificationCardLayout Third = default, NotificationCardLayout Overflow = default, int Revision = 0)
 {
-    public HudRect PaintedBounds => Count==0 ? default : Bounds with {Height=Card(Count-1).Bounds.Bottom-Bounds.Y};
+    public HudRect PaintedBounds => Count==0 ? default : Bounds with {Height=Card(Count-1).InteractiveBounds.Bottom-Bounds.Y};
     public NotificationCardLayout Card(int index) => index >= 0 && index < Count ? index switch
     { 0 => First, 1 => Second, 2 => Third, _ => Overflow } : default;
     public int Hit(Vector2 point)
-    { for (int i = 0; i < Count; i++) if (Card(i).Bounds.Contains(point)) return i; return -1; }
+    { for (int i = 0; i < Count; i++) if (Card(i).InteractiveBounds.Contains(point)) return i; return -1; }
     public bool Contains(Vector2 point) => Hit(point) >= 0;
 }
 
 /// <summary>Bounded copied notifications; the same card geometry drives rendering and input.</summary>
 public static class ActionableAlertLayout
 {
-    public const int ContractVersion = 4;
+    public const int ContractVersion = 5;
     public const int MaximumCards = 3;
     public static float Scale(in GameplayHudLayout layout) => MathF.Max(1, layout.NotificationScale);
-    public static NotificationStackLayout Resolve(PresentationSnapshot? snapshot, in GameplayHudLayout layout, bool expanded = false, string localFeedback = "") =>
+    public static NotificationStackLayout Resolve(PresentationSnapshot? snapshot, in GameplayHudLayout layout,
+        bool expanded = false, string localFeedback = "", NotificationExpansion expansion = default) =>
         snapshot?.PlayerExperience is { } experience && experience.Tick == snapshot.Tick
-            ? Resolve(experience, layout, expanded, ActionableAlertSnapshot.Resolve(snapshot), localFeedback) : default;
+            ? Resolve(experience, layout, expanded, ActionableAlertSnapshot.Resolve(snapshot), localFeedback, expansion) : default;
     public static NotificationStackLayout Resolve(in PlayerExperienceSnapshot experience, in GameplayHudLayout layout,
-        bool expanded = false, ActionableAlertSnapshot? alerts = null, string localFeedback = "")
+        bool expanded = false, ActionableAlertSnapshot? alerts = null, string localFeedback = "",
+        NotificationExpansion expansion = default)
     {
         localFeedback ??= "";
         var bounds = layout.NotificationBounds(expanded);
@@ -48,6 +55,12 @@ public static class ActionableAlertLayout
         Span<char> text = stackalloc char[2048];
         float y = bounds.Y;
         int count = 0, consumed = 0;
+        // Reserve the regular rows first: expanding one card must never make a
+        // subsequent actionable row or overflow card disappear.
+        int normalRows = Math.Min(total, MaximumCards) + (total > MaximumCards ? 1 : 0);
+        float freeHeight = MathF.Max(0, bounds.Height -
+            (normalRows * summary + MathF.Max(0, normalRows - 1) * gap));
+        float detailBudget = MathF.Min(126 * scale, freeHeight);
         for (int i = 0; i < Math.Min(total, MaximumCards); i++)
         {
             var item = i == ResourcePowerHudModel.ResolveNotificationCount(experience) ? new AlertNotification(default, Local: true) : Ordered(experience, i);
@@ -82,8 +95,19 @@ public static class ActionableAlertLayout
                 for (int a = 0; a < alerts.Alerts.Count; a++)
                     if (alerts.Alerts[a].Identity.Kind == item.Kind)
                     { identity = alerts.Alerts[a].Identity; break; }
-            cards[count++] = new(item, rect, content, action, details, truncated, NotificationText.Revision(value), identity);
-            consumed++; y += height + gap;
+            ulong textRevision = NotificationText.Revision(value);
+            HudRect expandedBounds = default;
+            if (expansion.Open && item.Hidden == 0 && expansion.Item == item &&
+                expansion.Identity == identity && expansion.Revision == textRevision &&
+                detailBudget >= line + 2 * padding)
+            {
+                float visibleHeight = detailBudget * Math.Clamp(expansion.Progress, 0, 1);
+                if (visibleHeight > 0)
+                    expandedBounds = new HudRect(rect.X, rect.Bottom, rect.Width, visibleHeight);
+            }
+            cards[count++] = new(item, rect, content, action, details, truncated,
+                textRevision, identity, expandedBounds);
+            consumed++; y += height + (expandedBounds.IsEmpty ? 0 : expandedBounds.Height) + gap;
         }
         if (consumed < total && y + summary <= bounds.Bottom)
         {
