@@ -197,3 +197,79 @@ No rerun, updated image, merge, tag or release is authorized by this checkpoint.
 This implementation does not repair frozen renderer or central workflow files,
 raise content/timing budgets, disable tests or accept new goldens. Required
 out-of-scope failures remain visible with their source and reproduction context.
+
+## Master reconciliation, 20 October 2026
+
+During hosted verification, master advanced from
+`e42ae48346bbb1331b7a548a72fc0905ae6d184a` to
+`2b4b61ece625d1311c9ee5564cf513dadf2d1123` through
+[PR #267](https://github.com/DaveBeusing/Forgeline/pull/267). Its product version
+is `0.1.425-dev`. The qualification branch integrates that exact master and
+adjusts its isolated version delta to **`0.1.426-dev`**, exactly one PATCH above
+the new base. The earlier `0.1.425-dev` checkpoint remains historical; it does
+not reserve or duplicate the new master's version.
+
+The base delta changes composition shaders, particle submission/ordering and
+that workstream's tests and evidence. None of the 15 qualification paths or the
+four invoked central capture/comparison scripts changed. The shared version
+file had identical `425` blobs on both branches. The integration keeps the
+master's complete tree and overlays only the qualification-owned paths, then
+applies the isolated `425` to `426` change. No functional conflict is resolved by
+choosing an entire branch's version of unrelated files.
+
+The required ownership base is now the integrated master
+`2b4b61ece625d1311c9ee5564cf513dadf2d1123`; the workflow already obtains it
+from the PR event. Earlier baseline/cohort identities stay pinned to their
+actual sources. The original source checkpoint and all older CI records are not
+relabelled as measurements of the new master.
+
+The native sample/export schemas remain unchanged, but the new implementation
+changes what several measurements contain. `PreparationCpuMilliseconds` now
+times the inner particle submission; wrapper diagnostics copying and argument
+validation sit outside that subphase. The enclosing native CPU interval still
+includes outer preparation, rendering and Present. Retained depth-key,
+candidate and authorization scratch also changes managed memory, while
+`BufferBytes` still describes renderer GPU buffers rather than total memory.
+Neither subphase timing nor that buffer counter establishes the complete-frame
+timing or memory gate.
+
+Particle depth ordering, copied-snapshot admission and event priority affect
+moving, off-axis and dense effects. Composition changes also affect the regular
+shader paths while `COMPOSITION_SHARED_LINEAR` remains disabled. Equal asset,
+profile and runtime fingerprints therefore do not prove an unchanged image:
+`qualityChanged` does not detect internal shader edits. Comparisons across
+these intentional changes require visual-candidate context and fresh human
+image/motion review. The additional WARP composition tests, synthetic CPU
+ordering checks and current-thread preparation allocation test (64 warmups,
+128 calls) do not replace the fixed 512-sample full-frame measurement or moving
+lifecycle evidence.
+
+Before this base change was reconciled,
+[qualification run 39499174312](https://github.com/DaveBeusing/Forgeline/actions/runs/39499174312/job/118891971370)
+completed successfully on `f4f3bed845e1106972f5c32fe903df2f251592c1`, including
+all executed ownership, Python, PowerShell, PlanOnly, Release, runtime and
+frame/renderer steps. Its two physical jobs were skipped. Frame hot paths,
+Scalability CPU qualification and Movement quality also passed. The associated
+main CI was still incomplete. These results describe the
+old source; the integrated branch requires its own complete validation.
+
+The actual new-master
+[CI run 39499494041](https://github.com/DaveBeusing/Forgeline/actions/runs/39499494041/job/118893071655)
+passed versioning, Release build and steps through the single-object ring
+contracts, and was compiling runtime assets at the reconciliation check. Its
+complete suite was not yet established. The independently checked earlier
+[full-suite run 39491919890](https://github.com/DaveBeusing/Forgeline/actions/runs/39491919890/job/118867002375)
+on PR #267's functional source
+`7a42e0c4299bc0a822edd5bffb3e4c7309bbe547` failed step 59, `Test`.
+Steps 1 through 58 passed; package/product steps 60 through 64 were skipped.
+The exact failing test was not recovered in the recorded diagnostics. This is a
+known unresolved prior result, not proof of a particular regression in the
+integrated master or this qualification. The qualification must not replace either result with a claim
+based on green partial checks.
+
+The PR records the integrated source SHA and the eventual exact-source workflow
+results. Native timing, complete host/timestamp/memory exports, hardware
+conditions, lifecycle execution and human review remain open regardless of a
+successful hosted build. Recheck master and the net single-PATCH delta again
+before integration; no merge, tag or release follows from these checkpoints.
+
