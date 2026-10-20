@@ -142,3 +142,33 @@ exact shared-texture output and disposed cached-texture rejection. A test-loop
 Analyzer failure was corrected before this passing build; no rule was suppressed.
 A new paired protocol is required for this changed source, preserving all first
 protocol results. No timer, sample, image or regression threshold is relaxed.
+
+
+## Extended fault metadata and isolated baseline failures
+
+The opt-in DRED collector now records at most sixteen breadcrumb nodes, with a
+sixteen-operation window around each completion marker, plus sixteen existing and
+sixteen freed allocation types. Page-fault presence is a boolean. It serializes
+only selected numeric metadata, never names, native objects, pointers or memory.
+Unsupported interfaces/HRESULTs remain explicit. Actual device removal is not
+forced; ordinary CPU tests verify bounded, copied windows and missing history.
+This fault-only change is inactive in the timed production configuration.
+
+The first refined protocol attempt stops after its first baseline upload probe:
+a foreign snapshot-publication CPU benchmark is observed by the mandatory quiet
+window guard. No changed upload or native matrix is accepted from that attempt.
+Its data, foreign-work observation and error remain distinct. A complete isolated
+protocol must start with fresh evidence roots after all competing tests finish.
+
+The complete solution on source 79fea4c6 finishes with 2,960 passed, four failed,
+17 optional skips / 2,981 total (10m11.669s). The failures are Controls count
+(expected 49, actual 53), notification reset opacity (one versus zero), selection
+marker line count (24 versus eight), and the Operations native opaque sample.
+Hosted CI 39405830327 fails the same Operations assertion at line 171.
+
+All four exact unchanged tests are independently reproduced against the original
+f2be6532 production binaries. Their production source/assets/compiler trees equal
+current base e42f4e75, and these four test files are unchanged by this PR. Both
+original-binary processes fail with the same assertions (three Presentation, one
+Client). These are demonstrated baseline failures, not waived gates. Their files
+are outside resource-scheduling ownership; serial repair authorization is pending.

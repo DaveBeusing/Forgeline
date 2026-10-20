@@ -30,7 +30,8 @@ elide per-draw constants, buffer addresses/offsets or resource registration.
 Particle descriptor setup must run after its corresponding root signature.
 
 DRED is explicit and process-wide before device creation; status collection is
-bounded and never dumps memory or private names. Detailed operation traversal and
-automatic device-loss reconstruction are not delivered. Performance processes
+bounded and never dumps memory or private names. Breadcrumb output is capped at sixteen nodes and sixteen operations per node,
+with allocation types similarly bounded; automatic device-loss reconstruction
+is not delivered. Performance processes
 keep DRED/debug validation disabled. Existing ten-second fences, quality/texture
 budgets, shader layouts and public interfaces remain unchanged.
