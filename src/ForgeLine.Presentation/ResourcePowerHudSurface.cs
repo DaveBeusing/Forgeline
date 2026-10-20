@@ -208,7 +208,8 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
             context.RuntimeMetrics,
             context.ShowRuntimeMetrics,
             dockExpanded: context.ActionPanel.DockExpanded, localFeedback: context.PreAlphaUx.Placement.Visible ? "" : context.PreAlphaUx.InteractionHint,
-            presentationTime: context.PresentationTime, animateNotifications: context.AnimateNotifications);
+            presentationTime: context.PresentationTime, animateNotifications: context.AnimateNotifications,
+            expansion: context.NotificationExpansion);
 
     public void RenderWaiting(IGraphicsCommandContext graphics, in GameplayHudLayout layout,
         in RuntimeMetricsView metrics, bool showRuntimeMetrics = false) =>
