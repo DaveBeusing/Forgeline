@@ -1,5 +1,34 @@
 # Actionable Alerts and Strategic Map
 
+## Current interactive notification stack
+
+FOCUS on an actionable row advances through the current authorized alert identities in
+the published priority order, including focusable conditions represented by the MORE
+overflow row. The first click starts at the clicked condition. Subsequent FOCUS
+clicks advance cyclically, skipping missing targets. Resolution, target-generation
+changes, player/session changes and tick rollback invalidate earlier identities.
+An OPS button or no usable destination routes to Operations; navigation still
+rechecks world visibility and full entity identity before selecting.
+
+Clicking the **message body** (not FOCUS, OPS or MORE) toggles the single in-stack
+details region underneath that row. It shows only currently authorized severity,
+reason/label, affected counts, onset tick, eligible entity identifier and real
+next action; unavailable facts read N/A. Its fixed available height is bounded by
+the existing right safe-area notification allocation. Long content uses click-to-
+advance pages, never world overflow or inferred event history. MORE continues
+to open the full Operations Notifications panel independently.
+
+New live rows advance from the right safe-area edge over 180 ms; the separate
+200-ms detail expansion uses an eased vertical track. The body and outgoing
+decoration are never treated as newly authoritative. Input, render and ring
+obstacle geometry derive from the same copied expansion identity and current
+layout. Reduced Motion, Low quality, resize, focus loss and interrupted clocks
+settle instead of retaining stale gestures. Active critical conditions stay
+visible until resolved, with no timer-based dismissal. Older qualification
+screenshots and measurements below are historical; current-source native
+D3D12/WARP and human visual approval remain distinct gates.
+
+
 The alert stack keeps the existing critical/warning/information text, icons and command-result cards. Current Core Destroyed, Core Damaged, Critical Supply, Blocked Production and Constrained Power conditions have at most five copied records. Their identity is session, player, condition and onset tick. Repeated completed ticks keep the identity; resolution removes the record, recurrence starts another identity. Fresh sessions or tick rollback reset lifecycle state. Pausing preserves the last completed capture. Terminal alerts remain visible but cannot activate navigation. No history, sound, dismissal command or per-tick popup is introduced.
 
 ## Current notification and context-hint presentation
