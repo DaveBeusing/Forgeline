@@ -119,7 +119,8 @@ public sealed class GameplayHudRenderer : IDisposable
         OperationsView operations = default,
         TimeSpan presentationTime = default,
         bool animateNotifications = false,
-        bool animateOperations = false)
+        bool animateOperations = false,
+        NotificationExpansion notificationExpansion = default)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -167,7 +168,8 @@ public sealed class GameplayHudRenderer : IDisposable
                 operations,
                 presentationTime,
                 animateNotifications,
-                animateOperations);
+                animateOperations,
+                notificationExpansion);
 
         foreach (IGameplayHudSurface surface in _surfaces)
         {
