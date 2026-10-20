@@ -541,7 +541,7 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
             ProviderCandidate candidate =
                 _providers[index];
 
-            if (candidate.Entity == recipient.Entity || mobileOnly && !candidate.Mobile)
+            if (candidate.Entity == recipient.Entity || mobileOnly && !candidate.IsTruck)
             {
                 continue;
             }
