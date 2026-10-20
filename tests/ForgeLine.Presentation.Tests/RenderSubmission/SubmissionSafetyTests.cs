@@ -52,6 +52,27 @@ public sealed class SubmissionSafetyTests
         int rebuilds = index.Rebuilds; index.Update(world); Assert.Equal(rebuilds, index.Rebuilds);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(31)]
+    [InlineData(32)]
+    [InlineData(63)]
+    [InlineData(64)]
+    [InlineData(65)]
+    [InlineData(1000)]
+    public void CandidateEnumerationContainsOnlyStableAscendingSources(int count)
+    {
+        var camera = new RtsCamera();
+        var roots = Enumerable.Range(0, count).Select(i => Root(i, i % 3 == 0 ? camera.Target : new Vector3(100000 + i))).ToArray();
+        var index = new SpatialSubmissionIndex(); index.Update(CreateWorld(roots));
+        index.Query(ViewFrustum.FromViewProjection(camera.GetMatrices(1600, 900).ViewProjection), count);
+        var enumerator = index.Candidates(); var actual = new List<int>();
+        while (enumerator.MoveNext()) actual.Add(enumerator.Current);
+        Assert.Equal(Enumerable.Range(0, count).Where(index.IsCandidate), actual);
+        Assert.Equal(actual.Order(), actual);
+    }
+
     [Fact]
     public void SpatialPermutationReuseRequiresEqualLiveCellsAndSession()
     {

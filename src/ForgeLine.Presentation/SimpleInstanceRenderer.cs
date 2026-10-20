@@ -56,6 +56,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
     private int _activeBatchCount;
     private int _renderRootIndex;
+    private bool _collectRootIndices;
     private long _snapshotIndexBytes;
     private bool _disposed;
 
@@ -308,6 +309,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         _preparedRoots.Begin(world, alpha, presentationSeconds);
         _passMeshes.Clear(); _passMaterials.Clear();
         _meshResolutions = _materialResolutions = 0;
+        _collectRootIndices = shadowProjection.HasValue && (maximumCasters != int.MaxValue || maximumDraws != int.MaxValue);
         int candidates = 0, batchedRoots = 0;
         int visible = 0;
         int animatedVegetation = 0;
@@ -319,10 +321,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
         int lod1Instances = 0;
         int lod2Instances = 0;
 
-        for (int index = 0; index < world.InstanceCount; index++)
+        int index = -1;
+        var candidateIndices = _spatialVisibility.Candidates();
+        while (spatialCulling ? candidateIndices.MoveNext() : ++index < world.InstanceCount)
         {
+            if (spatialCulling) index = candidateIndices.Current;
             _renderRootIndex = index;
-            if (spatialCulling && !_spatialVisibility.IsCandidate(index)) continue;
             if (_clusterCulling && !spatialCulling && index % 32 == 0)
             {
                 clusterTests++;
@@ -333,7 +337,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 }
             }
             candidates++;
-            PreparedRoot preparedRoot = _preparedRoots.Get(world, index);
+            ref readonly PreparedRoot preparedRoot = ref _preparedRoots.Get(world, index);
             RenderInstance instance = preparedRoot.Instance;
             if (shadowProjection.HasValue && (instance.VfxFeature.IsSpecified || instance.DecalFeature.IsSpecified)) continue;
 
@@ -692,7 +696,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         stateBatch);
                 }
 
-                stateBatch.RootIndices.Add(_renderRootIndex);
+                if (_collectRootIndices) stateBatch.RootIndices.Add(_renderRootIndex);
                 stateBatch.Instances.Add(
                     CreateInstanceRenderData(
                         worldMatrix,
@@ -707,7 +711,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             instanceTests, _meshResolutions, _materialResolutions, visible, 0, 0, 0, 0);
         if (context is null) return;
 
-        if (shadowProjection.HasValue && world.CurrentSnapshot is { } snapshot)
+        int preparedParts = 0;
+        for (int batchIndex = 0; batchIndex < _activeBatchCount; batchIndex++) preparedParts = checked(preparedParts + batches[batchIndex].Instances.Count);
+        if (shadowProjection.HasValue && (preparedParts > maximumCasters || _activeBatchCount > maximumDraws) && world.CurrentSnapshot is { } snapshot)
         {
             using var budget = new ShadowRootBudget(snapshot);
             for (int batchIndex = 0; batchIndex < _activeBatchCount; batchIndex++)
@@ -716,7 +722,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 for (int i = 0; i < batch.RootIndices.Count; i++) budget.IncludePart(batch.RootIndices[i], batchIndex < maximumDraws);
             }
             int drawnRoots = budget.Select(maximumCasters);
-            for (int batchIndex = 0; batchIndex < _activeBatchCount; batchIndex++)
+            for (int batchIndex = 0; drawnRoots != batchedRoots && batchIndex < _activeBatchCount; batchIndex++)
             {
                 InstanceBatch batch = batches[batchIndex]; int write = 0;
                 for (int i = 0; i < batch.Instances.Count; i++)
@@ -1134,7 +1140,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 batch = RentBatch(usesMesh, slice, usesMaterial, material);
                 _batchLookup.Add(key, batch);
             }
-            batch.RootIndices.Add(_renderRootIndex);
+            if (_collectRootIndices) batch.RootIndices.Add(_renderRootIndex);
             batch.Instances.Add(CreateInstanceRenderData(articulated ? Matrix4x4.CreateTranslation(parts[i].GeometryOffset) * transforms[i] : world,
                 color, usesMaterial, material));
         }

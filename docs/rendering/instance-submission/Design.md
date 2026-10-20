@@ -5,8 +5,12 @@
 SimpleInstanceRenderer queries a private Morton-ordered sidecar built from the
 current/previous immutable snapshots. Bounds union both endpoints, enclose
 rotation with a sphere, and include infantry and vegetation wind envelopes.
-The sidecar sorts indices, never public instances. Its query marks clusters;
-the renderer consumes candidates in original source order. Camera and light
+The sidecar sorts indices, never public instances. Its query marks a bounded
+bitset; a value enumerator emits only candidate sources in original order.
+Fully rejected scenes do not scan every root. Equal, strictly ordered unique
+entity sequences permit direct previous-transform reads; duplicate, unordered,
+changed-generation or otherwise unmatched sequences use the frozen world
+correspondence. VFX and ground decals keep their no-interpolation rule. Camera and light
 queries are independent. Nonfinite cluster or object bounds are conservative.
 No simulation, visibility authority, picking, particle order or graphics layout
 changes are introduced.

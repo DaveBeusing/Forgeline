@@ -66,6 +66,28 @@ public sealed class SubmissionReferenceTests
         }
     }
 
+    [Fact]
+    public void DuplicateOrUnorderedEndpointsKeepLegacyCorrespondence()
+    {
+        using var graphics = new FakeGraphicsDevice { CaptureUploads = true };
+        using var referenceGraphics = new FakeGraphicsDevice { CaptureUploads = true };
+        using var renderer = new SimpleInstanceRenderer(graphics);
+        using var reference = new SimpleInstanceRenderer(referenceGraphics, clusterCulling: false);
+        var camera = new RtsCamera();
+        var old = new[] { Root(0, camera.Target), Root(1, new(200, 0, 200)), Root(0, new(300, 0, 300)) };
+        var current = old.Select((root, i) => root with { Transform = root.Transform with { Position = camera.Target + new Vector3(i, 0, 0) } }).ToArray();
+        var world = CreateWorld(old); var buffer = new PresentationSnapshotBuffer();
+        buffer.Publish(new(new SimulationTick(2), TimeSpan.FromMilliseconds(50), current.Length, current)); world.Update(buffer);
+        foreach (float alpha in new[] { 0f, .5f, 1f })
+        {
+            renderer.Render(new FakeGraphicsCommandContext(), camera, world, alpha);
+            reference.Render(new FakeGraphicsCommandContext(), camera, world, alpha);
+            Assert.Equal(reference.LastDiagnostics.VisibleInstances, renderer.LastDiagnostics.VisibleInstances);
+            if (renderer.SubmissionMetrics.SubmittedInstances > 0)
+                Assert.Equal(referenceGraphics.Buffers[^1].LastUpload, graphics.Buffers[^1].LastUpload);
+        }
+    }
+
     internal static RenderInstance Root(int index, Vector3 position) => new(new EntityId((uint)index + 1, 1),
         new(position, Quaternion.Identity, Vector3.One), new(1), RenderMaterialHandle.Default,
         RenderVisibilityMask.World, (uint)index + 1);
