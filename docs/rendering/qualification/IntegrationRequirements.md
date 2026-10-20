@@ -176,6 +176,112 @@ the exact baseline and candidate, artifact hashes, reviewer, date and accepted
 scope. Pixel equality and source-less packaging remain separate checks. Existing
 golden files are not replaced automatically.
 
+## Exact compiled-content metric
+
+At qualification source
+`8d4748d3228c49e50ae26600c1c65938687ef9dd`, the unchanged 56-MiB assertion
+is in
+[`Invoke-WindowModeQualification.ps1`](https://github.com/DaveBeusing/Forgeline/blob/8d4748d3228c49e50ae26600c1c65938687ef9dd/build/Invoke-WindowModeQualification.ps1),
+before its Windowed/Borderless smoke calls. It requires a successful asset report
+(normally `artifacts/asset-qualification.json`), positive total texture bytes,
+and studio-splash bytes between zero and that total. Its exact calculation is:
+
+```text
+gameplayTextureBytes = textureRuntimeBytes - studioSplashTextureRuntimeBytes
+gameplayTextureBytes <= 58,720,256 bytes (56 MiB)
+studioSplashTextureRuntimeBytes <= 3,145,728 bytes (3 MiB)
+```
+
+[`RuntimeAssetQualification.Run`](https://github.com/DaveBeusing/Forgeline/blob/8d4748d3228c49e50ae26600c1c65938687ef9dd/src/ForgeLine.Assets/RuntimeAssetQualification.cs)
+iterates the manifest records, resolves each runtime file and uses its entire
+`FileInfo.Length`. For texture records it sums those compiled container lengths
+into `TextureRuntimeBytes`. Only texture IDs starting with the exact ordinal
+prefix `branding.undefined_behavior.splash.` also enter
+`StudioSplashTextureRuntimeBytes`. Other UI textures are not generally excluded
+from the gameplay calculation. These values are not just unwrapped pixel/mip
+payload bytes. The asset compiler serializes this report for the downstream
+window qualification step.
+
+The same window script separately checks `peakResidentTextureBytes` against
+67,108,864 bytes (64 MiB) inside its native smoke validation. That scoped resident
+texture counter is distinct from compiled content and from complete physical GPU
+allocation. Neither limit was changed by this qualification. Retain the actual
+printed `Qualified texture budgets` line and original report for each source;
+the historical 99,608,050-byte report is not a current measurement.
+
+## Historical interaction-allocation context
+
+The reported 8,104-byte suite discrepancy is historical context for analysis
+source `874b1652bc272ef648120a0b1de9bc85edf5f70c`. That analysis anchor does
+not establish the original measurement source. It is not a new measurement from
+the qualification source `8d4748d3228c49e50ae26600c1c65938687ef9dd`.
+The original failing source SHA, theory row, complete process environment and
+executed isolated/suite command lines have not been recovered. No specific GC,
+tiering or renderer cause is established by the reported byte count.
+
+At the historical source,
+[`SelectedCombatGroupTests.RenderAndControlsShareBoundedGeometryWithZeroWarmAllocation`](https://github.com/DaveBeusing/Forgeline/blob/874b1652bc272ef648120a0b1de9bc85edf5f70c/tests/ForgeLine.Presentation.Tests/SelectedCombatGroupTests.cs)
+tested `(width, height, DPI, UI scale)` values `(1024, 720, 96, 1)`,
+`(1024, 720, 192, 2)`, `(1600, 900, 144, 1.25)`, `(1920, 1080, 96, 1)` and
+`(3840, 2160, 192, 2)`. Setup, geometry checks and the first recording render
+preceded the measured interval. A separate retained graphics device and
+`SelectionInspectorHudRenderer` received 128 warmup renders, followed by exactly
+256 renders between two `GC.GetAllocatedBytesForCurrentThread` observations.
+The assertion required an exact zero-byte delta. That method did not request
+`GC.Collect`, a no-GC region or a tiering setting.
+
+Current coverage uses different rendering code and must retain its actual scope:
+
+| Current contract at `8d4748d3228c49e50ae26600c1c65938687ef9dd` | Measured boundary and unchanged assertion |
+| --- | --- |
+| [`HoverTooltipRenderingTests.WarmSelectionStatusUsesRetainedBuffersWithoutManagedAllocations`](https://github.com/DaveBeusing/Forgeline/blob/8d4748d3228c49e50ae26600c1c65938687ef9dd/tests/ForgeLine.Presentation.Tests/HoverTooltipRenderingTests.Status.cs) | Current `WorldHoverTooltipSurface`, active selection status/action panel, 1600 by 900 at 96 DPI; 128 warmups, 256 render calls, exact zero thread-local bytes, positive vertex count and one retained buffer. This is related current coverage, not the old renderer/display matrix. |
+| [`SelectedCombatGroupTests.RebuildingSummaryAllocatesBoundedStorageIndependentOfArmySize`](https://github.com/DaveBeusing/Forgeline/blob/8d4748d3228c49e50ae26600c1c65938687ef9dd/tests/ForgeLine.Presentation.Tests/SelectedCombatGroupTests.cs) | 1,000 selected members; 128 summary-construction warmups, 256 constructions, at most 256 times 512 bytes. The 131,072-byte bound is a distinct summary-storage contract, not a relaxed reproduction of the old zero-allocation renderer assertion. |
+| [`CombatGroupMeasurements`](https://github.com/DaveBeusing/Forgeline/blob/8d4748d3228c49e50ae26600c1c65938687ef9dd/benchmarks/ForgeLine.Rendering.Benchmarks/CombatGroupMeasurements.cs) | 1, 10, 100 and 1,000 members, pure and mixed groups, 128 warmups and 256 samples per domain. HUD plus idle input requires zero bytes; summary construction allows 512 bytes per sample; snapshot copy uses its existing count-dependent bound. Its null-graphics HUD frame includes panel update, view creation and gameplay HUD rendering, not the whole live client or a GPU/Present/fence interval. |
+
+The old renderer name and method no longer occur in the 152 direct current
+Presentation test source files inspected at that source. This does not imply
+that all related zero-allocation coverage disappeared: the tooltip/status test
+above exercises the current rendering path. Current class success alone is not
+evidence that the exact old theory matrix was rerun.
+
+The current SDK is `10.0.401`, with Microsoft.Testing.Platform and
+`xunit.v3.mtp-v2`. The
+[`Presentation` test project](https://github.com/DaveBeusing/Forgeline/blob/8d4748d3228c49e50ae26600c1c65938687ef9dd/tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj)
+explicitly sets `ConcurrentGarbageCollection` to `false`; its comment cites
+runtime allocation-counter accounting issues. This configuration is observable,
+but does not prove the cause of the historical 8,104-byte result. Main CI has no
+explicit tiering or concurrent-GC environment override. In
+[`frame-hotpaths.yml`](https://github.com/DaveBeusing/Forgeline/blob/8d4748d3228c49e50ae26600c1c65938687ef9dd/.github/workflows/frame-hotpaths.yml),
+`DOTNET_TieredCompilation=0` and `DOTNET_gcConcurrent=0` apply only to the
+alert-map and gameplay-UI benchmark steps. They do not apply to the combat-group
+class selection or the separate `--combat-group-hotpaths` process. The benchmark
+project does not set `ConcurrentGarbageCollection`.
+
+After the normal Release build and runtime-asset preparation, the current
+isolated-method and complete Presentation reproduction commands are:
+
+```powershell
+dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-method '*WarmSelectionStatusUsesRetainedBuffersWithoutManagedAllocations'
+dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build
+```
+
+The actual required full-solution command in current main CI is:
+
+```powershell
+dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1
+```
+
+Use the old `*RenderAndControlsShareBoundedGeometryWithZeroWarmAllocation`
+method filter only on the historical checkout. The
+[MTP method filter](https://xunit.net/docs/getting-started/v3/microsoft-testing-platform)
+is distinct from VSTest filtering. A separately labeled diagnostic project run
+may add `-- --parallel none`; it cannot replace the required suite result.
+These are reproduction recipes, not recovered proof of the original failing
+commands. Preserve the exact theory row, process/runtime settings, raw delta,
+command, exit code and full log if the failure recurs. Keep the existing
+assertions unchanged and route any production or central-test correction through
+the Presentation/integration owner.
+
 ## Integration validation
 
 Regression tests must reject moved Prepare/host costs, invalid clock frequencies,

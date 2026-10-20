@@ -140,10 +140,44 @@ temporary evidence. Native command logs continue to preserve original bytes.
 The [initial main CI run 39494628176](https://github.com/DaveBeusing/Forgeline/actions/runs/39494628176/job/118876342772)
 passed its version and metadata checks on that exact source. This establishes
 that the proposed PATCH satisfies the PR rule; it does not revise the older
-failed master result. The next verification step is to inspect hosted results
-for the corrected PR head, including PowerShell, Release build, focused renderer
-tests and the complete mandatory CI. The PR's checks and validation section
-record the current source and outcomes; review those actual runs before resuming.
+failed master result. The first and following main attempts were later canceled
+after source corrections while compiling runtime assets. Neither completed the
+mandatory suite, and neither substitutes for a successful current-source run.
+
+### Verified executable checkpoint
+
+The following results were verified for the exact executable source
+`8d4748d3228c49e50ae26600c1c65938687ef9dd` on 20 October 2026. They do not
+automatically apply to a later source revision.
+
+| Workflow | Actual run | Result at checkpoint |
+| --- | --- | --- |
+| Render qualification | [39496210338, job 118881794257](https://github.com/DaveBeusing/Forgeline/actions/runs/39496210338/job/118881794257) | Completed successfully: evidence/ownership contracts, PowerShell orchestration and existing reference tools, complete PlanOnly report, Release build, runtime fixtures and real frame/renderer regression checks. Both physical jobs were skipped. |
+| Frame hot paths | [39496209906, job 118881793062](https://github.com/DaveBeusing/Forgeline/actions/runs/39496209906/job/118881793062) | Completed successfully, including the unchanged allocation guards and CPU report contracts. |
+| Scalability qualification | [39496209828, job 118881792067](https://github.com/DaveBeusing/Forgeline/actions/runs/39496209828/job/118881792067) | CPU qualification completed successfully. The separate native-reference job was skipped. |
+| Movement quality | [39496209816, job 118881793623](https://github.com/DaveBeusing/Forgeline/actions/runs/39496209816/job/118881793623) | Completed successfully. |
+| Main CI | [39496209833, job 118881998515](https://github.com/DaveBeusing/Forgeline/actions/runs/39496209833/job/118881998515) | At 21:16 UTC, steps 1 through 40 were successful, including versioning, Release build, runtime assets and compiled UI-atlas contracts. The complete suite and package steps had not run. This was not a completed mandatory-CI result. |
+
+The full qualification job/step response establishes its success. Original log
+download was unavailable through the observed execution service, so no additional
+PowerShell assertion count or detailed C# result count is inferred from step
+names. The implementation contains ten new C# cases, and their focused test step
+completed successfully. The 54 local Python tests have a separately retained
+successful command result.
+
+The following documentation revision records the precise compiled-content and
+historical allocation context in
+[integration requirements](IntegrationRequirements.md#exact-compiled-content-metric).
+It preserves the known distinction between an analysis anchor and the unknown
+original measurement SHA for the historical 8,104-byte discrepancy. Current
+tooltip/status zero-allocation coverage, the separate bounded summary contract,
+actual warmup windows, GC/tiering configuration and MTP reproduction commands
+are documented without changing those tests or their budgets.
+
+The final branch revision requires its own complete main CI and current hosted
+checks. The PR's validation section records that final source and the actual
+outcomes. Review those runs before resuming; an earlier successful workflow or
+an incomplete/superseded main attempt is not a substitute.
 
 Native admission, thermal observations, full live-client timing, original GPU
 timestamps, complete budgets, the moving lifecycle and human review remain the
