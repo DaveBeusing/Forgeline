@@ -18,3 +18,21 @@ No deadline, stock cost, admission threshold or physical docking rule is relaxed
 Strict rendering timing gates remain open; this functional correction does not
 establish a rendering performance result. The previous visual approval remains
 bound to production source 57fa863f and its six recorded image pairs.
+
+## Bootstrap hauling candidate
+
+The remaining unchanged-deadline scenarios still fail after the role correction.
+Their snapshots show three eastern cargo vehicles occupied while four processing
+facilities and unit factories wait for inputs available in the core. The bootstrap
+fleet target capped processing demand at three until the assault force existed.
+The prepared correction permits four only after the complete four-processor chain;
+its mature eight-vehicle rule and all unit costs/attack admission gates remain.
+
+The existing production-policy fixture now distinguishes a two-depot complete
+chain with three cargo vehicles (recover the fourth) from four (do not request
+another), while retaining the original expanded-network cases. This candidate
+is submitted for remote validation while a separate terrain measurement window
+excludes local builds/tests. It is not yet a passing scenario result.
+
+The expansion failure diagnostic now records actual movement and nearby spatial
+bounds without changing its 24,000-tick deadline or funding assertions.

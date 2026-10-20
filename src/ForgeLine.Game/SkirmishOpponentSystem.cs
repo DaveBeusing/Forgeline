@@ -3623,9 +3623,18 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private static int ResolveCargoFleetTarget(OwnedState owned, SkirmishOpponentConfiguration configuration,
         bool reserveForExpansion = false)
     {
-        int industry = owned.CombatUnits.Count > configuration.MinimumAttackUnits &&
-            GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits
-            ? Math.Min(owned.ProductionFacilities.Count, reserveForExpansion ? 4 : 3) : Math.Min(owned.ProductionFacilities.Count, 3);
+        bool completeProcessingChain =
+            GetBuildingCount(owned, BuildingIds.Smelter) > 0 &&
+            GetBuildingCount(owned, BuildingIds.Refinery) > 0 &&
+            GetBuildingCount(owned, BuildingIds.ElectronicsPlant) > 0 &&
+            GetBuildingCount(owned, BuildingIds.AmmunitionPlant) > 0;
+        // The fourth processor needs its own bootstrap hauling capacity before
+        // its inputs can establish the assault force. Mature expansion remains
+        // gated on the completed force and retains its separate eight-truck cap.
+        int industryLimit = completeProcessingChain || reserveForExpansion &&
+            owned.CombatUnits.Count > configuration.MinimumAttackUnits &&
+            GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits ? 4 : 3;
+        int industry = Math.Min(owned.ProductionFacilities.Count, industryLimit);
         int demand = Math.Max(owned.SupplyDepots.Count + (reserveForExpansion ? 1 : 0), industry);
         int maximum = 4;
         bool assaultFleetEstablished =
@@ -3634,11 +3643,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             GetUnitCount(owned, UnitIds.MobileArtillery) >= 1 &&
             GetUnitCount(owned, UnitIds.SupplyTruck) >=
                 configuration.ResolveMatureSupplyTruckTarget(owned.SupplyDepots.Count);
-        if (assaultFleetEstablished && owned.SupplyDepots.Count >= 2 &&
-            GetBuildingCount(owned, BuildingIds.Smelter) > 0 &&
-            GetBuildingCount(owned, BuildingIds.Refinery) > 0 &&
-            GetBuildingCount(owned, BuildingIds.ElectronicsPlant) > 0 &&
-            GetBuildingCount(owned, BuildingIds.AmmunitionPlant) > 0)
+        if (assaultFleetEstablished && owned.SupplyDepots.Count >= 2 && completeProcessingChain)
         {
             // The completed processing chain and forward depots have independent
             // delivery routes. Their demand adds up; sharing the larger count
