@@ -103,6 +103,17 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 continue;
             }
 
+            // Cargo propulsion refueling is owned by the docking service.
+            // Only an unserviceable truck may request existing mobile battlefield rescue.
+            if (context.Entities.HasComponent<CargoTransport>(entity) &&
+                (!context.Entities.TryGetComponent(entity, out CargoFuelServiceState fuelService) ||
+                 fuelService.Phase != CargoFuelServicePhase.AwaitingFuelRescue) &&
+                !context.Entities.HasComponent<ResupplyOrder>(entity))
+                continue;
+            if (context.Entities.TryGetComponent(entity, out CargoFuelServiceState activeFuelService) &&
+                activeFuelService.Phase != CargoFuelServicePhase.AwaitingFuelRescue)
+                continue;
+
             bool needsAmmunition =
                 !context.Entities.HasComponent<CargoTransport>(entity) &&
                 NeedsAmmunition(
