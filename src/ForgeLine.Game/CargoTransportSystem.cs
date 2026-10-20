@@ -196,6 +196,18 @@ public sealed class CargoTransportSystem : ISimulationSystem
         EntityId entity,
         in CargoTransport transport)
     {
+        // A failed order can lose its cargo inventory while still occupying
+        // the service bay. Physical departure takes precedence over rechecking
+        // the failed inventory contract.
+        if (!context.Entities.HasComponent<CargoTransportOrder>(entity) &&
+            context.Entities.TryGetComponent(entity, out VehicleDockVisit recoveryExit) &&
+            recoveryExit.Status == VehicleDockStatus.Exiting &&
+            !_docks.Exit(context, entity))
+        {
+            PrepareDockFuelBudget(context, entity);
+            return;
+        }
+
         if (!_inventories.Contains(
                 transport.CargoInventory))
         {
@@ -221,16 +233,6 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 entity,
                 out CargoTransportOrder order))
         {
-            // The order may already be canceled after a service failure. The
-            // vehicle still owns its physical bay until it has driven clear.
-            if (context.Entities.TryGetComponent(entity, out VehicleDockVisit abandonedVisit) &&
-                abandonedVisit.Status == VehicleDockStatus.Exiting &&
-                !_docks.Exit(context, entity))
-            {
-                PrepareDockFuelBudget(context, entity);
-                return;
-            }
-
             if (state.Lifecycle !=
                 CargoTransportLifecycleState.Idle)
             {
