@@ -19,6 +19,7 @@ public sealed class HostPublicationProfileTests
     {
         string? output = Environment.GetEnvironmentVariable("FORGELINE_HOST_PROFILE_OUTPUT");
         int samples = string.IsNullOrEmpty(output) ? 16 : 256;
+        int warmupBatches = string.IsNullOrEmpty(output) ? 128 : 2048;
         const int operations = 32;
         using var entered = new ManualResetEventSlim();
         using var release = new ManualResetEventSlim();
@@ -41,10 +42,19 @@ public sealed class HostPublicationProfileTests
         Assert.True(host.Publish(caller));
         Assert.True(entered.Wait(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
         var observations = new Observation[samples];
+        long warmupStarted = Stopwatch.GetTimestamp();
+        long warmupBefore = GC.GetAllocatedBytesForCurrentThread();
+        long warmupAllocated = 0;
+        double warmupMilliseconds = 0;
         try
         {
-            for (int i = -128; i < samples; i++)
+            for (int i = -warmupBatches; i < samples; i++)
             {
+                if (i == 0)
+                {
+                    warmupAllocated = GC.GetAllocatedBytesForCurrentThread() - warmupBefore;
+                    warmupMilliseconds = Stopwatch.GetElapsedTime(warmupStarted).TotalMilliseconds;
+                }
                 long bytes = GC.GetAllocatedBytesForCurrentThread();
                 long started = Stopwatch.GetTimestamp();
                 for (int operation = 0; operation < operations; operation++)
@@ -65,7 +75,8 @@ public sealed class HostPublicationProfileTests
                 {
                     Source = typeof(ClientRenderHost).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                     Method = "Actual ClientRenderHost.Publish and mailbox; retained reader blocked deliberately. Fixed 128/32 gameplay and 32/8 debug line/label arrays, eight selected identities. Producer-thread bytes/time include defensive copy, lock, counter and signal; exclude fixture, observer storage, GPU and Present. Not gameplay FPS.",
-                    Changing = changing, WarmupBatches = 128, OperationsPerBatch = operations, Observations = observations
+                    Changing = changing, WarmupBatches = warmupBatches, WarmupAllocatedBytes = warmupAllocated,
+                    WarmupMilliseconds = warmupMilliseconds, OperationsPerBatch = operations, Observations = observations
                 }, JsonOptions));
             }
         }
