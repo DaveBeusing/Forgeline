@@ -26,13 +26,16 @@ zero decoded tangent normal falls back to the surface normal. The GGX denominato
 is evaluated as `(1-NoH²)+alpha²*NoH²`, avoiding cancellation of a small positive
 term at the specular peak. The 0.045 perceptual roughness floor remains.
 
-The conservative specular filter keeps the existing roughness domain and adds
-both screen axes: `rFiltered = sqrt(saturate(r² + min(0.25*(|ddx(N)|²+|ddy(N)|²),0.04)))`.
-A flat footprint preserves authored roughness; seams cannot contribute more than
-0.04 variance. The first squared-slope-domain candidate is retained as an
-experiment, not silently discarded: it increased bare-steel mean motion and
-added 3–7% GPU time in the analytic workload, despite improvements elsewhere.
-The conservative variant requires its own complete comparison.
+The existing specular variance kernel is retained exactly:
+`rFiltered = sqrt(saturate(r² + 0.25*max(|ddx(N)|²,|ddy(N)|²)))`.
+Two explicitly measured alternatives were rejected. Squared-slope filtering
+increased bare-steel mean motion by 71–128% and cost 3–7% GPU time in the
+analytic workload. A conservative sum-of-axes variant still increased bare-steel
+mean motion by 1–10%, with mixed tails and unstable GPU cost. Their improvements
+on other panels do not establish a reliable material-quality benefit. Both
+complete experiments remain evidence; neither becomes the product default.
+A future kernel needs a stronger predeclared perceptual reference and demonstrated
+benefit. This change therefore adds no new specular blur or required filter cost.
 
 Receiver-plane conditioning compares squared determinant with the derivative
 footprint rather than a fixed determinant threshold. Nearly collinear/zero

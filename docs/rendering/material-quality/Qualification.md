@@ -35,3 +35,14 @@ controlled material/normal/shadow sequences, and compile all production variants
 Then qualify the minimal numerical and visual changes using unchanged assets,
 lighting, camera sequences and quality profiles. Retain original references.
 Human material and shadow-contact approval is separate from automated tests.
+
+## Rejected filtering experiments
+
+The source `9d5cf3968112c0a9aa812d9f56ec21771fc63a2a` squared-slope kernel
+and source `44efde21` conservative sum-of-axes kernel each completed all twelve
+hardware cohorts. Repeated images were exact within each implementation.
+Neither consistently improved bare-steel temporal response. Original normal-variance
+filtering is restored; no success claim is derived from a selected panel or metric.
+The baseline Release build passed with zero warnings/errors (1m38.71s), and
+53 existing focused tests passed. The new numerical contracts and existing
+material/shadow integration passed 50 tests before the filtering experiments.
