@@ -219,6 +219,10 @@ public sealed class ActionableAlertTests
         var closed = controller.Update(input, snapshot, hud);
         Assert.True(closed.Captured); Assert.False(closed.Target.IsValid);
         Assert.False(controller.Expansion.Open);
+        var outgoing = ActionableAlertLayout.Resolve(snapshot, hud, expansion: controller.Expansion);
+        Assert.False(outgoing.First.ExpansionBounds.IsEmpty);
+        Assert.False(outgoing.Contains(new Vector2(outgoing.First.ExpansionBounds.X + 8,
+            outgoing.First.ExpansionBounds.Y + 8)));
     }
 
     [Fact]
