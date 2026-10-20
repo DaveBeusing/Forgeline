@@ -108,6 +108,43 @@ public sealed class CorrespondenceContractTests
         index.Rebuild(Snapshot([], 4), after);
     }
 
+    [Fact]
+    public void WreckEffectsAndDecalsRetainTheirExistingInterpolationSemantics()
+    {
+        var wreck = Instance(new(1, 2), 10) with
+        { UnitFeature = new(ForgeLine.Game.UnitIds.MainBattleTank, UnitPresentationDamageState.Wreck) };
+        var effect = Instance(new(0xF0000000, 1), 20) with
+        { VfxFeature = new(VfxEffectKind.PersistentDust, 23, 7, true, 2) };
+        var ground = Instance(new(0xD0000000, 5), 30) with
+        { DecalFeature = new(DecalKind.TireTrack, .5f, DecalSurface.Ground) };
+        var receiver = Instance(new(0xD0000001, 6), 40) with
+        { DecalFeature = new(DecalKind.Scorch, .5f, DecalSurface.Receiver) };
+        RenderInstance[] current = [wreck, effect, ground, receiver];
+        var prior = current.Select(v => v with { Transform = RenderTransform.Identity }).ToArray();
+        prior[1] = prior[1] with { VfxFeature = new(VfxEffectKind.PersistentDust, 99, 1, true, 1) };
+        var buffer = new PresentationSnapshotBuffer(); var world = new RenderWorld();
+        buffer.Publish(Snapshot(prior, 1)); world.Update(buffer);
+        buffer.Publish(Snapshot(current, 2)); world.Update(buffer);
+        Assert.Equal(effect, world.GetInterpolatedInstance(1, .5f));
+        Assert.Equal(ground, world.GetInterpolatedInstance(2, .5f));
+        Assert.Equal(RenderTransform.Interpolate(prior[0].Transform, wreck.Transform, .5f), world.GetInterpolatedInstance(0, .5f).Transform);
+        Assert.Equal(RenderTransform.Interpolate(prior[3].Transform, receiver.Transform, .5f), world.GetInterpolatedInstance(3, .5f).Transform);
+        for (int i = 0; i < current.Length; i++)
+        {
+            Assert.True(world.TryGetInterpolatedInstance(current[i].Entity, .5f, out var found));
+            Assert.Equal(world.GetInterpolatedInstance(i, .5f), found);
+        }
+    }
+
+    [Fact]
+    public void DuplicatePredecessorsRetainTheExistingBinaryTie()
+    {
+        var prior = Snapshot([Instance(new(1, 1), 1), Instance(new(1, 1), 2), Instance(new(3, 1), 3)], 1);
+        var current = Snapshot([Instance(new(1, 1), 4), Instance(new(3, 1), 5)], 2);
+        var index = new RenderSnapshotIndex(false); index.Rebuild(current, prior);
+        for (int i = 0; i < current.InstanceCount; i++) Assert.Equal(Find(prior, current.Instances[i].Entity), index.PreviousIndex(i));
+    }
+
     internal static PresentationSnapshot Snapshot(RenderInstance[] values, ulong tick) =>
         new(new(tick), TimeSpan.FromMilliseconds(50), values.Length, values.AsSpan(), sessionId: new(1));
 

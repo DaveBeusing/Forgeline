@@ -89,6 +89,19 @@ public sealed class DefensivePublicationTests
         Assert.Equal(new EntityId(1, 1), retained!.Value.InformationLayer.SelectedEntities.Single());
     }
 
+    [Fact]
+    public void FailedCaptureCannotReplaceLatestFrameOrStrandTheMailboxGate()
+    {
+        var publication = new ClientRenderPublication();
+        var original = ClientRenderPublication.Copy(Frame());
+        lock (publication.Gate) publication.StoreCopied(original);
+        var invalid = Frame() with { GameplayLabels = null! };
+        Assert.Throws<ArgumentNullException>(() => ClientRenderPublication.Copy(invalid));
+        Assert.Same(original.GameplayLines, publication.ReadLatest()!.Value.GameplayLines);
+        lock (publication.Gate) publication.StoreCopied(ClientRenderPublication.Copy(Frame()));
+        Assert.Equal("status", original.GameplayLabels[0].Text);
+    }
+
     private static ClientRenderFrame Frame() => default(ClientRenderFrame) with
     {
         GameplayLines = [new(Vector3.One, Vector3.UnitX, Vector4.One)],
