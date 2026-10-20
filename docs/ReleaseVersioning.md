@@ -24,6 +24,22 @@ beyond the .NET numeric metadata limit.
 
 This policy change itself advances 0.1.337 to 0.1.338.
 
+## Sequential integration and reconciliation
+
+When two PRs both branch from PATCH 417, both may initially prepare PATCH 418.
+The first merged PR consumes 418; the second must synchronize with the new
+`master` and prepare 419 before merging. A successful Git merge does not
+guarantee that the version contract was preserved. Verify the PR base is still
+current and rerun the SemVer and CI gates immediately before integration.
+
+On 20 October 2026, the radial HUD correction (PR #254) and cargo docking
+recovery (PR #255) were merged with the same 0.1.418 version. The resulting
+`master` commit `f2be6532d759ab0840f2a4674c28d00446fe75ea` still
+carried 418, while its version validation expected 419. The reconciliation
+advances only PATCH to 419 from that exact master base; no historic merge or
+release tag is rewritten. This is an integration-history correction, not a new
+MAJOR/MINOR allocation or an automatic build-time version change.
+
 ## CI and metadata
 
 CI has contents: read and performs no remote writes. The version-assignment

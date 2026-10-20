@@ -65,7 +65,11 @@ public sealed class GameplayDisplayQualificationTests
             vertex.Color.W == RtsSelectionVisualStyle.MarqueeFillOpacity));
         Assert.Equal(24, informationVertices.Count(vertex =>
             vertex.Color.W == RtsSelectionVisualStyle.MarqueeBorderOpacity));
-        Assert.Equal(30, informationVertices.Length);
+        // The information pass can share one upload buffer with other HUD geometry.
+        // Count the actual marquee primitives, not unrelated batched surfaces.
+        Assert.Equal(30, informationVertices.Count(vertex =>
+            vertex.Color.W == RtsSelectionVisualStyle.MarqueeFillOpacity ||
+            vertex.Color.W == RtsSelectionVisualStyle.MarqueeBorderOpacity));
         var buffers = device.Buffers.ToArray();
         hud.Render(context, camera, snapshot, bounds, view with { IsDragSelecting = false }, default, default,
             FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, dpi, 1);
