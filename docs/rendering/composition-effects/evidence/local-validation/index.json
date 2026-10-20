@@ -218,13 +218,21 @@
       "sourceHead": "1d658d51522bf510a9f0e54ef1dce0fbd46d1e24",
       "runId": 39490676772,
       "jobId": 118862700932
+    },
+    {
+      "path": "pr267-windows-ci.json",
+      "sha256": "5487e1d9f7069c727df1c297fd4049b41b367fc2b27a66d321b6a6f8db06fbc4",
+      "sourceHead": "7a42e0c4299bc0a822edd5bffb3e4c7309bbe547",
+      "testedMergeCommit": "c2c71150760828b25561a215ae14708bdb98876c",
+      "runId": 39491919890,
+      "jobId": 118867002375
     }
   ],
   "postCommitFixtureReview": {
     "sourceHeadBeforeFix": "1d658d51522bf510a9f0e54ef1dce0fbd46d1e24",
     "buildRecord": "native-fixture-guards-build.json",
     "productionSourceChanged": false,
-    "nativeExecution": "pending",
+    "nativeExecution": "Full Windows Test failed at head 7a42e0c; individual case outcomes unavailable. See pr267-windows-ci.json.",
     "change": "Guard atmosphere-camera submission in two native test capture helpers when atmosphere is disabled."
   },
   "latestOwnership": {

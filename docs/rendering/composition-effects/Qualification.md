@@ -81,7 +81,7 @@ validation-root prefixes in retained logs were normalized; original hashes remai
 | Complete dependency restore | Passed after fetching omitted same-commit tool/benchmark projects into the sparse checkout. The first attempt failed on the incomplete checkout, not on a source repair. |
 | Release solution build | Final functional source `8331e384` passed in 103.93 s; after the master reconciliation, `e121263a` passed in 98.81 s. Both exit 0 with zero warnings/errors. Earlier runs and source-file hashes remain retained. |
 | Project references | Existing validator passed all 44 projects, without a cycle. |
-| Ownership and formatting | All 57 functional/evidence paths pass the current ownership validator; whitespace checks pass. `Directory.Build.props` is validated separately as the isolated version exception. |
+| Ownership and formatting | At functional head `7a42e0c`, all 57 functional/evidence paths passed the current ownership validator; whitespace checks passed. The later CI checkpoint adds one evidence file in the same owned prefix. `Directory.Build.props` is validated separately as the isolated version exception. |
 | New portable particle classes | 21 regression cases passed. The final measured run added the opt-in qualification case: 22/22 passed, zero failed/skipped. All 21 regressions passed again after the current-master reconciliation. Coverage includes full snapshot admission, saturation, visibility, pause/session reset, deterministic sorting and warm allocations. |
 | Required existing three-class Presentation selection | 26 executed: 13 passed and 13 failed. Every failing SimpleInstanceRenderer case stops in the unchanged native DXC call with `error: invalid profile` on this Linux host. This is a failed local run, not a passed Windows gate. |
 | New native composition cases | 21 cases compile; Windows/WARP execution remains open. A subsequent fixture review guarded atmosphere-camera submission when atmosphere is disabled; the affected Graphics test project rebuilt with zero warnings/errors in 9.92 s. All cases and assertions remain intact. Actual 4K product capture is distinct from virtual 4K coordinate probes. |
@@ -150,7 +150,37 @@ called `SetAtmosphereView` while atmosphere was disabled, which the existing
 native contract rejects. Those calls now depend on `graphics.Atmosphere.Enabled`.
 This corrects the setup of five cases without changing product code or weakening
 their assertions. It does not repair or explain the unrelated UI allocation
-assertion. The revised head must execute the full Windows gates afresh.
+assertion.
+
+The revised head `7a42e0c4299bc0a822edd5bffb3e4c7309bbe547` completed main run
+[39491919890](https://github.com/DaveBeusing/Forgeline/actions/runs/39491919890/job/118867002375)
+at 2026-10-20 21:07:53 UTC. All steps 1-58 passed, including the earlier UI audio
+group, Release build, runtime assets, native WARP reference and rendering
+benchmark. Full solution Test step 59 failed; package/product steps 60-64 were
+skipped. Frame hot paths, CPU scalability and movement quality passed at this
+same head. The optional physical-GPU lane was skipped.
+
+The actual CI checkout was merge commit
+`c2c71150760828b25561a215ae14708bdb98876c`, whose parents are the recorded master
+and PR head and whose tree `0524a49033dccb5231c4fb53d3450ad2cc0f824e` exactly
+matches the PR head. The
+[Windows CI checkpoint](evidence/local-validation/pr267-windows-ci.json) preserves
+every step conclusion, source identities and the verified diagnostic-artifact
+digest. Both WARP manifests record `.NET 10.0.13`, software rendering,
+`structural-pass`, asset fingerprint
+`DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99`, and pending
+human visual acceptance. This observed capture runtime is distinct from the
+local CPU qualification runtime.
+
+The exact failing tests, assertions and full-suite counts remain unavailable.
+Two completed-job log downloads failed with `Transport closed`; the check-run
+summary and text are null, and its two annotations could not be retrieved.
+The diagnostic ZIP was downloaded and its SHA-256 verified, but none of its 29
+entries contains the full-test log or named unit-test results. Therefore the
+individual outcomes of the 21 owned composition and 21 particle cases remain
+unclassified for this Windows run. This failure is not attributed to either the
+earlier UI allocation observation or an owned regression without the assertions.
+A focused source review found no further concrete native fixture defect.
 
 Remaining mandatory gates:
 
@@ -174,10 +204,13 @@ accepted, or tags, releases or master merges performed.
 ## Resume and serial handoff
 
 Read the actual branch/PR/CI state first. Reconcile any newly merged master and
-its one-PATCH requirement before integration. The next external action is native
-Windows and hardware qualification using the retained source identities; failed
-cohorts must remain available. The shared-linear default stays zero until those
-gates approve it.
+its one-PATCH requirement before integration. First obtain the raw Test output
+from job `118867002375`, identify every failed assertion and its owner, reproduce
+under the observed Windows environment, and repair any owned regression. Retain
+the failed run when executing the relevant and full gates again. Native
+source-less and hardware qualification then uses the retained source identities;
+failed cohorts must remain available. The shared-linear default stays zero until
+those gates approve it.
 
 No new public API or shared workflow change is needed. The serial documentation
 owner can link this decision and qualification from the central rendering and

@@ -1,0 +1,552 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-20T21:14:33.067768+00:00",
+  "repository": "DaveBeusing/Forgeline",
+  "pullRequest": 267,
+  "sourceHead": "7a42e0c4299bc0a822edd5bffb3e4c7309bbe547",
+  "baseCommit": "e42ae48346bbb1331b7a548a72fc0905ae6d184a",
+  "testedMergeCommit": "c2c71150760828b25561a215ae14708bdb98876c",
+  "testedMergeParents": [
+    "e42ae48346bbb1331b7a548a72fc0905ae6d184a",
+    "7a42e0c4299bc0a822edd5bffb3e4c7309bbe547"
+  ],
+  "testedMergeAndHeadTree": "0524a49033dccb5231c4fb53d3450ad2cc0f824e",
+  "sourceIdentityVerified": "The Git commit API reports the same tree for the tested merge and the PR head.",
+  "main": {
+    "runId": 39491919890,
+    "jobId": 118867002375,
+    "runAttempt": 1,
+    "conclusion": "failure",
+    "createdAtUtc": "2026-10-20T20:26:01Z",
+    "runUpdatedAtUtc": "2026-10-20T21:07:53Z",
+    "runUrl": "https://github.com/DaveBeusing/Forgeline/actions/runs/39491919890",
+    "jobUrl": "https://github.com/DaveBeusing/Forgeline/actions/runs/39491919890/job/118867002375",
+    "failedStep": {
+      "number": 59,
+      "name": "Test",
+      "conclusion": "failure"
+    },
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Check out repository",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Assign validation build identity",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Validate one version increment per PR",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Version and metadata contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Set up .NET",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Restore",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Validate project references",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 8
+      },
+      {
+        "name": "Validate bundled UI font resources",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "UI motion, optional sound and preference contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "World audio playback catalog",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      },
+      {
+        "name": "Cargo transport recovery regression",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 12
+      },
+      {
+        "name": "Cargo propulsion Fuel and docking contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13
+      },
+      {
+        "name": "Distribution FIFO and dispatch fairness contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 14
+      },
+      {
+        "name": "Build",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15
+      },
+      {
+        "name": "Cargo fleet capacity diagnosis and alert lifecycle",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 16
+      },
+      {
+        "name": "Logistics order identity and quantity contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 17
+      },
+      {
+        "name": "Set up source-contract Python",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 18
+      },
+      {
+        "name": "Blender source geometry contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 19
+      },
+      {
+        "name": "Render boundary ownership and shader source contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 20
+      },
+      {
+        "name": "Render boundary and publication contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 21
+      },
+      {
+        "name": "Rigid motion lifecycle and allocation contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 22
+      },
+      {
+        "name": "Rigid clip compilation and deployment contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 23
+      },
+      {
+        "name": "Blender launcher protocol contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 24
+      },
+      {
+        "name": "UI audio reliability and industrial source contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 25
+      },
+      {
+        "name": "World audio extraction, visibility and deterministic publication contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 26
+      },
+      {
+        "name": "Graphics budget gate input contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 27
+      },
+      {
+        "name": "UI qualification matrix coverage contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 28
+      },
+      {
+        "name": "Compile and qualify canonical map",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 29
+      },
+      {
+        "name": "Adaptive frontend geometry and interaction contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 30
+      },
+      {
+        "name": "Battlefield HUD hierarchy and interaction contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 31
+      },
+      {
+        "name": "UI motion and feedback interaction contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 32
+      },
+      {
+        "name": "Native UI typography contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 33
+      },
+      {
+        "name": "Native material BRDF and HDR contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 34
+      },
+      {
+        "name": "Graphics quality and display contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 35
+      },
+      {
+        "name": "Single object ring interaction contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 36
+      },
+      {
+        "name": "Compile and qualify runtime assets",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 37
+      },
+      {
+        "name": "Runtime asset process contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 38
+      },
+      {
+        "name": "Compiled UI atlas and ordered skin contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 39
+      },
+      {
+        "name": "Graphical battlefield skin identity and native lifetime contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 40
+      },
+      {
+        "name": "Directorate skin package integrity and source exclusion",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 41
+      },
+      {
+        "name": "Graphical economy work states and operations privacy contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 42
+      },
+      {
+        "name": "Tactical artwork privacy and native pointer ownership",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 43
+      },
+      {
+        "name": "Graphical frontend skin and pointer contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 44
+      },
+      {
+        "name": "Cinematic menu image and native lifecycle contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 45
+      },
+      {
+        "name": "World environment and terrain residency contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 46
+      },
+      {
+        "name": "Combat industrial effects and decal contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 47
+      },
+      {
+        "name": "Reference evidence report contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 48
+      },
+      {
+        "name": "Reference performance and image contracts without GPU",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 49
+      },
+      {
+        "name": "UI reference geometry and input contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 50
+      },
+      {
+        "name": "Software UI reference smoke (no physical visual acceptance)",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 51
+      },
+      {
+        "name": "Native WARP reference capture",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 52
+      },
+      {
+        "name": "Windows apphost reference completion contract",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 53
+      },
+      {
+        "name": "Windows window mode and visual qualification smoke",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 54
+      },
+      {
+        "name": "Rendering benchmark qualification",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 55
+      },
+      {
+        "name": "Headless diagnostics smoke test",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 56
+      },
+      {
+        "name": "Lightweight entity stress smoke",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 57
+      },
+      {
+        "name": "Save and replay recovery smoke",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 58
+      },
+      {
+        "name": "Test",
+        "status": "completed",
+        "conclusion": "failure",
+        "number": 59
+      },
+      {
+        "name": "Publish reproducible pre-alpha package",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 60
+      },
+      {
+        "name": "Packaged client fresh-install smoke",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 61
+      },
+      {
+        "name": "Packaged startup menu lifecycle",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 62
+      },
+      {
+        "name": "Two-opponent full-match validation",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 63
+      },
+      {
+        "name": "Upload pre-alpha package",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 64
+      },
+      {
+        "name": "Upload engine diagnostic artifacts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 65
+      },
+      {
+        "name": "Post Set up source-contract Python",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 128
+      },
+      {
+        "name": "Post Set up .NET",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 129
+      },
+      {
+        "name": "Post Check out repository",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 130
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 131
+      }
+    ]
+  },
+  "testEvidence": {
+    "fullSuiteConclusion": "failure",
+    "exactFailingTests": null,
+    "exactAssertions": null,
+    "fullTestTotals": null,
+    "ownedCompositionCasesResult": "unavailable",
+    "ownedParticleCasesResult": "unavailable",
+    "rawJobLogAvailable": false,
+    "jobLogDownloadAttempts": 2,
+    "jobLogDownloadError": "Transport closed",
+    "checkSummary": null,
+    "checkText": null,
+    "checkAnnotationsCount": 2,
+    "checkAnnotationsAvailable": false,
+    "classification": "Unresolved. Neither an owned regression nor a pre-existing failure can be assigned without the failing assertions.",
+    "earlierUiAllocationFailure": "Separate earlier-head observation retained in pr267-initial-ci.json. The current run passed step 25; no UI implementation or assertion changed.",
+    "nextAction": "Obtain the raw Test output from job 118867002375, identify failing assertions and ownership, reproduce under the observed Windows environment, and fix owned regressions before relevant and full qualification."
+  },
+  "otherWorkflows": [
+    {
+      "name": "Frame hot paths",
+      "runId": 39491919894,
+      "conclusion": "success"
+    },
+    {
+      "name": "Scalability qualification",
+      "runId": 39491920001,
+      "conclusion": "success",
+      "cpuLane": "success",
+      "nativeReferenceLane": "skipped"
+    },
+    {
+      "name": "Movement quality",
+      "runId": 39491919933,
+      "conclusion": "success"
+    }
+  ],
+  "diagnosticArtifact": {
+    "id": 12298202363,
+    "name": "engine-diagnostics-0.1.425-pr.267.39491919890.1-attempt-1",
+    "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39491919890/artifacts/12298202363",
+    "sha256": "5596a9e5bf5d57106d092f998c0f16d480eac02a6087ef3db48472655ac27e81",
+    "bytes": 683616,
+    "digestVerified": true,
+    "entryCount": 29,
+    "uncompressedBytes": 1562898,
+    "textEntriesInspected": 26,
+    "fullSolutionTestReportPresent": false,
+    "namedUnitTestResultsPresent": false,
+    "captures": [
+      {
+        "entry": "visual-reference-warp/manifest.json",
+        "sha256": "1b961b1d675360e5d13e59dfd9bb65d63a71fc0786fa69e7b2ccd26372cb8e6b",
+        "status": "structural-pass",
+        "error": null,
+        "commit": "c2c71150760828b25561a215ae14708bdb98876c",
+        "buildIdentity": "0.1.425-pr.267.39491919890.1+c2c71150760828b25561a215ae14708bdb98876c",
+        "runtime": ".NET 10.0.13",
+        "environment": {
+          "os": "Microsoft Windows 10.0.26100",
+          "architecture": "X64",
+          "logicalProcessors": 4,
+          "cpu": "AMD64 Family 25 Model 17 Stepping 1, AuthenticAMD",
+          "configuration": "Release"
+        },
+        "runtimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "driver": "Microsoft Hyper-V Video: 10.0.26100.1150",
+        "software": true,
+        "fixtureVersion": 7,
+        "clientAssemblySha256": "CDAB8D5063B27B6FEED283CA41934D54369B05402BE8093219654E0144C5B469",
+        "presentationAssemblySha256": "07C1A40222D25E016A2B3FE36C8B212401E6E173E8413F29073B174983BB8F25",
+        "warmups": 3,
+        "samples": 8,
+        "failedCaptures": [],
+        "humanVisualAcceptance": "pending"
+      },
+      {
+        "entry": "ui-reference-warp/manifest.json",
+        "sha256": "678cbb6e15f010b30d1ea2eb58fb71258bddb371b46ec1cf7fd8501bf2acc47c",
+        "status": "structural-pass",
+        "error": null,
+        "commit": "c2c71150760828b25561a215ae14708bdb98876c",
+        "buildIdentity": "0.1.425-pr.267.39491919890.1+c2c71150760828b25561a215ae14708bdb98876c",
+        "runtime": ".NET 10.0.13",
+        "environment": {
+          "os": "Microsoft Windows 10.0.26100",
+          "architecture": "X64",
+          "logicalProcessors": 4,
+          "cpu": "AMD64 Family 25 Model 17 Stepping 1, AuthenticAMD",
+          "configuration": "Release"
+        },
+        "runtimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "driver": "Microsoft Hyper-V Video: 10.0.26100.1150",
+        "software": true,
+        "fixtureVersion": 7,
+        "clientAssemblySha256": "CDAB8D5063B27B6FEED283CA41934D54369B05402BE8093219654E0144C5B469",
+        "presentationAssemblySha256": "07C1A40222D25E016A2B3FE36C8B212401E6E173E8413F29073B174983BB8F25",
+        "warmups": 3,
+        "samples": 8,
+        "failedCaptures": [],
+        "humanVisualAcceptance": "pending"
+      }
+    ],
+    "qualificationLimit": "Software structural captures do not establish physical GPU performance, individual unit-test outcomes, sustained memory plateaus or human image acceptance."
+  },
+  "acceptance": "implemented, not yet accepted"
+}
