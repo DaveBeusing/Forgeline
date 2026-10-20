@@ -1,0 +1,23 @@
+{
+  "baseColorFactor": [
+    0.65,
+    0.65,
+    0.65,
+    1
+  ],
+  "metallicFactor": 1,
+  "roughnessFactor": 1,
+  "baseColorTexture": "texture.directorate.surface.atlas_base",
+  "normalTexture": "texture.directorate.surface.atlas_normal",
+  "ormTexture": "texture.directorate.surface.atlas_orm",
+  "uvScale": [
+    0.214,
+    0.214
+  ],
+  "emissiveTexture": "texture.directorate.building.command_core.emissive",
+  "emissiveMultiplier": 0.35,
+  "uvOffset": [
+    0.018,
+    0.518
+  ]
+}

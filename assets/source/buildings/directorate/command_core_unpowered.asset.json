@@ -1,8 +1,8 @@
 {
   "id": "building.directorate.command_core.unpowered",
-  "type": "mesh",
-  "source": "sources/command_core/command_core_unpowered.gltf",
   "materialReferences": [
-    "material.directorate.building.unpowered"
-  ]
+    "material.directorate.building.command_core.unpowered"
+  ],
+  "source": "sources/command_core/blender/unpowered.glb",
+  "type": "mesh"
 }
