@@ -6,6 +6,7 @@ param(
     [string]$RuntimeAssets = $env:FORGELINE_INSTANCE_ASSETS,
     [string]$BaselineSource = $env:FORGELINE_INSTANCE_BASELINE_SOURCE,
     [string]$ProductSource = $env:FORGELINE_INSTANCE_PRODUCT_SOURCE,
+    [string]$ClientSuffix = $env:FORGELINE_INSTANCE_CLIENT_SUFFIX,
     [switch]$NativeOnly = ($env:FORGELINE_INSTANCE_NATIVE -eq '1')
 )
 Set-StrictMode -Version Latest
@@ -54,7 +55,7 @@ try {
                 & git -C $reference -c core.longpaths=true switch --detach $source *> (Join-Path $output "$side-checkout.log")
                 if ($LASTEXITCODE -ne 0) { throw 'Cannot select exact capture source.' }
                 $clientName = if ($side -eq 'baseline') { 'reference-client' } else { 'candidate-client' }
-                $client = Join-Path $artifactRoot "$clientName/ForgeLine.Client.exe"
+                $client = Join-Path $artifactRoot "$clientName$ClientSuffix/ForgeLine.Client.exe"
                 foreach ($path in @('Fixed','Sweep','Budget')) {
                     $scenes = if ($path -eq 'Fixed') { @('IndustrialBase','BattlefieldCombat','MainBattleTankProduction','CombatSupportRepeated','MechanicalFiring','EffectsBarrage','OperationalBuildingsRepeated') } else { @('CombatSupportRepeated') }
                     $arguments = @{ Capture = $true; ClientPath = $client; RuntimeAssetRoot = $assets;
