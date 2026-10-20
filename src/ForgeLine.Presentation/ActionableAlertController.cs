@@ -10,6 +10,14 @@ public readonly record struct AlertNotification(PlayerAlertState Kind, bool Feed
 public readonly record struct AlertActivation(bool Captured, EntityId Target = default, bool OpenOperations = false,
     OperationsCategory Category = OperationsCategory.Blocked, bool NotificationDetails = false);
 
+/// <summary>Presentation-only identity, page and reversible expansion progress. Never grants target authority.</summary>
+public readonly record struct NotificationExpansion(AlertNotification Item, AlertIdentity Identity, ulong Revision,
+    bool Open = false, float Progress = 0, int Page = 0)
+{
+    public bool Matches(in NotificationCardLayout card) =>
+        Open && card.Item == Item && card.Identity == Identity && card.Revision == Revision && card.Item.Hidden == 0;
+}
+
 /// <summary>Navigation only; retains short clicks, rejects lifecycle edges and never emits simulation commands.</summary>
 public sealed class ActionableAlertController
 {
@@ -26,6 +34,14 @@ public sealed class ActionableAlertController
     private NotificationStackLayout _pressedStack;
     private bool _details;
     private EntityId _target;
+    private AlertIdentity _focusCursor;
+    private int _focusRevision;
+    private bool _hasFocusCursor;
+    private bool _pressFocus;
+    private bool _pressPaging;
+    private float _expansionPosition;
+    private NotificationExpansion _expansion;
+    public NotificationExpansion Expansion => _expansion with { Progress = _expansionPosition };
     public string Feedback { get; private set; } = string.Empty;
     public void Unavailable() { Feedback = "TARGET UNAVAILABLE - OPEN OPERATIONS"; _feedbackSeconds = 3; }
     public void CancelInput(InputState input) { _press = input.MousePressSequence(PlatformMouseButton.Left); _pending = false; }
@@ -33,21 +49,27 @@ public sealed class ActionableAlertController
     {
         if (_session.IsSpecified && snapshot?.SessionId is { IsSpecified: true } incoming &&
             (incoming.Value < _session.Value || incoming == _session && snapshot.Tick.Value < _tick.Value))
-        { CancelInput(input); return default; }
+        { CancelInput(input); ResetTransient(); return default; }
         _feedbackSeconds = Math.Max(0, _feedbackSeconds - Math.Max(0, seconds));
         if (_feedbackSeconds == 0) Feedback = string.Empty;
         ulong press = input.MousePressSequence(PlatformMouseButton.Left); bool fresh = press != _press; _press = press;
         bool changed = _initialized && (_layout != layout || _session != snapshot?.SessionId);
         _initialized = true; _layout = layout;
-        if (_session != snapshot?.SessionId) { Feedback = string.Empty; _feedbackSeconds = 0; }
+        if (_session != snapshot?.SessionId) { Feedback = string.Empty; _feedbackSeconds = 0; ResetTransient(); }
         _session = snapshot?.SessionId ?? default;
         _tick = snapshot?.Tick ?? default;
         if (blocked || input.FocusLostThisFrame || snapshot?.PlayerExperience is not { IsMatchComplete: false } experience)
-        { _pending = false; return default; }
-        var stack = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback);
+        { _pending = false; _expansionPosition = _expansion.Open ? 1 : 0; return default; }
+        var plain = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback);
+        if (_expansion.Open && !HasExpandedCard(plain)) _expansion = default;
+        float requested = _expansion.Open ? 1 : 0;
+        _expansionPosition = Math.Clamp(_expansionPosition +
+            (float)Math.Max(0, seconds) / .2f * (requested > _expansionPosition ? 1 : -1), 0, 1);
+        var stack = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback,
+            Expansion);
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
         bool captured = _pending || input.HasPointerPosition && stack.Contains(input.PointerPosition) || fresh && originValid && stack.Contains(origin);
-        if (changed) { _pending = false; return new(captured); }
+        if (changed) { _pending = false; _expansionPosition = _expansion.Open ? 1 : 0; return new(captured); }
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
         if (fresh)
         {
@@ -58,8 +80,10 @@ public sealed class ActionableAlertController
             var card = stack.Card(_row);
             _item = card.Item;
             _pressedStack = stack;
-            _details = card.Item.Hidden > 0 || card.Truncated && (card.Item.Feedback || card.Item.Local || card.Details.Contains(origin));
-            _pending = card.Item.Kind != PlayerAlertState.None || _details;
+            _details = card.Item.Hidden > 0 || card.Truncated && !card.Details.IsEmpty && card.Details.Contains(origin);
+            _pressFocus = !_details && !card.Action.IsEmpty && card.Action.Contains(origin);
+            _pressPaging = !card.ExpansionBounds.IsEmpty && card.ExpansionBounds.Contains(origin);
+            _pending = true;
             _target = default;
             if (alerts is not null)
                 for (int i = 0; i < alerts.Alerts.Count; i++)
@@ -68,25 +92,78 @@ public sealed class ActionableAlertController
         }
         if (!_pending || input.IsMouseButtonDown(PlatformMouseButton.Left)) return new(captured);
         _pending = false;
-        if (!input.HasPointerPosition || !stack.Card(_row).Bounds.Contains(input.PointerPosition) || stack != _pressedStack) return new(true);
+        if (!input.HasPointerPosition || _row < 0 || _row >= stack.Count ||
+            !stack.Card(_row).InteractiveBounds.Contains(input.PointerPosition) || stack != _pressedStack) return new(true);
         var item = stack.Card(_row).Item;
         if (item.Kind != _item.Kind || (item.Hidden > 0) != (_item.Hidden > 0)) return new(true);
         var releasedCard = stack.Card(_row);
         bool releasedDetails = item.Hidden > 0 || releasedCard.Truncated &&
-            (item.Feedback || item.Local || releasedCard.Details.Contains(input.PointerPosition));
-        if (_details != releasedDetails) return new(true);
+            !releasedCard.Details.IsEmpty && releasedCard.Details.Contains(input.PointerPosition);
+        bool releasedFocus = !_details && !releasedCard.Action.IsEmpty &&
+            releasedCard.Action.Contains(input.PointerPosition);
+        bool releasedPaging = !releasedCard.ExpansionBounds.IsEmpty &&
+            releasedCard.ExpansionBounds.Contains(input.PointerPosition);
+        if (_details != releasedDetails || _pressFocus != releasedFocus || _pressPaging != releasedPaging) return new(true);
         if (_details) return new(true, OpenOperations: true, NotificationDetails: true);
-        if (item.Kind == PlayerAlertState.None) return new(true);
-        if (alerts is not null)
-            for (int i = 0; i < alerts.Alerts.Count; i++)
-                if (alerts.Alerts[i].Identity.Kind == item.Kind)
+        if (_pressPaging)
+        {
+            _expansion = _expansion with { Page = _expansion.Page + 1 };
+            return new(true);
+        }
+        if (!_pressFocus)
+        {
+            if (_expansion.Matches(releasedCard)) _expansion = default;
+            else _expansion = new(item, releasedCard.Identity, releasedCard.Revision, true);
+            _expansionPosition = 0;
+            return new(true);
+        }
+        if (item.Kind == PlayerAlertState.None) return new(true, OpenOperations: true, NotificationDetails: true);
+        if (alerts is null) { Unavailable(); return new(true, OpenOperations: true, Category: AlertLifecycleTracker.Category(item.Kind)); }
+        bool stillCurrent = false;
+        for (int i = 0; i < alerts.Alerts.Count; i++)
+            if (alerts.Alerts[i].Identity == _identity && alerts.Alerts[i].Target == _target &&
+                alerts.Alerts[i].Identity.Kind == item.Kind) { stillCurrent = true; break; }
+        if (!stillCurrent) return new(true);
+        // Cycle only through currently published, locally authorized, focusable cards.
+        // Count/order/target revisions reset the cursor instead of reusing a stale index.
+        bool advance = _hasFocusCursor && _focusRevision == plain.Revision;
+        int start = _row;
+        if (advance)
+            for (int i = 0; i < plain.Count; i++)
+                if (plain.Card(i).Identity == _focusCursor) { start = (i + 1) % plain.Count; break; }
+        for (int offset = 0; offset < plain.Count; offset++)
+        {
+            var candidate = plain.Card((start + offset) % plain.Count);
+            if (candidate.Item.Hidden > 0 || candidate.Item.Feedback || candidate.Item.Local) continue;
+            for (int a = 0; a < alerts.Alerts.Count; a++)
+                if (alerts.Alerts[a].Identity == candidate.Identity &&
+                    alerts.Alerts[a].Target.IsValid)
                 {
-                    var alert = alerts.Alerts[i];
-                    if (_identity != alert.Identity || _target != alert.Target) return new(true);
-                    if (alert.Target.IsValid) return new(true, alert.Target, Category: alert.Operations);
-                    Unavailable(); return new(true, OpenOperations: true, Category: alert.Operations);
+                    _focusCursor = candidate.Identity;
+                    _hasFocusCursor = true;
+                    _focusRevision = plain.Revision;
+                    return new(true, alerts.Alerts[a].Target, Category: alerts.Alerts[a].Operations);
                 }
-        Feedback = "ALERT DATA UNAVAILABLE - OPEN OPERATIONS"; _feedbackSeconds = 3;
+        }
+        _hasFocusCursor = false;
+        Unavailable();
         return new(true, OpenOperations: true, Category: AlertLifecycleTracker.Category(item.Kind));
+    }
+
+    private bool HasExpandedCard(in NotificationStackLayout stack)
+    {
+        for (int i = 0; i < stack.Count; i++)
+            if (_expansion.Matches(stack.Card(i))) return true;
+        return false;
+    }
+
+    private void ResetTransient()
+    {
+        _pending = false;
+        _hasFocusCursor = false;
+        _focusCursor = default;
+        _focusRevision = 0;
+        _expansion = default;
+        _expansionPosition = 0;
     }
 }
