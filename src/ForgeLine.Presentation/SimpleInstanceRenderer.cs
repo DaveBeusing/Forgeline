@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Buffers;
 using ForgeLine.Presentation.RenderSubmission;
 using ForgeLine.Presentation.RenderContracts;
@@ -41,6 +42,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly Dictionary<int, FrameInstanceBuffer> _shadowFrameInstanceBuffers = [];
     private readonly Dictionary<InstanceBatchKey, InstanceBatch> _batchLookup = [];
     private readonly List<InstanceBatch> _batches = [];
+    private readonly ConditionalWeakTable<RenderWorld, WorldLodHistory> _worldLods = new();
+    private CameraLodHistory? _activeLodHistory;
     private Dictionary<(EntityId Entity, uint Identity), int> _previousLods = [];
     private Dictionary<(EntityId Entity, uint Identity), int> _currentLods = [];
     private InstanceRenderData[] _instanceStaging = [];
@@ -277,6 +280,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
         ViewFrustum frustum =
             ViewFrustum.FromViewProjection(
                 shadowProjection ?? matrices.ViewProjection);
+        var session = world.CurrentSnapshot?.SessionId ?? default;
+        WorldLodHistory worldHistory = _worldLods.GetValue(world, static _ => new WorldLodHistory());
+        if (worldHistory.Session != session) { worldHistory.Cameras.Clear(); worldHistory.Session = session; }
+        _activeLodHistory = worldHistory.Cameras.GetValue(camera, static _ => new CameraLodHistory());
+        _previousLods = _activeLodHistory.Previous; _currentLods = _activeLodHistory.Current;
         if (!preparing)
         {
             ResetScratch(shadowProjection.HasValue);
@@ -968,7 +976,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         _spatialVisibility.Clear();
         _preparedRoots.Clear(); _passMeshes.Clear(); _passMaterials.Clear();
         _previousLods.Clear();
-        _currentLods.Clear();
+        _currentLods.Clear(); _worldLods.Clear(); _activeLodHistory = null;
         _skinFrames?.Dispose(); _skinFrames = null;
         _runtimeAssets?.Dispose();
         _indexBuffer.Dispose();
@@ -981,7 +989,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
     private void ResetScratch(bool shadow = false)
     {
-        if (!shadow) (_previousLods, _currentLods) = (_currentLods, _previousLods);
+        if (!shadow)
+        {
+            (_previousLods, _currentLods) = (_currentLods, _previousLods);
+            if (_activeLodHistory is { } history) { history.Previous = _previousLods; history.Current = _currentLods; }
+        }
         // Only the render owner uses scratch; no span escapes synchronous SetData.
         _batchLookup.Clear();
         long retainedInstances = 0;
@@ -1331,6 +1343,18 @@ public sealed class SimpleInstanceRenderer : IDisposable
             RuntimeMaterial = default;
             InstanceOffset = 0;
         }
+    }
+
+    private sealed class WorldLodHistory
+    {
+        internal ForgeLine.Simulation.SimulationSessionId Session;
+        internal readonly ConditionalWeakTable<RtsCamera, CameraLodHistory> Cameras = new();
+    }
+
+    private sealed class CameraLodHistory
+    {
+        internal Dictionary<(EntityId Entity, uint Identity), int> Previous = [];
+        internal Dictionary<(EntityId Entity, uint Identity), int> Current = [];
     }
 
     private sealed class FrameInstanceBuffer

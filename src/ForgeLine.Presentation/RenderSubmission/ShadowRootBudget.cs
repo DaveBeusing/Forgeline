@@ -27,8 +27,16 @@ internal readonly struct ShadowRootBudget : IDisposable
     internal void IncludePart(int root, bool drawAvailable) { _costs[root]++; _eligible[root] &= drawAvailable; }
     internal int Select(int parts)
     {
-        Array.Sort(_priorities, 0, _count);
+        long total = 0;
+        for (int i = 0; i < _count; i++) if (_eligible[i]) total += _costs[i];
         int roots = 0;
+        if (total <= parts)
+        {
+            for (int i = 0; i < _count; i++)
+                if (_eligible[i] && _costs[i] > 0) { _selected[i] = true; roots++; }
+            return roots;
+        }
+        Array.Sort(_priorities, 0, _count);
         for (int slot = 0; slot < _count; slot++)
         {
             int source = (int)(uint)_priorities[slot];

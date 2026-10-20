@@ -56,6 +56,15 @@ internal static class SubmissionProbe
             camera.ApplyState(camera.CaptureState() with { Target = new Vector3(i % 101 * 4 - 200, 0, 0), Distance = i % 3 == 0 ? 120 : i % 3 == 1 ? 420 : 900 });
             renderer.Render(context, camera, distributed, i % 2 == 0 ? .25f : .75f, presentationSeconds: i / 60d);
         }, renderer));
+        camera.ApplyState(camera.CaptureState() with { Target = Vector3.Zero, Distance = 420 });
+        var first = new PresentationSnapshot(new SimulationTick(2), TimeSpan.FromMilliseconds(50), roots.Length, roots);
+        var movedRoots = roots.Select(root => root with { Transform = root.Transform with { Position = root.Transform.Position + new Vector3(.125f, 0, .125f) } }).ToArray();
+        var second = new PresentationSnapshot(new SimulationTick(2), TimeSpan.FromMilliseconds(50), roots.Length, movedRoots);
+        results.Add(Measure("distributed-10000-new-snapshot-pair", i =>
+        {
+            snapshots.Publish(i % 2 == 0 ? first : second); distributed.Update(snapshots);
+            renderer.Render(context, camera, distributed, .5f, presentationSeconds: i / 60d);
+        }, renderer));
         var version = typeof(SimpleInstanceRenderer).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
         File.WriteAllText(output, JsonSerializer.Serialize(new { SchemaVersion = 1, SourceVersion = version,
             Runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,

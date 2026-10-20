@@ -9,6 +9,8 @@ internal sealed class SpatialSubmissionIndex
     internal const int MaximumRetainedRoots = 262144;
     private PresentationSnapshot? _current, _previous;
     private ulong[] _order = [];
+    private uint[] _cellKeys = [];
+    private int _count;
     private AxisAlignedBounds[] _bounds = [], _clusters = [];
     private bool[] _finite = [], _valid = [], _visible = [];
     private int[] _sourceCluster = [];
@@ -16,36 +18,38 @@ internal sealed class SpatialSubmissionIndex
     internal int RejectedClusters { get; private set; }
     internal int RejectedRoots { get; private set; }
     internal int Rebuilds { get; private set; }
-    internal long RetainedBytes => (long)_order.Length * (8 + 24 + 1 + 4) + (long)_clusters.Length * 26;
+    internal int Sorts { get; private set; }
+    internal long RetainedBytes => (long)_order.Length * (8 + 24 + 1 + 4 + 4) + (long)_clusters.Length * 26;
 
     internal void Update(RenderWorld world)
     {
         if (ReferenceEquals(_current, world.CurrentSnapshot) && ReferenceEquals(_previous, world.PreviousSnapshot)) return;
+        bool sort = _count != world.InstanceCount || _current?.SessionId != world.CurrentSnapshot?.SessionId;
         _current = world.CurrentSnapshot; _previous = world.PreviousSnapshot;
-        int count = world.InstanceCount;
+        int count = world.InstanceCount; _count = count;
         if (_order.Length < count || _order.Length > 65536 && count <= 16384)
         {
             int capacity = count == 0 ? 0 : (int)System.Numerics.BitOperations.RoundUpToPowerOf2((uint)count);
-            _order = new ulong[capacity]; _bounds = new AxisAlignedBounds[capacity];
+            sort = true;
+            _order = new ulong[capacity]; _cellKeys = new uint[capacity]; _bounds = new AxisAlignedBounds[capacity];
             _finite = new bool[capacity]; _sourceCluster = new int[capacity];
         }
         ClusterCount = (count + 31) / 32;
         if (_clusters.Length < ClusterCount || _clusters.Length > 2048 && count <= 16384)
         { _clusters = new AxisAlignedBounds[ClusterCount]; _valid = new bool[ClusterCount]; _visible = new bool[ClusterCount]; }
-        Vector3 min = new(float.MaxValue), max = new(float.MinValue);
         for (int i = 0; i < count; i++)
         {
             RenderInstance current = _current!.GetInstance(i);
             _finite[i] = InstanceVisibilityIndex.TrySweptBounds(current, world.GetInterpolatedInstance(i, 0), out _bounds[i]);
-            if (_finite[i]) { min = Vector3.Min(min, current.Transform.Position); max = Vector3.Max(max, current.Transform.Position); }
+            Vector3 position = current.Transform.Position;
+            uint key = Spread(Quantize(position.X)) | Spread(Quantize(position.Z)) << 1;
+            sort |= key != _cellKeys[i]; _cellKeys[i] = key;
         }
-        for (int i = 0; i < count; i++)
+        if (sort)
         {
-            Vector3 position = _current!.GetInstance(i).Transform.Position;
-            uint x = Quantize(position.X, min.X, max.X), z = Quantize(position.Z, min.Z, max.Z);
-            _order[i] = ((ulong)(Spread(x) | Spread(z) << 1) << 32) | (uint)i;
+            for (int i = 0; i < count; i++) _order[i] = ((ulong)_cellKeys[i] << 32) | (uint)i;
+            Array.Sort(_order, 0, count); Sorts++;
         }
-        Array.Sort(_order, 0, count);
         for (int slot = 0; slot < count; slot++)
         {
             int source = (int)(uint)_order[slot], cluster = slot / 32;
@@ -73,11 +77,11 @@ internal sealed class SpatialSubmissionIndex
     internal bool IsCandidate(int source) => _visible[_sourceCluster[source]];
     internal void Clear()
     {
-        _current = _previous = null; _order = []; _bounds = []; _clusters = [];
+        _current = _previous = null; _order = []; _cellKeys = []; _bounds = []; _clusters = []; _count = 0;
         _finite = []; _valid = []; _visible = []; _sourceCluster = []; ClusterCount = 0;
     }
-    private static uint Quantize(float value, float min, float max) =>
-        !float.IsFinite(value) || !(max > min) ? 0 : (uint)Math.Clamp(((double)value - min) / ((double)max - min) * 65535, 0, 65535);
+    private static uint Quantize(float value) =>
+        !float.IsFinite(value) ? 0 : (uint)Math.Clamp(Math.Floor((double)value / 32) + 32768, 0, 65535);
     private static uint Spread(uint value)
     {
         value = (value | value << 8) & 0x00ff00ff;

@@ -43,6 +43,22 @@ public sealed class SubmissionSafetyTests
     }
 
     [Fact]
+    public void SpatialPermutationReuseRequiresEqualLiveCellsAndSession()
+    {
+        var roots = Enumerable.Range(0, 64).Select(i => Root(i, new(2 + i * 64, 0, 2))).ToArray();
+        var world = CreateWorld(roots); var index = new SpatialSubmissionIndex(); index.Update(world);
+        int sorts = index.Sorts;
+        var buffer = new PresentationSnapshotBuffer();
+        buffer.Publish(new(new SimulationTick(2), TimeSpan.FromMilliseconds(50), roots.Length, roots)); world.Update(buffer); index.Update(world);
+        Assert.Equal(sorts, index.Sorts);
+        roots[0] = roots[0] with { Transform = roots[0].Transform with { Position = new(3000, 0, 3000) } };
+        buffer.Publish(new(new SimulationTick(3), TimeSpan.FromMilliseconds(50), roots.Length, roots)); world.Update(buffer); index.Update(world);
+        Assert.Equal(++sorts, index.Sorts);
+        buffer.Publish(new(new SimulationTick(1), TimeSpan.FromMilliseconds(50), roots.Length, roots, sessionId: new SimulationSessionId(92)));
+        world.Update(buffer); index.Update(world); Assert.Equal(sorts + 1, index.Sorts);
+    }
+
+    [Fact]
     public void FrameReuseInvalidatesAlphaTimeSnapshotAndSessionButNotCamera()
     {
         var camera = new RtsCamera(); var world = CreateWorld([Root(0, camera.Target)]);
@@ -123,6 +139,23 @@ public sealed class SubmissionSafetyTests
         Assert.Equal(5, budget.Select(5));
         Assert.False(budget.Selected(0)); Assert.False(budget.Selected(19));
         Assert.Equal(5, Enumerable.Range(0, 20).Count(budget.Selected));
+    }
+
+    [Fact]
+    public void ShadowWarmTraversalDoesNotAllocateAndCameraHistoryRemainsIndependent()
+    {
+        using var graphics = new FakeGraphicsDevice { DirectionalShadows = new(DirectionalShadowQuality.Low) };
+        using var renderer = new SimpleInstanceRenderer(graphics);
+        var camera = new RtsCamera(); var second = new RtsCamera(new() { InitialDistance = 900 });
+        var context = new FakeGraphicsCommandContext();
+        var world = CreateWorld(Enumerable.Range(0, 1000).Select(i => Root(i, camera.Target)).ToArray());
+        var frame = new GraphicsDirectionalShadowFrame(camera.GetMatrices(1600, 900).ViewProjection, camera.Target, 750, 2000);
+        for (int i = 0; i < 64; i++)
+        { renderer.Render(context, camera, world, 1); renderer.RenderShadow(context, camera, world, 1, frame, 1024, 256); renderer.Render(context, second, world, 1); }
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 64; i++)
+        { renderer.Render(context, camera, world, 1); renderer.RenderShadow(context, camera, world, 1, frame, 1024, 256); renderer.Render(context, second, world, 1); }
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
     }
 
     [Fact]

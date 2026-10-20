@@ -13,9 +13,11 @@ changes are introduced.
 
 The existing RenderWorld visibility interface remains compatible. The new
 renderer sidecar needs the exact pair of snapshot identities, including session
-identity, before reuse. Static scenery is rebuilt on a new pair; no unsupported
-static revision inference is used. A 262,144-root ceiling bounds this additional
-index to about 10 MiB of array payload. Larger snapshots use the existing swept
+identity, before reuse. Bounds are refreshed on every new pair. The sorted
+permutation can survive a new pair only after all live 32-metre cell keys are
+recomputed and prove unchanged, with the same session and count. Crossing a
+cell or session boundary sorts again. No static revision inference is used. A 262,144-root ceiling bounds this additional
+index to about 11 MiB of array payload. Larger snapshots use the existing swept
 contiguous-cluster path, still visiting every relevant root.
 
 A lazy root preparation cache retains at most 256 pages of 256 entries. Its key
@@ -26,7 +28,8 @@ A new renderer is required for a new asset generation or quality construction.
 Session changes clear pages. Overflow roots are prepared directly without
 extending retained pages. Only interpolated pose, conservative bounds and base
 transform are shared: camera projection, LOD/hysteresis, distance density, wind
-LOD amplitude and mechanical-detail weight remain per pass.
+LOD amplitude and mechanical-detail weight remain per pass. LOD histories are isolated by weak RenderWorld and camera
+identity, and reset for a changed session; another camera cannot seed hysteresis.
 
 Per-pass string-to-mesh/material maps retain stable resolved handles only inside
 one prepare or recording traversal. Every new traversal clears these maps and
