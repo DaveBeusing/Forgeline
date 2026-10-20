@@ -32,3 +32,31 @@ generation after last-owner release. A retiring wrapper failure cannot double-de
 or prevent remaining wrappers from receiving disposal.
 
 No public ABI, runtime container format, source master, global quality cap or shader changes.
+
+
+## Startup stop and retained CPU data
+
+An owner-thread preparation scope is prepared to consume host stop requests at each CPU read
+and GPU publication boundary, including the boundary immediately before Ready. Nested rebuilds
+restore their predecessor scope in reverse order; foreign-thread disposal cannot remove it.
+The real client/reference host bindings require a separately approved serial edit because both
+host files are outside this area's file ownership. Until integrated and tested, cancellation in
+the running client is an explicit acceptance blocker rather than a claimed product feature.
+
+Final native retirement also clears the prepared typed dictionaries, even if a resource wrapper
+throws during disposal. The encoded-payload cap bounds admitted source data, not exact managed
+heap usage: typed arrays, dictionary overhead and transient decode copies are separate CPU costs.
+No actual heap allocation is inferred from this cap or the logical GPU-data policy.
+
+## Measurement interpretation
+
+The declared native sequence is two fixed B-A-A-B warm pairs followed by a separate RendererCold
+pair, with identical source-independent fixtures, cameras, profiles and runtime fingerprint.
+Raw setup time/allocations include renderer construction and initial terrain preparation;
+whole startup, catalog checks and later CPU/GPU samples remain separate observations. Failed
+cohorts remain evidence and are not replaced by RendererCold or changed regression thresholds.
+A three-cycle load/warm/unload probe records shared cache IDs, last-owner resource return,
+upload-arena capacity/backpressure and DXGI process usage. Staging capacity is not committed
+Default-heap occupancy; the frozen public interface exposes no exact Default-heap byte counter.
+Cross-source zero-delta pixels are a technical comparison, with human image approval still
+required; the existing same-source accepted-golden gate is not repurposed for different code.

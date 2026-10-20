@@ -60,3 +60,23 @@ space and mesh material/LOD types before any required GPU publication. Thirteen
 focused residency tests pass (6.091s), including incompatible normal/BaseColor
 bindings and a small explicit resident budget that cannot evict an active texture.
 The final full suite is rerun on the committed refinement before native qualification.
+
+
+## Complete solution and baseline gameplay blockers
+
+Release build on e2931f79 succeeds with zero warnings/errors (21.43s). The complete
+serial solution run finishes with 3,019 passed, six failed and eighteen optional
+skips / 3,043 total (8m59.982s). All six failures are independently reproduced on
+the original master 47f4230f binaries: SupplyTruckFinishesRefuelingBeforeRescuingImmobileUnit,
+DockedSupplyKeepsCargoSeparateFromOptionalDriveTopupsButAllowsRequiredRecovery (zero fuel),
+ActiveCargoTransportRefuelsWithoutDroppingDeliveryOrder,
+ExpansionFundingKeepsPartialHubCostsAheadOfOptionalExtractors,
+DirectCombatTargetsRequireCurrentIdentifiedIntelligence, and
+EastOffensiveObjectiveAdvancesIntoOpponentHalfAgainstStationaryBase. The original-binary
+processes execute seven cases combined, six failed and one passed (the other docking
+Theory input). Game, Logistics, Simulation, Economy sources and Game tests are byte-identical
+to master. Their failures are retained baseline blockers, not repaired or waived here.
+
+The complete standalone Assets suite on the earlier 15a0c56e source passes all 170 cases
+(7m46.274s); the full solution subsequently covers the committed semantic refinement.
+Native measurements wait for an explicitly coordinated exclusive CPU/GPU window.
