@@ -22,7 +22,7 @@ if(graphics.Diagnostics.Device.IsSoftwareAdapter)throw new InvalidOperationExcep
 var rows=new List<object>();
 foreach(RenderQuality quality in Enum.GetValues<RenderQuality>())
 foreach(var sceneKind in new[] {VisualReferenceSceneKind.MainBattleTankProduction,VisualReferenceSceneKind.IndustrialBase})
-foreach(var zoom in new[] {RtsReferenceZoom.CloseTactical,RtsReferenceZoom.NormalGameplay,RtsReferenceZoom.Strategic})
+foreach(var zoom in new[] {RtsReferenceZoom.NormalGameplay})
 {
     var profile=new RenderQualitySettings {Quality=quality}.Resolve(true,false,1920,1080,3);
     graphics.ConfigurePostProcessing(profile.PostProcessing);
@@ -34,7 +34,7 @@ foreach(var zoom in new[] {RtsReferenceZoom.CloseTactical,RtsReferenceZoom.Norma
     var camera=new RtsCamera(RtsVisualReference.CreateCameraSettings(scene.Target,zoom));
     var cameraStart=camera.CaptureState();
     var cpu=new List<double>();var worldGpu=new List<double>();var shadowGpu=new List<double>();var totalGpu=new List<double>();
-    var completedFences=new List<ulong>();ulong previousFence=0;
+    var completedFences=new List<ulong>();var shadowFences=new List<ulong>();ulong previousFence=0;
     GraphicsDiagnostics warmStart,warmEnd;
     using(var ground=new TerrainRenderer(graphics,terrain,runtimeAssets:catalog,surfaceDetail:profile.TerrainDetail,
         textureDetail:profile.Textures,residency:new(true,128)) {DebugChunksEnabled=false})
@@ -72,7 +72,8 @@ foreach(var zoom in new[] {RtsReferenceZoom.CloseTactical,RtsReferenceZoom.Norma
             {
                 previousFence=f.GpuSubmissionFence;completedFences.Add(previousFence);
                 if(f.WorldGpuMilliseconds is double w)worldGpu.Add(w);
-                if(d.DirectionalShadows?.GpuMilliseconds is double s && profile.Shadows.Enabled)shadowGpu.Add(s);
+                if(d.DirectionalShadows is {} sd && profile.Shadows.Enabled && sd.GpuSubmissionFence==f.GpuSubmissionFence && sd.GpuMilliseconds is double s)
+                {shadowGpu.Add(s);shadowFences.Add(sd.GpuSubmissionFence);}
                 if(d.GpuFrameMilliseconds is double g)totalGpu.Add(g);
             }
         }
@@ -85,7 +86,7 @@ foreach(var zoom in new[] {RtsReferenceZoom.CloseTactical,RtsReferenceZoom.Norma
     if(retired.Health.PendingRetirementCount!=0 || retired.Resources.LoadedTextureCount!=0 || retired.Health.SubmissionFaultCount!=0)
         throw new InvalidOperationException("Native resource retirement or device health failed.");
     rows.Add(new {quality,scene=sceneKind,zoom,scene.Fingerprint,profile,warmups=64,samples=256,cpuMilliseconds=cpu,
-        worldGpuMilliseconds=worldGpu,shadowGpuMilliseconds=shadowGpu,totalGpuMilliseconds=totalGpu,completedFences,
+        worldGpuMilliseconds=worldGpu,shadowGpuMilliseconds=shadowGpu,totalGpuMilliseconds=totalGpu,completedFences,shadowFences,
         warmStart,warmEnd,retiredResources=retired.Resources,retiredHealth=retired.Health,
         interpretation="Fixed mechanical pose at one second; 0.005/0.003 metre target pan per frame; GPU timestamps are completed distinct fences. World and shadow intervals remain separate. No atmosphere or particles are recorded by this focused probe; full-client references qualify those paths separately."});
     Console.WriteLine($"Completed {quality}/{sceneKind}/{zoom}");

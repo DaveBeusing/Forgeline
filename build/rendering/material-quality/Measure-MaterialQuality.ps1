@@ -41,8 +41,8 @@ foreach($member in $protocol.sequence) {
                 vegetation=@{density=1.0;maximumDistanceMeters=4000.0};terrainResidency=@{enabled=$true;maximumResidentChunks=128}};
             warmups=64;samples=256;repeatCaptures=2;continueAfterMismatch=$false;uiScenarios=@('World');uiScales=@(1.0);
             scenes=@('MainBattleTankProduction','IndustrialBase');displays=@(@{width=1920;height=1080});
-            profiles=if($kind -eq 'fixed'){@('High')}else{@('Low','Medium','High','Ultra')};
-            zooms=if($kind -eq 'fixed'){@('CloseTactical','NormalGameplay','Strategic')}else{@('NormalGameplay')};yawDegrees=45.0}
+            profiles=@(if($kind -eq 'fixed'){'High'}else{'Low';'Medium';'High';'Ultra'});
+            zooms=@(if($kind -eq 'fixed'){'CloseTactical';'NormalGameplay';'Strategic'}else{'NormalGameplay'});yawDegrees=45.0}
         $requestPath=Join-Path $root "$name.request.json"
         $request|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $requestPath -Encoding utf8NoBOM
         & nvidia-smi --query-gpu=timestamp,pstate,clocks.gr,power.draw,power.limit --format=csv >> (Join-Path $root 'gpu.csv')
@@ -78,7 +78,7 @@ $comparisons=foreach($pair in @(1,2)) {
             & (Join-Path $repo 'build/Compare-ReferencePerformance.ps1') -BaselineRoot (Join-Path $root "before-$pair-$kind") `
                 -CurrentRoot (Join-Path $root "after-$pair-$kind") -ReportPath (Join-Path $root "performance-$pair-$kind.json") -GatePerformance `
                 *> (Join-Path $root "performance-$pair-$kind.log")
-        } catch { $comparisonExit=2;Write-Output $_.Exception.Message }
+        } catch { $comparisonExit=2;Write-Warning $_.Exception.Message }
         @{pair=$pair;kind=$kind;exitCode=$comparisonExit}
     }
 }
