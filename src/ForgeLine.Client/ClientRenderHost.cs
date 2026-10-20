@@ -740,7 +740,8 @@ internal sealed class ClientRenderHost : IDisposable
                             ringLayout = ringLayout with { Minimap = current.InformationLayer.MinimapBounds };
                         Span<HudRect> occupied = stackalloc HudRect[8];
                         RadialActionLayout.ResolveObstacles(occupied,ringLayout,current.PreAlphaUx.Onboarding,current.Operations,current.CombatGroups,
-                            ActionableAlertLayout.Resolve(snapshot,ringLayout,localFeedback:current.PreAlphaUx.Placement.Visible ? "" : current.PreAlphaUx.InteractionHint));
+                            ActionableAlertLayout.Resolve(snapshot,ringLayout,localFeedback:current.PreAlphaUx.Placement.Visible ? "" : current.PreAlphaUx.InteractionHint,
+                                expansion: current.NotificationExpansion));
                         animatedPanel = animatedPanel with { Ring = animatedPanel.Ring.Project(renderWorld, renderCamera,
                             renderAlpha, snapshot, ringLayout, occupied) };
                         inputRing = animatedPanel.Ring;
