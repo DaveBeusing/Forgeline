@@ -1014,7 +1014,10 @@ public sealed class AutomatedDistributionSystemTests
         foreach (EntityId entity in fixture.Simulation.Entities.Query<LogisticsStockPolicy>())
             policyEntity = entity;
         var current = fixture.Simulation.Entities.GetComponent<LogisticsStockPolicy>(policyEntity);
-        fixture.Simulation.Entities.SetComponent(policyEntity, current with { Enabled = false });
+        fixture.Simulation.Entities.SetComponent(policyEntity,
+            new LogisticsStockPolicy(current.TargetEntity, current.ResourceId,
+                current.DesiredMinimum, current.DesiredTarget, current.DesiredMaximum,
+                current.Priority, enabled: false));
         fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
         fixture.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
 
