@@ -160,7 +160,10 @@ internal sealed class CargoFuelServiceController(
             }
 
             // Exit and maneuvering reserve cannot be spent on the initial approach.
-            double required = (length + Vector3.Distance(pose.Entry, pose.Service) + pose.HalfLength * 3 + 10) *
+            bool alreadySettled = entities.TryGetComponent(truck, out GroundMovementState motion) &&
+                pose.IsSettled(truckTransform, motion);
+            double required = alreadySettled ? 0 :
+                (length + Vector3.Distance(pose.Entry, pose.Service) + pose.HalfLength * 3 + 10) *
                 fuel.ConsumptionPerMeter;
             if (!double.IsFinite(required) || available + Epsilon < required)
             {
