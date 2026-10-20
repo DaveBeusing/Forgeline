@@ -6,7 +6,8 @@ param(
     [Parameter(Mandatory)][string]$CurrentClient,
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$CurrentSource,
     [Parameter(Mandatory)][string]$RuntimeRoot,
-    [Parameter(Mandatory)][string]$OutputRoot
+    [Parameter(Mandatory)][string]$OutputRoot,
+    [switch]$WarmOnly
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
@@ -23,11 +24,12 @@ foreach($client in @($before,$after)){if(-not (Test-Path -LiteralPath $client)){
 [void][IO.Directory]::CreateDirectory($root)
 $manifestHash=(Get-FileHash -LiteralPath (Join-Path $runtime 'manifest.json') -Algorithm SHA256).Hash
 $driver=@(Get-CimInstance Win32_VideoController|ForEach-Object{"$($_.Name): $($_.DriverVersion)"}) -join '; '
-$sequence=@('warm-before-1','warm-after-1','warm-after-2','warm-before-2','cold-before','cold-after')
+$sequence=@('warm-before-1','warm-after-1','warm-after-2','warm-before-2')
+if(-not $WarmOnly){$sequence+=@('cold-before','cold-after')}
 $plan=@{declaredUtc=(Get-Date).ToUniversalTime().ToString('o');baselineSource=$BaselineSource;currentSource=$CurrentSource;
     baselineClientSha256=(Get-FileHash -LiteralPath $before).Hash;currentClientSha256=(Get-FileHash -LiteralPath $after).Hash;
     runtimeManifestSha256=$manifestHash;sequence=$sequence;scenes=@('MainBattleTankProduction','IndustrialBase');zooms=@('CloseTactical','NormalGameplay','Strategic');
-    warmups=128;samples=512;repeatCaptures=2;maximumRegressionPercent=15;
+    warmups=128;samples=512;repeatCaptures=2;maximumRegressionPercent=15;warmOnly=[bool]$WarmOnly;
     interpretation='Two fixed B-A-A-B warm pairs; RendererCold is separate cold/setup evidence with zero effective warmups, not a substitute for failed warm gates. Keep every cohort and all chronological observations.'}
 $plan|ConvertTo-Json -Depth 8|Set-Content -LiteralPath (Join-Path $root 'protocol.json') -Encoding utf8NoBOM
 function Foreign-Work([int]$OwnId=0) {
@@ -91,9 +93,11 @@ try {
         $pixelResult=@(Compare-ResidencyPixels "warm-after-$pair" "warm-before-$pair" "warm-pair$pair")
         if($pixelResult[-1] -ne $true){$pixelsPassed=$false}
     }
-    $pixelResult=@(Compare-ResidencyPixels "cold-after" "cold-before" "cold")
-    if($pixelResult[-1] -ne $true){$pixelsPassed=$false}
-    @{capturesComplete=$true;warmPerformancePassed=(-not $failed);crossSourcePixelsEqual=$pixelsPassed;humanVisualAcceptance="pending"}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $root 'status.json') -Encoding utf8NoBOM
+    if(-not $WarmOnly) {
+        $pixelResult=@(Compare-ResidencyPixels "cold-after" "cold-before" "cold")
+        if($pixelResult[-1] -ne $true){$pixelsPassed=$false}
+    }
+    @{capturesComplete=$true;warmPerformancePassed=(-not $failed);crossSourcePixelsEqual=$pixelsPassed;humanVisualAcceptance="pending";coldAttempted=(-not $WarmOnly)}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $root 'status.json') -Encoding utf8NoBOM
     if($failed -or -not $pixelsPassed){throw 'A fixed warm performance or cross-source pixel check failed; preserve all cohorts without replacement or threshold changes.'}
 } catch {
     $_|Out-String|Set-Content -LiteralPath (Join-Path $root 'protocol-error.log') -Encoding utf8NoBOM

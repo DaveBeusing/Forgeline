@@ -220,3 +220,40 @@ implementation. This changes SimpleInstanceRenderer/visibility/submission code, 
 residency/submission product needs a new integrated build and complete suite. Existing records
 above retain their exact source identities and unresolved gates. The next isolated version delta
 is 0.1.422 -> 0.1.423. No existing timing result is relabelled as the new product or current master.
+
+
+## Final combined residency/submission result
+
+Current master cd62153ef77b6a5dda754381a0aa4b7346b32b29 is integrated without conflicts. Exactly one
+PATCH remains: 0.1.422 -> 0.1.423. Final production source is
+21650bad0584bdf390b33117b86e0833f0caee8c. Release build succeeds with zero warnings/errors
+(1m39.27s). The complete unfiltered solution finishes in 5m51.222s: 3,074 passed, the same five
+existing Game failures, eighteen optional skips / 3,097 total, exit two. All other modules pass.
+There is still no Game/Logistics/Simulation/Economy branch delta from current master.
+
+Because submission code genuinely changed during integration, a new fixed B-A-A-B warm cohort
+uses the actual b69e5f72a1444bbffce149c6a71b7551a27044a4 baseline build. Its source and version
+are verified identical to current master under src/, tools/ and Directory.Build.props; its actual
+build identity is retained rather than relabelled as cd62153e. Parameters remain High, 1920x1080,
+two scenes/three zooms, 128 warmups/512 samples/two repeat captures, unchanged 15-percent limit.
+The known before-source RendererCold sampling defect is explicitly excluded by WarmOnly; it is
+not a passed cold gate. Current corrected cold operation is captured separately. The earlier
+failed cohorts remain untouched. Both new warm pairs are structurally comparable but fail with
+five and fourteen metric/statistic threshold observations. All twelve image rows have zero
+channel delta. This is still **implemented, not accepted**; no timing improvement is inferred.
+
+Final corrected RendererCold passes all six cases on source 21650bad, exit zero. The 0.1.423
+archive passes all packaging checks and its runtime-only child startup, exit zero, 1,532 entries,
+no authoring/compiler files, fresh child settings. Archive SHA256 is
+89a9790b957d6bbf7a3217411a735077d4fc6931f318f01ecc539896abd58115.
+Its own packaged runtime is confirmed. All local builds/tests/native processes are finished.
+
+The twelve-cycle resource plateau and controlled native window cancellation retain their
+original source identities; residency implementation and its host bindings are unchanged by
+submission integration. The new complete suite, two fixed warm pairs, six cold cases and
+source-less player startup verify the actual combined renderer path. Exact Default-heap
+allocation and shader-compilation call counters remain unavailable through the frozen contracts.
+
+Remaining acceptance items: the failed unchanged warm time gates, visible pre-existing Game
+failures, required human image review and final remote CI. The image review covers equality only
+and cannot waive timing or gameplay failures. The PR stays draft; no merge/tag/release is performed.

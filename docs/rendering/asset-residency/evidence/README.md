@@ -1,6 +1,6 @@
 # Retained asset residency evidence
 
-Final integrated image source: `1edf00e20cdc3887eebeab57da2cc0863ea60106` against current master `a1610d1a51d4107c4b8202e234ed33edd3cfc9c9`, product 0.1.422. Earlier cold/warm/plateau observations retain their own sources in the qualification report.
+Final combined image source: `21650bad0584bdf390b33117b86e0833f0caee8c` (0.1.423), against actual build `b69e5f72a1444bbffce149c6a71b7551a27044a4`, whose runtime code/version is audited identical to current master `cd62153ef77b6a5dda754381a0aa4b7346b32b29`. Earlier observations retain their own source identities.
 
 [index.json](index.json) maps every original artifact path to original, retained and stored hashes. Text objects are gzip-compressed after explicit private-path redaction. PNG bytes are unchanged. Failed tests, the original RendererCold failure and both failed warm gates remain retained.
 
