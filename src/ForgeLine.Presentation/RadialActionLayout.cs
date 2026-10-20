@@ -57,7 +57,7 @@ public readonly record struct RadialActionLayout(Vector2 Anchor, Vector2 Center,
         occupied[4]=notifications?.PaintedBounds ?? layout.NotificationBounds();
         occupied[5]=onboarding?.VisiblePanel ?? default;
         occupied[6]=onboarding?.Tab ?? default;
-        occupied[7]=operations.Open ? OperationsLayout.Panel(layout) : OperationsLayout.Entry(layout);
+        occupied[7]=operations.Open && !operations.Suppressed ? OperationsLayout.Panel(layout) : default;
     }
 
     public static RadialActionLayout Fit(Vector2 anchor, float footprintRadius, in GameplayHudLayout hud,

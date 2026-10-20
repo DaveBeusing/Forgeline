@@ -26,7 +26,7 @@ public sealed class GuidanceLessonTests
             Assert.InRange(view.PageCount, 1, 8);
             var panel = GameplayGuidanceLayout.Resolve(layout, true);
             Assert.True(panel.Height > layout.OnboardingBounds.Height);
-            Assert.True(panel.Bottom <= OperationsLayout.Entry(layout).Y - layout.Gap + .01f);
+            Assert.True(panel.Bottom <= layout.SecondaryView.Y - layout.Gap + .01f);
             var pages = new List<string>();
             for (int page = 0; page < view.PageCount; page++)
             {

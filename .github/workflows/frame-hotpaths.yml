@@ -20,6 +20,13 @@ jobs:
         run: dotnet restore ForgeLine.sln
       - name: Build Release
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
+      - name: Capture candidate action-ring geometry
+        shell: pwsh
+        run: |
+          $env:FORGELINE_UI_FIXTURE_BASELINE = Join-Path $env:GITHUB_WORKSPACE "artifacts/action-ring-geometry-candidate.json"
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GameplayUiFixtureTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-Content $env:FORGELINE_UI_FIXTURE_BASELINE -Raw
       - name: Render scratch and snapshot contracts
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.SimpleInstanceRendererTests ForgeLine.Presentation.Tests.PresentationExtractionTests ForgeLine.Presentation.Tests.RenderSnapshotIndexTests
       - name: Render boundary and publication contracts

@@ -10,6 +10,10 @@ Current single/group rings have no rectangular mode bar or command dock. Existin
 
 Current validation and remaining gates: [qualification report](WorldAnchoredActionMenuQualification.md). Checkpoints below retain their original source identities.
 
+## Current Operations obstacle ownership
+
+The radial layout reserves physical screen space for Operations only when its diagnostic panel is logically open and visible. A closed or suppressed panel adds no obstacle, because the former permanent Operations tab and its hit region have been removed. The same published Operations panel rectangle is used for rendering and input capture. Existing resource, notification, onboarding, minimap and combat-group reservations remain separate. This correction does not change strategic overlay contents or F10/F11 controls.
+
 ## Current radial material and motion contract
 
 Single, group, category, item and parameter rings render through the same radial sector pipeline. Every settled background sector uses straight-alpha compositing with effective alpha **0.30** (70% transparency), including disabled, hovered, pressed and pending tint states. Color-state tints come from the shared command-interface palette; icons and text retain independently specified contrast and receive only the presentation visibility factor. The one-pixel inner/outer alpha fringe does not introduce another opaque background pass.
