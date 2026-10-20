@@ -1,0 +1,1128 @@
+{
+  "families": [
+    {
+      "assets": [
+        {
+          "definition": {
+            "collisionReference": "building.directorate.module.collision_box",
+            "collisionRequired": true,
+            "id": "building.directorate.extractor",
+            "lods": [
+              {
+                "assetId": "building.directorate.extractor.lod1",
+                "level": 1,
+                "maxDistance": 220
+              },
+              {
+                "assetId": "building.directorate.extractor.lod2",
+                "level": 2,
+                "maxDistance": 620
+              }
+            ],
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "sockets": [
+              {
+                "name": "material_outlet",
+                "x": 0.4,
+                "y": -0.15,
+                "z": 0.21
+              },
+              {
+                "name": "service_access",
+                "x": 0.18,
+                "y": -0.36,
+                "z": -0.32
+              },
+              {
+                "name": "extraction_axis",
+                "x": -0.2,
+                "y": -0.46,
+                "z": -0.04
+              }
+            ],
+            "source": "sources/industrial/extractor/lod0.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.glb",
+          "exportSha256": "18f023eea7f4b038a3ca39f22a82fb1b267c93c91f3bb67171a3c4f70f24ff8b",
+          "id": "building.directorate.extractor",
+          "originalDefinition": "assets/source/buildings/directorate/extractor.asset.json",
+          "originalDefinitionSha256": "8f4eb534558d68c67f28307c3dbc9a9eaba203cdd7a0da0cf569f5f1e0417e2c",
+          "sourceStats": {
+            "boundsMax": [
+              0.4099999964237213,
+              0.4000000059604645,
+              0.36000001430511475
+            ],
+            "boundsMin": [
+              -0.5528813004493713,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 1260,
+            "vertices": 2208
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.critical",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/critical.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.critical.glb",
+          "exportSha256": "5d40b25724e9c3b2b79e5d75bfd5633cca68a8a9b30411a98a4ab4c60be049c6",
+          "id": "building.directorate.extractor.critical",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_critical.asset.json",
+          "originalDefinitionSha256": "debfbca840ebb83f5d419c0722d6ed62c89f684ad000e2d32da90a941e9540db",
+          "sourceStats": {
+            "boundsMax": [
+              -0.30288130044937134,
+              -0.10373086482286453,
+              -0.09000000357627869
+            ],
+            "boundsMin": [
+              -0.49288129806518555,
+              -0.4300000071525574,
+              -0.29794731736183167
+            ],
+            "primitives": 1,
+            "triangles": 60,
+            "vertices": 108
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.damaged",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/damaged.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.damaged.glb",
+          "exportSha256": "673e826369513508c2a51349d3ac3cf871b38e26a4b3209e776ba3bf9037425e",
+          "id": "building.directorate.extractor.damaged",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_damaged.asset.json",
+          "originalDefinitionSha256": "3b43262431965152a3734362e5d83f206ff3fee3f5b5ff683ad4ee7835ef9dd6",
+          "sourceStats": {
+            "boundsMax": [
+              0.3793768286705017,
+              -0.15152259171009064,
+              0.29499998688697815
+            ],
+            "boundsMin": [
+              -0.49288129806518555,
+              -0.4350000023841858,
+              0.19499999284744263
+            ],
+            "primitives": 1,
+            "triangles": 48,
+            "vertices": 84
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.destroyed",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/destroyed.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.destroyed.glb",
+          "exportSha256": "5c36e650f8f965fc6ac502fd66411f8f3a4f04b5a199fc1a57ebf7c55d15db12",
+          "id": "building.directorate.extractor.destroyed",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_destroyed.asset.json",
+          "originalDefinitionSha256": "4e545ccadee9c62486ed92d410d38b8241255dc76d008c9827db258e5d85a963",
+          "sourceStats": {
+            "boundsMax": [
+              0.4099999964237213,
+              -0.12949702143669128,
+              0.36000001430511475
+            ],
+            "boundsMin": [
+              -0.5528813004493713,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 136,
+            "vertices": 240
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.foundation",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/foundation.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.foundation.glb",
+          "exportSha256": "2f12ff9c7848ad71d06209a5aa2f0a0ee8ec709de28e4270e688258cf07006bc",
+          "id": "building.directorate.extractor.foundation",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_foundation.asset.json",
+          "originalDefinitionSha256": "c241efcfb5281d414506d1048887584d4d3824401786463ceaec8b8a2efd975b",
+          "sourceStats": {
+            "boundsMax": [
+              0.4099999964237213,
+              -0.46000000834465027,
+              0.36000001430511475
+            ],
+            "boundsMin": [
+              -0.5528813004493713,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 12,
+            "vertices": 24
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.idle",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/idle.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.idle.glb",
+          "exportSha256": "f5acfac1a1e91c3662e02e12a7a087c0d540da2f3b6c1b40c19c4d4797611650",
+          "id": "building.directorate.extractor.idle",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_idle.asset.json",
+          "originalDefinitionSha256": "52867751545064091afaa2aefe621d56f0a4198b2ae3bd81d1c776d2745b3751",
+          "sourceStats": {
+            "boundsMax": [
+              0.3919999897480011,
+              -0.06499999761581421,
+              0.3050000071525574
+            ],
+            "boundsMin": [
+              0.36500000953674316,
+              -0.18000000715255737,
+              0.11500000208616257
+            ],
+            "primitives": 1,
+            "triangles": 24,
+            "vertices": 48
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.lod1",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/lod1.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.lod1.glb",
+          "exportSha256": "f8d5ca6e8df8f78160e292ae14368697580b06733737a3ee6ce0ab14ce6c0377",
+          "id": "building.directorate.extractor.lod1",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_lod1.asset.json",
+          "originalDefinitionSha256": "712d2117951b9a44db1fb2d833a0376ab376ad28ca786e4e0d245c9795616b53",
+          "sourceStats": {
+            "boundsMax": [
+              0.4099999964237213,
+              0.4000000059604645,
+              0.36000001430511475
+            ],
+            "boundsMin": [
+              -0.5528813004493713,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 344,
+            "vertices": 624
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.lod2",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/lod2.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.lod2.glb",
+          "exportSha256": "81312461e049e4562b05ca4854c14b1bf27242e7700b06ad6888ae175cedac95",
+          "id": "building.directorate.extractor.lod2",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_lod2.asset.json",
+          "originalDefinitionSha256": "f2a0a6eb7ad0601f035848ece1e27dbff18e78e4485fa914ce55be4a49a12e34",
+          "sourceStats": {
+            "boundsMax": [
+              0.4099999964237213,
+              0.4000000059604645,
+              0.36000001430511475
+            ],
+            "boundsMin": [
+              -0.5528813004493713,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 232,
+            "vertices": 444
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.partial_shell",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/partial_shell.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.partial_shell.glb",
+          "exportSha256": "f401e264ff12168d8ad4b7fb94953266cb7e0ea8c8c177ca890fa9fe9ccdf8a0",
+          "id": "building.directorate.extractor.partial_shell",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_partial_shell.asset.json",
+          "originalDefinitionSha256": "83bc81ee00c75d81cb9b453fd3cea14cfc091efa81e2d383622ea0d557124abc",
+          "sourceStats": {
+            "boundsMax": [
+              0.4099999964237213,
+              0.3700000047683716,
+              0.36000001430511475
+            ],
+            "boundsMin": [
+              -0.5528813004493713,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 260,
+            "vertices": 504
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.structural_frame",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/structural_frame.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.structural_frame.glb",
+          "exportSha256": "c8073c492007b40511615eeb5be002986a600113d7f0fc5e7e7a0bb1f5272494",
+          "id": "building.directorate.extractor.structural_frame",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_structural_frame.asset.json",
+          "originalDefinitionSha256": "fdd589078bca7dc3e8691c67b15c468ec4f43ce8b18baeb8162f58ade5408bf2",
+          "sourceStats": {
+            "boundsMax": [
+              0.4099999964237213,
+              0.10000000149011612,
+              0.36000001430511475
+            ],
+            "boundsMin": [
+              -0.5528813004493713,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 72,
+            "vertices": 144
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.extractor.unpowered",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/extractor/unpowered.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/extractor/building.directorate.extractor.unpowered.glb",
+          "exportSha256": "11336ee1379362fd0fa435262345b4fb6f7d60c3a281668edcc70b9fbc68c7d9",
+          "id": "building.directorate.extractor.unpowered",
+          "originalDefinition": "assets/source/buildings/directorate/extractor_unpowered.asset.json",
+          "originalDefinitionSha256": "bb8dd70099b102ec8b8598ce4f510a9694878d405f8f436958784fa129b3835b",
+          "sourceStats": {
+            "boundsMax": [
+              -0.4178813099861145,
+              -0.17550432682037354,
+              0.35199999809265137
+            ],
+            "boundsMin": [
+              -0.5278813242912292,
+              -0.41999998688697815,
+              0.28999999165534973
+            ],
+            "primitives": 1,
+            "triangles": 48,
+            "vertices": 84
+          }
+        }
+      ],
+      "family": "extractor",
+      "master": "masters/extractor.blend",
+      "masterSha256": "fc584aef0690dd344e98eda743c02083c6a1c53817659638e14a2e30f2e27968",
+      "root": "building.directorate.extractor",
+      "sourceSignature": "78dd2cc78926ed652a2a6ec0d3beb7a8f4710422fee73392cc2dc0c019e21034"
+    },
+    {
+      "assets": [
+        {
+          "definition": {
+            "collisionReference": "building.directorate.module.collision_box",
+            "collisionRequired": true,
+            "id": "building.directorate.smelter",
+            "lods": [
+              {
+                "assetId": "building.directorate.smelter.lod1",
+                "level": 1,
+                "maxDistance": 220
+              },
+              {
+                "assetId": "building.directorate.smelter.lod2",
+                "level": 2,
+                "maxDistance": 620
+              }
+            ],
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "sockets": [
+              {
+                "name": "material_feed",
+                "x": 0.2,
+                "y": 0.38,
+                "z": -0.1
+              },
+              {
+                "name": "slag_outlet",
+                "x": -0.09,
+                "y": -0.4,
+                "z": 0.47
+              },
+              {
+                "name": "service_access",
+                "x": 0.28,
+                "y": -0.36,
+                "z": 0.43
+              }
+            ],
+            "source": "sources/industrial/smelter/lod0.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.glb",
+          "exportSha256": "03559c2cfba7a9d0318a16e95330f0d39698e912a92f7f72e8d79097f8fc1933",
+          "id": "building.directorate.smelter",
+          "originalDefinition": "assets/source/buildings/directorate/smelter.asset.json",
+          "originalDefinitionSha256": "a4771b52566340b7f6b47ee7c9075fcab58214cce970a8d2ce839ae0fb3eee83",
+          "sourceStats": {
+            "boundsMax": [
+              0.41999998688697815,
+              0.5199999809265137,
+              0.4699999988079071
+            ],
+            "boundsMin": [
+              -0.47999998927116394,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 1236,
+            "vertices": 2264
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.critical",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/critical.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.critical.glb",
+          "exportSha256": "c74b4768c7e30456acc0eb28c535975bc4c49343b0fd95ae0ecd8f2a2a986f88",
+          "id": "building.directorate.smelter.critical",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_critical.asset.json",
+          "originalDefinitionSha256": "f0e633520e049d1e0858c5cfa5df43196dcce61e89982541c1c48ceaec161496",
+          "sourceStats": {
+            "boundsMax": [
+              -0.23000000417232513,
+              -0.10373086482286453,
+              -0.09000000357627869
+            ],
+            "boundsMin": [
+              -0.41999998688697815,
+              -0.4300000071525574,
+              -0.29794731736183167
+            ],
+            "primitives": 1,
+            "triangles": 60,
+            "vertices": 108
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.damaged",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/damaged.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.damaged.glb",
+          "exportSha256": "d99ce312b2c1c7b59e13a1165f9deab9ec66b13e61edef184f35d0e82e3eaa8c",
+          "id": "building.directorate.smelter.damaged",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_damaged.asset.json",
+          "originalDefinitionSha256": "80194828c97596d693d72c9c104a01ad7c7bc3d129fa3f6ef4941cc247fbfff8",
+          "sourceStats": {
+            "boundsMax": [
+              0.38937681913375854,
+              -0.15152259171009064,
+              0.4050000011920929
+            ],
+            "boundsMin": [
+              -0.41999998688697815,
+              -0.4350000023841858,
+              0.3050000071525574
+            ],
+            "primitives": 1,
+            "triangles": 48,
+            "vertices": 84
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.destroyed",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/destroyed.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.destroyed.glb",
+          "exportSha256": "39598f6c15bc032a9678bce0b9cd025895ac11baad9c9d808d7224ac6d54c0a2",
+          "id": "building.directorate.smelter.destroyed",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_destroyed.asset.json",
+          "originalDefinitionSha256": "0040d88e3490a40015465dcdea3e99633629710baff20f591eec215b13692c67",
+          "sourceStats": {
+            "boundsMax": [
+              0.41999998688697815,
+              -0.05000000074505806,
+              0.4699999988079071
+            ],
+            "boundsMin": [
+              -0.47999998927116394,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 152,
+            "vertices": 292
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.foundation",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/foundation.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.foundation.glb",
+          "exportSha256": "c59cb6699b8bbc7239a2e98792338e78cd801367692ba7a1d62581af4b825ec0",
+          "id": "building.directorate.smelter.foundation",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_foundation.asset.json",
+          "originalDefinitionSha256": "f01cd8271277c07266b59e86923e1dc0c9e5007913ec91082603c7acb8e24eab",
+          "sourceStats": {
+            "boundsMax": [
+              0.41999998688697815,
+              -0.46000000834465027,
+              0.4699999988079071
+            ],
+            "boundsMin": [
+              -0.47999998927116394,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 12,
+            "vertices": 24
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.idle",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/idle.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.idle.glb",
+          "exportSha256": "5fd7f5a07f799f6b93c56166c0d5d5b4b0d6a8064baf248a65f6013af3e136ef",
+          "id": "building.directorate.smelter.idle",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_idle.asset.json",
+          "originalDefinitionSha256": "9bbfd6a9b3e98ca5d6c57278599d18494ab6a64c1842ea828171327150257189",
+          "sourceStats": {
+            "boundsMax": [
+              0.029999999329447746,
+              -0.20000000298023224,
+              0.453000009059906
+            ],
+            "boundsMin": [
+              -0.20999999344348907,
+              -0.3700000047683716,
+              0.41999998688697815
+            ],
+            "primitives": 1,
+            "triangles": 24,
+            "vertices": 48
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.lod1",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/lod1.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.lod1.glb",
+          "exportSha256": "b7884e46d28ad4e5f96fefeabf21d98505266ff41f8288cba8b3bf4fec8a0b39",
+          "id": "building.directorate.smelter.lod1",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_lod1.asset.json",
+          "originalDefinitionSha256": "489506f5a905b97566484d7af4bad882732bf9e541caa1de330b3b529f7f8702",
+          "sourceStats": {
+            "boundsMax": [
+              0.41999998688697815,
+              0.5199999809265137,
+              0.4699999988079071
+            ],
+            "boundsMin": [
+              -0.47999998927116394,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 388,
+            "vertices": 724
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.lod2",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/lod2.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.lod2.glb",
+          "exportSha256": "e956d9868228f128af3f2a1a606b5e841111e5a62fb871f737e64bcee618e546",
+          "id": "building.directorate.smelter.lod2",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_lod2.asset.json",
+          "originalDefinitionSha256": "8ad8528f279c6e343b0cf0574cbee34d5f2876f8b4352d2005cc30cb476c6dcc",
+          "sourceStats": {
+            "boundsMax": [
+              0.41999998688697815,
+              0.5199999809265137,
+              0.4699999988079071
+            ],
+            "boundsMin": [
+              -0.47999998927116394,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 248,
+            "vertices": 480
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.partial_shell",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/partial_shell.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.partial_shell.glb",
+          "exportSha256": "a0f689ac420a61a7924267210dce1c95278ccffd36754ced6a5f239b62632cee",
+          "id": "building.directorate.smelter.partial_shell",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_partial_shell.asset.json",
+          "originalDefinitionSha256": "924fdf1331f76756bb3f5d59c4c526b8afbaa90467822876491df695d5d6a43c",
+          "sourceStats": {
+            "boundsMax": [
+              0.41999998688697815,
+              0.3799999952316284,
+              0.4699999988079071
+            ],
+            "boundsMin": [
+              -0.47999998927116394,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 288,
+            "vertices": 540
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.structural_frame",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/structural_frame.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.structural_frame.glb",
+          "exportSha256": "14975bda28ee4299e9b6934844989c407941ec4a81052779678ce78667db7cb3",
+          "id": "building.directorate.smelter.structural_frame",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_structural_frame.asset.json",
+          "originalDefinitionSha256": "add899b6a66858a21aaf43a537dbce8cd36e5283a5f9dccff0f3587ab78a0413",
+          "sourceStats": {
+            "boundsMax": [
+              0.41999998688697815,
+              0.10000000149011612,
+              0.4699999988079071
+            ],
+            "boundsMin": [
+              -0.47999998927116394,
+              -0.5,
+              -0.36000001430511475
+            ],
+            "primitives": 1,
+            "triangles": 72,
+            "vertices": 144
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.smelter.unpowered",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/smelter/unpowered.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/smelter/building.directorate.smelter.unpowered.glb",
+          "exportSha256": "c5d25c3ca28447275c79adf475bd0209a15f2b47e2f6b950cd8d6b9b5eb5f140",
+          "id": "building.directorate.smelter.unpowered",
+          "originalDefinition": "assets/source/buildings/directorate/smelter_unpowered.asset.json",
+          "originalDefinitionSha256": "1e3a8f8115426144f59f6f19974b27d83bbae91a2760ffd24552b04f94d66324",
+          "sourceStats": {
+            "boundsMax": [
+              -0.3449999988079071,
+              -0.17550432682037354,
+              0.4620000123977661
+            ],
+            "boundsMin": [
+              -0.45500001311302185,
+              -0.41999998688697815,
+              0.4000000059604645
+            ],
+            "primitives": 1,
+            "triangles": 48,
+            "vertices": 84
+          }
+        }
+      ],
+      "family": "smelter",
+      "master": "masters/smelter.blend",
+      "masterSha256": "23ba8f47226d04efe272725c57b17a6f74aadd38234e094e477bae56c9c7a68c",
+      "root": "building.directorate.smelter",
+      "sourceSignature": "9396576191711720c210cc9fbc8975ced4f1bfb55a71f805d65cb758a7055d93"
+    },
+    {
+      "assets": [
+        {
+          "definition": {
+            "collisionReference": "building.directorate.module.collision_box",
+            "collisionRequired": true,
+            "id": "building.directorate.electronics_plant",
+            "lods": [
+              {
+                "assetId": "building.directorate.electronics_plant.lod1",
+                "level": 1,
+                "maxDistance": 220
+              },
+              {
+                "assetId": "building.directorate.electronics_plant.lod2",
+                "level": 2,
+                "maxDistance": 620
+              }
+            ],
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "sockets": [
+              {
+                "name": "conditioned_power",
+                "x": -0.28,
+                "y": -0.2,
+                "z": 0.44
+              },
+              {
+                "name": "service_access",
+                "x": 0.23,
+                "y": -0.43,
+                "z": 0.49
+              },
+              {
+                "name": "clean_air",
+                "x": -0.17,
+                "y": 0.28,
+                "z": -0.14
+              }
+            ],
+            "source": "sources/industrial/electronics_plant/lod0.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.glb",
+          "exportSha256": "351d17530eda59f76169ea196d8656772b543cbb1abf27d3f8f6f1002e1b6d05",
+          "id": "building.directorate.electronics_plant",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant.asset.json",
+          "originalDefinitionSha256": "8edb83a66824d81d3ebc4b765520bf3fe2ee17a1e9983260e41252fb636da23a",
+          "sourceStats": {
+            "boundsMax": [
+              0.4300000071525574,
+              0.2800000011920929,
+              0.49000000953674316
+            ],
+            "boundsMin": [
+              -0.4000000059604645,
+              -0.5,
+              -0.3499999940395355
+            ],
+            "primitives": 1,
+            "triangles": 1124,
+            "vertices": 2328
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.critical",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/critical.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.critical.glb",
+          "exportSha256": "6ccb219b0cc13a27ce66907d091cfe95e967f0e4ff69f52cc2c458e77ab63107",
+          "id": "building.directorate.electronics_plant.critical",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_critical.asset.json",
+          "originalDefinitionSha256": "90ce8aaf862aa62366c9461f9ab576388d4efe623435bc93c6c1d51307ee9836",
+          "sourceStats": {
+            "boundsMax": [
+              -0.15000000596046448,
+              -0.10373086482286453,
+              -0.07999999821186066
+            ],
+            "boundsMin": [
+              -0.3400000035762787,
+              -0.4300000071525574,
+              -0.28794732689857483
+            ],
+            "primitives": 1,
+            "triangles": 60,
+            "vertices": 108
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.damaged",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/damaged.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.damaged.glb",
+          "exportSha256": "acbacb0f7f279b62c00e4f9ef939ed2c8dda9cbc2ebfbe50440108822b6b4c88",
+          "id": "building.directorate.electronics_plant.damaged",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_damaged.asset.json",
+          "originalDefinitionSha256": "bb966535bdbf4bbe272c6a0be4c6bb8443d4de866d0f02e1816e55cc46050b32",
+          "sourceStats": {
+            "boundsMax": [
+              0.39937683939933777,
+              -0.15152259171009064,
+              0.42500001192092896
+            ],
+            "boundsMin": [
+              -0.3400000035762787,
+              -0.4350000023841858,
+              0.32499998807907104
+            ],
+            "primitives": 1,
+            "triangles": 48,
+            "vertices": 84
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.destroyed",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/destroyed.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.destroyed.glb",
+          "exportSha256": "5185447bdad694312c799c6c744f41f669cd2a2a1903d1702f4010d9e22b71b0",
+          "id": "building.directorate.electronics_plant.destroyed",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_destroyed.asset.json",
+          "originalDefinitionSha256": "42205e5a314ab35efb59e217901e6e99cb3e6c673e39f465b882f1543f6fb495",
+          "sourceStats": {
+            "boundsMax": [
+              0.4300000071525574,
+              -0.13018789887428284,
+              0.49000000953674316
+            ],
+            "boundsMin": [
+              -0.4000000059604645,
+              -0.5,
+              -0.3499999940395355
+            ],
+            "primitives": 1,
+            "triangles": 84,
+            "vertices": 156
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.foundation",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/foundation.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.foundation.glb",
+          "exportSha256": "739704217ead046b31b245da64641bcf37294731d1da4a75d77d2638602b4de1",
+          "id": "building.directorate.electronics_plant.foundation",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_foundation.asset.json",
+          "originalDefinitionSha256": "32bfcb59478ace153a0737f0cfad835d907bcae1671963b5a7c89da243a367a9",
+          "sourceStats": {
+            "boundsMax": [
+              0.4300000071525574,
+              -0.46000000834465027,
+              0.49000000953674316
+            ],
+            "boundsMin": [
+              -0.4000000059604645,
+              -0.5,
+              -0.3499999940395355
+            ],
+            "primitives": 1,
+            "triangles": 12,
+            "vertices": 24
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.idle",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/idle.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.idle.glb",
+          "exportSha256": "ec77aa6560f426741866c3aae642879d85643f4a15dbb609c4bf10edb4180ef8",
+          "id": "building.directorate.electronics_plant.idle",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_idle.asset.json",
+          "originalDefinitionSha256": "59396a5c191d4ff2b7e0bd4263915b0b94463a7bac9839acb2d9e06318d5431d",
+          "sourceStats": {
+            "boundsMax": [
+              0.375,
+              -0.20000000298023224,
+              0.4729999899864197
+            ],
+            "boundsMin": [
+              0.07500000298023224,
+              -0.3700000047683716,
+              0.4399999976158142
+            ],
+            "primitives": 1,
+            "triangles": 24,
+            "vertices": 48
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.lod1",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/lod1.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.lod1.glb",
+          "exportSha256": "3140272d967c745f5a147c38720795f6c12ca1dca22bdacab37382d88c7dcfa3",
+          "id": "building.directorate.electronics_plant.lod1",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_lod1.asset.json",
+          "originalDefinitionSha256": "802d48f3df2da8982870a8faa2cba30b741dce24ed61ad883f3ba98abe8f2e02",
+          "sourceStats": {
+            "boundsMax": [
+              0.4300000071525574,
+              0.2800000011920929,
+              0.49000000953674316
+            ],
+            "boundsMin": [
+              -0.4000000059604645,
+              -0.5,
+              -0.3499999940395355
+            ],
+            "primitives": 1,
+            "triangles": 260,
+            "vertices": 492
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.lod2",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/lod2.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.lod2.glb",
+          "exportSha256": "be42ff5c5c26afe46166cd11e1f1046c906fea44a55199d312ab2fad397bc60b",
+          "id": "building.directorate.electronics_plant.lod2",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_lod2.asset.json",
+          "originalDefinitionSha256": "4e5dc96d61377a04bdd09a7bcd20deb4c41b809951bbb641f4213911e064adae",
+          "sourceStats": {
+            "boundsMax": [
+              0.4300000071525574,
+              0.2800000011920929,
+              0.49000000953674316
+            ],
+            "boundsMin": [
+              -0.4000000059604645,
+              -0.5,
+              -0.3499999940395355
+            ],
+            "primitives": 1,
+            "triangles": 184,
+            "vertices": 360
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.partial_shell",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/partial_shell.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.partial_shell.glb",
+          "exportSha256": "77d277a12349f986d5c41509ff2c4addaac7d74bf6cb7cfeceb0c9fdb8bfb022",
+          "id": "building.directorate.electronics_plant.partial_shell",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_partial_shell.asset.json",
+          "originalDefinitionSha256": "89fe220374a72ff387ec373079d78a440c1fcc72caac13a2902e87e4c740149f",
+          "sourceStats": {
+            "boundsMax": [
+              0.4300000071525574,
+              0.15000000596046448,
+              0.49000000953674316
+            ],
+            "boundsMin": [
+              -0.4000000059604645,
+              -0.5,
+              -0.3499999940395355
+            ],
+            "primitives": 1,
+            "triangles": 224,
+            "vertices": 444
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.structural_frame",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/structural_frame.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.structural_frame.glb",
+          "exportSha256": "ca6bc91a1bc559cc7996d45d9b1ce44ee5fcf9d91043179d369b9597fe779629",
+          "id": "building.directorate.electronics_plant.structural_frame",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_structural_frame.asset.json",
+          "originalDefinitionSha256": "a698f97fcf7479fdcfe2c792a4a01106651048c7d67220a0f10d812a4b6c81ed",
+          "sourceStats": {
+            "boundsMax": [
+              0.4300000071525574,
+              0.10000000149011612,
+              0.49000000953674316
+            ],
+            "boundsMin": [
+              -0.4000000059604645,
+              -0.5,
+              -0.3499999940395355
+            ],
+            "primitives": 1,
+            "triangles": 72,
+            "vertices": 144
+          }
+        },
+        {
+          "definition": {
+            "id": "building.directorate.electronics_plant.unpowered",
+            "materialReferences": [
+              "material.directorate.building.structural"
+            ],
+            "source": "sources/industrial/electronics_plant/unpowered.gltf",
+            "type": "mesh"
+          },
+          "export": "exports/electronics_plant/building.directorate.electronics_plant.unpowered.glb",
+          "exportSha256": "28fa4d42034df09f2dc92c16dd3faac07a288c1e94f58612d9a7f33d2f9c9d29",
+          "id": "building.directorate.electronics_plant.unpowered",
+          "originalDefinition": "assets/source/buildings/directorate/electronics_plant_unpowered.asset.json",
+          "originalDefinitionSha256": "6d6bd4566fdc6f353d7f151e4ad1285083d707fdaaa01f931f05bc5cc5e9c38d",
+          "sourceStats": {
+            "boundsMax": [
+              -0.26499998569488525,
+              -0.17550432682037354,
+              0.4819999933242798
+            ],
+            "boundsMin": [
+              -0.375,
+              -0.41999998688697815,
+              0.41999998688697815
+            ],
+            "primitives": 1,
+            "triangles": 48,
+            "vertices": 84
+          }
+        }
+      ],
+      "family": "electronics_plant",
+      "master": "masters/electronics_plant.blend",
+      "masterSha256": "36f10d224e1a7b6ce44ebf711b82c229b070c44fd09e8a5bb2ae94efd6bcec6b",
+      "root": "building.directorate.electronics_plant",
+      "sourceSignature": "bcf82db3997b0b4834614bd66f3cf11a2f61aa570f8375b1a3ae6de4dde2ad82"
+    }
+  ],
+  "productionPromoted": false,
+  "provenance": "Existing original repository geometry and Directorate materials; no third-party inputs",
+  "schemaVersion": 1,
+  "sourceBase": "d3acf9b0fb94da75ecfd26173cc387398f317096",
+  "status": "staged"
+}
