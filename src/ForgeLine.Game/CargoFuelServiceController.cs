@@ -97,7 +97,19 @@ internal sealed class CargoFuelServiceController(
             return false;
         if (entities.TryGetComponent(truck, out VehicleDockVisit visit) &&
             visit.Generation > 0)
-            return true; // Never interrupt occupied cargo bays.
+        {
+            // An already-settled cargo bay can perform exclusive propulsion service
+            // without canceling its generation or forfeiting reserved freight.
+            if (visit.Status is VehicleDockStatus.Docked or VehicleDockStatus.Servicing &&
+                ValidProvider(entities, cargo.Owner, visit.Building, out InventoryId inPlaceSource) &&
+                inventories.GetAvailableQuantity(inPlaceSource, ResourceIds.Fuel) > Epsilon)
+            {
+                Mark(context, truck, new(visit.Building, CargoFuelServicePhase.Servicing,
+                    CargoFuelServiceReason.None, context.Tick));
+                return false;
+            }
+            return true; // An occupied exit remains physically owned until it clears.
+        }
 
         if (!TryChooseProvider(context, truck, cargo.Owner, fuel, available,
                 out EntityId provider, out CargoFuelServiceReason reason))
@@ -251,6 +263,8 @@ internal sealed class CargoFuelServiceController(
         bool docked = docks.Approach(context, truck, service.Provider, cargo.Owner);
         CargoDeliveryFuelPolicy.PrepareDockMovement(context, inventories, truck);
         if (!docked) return;
+        if (service.Phase != CargoFuelServicePhase.Servicing)
+            Mark(context, truck, service with { Phase = CargoFuelServicePhase.Servicing });
         if (!entities.TryGetComponent(truck, out VehicleDockVisit visit) ||
             visit.Building != service.Provider || visit.Generation == 0) return;
 
