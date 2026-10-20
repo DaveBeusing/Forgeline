@@ -1,0 +1,52 @@
+name: Industrial plant master qualification
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/industrial-plant-masters.yml'
+      - 'build/industrial-plants/**'
+      - 'assets/staged/industrial-plants/**'
+      - 'tests/ForgeLine.Presentation.Tests/IndustrialPlantMasterTests.cs'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/industrial-plant-masters.yml'
+      - 'build/industrial-plants/**'
+      - 'assets/staged/industrial-plants/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retained-contracts:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify saved master hashes and every staged LOD/state export
+        shell: pwsh
+        run: python build/industrial-plants/validate_retained.py
+
+  native-masters:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Save, reopen, export and compile both families
+        shell: pwsh
+        run: ./build/industrial-plants/Qualify-Masters.ps1 -OutputRoot artifacts/ip-ci
+      - name: Retain native authoring evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: industrial-plant-masters-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/ip-ci
+          retention-days: 14
