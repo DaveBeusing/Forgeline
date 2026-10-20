@@ -1,6 +1,6 @@
 # Asset residency qualification
 
-Status: implemented, not accepted. Functional build/asset/scene/package checks pass; original warm performance gates, existing gameplay baselines, human image approval and final CI remain open.
+Status: implemented, not accepted. Functional build/asset/scene/package checks pass; warm performance gates, existing gameplay baselines and final CI remain open; human image equality is approved.
 
 Baseline master is 47f4230f487e37f699b6572354e89f800476c513, version 0.1.420.
 The accepted render foundation and initialized static-buffer implementation are integrated.
@@ -257,3 +257,11 @@ allocation and shader-compilation call counters remain unavailable through the f
 Remaining acceptance items: the failed unchanged warm time gates, visible pre-existing Game
 failures, required human image review and final remote CI. The image review covers equality only
 and cannot waive timing or gameplay failures. The PR stays draft; no merge/tag/release is performed.
+
+
+## Human image decision
+
+The project owner explicitly approves equality of the six final source-21650bad reference
+images. The exact decision timestamp, source/runtime/manifests and six image hashes are recorded
+in evidence/visual-approval.json. Both fixed pairs remain technically pixel-identical. This closes
+the human visual-equality item only; failed warm time gates and baseline Game failures stay open.

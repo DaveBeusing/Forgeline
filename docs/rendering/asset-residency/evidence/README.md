@@ -6,7 +6,7 @@ Final combined image source: `21650bad0584bdf390b33117b86e0833f0caee8c` (0.1.423
 
 ## Native image review
 
-High, 1920×1080; these final integrated images match the current master pixels exactly. Technical equality does not replace human approval. Performance acceptance is independently open.
+High, 1920×1080; these final integrated images match the current master pixels exactly. Human visual-equality review is accepted; see [visual-approval.json](visual-approval.json). Performance acceptance remains independently open.
 
 | Scene and zoom | Native image |
 |---|---|
