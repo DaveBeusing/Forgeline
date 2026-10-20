@@ -42,7 +42,7 @@ internal static class InteractionHotPathMeasurements
             Results = results
         }, JsonOptions));
         if (results.Any(result => result.AllocatedBytes != 0 || result.DroppedLines != 0 ||
-            result.DrawCalls > 1 || result.HudVertices <= 0 || result.LineCount != result.SelectedCount * 24 + 22))
+            result.DrawCalls > 1 || result.HudVertices <= 0 || result.LineCount != result.SelectedCount * 8 + 22))
             throw new InvalidOperationException("Interaction hot paths violated allocation, geometry or draw budgets; inspect the report.");
         Console.WriteLine($"Interaction hot-path measurements: {Path.GetFullPath(output)} ({results.Count} cases; zero allocation and no dropped lines)");
     }

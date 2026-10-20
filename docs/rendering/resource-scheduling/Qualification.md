@@ -262,8 +262,32 @@ The first/last 128-frame block means are 1.207/1.347 ms, versus 2.446 ms in the
 256-383 block. These descriptive slices do not alter the full-cohort gate and do
 not prove a cause. Raw chronological observations remain authoritative.
 
-Human review of the six original native PNGs is requested and pending. Current
+Human review of the six original native PNGs was explicitly approved on 2026-10-20. Current
 required PR checks can be followed at PR #260; no green final-CI result is inferred
 from the local suite. Final status is **implemented, not accepted**: retain the
-draft until CPU-tail, actual debug-layer, human visual and required CI gates are
+draft until CPU-tail, actual debug-layer and required CI gates are
 resolved. No merge, tag or release is performed.
+
+
+## Visual acceptance and subsequent CI repair
+
+The six native PNGs listed in evidence/README.md are explicitly approved for visual
+equality on 2026-10-20; all twelve exact before/after comparisons remain retained.
+This approval does not waive CPU, debug validation or CI requirements.
+
+CI on d40b5262 completes with movement and CPU scalability passing, while main CI
+fails its debug-enabled window smoke and frame CI fails the interaction geometry
+guard. The debug smoke reports CreateResourceStateIgnored: static buffers request
+COPY_DEST even though the buffer creation API starts them in COMMON. Static buffer
+creation now explicitly requests COMMON; the first copy promotes to COPY_DEST and
+the existing post-copy transition to vertex/index use is retained. A native paired
+debug/non-debug regression exercises initialized vertex and index buffers and draw,
+requiring zero warning/error counts; unavailable debug support is an explicit skip.
+No warning filter, gate or counter is suppressed.
+
+The interaction report has zero managed allocations and no dropped lines, but its
+old equation still expects 24 selection segments per object; the approved four
+L-corners emit eight. A further explicit serial authorization includes only
+benchmarks/ForgeLine.Rendering.Benchmarks/InteractionHotPathMeasurements.cs. Its
+expected geometry is corrected to eight while fixed overhead, zero-allocation,
+draw-count and all other limits remain unchanged. Both failed CI logs are retained.

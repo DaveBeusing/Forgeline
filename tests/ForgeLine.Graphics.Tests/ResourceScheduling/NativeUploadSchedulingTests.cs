@@ -8,6 +8,26 @@ namespace ForgeLine.Graphics.Tests.ResourceScheduling;
 
 public sealed class NativeUploadSchedulingTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void InitializedStaticBuffersCopyAndDrawWithoutDebugWarnings(bool requireDebugLayer)
+    {
+        using var fixture = new NativeFixture(false, requireDebugLayer);
+        Assert.SkipWhen(requireDebugLayer && !fixture.Device.Diagnostics.Debug.Enabled,
+            "D3D12 debug layer is unavailable.");
+        byte[] vertices = NativeFixture.Vertices();
+        byte[] indices = MemoryMarshal.AsBytes<ushort>(new ushort[] { 0, 1, 2 }.AsSpan()).ToArray();
+        using var vertex = fixture.Device.CreateInitializedStaticBuffer(
+            new((ulong)vertices.Length, StaticGraphicsBufferUsage.Vertex), vertices);
+        using var index = fixture.Device.CreateInitializedStaticBuffer(
+            new((ulong)indices.Length, StaticGraphicsBufferUsage.Index), indices);
+        Assert.Contains(fixture.Capture(vertex, indexBuffer: index), value => value != 0);
+        fixture.Device.WaitForIdle();
+        Assert.Equal(0, fixture.Device.Diagnostics.Debug.WarningCount);
+        Assert.Equal(0, fixture.Device.Diagnostics.Debug.ErrorCount);
+    }
+
     [Fact]
     public void InitializedGpuLocalBufferCopiesInputAndMatchesUploadFallback()
     {
@@ -279,12 +299,12 @@ public sealed class NativeUploadSchedulingTests
         private readonly IWindow _window;
         private readonly IGraphicsPipeline[] _pipelines;
         internal D3D12GraphicsDevice Device { get; }
-        internal NativeFixture(bool textured)
+        internal NativeFixture(bool textured, bool requestDebugLayer = false)
         {
             _window = _platform.CreateWindow(new WindowConfiguration("FORGELINE Upload Qualification", 64, 64));
             Device = (D3D12GraphicsDevice)GraphicsDeviceFactory.CreateForWindow(_window,
-                new GraphicsConfiguration { AllowSoftwareAdapterFallback = true, EnableVSync = false,
-                    EnableDebugLayer = Environment.GetEnvironmentVariable("FORGELINE_RESOURCE_SCHEDULING_DEBUG") == "1" });
+                new GraphicsConfiguration { AllowSoftwareAdapterFallback = true, EnableVSync = false, ForceSoftwareAdapter = requestDebugLayer,
+                    EnableDebugLayer = requestDebugLayer || Environment.GetEnvironmentVariable("FORGELINE_RESOURCE_SCHEDULING_DEBUG") == "1" });
             if (Environment.GetEnvironmentVariable("FORGELINE_RESOURCE_SCHEDULING_DEBUG") == "1")
                 Assert.True(Device.Diagnostics.Device.DebugLayerEnabled, "Requested native debug layer is unavailable.");
             var compiler = new DxcShaderCompiler();

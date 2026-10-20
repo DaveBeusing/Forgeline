@@ -40,8 +40,9 @@ internal sealed partial class D3D12GraphicsDevice
             catch { fallback.Dispose(); throw; }
         }
         _ = UploadArenaLimits.Capacity(description.SizeInBytes);
+        // Buffers start in COMMON and promote to COPY_DEST on their first copy.
         ID3D12Resource resource = _device.CreateCommittedResource(HeapType.Default,
-            ResourceDescription.Buffer(description.SizeInBytes), ResourceStates.CopyDest);
+            ResourceDescription.Buffer(description.SizeInBytes), ResourceStates.Common);
         var buffer = new D3D12GraphicsBuffer(this, new(description.SizeInBytes, GraphicsBufferMemory.GpuLocal), resource);
         try
         {

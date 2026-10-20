@@ -4,7 +4,7 @@ The index maps each original artifact to a content-addressed retained object, wi
 
 ## Native image review
 
-The six images below are the final changed-source second cohort (09eb021b). The before/after pairs in both complete protocols match exactly by native PNG checksum; review is still required by the visual acceptance policy. This is presentation equality, not approval of new artwork.
+The six images below are the final changed-source second cohort (09eb021b). The before/after pairs in both complete protocols match exactly by native PNG checksum; human visual equality review was explicitly approved on 2026-10-20. This is presentation equality, not approval of new artwork.
 
 | Scene / camera | Native PNG |
 | --- | --- |
