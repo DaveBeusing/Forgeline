@@ -72,6 +72,9 @@ jobs:
         shell: pwsh
         run: ./build/Validate-WorldAudio.ps1
 
+      - name: Cargo transport recovery regression
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.CargoDockFailureRecoveryTests
+
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
