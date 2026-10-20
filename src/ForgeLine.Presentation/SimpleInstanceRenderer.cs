@@ -708,7 +708,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
         }
 
         WorkMetrics = new(world.InstanceCount, candidates, _preparedRoots.Interpolations, _preparedRoots.Hits,
-            instanceTests, _meshResolutions, _materialResolutions, visible, 0, 0, 0, 0);
+            instanceTests, _meshResolutions, _materialResolutions, visible, 0, 0, 0, 0)
+        { PreparedRootBytes = _preparedRoots.RetainedBytes, SpatialIndexBytes = _spatialVisibility.RetainedBytes };
         if (context is null) return;
 
         int preparedParts = 0;

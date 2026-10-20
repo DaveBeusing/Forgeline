@@ -90,6 +90,22 @@ public sealed class SubmissionSafetyTests
     }
 
     [Fact]
+    public void PreparedPagesReturnToNormalWithoutFlappingAtTheLargeBoundary()
+    {
+        var roots = Enumerable.Range(0, 65537).Select(i => Root(i, Vector3.Zero)).ToArray();
+        var world = CreateWorld(roots); var cache = new SubmissionFrameCache();
+        cache.Begin(world, .5f, 1); cache.Get(world, 65535);
+        long pageBytes = cache.RetainedBytes; Assert.True(pageBytes > 0);
+        var buffer = new PresentationSnapshotBuffer();
+        buffer.Publish(new(new SimulationTick(2), TimeSpan.FromMilliseconds(50), 65535, roots.AsSpan(0, 65535))); world.Update(buffer);
+        cache.Begin(world, .5f, 1); Assert.Equal(pageBytes, cache.RetainedBytes);
+        cache.Get(world, 0); Assert.Equal(pageBytes * 2, cache.RetainedBytes);
+        world = CreateWorld([Root(0, Vector3.Zero)]); cache.Begin(world, .5f, 1); cache.Get(world, 0);
+        Assert.Equal(pageBytes, cache.RetainedBytes);
+        cache.Clear(); Assert.Equal(0, cache.RetainedBytes);
+    }
+
+    [Fact]
     public void FrameReuseInvalidatesAlphaTimeSnapshotAndSessionButNotCamera()
     {
         var camera = new RtsCamera(); var world = CreateWorld([Root(0, camera.Target)]);
