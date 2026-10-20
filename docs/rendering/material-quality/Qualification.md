@@ -1,6 +1,6 @@
 # Material and shadow qualification
 
-Status: implementation in progress; no quality or performance acceptance claimed.
+Status: **implemented, not accepted**. Strict timing gates fail; human material/shadow decisions and final CI remain open.
 
 ## Baseline
 
@@ -109,9 +109,42 @@ zero newly compiled assets and zero issues. Gameplay texture containers remain
 is changed. The first two analytic filtering candidates include the common
 numerical changes; their observed GPU differences are not isolated filter costs.
 
-The complete Presentation suite passes on final production source. The full
-solution run is still completing its long Assets suite; the Game project reports
-the same five known failures. Master CI additionally reported the pre-existing
-SubmissionSafety allocation failure, which does not reproduce in this local
-Presentation suite. No test, threshold or original golden is changed to hide
-these outcomes.
+The complete unfiltered solution run finished: **3,102 passed, five failed,
+19 optional/environment skips, 3,126 total**, 20m17.953s, exit 2. Assets,
+Graphics, Client and Presentation all pass. All five failures are the known
+Game cases below; their owning source trees are unchanged. Master CI additionally
+reported the pre-existing SubmissionSafety allocation failure, which does not
+reproduce in the local final Presentation suite. No test, threshold or original
+golden is changed to hide these outcomes.
+
+- BattlefieldSupplySystemTests.SupplyTruckFinishesRefuelingBeforeRescuingImmobileUnit
+- VehicleDockingIntegrationTests.DockedSupplyKeepsCargoSeparateFromOptionalDriveTopupsButAllowsRequiredRecovery (zero-fuel case)
+- TacticalCombatSystemTests.ActiveCargoTransportRefuelsWithoutDroppingDeliveryOrder
+- SkirmishSupplyPolicyTests.ExpansionFundingKeepsPartialHubCostsAheadOfOptionalExtractors
+- SkirmishOpponentTests.EastOffensiveObjectiveAdvancesIntoOpponentHalfAgainstStationaryBase
+
+## Usual launch path and final checks
+
+The ordinary Release solution output was rebuilt after the full frozen-output
+suite: **zero warnings/errors, 1m57.52s**. The ordinary client smoke starts the
+real High 2560x1440 match, loads the sealed 1,357-entry player catalog, records
+zero fallback meshes/pending retirements in its sampled frames and exits **0**
+through normal window/session shutdown. Its short startup FPS observations are
+not a throughput acceptance or a claimed performance gain.
+
+The ordinary build source is `0529706c1df6644aace353fb1c245f687ee99c25`.
+The complete production, test, tool and asset trees and Directory.Build.props
+are unchanged from measured/tested source `57fa863f`; later changes are local
+qualification helpers/evidence/documentation. The production-tree equivalence
+check is retained. Version **0.1.424** validates exactly one PATCH over current
+master `bfc16a95`. Ownership validates 159 lane-owned paths at the first evidence
+checkpoint, with only the isolated version commit handled separately; final
+counts may include additional evidence records. The existing independent
+`.gitignore` modification remains excluded.
+
+[Draft PR #266](https://github.com/DaveBeusing/Forgeline/pull/266) contains the
+implementation, reproducible helpers, native images and raw evidence. Required
+CI was in progress when the draft was created; no green CI claim is made.
+Remaining gates are the strict CPU/GPU timings, baseline gameplay failures,
+final CI and separate human material/shadow-contact decisions. No merge, tag or
+release is performed. See [reproduction](Reproduction.md) and [review](Review.md).
