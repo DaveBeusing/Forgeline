@@ -92,6 +92,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
         try
         {
+            ConfigureDred();
             bool debugLayerEnabled = TryEnableDebugLayer(configuration.EnableDebugLayer);
             _factory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(debugLayerEnabled);
 
@@ -323,7 +324,21 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private string PresentMode => _configuration.EnableVSync ? "VSync" : "Immediate";
 
+    private GraphicsMemoryDiagnostics? _memoryBudgetSample;
+    private long _memoryBudgetSampleTimestamp;
+    private bool _memoryBudgetSampled;
+
     private GraphicsMemoryDiagnostics CaptureMemoryBudget()
+    {
+        if (_memoryBudgetSampled && System.Diagnostics.Stopwatch.GetElapsedTime(_memoryBudgetSampleTimestamp).TotalMilliseconds < 250)
+            return _memoryBudgetSample!;
+        _memoryBudgetSampleTimestamp = System.Diagnostics.Stopwatch.GetTimestamp();
+        _memoryBudgetSampled = true;
+        _memoryBudgetSample = QueryMemoryBudget();
+        return _memoryBudgetSample;
+    }
+
+    private GraphicsMemoryDiagnostics QueryMemoryBudget()
     {
         try
         {
@@ -594,6 +609,10 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 checked((uint)description.Height),
                 mipLevels: checked((ushort)description.MipCount));
 
+        _device.GetCopyableFootprints(resourceDescription, 0, checked((uint)description.MipCount), 0,
+            _uploadLayouts, _uploadRows, _uploadRowSizes, out ulong uploadSize);
+        _ = UploadArenaLimits.Capacity(uploadSize);
+
         ID3D12Resource? resource = null;
         int descriptorIndex = -1;
         GraphicsResourceRetirement.Resource? lifetime = null;
@@ -625,7 +644,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 resource,
                 resourceDescription,
                 texture,
-                lifetime);
+                lifetime,
+                uploadSize);
 
             descriptorIndex =
                 _shaderResourceDescriptors.Allocate();
@@ -845,6 +865,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             ResourceStates.Present);
         _commandList.Close();
 
+        FlushUploads();
+        InjectSchedulingFailure(SchedulingOperation.ExecuteFrame);
         _commandQueue.ExecuteCommandList(_commandList);
         _submittedFrameCount++;
         SignalSubmittedFrame();
@@ -858,6 +880,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _recording = false;
 
         long presentStarted = System.Diagnostics.Stopwatch.GetTimestamp();
+        InjectSchedulingFailure(SchedulingOperation.Present);
         var presentResult = _swapChain.Present(
             _configuration.EnableVSync ? 1u : 0u,
             PresentFlags.None);
@@ -927,6 +950,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void WaitForIdleCore()
     {
+        FlushUploads();
 
         ulong fenceValue = _nextFenceValue++;
         CheckResult(_commandQueue.Signal(_frameFence, fenceValue), "fence-signal-failed");
@@ -947,6 +971,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             return;
         }
 
+        InjectSchedulingFailure(SchedulingOperation.Dispose);
         try
         {
             WaitForIdleCore();
@@ -971,6 +996,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void DisposeNativeObjects()
     {
+        ReleaseUploadArena();
         ReleaseDirectionalShadows();
         ReleaseParticleQueries();
         if (_renderTargets is not null)
@@ -1325,156 +1351,44 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         ID3D12Resource destination,
         ResourceDescription resourceDescription,
         GraphicsTextureData texture,
-        GraphicsResourceRetirement.Resource destinationLifetime)
+        GraphicsResourceRetirement.Resource destinationLifetime,
+        ulong size)
     {
-        int mipCount =
-            texture.Description.MipCount;
-        var layouts =
-            new PlacedSubresourceFootPrint[mipCount];
-        var rowCounts =
-            new uint[mipCount];
-        var rowSizes =
-            new ulong[mipCount];
-
-        _device.GetCopyableFootprints(
-            resourceDescription,
-            0,
-            checked((uint)mipCount),
-            0,
-            layouts,
-            rowCounts,
-            rowSizes,
-            out ulong uploadSize);
-
-        if (uploadSize > int.MaxValue)
-        {
-            throw new GraphicsDeviceException(
-                $"Texture upload requires {uploadSize} bytes, exceeding the supported staging allocation size.");
-        }
-
-        var uploadBytes =
-            new byte[checked((int)uploadSize)];
-
-        for (int mipIndex = 0;
-             mipIndex < mipCount;
-             mipIndex++)
-        {
-            GraphicsTextureMipData mip =
-                texture.Mips[mipIndex];
-            int rowBytes =
-                texture.Description.Format == GraphicsTextureFormat.Bc7Unorm
-                    ? checked(((mip.Width + 3) / 4) * 16)
-                    : checked(mip.Width * (texture.Description.Format == GraphicsTextureFormat.R8Unorm ? 1 : 4));
-
-            if (rowSizes[mipIndex] < checked((ulong)rowBytes))
-            {
-                throw new GraphicsDeviceException(
-                    $"D3D12 copy footprint for mip {mipIndex} is smaller than the source row.");
-            }
-
-            for (int row = 0;
-                 row < checked((int)rowCounts[mipIndex]);
-                 row++)
-            {
-                int sourceOffset =
-                    checked(
-                        row *
-                        mip.RowPitch);
-                int destinationOffset =
-                    checked(
-                        (int)layouts[mipIndex].Offset +
-                        row *
-                        checked((int)layouts[mipIndex].Footprint.RowPitch));
-
-                mip.Pixels.AsSpan(
-                        sourceOffset,
-                        rowBytes)
-                    .CopyTo(
-                        uploadBytes.AsSpan(
-                            destinationOffset,
-                            rowBytes));
-            }
-        }
-
-        var staging = new List<GraphicsResourceRetirement.Resource>(3);
+        int count = texture.Description.MipCount;
+        UploadBatch batch = AcquireUploadBatch(size);
+        ulong offset = UploadArenaLimits.Align(batch.Used);
+        InjectSchedulingFailure(SchedulingOperation.MapUpload);
+        Span<byte> mapped = batch.Upload.Map<byte>(0, checked((int)batch.Capacity));
         try
         {
-            ID3D12Resource upload =
-                _device.CreateCommittedResource(
-                    HeapType.Upload,
-                    ResourceDescription.Buffer(uploadSize),
-                    ResourceStates.GenericRead);
-            staging.Add(RegisterResource(upload.Dispose));
-            upload.Name =
-                "ForgeLine Texture Upload";
-            upload.SetData<byte>(
-                uploadBytes);
-
-            ID3D12CommandAllocator allocator =
-                _device.CreateCommandAllocator(
-                    CommandListType.Direct);
-            staging.Add(RegisterResource(allocator.Dispose));
-            ID3D12GraphicsCommandList uploadList =
-                _device.CreateCommandList<ID3D12GraphicsCommandList>(
-                    CommandListType.Direct,
-                    allocator);
-            staging.Add(RegisterResource(uploadList.Dispose));
-
-            for (int mipIndex = 0;
-                 mipIndex < mipCount;
-                 mipIndex++)
+            mapped.Slice(checked((int)offset), checked((int)size)).Clear();
+            for (int mipIndex = 0; mipIndex < count; mipIndex++)
             {
-                uploadList.CopyTextureRegion(
-                    new TextureCopyLocation(
-                        destination,
-                        checked((uint)mipIndex)),
-                    0,
-                    0,
-                    0,
-                    new TextureCopyLocation(
-                        upload,
-                        layouts[mipIndex]));
+                GraphicsTextureMipData mip = texture.Mips[mipIndex];
+                int rowBytes = texture.Description.Format == GraphicsTextureFormat.Bc7Unorm
+                    ? checked(((mip.Width + 3) / 4) * 16)
+                    : checked(mip.Width * (texture.Description.Format == GraphicsTextureFormat.R8Unorm ? 1 : 4));
+                if (_uploadRowSizes[mipIndex] < (ulong)rowBytes)
+                    throw new GraphicsDeviceException($"D3D12 footprint for mip {mipIndex} is smaller than its source row.");
+                for (int row = 0; row < checked((int)_uploadRows[mipIndex]); row++)
+                    mip.Pixels.AsSpan(checked(row * mip.RowPitch), rowBytes).CopyTo(mapped.Slice(
+                        checked((int)(offset + _uploadLayouts[mipIndex].Offset) + row * (int)_uploadLayouts[mipIndex].Footprint.RowPitch), rowBytes));
             }
-
-            uploadList.ResourceBarrierTransition(
-                destination,
-                ResourceStates.CopyDest,
-                ResourceStates.PixelShaderResource);
-            uploadList.Close();
-
-            destinationLifetime.Recording = true;
-            foreach (GraphicsResourceRetirement.Resource item in staging)
-            {
-                item.Recording = true;
-            }
-            _commandQueue.ExecuteCommandList(
-                uploadList);
-
-            ulong fenceValue =
-                _nextFenceValue++;
-            CheckResult(_commandQueue.Signal(
-                _frameFence,
-                fenceValue), "upload-signal-failed");
-            destinationLifetime.LastUseFence = fenceValue;
-            destinationLifetime.Recording = false;
-            foreach (GraphicsResourceRetirement.Resource item in staging)
-            {
-                item.LastUseFence = fenceValue;
-                item.Recording = false;
-            }
-            if (!texture.Description.DeferUploadWait) WaitForFence(fenceValue);
         }
-        catch (Exception exception)
+        finally { batch.Upload.Unmap(0); }
+        for (int mipIndex = 0; mipIndex < count; mipIndex++)
         {
-            _failure = exception as GraphicsDeviceException ?? new GraphicsDeviceException("Texture upload failed.", exception);
-            throw;
+            PlacedSubresourceFootPrint layout = _uploadLayouts[mipIndex];
+            layout.Offset += offset;
+            batch.Commands.CopyTextureRegion(new TextureCopyLocation(destination, checked((uint)mipIndex)),
+                0, 0, 0, new TextureCopyLocation(batch.Upload, layout));
         }
-        finally
+        batch.Commands.ResourceBarrierTransition(destination, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
+        FinishUploadTransfer(batch, destinationLifetime, offset + size, size);
+        if (!texture.Description.DeferUploadWait)
         {
-            foreach (GraphicsResourceRetirement.Resource item in staging)
-            {
-                RetireResource(item);
-            }
+            FlushUploads();
+            WaitForFence(batch.Fence);
         }
     }
 
@@ -1565,6 +1479,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             $"completedFence={_frameFence.CompletedValue}");
         ReleaseRenderTargets();
 
+        InjectSchedulingFailure(SchedulingOperation.Resize);
         var resizeResult =
             _swapChain.ResizeBuffers(
                 (uint)_configuration.BufferCount,
@@ -1657,6 +1572,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void SignalSubmittedFrame()
     {
+        InjectSchedulingFailure(SchedulingOperation.SignalFrame);
         ulong fenceValue =
             _nextFenceValue++;
         CheckResult(_commandQueue.Signal(
@@ -1713,6 +1629,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         int resultCode)
     {
         int removedReason = _device.DeviceRemovedReason.Code;
+        if (removedReason < 0) CaptureDredFailure();
 
         return new GraphicsDeviceException(
             $"{message} HRESULT=0x{resultCode:X8}; " +
@@ -1851,6 +1768,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     internal void UseResource(GraphicsResourceRetirement.Resource resource)
     {
         ValidateRecording();
+        FlushUploads();
         _resources.Use(resource);
     }
 
@@ -1927,6 +1845,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         if (result.Failure)
         {
             int removedReason = _device.DeviceRemovedReason.Code;
+            if (removedReason < 0) CaptureDredFailure();
             throw new GraphicsDeviceException(
                 $"Direct3D 12 operation failed. HRESULT=0x{result.Code:X8}; deviceRemovedReason=0x{removedReason:X8}; adapter=\"{_deviceInfo.AdapterName}\".",
                 removedReason < 0 ? "device-removed" : reasonCode);
