@@ -67,10 +67,12 @@ internal static class TerrainProbe
         }
         Move(0); start = Stopwatch.GetTimestamp(); renderer.Prepare(camera, context.Width, context.Height);
         double firstPrepareMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+        renderer.Render(context, camera);
         object first = new { Diagnostics = renderer.LastDiagnostics, Work = Work(renderer), device.UploadCalls, device.UploadBytes };
         var results = new List<object>();
         results.Add(Measure("stable-prepare", 128, 1024, _ => renderer.Prepare(camera, context.Width, context.Height)));
         results.Add(Measure("whole-map-teleport-prepare", 128, 512, i => { Move(i); renderer.Prepare(camera, context.Width, context.Height); }));
+        renderer.Render(context, camera);
         object afterTraverse = new { Diagnostics = renderer.LastDiagnostics, Work = Work(renderer), device.UploadCalls, device.UploadBytes };
         results.Add(Measure("warm-main-record", 128, 1024, _ => renderer.Render(context, camera)));
         var plateau = new List<object>();
@@ -158,6 +160,8 @@ internal static class TerrainProbe
                     byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                     bool equal = pixels.SequenceEqual(graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record));
                     if (!equal) throw new InvalidOperationException("Repeated native image differs.");
+                    if (graphics.Diagnostics.Health.SubmissionFaultCount != 0 || graphics.Diagnostics.Resources.TextureBindingFailureCount != 0)
+                        throw new InvalidOperationException("Native submission or texture binding fault.");
                     string image = Path.GetFileNameWithoutExtension(output) + $"-{pose.Item1}-{distance}-{moving}.ppm";
                     using (var file = File.Create(Path.Combine(Path.GetDirectoryName(output)!, image)))
                     {
@@ -167,6 +171,7 @@ internal static class TerrainProbe
                     cases.Add(new { Site = pose.Item1, Distance = distance, Moving = moving, Warmups = 128, Samples = 256,
                         CpuTicks = cpuTicks, PrepareTicks = prepareTicks, RawAllocatedBytes = allocated, CompletedGpuFrames = completed,
                         Diagnostics = renderer.LastDiagnostics, Work = Work(renderer), Resources = graphics.Diagnostics.Resources,
+                        Health = graphics.Diagnostics.Health,
                         ManagedBytes = GC.GetTotalMemory(false), WorkingSetBytes = Environment.WorkingSet,
                         RepeatPixelsEqual = equal, Image = image, RgbaSha256 = Hash(pixels) });
                 }
