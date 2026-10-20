@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using ForgeLine.Assets;
 using ForgeLine.Game;
 using ForgeLine.Presentation;
 using ForgeLine.Simulation;
@@ -35,8 +36,12 @@ public sealed class GameplayCaptureProfileTests
         var commands = new PlayerCommandGateway(scenario.Simulation, scenario.Services.BuildingCommands,
             scenario.BattlefieldRuntime.MatchStateEntity, 32, scenario.Intelligence,
             scenario.Services.Weapons, scenario.Services.ArtilleryWeapons);
+        string? assetRoot = Environment.GetEnvironmentVariable("FORGELINE_RUNTIME_ASSETS");
+        var assets = string.IsNullOrEmpty(output) ? null : RuntimeAssetCatalog.LoadCancellable(
+            assetRoot ?? throw new InvalidOperationException("Profile requires canonical runtime assets."),
+            TestContext.Current.CancellationToken);
         var extractor = new PresentationExtractor(buffer,
-            new PresentationExtractionContext(scenario, new PlayerId(1), interaction, commands));
+            new PresentationExtractionContext(scenario, new PlayerId(1), interaction, commands), assets);
         var probe = new CaptureProbe(extractor);
         scenario.Simulation.RegisterTickObserver(commands);
         scenario.Simulation.RegisterTickObserver(probe);
@@ -92,7 +97,7 @@ public sealed class GameplayCaptureProfileTests
             {
                 Source = typeof(PresentationExtractor).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                 Runtime = RuntimeInformation.FrameworkDescription, Seed = 9147, Warmup = warmup, Samples = samples,
-                RenderRatio = renderRatio, ReusedCombatPayloads = reusedPayloads, Checksum = checksum,
+                RuntimeAssetsProvided = assets is not null, RenderRatio = renderRatio, ReusedCombatPayloads = reusedPayloads, Checksum = checksum,
                 Method = "Actual Central Divide fixed ticks and PresentationExtractor; CPU RenderWorld consumer. Ratios are injected, not wall-clock FPS. Tick includes capture; consumer includes index/interpolation, no GPU/Present. Thread allocations exclude observation storage; GC counts are process-wide.",
                 ProcessCollectionDeltas = new[] { GC.CollectionCount(0)-collections[0], GC.CollectionCount(1)-collections[1], GC.CollectionCount(2)-collections[2] },
                 Observations = observations
