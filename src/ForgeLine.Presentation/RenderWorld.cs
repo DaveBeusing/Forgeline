@@ -51,7 +51,7 @@ public sealed class RenderWorld
             _previous = null;
             _current = latest;
             _index.Rebuild(latest, _previous);
-        _visibility.Rebuild(latest, _previous, _index);
+            _visibility.Rebuild(latest, _previous, _index);
             return true;
         }
 
@@ -105,70 +105,13 @@ public sealed class RenderWorld
         float alpha,
         out RenderInstance instance)
     {
-        if (_current is null ||
-            !TryFindByEntity(_current, entity, out RenderInstance current))
-        {
-            instance = default;
-            return false;
-        }
-
-        if (current.VfxFeature.IsSpecified || current.DecalFeature.IsSpecified && current.DecalFeature.Surface == DecalSurface.Ground ||
-            _previous is null ||
-            !TryFindByEntity(
-                _previous,
-                entity,
-                out RenderInstance previous))
-        {
-            instance = current;
-            return true;
-        }
-
-        instance = current with
-        {
-            Transform = RenderTransform.Interpolate(
-                previous.Transform,
-                current.Transform,
-                alpha),
-            MechanicalPose = MechanicalPose.Interpolate(previous.MechanicalPose, current.MechanicalPose, alpha),
-            UnitFeature = current.UnitFeature with { AimYawRadians = InterpolateYaw(previous.UnitFeature.AimYawRadians, current.UnitFeature.AimYawRadians, alpha) }
-        };
+        int index = _index.FindCurrent(entity);
+        if (_current is null || index < 0) { instance = default; return false; }
+        instance = GetInterpolatedInstance(index, alpha);
         return true;
     }
 
     private static float InterpolateYaw(float previous, float current, float alpha) =>
         previous + MathF.IEEERemainder(current - previous, MathF.Tau) * (float.IsFinite(alpha) ? Math.Clamp(alpha, 0, 1) : 1);
 
-    private static bool TryFindByEntity(
-        PresentationSnapshot snapshot,
-        EntityId entity,
-        out RenderInstance instance)
-    {
-        int low = 0;
-        int high = snapshot.InstanceCount - 1;
-
-        while (low <= high)
-        {
-            int middle = low + ((high - low) / 2);
-            RenderInstance candidate = snapshot.GetInstance(middle);
-            int comparison = candidate.Entity.CompareTo(entity);
-
-            if (comparison == 0)
-            {
-                instance = candidate;
-                return true;
-            }
-
-            if (comparison < 0)
-            {
-                low = middle + 1;
-            }
-            else
-            {
-                high = middle - 1;
-            }
-        }
-
-        instance = default;
-        return false;
-    }
 }

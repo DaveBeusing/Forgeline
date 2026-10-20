@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "status": "implemented-not-accepted",
+  "method": "Portable projection of complete raw test logs and exit records. Source is the built product/test revision; original logs remain under local qualification artifacts. Failed, skipped and explicit-not-run cases remain separate; no failed suite is labelled green. Preliminary working-tree probes are excluded.",
+  "results": [
+    {
+      "log": "final-solution-tests.txt",
+      "source": "f797af6f65361949fa1017ce2387026ec41628f6",
+      "exit": 2,
+      "rawLogSha256": "720e477edc502ff2b92cd01b8eb1bd535a146667fb78beb784255bce20f0a116",
+      "counts": {
+        "total": 2971,
+        "failed": 5,
+        "passed": 2949,
+        "skipped": 17
+      },
+      "failures": [
+        "ForgeLine.Client.Tests.UiInteractionFeedbackTests.WarmCopiedFeedbackRetainsZeroAllocation",
+        "ForgeLine.Client.Tests.MainMenuModelTests.ControlsPresentationListsGameplayBindings",
+        "ForgeLine.Presentation.Tests.RtsInformationLayerTests.WorldMarkersUseDistinctGeometryForSelectionHoverAndInvalidTargets",
+        "ForgeLine.Presentation.Tests.NotificationRowMotionTests.IdentityRevisionSessionClockAndReducedMotionDoNotRetainStaleVisuals",
+        "ForgeLine.Presentation.Tests.EconomicInterfaceSkinTests.NativeOperationsRejectsStaleFactsAndSelectionNeverCachesRetiredFacilityData"
+      ]
+    },
+    {
+      "log": "ForgeLine.Presentation.Tests-repeat-1.txt",
+      "source": "f797af6f65361949fa1017ce2387026ec41628f6",
+      "exit": 2,
+      "rawLogSha256": "078d2d1083ee0b1fc519537f001e78cbb68bd146f5a59c8639444bb60fc01b07",
+      "counts": {
+        "total": 1417,
+        "failed": 3,
+        "passed": 1402,
+        "skipped": 12
+      },
+      "failures": [
+        "ForgeLine.Presentation.Tests.RtsInformationLayerTests.WorldMarkersUseDistinctGeometryForSelectionHoverAndInvalidTargets",
+        "ForgeLine.Presentation.Tests.NotificationRowMotionTests.IdentityRevisionSessionClockAndReducedMotionDoNotRetainStaleVisuals",
+        "ForgeLine.Presentation.Tests.EconomicInterfaceSkinTests.NativeOperationsRejectsStaleFactsAndSelectionNeverCachesRetiredFacilityData"
+      ]
+    },
+    {
+      "log": "ForgeLine.Client.Tests-repeat-1.txt",
+      "source": "f797af6f65361949fa1017ce2387026ec41628f6",
+      "exit": 2,
+      "rawLogSha256": "cb9cc49a311142514da2babdd6fee84d47c7de86e373b3a41c066e2f6437b498",
+      "counts": {
+        "total": 451,
+        "failed": 1,
+        "passed": 448,
+        "skipped": 2
+      },
+      "failures": [
+        "ForgeLine.Client.Tests.MainMenuModelTests.ControlsPresentationListsGameplayBindings"
+      ]
+    },
+    {
+      "log": "selected-isolated-1.txt",
+      "source": "f797af6f65361949fa1017ce2387026ec41628f6",
+      "exit": 0,
+      "rawLogSha256": "d99d5e2a2fbb4f8abefd62028a57c109c1f223ce30bccbda409251081421acd2",
+      "counts": {
+        "total": 15,
+        "errors": 0,
+        "failed": 0,
+        "skipped": 0,
+        "notRun": 0
+      },
+      "failures": []
+    },
+    {
+      "log": "refined-client-suite-1.txt",
+      "source": "5ab7b3cea21c864e1825874086cb425d0002b35e",
+      "exit": 1,
+      "rawLogSha256": "942cd1228ab6fb1757471725fba545ac143ea895177f7abeab5657597f4ae645",
+      "counts": {
+        "total": 452,
+        "errors": 0,
+        "failed": 2,
+        "skipped": 0,
+        "notRun": 2
+      },
+      "failures": [
+        "ForgeLine.Client.Tests.MainMenuModelTests.ControlsPresentationListsGameplayBindings",
+        "ForgeLine.Client.Tests.PausedSettingsControllerTests.ApplyUpdatesReadableUiImmediatelyAndPersistsNextMatchGraphicsWithoutResettingMatch"
+      ]
+    },
+    {
+      "log": "ForgeLine.Presentation.Tests-repeat-2.txt",
+      "source": "f797af6f65361949fa1017ce2387026ec41628f6",
+      "exit": 2,
+      "rawLogSha256": "86c31ffceb50af1b87e590e6ae189eca3205fc23585e513a98eab930b0ac9b7f",
+      "counts": {
+        "total": 1417,
+        "failed": 3,
+        "passed": 1402,
+        "skipped": 12
+      },
+      "failures": [
+        "ForgeLine.Presentation.Tests.RtsInformationLayerTests.WorldMarkersUseDistinctGeometryForSelectionHoverAndInvalidTargets",
+        "ForgeLine.Presentation.Tests.NotificationRowMotionTests.IdentityRevisionSessionClockAndReducedMotionDoNotRetainStaleVisuals",
+        "ForgeLine.Presentation.Tests.EconomicInterfaceSkinTests.NativeOperationsRejectsStaleFactsAndSelectionNeverCachesRetiredFacilityData"
+      ]
+    },
+    {
+      "log": "ForgeLine.Client.Tests-repeat-2.txt",
+      "source": "f797af6f65361949fa1017ce2387026ec41628f6",
+      "exit": 2,
+      "rawLogSha256": "c669c191ea957fe1c2cad2b427a5fa4ca3219ca9fb7e846a3d938cd7f4a1e0b5",
+      "counts": {
+        "total": 451,
+        "failed": 1,
+        "passed": 448,
+        "skipped": 2
+      },
+      "failures": [
+        "ForgeLine.Client.Tests.MainMenuModelTests.ControlsPresentationListsGameplayBindings"
+      ]
+    },
+    {
+      "log": "selected-isolated-2.txt",
+      "source": "f797af6f65361949fa1017ce2387026ec41628f6",
+      "exit": 0,
+      "rawLogSha256": "62d7f6e821c389d7f95888f3944dc82c1cf1f76082b65811c1588746f617fd52",
+      "counts": {
+        "total": 15,
+        "errors": 0,
+        "failed": 0,
+        "skipped": 0,
+        "notRun": 0
+      },
+      "failures": []
+    },
+    {
+      "log": "refined-client-suite-2.txt",
+      "source": "5ab7b3cea21c864e1825874086cb425d0002b35e",
+      "exit": 1,
+      "rawLogSha256": "1ac208474c97d3ba06003702d07129742515cb667083583e4dfeb72210e4c6f5",
+      "counts": {
+        "total": 452,
+        "errors": 0,
+        "failed": 1,
+        "skipped": 0,
+        "notRun": 2
+      },
+      "failures": [
+        "ForgeLine.Client.Tests.MainMenuModelTests.ControlsPresentationListsGameplayBindings"
+      ]
+    },
+    {
+      "log": "base-ui-reproduction.txt",
+      "source": "e42f4e7537b84c56c9dbdafe56f03f1e5e74270d",
+      "exit": 1,
+      "rawLogSha256": "b9214ae3d7785fad667228bf252e2d7d6c52493838f8570703674f911690defe",
+      "counts": {
+        "total": 38,
+        "errors": 0,
+        "failed": 3,
+        "skipped": 0,
+        "notRun": 0
+      },
+      "failures": [
+        "ForgeLine.Presentation.Tests.RtsInformationLayerTests.WorldMarkersUseDistinctGeometryForSelectionHoverAndInvalidTargets",
+        "ForgeLine.Presentation.Tests.NotificationRowMotionTests.IdentityRevisionSessionClockAndReducedMotionDoNotRetainStaleVisuals",
+        "ForgeLine.Presentation.Tests.EconomicInterfaceSkinTests.NativeOperationsRejectsStaleFactsAndSelectionNeverCachesRetiredFacilityData"
+      ]
+    },
+    {
+      "log": "base-client-ui.txt",
+      "source": "e42f4e7537b84c56c9dbdafe56f03f1e5e74270d",
+      "exit": 1,
+      "rawLogSha256": "3a023700c19cc416cc7f0523e10e69b0604411244d3865391e429cfcf6af363d",
+      "counts": {
+        "total": 19,
+        "errors": 0,
+        "failed": 1,
+        "skipped": 0,
+        "notRun": 0
+      },
+      "failures": [
+        "ForgeLine.Client.Tests.MainMenuModelTests.ControlsPresentationListsGameplayBindings"
+      ]
+    },
+    {
+      "log": "baseline-client-mtp.txt",
+      "source": "e42f4e7537b84c56c9dbdafe56f03f1e5e74270d",
+      "exit": 2,
+      "rawLogSha256": "ec7c4c0c44fe8b80c7905a0d2b52ab84de927d5936c2e6686f12440df5e494cc",
+      "counts": {
+        "total": 442,
+        "failed": 1,
+        "passed": 439,
+        "skipped": 2
+      },
+      "failures": [
+        "ForgeLine.Client.Tests.MainMenuModelTests.ControlsPresentationListsGameplayBindings"
+      ]
+    },
+    {
+      "log": "final-client-mtp.txt",
+      "source": "43631f025eba4d3da62396505ffff10986281dce",
+      "exit": 2,
+      "rawLogSha256": "d546be988f1127b28761e04e54f5891f5efc592519e720840dd9706ce1dcd389",
+      "counts": {
+        "total": 452,
+        "failed": 1,
+        "passed": 449,
+        "skipped": 2
+      },
+      "failures": [
+        "ForgeLine.Client.Tests.MainMenuModelTests.ControlsPresentationListsGameplayBindings"
+      ]
+    },
+    {
+      "log": "baseline-feedback-settings.txt",
+      "source": "e42f4e7537b84c56c9dbdafe56f03f1e5e74270d",
+      "exit": 0,
+      "rawLogSha256": "e569659e4a6323311d6dd626f8405bc36b72c79314bd00e7cb2c2fc51d29041c",
+      "counts": {
+        "total": 18,
+        "errors": 0,
+        "failed": 0,
+        "skipped": 0,
+        "notRun": 0
+      },
+      "failures": []
+    },
+    {
+      "log": "candidate-feedback-settings.txt",
+      "source": "43631f025eba4d3da62396505ffff10986281dce",
+      "exit": 0,
+      "rawLogSha256": "edfa6801cfefeb2497902439061cd16a6766216f455e91f88168881eddfefee5",
+      "counts": {
+        "total": 18,
+        "errors": 0,
+        "failed": 0,
+        "skipped": 0,
+        "notRun": 0
+      },
+      "failures": []
+    },
+    {
+      "log": "final-presentation-contracts.txt",
+      "source": "f797af6f65361949fa1017ce2387026ec41628f6",
+      "exit": 0,
+      "rawLogSha256": "a911f93daf4e4b04bd00cad070cc50f93a93e90004f637dd3029822fd886365b",
+      "counts": {
+        "total": 12,
+        "errors": 0,
+        "failed": 0,
+        "skipped": 0,
+        "notRun": 0
+      },
+      "failures": []
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+{
+  "SchemaVersion": 1,
+  "BuildVersion": "0.1.0.0",
+  "Backend": "CPU null graphics; copied member indexing, summary rebuild, retained full HUD and idle input; excludes ECS extraction, GPU, waits and Present",
+  "Warmup": 128,
+  "Samples": 256,
+  "TimingPolicy": "Timing is observational. HUD/input has zero warm allocation; summaries have constant bounded storage; snapshot copies have linear bounded storage.",
+  "Results": [
+    {
+      "Domain": "HUD and idle input",
+      "Members": 1,
+      "Mixed": false,
+      "AllocatedBytes": 0,
+      "BytesPerSample": 0,
+      "P50Microseconds": 228.7,
+      "P95Microseconds": 291.5,
+      "P99Microseconds": 299.8
+    },
+    {
+      "Domain": "Selection summary rebuild",
+      "Members": 1,
+      "Mixed": false,
+      "AllocatedBytes": 53248,
+      "BytesPerSample": 208,
+      "P50Microseconds": 0.3,
+      "P95Microseconds": 0.3,
+      "P99Microseconds": 0.8
+    },
+    {
+      "Domain": "Owned snapshot copy and index",
+      "Members": 1,
+      "Mixed": false,
+      "AllocatedBytes": 327680,
+      "BytesPerSample": 1280,
+      "P50Microseconds": 0.5,
+      "P95Microseconds": 1.1,
+      "P99Microseconds": 1.1
+    },
+    {
+      "Domain": "HUD and idle input",
+      "Members": 1,
+      "Mixed": true,
+      "AllocatedBytes": 0,
+      "BytesPerSample": 0,
+      "P50Microseconds": 209.1,
+      "P95Microseconds": 225.3,
+      "P99Microseconds": 495.5
+    },
+    {
+      "Domain": "Selection summary rebuild",
+      "Members": 1,
+      "Mixed": true,
+      "AllocatedBytes": 53248,
+      "BytesPerSample": 208,
+      "P50Microseconds": 0.2,
+      "P95Microseconds": 0.3,
+      "P99Microseconds": 0.7
+    },
+    {
+      "Domain": "Owned snapshot copy and index",
+      "Members": 1,
+      "Mixed": true,
+      "AllocatedBytes": 327680,
+      "BytesPerSample": 1280,
+      "P50Microseconds": 0.4,
+      "P95Microseconds": 0.9,
+      "P99Microseconds": 0.9
+    },
+    {
+      "Domain": "HUD and idle input",
+      "Members": 10,
+      "Mixed": false,
+      "AllocatedBytes": 0,
+      "BytesPerSample": 0,
+      "P50Microseconds": 501.1,
+      "P95Microseconds": 1292.2,
+      "P99Microseconds": 5454
+    },
+    {
+      "Domain": "Selection summary rebuild",
+      "Members": 10,
+      "Mixed": false,
+      "AllocatedBytes": 53248,
+      "BytesPerSample": 208,
+      "P50Microseconds": 1.4,
+      "P95Microseconds": 1.5,
+      "P99Microseconds": 1.8
+    },
+    {
+      "Domain": "Owned snapshot copy and index",
+      "Members": 10,
+      "Mixed": false,
+      "AllocatedBytes": 870400,
+      "BytesPerSample": 3400,
+      "P50Microseconds": 2.8,
+      "P95Microseconds": 6.5,
+      "P99Microseconds": 8.6
+    },
+    {
+      "Domain": "HUD and idle input",
+      "Members": 10,
+      "Mixed": true,
+      "AllocatedBytes": 0,
+      "BytesPerSample": 0,
+      "P50Microseconds": 314.2,
+      "P95Microseconds": 685.1,
+      "P99Microseconds": 794.3
+    },
+    {
+      "Domain": "Selection summary rebuild",
+      "Members": 10,
+      "Mixed": true,
+      "AllocatedBytes": 53248,
+      "BytesPerSample": 208,
+      "P50Microseconds": 1,
+      "P95Microseconds": 1.3,
+      "P99Microseconds": 1.6
+    },
+    {
+      "Domain": "Owned snapshot copy and index",
+      "Members": 10,
+      "Mixed": true,
+      "AllocatedBytes": 870400,
+      "BytesPerSample": 3400,
+      "P50Microseconds": 2.5,
+      "P95Microseconds": 3.2,
+      "P99Microseconds": 4.4
+    },
+    {
+      "Domain": "HUD and idle input",
+      "Members": 100,
+      "Mixed": false,
+      "AllocatedBytes": 0,
+      "BytesPerSample": 0,
+      "P50Microseconds": 440.3,
+      "P95Microseconds": 699.9,
+      "P99Microseconds": 717.8
+    },
+    {
+      "Domain": "Selection summary rebuild",
+      "Members": 100,
+      "Mixed": false,
+      "AllocatedBytes": 53248,
+      "BytesPerSample": 208,
+      "P50Microseconds": 12.1,
+      "P95Microseconds": 13.2,
+      "P99Microseconds": 15.9
+    },
+    {
+      "Domain": "Owned snapshot copy and index",
+      "Members": 100,
+      "Mixed": false,
+      "AllocatedBytes": 7430144,
+      "BytesPerSample": 29024,
+      "P50Microseconds": 29.1,
+      "P95Microseconds": 42.5,
+      "P99Microseconds": 49.5
+    },
+    {
+      "Domain": "HUD and idle input",
+      "Members": 100,
+      "Mixed": true,
+      "AllocatedBytes": 0,
+      "BytesPerSample": 0,
+      "P50Microseconds": 95.8,
+      "P95Microseconds": 252.5,
+      "P99Microseconds": 373.9
+    },
+    {
+      "Domain": "Selection summary rebuild",
+      "Members": 100,
+      "Mixed": true,
+      "AllocatedBytes": 53248,
+      "BytesPerSample": 208,
+      "P50Microseconds": 16.1,
+      "P95Microseconds": 19.5,
+      "P99Microseconds": 23.4
+    },
+    {
+      "Domain": "Owned snapshot copy and index",
+      "Members": 100,
+      "Mixed": true,
+      "AllocatedBytes": 7430144,
+      "BytesPerSample": 29024,
+      "P50Microseconds": 24.8,
+      "P95Microseconds": 27.8,
+      "P99Microseconds": 29.4
+    },
+    {
+      "Domain": "HUD and idle input",
+      "Members": 1000,
+      "Mixed": false,
+      "AllocatedBytes": 0,
+      "BytesPerSample": 0,
+      "P50Microseconds": 88.1,
+      "P95Microseconds": 99.6,
+      "P99Microseconds": 103.6
+    },
+    {
+      "Domain": "Selection summary rebuild",
+      "Members": 1000,
+      "Mixed": false,
+      "AllocatedBytes": 53248,
+      "BytesPerSample": 208,
+      "P50Microseconds": 10.2,
+      "P95Microseconds": 10.9,
+      "P99Microseconds": 11.7
+    },
+    {
+      "Domain": "Owned snapshot copy and index",
+      "Members": 1000,
+      "Mixed": false,
+      "AllocatedBytes": 73906176,
+      "BytesPerSample": 288696,
+      "P50Microseconds": 115.9,
+      "P95Microseconds": 141.5,
+      "P99Microseconds": 160
+    },
+    {
+      "Domain": "HUD and idle input",
+      "Members": 1000,
+      "Mixed": true,
+      "AllocatedBytes": 0,
+      "BytesPerSample": 0,
+      "P50Microseconds": 87,
+      "P95Microseconds": 92.2,
+      "P99Microseconds": 100.9
+    },
+    {
+      "Domain": "Selection summary rebuild",
+      "Members": 1000,
+      "Mixed": true,
+      "AllocatedBytes": 53248,
+      "BytesPerSample": 208,
+      "P50Microseconds": 8.1,
+      "P95Microseconds": 8.4,
+      "P99Microseconds": 8.7
+    },
+    {
+      "Domain": "Owned snapshot copy and index",
+      "Members": 1000,
+      "Mixed": true,
+      "AllocatedBytes": 73909320,
+      "BytesPerSample": 288708.28125,
+      "P50Microseconds": 631,
+      "P95Microseconds": 707.8,
+      "P99Microseconds": 1051
+    }
+  ]
+}

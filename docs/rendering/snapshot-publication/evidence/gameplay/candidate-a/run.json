@@ -1,0 +1,12 @@
+{
+  "repositorySource": "29bebfdc6ca59c6b98789a9a6e110e4cf263fdb9",
+  "harnessSha256": "9F9E3001C0FA1EE3AAB9154D83AFD89A7410CE2676115F7996E339F311CAE8A2",
+  "runtimeManifestSha256": "D1786170F593B6D32FE1CF4FCE85514CAB7681F52132D47F15EF2612A3D76870",
+  "runtimeContentSignature": "edcbaeaf79e9a93e907b9e4f62bbb3065f7c60b928b71d742e3f94c47a4f8136",
+  "tieredCompilation": null,
+  "startedUtc": "2026-10-20T10:14:03.9487761Z",
+  "profileExit": 0,
+  "frameHotpathsExit": 0,
+  "combatGroupHotpathsExit": 0,
+  "completedUtc": "2026-10-20T10:15:18.6561615Z"
+}

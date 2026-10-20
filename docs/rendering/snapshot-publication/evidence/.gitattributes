@@ -1,0 +1,3 @@
+# Preserve immutable raw evidence hashes across checkout platforms.
+*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+*.jsonl -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

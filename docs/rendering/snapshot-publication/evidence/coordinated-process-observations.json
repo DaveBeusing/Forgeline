@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "originalSummarySha256": "50d809cb5ed72058443800a108db1ea1cb30fd76d57a21d3c5999b923ee4c56f",
+  "commandExit": 0,
+  "observationSummary": {
+    "qualified": true,
+    "samples": 105,
+    "intervalSeconds": 2,
+    "foreignCpuThresholdSeconds": 0.1,
+    "violations": [],
+    "limitation": "Bounded process observations of foreign build/test/renderer executables; cannot exclude shorter transients or all user/OS activity. No command lines or private paths recorded.",
+    "PSComputerName": "localhost",
+    "RunspaceId": "28d0730c-8a33-41cb-bcc7-f7f718f340ce",
+    "PSShowComputerName": false
+  },
+  "scope": "The original guard qualified process observations only. Command outcome is separate. Extended command had a post-processing argument error after all profile processes exited 0; pure-data recovery verified the completed captures without rerunning or changing measurement samples."
+}
