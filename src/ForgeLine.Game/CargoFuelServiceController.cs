@@ -88,9 +88,15 @@ internal sealed class CargoFuelServiceController(
             entities.RemoveComponent<CargoFuelServiceDemand>(truck);
             dispatchNeedsFuel = false;
         }
-        if (available >= fuel.Capacity * StartFraction &&
-            !entities.HasComponent<CargoDeliveryFuelDeferral>(truck) &&
-            !dispatchNeedsFuel)
+        bool routeDeferred = entities.HasComponent<CargoDeliveryFuelDeferral>(truck);
+        if (available >= fuel.Capacity * StartFraction && !routeDeferred && !dispatchNeedsFuel)
+            return true;
+        // Let hierarchical navigation establish the actual physical-route fuel
+        // deficit before interrupting a committed cargo journey. The deferral
+        // remains available for diagnostics if no service provider exists.
+        if (!routeDeferred && !dispatchNeedsFuel && available > Epsilon &&
+            entities.HasComponent<CargoTransportOrder>(truck) &&
+            entities.HasComponent<NavigationAgent>(truck))
             return true;
         if (entities.HasComponent<ResupplyOrder>(truck) ||
             entities.HasComponent<SupplyRescueAssignment>(truck))
