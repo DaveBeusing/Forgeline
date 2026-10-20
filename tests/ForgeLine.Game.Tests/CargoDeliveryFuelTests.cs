@@ -57,7 +57,7 @@ public sealed class CargoDeliveryFuelTests
         var service = fixture.Simulation.Entities.GetComponent<CargoFuelServiceState>(fixture.Truck);
         Assert.Equal(CargoFuelServicePhase.AwaitingFuelRescue, service.Phase);
         Assert.Equal(CargoFuelServiceReason.NoEligibleProvider, service.Reason);
-        Assert.Equal(30.0, fixture.Inventories.GetQuantity(fixture.FuelInventory, ResourceIds.Fuel));
+        Assert.Equal(30.0, fixture.Inventories.GetAvailableQuantity(fixture.FuelInventory, ResourceIds.Fuel));
         Assert.Equal(0.0, fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.Steel));
         if (reserveFuel)
         {
