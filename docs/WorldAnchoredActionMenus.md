@@ -10,6 +10,29 @@ Current single/group rings have no rectangular mode bar or command dock. Existin
 
 Current validation and remaining gates: [qualification report](WorldAnchoredActionMenuQualification.md). Checkpoints below retain their original source identities.
 
+## Hover geometry structural qualification
+
+The selected-sector hover arc is a 20-quad, 120-vertex overlay drawn only
+while that sector is hovered. Its radial interval starts strictly inside the
+published inner hit radius and ends one physical pixel inside the outer
+radius; its angular interval matches the sector. It is decorative and does
+not expand pointer ownership, reposition the ring, or reserve new HUD space.
+
+The geometry candidate produced by the Windows Frame hot paths run for
+`e989e325011a83b69750cc2cb72621d067dd351f` was compared by key
+against all 135 committed structural snapshots. Exactly 15 keys differed:
+one Hover state for every combination of the five display profiles and
+three UI scales; each added exactly 120 vertices. All 120 non-Hover states,
+including Cancelled, were byte-for-byte hash-identical to the existing
+fixture. The structural fixture therefore updates only those 15
+observations, and asserts the exact bounded delta and unchanged other
+states. The temporary candidate-export CI step is removed so Frame hot
+paths once again checks the committed fixture directly.
+
+These are source-geometry findings, not approval of native screenshots,
+physical DPI/monitor readability, contrast or the human visual golden.
+Those gates remain independent of a passing structural fixture.
+
 ## Current Operations obstacle ownership
 
 The radial layout reserves physical screen space for Operations only when its diagnostic panel is logically open and visible. A closed or suppressed panel adds no obstacle, because the former permanent Operations tab and its hit region have been removed. The same published Operations panel rectangle is used for rendering and input capture. Existing resource, notification, onboarding, minimap and combat-group reservations remain separate. This correction does not change strategic overlay contents or F10/F11 controls.
