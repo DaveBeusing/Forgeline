@@ -16,6 +16,8 @@ def summarize(root):
         folder = root / label
         meta = read(folder / "run.json")
         assert meta["profileExit"] == 0
+        assert meta["frameHotpathsExit"] == 0
+        assert meta["combatGroupHotpathsExit"] == 0
         assert meta["tieredCompilation"] in (None, "1"), "Do not hide allocation behavior by disabling tiering."
         profiles = [read(folder / "gameplay" / f"gameplay-ratio-{ratio}.json") for ratio in (1, 3, 7)]
         for profile in profiles:

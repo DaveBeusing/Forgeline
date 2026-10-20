@@ -1,0 +1,1035 @@
+{
+  "Source": "0.1.420-dev\u002B43631f025eba4d3da62396505ffff10986281dce",
+  "Method": "Actual ClientRenderHost.Publish and mailbox; retained reader blocked deliberately. Fixed 128/32 gameplay and 32/8 debug line/label arrays, eight selected identities. Producer-thread bytes/time include defensive copy, lock, counter and signal; exclude fixture, observer storage, GPU and Present. Not gameplay FPS.",
+  "Changing": true,
+  "WarmupBatches": 2048,
+  "WarmupAllocatedBytes": 337117184,
+  "WarmupMilliseconds": 136.1885,
+  "OperationsPerBatch": 32,
+  "Observations": [
+    {
+      "MicrosecondsPerPublication": 1.928125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.825,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.821875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.81875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 2.03125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.86875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.86875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.896875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.88125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.86875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.86875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.88125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.9,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.890625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.890625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.896875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.91875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.88125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.859375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.86875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 3.325,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.903125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.89375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.853125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.81875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.959375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.80625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.803125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 7.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.815625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.80625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.81875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.803125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.80625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.828125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.815625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.790625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.83125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 2.0125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.884375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.83125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.83125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.815625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.859375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.81875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.825,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.803125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.865625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.946875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.81875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.859375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.865625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.828125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.853125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.825,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.815625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.80625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.815625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.790625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.796875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.803125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.815625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.83125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.81875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.83125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.803125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.828125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.803125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.96875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.821875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.88125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.86875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 8.046875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.878125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.865625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.878125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.828125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 2.0375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.865625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.86875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.853125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.88125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.859375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.859375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.853125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.83125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.99375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.825,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.846875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.871875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.83125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.821875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.80625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.80625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.80625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.853125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.859375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.853125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.840625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.84375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.859375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.85625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.80625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 2.021875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.825,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.83125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.80625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.821875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.81875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.83125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.81875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.815625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.809375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.815625,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.828125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.821875,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.825,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.825,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.8125,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.834375,
+      "BytesPerPublication": 5144
+    },
+    {
+      "MicrosecondsPerPublication": 1.815625,
+      "BytesPerPublication": 5144
+    }
+  ]
+}

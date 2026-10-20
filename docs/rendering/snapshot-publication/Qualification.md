@@ -1,87 +1,134 @@
 # Snapshot publication qualification
 
-## Baseline and scope
+Status: **implemented, not yet accepted**. Branch `performance/snapshot-publication`,
+PR [258](https://github.com/DaveBeusing/Forgeline/pull/258). Base is current master
+`e42f4e7537b84c56c9dbdafe56f03f1e5e74270d`, 0.1.419; the isolated version commit
+sets exactly one PATCH delta to 0.1.420. No tag, release or master merge is performed.
 
-Source master: `f2be6532d759ab0840f2a4674c28d00446fe75ea`, version 0.1.418.
-Branch: `performance/snapshot-publication`. The integrated foundation and explicit
-parallel release are present through PRs 236, 237 and 241. No existing snapshot
-implementation branch or open snapshot PR was found. Historical unmerged PRs 94,
-98 and 100 concern session lifecycle or superseded material/terrain work.
+## Integration and ownership
 
-Master CI run 39396697547 fails before restore/build/tests: its version check
-expects 0.1.419 but receives 0.1.418 after adjacent merges. PR 256 independently
-repairs serial versioning and HUD qualification; PR 257 owns cargo fuel service.
-Neither branch overlaps the assigned snapshot files. Their pending CI is not a
-passing master qualification. Shared workflows and foreign tests remain read-only.
+The integrated parallelization foundation and explicit release in the ownership manifest
+were verified before implementation. Initial master was
+`f2be6532d759ab0840f2a4674c28d00446fe75ea`, 0.1.418. PR 256 subsequently merged;
+its current master was synchronized preserving history. PR 257 owns cargo fuel service
+and does not overlap functional snapshot files. Closed historical PRs 94/98/100 were
+checked for superseded work; this branch does not revive them.
 
-## Identity audit
+All functional changes remain in the assigned snapshot/publication files and prefixes.
+The ownership validator checks the complete functional path list separately from the
+explicit serial `Directory.Build.props` exception. That file changes only PATCH
+419→420. The graph validator reports 46 projects, no cycles and preserved architecture
+boundaries. Public formats, frame/thread/fence contracts, queue count, dependency graph,
+visibility authority, GPU resources and workflows remain unchanged.
 
-`EntityId.CompareTo` orders Index then Generation. ECS extraction uses stable
-entity-index order; live entities, including wreck state, retain full generation.
-Static dressing uses the distinct 0xE0000000 range; queued VFX use 0xF0000000 slots,
-with emitter/generation metadata; decals use 0xD0000000 plus pool slot and its real
-generation. Decals follow VFX in the public array, so complete snapshots can have
-two ascending runs. Do not reorder public arrays or assume global monotonicity.
-VFX and ground decals bypass interpolation; receiver decals retain full identity.
+## Delivered behavior
 
-## Initial checks
+See [Decision](Decision.md) for ownership, cache invalidation and retention bounds.
+Correspondence is O(n+m), including private normalization for arbitrary current order.
+The public order never changes. Entity identity always includes generation; ECS, static
+dressing, VFX, decal and wreck identities were audited. Decals follow VFX, so production
+can contain two ascending runs rather than globally sorted identities. The nonmonotone
+predecessor adapter preserves the precise hits, misses and duplicate ties of the prior
+binary search, including unreachable keys; it does not silently change interpolation.
+All interpolated transform, pose and wrapped yaw fields are compared against that reference.
 
-Release restore/build at the baseline passed with zero warnings/errors. The initial
-focused extraction/index/renderer/SelectedCombatGroup run passed 41 cases. Full
-project and isolated allocation reproduction results will be recorded separately.
-Raw local evidence: `artifacts/snapshot-publication/baseline/`.
+Combat capture still inspects every eligible owned member and operational field, shares
+only completely equal immutable payloads in the same session, and publishes fresh tick
+envelopes. Other mutable/intelligence/selection/alert dependencies remain freshly captured.
+Filtered instance extraction reuses only private producer scratch and always publishes a
+fresh exact-length owned array. Old snapshots remain valid indefinitely.
 
-Next: prove binary-reference correspondence and indefinite snapshot ownership,
-then replace correspondence using render-owner scratch. Qualification is open;
-no performance improvement, final CI, native acceptance or release is claimed.
+Host publication compares complete input and shares only engine-owned immutable defensive
+copies, bounded per producer thread. Mutating caller arrays, retained/blocked readers,
+concurrent producers, shutdown, failed copying and full generation changes are exercised.
+The first equality-cache profile saved allocations but regressed CPU time; commit
+`5ab7b3cea21c864e1825874086cb425d0002b35e` replaces element dispatch for unmanaged
+line/identity channels with conservative bitwise comparison. Distinct floating-point
+representations copy again; no input bits are lost. Labels keep complete value comparison.
 
+## Executed checks
 
-## Correspondence checkpoint
+Product source `29bebfdc6ca59c6b98789a9a6e110e4cf263fdb9` passed Release solution
+build with zero warnings/errors, runtime asset validation, graph and version checks.
+The later profile-only source `f797af6f65361949fa1017ce2387026ec41628f6` also passed
+Release solution build with zero warnings/errors. The refinement source above passed an
+isolated Release Client/test build and all seven dedicated publication/retained-reader
+cases, including NaN payload and signed-zero caller changes. No additional references
+or package changes were needed.
 
-The new mapping uses a stable two-pointer merge. Ordered snapshots use their
-existing positions directly. The two production ascending runs are merged into
-render-owner permutations; arbitrary caller order uses eight stable uint radix
-passes, generation before index. Full EntityId equality remains authoritative.
-All normalization and correspondence are O(n+m). For nonmonotone or duplicate
-predecessors, a linear in-order traversal emits precisely the keys reachable by the
-old binary search under strict ancestor bounds. Its misses and duplicate ties are
-preserved; no hidden interpolation correction is introduced. Entity queries keep
-the original raw search, then reuse the cached predecessor index.
-Public arrays, interpolation and the independent visibility implementation are unchanged.
-Scratch grows geometrically within 65,536 entries and trims after oversized populations;
-four int arrays retain at most 1 MiB within that bound, excluding the unchanged legacy
-visibility adapter. No borrowed/published instance array is reused as mutable scratch.
+The complete solution invocation at f797af6 finished: **2,971 total, 2,949 passed,
+5 failed, 17 skipped**, exit 2. The Presentation project repeats twice with 1,417 total / 1,402 passed / three failed /
+12 skipped, exit 2 each. The Client project repeats twice with 451 total / 448 passed /
+one failed / two skipped, exit 2 each. SelectedCombatGroup passes twice in isolation,
+15/15 each, exit 0. Results are retained rather than
+calling a failed invocation green. Snapshot capture/correspondence production files are
+unchanged between 29bebfd and the refinement; the latter changes only Client publication.
+Two complete refined Client direct-runner invocations finish with 452 discovered cases,
+respectively two and one failures, and two explicit native-audio cases not run. The
+first includes an intermittent frozen settings failure described below.
 
-The initial correspondence check passes 21 new/existing mapping and foundation
-boundary cases, including mixed presentation ranges, arbitrary order, generation
-reuse, all interpolated TRS/pose/yaw values, caller mutation, retention, growth,
-empty snapshots and warm zero allocation. Raw evidence:
-`artifacts/snapshot-publication/correspondence-tests.txt`. A final recheck follows
-the capacity-trimming correction. Producer and render timing remain separate.
+Earlier CPU cohorts overlap a subsequently reported concurrent solution run and are
+unqualified for isolated CPU timing; their raw data is preserved. A coordinated
+replacement with bounded process observations is required. Thread allocation windows,
+retained payload counters,
+source/catalog hashes and native frame/resource observations are in
+[Measurements](Measurements.md). Hardware images match exactly; no global FPS or
+unqualified consumer latency improvement is claimed.
 
+## Open gates and precise serial handoff
 
-## Integrated-base and compatibility checkpoint
+These frozen paths require serial work. They are not modified in this PR and are not
+hidden by wider budgets, disabled tests or accepted goldens:
 
-PR 256 is merged at `e42f4e7537b84c56c9dbdafe56f03f1e5e74270d`, version 0.1.419,
-and synchronized into this branch. Initial baseline suite failures are 64 display
-marquee cases and one action-ring fixture case (addressed by PR 256), plus one each
-in RtsInformationLayerTests.WorldMarkersUseDistinctGeometryForSelectionHoverAndInvalidTargets,
-NotificationRowMotionTests.IdentityRevisionSessionClockAndReducedMotionDoNotRetainStaleVisuals,
-and EconomicInterfaceSkinTests.NativeOperationsRejectsStaleFactsAndSelectionNeverCachesRetiredFacilityData.
-These three existed before snapshot changes. Full current qualification remains open;
-foreign UI tests/renderers are not changed to conceal the baseline failures.
+| Gate | Observed result | Responsible frozen surface |
+|---|---|---|
+| Selection geometry | Presentation `WorldMarkersUseDistinctGeometryForSelectionHoverAndInvalidTargets`, line 547: expected 24 lines, actual 8 | `RtsInformationLayer` geometry and its existing test |
+| Notification motion | `IdentityRevisionSessionClockAndReducedMotionDoNotRetainStaleVisuals`, line 82: expected 1, actual 0 | notification motion state/revision logic |
+| Operations privacy | `NativeOperationsRejectsStaleFactsAndSelectionNeverCachesRetiredFacilityData`, line 171: Assert.True false | Operations view/renderer and existing native test |
+| Controls listing | Client `ControlsPresentationListsGameplayBindings`, line 76: expected 49 entries, actual 53 | frontend controls presentation and its count contract |
+| UI feedback allocation | complete solution only: `WarmCopiedFeedbackRetainsZeroAllocation`, line 138, expected 0, actual 3,344 bytes; repeated refined direct Client suites pass this case | `UiInteractionFeedback.Gameplay` / its frozen allocation measurement; no snapshot capture/index/publication is invoked in this measured method |
+| Paused settings | first refined full Client run: `ApplyUpdatesReadableUiImmediatelyAndPersistsNextMatchGraphicsWithoutResettingMatch`, line 22, applied result null; next full run and baseline class pass | settings controller/store test; no render publication is invoked |
 
-The allocation failure reported historically is not reproduced in the baseline's
-SelectedCombatGroup class, either alone or within the complete Presentation invocation.
-The new warmed summary measurement retains the existing 512-byte-per-operation bound,
-and a deliberately allocating 4-KiB control validates detection without disabling JIT
-tiering or including fixture construction. This is not a newly established historical
-root cause or a claim to have fixed an unreproduced failure.
+The first three reproduce directly on clean e42f4e7: 38 class cases, three failures.
+Controls reproduces there too: 19 Client class cases, one failure. The intermittent
+feedback/settings outcomes have no established root cause; they remain separate open
+qualification findings rather than asserted snapshot regressions or invented fixes.
 
-The new compatibility set passes 26 cases, including 100 reproducible random unordered/
-duplicate snapshots checked against every binary-search result, and direct effect,
-receiver/ground-decal, wreck, generation, retained-reader and full interpolation contracts.
-Unsigned identity extrema are included in the final rerun. Initial Client host contracts
-pass 24 cases; added copy/failure and complete-gameplay probes pass 7 Client and 10
-Presentation cases before the final compatibility additions. Source and raw command
-logs distinguish each checkpoint; no failing whole suite is called green.
+Frame-contracts CI at product 29bebfd fails in
+`InteractionHotPathMeasurements.Run`, line 46. The unchanged benchmark expects
+`selected*24+22` lines; 24/36 cases produce `selected*8+22` (30 for one, 8,022 for 1,000).
+All 36 report zero allocation, no dropped lines and at most one draw. The same 24/36
+failure is reproduced by the e42f4e7 benchmark, exit nonzero. A separately authorized serial UI repair owns these four preexisting UI surfaces;
+this branch does not modify them. The serial owner must
+reconcile the renderer's required geometry and both frozen test/benchmark contracts,
+then re-run frame-contracts. This PR does not decide that unrelated UI contract.
+Current main CI at 29bebfd fails earlier in Graphical economy work states and operations
+privacy contracts; later main gates are skipped. Navigation and CPU-scale CI pass;
+the hosted native-reference job is explicitly skipped. Final-head CI is still required.
+
+## Historical combat allocation report
+
+The reported 8,104-byte SelectedCombatGroup failure is **not reproduced** in the initial
+baseline's full Presentation run or current isolated class. The old zero-allocation
+`RenderAndControlsShareBoundedGeometryWithZeroWarmAllocation` from the analysis anchor
+was removed with the obsolete inspector in PR 242 (`09425dc`); current summary geometry
+already has a 512-byte/operation bound. That existing bound is not widened. New warmed
+measurements exclude fixture setup, use the current producer thread and validate the
+counter with a deliberately allocating 4-KiB positive control. Tiering stays enabled by
+default; process GC counts are not attributed to an operation. There is no proven
+historical root cause or claim to have fixed an absent renderer. Historical error closure
+remains open pending an authoritative reproduction/resolution by the responsible surface.
+
+## Remaining acceptance
+
+The current canonical refined Client project has 452 total / 449 passed / one failed /
+two skipped (exit 2), matching the preexisting controls failure. Clean baseline Client
+has 442 total / 439 passed / one failed / two skipped (exit 2). Feedback/settings classes
+pass on both sources (18/18 each); final dedicated scopes pass 12 Presentation and
+10 Client cases. The source-pinned extended host comparison is complete; it demonstrates reduced
+allocation with a small observed CPU tradeoff. Record final-head CI results and finish
+the final native recheck before acceptance. Human review of the six images remains pending. Mixed consumer
+CPU timings need a controlled performance review; improved capture/publication allocation
+must not be presented as universal latency improvement. Reconcile the frozen UI gates
+and historical allocation report serially, then re-run mandatory workflows before merge.
+No automatic merge, tag or release is authorized by this qualification.

@@ -64,3 +64,5 @@ path remains intact. Scratch clears old references, grows geometrically up to 16
 retained instance slots, serves larger captures without truncation, and trims on the
 next smaller capture. Producer scratch diagnostics include that array and the combat
 capture list, separate from reader-retained snapshot arrays and render-owner indices.
+
+Unmanaged line and identity channels use conservative bitwise equality to avoid per-element value dispatch. Different NaN or signed-zero representations force a fresh copy; identical bits permit sharing. Label channels retain complete value equality. This changes neither caller-copy safety nor published lifetime.
