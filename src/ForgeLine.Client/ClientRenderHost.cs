@@ -128,7 +128,8 @@ internal readonly record struct ClientRenderFrame(
     CombatGroupOverviewView? CombatGroups = null,
     bool MetricsActive = true,
     HoverTooltipView HoverTooltip = default,
-    OperationsView Operations = default, UiFeedbackSettings FeedbackSettings = default, WorldAudioSettings WorldAudio = default);
+    OperationsView Operations = default, UiFeedbackSettings FeedbackSettings = default, WorldAudioSettings WorldAudio = default,
+    NotificationExpansion NotificationExpansion = default);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -739,7 +740,8 @@ internal sealed class ClientRenderHost : IDisposable
                             ringLayout = ringLayout with { Minimap = current.InformationLayer.MinimapBounds };
                         Span<HudRect> occupied = stackalloc HudRect[8];
                         RadialActionLayout.ResolveObstacles(occupied,ringLayout,current.PreAlphaUx.Onboarding,current.Operations,current.CombatGroups,
-                            ActionableAlertLayout.Resolve(snapshot,ringLayout,localFeedback:current.PreAlphaUx.Placement.Visible ? "" : current.PreAlphaUx.InteractionHint));
+                            ActionableAlertLayout.Resolve(snapshot,ringLayout,localFeedback:current.PreAlphaUx.Placement.Visible ? "" : current.PreAlphaUx.InteractionHint,
+                                expansion: current.NotificationExpansion));
                         animatedPanel = animatedPanel with { Ring = animatedPanel.Ring.Project(renderWorld, renderCamera,
                             renderAlpha, snapshot, ringLayout, occupied) };
                         inputRing = animatedPanel.Ring;
@@ -772,7 +774,8 @@ internal sealed class ClientRenderHost : IDisposable
                                 current.FeedbackSettings.Animate(qualityProfile.Active),
                             animateOperations: current.MetricsActive && !current.SurfaceSuspended &&
                                 current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
-                                current.FeedbackSettings.Animate(qualityProfile.Active));
+                                current.FeedbackSettings.Animate(qualityProfile.Active),
+                            notificationExpansion: current.NotificationExpansion);
                         developmentOverlayRenderer.Render(
                             context,
                             overlayMetrics,

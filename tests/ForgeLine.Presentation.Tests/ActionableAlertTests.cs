@@ -84,12 +84,12 @@ public sealed class ActionableAlertTests
         var snapshot = Snapshot(alerts); var layout = GameplayHudLayout.Create(1600, 900, 96);
         var controller = new ActionableAlertController(); var input = new InputState();
         controller.Update(input, snapshot, layout);
-        Click(input, ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Bounds);
+        Click(input, ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Action);
         var result = controller.Update(input, snapshot, layout);
         Assert.True(result.Captured); Assert.Equal(target, result.Target); Assert.False(result.OpenOperations);
         Assert.False(controller.Update(input, snapshot, layout).Target.IsValid);
         var missing = Snapshot(tracker.Capture(new(1), Experience(4, PlayerAlertState.LowPower), []));
-        Click(input, ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Bounds);
+        Click(input, ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Action);
         var fallback = controller.Update(input, missing, layout);
         Assert.True(fallback.OpenOperations); Assert.Equal(OperationsCategory.Power, fallback.Category);
         Assert.Contains("UNAVAILABLE", controller.Feedback);
@@ -104,7 +104,7 @@ public sealed class ActionableAlertTests
         var controller = new ActionableAlertController(); var input = new InputState();
         var layout = GameplayHudLayout.Create(1600, 900, 96); var snapshot = Snapshot(alerts);
         controller.Update(input, snapshot, layout);
-        Click(input, ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Bounds);
+        Click(input, ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Action);
         var result = controller.Update(input, terminal ? Snapshot(alerts, terminal: true) : snapshot,
             resize ? GameplayHudLayout.Create(1920, 1080, 144) : layout, blocked);
         Assert.False(result.OpenOperations); Assert.False(result.Target.IsValid);
@@ -116,7 +116,7 @@ public sealed class ActionableAlertTests
         var alerts = new AlertLifecycleTracker().Capture(new(1), Experience(4, PlayerAlertState.LowPower), []);
         var controller = new ActionableAlertController(); var input = new InputState(); var snapshot = Snapshot(alerts);
         var layout = GameplayHudLayout.Create(1600, 900, 96); controller.Update(input, snapshot, layout);
-        Click(input, ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Bounds); controller.CancelInput(input);
+        Click(input, ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Action); controller.CancelInput(input);
         Assert.False(controller.Update(input, snapshot, layout).OpenOperations);
         Assert.Single(alerts.Alerts);
     }
@@ -139,6 +139,92 @@ public sealed class ActionableAlertTests
             Assert.Equal(i, stack.Hit(new(stack.Card(i).Bounds.X + 1, stack.Card(i).Bounds.Y + 1)));
         }
     }
+    [Fact]
+    public void RepeatedFocusCyclesThroughCurrentAuthorizedTargetsAndSkipsUnavailable()
+    {
+        var tracker = new AlertLifecycleTracker();
+        var kinds = PlayerAlertState.CommandCoreDamaged | PlayerAlertState.SupplyCritical | PlayerAlertState.LowPower;
+        EntityId first = new(4, 1), second = new(5, 2), third = new(6, 3);
+        var alerts = tracker.Capture(new(1), Experience(4, kinds), [default, first, second, default, third]);
+        var snapshot = Snapshot(alerts);
+        var hud = GameplayHudLayout.Create(1920, 1080, 96);
+        var controller = new ActionableAlertController(); var input = new InputState();
+        controller.Update(input, snapshot, hud);
+        var action = ActionableAlertLayout.Resolve(snapshot, hud).Card(0).Action;
+        foreach (EntityId expected in new[] { first, second, third, first })
+        {
+            Click(input, action);
+            var result = controller.Update(input, snapshot, hud);
+            Assert.Equal(expected, result.Target);
+            Assert.False(result.OpenOperations);
+            Assert.False(controller.Expansion.Open);
+        }
+        var changed = alerts.Alerts.Select(alert => alert.Identity.Kind == PlayerAlertState.SupplyCritical
+            ? alert with { Target = default } : alert).ToArray();
+        snapshot = Snapshot(new ActionableAlertSnapshot(new(1), new(4), new(1), changed));
+        Click(input, action);
+        Assert.Equal(first, controller.Update(input, snapshot, hud).Target);
+        Click(input, action);
+        Assert.Equal(third, controller.Update(input, snapshot, hud).Target);
+    }
+
+    [Fact]
+    public void FocusCyclingIncludesCurrentTargetsBehindTheMoreOverflowCard()
+    {
+        var tracker = new AlertLifecycleTracker();
+        var targets = new EntityId[]
+        {
+            new(11, 1), new(12, 1), new(13, 1), new(14, 1), new(15, 1)
+        };
+        var snapshot = Snapshot(tracker.Capture(new(1), Experience(4, (PlayerAlertState)31), targets));
+        var layout = GameplayHudLayout.Create(1920, 1080, 96);
+        var stack = ActionableAlertLayout.Resolve(snapshot, layout);
+        Assert.Equal(4, stack.Count);
+        Assert.True(stack.Overflow.Item.Hidden > 0);
+        var controller = new ActionableAlertController(); var input = new InputState();
+        controller.Update(input, snapshot, layout);
+        foreach (var expected in targets)
+        {
+            Click(input, stack.First.Action);
+            Assert.Equal(expected, controller.Update(input, snapshot, layout).Target);
+        }
+        Click(input, stack.First.Action);
+        Assert.Equal(targets[0], controller.Update(input, snapshot, layout).Target);
+    }
+
+    [Fact]
+    public void CardSurfaceTogglesSingleDetailWithoutActivatingFocusOrOperations()
+    {
+        var alerts = new AlertLifecycleTracker().Capture(new(1),
+            Experience(4, PlayerAlertState.LowPower), [default, default, default, default, new EntityId(8, 2)]);
+        var snapshot = Snapshot(alerts);
+        var hud = GameplayHudLayout.Create(1920, 1080, 96);
+        var controller = new ActionableAlertController(); var input = new InputState();
+        controller.Update(input, snapshot, hud);
+        var card = ActionableAlertLayout.Resolve(snapshot, hud).First;
+        Click(input, new HudRect(card.Bounds.X + 8, card.Bounds.Y + 3, 10, 10));
+        var opened = controller.Update(input, snapshot, hud);
+        Assert.True(opened.Captured); Assert.False(opened.Target.IsValid); Assert.False(opened.OpenOperations);
+        Assert.True(controller.Expansion.Open);
+        controller.Update(input, snapshot, hud, seconds: .25);
+        var expanded = ActionableAlertLayout.Resolve(snapshot, hud, expansion: controller.Expansion);
+        Assert.False(expanded.First.ExpansionBounds.IsEmpty);
+        Assert.True(expanded.First.InteractiveBounds.Contains(
+            new Vector2(expanded.First.ExpansionBounds.X + 8, expanded.First.ExpansionBounds.Y + 8)));
+        Click(input, card.Action);
+        var focused = controller.Update(input, snapshot, hud);
+        Assert.Equal(new EntityId(8, 2), focused.Target);
+        Assert.True(controller.Expansion.Open);
+        Click(input, new HudRect(card.Bounds.X + 8, card.Bounds.Y + 3, 10, 10));
+        var closed = controller.Update(input, snapshot, hud);
+        Assert.True(closed.Captured); Assert.False(closed.Target.IsValid);
+        Assert.False(controller.Expansion.Open);
+        var outgoing = ActionableAlertLayout.Resolve(snapshot, hud, expansion: controller.Expansion);
+        Assert.False(outgoing.First.ExpansionBounds.IsEmpty);
+        Assert.False(outgoing.Contains(new Vector2(outgoing.First.ExpansionBounds.X + 8,
+            outgoing.First.ExpansionBounds.Y + 8)));
+    }
+
     [Fact]
     public void WarmIdleAlertInputHasZeroAllocation()
     {
@@ -168,9 +254,9 @@ public sealed class ActionableAlertTests
     {
         var tracker = new AlertLifecycleTracker(); var controller = new ActionableAlertController(); var input = new InputState();
         var snapshot = Snapshot(tracker.Capture(new(1), Experience(4, PlayerAlertState.LowPower), []));
-        var layout = GameplayHudLayout.Create(1600, 900, 96); var rect = ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Bounds;
+        var layout = GameplayHudLayout.Create(1600, 900, 96); var rect = ActionableAlertLayout.Resolve(snapshot, layout).Card(0).Action;
         controller.Update(input, snapshot, layout);
-        int x = (int)(rect.X + 10), y = (int)(rect.Y + 5);
+        int x = (int)(rect.X + rect.Width / 2), y = (int)(rect.Y + rect.Height / 2);
         input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, x, y));
         Assert.False(controller.Update(input, snapshot, layout).OpenOperations);
         if (resolved)

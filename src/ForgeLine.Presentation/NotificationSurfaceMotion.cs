@@ -21,6 +21,14 @@ internal sealed class NotificationSurfaceMotion
     private GameplayHudLayout _layout;
 
     internal float Opacity(int index) => index >= 0 && index < _count ? _opacities[index] : 0;
+    // The animated leading edge starts at the safe-area right edge and moves
+    // left. Hit testing continues to use the fully activated live rectangle.
+    internal HudRect EnteringBounds(in HudRect final, int index)
+    {
+        float progress = Math.Clamp(Opacity(index), 0, 1);
+        float leading = final.Width * (1 - progress);
+        return new(final.X + leading, final.Y, final.Width - leading, final.Height);
+    }
     internal int RetiredCount => _retiredCount;
     internal (HudRect Bounds, float Opacity) Retired(int index) =>
         index >= 0 && index < _retiredCount ? (_retired[index].Bounds, _retired[index].Opacity) : default;
@@ -64,8 +72,23 @@ internal sealed class NotificationSurfaceMotion
             int match = -1;
             for (int j = 0; j < previousCount; j++)
                 if (previous[j].Key == key) { match = j; break; }
-            var track = match < 0 ? new Track(key, card.Bounds, 0, 0, now) :
-                previous[match] with { Bounds = card.Bounds };
+            Track track;
+            if (match >= 0)
+                track = previous[match] with { Bounds = card.Bounds };
+            else
+            {
+                float inherited = 0;
+                for (int j = 0; j < _retiredCount; j++)
+                    if (_retired[j].Key == key)
+                    {
+                        inherited = _retired[j].Opacity;
+                        _retired[j] = _retired[--_retiredCount];
+                        break;
+                    }
+                // Resuming a live identity reverses the outgoing fade and
+                // slide from its last progress instead of jumping to zero.
+                track = new Track(key, card.Bounds, inherited, inherited, now);
+            }
             track = track with { Opacity = Interpolate(track.From, 1, now - track.Start) };
             _current[i] = track;
             _opacities[i] = track.Opacity;

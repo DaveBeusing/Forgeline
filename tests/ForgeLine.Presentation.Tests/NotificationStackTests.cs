@@ -156,6 +156,64 @@ public sealed class NotificationStackTests
     }
 
     [Fact]
+    public void CardDetailsStayWithinAlertSafeAreaAndPageThroughAuthorizedLongMessage()
+    {
+        string label = string.Join(" ", Enumerable.Repeat("Factory blocked: insufficient steel and no incoming cargo.", 80)) +
+            " FULL MESSAGE END";
+        var alerts = Snapshot().Alerts!.Alerts.ToArray();
+        alerts[2] = alerts[2] with { Label = label };
+        var snapshot = Snapshot(alerts);
+        var layout = GameplayHudLayout.Create(1920, 1080, 96);
+        var input = new InputState(); var controller = new ActionableAlertController();
+        controller.Update(input, snapshot, layout);
+        var third = ActionableAlertLayout.Resolve(snapshot, layout).Third;
+        Click(input, new HudRect(third.Bounds.X + 7, third.Bounds.Y + 5, 12, 10));
+        var opened = controller.Update(input, snapshot, layout);
+        Assert.True(opened.Captured);
+        Assert.False(opened.Target.IsValid);
+        Assert.False(opened.OpenOperations);
+        Assert.Contains("FULL MESSAGE END", controller.Expansion.Content);
+        controller.Update(input, snapshot, layout, seconds: .22);
+        var stack = ActionableAlertLayout.Resolve(snapshot, layout, expansion: controller.Expansion);
+        Assert.False(stack.Third.ExpansionBounds.IsEmpty);
+        Assert.True(stack.Third.ExpansionBounds.Bottom <= stack.Bounds.Bottom);
+        Assert.False(stack.PaintedBounds.Intersects(layout.Minimap));
+        Assert.False(stack.PaintedBounds.Intersects(OperationsLayout.Panel(layout)));
+        int previousPage = controller.Expansion.Page;
+        Click(input, new HudRect(stack.Third.ExpansionBounds.X + 8,
+            stack.Third.ExpansionBounds.Y + 8, 12, 10));
+        var next = controller.Update(input, snapshot, layout);
+        Assert.True(next.Captured);
+        Assert.Equal(previousPage + 1, controller.Expansion.Page);
+        Click(input, third.Details);
+        var more = controller.Update(input, snapshot, layout);
+        Assert.True(more.NotificationDetails);
+        Assert.True(controller.Expansion.Open);
+    }
+
+    [Fact]
+    public void DetailStateResetsOnTargetGenerationChangeAndFreshSession()
+    {
+        var snapshot = Snapshot();
+        var layout = GameplayHudLayout.Create(1920, 1080, 96);
+        var input = new InputState(); var controller = new ActionableAlertController();
+        controller.Update(input, snapshot, layout);
+        var first = ActionableAlertLayout.Resolve(snapshot, layout).First.Bounds;
+        Click(input, new HudRect(first.X + 8, first.Y + 5, 10, 10));
+        controller.Update(input, snapshot, layout, seconds: .25);
+        Assert.True(controller.Expansion.Open);
+        var modified = snapshot.Alerts!.Alerts.ToArray();
+        modified[0] = modified[0] with { Target = new EntityId(15, 2) };
+        controller.Update(input, Snapshot(modified), layout);
+        Assert.False(controller.Expansion.Open);
+        Click(input, new HudRect(first.X + 8, first.Y + 5, 10, 10));
+        controller.Update(input, snapshot, layout);
+        Assert.True(controller.Expansion.Open);
+        controller.Update(input, Snapshot(session: 2), layout);
+        Assert.False(controller.Expansion.Open);
+    }
+
+    [Fact]
     public void DefaultPresentationFeedbackIsEmptyInsteadOfThrowing()
     {
         var layout=GameplayHudLayout.Create(1920,1080,96); var snapshot=Snapshot();

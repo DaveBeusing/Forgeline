@@ -1,5 +1,28 @@
 # Notification stack qualification
 
+## Interactive focus and inline detail qualification
+
+The current interactive update retains the existing source-owned five alert
+conditions and three visible cards plus the MORE overflow row. A first FOCUS
+click uses its explicitly selected alert; following clicks cycle the current
+authorized priority roster, including focusable alerts behind MORE. A target
+with a missing entity/generation falls back to Operations rather than reusing
+a prior navigation result.
+
+The message body toggles one paginated, bounded, vertically expanding details
+region; the FOCUS, OPS and MORE hit regions remain independent. A reversible
+right-entry reveal uses the live authorized rows, while resolved cards relinquish
+hit ownership immediately. The 0.30 material-opacity contract is unchanged.
+The same copied expansion record feeds the client and HUD render geometry;
+no simulation-owned resource or request is modified.
+
+Tests cover focus cycles, missing targets and identity invalidation, held/released
+pointer ownership, safe-area detail pagination, entry motion at 30/60/144 Hz,
+and reduced-motion settlement. Automated structural validation is not a native
+visual golden or physical-display/DPI acceptance. Earlier results in this
+document remain historical, not proof for the current source.
+
+
 ## Current presentation revision
 
 A later notification-row refinement uses contract version 4. The placement-context hint uses its own copied, session/tick-scoped preview state; its former tall panel capture is not retained beneath the single-row visual. Onboarding guidance stays a separate control and animation. It replaces multiline cards with single centered icon/text/control rows, caps the container/background alpha at 0.30, and reuses the authorized Operations Notifications full-text path for ellipsized messages. The existing global notification bounds remain authoritative; there is no dependency on a removed rectangular action bar. Visibility transitions are 180 ms SmoothStep on presentation time and do not alter actionable bounds; retired surfaces may show a fading background only, without text, target, or pointer capture. No alert type, priority, history, or simulation authority changes. The prior qualification below remains historical and must not be represented as current-source graphics validation.

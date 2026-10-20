@@ -1192,7 +1192,8 @@ internal sealed class ClientApplication
             transientMenus.Update(inputState, inputSnapshot, interactionLayout, selectionController.Selection,
                 actionPanel, operationsController, presentationInteraction, informationLayer.MinimapEnabled,
                 buildingPlacementController.IsActive,
-                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback, onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View);
+                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback, onboarding: buildingPlacementController.IsActive ? null : guidanceInteraction.View,
+                expansion: alertController.Expansion);
             hudInteraction.CapturePointer(transientMenus.PointerCaptured);
             actionPanel.SynchronizeObjectRing(inputState, inputSnapshot, renderWorld, selectionController.Selection, false);
             actionPanel.AdoptPresentedRing(renderHost.LatestActionRing);
@@ -1240,7 +1241,8 @@ internal sealed class ClientApplication
             var alertResult = alertController.Update(inputState, inputSnapshot, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive, seconds: frameElapsed.TotalSeconds, dockExpanded: actionPanel.DockExpanded,
-                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback);
+                localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
+                animateDetails: !_settings.ReducedUiMotion && _settings.RenderQuality.Quality != RenderQuality.Low);
             hudInteraction.CapturePointer(alertResult.Captured);
             if (alertResult.Target.IsValid && inputSnapshot is not null)
             {
@@ -1705,7 +1707,8 @@ internal sealed class ClientApplication
                         combatGroupOverview,
                     MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
-                    Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio));
+                    Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
+                    NotificationExpansion: alertController.Expansion));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
