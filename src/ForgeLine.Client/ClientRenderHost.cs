@@ -774,7 +774,8 @@ internal sealed class ClientRenderHost : IDisposable
                                 current.FeedbackSettings.Animate(qualityProfile.Active),
                             animateOperations: current.MetricsActive && !current.SurfaceSuspended &&
                                 current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
-                                current.FeedbackSettings.Animate(qualityProfile.Active));
+                                current.FeedbackSettings.Animate(qualityProfile.Active),
+                            notificationExpansion: current.NotificationExpansion);
                         developmentOverlayRenderer.Render(
                             context,
                             overlayMetrics,
