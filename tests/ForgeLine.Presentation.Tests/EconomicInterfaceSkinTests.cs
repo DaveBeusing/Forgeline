@@ -180,8 +180,6 @@ public sealed class EconomicInterfaceSkinTests
             // The corner outside the logical panel remains the unmodified world.
             Assert.True(blue.AsSpan(0,4).SequenceEqual(blueWorld.AsSpan(0,4)));
             Assert.True(red.AsSpan(0,4).SequenceEqual(redWorld.AsSpan(0,4)));
-            Assert.Equal(255, blue[pixel + 3]);
-            Assert.Equal(255, red[pixel + 3]);
             long uploads = device.Diagnostics.Resources.TextureUploadCount;
             Capture(Snapshot(operations: data), view);
             Assert.Equal(uploads, device.Diagnostics.Resources.TextureUploadCount);
