@@ -33,6 +33,8 @@ public sealed class AutomatedDistributionSystem
     private ulong _totalDeliveryLatencyTicks;
     private ulong _maximumDeliveryLatencyTicks;
     private int _unservedDeficitCount;
+    private int _committedDispatchCountThisTick;
+    private double _committedDispatchQuantityThisTick;
 
     public AutomatedDistributionSystem(
         LogisticsNetwork network,
@@ -377,6 +379,8 @@ public sealed class AutomatedDistributionSystem
     private void DispatchPendingRequests(SimulationContext context)
     {
         _dispatchCandidates.Clear();
+        _committedDispatchCountThisTick = 0;
+        _committedDispatchQuantityThisTick = 0;
 
         for (int index = 0; index < _requests.Count; index++)
         {
@@ -427,6 +431,9 @@ public sealed class AutomatedDistributionSystem
         SimulationContext context,
         RequestState request)
     {
+        // One feasibility attempt per eligible pending request per tick.
+        // RetryPending requests retain their place without reserving anything.
+        request.LastEvaluatedAtTick = context.Tick;
         if (!_network.TryGetNode(
                 request.Destination,
                 out LogisticsNode destination) ||
@@ -553,6 +560,8 @@ public sealed class AutomatedDistributionSystem
         request.State = LogisticsTransportRequestState.Assigned;
         request.FailureReason = LogisticsTransportRequestFailureReason.None;
         request.StateChangedAtTick = context.Tick;
+        _committedDispatchCountThisTick++;
+        _committedDispatchQuantityThisTick += selection.Quantity;
     }
 
     private DispatchSelection SelectDispatchCandidate(
@@ -571,6 +580,7 @@ public sealed class AutomatedDistributionSystem
         bool hadSurplus = false;
         bool hadStructuralRoute = false;
         bool hadAvailableTruck = false;
+        bool hadUnderfueledTruck = false;
         bool hadCapacityBlockedRoute = false;
 
         for (int index = 0; index < nodes.Count; index++)
@@ -640,8 +650,10 @@ public sealed class AutomatedDistributionSystem
                     structuralRoute.Route,
                     request.ResourceId,
                     out EntityId truckEntity,
-                    out CargoTransport truck))
+                    out CargoTransport truck,
+                    out bool fuelBlocked))
             {
+                hadUnderfueledTruck |= fuelBlocked;
                 continue;
             }
 
@@ -708,7 +720,9 @@ public sealed class AutomatedDistributionSystem
                 : !hadStructuralRoute
                     ? LogisticsTransportRequestFailureReason.NoRoute
                     : !hadAvailableTruck
-                        ? LogisticsTransportRequestFailureReason.NoTruckAvailable
+                        ? hadUnderfueledTruck
+                            ? LogisticsTransportRequestFailureReason.NoDriveFuel
+                            : LogisticsTransportRequestFailureReason.NoTruckAvailable
                         : hadCapacityBlockedRoute
                             ? LogisticsTransportRequestFailureReason.CapacitySaturated
                             : LogisticsTransportRequestFailureReason.AssignmentFailed;
@@ -772,10 +786,12 @@ public sealed class AutomatedDistributionSystem
         LogisticsRoute route,
         ResourceId resource,
         out EntityId selectedEntity,
-        out CargoTransport selectedTransport)
+        out CargoTransport selectedTransport,
+        out bool fuelBlocked)
     {
         selectedEntity = EntityId.Invalid;
         selectedTransport = default;
+        fuelBlocked = false;
         _pendingFuelServiceDemands.Clear();
 
         bool hasOwner =
@@ -845,7 +861,10 @@ public sealed class AutomatedDistributionSystem
                 // Preserve the physical shipment; request real service instead of treating
                 // an underfueled, otherwise free truck as permanently undispatchable.
                 if (entities.HasComponent<UnitFuelState>(entity))
+                {
+                    fuelBlocked = true;
                     _pendingFuelServiceDemands.Add(entity);
+                }
                 continue;
             }
 
@@ -1244,6 +1263,8 @@ public sealed class AutomatedDistributionSystem
                 LogisticsBottleneckReason.InsufficientSourceStock,
             LogisticsTransportRequestFailureReason.NoTruckAvailable =>
                 LogisticsBottleneckReason.InsufficientTruckCapacity,
+            LogisticsTransportRequestFailureReason.NoDriveFuel =>
+                LogisticsBottleneckReason.DriveFuelUnavailable,
             LogisticsTransportRequestFailureReason.CapacitySaturated =>
                 LogisticsBottleneckReason.SaturatedLinkOrHub,
             LogisticsTransportRequestFailureReason.NoRoute =>
@@ -1636,6 +1657,8 @@ public sealed class AutomatedDistributionSystem
         public SimulationTick StateChangedAtTick { get; set; }
 
         public SimulationTick NextAttemptTick { get; set; }
+
+        public SimulationTick LastEvaluatedAtTick { get; set; }
 
         public LogisticsTransportRequestState State { get; set; }
 
