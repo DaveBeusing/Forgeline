@@ -49,6 +49,12 @@ Output must be fresh. Each family gets separate `first`, `second`, `master`,
 `reopened`, `native-contracts` and compiled runtime directories. `families.json`
 includes the existing primary, LOD and all eight state IDs explicitly; the
 existing catalog computes shared material/texture/collision closure.
+For a scoped retry, call the script from PowerShell with, for example,
+`-Family @('smelter','electronics_plant')` and a fresh output root. Subset reports
+leave the combined typed comparison pending. Collect the completed family
+directories under one artifacts root and run the three typed comparisons with
+`FORGELINE_INDUSTRIAL_BLENDER_ROOT` pointing to that root before claiming all
+families qualified. Preserve failed roots and original launcher/compiler logs.
 Instance scales follow the game footprints in engine X/Y/Z order:
 Extractor 12/8/12, Smelter 18/10/16, Electronics Plant 18/10/18.
 The 37-degree instance and translation exercise the existing socket transform

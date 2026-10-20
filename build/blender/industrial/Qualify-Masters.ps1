@@ -2,6 +2,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$OutputRoot,
+    [ValidateSet('extractor','smelter','electronics_plant')][string[]]$Family = @('extractor','smelter','electronics_plant'),
     [string]$BlenderPath,
     [ValidateRange(1,86400)][int]$TimeoutSeconds = 480
 )
@@ -24,12 +25,12 @@ function Tree([string]$Path) {
 }
 $before = Tree (Join-Path $repo 'assets/source')
 $reports = @()
-foreach ($family in $contract.families) {
-    $name = $family.root.Substring('building.directorate.'.Length)
+foreach ($familyContract in @($contract.families | Where-Object { $_.root.Substring('building.directorate.'.Length) -in $Family })) {
+    $name = $familyContract.root.Substring('building.directorate.'.Length)
     $directory = Join-Path $root $name
     New-Item -ItemType Directory -Path $directory | Out-Null
     $fixture = Join-Path $directory 'family.json'
-    @{ schemaVersion = 1; families = @($family) } | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $fixture -Encoding utf8NoBOM
+    @{ schemaVersion = 1; families = @($familyContract) } | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $fixture -Encoding utf8NoBOM
     $roundTrip = Join-Path $repo 'tools/blender/Invoke-BlenderRoundTrip.ps1'
     foreach ($variant in @('first','second')) {
         & $roundTrip -OutputRoot (Join-Path $directory $variant) -FixtureContract $fixture -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
@@ -64,19 +65,23 @@ foreach ($family in $contract.families) {
     }
 }
 if (Compare-Object $before (Tree (Join-Path $repo 'assets/source'))) { throw 'Production source tree changed.' }
-$previousIndustrialRoot = $env:FORGELINE_INDUSTRIAL_BLENDER_ROOT
-try {
-    $env:FORGELINE_INDUSTRIAL_BLENDER_ROOT = $root
-    & dotnet test --project $tests --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests 2>&1 | Out-File -LiteralPath (Join-Path $root 'typed-runtime.log') -Encoding utf8NoBOM
-    if ($LASTEXITCODE -ne 0) { throw 'Typed compiled geometry/material/socket/state/LOD comparison failed.' }
+$typedStatus = 'pending-family-subset'
+if ($reports.Count -eq 3) {
+    $previousIndustrialRoot = $env:FORGELINE_INDUSTRIAL_BLENDER_ROOT
+    try {
+        $env:FORGELINE_INDUSTRIAL_BLENDER_ROOT = $root
+        & dotnet test --project $tests --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests 2>&1 | Out-File -LiteralPath (Join-Path $root 'typed-runtime.log') -Encoding utf8NoBOM
+        if ($LASTEXITCODE -ne 0) { throw 'Typed compiled geometry/material/socket/state/LOD comparison failed.' }
+        $typedStatus = 'passed'
+    }
+    finally { $env:FORGELINE_INDUSTRIAL_BLENDER_ROOT = $previousIndustrialRoot }
 }
-finally { $env:FORGELINE_INDUSTRIAL_BLENDER_ROOT = $previousIndustrialRoot }
 @{
     schemaVersion = 1
     sourceSha = (& git -C $repo rev-parse HEAD)
     families = $reports
     productionSourceUnchanged = $true
-    typedCompiledContracts = 'passed'
+    typedCompiledContracts = $typedStatus
     productionPromotion = 'blocked-render-qualification'
     nativeRenderer = 'pending'
     liveLogisticsAndRotations = 'pending'
