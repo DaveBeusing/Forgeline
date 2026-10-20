@@ -1,0 +1,53 @@
+{
+  "repository": "DaveBeusing/Forgeline",
+  "prNumber": 267,
+  "runId": 39490676772,
+  "jobId": 118862700932,
+  "runAttempt": 1,
+  "headSha": "1d658d51522bf510a9f0e54ef1dce0fbd46d1e24",
+  "conclusion": "failure",
+  "runUpdatedAtUtc": "2026-10-20T20:22:12Z",
+  "failureReportedAtUtc": "2026-10-20T20:22:03.4055187Z",
+  "persistedAtUtc": "2026-10-20T20:23:35.122Z",
+  "runUrl": "https://github.com/DaveBeusing/Forgeline/actions/runs/39490676772",
+  "jobUrl": "https://github.com/DaveBeusing/Forgeline/actions/runs/39490676772/job/118862700932",
+  "rawLogEndpoint": "https://api.github.com/repos/DaveBeusing/Forgeline/actions/jobs/118862700932/logs",
+  "failedStep": {
+    "number": 25,
+    "name": "UI audio reliability and industrial source contracts",
+    "conclusion": "failure"
+  },
+  "failingTest": "ForgeLine.Client.Tests.UiInteractionFeedbackTests.WarmCopiedFeedbackRetainsZeroAllocation",
+  "assertion": "Assert.Equal() Failure: Values differ",
+  "expected": 0,
+  "actual": 3008,
+  "testSource": "tests/ForgeLine.Client.Tests/UiInteractionFeedbackTests.cs:138",
+  "failureExcerpt": "2026-10-20T20:22:03.4055187Z failed ForgeLine.Client.Tests.UiInteractionFeedbackTests.WarmCopiedFeedbackRetainsZeroAllocation (7ms)\n2026-10-20T20:22:03.4057178Z   from D:\\a\\Forgeline\\Forgeline\\tests\\ForgeLine.Client.Tests\\bin\\Release\\net10.0-windows\\ForgeLine.Client.Tests.dll (net10.0|x64)\n2026-10-20T20:22:03.4058546Z   Assert.Equal() Failure: Values differ\n2026-10-20T20:22:03.4059029Z   Expected: 0\n2026-10-20T20:22:03.4059355Z   Actual:   3008\n2026-10-20T20:22:03.4066269Z     at ForgeLine.Client.Tests.UiInteractionFeedbackTests.WarmCopiedFeedbackRetainsZeroAllocation() in /_/tests/ForgeLine.Client.Tests/UiInteractionFeedbackTests.cs:138\n2026-10-20T20:22:03.4068168Z     at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)\n2026-10-20T20:22:03.4069172Z     at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)",
+  "filteredClientGroup": {
+    "total": 62,
+    "passed": 59,
+    "failed": 1,
+    "skipped": 2,
+    "durationMilliseconds": 3849,
+    "testExitCode": 2,
+    "stepExitCode": 1
+  },
+  "releaseSolutionBuild": {
+    "passed": true,
+    "warnings": 0,
+    "errors": 0,
+    "elapsed": "00:00:28.17"
+  },
+  "fullTestStep": {
+    "number": 59,
+    "conclusion": "skipped"
+  },
+  "newNativeCompositionCasesResult": "Not executed: full Test step skipped.",
+  "newParticleCasesResult": "Not executed in this main CI run: full Test step skipped.",
+  "artifactsCount": 0,
+  "acquisition": "Single GitHub job-log response, persisted as UTF-8 with its original ANSI sequences and CRLF; the exact failure excerpt is retained here.",
+  "causalAttribution": "Not established; failure is a UI feedback allocation assertion.",
+  "rawLogSha256": "477148ef9ccf321a7979b9f362e864ea3b24ae18ae172b0896a479545df79387",
+  "rawLogBytes": 96277,
+  "rawLogLocation": "GitHub job-log endpoint above; the complete original log is identified by its SHA-256 and byte count."
+}

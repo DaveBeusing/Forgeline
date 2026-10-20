@@ -1,0 +1,247 @@
+{
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "python": "3.12.14",
+  "sourceMapping": "Each build/test record retains exact source-file hashes. Earlier pre-commit runs are retained with their original hashes; final-source-release and final-particle-qualification match source8331e384d1fc7b89c9b40ade7590ce9a5ed6f99a. Warmed ordering JSON also records actual assembly fingerprints. Later master reconciliation preserves these owned source blobs without relabeling measurements.",
+  "pathNormalization": "Only the absolute validation-root prefix was replaced; original and retained hashes below.",
+  "files": [
+    {
+      "path": "release-solution.json",
+      "originalSha256": "99ce31cdc556f5a1bc2172443eba84e5c3764fe21a5fafc3d8962f0f43711cc3",
+      "retainedSha256": "665839cf662655344bce0397fa50e7fd102bb3e4c0af5ed9556f1a3f219939bc",
+      "bytes": 2022,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "release-solution.log",
+      "originalSha256": "79ab571d4db706bd3b0458d4c4869329a5acb5a9067bce57e7ac33ea76821f1c",
+      "retainedSha256": "3a3bc19c58f1ace4c31ab076d58a44ecd466fa81ef330134b0eee6f74494d53c",
+      "bytes": 5629,
+      "normalizationOccurrences": 43
+    },
+    {
+      "path": "presentation-release.json",
+      "originalSha256": "c33eb976dd2f322c0e3d04933402a578abce21ec1f9f75f98bd3d61f8f0040f5",
+      "retainedSha256": "befd18c682fbf23ab29e7a37f4bb017ae8e45b91c76adbf054d787b0efeda53e",
+      "bytes": 2079,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "presentation-release.log",
+      "originalSha256": "bdd46dbc42fd4b441e0c886e6a8dab4687d26bb2d61a48fe91a76083c03a1ea0",
+      "retainedSha256": "09902dee76744c1c4f8cc372ca92caa7077d0e7c7e22e4fc7aa902659ba4aba4",
+      "bytes": 2342,
+      "normalizationOccurrences": 19
+    },
+    {
+      "path": "existing-presentation-regressions.json",
+      "originalSha256": "e87ee5269a7669557899aa824d9f318dbc67727ec2b9e629937cf461bb4bbb85",
+      "retainedSha256": "c1863f166896d6f902a5a09cabff9be9ff5657dc3825023c000267bc51980f30",
+      "bytes": 2268,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "existing-presentation-regressions.log",
+      "originalSha256": "333782725ba115bc72402421744938c0dcef4ebfc09d3845b67f7d3e7bff951a",
+      "retainedSha256": "e095e1963c50ac7f91648abd1a58fa8e459bf6273de64319a59e29e78ac99472",
+      "bytes": 22107,
+      "normalizationOccurrences": 68
+    },
+    {
+      "path": "owned-particle-regressions.json",
+      "originalSha256": "0ab7bd73754f39c16e8a73bfe40847f76554881e3c703302250817682eb11546",
+      "retainedSha256": "e59404a2706208e37f1d09954a5929927c54515a5b10f78f36400804050abd4b",
+      "bytes": 2242,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "owned-particle-regressions.log",
+      "originalSha256": "d85e210d252ec9d080034f96b1378b26dbf3ccbb5de8685233c13e7cd452761b",
+      "retainedSha256": "2aa28b34578e600c224ae3c706248a168e99e2e3c1975e8b1a4b5b948a456a54",
+      "bytes": 414,
+      "normalizationOccurrences": 2
+    },
+    {
+      "path": "committed-ordering-build.json",
+      "originalSha256": "005b236cee83b24b2730cd29392328e028c2b83177b15164133bb8caa71c022b",
+      "retainedSha256": "c91515ccb23cedd6a2a1a4584fcaa2906887c594de4ae47f2aec3d2fd1750883",
+      "bytes": 2079,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "committed-ordering-build.log",
+      "originalSha256": "e0a1259b1de714c58045370446a429a90384cd776c872c6324bdd17bbd23d152",
+      "retainedSha256": "17f4e4085b7ecccd3d2dbaf6570e54cb570ad9759b1d81105604500c56b71e7a",
+      "bytes": 2342,
+      "normalizationOccurrences": 19
+    },
+    {
+      "path": "particle-ordering-run.json",
+      "originalSha256": "70ae1cdaadb439a44845c45102adb26ecb215888a2fde494091def5701235d34",
+      "retainedSha256": "7eebd71b8e42ac3edecd46a20f42a1bdccad782f2205793a3f14c3235d7ee100",
+      "bytes": 2363,
+      "normalizationOccurrences": 2
+    },
+    {
+      "path": "particle-ordering-run.log",
+      "originalSha256": "45823bfe9abb1be52ad448e831ba1b9a3383d07032add26abbd3f8e3a43acc20",
+      "retainedSha256": "2e57afc20a78d4e7dd14dcc0ef39ffd11be8659f41b2ebe54ccba2a656cc3224",
+      "bytes": 412,
+      "normalizationOccurrences": 2
+    },
+    {
+      "path": "final-source-release.json",
+      "originalSha256": "4946ebf2b017ebcf0ff4470773206ddbdfe7e0e900f76127a1e1f70e920fa831",
+      "retainedSha256": "9c2267b7c065002d3518fa04c626bee9c95a72f85f5dd80809763320ba0256d5",
+      "bytes": 2023,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "final-source-release.log",
+      "originalSha256": "2c42cd9683a4c87cd50eaefa7fca56761c5444f71a3bb765b97e98dbe2496cbe",
+      "retainedSha256": "550e1f762238df2d71d6cc0f2a2c2b7972a403bf602533021ed3efaa043dbb83",
+      "bytes": 5629,
+      "normalizationOccurrences": 43
+    },
+    {
+      "path": "final-particle-qualification.json",
+      "originalSha256": "cbbc1b17c22ff96c47e13c3cfe7532ea1d6738d0392c6445f5c068d93d529b53",
+      "retainedSha256": "0d24b8a06888a98e35a3f89b2d3ff22f73553619af0bcc20b71d5549d21cc6ad",
+      "bytes": 2532,
+      "normalizationOccurrences": 2
+    },
+    {
+      "path": "final-particle-qualification.log",
+      "originalSha256": "df968d96bee825ce55266d25fe60e8a17e7403e0f21641d8a84c32b14472431c",
+      "retainedSha256": "0da5b88f6fdc7a752c3f647617f1dbb3348625119488cfd3f2a2f17be90c0720",
+      "bytes": 414,
+      "normalizationOccurrences": 2
+    },
+    {
+      "path": "project-references.json",
+      "originalSha256": "81c5b4a970af95c9f7e3bf51f2231631cbe7774a31844dfb1dbb1f414df898bc",
+      "retainedSha256": "de845238f00c72eea1d5be5b4685ab9e57b8560b921ff435c343a2f6fc83bee5",
+      "bytes": 1927,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "project-references.log",
+      "originalSha256": "41b4e08f24646b7a76c04b419c841cc0559ded50da5e3cd81e0e456634384c35",
+      "retainedSha256": "41b4e08f24646b7a76c04b419c841cc0559ded50da5e3cd81e0e456634384c35",
+      "bytes": 94,
+      "normalizationOccurrences": 0
+    },
+    {
+      "path": "ownership.json",
+      "originalSha256": "0a958e97b309e764fd09e829e03735f3f7803c1a66f20b9b55d2fd3e8f061dfe",
+      "retainedSha256": "7bf5d278b4643e49b9ef8511bdb0b0277851e388577e9b42b8cbd5173833d579",
+      "bytes": 2002,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "ownership.log",
+      "originalSha256": "8f7fbc9a74ea682b1ab8c7bf0013cb3647b9cad1702708acdf71ba7e4263fc45",
+      "retainedSha256": "8f7fbc9a74ea682b1ab8c7bf0013cb3647b9cad1702708acdf71ba7e4263fc45",
+      "bytes": 243,
+      "normalizationOccurrences": 0
+    },
+    {
+      "path": "ownership-paths.txt",
+      "originalSha256": "2f46c1f0e8c8d6155c64c0321a4caac28a7124cdb3713bb0def4ffd6c1067416",
+      "retainedSha256": "2f46c1f0e8c8d6155c64c0321a4caac28a7124cdb3713bb0def4ffd6c1067416",
+      "bytes": 2548,
+      "normalizationOccurrences": 0
+    },
+    {
+      "path": "current-master-release.json",
+      "originalSha256": "65b61e75c0168a5c4793e78a8fa7b3d419f89be9a78767aa881e332a673d0638",
+      "retainedSha256": "ffe197dadfbf81d3e3f02c26cd2236a5f78e81392b3681884aff649fe9d7c7d9",
+      "bytes": 2022,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "current-master-release.log",
+      "originalSha256": "bed8cc2784d30d0a61728394f9f632c55dd97c8153a20a5d3a76e27231ae3ed6",
+      "retainedSha256": "234af4bfaf088d1dbd06bdaaf207d8733a76bfc92f7eda21109753c749ef0a00",
+      "bytes": 5629,
+      "normalizationOccurrences": 43
+    },
+    {
+      "path": "current-master-particle-regressions.json",
+      "originalSha256": "c111c65e4fed5a0bb691dd4e30702c94e2ebb3b173d2d34462fdb09eba274c85",
+      "retainedSha256": "cfb43c07cdf5a5982bcde5c866abe6b01be204d954b6d169c8e48acbeea847ed",
+      "bytes": 2242,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "current-master-particle-regressions.log",
+      "originalSha256": "5b2cbd0a0c0176bbc72672043e9e81f39c84200def86228fd51095fb64847b8c",
+      "retainedSha256": "86b06fc0f62273c054ee317e0b040cc5cabe064a8626f56f5915b7c462d039b1",
+      "bytes": 414,
+      "normalizationOccurrences": 2
+    },
+    {
+      "path": "native-fixture-guards-build.json",
+      "originalSha256": "586c9a75896acddf1c807ba1f16383298c2e395ef1ca19ebdb48b66c38775156",
+      "retainedSha256": "c5c8c9988a168b2440fb14272d828b382bcedc5562e6df88d75173147926db1e",
+      "bytes": 2071,
+      "normalizationOccurrences": 1
+    },
+    {
+      "path": "native-fixture-guards-build.log",
+      "originalSha256": "2e52f5966c32dba4e4c9ec969e9edf0d5917e4793cdf934dbee380febca6832d",
+      "retainedSha256": "8254aa7649bc03aeb806f8f42541ec5b0da312c7a6e7c49be3a667f422ae15b0",
+      "bytes": 604,
+      "normalizationOccurrences": 4
+    }
+  ],
+  "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+  "measuredSources": {
+    "initialOrdering": "68d62dbe8d788bb4e29516a69655e74b2ccdd2f8",
+    "warmedOrdering": "8331e384d1fc7b89c9b40ade7590ce9a5ed6f99a"
+  },
+  "initialBenchmarkAssemblySha256": "3c78eaf5b17c1e7d5e8c8bd33c70a138c4c10523991c13d5ee7d696d2652641a",
+  "sourceReconciliation": {
+    "currentMaster": "e42ae48346bbb1331b7a548a72fc0905ae6d184a",
+    "mergeCommit": "e121263ababc9d2f51ee38ac507fc6da34fdeaef",
+    "releaseRecord": "current-master-release.json",
+    "regressionRecord": "current-master-particle-regressions.json",
+    "ownedSourceChangesFromMeasured8331": "none"
+  },
+  "runtimeAssetFingerprint": null,
+  "runtimeAssetsUsed": false,
+  "assetApplicability": "Synthetic CPU and static compiler qualification load no runtime assets. Native source-less captures and their asset identity remain open.",
+  "ciObservations": [
+    {
+      "path": "pr267-initial-ci.json",
+      "sha256": "6dc1ea9f5190150fc9dd0adbe0e98ee2e864107a40bdb5d442497a187ba1a0c8",
+      "sourceHead": "1d658d51522bf510a9f0e54ef1dce0fbd46d1e24",
+      "runId": 39490676772,
+      "jobId": 118862700932
+    },
+    {
+      "path": "pr267-windows-ci.json",
+      "sha256": "5487e1d9f7069c727df1c297fd4049b41b367fc2b27a66d321b6a6f8db06fbc4",
+      "sourceHead": "7a42e0c4299bc0a822edd5bffb3e4c7309bbe547",
+      "testedMergeCommit": "c2c71150760828b25561a215ae14708bdb98876c",
+      "runId": 39491919890,
+      "jobId": 118867002375
+    }
+  ],
+  "postCommitFixtureReview": {
+    "sourceHeadBeforeFix": "1d658d51522bf510a9f0e54ef1dce0fbd46d1e24",
+    "buildRecord": "native-fixture-guards-build.json",
+    "productionSourceChanged": false,
+    "nativeExecution": "Full Windows Test failed at head 7a42e0c; individual case outcomes unavailable. See pr267-windows-ci.json.",
+    "change": "Guard atmosphere-camera submission in two native test capture helpers when atmosphere is disabled."
+  },
+  "latestOwnership": {
+    "checkedUtc": "2026-10-20T20:25:53.240997+00:00",
+    "pathFile": "ownership-fixture-paths.txt",
+    "pathCount": 57,
+    "pathSha256": "e7c434adf73c401fd5662ff678dae4e3b861ad9a7f249fca2528366d346b5c1a",
+    "exitCode": 0,
+    "output": "VALID: 10 workstreams, 8 mutually disjoint parallel lanes; dependency graph valid.\nVALID: 57 changed paths belong to SceneCompositionAndParticleEfficiency.\nThis is a path/dependency check, not a semantic, runtime, or merge-approval guarantee.",
+    "versionException": "Directory.Build.props, separately validated as exactly master PATCH plus one."
+  }
+}
