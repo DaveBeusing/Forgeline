@@ -28,7 +28,7 @@ def main() -> None:
         if path.is_file() and (path.name.startswith("gpu-lifecycle-") or path.name.startswith("run-gpu-lifecycle-")):
             if path.suffix in TEXT_SUFFIXES and path.name != "gpu-lifecycle-pr-body.txt":
                 selected.append(path)
-        elif path.is_dir() and path.name.startswith("gpu-lifecycle-") and ("-native-" in path.name or "-upload-" in path.name or path.name == "gpu-lifecycle-probe-validation"):
+        elif path.is_dir() and path.name.startswith("gpu-lifecycle-") and ("-native-" in path.name or path.name.endswith("-native") or "-upload-" in path.name or path.name == "gpu-lifecycle-probe-validation"):
             selected.extend(p for p in path.iterdir() if p.is_file() and (p.suffix in TEXT_SUFFIXES or p.suffix == ".png"))
     records = []
     for source in sorted(set(selected)):

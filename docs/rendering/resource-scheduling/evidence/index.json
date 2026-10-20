@@ -263,6 +263,86 @@
       "storedSha256": "5676276504839af86a0abf154cffe2dbcf554d349909b3ae87a7073131f686b8"
     },
     {
+      "source": "artifacts/gpu-lifecycle-ci-repair-native/comparison.json",
+      "originalBytes": 3327,
+      "originalSha256": "7cec95e39b79dd5589132849b2b230fd3a417cbed044b5426dc8640fe3f8a890",
+      "retainedBytes": 3327,
+      "retainedSha256": "7cec95e39b79dd5589132849b2b230fd3a417cbed044b5426dc8640fe3f8a890",
+      "redacted": false,
+      "object": "objects/7cec95e39b79dd5589132849b2b230fd3a417cbed044b5426dc8640fe3f8a890.gz",
+      "storedSha256": "cfdf1613700d2a8c63dfc6fe9de7548fb3f531b1791d3bbb4fe30d4a9faa7f13"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ci-repair-native/IndustrialBase-1920x1080-High-CloseTactical.png",
+      "originalBytes": 4500953,
+      "originalSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "retainedBytes": 4500953,
+      "retainedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "redacted": false,
+      "object": "objects/555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f.png",
+      "storedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ci-repair-native/IndustrialBase-1920x1080-High-NormalGameplay.png",
+      "originalBytes": 4873619,
+      "originalSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "retainedBytes": 4873619,
+      "retainedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "redacted": false,
+      "object": "objects/54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c.png",
+      "storedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ci-repair-native/IndustrialBase-1920x1080-High-Strategic.png",
+      "originalBytes": 4722585,
+      "originalSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "retainedBytes": 4722585,
+      "retainedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "redacted": false,
+      "object": "objects/0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264.png",
+      "storedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ci-repair-native/MainBattleTankProduction-1920x1080-High-CloseTactical.png",
+      "originalBytes": 4464188,
+      "originalSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "retainedBytes": 4464188,
+      "retainedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "redacted": false,
+      "object": "objects/c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320.png",
+      "storedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ci-repair-native/MainBattleTankProduction-1920x1080-High-NormalGameplay.png",
+      "originalBytes": 4856289,
+      "originalSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "retainedBytes": 4856289,
+      "retainedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "redacted": false,
+      "object": "objects/f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0.png",
+      "storedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ci-repair-native/MainBattleTankProduction-1920x1080-High-Strategic.png",
+      "originalBytes": 4714892,
+      "originalSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "retainedBytes": 4714892,
+      "retainedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "redacted": false,
+      "object": "objects/573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a.png",
+      "storedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a"
+    },
+    {
+      "source": "artifacts/gpu-lifecycle-ci-repair-native/manifest.json",
+      "originalBytes": 18889544,
+      "originalSha256": "b0a28671cbf5f405b3bef37e43e369e7901dca834733370ccd2a0e1f4ecafa3e",
+      "retainedBytes": 18889544,
+      "retainedSha256": "b0a28671cbf5f405b3bef37e43e369e7901dca834733370ccd2a0e1f4ecafa3e",
+      "redacted": false,
+      "object": "objects/b0a28671cbf5f405b3bef37e43e369e7901dca834733370ccd2a0e1f4ecafa3e.gz",
+      "storedSha256": "6c885d436374bab556e20300bc15c643e134868d38e31257143c947b98e8032d"
+    },
+    {
       "source": "artifacts/gpu-lifecycle-ci-repair-native.log",
       "originalBytes": 0,
       "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
