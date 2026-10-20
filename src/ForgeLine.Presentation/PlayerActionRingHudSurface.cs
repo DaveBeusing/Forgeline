@@ -330,6 +330,13 @@ internal sealed partial class PlayerActionRingHudRenderer : IDisposable
             }
         }
 
+        public void Append(ulong value)
+        {
+            if (value.TryFormat(_buffer[_length..], out int written,
+                provider: CultureInfo.InvariantCulture))
+                _length += written;
+        }
+
         public void Append(
             double value,
             string format)

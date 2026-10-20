@@ -181,8 +181,16 @@ public sealed partial class PlayerActionPanelController
         }
         else
         {
+            bool readonlyOrder = Mode == PlayerActionPanelMode.Logistics &&
+                actions?.Logistics is { } logistics && SelectedIndex >= logistics.OrderStartIndex;
             for (int i = 0; i < 6; i++)
             {
+                if (readonlyOrder)
+                {
+                    slots[i] = new(new(PlayerActionDockControlKind.Page, Mode, SelectedIndex),
+                        ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions), Enabled: false);
+                    continue;
+                }
                 var kind = PlayerActionDockInteractionLayout.FooterControl(i);
                 slots[i] = new(new(kind, Mode, SelectedIndex), ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions),
                     Present: PlayerActionDockHudModel.ResolveFooterLabel(kind, Mode).Length > 0);
@@ -295,7 +303,8 @@ public sealed partial class PlayerActionPanelController
             case ActionRingNavigation.Parameters: _ringLevel = ActionRingLevel.Parameters; _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions); break;
             case ActionRingNavigation.NextItem:
                 if (count > 0) { SelectedIndex = (SelectedIndex + 1) % count; _ringPage = SelectedIndex / 4;
-                    _stockResourceId = ResourceId.None; _desiredStockQuantity = 0; SynchronizeStockEditor(actions); SynchronizeSupplyEditor(actions);
+                    _stockResourceId = ResourceId.None; _desiredStockQuantity = 0; _logisticsSteps = 1;
+                    SynchronizeStockEditor(actions); SynchronizeSupplyEditor(actions);
                     _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions); }
                 break;
             default:

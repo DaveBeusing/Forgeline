@@ -689,6 +689,50 @@ public sealed class PlayerActionPanelTests
         Assert.Equal(policyEntity, remove.RequestEntity);
     }
 
+    [Fact]
+    public void LogisticsFiftyUnitControlsPreserveLegacyPoliciesAndNeverDispatchFromOrderRows()
+    {
+        var policy = new PlayerStockPolicyActionReadModel(new(71, 1), ResourceIds.Fuel, "Fuel",
+            10, 0, 75, 175, LogisticsStockPriority.Normal, true,
+            PlayerDistributionActionState.Pending, default, default, default);
+        var order = new PlayerLogisticsOrderReadModel(new(99), ResourceIds.Fuel, "Fuel",
+            LogisticsTransportRequestState.RetryPending, LogisticsTransportRequestFailureReason.NoTruckAvailable,
+            LogisticsBottleneckReason.InsufficientTruckCapacity, 75, 0, default, default, default, "", "");
+        var logistics = new PlayerLogisticsActionReadModel(new(70, 1), [policy], null, 300, orders: [order])
+            { TotalOrderCount = 1 };
+        var snapshot = CreateSnapshot(logistics: logistics);
+        var input = new InputState();
+        var controller = new PlayerActionPanelController();
+        controller.Update(input, snapshot, 1600, 900);
+
+        void Key(PlatformKey key)
+        {
+            Press(input, key); controller.Update(input, snapshot, 1600, 900);
+            Release(input, key); controller.Update(input, snapshot, 1600, 900);
+        }
+
+        Key(PlatformKey.L);
+        var unchanged = controller.CreateView(1600, 900, snapshot.PlayerActions);
+        Assert.Equal(0, unchanged.StockMinimum);
+        Assert.Equal(75, unchanged.StockTarget);
+        Assert.Equal(175, unchanged.StockMaximum);
+        Key(PlatformKey.Right);
+        var raised = controller.CreateView(1600, 900, snapshot.PlayerActions);
+        Assert.Equal(100, raised.StockTarget);
+        Assert.Equal(0, raised.StockMinimum);
+        Assert.Equal(175, raised.StockMaximum);
+        Key(PlatformKey.Left);
+        Assert.Equal(50, controller.CreateView(1600, 900, snapshot.PlayerActions).StockTarget);
+        Key(PlatformKey.Tab);
+        Assert.Equal(1, controller.SelectedIndex);
+        Key(PlatformKey.Right);
+        Key(PlatformKey.Enter);
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.Equal(75, logistics.Policies[0].DesiredTarget);
+        Assert.Equal(0, logistics.Policies[0].DesiredMinimum);
+        Assert.Equal(175, logistics.Policies[0].DesiredMaximum);
+    }
+
     [Theory]
     [InlineData("missing-actions")]
     [InlineData("missing-supply")]

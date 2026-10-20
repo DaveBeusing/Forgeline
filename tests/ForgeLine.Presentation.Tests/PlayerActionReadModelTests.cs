@@ -319,6 +319,45 @@ public sealed class PlayerActionReadModelTests
     }
 
     [Fact]
+    public void ActiveDistributionRequestsAreCopiedOnlyForTheCurrentOwnedSelection()
+    {
+        using MatchRuntime scenario = CreateScenario(5304);
+        var buffer = RegisterExtraction(scenario, out PresentationInteractionState interaction, out _);
+        var side = scenario.GetBase(new ForgeLine.Game.PlayerId(1));
+        double stock = scenario.Inventories.GetQuantity(side.StartingInventory, ResourceIds.Fuel);
+        EntityId policyEntity = scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(policyEntity,
+            new LogisticsStockPolicy(side.CommandCore, ResourceIds.Fuel,
+                stock + 50, stock + 100, stock + 150));
+
+        interaction.SetSelection([side.CommandCore]);
+        for (int i = 0; i < 3; i++) scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out PresentationSnapshot snapshot));
+
+        var logistics = Assert.IsType<PlayerLogisticsActionReadModel>(snapshot.PlayerActions?.Logistics);
+        var observed = scenario.AutomatedDistribution.LastDebugSnapshot;
+        Assert.Equal(snapshot.Tick, observed.Tick);
+        var live = observed.Requests.Where(r => r.PolicyEntity == policyEntity &&
+            r.State != LogisticsTransportRequestState.Completed).ToArray();
+        Assert.NotEmpty(live);
+        Assert.Equal(live.Length, logistics.TotalOrderCount);
+        Assert.Equal(live.Length, logistics.Orders.Count);
+        foreach (var order in logistics.Orders)
+        {
+            var authoritative = Assert.Single(live, r => r.RequestId == order.RequestId);
+            Assert.Equal(authoritative.RequestedQuantity, order.RequestedQuantity);
+            Assert.Equal(authoritative.State, order.State);
+            Assert.Equal(ResourceIds.Fuel, order.ResourceId);
+            Assert.Equal(side.CommandCore, order.Destination);
+        }
+
+        interaction.SetSelection([scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out snapshot));
+        Assert.Null(snapshot.PlayerActions?.Logistics);
+    }
+
+    [Fact]
     public void LogisticsAndSupplyActionsExposeOwnedAuthoritativeState()
     {
         using MatchRuntime scenario =

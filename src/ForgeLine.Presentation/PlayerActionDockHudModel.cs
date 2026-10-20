@@ -43,6 +43,8 @@ internal static class PlayerActionDockHudModel
 
     public static string ResolveRingItemTitle(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions, bool compact)
     {
+        if (mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } logistics &&
+            index >= logistics.OrderStartIndex && index < logistics.ItemCount) return "ORDER";
         if (mode != PlayerActionPanelMode.Tactical) return ResolveItemTitle(mode,index,actions);
         return index switch
         {
@@ -287,11 +289,12 @@ internal static class PlayerActionDockHudModel
                     : string.Empty;
 
             case PlayerActionPanelMode.Logistics:
-                return actions.Logistics is
-                           PlayerLogisticsActionReadModel logistics &&
+                return actions.Logistics is PlayerLogisticsActionReadModel logistics &&
                        index < logistics.ItemCount
                     ? index < logistics.Policies.Count ? logistics.Policies[index].DisplayName
-                        : logistics.Requirements[index - logistics.Policies.Count].Title
+                        : index < logistics.OrderStartIndex
+                            ? logistics.Requirements[index - logistics.Policies.Count].Title
+                            : logistics.Orders[index - logistics.OrderStartIndex].ResourceName
                     : string.Empty;
 
             case PlayerActionPanelMode.Supply:
@@ -429,12 +432,11 @@ internal static class PlayerActionDockHudModel
                         "UNAVAILABLE");
 
             case PlayerActionPanelMode.Logistics:
-                return actions.Logistics is
-                           PlayerLogisticsActionReadModel logistics &&
+                return actions.Logistics is PlayerLogisticsActionReadModel logistics &&
                        index < logistics.ItemCount
-                    ? PlayerActionDockItemState.Enabled
-                    : PlayerActionDockItemState.Disabled(
-                        "SELECT LOGISTICS");
+                    ? index < logistics.OrderStartIndex ? PlayerActionDockItemState.Enabled :
+                        PlayerActionDockItemState.Disabled("READ ONLY")
+                    : PlayerActionDockItemState.Disabled("SELECT LOGISTICS");
 
             case PlayerActionPanelMode.Supply:
                 if (actions.Supply is { IsStaticProvider: true }) return PlayerActionDockItemState.Disabled("USE LOGISTICS FOR STOCK");
@@ -491,6 +493,8 @@ internal static class PlayerActionDockHudModel
         actions is not null && actions.PendingCommandCount == 0 &&
         !(panel.ContextualPending && panel.ContextualActivationTick == actions.Tick &&
           panel.ContextualSessionId == actions.SessionId) &&
+        !(mode == PlayerActionPanelMode.Logistics && actions.Logistics is { } orders &&
+          index >= orders.OrderStartIndex) &&
         control switch
         {
             PlayerActionDockControlKind.Activate =>
@@ -530,6 +534,7 @@ internal static class PlayerActionDockHudModel
                 index - production.Recipes.Count < production.Requests.Count =>
                 production.Requests[index - production.Recipes.Count].Paused ? "RESUME" : "PAUSE",
             PlayerActionPanelMode.Production or PlayerActionPanelMode.UnitProduction => "QUEUE",
+            PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.OrderStartIndex => "VIEW ORDER",
             PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.Policies.Count => "USE INPUTS",
             PlayerActionPanelMode.Logistics => "APPLY POLICY",
             PlayerActionPanelMode.Supply => index < 2 ? "APPLY AUTO" : "REQUEST SUPPLY",
@@ -656,7 +661,7 @@ internal static class PlayerActionDockHudModel
             actions.Logistics is
                 PlayerLogisticsActionReadModel logistics)
         {
-            return index < logistics.ItemCount;
+            return index < logistics.OrderStartIndex;
         }
 
         return mode ==

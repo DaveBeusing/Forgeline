@@ -299,6 +299,7 @@ public sealed partial class PlayerActionPanelController
                     itemCount;
                 _desiredStockQuantity = 0.0;
                 _stockResourceId = ResourceId.None;
+                _logisticsSteps = 1;
                 _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions);
                 if (_ringContext) { _ringPage = SelectedIndex / 4; _ringRevision++; _presentedRing = default; }
             }
@@ -315,6 +316,7 @@ public sealed partial class PlayerActionPanelController
             SelectedIndex = Math.Clamp(SelectedIndex + (input.WheelDelta > 0 ? -capacity : capacity), 0, itemCount - 1);
             _desiredStockQuantity = 0.0;
             _stockResourceId = ResourceId.None;
+            _logisticsSteps = 1;
             if (_ringContext) { _ringPage = SelectedIndex / 4; _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions); _ringRevision++; _presentedRing = default; }
         }
         SynchronizeStockEditor(actions);
@@ -674,6 +676,7 @@ public sealed partial class PlayerActionPanelController
         {
             return;
         }
+        if (SelectedIndex >= logistics.OrderStartIndex) return;
         if (SelectedIndex >= logistics.Policies.Count)
         {
             var requirement = logistics.Requirements[SelectedIndex - logistics.Policies.Count];
@@ -1041,6 +1044,7 @@ public sealed partial class PlayerActionPanelController
 
             case PlayerActionDockControlKind.Page:
             case PlayerActionDockControlKind.Item:
+                if (SelectedIndex != hit.ItemIndex) _logisticsSteps = 1;
                 SelectedIndex =
                     hit.ItemIndex;
                 _desiredStockQuantity = 0.0;
@@ -1146,6 +1150,8 @@ public sealed partial class PlayerActionPanelController
     private void CyclePrimarySetting(
         PlayerActionSnapshot? actions)
     {
+        if (Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } orders &&
+            SelectedIndex >= orders.OrderStartIndex) return;
         if (Mode == PlayerActionPanelMode.Supply && actions?.Supply is { IsStaticProvider: true }) return;
         if (Mode is
             PlayerActionPanelMode.Production or
@@ -1205,6 +1211,8 @@ public sealed partial class PlayerActionPanelController
     private void CycleSecondarySetting(
         PlayerActionSnapshot? actions)
     {
+        if (Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } orders &&
+            SelectedIndex >= orders.OrderStartIndex) return;
         if (Mode == PlayerActionPanelMode.Supply && actions?.Supply is { IsStaticProvider: true }) return;
         if (Mode ==
             PlayerActionPanelMode.Production)
@@ -1322,7 +1330,7 @@ public sealed partial class PlayerActionPanelController
         PlayerActionSnapshot? actions,
         int direction)
     {
-        if (actions?.Logistics is { } logistics && SelectedIndex >= logistics.Policies.Count && SelectedIndex < logistics.ItemCount)
+        if (actions?.Logistics is { } logistics && SelectedIndex >= logistics.Policies.Count && SelectedIndex < logistics.OrderStartIndex)
         { _logisticsSteps = Math.Clamp(_logisticsSteps + direction, 1, 100); return; }
         if (actions?.Logistics is null ||
             SelectedIndex < 0 ||
@@ -1331,46 +1339,28 @@ public sealed partial class PlayerActionPanelController
             return;
         }
 
-        double step =
-            Math.Max(
-                1.0,
-                Math.Ceiling(
-                    _stockTarget *
-                    0.1));
-        double delta =
-            direction *
-            step;
-
+        // Policies retain their exact previous values until the player edits one field.
+        // The three thresholds remain independently editable and always ordered.
         switch (StockThresholdField)
         {
             case PlayerStockThresholdField.Minimum:
-                _stockMinimum =
-                    Math.Clamp(
-                        _stockMinimum + delta,
-                        0.0,
-                        _stockTarget);
+                _stockMinimum = LogisticsQuantityEditor.Adjust(
+                    _stockMinimum, direction, upper: _stockTarget);
                 break;
 
             case PlayerStockThresholdField.Target:
-                _stockTarget =
-                    Math.Max(
-                        1.0,
-                        _stockTarget + delta);
-                _stockMinimum =
-                    Math.Min(
-                        _stockMinimum,
-                        _stockTarget);
-                _stockMaximum =
-                    Math.Max(
-                        _stockMaximum,
-                        _stockTarget);
+                _stockTarget = LogisticsQuantityEditor.Adjust(
+                    _stockTarget, direction, lower: Math.Max(LogisticsQuantityEditor.Minimum, _stockMinimum),
+                    upper: _stockMaximum);
                 break;
 
             case PlayerStockThresholdField.Maximum:
-                _stockMaximum =
-                    Math.Max(
-                        _stockTarget,
-                        _stockMaximum + delta);
+                _stockMaximum = LogisticsQuantityEditor.Adjust(
+                    _stockMaximum, direction, lower: Math.Max(LogisticsQuantityEditor.Minimum, _stockTarget),
+                    upper: actions.Logistics.InventoryCapacity > 0
+                        ? direction > 0 ? actions.Logistics.InventoryCapacity
+                            : Math.Max(_stockMaximum, actions.Logistics.InventoryCapacity)
+                        : double.MaxValue);
                 break;
         }
     }

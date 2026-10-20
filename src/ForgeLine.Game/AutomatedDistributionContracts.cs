@@ -302,6 +302,8 @@ public sealed class AutomatedDistributionDebugSnapshot
 
     public AutomatedDistributionMetrics Metrics { get; }
 
+    public SimulationTick Tick { get; init; }
+
     public IReadOnlyList<LogisticsTransportRequestReadModel> Requests =>
         _requests;
 }
