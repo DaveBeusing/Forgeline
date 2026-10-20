@@ -1,3 +1,4 @@
+using System.Text;
 using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Input;
@@ -12,10 +13,11 @@ public readonly record struct AlertActivation(bool Captured, EntityId Target = d
 
 /// <summary>Presentation-only identity, page and reversible expansion progress. Never grants target authority.</summary>
 public readonly record struct NotificationExpansion(AlertNotification Item, AlertIdentity Identity, ulong Revision,
-    bool Open = false, float Progress = 0, int Page = 0)
+    bool Open = false, float Progress = 0, int Page = 0, string Content = "")
 {
     public bool Matches(in NotificationCardLayout card) =>
-        Open && card.Item == Item && card.Identity == Identity && card.Revision == Revision && card.Item.Hidden == 0;
+        (Open || Progress > 0) && card.Item == Item && card.Identity == Identity &&
+        card.Revision == Revision && card.Item.Hidden == 0;
 }
 
 /// <summary>Navigation only; retains short clicks, rejects lifecycle edges and never emits simulation commands.</summary>
@@ -61,10 +63,12 @@ public sealed class ActionableAlertController
         if (blocked || input.FocusLostThisFrame || snapshot?.PlayerExperience is not { IsMatchComplete: false } experience)
         { _pending = false; _expansionPosition = _expansion.Open ? 1 : 0; return default; }
         var plain = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback);
-        if (_expansion.Open && !HasExpandedCard(plain)) _expansion = default;
+        if ((_expansion.Open || _expansionPosition > 0) && !HasExpandedCard(plain))
+        { _expansion = default; _expansionPosition = 0; }
         float requested = _expansion.Open ? 1 : 0;
         _expansionPosition = Math.Clamp(_expansionPosition +
             (float)Math.Max(0, seconds) / .2f * (requested > _expansionPosition ? 1 : -1), 0, 1);
+        if (!_expansion.Open && _expansionPosition == 0) _expansion = default;
         var stack = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback,
             Expansion);
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
@@ -112,9 +116,14 @@ public sealed class ActionableAlertController
         }
         if (!_pressFocus)
         {
-            if (_expansion.Matches(releasedCard)) _expansion = default;
-            else _expansion = new(item, releasedCard.Identity, releasedCard.Revision, true);
-            _expansionPosition = 0;
+            if (_expansion.Open && _expansion.Matches(releasedCard))
+                _expansion = _expansion with { Open = false };
+            else
+            {
+                _expansion = new(item, releasedCard.Identity, releasedCard.Revision, true,
+                    _expansionPosition, 0, BuildDetail(experience, alerts, item, localFeedback));
+                _expansionPosition = 0;
+            }
             return new(true);
         }
         if (item.Kind == PlayerAlertState.None) return new(true, OpenOperations: true, NotificationDetails: true);
@@ -153,8 +162,38 @@ public sealed class ActionableAlertController
     private bool HasExpandedCard(in NotificationStackLayout stack)
     {
         for (int i = 0; i < stack.Count; i++)
-            if (_expansion.Matches(stack.Card(i))) return true;
+            if ((_expansion with { Progress = _expansionPosition }).Matches(stack.Card(i))) return true;
         return false;
+    }
+
+    private static string BuildDetail(in PlayerExperienceSnapshot experience,
+        ActionableAlertSnapshot? alerts, in AlertNotification item, string localFeedback)
+    {
+        Span<char> summary = stackalloc char[2048];
+        var text = new StringBuilder(320);
+        text.AppendLine(NotificationText.Format(experience, alerts, item, summary, localFeedback).ToString());
+        text.Append("SEVERITY: ").AppendLine(NotificationText.Severity(experience, item).ToString().ToUpperInvariant());
+        if (item.Local || item.Feedback)
+        {
+            text.Append("REASON: ").AppendLine(item.Local ? localFeedback : ResourcePowerHudRenderer.ResolveFailureLabel(experience.Feedback));
+            text.Append("TICK: ").AppendLine((item.Feedback ? experience.Feedback.ResolvedAtTick : experience.Tick).Value.ToString());
+            text.AppendLine("FOCUS: N/A");
+            text.AppendLine("NEXT ACTION: OPEN OPERATIONS NOTIFICATIONS");
+            return text.ToString();
+        }
+        ActionableAlert? source = null;
+        if (alerts is not null)
+            for (int i = 0; i < alerts.Alerts.Count; i++)
+                if (alerts.Alerts[i].Identity.Kind == item.Kind) { source = alerts.Alerts[i]; break; }
+        text.Append("REASON: ").AppendLine(source?.Label ?? AlertLifecycleTracker.Label(item.Kind));
+        int affected = item.Kind == PlayerAlertState.SupplyCritical ? experience.CriticalSupplyUnits :
+            item.Kind == PlayerAlertState.ProductionBlocked ? experience.BlockedProductionFacilities : 0;
+        text.Append("AFFECTED: ").AppendLine(affected > 0 ? affected.ToString() : "N/A");
+        text.Append("ONSET TICK: ").AppendLine(source?.Identity.Started.Value.ToString() ?? "N/A");
+        text.Append("FOCUS: ").AppendLine(source is { Target.IsValid: true } ? source.Value.Target.ToString() : "N/A");
+        text.Append("NEXT ACTION: ").AppendLine(source is { Target.IsValid: true } ?
+            "FOCUS AFFECTED ENTITY" : "OPEN OPERATIONS DETAILS");
+        return text.ToString();
     }
 
     private void ResetTransient()
