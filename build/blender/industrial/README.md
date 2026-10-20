@@ -6,6 +6,13 @@ material definitions and texture inputs remain authoritative. This checkpoint
 creates independently editable Blender masters from that existing geometry.
 It does not claim new artwork, newly baked PBR maps or production integration.
 
+The saved sources are `masters/extractor.blend`, `masters/smelter.blend` and
+`masters/electronics_plant.blend`. Each contains its eleven existing family
+meshes plus the shared collision reference. The 33 family GLBs are under
+`exports/`. `SourceBindings.json` maps every export to its original definition,
+ordered material/LOD/socket metadata, input signature and binary SHA-256.
+These files are a staged snapshot; canonical discovery remains unchanged.
+
 ## Audit and promotion boundary
 
 Base: remote `master` `d3acf9b0fb94da75ecfd26173cc387398f317096`, version
