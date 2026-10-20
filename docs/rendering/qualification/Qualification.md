@@ -100,6 +100,46 @@ records and frozen owner paths. A report with one open or failed required gate i
 not accepted. The physical workflow uses `--require-accepted` and retains that
 status even if individual capture commands return success.
 
+## Implementation verification checkpoint
+
+[Draft PR #268](https://github.com/DaveBeusing/Forgeline/pull/268) contains the
+qualification implementation on `testing/render-performance-qualification`.
+The initial implementation source is
+`8458f89af9397c8566e2f898ae8838a0dddee04a`, with the isolated product PATCH
+`0.1.425-dev` against master `e42ae48346bbb1331b7a548a72fc0905ae6d184a`.
+The remote contents of all 15 qualification files at the initial PR head matched
+the reviewed local Git blob identities.
+
+The local Python command
+`python -m unittest discover -s build/rendering/qualification -p 'test_*.py' -q`
+passed 54 tests. The existing ownership checker accepted all 15 dedicated paths;
+the only additional path was the separately inspected one-line PATCH change.
+Workflow YAML parsed successfully. The ten new Client test cases were checked
+against the existing collector signatures and friend-assembly access.
+
+The first [qualification run 39494628556](https://github.com/DaveBeusing/Forgeline/actions/runs/39494628556/job/118876342527)
+passed all 54 Python tests and nine existing ownership tests on Windows. Step 7,
+`PowerShell command journaling and orchestration contracts`, then failed with
+exit 1 because internal asynchronous-copy return values accompanied the command
+journal. The consumer could not obtain `exitCode` from that mixed result.
+Subsequent steps in that job were skipped. The correction suppresses those four
+internal return values and adds single-journal assertions for success, native
+failure, a thrown child error and timeout. This failed attempt remains part of
+the record; it is not rerun without a code change.
+
+The [initial main CI run 39494628176](https://github.com/DaveBeusing/Forgeline/actions/runs/39494628176/job/118876342772)
+passed its version and metadata checks on that exact source. This establishes
+that the proposed PATCH satisfies the PR rule; it does not revise the older
+failed master result. The next verification step is to inspect hosted results
+for the corrected PR head, including PowerShell, Release build, focused renderer
+tests and the complete mandatory CI. The PR's checks and validation section
+record the current source and outcomes; review those actual runs before resuming.
+
+Native admission, thermal observations, full live-client timing, original GPU
+timestamps, complete budgets, the moving lifecycle and human review remain the
+specific outstanding acceptance requirements described above. The status stays
+**implemented, not yet accepted** while any required gate is open or failed.
+
 ## Resume and integration
 
 Read the actual branch commits, PR checks and retained attempt files first.

@@ -230,15 +230,17 @@ function Invoke-QualificationProcess {
         }
         $process.WaitForExit()
         $record.nativeExitCode = $process.ExitCode
-        $outputTask.GetAwaiter().GetResult(); $errorTask.GetAwaiter().GetResult()
+        # Runtime tasks may expose VoidTaskResult through PowerShell's dynamic binder.
+        # Only the completed command journal belongs on the success output stream.
+        [void]$outputTask.GetAwaiter().GetResult(); [void]$errorTask.GetAwaiter().GetResult()
         $record.exitCode = $process.ExitCode
         if ($record.timedOut -or $record.competitionDetected) { $record.exitCode = -1 }
     } catch {
         $record.launchError = $_.Exception.Message
         if ($null -ne $process -and -not $process.HasExited) { $process.Kill($true); $process.WaitForExit() }
         if ($null -ne $process -and $process.HasExited) { $record.nativeExitCode = $process.ExitCode }
-        if ($null -ne $outputTask) { $outputTask.GetAwaiter().GetResult() }
-        if ($null -ne $errorTask) { $errorTask.GetAwaiter().GetResult() }
+        if ($null -ne $outputTask) { [void]$outputTask.GetAwaiter().GetResult() }
+        if ($null -ne $errorTask) { [void]$errorTask.GetAwaiter().GetResult() }
     } finally {
         $watch.Stop(); $record.elapsedMilliseconds = $watch.Elapsed.TotalMilliseconds
         $record.completedAtUtc = [DateTimeOffset]::UtcNow.ToString('o')

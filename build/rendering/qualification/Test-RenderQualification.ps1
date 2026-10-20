@@ -89,6 +89,7 @@ try {
     $literal = 'space " quote ` $() ; unicode-ö'
     $command = Invoke-QualificationProcess -Executable $pwsh -Arguments @('-NoProfile','-File',$child,'-Token',$literal) `
         -WorkingDirectory $testRoot -JournalRoot $testRoot -Id 'failure'
+    Assert-Case ($command -is [Collections.IDictionary]) 'The process wrapper emitted internal task results alongside its command journal.'
     Assert-Case ($command.exitCode -eq 7 -and $command.nativeExitCode -eq 7) 'The actual native failure exit was lost.'
     Assert-Case ([IO.File]::ReadAllText((Join-Path $testRoot 'failure.stdout.log')) -ceq $literal) 'Literal argument data was executed or altered.'
     Assert-Rejected { Assert-QualificationCommand $command } 'A failed native command was accepted.'
@@ -102,16 +103,19 @@ try {
     Write-QualificationJson -Path $parametersPath -Value @{ Names = @('one','two three'); Capture = $true }
     $splat = Invoke-QualificationProcess -Executable $pwsh -Arguments @('-NoProfile','-File', (Join-Path $PSScriptRoot 'Invoke-QualificationChild.ps1'),
         '-Script', $arrayChild, '-ParametersJson', $parametersPath) -WorkingDirectory $testRoot -JournalRoot $testRoot -Id 'splat'
+    Assert-Case ($splat -is [Collections.IDictionary]) 'A successful process returned more than its command journal.'
     Assert-Case ($splat.exitCode -eq 0) 'The wrapper changed string arrays or switch parameters.'
     [IO.File]::WriteAllText($arrayChild, 'param([string[]]$Names,[switch]$Capture) throw "Deliberate script failure"')
     $thrown = Invoke-QualificationProcess -Executable $pwsh -Arguments @('-NoProfile','-File', (Join-Path $PSScriptRoot 'Invoke-QualificationChild.ps1'),
         '-Script', $arrayChild, '-ParametersJson', $parametersPath) -WorkingDirectory $testRoot -JournalRoot $testRoot -Id 'throw'
+    Assert-Case ($thrown -is [Collections.IDictionary]) 'A thrown script failure returned more than its command journal.'
     Assert-Case ($thrown.exitCode -ne 0) 'A thrown PowerShell prerequisite failure returned success.'
 
     $slow = Join-Path $testRoot 'slow-child.ps1'
     [IO.File]::WriteAllText($slow, 'Start-Sleep -Seconds 20; exit 0')
     $timeout = Invoke-QualificationProcess -Executable $pwsh -Arguments @('-NoProfile','-File',$slow) -WorkingDirectory $testRoot `
         -JournalRoot $testRoot -Id 'timeout' -TimeoutSeconds 1
+    Assert-Case ($timeout -is [Collections.IDictionary]) 'A timed-out process returned more than its command journal.'
     Assert-Case ($timeout.timedOut -and $timeout.exitCode -ne 0 -and $null -ne $timeout.nativeExitCode) 'A timed-out native process was accepted or lost its actual exit.'
     Write-Output "PASS: $script:passed qualification orchestration assertions. No physical GPU acceptance is inferred."
 } finally { Remove-Item -LiteralPath $testRoot -Recurse -Force }
