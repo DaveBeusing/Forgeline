@@ -106,7 +106,8 @@ public sealed class VehicleQueueCoordinator
                 !entities.TryGetComponent(entry.Building, out CompletedBuilding building) || building.Owner != entry.Owner ||
                 entities.TryGetComponent(truck, out ControllableEntity control) && (control.Owner != entry.Owner || !control.IsControllable) ||
                 !entities.HasComponent<VehicleDockVisit>(truck) && !entities.HasComponent<CargoTransportOrder>(truck) &&
-                !entities.HasComponent<SupplyLoadingOrder>(truck)) _members.Add(truck);
+                !entities.HasComponent<SupplyLoadingOrder>(truck) &&
+                !entities.HasComponent<CargoFuelServiceState>(truck)) _members.Add(truck);
         }
         foreach (EntityId truck in _members)
         {
