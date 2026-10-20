@@ -2,6 +2,7 @@ using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
 using ForgeLine.Game;
+using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Presentation;
