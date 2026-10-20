@@ -97,7 +97,7 @@ public static class ActionableAlertLayout
                     { identity = alerts.Alerts[a].Identity; break; }
             ulong textRevision = NotificationText.Revision(value);
             HudRect expandedBounds = default;
-            if (expansion.Open && item.Hidden == 0 && expansion.Item == item &&
+            if ((expansion.Open || expansion.Progress > 0) && item.Hidden == 0 && expansion.Item == item &&
                 expansion.Identity == identity && expansion.Revision == textRevision &&
                 detailBudget >= line + 2 * padding)
             {
