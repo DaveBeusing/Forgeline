@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using ForgeLine.Presentation.TerrainResidency;
 using ForgeLine.Graphics.RenderContracts;
 using System.Diagnostics;
 using System.Numerics;
@@ -48,6 +49,16 @@ public sealed class TerrainRenderer : IDisposable
     private readonly SceneLightingSettings _lighting;
     private readonly TerrainSurfaceDetailSettings _surfaceDetail;
 
+    private readonly TerrainPreparationSettings _preparation;
+    private readonly TerrainPreparedSource _source;
+    private readonly TerrainPreparedCache _prepared;
+    private readonly TerrainPreparationWorker _worker = new();
+    private readonly Dictionary<uint, TerrainPalette> _palettes = [];
+    private IGraphicsBuffer? _sharedIndices;
+    private long _meshBuilds, _splatBuilds, _geometryUploadBytes, _controlUploadBytes;
+    private long _geometryEvictionBytes, _controlEvictionBytes;
+    private double _meshMilliseconds, _splatMilliseconds, _uploadMilliseconds, _materialMilliseconds;
+    private readonly int _owner = Environment.CurrentManagedThreadId;
     private bool _disposed;
 
     public TerrainRenderer(
@@ -58,7 +69,8 @@ public sealed class TerrainRenderer : IDisposable
         RuntimeAssetCatalog? runtimeAssets = null,
         SceneLightingSettings? lighting = null,
         TerrainSurfaceDetailSettings? surfaceDetail = null, TextureDetailQuality textureDetail = TextureDetailQuality.Full,
-        TerrainResidencySettings? residency = null, WorldEnvironmentSettings? environment = null)
+        TerrainResidencySettings? residency = null, WorldEnvironmentSettings? environment = null,
+        TerrainPreparationSettings? preparation = null)
     {
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(world);
@@ -88,6 +100,12 @@ public sealed class TerrainRenderer : IDisposable
         resolvedMeshSettings.Validate();
         _meshSettings = resolvedMeshSettings;
         _profile = resolvedProfile;
+        _preparation = preparation ?? new(); _preparation.Validate();
+        _source = new(world, resolvedMeshSettings, resolvedProfile, _preparation);
+        _chunks = _source.Chunks;
+        if (_source.Patterns.Bytes >= _preparation.MaximumPreparedBytes)
+            throw new ArgumentOutOfRangeException(nameof(preparation), "Shared terrain indices exceed the CPU preparation budget.");
+        _prepared = new(_preparation with { MaximumPreparedBytes = _preparation.MaximumPreparedBytes - _source.Patterns.Bytes });
 
         var resources = new List<TerrainChunkRenderResource>(Math.Min(world.Chunks.Count, _residency.MaximumResidentChunks));
         try
@@ -131,8 +149,16 @@ public sealed class TerrainRenderer : IDisposable
                         GraphicsTextureColorSpace.Linear);
             }
 
+            EnsureRequiredBudgets(0);
+            long indexStarted = Stopwatch.GetTimestamp();
+            _sharedIndices = graphics.CreateInitializedStaticBuffer(
+                new((ulong)_source.Patterns.Bytes, StaticGraphicsBufferUsage.Index),
+                MemoryMarshal.AsBytes(_source.Patterns.Indices.AsSpan()));
+            _geometryUploadBytes += _source.Patterns.Bytes;
+            _uploadMilliseconds += Stopwatch.GetElapsedTime(indexStarted).TotalMilliseconds;
             if (!_residency.Enabled)
             {
+                EnsureRequiredBudgets(_chunks.Count);
                 for (int index = 0; index < _chunks.Count; index++)
                 {
                     var resource = LoadChunk(index);
@@ -151,6 +177,8 @@ public sealed class TerrainRenderer : IDisposable
                 resource.Dispose();
             }
 
+            _sharedIndices?.Dispose();
+            _prepared.Clear(); _worker.Dispose(); _palettes.Clear();
             _fallbackOrm?.Dispose();
             _fallbackNormal?.Dispose();
             _fallbackBaseColor?.Dispose();
@@ -167,9 +195,7 @@ public sealed class TerrainRenderer : IDisposable
                 _chunks.Count,
                 0,
                 0,
-                checked(
-                    _resources.Count *
-                    2),
+                checked(_resources.Count + 1),
                 _resources.Count,
                 TerrainTextureCount,
                 TerrainTextureCount,
@@ -178,63 +204,97 @@ public sealed class TerrainRenderer : IDisposable
 
     private TerrainChunkRenderResource LoadChunk(int chunkIndex)
     {
+        ThrowIfDisposed(); AssetPreparationScope.ThrowIfStopped();
+        PreparedTerrainChunk? prepared = _prepared.Get(chunkIndex);
+        if (prepared is null)
+        {
+            prepared = _source.Build(chunkIndex, CancellationToken.None);
+            ObserveBuild(prepared); _prepared.Admit(chunkIndex, prepared);
+        }
+        AssetPreparationScope.ThrowIfStopped();
         TerrainChunk chunk = _chunks[chunkIndex];
-        TerrainMeshData mesh =
-            TerrainMeshGenerator.Generate(
-                chunk,
-                _meshSettings);
-        TerrainChunkSplatData splat =
-            TerrainSplatMapBuilder.Build(
-                chunk,
-                _profile);
-        TerrainRenderVertex[] renderVertices =
-            CreateRenderVertices(
-                mesh.Vertices);
-        IGraphicsTexture controlTexture =
-            _graphics.CreateTexture(
-                splat.CreateTextureData());
-        IGraphicsBuffer? vertexBuffer = null;
-        IGraphicsBuffer? indexBuffer = null;
+        TerrainPalette? palette = null;
+        IGraphicsTexture? control = null; IGraphicsBuffer? vertex = null;
         try
         {
-            TerrainLayerResource[] layers =
-                CreateLayers(
-                    splat.Palette,
-                    _profile);
-
-            ulong vertexBytes =
-                checked(
-                    (ulong)renderVertices.Length *
-                    TerrainRenderVertex.SizeInBytes);
-            ulong indexBytes =
-                checked(
-                    (ulong)mesh.Indices.Length *
-                    sizeof(uint));
-
-            vertexBuffer = _graphics.CreateInitializedStaticBuffer(
-                new(vertexBytes, StaticGraphicsBufferUsage.Vertex), MemoryMarshal.AsBytes(renderVertices.AsSpan()));
-            indexBuffer = _graphics.CreateInitializedStaticBuffer(
-                new(indexBytes, StaticGraphicsBufferUsage.Index), MemoryMarshal.AsBytes(mesh.Indices.AsSpan()));
-
-            return
-                new TerrainChunkRenderResource(
-                    chunk.Coordinate,
-                    mesh.Bounds,
-                    vertexBuffer,
-                    indexBuffer,
-                    controlTexture,
-                    layers,
-                    mesh.Indices.Length,
-                    mesh.TriangleCount, chunkIndex, splat.Mips.Sum(static mip => (long)mip.Pixels.Length));
+            long started = Stopwatch.GetTimestamp();
+            palette = AcquirePalette(prepared.Splat.Palette);
+            _materialMilliseconds += Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+            started = Stopwatch.GetTimestamp();
+            control = _graphics.CreateTexture(prepared.Splat.CreateTextureData());
+            long vertexBytes = (long)prepared.Vertices.Length * TerrainRenderVertex.SizeInBytes;
+            vertex = _graphics.CreateInitializedStaticBuffer(new((ulong)vertexBytes, StaticGraphicsBufferUsage.Vertex),
+                MemoryMarshal.AsBytes(prepared.Vertices.AsSpan()));
+            _geometryUploadBytes += vertexBytes; _controlUploadBytes += prepared.ControlBytes;
+            _uploadMilliseconds += Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+            TerrainIndexRange full = _source.Patterns.Ranges[0];
+            return new(chunk.Coordinate, chunk.Bounds, vertex, _sharedIndices!, control, palette.Layers,
+                full.IndexCount, full.IndexCount / 3, chunkIndex, prepared.ControlBytes)
+            { PaletteKey = palette.Key, HeightErrors = prepared.HeightErrors, NormalErrors = prepared.NormalErrors };
         }
         catch
         {
-            indexBuffer?.Dispose();
-            vertexBuffer?.Dispose();
-            controlTexture.Dispose();
+            vertex?.Dispose(); control?.Dispose();
+            if (palette is not null) ReleasePalette(palette.Key);
             throw;
         }
     }
+
+    private void ObserveBuild(PreparedTerrainChunk data)
+    {
+        _meshBuilds++; _splatBuilds++; _meshMilliseconds += data.MeshMilliseconds;
+        _splatMilliseconds += data.SplatMilliseconds;
+    }
+    private long VertexBytesPerChunk => checked((long)_meshSettings.VertexSamplesPerSide * _meshSettings.VertexSamplesPerSide * TerrainRenderVertex.SizeInBytes);
+    private const long ControlBytesPerChunk = 5720;
+    private int ResidentLimit => (int)Math.Min(_residency.MaximumResidentChunks,
+        Math.Min((_preparation.MaximumGeometryBytes - _source.Patterns.Bytes) / VertexBytesPerChunk,
+            _preparation.MaximumControlBytes / ControlBytesPerChunk));
+    private void EnsureRequiredBudgets(int count)
+    {
+        if (checked(_source.Patterns.Bytes + VertexBytesPerChunk * count) > _preparation.MaximumGeometryBytes ||
+            checked(ControlBytesPerChunk * count) > _preparation.MaximumControlBytes)
+            throw new InvalidOperationException("Required terrain exceeds its geometry or control-texture byte budget; coverage cannot be dropped.");
+    }
+    private TerrainPalette AcquirePalette(IReadOnlyList<TerrainMaterialSlot> slots)
+    {
+        uint key = (uint)slots[0] | (uint)slots[1] << 8 | (uint)slots[2] << 16 | (uint)slots[3] << 24;
+        if (!_palettes.TryGetValue(key, out TerrainPalette? palette))
+        { palette = new(key, CreateLayers(slots, _profile)); _palettes.Add(key, palette); }
+        palette.References++; return palette;
+    }
+    private void ReleasePalette(uint key)
+    {
+        TerrainPalette palette = _palettes[key];
+        if (--palette.References == 0) _palettes.Remove(key);
+    }
+    private sealed class TerrainPalette(uint key, TerrainLayerResource[] layers)
+    {
+        internal readonly uint Key = key;
+        internal readonly TerrainLayerResource[] Layers = layers;
+        internal int References;
+    }
+    private void Evict(TerrainChunkRenderResource resource)
+    {
+        _resources.Remove(resource); _resident[resource.ChunkIndex] = null;
+        _geometryEvictionBytes += (long)resource.VertexBuffer.Description.SizeInBytes;
+        _controlEvictionBytes += resource.ControlBytes;
+        resource.Dispose(); ReleasePalette(resource.PaletteKey); _evictions++;
+    }
+    public TerrainWorkMetrics WorkMetrics => new()
+    {
+        MeshBuilds = _meshBuilds, SplatBuilds = _splatBuilds, CacheHits = _prepared.Hits,
+        CpuEvictions = _prepared.Evictions, PreparedChunks = _prepared.Count,
+        PreparedBytes = _prepared.Bytes + _source.Patterns.CpuBytes, PendingCpuChunks = _worker.PendingCount,
+        DiscardedWorkerResults = _worker.Discarded, GeometryUploadBytes = _geometryUploadBytes,
+        ControlUploadBytes = _controlUploadBytes, GeometryEvictionBytes = _geometryEvictionBytes,
+        ControlEvictionBytes = _controlEvictionBytes, ResidentGeometryBytes = GeometryBytes(),
+        ResidentControlBytes = ControlBytes(), RequiredChunks = _requiredCount, ResidentChunks = _resources.Count,
+        IndexPatterns = _source.Patterns.Ranges.Length, MainTriangles = LastDiagnostics.SubmittedTriangles,
+        MeshMilliseconds = _meshMilliseconds, SplatMilliseconds = _splatMilliseconds,
+        UploadMilliseconds = _uploadMilliseconds, MaterialMilliseconds = _materialMilliseconds,
+        PrepareMilliseconds = _residencyMilliseconds
+    };
 
     /// <summary>Call on the render owner before frame recording, with the world viewport and shadow coverage.</summary>
     public void Prepare(RtsCamera camera, int width, int height, GraphicsDirectionalShadowFrame? shadow = null)
@@ -258,20 +318,19 @@ public sealed class TerrainRenderer : IDisposable
         }
         if (required > _residency.MaximumResidentChunks)
             throw new InvalidOperationException($"Terrain view requires {required} chunks; residency limit is {_residency.MaximumResidentChunks}. Increase the limit before rendering; required coverage is never dropped.");
+        EnsureRequiredBudgets(required);
         _requiredCount = required;
+        _preparedView = _preparedShadow = null;
         long generation = ++_generation;
         foreach (var resource in _resources)
             if (_required[resource.ChunkIndex]) resource.LastRequired = generation;
-        while (_resources.Count + missing > _residency.MaximumResidentChunks)
+        while (_resources.Count + missing > ResidentLimit)
         {
             TerrainChunkRenderResource? oldest = null;
             foreach (var resource in _resources)
                 if (!_required[resource.ChunkIndex] && (oldest is null || resource.LastRequired < oldest.LastRequired)) oldest = resource;
             if (oldest is null) throw new InvalidOperationException("Terrain residency has no safe eviction candidate.");
-            _resources.Remove(oldest);
-            _resident[oldest.ChunkIndex] = null;
-            oldest.Dispose();
-            _evictions++;
+            Evict(oldest);
         }
         for (int index = 0; index < _chunks.Count; index++)
         {
@@ -389,9 +448,7 @@ public sealed class TerrainRenderer : IDisposable
                 visibleChunks,
                 submittedTriangles,
                 drawCalls,
-                checked(
-                    _resources.Count *
-                    2),
+                checked(_resources.Count + 1),
                 _resources.Count,
                 TerrainTextureCount,
                 TerrainTextureCount,
@@ -415,11 +472,14 @@ public sealed class TerrainRenderer : IDisposable
             return;
         }
 
+        if (_owner != Environment.CurrentManagedThreadId) throw new InvalidOperationException("Dispose terrain on its creating render owner.");
         foreach (TerrainChunkRenderResource resource in _resources)
         {
             resource.Dispose();
         }
-
+        _resources.Clear(); Array.Clear(_resident); _preparedView = _preparedShadow = null;
+        _worker.Dispose(); _prepared.Clear(); _palettes.Clear(); _source.Patterns.ReleaseCpuIndices();
+        _sharedIndices?.Dispose(); _sharedIndices = null;
         _fallbackOrm?.Dispose();
         _fallbackNormal?.Dispose();
         _fallbackBaseColor?.Dispose();
@@ -712,7 +772,7 @@ public sealed class TerrainRenderer : IDisposable
                 maximum));
     }
 
-    private readonly record struct TerrainRenderVertex(
+    internal readonly record struct TerrainRenderVertex(
         Vector3 Position,
         Vector3 Normal,
         Vector2 LocalUv,
@@ -773,8 +833,8 @@ public sealed class TerrainRenderer : IDisposable
 
     private long GeometryBytes()
     {
-        long bytes = 0;
-        foreach (var resource in _resources) bytes += checked((long)(resource.VertexBuffer.Description.SizeInBytes + resource.IndexBuffer.Description.SizeInBytes));
+        long bytes = _sharedIndices is null ? 0 : (long)_sharedIndices.Description.SizeInBytes;
+        foreach (var resource in _resources) bytes += checked((long)resource.VertexBuffer.Description.SizeInBytes);
         return bytes;
     }
 
@@ -787,6 +847,7 @@ public sealed class TerrainRenderer : IDisposable
 
     private void ThrowIfDisposed()
     {
+        if (_owner != Environment.CurrentManagedThreadId) throw new InvalidOperationException("Terrain GPU resources belong to their creating render owner.");
         ObjectDisposedException.ThrowIf(
             _disposed,
             this);
@@ -830,6 +891,11 @@ public sealed class TerrainRenderer : IDisposable
                 triangleCount;
         }
 
+        internal uint PaletteKey { get; init; }
+        internal float[] HeightErrors { get; init; } = [];
+        internal float[] NormalErrors { get; init; } = [];
+        internal int MainLod { get; set; }
+        internal int ShadowLod { get; set; }
         internal int ChunkIndex { get; }
         internal long ControlBytes { get; }
         internal long LastRequired { get; set; }
@@ -852,7 +918,6 @@ public sealed class TerrainRenderer : IDisposable
         public void Dispose()
         {
             ControlTexture.Dispose();
-            IndexBuffer.Dispose();
             VertexBuffer.Dispose();
         }
     }

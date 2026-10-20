@@ -20,4 +20,18 @@ The serialized one-PATCH exception is finalized against current master later.
 
 Initial custom-artifact build with --no-restore failed NETSDK1004 because that
 output directory had no restored assets. The baseline build restores there
-before compilation; the failed invocation is retained, not a product failure.
+before compilation; the failed invocation is recorded here, not a product failure.
+
+
+The unchanged Release solution builds with zero warnings/errors (4m07.04s).
+Four new reference cases pass before product changes. The initial no-test
+selection (exit 8) reflected an earlier project file-list evaluation; rebuilding
+the test project discovers all four. The initial texture-capability omissions
+in the fake context are corrected without changing product assertions.
+
+The bounded CPU preparation/shared-static-index path builds without warnings
+or errors and passes 11 reference/preparation cases. These verify unchanged
+positions, UVs, control maps and authoritative height samples, bounded CPU LRU,
+GPU eviction reuse, late cancellation, static-buffer fallback and failed GPU
+publication invalidating readiness. Vertex normals deliberately sample both
+sides of immutable chunk boundaries. Native appearance review is still required.
