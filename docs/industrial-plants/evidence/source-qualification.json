@@ -1,0 +1,14 @@
+{
+  "nativeRenderer": "pending",
+  "productionPromotion": "blocked-pending-render-qualification",
+  "sourceLessIntegrity": "passed",
+  "schemaVersion": 1,
+  "savedAndReopenedBlenderMasters": "passed",
+  "installedPackage": "pending",
+  "deterministicSourceAndRuntime": "passed",
+  "humanVisualApproval": "pending",
+  "physicalPerformance": "pending",
+  "productionSourcesUnchanged": true,
+  "sourceSha": "a1cfd0f89e4c047733520063073cbfe7b654f384",
+  "typedCompiledComparison": "passed"
+}

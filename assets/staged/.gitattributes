@@ -1,0 +1,3 @@
+industrial-plants/**/*.blend binary
+industrial-plants/**/*.glb binary
+industrial-plants/**/*.json -text -whitespace

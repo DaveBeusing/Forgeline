@@ -1,0 +1,47 @@
+{
+  "families": [
+    {
+      "family": "fuel_refinery",
+      "masterSha256": "4e9b149e63742a962b252f5d27fc5eb071eb0dac075a586eb1a76e57ec90165f",
+      "packedImages": [
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.surface.atlas_base",
+          "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_normal",
+          "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_orm",
+          "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1"
+        }
+      ]
+    },
+    {
+      "family": "ammunition_plant",
+      "masterSha256": "da651a70315f5d5ceddc731a3d13f9fb3ea14a47f122733855f9268cb421a469",
+      "packedImages": [
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.surface.atlas_base",
+          "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_normal",
+          "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_orm",
+          "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1"
+        }
+      ]
+    }
+  ],
+  "success": true
+}

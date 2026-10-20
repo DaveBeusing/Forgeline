@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "status": "staged-not-promoted",
+  "sourceSha": "a1cfd0f89e4c047733520063073cbfe7b654f384",
+  "sourceSignature": "f0e6565c033e5ad4077ed0f4f4191af1ce9758fce026b1d98f2fd298c780f064",
+  "portableSourceSignature": "9d68864af6e4ebe745ac734918adc446b68656d2c77fa2b940f286e745992a7a",
+  "fixtureSha256": "bb90747ac87f1bcd931b70b57bdb411afc538187aba148b3800265545bc7736e",
+  "blenderVersion": "5.2.2",
+  "master": "ammunition_plant.blend",
+  "masterSha256": "9052e2ade1888cc9ba7c1b7ecabbbd91295ef2f08798e052ac5547d04a4fcacc",
+  "surfaceReviewMaster": "ammunition_plant_surfaces.blend",
+  "surfaceReviewMasterSha256": "da651a70315f5d5ceddc731a3d13f9fb3ea14a47f122733855f9268cb421a469",
+  "exports": [
+    {
+      "id": "building.directorate.ammunition_plant",
+      "source": "building.directorate.ammunition_plant.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant.asset.json",
+      "sha256": "c5f2beffdd717c6e7ead067a0ca07afce2477285fb4daae4e2fc5a4ca2384d2e"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.critical",
+      "source": "building.directorate.ammunition_plant.critical.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_critical.asset.json",
+      "sha256": "b2cb6780761a382c052e5b22aced49960280daa43be3b8836ba0884cda6315db"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.damaged",
+      "source": "building.directorate.ammunition_plant.damaged.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_damaged.asset.json",
+      "sha256": "0c0dc6d37842718f8b15dd4dae46dd9a8aa178cb039cdf4cbcda1dbfcce03678"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.destroyed",
+      "source": "building.directorate.ammunition_plant.destroyed.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_destroyed.asset.json",
+      "sha256": "550d90d6b2c1d33b72c33701ec8497efd85b239970ec69fba0e67e20b48752fd"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.foundation",
+      "source": "building.directorate.ammunition_plant.foundation.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_foundation.asset.json",
+      "sha256": "df0d914fcc19ef2c5ab8609eb0d593f23b45e5709444b98bdadff51fad1490a6"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.idle",
+      "source": "building.directorate.ammunition_plant.idle.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_idle.asset.json",
+      "sha256": "32c3fd95fa4a73f319d0d3b88853aebab265b2f16fe76a13daf2b2fe9e16f4d1"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.lod1",
+      "source": "building.directorate.ammunition_plant.lod1.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_lod1.asset.json",
+      "sha256": "5186486825325ac6bc3362c9db53fb4ac0d2583d91cfe245a0c1002d4214b2b6"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.lod2",
+      "source": "building.directorate.ammunition_plant.lod2.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_lod2.asset.json",
+      "sha256": "0392a8999f802bfec3c644cc7bb25ea63212f7d744bb160e72dc6bd2e74fd02e"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.partial_shell",
+      "source": "building.directorate.ammunition_plant.partial_shell.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_partial_shell.asset.json",
+      "sha256": "091808747f07268543b157de18b4c2d022999ceccb40fc7a4402786ff26375fa"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.structural_frame",
+      "source": "building.directorate.ammunition_plant.structural_frame.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_structural_frame.asset.json",
+      "sha256": "b5158f23af2957da1301da886fa8f8218957f1d5bc5338d9337e8d276e651400"
+    },
+    {
+      "id": "building.directorate.ammunition_plant.unpowered",
+      "source": "building.directorate.ammunition_plant.unpowered.glb",
+      "canonicalDefinition": "buildings/directorate/ammunition_plant_unpowered.asset.json",
+      "sha256": "de7a81e13912661469e7dc320f2007251749a16ab4314515ec0dfe129226ee30"
+    }
+  ],
+  "canonicalSourcesUnchanged": true,
+  "promotionGate": "Current render qualification, source ownership release, native/package/performance and human visual acceptance required."
+}

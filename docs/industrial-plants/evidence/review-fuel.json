@@ -1,0 +1,902 @@
+{
+  "assetIds": [
+    "building.directorate.fuel_refinery",
+    "building.directorate.fuel_refinery.critical",
+    "building.directorate.fuel_refinery.damaged",
+    "building.directorate.fuel_refinery.destroyed",
+    "building.directorate.fuel_refinery.foundation",
+    "building.directorate.fuel_refinery.idle",
+    "building.directorate.fuel_refinery.lod1",
+    "building.directorate.fuel_refinery.lod2",
+    "building.directorate.fuel_refinery.partial_shell",
+    "building.directorate.fuel_refinery.structural_frame",
+    "building.directorate.fuel_refinery.unpowered",
+    "building.directorate.module.collision_box",
+    "material.directorate.building.structural",
+    "texture.directorate.surface.atlas_base",
+    "texture.directorate.surface.atlas_normal",
+    "texture.directorate.surface.atlas_orm"
+  ],
+  "collisionSourcesUnchanged": true,
+  "errors": [],
+  "inventory": [
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.5199999809265137,
+        0.44999998807907104
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.33000001311302185
+      ],
+      "estimatedVertexBytes": 154752,
+      "id": "building.directorate.fuel_refinery",
+      "indexBytes": 21456,
+      "lods": [
+        {
+          "assetId": "building.directorate.fuel_refinery.lod1",
+          "level": 1,
+          "maxDistance": 220
+        },
+        {
+          "assetId": "building.directorate.fuel_refinery.lod2",
+          "level": 2,
+          "maxDistance": 620
+        }
+      ],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 1788,
+      "vertices": 3224
+    },
+    {
+      "boundsMax": [
+        -0.18000000715255737,
+        -0.10373086482286453,
+        -0.05999999865889549
+      ],
+      "boundsMin": [
+        -0.3700000047683716,
+        -0.4300000071525574,
+        -0.26794734597206116
+      ],
+      "estimatedVertexBytes": 5184,
+      "id": "building.directorate.fuel_refinery.critical",
+      "indexBytes": 720,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 60,
+      "vertices": 108
+    },
+    {
+      "boundsMax": [
+        0.3793768286705017,
+        -0.15152259171009064,
+        0.38499999046325684
+      ],
+      "boundsMin": [
+        -0.3700000047683716,
+        -0.4350000023841858,
+        0.2849999964237213
+      ],
+      "estimatedVertexBytes": 4032,
+      "id": "building.directorate.fuel_refinery.damaged",
+      "indexBytes": 576,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 48,
+      "vertices": 84
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        -0.03999999910593033,
+        0.44999998807907104
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.33000001311302185
+      ],
+      "estimatedVertexBytes": 16896,
+      "id": "building.directorate.fuel_refinery.destroyed",
+      "indexBytes": 2256,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 188,
+      "vertices": 352
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        -0.46000000834465027,
+        0.44999998807907104
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.33000001311302185
+      ],
+      "estimatedVertexBytes": 1152,
+      "id": "building.directorate.fuel_refinery.foundation",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 24
+    },
+    {
+      "boundsMax": [
+        0.3449999988079071,
+        -0.20000000298023224,
+        0.43299999833106995
+      ],
+      "boundsMin": [
+        0.1550000011920929,
+        -0.3700000047683716,
+        0.4000000059604645
+      ],
+      "estimatedVertexBytes": 2304,
+      "id": "building.directorate.fuel_refinery.idle",
+      "indexBytes": 288,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 24,
+      "vertices": 48
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.5199999809265137,
+        0.44999998807907104
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.33000001311302185
+      ],
+      "estimatedVertexBytes": 45696,
+      "id": "building.directorate.fuel_refinery.lod1",
+      "indexBytes": 6288,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 524,
+      "vertices": 952
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.5199999809265137,
+        0.44999998807907104
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.33000001311302185
+      ],
+      "estimatedVertexBytes": 25152,
+      "id": "building.directorate.fuel_refinery.lod2",
+      "indexBytes": 3312,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 276,
+      "vertices": 524
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.14499999582767487,
+        0.44999998807907104
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.33000001311302185
+      ],
+      "estimatedVertexBytes": 39936,
+      "id": "building.directorate.fuel_refinery.partial_shell",
+      "indexBytes": 5280,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 440,
+      "vertices": 832
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.10000000149011612,
+        0.44999998807907104
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.33000001311302185
+      ],
+      "estimatedVertexBytes": 6912,
+      "id": "building.directorate.fuel_refinery.structural_frame",
+      "indexBytes": 864,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 72,
+      "vertices": 144
+    },
+    {
+      "boundsMax": [
+        -0.29499998688697815,
+        -0.17550432682037354,
+        0.44200000166893005
+      ],
+      "boundsMin": [
+        -0.4050000011920929,
+        -0.41999998688697815,
+        0.3799999952316284
+      ],
+      "estimatedVertexBytes": 4032,
+      "id": "building.directorate.fuel_refinery.unpowered",
+      "indexBytes": 576,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 48,
+      "vertices": 84
+    },
+    {
+      "boundsMax": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "boundsMin": [
+        -0.5,
+        -0.5,
+        -0.5
+      ],
+      "estimatedVertexBytes": 384,
+      "id": "building.directorate.module.collision_box",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 8
+    }
+  ],
+  "meshes": [
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.5199999809265137,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 1788,
+        "vertices": 3224
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.5199999809265137,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 1788,
+        "vertices": 3224
+      },
+      "estimatedCompiledGeometryBytes": 176208,
+      "id": "building.directorate.fuel_refinery",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.18000000715255737,
+          -0.10373086482286453,
+          -0.05999999865889549
+        ],
+        "boundsMin": [
+          -0.3700000047683716,
+          -0.4300000071525574,
+          -0.26794734597206116
+        ],
+        "primitives": 1,
+        "triangles": 60,
+        "vertices": 108
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.18000000715255737,
+          -0.10373086482286453,
+          -0.05999999865889549
+        ],
+        "boundsMin": [
+          -0.3700000047683716,
+          -0.4300000071525574,
+          -0.26794734597206116
+        ],
+        "primitives": 1,
+        "triangles": 60,
+        "vertices": 108
+      },
+      "estimatedCompiledGeometryBytes": 5904,
+      "id": "building.directorate.fuel_refinery.critical",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.critical"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.3793768286705017,
+          -0.15152259171009064,
+          0.38499999046325684
+        ],
+        "boundsMin": [
+          -0.3700000047683716,
+          -0.4350000023841858,
+          0.2849999964237213
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "candidate": {
+        "boundsMax": [
+          0.3793768286705017,
+          -0.15152259171009064,
+          0.38499999046325684
+        ],
+        "boundsMin": [
+          -0.3700000047683716,
+          -0.4350000023841858,
+          0.2849999964237213
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "estimatedCompiledGeometryBytes": 4608,
+      "id": "building.directorate.fuel_refinery.damaged",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.damaged"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          -0.03999999910593033,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 188,
+        "vertices": 352
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          -0.03999999910593033,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 188,
+        "vertices": 352
+      },
+      "estimatedCompiledGeometryBytes": 19152,
+      "id": "building.directorate.fuel_refinery.destroyed",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.destroyed"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          -0.46000000834465027,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          -0.46000000834465027,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "estimatedCompiledGeometryBytes": 1296,
+      "id": "building.directorate.fuel_refinery.foundation",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.foundation"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.3449999988079071,
+          -0.20000000298023224,
+          0.43299999833106995
+        ],
+        "boundsMin": [
+          0.1550000011920929,
+          -0.3700000047683716,
+          0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "candidate": {
+        "boundsMax": [
+          0.3449999988079071,
+          -0.20000000298023224,
+          0.43299999833106995
+        ],
+        "boundsMin": [
+          0.1550000011920929,
+          -0.3700000047683716,
+          0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "estimatedCompiledGeometryBytes": 2592,
+      "id": "building.directorate.fuel_refinery.idle",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.idle"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.5199999809265137,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 524,
+        "vertices": 952
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.5199999809265137,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 524,
+        "vertices": 952
+      },
+      "estimatedCompiledGeometryBytes": 51984,
+      "id": "building.directorate.fuel_refinery.lod1",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.lod1"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.5199999809265137,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 276,
+        "vertices": 524
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.5199999809265137,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 276,
+        "vertices": 524
+      },
+      "estimatedCompiledGeometryBytes": 28464,
+      "id": "building.directorate.fuel_refinery.lod2",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.lod2"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.14499999582767487,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 440,
+        "vertices": 832
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.14499999582767487,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 440,
+        "vertices": 832
+      },
+      "estimatedCompiledGeometryBytes": 45216,
+      "id": "building.directorate.fuel_refinery.partial_shell",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.partial_shell"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.10000000149011612,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.10000000149011612,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "estimatedCompiledGeometryBytes": 7776,
+      "id": "building.directorate.fuel_refinery.structural_frame",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.structural_frame"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.29499998688697815,
+          -0.17550432682037354,
+          0.44200000166893005
+        ],
+        "boundsMin": [
+          -0.4050000011920929,
+          -0.41999998688697815,
+          0.3799999952316284
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.29499998688697815,
+          -0.17550432682037354,
+          0.44200000166893005
+        ],
+        "boundsMin": [
+          -0.4050000011920929,
+          -0.41999998688697815,
+          0.3799999952316284
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "estimatedCompiledGeometryBytes": 4608,
+      "id": "building.directorate.fuel_refinery.unpowered",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.fuel_refinery.unpowered"
+    }
+  ],
+  "previews": [
+    {
+      "assetId": "building.directorate.fuel_refinery",
+      "camera": "close",
+      "distanceInAssetExtents": 3.5452929656700385,
+      "file": "building.directorate.fuel_refinery-close.png"
+    },
+    {
+      "assetId": "building.directorate.fuel_refinery",
+      "camera": "normal",
+      "distanceInAssetExtents": 5.801388489278245,
+      "file": "building.directorate.fuel_refinery-normal.png"
+    },
+    {
+      "assetId": "building.directorate.fuel_refinery",
+      "camera": "strategic",
+      "distanceInAssetExtents": 10.958178257525573,
+      "file": "building.directorate.fuel_refinery-strategic.png"
+    }
+  ],
+  "productionSourcesUnchanged": true,
+  "profileSha256": "711f4a462bb2d3c7eb8a0fe2ceb8d96c0f5bfd4caf768f3c4fd1d41fd0886074",
+  "schemaVersion": 1,
+  "sourceHashes": {
+    "buildings/directorate/fuel_refinery.asset.json": "2291908de3dd1b259b1d3d4bcaa739c082506f47d65d23613a9954d506cba530",
+    "buildings/directorate/fuel_refinery_critical.asset.json": "3b94fdf290e3c7cdcdd1c479b9bcd084600d5caf9d6826e68c1251db1f24227d",
+    "buildings/directorate/fuel_refinery_damaged.asset.json": "5683f65f9deb928512faf300ceba3b74230cc2d91a0e02e3f3e9e3818f843354",
+    "buildings/directorate/fuel_refinery_destroyed.asset.json": "8b1ce55198218ffde853d43e2be3c9f9c5e83d02e351a7e00f16f77cdb6bb555",
+    "buildings/directorate/fuel_refinery_foundation.asset.json": "09f72e97edf5ba74d522f38a4abc19cce3eb915a70a2d760f97bc718e0795d76",
+    "buildings/directorate/fuel_refinery_idle.asset.json": "83fd44c3def8af197ced5e02b26bd159aa5c229a3668e53897779a2a4f86ac03",
+    "buildings/directorate/fuel_refinery_lod1.asset.json": "675b608a16b977c9e9a4998e03daa1d06271dab7be3319e41117eaba47a846ff",
+    "buildings/directorate/fuel_refinery_lod2.asset.json": "d0dedcb9d69dac9fc8bebfc06e606199424aa9dfbae88abcddb2acccac3551af",
+    "buildings/directorate/fuel_refinery_partial_shell.asset.json": "ce842f75e616b278e54ea40d4a1e563b0b0dcde77373fd39c5006170d8d48b5f",
+    "buildings/directorate/fuel_refinery_structural_frame.asset.json": "90f43f796788e297f2a4c8923f84d7fd2f55a9e3f336191852f31618e372732c",
+    "buildings/directorate/fuel_refinery_unpowered.asset.json": "5ff28356f9a4920c7bca93fd662127820460c2d54c3265bcff47183c96adc32f",
+    "buildings/directorate/materials/structural.asset.json": "3692dc0effd7a964b33d05610534729780cf4f4920b5230425495ced7ec543b8",
+    "buildings/directorate/materials/structural.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "buildings/directorate/modules/collision_box.asset.json": "b5ac3e871a08eabff5bb20cddf65de2d928f0d7728b7cdd3cd5669205c4ee637",
+    "buildings/directorate/sources/industrial/fuel_refinery/critical.gltf": "5afdb9ee445b077a089215e019516de710e54fb6a406c499648f7cf49523e57c",
+    "buildings/directorate/sources/industrial/fuel_refinery/damaged.gltf": "ec8cd3f89e5bab9fb8e5a91afb69edda867a462f6330c9d36f9ae21d48fe30a0",
+    "buildings/directorate/sources/industrial/fuel_refinery/destroyed.gltf": "cbd706a57bca506fb439ccc1277505a446cfcf748681e0c03ae326986ba1bbd5",
+    "buildings/directorate/sources/industrial/fuel_refinery/foundation.gltf": "718f46fed886ecd262c65e4aa2156da7fa04f2c4075a28a289fa87ed67b8b153",
+    "buildings/directorate/sources/industrial/fuel_refinery/idle.gltf": "fdfb0bc81c3cbdc3f430971b42737e9f1b2f255c135c3239a3d6f0747c4a44bb",
+    "buildings/directorate/sources/industrial/fuel_refinery/lod0.gltf": "367a19f73e4f198bc9013a91b83449a87d93b9c4d2b6063e20de474e948d5f2c",
+    "buildings/directorate/sources/industrial/fuel_refinery/lod1.gltf": "b5cee4187208f78ca9fb4545fe7bed93a13293e9db458a4cc787f40284d286b6",
+    "buildings/directorate/sources/industrial/fuel_refinery/lod2.gltf": "205dbb59a19366a1e7a668a581928d46bed50864f61af9d9e76f2b66dd731a17",
+    "buildings/directorate/sources/industrial/fuel_refinery/partial_shell.gltf": "c33985a675fe48c61990834a171c8b1ef884a569eb58c86e136c3ca52236acd6",
+    "buildings/directorate/sources/industrial/fuel_refinery/structural_frame.gltf": "a0e3b3abf8ab6a6dd30c5639ba8ee077bcd6582991e0ee0486b10cace140531e",
+    "buildings/directorate/sources/industrial/fuel_refinery/unpowered.gltf": "b96bb3635fbc8dfe310d4f75d5dca8dde71af01d4d015a3f34a456b176bb3995",
+    "buildings/directorate/sources/module_collision_box.gltf": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+    "materials/directorate/surfaces/production_surface_base.png": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+    "materials/directorate/surfaces/production_surface_normal.png": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+    "materials/directorate/surfaces/production_surface_orm.png": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+    "materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+  },
+  "sourceSignature": "5dc75e02c5e7bf0607c1d27c97bfcc5f8b84f2785ce8d1e61df3d8deb6a32b63",
+  "success": true,
+  "texturePayloadBytes": 7323648,
+  "textures": [
+    {
+      "colorSpace": "srgb",
+      "estimatedPayloadBytes": 5586944,
+      "format": "BC7",
+      "height": 2048,
+      "id": "texture.directorate.surface.atlas_base",
+      "mipLevels": 5,
+      "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+      "usage": "baseColor",
+      "width": 2048
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 1392640,
+      "format": "BC7",
+      "height": 1024,
+      "id": "texture.directorate.surface.atlas_normal",
+      "mipLevels": 4,
+      "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+      "usage": "normal",
+      "width": 1024
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 344064,
+      "format": "BC7",
+      "height": 512,
+      "id": "texture.directorate.surface.atlas_orm",
+      "mipLevels": 3,
+      "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+      "usage": "orm",
+      "width": 512
+    }
+  ]
+}
