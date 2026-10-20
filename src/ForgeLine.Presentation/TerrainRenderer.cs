@@ -261,7 +261,7 @@ public sealed class TerrainRenderer : IDisposable
         _splatMilliseconds += data.SplatMilliseconds;
     }
     private long VertexBytesPerChunk => checked((long)_meshSettings.VertexSamplesPerSide * _meshSettings.VertexSamplesPerSide * TerrainRenderVertex.SizeInBytes);
-    private const long ControlBytesPerChunk = 5720;
+    private const long ControlBytesPerChunk = PreparedTerrainChunk.ControlPayloadBytes;
     private int ResidentLimit => (int)Math.Min(_residency.MaximumResidentChunks,
         Math.Min((_preparation.MaximumGeometryBytes - _source.Patterns.Bytes) / VertexBytesPerChunk,
             _preparation.MaximumControlBytes / ControlBytesPerChunk));

@@ -8,6 +8,7 @@ namespace ForgeLine.Presentation.TerrainResidency;
 internal sealed record PreparedTerrainChunk(RenderVertex[] Vertices, TerrainChunkSplatData Splat,
     float[] HeightErrors, float[] NormalErrors, float[] TintErrors, bool ProtectedSurface, double MeshMilliseconds, double SplatMilliseconds)
 {
+    internal const long ControlPayloadBytes = 5720;
     internal long ControlBytes => Splat.Mips.Sum(static m => (long)m.Pixels.Length);
     internal long Bytes => (long)Vertices.Length * RenderVertex.SizeInBytes + ControlBytes +
         (HeightErrors.Length + NormalErrors.Length + TintErrors.Length) * sizeof(float);
@@ -27,6 +28,10 @@ internal sealed class TerrainPreparedSource
     {
         Chunks = world.Chunks.ToArray(); _profile = profile; _samples = settings.VertexSamplesPerSide;
         Patterns = new(_samples, policy.MaximumChunkPreparationBytes);
+        long payloadBytes = checked((long)_samples * _samples * RenderVertex.SizeInBytes +
+            PreparedTerrainChunk.ControlPayloadBytes + Patterns.Ranges.Length * 3L * sizeof(float));
+        if (payloadBytes > policy.MaximumChunkPreparationBytes)
+            throw new ArgumentOutOfRangeException(nameof(policy), "Terrain vertex, control and error payload exceeds the per-chunk preparation limit.");
         _coordinates = new(Chunks.Length);
         for (int i = 0; i < Chunks.Length; i++) _coordinates.Add(Chunks[i].Coordinate, i);
     }

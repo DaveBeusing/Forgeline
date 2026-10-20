@@ -129,4 +129,14 @@ public sealed class TerrainPreparationTests
         using var stopped = new AssetPreparationScope(() => true);
         Assert.Throws<OperationCanceledException>(() => renderer.Prepare(new(), 1600, 900));
     }
+
+    [Fact]
+    public void PerChunkLimitIncludesControlAndErrorPayloadEvenForSmallMeshes()
+    {
+        using var device = new TerrainTestDevice();
+        Assert.Throws<ArgumentOutOfRangeException>(() => new TerrainRenderer(device, FlatWorld(0),
+            meshSettings: new() { VertexSamplesPerSide = 2 },
+            preparation: new() { MaximumChunkPreparationBytes = 512 }));
+        Assert.Empty(device.Inner.Buffers); Assert.Empty(device.Textures);
+    }
 }

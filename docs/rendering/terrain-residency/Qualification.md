@@ -63,6 +63,13 @@ open. The standalone probe compiles against unchanged master and its CPU smoke
 executes successfully; smoke timings overlap functional work and are not used as
 performance evidence.
 
+Final budget review adds a pre-GPU check that includes control pixels and error
+arrays even for a two-sample mesh. All 32 owned tests pass (9.142s), with a
+zero-warning/error Release solution build (4m25.02s). Development runtime
+qualification in an isolated copied cache reports 0 compiled / 1,357 unchanged,
+309 meshes, 900 textures, 127 materials, 18 animations, two skins and 75,122,812
+container bytes. Canonical runtime inputs are not modified.
+
 ## Reproduction
 
 Use the pinned SDK, Release, and isolated artifact directories. Restore before
