@@ -953,7 +953,13 @@ public sealed class AutomatedDistributionSystemTests
         Assert.Equal(LogisticsTransportRequestFailureReason.NoRoute, oldest.FailureReason);
         Assert.Equal(80, oldest.RequestedQuantity);
 
-        EntityId policyEntity = Assert.Single(fixture.Simulation.Entities.Query<LogisticsStockPolicy>());
+        EntityId policyEntity = EntityId.Invalid;
+        foreach (EntityId entity in fixture.Simulation.Entities.Query<LogisticsStockPolicy>())
+        {
+            Assert.False(policyEntity.IsValid);
+            policyEntity = entity;
+        }
+        Assert.True(policyEntity.IsValid);
         fixture.Simulation.Entities.SetComponent(policyEntity,
             new LogisticsStockPolicy(fixture.DestinationEntity, ResourceIds.FerrousOre, 20, 30, 100,
                 LogisticsStockPriority.Normal));
