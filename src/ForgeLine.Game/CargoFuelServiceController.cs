@@ -132,7 +132,15 @@ internal sealed class CargoFuelServiceController(
                 continue;
             Vector3 entry = pose.Entry;
             if (entities.TryGetComponent(truck, out GroundMovement movement))
-                entry.Y += movement.HeightOffset;
+            {
+                pose = pose with
+                {
+                    Entry = pose.Entry + new Vector3(0, movement.HeightOffset, 0),
+                    Service = pose.Service + new Vector3(0, movement.HeightOffset, 0),
+                    Exit = pose.Exit + new Vector3(0, movement.HeightOffset, 0)
+                };
+                entry = pose.Entry;
+            }
             double length;
             if (navigation is not null && entities.TryGetComponent(truck, out NavigationAgent agent))
             {
