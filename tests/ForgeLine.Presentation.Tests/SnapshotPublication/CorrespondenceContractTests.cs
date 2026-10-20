@@ -72,7 +72,7 @@ public sealed class CorrespondenceContractTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void UnorderedCallerAndProductionDecalTailUseFullStableIdentityWithoutReordering(bool shuffled)
+    public void UnorderedCallerAndProductionDecalTailPreserveBinarySemanticsWithoutReordering(bool shuffled)
     {
         RenderInstance[] prior = [Instance(new(1, 1), 1), Instance(new(2, 1), 2),
             Instance(new(0xE0000000, 1), 3), Instance(new(0xF0000000, 1), 4),
@@ -86,15 +86,17 @@ public sealed class CorrespondenceContractTests
         var buffer = new PresentationSnapshotBuffer();
         var world = new RenderWorld();
         buffer.Publish(before); world.Update(buffer);
-        foreach (var value in prior) Assert.True(world.TryGetInterpolatedInstance(value.Entity, .5f, out _));
+        foreach (var value in prior) Assert.Equal(Find(before, value.Entity) >= 0,
+            world.TryGetInterpolatedInstance(value.Entity, .5f, out _));
         buffer.Publish(after); world.Update(buffer);
         for (int i = 0; i < current.Length; i++)
-            Assert.Equal(Array.FindIndex(prior, v => v.Entity == current[i].Entity), index.PreviousIndex(i));
+            Assert.Equal(Find(before, current[i].Entity), index.PreviousIndex(i));
         foreach (var value in current)
         {
-            Assert.True(world.TryGetInterpolatedInstance(value.Entity, .5f, out var found));
-            int slot = Array.FindIndex(current, v => v.Entity == value.Entity);
-            Assert.Equal(world.GetInterpolatedInstance(slot, .5f), found);
+            int slot = Find(after, value.Entity);
+            bool present = world.TryGetInterpolatedInstance(value.Entity, .5f, out var found);
+            Assert.Equal(slot >= 0, present);
+            if (present) Assert.Equal(world.GetInterpolatedInstance(slot, .5f), found);
         }
         Assert.True(current.AsSpan().SequenceEqual(after.Instances));
         for (int i = 0; i < 128; i++) index.Rebuild(after, before);
@@ -128,11 +130,14 @@ public sealed class CorrespondenceContractTests
         Assert.Equal(effect, world.GetInterpolatedInstance(1, .5f));
         Assert.Equal(ground, world.GetInterpolatedInstance(2, .5f));
         Assert.Equal(RenderTransform.Interpolate(prior[0].Transform, wreck.Transform, .5f), world.GetInterpolatedInstance(0, .5f).Transform);
-        Assert.Equal(RenderTransform.Interpolate(prior[3].Transform, receiver.Transform, .5f), world.GetInterpolatedInstance(3, .5f).Transform);
+        int receiverPrevious = Find(Snapshot(prior, 1), receiver.Entity);
+        Assert.Equal(receiverPrevious < 0 ? receiver.Transform : RenderTransform.Interpolate(prior[receiverPrevious].Transform, receiver.Transform, .5f), world.GetInterpolatedInstance(3, .5f).Transform);
         for (int i = 0; i < current.Length; i++)
         {
-            Assert.True(world.TryGetInterpolatedInstance(current[i].Entity, .5f, out var found));
-            Assert.Equal(world.GetInterpolatedInstance(i, .5f), found);
+            int slot = Find(Snapshot(current, 2), current[i].Entity);
+            bool present = world.TryGetInterpolatedInstance(current[i].Entity, .5f, out var found);
+            Assert.Equal(slot >= 0, present);
+            if (present) Assert.Equal(world.GetInterpolatedInstance(slot, .5f), found);
         }
     }
 
@@ -143,6 +148,26 @@ public sealed class CorrespondenceContractTests
         var current = Snapshot([Instance(new(1, 1), 4), Instance(new(3, 1), 5)], 2);
         var index = new RenderSnapshotIndex(false); index.Rebuild(current, prior);
         for (int i = 0; i < current.InstanceCount; i++) Assert.Equal(Find(prior, current.Instances[i].Entity), index.PreviousIndex(i));
+    }
+
+    [Fact]
+    public void RandomUnorderedAndDuplicateInputsMatchEveryBinarySearchResult()
+    {
+        var random = new Random(6173);
+        var mapping = new RenderSnapshotIndex(false);
+        for (int sample = 0; sample < 100; sample++)
+        {
+            var prior = Enumerable.Range(0, 257).Select(i => Instance(new((uint)random.Next(0, 128), (uint)random.Next(0, 4)), i)).ToArray();
+            var current = Enumerable.Range(0, 271).Select(i => Instance(new((uint)random.Next(0, 160), (uint)random.Next(0, 4)), i)).ToArray();
+            prior[0] = Instance(new(uint.MaxValue, uint.MaxValue), 1);
+            current[0] = Instance(new(uint.MaxValue, uint.MaxValue), 2);
+            prior[1] = Instance(new(0, uint.MaxValue), 3);
+            current[1] = Instance(new(0, uint.MaxValue), 4);
+            var before = Snapshot(prior, 1); var after = Snapshot(current, 2);
+            mapping.Rebuild(after, before);
+            for (int i = 0; i < current.Length; i++) Assert.Equal(Find(before, current[i].Entity), mapping.PreviousIndex(i));
+            foreach (var instance in current) Assert.Equal(Find(after, instance.Entity), mapping.FindCurrent(instance.Entity));
+        }
     }
 
     internal static PresentationSnapshot Snapshot(RenderInstance[] values, ulong tick) =>

@@ -9,7 +9,6 @@ internal sealed class RenderSnapshotIndex : IRenderSnapshotCorrespondence
     internal const int ClusterSize = InstanceVisibilityIndex.ClusterSize;
     private int[] _previousIndices = [];
     private PresentationSnapshot? _currentSnapshot;
-    private bool _currentOrdered;
     private int[] _currentOrder = [], _previousOrder = [], _sortScratch = [];
     private readonly InstanceVisibilityIndex? _legacyVisibility;
 
@@ -26,51 +25,32 @@ internal sealed class RenderSnapshotIndex : IRenderSnapshotCorrespondence
         SnapshotIdentityOrder.Ensure(ref _previousIndices, count);
         SnapshotIdentityOrder.Trim(ref _currentOrder, count);
         SnapshotIdentityOrder.Trim(ref _previousOrder, previous?.InstanceCount ?? 0);
-        SnapshotIdentityOrder.Trim(ref _sortScratch, Math.Max(count, previous?.InstanceCount ?? 0));
-        _currentOrdered = SnapshotIdentityOrder.Prepare(current, ref _currentOrder, ref _sortScratch, out _);
+        SnapshotIdentityOrder.Trim(ref _sortScratch, count);
+        bool currentOrdered = SnapshotIdentityOrder.Prepare(current, ref _currentOrder, ref _sortScratch);
         if (previous is null || previous.SessionId != current.SessionId)
             _previousIndices.AsSpan(0, count).Fill(-1);
         else
         {
-            bool previousOrdered = SnapshotIdentityOrder.Prepare(previous, ref _previousOrder, ref _sortScratch, out bool duplicates);
-            if (duplicates)
+            bool previousOrdered = SnapshotIdentityOrder.IsStrictlyOrdered(previous);
+            int predecessorCount = previousOrdered ? previous.InstanceCount :
+                SnapshotIdentityOrder.PrepareSearchable(previous, ref _previousOrder);
+            int predecessor = 0;
+            for (int ordered = 0; ordered < count; ordered++)
             {
-                // Preserve the historical binary-search tie for ambiguous duplicate caller keys.
-                for (int i = 0; i < count; i++) _previousIndices[i] = Find(previous, current.Instances[i].Entity);
-            }
-            else
-            {
-                int predecessor = 0;
-                for (int ordered = 0; ordered < count; ordered++)
-                {
-                    int index = _currentOrdered ? ordered : _currentOrder[ordered];
-                    var entity = current.Instances[index].Entity;
-                    while (predecessor < previous.InstanceCount && previous.Instances[
-                        previousOrdered ? predecessor : _previousOrder[predecessor]].Entity.CompareTo(entity) < 0)
-                        predecessor++;
-                    int candidate = predecessor == previous.InstanceCount ? -1 :
-                        previousOrdered ? predecessor : _previousOrder[predecessor];
-                    _previousIndices[index] = candidate >= 0 && previous.Instances[candidate].Entity == entity ? candidate : -1;
-                }
+                int index = currentOrdered ? ordered : _currentOrder[ordered];
+                var entity = current.Instances[index].Entity;
+                while (predecessor < predecessorCount && previous.Instances[
+                    previousOrdered ? predecessor : _previousOrder[predecessor]].Entity.CompareTo(entity) < 0)
+                    predecessor++;
+                int candidate = predecessor == predecessorCount ? -1 :
+                    previousOrdered ? predecessor : _previousOrder[predecessor];
+                _previousIndices[index] = candidate >= 0 && previous.Instances[candidate].Entity == entity ? candidate : -1;
             }
         }
         _currentSnapshot = current;
         _legacyVisibility?.Rebuild(current, previous, this);
     }
-    internal int FindCurrent(EntityId entity)
-    {
-        if (_currentSnapshot is not { } snapshot) return -1;
-        int low = 0, high = snapshot.InstanceCount - 1;
-        while (low <= high)
-        {
-            int middle = low + (high - low) / 2;
-            int index = _currentOrdered ? middle : _currentOrder[middle];
-            int comparison = snapshot.Instances[index].Entity.CompareTo(entity);
-            if (comparison == 0) return index;
-            if (comparison < 0) low = middle + 1; else high = middle - 1;
-        }
-        return -1;
-    }
+    internal int FindCurrent(EntityId entity) => _currentSnapshot is { } snapshot ? Find(snapshot, entity) : -1;
     internal bool IsVisible(int firstIndex, in ViewFrustum frustum) =>
         (_legacyVisibility ?? throw new InvalidOperationException("Visibility belongs to the separate index.")).IsVisible(firstIndex, frustum);
     private static int Find(PresentationSnapshot snapshot, ForgeLine.Core.EntityId entity)

@@ -4,11 +4,15 @@
 
 Published instances retain their original order and indefinite GC-owned lifetime.
 Render-owner permutations normalize full unsigned Index/Generation identity only for
-correspondence and entity lookup. Monotone data needs no permutation. Two ascending
+correspondence. Entity queries retain the original raw binary-search result. Monotone data needs no permutation. Two ascending
 runs use a stable merge; arbitrary order uses eight stable radix passes. Spatial
 clusters, visibility interfaces, draw orchestration, GPU ABI and fences are untouched.
-Duplicate predecessor keys preserve the earlier binary-search tie as compatibility;
-they are not the unique production identity contract.
+For nonmonotone or duplicate predecessor input, a linear in-order walk of the implicit
+binary-search tree emits only keys satisfying every strict ancestor bound. These are
+exactly the hits the old search could return, already sorted, with its original ties.
+Unreachable keys remain misses. Normalizing all predecessor keys would silently fix
+old caller behavior and change interpolation, so it is deliberately avoided. Each node
+is visited at most once, with logarithmic bounded recursion depth; no input is reordered.
 
 Completed-tick combat capture still queries every eligible owned entity and copies
 every operational field. Only complete record equality, count/order and matching

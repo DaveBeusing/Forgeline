@@ -21,15 +21,13 @@ internal static class SnapshotIdentityOrder
 
     // Production has either one ascending run or ECS/dressing/VFX followed by decals.
     // Arbitrary caller order uses eight stable radix passes over the full uint/uint identity.
-    internal static bool Prepare(PresentationSnapshot snapshot, ref int[] order, ref int[] scratch, out bool duplicates)
+    internal static bool Prepare(PresentationSnapshot snapshot, ref int[] order, ref int[] scratch)
     {
         int split = -1;
         bool manyRuns = false;
-        duplicates = false;
         for (int i = 1; i < snapshot.InstanceCount; i++)
         {
             int comparison = snapshot.Instances[i - 1].Entity.CompareTo(snapshot.Instances[i].Entity);
-            if (comparison == 0) duplicates = true;
             if (comparison <= 0) continue;
             if (split >= 0) manyRuns = true;
             else split = i;
@@ -61,8 +59,6 @@ internal static class SnapshotIdentityOrder
                 (source, destination) = (destination, source);
             }
         }
-        for (int i = 1; i < count; i++)
-            if (snapshot.Instances[order[i - 1]].Entity == snapshot.Instances[order[i]].Entity) duplicates = true;
         return false;
 
         int Digit(int index, int pass)
@@ -72,4 +68,36 @@ internal static class SnapshotIdentityOrder
             return (int)((value >> ((pass & 3) * 8)) & 255);
         }
     }
+    internal static bool IsStrictlyOrdered(PresentationSnapshot snapshot)
+    {
+        for (int i = 1; i < snapshot.InstanceCount; i++)
+            if (snapshot.Instances[i - 1].Entity.CompareTo(snapshot.Instances[i].Entity) >= 0) return false;
+        return true;
+    }
+
+    // A binary-search hit is reachable exactly when its key obeys every ancestor's
+    // strict bounds. In-order traversal emits those hits in sorted order, including
+    // the original duplicate tie. This preserves existing unordered caller behavior.
+    internal static int PrepareSearchable(PresentationSnapshot snapshot, ref int[] order)
+    {
+        Ensure(ref order, snapshot.InstanceCount);
+        int[] indices = order;
+        int written = 0;
+        Visit(0, snapshot.InstanceCount - 1, null, null);
+        return written;
+
+        void Visit(int low, int high, ForgeLine.Core.EntityId? lower, ForgeLine.Core.EntityId? upper)
+        {
+            if (low > high || lower.HasValue && upper.HasValue && lower.Value >= upper.Value) return;
+            int middle = low + (high - low) / 2;
+            var key = snapshot.Instances[middle].Entity;
+            var leftUpper = !upper.HasValue || key < upper.Value ? key : upper.Value;
+            Visit(low, middle - 1, lower, leftUpper);
+            if ((!lower.HasValue || key > lower.Value) && (!upper.HasValue || key < upper.Value))
+                indices[written++] = middle;
+            var rightLower = !lower.HasValue || key > lower.Value ? key : lower.Value;
+            Visit(middle + 1, high, rightLower, upper);
+        }
+    }
+
 }
