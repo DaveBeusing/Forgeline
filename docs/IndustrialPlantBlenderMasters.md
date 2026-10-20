@@ -22,6 +22,15 @@ were returned for #182, #229, #269 or #268. The current ownership manifest reser
 `assets/source/` and the compiler for the render residency lane. This work therefore
 uses isolated output and does not promote sources or change renderer contracts.
 
+The integration base subsequently advanced to
+`538ddc0bd49a722462bf185cfc118cf5a3e5008f` (PR #268 merged, `0.1.427-dev`).
+This branch synchronized that complete base and reconciled its single net PATCH
+to `0.1.428-dev`. The incoming delta is qualification code/tests/documentation,
+not renderer, mesh, material or canonical source changes. Its five source-bound
+workflows passed, but physical jobs were skipped and the declared physical,
+complete-frame/memory/lifecycle and human visual gates remain open. Merge status
+does not grant production promotion.
+
 ## Reproduction
 
 Use the pinned Blender 5.2.2 x64, .NET SDK 10.0.401 and PowerShell 7.4+:
@@ -106,7 +115,7 @@ actual content independently of those commit boundaries.
 | Pinned native Blender | 5.2.2 x64, build `d13f752e3b9c`; executable SHA-256 `f141a3c5754500e6f84361099a4cd53f0bb7662b6a0d2cfaaa8fbb63e92234a0` |
 | Release restore/build | Passed; zero warnings/errors |
 | Project graph | Passed, 44 projects |
-| PR version | 0.1.426 to 0.1.427, exactly one PATCH |
+| PR version | Reconciled to 0.1.428 against current master 0.1.427, exactly one net PATCH |
 | Portable source/export contracts | 29 passed |
 | Existing building presentation regressions | 26 passed |
 | Native scene mutation contracts | 19 invalid scenes rejected; two-slot/tangent positive passed |
@@ -120,8 +129,11 @@ actual content independently of those commit boundaries.
 | PBR review | Six 384x216 CPU Cycles authoring images; 7,323,648 texture payload bytes per family |
 | Packed PBR projects | Both reopened; all three embedded image hashes and semantic color spaces match source; relative image references retained |
 | Retained source lineage | Both masters and all 22 GLBs match current source geometry and recorded hashes |
-| Complete Release suite | In progress at this checkpoint |
-| Native D3D12 / installed package / physical performance | Pending |
+| Complete Release suite before base synchronization | 3,207 total: 3,184 passed, 23 optional skips, zero failures; 38m 47.689s |
+| Natural headless match | Seed 2026, Victory / CommandCoreDestroyed, winner 1 at tick 55,210; exit 0 |
+| Native D3D12 preservation views | 24 images / 12 before-after pairs, High at 1080p/4K and three zooms; all repeat reads identical and structural checks pass |
+| Native pixel observations | Fuel: one changed pixel across six pairs; ammunition: 14 across six pairs; maximum channel delta 1, unchanged zero-tolerance observation policy |
+| Installed package / physical performance | Pending |
 | Render integration and human art approval | Blocked/open; no production promotion |
 
 Original source qualification, packed-image checks, native mutation results, PBR
@@ -131,6 +143,17 @@ authoring inspection, not native game captures, accepted goldens or FPS evidence
 The actual commands above generate raw compiler, source-less and typed comparison
 logs under `artifacts/ip1/`; canonical, build, full-suite and overlay logs are under
 `artifacts/industrial-plants/`.
+
+The first native matrix binds executable source
+`de5991b07b01b0b30c5be3feab4cd6a419d0b06e`, version `0.1.427-dev`, on NVIDIA RTX
+PRO 5000 Blackwell Generation Laptop GPU. It uses three warmup frames, eight
+samples and eight independent readbacks per case. Source, hardware and settings
+match within each before/after pair; the runtime catalogs intentionally differ.
+The 15 one-byte pixel observations remain recorded without causal attribution,
+image tolerance changes or golden approval. CloseTactical retains the existing
+gallery framing that clips the nearest foundation at the viewport edge. These
+short functional runs do not establish sustained performance or moving-LOD quality.
+The D3D12 debug layer was unavailable.
 
 Keep qualification output paths short on Windows. The longer initial
 `artifacts/industrial-plants/qualified` path exceeded the native file path limit
