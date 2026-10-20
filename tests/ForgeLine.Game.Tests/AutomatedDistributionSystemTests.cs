@@ -999,6 +999,31 @@ public sealed class AutomatedDistributionSystemTests
         Assert.Equal(0, fixture.Distribution.Metrics.BacklogRequestCount);
     }
 
+    [Fact]
+    public void DisabledPendingPolicyCannotDispatchAfterItsRouteRecovers()
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 100);
+        fixture.AddPolicy(fixture.DestinationEntity, 20, 60, 100, LogisticsStockPriority.High);
+        var truck = fixture.CreateTruck(fixture.SourcePosition);
+        fixture.Simulation.AdvanceOneTick();
+        var initial = Assert.Single(fixture.Distribution.LastDebugSnapshot.Requests);
+        Assert.Equal(LogisticsTransportRequestState.RetryPending, initial.State);
+
+        EntityId policyEntity = EntityId.Invalid;
+        foreach (EntityId entity in fixture.Simulation.Entities.Query<LogisticsStockPolicy>())
+            policyEntity = entity;
+        var current = fixture.Simulation.Entities.GetComponent<LogisticsStockPolicy>(policyEntity);
+        fixture.Simulation.Entities.SetComponent(policyEntity, current with { Enabled = false });
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        fixture.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
+
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(truck));
+        Assert.Equal(0, fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.FerrousOre));
+        Assert.Equal(0, fixture.Inventories.GetReservedQuantity(fixture.SourceInventory, ResourceIds.FerrousOre));
+        Assert.Equal(0, fixture.Distribution.Metrics.CompletedRequestCount);
+        Assert.Equal(0, fixture.Distribution.Metrics.BacklogRequestCount);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
