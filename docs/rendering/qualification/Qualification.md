@@ -127,6 +127,16 @@ internal return values and adds single-journal assertions for success, native
 failure, a thrown child error and timeout. This failed attempt remains part of
 the record; it is not rerun without a code change.
 
+The [following qualification run 39495339363](https://github.com/DaveBeusing/Forgeline/actions/runs/39495339363/job/118878843053)
+on `7daf88b8b4502357f3af2eebd6358e5711e6d806` passed the new single-journal
+and native-exit assertions, then failed the literal-argument output assertion.
+Its old test cleanup did not retain the actual child bytes, so a specific
+encoding cause cannot be claimed retrospectively. The test now emits explicit
+UTF-8 bytes, compares the complete expected byte sequence and prints both hex
+values on mismatch. Failed synthetic fixtures and journals are copied to a fresh,
+checksum-verified artifact before cleanup; retention failure keeps the original
+temporary evidence. Native command logs continue to preserve original bytes.
+
 The [initial main CI run 39494628176](https://github.com/DaveBeusing/Forgeline/actions/runs/39494628176/job/118876342772)
 passed its version and metadata checks on that exact source. This establishes
 that the proposed PATCH satisfies the PR rule; it does not revise the older

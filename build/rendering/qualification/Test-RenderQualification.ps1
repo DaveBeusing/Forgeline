@@ -4,6 +4,8 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'Qualification.Commands.psm1') -Force
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('forgeline-qualification-' + [Guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($testRoot)
+$cleanupTestRoot = $true
+$failureRecord = $null
 $script:passed = 0
 function Assert-Case([bool]$Condition, [string]$Reason) {
     if (-not $Condition) { throw $Reason }
@@ -85,13 +87,23 @@ try {
 
     $pwsh = (Get-Command pwsh).Source
     $child = Join-Path $testRoot 'argument-child.ps1'
-    [IO.File]::WriteAllText($child, 'param([string]$Token) [Console]::Write($Token); exit 7')
+    # Emit known UTF-8 bytes; Console.Write may use the Windows console code page.
+    [IO.File]::WriteAllText($child, @'
+param([string]$Token)
+$bytes = [Text.Encoding]::UTF8.GetBytes($Token)
+$stdout = [Console]::OpenStandardOutput()
+$stdout.Write($bytes, 0, $bytes.Length)
+$stdout.Flush()
+exit 7
+'@)
     $literal = 'space " quote ` $() ; unicode-ö'
     $command = Invoke-QualificationProcess -Executable $pwsh -Arguments @('-NoProfile','-File',$child,'-Token',$literal) `
         -WorkingDirectory $testRoot -JournalRoot $testRoot -Id 'failure'
     Assert-Case ($command -is [Collections.IDictionary]) 'The process wrapper emitted internal task results alongside its command journal.'
     Assert-Case ($command.exitCode -eq 7 -and $command.nativeExitCode -eq 7) 'The actual native failure exit was lost.'
-    Assert-Case ([IO.File]::ReadAllText((Join-Path $testRoot 'failure.stdout.log')) -ceq $literal) 'Literal argument data was executed or altered.'
+    $actualBytes = [Convert]::ToHexString([IO.File]::ReadAllBytes((Join-Path $testRoot 'failure.stdout.log')))
+    $expectedBytes = [Convert]::ToHexString([Text.Encoding]::UTF8.GetBytes($literal))
+    Assert-Case ($actualBytes -ceq $expectedBytes) "Literal argument bytes changed: expected $expectedBytes; actual $actualBytes."
     Assert-Rejected { Assert-QualificationCommand $command } 'A failed native command was accepted.'
     Assert-Rejected { Invoke-QualificationProcess -Executable $pwsh -Arguments @('-NoProfile','-File',$child) -WorkingDirectory $testRoot -JournalRoot $testRoot -Id 'failure' } 'An existing command journal was reused.'
     $saved = Get-Content -LiteralPath (Join-Path $testRoot 'failure.json') -Raw | ConvertFrom-Json
@@ -118,4 +130,37 @@ try {
     Assert-Case ($timeout -is [Collections.IDictionary]) 'A timed-out process returned more than its command journal.'
     Assert-Case ($timeout.timedOut -and $timeout.exitCode -ne 0 -and $null -ne $timeout.nativeExitCode) 'A timed-out native process was accepted or lost its actual exit.'
     Write-Output "PASS: $script:passed qualification orchestration assertions. No physical GPU acceptance is inferred."
-} finally { Remove-Item -LiteralPath $testRoot -Recurse -Force }
+} catch {
+    $failureRecord = $_
+    try {
+        $artifactRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../artifacts'))
+        [void][IO.Directory]::CreateDirectory($artifactRoot)
+        $failureRoot = Join-Path $artifactRoot ('render-qualification-contracts-failure-' + [Guid]::NewGuid().ToString('N'))
+        New-Item -ItemType Directory -Path $failureRoot -ErrorAction Stop | Out-Null
+        $snapshotPath = Join-Path $failureRoot 'synthetic-fixtures-and-journals'
+        $originalIdentity = Get-QualificationTreeIdentity $testRoot
+        Copy-Item -LiteralPath $testRoot -Destination $snapshotPath -Recurse -ErrorAction Stop
+        $snapshotIdentity = Get-QualificationTreeIdentity $snapshotPath
+        if ($snapshotIdentity.sha256 -cne $originalIdentity.sha256) { throw 'Synthetic failure evidence changed during retention.' }
+        Write-QualificationJson -Path (Join-Path $failureRoot 'synthetic-failure.json') -Value @{
+            schemaVersion = 1; artifactKind = 'synthetic-qualification-contract-test-failure'
+            observedAtUtc = [DateTimeOffset]::UtcNow.ToString('o'); message = $failureRecord.Exception.Message
+            scriptStackTrace = $failureRecord.ScriptStackTrace; position = $failureRecord.InvocationInfo.PositionMessage
+            note = 'Synthetic test fixtures and journals only. No product measurements or physical GPU acceptance.'
+            snapshot = @{ path = 'synthetic-fixtures-and-journals'; sha256 = $snapshotIdentity.sha256; files = $snapshotIdentity.files }
+        }
+        Write-Host "Preserved synthetic qualification failure evidence: $failureRoot"
+    } catch {
+        $cleanupTestRoot = $false
+        Write-Warning "Could not retain synthetic failure artifacts: $($_.Exception.Message). Original journals remain at $testRoot."
+    }
+    throw $failureRecord
+} finally {
+    if ($cleanupTestRoot) {
+        try { Remove-Item -LiteralPath $testRoot -Recurse -Force }
+        catch {
+            if ($null -eq $failureRecord) { throw }
+            Write-Warning "Synthetic test cleanup failed: $($_.Exception.Message). The original test failure is retained."
+        }
+    }
+}
