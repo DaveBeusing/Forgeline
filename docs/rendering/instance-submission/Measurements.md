@@ -39,12 +39,12 @@ adapter allocation sample is zero. Median ranges in microseconds:
 
 | Workload | Reference A/B | Corrected A/B |
 | --- | ---: | ---: |
-| 872 visible near roots | 239.3Ã¢â‚¬â€œ245.4 | 150.5Ã¢â‚¬â€œ193.4 |
-| 5,000 fully culled roots | 4.0Ã¢â‚¬â€œ4.2 | 1.6Ã¢â‚¬â€œ2.7 |
-| 10,000 distributed roots, pan/zoom | 1,187.0Ã¢â‚¬â€œ1,237.1 | 602.1Ã¢â‚¬â€œ655.0 |
-| 10,000 distributed roots, new snapshot pair | 2,089.4Ã¢â‚¬â€œ2,493.4 | 2,023.8Ã¢â‚¬â€œ2,140.4 |
-| Mechanical fixed 1,000 roots / 9,750 parts | 1,930.1Ã¢â‚¬â€œ2,307.1 | 1,910.1Ã¢â‚¬â€œ2,898.1 |
-| Changing alpha, single snapshot, main + light | 3,696.1Ã¢â‚¬â€œ3,884.5 | 3,619.6Ã¢â‚¬â€œ4,862.6 |
+| 872 visible near roots | 239.3ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“245.4 | 150.5ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“193.4 |
+| 5,000 fully culled roots | 4.0ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“4.2 | 1.6ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2.7 |
+| 10,000 distributed roots, pan/zoom | 1,187.0ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“1,237.1 | 602.1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“655.0 |
+| 10,000 distributed roots, new snapshot pair | 2,089.4ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2,493.4 | 2,023.8ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2,140.4 |
+| Mechanical fixed 1,000 roots / 9,750 parts | 1,930.1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2,307.1 | 1,910.1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2,898.1 |
+| Changing alpha, single snapshot, main + light | 3,696.1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“3,884.5 | 3,619.6ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“4,862.6 |
 
 Mechanical timings and CPU tails remain mixed. No general mechanical speedup,
 sustained FPS improvement, stable-clock equivalence or complete performance
@@ -171,3 +171,8 @@ samples, with zero submission and binding faults. Twelve of 16 paired images
 are exact; the same tactical High/Low shadow changes remain. Human approval,
 sweep demand/plateau coverage and the full CI remain open. No extra native
 quality reduction, runtime-policy change or new golden was introduced.
+
+CPU raw sample streams are also losslessly compressed as .json.gz.
+raw-file-hashes.json records the original decompressed bytes; hashes.json records
+the committed files. Decompress a cohort to a temporary directory before running
+SummarizeComparison.py; metadata, summaries and source archives stay directly readable.
