@@ -1,3 +1,4 @@
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -50,10 +51,13 @@ public sealed class CargoFleetShortageTracker
             var request = distribution.Requests[requestIndex];
             if (request.State != LogisticsTransportRequestState.RetryPending ||
                 request.FailureReason != LogisticsTransportRequestFailureReason.NoTruckAvailable ||
-                !entities.TryGetComponent(request.PolicyEntity, out LogisticsStockPolicy policy) ||
-                !policy.Enabled || !entities.IsAlive(policy.TargetEntity) ||
+                !entities.TryGetComponent(request.PolicyEntity, out LogisticsStockPolicy policy))
+                continue;
+            if (!policy.Enabled || !entities.IsAlive(policy.TargetEntity) ||
                 !entities.TryGetComponent(policy.TargetEntity, out CompletedBuilding target) ||
                 target.Owner != player ||
+                !entities.TryGetComponent(policy.TargetEntity, out ControllableEntity control) ||
+                control.Owner != player || !control.IsControllable ||
                 entities.TryGetComponent(policy.TargetEntity, out HealthState health) && health.IsDepleted)
                 continue;
 
@@ -190,6 +194,8 @@ public sealed class CargoFleetShortageTracker
         entities.IsAlive(entity) &&
         entities.TryGetComponent(entity, out CompletedBuilding completed) &&
         completed.Owner == player &&
+        entities.TryGetComponent(entity, out ControllableEntity control) &&
+        control.Owner == player && control.IsControllable &&
         (!entities.TryGetComponent(entity, out HealthState health) || !health.IsDepleted);
 
     private void ResetEvidence()
