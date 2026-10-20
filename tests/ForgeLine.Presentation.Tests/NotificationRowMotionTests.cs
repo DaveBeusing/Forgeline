@@ -72,6 +72,28 @@ public sealed class NotificationRowMotionTests
     }
 
     [Fact]
+    public void ReappearingCurrentIdentityReversesItsOutgoingEntryWithoutJumping()
+    {
+        var layout = GameplayHudLayout.Create(1920, 1080, 96);
+        var area = layout.NotificationBounds() with { Height = 36 };
+        var motion = new NotificationSurfaceMotion();
+        var start = TimeSpan.FromSeconds(1);
+        var card = One(area);
+        motion.Update(default, new(1), layout, start, true);
+        motion.Update(card, new(1), layout, start + TimeSpan.FromMilliseconds(16), true);
+        motion.Update(card, new(1), layout, start + TimeSpan.FromMilliseconds(106), true);
+        Assert.InRange(motion.Opacity(0), .45f, .55f);
+        motion.Update(default, new(1), layout, start + TimeSpan.FromMilliseconds(122), true);
+        Assert.Equal(1, motion.RetiredCount);
+        motion.Update(card, new(1), layout, start + TimeSpan.FromMilliseconds(138), true);
+        Assert.InRange(motion.Opacity(0), .40f, .55f);
+        Assert.Equal(0, motion.RetiredCount);
+        motion.Update(card, new(1), layout, start + TimeSpan.FromMilliseconds(318), true);
+        Assert.Equal(1, motion.Opacity(0));
+        Assert.Equal(area, motion.EnteringBounds(area, 0));
+    }
+
+    [Fact]
     public void ResolvedMessageHasNoHitTargetDuringDecorativeFade()
     {
         var layout = GameplayHudLayout.Create(1920, 1080, 96);
