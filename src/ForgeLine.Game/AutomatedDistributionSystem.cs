@@ -808,6 +808,12 @@ public sealed class AutomatedDistributionSystem
                     entities.TryGetComponent(destination.Entity, out ProductionFacility facility) &&
                     facility.Supports(ProductionCapability.FuelProcessing)))
             {
+                // Preserve the physical shipment; request real service instead of treating
+                // an underfueled, otherwise free truck as permanently undispatchable.
+                if (entities.HasComponent<UnitFuelState>(entity))
+                    VehicleDockingService.Put(entities, entity,
+                        new CargoFuelServiceDemand(entities.TryGetComponent(entity, out CargoTransportRuntimeState previous)
+                            ? previous.StateChangedAtTick : SimulationTick.Zero));
                 continue;
             }
 
