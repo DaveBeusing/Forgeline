@@ -221,6 +221,16 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 entity,
                 out CargoTransportOrder order))
         {
+            // The order may already be canceled after a service failure. The
+            // vehicle still owns its physical bay until it has driven clear.
+            if (context.Entities.TryGetComponent(entity, out VehicleDockVisit abandonedVisit) &&
+                abandonedVisit.Status == VehicleDockStatus.Exiting &&
+                !_docks.Exit(context, entity))
+            {
+                PrepareDockFuelBudget(context, entity);
+                return;
+            }
+
             if (state.Lifecycle !=
                 CargoTransportLifecycleState.Idle)
             {
@@ -1970,7 +1980,17 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
-        VehicleDockingService.Cancel(entities, entity);
+        if (VehicleDockingService.BeginFailureExit(entities, entity))
+        {
+            // The failed request releases its reservation independently. Keep
+            // the visit and slot alive until the dock's physical exit completes.
+            if (entities.HasComponent<CargoTransportOrder>(entity))
+                entities.RemoveComponent<CargoTransportOrder>(entity);
+        }
+        else
+        {
+            VehicleDockingService.Cancel(entities, entity);
+        }
         ClearNavigation(
             entities,
             entity);
