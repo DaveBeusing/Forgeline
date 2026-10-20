@@ -33,6 +33,8 @@ def main() -> None:
             selected.extend(p for p in path.rglob("*") if p.is_file()
                             and not {"bin", "obj"}.intersection(p.relative_to(path).parts)
                             and (p.suffix in TEXT_SUFFIXES or p.suffix == ".png"))
+        elif path.is_dir() and "-package-" in path.name and path.name.endswith("-smoke"):
+            selected.extend(p for p in path.iterdir() if p.is_file() and p.suffix in TEXT_SUFFIXES)
         elif path.is_dir() and "-package-" in path.name:
             selected.extend(p for p in path.rglob("*") if p.is_file() and p.name in
                             {"build-provenance.json", "asset-qualification.json", "asset-compilation.jsonl"})

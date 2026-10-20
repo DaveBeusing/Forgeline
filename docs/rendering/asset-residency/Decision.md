@@ -72,3 +72,8 @@ The 96-MiB geometry/mip cap is per live device/catalog/profile store. With the e
 two live generations, at most 192 MiB of that logical data can be pinned during reconstruction.
 Terrain chunks, transient frame buffers, render targets, native allocator padding and CPU decode
 storage are separately bounded/observed systems and are not silently included in that number.
+
+Unpinned in-flight native retirements are governed by the existing bounded fence-retirement
+implementation; they are not counted as live pinned cache entries. The 192-MiB figure is therefore
+not a strict process VRAM cap. Staging, allocator overhead and in-flight physical storage are
+separate observations, with final fence-drained plateau evidence retained explicitly.

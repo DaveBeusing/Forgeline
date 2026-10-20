@@ -363,6 +363,46 @@
       "storedSha256": "d379c146e5349674fc8935ac61ef855675a2cf4f137faf16e33d4ab859c571ab"
     },
     {
+      "source": "artifacts/asset-residency-master-build.log",
+      "originalBytes": 5975,
+      "originalSha256": "33e85bcce5ddf5ec33856030b2d37d116fd5e10bcf49e6634effec4f66401f4f",
+      "retainedBytes": 5975,
+      "retainedSha256": "33e85bcce5ddf5ec33856030b2d37d116fd5e10bcf49e6634effec4f66401f4f",
+      "redacted": false,
+      "object": "objects/33e85bcce5ddf5ec33856030b2d37d116fd5e10bcf49e6634effec4f66401f4f.gz",
+      "storedSha256": "770992dc9fa589606b7e08d4ee9752f9bba40a1003fa2eda77c3c705d8f257c2"
+    },
+    {
+      "source": "artifacts/asset-residency-master-final-summary.json",
+      "originalBytes": 2552,
+      "originalSha256": "2a3dcdcbefed86c9fb50d42c79e2880d1daaa1e3fda625768be88a952086d7a1",
+      "retainedBytes": 2552,
+      "retainedSha256": "2a3dcdcbefed86c9fb50d42c79e2880d1daaa1e3fda625768be88a952086d7a1",
+      "redacted": false,
+      "object": "objects/2a3dcdcbefed86c9fb50d42c79e2880d1daaa1e3fda625768be88a952086d7a1.gz",
+      "storedSha256": "45edf165bb3e9191af95108786291fc56a01f86d7bc70e1d1c1940ca54916f0a"
+    },
+    {
+      "source": "artifacts/asset-residency-master-solution-tests.log",
+      "originalBytes": 26883,
+      "originalSha256": "51a63f6a71fb88901ff5189301e8dfd7efdc325b4b665e3a3d20fd3836725b28",
+      "retainedBytes": 26883,
+      "retainedSha256": "51a63f6a71fb88901ff5189301e8dfd7efdc325b4b665e3a3d20fd3836725b28",
+      "redacted": false,
+      "object": "objects/51a63f6a71fb88901ff5189301e8dfd7efdc325b4b665e3a3d20fd3836725b28.gz",
+      "storedSha256": "4d0985ae7a89afe53450b9b7845ed94cbe380e510df6fccca408c82c0dcc449a"
+    },
+    {
+      "source": "artifacts/asset-residency-master-status.json",
+      "originalBytes": 288,
+      "originalSha256": "768d551beac0390a9d322df0d768b155e61850f4f2c387e1108d99f574249ad4",
+      "retainedBytes": 288,
+      "retainedSha256": "768d551beac0390a9d322df0d768b155e61850f4f2c387e1108d99f574249ad4",
+      "redacted": false,
+      "object": "objects/768d551beac0390a9d322df0d768b155e61850f4f2c387e1108d99f574249ad4.gz",
+      "storedSha256": "6eb5ca6d81296152e5f451de6798f1d1561b2c94520bb7232c875843d0dbd98e"
+    },
+    {
       "source": "artifacts/asset-residency-native-cancel/failure.json",
       "originalBytes": 1698,
       "originalSha256": "c729b0c267afca8844416bca30aca9f8807aa2468d34a91fd4c544620011d93a",
@@ -1063,6 +1103,246 @@
       "storedSha256": "41d613f65d77dc1c3d426660d6177746c31da9da83f8b31abbbbe3bc5209046e"
     },
     {
+      "source": "artifacts/asset-residency-native-master-final/baseline/IndustrialBase-1920x1080-High-CloseTactical.png",
+      "originalBytes": 4500953,
+      "originalSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "retainedBytes": 4500953,
+      "retainedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "redacted": false,
+      "object": "objects/555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f.png",
+      "storedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline/IndustrialBase-1920x1080-High-NormalGameplay.png",
+      "originalBytes": 4873619,
+      "originalSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "retainedBytes": 4873619,
+      "retainedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "redacted": false,
+      "object": "objects/54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c.png",
+      "storedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline/IndustrialBase-1920x1080-High-Strategic.png",
+      "originalBytes": 4722585,
+      "originalSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "retainedBytes": 4722585,
+      "retainedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "redacted": false,
+      "object": "objects/0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264.png",
+      "storedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline/MainBattleTankProduction-1920x1080-High-CloseTactical.png",
+      "originalBytes": 4464188,
+      "originalSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "retainedBytes": 4464188,
+      "retainedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "redacted": false,
+      "object": "objects/c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320.png",
+      "storedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline/MainBattleTankProduction-1920x1080-High-NormalGameplay.png",
+      "originalBytes": 4856289,
+      "originalSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "retainedBytes": 4856289,
+      "retainedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "redacted": false,
+      "object": "objects/f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0.png",
+      "storedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline/MainBattleTankProduction-1920x1080-High-Strategic.png",
+      "originalBytes": 4714892,
+      "originalSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "retainedBytes": 4714892,
+      "retainedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "redacted": false,
+      "object": "objects/573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a.png",
+      "storedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline/manifest.json",
+      "originalBytes": 2514374,
+      "originalSha256": "1c01b6d9d8fcae2289014c3db520c112a87a59df96bc2860f085ab4afcf25424",
+      "retainedBytes": 2514374,
+      "retainedSha256": "1c01b6d9d8fcae2289014c3db520c112a87a59df96bc2860f085ab4afcf25424",
+      "redacted": false,
+      "object": "objects/1c01b6d9d8fcae2289014c3db520c112a87a59df96bc2860f085ab4afcf25424.gz",
+      "storedSha256": "ff85a43feedc742097a690a772a33a76e3c962d9cb705345226f0179221079f3"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline.request.json",
+      "originalBytes": 1213,
+      "originalSha256": "3a53abe66a68facb00f412b2b9158fe36f87d620cf517f96b96c7f1c59786b88",
+      "retainedBytes": 1213,
+      "retainedSha256": "3a53abe66a68facb00f412b2b9158fe36f87d620cf517f96b96c7f1c59786b88",
+      "redacted": false,
+      "object": "objects/3a53abe66a68facb00f412b2b9158fe36f87d620cf517f96b96c7f1c59786b88.gz",
+      "storedSha256": "ebe5b6f928a74de1f09a39981147d28061cff8427ac0c67e57fce5546a557c42"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline.status.json",
+      "originalBytes": 131,
+      "originalSha256": "56ae4de8f608f61e4d3a83ac9d46d513cc9bf739a603ca9dea95be9885b1cd7c",
+      "retainedBytes": 131,
+      "retainedSha256": "56ae4de8f608f61e4d3a83ac9d46d513cc9bf739a603ca9dea95be9885b1cd7c",
+      "redacted": false,
+      "object": "objects/56ae4de8f608f61e4d3a83ac9d46d513cc9bf739a603ca9dea95be9885b1cd7c.gz",
+      "storedSha256": "42cab170e7479f6d40c7f32b4beaf8e1a2cccee5099c2c24451e2f29764875fd"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline.stderr.log",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedBytes": 0,
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redacted": false,
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/baseline.stdout.log",
+      "originalBytes": 925,
+      "originalSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "retainedBytes": 925,
+      "retainedSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "redacted": false,
+      "object": "objects/ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7.gz",
+      "storedSha256": "7fe7aa6fb1dd9ce7e991d089f67fa067e9367e789962448732e2fad7f99df4fe"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current/IndustrialBase-1920x1080-High-CloseTactical.png",
+      "originalBytes": 4500953,
+      "originalSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "retainedBytes": 4500953,
+      "retainedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f",
+      "redacted": false,
+      "object": "objects/555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f.png",
+      "storedSha256": "555f1271216befa60296f390dcc123e3993117b8cfb4f8a6c92864a9a0cdb69f"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current/IndustrialBase-1920x1080-High-NormalGameplay.png",
+      "originalBytes": 4873619,
+      "originalSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "retainedBytes": 4873619,
+      "retainedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c",
+      "redacted": false,
+      "object": "objects/54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c.png",
+      "storedSha256": "54930583f7e8adfb1e233249234e589e82ffece34b25b6be80ed2d6d639a262c"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current/IndustrialBase-1920x1080-High-Strategic.png",
+      "originalBytes": 4722585,
+      "originalSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "retainedBytes": 4722585,
+      "retainedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264",
+      "redacted": false,
+      "object": "objects/0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264.png",
+      "storedSha256": "0488ee1d61fc565f9a2d83c8376fd6a3fe716a602078c24cffa0b975cbc47264"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current/MainBattleTankProduction-1920x1080-High-CloseTactical.png",
+      "originalBytes": 4464188,
+      "originalSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "retainedBytes": 4464188,
+      "retainedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320",
+      "redacted": false,
+      "object": "objects/c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320.png",
+      "storedSha256": "c091b5b91419dd6808ba1358fc5a58068681fb64451311f79ba5618a99497320"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current/MainBattleTankProduction-1920x1080-High-NormalGameplay.png",
+      "originalBytes": 4856289,
+      "originalSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "retainedBytes": 4856289,
+      "retainedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0",
+      "redacted": false,
+      "object": "objects/f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0.png",
+      "storedSha256": "f156028d99a9d5ca869306b7ab30b6aae4ef4a22a84639560a09d252d54d3ae0"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current/MainBattleTankProduction-1920x1080-High-Strategic.png",
+      "originalBytes": 4714892,
+      "originalSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "retainedBytes": 4714892,
+      "retainedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a",
+      "redacted": false,
+      "object": "objects/573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a.png",
+      "storedSha256": "573ecfead47910b9aa0a13202505fdcc3f5338d02fa91008e304563613ce036a"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current/manifest.json",
+      "originalBytes": 2519153,
+      "originalSha256": "39527496aaae35b93561829499b5ef47c34f5261608195ac62b0c8756de80327",
+      "retainedBytes": 2519153,
+      "retainedSha256": "39527496aaae35b93561829499b5ef47c34f5261608195ac62b0c8756de80327",
+      "redacted": false,
+      "object": "objects/39527496aaae35b93561829499b5ef47c34f5261608195ac62b0c8756de80327.gz",
+      "storedSha256": "0d3da986892bbdd27ecfb12339012e0570c753796ff0c3829c5a61b0d8e81dad"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current.request.json",
+      "originalBytes": 1212,
+      "originalSha256": "68a496c774a821889e06ee6d2832c29b62ce27547c528a1e648aebc2ec64eec2",
+      "retainedBytes": 1212,
+      "retainedSha256": "68a496c774a821889e06ee6d2832c29b62ce27547c528a1e648aebc2ec64eec2",
+      "redacted": false,
+      "object": "objects/68a496c774a821889e06ee6d2832c29b62ce27547c528a1e648aebc2ec64eec2.gz",
+      "storedSha256": "935554cabe1d6e90b7ca59cbebeeab34ccdd819c32a538fa91b55f0397456f40"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current.status.json",
+      "originalBytes": 131,
+      "originalSha256": "1678cd268bff8e3981d8e18a2b6e23526ee58f87a5d5b724c3d145f056ecd63a",
+      "retainedBytes": 131,
+      "retainedSha256": "1678cd268bff8e3981d8e18a2b6e23526ee58f87a5d5b724c3d145f056ecd63a",
+      "redacted": false,
+      "object": "objects/1678cd268bff8e3981d8e18a2b6e23526ee58f87a5d5b724c3d145f056ecd63a.gz",
+      "storedSha256": "3d95b762ce8698b84849dc91bce66363b5937a036f98dc349cf8a7f7ca378db2"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current.stderr.log",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedBytes": 0,
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redacted": false,
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/current.stdout.log",
+      "originalBytes": 925,
+      "originalSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "retainedBytes": 925,
+      "retainedSha256": "ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7",
+      "redacted": false,
+      "object": "objects/ac3cb17bf4efa170d9fc0cc2a5b35df095e0d8e7c14f6f7c27f18e729bc877b7.gz",
+      "storedSha256": "7fe7aa6fb1dd9ce7e991d089f67fa067e9367e789962448732e2fad7f99df4fe"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/pixels.json",
+      "originalBytes": 4407,
+      "originalSha256": "d11a3d1dd33080ee87b98826ee576784b5fb390869690afa956f84a315dab239",
+      "retainedBytes": 4407,
+      "retainedSha256": "d11a3d1dd33080ee87b98826ee576784b5fb390869690afa956f84a315dab239",
+      "redacted": false,
+      "object": "objects/d11a3d1dd33080ee87b98826ee576784b5fb390869690afa956f84a315dab239.gz",
+      "storedSha256": "75f64ea36bc83af433a2f22252c4560eab57c38eeaab940e5d38dcab296eb2b1"
+    },
+    {
+      "source": "artifacts/asset-residency-native-master-final/protocol.json",
+      "originalBytes": 918,
+      "originalSha256": "a7724ffd0df747159227e2f8ab8eee23222eae16c9d3de8fe70dd2ffe4965283",
+      "retainedBytes": 754,
+      "retainedSha256": "a35b255468ddd3212ca0f48f76cfeaa844718384533b68a6e3ff1e26604c9e8a",
+      "redacted": true,
+      "object": "objects/a35b255468ddd3212ca0f48f76cfeaa844718384533b68a6e3ff1e26604c9e8a.gz",
+      "storedSha256": "2020922fbb45bbf81c06e67f53a5daf8b8bec3da79f197079ec2e0c2930da8d0"
+    },
+    {
       "source": "artifacts/asset-residency-ownership.log",
       "originalBytes": 247,
       "originalSha256": "6fdf101eab7b4b5d761563af9e84c8d36c8300bf77fed8611b06530e745f1c36",
@@ -1161,6 +1441,156 @@
       "redacted": false,
       "object": "objects/34de86e802aaa6c264ae611738a4c1c453ff9a86926505b2f0d1aa01d73fb33c.gz",
       "storedSha256": "abf6a23dd59bdce897d1bdd18470c28d8641d015fd47d967033bbca3d859995a"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master/asset-compilation.jsonl",
+      "originalBytes": 1176,
+      "originalSha256": "3b688da53cc9494b4df0db3553915bb49ded9c1c1f45cfc00f92017f35e75a0b",
+      "retainedBytes": 1176,
+      "retainedSha256": "3b688da53cc9494b4df0db3553915bb49ded9c1c1f45cfc00f92017f35e75a0b",
+      "redacted": false,
+      "object": "objects/3b688da53cc9494b4df0db3553915bb49ded9c1c1f45cfc00f92017f35e75a0b.gz",
+      "storedSha256": "13d87316b48ca7d5bb97ae55dd5b2cc34ef2bb7185a76b2865320e4598e3e9c0"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master/asset-qualification.json",
+      "originalBytes": 2110,
+      "originalSha256": "949df5e61fa871bff3c4236ad52bc41aaad68d05a9c97eb84059f4c28db6f6ac",
+      "retainedBytes": 2110,
+      "retainedSha256": "949df5e61fa871bff3c4236ad52bc41aaad68d05a9c97eb84059f4c28db6f6ac",
+      "redacted": false,
+      "object": "objects/949df5e61fa871bff3c4236ad52bc41aaad68d05a9c97eb84059f4c28db6f6ac.gz",
+      "storedSha256": "fc06ba4f1ad92c91805165debb2e0c1771208e9b86a2c98dc51e58fddc8b6001"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master/win-x64/publish/build-provenance.json",
+      "originalBytes": 730,
+      "originalSha256": "802e1c2b4ef7f0996a2929b19e3051a9ec538c4ed9b18c6f31165e18aef2f21b",
+      "retainedBytes": 730,
+      "retainedSha256": "802e1c2b4ef7f0996a2929b19e3051a9ec538c4ed9b18c6f31165e18aef2f21b",
+      "redacted": false,
+      "object": "objects/802e1c2b4ef7f0996a2929b19e3051a9ec538c4ed9b18c6f31165e18aef2f21b.gz",
+      "storedSha256": "7e76973befa23300f4befb8c73f0b92b395cb96eaf283d340052c5e8343fa950"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master-smoke/startup.json",
+      "originalBytes": 10666,
+      "originalSha256": "d842af76a80d3ce9828033ad26d9e56cc270f6acdb8f828d1f2430a0752cd6bd",
+      "retainedBytes": 10666,
+      "retainedSha256": "d842af76a80d3ce9828033ad26d9e56cc270f6acdb8f828d1f2430a0752cd6bd",
+      "redacted": false,
+      "object": "objects/d842af76a80d3ce9828033ad26d9e56cc270f6acdb8f828d1f2430a0752cd6bd.gz",
+      "storedSha256": "cab805a94678da2d29ace664a00c3a3722b5fbfe442ef730c6521705df7e6634"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master-smoke/status.json",
+      "originalBytes": 621,
+      "originalSha256": "90fb3b128723c188e4f3a818ddd1b2468aa0f4bb13c6ed20c6a86262b04146e9",
+      "retainedBytes": 621,
+      "retainedSha256": "90fb3b128723c188e4f3a818ddd1b2468aa0f4bb13c6ed20c6a86262b04146e9",
+      "redacted": false,
+      "object": "objects/90fb3b128723c188e4f3a818ddd1b2468aa0f4bb13c6ed20c6a86262b04146e9.gz",
+      "storedSha256": "7aa3c2d2e29fae48f4a1760cc9eb2bb248f7dcc8988f1ddcf3c5d4e7c6487dce"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master-smoke/stderr.log",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedBytes": 0,
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redacted": false,
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master-smoke/stdout.log",
+      "originalBytes": 3400,
+      "originalSha256": "1fe11bd5dbdbe80232e2f086d39154a87d4c80e6cb50fcb73316d0ef0423a972",
+      "retainedBytes": 3400,
+      "retainedSha256": "1fe11bd5dbdbe80232e2f086d39154a87d4c80e6cb50fcb73316d0ef0423a972",
+      "redacted": false,
+      "object": "objects/1fe11bd5dbdbe80232e2f086d39154a87d4c80e6cb50fcb73316d0ef0423a972.gz",
+      "storedSha256": "d7000eaf351a67d7a10f51929ccb01ed1094588b813dc1b46875c387cddd90d3"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master-smoke/visual.json",
+      "originalBytes": 9560,
+      "originalSha256": "21135ef0240faf494c5887b1f7f453ed7fb1f7ca6bc654b5591391f6b6532d65",
+      "retainedBytes": 9560,
+      "retainedSha256": "21135ef0240faf494c5887b1f7f453ed7fb1f7ca6bc654b5591391f6b6532d65",
+      "redacted": false,
+      "object": "objects/21135ef0240faf494c5887b1f7f453ed7fb1f7ca6bc654b5591391f6b6532d65.gz",
+      "storedSha256": "075cb0c28bcb2d1b4af3b1456262c536e7e6c322015182c4fe32ce34c14e5972"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master-smoke.log",
+      "originalBytes": 78,
+      "originalSha256": "2cf7c9999980c83a0241c91f69cce00d8d97c9473bd5bba0f7818ec5f5f5907b",
+      "retainedBytes": 78,
+      "retainedSha256": "2cf7c9999980c83a0241c91f69cce00d8d97c9473bd5bba0f7818ec5f5f5907b",
+      "redacted": false,
+      "object": "objects/2cf7c9999980c83a0241c91f69cce00d8d97c9473bd5bba0f7818ec5f5f5907b.gz",
+      "storedSha256": "506c282bb32f88ac47ca43dff90b9c3a64baad4054b6c68644272d53617618f5"
+    },
+    {
+      "source": "artifacts/asset-residency-package-master.log",
+      "originalBytes": 3402,
+      "originalSha256": "fc08c5ca5c5c9f73ddfc453638c81c7ccdf2efedc6039392f9d1502e502af244",
+      "retainedBytes": 3402,
+      "retainedSha256": "fc08c5ca5c5c9f73ddfc453638c81c7ccdf2efedc6039392f9d1502e502af244",
+      "redacted": false,
+      "object": "objects/fc08c5ca5c5c9f73ddfc453638c81c7ccdf2efedc6039392f9d1502e502af244.gz",
+      "storedSha256": "1282cbf94865358d1b5fb173de8414e85afacd094b517e63fc5bf47340667ea4"
+    },
+    {
+      "source": "artifacts/asset-residency-package-smoke/startup.json",
+      "originalBytes": 10662,
+      "originalSha256": "6fd04af8b77abe3e98d83e0375c2ebbcbcf2170945cd2db5cb58494c79bc4885",
+      "retainedBytes": 10662,
+      "retainedSha256": "6fd04af8b77abe3e98d83e0375c2ebbcbcf2170945cd2db5cb58494c79bc4885",
+      "redacted": false,
+      "object": "objects/6fd04af8b77abe3e98d83e0375c2ebbcbcf2170945cd2db5cb58494c79bc4885.gz",
+      "storedSha256": "50945c7980a25d1ed23bf83e8e36fed16e0a63c2ead975792cc758d33bf2d861"
+    },
+    {
+      "source": "artifacts/asset-residency-package-smoke/status.json",
+      "originalBytes": 621,
+      "originalSha256": "1e8db63fcfd7f712897349111ac2dda1f9cf91fafcfc7d1b5fea58ed6c19e7e3",
+      "retainedBytes": 621,
+      "retainedSha256": "1e8db63fcfd7f712897349111ac2dda1f9cf91fafcfc7d1b5fea58ed6c19e7e3",
+      "redacted": false,
+      "object": "objects/1e8db63fcfd7f712897349111ac2dda1f9cf91fafcfc7d1b5fea58ed6c19e7e3.gz",
+      "storedSha256": "f14039186f5a7c493eee87ac79c2b772dccd5f52b8c058e4ffaeefe669344484"
+    },
+    {
+      "source": "artifacts/asset-residency-package-smoke/stderr.log",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retainedBytes": 0,
+      "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redacted": false,
+      "object": "objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+      "storedSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e"
+    },
+    {
+      "source": "artifacts/asset-residency-package-smoke/stdout.log",
+      "originalBytes": 3391,
+      "originalSha256": "e6a681b71206ac6e1d23de350d2979f463f5fb564cd94ac5026ff557189398f6",
+      "retainedBytes": 3391,
+      "retainedSha256": "e6a681b71206ac6e1d23de350d2979f463f5fb564cd94ac5026ff557189398f6",
+      "redacted": false,
+      "object": "objects/e6a681b71206ac6e1d23de350d2979f463f5fb564cd94ac5026ff557189398f6.gz",
+      "storedSha256": "50cd580e01c6381e1e08ee433b447dd5db8d981360d4a5bfaa28182429f7ab61"
+    },
+    {
+      "source": "artifacts/asset-residency-package-smoke/visual.json",
+      "originalBytes": 9571,
+      "originalSha256": "a5449b623ce75da380c2a05259397c8d9d8f502546e3daa3e9ec89a0f817ca9b",
+      "retainedBytes": 9571,
+      "retainedSha256": "a5449b623ce75da380c2a05259397c8d9d8f502546e3daa3e9ec89a0f817ca9b",
+      "redacted": false,
+      "object": "objects/a5449b623ce75da380c2a05259397c8d9d8f502546e3daa3e9ec89a0f817ca9b.gz",
+      "storedSha256": "c053b570a40ac9153eb87f2da90b7fea4c116f136589bb5c71a9f1e408ed3cfd"
     },
     {
       "source": "artifacts/asset-residency-package-smoke.log",

@@ -1,6 +1,6 @@
 # Asset residency qualification
 
-Status: implementation under qualification; complete affected suites, native cold/warm evidence and CI acceptance are pending.
+Status: implemented, not accepted. Functional build/asset/scene/package checks pass; original warm performance gates, existing gameplay baselines, human image approval and final CI remain open.
 
 Baseline master is 47f4230f487e37f699b6572354e89f800476c513, version 0.1.420.
 The accepted render foundation and initialized static-buffer implementation are integrated.
@@ -176,3 +176,47 @@ A subsequent remote-master advance to a1610d1a51d4107c4b8202e234ed33edd3cfc9c9 i
 logistics/alert/CI changes and version 0.1.421. Historical measurements above remain tied to their
 actual sources. The branch must integrate that master, move its isolated delta to 0.1.422 and
 repeat integrated build/tests before any final acceptance claim.
+
+
+## Current-master integration
+
+Master a1610d1a51d4107c4b8202e234ed33edd3cfc9c9 is merged without rewriting history. The isolated
+version delta is now exactly 0.1.421 -> 0.1.422. Product source 1edf00e20cdc3887eebeab57da2cc0863ea60106
+builds with zero warnings/errors (2m08.90s). Its complete unfiltered solution run finishes in
+7m16.338s: 3,047 passed, five failed, eighteen optional skips / 3,070 total, exit two. All modules
+except Game pass, including the entire Assets, Graphics, Presentation and Client suites. The five
+remaining failures are the previously documented supply, docking, tactical refueling, expansion
+funding and EastOffensiveObjective cases. DirectCombatTargetsRequireCurrentIdentifiedIntelligence
+now passes following the master update. Game, Game tests, Logistics, Simulation and Economy have
+no branch delta from current master. An independently isolated current-master baseline run
+likewise reports five failures/two passes across those seven original cases.
+
+The final integrated image/function matrix compares the unchanged current-master a1610d1a client
+with product 1edf00e2, same owned runtime root, High/1920x1080, three zooms and two scenes,
+128 warmups/64 samples/two repeat readbacks. Both native processes exit zero. All six rows have
+identical runtime/device context and MaximumChannelDelta zero. This deliberately shorter final
+image verification is not a replacement warm performance cohort and grants no timing acceptance.
+The original failed B-A-A-B reports remain the relevant unresolved timing observations.
+
+The final 0.1.422 runtime-only archive passes asset/UI/icon/audio validation and actual player
+startup, exit zero, own packaged runtime confirmed, 1,532 archive entries/no authoring files.
+The complete package and images in this observation use source 1edf00e2; subsequent integration
+is recorded separately and is not inferred from these earlier images. The accepted native plateau observation remains source 16071418; residency,
+render-host and reference-capture implementation files are unchanged by the master integration.
+Its nine steady retired observations therefore remain a source-identified functional memory
+result, while the final master-derived image and complete solution checks cover integration.
+
+No frame gate, quality level, source texture, gameplay assertion or public renderer/graphics
+contract is weakened. The PR remains draft until performance qualification, the visible baseline
+blockers and required final CI/image acceptance are resolved. Main CI on the earlier product
+source completed frame, movement and scalability checks; its long main job and the final
+synchronization checks are reported by their actual status, never inferred from local success.
+
+
+## Submission integration in current master
+
+Master advances again to cd62153e by integrating the independently qualified instance-submission
+implementation. This changes SimpleInstanceRenderer/visibility/submission code, so the combined
+residency/submission product needs a new integrated build and complete suite. Existing records
+above retain their exact source identities and unresolved gates. The next isolated version delta
+is 0.1.422 -> 0.1.423. No existing timing result is relabelled as the new product or current master.
