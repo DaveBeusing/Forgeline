@@ -24,6 +24,7 @@ public sealed class AutomatedDistributionSystem
     private readonly ulong _fairnessAgingTicks;
     private readonly List<RequestState> _requests = new();
     private readonly List<RequestState> _dispatchCandidates = new();
+    private readonly List<EntityId> _pendingFuelServiceDemands = new();
     private readonly List<PolicyState> _policies = new();
     private readonly HashSet<EntityId> _fuelDemandTargets = new();
     private ulong _nextRequestId;
@@ -743,6 +744,7 @@ public sealed class AutomatedDistributionSystem
     {
         selectedEntity = EntityId.Invalid;
         selectedTransport = default;
+        _pendingFuelServiceDemands.Clear();
 
         bool hasOwner =
             TryResolveOwner(
@@ -811,9 +813,7 @@ public sealed class AutomatedDistributionSystem
                 // Preserve the physical shipment; request real service instead of treating
                 // an underfueled, otherwise free truck as permanently undispatchable.
                 if (entities.HasComponent<UnitFuelState>(entity))
-                    VehicleDockingService.Put(entities, entity,
-                        new CargoFuelServiceDemand(entities.TryGetComponent(entity, out CargoTransportRuntimeState previous)
-                            ? previous.StateChangedAtTick : SimulationTick.Zero));
+                    _pendingFuelServiceDemands.Add(entity);
                 continue;
             }
 
@@ -826,6 +826,10 @@ public sealed class AutomatedDistributionSystem
             }
         }
 
+        // Structural ECS writes must occur after the stable entity query ends.
+        foreach (EntityId underfueled in _pendingFuelServiceDemands)
+            if (!entities.HasComponent<CargoFuelServiceDemand>(underfueled))
+                entities.AddComponent(underfueled, new CargoFuelServiceDemand(SimulationTick.Zero));
         return selectedEntity.IsValid;
     }
 
