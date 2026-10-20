@@ -168,7 +168,7 @@ internal static class NotificationText
             if (alerts is not null)
                 for (int i = 0; i < alerts.Alerts.Count; i++)
                     if (alerts.Alerts[i].Identity.Kind == item.Kind) { label = alerts.Alerts[i].Label; break; }
-            b.Append(label);
+            b.Append(label.AsSpan());
             int count = item.Kind == PlayerAlertState.SupplyCritical ? experience.CriticalSupplyUnits :
                 item.Kind == PlayerAlertState.ProductionBlocked ? experience.BlockedProductionFacilities : 0;
             if (count > 0) { b.Append(" / "); b.Append(count); }
