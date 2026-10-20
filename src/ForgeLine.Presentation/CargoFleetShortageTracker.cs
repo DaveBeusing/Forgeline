@@ -45,8 +45,9 @@ public sealed class CargoFleetShortageTracker
         var entities = context.Entities;
         int backlog = 0;
         EntityId facility = default;
-        foreach (var request in distribution.Requests)
+        for (int requestIndex = 0; requestIndex < distribution.Requests.Count; requestIndex++)
         {
+            var request = distribution.Requests[requestIndex];
             if (request.State != LogisticsTransportRequestState.RetryPending ||
                 request.FailureReason != LogisticsTransportRequestFailureReason.NoTruckAvailable ||
                 !entities.TryGetComponent(request.PolicyEntity, out LogisticsStockPolicy policy) ||
