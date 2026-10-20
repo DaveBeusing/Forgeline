@@ -157,6 +157,25 @@ public sealed class NativeUploadSchedulingTests
     }
 
     [Fact]
+    public void SharedTexturesSurviveRootAndPassChangesAndRejectDisposedRebind()
+    {
+        using var fixture = new NativeFixture(true);
+        using IGraphicsTexture texture = fixture.Device.CreateTexture(Texture(GraphicsTextureFormat.Rgba8Unorm, true));
+        using IGraphicsBuffer vertices = fixture.Device.CreateInitializedStaticBuffer(new(36, StaticGraphicsBufferUsage.Vertex), NativeFixture.Vertices());
+        byte[] reference = fixture.Capture(vertices, texture);
+        byte[] changed = fixture.CaptureRootAndPassChanges(vertices, texture);
+        Assert.Equal(reference, changed);
+        fixture.Device.CaptureFrame(GraphicsColor.ForgeLineClear, context =>
+        {
+            fixture.BindSolidPipeline(context);
+            context.SetVertexBuffer(vertices, 12);
+            context.SetPixelTexture(0, texture); context.SetPixelTexture(0, texture);
+            context.Draw(3); texture.Dispose();
+            Assert.Throws<ObjectDisposedException>(() => context.SetPixelTexture(0, texture));
+        });
+    }
+
+    [Fact]
     public void InitializedIndexBufferMatchesItsUploadFallback()
     {
         using var fixture = new NativeFixture(false);
@@ -281,6 +300,18 @@ public sealed class NativeUploadSchedulingTests
                 _pipelines[level] = Device.CreateGraphicsPipeline(new(vertex, pixel) { VertexElements = [new("POSITION", 0, GraphicsVertexElementFormat.Float3, 0)], CullMode = GraphicsCullMode.None, PixelTextureCount = textured ? 1 : 0 });
             }
         }
+        internal byte[] CaptureRootAndPassChanges(IGraphicsBuffer vertices, IGraphicsTexture texture) => Device.CaptureFrame(GraphicsColor.ForgeLineClear, context =>
+        {
+            for (int index = 0; index < 3; index++)
+            {
+                int level = index == 1 ? 1 : 0;
+                context.SetPipeline(_pipelines[level]); context.SetVertexBuffer(vertices, 12);
+                context.SetPixelTexture(0, texture); context.SetPixelTexture(0, texture); context.Draw(3);
+            }
+            context.BeginPass(GraphicsFramePass.Overlay);
+            context.SetPipeline(_pipelines[0]); context.SetVertexBuffer(vertices, 12);
+            context.SetPixelTexture(0, texture); context.Draw(3);
+        });
         internal void BindSolidPipeline(IGraphicsCommandContext context) => context.SetPipeline(_pipelines[0]);
         internal static byte[] Vertices() => MemoryMarshal.AsBytes<float>(new float[] { -1, -1, 0, -1, 3, 0, 3, -1, 0 }.AsSpan()).ToArray();
         internal byte[] Capture(IGraphicsBuffer vertices, IGraphicsTexture? texture = null, int level = 0, IGraphicsBuffer? indexBuffer = null) => Device.CaptureFrame(GraphicsColor.ForgeLineClear, context =>

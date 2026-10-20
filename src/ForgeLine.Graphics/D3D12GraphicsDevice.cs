@@ -997,6 +997,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void DisposeNativeObjects()
     {
+        InvalidateTextureBindings();
         ReleaseUploadArena();
         ReleaseDirectionalShadows();
         ReleaseParticleQueries();
@@ -1769,7 +1770,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     internal void UseResource(GraphicsResourceRetirement.Resource resource)
     {
         ValidateRecording();
-        FlushUploads();
+        if (_activeUploadBatch >= 0) FlushUploads();
         _resources.Use(resource);
     }
 

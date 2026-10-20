@@ -109,3 +109,36 @@ host check is not a paired performance acceptance. Fixed clean paired measuremen
 will use the committed probe, preserve chronological samples and separately record
 CPU recording, final drain and unavailable GPU-copy time. No frame-context lifetime
 is weakened to remove the semantically necessary context allocation.
+
+
+## First fixed performance protocol and binding refinement
+
+The first predeclared B-A-A-B sequence uses baseline f2be6532 and repaired source
+40cf69a0. All twelve paired native images are exact; every structural/resource
+case qualifies. Both unchanged 15% gates fail: pair one has four CPU regressions
+(all strategic tank CPU mean/p50/p95/p99), pair two has three CPU regressions
+(tank close p95, tank normal p50, industrial strategic p50). No GPU metric
+regresses. Complete before/after matrices, per-frame observations and monitors
+are preserved; these failures are not overridden by the upload gains.
+
+Both paired upload runs reduce managed bytes from 67,531,680 to 157,696 for 256
+uploads. Recording windows are 287.198 -> 95.981 ms and 242.724 -> 130.767 ms;
+final drain is recorded separately. The native pool plateaus at 8 MiB. Empty
+frames remain 56 bytes each. This is a measured upload workload, not a universal
+FPS or GPU-copy timing claim.
+
+Phase data show variation across Prepare, Record and overlay work; they do not
+establish one cause for all CPU tails. The next source refinement elides redundant
+shader-heap and identical texture-table bindings. Its bounded sixteen-reference
+cache is device-owned, reset for every frame, new root and pass/native transition.
+Owner/lifetime checks precede lookup; disposed/recycled wrappers cannot hit by
+descriptor index. Constants, offsets and buffer bindings remain unconditional.
+The context object is still per callback, without an additional cache array per
+frame. An inactive upload arena also avoids a hot call into the submission path.
+
+The complete refined Graphics suite passes 111 tests, zero failures, three
+optional skips / 114 total (26.652s). Tests include root changes, pass changes,
+exact shared-texture output and disposed cached-texture rejection. A test-loop
+Analyzer failure was corrected before this passing build; no rule was suppressed.
+A new paired protocol is required for this changed source, preserving all first
+protocol results. No timer, sample, image or regression threshold is relaxed.

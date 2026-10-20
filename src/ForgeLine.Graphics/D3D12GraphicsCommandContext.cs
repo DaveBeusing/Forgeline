@@ -11,9 +11,15 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     private readonly ID3D12GraphicsCommandList _commandList;
 
     private D3D12GraphicsPipeline? _pipeline;
-    private bool _closed;
+    private bool _closed, _heapBound;
     private readonly int _outputWidth, _outputHeight;
     internal void Close() => _closed = true;
+    private void InvalidatePipelineBindings()
+    {
+        _pipeline = null;
+        _heapBound = false;
+        _owner.InvalidateTextureBindings();
+    }
     private void ValidateRecording()
     {
         ObjectDisposedException.ThrowIf(_closed, this);
@@ -28,6 +34,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         int frameIndex)
     {
         _owner = owner;
+        _owner.InvalidateTextureBindings();
         _commandList = commandList;
         _outputWidth = width;
         _outputHeight = height;
@@ -40,8 +47,8 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public int FrameIndex { get; }
 
-    public void BeginParticlePass() { ValidateRecording(); _owner.BeginParticlePass(); _pipeline = null; }
-    public void EndParticlePass() { ValidateRecording(); _owner.EndParticlePass(); _pipeline = null; }
+    public void BeginParticlePass() { ValidateRecording(); _owner.BeginParticlePass(); InvalidatePipelineBindings(); }
+    public void EndParticlePass() { ValidateRecording(); _owner.EndParticlePass(); InvalidatePipelineBindings(); }
 
     public void SetAtmosphereView(GraphicsAtmosphereView view)
     {
@@ -53,21 +60,21 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     {
         ValidateRecording();
         _owner.BeginDirectionalShadowPass(frame);
-        _pipeline = null;
+        InvalidatePipelineBindings();
     }
 
     public void EndDirectionalShadowPass()
     {
         ValidateRecording();
         _owner.EndDirectionalShadowPass();
-        _pipeline = null;
+        InvalidatePipelineBindings();
     }
 
     public void BeginPass(GraphicsFramePass pass)
     {
         ValidateRecording();
         if (_owner.BeginPass(pass))
-            _pipeline = null;
+            InvalidatePipelineBindings();
     }
 
     public void SetViewport(float x, float y, float width, float height)
@@ -118,6 +125,8 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
             _owner.ValidateParticlePipeline(d3d12Pipeline);
             return;
         }
+        _heapBound = false;
+        _owner.InvalidateTextureBindings();
         _pipeline = d3d12Pipeline;
         _commandList.SetGraphicsRootSignature(d3d12Pipeline.RootSignature);
         _commandList.SetPipelineState(d3d12Pipeline.PipelineState);
@@ -250,7 +259,12 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         }
 
         _owner.UseResource(d3d12Texture.Lifetime);
-        _commandList.SetDescriptorHeaps(_owner.ShaderResourceHeap);
+        if (_owner.TextureBindingMatches(slot, d3d12Texture)) return;
+        if (!_heapBound)
+        {
+            _commandList.SetDescriptorHeaps(_owner.ShaderResourceHeap);
+            _heapBound = true;
+        }
 
         int rootParameterIndex =
             (_pipeline.Description.VertexRootConstantCount > 0 ? 1 : 0) +
@@ -259,6 +273,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _commandList.SetGraphicsRootDescriptorTable(
             checked((uint)rootParameterIndex),
             d3d12Texture.GpuDescriptorHandle);
+        _owner.RememberTextureBinding(slot, d3d12Texture);
     }
 
     public void Draw(int vertexCount, int startVertex = 0)
