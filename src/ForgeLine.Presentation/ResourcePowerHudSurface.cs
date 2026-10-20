@@ -476,19 +476,24 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 EmitQuad(incoming.X, incoming.Y, MathF.Min(incoming.Width, color == HudAlertSeverity.Critical ? 5 : 3),
                     incoming.Height, SeverityColor(color) with { W = visibility }, width, height);
             }
-            // Text, icons and controls use the settled authorized geometry. During
-            // entrance only the clipped material advances across the safe area.
-            if (visibility < .999f) continue;
+            // Foreground geometry advances with the row and becomes visible only
+            // once its complete clip-safe bounds have entered from the right.
+            float shift = incoming.X - card.Bounds.X;
             float iconSize = stack.FontSize;
-            EmitIcon(item.Hidden > 0 ? RtsUiIcon.StatusAlert :
-                item.Feedback ? CommandIcon(experience.Feedback.Kind) : item.Local ? RtsUiIcon.StatusAlert : AlertIcon(item.Kind),
-                card.Bounds.X + (5 + 4) * ActionableAlertLayout.Scale(layout),
-                card.Bounds.Y + (card.Bounds.Height - iconSize) * .5f,
-                iconSize, width, height, visibility);
+            float iconX = card.Bounds.X + (5 + 4) * ActionableAlertLayout.Scale(layout) + shift;
+            if (iconX + iconSize <= layout.SafeArea.Right)
+                EmitIcon(item.Hidden > 0 ? RtsUiIcon.StatusAlert :
+                    item.Feedback ? CommandIcon(experience.Feedback.Kind) : item.Local ? RtsUiIcon.StatusAlert : AlertIcon(item.Kind),
+                    iconX, card.Bounds.Y + (card.Bounds.Height - iconSize) * .5f,
+                    iconSize, width, height, visibility);
             var message = NotificationText.Format(experience, alerts, item, buffer, localFeedback);
             var visible = NotificationText.Ellipsized(message, card.Text.Width, stack.FontSize, ellipsis);
-            if (!_text.AddCentered(visible, card.Text, stack.FontSize, TextColor with { W = visibility }, width, height))
-                EmitText(visible, card.Text.X, card.Text.Y, TextColor with { W = visibility }, width, height);
+            HudRect movingText = card.Text with { X = card.Text.X + shift };
+            if (movingText.Right <= layout.SafeArea.Right)
+            {
+                if (!_text.AddCentered(visible, movingText, stack.FontSize, TextColor with { W = visibility }, width, height))
+                    EmitText(visible, movingText.X, movingText.Y, TextColor with { W = visibility }, width, height);
+            }
             if (!card.Action.IsEmpty && item.Hidden == 0)
             {
                 bool collapsedMore = card.Truncated && card.Action == card.Details;
@@ -496,11 +501,17 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 if (!collapsedMore && alerts is not null)
                     for (int a = 0; a < alerts.Alerts.Count; a++)
                         if (alerts.Alerts[a].Identity.Kind == item.Kind && alerts.Alerts[a].Target.IsValid) label = "FOCUS";
-                EmitNotificationAction(label, card.Action, stack.FontSize, width, height, visibility);
+                HudRect movingAction = card.Action with { X = card.Action.X + shift };
+                if (movingAction.Right <= layout.SafeArea.Right)
+                    EmitNotificationAction(label, movingAction, stack.FontSize, width, height, visibility);
             }
             if (card.Truncated && !card.Details.IsEmpty && card.Details != card.Action && item.Hidden == 0)
-                EmitNotificationAction("MORE", card.Details, stack.FontSize, width, height, visibility);
-            if (expansion.Matches(card) && !card.ExpansionBounds.IsEmpty)
+            {
+                HudRect movingDetails = card.Details with { X = card.Details.X + shift };
+                if (movingDetails.Right <= layout.SafeArea.Right)
+                    EmitNotificationAction("MORE", movingDetails, stack.FontSize, width, height, visibility);
+            }
+            if (visibility >= .999f && expansion.Matches(card) && !card.ExpansionBounds.IsEmpty)
                 EmitExpandedNotification(card.ExpansionBounds, expansion, stack.FontSize, width, height);
         }
         // Retired cards paint only a short-lived, noninteractive background. Their old
