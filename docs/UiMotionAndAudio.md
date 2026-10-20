@@ -1,5 +1,19 @@
 # UI motion and interface audio
 
+## Notification entry and inline detail tracks
+
+New cards reveal from the right edge to their settled right-aligned bounds
+using 180-ms SmoothStep alpha and bounded horizontal geometry. No simulation
+tick drives this animation. The detail area opens below its owning card over
+200 ms with the same smooth easing, and closing reverses from the live amount.
+Only the current authorized card and its expanded bounds own pointer input;
+retired fades display no stale text or targets. Existing 0.30 background
+alpha and full-intensity severity cues are retained. Reduced motion, Low
+quality, changed presentation geometry, focus loss, a >250-ms time discontinuity
+or a reset session settle the track immediately. This feature adds no sound
+and does not acknowledge or delete a critical alert.
+
+
 Own single buildings and units now use [world anchored action rings](WorldAnchoredActionMenus.md). Selection release opens categories; the global mode bar and bound keys open the same ring. Click an item to act immediately. Parameters exposes existing priority, mode, thresholds and queue cancellation before activation; Next item selects the edited item. Back / previous / next page remain fixed controls. The inner hole and gaps allow world input; outside clicks dismiss centrally. The inspector remains informational. Multi-selection uses the same [group action rings](GroupActionMenus.md). Closed/fading rings own no input; alpha transitions last 160 ms and reduced/Low modes settle immediately.
 
 UI feedback follows presentation time. Render owners feed a monotonic clock to the
