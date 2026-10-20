@@ -89,6 +89,122 @@ public sealed class CargoDockFailureRecoveryTests
         Assert.False(simulation.Entities.HasComponent<VehicleQueueEntry>(successor));
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void MultipleDockedSourcesAndDestinationsRecoverRepeatedPhysicalDeficits(bool reverseLayout)
+    {
+        var simulation = new SimulationCoordinator(ticksPerSecond: 20);
+        var inventories = new InventoryStore();
+        var network = new LogisticsNetwork();
+        var cargo = new CargoTransportSystem(network, inventories);
+        var distribution = new AutomatedDistributionSystem(network, inventories, cargo, retryDelayTicks: 5);
+        simulation.RegisterSystem(new GroundMovementSystem());
+        simulation.RegisterSystem(distribution);
+        simulation.RegisterSystem(cargo);
+
+        float Z(float value) => reverseLayout ? 120 - value : value;
+        var firstMine = CreateBuilding(simulation, inventories, new Vector3(0, 0, Z(0)));
+        var secondMine = CreateBuilding(simulation, inventories, new Vector3(0, 0, Z(60)));
+        var thirdMine = CreateBuilding(simulation, inventories, new Vector3(0, 0, Z(120)));
+        var firstFactory = CreateBuilding(simulation, inventories, new Vector3(120, 0, Z(0)));
+        var secondFactory = CreateBuilding(simulation, inventories, new Vector3(120, 0, Z(120)));
+        var depot = CreateBuilding(simulation, inventories, new Vector3(60, 0, Z(60)));
+
+        Assert.True(inventories.Add(firstMine.Inventory, ResourceIds.Steel, 180).Succeeded);
+        Assert.True(inventories.Add(secondMine.Inventory, ResourceIds.Steel, 180).Succeeded);
+        Assert.True(inventories.Add(secondMine.Inventory, ResourceIds.Silicates, 180).Succeeded);
+        Assert.True(inventories.Add(thirdMine.Inventory, ResourceIds.Silicates, 180).Succeeded);
+
+        var sources = new[] { firstMine, secondMine, thirdMine };
+        var destinations = new[] { firstFactory, secondFactory };
+        var sourceNodes = new LogisticsNodeId[sources.Length];
+        for (int i = 0; i < sources.Length; i++)
+            sourceNodes[i] = network.AddNode(sources[i].Entity,
+                simulation.Entities.GetComponent<WorldTransform>(sources[i].Entity).Position,
+                LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoSource);
+        var depotNode = network.AddNode(depot.Entity, simulation.Entities.GetComponent<WorldTransform>(depot.Entity).Position,
+            LogisticsNodeKind.LogisticsHub, LogisticsNodeCapabilities.Storage);
+        for (int i = 0; i < sources.Length; i++)
+        {
+            var p = simulation.Entities.GetComponent<WorldTransform>(sources[i].Entity).Position;
+            var d = Vector3.Distance(p, simulation.Entities.GetComponent<WorldTransform>(depot.Entity).Position);
+            network.AddEdge(sourceNodes[i], depotNode, LogisticsTransportMode.GroundRoad, d, d, 200);
+        }
+        foreach (var factory in destinations)
+        {
+            var p = simulation.Entities.GetComponent<WorldTransform>(factory.Entity).Position;
+            var d = Vector3.Distance(p, simulation.Entities.GetComponent<WorldTransform>(depot.Entity).Position);
+            var id = network.AddNode(factory.Entity, p, LogisticsNodeKind.StorageDepot,
+                LogisticsNodeCapabilities.CargoDestination);
+            network.AddEdge(depotNode, id, LogisticsTransportMode.GroundRoad, d, d, 200);
+        }
+
+        EntityId steelPolicy = simulation.Entities.CreateEntity();
+        EntityId silicatePolicy = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(steelPolicy, new LogisticsStockPolicy(firstFactory.Entity, ResourceIds.Steel,
+            40, 80, 160, LogisticsStockPriority.Normal));
+        simulation.Entities.AddComponent(silicatePolicy, new LogisticsStockPolicy(secondFactory.Entity, ResourceIds.Silicates,
+            40, 80, 160, LogisticsStockPriority.Normal));
+        var trucks = new List<EntityId>();
+        for (int i = 0; i < 4; i++)
+        {
+            float z = Z(i % 2 == 0 ? 0 : 120);
+            trucks.Add(CargoTruckFactory.Create(simulation.Entities, inventories,
+                new Vector3(-45 - (i / 2) * 20, 1, z + 14), new PlayerId(1), cargo));
+        }
+
+        double Total(ResourceId resource)
+        {
+            double amount = 0;
+            foreach (var building in sources.Concat(destinations))
+                amount += inventories.GetQuantity(building.Inventory, resource);
+            foreach (EntityId truck in trucks)
+                amount += inventories.GetQuantity(simulation.Entities.GetComponent<CargoTransport>(truck).CargoInventory, resource);
+            return amount;
+        }
+
+        double initialSteel = Total(ResourceIds.Steel);
+        double initialSilicates = Total(ResourceIds.Silicates);
+        for (int stage = 0; stage < 2; stage++)
+        {
+            double expected = stage == 0 ? 80 : 120;
+            bool fulfilled = false;
+            for (int tick = 0; tick < 8000; tick++)
+            {
+                simulation.AdvanceOneTick();
+                if (tick % 50 == 0)
+                {
+                    Assert.Equal(initialSteel, Total(ResourceIds.Steel), 6);
+                    Assert.Equal(initialSilicates, Total(ResourceIds.Silicates), 6);
+                }
+                if (inventories.GetQuantity(firstFactory.Inventory, ResourceIds.Steel) >= expected &&
+                    inventories.GetQuantity(secondFactory.Inventory, ResourceIds.Silicates) >= expected)
+                {
+                    fulfilled = true;
+                    break;
+                }
+            }
+            Assert.True(fulfilled, $"Physical supply did not reach stage {stage}; " +
+                string.Join("; ", distribution.LastDebugSnapshot.Requests.Select(request => request.ToString())));
+            if (stage == 0)
+            {
+                simulation.Entities.SetComponent(steelPolicy, new LogisticsStockPolicy(firstFactory.Entity, ResourceIds.Steel,
+                    100, 120, 160, LogisticsStockPriority.Normal));
+                simulation.Entities.SetComponent(silicatePolicy, new LogisticsStockPolicy(secondFactory.Entity, ResourceIds.Silicates,
+                    100, 120, 160, LogisticsStockPriority.Normal));
+            }
+        }
+
+        Assert.Equal(initialSteel, Total(ResourceIds.Steel), 6);
+        Assert.Equal(initialSilicates, Total(ResourceIds.Silicates), 6);
+        foreach (var source in sources)
+        {
+            Assert.Equal(0, inventories.GetReservedQuantity(source.Inventory, ResourceIds.Steel));
+            Assert.Equal(0, inventories.GetReservedQuantity(source.Inventory, ResourceIds.Silicates));
+        }
+    }
+
     private static (EntityId Entity, InventoryId Inventory) CreateBuilding(
         SimulationCoordinator simulation, InventoryStore inventories, Vector3 position)
     {
