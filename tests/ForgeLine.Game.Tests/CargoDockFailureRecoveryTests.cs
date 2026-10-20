@@ -110,6 +110,15 @@ public sealed class CargoDockFailureRecoveryTests
         var firstFactory = CreateBuilding(simulation, inventories, new Vector3(120, 0, Z(0)));
         var secondFactory = CreateBuilding(simulation, inventories, new Vector3(120, 0, Z(120)));
         var depot = CreateBuilding(simulation, inventories, new Vector3(60, 0, Z(60)));
+        foreach (EntityId mine in new[] { firstMine.Entity, secondMine.Entity, thirdMine.Entity })
+            simulation.Entities.SetComponent(mine,
+                new CompletedBuilding(BuildingIds.Extractor, new PlayerId(1), SimulationTick.Zero));
+        simulation.Entities.SetComponent(firstFactory.Entity,
+            new CompletedBuilding(BuildingIds.VehicleFactory, new PlayerId(1), SimulationTick.Zero));
+        simulation.Entities.SetComponent(secondFactory.Entity,
+            new CompletedBuilding(BuildingIds.ElectronicsPlant, new PlayerId(1), SimulationTick.Zero));
+        simulation.Entities.SetComponent(depot.Entity,
+            new CompletedBuilding(BuildingIds.StorageDepot, new PlayerId(1), SimulationTick.Zero));
 
         Assert.True(inventories.Add(firstMine.Inventory, ResourceIds.Steel, 180).Succeeded);
         Assert.True(inventories.Add(secondMine.Inventory, ResourceIds.Steel, 180).Succeeded);
