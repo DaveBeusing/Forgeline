@@ -5,7 +5,7 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
 
-public enum VehicleQueueService : byte { CargoPickup, CargoDelivery, SupplyLoading }
+public enum VehicleQueueService : byte { CargoPickup, CargoDelivery, SupplyLoading, CargoRefueling }
 public enum VehicleQueueWaitReason : byte { None, Predecessor, OccupiedExit, Full, GeometryBlocked, Unavailable }
 
 public readonly record struct VehicleQueueSequence(ulong Value);
