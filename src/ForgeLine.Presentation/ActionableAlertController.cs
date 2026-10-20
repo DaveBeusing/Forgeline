@@ -229,6 +229,16 @@ public sealed class ActionableAlertController
             for (int i = 0; i < alerts.Alerts.Count; i++)
                 if (alerts.Alerts[i].Identity.Kind == item.Kind) { source = alerts.Alerts[i]; break; }
         text.Append("REASON: ").AppendLine(source?.Label ?? AlertLifecycleTracker.Label(item.Kind));
+        if (item.Kind == PlayerAlertState.CargoFleetShortage && source?.Fleet is { } fleet)
+        {
+            text.Append("BACKLOG: ").AppendLine(fleet.BacklogRequests.ToString(CultureInfo.InvariantCulture));
+            text.Append("ACTIVE TRUCKS: ").AppendLine(fleet.ActiveTrucks.ToString(CultureInfo.InvariantCulture));
+            text.Append("IDLE TRUCKS: ").AppendLine(fleet.IdleTrucks.ToString(CultureInfo.InvariantCulture));
+            text.Append("EFFECTIVE TRUCKS: ").AppendLine(fleet.EffectiveTrucks.ToString(CultureInfo.InvariantCulture));
+            text.Append("AFFECTED FACILITY: ").AppendLine(fleet.AffectedFacility.ToString());
+            text.AppendLine("NEXT ACTION: REVIEW LOGISTICS ORDERS AND OWNED CARGO FLEET; ADD CAPACITY ONLY IF THIS CONDITION PERSISTS");
+            return text.ToString();
+        }
         int affected = item.Kind == PlayerAlertState.SupplyCritical ? experience.CriticalSupplyUnits :
             item.Kind == PlayerAlertState.ProductionBlocked ? experience.BlockedProductionFacilities : 0;
         text.Append("AFFECTED: ").AppendLine(affected > 0 ? affected.ToString(CultureInfo.InvariantCulture) : "N/A");

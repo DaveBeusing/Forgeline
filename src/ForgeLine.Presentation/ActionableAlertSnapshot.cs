@@ -10,7 +10,8 @@ namespace ForgeLine.Presentation;
 public enum AlertSeverity : byte { Information, Warning, Critical }
 public readonly record struct AlertIdentity(SimulationSessionId Session, PlayerAlertState Kind, SimulationTick Started, PlayerId Player = default);
 public readonly record struct ActionableAlert(AlertIdentity Identity, AlertSeverity Severity, EntityId Target,
-    string Label, OperationsCategory Operations, RtsUiIcon Icon);
+    string Label, OperationsCategory Operations, RtsUiIcon Icon,
+    CargoFleetCapacityObservation? Fleet = null);
 
 /// <summary>Current conditions only; immutable, bounded and authorized at the completed tick.</summary>
 public sealed class ActionableAlertSnapshot
@@ -18,7 +19,7 @@ public sealed class ActionableAlertSnapshot
     public ActionableAlertSnapshot(SimulationSessionId session, SimulationTick tick, PlayerId player, IReadOnlyList<ActionableAlert> alerts)
     {
         Session = session; Tick = tick; Player = player;
-        Alerts = Array.AsReadOnly(alerts.Take(5).ToArray());
+        Alerts = Array.AsReadOnly(alerts.Take(6).ToArray());
     }
     public SimulationSessionId Session { get; }
     public SimulationTick Tick { get; }
@@ -30,11 +31,11 @@ public sealed class ActionableAlertSnapshot
         alerts.Player == experience.Player ? alerts : null;
 }
 
-/// <summary>Five aggregate identities avoid per-tick notification storms; resolution removes a condition immediately.</summary>
+/// <summary>Six aggregate identities avoid per-tick notification storms; resolution removes a condition immediately.</summary>
 public sealed class AlertLifecycleTracker
 {
-    private readonly SimulationTick[] _started = new SimulationTick[5];
-    private readonly bool[] _active = new bool[5];
+    private readonly SimulationTick[] _started = new SimulationTick[6];
+    private readonly bool[] _active = new bool[6];
     private SimulationSessionId _session;
     private PlayerId _player;
     private SimulationTick _tick;
@@ -44,21 +45,25 @@ public sealed class AlertLifecycleTracker
         1 => PlayerAlertState.CommandCoreDamaged,
         2 => PlayerAlertState.SupplyCritical,
         3 => PlayerAlertState.ProductionBlocked,
-        _ => PlayerAlertState.LowPower
+        4 => PlayerAlertState.LowPower,
+        5 => PlayerAlertState.CargoFleetShortage,
+        _ => PlayerAlertState.None
     };
-    public ActionableAlertSnapshot Capture(SimulationSessionId session, in PlayerExperienceSnapshot experience, ReadOnlySpan<EntityId> targets)
+    public ActionableAlertSnapshot Capture(SimulationSessionId session, in PlayerExperienceSnapshot experience, ReadOnlySpan<EntityId> targets,
+        CargoFleetCapacityObservation? fleet = null)
     {
         if (_session != session || _player != experience.Player || experience.Tick.Value < _tick.Value) Array.Clear(_active);
         _session = session; _player = experience.Player; _tick = experience.Tick;
-        var alerts = new List<ActionableAlert>(5);
-        for (int i = 0; i < 5; i++)
+        var alerts = new List<ActionableAlert>(6);
+        for (int i = 0; i < 6; i++)
         {
             var kind = Kind(i); bool active = (experience.Alerts & kind) != 0;
             if (active && !_active[i]) _started[i] = experience.Tick;
             _active[i] = active;
             if (!active) continue;
             alerts.Add(new(new(session, kind, _started[i], experience.Player), i < 3 ? AlertSeverity.Critical : AlertSeverity.Warning,
-                targets.Length > i ? targets[i] : default, Label(kind), Category(kind), Icon(kind)));
+                targets.Length > i ? targets[i] : default, Label(kind), Category(kind), Icon(kind),
+                kind == PlayerAlertState.CargoFleetShortage ? fleet : null));
         }
         return new(session, experience.Tick, experience.Player, alerts);
     }
@@ -68,11 +73,13 @@ public sealed class AlertLifecycleTracker
         PlayerAlertState.CommandCoreDamaged => "CORE DAMAGED",
         PlayerAlertState.SupplyCritical => "SUPPLY CRITICAL",
         PlayerAlertState.ProductionBlocked => "PRODUCTION BLOCKED",
+        PlayerAlertState.CargoFleetShortage => "INSUFFICIENT CARGO TRANSPORT CAPACITY",
         _ => "POWER CONSTRAINED"
     };
     public static OperationsCategory Category(PlayerAlertState kind) => kind switch
     {
         PlayerAlertState.SupplyCritical => OperationsCategory.Supply,
+        PlayerAlertState.CargoFleetShortage => OperationsCategory.Logistics,
         PlayerAlertState.LowPower => OperationsCategory.Power,
         _ => OperationsCategory.Blocked
     };
@@ -81,14 +88,16 @@ public sealed class AlertLifecycleTracker
         PlayerAlertState.SupplyCritical => RtsUiIcon.SupplyCritical,
         PlayerAlertState.LowPower => RtsUiIcon.StatusPower,
         PlayerAlertState.ProductionBlocked => RtsUiIcon.BuildingFactory,
+        PlayerAlertState.CargoFleetShortage => RtsUiIcon.UnitLogistics,
         PlayerAlertState.CommandCoreDamaged => RtsUiIcon.StatusHealth,
         PlayerAlertState.CommandCoreDestroyed => RtsUiIcon.BuildingCommand,
         _ => RtsUiIcon.StatusAlert
     };
 
-    internal ActionableAlertSnapshot Capture(SimulationContext context, PresentationExtractionContext extraction, in PlayerExperienceSnapshot experience)
+    internal ActionableAlertSnapshot Capture(SimulationContext context, PresentationExtractionContext extraction, in PlayerExperienceSnapshot experience,
+        CargoFleetCapacityObservation? fleet = null)
     {
-        Span<EntityId> targets = stackalloc EntityId[5];
+        Span<EntityId> targets = stackalloc EntityId[6];
         foreach (var entity in context.Entities.Query<ControllableEntity>(QueryIterationOrder.StableByEntityIndex))
         {
             var owner = context.Entities.GetComponent<ControllableEntity>(entity);
@@ -104,6 +113,7 @@ public sealed class AlertLifecycleTracker
             if (!targets[4].IsValid && context.Entities.TryGetComponent(entity, out PowerConsumer power) &&
                 power.State is PowerOperationalState.Brownout or PowerOperationalState.Offline) targets[4] = entity;
         }
-        return Capture(extraction.Scenario.Simulation.SessionId, experience, targets);
+        if (fleet is { } shortage) targets[5] = shortage.AffectedFacility;
+        return Capture(extraction.Scenario.Simulation.SessionId, experience, targets, fleet);
     }
 }
