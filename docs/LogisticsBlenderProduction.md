@@ -17,7 +17,9 @@ Related PRs #184 (logistics art), #247 (copied loading/queue overlays),
 Core) are merged. Related review threads have no outstanding review comments.
 No unfinished logistics Blender branch was available to reuse.
 Branch `art/logistics-blender` starts directly from that fetched master and
-advances PATCH exactly once to `0.1.429`.
+initially advances PATCH exactly once to `0.1.429`. After concurrent master
+integrations it is synchronized with `a6fe1185` / `0.1.431`; current PATCH is
+`0.1.432`. See the current-base appendix in [qualification](LogisticsBlenderQualification.md).
 
 The optimized renderer and qualification tooling are integrated. Their strict
 physical paired timing, thermal, full-frame/memory/lifecycle and human visual

@@ -10,12 +10,13 @@ inventory, throughput, navigation and collision authority are unchanged.
 [Machine-readable results](qualification/logistics-blender/Qualification.json) ·
 [Lossless native raw samples](qualification/logistics-blender/NativeSamples.json.gz).
 
-## Source and commits
+## Original qualification source and commits
 
 Fetched integration/default branch `master`:
 `b32bf04671fb579e01a7e282eac76ff91c5b2f1d`, version **0.1.428**.
-Final re-fetch confirms the same base. Branch `art/logistics-blender` advances
-PATCH exactly once to **0.1.429**; no tag, release or merge is created.
+That source was used for the comprehensive measurements below. The branch
+initially advanced PATCH once to **0.1.429**. Concurrent integrations required
+the current-base reconciliation recorded at the end; no tag or release is created.
 
 | Boundary | Commit |
 | --- | --- |
@@ -206,3 +207,51 @@ performance/thermal/full-memory/lifecycle acceptance and explicit human art and
 live traffic/motion approval remain open. Integration of renderer optimization
 code or its tooling alone does not close those gates. Do not promote, merge, tag,
 release or approve new goldens from these source and static image results.
+
+
+## Current-base reconciliation: 0.1.432
+
+Concurrent PRs #274, #275 and operational Blender work advanced `master` to
+`a6fe118583be842e00416bcb100d1210f3240a00` / **0.1.431**. Merge commit
+`382a99cc9996f2137747a2500fa33f878f81aca8` preserves all master scene enum
+values, appends logistics diagnostics and reconciles exactly one PATCH to
+**0.1.432**. Historical commits and measurements above are retained unchanged.
+The three saved masters and all 33 exports still match their recorded hashes.
+
+[Current-base machine results](qualification/logistics-blender/CurrentBaseQualification.json)
+and [eight raw native cases](qualification/logistics-blender/CurrentBaseNativeSamples.json.gz)
+record the following fresh checks on that merge commit:
+
+- Complete Release build: zero warnings/errors; 44-project graph and exact-PATCH checks pass.
+- 110 portable Blender contracts, 81 visual scene tests and 20 physical queue tests pass.
+  The latter still exercise 108 actual logistics dock/fleet/orientation combinations.
+- Official development compile and source-less validation: 1,363 assets,
+  74,844,665 bytes. Only the twelve incoming Cargo/Supply Truck runtime payloads
+  differ from the earlier sealed catalog. All logistics building payloads remain
+  identical; texture/material sizes and the 56 MiB gameplay texture cap are unchanged.
+- Three High/Normal/1080p family galleries and real loading production on the
+  native hardware adapter exactly match the original RGBA and PNG bytes, with
+  repeat-identical readbacks and zero fallback/binding/submission faults.
+- Reproducible player ZIP: **55,139,506 bytes**, SHA256
+  `065c0c309f3b45849e6a68e585dbf6d3057bb402269e44c79f72e03e6bae9873`.
+  All 1,487 manifest hashes verify in a fresh sibling installation outside the
+  checkout. No authoring/compiler files ship. With system/.NET-only child PATH,
+  the same four installed scenes exactly match development and original pixels.
+
+These eight new captures supplement the original 212; they do not attribute all
+historical measurements or the original full-suite result to the merge commit.
+CI is re-run after synchronization; its current check state is recorded in the
+Draft PR. Human art, live motion and controlled physical performance gates remain open.
+
+Commands use fresh retained paths:
+
+```powershell
+dotnet build ForgeLine.sln --configuration Release --no-restore -m:1 -nr:false
+python -m unittest discover -s tools/blender/tests -p 'test_*.py'
+dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.VisualReferenceSceneTests
+dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.VehicleQueuePhysicalTests
+dotnet tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll --mode development --source assets/source --runtime artifacts/lg/r432 --qualification-output artifacts/lg/qualification432.json
+dotnet tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll --mode validate --source artifacts/lg/no-source-432 --runtime artifacts/lg/r432 --qualification-output artifacts/lg/source-less432.json
+./build/Invoke-RtsReferenceQualification.ps1 -Capture -OutputRoot artifacts/logistics/current432 -RuntimeAssetRoot artifacts/lg/r432 -Scenes @('StorageDepotProduction','SupplyDepotProduction','LogisticsHubProduction','LogisticsLoadingProduction') -Profiles @('High') -Zooms @('NormalGameplay') -Displays @('1920x1080') -Warmups 8 -Samples 32 -RepeatCaptures 2
+./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible -OutputRoot artifacts/lg/pkg432 -RuntimeAssetRoot artifacts/lg/r432
+```
