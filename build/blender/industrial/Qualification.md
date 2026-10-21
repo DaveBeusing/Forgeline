@@ -9,8 +9,13 @@ integration.
 
 The freshly fetched integration/default branch was `master`,
 `d3acf9b0fb94da75ecfd26173cc387398f317096`, tracked version `0.1.426-dev`.
-Branch `assets/industrial-blender-masters`, PR #270, advances PATCH once to
-`0.1.427-dev`. PR #182 already integrated the industrial geometry, states and
+Branch `assets/industrial-blender-masters`, PR #270, initially prepared
+`0.1.427-dev`. After master advanced through PR #268 to
+`538ddc0bd49a722462bf185cfc118cf5a3e5008f` / `0.1.427-dev`, synchronization
+`477d9711` merges the updated baseline while preserving the measured `e8d277cb` ancestor
+and reconciles exactly one
+net PATCH to **`0.1.428-dev`**. No renderer or asset source changed in that
+master delta; only qualification tools/docs/workflow/tests and version changed. PR #182 already integrated the industrial geometry, states and
 presentation bindings. PR #269 supplies the inventory/preservation contract.
 The demonstrated remaining source gap was the independently saved Blender masters.
 
@@ -68,6 +73,11 @@ The complete serial Release suite on executable source `e8d277cb` passes:
 **3,184 passed / 24 skipped / zero failed**, 3,208 total, 21m45.851s. The complete
 log SHA-256 is retained in the JSON evidence. Opt-in/environment skips do not
 certify the corresponding physical or debug-layer gates.
+
+After synchronization to master `538ddc0b`, source `477d9711` builds the complete
+Release solution with zero warnings/errors. The ten newly integrated qualification
+boundary tests pass, and the three typed industrial comparisons pass again
+(four unrelated opt-ins skip). Current-head hosted CI is a separate pending gate.
 
 ## Native game display
 
@@ -146,14 +156,14 @@ variable collision; an overlapping build/active compiler DLL lock; and incomplet
 full-suite prerequisites in the initially sparse checkout. The checkout is now
 complete and the baseline runtime is qualified. Earlier canceled/failed suite
 attempts are not reclassified as passes. An early portable test attempt lacked
-the tank reference file, and sandbox temporary-directory permissions caused a
-separate portable failure; the completed unsandboxed portable run passed all 88.
+the tank reference file, and restricted temporary-directory permissions caused a
+separate portable failure; the completed local portable run passed all 88.
 
 ## Integration decision
 
 Do not merge or promote these staged sources yet. Required remaining gates are
-the actual rendering milestone integration/acceptance and release of source
-ownership, current-head CI/full suite, human review of the two differing close
+the actual rendering milestone product acceptance and release of source
+ownership, current-head CI including its full suite, human review of the two differing close
 images and complete art acceptance, live adjacent traffic and four rotations,
 moving LODs/states, the full resolution/profile/weather/stress matrix, sustained
 paired GPU/CPU/residency evidence, fixed-seed scenic comparisons and an installed

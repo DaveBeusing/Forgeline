@@ -27,11 +27,13 @@ presentation bindings. Its discussion has no comments. PR #269 is merged and
 adds the inventory and staged preservation contract. Reuse these sources;
 absence of a bound saved master is the demonstrated source-maturity gap.
 
-PR #267 is merged, but PR #268 is still open at head
-`1a0117802db3079fec315426d1b5486d7a680c34`. Its physical qualification jobs
-were skipped, its report retains open product acceptance gates, and it has
-not been integrated. Current-master CI run `39506391125` was in progress at
-precheck. Neither a merge nor an authoring pass proves rendering acceptance.
+At precheck, PR #268 was open. It subsequently merged at
+`37ad6e0428894ecbc12aac8181c9092a1924230b`, producing master
+`538ddc0bd49a722462bf185cfc118cf5a3e5008f` / `0.1.427-dev`. Its published plan
+has zero native records and all twelve product gates remain open. This branch
+is synchronized with that master and has one net PATCH to `0.1.428-dev`.
+Rendering/asset source blobs are unchanged by that master advance. Neither
+a merge nor an authoring pass proves product performance or visual acceptance.
 
 The current `docs/rendering/parallelization/ParallelRenderOwnership.json`
 retains the `assets/source/` and compiler ownership hold. All new authoring
@@ -98,8 +100,8 @@ pending; do not infer success from the existence of a `.blend` or `.glb`.
 
 ## Remaining production acceptance
 
-Release the source ownership hold and integrate/accept the rendering milestone
-before production promotion. Then review any demonstrated visual quality gaps,
+Release the source ownership hold and complete the rendering milestone product
+acceptance before production promotion. Then review any demonstrated visual quality gaps,
 bind reviewed masters/exports to canonical IDs, and qualify current-source full
 CI, native close/normal/strategic views and moving LODs, all real states,
 bright/dark/wet, 1080p/4K and quality profiles, adjacent live trucks and four

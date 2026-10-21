@@ -4,7 +4,7 @@
   "executableSource": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
   "branch": "assets/industrial-blender-masters",
   "pullRequest": "https://github.com/DaveBeusing/Forgeline/pull/270",
-  "trackedVersion": "0.1.427-dev",
+  "trackedVersion": "0.1.428-dev",
   "canonicalDefinitionsChanged": false,
   "sharedMaterialsChanged": false,
   "newArtClaimed": false,
@@ -27,7 +27,6 @@
     {
       "family": "extractor",
       "sourceSignature": "78dd2cc78926ed652a2a6ec0d3beb7a8f4710422fee73392cc2dc0c019e21034",
-      "masters": "fc584aef0690dd344e98eda743c02083c6a1c53817659638e14a2e30f2e27968",
       "authoritativeInputsUnchanged": true,
       "sourceAndRuntimeRepeatedBytesEqual": true,
       "sourceTreeSha256": "a73075588c1241827dbd77a587c13cee8a3821d6e57a4a7d7e0071c472022526",
@@ -118,12 +117,12 @@
           "maximumTangentError": 0.0000014564313,
           "mechanicalBatchIdentityPreserved": true
         }
-      ]
+      ],
+      "masterSha256": "fc584aef0690dd344e98eda743c02083c6a1c53817659638e14a2e30f2e27968"
     },
     {
       "family": "smelter",
       "sourceSignature": "9396576191711720c210cc9fbc8975ced4f1bfb55a71f805d65cb758a7055d93",
-      "masters": "23ba8f47226d04efe272725c57b17a6f74aadd38234e094e477bae56c9c7a68c",
       "authoritativeInputsUnchanged": true,
       "sourceAndRuntimeRepeatedBytesEqual": true,
       "sourceTreeSha256": "4bae9bfe962964758b44d4448d0ef8424bd8353b787e15a3ddbfa8dd23c1876b",
@@ -214,12 +213,12 @@
           "maximumTangentError": 0.000001386689,
           "mechanicalBatchIdentityPreserved": true
         }
-      ]
+      ],
+      "masterSha256": "23ba8f47226d04efe272725c57b17a6f74aadd38234e094e477bae56c9c7a68c"
     },
     {
       "family": "electronics_plant",
       "sourceSignature": "bcf82db3997b0b4834614bd66f3cf11a2f61aa570f8375b1a3ae6de4dde2ad82",
-      "masters": "36f10d224e1a7b6ce44ebf711b82c229b070c44fd09e8a5bb2ae94efd6bcec6b",
       "authoritativeInputsUnchanged": true,
       "sourceAndRuntimeRepeatedBytesEqual": true,
       "sourceTreeSha256": "5120e39c93eda27623dd805797a7513dd66a39752347c1ab3aa58d0ab11ff067",
@@ -310,7 +309,8 @@
           "maximumTangentError": 0.0000012262487,
           "mechanicalBatchIdentityPreserved": true
         }
-      ]
+      ],
+      "masterSha256": "36f10d224e1a7b6ce44ebf711b82c229b070c44fd09e8a5bb2ae94efd6bcec6b"
     }
   ],
   "canonical": {
@@ -1378,7 +1378,7 @@
     "humanVisualApproval": "pending"
   },
   "acceptance": {
-    "renderMilestone": "tooling integrated; twelve product gates open; no physical qualification records",
+    "renderMilestone": "qualification tooling merged in PR 268; all twelve product gates remain open",
     "productionPromotion": "blocked",
     "fullDisplayProfileWeatherStateStressMatrix": "pending",
     "liveLogisticsAndFourRotations": "pending",
@@ -1435,5 +1435,30 @@
     "source": "d76be8452226cd37f4da3b2fa9f86105e2b1bd6e",
     "allFourWorkflows": "passed",
     "mainRun": 39510199252
+  },
+  "integrationBase": "538ddc0bd49a722462bf185cfc118cf5a3e5008f",
+  "synchronizationSource": "477d9711cf2b12c075918ba46ab952d370da9eeb",
+  "rendererAndAssetSourceDeltaSinceAnalysis": [],
+  "currentMasterVerification": {
+    "source": "477d9711cf2b12c075918ba46ab952d370da9eeb",
+    "build": {
+      "passed": true,
+      "warnings": 0,
+      "errors": 0,
+      "logSha256": "d39e25dacd8e794d15bf021f814c68e2ea97d1e2d2dbad1b175e172ca39bad3d"
+    },
+    "newBoundaryTests": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "logSha256": "e06ef1e85d98a7d214cc24979910d7530ae2574f4ddfa424fee18cd57a7a21ee"
+    },
+    "typedRuntimeTests": {
+      "passed": 3,
+      "failed": 0,
+      "skipped": 4,
+      "logSha256": "d445a57980b03f0a2ef57e59a5095d29399fb9005134fc263035cbb6d2a4aa68"
+    },
+    "exactHeadCi": "pending"
   }
 }
