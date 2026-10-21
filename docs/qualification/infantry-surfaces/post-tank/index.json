@@ -1,0 +1,737 @@
+{
+  "implementationSource": "c85fd2987611de126963c93608cf3eda66636680",
+  "base": "3c732aa519bb54bec17070bcdad378c232ea9de1",
+  "version": "0.1.434",
+  "historicalEvidence": "../index.json",
+  "newPairedCases": 4,
+  "newOriginalImages": 12,
+  "totalOriginalImagesAcrossBothIndexes": 150,
+  "allRepeatReadbacksAgree": true,
+  "zeroFallbacksAndBindingFailures": true,
+  "installedPixelExactCases": 4,
+  "performance": [
+    {
+      "cohort": "gallery",
+      "regressions": 4,
+      "unqualified": 0
+    },
+    {
+      "cohort": "close-loads",
+      "regressions": 0,
+      "unqualified": 0
+    }
+  ],
+  "performanceAcceptance": "failed-historical-gates-retained-not-qualified",
+  "humanArtApproval": "pending",
+  "images": [
+    {
+      "path": "ifn4/gallery/before/InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png",
+      "bytes": 3900935,
+      "sha256": "9273dd971b076fc2e82fe3a6f4cc3b414200523b956aaf1b8156fd52a60b62f4",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifn4/gallery/before/InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png",
+      "bytes": 3921738,
+      "sha256": "16a8b6a2791464014f2fad7b75df5f0c0ecee71decff7b94871413a048034729",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifn4/gallery/after/InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png",
+      "bytes": 3895858,
+      "sha256": "359a72bc0e7cd0f50ae9361de588ad17633e9a5eb723b7bdc90e2e2961c0f4b4",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifn4/gallery/after/InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png",
+      "bytes": 3918568,
+      "sha256": "ddb7500e0c19fd106631544dea2581d7ccaa1683b916970d935ab04f445a4215",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifni434/gallery/InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png",
+      "bytes": 3895858,
+      "sha256": "359a72bc0e7cd0f50ae9361de588ad17633e9a5eb723b7bdc90e2e2961c0f4b4",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifni434/gallery/InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png",
+      "bytes": 3918568,
+      "sha256": "ddb7500e0c19fd106631544dea2581d7ccaa1683b916970d935ab04f445a4215",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifn4/close-loads/before/InfantryRifleThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40.png",
+      "bytes": 4852463,
+      "sha256": "58be94f2ba921fc2ae9361979b513b79a7468191852f5ff9a5fc40e55bf2c87d",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantryRifleThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifn4/close-loads/before/InfantryEngineerThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40.png",
+      "bytes": 4941929,
+      "sha256": "6cfdcfbae1642c8598b37be4b46fd39e48b17f6109725d784f63a1e45646adc3",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantryEngineerThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifn4/close-loads/after/InfantryRifleThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40.png",
+      "bytes": 4815341,
+      "sha256": "1f0e53096684747a62c484e33c190713d7e9fe7c73863ac625b1e674f48bcd88",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantryRifleThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifn4/close-loads/after/InfantryEngineerThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40.png",
+      "bytes": 4948822,
+      "sha256": "f44f3bb8950339fcb28d81bdaa73e95ce2b83107c2caa30c16143ecf4a0ad7f4",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantryEngineerThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifni434/close-loads/InfantryRifleThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40.png",
+      "bytes": 4815341,
+      "sha256": "1f0e53096684747a62c484e33c190713d7e9fe7c73863ac625b1e674f48bcd88",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantryRifleThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "ifni434/close-loads/InfantryEngineerThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40.png",
+      "bytes": 4948822,
+      "sha256": "f44f3bb8950339fcb28d81bdaa73e95ce2b83107c2caa30c16143ecf4a0ad7f4",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantryEngineerThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "selectedImages": [
+    {
+      "path": "ifn4/gallery/after/InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png",
+      "bytes": 3895858,
+      "sha256": "359a72bc0e7cd0f50ae9361de588ad17633e9a5eb723b7bdc90e2e2961c0f4b4",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "width": 1920,
+      "height": 1080,
+      "retained": "images/rifle.png"
+    },
+    {
+      "path": "ifn4/gallery/after/InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png",
+      "bytes": 3918568,
+      "sha256": "ddb7500e0c19fd106631544dea2581d7ccaa1683b916970d935ab04f445a4215",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "key": "InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "width": 1920,
+      "height": 1080,
+      "retained": "images/engineer.png"
+    }
+  ],
+  "pairs": [
+    {
+      "key": "InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "cohort": "gallery",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "identicalGeometryAndResources": true,
+      "pixels": {
+        "MaximumChannelDelta": 86,
+        "MeanAbsoluteChannelDelta": 0.3913767119984568,
+        "ChangedPixels": 56474,
+        "ChangedPixelFraction": 0.027234760802469136,
+        "WithinTolerance": false
+      }
+    },
+    {
+      "key": "InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20",
+      "cohort": "gallery",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "identicalGeometryAndResources": true,
+      "pixels": {
+        "MaximumChannelDelta": 98,
+        "MeanAbsoluteChannelDelta": 0.6831921537422839,
+        "ChangedPixels": 66269,
+        "ChangedPixelFraction": 0.031958429783950616,
+        "WithinTolerance": false
+      }
+    },
+    {
+      "key": "InfantryRifleThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40",
+      "cohort": "close-loads",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "identicalGeometryAndResources": true,
+      "pixels": {
+        "MaximumChannelDelta": 103,
+        "MeanAbsoluteChannelDelta": 2.4728749517746915,
+        "ChangedPixels": 420455,
+        "ChangedPixelFraction": 0.20276572145061728,
+        "WithinTolerance": false
+      }
+    },
+    {
+      "key": "InfantryEngineerThousand-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection40",
+      "cohort": "close-loads",
+      "source": "c85fd2987611de126963c93608cf3eda66636680",
+      "identicalGeometryAndResources": true,
+      "pixels": {
+        "MaximumChannelDelta": 122,
+        "MeanAbsoluteChannelDelta": 4.23176986882716,
+        "ChangedPixels": 487512,
+        "ChangedPixelFraction": 0.23510416666666667,
+        "WithinTolerance": false
+      }
+    }
+  ],
+  "metadata": [
+    {
+      "original": "artifacts/capture_infantry_tank.ps1",
+      "originalBytes": 1916,
+      "originalSha256": "de584ef120fb4b730b5761f4eacd2ee6864fbeacd2921fa219faf685aca4324a",
+      "retained": "raw/capture_infantry_tank.ps1.gz",
+      "retainedSha256": "6b210ada0b0df2738336fd1d7dbe00d122881b06e685f72f15eef15697b45422"
+    },
+    {
+      "original": "artifacts/ifn4/close-loads/after/comparison.json",
+      "originalBytes": 1563,
+      "originalSha256": "8cffe6bfb5247d018712dea970d957e75197d18aba92f7bf792eee7f479864c6",
+      "retained": "raw/ifn4/close-loads/after/comparison.json.gz",
+      "retainedSha256": "d937cb4aef761e7321e01be590233ad0d4e0ce1ae98ba746370ebfde06d34190"
+    },
+    {
+      "original": "artifacts/ifn4/close-loads/after/manifest.json",
+      "originalBytes": 454741,
+      "originalSha256": "13bd1cec3a8ccda7efb0d44ad3ac32127ed6e6f7b2392ab837400b24ecfcece4",
+      "retained": "raw/ifn4/close-loads/after/manifest.json.gz",
+      "retainedSha256": "20394bae61d4427aca00a44cc94fc83906932c3f1a9bd222dbf1f3918bf3c26e"
+    },
+    {
+      "original": "artifacts/ifn4/close-loads/after.request.json",
+      "originalBytes": 1511,
+      "originalSha256": "e88724f48f9fae69fc584c8e00125afbf0b87391a2beab27b150c9668c59d1f7",
+      "retained": "raw/ifn4/close-loads/after.request.json.gz",
+      "retainedSha256": "9f4fdf337b634b10382bef48c314cf7eb3401b14179516af856f220ab14d7970"
+    },
+    {
+      "original": "artifacts/ifn4/close-loads/before/comparison.json",
+      "originalBytes": 1496,
+      "originalSha256": "9aa54912c46a1a6c810055ec11d26155778ab1e494f9093257452c513ae0c0ae",
+      "retained": "raw/ifn4/close-loads/before/comparison.json.gz",
+      "retainedSha256": "e68af3a56dd25d5632ca16311eafb8b4b85bf998944a56cd789c6871797fece7"
+    },
+    {
+      "original": "artifacts/ifn4/close-loads/before/manifest.json",
+      "originalBytes": 453949,
+      "originalSha256": "810759ce99f9428f3001c9923ca277c5efb957d1c66075646ed02aec45fce676",
+      "retained": "raw/ifn4/close-loads/before/manifest.json.gz",
+      "retainedSha256": "d702e9e8f25c74f8a26a78aac3e95e201203a55d5101ced9cec12b7feed84ba9"
+    },
+    {
+      "original": "artifacts/ifn4/close-loads/before.request.json",
+      "originalBytes": 1512,
+      "originalSha256": "fc3bcf61ed21d8ff4b7ff77fdfb7977138fde2d0eabdc5b15a0e527841f9a3ae",
+      "retained": "raw/ifn4/close-loads/before.request.json.gz",
+      "retainedSha256": "2941287c0d5029cb45b362f73486a560a359de6631f30c3deabe4af0fd6b4490"
+    },
+    {
+      "original": "artifacts/ifn4/close-loads/performance.json",
+      "originalBytes": 5274,
+      "originalSha256": "878cf047744187b8b7743c20fc89094db53d0b45373435a96e5cb58176829603",
+      "retained": "raw/ifn4/close-loads/performance.json.gz",
+      "retainedSha256": "4345e5d4ec1812d2d86f5bc46389c70f6e11ff7d876bd1456d50db617c12d127"
+    },
+    {
+      "original": "artifacts/ifn4/close-loads/performance.log",
+      "originalBytes": 88,
+      "originalSha256": "074c9dd8815f4ae39d845806bf03a085c9a90472af07cbaaadefc941c2b94d66",
+      "retained": "raw/ifn4/close-loads/performance.log.gz",
+      "retainedSha256": "bd7ea1be1b50ff3cc75ad3421a4b1fe77ae024866f979ebf83e0a0154fc1ba09"
+    },
+    {
+      "original": "artifacts/ifn4/close-loads/pixels.json",
+      "originalBytes": 2004,
+      "originalSha256": "be0be1b49ac32517c72980a30fe19657a84f339c56ba2cacdee10cdfea1ea4b9",
+      "retained": "raw/ifn4/close-loads/pixels.json.gz",
+      "retainedSha256": "63db164165a2d02385252187640aad926231cd327fe6f84cd1a53bab88bbb5af"
+    },
+    {
+      "original": "artifacts/ifn4/gallery/after/comparison.json",
+      "originalBytes": 1573,
+      "originalSha256": "1f43d87ba5a99e9be49a7ac6227a2876c1d3283d54e4f9b6e3723fcfd14c8e04",
+      "retained": "raw/ifn4/gallery/after/comparison.json.gz",
+      "retainedSha256": "54841aade5ae5f08e411216c2b4d97e9fee25c9c4c523309e9883fa420f27e9f"
+    },
+    {
+      "original": "artifacts/ifn4/gallery/after/manifest.json",
+      "originalBytes": 451984,
+      "originalSha256": "132fba556b6bc455c304263b7e089997109bb5a92b3e3dd9c23e788ce311c848",
+      "retained": "raw/ifn4/gallery/after/manifest.json.gz",
+      "retainedSha256": "c7e03923c607cd17cdd9a090f817fecc3c2b42947dd4803a1acc924ab7ffac12"
+    },
+    {
+      "original": "artifacts/ifn4/gallery/after.request.json",
+      "originalBytes": 1502,
+      "originalSha256": "9dbba5834aa14ff866bfc36d39b3b99e6b64bbae9ebf9128f0acad320bb5c6ee",
+      "retained": "raw/ifn4/gallery/after.request.json.gz",
+      "retainedSha256": "96106552ec4c9fdb14b6c0e69cf33e016113855cd2a974b9651fa9e7219c7eb7"
+    },
+    {
+      "original": "artifacts/ifn4/gallery/before/comparison.json",
+      "originalBytes": 1488,
+      "originalSha256": "961798a8a39977ddd4fdaf88ba812cec234399eb4eb90192e60703f92ed1aa81",
+      "retained": "raw/ifn4/gallery/before/comparison.json.gz",
+      "retainedSha256": "74c833d601c6a1e7a192f7fceb77a2ffa25a56fcbc3f54099ff0ec8427df74ea"
+    },
+    {
+      "original": "artifacts/ifn4/gallery/before/manifest.json",
+      "originalBytes": 450300,
+      "originalSha256": "ca396a27dda434d2a52bd924cba1385288859f637d9b54c735021f22a5755bac",
+      "retained": "raw/ifn4/gallery/before/manifest.json.gz",
+      "retainedSha256": "2d77e1f033b50eeae3bb341485da7a84c5f541cf287743a9c34db83298dfc57a"
+    },
+    {
+      "original": "artifacts/ifn4/gallery/before.request.json",
+      "originalBytes": 1503,
+      "originalSha256": "73e664560fb37998cbd64bf02c47fd837b2faf7af56f9ef09809c512a6307275",
+      "retained": "raw/ifn4/gallery/before.request.json.gz",
+      "retainedSha256": "c76a456e8024af58a38b978c00aee02152d33727832a8ba3c4be1205e751279d"
+    },
+    {
+      "original": "artifacts/ifn4/gallery/performance.json",
+      "originalBytes": 5631,
+      "originalSha256": "b1fa79a25bb71e12941bb1971f917ac49d977e705f3523d86e739a5e2bc73911",
+      "retained": "raw/ifn4/gallery/performance.json.gz",
+      "retainedSha256": "6ba3ecd814069106cf08b9e62320d26799b298a9b894bd1a36c6f470c5d1b64d"
+    },
+    {
+      "original": "artifacts/ifn4/gallery/performance.log",
+      "originalBytes": 578,
+      "originalSha256": "0bd96ead68f483c53655204fb9f3db81c598ef2de3bb3cf2be2a2146465128cd",
+      "retained": "raw/ifn4/gallery/performance.log.gz",
+      "retainedSha256": "70f98e6ce3327a0d0ad040c4b5dc2dc03eef3b5d900ad7ff17d670e2a00662f0"
+    },
+    {
+      "original": "artifacts/ifn4/gallery/pixels.json",
+      "originalBytes": 2014,
+      "originalSha256": "ee2fbce0268c7347358aa7e7e8c88aa7be5643d30f4b0032d67640ebdaefcc5a",
+      "retained": "raw/ifn4/gallery/pixels.json.gz",
+      "retainedSha256": "d8939a187ab31256a57d7aeb07b86379dd70a383c7ce01e631dd87f5c9a78b2a"
+    },
+    {
+      "original": "artifacts/ifn4/summary.json",
+      "originalBytes": 359,
+      "originalSha256": "be1905f95d6f0b40abc10b1a7cd2b62bef1df0ee18faabc770238fde391872c8",
+      "retained": "raw/ifn4/summary.json.gz",
+      "retainedSha256": "fb240cb2ff1ff5748f8313d7bd94e8d596218ae5037b69116945b3d7aded58a5"
+    },
+    {
+      "original": "artifacts/ifni434/close-loads/comparison.json",
+      "originalBytes": 1549,
+      "originalSha256": "2329b3cda4530310850ff53e91dfe4356077f704e5fefb8325d1602dfbb09352",
+      "retained": "raw/ifni434/close-loads/comparison.json.gz",
+      "retainedSha256": "960852e71226b183783a0806d98d9f7d05f4c8d3106a5edc49fef1af2b6dee90"
+    },
+    {
+      "original": "artifacts/ifni434/close-loads/manifest.json",
+      "originalBytes": 454728,
+      "originalSha256": "de6709e4f13ba390703a42a73b9f99a7d8ca6cb5eac59fe681f168aa8a83507c",
+      "retained": "raw/ifni434/close-loads/manifest.json.gz",
+      "retainedSha256": "c6b7d3a9fd28715bfb280410b2a63a7c2d949b82cfd9233d2930d999f3e50b80"
+    },
+    {
+      "original": "artifacts/ifni434/close-loads/pixels.json",
+      "originalBytes": 1914,
+      "originalSha256": "0325802dc788388d4fb4296e44616716bf2e4ffeca94b0aeee7a47be225371bb",
+      "retained": "raw/ifni434/close-loads/pixels.json.gz",
+      "retainedSha256": "9ecdbe6cbbd7b7418d76013431ad3d319dd27a026f7f968a7289dfb07547a1a7"
+    },
+    {
+      "original": "artifacts/ifni434/close-loads.request.json",
+      "originalBytes": 1502,
+      "originalSha256": "39f5b425254ace5e21d21906be8522dffaaf9126460a3f72ad9d941b5bba702d",
+      "retained": "raw/ifni434/close-loads.request.json.gz",
+      "retainedSha256": "2144a11fec439490c281c43c22b0e456406eb610c9a12bcca75067d3fa2d10db"
+    },
+    {
+      "original": "artifacts/ifni434/gallery/comparison.json",
+      "originalBytes": 1551,
+      "originalSha256": "7efe6d132a1631bdb4a0f42c656207c920b3433c39938d4d585a0771bbc59b2e",
+      "retained": "raw/ifni434/gallery/comparison.json.gz",
+      "retainedSha256": "5ab62fb55fa76c9eddbdd1642b4c78c50f2ce178cade4caa85417d9841a50d30"
+    },
+    {
+      "original": "artifacts/ifni434/gallery/manifest.json",
+      "originalBytes": 452407,
+      "originalSha256": "3de9bd47232c5686885f9104eafbfddbfa38c2d02637581d3f1765427b4f42bf",
+      "retained": "raw/ifni434/gallery/manifest.json.gz",
+      "retainedSha256": "70d52e6559e305a788eb80ea107883e6ee7f8f832e3842665a9a34477437e36a"
+    },
+    {
+      "original": "artifacts/ifni434/gallery/pixels.json",
+      "originalBytes": 1916,
+      "originalSha256": "1c2eea996b90af04022cbf3337ee410beb4e1d0d073e77a334f8d7a5b660dc95",
+      "retained": "raw/ifni434/gallery/pixels.json.gz",
+      "retainedSha256": "8d4f2c71b5b9a07775535a965fa3eb8b2ddfc7b9005cab353f63b865ce0a7b06"
+    },
+    {
+      "original": "artifacts/ifni434/gallery.request.json",
+      "originalBytes": 1493,
+      "originalSha256": "2a1ed2998818d4d06e8b9140e2dc58ee1afe841b760daae59a9b97f552653722",
+      "retained": "raw/ifni434/gallery.request.json.gz",
+      "retainedSha256": "269c3b1eb3925cbdd7df073ddbb1c2e6ce970d7546372d5471835eb138a0adaa"
+    },
+    {
+      "original": "artifacts/ifni434/summary.json",
+      "originalBytes": 175,
+      "originalSha256": "b96070a39196bab678c64dc0f706c1235a5b256a4942cdd5136ae3b95c2300bd",
+      "retained": "raw/ifni434/summary.json.gz",
+      "retainedSha256": "88d0fa60edfe3b12c63df28360fdc942a4347a0cdfdbdc928acd54e4b1a3f7fb"
+    },
+    {
+      "original": "artifacts/ifpkg434/FORGELINE-0.1.434-dev-win-x64.zip.provenance.json",
+      "originalBytes": 729,
+      "originalSha256": "37a7b4a3bb6978524855894d85e094cf5439623b6e063d2b1e21c76b5d6a2a59",
+      "retained": "raw/ifpkg434/FORGELINE-0.1.434-dev-win-x64.zip.provenance.json.gz",
+      "retainedSha256": "c0626bbfbdbc217df4654ea77327c7044523ba267a09500b760213080e9a3d3a"
+    },
+    {
+      "original": "artifacts/ifpkg434/FORGELINE-0.1.434-dev-win-x64.zip.sha256",
+      "originalBytes": 101,
+      "originalSha256": "63b0397e9d350125885ff84524fc3f3897f5071651184620888a8aa7b74bc46a",
+      "retained": "raw/ifpkg434/FORGELINE-0.1.434-dev-win-x64.zip.sha256.gz",
+      "retainedSha256": "e981d85724d92b985a34c55ccb3fe979ebae1b81d3a528110892187430ca2e66"
+    },
+    {
+      "original": "artifacts/ifpkg434/win-x64/publish/build-provenance.json",
+      "originalBytes": 729,
+      "originalSha256": "37a7b4a3bb6978524855894d85e094cf5439623b6e063d2b1e21c76b5d6a2a59",
+      "retained": "raw/ifpkg434/win-x64/publish/build-provenance.json.gz",
+      "retainedSha256": "c0626bbfbdbc217df4654ea77327c7044523ba267a09500b760213080e9a3d3a"
+    },
+    {
+      "original": "artifacts/ifpkg434/win-x64/publish/manifest.sha256",
+      "originalBytes": 203809,
+      "originalSha256": "1326d7a50449f534ab18173bbd92b117e1e080da0db69efaab7a34be311f0b51",
+      "retained": "raw/ifpkg434/win-x64/publish/manifest.sha256.gz",
+      "retainedSha256": "3a253df43cbd3d3aec61d0450cf5b56c251de80ff23533805d933e8aea064a8d"
+    },
+    {
+      "original": "artifacts/infantry-tank-assets-tests.log",
+      "originalBytes": 604,
+      "originalSha256": "4345ac2cba61d80ba3b156cd33dd9890bc81a11d17ef96704481cd926cc36395",
+      "retained": "raw/infantry-tank-assets-tests.log.gz",
+      "retainedSha256": "3bac85889691ded2d5009cf912bd1939b2d107bb95838bb94097d6c3d3dcc992"
+    },
+    {
+      "original": "artifacts/infantry-tank-baseline-assets.json",
+      "originalBytes": 2110,
+      "originalSha256": "d980b7db456dc2f534a6cb81121a318b1e3f75d250cadbafd0cb617f800d70f0",
+      "retained": "raw/infantry-tank-baseline-assets.json.gz",
+      "retainedSha256": "708954304ac004a8632a300b4fe420e27890fd8eee166783822df7f136004cab"
+    },
+    {
+      "original": "artifacts/infantry-tank-baseline-compile.log",
+      "originalBytes": 2001407,
+      "originalSha256": "cc72f5421b882f82ca77f8c820649c31363417398d9f8d5e43ba2f6b362c807b",
+      "retained": "raw/infantry-tank-baseline-compile.log.gz",
+      "retainedSha256": "10f31ad0793eefc5e4c79a0303ec107a9daa4f4385e7ef799471b7b4bfce919c"
+    },
+    {
+      "original": "artifacts/infantry-tank-baseline-source-less.log",
+      "originalBytes": 1886,
+      "originalSha256": "7b8c86b63377d87293e4a5aadc131ff170623364ed5f04ac011b2e5e676cd441",
+      "retained": "raw/infantry-tank-baseline-source-less.log.gz",
+      "retainedSha256": "9550037d42b791b3411979aa71720c3207ddbec5eb294ded4cfea284cd7aa3e1"
+    },
+    {
+      "original": "artifacts/infantry-tank-build.log",
+      "originalBytes": 9587,
+      "originalSha256": "1b858260458ca843d739909d1c276b732ffa864bcd31b21ef10028460844d36c",
+      "retained": "raw/infantry-tank-build.log.gz",
+      "retainedSha256": "745139d7d03dacf6b55daadad031524b1394ff5e6d2247411aa5706a633637ca"
+    },
+    {
+      "original": "artifacts/infantry-tank-candidate-assets.json",
+      "originalBytes": 2110,
+      "originalSha256": "50231fb284283dda0b1c73b564230b8044e4a786d0748a5c1e91e6e4d229f3eb",
+      "retained": "raw/infantry-tank-candidate-assets.json.gz",
+      "retainedSha256": "bece3b88a2dc88e0d04d6ffb191f2b7daceef3449544d4efd8ebdd5f5d0a0d5d"
+    },
+    {
+      "original": "artifacts/infantry-tank-candidate-compile.log",
+      "originalBytes": 1904958,
+      "originalSha256": "a200801fffb68d50ce8c18b69e64e8d4c05252ffd9d6dc4801172128c35ba31f",
+      "retained": "raw/infantry-tank-candidate-compile.log.gz",
+      "retainedSha256": "9097ff6e6d1c50aa116746d074afa7be77ba8db086b354a9cd88e64d74ae35a8"
+    },
+    {
+      "original": "artifacts/infantry-tank-candidate-source-less.log",
+      "originalBytes": 1888,
+      "originalSha256": "7205da15c104eef2b0fe8fbcbae9da506bb440039f4ff2873c72326b49c2e20d",
+      "retained": "raw/infantry-tank-candidate-source-less.log.gz",
+      "retainedSha256": "2856ed705851911ab089a4d730bc45d60de5dc0c68a7da534a36489aa5ce2bf9"
+    },
+    {
+      "original": "artifacts/infantry-tank-captures.log",
+      "originalBytes": 3270,
+      "originalSha256": "4fc580047583f6a361285e48aacdabf179465daf7a3b969e9033b2523ea95b86",
+      "retained": "raw/infantry-tank-captures.log.gz",
+      "retainedSha256": "5c6413b22afb9e69d88c3b63b4304cc338d9cba8b489d3373a5b21617962209c"
+    },
+    {
+      "original": "artifacts/infantry-tank-client-tests.log",
+      "originalBytes": 602,
+      "originalSha256": "5f5d58763f8c735b70b393cf339ab51b17d0ce977155d8eb25ef54fd9f3df836",
+      "retained": "raw/infantry-tank-client-tests.log.gz",
+      "retainedSha256": "81da79b1754bacc38feac0c05e863cbf183a0c125ed712b6577909ce9676c4ba"
+    },
+    {
+      "original": "artifacts/infantry-tank-merge-commit.log",
+      "originalBytes": 106,
+      "originalSha256": "e07481b394e909f40ad19bd3eb266853035cae639ab347cbc7510ea0a1c97b10",
+      "retained": "raw/infantry-tank-merge-commit.log.gz",
+      "retainedSha256": "2de88b73402b4e9f050e9af1d3d54a7aa3aa700417d929256fda1470c5633e1d"
+    },
+    {
+      "original": "artifacts/infantry-tank-merge.log",
+      "originalBytes": 542,
+      "originalSha256": "0ff095e0259d04e733d70534507b602b7f70c660572bdeb26cb5285c567fe655",
+      "retained": "raw/infantry-tank-merge.log.gz",
+      "retainedSha256": "983116bc1de624b160d82cf1326f15c99c2c53fe243406caa4b0066affc23ebe"
+    },
+    {
+      "original": "artifacts/infantry-tank-native-parity-tests.log",
+      "originalBytes": 624,
+      "originalSha256": "cac43dca197a193bd09d3df4bbec9739675554e73e3d4919d6a025fa0bb165df",
+      "retained": "raw/infantry-tank-native-parity-tests.log.gz",
+      "retainedSha256": "666a34b8cc02d3157efecb4d75c73b2696836ef1d4493b053337b026532cf013"
+    },
+    {
+      "original": "artifacts/infantry-tank-portable-tests.log",
+      "originalBytes": 15953,
+      "originalSha256": "a68352ef561b58a6bb53213792b82c6fe0a4941ebaae09ed0fc809023366cd31",
+      "retained": "raw/infantry-tank-portable-tests.log.gz",
+      "retainedSha256": "85c6457b20d4a6de9c31823f7c1ac3e0753c35c59e5aa434fdb0ab003ac5ecce"
+    },
+    {
+      "original": "artifacts/infantry-tank-presentation-tests.log",
+      "originalBytes": 2044,
+      "originalSha256": "e6c1b1ceab927c189c0a410caf18a17f2dadac3bbdfc64820de62211efd1253e",
+      "retained": "raw/infantry-tank-presentation-tests.log.gz",
+      "retainedSha256": "943838990cf3464bcda6d5f739a21486ee8140b1b75b73534b7adeebb1226af0"
+    },
+    {
+      "original": "artifacts/infantry-tank-runtime-comparison.json",
+      "originalBytes": 1913,
+      "originalSha256": "40e1388ebc08d2781ed2e50eb8511eb462875319a74533adf4e7a4a5d403adfe",
+      "retained": "raw/infantry-tank-runtime-comparison.json.gz",
+      "retainedSha256": "c2e5f74cf41561ad8a5873c2c81ce03fb0292cac6d72d1e36ad37c4cea1807a5"
+    },
+    {
+      "original": "artifacts/infantry-tank-runtime-comparison.log",
+      "originalBytes": 1913,
+      "originalSha256": "40e1388ebc08d2781ed2e50eb8511eb462875319a74533adf4e7a4a5d403adfe",
+      "retained": "raw/infantry-tank-runtime-comparison.log.gz",
+      "retainedSha256": "c2e5f74cf41561ad8a5873c2c81ce03fb0292cac6d72d1e36ad37c4cea1807a5"
+    },
+    {
+      "original": "artifacts/infantry-tank-runtime.log",
+      "originalBytes": 133,
+      "originalSha256": "239212a027f2015aeb993764d0776978418ffaed0801f6b2e528294125381d6a",
+      "retained": "raw/infantry-tank-runtime.log.gz",
+      "retainedSha256": "325aa4842c5ebc52b262e74df4466a2253e7e179f3ec696428086b5a33788106"
+    },
+    {
+      "original": "artifacts/infantry434-installation.json",
+      "originalBytes": 708,
+      "originalSha256": "1bd639e7f9f4830ab23629c302c57bad53bf7eda01ad10df9aef900eecaa0d4e",
+      "retained": "raw/infantry434-installation.json.gz",
+      "retainedSha256": "0eb0dbfcee768d2cc508b56307d9f47a2c1bb1ea74421917bfb72b5000f4b8f5"
+    },
+    {
+      "original": "artifacts/infantry434-installation.log",
+      "originalBytes": 708,
+      "originalSha256": "1bd639e7f9f4830ab23629c302c57bad53bf7eda01ad10df9aef900eecaa0d4e",
+      "retained": "raw/infantry434-installation.log.gz",
+      "retainedSha256": "0eb0dbfcee768d2cc508b56307d9f47a2c1bb1ea74421917bfb72b5000f4b8f5"
+    },
+    {
+      "original": "artifacts/infantry434-installed-smoke/settings/FORGELINE/settings.json",
+      "originalBytes": 2116,
+      "originalSha256": "b6c286de08c3493b91a186c580d03bc424ac0e3148f4b806e12f0324cc38c8a0",
+      "retained": "raw/infantry434-installed-smoke/settings/FORGELINE/settings.json.gz",
+      "retainedSha256": "5b3b0a4db8eab35879c5c17db0dd9851ac0bdb2197456b8174da14a09a32ae26"
+    },
+    {
+      "original": "artifacts/infantry434-installed-smoke/startup.json",
+      "originalBytes": 10927,
+      "originalSha256": "bca80c2c60c11728ea2c1d35314f60a3b0ab8ee946144e6b9f577559b1307c6f",
+      "retained": "raw/infantry434-installed-smoke/startup.json.gz",
+      "retainedSha256": "175fd920b0633af37bdd2bea905f549357d3a2c5e8da4a6b86a9593cd933f425"
+    },
+    {
+      "original": "artifacts/infantry434-installed-smoke/status.json",
+      "originalBytes": 390,
+      "originalSha256": "415a9763ac2e9173d734076fe2873ba88de44d2027af1c46e103ed255917fca4",
+      "retained": "raw/infantry434-installed-smoke/status.json.gz",
+      "retainedSha256": "e2317ab9d090fd353eb593f0d5eb7eac7d952c04be594012e0d805fbec932434"
+    },
+    {
+      "original": "artifacts/infantry434-installed-smoke/stderr.log",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained": "raw/infantry434-installed-smoke/stderr.log.gz",
+      "retainedSha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83"
+    },
+    {
+      "original": "artifacts/infantry434-installed-smoke/stdout.log",
+      "originalBytes": 4602,
+      "originalSha256": "8394e17d7dce6f7ae1f2be76c0662e6b237232d39c1051f5b558269dde6caf8a",
+      "retained": "raw/infantry434-installed-smoke/stdout.log.gz",
+      "retainedSha256": "275a138ee1a890aa6aa678fa4890fdfe2fd0a96d3772d4f2bf913b178e5bb1e2"
+    },
+    {
+      "original": "artifacts/infantry434-installed-smoke/visual.json",
+      "originalBytes": 9665,
+      "originalSha256": "9c36a4d4ff6a06f4d013963c78cfc0b233ba563ea4289c0e44ef407decdd0196",
+      "retained": "raw/infantry434-installed-smoke/visual.json.gz",
+      "retainedSha256": "0a36a0bf9a636121e1ef495bcbfc93752ba80065c60986fc7ca1ce8ef40e5d3b"
+    },
+    {
+      "original": "artifacts/infantry434-package-checks.log",
+      "originalBytes": 1703,
+      "originalSha256": "235f0028ddcb3bbed71483e6c5758307282601e09b26d14726c5b872847a7849",
+      "retained": "raw/infantry434-package-checks.log.gz",
+      "retainedSha256": "54beb5a6f2a84becea7068dcde91a2c1698ef5e9748bd575a3853d5519886f17"
+    },
+    {
+      "original": "artifacts/infantry434-publish.log",
+      "originalBytes": 4538,
+      "originalSha256": "731ca5672d0ef308b7d16e4d18921e5f6cacdbdb79f09138d575ed22fc28a3ca",
+      "retained": "raw/infantry434-publish.log.gz",
+      "retainedSha256": "9631f56b28707b21022033640bc37f08bfd67921dc7a79819c70d8244ba74c17"
+    },
+    {
+      "original": "artifacts/infantry434-published-smoke/settings/FORGELINE/settings.json",
+      "originalBytes": 2116,
+      "originalSha256": "b6c286de08c3493b91a186c580d03bc424ac0e3148f4b806e12f0324cc38c8a0",
+      "retained": "raw/infantry434-published-smoke/settings/FORGELINE/settings.json.gz",
+      "retainedSha256": "5b3b0a4db8eab35879c5c17db0dd9851ac0bdb2197456b8174da14a09a32ae26"
+    },
+    {
+      "original": "artifacts/infantry434-published-smoke/startup.json",
+      "originalBytes": 10952,
+      "originalSha256": "62878fd3d0bb049d98e670b4429c5a29cb1b6e555233206d426d81c310d2f5fc",
+      "retained": "raw/infantry434-published-smoke/startup.json.gz",
+      "retainedSha256": "c85f05f755fc97b53581d914620d2bbe1d2894391f8bb7592686e3eaf97d8346"
+    },
+    {
+      "original": "artifacts/infantry434-published-smoke/status.json",
+      "originalBytes": 434,
+      "originalSha256": "963cf63f8a9d3fd4b49e1f96c18ff846f440c3400b5d7c41c98a37ea081e4899",
+      "retained": "raw/infantry434-published-smoke/status.json.gz",
+      "retainedSha256": "c795ee6e0d77a6551f28c9610ca1c68d358d9fcc716ff2e331101626b8e56d49"
+    },
+    {
+      "original": "artifacts/infantry434-published-smoke/stderr.log",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained": "raw/infantry434-published-smoke/stderr.log.gz",
+      "retainedSha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83"
+    },
+    {
+      "original": "artifacts/infantry434-published-smoke/stdout.log",
+      "originalBytes": 4644,
+      "originalSha256": "e781d3da7431ccab2f24a49220b2d60bc40bc89efb2e7c88e89169c7c091c74f",
+      "retained": "raw/infantry434-published-smoke/stdout.log.gz",
+      "retainedSha256": "45058380582c63714c44b8f7f36a09f9b301c74e33080ccf25eb2c611ffe2165"
+    },
+    {
+      "original": "artifacts/infantry434-published-smoke/visual.json",
+      "originalBytes": 9656,
+      "originalSha256": "05a5c1781efb98e5d3ac7b411dbbb11bd01e1fc30eb12c3d06baaed0a37809f9",
+      "retained": "raw/infantry434-published-smoke/visual.json.gz",
+      "retainedSha256": "abaaedbb572d8b90784709dc462a07db9f5a00678a443aef78af2b45bd18b7c7"
+    },
+    {
+      "original": "artifacts/infantry434-retention.log",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained": "raw/infantry434-retention.log.gz",
+      "retainedSha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83"
+    },
+    {
+      "original": "artifacts/install_infantry434.py",
+      "originalBytes": 1752,
+      "originalSha256": "12b821710a23e7bf34427fe656e6abd67963ab8b3d4588efe58bcdd14b6f9197",
+      "retained": "raw/install_infantry434.py.gz",
+      "retainedSha256": "508795a6cedb2a0b651fee217952dedbc54ed1a57ac125c87658d04b644b803c"
+    },
+    {
+      "original": "artifacts/package_infantry434.ps1",
+      "originalBytes": 3539,
+      "originalSha256": "d7ab083535cb1c10ff81e5c38d1ddba5e4ee6e33a00db359b3111a2f04812c95",
+      "retained": "raw/package_infantry434.ps1.gz",
+      "retainedSha256": "6e30c9e15a681b79b5b835fda2fc3407fcbff9dc914b25727838b01f31d8445d"
+    },
+    {
+      "original": "artifacts/prepare_infantry_tank.ps1",
+      "originalBytes": 2633,
+      "originalSha256": "9bf4bf1ed1c9bbcad2c9c56a6d04a813858364d53f4d3975857ddf94aec7230e",
+      "retained": "raw/prepare_infantry_tank.ps1.gz",
+      "retainedSha256": "26697958dd34fda4bbe5e1829dbcd94f9e809a7f59011cf48212ffeafe9fda38"
+    },
+    {
+      "original": "artifacts/resolve_infantry_tank_merge.py",
+      "originalBytes": 2187,
+      "originalSha256": "0ee9c2114b2133d852c9bab0e6902bc2c21fd1227ddeab80b42172a35c997e27",
+      "retained": "raw/resolve_infantry_tank_merge.py.gz",
+      "retainedSha256": "a6705e1672aed24fe7571c6fbd4108803853980377a2c5f5072510229e2daf6a"
+    }
+  ],
+  "package": {
+    "success": true,
+    "source": "c85fd2987611de126963c93608cf3eda66636680",
+    "sourceTreeClean": true,
+    "archive": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\fuel-ammunition-blender\\artifacts\\ifpkg434\\FORGELINE-0.1.434-dev-win-x64.zip",
+    "archiveBytes": 55141213,
+    "archiveSha256": "5b06d740b0e7f51d09aa863ec29a7b0771d86d15e77242e4d73a370fddf065f1",
+    "archiveEntries": 1539,
+    "installation": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\infantry-player434",
+    "verifiedFileHashes": 1487,
+    "authoringFiles": 0,
+    "commonByteIdenticalCompiledFiles": 1364,
+    "publisherOnlyMediaFiles": 63
+  },
+  "archive": {
+    "path": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\fuel-ammunition-blender\\artifacts\\infantry434-post-tank-evidence.zip",
+    "bytes": 53278121,
+    "sha256": "96cf20bb905653e801ca1ca975dbfd7daa6f8ca6448030e24e5ae010d93ea31d"
+  }
+}
