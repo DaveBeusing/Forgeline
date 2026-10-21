@@ -1,0 +1,199 @@
+{
+  "blenderVersion": "5.2.2",
+  "canonicalSourcesUnchanged": true,
+  "componentSelectionGroups": 83,
+  "exports": [
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant.asset.json",
+      "definition": {
+        "collisionReference": "building.directorate.module.collision_box",
+        "collisionRequired": true,
+        "id": "building.directorate.power_plant",
+        "lods": [
+          {
+            "assetId": "building.directorate.power_plant.lod1",
+            "level": 1,
+            "maxDistance": 220
+          },
+          {
+            "assetId": "building.directorate.power_plant.lod2",
+            "level": 2,
+            "maxDistance": 620
+          }
+        ],
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "mechanicalParts": [
+          {
+            "firstIndex": 0,
+            "indexCount": 2724,
+            "motion": "static",
+            "name": "body",
+            "parent": -1
+          },
+          {
+            "firstIndex": 2724,
+            "indexCount": 324,
+            "motion": "fan",
+            "name": "cooling_fan",
+            "parent": -1,
+            "rate": 2.2,
+            "socket": "motion_cooling_fan",
+            "travel": 0
+          }
+        ],
+        "sockets": [
+          {
+            "name": "motion_cooling_fan",
+            "x": -0.03,
+            "y": 0.292,
+            "z": -0.06
+          }
+        ],
+        "source": "sources/operational/power_plant_lod0.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant",
+      "sha256": "045b7b3a90603f405bb9236164b5440d35198812255781c41b351affe7bc4b64",
+      "source": "building.directorate.power_plant.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant_lod1.asset.json",
+      "definition": {
+        "id": "building.directorate.power_plant.lod1",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/power_plant_lod1.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant.lod1",
+      "sha256": "3af3b3f7baba20f9fd2cad8e243b710e0377f02c665ada4e3b1b934e28ab50fe",
+      "source": "building.directorate.power_plant.lod1.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant_lod2.asset.json",
+      "definition": {
+        "id": "building.directorate.power_plant.lod2",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/power_plant_lod2.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant.lod2",
+      "sha256": "123759d4e1b06842452935d6e1e13dd5a704e15b6e0d12ac1ee9c85f8c43667e",
+      "source": "building.directorate.power_plant.lod2.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant_foundation.asset.json",
+      "definition": {
+        "id": "building.directorate.power_plant.foundation",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/power_plant_foundation.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant.foundation",
+      "sha256": "bf3d84f50ecc18df457933785f68f6e68c385f47f12397b3044bce4fdc3cd0eb",
+      "source": "building.directorate.power_plant.foundation.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant_structural_frame.asset.json",
+      "definition": {
+        "id": "building.directorate.power_plant.structural_frame",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/power_plant_structural_frame.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant.structural_frame",
+      "sha256": "71227c79ca3456daca503ad569c9055e2b198d69381e8c266b9cf4d0538f0087",
+      "source": "building.directorate.power_plant.structural_frame.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant_partial_shell.asset.json",
+      "definition": {
+        "id": "building.directorate.power_plant.partial_shell",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/power_plant_partial_shell.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant.partial_shell",
+      "sha256": "3768b3f5d28573c34ce2e6e9dee51215740905f433ec57de0493023368943e8d",
+      "source": "building.directorate.power_plant.partial_shell.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant_unpowered.asset.json",
+      "definition": {
+        "id": "building.directorate.power_plant.unpowered",
+        "materialReferences": [
+          "material.directorate.building.unpowered"
+        ],
+        "source": "sources/operational/power_plant_unpowered.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant.unpowered",
+      "sha256": "31e9b198a82125b6b8158941f424993eabb919cb107b849bb14ac6fddf0856f4",
+      "source": "building.directorate.power_plant.unpowered.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant_damaged.asset.json",
+      "definition": {
+        "id": "building.directorate.power_plant.damaged",
+        "materialReferences": [
+          "material.directorate.building.damaged"
+        ],
+        "source": "sources/operational/power_plant_damaged.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant.damaged",
+      "sha256": "8decd83333515ab51288861d423179604488e43565f9dad3f87aa122095bc177",
+      "source": "building.directorate.power_plant.damaged.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant_critical.asset.json",
+      "definition": {
+        "id": "building.directorate.power_plant.critical",
+        "materialReferences": [
+          "material.directorate.building.critical"
+        ],
+        "source": "sources/operational/power_plant_critical.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant.critical",
+      "sha256": "8b8397086c01dc7dd3141b15be81b0e065e7f1507052546a04e2c142f969a93b",
+      "source": "building.directorate.power_plant.critical.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/power_plant_destroyed.asset.json",
+      "definition": {
+        "id": "building.directorate.power_plant.destroyed",
+        "materialReferences": [
+          "material.directorate.building.destroyed"
+        ],
+        "source": "sources/operational/power_plant_destroyed.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.power_plant.destroyed",
+      "sha256": "a27adb33165c4b535dbadda29d9f472ce61d9a9e7b1579692f1ee64e4dd09a9a",
+      "source": "building.directorate.power_plant.destroyed.glb"
+    }
+  ],
+  "fixtureSha256": "7ff159458526a42cd5211007db7550cca2acc049fa6a216dc4d65876d556253d",
+  "master": "power_plant.blend",
+  "masterSha256": "b802e592d080beb286ae165275f6104ea3621240acc9fe4d6d87954e82a4159c",
+  "portableSourceSignature": "bcf869f9945691d4e16f3c759966a10bbdc30dc400e239d7f80a34c00bf81bbe",
+  "productionPromoted": false,
+  "schemaVersion": 1,
+  "sourceSha": "6454ec14c520f7650d62e9e71634de9b230d32dc",
+  "sourceSignature": "33ecb0974efd02b87f28f4bea6f9c37c18fdafb78b823dea5f31f1190ac5c3e7",
+  "status": "staged-not-promoted",
+  "surfaceReviewMaster": "power_plant_surfaces.blend",
+  "surfaceReviewMasterSha256": "876a5d7a91b84884f67c2874c6311c0adc31d6dfa49d420d80089e375303e3f9"
+}

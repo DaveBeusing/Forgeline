@@ -286,7 +286,25 @@ FPS, authoritative firing behavior or every elevation/terrain case. Do not merge
 release, approve goldens or promote source bindings while acceptance is open.
 
 Concurrent PR #273 appeared after the initial audit and owns logistics source/review
-work. Both PRs currently prepare 0.1.429 from the same 0.1.428 base and append scene
-enum values. Integrate serially: preserve already integrated scene identities,
-synchronize current master, reconcile exactly one PATCH and rerun applicable
-checks before any adoption. No other branch is modified by this work.
+work. It initially shared the 0.1.429 allocation. Integrate serially against current
+master, preserving integrated scene identities and reconciling exactly one PATCH.
+No other branch is modified by this work.
+
+## Merge reconciliation
+
+Merged master `2f8a8ae230ab0d653658a858b3e693ead24f5c1f` (PR #276) into this
+review branch. Preserve every integrated enum value, including the eight operational
+building scenes, then append the three artillery scenes. Both scene factories keep
+their own dispatch. The PR version is now **0.1.430**, exactly one PATCH above
+master's 0.1.429. Earlier executable, image and 0.1.429 package observations remain
+bound to the source checkpoints recorded above; they do not certify this merge.
+
+Reconciliation validation: all 63 integrated scene enum IDs retain their numeric
+positions; no unresolved conflict remains. The complete Release solution build
+(`--artifacts-path artifacts/merge274`) passes with zero warnings/errors. All
+108 selected presentation tests pass without skips (31.060 seconds), including
+artillery native geometry/pose checks against `artifacts/ar2`, artillery loads,
+operational building loads, general reference scenes, aim and mechanical motion.
+Retained-master validation confirms both Blender projects and all eight exports
+match current canonical sources; the 44-project reference graph remains acyclic.
+These are merge validation results, not a new native capture or package run.

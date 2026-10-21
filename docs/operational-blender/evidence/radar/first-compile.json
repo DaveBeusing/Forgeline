@@ -1,0 +1,83 @@
+{
+  "assetCount": 20,
+  "meshCount": 11,
+  "textureCount": 4,
+  "materialCount": 5,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7550076,
+  "meshRuntimeBytes": 213131,
+  "textureRuntimeBytes": 7328479,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 8466,
+  "catalogLoadDuration": "00:00:00.0339870",
+  "assetReadDuration": "00:00:00.0905228",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "building.directorate.radar",
+      "type": "mesh",
+      "runtimeBytes": 85455
+    },
+    {
+      "assetId": "building.directorate.radar.lod1",
+      "type": "mesh",
+      "runtimeBytes": 36331
+    },
+    {
+      "assetId": "building.directorate.radar.destroyed",
+      "type": "mesh",
+      "runtimeBytes": 21179
+    },
+    {
+      "assetId": "building.directorate.radar.lod2",
+      "type": "mesh",
+      "runtimeBytes": 17707
+    },
+    {
+      "assetId": "building.directorate.radar.partial_shell",
+      "type": "mesh",
+      "runtimeBytes": 15333
+    },
+    {
+      "assetId": "building.directorate.radar.structural_frame",
+      "type": "mesh",
+      "runtimeBytes": 12750
+    },
+    {
+      "assetId": "building.directorate.radar.critical",
+      "type": "mesh",
+      "runtimeBytes": 11018
+    },
+    {
+      "assetId": "building.directorate.radar.damaged",
+      "type": "mesh",
+      "runtimeBytes": 5675
+    },
+    {
+      "assetId": "building.directorate.module.collision_box",
+      "type": "mesh",
+      "runtimeBytes": 2956
+    }
+  ],
+  "issues": [],
+  "success": true
+}

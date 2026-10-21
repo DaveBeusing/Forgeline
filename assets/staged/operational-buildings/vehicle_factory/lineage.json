@@ -1,0 +1,215 @@
+{
+  "blenderVersion": "5.2.2",
+  "canonicalSourcesUnchanged": true,
+  "componentSelectionGroups": 107,
+  "exports": [
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory.asset.json",
+      "definition": {
+        "collisionReference": "building.directorate.module.collision_box",
+        "collisionRequired": true,
+        "id": "building.directorate.vehicle_factory",
+        "lods": [
+          {
+            "assetId": "building.directorate.vehicle_factory.lod1",
+            "level": 1,
+            "maxDistance": 220
+          },
+          {
+            "assetId": "building.directorate.vehicle_factory.lod2",
+            "level": 2,
+            "maxDistance": 620
+          }
+        ],
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "mechanicalParts": [
+          {
+            "firstIndex": 0,
+            "indexCount": 1152,
+            "motion": "static",
+            "name": "body",
+            "parent": -1
+          },
+          {
+            "firstIndex": 1152,
+            "indexCount": 216,
+            "motion": "door",
+            "name": "loading_door",
+            "parent": -1,
+            "rate": 1,
+            "socket": "motion_loading_door",
+            "travel": 0.35
+          },
+          {
+            "firstIndex": 1368,
+            "indexCount": 252,
+            "motion": "crane",
+            "name": "overhead_crane",
+            "parent": -1,
+            "rate": 0.25,
+            "socket": "motion_overhead_crane",
+            "travel": 0.25
+          }
+        ],
+        "sockets": [
+          {
+            "name": "motion_loading_door",
+            "x": 0,
+            "y": -0.11999999731779099,
+            "z": 0.4000000059604645
+          },
+          {
+            "name": "motion_overhead_crane",
+            "x": 0,
+            "y": 0.24,
+            "z": -0.05
+          }
+        ],
+        "source": "sources/operational/vehicle_factory_lod0.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory",
+      "sha256": "d5d14a6aa9774e66922bf5041c9ef343b78af0ab6ad0dee39a54b189b1c31cf9",
+      "source": "building.directorate.vehicle_factory.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory_lod1.asset.json",
+      "definition": {
+        "id": "building.directorate.vehicle_factory.lod1",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/vehicle_factory_lod1.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory.lod1",
+      "sha256": "8b78c9e42bbfeffa2077073539203f74566463d6e0d904f440e0c35f14107336",
+      "source": "building.directorate.vehicle_factory.lod1.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory_lod2.asset.json",
+      "definition": {
+        "id": "building.directorate.vehicle_factory.lod2",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/vehicle_factory_lod2.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory.lod2",
+      "sha256": "773828786160a8052f72e8f61b214cabd67095e309a8c879becb7d1f8872f1cc",
+      "source": "building.directorate.vehicle_factory.lod2.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory_foundation.asset.json",
+      "definition": {
+        "id": "building.directorate.vehicle_factory.foundation",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/vehicle_factory_foundation.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory.foundation",
+      "sha256": "19ba4d9fe5685b0ef5a24687092a0a908ecf7e425b8be83bed4f56fe49373fce",
+      "source": "building.directorate.vehicle_factory.foundation.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory_structural_frame.asset.json",
+      "definition": {
+        "id": "building.directorate.vehicle_factory.structural_frame",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/vehicle_factory_structural_frame.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory.structural_frame",
+      "sha256": "8b4562283753d1c0b8cc76f0433709c630af2c926ecaa1a913774dd971f3abc4",
+      "source": "building.directorate.vehicle_factory.structural_frame.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory_partial_shell.asset.json",
+      "definition": {
+        "id": "building.directorate.vehicle_factory.partial_shell",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/vehicle_factory_partial_shell.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory.partial_shell",
+      "sha256": "3728a115b8347204af13d2ec03d0e03f1f67f8351daa5330fb720dff9a445a46",
+      "source": "building.directorate.vehicle_factory.partial_shell.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory_unpowered.asset.json",
+      "definition": {
+        "id": "building.directorate.vehicle_factory.unpowered",
+        "materialReferences": [
+          "material.directorate.building.unpowered"
+        ],
+        "source": "sources/operational/vehicle_factory_unpowered.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory.unpowered",
+      "sha256": "1cf5e8e710def28a8d3b177a8553b498904fc5e10b313bdcadc30845e903fedd",
+      "source": "building.directorate.vehicle_factory.unpowered.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory_damaged.asset.json",
+      "definition": {
+        "id": "building.directorate.vehicle_factory.damaged",
+        "materialReferences": [
+          "material.directorate.building.damaged"
+        ],
+        "source": "sources/operational/vehicle_factory_damaged.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory.damaged",
+      "sha256": "f0c247324355a5c5976b1fe1199a0aa69f62ff1f0d0bfcbb740401f62fc151ff",
+      "source": "building.directorate.vehicle_factory.damaged.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory_critical.asset.json",
+      "definition": {
+        "id": "building.directorate.vehicle_factory.critical",
+        "materialReferences": [
+          "material.directorate.building.critical"
+        ],
+        "source": "sources/operational/vehicle_factory_critical.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory.critical",
+      "sha256": "59181fa0ae69881cf343deedd853fb26734944647416044800b99afe32ab110d",
+      "source": "building.directorate.vehicle_factory.critical.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/vehicle_factory_destroyed.asset.json",
+      "definition": {
+        "id": "building.directorate.vehicle_factory.destroyed",
+        "materialReferences": [
+          "material.directorate.building.destroyed"
+        ],
+        "source": "sources/operational/vehicle_factory_destroyed.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.vehicle_factory.destroyed",
+      "sha256": "3eb2015f2a272fd1dc36be435b7554237c6168f6a30ab8ca952a707f4fb4231e",
+      "source": "building.directorate.vehicle_factory.destroyed.glb"
+    }
+  ],
+  "fixtureSha256": "b95f59bf7253b452b4cb6a006e31df8a90ea98700b74ad3ff6acc5f6c5f954b4",
+  "master": "vehicle_factory.blend",
+  "masterSha256": "bc9318a26dd5fe1eaf30fc2f118d1d8741308c23ff85dab1846b36066f7168d2",
+  "portableSourceSignature": "03f08e4cd50d35cc1f11a2b6b9951bd919de3b2a662cbee9fb2620e7b1774610",
+  "productionPromoted": false,
+  "schemaVersion": 1,
+  "sourceSha": "6454ec14c520f7650d62e9e71634de9b230d32dc",
+  "sourceSignature": "fc5992e0050a5aa3bc41ec7425088630317dadda79f55b2afba2f4d9657496fd",
+  "status": "staged-not-promoted",
+  "surfaceReviewMaster": "vehicle_factory_surfaces.blend",
+  "surfaceReviewMasterSha256": "401b11681257ccf2aaa706f50cd7db0224baa321cdfa82d5a4f76b59b4e1157f"
+}

@@ -1,0 +1,857 @@
+{
+  "assetIds": [
+    "building.directorate.barracks",
+    "building.directorate.barracks.critical",
+    "building.directorate.barracks.damaged",
+    "building.directorate.barracks.destroyed",
+    "building.directorate.barracks.foundation",
+    "building.directorate.barracks.lod1",
+    "building.directorate.barracks.lod2",
+    "building.directorate.barracks.partial_shell",
+    "building.directorate.barracks.structural_frame",
+    "building.directorate.barracks.unpowered",
+    "building.directorate.module.collision_box",
+    "material.directorate.building.critical",
+    "material.directorate.building.damaged",
+    "material.directorate.building.destroyed",
+    "material.directorate.building.structural",
+    "material.directorate.building.unpowered",
+    "texture.directorate.material.status_emissive",
+    "texture.directorate.surface.atlas_base",
+    "texture.directorate.surface.atlas_normal",
+    "texture.directorate.surface.atlas_orm"
+  ],
+  "collisionSourcesUnchanged": true,
+  "errors": [],
+  "inventory": [
+    {
+      "boundsMax": [
+        0.4300000071525574,
+        0.1599999964237213,
+        0.41999998688697815
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.4099999964237213
+      ],
+      "estimatedVertexBytes": 27072,
+      "id": "building.directorate.barracks",
+      "indexBytes": 3312,
+      "lods": [
+        {
+          "assetId": "building.directorate.barracks.lod1",
+          "level": 1,
+          "maxDistance": 220
+        },
+        {
+          "assetId": "building.directorate.barracks.lod2",
+          "level": 2,
+          "maxDistance": 620
+        }
+      ],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 276,
+      "vertices": 564
+    },
+    {
+      "boundsMax": [
+        0.3564611077308655,
+        -0.2041861116886139,
+        0.36762166023254395
+      ],
+      "boundsMin": [
+        -0.3700000047683716,
+        -0.4558138847351074,
+        0.23999999463558197
+      ],
+      "estimatedVertexBytes": 8832,
+      "id": "building.directorate.barracks.critical",
+      "indexBytes": 1104,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.critical"
+      ],
+      "primitives": 1,
+      "triangles": 92,
+      "vertices": 184
+    },
+    {
+      "boundsMax": [
+        -0.18000000715255737,
+        -0.2620428800582886,
+        -0.24691884219646454
+      ],
+      "boundsMin": [
+        -0.3499999940395355,
+        -0.44999998807907104,
+        -0.33000001311302185
+      ],
+      "estimatedVertexBytes": 4032,
+      "id": "building.directorate.barracks.damaged",
+      "indexBytes": 576,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.damaged"
+      ],
+      "primitives": 1,
+      "triangles": 48,
+      "vertices": 84
+    },
+    {
+      "boundsMax": [
+        0.4300000071525574,
+        -0.2199999988079071,
+        0.41999998688697815
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.4099999964237213
+      ],
+      "estimatedVertexBytes": 8928,
+      "id": "building.directorate.barracks.destroyed",
+      "indexBytes": 1200,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.destroyed"
+      ],
+      "primitives": 1,
+      "triangles": 100,
+      "vertices": 186
+    },
+    {
+      "boundsMax": [
+        0.4300000071525574,
+        -0.4699999988079071,
+        0.41999998688697815
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.4099999964237213
+      ],
+      "estimatedVertexBytes": 1152,
+      "id": "building.directorate.barracks.foundation",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 24
+    },
+    {
+      "boundsMax": [
+        0.4300000071525574,
+        0.1599999964237213,
+        0.41999998688697815
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.4099999964237213
+      ],
+      "estimatedVertexBytes": 13248,
+      "id": "building.directorate.barracks.lod1",
+      "indexBytes": 1680,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 140,
+      "vertices": 276
+    },
+    {
+      "boundsMax": [
+        0.4300000071525574,
+        0.1599999964237213,
+        0.41999998688697815
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.4099999964237213
+      ],
+      "estimatedVertexBytes": 8640,
+      "id": "building.directorate.barracks.lod2",
+      "indexBytes": 1104,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 92,
+      "vertices": 180
+    },
+    {
+      "boundsMax": [
+        0.4300000071525574,
+        0.1599999964237213,
+        0.41999998688697815
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.4099999964237213
+      ],
+      "estimatedVertexBytes": 15552,
+      "id": "building.directorate.barracks.partial_shell",
+      "indexBytes": 1968,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 164,
+      "vertices": 324
+    },
+    {
+      "boundsMax": [
+        0.4300000071525574,
+        0.0949999988079071,
+        0.41999998688697815
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.4099999964237213
+      ],
+      "estimatedVertexBytes": 10368,
+      "id": "building.directorate.barracks.structural_frame",
+      "indexBytes": 1296,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 108,
+      "vertices": 216
+    },
+    {
+      "boundsMax": [
+        -0.25,
+        -0.18000000715255737,
+        0.4050000011920929
+      ],
+      "boundsMin": [
+        -0.3799999952316284,
+        -0.3799999952316284,
+        0.39500001072883606
+      ],
+      "estimatedVertexBytes": 1152,
+      "id": "building.directorate.barracks.unpowered",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.unpowered"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 24
+    },
+    {
+      "boundsMax": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "boundsMin": [
+        -0.5,
+        -0.5,
+        -0.5
+      ],
+      "estimatedVertexBytes": 384,
+      "id": "building.directorate.module.collision_box",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 8
+    }
+  ],
+  "meshes": [
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.1599999964237213,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 276,
+        "vertices": 564
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.1599999964237213,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 276,
+        "vertices": 564
+      },
+      "estimatedCompiledGeometryBytes": 30384,
+      "id": "building.directorate.barracks",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.3564611077308655,
+          -0.2041861116886139,
+          0.36762166023254395
+        ],
+        "boundsMin": [
+          -0.3700000047683716,
+          -0.4558138847351074,
+          0.23999999463558197
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      },
+      "candidate": {
+        "boundsMax": [
+          0.3564611077308655,
+          -0.2041861116886139,
+          0.36762166023254395
+        ],
+        "boundsMin": [
+          -0.3700000047683716,
+          -0.4558138847351074,
+          0.23999999463558197
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      },
+      "estimatedCompiledGeometryBytes": 9936,
+      "id": "building.directorate.barracks.critical",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks.critical"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.18000000715255737,
+          -0.2620428800582886,
+          -0.24691884219646454
+        ],
+        "boundsMin": [
+          -0.3499999940395355,
+          -0.44999998807907104,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.18000000715255737,
+          -0.2620428800582886,
+          -0.24691884219646454
+        ],
+        "boundsMin": [
+          -0.3499999940395355,
+          -0.44999998807907104,
+          -0.33000001311302185
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "estimatedCompiledGeometryBytes": 4608,
+      "id": "building.directorate.barracks.damaged",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks.damaged"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4300000071525574,
+          -0.2199999988079071,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 100,
+        "vertices": 186
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4300000071525574,
+          -0.2199999988079071,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 100,
+        "vertices": 186
+      },
+      "estimatedCompiledGeometryBytes": 10128,
+      "id": "building.directorate.barracks.destroyed",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks.destroyed"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4300000071525574,
+          -0.4699999988079071,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4300000071525574,
+          -0.4699999988079071,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "estimatedCompiledGeometryBytes": 1296,
+      "id": "building.directorate.barracks.foundation",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks.foundation"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.1599999964237213,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 140,
+        "vertices": 276
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.1599999964237213,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 140,
+        "vertices": 276
+      },
+      "estimatedCompiledGeometryBytes": 14928,
+      "id": "building.directorate.barracks.lod1",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks.lod1"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.1599999964237213,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 180
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.1599999964237213,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 180
+      },
+      "estimatedCompiledGeometryBytes": 9744,
+      "id": "building.directorate.barracks.lod2",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks.lod2"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.1599999964237213,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 164,
+        "vertices": 324
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.1599999964237213,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 164,
+        "vertices": 324
+      },
+      "estimatedCompiledGeometryBytes": 17520,
+      "id": "building.directorate.barracks.partial_shell",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks.partial_shell"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.0949999988079071,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4300000071525574,
+          0.0949999988079071,
+          0.41999998688697815
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      },
+      "estimatedCompiledGeometryBytes": 11664,
+      "id": "building.directorate.barracks.structural_frame",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks.structural_frame"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.25,
+          -0.18000000715255737,
+          0.4050000011920929
+        ],
+        "boundsMin": [
+          -0.3799999952316284,
+          -0.3799999952316284,
+          0.39500001072883606
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.25,
+          -0.18000000715255737,
+          0.4050000011920929
+        ],
+        "boundsMin": [
+          -0.3799999952316284,
+          -0.3799999952316284,
+          0.39500001072883606
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "estimatedCompiledGeometryBytes": 1296,
+      "id": "building.directorate.barracks.unpowered",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.barracks.unpowered"
+    }
+  ],
+  "previews": [
+    {
+      "assetId": "building.directorate.barracks",
+      "camera": "close",
+      "distanceInAssetExtents": 3.7415220997561622,
+      "file": "building.directorate.barracks-close.png"
+    },
+    {
+      "assetId": "building.directorate.barracks",
+      "camera": "normal",
+      "distanceInAssetExtents": 6.122490708691902,
+      "file": "building.directorate.barracks-normal.png"
+    },
+    {
+      "assetId": "building.directorate.barracks",
+      "camera": "strategic",
+      "distanceInAssetExtents": 11.564704671973592,
+      "file": "building.directorate.barracks-strategic.png"
+    }
+  ],
+  "productionSourcesUnchanged": true,
+  "profileSha256": "ddc8a34ed169b59f1769b7425a823df5b7cd3f2c36a76a4b1e17d137174b535d",
+  "schemaVersion": 1,
+  "sourceHashes": {
+    "buildings/directorate/barracks.asset.json": "0077bd485a9484e4603fe2d39bf7e18e48f43dd5199be165b0b32539274ffe4c",
+    "buildings/directorate/barracks_critical.asset.json": "e491f2835cad1f994def889884f9e81ca7713f0f28404e8c2c48b3f355ce43f4",
+    "buildings/directorate/barracks_damaged.asset.json": "8d72ab8784f7db2dc8aad11378c69b941a04fcafe8fc83ee91f460bd756974b9",
+    "buildings/directorate/barracks_destroyed.asset.json": "8b4d7b1d2ff7bbad4d863a76dbc934b3b1a9c313956e6f797b87f1d932680493",
+    "buildings/directorate/barracks_foundation.asset.json": "10dc3d7d9e3bfdafcc68e6ae2b28a8b044cfc4d8e5612ea0543185e95f6c20c8",
+    "buildings/directorate/barracks_lod1.asset.json": "6fb9bbc16c1a367722d4fad37fc9e1037c3f333fe48b3034f239b638af580fc6",
+    "buildings/directorate/barracks_lod2.asset.json": "603871e8a54894fde4c1065b9ec2d3d05b79f820b35262b7f63828576e5ce839",
+    "buildings/directorate/barracks_partial_shell.asset.json": "d9605ccc2b7d7e834eafbefaff9a09d566ab22730335080ca5d4af7aabcd46ce",
+    "buildings/directorate/barracks_structural_frame.asset.json": "e9e95b42cc79620968d941e82f186cc0f9c9c20cd9adbf3f94d1923d9eb8e9aa",
+    "buildings/directorate/barracks_unpowered.asset.json": "03697de07e5e68bddd54cf4176b35a2786b085f37337debdc9151b7fd6098347",
+    "buildings/directorate/materials/critical.asset.json": "8c1a6eb4672ce7f238674b5a76f5f8f64ac39528d9cd27b069bd8eb99ee41fa1",
+    "buildings/directorate/materials/critical.material.json": "6e8256d9cd4d811f22f1c0ba8fed303c2fd358e6c9d11af01bad92ace16050b7",
+    "buildings/directorate/materials/damaged.asset.json": "b5d1c0f60bef36661b4525cb7e8c52e5cb46260bfd1c02b9a56c18987f5b5e3e",
+    "buildings/directorate/materials/damaged.material.json": "a1c57cb49c08c1caf03c030e80e57894f254ef8d4e38469fe4a0199c2b2bc636",
+    "buildings/directorate/materials/destroyed.asset.json": "e89a774bce9c320f7a2548c01ecae150863d593f54a63ec936dc5972c9d48eb3",
+    "buildings/directorate/materials/destroyed.material.json": "0a2a981e9afa9ea4477b9fe541ad85b203370686bb36d2effa9ec47cf774ad67",
+    "buildings/directorate/materials/structural.asset.json": "3692dc0effd7a964b33d05610534729780cf4f4920b5230425495ced7ec543b8",
+    "buildings/directorate/materials/structural.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "buildings/directorate/materials/unpowered.asset.json": "f4847dd15d0d5bb22bcdb9eb4529875fe438ddb0ed76f4815ba91e6b18f87fa8",
+    "buildings/directorate/materials/unpowered.material.json": "8373a93e0dbdacae3829d65406c18fb45daa571d01afe73df9cf87652e4590e6",
+    "buildings/directorate/modules/collision_box.asset.json": "b5ac3e871a08eabff5bb20cddf65de2d928f0d7728b7cdd3cd5669205c4ee637",
+    "buildings/directorate/sources/module_collision_box.gltf": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+    "buildings/directorate/sources/operational/barracks_critical.gltf": "b4712cbfaab98018e3f16ab7de20d07960a79fda26a77c7c6fed8cbf9f8bae2d",
+    "buildings/directorate/sources/operational/barracks_damaged.gltf": "3db886caf21be387d8107da6f48846fa17f24b21791d8a0b1c0ed9eb8ed98993",
+    "buildings/directorate/sources/operational/barracks_destroyed.gltf": "af25d0fb06744c1e930c9ef73b43178be1ae2ffe8d221a2d1b016344ac98c492",
+    "buildings/directorate/sources/operational/barracks_foundation.gltf": "8410e875e2e727b573b83a9e16ca948a2c2a9e57b77de94ce9e476c9ecaa0fff",
+    "buildings/directorate/sources/operational/barracks_lod0.gltf": "95a6f7c0352268d9527e588ad041d20277917e6da2a033c79dd2d684d86033f2",
+    "buildings/directorate/sources/operational/barracks_lod1.gltf": "a7f96daee901b323ba4467e58eb92006908026a916f9bb80de9c1a442e6b0f09",
+    "buildings/directorate/sources/operational/barracks_lod2.gltf": "f5276ca3758cbcfc559a711e97879296347547933868f11d61c3e7a563f0abb5",
+    "buildings/directorate/sources/operational/barracks_partial_shell.gltf": "70b72ca49ddd210801f8b533dec219e00d5d12819dfb06ae8b8823557ad5009b",
+    "buildings/directorate/sources/operational/barracks_structural_frame.gltf": "3cb9d1627e2f106c6dffa98e6161acf67e8e6d3f033c5a99bc246b74305f4f78",
+    "buildings/directorate/sources/operational/barracks_unpowered.gltf": "8f8fc482f6759599b7005ee5fc4c8b75952280a893416196c30049ad4ff7b1c3",
+    "materials/directorate/surfaces/production_surface_base.png": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+    "materials/directorate/surfaces/production_surface_normal.png": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+    "materials/directorate/surfaces/production_surface_orm.png": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+    "materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9",
+    "materials/directorate/textures/status_emissive.asset.json": "464a32ad532fa18cfc149cc1f6f3e887c156025dca9cf8308485fcadac83b5d0",
+    "materials/directorate/textures/status_emissive.tga": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6"
+  },
+  "sourceSignature": "95f4383495bc2f2f61d4c1e15f51a6c025ee660a776f32093cf40f15b4a73b12",
+  "success": true,
+  "texturePayloadBytes": 7325040,
+  "textures": [
+    {
+      "colorSpace": "srgb",
+      "estimatedPayloadBytes": 1392,
+      "format": "BC7",
+      "height": 32,
+      "id": "texture.directorate.material.status_emissive",
+      "mipLevels": 6,
+      "sourceSha256": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6",
+      "usage": "emissive",
+      "width": 32
+    },
+    {
+      "colorSpace": "srgb",
+      "estimatedPayloadBytes": 5586944,
+      "format": "BC7",
+      "height": 2048,
+      "id": "texture.directorate.surface.atlas_base",
+      "mipLevels": 5,
+      "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+      "usage": "baseColor",
+      "width": 2048
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 1392640,
+      "format": "BC7",
+      "height": 1024,
+      "id": "texture.directorate.surface.atlas_normal",
+      "mipLevels": 4,
+      "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+      "usage": "normal",
+      "width": 1024
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 344064,
+      "format": "BC7",
+      "height": 512,
+      "id": "texture.directorate.surface.atlas_orm",
+      "mipLevels": 3,
+      "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+      "usage": "orm",
+      "width": 512
+    }
+  ]
+}

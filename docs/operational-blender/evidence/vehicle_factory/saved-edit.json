@@ -1,0 +1,14 @@
+{
+  "canonicalYDelta": 0.0009999871253967276,
+  "editAsset": "building.directorate.vehicle_factory",
+  "editIsQualificationOnly": true,
+  "editVertex": 601,
+  "family": "building.directorate.vehicle_factory",
+  "meshCount": 11,
+  "organizedMasterReopened": true,
+  "productionPromotion": "pending",
+  "savedVertexEditReopenedAndExported": true,
+  "schemaVersion": 1,
+  "sourceSignature": "fc5992e0050a5aa3bc41ec7425088630317dadda79f55b2afba2f4d9657496fd",
+  "success": true
+}

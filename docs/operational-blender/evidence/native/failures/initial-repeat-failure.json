@@ -1,0 +1,42 @@
+{
+  "status": "structural-failure",
+  "error": "System.InvalidOperationException: Repeated fixed-state pixels differ on repetition 2: 1 channels, maximum delta 1; failed images exported.\r\n   at ForgeLine.Client.VisualReferenceCapture.Run(String requestPath) in C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\operational-blender\\src\\ForgeLine.Client\\VisualReferenceCapture.cs:line 415",
+  "completedCaptures": 22,
+  "captureState": {
+    "key": "RadarProduction-1920x1080-Medium-NormalGameplay",
+    "stage": "repeat-readback",
+    "repetition": 2,
+    "surface": {
+      "width": 1920,
+      "height": 1080,
+      "bufferCount": 3,
+      "frameIndex": 2,
+      "isSuspended": false,
+      "presentMode": "Immediate",
+      "isOccluded": false,
+      "resizePending": false,
+      "resizeGeneration": 1,
+      "appliedResizeGeneration": 1,
+      "submittedFrameCount": 1100,
+      "presentedFrameCount": 1100
+    },
+    "hostWindowDpi": 144
+  },
+  "captureInputs": [
+    {
+      "frameIndex": 0,
+      "fingerprint": "6EF3E22F255AE955ABF57373C026962441CEC8B04E9F8AB4244728304E59461A",
+      "shadowFingerprint": null
+    },
+    {
+      "frameIndex": 1,
+      "fingerprint": "6EF3E22F255AE955ABF57373C026962441CEC8B04E9F8AB4244728304E59461A",
+      "shadowFingerprint": null
+    },
+    {
+      "frameIndex": 2,
+      "fingerprint": "6EF3E22F255AE955ABF57373C026962441CEC8B04E9F8AB4244728304E59461A",
+      "shadowFingerprint": null
+    }
+  ]
+}

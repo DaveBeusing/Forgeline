@@ -1,0 +1,172 @@
+{
+  "blenderVersion": "5.2.2",
+  "canonicalSourcesUnchanged": true,
+  "componentSelectionGroups": 69,
+  "exports": [
+    {
+      "canonicalDefinition": "buildings/directorate/barracks.asset.json",
+      "definition": {
+        "collisionReference": "building.directorate.module.collision_box",
+        "collisionRequired": true,
+        "id": "building.directorate.barracks",
+        "lods": [
+          {
+            "assetId": "building.directorate.barracks.lod1",
+            "level": 1,
+            "maxDistance": 220
+          },
+          {
+            "assetId": "building.directorate.barracks.lod2",
+            "level": 2,
+            "maxDistance": 620
+          }
+        ],
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/barracks_lod0.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks",
+      "sha256": "3a49d7efabdc54014de9bf1dcfb16e9d9d1d987f94fe7039646b02c16fbb3ff0",
+      "source": "building.directorate.barracks.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/barracks_lod1.asset.json",
+      "definition": {
+        "id": "building.directorate.barracks.lod1",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/barracks_lod1.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks.lod1",
+      "sha256": "37c8b9fe7522318e351983c822a0a46434bd37d6f2c64d7562cfc92bd2326acc",
+      "source": "building.directorate.barracks.lod1.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/barracks_lod2.asset.json",
+      "definition": {
+        "id": "building.directorate.barracks.lod2",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/barracks_lod2.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks.lod2",
+      "sha256": "e9ec845c72737c262e2f2e0e52fdffc5dc1772873e049f8abb2daa453e4ed3b8",
+      "source": "building.directorate.barracks.lod2.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/barracks_foundation.asset.json",
+      "definition": {
+        "id": "building.directorate.barracks.foundation",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/barracks_foundation.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks.foundation",
+      "sha256": "a1fd5c0710873e80617c688e92fb70af68558a0eac637c5ad4e19c1f111551e7",
+      "source": "building.directorate.barracks.foundation.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/barracks_structural_frame.asset.json",
+      "definition": {
+        "id": "building.directorate.barracks.structural_frame",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/barracks_structural_frame.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks.structural_frame",
+      "sha256": "17ed30d007da846a162767ebdcfa2ddd6e89ee0eadfd5cf0b6d557493664b9cb",
+      "source": "building.directorate.barracks.structural_frame.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/barracks_partial_shell.asset.json",
+      "definition": {
+        "id": "building.directorate.barracks.partial_shell",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/barracks_partial_shell.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks.partial_shell",
+      "sha256": "761f321e7b2b7cab66c1d41c61dd8982663a73fc0eff91e152199f07bc905543",
+      "source": "building.directorate.barracks.partial_shell.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/barracks_unpowered.asset.json",
+      "definition": {
+        "id": "building.directorate.barracks.unpowered",
+        "materialReferences": [
+          "material.directorate.building.unpowered"
+        ],
+        "source": "sources/operational/barracks_unpowered.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks.unpowered",
+      "sha256": "b8af5579312d3e2c7f079a4e14bd43059b5bc05e29caeaf201958bb2f8aeea25",
+      "source": "building.directorate.barracks.unpowered.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/barracks_damaged.asset.json",
+      "definition": {
+        "id": "building.directorate.barracks.damaged",
+        "materialReferences": [
+          "material.directorate.building.damaged"
+        ],
+        "source": "sources/operational/barracks_damaged.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks.damaged",
+      "sha256": "ef4d1b67fb81b91dbb13ac87f23c11f2ce74d520d644d3affd877995f6e2c754",
+      "source": "building.directorate.barracks.damaged.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/barracks_critical.asset.json",
+      "definition": {
+        "id": "building.directorate.barracks.critical",
+        "materialReferences": [
+          "material.directorate.building.critical"
+        ],
+        "source": "sources/operational/barracks_critical.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks.critical",
+      "sha256": "6e8f07885b47eadea88866071c6926d555208e0ef961a6d91a2f39b694054122",
+      "source": "building.directorate.barracks.critical.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/barracks_destroyed.asset.json",
+      "definition": {
+        "id": "building.directorate.barracks.destroyed",
+        "materialReferences": [
+          "material.directorate.building.destroyed"
+        ],
+        "source": "sources/operational/barracks_destroyed.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.barracks.destroyed",
+      "sha256": "2cb804e5a070511a9c033dbdd4e515ba91ddc2fa5497b26cdb7748660b1676aa",
+      "source": "building.directorate.barracks.destroyed.glb"
+    }
+  ],
+  "fixtureSha256": "eb2b883b97196d9eadfb3be85dd949ea120c6f70aad9abf42c92bf6ee5ccf4a3",
+  "master": "barracks.blend",
+  "masterSha256": "44bbb5649ad37780d12a878d332036bbb9ca88b499a210b88ba3aab7c9470001",
+  "portableSourceSignature": "d3eb11946a300ba678712cc77c73e821466a85768a2aed7b6f3fb265d3b746d0",
+  "productionPromoted": false,
+  "schemaVersion": 1,
+  "sourceSha": "6454ec14c520f7650d62e9e71634de9b230d32dc",
+  "sourceSignature": "95f4383495bc2f2f61d4c1e15f51a6c025ee660a776f32093cf40f15b4a73b12",
+  "status": "staged-not-promoted",
+  "surfaceReviewMaster": "barracks_surfaces.blend",
+  "surfaceReviewMasterSha256": "d16f1ff8c46bde690aaf9d8eb97f06f5bd675a51dd8ec0ea8878c42218ed7150"
+}

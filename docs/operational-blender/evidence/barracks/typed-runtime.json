@@ -1,0 +1,29 @@
+[
+  {
+    "variant": "first",
+    "meshes": 11,
+    "triangles": 1056,
+    "parts": 0,
+    "maximumPositionError": 0,
+    "maximumTangentError": 5.1273855E-07,
+    "mechanicalBatchIdentityPreserved": true
+  },
+  {
+    "variant": "second",
+    "meshes": 11,
+    "triangles": 1056,
+    "parts": 0,
+    "maximumPositionError": 0,
+    "maximumTangentError": 5.1273855E-07,
+    "mechanicalBatchIdentityPreserved": true
+  },
+  {
+    "variant": "reopened",
+    "meshes": 11,
+    "triangles": 1056,
+    "parts": 0,
+    "maximumPositionError": 0,
+    "maximumTangentError": 5.1273855E-07,
+    "mechanicalBatchIdentityPreserved": true
+  }
+]
