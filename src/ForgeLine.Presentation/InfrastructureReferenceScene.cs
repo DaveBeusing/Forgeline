@@ -66,7 +66,7 @@ internal static class InfrastructureReferenceScene
                 new(1), RenderMaterialHandle.Default, RenderVisibilityMask.World,
                 InfrastructureFeature: new(InfrastructurePresentationKind.RoadBridge, state)));
         }
-        return Scene(kind, center, Snapshot(instances), Array.Empty<WorldTransform>());
+        return Scene(kind, center, Snapshot(instances,terrain), Array.Empty<WorldTransform>());
     }
 
     private static VisualReferenceScene RoadReview(VisualReferenceSceneKind kind, TerrainWorld terrain, RuntimeAssetCatalog? assets)
@@ -85,9 +85,7 @@ internal static class InfrastructureReferenceScene
             uint id = 0xE7000000u + (uint)(i * 3);
             instances.Add(new(new(id,1), transform, new(1), RenderMaterialHandle.Default, RenderVisibilityMask.World,
                 InfrastructureFeature: new(chart.Kind, InfrastructurePresentationState.Operational)));
-            instances.Add(new(new(id+1,1), new(anchor-normal*.48f,transform.Rotation,new(58,2,58)), new(1),
-                RenderMaterialHandle.Default,RenderVisibilityMask.World,
-                WorldFeature:new(WorldVisualId.PropLoadingApron,WorldPresentationKind.Prop,default,false)));
+            instances.Add(GravelStand(id+1,anchor,normal,transform.Rotation,58));
             Matrix4x4 world = InfrastructurePresentationCatalog.AdjustWorldTransform(
                 new(chart.Kind,InfrastructurePresentationState.Operational),transform.ToMatrix());
             Vector3[] path = chart.Path.Select(p => Vector3.Transform(new Vector3(p.X,-.42f,p.Y),world)).ToArray();
@@ -97,7 +95,7 @@ internal static class InfrastructureReferenceScene
             float offset = DirectorateContent.CreateUnitCatalog()[UnitIds.CargoTruck].Movement.HeightOffset;
             var pose = truck.Transform with { Position=truck.Transform.Position with { Y=height+offset/normal.Y },
                 Rotation=OnPlane(truck.Transform.Rotation,normal) };
-            instances.Add(truck with { Entity=new(id+2,1),DebugIdentity=id+2,Transform=pose });
+            instances.Add(truck with { Entity=new(id+2,1),DebugIdentity=id+2,Transform=pose,Selectable=SelectablePresentationMetadata.None });
             traces.Add(sample.Trace);
         }
         if (gallery)
@@ -106,11 +104,9 @@ internal static class InfrastructureReferenceScene
             instances.Add(new(new(0xE7001000,1),plane with { Scale=new(12,.35f,12) },new(1),
                 RenderMaterialHandle.Default,RenderVisibilityMask.World,
                 InfrastructureFeature:new(InfrastructurePresentationKind.RoadYardTransition,InfrastructurePresentationState.Operational)));
-            instances.Add(new(new(0xE7001001,1),new(anchor-normal*.48f,plane.Rotation,new(16,2,16)),new(1),
-                RenderMaterialHandle.Default,RenderVisibilityMask.World,
-                WorldFeature:new(WorldVisualId.PropLoadingApron,WorldPresentationKind.Prop,default,false)));
+            instances.Add(GravelStand(0xE7001001,anchor,normal,plane.Rotation,16));
         }
-        return Scene(kind,center,Snapshot(instances),traces);
+        return Scene(kind,center,Snapshot(instances,terrain),traces);
     }
 
     internal static TrafficSample SimulatePath(TerrainWorld terrain, RuntimeAssetCatalog? assets, Vector3[] path, float phase)
@@ -213,8 +209,22 @@ internal static class InfrastructureReferenceScene
         if(!terrain.TrySampleHeight(point.X,point.Z,out float height)) throw new InvalidOperationException("Infrastructure review lies outside terrain.");
         return point with { Y=height };
     }
-    private static PresentationSnapshot Snapshot(List<RenderInstance> instances) =>
-        new(new SimulationTick(VisualReferenceScene.FixedTick),TimeSpan.FromMilliseconds(50),instances.Count,instances.ToArray(),sessionId:new(1));
+    private static RenderInstance GravelStand(uint id,Vector3 anchor,Vector3 normal,Quaternion rotation,float width)
+    {
+        const float HeightScale=2/.06f;
+        // Expanded existing gravel shoulder, with its top touching the concrete module's underside.
+        return new(new(id,1),new(anchor+normal*(.01f*HeightScale-.028f),rotation,new(width/.16f,HeightScale,width)),
+            new(1),RenderMaterialHandle.Default,RenderVisibilityMask.World,
+            InfrastructureFeature:new(InfrastructurePresentationKind.RoadShoulder,InfrastructurePresentationState.Operational));
+    }
+    private static PresentationSnapshot Snapshot(List<RenderInstance> instances,TerrainWorld terrain)
+    {
+        var basis=VisualReferenceScene.Create(VisualReferenceSceneKind.DirectorateUnits,terrain,false);
+        PlayerExperienceSnapshot? experience=basis.Snapshot.PlayerExperience is {} source
+            ? source with { Selection=PlayerSelectionSummary.Empty } : null;
+        return new(new SimulationTick(VisualReferenceScene.FixedTick),TimeSpan.FromMilliseconds(50),instances.Count,
+            instances.ToArray(),sessionId:new(1),playerExperience:experience);
+    }
     private static VisualReferenceScene Scene(VisualReferenceSceneKind kind,Vector3 target,PresentationSnapshot snapshot,object trace)
     {
         string fingerprint=Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new

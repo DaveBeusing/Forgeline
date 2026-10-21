@@ -41,11 +41,13 @@ public sealed class InfrastructureReferenceSceneTests
         var terrain=CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
         var scene=VisualReferenceScene.Create(kind,terrain);
         var instances=scene.Snapshot.Instances.ToArray();
-        Assert.Single(instances,x=>x.InfrastructureFeature.IsSpecified);
+        Assert.Single(instances,x=>x.InfrastructureFeature.IsSpecified && x.InfrastructureFeature.Kind!=InfrastructurePresentationKind.RoadShoulder);
         var truck=Assert.Single(instances,x=>x.UnitFeature.Unit==UnitIds.CargoTruck);
         Assert.True(truck.MechanicalPose.IsSpecified);
         Assert.True(float.IsFinite(truck.Transform.Position.Y));
-        Assert.Single(instances,x=>x.WorldFeature.Visual==WorldVisualId.PropLoadingApron);
+        Assert.Single(instances,x=>x.InfrastructureFeature.Kind==InfrastructurePresentationKind.RoadShoulder);
+        Assert.False(truck.Selectable.IsSelectable);
+        Assert.NotNull(scene.Snapshot.PlayerExperience);
     }
 
     [Theory]
