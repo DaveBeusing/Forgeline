@@ -45,6 +45,10 @@ def review_gltf(record, folder):
                     {'bufferView':2,'componentType':5126,'count':4,'type':'VEC2'},
                     {'bufferView':3,'componentType':5123,'count':6,'type':'SCALAR'}],
        'extras':{'purpose':'Material inspection only; no gameplay terrain mesh','effectiveRepeatMetres':record['tileMetres']}}
+    reference_scale = next(iter(record['materials'].values())).get('uvScale',[1,1])[0]
+    for node, material in zip(d['nodes'],record['materials'].values()):
+        scale = reference_scale/material.get('uvScale',[1,1])[0]
+        if scale != 1: node['scale'] = [scale,1,scale]
     (folder/'surface.gltf').write_text(json.dumps(d,indent=2)+'\n',encoding='utf-8')
 
 
