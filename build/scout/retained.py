@@ -39,9 +39,10 @@ def retain(root, refresh=False):
     first = root / 'first'
     report = json.loads((first / 'roundtrip-report.json').read_text(encoding='utf-8'))
     require(report['success'] and report['sourceSignature'] == catalog.signature(ids)[0], 'Source changed')
+    require(report.get('canonicalSourceFloats') is True, 'Requalify through the exact Scout exporter first')
     if TARGET.exists() and {p.name for p in TARGET.iterdir()} - {'.gitattributes'}:
         require(refresh, 'Existing candidate requires explicit --refresh after native qualification')
-        validate()
+        validate(require_exact=False)
         previous = json.loads((TARGET / 'lineage.json').read_text(encoding='utf-8'))
         owned = {'.gitattributes', 'lineage.json'} | {x['path'] for x in previous['masters']} | {x['source'] for x in previous['exports']}
         require({p.name for p in TARGET.iterdir()} == owned, 'Unknown candidate files; preserve them explicitly first')
@@ -64,10 +65,11 @@ def retain(root, refresh=False):
                'portableSourceSignature': portable_signature(catalog, ids), 'fixtureSha256': sha(FIXTURE),
                'sourceKit': KIT.relative_to(catalog.root).as_posix(), 'portableSourceKitSha256': kit_hash(),
                'blenderVersion': '5.2.2', 'masters': files, 'exports': bindings,
-               'canonicalSourcesUnchanged': True, 'humanArtApproval': 'pending'})
+               'canonicalSourcesUnchanged': True, 'sourceAttributesExact': True,
+               'editorStorageNoiseLimit': 5e-8, 'humanArtApproval': 'pending'})
 
 
-def validate():
+def validate(require_exact=True):
     catalog = Catalog(ROOT / 'assets/source')
     ids, families = fixture_selection(catalog, FIXTURE, [])
     lineage = json.loads((TARGET / 'lineage.json').read_text(encoding='utf-8'))
@@ -89,8 +91,11 @@ def validate():
         require(entry['source'] == entry['id'] + '.glb', 'Unexpected export path')
         exported = TARGET / entry['source']
         require(entry['sha256'] == sha(exported), 'Export hash changed')
-        compare_geometry(read_geometry(catalog.source(entry['id']), catalog.root, definition),
-                         read_geometry(exported, TARGET, definition))
+        deviations = compare_geometry(read_geometry(catalog.source(entry['id']), catalog.root, definition),
+                                      read_geometry(exported, TARGET, definition))
+        if require_exact:
+            require(lineage.get('sourceAttributesExact') is True and max(deviations.values()) == 0,
+                    'Retained Scout vertex channels must be exact canonical values')
     print('Scout: two native projects and eight geometry exports match current sources')
 
 
