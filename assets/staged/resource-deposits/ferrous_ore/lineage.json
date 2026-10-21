@@ -1,16 +1,19 @@
 {
   "blenderVersion": "5.2.2",
-  "canonicalSourcesUnchanged": true,
+  "boundPortableSourceSignature": "649588e910d2b33b84db55032937a61d9f8089d4d63fd318ece764bb79d0413a",
+  "canonicalSourcesUnchanged": false,
   "exports": [
     {
       "canonicalDefinition": "world/meshes/resources/ferrous_ore.asset.json",
       "id": "mesh.world.resource.ferrous_ore",
+      "previousCanonicalSource": "../sources/environment_kit/ferrous_high.gltf",
       "sha256": "5a776f5dcc103a1ec07a06de063b88244ad8276f8622f60fbaaadcab5c445ddb",
       "source": "mesh.world.resource.ferrous_ore.glb"
     },
     {
       "canonicalDefinition": "world/meshes/resources/ferrous_ore_lod1.asset.json",
       "id": "mesh.world.resource.ferrous_ore_lod1",
+      "previousCanonicalSource": "../sources/environment_kit/ferrous_reduced.gltf",
       "sha256": "7e836f337b1395dd598686657958a1efc50b0e8f52d1e7d1dfb361bac101ab3f",
       "source": "mesh.world.resource.ferrous_ore_lod1.glb"
     }
@@ -31,5 +34,5 @@
   "schemaVersion": 1,
   "sourceSha": "1f351e14ab0f703006a641320502f26bb506087f",
   "sourceSignature": "5ef3d1dc1a8fba0fcd7f944a436a1e3ca38a9be5b3eafbe5193ca2823a1f8c81",
-  "status": "staged-not-promoted"
+  "status": "review-bound-not-accepted"
 }

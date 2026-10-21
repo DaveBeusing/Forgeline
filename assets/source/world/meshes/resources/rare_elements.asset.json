@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.resource.rare_elements",
   "type": "mesh",
-  "source": "../sources/resource_rare_elements.gltf",
+  "source": "../sources/blender/rare_elements/mesh.world.resource.rare_elements.glb",
   "materialReferences": [
     "material.world.resource.rare_elements"
   ],

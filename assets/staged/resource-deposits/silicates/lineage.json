@@ -1,16 +1,19 @@
 {
   "blenderVersion": "5.2.2",
-  "canonicalSourcesUnchanged": true,
+  "boundPortableSourceSignature": "499ffcb657692029ecc9df362366b9e7912dacb71be6a07be528ca90eec89df4",
+  "canonicalSourcesUnchanged": false,
   "exports": [
     {
       "canonicalDefinition": "world/meshes/resources/silicates.asset.json",
       "id": "mesh.world.resource.silicates",
+      "previousCanonicalSource": "../sources/resource_silicates.gltf",
       "sha256": "840f0dbc14e9980e8cf82492a930cdb46461d57eefea8e0b634a9e797377031c",
       "source": "mesh.world.resource.silicates.glb"
     },
     {
       "canonicalDefinition": "world/meshes/resources/silicates_lod1.asset.json",
       "id": "mesh.world.resource.silicates_lod1",
+      "previousCanonicalSource": "../sources/resource_silicates_lod1.gltf",
       "sha256": "b8ed051d00e060f6eaed52904525451102af19efdbe249fd4030ef55fc7f3f27",
       "source": "mesh.world.resource.silicates_lod1.glb"
     }
@@ -31,5 +34,5 @@
   "schemaVersion": 1,
   "sourceSha": "1f351e14ab0f703006a641320502f26bb506087f",
   "sourceSignature": "79a43522efa3bad6d62b107ae0f032ec0b879d2afa4c69f5865f929dfb74c64e",
-  "status": "staged-not-promoted"
+  "status": "review-bound-not-accepted"
 }

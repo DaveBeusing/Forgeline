@@ -63,8 +63,11 @@ def validate():
         ids, families = fixture_selection(catalog, FIXTURE, ['mesh.world.resource.' + name])
         target = TARGET / name
         lineage = json.loads((target / 'lineage.json').read_text(encoding='utf-8'))
-        require(lineage['status'] == 'staged-not-promoted', 'Unexpected promotion claim')
-        require(lineage['portableSourceSignature'] == portable_signature(catalog, ids), 'Canonical source changed')
+        require(lineage['status'] in ('staged-not-promoted', 'review-bound-not-accepted'), 'Unexpected acceptance claim')
+        if lineage['status'] == 'staged-not-promoted':
+            require(lineage['portableSourceSignature'] == portable_signature(catalog, ids), 'Canonical source changed')
+        else:
+            require(lineage['boundPortableSourceSignature'] == portable_signature(catalog, ids), 'Bound source changed')
         require(lineage['fixtureSha256'] == sha(FIXTURE), 'Fixture changed')
         require({x['path'] for x in lineage['masters']} == {name + '.blend', name + '_inspection.blend'}
                 and len(lineage['masters']) == 2, 'Incomplete masters')
@@ -79,6 +82,9 @@ def validate():
             require(entry['canonicalDefinition'] == path.relative_to(catalog.root).as_posix(), 'Definition owner changed')
             require(entry['source'] == entry['id'] + '.glb', 'Unexpected export path')
             exported = target / entry['source']
+            if lineage['status'] == 'review-bound-not-accepted':
+                require(definition['source'] == '../sources/blender/' + name + '/' + entry['source'], 'Binding changed')
+                require(sha(catalog.source(entry['id'])) == entry['sha256'], 'Bound export changed')
             require(entry['sha256'] == sha(exported), 'Export changed')
             compare_geometry(read_geometry(catalog.source(entry['id']), catalog.root, definition),
                              read_geometry(exported, target, definition))

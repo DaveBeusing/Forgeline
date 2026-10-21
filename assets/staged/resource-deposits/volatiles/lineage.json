@@ -1,16 +1,19 @@
 {
   "blenderVersion": "5.2.2",
-  "canonicalSourcesUnchanged": true,
+  "boundPortableSourceSignature": "c182995729b8303a16cf2ba322565af3c13ff97c8af246de73a0a9b56eaf77d5",
+  "canonicalSourcesUnchanged": false,
   "exports": [
     {
       "canonicalDefinition": "world/meshes/resources/volatiles.asset.json",
       "id": "mesh.world.resource.volatiles",
+      "previousCanonicalSource": "../sources/resource_volatiles.gltf",
       "sha256": "8822d1809ef568d0b9edd0af95f9f0a179fbe00dc7d69848981310db8ff4b483",
       "source": "mesh.world.resource.volatiles.glb"
     },
     {
       "canonicalDefinition": "world/meshes/resources/volatiles_lod1.asset.json",
       "id": "mesh.world.resource.volatiles_lod1",
+      "previousCanonicalSource": "../sources/resource_volatiles_lod1.gltf",
       "sha256": "fa440aa6745aca2c09f7ff083dba4db9434c3f440c1a106339409aa290091203",
       "source": "mesh.world.resource.volatiles_lod1.glb"
     }
@@ -31,5 +34,5 @@
   "schemaVersion": 1,
   "sourceSha": "1f351e14ab0f703006a641320502f26bb506087f",
   "sourceSignature": "eee316b4b0aab7feaa836a684c436e78be7ea7b4c925dd96593a7991812f878d",
-  "status": "staged-not-promoted"
+  "status": "review-bound-not-accepted"
 }
