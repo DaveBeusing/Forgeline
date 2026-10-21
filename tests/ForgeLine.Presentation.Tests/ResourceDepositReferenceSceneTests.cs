@@ -28,10 +28,10 @@ public sealed class ResourceDepositReferenceSceneTests
             var source = map.Resources.First(x => WorldPresentationIdentity.ForResource(x.ResourceId).Visual == deposit.WorldFeature.Visual);
             float minimumHeight = deposit.WorldFeature.Visual switch
             {
-                WorldVisualId.ResourceFerrousOre => 8,
-                WorldVisualId.ResourceSilicates => 12,
-                WorldVisualId.ResourceVolatiles => 4,
-                WorldVisualId.ResourceRareElements => 14,
+                WorldVisualId.ResourceFerrousOre => 16,
+                WorldVisualId.ResourceSilicates => 28,
+                WorldVisualId.ResourceVolatiles => 8,
+                WorldVisualId.ResourceRareElements => 32,
                 _ => throw new InvalidOperationException()
             };
             float heightScale = MathF.Max(source.HalfExtents.Y * 2, minimumHeight);

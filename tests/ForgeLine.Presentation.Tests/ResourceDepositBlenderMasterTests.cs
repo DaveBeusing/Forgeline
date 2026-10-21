@@ -103,7 +103,7 @@ public sealed class ResourceDepositBlenderMasterTests
         ResourceId[] resources = [ResourceIds.FerrousOre, ResourceIds.Silicates, ResourceIds.Volatiles, ResourceIds.RareElements];
         ResourceDepositPresentationState[] expected = [ResourceDepositPresentationState.Untouched, ResourceDepositPresentationState.Active, ResourceDepositPresentationState.Depleted];
         double[] quantities = [1000, 650, 0];
-        float[] heights = [8, 12, 4, 14];
+        float[] heights = [16, 28, 8, 32];
         var simulation = new SimulationCoordinator();
         var snapshots = new PresentationSnapshotBuffer();
         simulation.RegisterTickObserver(new PresentationExtractor(snapshots));

@@ -13,10 +13,10 @@ internal static class ResourceDepositVisualTransform
             return source;
         float minimumHeight = feature.Visual switch
         {
-            WorldVisualId.ResourceFerrousOre => 8,
-            WorldVisualId.ResourceSilicates => 12,
-            WorldVisualId.ResourceVolatiles => 4,
-            WorldVisualId.ResourceRareElements => 14,
+            WorldVisualId.ResourceFerrousOre => 16,
+            WorldVisualId.ResourceSilicates => 28,
+            WorldVisualId.ResourceVolatiles => 8,
+            WorldVisualId.ResourceRareElements => 32,
             _ => 0
         };
         float height = MathF.Max(source.Scale.Y, minimumHeight);
