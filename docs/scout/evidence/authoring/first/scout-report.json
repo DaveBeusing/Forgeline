@@ -1,0 +1,314 @@
+{
+  "canonicalSourcesUnchanged": true,
+  "componentGroups": [
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "recon_hull",
+      "vertices": 256
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "guard_wheel_n1_n1_47",
+      "vertices": 96
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "suspension_wheel_n1_n1_47",
+      "vertices": 72
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "guard_wheel_1_n1_47",
+      "vertices": 96
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "suspension_wheel_1_n1_47",
+      "vertices": 72
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "guard_wheel_n1_0",
+      "vertices": 96
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "suspension_wheel_n1_0",
+      "vertices": 72
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "guard_wheel_1_0",
+      "vertices": 96
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "suspension_wheel_1_0",
+      "vertices": 72
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "guard_wheel_n1_1_47",
+      "vertices": 96
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "suspension_wheel_n1_1_47",
+      "vertices": 72
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "guard_wheel_1_1_47",
+      "vertices": 96
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "suspension_wheel_1_1_47",
+      "vertices": 72
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "recon_side_windows",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "sensor_mast",
+      "vertices": 216
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "wheel_n1_n1_47",
+      "vertices": 528
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "wheel_1_n1_47",
+      "vertices": 528
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "wheel_n1_0",
+      "vertices": 528
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "wheel_1_0",
+      "vertices": 528
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "wheel_n1_1_47",
+      "vertices": 528
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "wheel_1_1_47",
+      "vertices": 528
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle",
+      "group": "sensor_head",
+      "vertices": 120
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.critical",
+      "group": "damaged_panels",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.critical",
+      "group": "critical_structure",
+      "vertices": 116
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.damaged",
+      "group": "damaged_panels",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "recon_hull",
+      "vertices": 104
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "guard_wheel_n1_n1_47",
+      "vertices": 24
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "guard_wheel_1_n1_47",
+      "vertices": 24
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "guard_wheel_n1_0",
+      "vertices": 24
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "guard_wheel_1_0",
+      "vertices": 24
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "guard_wheel_n1_1_47",
+      "vertices": 24
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "guard_wheel_1_1_47",
+      "vertices": 24
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "recon_side_windows",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "sensor_mast",
+      "vertices": 84
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "wheel_n1_n1_47",
+      "vertices": 132
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "wheel_1_n1_47",
+      "vertices": 132
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "wheel_n1_0",
+      "vertices": 132
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "wheel_1_0",
+      "vertices": 132
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "wheel_n1_1_47",
+      "vertices": 132
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "wheel_1_1_47",
+      "vertices": 132
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "sensor_head",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "weapon_mount",
+      "vertices": 32
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod1",
+      "group": "weapon_barrel",
+      "vertices": 60
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "recon_hull",
+      "vertices": 104
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "sensor_mast",
+      "vertices": 60
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "wheel_n1_n1_47",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "wheel_1_n1_47",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "wheel_n1_0",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "wheel_1_0",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "wheel_n1_1_47",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "wheel_1_1_47",
+      "vertices": 48
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "sensor_head",
+      "vertices": 24
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "weapon_mount",
+      "vertices": 32
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.lod2",
+      "group": "weapon_barrel",
+      "vertices": 36
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.turret",
+      "group": "weapon_mount",
+      "vertices": 64
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.turret",
+      "group": "weapon_barrel",
+      "vertices": 320
+    },
+    {
+      "asset": "unit.directorate.scout_vehicle.wreck",
+      "group": "collapsed_chassis",
+      "vertices": 224
+    }
+  ],
+  "inspectionImages": [
+    "unit.directorate.scout_vehicle-idle.png",
+    "unit.directorate.scout_vehicle-firing.png"
+  ],
+  "packedImages": [
+    {
+      "colorSpace": "sRGB",
+      "sha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+      "source": "materials/directorate/surfaces/production_surface_base.png"
+    },
+    {
+      "colorSpace": "Non-Color",
+      "sha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+      "source": "materials/directorate/surfaces/production_surface_normal.png"
+    },
+    {
+      "colorSpace": "Non-Color",
+      "sha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+      "source": "materials/directorate/surfaces/production_surface_orm.png"
+    }
+  ],
+  "poseSamples": 22,
+  "sourceSignature": "f3a92ee418e2a4214a8942a83e4445847e72719c9cd97d42cc5499c003abedf2",
+  "success": true
+}

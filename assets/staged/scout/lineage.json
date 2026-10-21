@@ -1,0 +1,73 @@
+{
+  "blenderVersion": "5.2.2",
+  "canonicalSourcesUnchanged": true,
+  "exports": [
+    {
+      "canonicalDefinition": "units/directorate/vehicles/scout_vehicle.asset.json",
+      "id": "unit.directorate.scout_vehicle",
+      "sha256": "061004219c000e8391d7e20971eddfdba8a8a821d910cebbd6d6053a7a5d4ce3",
+      "source": "unit.directorate.scout_vehicle.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/collision/scout_vehicle_collision.asset.json",
+      "id": "unit.directorate.scout_vehicle.collision",
+      "sha256": "4a8b8d6c316908eeb908c026fb6d59f4b5b2a822c963b26b6478ccc2c4343a3e",
+      "source": "unit.directorate.scout_vehicle.collision.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/vehicles/scout_vehicle_critical.asset.json",
+      "id": "unit.directorate.scout_vehicle.critical",
+      "sha256": "b9b95b89fc67bee963c2ce238e51088850518bfeb55e441fb76b45dca074dba8",
+      "source": "unit.directorate.scout_vehicle.critical.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/vehicles/scout_vehicle_damaged.asset.json",
+      "id": "unit.directorate.scout_vehicle.damaged",
+      "sha256": "b250d25205d6ce9096fd4fe9f94bd83958aed3190921449f241f8add073b5fa1",
+      "source": "unit.directorate.scout_vehicle.damaged.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/vehicles/scout_vehicle_lod1.asset.json",
+      "id": "unit.directorate.scout_vehicle.lod1",
+      "sha256": "e53c662b4da0d092ed4823291a356b225371e9ecba0d0de92d6c711ee8927a1b",
+      "source": "unit.directorate.scout_vehicle.lod1.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/vehicles/scout_vehicle_lod2.asset.json",
+      "id": "unit.directorate.scout_vehicle.lod2",
+      "sha256": "af7591009e2163122395336b09a58d97aa723a3dcbe0bc3fea601abb039df2f7",
+      "source": "unit.directorate.scout_vehicle.lod2.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/vehicles/scout_vehicle_turret.asset.json",
+      "id": "unit.directorate.scout_vehicle.turret",
+      "sha256": "a5fce7face10dcda55c5e2112190318ffd36b25bd18878be323e09812797e848",
+      "source": "unit.directorate.scout_vehicle.turret.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/vehicles/scout_vehicle_wreck.asset.json",
+      "id": "unit.directorate.scout_vehicle.wreck",
+      "sha256": "352baca19cef56df065bbc76649b9e93dbfb592aeee38bd48897e447d9ce99e5",
+      "source": "unit.directorate.scout_vehicle.wreck.glb"
+    }
+  ],
+  "fixtureSha256": "30b22e991519024d8a1623b958d6a7e9a56e8194b2b36970ee159a2385263e3a",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "scout.blend",
+      "sha256": "70007a5ae5ee848e9b2b654c211404c9068a5c85e920ff1c1613a5f4ffcb182e"
+    },
+    {
+      "path": "scout_inspection.blend",
+      "sha256": "4b509627a84e9876fac9b337df53d4b277795dce024c709ed71907264c83b643"
+    }
+  ],
+  "portableSourceKitSha256": "4afb0797208883ce31d48b0257ea23b729ba44151ee02a670e9636d931de0bbc",
+  "portableSourceSignature": "087481e8cdb1a2b8fd0a5c427868b76c8c5b567daf1a47d471f6d9dbba6c93fe",
+  "schemaVersion": 1,
+  "sourceKit": "units/directorate/authoring/scout_vehicle.kit.json",
+  "sourceSha": "d54e8376b551f5c68a0287e86132dc47c5044d80",
+  "sourceSignature": "f3a92ee418e2a4214a8942a83e4445847e72719c9cd97d42cc5499c003abedf2",
+  "status": "staged-not-promoted"
+}
