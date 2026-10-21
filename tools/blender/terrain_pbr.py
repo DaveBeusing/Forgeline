@@ -222,6 +222,11 @@ def validate(source, family):
                 abs(abs(v.co.y)-TILES[family]/2) < 1e-5 for v in obj.data.vertices), 'Physical repeat changed')
     require(len(obj.data.uv_layers) == 1 and obj.data.uv_layers.active.name == 'UV0' and
             sorted(tuple(x.uv) for x in obj.data.uv_layers.active.data) == [(0,0),(0,1),(1,0),(1,1)], 'UV orientation changed')
+    for loop in obj.data.loops:
+        vertex = obj.data.vertices[loop.vertex_index].co
+        require(tuple(obj.data.uv_layers.active.data[loop.index].uv) ==
+                (0 if vertex.x < 0 else 1, 0 if vertex.y < 0 else 1),
+                'UV corner association mirrored or rotated')
     mat = bpy.data.materials['Terrain:'+family]
     require(mat.animation_data is None and mat.node_tree.animation_data is None and graph(mat) == record['graph'],
             'Unsupported material graph edit')

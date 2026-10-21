@@ -54,6 +54,14 @@ for family in FAMILIES:
         except ValueError:rejected.append('unsupported graph')
         else:raise AssertionError('Accepted extra graph node')
     finally:n.remove(extra)
+    saved_uv=[tuple(v.uv) for v in obj.data.uv_layers.active.data]
+    for v in obj.data.uv_layers.active.data:v.uv=(1-v.uv.x,v.uv.y)
+    try:
+        try:validate(source,family)
+        except ValueError:rejected.append('mirrored UV corner association')
+        else:raise AssertionError('Accepted mirrored UV corner association')
+    finally:
+        for v,uv in zip(obj.data.uv_layers.active.data,saved_uv):v.uv=uv
     validate(source,family)
     require(digest(master)==before,'Native controls modified the saved master')
     results.append({'family':family,'masterSha256':before,'boundedEndpointsAccepted':True,'rejections':rejected})
