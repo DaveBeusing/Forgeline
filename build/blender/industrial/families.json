@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.extractor",
+      "assets": ["building.directorate.extractor", "building.directorate.extractor.lod1", "building.directorate.extractor.lod2", "building.directorate.extractor.foundation", "building.directorate.extractor.structural_frame", "building.directorate.extractor.partial_shell", "building.directorate.extractor.idle", "building.directorate.extractor.unpowered", "building.directorate.extractor.damaged", "building.directorate.extractor.critical", "building.directorate.extractor.destroyed"],
+      "instanceScale": [12, 8, 12],
+      "instanceTranslation": [17, 5, -29],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "building.directorate.smelter",
+      "assets": ["building.directorate.smelter", "building.directorate.smelter.lod1", "building.directorate.smelter.lod2", "building.directorate.smelter.foundation", "building.directorate.smelter.structural_frame", "building.directorate.smelter.partial_shell", "building.directorate.smelter.idle", "building.directorate.smelter.unpowered", "building.directorate.smelter.damaged", "building.directorate.smelter.critical", "building.directorate.smelter.destroyed"],
+      "instanceScale": [18, 10, 16],
+      "instanceTranslation": [17, 5, -29],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "building.directorate.electronics_plant",
+      "assets": ["building.directorate.electronics_plant", "building.directorate.electronics_plant.lod1", "building.directorate.electronics_plant.lod2", "building.directorate.electronics_plant.foundation", "building.directorate.electronics_plant.structural_frame", "building.directorate.electronics_plant.partial_shell", "building.directorate.electronics_plant.idle", "building.directorate.electronics_plant.unpowered", "building.directorate.electronics_plant.damaged", "building.directorate.electronics_plant.critical", "building.directorate.electronics_plant.destroyed"],
+      "instanceScale": [18, 10, 18],
+      "instanceTranslation": [17, 5, -29],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

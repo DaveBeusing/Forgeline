@@ -13,6 +13,19 @@ public sealed class BlenderRoundTripQualificationTests
 
     public static bool ReadinessEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_READINESS_ROOT"));
 
+    public static bool IndustrialEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_INDUSTRIAL_BLENDER_ROOT"));
+
+    [Theory(Skip = "Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.", SkipUnless = nameof(IndustrialEnabled))]
+    [InlineData("extractor", 2508)]
+    [InlineData("smelter", 2588)]
+    [InlineData("electronics_plant", 2152)]
+    public void IndustrialMastersPreserveCompiledGeometryAndStateContracts(string family, int triangles)
+    {
+        string root = Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_INDUSTRIAL_BLENDER_ROOT")!);
+        CompareExports(Path.Combine(root, family), ["first", "second", "reopened"], false,
+            expectedTriangles: triangles, expectedAssets: 16, expectedMeshes: 12, baselineFolder: "baseline/runtime");
+    }
+
     [Fact(Skip = "Set FORGELINE_BLENDER_READINESS_ROOT after the staged three-family exports.", SkipUnless = nameof(ReadinessEnabled))]
     public void BuildingVehicleAndPropPreserveCompiledContracts()
     {

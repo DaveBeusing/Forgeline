@@ -1,0 +1,4 @@
+masters/*.blend binary
+exports/**/*.glb binary
+evidence/*.json -text -whitespace
+evidence/**/*.png binary
