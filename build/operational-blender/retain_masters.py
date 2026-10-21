@@ -16,6 +16,7 @@ def retain(qualified, reviews, packed, organized):
     require(summary['typedCompiledContracts'] == 'passed' and summary['productionSourceUnchanged'], 'Qualification incomplete')
     target = ROOT / 'assets/staged/operational-buildings'
     target.mkdir(parents=True, exist_ok=False)
+    (target / '.gitattributes').write_text('*.blend binary\n*.glb binary\n*.json -text -whitespace\n', encoding='utf-8')
     component_report = json.loads((organized / 'component-masters.json').read_text(encoding='utf-8'))
     require(component_report['success'], 'Component organization not qualified')
     packed_report = json.loads((packed / 'packed-reviews.json').read_text(encoding='utf-8'))
@@ -34,6 +35,7 @@ def retain(qualified, reviews, packed, organized):
         surface = family + '_surfaces.blend'
         component_family = next(x for x in component_report['families'] if x['family'] == family)
         require(component_family['sourceSignature'] == report['sourceSignature'], 'Organized master source mismatch')
+        require(component_family['originalMasterSha256'] == sha(root / 'master/authoring.blend'), 'Organized master lineage changed')
         require(component_family['masterSha256'] == sha(organized / master), 'Organized master hash mismatch')
         require(component_family['reopened'] and component_family['exactExports'] == 10, 'Organized master export incomplete')
         shutil.copyfile(organized / master, folder / master)

@@ -20,8 +20,16 @@ public sealed class OperationalBuildingReferenceSceneTests
     {
         var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
         var source = VisualReferenceScene.Create(gallery, terrain, includeHiddenEnemy: false);
+        var expectedBuilding = gallery switch
+        {
+            VisualReferenceSceneKind.VehicleFactoryProduction => BuildingIds.VehicleFactory,
+            VisualReferenceSceneKind.PowerPlantProduction => BuildingIds.PowerPlant,
+            VisualReferenceSceneKind.BarracksProduction => BuildingIds.Barracks,
+            VisualReferenceSceneKind.RadarProduction => BuildingIds.Radar,
+            _ => throw new ArgumentOutOfRangeException(nameof(gallery))
+        };
         var template = source.Snapshot.Instances.ToArray().First(x =>
-            x.BuildingFeature.State == BuildingPresentationState.Operational && x.BuildingFeature.Building.IsSpecified);
+            x.BuildingFeature.State == BuildingPresentationState.Operational && x.BuildingFeature.Building == expectedBuilding);
         var first = VisualReferenceScene.Create(kind, terrain);
         Assert.Equal(first.Fingerprint, VisualReferenceScene.Create(kind, terrain).Fingerprint);
         Assert.Equal(source.Snapshot.Tick, first.Snapshot.Tick);

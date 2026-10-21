@@ -13,7 +13,10 @@ def organize(request):
     output = Path(request['outputRoot'])
     catalog = Catalog(request['inputRoot'])
     records = []
-    for family in ('vehicle_factory', 'power_plant', 'barracks', 'radar'):
+    allowed = ('vehicle_factory', 'power_plant', 'barracks', 'radar')
+    selected = request['arguments'][1:] or allowed
+    require(len(set(selected)) == len(selected) and all(x in allowed for x in selected), 'Invalid family selection')
+    for family in selected:
         fixture = Path(__file__).with_name(family + '.json')
         ids, families = fixture_selection(catalog, fixture, [])
         geometries = {aid: read_geometry(catalog.source(aid), catalog.root, catalog.definitions[aid][1])
@@ -42,7 +45,7 @@ def organize(request):
                     require(group.name == name, 'Component group name changed')
                     group.add(vertices, 1.0, 'REPLACE')
                     groups.append({'asset': aid, 'object': obj.name, 'group': name, 'vertices': len(vertices)})
-        require(groups, 'Missing editable component selection groups')
+        require({x['asset'] for x in groups} == set(families[0]['assets']), 'Incomplete state/LOD component selection groups')
         target = output / (family + '.blend')
         bpy.context.scene['fl_component_selection'] = 'Vertex groups retain original kit module/part names; runtime rigid ranges are unchanged.'
         bpy.context.preferences.filepaths.save_version = 0
