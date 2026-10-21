@@ -50,6 +50,8 @@ reject('arbitrary animation', lambda: part('wheel').keyframe_insert(data_path='l
 reject('locked weapon pivot', lambda: part('cannon').__setitem__('fl_pivot_game', [0.01, 0.24, -0.04]))
 reject('gameplay muzzle socket', lambda: setattr(next(o for o in bpy.context.scene.objects
        if o.get('fl_role') == 'socket' and o.get('fl_logical_name') == 'weapon_muzzle'), 'location', (2, 3, 4)))
+reject('changed sensor clock rate', lambda: part('radar').__setitem__('fl_rate', 0.8))
+reject('sensor pivot drift', lambda: part('radar').__setitem__('fl_pivot_game', [0.02, 0.48, 0.02]))
 bpy.ops.wm.open_mainfile(filepath=str(blend))
 validate()
 write_json(Path(request['outputRoot']) / 'native-contracts.json', {'success': True,

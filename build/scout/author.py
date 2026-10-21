@@ -14,6 +14,21 @@ from asset_contract import Catalog, fixture_selection, read_geometry, require, s
 import roundtrip
 import mechanical
 
+# Family-only samples of existing copied rigid inputs, not runtime animation clips.
+mechanical.SAMPLES = [
+    {'name': 'idle'},
+    {'name': 'forward', 'travel': 1.7, 'active': 2},
+    {'name': 'reverse', 'travel': -1.7, 'active': 2},
+    {'name': 'stopped', 'travel': 1.7, 'active': 2, 'seconds': 20},
+    {'name': 'paused', 'travel': 1.7, 'active': 2},
+    {'name': 'firing', 'active': 2, 'shot': 1.95, 'aim': .6, 'elevation': .2},
+    {'name': 'recovery', 'active': 2, 'shot': 1.85, 'aim': .6, 'elevation': .2},
+    {'name': 'sensor-still', 'travel': 1.7},
+    {'name': 'sensor-active', 'active': 2},
+    {'name': 'destroyed', 'active': 2, 'disabled': True},
+    {'name': 'lod', 'active': 2, 'weight': 0},
+]
+
 
 def component_groups(catalog, geometries):
     groups = []
@@ -117,6 +132,7 @@ def run(request):
     updates = mechanical.author_definitions(catalog, geometries, {'maxPivotDeltaMetres': 0.025})
     require(all(value == catalog.definitions[aid][1] for aid, value in updates.items()),
             'Preservation master cannot change mechanical metadata; use the established motion authoring path')
+    groups = component_groups(catalog, geometries) if args.action != 'Export' else []
     if args.action != 'Export':
         mechanical.layers(families)
         bpy.ops.wm.save_as_mainfile(filepath=str(output / 'authoring.blend'), check_existing=False)
