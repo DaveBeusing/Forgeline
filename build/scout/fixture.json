@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "unit.directorate.scout_vehicle",
+      "assets": [
+        "unit.directorate.scout_vehicle",
+        "unit.directorate.scout_vehicle.collision",
+        "unit.directorate.scout_vehicle.critical",
+        "unit.directorate.scout_vehicle.damaged",
+        "unit.directorate.scout_vehicle.lod1",
+        "unit.directorate.scout_vehicle.lod2",
+        "unit.directorate.scout_vehicle.turret",
+        "unit.directorate.scout_vehicle.wreck"
+      ],
+      "instanceScale": [
+        3,
+        2.4,
+        5.2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

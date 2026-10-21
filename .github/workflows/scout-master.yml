@@ -1,0 +1,52 @@
+name: Scout Blender master qualification
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/scout-master.yml'
+      - 'build/scout/**'
+      - 'assets/staged/scout/**'
+      - 'tests/ForgeLine.Presentation.Tests/ScoutBlender*.cs'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/scout-master.yml'
+      - 'build/scout/**'
+      - 'assets/staged/scout/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retained-scout:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify master hashes and all scout LOD/state exports
+        shell: pwsh
+        run: python build/scout/retained.py
+
+  native-scout:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Save, reopen, export and qualify scout geometry and rigid poses
+        shell: pwsh
+        run: ./build/scout/Qualify-Master.ps1 -OutputRoot artifacts/sc-ci
+      - name: Retain native authoring evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scout-master-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/sc-ci
+          retention-days: 14
