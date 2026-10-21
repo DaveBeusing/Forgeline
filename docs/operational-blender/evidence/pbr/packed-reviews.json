@@ -1,0 +1,113 @@
+{
+  "families": [
+    {
+      "family": "vehicle_factory",
+      "masterSha256": "401b11681257ccf2aaa706f50cd7db0224baa321cdfa82d5a4f76b59b4e1157f",
+      "packedImages": [
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.surface.atlas_base",
+          "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_normal",
+          "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_orm",
+          "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1"
+        },
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.material.status_emissive",
+          "sourceSha256": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6"
+        }
+      ],
+      "renderPath": "//previews/vehicle_factory.png"
+    },
+    {
+      "family": "power_plant",
+      "masterSha256": "876a5d7a91b84884f67c2874c6311c0adc31d6dfa49d420d80089e375303e3f9",
+      "packedImages": [
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.surface.atlas_base",
+          "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_normal",
+          "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_orm",
+          "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1"
+        },
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.material.status_emissive",
+          "sourceSha256": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6"
+        }
+      ],
+      "renderPath": "//previews/power_plant.png"
+    },
+    {
+      "family": "barracks",
+      "masterSha256": "d16f1ff8c46bde690aaf9d8eb97f06f5bd675a51dd8ec0ea8878c42218ed7150",
+      "packedImages": [
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.surface.atlas_base",
+          "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_normal",
+          "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_orm",
+          "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1"
+        },
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.material.status_emissive",
+          "sourceSha256": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6"
+        }
+      ],
+      "renderPath": "//previews/barracks.png"
+    },
+    {
+      "family": "radar",
+      "masterSha256": "df5ecc6164d5dc76212084b5ef70299b71d7c90e3490ba75ce46a0640405d29d",
+      "packedImages": [
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.surface.atlas_base",
+          "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_normal",
+          "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2"
+        },
+        {
+          "colorSpace": "Non-Color",
+          "id": "texture.directorate.surface.atlas_orm",
+          "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1"
+        },
+        {
+          "colorSpace": "sRGB",
+          "id": "texture.directorate.material.status_emissive",
+          "sourceSha256": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6"
+        }
+      ],
+      "renderPath": "//previews/radar.png"
+    }
+  ],
+  "success": true
+}

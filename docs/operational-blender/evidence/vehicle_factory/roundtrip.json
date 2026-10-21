@@ -1,0 +1,686 @@
+{
+  "action": "RoundTrip",
+  "assetIds": [
+    "building.directorate.module.collision_box",
+    "building.directorate.vehicle_factory",
+    "building.directorate.vehicle_factory.critical",
+    "building.directorate.vehicle_factory.damaged",
+    "building.directorate.vehicle_factory.destroyed",
+    "building.directorate.vehicle_factory.foundation",
+    "building.directorate.vehicle_factory.lod1",
+    "building.directorate.vehicle_factory.lod2",
+    "building.directorate.vehicle_factory.partial_shell",
+    "building.directorate.vehicle_factory.structural_frame",
+    "building.directorate.vehicle_factory.unpowered",
+    "material.directorate.building.critical",
+    "material.directorate.building.damaged",
+    "material.directorate.building.destroyed",
+    "material.directorate.building.structural",
+    "material.directorate.building.unpowered",
+    "texture.directorate.material.status_emissive",
+    "texture.directorate.surface.atlas_base",
+    "texture.directorate.surface.atlas_normal",
+    "texture.directorate.surface.atlas_orm"
+  ],
+  "axes": {
+    "blender": "right-handed +Z up / -Y forward",
+    "game": "right-handed +Y up / +Z forward",
+    "mapping": "(x,y,z) -> (x,-z,y)"
+  },
+  "deviations": {
+    "maximumEditorSplitNormalEncodingError": 2.1010637283325195e-05,
+    "maximumSocketInstanceWorldErrorMetres": 6.437301625084046e-08,
+    "maximumSocketLocalError": 5.364418020903372e-09
+  },
+  "errors": [],
+  "families": [
+    {
+      "assets": [
+        "building.directorate.vehicle_factory",
+        "building.directorate.vehicle_factory.lod1",
+        "building.directorate.vehicle_factory.lod2",
+        "building.directorate.vehicle_factory.foundation",
+        "building.directorate.vehicle_factory.structural_frame",
+        "building.directorate.vehicle_factory.partial_shell",
+        "building.directorate.vehicle_factory.unpowered",
+        "building.directorate.vehicle_factory.damaged",
+        "building.directorate.vehicle_factory.critical",
+        "building.directorate.vehicle_factory.destroyed"
+      ],
+      "instanceScale": [
+        26,
+        12,
+        24
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37,
+      "root": "building.directorate.vehicle_factory"
+    }
+  ],
+  "meshes": [
+    {
+      "collisionReference": null,
+      "exportSha256": "c010fe716a820acd09deef0cf2365d292a2e79dcf1b69b46582f7b5c7e034f0b",
+      "exportStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 8
+      },
+      "id": "building.directorate.module.collision_box",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+      "sourceStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 8
+      }
+    },
+    {
+      "collisionReference": "building.directorate.module.collision_box",
+      "exportSha256": "d5d14a6aa9774e66922bf5041c9ef343b78af0ab6ad0dee39a54b189b1c31cf9",
+      "exportStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 540,
+        "vertices": 1080
+      },
+      "id": "building.directorate.vehicle_factory",
+      "lods": [
+        {
+          "assetId": "building.directorate.vehicle_factory.lod1",
+          "level": 1,
+          "maxDistance": 220
+        },
+        {
+          "assetId": "building.directorate.vehicle_factory.lod2",
+          "level": 2,
+          "maxDistance": 620
+        }
+      ],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 7.450580596923828e-09,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.2351741790771484e-08
+      },
+      "mechanicalPartNames": [
+        "body",
+        "loading_door",
+        "overhead_crane"
+      ],
+      "sockets": [
+        {
+          "exported": [
+            0.0,
+            -0.11999999731779099,
+            0.4000000059604645
+          ],
+          "instanceWorldErrorMetres": 0.0,
+          "localError": 0.0,
+          "name": "motion_loading_door",
+          "source": [
+            0,
+            -0.11999999731779099,
+            0.4000000059604645
+          ]
+        },
+        {
+          "exported": [
+            0.0,
+            0.23999999463558197,
+            -0.05000000074505806
+          ],
+          "instanceWorldErrorMetres": 6.437301625084046e-08,
+          "localError": 5.364418020903372e-09,
+          "name": "motion_overhead_crane",
+          "source": [
+            0,
+            0.24,
+            -0.05
+          ]
+        }
+      ],
+      "sourceSha256": "7ad961942521bd0990108ac335a08ed4a3be5f7586d775468b64f4f2aed57866",
+      "sourceStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 540,
+        "vertices": 1080
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "59181fa0ae69881cf343deedd853fb26734944647416044800b99afe32ab110d",
+      "exportStats": {
+        "boundsMax": [
+          0.40646111965179443,
+          -0.2041861116886139,
+          0.4376216530799866
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.4558138847351074,
+          0.3100000023841858
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      },
+      "id": "building.directorate.vehicle_factory.critical",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.critical"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "a39e658c6ce44a4115b59b2242991497b21ca8394f3095927ace049d14ace809",
+      "sourceStats": {
+        "boundsMax": [
+          0.40646111965179443,
+          -0.2041861116886139,
+          0.4376216530799866
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.4558138847351074,
+          0.3100000023841858
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "f0c247324355a5c5976b1fe1199a0aa69f62ff1f0d0bfcbb740401f62fc151ff",
+      "exportStats": {
+        "boundsMax": [
+          -0.23000000417232513,
+          -0.2620428800582886,
+          -0.22691884636878967
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.44999998807907104,
+          -0.3100000023841858
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "id": "building.directorate.vehicle_factory.damaged",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.damaged"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "55010cff2baf36b13c7e8adcae07b90ccaa18417abb33e545627b208bdd78c23",
+      "sourceStats": {
+        "boundsMax": [
+          -0.23000000417232513,
+          -0.2620428800582886,
+          -0.22691884636878967
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.44999998807907104,
+          -0.3100000023841858
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "3eb2015f2a272fd1dc36be435b7554237c6168f6a30ab8ca952a707f4fb4231e",
+      "exportStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          -0.17000000178813934,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 96,
+        "vertices": 180
+      },
+      "id": "building.directorate.vehicle_factory.destroyed",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.destroyed"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "23d97a74b39c2929c23e3cca25357345d57f506b2f8953e58c9bfeb6c5cc67c3",
+      "sourceStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          -0.17000000178813934,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 96,
+        "vertices": 180
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "19ba4d9fe5685b0ef5a24687092a0a908ecf7e425b8be83bed4f56fe49373fce",
+      "exportStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          -0.4699999988079071,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.vehicle_factory.foundation",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "adf055a5c0a7ae6ad21d51db4c798cb8a8364a9cf8fe3bd7e88d4d63dadaf574",
+      "sourceStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          -0.4699999988079071,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "8b78c9e42bbfeffa2077073539203f74566463d6e0d904f440e0c35f14107336",
+      "exportStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 240,
+        "vertices": 480
+      },
+      "id": "building.directorate.vehicle_factory.lod1",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "7e70454f8082e58c9b419159bb8e06096eac5cf81de1fe8af7a3d985afc09ba4",
+      "sourceStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 240,
+        "vertices": 480
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "773828786160a8052f72e8f61b214cabd67095e309a8c879becb7d1f8872f1cc",
+      "exportStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 204,
+        "vertices": 408
+      },
+      "id": "building.directorate.vehicle_factory.lod2",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "679208bd408f6f813a1165f4bfb8bd220648032b541e9b09260a721b1fbb282f",
+      "sourceStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 204,
+        "vertices": 408
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "3728a115b8347204af13d2ec03d0e03f1f67f8351daa5330fb720dff9a445a46",
+      "exportStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.35499998927116394,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 192,
+        "vertices": 384
+      },
+      "id": "building.directorate.vehicle_factory.partial_shell",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "d176aea98e3a7b867f56f4487025ceaa60301be6fd1d32188170af160d224cf1",
+      "sourceStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.35499998927116394,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 192,
+        "vertices": 384
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "8b4562283753d1c0b8cc76f0433709c630af2c926ecaa1a913774dd971f3abc4",
+      "exportStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.35499998927116394,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      },
+      "id": "building.directorate.vehicle_factory.structural_frame",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "20204c8a0463c996743468d4b0d6cbede8c81fdd22741bff6815effceb3882e6",
+      "sourceStats": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.35499998927116394,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "1cf5e8e710def28a8d3b177a8553b498904fc5e10b313bdcadc30845e903fedd",
+      "exportStats": {
+        "boundsMax": [
+          -0.30000001192092896,
+          -0.18000000715255737,
+          0.4749999940395355
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.3799999952316284,
+          0.4650000035762787
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.vehicle_factory.unpowered",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.unpowered"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "03864ca06dfe932f62e14c8284a1a5fa71ebb2e3ed3af7d8575c8b358a745c52",
+      "sourceStats": {
+        "boundsMax": [
+          -0.30000001192092896,
+          -0.18000000715255737,
+          0.4749999940395355
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.3799999952316284,
+          0.4650000035762787
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      }
+    }
+  ],
+  "productionSourcesUnchanged": true,
+  "schemaVersion": 1,
+  "sourceHashes": {
+    "buildings/directorate/materials/critical.asset.json": "8c1a6eb4672ce7f238674b5a76f5f8f64ac39528d9cd27b069bd8eb99ee41fa1",
+    "buildings/directorate/materials/critical.material.json": "6e8256d9cd4d811f22f1c0ba8fed303c2fd358e6c9d11af01bad92ace16050b7",
+    "buildings/directorate/materials/damaged.asset.json": "b5d1c0f60bef36661b4525cb7e8c52e5cb46260bfd1c02b9a56c18987f5b5e3e",
+    "buildings/directorate/materials/damaged.material.json": "a1c57cb49c08c1caf03c030e80e57894f254ef8d4e38469fe4a0199c2b2bc636",
+    "buildings/directorate/materials/destroyed.asset.json": "e89a774bce9c320f7a2548c01ecae150863d593f54a63ec936dc5972c9d48eb3",
+    "buildings/directorate/materials/destroyed.material.json": "0a2a981e9afa9ea4477b9fe541ad85b203370686bb36d2effa9ec47cf774ad67",
+    "buildings/directorate/materials/structural.asset.json": "3692dc0effd7a964b33d05610534729780cf4f4920b5230425495ced7ec543b8",
+    "buildings/directorate/materials/structural.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "buildings/directorate/materials/unpowered.asset.json": "f4847dd15d0d5bb22bcdb9eb4529875fe438ddb0ed76f4815ba91e6b18f87fa8",
+    "buildings/directorate/materials/unpowered.material.json": "8373a93e0dbdacae3829d65406c18fb45daa571d01afe73df9cf87652e4590e6",
+    "buildings/directorate/modules/collision_box.asset.json": "b5ac3e871a08eabff5bb20cddf65de2d928f0d7728b7cdd3cd5669205c4ee637",
+    "buildings/directorate/sources/module_collision_box.gltf": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+    "buildings/directorate/sources/operational/vehicle_factory_critical.gltf": "a39e658c6ce44a4115b59b2242991497b21ca8394f3095927ace049d14ace809",
+    "buildings/directorate/sources/operational/vehicle_factory_damaged.gltf": "55010cff2baf36b13c7e8adcae07b90ccaa18417abb33e545627b208bdd78c23",
+    "buildings/directorate/sources/operational/vehicle_factory_destroyed.gltf": "23d97a74b39c2929c23e3cca25357345d57f506b2f8953e58c9bfeb6c5cc67c3",
+    "buildings/directorate/sources/operational/vehicle_factory_foundation.gltf": "adf055a5c0a7ae6ad21d51db4c798cb8a8364a9cf8fe3bd7e88d4d63dadaf574",
+    "buildings/directorate/sources/operational/vehicle_factory_lod0.gltf": "7ad961942521bd0990108ac335a08ed4a3be5f7586d775468b64f4f2aed57866",
+    "buildings/directorate/sources/operational/vehicle_factory_lod1.gltf": "7e70454f8082e58c9b419159bb8e06096eac5cf81de1fe8af7a3d985afc09ba4",
+    "buildings/directorate/sources/operational/vehicle_factory_lod2.gltf": "679208bd408f6f813a1165f4bfb8bd220648032b541e9b09260a721b1fbb282f",
+    "buildings/directorate/sources/operational/vehicle_factory_partial_shell.gltf": "d176aea98e3a7b867f56f4487025ceaa60301be6fd1d32188170af160d224cf1",
+    "buildings/directorate/sources/operational/vehicle_factory_structural_frame.gltf": "20204c8a0463c996743468d4b0d6cbede8c81fdd22741bff6815effceb3882e6",
+    "buildings/directorate/sources/operational/vehicle_factory_unpowered.gltf": "03864ca06dfe932f62e14c8284a1a5fa71ebb2e3ed3af7d8575c8b358a745c52",
+    "buildings/directorate/vehicle_factory.asset.json": "9779aa56d4f81a397df980fea4f247f8f2b619db7aff71e9056677c172d8b799",
+    "buildings/directorate/vehicle_factory_critical.asset.json": "4798811664c869321f4335b52672e739a6fc94915806a2868a36dd44618a0e08",
+    "buildings/directorate/vehicle_factory_damaged.asset.json": "74304a72c2b8a384e7902ec6dc4a98796bd65ce539e269883f85ece6d1dac4c8",
+    "buildings/directorate/vehicle_factory_destroyed.asset.json": "b6f13032644be74bc797fba10631400f6e31862626ee2572ee1e4dfa2b1584db",
+    "buildings/directorate/vehicle_factory_foundation.asset.json": "542fa7786bae150ec5af9f252b9c09da9a79461290390beeecf40b76de5f5fe0",
+    "buildings/directorate/vehicle_factory_lod1.asset.json": "a50289eb82aa953793b7cdbc607e3c71eadb87ad3763c9354792caace2e82114",
+    "buildings/directorate/vehicle_factory_lod2.asset.json": "344dc5b9810a99adfb229213b962be6e3b99284994aa0cff615ae31db3dc478d",
+    "buildings/directorate/vehicle_factory_partial_shell.asset.json": "7edbdf650e3c73835c308f1f7d94edb5c60eb0b22aad4d53f2de03b61203b449",
+    "buildings/directorate/vehicle_factory_structural_frame.asset.json": "0b462566b2bfa058b4ef88c70b5d7e5457f1c7424a83646fe6d3b69b4c6b24c3",
+    "buildings/directorate/vehicle_factory_unpowered.asset.json": "b11b6c057b63ef54f0663e3d302ee51388b4c8f3be4de887452762ae9681901d",
+    "materials/directorate/surfaces/production_surface_base.png": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+    "materials/directorate/surfaces/production_surface_normal.png": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+    "materials/directorate/surfaces/production_surface_orm.png": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+    "materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9",
+    "materials/directorate/textures/status_emissive.asset.json": "464a32ad532fa18cfc149cc1f6f3e887c156025dca9cf8308485fcadac83b5d0",
+    "materials/directorate/textures/status_emissive.tga": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6"
+  },
+  "sourceSignature": "fc5992e0050a5aa3bc41ec7425088630317dadda79f55b2afba2f4d9657496fd",
+  "success": true
+}

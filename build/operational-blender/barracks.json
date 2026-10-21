@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.barracks",
+      "assets": [
+        "building.directorate.barracks",
+        "building.directorate.barracks.lod1",
+        "building.directorate.barracks.lod2",
+        "building.directorate.barracks.foundation",
+        "building.directorate.barracks.structural_frame",
+        "building.directorate.barracks.partial_shell",
+        "building.directorate.barracks.unpowered",
+        "building.directorate.barracks.damaged",
+        "building.directorate.barracks.critical",
+        "building.directorate.barracks.destroyed"
+      ],
+      "instanceScale": [
+        18,
+        8,
+        16
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

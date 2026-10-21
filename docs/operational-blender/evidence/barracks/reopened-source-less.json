@@ -1,0 +1,83 @@
+{
+  "assetCount": 20,
+  "meshCount": 11,
+  "textureCount": 4,
+  "materialCount": 5,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7462558,
+  "meshRuntimeBytes": 125613,
+  "textureRuntimeBytes": 7328479,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 8466,
+  "catalogLoadDuration": "00:00:01.1337490",
+  "assetReadDuration": "00:00:00.4534938",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "building.directorate.barracks",
+      "type": "mesh",
+      "runtimeBytes": 31839
+    },
+    {
+      "assetId": "building.directorate.barracks.partial_shell",
+      "type": "mesh",
+      "runtimeBytes": 18607
+    },
+    {
+      "assetId": "building.directorate.barracks.lod1",
+      "type": "mesh",
+      "runtimeBytes": 15988
+    },
+    {
+      "assetId": "building.directorate.barracks.structural_frame",
+      "type": "mesh",
+      "runtimeBytes": 12761
+    },
+    {
+      "assetId": "building.directorate.barracks.destroyed",
+      "type": "mesh",
+      "runtimeBytes": 11201
+    },
+    {
+      "assetId": "building.directorate.barracks.critical",
+      "type": "mesh",
+      "runtimeBytes": 11026
+    },
+    {
+      "assetId": "building.directorate.barracks.lod2",
+      "type": "mesh",
+      "runtimeBytes": 10804
+    },
+    {
+      "assetId": "building.directorate.barracks.damaged",
+      "type": "mesh",
+      "runtimeBytes": 5684
+    },
+    {
+      "assetId": "building.directorate.module.collision_box",
+      "type": "mesh",
+      "runtimeBytes": 2956
+    }
+  ],
+  "issues": [],
+  "success": true
+}
