@@ -1,6 +1,6 @@
 #requires -Version 7.4
 [CmdletBinding()]
-param([Parameter(Mandatory)][string]$OutputRoot, [string]$BlenderPath, [switch]$RenderPreviews)
+param([Parameter(Mandatory)][string]$OutputRoot, [string]$BlenderPath, [switch]$RenderPreviews, [string]$QualifiedRuntimeSeed)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath('../..', $PSScriptRoot)
@@ -17,6 +17,11 @@ function Read-Tree([string]$Path) {
         [IO.Path]::GetRelativePath($Path, $_.FullName) + ':' + (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
     })
 }
+$seed = if ($QualifiedRuntimeSeed) { [IO.Path]::GetFullPath($QualifiedRuntimeSeed, $repo) } else { $null }
+if ($seed) {
+    $seedQualification = Get-Content -LiteralPath (Join-Path $seed 'qualification.json') -Raw | ConvertFrom-Json
+    if (-not $seedQualification.success -or -not $seedQualification.sourceLessIntegrity) { throw 'Runtime seed is not qualified.' }
+}
 $before = Read-Tree (Join-Path $repo 'assets/source')
 $fixture = Join-Path $PSScriptRoot 'fixture.json'
 foreach ($variant in @('first', 'second', 'reopened')) {
@@ -31,7 +36,12 @@ foreach ($variant in @('first', 'second', 'reopened')) {
 foreach ($variant in @('baseline', 'first', 'second', 'reopened', 'edited')) {
     $source = if ($variant -eq 'baseline') { Join-Path $output 'first/baseline-source' } elseif ($variant -eq 'edited') { Join-Path $output 'edit-check/edit-source' } else { Join-Path $output "$variant/source" }
     $runtime = Join-Path $output "$variant/runtime"
-    & dotnet $compiler --mode build --source $source --runtime $runtime --qualification-output (Join-Path $output "$variant-compile.json") 2>&1 | Out-File (Join-Path $output "$variant-compile.log") -Encoding utf8NoBOM
+    $mode = if ($seed) { 'development' } else { 'build' }
+    if ($seed) {
+        New-Item -ItemType Directory -Path (Join-Path $output $variant) -Force | Out-Null
+        Copy-Item -LiteralPath (Join-Path $seed "$variant/runtime") -Destination (Join-Path $output $variant) -Recurse
+    }
+    & dotnet $compiler --mode $mode --source $source --runtime $runtime --qualification-output (Join-Path $output "$variant-compile.json") 2>&1 | Out-File (Join-Path $output "$variant-compile.log") -Encoding utf8NoBOM
     if ($LASTEXITCODE -ne 0) { throw "Compilation failed: $variant" }
     & dotnet $compiler --mode validate --source (Join-Path $output 'absent-source') --runtime $runtime --qualification-output (Join-Path $output "$variant-source-less.json") 2>&1 | Out-File (Join-Path $output "$variant-source-less.log") -Encoding utf8NoBOM
     if ($LASTEXITCODE -ne 0) { throw "Source-less validation failed: $variant" }
@@ -52,5 +62,5 @@ finally { $env:FORGELINE_SCOUT_MASTER = $previous }
 @{ schemaVersion = 1; sourceSha = (& git -C $repo rev-parse HEAD); success = $true;
    deterministicSourceAndRuntime = $true; sourceLessIntegrity = $true; typedCompiledComparison = $true;
    canonicalSourcesUnchanged = $true; productionPromotion = 'blocked-pending-render-qualification';
-   physicalPerformance = 'pending'; humanArtApproval = 'pending' } |
+   physicalPerformance = 'pending'; humanArtApproval = 'pending'; qualifiedRuntimeSeed = $seed } |
     ConvertTo-Json | Set-Content (Join-Path $output 'qualification.json') -Encoding utf8NoBOM

@@ -2,6 +2,7 @@
 import argparse
 import json
 import math
+import shutil
 import sys
 from pathlib import Path
 
@@ -10,7 +11,7 @@ from mathutils import Matrix, Vector
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/blender'))
-from asset_contract import Catalog, fixture_selection, read_geometry, require, sha, write_json
+from asset_contract import Catalog, compare_geometry, fixture_selection, geometry_stats, read_geometry, require, sha, write_glb, write_json
 import roundtrip
 import mechanical
 
@@ -28,6 +29,46 @@ mechanical.SAMPLES = [
     {'name': 'destroyed', 'active': 2, 'disabled': True},
     {'name': 'lod', 'active': 2, 'weight': 0},
 ]
+
+
+def preserve_source_floats(catalog, geometries, output):
+    # A preservation master must not turn editor float storage noise into new art.
+    # The shared exporter has already validated the actual Blender objects/frames.
+    exported = Catalog(output / 'source')
+    report_path = output / 'roundtrip-report.json'
+    raw_report = report_path.read_bytes()
+    (output / 'native-readback-report.json').write_bytes(raw_report)
+    report = json.loads(raw_report)
+    backups = output / 'native-readback-glb'
+    backups.mkdir()
+    records = []
+    for aid, original in sorted(geometries.items()):
+        path = exported.source(aid)
+        definition = catalog.definitions[aid][1]
+        observed = read_geometry(path, exported.root, definition)
+        deviations = compare_geometry(original, observed)
+        require(max(deviations.values()) <= 5e-8,
+                'Scout preservation export exceeds editor float storage noise; review source-kit edits explicitly')
+        backup = backups / (aid + '.glb')
+        shutil.copyfile(path, backup)
+        write_glb(path, original)
+        final = read_geometry(path, exported.root, definition)
+        exact = compare_geometry(original, final)
+        require(max(exact.values()) == 0, 'Source vertex channels were not preserved exactly')
+        row = next(r for r in report['meshes'] if r['id'] == aid)
+        row['nativeReadbackSha256'] = sha(backup)
+        row['nativeReadbackMaximumDeviations'] = row['maximumDeviations']
+        row['exportSha256'] = sha(path)
+        row['exportStats'] = geometry_stats(final)
+        row['maximumDeviations'] = exact
+        records.append({'id': aid, 'nativeReadback': backup.relative_to(output).as_posix(),
+                        'nativeReadbackSha256': sha(backup), 'nativeReadbackDeviations': deviations,
+                        'sourceFloatExportSha256': sha(path), 'finalDeviations': exact})
+    report['canonicalSourceFloats'] = True
+    write_json(report_path, report)
+    write_json(output / 'canonical-export-report.json', {'schemaVersion': 1,
+        'nativeSceneValidatedBeforeSerialization': True, 'maximumEditorStorageNoise': 5e-8,
+        'sourceAttributesExact': True, 'assets': records})
 
 
 def component_groups(catalog, geometries):
@@ -125,6 +166,7 @@ def run(request):
     ids, families = fixture_selection(catalog, args.fixtures, [])
     geometries = {aid: read_geometry(catalog.source(aid), catalog.root, catalog.definitions[aid][1])
                   for aid in ids if catalog.definitions[aid][1]['type'] == 'mesh'}
+    preserve_source_floats(catalog, geometries, output)
     # The rest project remains a strict preservation input. Generated actions and
     # packed PBR graphs belong to the separate inspection project only.
     if args.action != 'Export':

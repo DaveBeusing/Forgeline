@@ -25,7 +25,9 @@ def part(kind):
 
 
 def validate():
-    export_scene(catalog, ids, families, geometries)
+    _, reports, _ = export_scene(catalog, ids, families, geometries)
+    require(all(max(r['maximumDeviations'].values()) <= 5e-8 for r in reports),
+            'Scout preservation edit exceeds editor storage noise')
     updates = author_definitions(catalog, geometries, {'maxPivotDeltaMetres': 0.025})
     require(all(value == catalog.definitions[aid][1] for aid, value in updates.items()), 'Preservation metadata changed')
 
@@ -41,6 +43,12 @@ def reject(name, change):
     raise AssertionError('Unsupported edit accepted: ' + name)
 
 
+def small_geometry_edit():
+    obj = next(o for o in bpy.context.scene.objects if o.get('fl_role') == 'geometry' and o.get('fl_asset') == families[0]['root'])
+    obj.data.vertices[0].co.z += 0.000001
+
+
+reject('geometry edit beyond storage noise', small_geometry_edit)
 reject('unknown motion', lambda: part('wheel').__setitem__('fl_motion', 'skeletal'))
 reject('unbounded rate', lambda: part('wheel').__setitem__('fl_rate', 21))
 reject('changed bounded rate', lambda: part('wheel').__setitem__('fl_rate', -1.75))

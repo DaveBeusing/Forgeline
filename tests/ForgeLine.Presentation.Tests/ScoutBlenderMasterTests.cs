@@ -45,6 +45,7 @@ public sealed class ScoutBlenderMasterTests
                 Assert.Equal(a.Sections, b.Sections);
                 Assert.Equal(a.Indices, b.Indices);
                 Assert.Equal(a.Vertices.Count, b.Vertices.Count);
+                Assert.Equal(a.Vertices, b.Vertices);
                 for (int i = 0; i < a.Vertices.Count; i++)
                 {
                     var x = a.Vertices[i];

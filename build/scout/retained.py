@@ -1,4 +1,5 @@
 """Retain and verify the scout preservation candidate against canonical sources."""
+import argparse
 import hashlib
 import json
 import shutil
@@ -28,7 +29,7 @@ def portable_signature(catalog, ids):
     return hashlib.sha256(json.dumps(hashes, sort_keys=True).encode()).hexdigest()
 
 
-def retain(root):
+def retain(root, refresh=False):
     qualification = json.loads((root / 'qualification.json').read_text(encoding='utf-8-sig'))
     require(qualification['success'] and qualification['deterministicSourceAndRuntime']
             and qualification['sourceLessIntegrity'] and qualification['typedCompiledComparison'],
@@ -38,8 +39,13 @@ def retain(root):
     first = root / 'first'
     report = json.loads((first / 'roundtrip-report.json').read_text(encoding='utf-8'))
     require(report['success'] and report['sourceSignature'] == catalog.signature(ids)[0], 'Source changed')
-    require(not TARGET.exists() or {p.name for p in TARGET.iterdir()} <= {'.gitattributes'},
-            'Retaining a candidate must not overwrite existing master/export files')
+    if TARGET.exists() and {p.name for p in TARGET.iterdir()} - {'.gitattributes'}:
+        require(refresh, 'Existing candidate requires explicit --refresh after native qualification')
+        validate()
+        previous = json.loads((TARGET / 'lineage.json').read_text(encoding='utf-8'))
+        owned = {'.gitattributes', 'lineage.json'} | {x['path'] for x in previous['masters']} | {x['source'] for x in previous['exports']}
+        require({p.name for p in TARGET.iterdir()} == owned, 'Unknown candidate files; preserve them explicitly first')
+        shutil.copytree(TARGET, root / 'previous-retained-candidate')
     TARGET.mkdir(parents=True, exist_ok=True)
     files = []
     for source, target in [('authoring.blend', 'scout.blend'), ('inspection.blend', 'scout_inspection.blend')]:
@@ -89,6 +95,11 @@ def validate():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        retain(Path(sys.argv[1]).resolve())
+    parser = argparse.ArgumentParser()
+    parser.add_argument('qualified_root', nargs='?', type=Path)
+    parser.add_argument('--refresh', action='store_true')
+    args = parser.parse_args()
+    require(args.qualified_root is not None or not args.refresh, '--refresh requires a qualified native root')
+    if args.qualified_root is not None:
+        retain(args.qualified_root.resolve(), args.refresh)
     validate()
