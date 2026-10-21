@@ -29,7 +29,11 @@ and reviewed; it is not a waiver of production promotion requirements.
 Masters live in `assets/source/buildings/directorate/authoring/`:
 `storage_depot.blend`, `supply_depot.blend`, `logistics_hub.blend`.
 Each contains all eleven existing meshes, named editable module objects, static
-service-socket empties and packed shared Base Color/Normal/ORM/emissive previews.
+service-socket empties and packed shared Base Color/Normal/ORM previews.
+Existing runtime state-material overrides, including supported status emissives,
+remain unchanged and are exercised with the full canonical catalog. The isolated
+16-asset family catalogs qualify geometry dependencies; they are not a complete
+renderer installation with all shared state/effect materials.
 Engine coordinates remain +Y up/+Z forward, Blender +Z up/-Y forward, metre scale.
 Collections isolate the intact LOD0, reduced LODs, construction and damage states.
 The collision mesh is retained as a separate contract, not a generated hull.
@@ -107,8 +111,8 @@ compiler build and source-less validation. The dedicated workflow runs portable
 contracts on PRs; actual native Blender execution is opt-in on a provisioned
 Windows x64 runner. A skipped native CI job does not mean Blender passed.
 
-Native display, full solution, package reproducibility and exact current-head CI
-results will be recorded with source identities before this candidate is offered
-for integration. Human artwork/traffic approval and controlled physical performance
+The [qualification record](LogisticsBlenderQualification.md) contains the executed
+full solution, source-less runtime, native before/after and installed-package
+results, source identities and unchanged budgets. Human artwork/traffic approval and controlled physical performance
 acceptance remain required; no golden, merge, tag or release is authorized by a
 successful export or static repeatable image.
