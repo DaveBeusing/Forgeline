@@ -1,0 +1,71 @@
+{
+  "blenderVersion": "5.2.2",
+  "canonicalSourcesUnchanged": true,
+  "exports": [
+    {
+      "canonicalDefinition": "units/directorate/artillery/self_propelled_artillery.asset.json",
+      "id": "unit.directorate.self_propelled_artillery",
+      "sha256": "474a73580f7115fbcf6eb71456bfcc182af6f273865775f45cbeb4b95a010294",
+      "source": "unit.directorate.self_propelled_artillery.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/collision/self_propelled_artillery_collision.asset.json",
+      "id": "unit.directorate.self_propelled_artillery.collision",
+      "sha256": "4a8b8d6c316908eeb908c026fb6d59f4b5b2a822c963b26b6478ccc2c4343a3e",
+      "source": "unit.directorate.self_propelled_artillery.collision.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/artillery/self_propelled_artillery_critical.asset.json",
+      "id": "unit.directorate.self_propelled_artillery.critical",
+      "sha256": "944e4eb3032896d68713b8d67862fd69e0dc839f5132e3fc04c30e332b67506a",
+      "source": "unit.directorate.self_propelled_artillery.critical.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/artillery/self_propelled_artillery_damaged.asset.json",
+      "id": "unit.directorate.self_propelled_artillery.damaged",
+      "sha256": "4fdeecfbca57d81073de0d3422e3dd54f45ea2e53d02c3509bb1000df80240e4",
+      "source": "unit.directorate.self_propelled_artillery.damaged.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/artillery/self_propelled_artillery_lod1.asset.json",
+      "id": "unit.directorate.self_propelled_artillery.lod1",
+      "sha256": "592d44103f8052df117394465f2f54f809188efb72870517de56b82eadde93f4",
+      "source": "unit.directorate.self_propelled_artillery.lod1.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/artillery/self_propelled_artillery_lod2.asset.json",
+      "id": "unit.directorate.self_propelled_artillery.lod2",
+      "sha256": "09e7954f85a81d986112d0289316d43b6a0ee7dfc3f8d0de84ed63e6fc56bf0d",
+      "source": "unit.directorate.self_propelled_artillery.lod2.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/artillery/self_propelled_artillery_turret.asset.json",
+      "id": "unit.directorate.self_propelled_artillery.turret",
+      "sha256": "e23f2f215eace7d27915fbf7b2aaed286d80dfe0209eac2b59f7dda27f2e0e8b",
+      "source": "unit.directorate.self_propelled_artillery.turret.glb"
+    },
+    {
+      "canonicalDefinition": "units/directorate/artillery/self_propelled_artillery_wreck.asset.json",
+      "id": "unit.directorate.self_propelled_artillery.wreck",
+      "sha256": "adf9316cbb7cba591310231299b16c939dce4ea882c3e43ae5496e35e99ff702",
+      "source": "unit.directorate.self_propelled_artillery.wreck.glb"
+    }
+  ],
+  "fixtureSha256": "ef510ec7aa187c0ed977544e69a46a4096a4f8b5ae095b739fc2a2b338536a4e",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "artillery.blend",
+      "sha256": "ce1e12e029a757b20aa82dee02b623d5913b8b1758f9c5039196183451c5575e"
+    },
+    {
+      "path": "artillery_inspection.blend",
+      "sha256": "d5d0c8fe9a5e05dedb9ac907ab9b8ece5ce2b998a3279b1d3761f9c04bb70e21"
+    }
+  ],
+  "portableSourceSignature": "7f957b156366ffbe0cf1fbb96eddd0dc0c77fb735552bb16b45300bbc424c6b6",
+  "schemaVersion": 1,
+  "sourceSha": "aeee2a3cf76e9f8565be6303f4802b0c6b601f35",
+  "sourceSignature": "9f1f474f3cf79acf78170d69ee327db722ac1047d4b93a268989b57a9291032d",
+  "status": "staged-not-promoted"
+}

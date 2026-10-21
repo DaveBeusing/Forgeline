@@ -19,16 +19,18 @@ internal static class CombatSupportReferenceScene
         UnitId family = kind switch
         {
             VisualReferenceSceneKind.ScoutVehicleProduction => UnitIds.ScoutVehicle,
-            VisualReferenceSceneKind.ArtilleryProduction => UnitIds.MobileArtillery,
+            VisualReferenceSceneKind.ArtilleryProduction or VisualReferenceSceneKind.ArtillerySingle or
+                VisualReferenceSceneKind.ArtilleryRepeated100 or VisualReferenceSceneKind.ArtilleryRepeated1000 => UnitIds.MobileArtillery,
             VisualReferenceSceneKind.CargoTruckProduction or VisualReferenceSceneKind.CargoTruckSingle or
                 VisualReferenceSceneKind.CargoTruckHundred or VisualReferenceSceneKind.CargoTruckRepeated => UnitIds.CargoTruck,
             VisualReferenceSceneKind.SupplyTruckProduction or VisualReferenceSceneKind.SupplyTruckSingle or
                 VisualReferenceSceneKind.SupplyTruckHundred or VisualReferenceSceneKind.SupplyTruckRepeated => UnitIds.SupplyTruck,
             _ => default
         };
-        bool single = kind is VisualReferenceSceneKind.CargoTruckSingle or VisualReferenceSceneKind.SupplyTruckSingle;
-        bool hundred = kind is VisualReferenceSceneKind.CargoTruckHundred or VisualReferenceSceneKind.SupplyTruckHundred;
-        bool repeated = hundred || kind is VisualReferenceSceneKind.CombatSupportRepeated or
+        bool artilleryRepeated = kind is VisualReferenceSceneKind.ArtilleryRepeated100 or VisualReferenceSceneKind.ArtilleryRepeated1000;
+        bool single = kind is VisualReferenceSceneKind.ArtillerySingle or VisualReferenceSceneKind.CargoTruckSingle or VisualReferenceSceneKind.SupplyTruckSingle;
+        bool hundred = kind is VisualReferenceSceneKind.ArtilleryRepeated100 or VisualReferenceSceneKind.CargoTruckHundred or VisualReferenceSceneKind.SupplyTruckHundred;
+        bool repeated = artilleryRepeated || hundred || kind is VisualReferenceSceneKind.CombatSupportRepeated or
             VisualReferenceSceneKind.CargoTruckRepeated or VisualReferenceSceneKind.SupplyTruckRepeated;
         int count = single ? 1 : hundred ? 100 : repeated ? 1000 : 8;
         if (!repeated && !family.IsSpecified) throw new ArgumentOutOfRangeException(nameof(kind));
@@ -73,13 +75,15 @@ internal static class CombatSupportReferenceScene
             RenderInstance item = visible[i];
             if (!review.TryGetValue(item.Entity, out int pose) || item.UnitFeature.IsWreck) continue;
             bool armed = item.UnitFeature.Unit == UnitIds.ScoutVehicle || item.UnitFeature.Unit == UnitIds.MobileArtillery;
+            int poseKind = artilleryRepeated ? pose % 4 : pose;
+            bool reviewAim = !repeated || artilleryRepeated;
             // Fixed cosmetic read-model inputs qualify rigid transforms, not a live combat workload.
             visible[i] = item with
             {
                 MechanicalPose = new(true, repeated || pose == 2 ? 1.7 : 0, 1.6, 1.6,
-                    armed && pose == 3 && !repeated ? 1.55 : -1,
-                    armed && pose is 1 or 3 && !repeated ? .2f : 0, 0),
-                UnitFeature = item.UnitFeature with { AimYawRadians = armed && pose is 1 or 3 && !repeated ? .6f : 0 }
+                    armed && poseKind == 3 && reviewAim ? 1.55 : -1,
+                    armed && poseKind is 1 or 3 && reviewAim ? .2f : 0, 0),
+                UnitFeature = item.UnitFeature with { AimYawRadians = armed && poseKind is 1 or 3 && reviewAim ? .6f : 0 }
             };
         }
         var snapshot = new PresentationSnapshot(extracted.Tick, extracted.TickDuration, extracted.SimulationEntityCount,

@@ -1,0 +1,57 @@
+{
+  "baselineCommit": null,
+  "visualAcceptance": "pending",
+  "pixelComparisonRequested": false,
+  "channelTolerance": 0,
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0,
+  "captures": [
+    {
+      "gpuMeanMs": 6.380815999999999,
+      "key": "ArtillerySingle-1920x1080-High-NormalGameplay",
+      "sameRuntime": false,
+      "cpuMeanMs": 7.5458,
+      "visualReview": "pending",
+      "pixelComparison": null,
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "no-matched-baseline",
+      "sameSource": false,
+      "cpuMeanDeltaMs": null,
+      "equivalentHardware": false
+    },
+    {
+      "gpuMeanMs": 6.329549714285713,
+      "key": "ArtilleryRepeated100-1920x1080-High-NormalGameplay",
+      "sameRuntime": false,
+      "cpuMeanMs": 5.7921875,
+      "visualReview": "pending",
+      "pixelComparison": null,
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "no-matched-baseline",
+      "sameSource": false,
+      "cpuMeanDeltaMs": null,
+      "equivalentHardware": false
+    },
+    {
+      "gpuMeanMs": 8.506587999999999,
+      "key": "ArtilleryRepeated1000-1920x1080-High-NormalGameplay",
+      "sameRuntime": false,
+      "cpuMeanMs": 14.45795,
+      "visualReview": "pending",
+      "pixelComparison": null,
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "no-matched-baseline",
+      "sameSource": false,
+      "cpuMeanDeltaMs": null,
+      "equivalentHardware": false
+    }
+  ],
+  "structural": "pass",
+  "commit": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "imageGateRequested": false,
+  "imageFailures": [],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred."
+}

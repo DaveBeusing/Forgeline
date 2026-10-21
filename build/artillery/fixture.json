@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "families": [{
+    "root": "unit.directorate.self_propelled_artillery",
+    "assets": [
+      "unit.directorate.self_propelled_artillery",
+      "unit.directorate.self_propelled_artillery.collision",
+      "unit.directorate.self_propelled_artillery.critical",
+      "unit.directorate.self_propelled_artillery.damaged",
+      "unit.directorate.self_propelled_artillery.lod1",
+      "unit.directorate.self_propelled_artillery.lod2",
+      "unit.directorate.self_propelled_artillery.turret",
+      "unit.directorate.self_propelled_artillery.wreck"
+    ],
+    "instanceScale": [3.8, 3.2, 7.5],
+    "instanceTranslation": [17, 5, -29],
+    "instanceYawDegrees": 37
+  }]
+}

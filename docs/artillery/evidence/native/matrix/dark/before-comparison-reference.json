@@ -1,0 +1,29 @@
+{
+  "baselineCommit": null,
+  "visualAcceptance": "pending",
+  "pixelComparisonRequested": false,
+  "channelTolerance": 0,
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0,
+  "captures": [
+    {
+      "gpuMeanMs": 5.710148571428571,
+      "key": "ArtilleryProduction-1920x1080-High-NormalGameplay",
+      "sameRuntime": false,
+      "cpuMeanMs": 6.325225,
+      "visualReview": "pending",
+      "pixelComparison": null,
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "no-matched-baseline",
+      "sameSource": false,
+      "cpuMeanDeltaMs": null,
+      "equivalentHardware": false
+    }
+  ],
+  "structural": "pass",
+  "commit": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "imageGateRequested": false,
+  "imageFailures": [],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred."
+}
