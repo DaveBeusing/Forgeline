@@ -1,8 +1,8 @@
 {
   "id": "building.directorate.logistics_hub.critical",
-  "type": "mesh",
-  "source": "sources/logistics/logistics_hub/critical.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
-  ]
+  ],
+  "source": "sources/logistics/logistics_hub/blender/critical.glb",
+  "type": "mesh"
 }

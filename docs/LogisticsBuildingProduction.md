@@ -1,5 +1,12 @@
 # Directorate logistics building production
 
+The current [saved Blender workflow](LogisticsBlenderProduction.md) preserves
+this integrated artwork in three editable native masters and adopts their
+lossless GLB exports through the same LOD/state IDs. The component recipes and
+glTF generator below remain historical source material; regular export opens
+the saved master. [Source bindings](qualification/logistics-blender/SourceBindings.json)
+record exact geometry, metadata, sockets and export hashes.
+
 Storage Depot, Supply Depot and Logistics Hub use editable component recipes,
 actual glTF meshes, three dedicated LODs and family construction/status/wreck
 geometry. Their public identities, inventory capacities, logistics topology,
