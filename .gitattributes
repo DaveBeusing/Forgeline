@@ -63,3 +63,10 @@ docs/qualification/tank-finish/*.json.gz binary
 docs/qualification/tank-finish/*.png binary
 docs/qualification/tank-finish/*.json text eol=lf
 tools/blender/fixtures/tank_finish_sources.json text eol=lf
+
+assets/source/infrastructure/directorate/authoring/*.blend binary
+assets/source/infrastructure/directorate/sources/blender/*.glb binary
+tools/blender/fixtures/infrastructure*.json text eol=lf
+docs/qualification/infrastructure/*.json text eol=lf
+docs/qualification/infrastructure/*.json.gz binary
+docs/qualification/infrastructure/*.png binary
