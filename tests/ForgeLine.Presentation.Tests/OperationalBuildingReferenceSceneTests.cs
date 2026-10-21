@@ -44,7 +44,7 @@ public sealed class OperationalBuildingReferenceSceneTests
             Assert.True(terrain.TrySampleHeight(instance.Transform.Position.X, instance.Transform.Position.Z, out float height));
             Assert.InRange(MathF.Abs(instance.Transform.Position.Y - height - instance.Transform.Scale.Y * .5f), 0, .0001f);
             Vector3 forward = Vector3.Transform(Vector3.UnitZ, instance.Transform.Rotation);
-            Assert.True(new[] { Vector3.UnitZ, Vector3.UnitX, -Vector3.UnitZ, -Vector3.UnitX }.Any(x => Vector3.Distance(x, forward) < .000001f));
+            Assert.Contains(new[] { Vector3.UnitZ, Vector3.UnitX, -Vector3.UnitZ, -Vector3.UnitX }, x => Vector3.Distance(x, forward) < .000001f);
         }
         Assert.Equal(count == 1 ? 1 : 4, instances.Select(x => x.Transform.Rotation).Distinct().Count());
         if (count == 100)
