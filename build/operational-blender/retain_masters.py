@@ -11,11 +11,13 @@ from asset_contract import Catalog, fixture_selection, require, sha, write_json
 from lineage import portable_signature
 FAMILIES = ('vehicle_factory', 'power_plant', 'barracks', 'radar')
 
-def retain(qualified, reviews, packed):
+def retain(qualified, reviews, packed, organized):
     summary = json.loads((qualified / 'qualification.json').read_text(encoding='utf-8-sig'))
     require(summary['typedCompiledContracts'] == 'passed' and summary['productionSourceUnchanged'], 'Qualification incomplete')
     target = ROOT / 'assets/staged/operational-buildings'
     target.mkdir(parents=True, exist_ok=False)
+    component_report = json.loads((organized / 'component-masters.json').read_text(encoding='utf-8'))
+    require(component_report['success'], 'Component organization not qualified')
     packed_report = json.loads((packed / 'packed-reviews.json').read_text(encoding='utf-8'))
     require(packed_report['success'], 'Packed image validation failed')
     for family in FAMILIES:
@@ -30,7 +32,11 @@ def retain(qualified, reviews, packed):
         folder.mkdir()
         master = family + '.blend'
         surface = family + '_surfaces.blend'
-        shutil.copyfile(root / 'master/authoring.blend', folder / master)
+        component_family = next(x for x in component_report['families'] if x['family'] == family)
+        require(component_family['sourceSignature'] == report['sourceSignature'], 'Organized master source mismatch')
+        require(component_family['masterSha256'] == sha(organized / master), 'Organized master hash mismatch')
+        require(component_family['reopened'] and component_family['exactExports'] == 10, 'Organized master export incomplete')
+        shutil.copyfile(organized / master, folder / master)
         packed_family = next(x for x in packed_report['families'] if x['family'] == family)
         require(packed_family['masterSha256'] == sha(packed / surface), 'Packed master mismatch')
         shutil.copyfile(packed / surface, folder / surface)
@@ -46,9 +52,9 @@ def retain(qualified, reviews, packed):
         write_json(folder / 'lineage.json', {'schemaVersion': 1, 'status': 'staged-not-promoted',
             'sourceSha': summary['sourceSha'], 'sourceSignature': report['sourceSignature'],
             'portableSourceSignature': portable_signature(catalog, ids), 'fixtureSha256': sha(fixture),
-            'blenderVersion': '5.2.2', 'master': master, 'masterSha256': sha(folder / master),
+            'blenderVersion': '5.2.2', 'componentSelectionGroups': len(component_family['componentGroups']), 'master': master, 'masterSha256': sha(folder / master),
             'surfaceReviewMaster': surface, 'surfaceReviewMasterSha256': sha(folder / surface),
             'exports': exports, 'canonicalSourcesUnchanged': True, 'productionPromoted': False})
 
 if __name__ == '__main__':
-    retain(*(Path(p).resolve() for p in sys.argv[1:4]))
+    retain(*(Path(p).resolve() for p in sys.argv[1:5]))
