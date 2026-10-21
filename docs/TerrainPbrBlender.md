@@ -4,7 +4,10 @@ The eight Central Divide terrain material IDs already resolve seven complete,
 original periodic 4K sets. Preserve this integrated artwork in seven genuine
 Blender 5.2.2 material masters and derive the compiler inputs by reopening and
 baking those files. This closes the saved-source/edit/export gap. It does not
-claim newly accepted art or a richer production picture from unchanged texels.
+claim newly accepted art. Native review also exposed oversized industrial ground
+rectangles; a separate profile-only correction concentrates those two areas into
+smaller feathered working patches. Texture fidelity and the intentional profile
+appearance change have separate evidence.
 
 ## Verified starting point
 
@@ -114,4 +117,4 @@ Static repeatability and preserved inputs establish functional source continuity
 They do not close live camera LOD/shimmer/seam review, sustained client performance,
 complete physical memory/lifecycle, thermal stability or explicit human art gates.
 Keep integration in draft while required checks or those acceptance gates remain
-open. See the retained qualification report for exact source and execution results.
+open. See [qualification](TerrainPbrBlenderQualification.md) for exact source and execution results.
