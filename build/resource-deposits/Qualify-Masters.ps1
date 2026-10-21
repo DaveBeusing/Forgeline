@@ -1,0 +1,57 @@
+#requires -Version 7.4
+[CmdletBinding()]
+param([Parameter(Mandatory)][string]$OutputRoot, [string]$BlenderPath, [switch]$RenderPreviews)
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+$repo = [IO.Path]::GetFullPath('../..', $PSScriptRoot)
+Import-Module (Join-Path $repo 'tools/blender/BlenderToolchain.psm1') -Force
+$output = Resolve-BlenderOutput -Path $OutputRoot -RepositoryRoot $repo
+if (Test-Path -LiteralPath $output) { throw 'Use fresh output.' }
+$compiler = Join-Path $repo 'tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll'
+function Read-Tree([string]$Path) {
+    return @(Get-ChildItem -LiteralPath $Path -File -Recurse | Sort-Object FullName | ForEach-Object {
+        [IO.Path]::GetRelativePath($Path, $_.FullName) + ':' + (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+    })
+}
+$before = Read-Tree (Join-Path $repo 'assets/source')
+$fixture = Join-Path $PSScriptRoot 'fixture.json'
+foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
+    $familyRoot = Join-Path $output $family
+    foreach ($variant in @('first','second','reopened')) {
+        $arguments = @('--fixtures', $fixture, '--family', $family)
+        if ($variant -eq 'reopened') { $arguments += @('--blend-file', (Join-Path $familyRoot 'first/authoring.blend')) }
+        if ($RenderPreviews -and $variant -eq 'first') { $arguments += '--render' }
+        & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'author.py') -InputRoot assets/source -OutputRoot (Join-Path $familyRoot $variant) -ScriptArguments $arguments -BlenderPath $BlenderPath -TimeoutSeconds 480
+    }
+    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'native_contract.py') -InputRoot assets/source -OutputRoot (Join-Path $familyRoot 'native-contracts') -ScriptArguments @((Join-Path $familyRoot 'first/authoring.blend'), $fixture, "mesh.world.resource.$family") -BlenderPath $BlenderPath -TimeoutSeconds 480
+}
+if (-not (Test-Path -LiteralPath $compiler)) { throw 'Build Release before compiling the preserved exports.' }
+foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
+    $familyRoot = Join-Path $output $family
+    foreach ($variant in @('baseline','first','second','reopened')) {
+        $source = if ($variant -eq 'baseline') { Join-Path $familyRoot 'first/baseline-source' } else { Join-Path $familyRoot "$variant/source" }
+        $runtime = Join-Path $familyRoot "$variant/runtime"
+        & dotnet $compiler --mode build --source $source --runtime $runtime --qualification-output (Join-Path $familyRoot "$variant-compile.json") 2>&1 | Out-File (Join-Path $familyRoot "$variant-compile.log") -Encoding utf8NoBOM
+        if ($LASTEXITCODE -ne 0) { throw "Compile failed: $family/$variant" }
+        & dotnet $compiler --mode validate --source (Join-Path $output 'absent-source') --runtime $runtime --qualification-output (Join-Path $familyRoot "$variant-source-less.json") 2>&1 | Out-File (Join-Path $familyRoot "$variant-source-less.log") -Encoding utf8NoBOM
+        if ($LASTEXITCODE -ne 0) { throw "Source-less validation failed: $family/$variant" }
+    }
+    foreach ($variant in @('second','reopened')) {
+        foreach ($kind in @('source','runtime')) {
+            if (Compare-Object (Read-Tree (Join-Path $familyRoot "first/$kind")) (Read-Tree (Join-Path $familyRoot "$variant/$kind"))) { throw "Non-deterministic $family/$variant/$kind" }
+        }
+    }
+}
+if (Compare-Object $before (Read-Tree (Join-Path $repo 'assets/source'))) { throw 'Canonical source bytes changed.' }
+$previous = $env:FORGELINE_RESOURCE_MASTERS
+try {
+    $env:FORGELINE_RESOURCE_MASTERS = $output
+    & dotnet test --project (Join-Path $repo 'tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj') --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.ResourceDepositBlenderMasterTests 2>&1 | Out-File (Join-Path $output 'typed-comparison.log') -Encoding utf8NoBOM
+    if ($LASTEXITCODE -ne 0) { throw 'Typed runtime comparison failed.' }
+}
+finally { $env:FORGELINE_RESOURCE_MASTERS = $previous }
+@{ schemaVersion = 1; sourceSha = (& git -C $repo rev-parse HEAD); success = $true;
+   deterministicSourceAndRuntime = $true; sourceLessIntegrity = $true; typedCompiledComparison = $true;
+   canonicalSourcesUnchanged = $true; productionPromotion = 'blocked-pending-render-qualification';
+   physicalPerformance = 'pending'; humanArtApproval = 'pending' } |
+    ConvertTo-Json | Set-Content (Join-Path $output 'qualification.json') -Encoding utf8NoBOM

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "mesh.world.resource.ferrous_ore",
+      "assets": [
+        "mesh.world.resource.ferrous_ore",
+        "mesh.world.resource.ferrous_ore_lod1"
+      ],
+      "instanceScale": [
+        1,
+        1,
+        1
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.resource.silicates",
+      "assets": [
+        "mesh.world.resource.silicates",
+        "mesh.world.resource.silicates_lod1"
+      ],
+      "instanceScale": [
+        1,
+        1,
+        1
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.resource.volatiles",
+      "assets": [
+        "mesh.world.resource.volatiles",
+        "mesh.world.resource.volatiles_lod1"
+      ],
+      "instanceScale": [
+        1,
+        1,
+        1
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.resource.rare_elements",
+      "assets": [
+        "mesh.world.resource.rare_elements",
+        "mesh.world.resource.rare_elements_lod1"
+      ],
+      "instanceScale": [
+        1,
+        1,
+        1
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}
