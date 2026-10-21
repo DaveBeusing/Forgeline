@@ -1,0 +1,12 @@
+{
+  "productionPromotion": "blocked-pending-render-qualification",
+  "humanArtApproval": "pending",
+  "deterministicSourceAndRuntime": true,
+  "schemaVersion": 1,
+  "physicalPerformance": "pending",
+  "typedCompiledComparison": true,
+  "sourceLessIntegrity": true,
+  "success": true,
+  "sourceSha": "ad6b88e06d8c0f99ae561a00429f694ef44c7470",
+  "canonicalSourcesUnchanged": true
+}

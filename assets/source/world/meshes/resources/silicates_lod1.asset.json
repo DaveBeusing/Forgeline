@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.resource.silicates_lod1",
   "type": "mesh",
-  "source": "../sources/resource_silicates_lod1.gltf",
+  "source": "../sources/blender/silicates/mesh.world.resource.silicates_lod1.glb",
   "materialReferences": [
     "material.world.resource.silicates"
   ]
