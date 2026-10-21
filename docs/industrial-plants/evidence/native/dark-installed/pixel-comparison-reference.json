@@ -1,0 +1,55 @@
+{
+  "imageFailures": [],
+  "visualAcceptance": "pending",
+  "structural": "pass",
+  "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+  "captures": [
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "gpuMeanMs": 7.7562999999999995,
+      "structural": "pass",
+      "cpuMeanDeltaMs": 9.509974999999997,
+      "sameRuntime": false,
+      "cpuMeanMs": 29.043912499999998,
+      "sameSource": true,
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "FuelRefineryProduction-1920x1080-High-NormalGameplay"
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "gpuMeanMs": 10.132495999999998,
+      "structural": "pass",
+      "cpuMeanDeltaMs": -1.4239750000000004,
+      "sameRuntime": false,
+      "cpuMeanMs": 9.5059375,
+      "sameSource": true,
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "AmmunitionPlantProduction-1920x1080-High-NormalGameplay"
+    }
+  ],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "pixelComparisonRequested": true,
+  "maximumChangedPixelFraction": 0.0,
+  "imageGateRequested": false,
+  "schemaVersion": 1,
+  "channelTolerance": 0,
+  "baselineCommit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076"
+}

@@ -133,7 +133,8 @@ actual content independently of those commit boundaries.
 | Natural headless match | Seed 2026, Victory / CommandCoreDestroyed, winner 1 at tick 55,210; exit 0 |
 | Native D3D12 preservation views | 24 images / 12 before-after pairs, High at 1080p/4K and three zooms; all repeat reads identical and structural checks pass |
 | Native pixel observations | Fuel: one changed pixel across six pairs; ammunition: 14 across six pairs; maximum channel delta 1, unchanged zero-tolerance observation policy |
-| Installed package / physical performance | Pending |
+| Installed package | Reproducible 0.1.428-dev candidate; published and freshly extracted runtime-only player both exit 0 |
+| Physical performance | Pending controlled complete-frame/memory/lifecycle and sustained acceptance |
 | Render integration and human art approval | Blocked/open; no production promotion |
 
 Original source qualification, packed-image checks, native mutation results, PBR
@@ -154,6 +155,68 @@ image tolerance changes or golden approval. CloseTactical retains the existing
 gallery framing that clips the nearest foundation at the viewport edge. These
 short functional runs do not establish sustained performance or moving-LOD quality.
 The D3D12 debug layer was unavailable.
+
+## Synchronized installed-player evidence
+
+Executable/package source: `f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076`, version
+`0.1.428-dev`, based on master `538ddc0bd49a722462bf185cfc118cf5a3e5008f`.
+The synchronized Release solution build has zero warnings/errors. All ten incoming
+`QualificationSampleBoundaryTests` cases pass; the 44-project graph and one-PATCH
+checks pass again. Canonical map qualification passes 71 reachability, two alternate
+navigation and two alternate road checks.
+
+The existing typed overlay helper composes both already-qualified family exports
+into one full, integrity-sealed runtime catalog. Its two family cases pass again.
+The resulting package contains 1,357 assets / 75,123,097 bytes: a 285-byte mesh
+container increase over canonical, with unchanged vertex/index counts and geometry
+costs. Texture containers remain exactly 59,451,623 bytes, including 1,786,417 studio
+splash bytes; the gameplay metric remains 57,665,206, below the unchanged 56-MiB gate.
+
+The actual corrected package command is:
+
+```powershell
+./build/Publish-PreAlpha.ps1 -Configuration Release -OutputRoot artifacts/pkg-review -VerifyReproducible -RuntimeAssetRoot artifacts/ipc/fuel_refinery/overlay/runtime
+./build/rendering/asset-residency/Test-PlayerPackage.ps1 -PublishRoot artifacts/pkg-review/win-x64/publish -ArchivePath artifacts/pkg-review/FORGELINE-0.1.428-dev-win-x64.zip -Source f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076 -OutputRoot artifacts/pks
+```
+
+Two publish trees have identical complete checksum manifests. The archive SHA-256
+is `be6cce12e90739fade9fded1d35f6fb726d7ef2d76e5321124efdab9a4f3ee06`.
+Fresh extraction verifies all 1,481 recorded file hashes. Both the published and
+freshly extracted player load their own runtime catalog and exit 0 with fresh
+settings and a child PATH limited to system/.NET directories. The archive has zero
+authoring/compiler files. System-wide Blender was not removed; project boundaries,
+archive inspection and the restricted child environment establish the observed
+scope. The earlier absolute `OutputRoot` invocation was rejected before packaging;
+its log is retained, and the supported relative path succeeded without script changes.
+
+The installed client adds 24 native images / twelve matched pairs: Low/Medium,
+dark and wet High views for both families, plus the existing real Loading, Transit,
+Unloading and Sustained logistics fixtures. These twelve pairs are pixel-exact.
+Together with the first matrix, there are 48 original captures and 24 comparisons.
+Every capture repeats exactly across eight readbacks, with zero texture/material
+binding failures or fallback mesh instances. All paired resource counters match.
+The first High close case retains 44,759,204 tracked resident texture bytes and
+83 peak SRV descriptors. Those are partial resource metrics, not total process VRAM.
+
+[`Native summary`](industrial-plants/evidence/native/summary.json) maps every source,
+runtime, raw manifest hash, comparison and local raw directory. Unchanged full native
+manifests/comparison reports are retained as `*-reference.json`. The checked-in
+gallery is a selected subset; all 48 unchanged original PNGs (396,803,033 bytes)
+remain in the documented local artifact roots. The renamed manifest references do
+not assert that this selected gallery is a complete standalone capture directory.
+
+The two packed PBR review projects were reopened once more to give both image inputs
+and render outputs portable relative paths. Embedded image hashes/color spaces were
+rechecked and their retained file hashes updated. This final authoring-metadata
+change does not alter any GLB, canonical source, runtime mesh or engine code.
+PBR metadata and evidence commits after the measured source are not relabelled as
+new executable measurements.
+
+Production adoption remains blocked: current-source required CI, renderer physical
+qualification, complete memory/frame and lifecycle evidence, moving-camera/LOD and
+all-rotation physical-display review, and explicit human art approval remain their
+own gates. The logistics images exercise existing fixtures; they do not create new
+refinery/ammunition docking semantics or certify every plant-specific traffic case.
 
 Keep qualification output paths short on Windows. The longer initial
 `artifacts/industrial-plants/qualified` path exceeded the native file path limit

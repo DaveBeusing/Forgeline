@@ -1,0 +1,71 @@
+{
+  "imageFailures": [],
+  "visualAcceptance": "pending",
+  "structural": "pass",
+  "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+  "captures": [
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 9.061717333333334,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 9.175712500000001,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "LogisticsLoadingProduction-1920x1080-High-NormalGameplay"
+    },
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 10.545114666666665,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 9.383325,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "LogisticsTransitProduction-1920x1080-High-NormalGameplay"
+    },
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 9.342255999999999,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 8.4821375,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "LogisticsUnloadingProduction-1920x1080-High-NormalGameplay"
+    },
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 10.141813333333333,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 9.8678375,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "LogisticsSustainedProduction-1920x1080-High-NormalGameplay"
+    }
+  ],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "pixelComparisonRequested": false,
+  "maximumChangedPixelFraction": 0.0,
+  "imageGateRequested": false,
+  "schemaVersion": 1,
+  "channelTolerance": 0,
+  "baselineCommit": null
+}

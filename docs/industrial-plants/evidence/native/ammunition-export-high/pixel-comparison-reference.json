@@ -1,0 +1,135 @@
+{
+  "maximumChangedPixelFraction": 0.0,
+  "schemaVersion": 1,
+  "channelTolerance": 0,
+  "commit": "de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+  "visualAcceptance": "pending",
+  "pixelComparisonRequested": true,
+  "imageGateRequested": false,
+  "baselineCommit": "de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "structural": "pass",
+  "captures": [
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 2.4112654320987655E-07,
+        "ChangedPixels": 2,
+        "ChangedPixelFraction": 9.645061728395062E-07,
+        "WithinTolerance": false
+      },
+      "cpuMeanMs": 17.2639875,
+      "visualReview": "pending",
+      "gpuMeanMs": 10.160653714285713,
+      "comparison": "pixels-require-human-review",
+      "sameRuntime": false,
+      "key": "AmmunitionPlantProduction-1920x1080-High-CloseTactical",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": 6.181274999999998
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 10.88875,
+      "visualReview": "pending",
+      "gpuMeanMs": 11.164709333333334,
+      "comparison": "exact-file-match",
+      "sameRuntime": false,
+      "key": "AmmunitionPlantProduction-1920x1080-High-NormalGameplay",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -0.3364375000000006
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 10.422075,
+      "visualReview": "pending",
+      "gpuMeanMs": 10.974245333333334,
+      "comparison": "exact-file-match",
+      "sameRuntime": false,
+      "key": "AmmunitionPlantProduction-1920x1080-High-Strategic",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -2.9193250000000006
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 3.3154899691358023E-07,
+        "ChangedPixels": 11,
+        "ChangedPixelFraction": 1.326195987654321E-06,
+        "WithinTolerance": false
+      },
+      "cpuMeanMs": 26.048787499999996,
+      "visualReview": "pending",
+      "gpuMeanMs": 33.80511466666666,
+      "comparison": "pixels-require-human-review",
+      "sameRuntime": false,
+      "key": "AmmunitionPlantProduction-3840x2160-High-CloseTactical",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": 3.553812499999996
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 3.014081790123457E-08,
+        "ChangedPixels": 1,
+        "ChangedPixelFraction": 1.2056327160493827E-07,
+        "WithinTolerance": false
+      },
+      "cpuMeanMs": 28.6829,
+      "visualReview": "pending",
+      "gpuMeanMs": 38.352074666666674,
+      "comparison": "pixels-require-human-review",
+      "sameRuntime": false,
+      "key": "AmmunitionPlantProduction-3840x2160-High-NormalGameplay",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": 5.428462499999998
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 22.498475000000003,
+      "visualReview": "pending",
+      "gpuMeanMs": 29.412858666666665,
+      "comparison": "exact-file-match",
+      "sameRuntime": false,
+      "key": "AmmunitionPlantProduction-3840x2160-High-Strategic",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": 0.15922500000000284
+    }
+  ],
+  "imageFailures": []
+}
