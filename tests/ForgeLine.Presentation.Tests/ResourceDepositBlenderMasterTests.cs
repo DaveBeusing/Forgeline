@@ -12,6 +12,37 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class ResourceDepositBlenderMasterTests
 {
+    [Fact]
+    public void ExistingTallSourceOnlyDepositsAndOtherWorldPropsKeepTheirTransforms()
+    {
+        var simulation = new SimulationCoordinator();
+        var snapshots = new PresentationSnapshotBuffer();
+        simulation.RegisterTickObserver(new PresentationExtractor(snapshots));
+        var source = new WorldTransform(new Vector3(7, 4, 9), Quaternion.Identity, new Vector3(24, 20, 24));
+        foreach (var identity in new[]
+        {
+            WorldPresentationIdentity.ForResource(ResourceIds.FerrousOre),
+            new WorldPresentationIdentity(WorldVisualId.PropRock, WorldPresentationKind.Prop)
+        })
+        {
+            EntityId entity = simulation.Entities.CreateEntity();
+            simulation.Entities.AddComponent(entity, source);
+            simulation.Entities.AddComponent(entity, new VisualIdentity(4000));
+            simulation.Entities.AddComponent(entity, identity);
+        }
+        simulation.AdvanceOneTick();
+        Assert.True(snapshots.TryReadLatest(out PresentationSnapshot snapshot));
+        Assert.Equal(2, snapshot.Instances.Length);
+        foreach (var instance in snapshot.Instances.ToArray())
+        {
+            Assert.Equal(source.Position, instance.Transform.Position);
+            Assert.Equal(source.Rotation, instance.Transform.Rotation);
+            Assert.Equal(source.Scale, instance.Transform.Scale);
+            Assert.Equal(source, simulation.Entities.GetComponent<WorldTransform>(instance.Entity));
+            Assert.False(simulation.Entities.HasComponent<ResourceDeposit>(instance.Entity));
+        }
+    }
+
     public static bool OverlayEnabled => Enabled && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_RESOURCE_RUNTIME_SEED"));
 
     [Fact(Skip = "Set qualified mineral exports and the complete canonical runtime seed.", SkipUnless = nameof(OverlayEnabled))]
