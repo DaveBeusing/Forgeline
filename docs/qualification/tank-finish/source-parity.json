@@ -1,0 +1,211 @@
+{
+  "after": {
+    "unit.directorate.main_battle_tank": {
+      "definition": "9f4dcbef59d466bcdae23238c0393a10f67c4c01cf5330cb7dd0a65eddeb3aec",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "a21c96d2671f8a30700ce7bdcd9e1254b8e3ec1d043a0aaffbcdf5bd7a12981a",
+            "POSITION": "6e50f5f26b5ef2af67aaa37a97d8a0eba82168b03160d50b81ec88495e0699dd",
+            "TEXCOORD_0": "97b72252946762768662ca8296ae89b0124a8a7778eddba154cd9b5d60707616"
+          },
+          "identity": "08d68ba096c6eeb1ec43dde2b3f726542ec1315e260256cdfe0e630d1b49b815"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.collision": {
+      "definition": "3a208efc97d0a760f39d82d361ce25fcab9c44981e6d4b55b95442129180bb96",
+      "primitives": [
+        {
+          "channels": {
+            "POSITION": "f5acd9785b05b4ecda9cbd7b31e025cd1c62de99fba8d216ffe39538dc52b94f"
+          },
+          "identity": "923e6fe9a35659969bbde2e40f37ecd474ee05a84166b91a2876668952b8f80b"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.critical": {
+      "definition": "a2baf6f98247f75a31c37bcff633d0f71728a0b3fbba24d51c74c0ae2face79e",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "d3f41d4de12d13963935ded06deac9d27926ec59ce34d6da9a72b86682b10a74",
+            "POSITION": "4de56a888877a2d2e8fb6771123d22ada0dd5ff1b1dfe1e265f91a7ad46df29f",
+            "TEXCOORD_0": "c77c246f34511238f3e105309237587d890906df5e8113a9b15445d038ecf8d2"
+          },
+          "identity": "2641ed87e38fda71d47b4692b34041e57166b4d8d94f24ed382b15dab8c374ee"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.damaged": {
+      "definition": "fcaa38e2867bc7abbdacbe49a915f6333e1b2c48114e8fc2a2aeb71190937a49",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "2e68733f17b4461702e86ef8452153b732ee82cbfbdb3175d331b6ba44c785ae",
+            "POSITION": "3b333873ab4c130e3ee7af9139338af685dbf21c2e2c3fd73cb00b1ea14226ab",
+            "TEXCOORD_0": "3576b0fec975f7207aef335c5d0baceb8d13174dc126a58b88a9501d84fa59c7"
+          },
+          "identity": "677e16760e5ed6bd97d4743d537a387bb4c1062c2fc9397fce6a2c8dbe430f22"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.lod1": {
+      "definition": "dae3376f0fc74332d873780aaceede2c5beb88df9d9929c94b4ae5d3e56120c2",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "ddb417d0050356ae3e8c764a46dfffa10ee7b3a976878c52426fa8e3db909028",
+            "POSITION": "04dfdfb9ce8d81d6020907345330a5f324525c607e51a580acf29eb0ec4256cc",
+            "TEXCOORD_0": "a33d1d5b889a1fd35635d1d3c4ec56ee33bc2bfd482467379f054c27831c360d"
+          },
+          "identity": "4ac2c89c02fe3c1931ee904471afef31a1d9f83b3113fa0bcc710c105651a623"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.lod2": {
+      "definition": "55a6ddf7828989aca2961376e467b7f5e80b82ae564b619b602a499d4d9d5a64",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "2840f095ef87081b287c48940c528edf7434a7ce3724bef5502a2c1725f5749c",
+            "POSITION": "b799f031ad40c49c38d3bb908aaa5593098064f2ce817cf01d5ba2a685a3046a",
+            "TEXCOORD_0": "df8486fb2de1d34587f46f6401c797c443e581d4036a36ba01c491a89f298da0"
+          },
+          "identity": "36f88d3ccf5f0f55934b4b10e0ee75fbd73814c50b7cb34220fff2571370326c"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.turret": {
+      "definition": "2bc637de935daf3410eec2b7befa49abe8fd5fa404fd2af493f7f0e74edc6f6d",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "b18fc6ccac074cc87f2ca8809a279e10564d852c7fdf14cd18916c1c2a797345",
+            "POSITION": "dcd16d169e48d27831540ea1c71e6150505b409170e9667982a5b65c6e9038e2",
+            "TEXCOORD_0": "e8a87380e070403aa3ee26794251bb4a66a5a3f296c1a9f5ee4193e6ea74b58d"
+          },
+          "identity": "6821aa97fd87a19253a11f60b5c0f584931a204b17ce6a25ef87ed80dd941c32"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.wreck": {
+      "definition": "3df670869bb3b1e0b92a534bddfc0e1f700cac0a85f375d4eadf4f06afe41e93",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "fb7f08fac35bc9287d6b402cb30cf3b8fd0bbaf5f6d4fdfada7eb9c058dfa2d7",
+            "POSITION": "a7302ea98ca6467449649295b5716f00bdcb444175e7c626bcb00ca17d47fa4b",
+            "TEXCOORD_0": "b41f1deb114effe922f74177c4a79a3f6b6d08ebc3e41d6b5242ee9eb0a51b61"
+          },
+          "identity": "fe2b84860516aa103faaf1100ac5b8c5d0b7ce59a288527cd2351231a5282848"
+        }
+      ]
+    }
+  },
+  "before": {
+    "unit.directorate.main_battle_tank": {
+      "definition": "9f4dcbef59d466bcdae23238c0393a10f67c4c01cf5330cb7dd0a65eddeb3aec",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "a21c96d2671f8a30700ce7bdcd9e1254b8e3ec1d043a0aaffbcdf5bd7a12981a",
+            "POSITION": "6e50f5f26b5ef2af67aaa37a97d8a0eba82168b03160d50b81ec88495e0699dd",
+            "TEXCOORD_0": "cf9c76777c06c997a3cee97676ffd05053e2c37893e34704144f0deeb567a0e9"
+          },
+          "identity": "08d68ba096c6eeb1ec43dde2b3f726542ec1315e260256cdfe0e630d1b49b815"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.collision": {
+      "definition": "3a208efc97d0a760f39d82d361ce25fcab9c44981e6d4b55b95442129180bb96",
+      "primitives": [
+        {
+          "channels": {
+            "POSITION": "f5acd9785b05b4ecda9cbd7b31e025cd1c62de99fba8d216ffe39538dc52b94f"
+          },
+          "identity": "923e6fe9a35659969bbde2e40f37ecd474ee05a84166b91a2876668952b8f80b"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.critical": {
+      "definition": "a2baf6f98247f75a31c37bcff633d0f71728a0b3fbba24d51c74c0ae2face79e",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "d3f41d4de12d13963935ded06deac9d27926ec59ce34d6da9a72b86682b10a74",
+            "POSITION": "4de56a888877a2d2e8fb6771123d22ada0dd5ff1b1dfe1e265f91a7ad46df29f",
+            "TEXCOORD_0": "c77c246f34511238f3e105309237587d890906df5e8113a9b15445d038ecf8d2"
+          },
+          "identity": "2641ed87e38fda71d47b4692b34041e57166b4d8d94f24ed382b15dab8c374ee"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.damaged": {
+      "definition": "fcaa38e2867bc7abbdacbe49a915f6333e1b2c48114e8fc2a2aeb71190937a49",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "2e68733f17b4461702e86ef8452153b732ee82cbfbdb3175d331b6ba44c785ae",
+            "POSITION": "3b333873ab4c130e3ee7af9139338af685dbf21c2e2c3fd73cb00b1ea14226ab",
+            "TEXCOORD_0": "3576b0fec975f7207aef335c5d0baceb8d13174dc126a58b88a9501d84fa59c7"
+          },
+          "identity": "677e16760e5ed6bd97d4743d537a387bb4c1062c2fc9397fce6a2c8dbe430f22"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.lod1": {
+      "definition": "dae3376f0fc74332d873780aaceede2c5beb88df9d9929c94b4ae5d3e56120c2",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "ddb417d0050356ae3e8c764a46dfffa10ee7b3a976878c52426fa8e3db909028",
+            "POSITION": "04dfdfb9ce8d81d6020907345330a5f324525c607e51a580acf29eb0ec4256cc",
+            "TEXCOORD_0": "d1f1f7dd19c1c8e6813aaf9533ccf7556b22a3fcd593c01575ba937a961881c8"
+          },
+          "identity": "4ac2c89c02fe3c1931ee904471afef31a1d9f83b3113fa0bcc710c105651a623"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.lod2": {
+      "definition": "55a6ddf7828989aca2961376e467b7f5e80b82ae564b619b602a499d4d9d5a64",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "2840f095ef87081b287c48940c528edf7434a7ce3724bef5502a2c1725f5749c",
+            "POSITION": "b799f031ad40c49c38d3bb908aaa5593098064f2ce817cf01d5ba2a685a3046a",
+            "TEXCOORD_0": "df8486fb2de1d34587f46f6401c797c443e581d4036a36ba01c491a89f298da0"
+          },
+          "identity": "36f88d3ccf5f0f55934b4b10e0ee75fbd73814c50b7cb34220fff2571370326c"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.turret": {
+      "definition": "2bc637de935daf3410eec2b7befa49abe8fd5fa404fd2af493f7f0e74edc6f6d",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "b18fc6ccac074cc87f2ca8809a279e10564d852c7fdf14cd18916c1c2a797345",
+            "POSITION": "dcd16d169e48d27831540ea1c71e6150505b409170e9667982a5b65c6e9038e2",
+            "TEXCOORD_0": "b14fc26bbb88fb47e47aad13f55178e0ee0d835923578ac5d99c15fbd03d00af"
+          },
+          "identity": "6821aa97fd87a19253a11f60b5c0f584931a204b17ce6a25ef87ed80dd941c32"
+        }
+      ]
+    },
+    "unit.directorate.main_battle_tank.wreck": {
+      "definition": "3df670869bb3b1e0b92a534bddfc0e1f700cac0a85f375d4eadf4f06afe41e93",
+      "primitives": [
+        {
+          "channels": {
+            "NORMAL": "fb7f08fac35bc9287d6b402cb30cf3b8fd0bbaf5f6d4fdfada7eb9c058dfa2d7",
+            "POSITION": "a7302ea98ca6467449649295b5716f00bdcb444175e7c626bcb00ca17d47fa4b",
+            "TEXCOORD_0": "b41f1deb114effe922f74177c4a79a3f6b6d08ebc3e41d6b5242ee9eb0a51b61"
+          },
+          "identity": "fe2b84860516aa103faaf1100ac5b8c5d0b7ce59a288527cd2351231a5282848"
+        }
+      ]
+    }
+  },
+  "success": true
+}

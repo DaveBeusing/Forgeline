@@ -1,0 +1,4461 @@
+{
+  "additionalDetailPairs": 1,
+  "archives": [
+    {
+      "file": "before-dark.json.gz",
+      "gzipSha256": "a0d213df172edd6b0d1fcea0b721bd12728f5fc3d63d99e0a10476d7e11e7887",
+      "sourceSha256": "059afd54a29a82992cd0072e634459f7e32415fa136ebac87be971820efe6082"
+    },
+    {
+      "file": "before-gallery.json.gz",
+      "gzipSha256": "1e36573553d5d46aa022138df82947481ba8c7bc5229a9f851adbe2ceff02386",
+      "sourceSha256": "9e1abd7d035a31f1b490795ffd8ff21c74eed285495457ecb0475b96fd66f954"
+    },
+    {
+      "file": "before-inspection-0.json.gz",
+      "gzipSha256": "5295e5124a2eb73702a5be6036be45b5450c58f573e431dbff6e3921bc7c2093",
+      "sourceSha256": "892c968d310b2008c191a12722f2408b96bd1672d26ec5eff038bdab8e289dcf"
+    },
+    {
+      "file": "before-inspection-180.json.gz",
+      "gzipSha256": "6321b3039eb4a29675939fce1f0bd7fb937b724d7538c02f17a7baba932d6b57",
+      "sourceSha256": "81455d564301e566c83b4a218ce280e2596312613feb1556db7fc20b11da0e24"
+    },
+    {
+      "file": "before-inspection-270.json.gz",
+      "gzipSha256": "77969dda63e323a93988fcd8f6da3fbe64cdc86cecd7e7e82eb752bf31d54f5f",
+      "sourceSha256": "e068330f9dc0b05d5afd1568b7f980ef7cc13217a62228170fad5edfa09f878c"
+    },
+    {
+      "file": "before-inspection-90.json.gz",
+      "gzipSha256": "016f723ea267cb7d67f75eb6c9bda7680567324771682df649496cf3635eae08",
+      "sourceSha256": "b1b590322f4989ed89b5c90d29951c29636971c4efcf8a4bc6376b09215813d5"
+    },
+    {
+      "file": "before-loads.json.gz",
+      "gzipSha256": "17a32d5e625ba7d5339c6f2de4dc20f02b25cfed8001eb14e2670b3ba1e32ce2",
+      "sourceSha256": "5af34934d5e924c59c8660abd59568f0cd333236d4511129436a49902e30bedc"
+    },
+    {
+      "file": "before-pose-1.55.json.gz",
+      "gzipSha256": "6c4c6abbcc4a9a5eb320f3b59d84bbda0c10bb9aab9e29965600118951679eca",
+      "sourceSha256": "5c0efaaa97f1c2ed2d9040132ca724e0955db6e91b2be3e4a9733f18751c10bb"
+    },
+    {
+      "file": "before-pose-1.6.json.gz",
+      "gzipSha256": "15f313cf7ef078c1676638135799cabcee23614278ae308697f66be80c57efb8",
+      "sourceSha256": "06be986d60df43817d0828b44467b4f29ccc060b1aa0eb4dbe24d4dbe5e6e2ee"
+    },
+    {
+      "file": "before-pose-1.72.json.gz",
+      "gzipSha256": "54e0a31cf868ae81c8b0c2c091726e5b155b12e3cc0d2b6e1a48e233dba0ca9b",
+      "sourceSha256": "7b33ee2b49517561cb284dc79c96d4a4c129d2a7739b4330d604ad05a01b693e"
+    },
+    {
+      "file": "before-pose-1.9.json.gz",
+      "gzipSha256": "ecf34f4dd3aa461c129efc15df65df1a839c216a590c68fd265ca4f330db5132",
+      "sourceSha256": "b94241f88c5cc34a25df61a1415883e99ad6a252620e1fabd9c4cc6426ae9c72"
+    },
+    {
+      "file": "before-sweep-CloseTactical.json.gz",
+      "gzipSha256": "b0943b248b43a2ba2aa496bbe569f78dff7c5cbe3d7cd5e18de42c730e966861",
+      "sourceSha256": "08386c0065dd478f410150dee46f1a866ebe1e2ff24f51038c112813762aa419"
+    },
+    {
+      "file": "before-sweep-NormalGameplay.json.gz",
+      "gzipSha256": "d67f9199abf890bb10d4880ed64efc6cca0ebb6d7a1675a4a81bcd4f685c14be",
+      "sourceSha256": "6d429754df241dbe4e427c7b0f0bd06d9e747febd3747a3712b21ed1465d675e"
+    },
+    {
+      "file": "before-wet.json.gz",
+      "gzipSha256": "11372c88b78d316bd670193684be0e856b595718f1f17cbe8ad1ffc1f91a434c",
+      "sourceSha256": "99125f3328b38acc22d4e69d703f8fbfd5e182cabb097a41b8bc9fc19eca72a4"
+    },
+    {
+      "file": "after-dark.json.gz",
+      "gzipSha256": "7abaee5ec2897e00edcaba1e727aefe6138595672a8cf494a13bda5c1a02590e",
+      "sourceSha256": "dbae7ffe2f9b8acf2d71c25de152ad9d10ca3312c66bada9c5f0b3e0e6944c0f"
+    },
+    {
+      "file": "after-gallery.json.gz",
+      "gzipSha256": "da6fca4b918b57fad9b691c3be8a3cd503bfbeca405f1ed6b86c1278b2a72a60",
+      "sourceSha256": "97fcdb4e465a0c1bb807c373d5927e16cd40d60aa9c93578c21258c6a3823f4a"
+    },
+    {
+      "file": "after-inspection-0.json.gz",
+      "gzipSha256": "1c3eab8e3ec4ad6f3c05bc61676e8e93701eefbb51396764650c36976f1093dd",
+      "sourceSha256": "222b1881b1f341e17537e640ad606b97c7b3d9a8cf492fdb54927e27f1581591"
+    },
+    {
+      "file": "after-inspection-180.json.gz",
+      "gzipSha256": "d466b8c094c4a34150440e00f208dea27eccf44145a351e61e34a60d1ad4d580",
+      "sourceSha256": "0d79c0faadc9ef89a369e2318797e37e7567467d529ffe5ab87865ebab1346de"
+    },
+    {
+      "file": "after-inspection-270.json.gz",
+      "gzipSha256": "c772b5ae532dc6f6d2f1bbcc1a136043ef44100696f33b26bbcdd2dd9514be91",
+      "sourceSha256": "cdc43608646a75e3f6ddf1290c1a5dff360aa727a2cf7170da2674fff2969f9e"
+    },
+    {
+      "file": "after-inspection-90.json.gz",
+      "gzipSha256": "ca42a9540587cd99f047c1155a678382f36e0d9b222aef0b93a376c054f51f91",
+      "sourceSha256": "9ca7f1f418f892764c5edce5e63e651bbf0d4eecf846cc3fb61de0a74f58e168"
+    },
+    {
+      "file": "after-loads.json.gz",
+      "gzipSha256": "af6e62f92d3f13fac714a29ac085d9538cc4cbb4093c65f2d7008801f4f4432d",
+      "sourceSha256": "e4e8dc41627d1c1a2fdedb8b76f24f628e2202dc7325a56e64b5a0ac7346a48b"
+    },
+    {
+      "file": "after-pose-1.55.json.gz",
+      "gzipSha256": "7939b031a0bd47b0ffdb448fc646e31027e9a5832591779caa8fd1e3b42000c4",
+      "sourceSha256": "01cb202eceb84c870376a67b22308e3ecdd282dae9de74a0c2e41151a6d16a35"
+    },
+    {
+      "file": "after-pose-1.6.json.gz",
+      "gzipSha256": "16cd94f799c3769f0b0104df5860a879263931fd354b521247beaf7fcae40c14",
+      "sourceSha256": "482f2595ce469da733bf19febc4a2f31cfe18133a1f0bb9d39b13060eaaed71f"
+    },
+    {
+      "file": "after-pose-1.72.json.gz",
+      "gzipSha256": "9b4e245ef4b6fc407adb25b9c95f72bd9262797f38485966887347fb9d25e193",
+      "sourceSha256": "b783c7ba9069fdbab8ed398a0966bd93d612bce0abb58e239a674294ea953f5c"
+    },
+    {
+      "file": "after-pose-1.9.json.gz",
+      "gzipSha256": "d0a051fe0d89556ae976008ac5e0cb0d2f4b3b63bccd75682d8b33a29a0edc02",
+      "sourceSha256": "9e49c3dc0aa17c220b942f119ec8c8aa7038583204e2cde3fba0071ef5b7faf7"
+    },
+    {
+      "file": "after-sweep-CloseTactical.json.gz",
+      "gzipSha256": "a0ad2c6061ae5366d05d20a46392d8b3a47a92e941a9ff24ed11dad611f21bf1",
+      "sourceSha256": "fc5163cc65967e6e089d3d61b1a07fb829491fdfbc6b97136341223cecef9b96"
+    },
+    {
+      "file": "after-sweep-NormalGameplay.json.gz",
+      "gzipSha256": "b2a74da3ddf13027381c33cb8b8e150fe2ea5df731fab728f25334da34133151",
+      "sourceSha256": "3de63dbb4aea4e9502432e018febc51cb3769633d3092e7f2058e880cf55da54"
+    },
+    {
+      "file": "after-wet.json.gz",
+      "gzipSha256": "124603837f31851843ed269d258649462bdf21bafbb4aa6e99466bb17d1f38a1",
+      "sourceSha256": "a8f6d7005f8ddfb7312f6a12dacb4a11e641dd2a703c804aac4695bd360a66ca"
+    },
+    {
+      "file": "master-assets.json.gz",
+      "gzipSha256": "4aa842205f4e9d1e00a43b3d6a692164722cf5f2e221d8b834df33b9d1b861c8",
+      "sourceSha256": "78e8e3ff1aee80bf6e1cf4c2de86efd52d505cc4fffb35cc7bc83cfe4b63a86e"
+    },
+    {
+      "file": "candidate-assets.json.gz",
+      "gzipSha256": "2257f0fff41bf6a8b032db4a8c3599b42c23dd97c9fbfd3fcc55a3b2fa298108",
+      "sourceSha256": "a4eb0d19b44f5edf0cba868ce143faf5082888bbc0f1f32a740ee04f3e451393"
+    },
+    {
+      "file": "before-detail.json.gz",
+      "gzipSha256": "5aaf817849a330919536e22a46f5eef8213ebb6e7a213dee3c17bc7c95ddf307",
+      "sourceSha256": "859f89a28ed8dc2706f49526eb9d8cf5b4b0387c5248ca0c122578d051373289"
+    },
+    {
+      "file": "after-detail.json.gz",
+      "gzipSha256": "21abdd27943e299a97eb3045fccca4a31c154c38a52af70b6ec4243fda6c3954",
+      "sourceSha256": "1c2060143b3e3cc38c79d3c54f7dfd011dbe0489cc587a87668427bb28edf9b3"
+    }
+  ],
+  "base": "a391a5bb0c0e25f079fa394613a5f84dfe7e9728",
+  "buildIdentity": "0.1.433-dev+92bff60f7f78f813a88c6d6a10bee47a89c9b3a9",
+  "casePairs": 41,
+  "cases": [
+    {
+      "afterImageSha256": "47375EB3FE37CB6C34B6A41F73E12C9625B6440F9D5273B68F319A917536217E",
+      "afterPixelSha256": "E5D5A7F236E69172F808622BA4D8DF4107C4ECBEECD1C2AC96C72073A94B61E4",
+      "beforeImageSha256": "173EE8F4F919E43EB901D8C6CF2F24E4ECAE16777B621603563AC266BEF3DAFD",
+      "beforePixelSha256": "4761539649056C2701F2144B9549D2BF0C9AE4F098FAC9547E342BDB6F64B3D9",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 391,
+        "clusterTests": 17,
+        "culledInstances": 508,
+        "drawCalls": 27,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 10,
+        "instanceBoundsTests": 122,
+        "lod1Instances": 0,
+        "lod2Instances": 1,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 13,
+        "runtimeMeshInstances": 104,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 104,
+        "totalInstances": 519,
+        "visibleInstances": 11,
+        "visibleVegetationInstances": 0
+      },
+      "key": "dark/MainBattleTankProduction-1920x1080-High-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 411254784,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140361728
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 86,
+        "peakLoadedTextureCount": 86,
+        "peakResidentTextureBytes": 44812076,
+        "peakShaderResourceDescriptorsUsed": 93,
+        "residentTextureBytes": 44812076,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 93,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 86
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 14.597028125000003,
+            "p50": 12.63,
+            "p95": 22.7651,
+            "p99": 22.8221,
+            "samples": 32
+          },
+          "before": {
+            "mean": 20.662121875,
+            "p50": 14.8086,
+            "p95": 52.6708,
+            "p99": 70.0311,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 8.936371692307695,
+            "p50": 9.179104,
+            "p95": 12.312416,
+            "p99": 12.403104,
+            "samples": 26
+          },
+          "before": {
+            "mean": 8.68830769230769,
+            "p50": 9.256384,
+            "p95": 12.034176,
+            "p99": 13.77328,
+            "samples": 26
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "9D42A5BE6696E93A3080E9487DF5923C17D5A757CA804D5F05C2016805ECC328",
+      "afterPixelSha256": "A4A113A6EF2F95185E4781AD6098DB9EB9B3C9FDA68338F1195A8D68C6085D00",
+      "beforeImageSha256": "A3C2B7C06B660AED40977DAF4680676859F27DB969FF5BFB3DEAFF621433F380",
+      "beforePixelSha256": "D64A5242F37A40019EC28957CCF2C97498C4BF69DE9DF941AFE1A2D14586C1A4",
+      "instances": {
+        "animatedVegetationInstances": 48,
+        "clusterCulledInstances": 263,
+        "clusterTests": 17,
+        "culledInstances": 422,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 18,
+        "instanceBoundsTests": 250,
+        "lod1Instances": 78,
+        "lod2Instances": 1,
+        "reducedLodInstances": 79,
+        "rejectedClusters": 9,
+        "runtimeMeshInstances": 99,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 99,
+        "totalInstances": 519,
+        "visibleInstances": 97,
+        "visibleVegetationInstances": 48
+      },
+      "key": "dark/MainBattleTankProduction-1920x1080-High-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 411254784,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140361728
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 86,
+        "peakLoadedTextureCount": 86,
+        "peakResidentTextureBytes": 44812076,
+        "peakShaderResourceDescriptorsUsed": 93,
+        "residentTextureBytes": 44812076,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 93,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 86,
+        "textureUploadCount": 172
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 12.976446874999997,
+            "p50": 9.5652,
+            "p95": 28.3929,
+            "p99": 28.9221,
+            "samples": 32
+          },
+          "before": {
+            "mean": 13.345318750000002,
+            "p50": 9.9204,
+            "p95": 28.2148,
+            "p99": 29.7909,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 9.374976000000002,
+            "p50": 9.863328,
+            "p95": 12.654528,
+            "p99": 12.98272,
+            "samples": 23
+          },
+          "before": {
+            "mean": 8.955399384615383,
+            "p50": 9.242336,
+            "p95": 12.850304,
+            "p99": 13.902528,
+            "samples": 26
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "A0AC96B8C0CBAABDC9C7CC231EC07EB7894C9456E3D39778AF52E737B505A105",
+      "afterPixelSha256": "587C3CCEB032CE68209F5ED2B0D070798F2E289E638463F9A953F229898FD117",
+      "beforeImageSha256": "CE0CB3695ED79BE530847B3B4020EDD483AD5A193073F5F9E8C69DFAE76C3FDD",
+      "beforePixelSha256": "98F9FCF035C616E0856D2F66D962F0CDD620C2C426DC9B3AF623E3594A92334C",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 391,
+        "clusterTests": 17,
+        "culledInstances": 508,
+        "drawCalls": 21,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 10,
+        "instanceBoundsTests": 122,
+        "lod1Instances": 0,
+        "lod2Instances": 1,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 13,
+        "runtimeMeshInstances": 96,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 96,
+        "totalInstances": 519,
+        "visibleInstances": 11,
+        "visibleVegetationInstances": 0
+      },
+      "key": "gallery/MainBattleTankProduction-1920x1080-Low-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 192581632,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 137650176
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 46,
+        "peakLoadedTextureCount": 46,
+        "peakResidentTextureBytes": 22469216,
+        "peakShaderResourceDescriptorsUsed": 53,
+        "residentTextureBytes": 22469216,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 53,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 46
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 14.128281250000004,
+            "p50": 14.7923,
+            "p95": 19.3491,
+            "p99": 19.4105,
+            "samples": 32
+          },
+          "before": {
+            "mean": 12.138231249999999,
+            "p50": 8.8997,
+            "p95": 28.7215,
+            "p99": 31.3024,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 5.246104275862069,
+            "p50": 5.509536,
+            "p95": 7.256384,
+            "p99": 7.778048,
+            "samples": 29
+          },
+          "before": {
+            "mean": 6.642266879999999,
+            "p50": 6.049376,
+            "p95": 9.046656,
+            "p99": 9.6448,
+            "samples": 25
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "FF03E28DF7E6BF158D609B687B5EB2F760AE73DFA5E34A81614B1936B06595CD",
+      "afterPixelSha256": "3A0B664074172E7265441CF92C67F6691E5F51DD6B51464BA52C21EA599FF601",
+      "beforeImageSha256": "0C353F4D916FD2F361600EE3339E4758E38F2389E32007FA80A9C173A5B944E8",
+      "beforePixelSha256": "BF232970C45D3EE7EA99A39DF3774465D7D43AE3532B3F2179FE19D504C2E335",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 263,
+        "clusterTests": 17,
+        "culledInstances": 422,
+        "drawCalls": 29,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 16,
+        "instanceBoundsTests": 250,
+        "lod1Instances": 80,
+        "lod2Instances": 1,
+        "reducedLodInstances": 81,
+        "rejectedClusters": 9,
+        "runtimeMeshInstances": 99,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 99,
+        "totalInstances": 519,
+        "visibleInstances": 97,
+        "visibleVegetationInstances": 48
+      },
+      "key": "gallery/MainBattleTankProduction-1920x1080-Low-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 193294336,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 139526144
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 52,
+        "peakLoadedTextureCount": 52,
+        "peakResidentTextureBytes": 22503536,
+        "peakShaderResourceDescriptorsUsed": 59,
+        "residentTextureBytes": 22503536,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 59,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 46,
+        "textureUploadCount": 98
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.9332,
+            "p50": 8.3084,
+            "p95": 28.3135,
+            "p99": 29.1592,
+            "samples": 32
+          },
+          "before": {
+            "mean": 11.68821875,
+            "p50": 8.3867,
+            "p95": 27.6162,
+            "p99": 28.2452,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 7.051735384615385,
+            "p50": 7.442528,
+            "p95": 9.070112,
+            "p99": 9.432096,
+            "samples": 26
+          },
+          "before": {
+            "mean": 7.569230666666667,
+            "p50": 8.265792,
+            "p95": 10.05488,
+            "p99": 10.06624,
+            "samples": 24
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "4BEFA5CDD6B2D18FDB62F9CBF41857FA96A4EF63D58FC9045353ACE58FA81EC4",
+      "afterPixelSha256": "4152B09B6933DDE25981917819CD66752E3BC72D892399D2732C773DC8565A5A",
+      "beforeImageSha256": "4BEFA5CDD6B2D18FDB62F9CBF41857FA96A4EF63D58FC9045353ACE58FA81EC4",
+      "beforePixelSha256": "4152B09B6933DDE25981917819CD66752E3BC72D892399D2732C773DC8565A5A",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 199,
+        "clusterTests": 17,
+        "culledInstances": 286,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 314,
+        "lod1Instances": 223,
+        "lod2Instances": 10,
+        "reducedLodInstances": 233,
+        "rejectedClusters": 7,
+        "runtimeMeshInstances": 233,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 233,
+        "totalInstances": 519,
+        "visibleInstances": 233,
+        "visibleVegetationInstances": 142
+      },
+      "key": "gallery/MainBattleTankProduction-1920x1080-Low-Strategic",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 196382720,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 139563008
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": true,
+      "resources": {
+        "loadedTextureCount": 78,
+        "peakLoadedTextureCount": 78,
+        "peakResidentTextureBytes": 22652256,
+        "peakShaderResourceDescriptorsUsed": 85,
+        "residentTextureBytes": 22652256,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 85,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 98,
+        "textureUploadCount": 176
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.161771875,
+            "p50": 8.8098,
+            "p95": 26.7358,
+            "p99": 27.9542,
+            "samples": 32
+          },
+          "before": {
+            "mean": 21.679184375000002,
+            "p50": 11.0266,
+            "p95": 80.3767,
+            "p99": 81.7988,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.387467733333332,
+            "p50": 6.706432,
+            "p95": 8.860704,
+            "p99": 10.533056,
+            "samples": 30
+          },
+          "before": {
+            "mean": 7.936004266666667,
+            "p50": 8.1608,
+            "p95": 11.732992,
+            "p99": 12.703232,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "54FEFF210DA29DDB44E0B0FBCDCE2DEE6A98FF537FD9364DEF702CAE7AC04B4D",
+      "afterPixelSha256": "034FD2886792A6259EBCA12D0F6D62B72628634C307D5D4E0CDD66D600A34870",
+      "beforeImageSha256": "9824473F8E7AF40AAABF7E0ABEB39802E945D8613C73F8EDF3004C96B3394DB8",
+      "beforePixelSha256": "213096780952D99BDEE019555F19AEE6E7E823BFDAAEB52F4AD473242EACBC6D",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 391,
+        "clusterTests": 17,
+        "culledInstances": 508,
+        "drawCalls": 27,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 10,
+        "instanceBoundsTests": 122,
+        "lod1Instances": 0,
+        "lod2Instances": 1,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 13,
+        "runtimeMeshInstances": 104,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 104,
+        "totalInstances": 519,
+        "visibleInstances": 11,
+        "visibleVegetationInstances": 0
+      },
+      "key": "gallery/MainBattleTankProduction-1920x1080-Medium-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 248745984,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 139968512
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 62,
+        "peakLoadedTextureCount": 78,
+        "peakResidentTextureBytes": 44674796,
+        "peakShaderResourceDescriptorsUsed": 85,
+        "residentTextureBytes": 44674796,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 69,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 176,
+        "textureUploadCount": 238
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.351215625,
+            "p50": 10.414,
+            "p95": 20.891,
+            "p99": 24.7377,
+            "samples": 32
+          },
+          "before": {
+            "mean": 12.09848125,
+            "p50": 10.3051,
+            "p95": 25.6624,
+            "p99": 26.8283,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 8.7074464,
+            "p50": 8.81936,
+            "p95": 11.321408,
+            "p99": 12.227264,
+            "samples": 30
+          },
+          "before": {
+            "mean": 8.467300266666669,
+            "p50": 8.821088,
+            "p95": 12.05824,
+            "p99": 12.285728,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "9A62989C9E52631CBDA6C6AC8231CDF23FD0EC2E7B17503A9DD8DE73FE4DBD01",
+      "afterPixelSha256": "304421F23D07516FF8897C0975058CDACE09FF09E0E43D37900D92A1D510DE75",
+      "beforeImageSha256": "990475AE9481BFECC4E117D1C416BAD05EFCD7398A8889262CFF523280BF3B7D",
+      "beforePixelSha256": "0C436BDF72559CFB68B1C56D8007EFD8F49CC96A3EA234D83235D81E8FB88F86",
+      "instances": {
+        "animatedVegetationInstances": 48,
+        "clusterCulledInstances": 263,
+        "clusterTests": 17,
+        "culledInstances": 422,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 18,
+        "instanceBoundsTests": 250,
+        "lod1Instances": 78,
+        "lod2Instances": 1,
+        "reducedLodInstances": 79,
+        "rejectedClusters": 9,
+        "runtimeMeshInstances": 99,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 99,
+        "totalInstances": 519,
+        "visibleInstances": 97,
+        "visibleVegetationInstances": 48
+      },
+      "key": "gallery/MainBattleTankProduction-1920x1080-Medium-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 248745984,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 139882496
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 62,
+        "peakLoadedTextureCount": 78,
+        "peakResidentTextureBytes": 44674796,
+        "peakShaderResourceDescriptorsUsed": 85,
+        "residentTextureBytes": 44674796,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 69,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 238,
+        "textureUploadCount": 300
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.805321874999999,
+            "p50": 11.8351,
+            "p95": 22.214,
+            "p99": 23.2015,
+            "samples": 32
+          },
+          "before": {
+            "mean": 10.522368750000004,
+            "p50": 10.4261,
+            "p95": 20.2729,
+            "p99": 24.081,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 8.859127466666669,
+            "p50": 8.869568,
+            "p95": 11.531232,
+            "p99": 12.12624,
+            "samples": 30
+          },
+          "before": {
+            "mean": 8.056149333333332,
+            "p50": 8.014912,
+            "p95": 11.30704,
+            "p99": 11.386048,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "483510896C93D177FA19F5A5826C4210FBA9E85F75FDBFD4B7A50409D111936B",
+      "afterPixelSha256": "FB628A7568F591B2FC6CAB2F866BD78D44C3459A71C14C39492702823A602281",
+      "beforeImageSha256": "483510896C93D177FA19F5A5826C4210FBA9E85F75FDBFD4B7A50409D111936B",
+      "beforePixelSha256": "FB628A7568F591B2FC6CAB2F866BD78D44C3459A71C14C39492702823A602281",
+      "instances": {
+        "animatedVegetationInstances": 49,
+        "clusterCulledInstances": 199,
+        "clusterTests": 17,
+        "culledInstances": 286,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 314,
+        "lod1Instances": 223,
+        "lod2Instances": 10,
+        "reducedLodInstances": 233,
+        "rejectedClusters": 7,
+        "runtimeMeshInstances": 233,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 233,
+        "totalInstances": 519,
+        "visibleInstances": 233,
+        "visibleVegetationInstances": 142
+      },
+      "key": "gallery/MainBattleTankProduction-1920x1080-Medium-Strategic",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 250765312,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 139919360
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": true,
+      "resources": {
+        "loadedTextureCount": 79,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 44772036,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "residentTextureBytes": 44772036,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 86,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 300,
+        "textureUploadCount": 379
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 24.984837500000005,
+            "p50": 13.7582,
+            "p95": 53.5511,
+            "p99": 56.8834,
+            "samples": 32
+          },
+          "before": {
+            "mean": 29.797175000000003,
+            "p50": 13.798,
+            "p95": 88.049,
+            "p99": 93.115,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 10.640620799999999,
+            "p50": 10.902592,
+            "p95": 13.048,
+            "p99": 13.099424,
+            "samples": 30
+          },
+          "before": {
+            "mean": 11.560975999999998,
+            "p50": 11.623488,
+            "p95": 14.36512,
+            "p99": 14.424832,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "CEFBB08C71DC3DF3CA79369516900DFC3FC7902FF793B4047BA3317D51C3F1A5",
+      "afterPixelSha256": "5ED6D8A24F3542C74E3BA5BF8B15FEC9DE05CF6D65289D6B29672AC25AF1F13D",
+      "beforeImageSha256": "132CC6AF83CEEEDCCE46821A405C9763A99CA45F30B21DED32F69C0800FCFD46",
+      "beforePixelSha256": "44098E838FEBBD7E20D37AB9B510C3FA2A38AF1C1C02D004E7162C5ABB0FD4A4",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 391,
+        "clusterTests": 17,
+        "culledInstances": 508,
+        "drawCalls": 27,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 10,
+        "instanceBoundsTests": 122,
+        "lod1Instances": 0,
+        "lod2Instances": 1,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 13,
+        "runtimeMeshInstances": 104,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 104,
+        "totalInstances": 519,
+        "visibleInstances": 11,
+        "visibleVegetationInstances": 0
+      },
+      "key": "gallery/MainBattleTankProduction-1920x1080-High-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 403763200,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140361728
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 44772036,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 379,
+        "textureUploadCount": 456
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.981946874999998,
+            "p50": 12.4679,
+            "p95": 22.5737,
+            "p99": 23.2592,
+            "samples": 32
+          },
+          "before": {
+            "mean": 28.095990625000006,
+            "p50": 14.0996,
+            "p95": 138.7906,
+            "p99": 181.8033,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 8.934555733333333,
+            "p50": 10.075584,
+            "p95": 11.849632,
+            "p99": 12.27808,
+            "samples": 30
+          },
+          "before": {
+            "mean": 11.151106133333336,
+            "p50": 11.773248,
+            "p95": 16.721152,
+            "p99": 16.891136,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "8B8E3F086A7BDC173AFBDCC8E30CC339C5578526FE9911166700448093C23F63",
+      "afterPixelSha256": "E3BD26627707833C9AAF8B50CCC5FC6C11B376C7A30B770321075B07896578C5",
+      "beforeImageSha256": "5C38A87A4601DF860515198EC0905BB97EE7F500CE0DDE705A3B48A9388F54BA",
+      "beforePixelSha256": "D56D33F0F0DC86562EE8D3ACA346E664FAEF298A8B7BC36D85EB0633870F2BB8",
+      "instances": {
+        "animatedVegetationInstances": 48,
+        "clusterCulledInstances": 263,
+        "clusterTests": 17,
+        "culledInstances": 422,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 18,
+        "instanceBoundsTests": 250,
+        "lod1Instances": 78,
+        "lod2Instances": 1,
+        "reducedLodInstances": 79,
+        "rejectedClusters": 9,
+        "runtimeMeshInstances": 99,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 99,
+        "totalInstances": 519,
+        "visibleInstances": 97,
+        "visibleVegetationInstances": 48
+      },
+      "key": "gallery/MainBattleTankProduction-1920x1080-High-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 403763200,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 144470016
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 44772036,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 456,
+        "textureUploadCount": 533
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 14.073159375,
+            "p50": 12.3724,
+            "p95": 29.3823,
+            "p99": 31.9034,
+            "samples": 32
+          },
+          "before": {
+            "mean": 12.928465624999998,
+            "p50": 13.3186,
+            "p95": 25.554,
+            "p99": 27.8179,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 8.582630400000001,
+            "p50": 8.945504,
+            "p95": 11.93376,
+            "p99": 12.501184,
+            "samples": 30
+          },
+          "before": {
+            "mean": 9.298641066666667,
+            "p50": 9.698144,
+            "p95": 12.445024,
+            "p99": 12.917216,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "1A2BEA15062FF4DB47C1860BC1ACBD024D929009C5685A088D508D111C64DF92",
+      "afterPixelSha256": "25CC16A1F8EBA7177E04336A53D7E878E7DB3F50C5778A52CEAEF7675CFA720C",
+      "beforeImageSha256": "1A2BEA15062FF4DB47C1860BC1ACBD024D929009C5685A088D508D111C64DF92",
+      "beforePixelSha256": "25CC16A1F8EBA7177E04336A53D7E878E7DB3F50C5778A52CEAEF7675CFA720C",
+      "instances": {
+        "animatedVegetationInstances": 49,
+        "clusterCulledInstances": 199,
+        "clusterTests": 17,
+        "culledInstances": 286,
+        "drawCalls": 29,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 3,
+        "instanceBoundsTests": 314,
+        "lod1Instances": 220,
+        "lod2Instances": 10,
+        "reducedLodInstances": 230,
+        "rejectedClusters": 7,
+        "runtimeMeshInstances": 233,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 233,
+        "totalInstances": 519,
+        "visibleInstances": 233,
+        "visibleVegetationInstances": 142
+      },
+      "key": "gallery/MainBattleTankProduction-1920x1080-High-Strategic",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 404238336,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 144506880
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": true,
+      "resources": {
+        "loadedTextureCount": 81,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44783476,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 88,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 533,
+        "textureUploadCount": 614
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.69710625,
+            "p50": 12.8903,
+            "p95": 20.9916,
+            "p99": 21.5857,
+            "samples": 32
+          },
+          "before": {
+            "mean": 25.764821875000006,
+            "p50": 14.3392,
+            "p95": 67.5323,
+            "p99": 68.0674,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 9.839035733333334,
+            "p50": 10.174432,
+            "p95": 14.035456,
+            "p99": 15.591136,
+            "samples": 30
+          },
+          "before": {
+            "mean": 11.085487304347827,
+            "p50": 12.11328,
+            "p95": 16.498464,
+            "p99": 17.475872,
+            "samples": 23
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "A690B82BF9A6ECEFD428F56C86FAA892750D869ABBD2AEC8E4B4C1046FD462A8",
+      "afterPixelSha256": "FD5360AD908EF6EC8268CA776E96991E41E4E99CA38FB339C2A530081377A541",
+      "beforeImageSha256": "A6F48965DF88851AE0ED93879AA0D60F54C10F6789EDD5D554DDEA7EF8FD351D",
+      "beforePixelSha256": "BB44A2A1918F44638323D57EB4D1FF200CEC7BC98DB6237B7B55887FE5F13220",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 391,
+        "clusterTests": 17,
+        "culledInstances": 508,
+        "drawCalls": 21,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 10,
+        "instanceBoundsTests": 122,
+        "lod1Instances": 0,
+        "lod2Instances": 1,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 13,
+        "runtimeMeshInstances": 96,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 96,
+        "totalInstances": 519,
+        "visibleInstances": 11,
+        "visibleVegetationInstances": 0
+      },
+      "key": "gallery/MainBattleTankProduction-3840x2160-Low-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 530747392,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 218411008
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 46,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 22469216,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 53,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 614,
+        "textureUploadCount": 660
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 25.209346875,
+            "p50": 23.6429,
+            "p95": 40.3577,
+            "p99": 41.8295,
+            "samples": 32
+          },
+          "before": {
+            "mean": 24.350640625000004,
+            "p50": 21.3907,
+            "p95": 38.9098,
+            "p99": 43.6779,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 17.596911999999996,
+            "p50": 17.38864,
+            "p95": 20.935328,
+            "p99": 21.554624,
+            "samples": 30
+          },
+          "before": {
+            "mean": 14.648467199999999,
+            "p50": 14.33936,
+            "p95": 19.10656,
+            "p99": 19.127936,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "6C3868944C276EE08042A790C343AD7EE30422A772091B346288920F845B25C3",
+      "afterPixelSha256": "6D504BD2E725D1ED6E82F60DC9775633693897CB903C85820C2E9284E75EC995",
+      "beforeImageSha256": "4044899F0B6122A7B83AC3D4DC15D02C15418FF5455B511F0067681DAFD8A524",
+      "beforePixelSha256": "A23D48C27BFBAC184EF1FD801E4F1AA40C46855C5795AA63D4176903EB5C1072",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 263,
+        "clusterTests": 17,
+        "culledInstances": 422,
+        "drawCalls": 29,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 16,
+        "instanceBoundsTests": 250,
+        "lod1Instances": 80,
+        "lod2Instances": 1,
+        "reducedLodInstances": 81,
+        "rejectedClusters": 9,
+        "runtimeMeshInstances": 99,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 99,
+        "totalInstances": 519,
+        "visibleInstances": 97,
+        "visibleVegetationInstances": 48
+      },
+      "key": "gallery/MainBattleTankProduction-3840x2160-Low-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 531460096,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 218386432
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 52,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 22503536,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 59,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 660,
+        "textureUploadCount": 712
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 25.036078125000003,
+            "p50": 24.4821,
+            "p95": 37.6516,
+            "p99": 39.1882,
+            "samples": 32
+          },
+          "before": {
+            "mean": 25.031271875000005,
+            "p50": 24.2318,
+            "p95": 38.3234,
+            "p99": 38.574,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 21.683197866666667,
+            "p50": 21.536416,
+            "p95": 24.005792,
+            "p99": 24.491904,
+            "samples": 30
+          },
+          "before": {
+            "mean": 21.333122133333337,
+            "p50": 20.662144,
+            "p95": 25.6136,
+            "p99": 25.859008,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "1669554180A4EA8DBE699B7DD1DF59FA59FBD1F42A064A4D5E0C2D5DCFE36042",
+      "afterPixelSha256": "4B6D7B5D2595475B6F800B63F1FFC363B0A1C85EF33A5E50C509086C126CD5D3",
+      "beforeImageSha256": "1669554180A4EA8DBE699B7DD1DF59FA59FBD1F42A064A4D5E0C2D5DCFE36042",
+      "beforePixelSha256": "4B6D7B5D2595475B6F800B63F1FFC363B0A1C85EF33A5E50C509086C126CD5D3",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 199,
+        "clusterTests": 17,
+        "culledInstances": 286,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 314,
+        "lod1Instances": 223,
+        "lod2Instances": 10,
+        "reducedLodInstances": 233,
+        "rejectedClusters": 7,
+        "runtimeMeshInstances": 233,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 233,
+        "totalInstances": 519,
+        "visibleInstances": 233,
+        "visibleVegetationInstances": 142
+      },
+      "key": "gallery/MainBattleTankProduction-3840x2160-Low-Strategic",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 534548480,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 218423296
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": true,
+      "resources": {
+        "loadedTextureCount": 78,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 22652256,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 85,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 712,
+        "textureUploadCount": 790
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 33.190628124999996,
+            "p50": 25.9573,
+            "p95": 66.4494,
+            "p99": 66.974,
+            "samples": 32
+          },
+          "before": {
+            "mean": 24.165815625,
+            "p50": 22.4221,
+            "p95": 38.0993,
+            "p99": 40.1664,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 18.279329066666666,
+            "p50": 18.08992,
+            "p95": 21.187968,
+            "p99": 23.394016,
+            "samples": 30
+          },
+          "before": {
+            "mean": 17.86232,
+            "p50": 17.226688,
+            "p95": 21.19776,
+            "p99": 22.449184,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "AAF5B52483A06C3BBEEEC9B00E0F8F90BDBF4CAF1CE56F17F381F1BCC35B6D78",
+      "afterPixelSha256": "F88EBF36FA806E3C1D502AE8CF3410356CE5DA2A521B2D1E77C68592B709656F",
+      "beforeImageSha256": "6FC43FCA76718B2D88D0DB6A2F3CF7D3375E5F73AC33985949D93743F117D5EB",
+      "beforePixelSha256": "E0EC1D557BDA76DF09EE98C553297038EE0E351A8FB128AC2DC5AAA53D7F63D5",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 391,
+        "clusterTests": 17,
+        "culledInstances": 508,
+        "drawCalls": 27,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 10,
+        "instanceBoundsTests": 122,
+        "lod1Instances": 0,
+        "lod2Instances": 1,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 13,
+        "runtimeMeshInstances": 104,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 104,
+        "totalInstances": 519,
+        "visibleInstances": 11,
+        "visibleVegetationInstances": 0
+      },
+      "key": "gallery/MainBattleTankProduction-3840x2160-Medium-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 577081344,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 218828800
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 62,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44674796,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 69,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 790,
+        "textureUploadCount": 852
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 30.30155625,
+            "p50": 30.6077,
+            "p95": 39.576,
+            "p99": 40.857,
+            "samples": 32
+          },
+          "before": {
+            "mean": 29.79090937500001,
+            "p50": 30.3251,
+            "p95": 41.4601,
+            "p99": 42.3762,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 26.682846933333334,
+            "p50": 26.135936,
+            "p95": 28.900448,
+            "p99": 28.977728,
+            "samples": 30
+          },
+          "before": {
+            "mean": 26.839079466666668,
+            "p50": 26.23024,
+            "p95": 29.66848,
+            "p99": 30.005312,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "B5BF44173622B634ADDC76CBA265AADE70BAB8423C9906C7090F1377A9D1C88F",
+      "afterPixelSha256": "D62514EF4E03E640C7AFD0FCF023C94CB22475BF87B9DEAB966F2032BB30260C",
+      "beforeImageSha256": "90A8384FD306E65A51CC287D07619971C53A997D1E84A2BB1196BCD456BE3ADA",
+      "beforePixelSha256": "14DA0D4AF938EB20EDDE58581F5F5D11B81480D7BCDEEAAD7982951EA3CEE4DE",
+      "instances": {
+        "animatedVegetationInstances": 48,
+        "clusterCulledInstances": 263,
+        "clusterTests": 17,
+        "culledInstances": 422,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 18,
+        "instanceBoundsTests": 250,
+        "lod1Instances": 78,
+        "lod2Instances": 1,
+        "reducedLodInstances": 79,
+        "rejectedClusters": 9,
+        "runtimeMeshInstances": 99,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 99,
+        "totalInstances": 519,
+        "visibleInstances": 97,
+        "visibleVegetationInstances": 48
+      },
+      "key": "gallery/MainBattleTankProduction-3840x2160-Medium-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 577081344,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 218742784
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 62,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44674796,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 69,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 852,
+        "textureUploadCount": 914
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 37.09182187499999,
+            "p50": 37.2157,
+            "p95": 60.3779,
+            "p99": 75.0475,
+            "samples": 32
+          },
+          "before": {
+            "mean": 32.518393749999994,
+            "p50": 35.0612,
+            "p95": 42.8496,
+            "p99": 44.185,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 34.82337173333333,
+            "p50": 34.405888,
+            "p95": 37.59456,
+            "p99": 37.684608,
+            "samples": 30
+          },
+          "before": {
+            "mean": 34.87647253333333,
+            "p50": 35.130272,
+            "p95": 36.787712,
+            "p99": 37.186496,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "4F09E8A5A0E171B19E6DA4C5DB6805F571CB57EFDE5BD86EC064F1BE8BBFD8F8",
+      "afterPixelSha256": "4BE3BD07CA2DC298F6157EAE11FC07361A0C0C1295C498C2E269AA3AD8CBD538",
+      "beforeImageSha256": "4F09E8A5A0E171B19E6DA4C5DB6805F571CB57EFDE5BD86EC064F1BE8BBFD8F8",
+      "beforePixelSha256": "4BE3BD07CA2DC298F6157EAE11FC07361A0C0C1295C498C2E269AA3AD8CBD538",
+      "instances": {
+        "animatedVegetationInstances": 49,
+        "clusterCulledInstances": 199,
+        "clusterTests": 17,
+        "culledInstances": 286,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 314,
+        "lod1Instances": 223,
+        "lod2Instances": 10,
+        "reducedLodInstances": 233,
+        "rejectedClusters": 7,
+        "runtimeMeshInstances": 233,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 233,
+        "totalInstances": 519,
+        "visibleInstances": 233,
+        "visibleVegetationInstances": 142
+      },
+      "key": "gallery/MainBattleTankProduction-3840x2160-Medium-Strategic",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 579100672,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 218779648
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": true,
+      "resources": {
+        "loadedTextureCount": 79,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44772036,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 86,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 914,
+        "textureUploadCount": 993
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 29.930621875000003,
+            "p50": 29.3312,
+            "p95": 43.7149,
+            "p99": 45.0584,
+            "samples": 32
+          },
+          "before": {
+            "mean": 30.751487499999996,
+            "p50": 30.2012,
+            "p95": 40.9442,
+            "p99": 45.4224,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 27.808272,
+            "p50": 27.788704,
+            "p95": 30.250368,
+            "p99": 32.207904,
+            "samples": 30
+          },
+          "before": {
+            "mean": 27.647912533333336,
+            "p50": 27.268864,
+            "p95": 30.305728,
+            "p99": 30.771872,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "6E790DA451518FF8E8D329506B321FB03BD762C0ABA066BADDD132839E0C0243",
+      "afterPixelSha256": "5AFFF0083C950D063B146484F2BDAD0971FCD932C89BE7B71A06B7CE63C47C29",
+      "beforeImageSha256": "E71DDC0762568D47CF3786CF6D127D438A8D74BE719244C28C036286E48727D5",
+      "beforePixelSha256": "D6C08DB4080232C47B13FBE1C2D987516FBDB7EF2CBC14A33989F3D6E6BE0CED",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 391,
+        "clusterTests": 17,
+        "culledInstances": 508,
+        "drawCalls": 27,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 10,
+        "instanceBoundsTests": 122,
+        "lod1Instances": 0,
+        "lod2Instances": 1,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 13,
+        "runtimeMeshInstances": 104,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 104,
+        "totalInstances": 519,
+        "visibleInstances": 11,
+        "visibleVegetationInstances": 0
+      },
+      "key": "gallery/MainBattleTankProduction-3840x2160-High-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 732098560,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 219222016
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 993,
+        "textureUploadCount": 1070
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 33.358509375,
+            "p50": 33.0983,
+            "p95": 52.1596,
+            "p99": 63.936,
+            "samples": 32
+          },
+          "before": {
+            "mean": 30.63124375,
+            "p50": 31.1549,
+            "p95": 40.8069,
+            "p99": 41.6848,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 29.676660266666666,
+            "p50": 29.71856,
+            "p95": 33.448096,
+            "p99": 34.150048,
+            "samples": 30
+          },
+          "before": {
+            "mean": 28.287096533333333,
+            "p50": 28.67088,
+            "p95": 30.17008,
+            "p99": 30.580928,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "A3234666135CFC1897329CC0D3CA05D5263EA1C99DB176B74BC1B28251288A7B",
+      "afterPixelSha256": "11616D93143DD0A8364C1E09CE505A8526F74A2A6679979953A278E6AB0630F6",
+      "beforeImageSha256": "70B613FCFB4C4DAE9F528F0BE353B03704876D3C3AA93375C9B3189660AD8B18",
+      "beforePixelSha256": "50F1B0C6C537D91DB946C7D931859CE938F0965CAABD0D35BA9677005E1854B4",
+      "instances": {
+        "animatedVegetationInstances": 48,
+        "clusterCulledInstances": 263,
+        "clusterTests": 17,
+        "culledInstances": 422,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 18,
+        "instanceBoundsTests": 250,
+        "lod1Instances": 78,
+        "lod2Instances": 1,
+        "reducedLodInstances": 79,
+        "rejectedClusters": 9,
+        "runtimeMeshInstances": 99,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 99,
+        "totalInstances": 519,
+        "visibleInstances": 97,
+        "visibleVegetationInstances": 48
+      },
+      "key": "gallery/MainBattleTankProduction-3840x2160-High-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 733212672,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 220184576
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 1070,
+        "textureUploadCount": 1147
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 32.210440625,
+            "p50": 34.9811,
+            "p95": 38.9043,
+            "p99": 40.4445,
+            "samples": 32
+          },
+          "before": {
+            "mean": 32.2905875,
+            "p50": 35.3177,
+            "p95": 38.0471,
+            "p99": 42.7084,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 35.109506133333326,
+            "p50": 35.087392,
+            "p95": 36.869504,
+            "p99": 37.613248,
+            "samples": 30
+          },
+          "before": {
+            "mean": 34.94538026666666,
+            "p50": 34.940096,
+            "p95": 37.717056,
+            "p99": 38.031904,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "C7A278063FBB80C6B0FB6BBD48E20CFB070F24E7C14864FDC7AC6776816ECF3D",
+      "afterPixelSha256": "6E011860DB1E39CB6C8A7A250EC33EBE1EC48856DF6E2F1EA3AD1B1E05522D64",
+      "beforeImageSha256": "C7A278063FBB80C6B0FB6BBD48E20CFB070F24E7C14864FDC7AC6776816ECF3D",
+      "beforePixelSha256": "6E011860DB1E39CB6C8A7A250EC33EBE1EC48856DF6E2F1EA3AD1B1E05522D64",
+      "instances": {
+        "animatedVegetationInstances": 49,
+        "clusterCulledInstances": 199,
+        "clusterTests": 17,
+        "culledInstances": 286,
+        "drawCalls": 29,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 3,
+        "instanceBoundsTests": 314,
+        "lod1Instances": 220,
+        "lod2Instances": 10,
+        "reducedLodInstances": 230,
+        "rejectedClusters": 7,
+        "runtimeMeshInstances": 233,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 233,
+        "totalInstances": 519,
+        "visibleInstances": 233,
+        "visibleVegetationInstances": 142
+      },
+      "key": "gallery/MainBattleTankProduction-3840x2160-High-Strategic",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 733687808,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 220221440
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": true,
+      "resources": {
+        "loadedTextureCount": 81,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44783476,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 88,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 1147,
+        "textureUploadCount": 1228
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 35.284371875000005,
+            "p50": 35.5899,
+            "p95": 53.2908,
+            "p99": 57.5556,
+            "samples": 32
+          },
+          "before": {
+            "mean": 30.67935625,
+            "p50": 31.9113,
+            "p95": 42.247,
+            "p99": 43.051,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 32.77462506666667,
+            "p50": 33.25264,
+            "p95": 36.089504,
+            "p99": 36.113696,
+            "samples": 30
+          },
+          "before": {
+            "mean": 30.625988266666674,
+            "p50": 30.614368,
+            "p95": 34.3,
+            "p99": 34.698208,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "1D7069CA29D8B5AAE6A71C04800B24C895BAE21D982F5721D2B804A834A7E057",
+      "afterPixelSha256": "658A706C4C0E21D0192606DDDC9C5FFBDDDB7360269480260712B4BEE1C4C43E",
+      "beforeImageSha256": "6C10E6F740695FCB5499513AA8933CD44DE6D47A8241B43658F0CB1BBC38ED6D",
+      "beforePixelSha256": "12EF273D92710948FFDC87AD3A102321F76C95BE22C80C980D6C426F4766A66C",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "inspection-0/MainBattleTankSingle-1920x1080-High-CloseTactical-Yaw0-Inspection30",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.8047,
+            "p50": 8.4133,
+            "p95": 31.301,
+            "p99": 31.3588,
+            "samples": 32
+          },
+          "before": {
+            "mean": 16.952103125,
+            "p50": 10.1059,
+            "p95": 43.2325,
+            "p99": 50.1868,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 5.743671172413792,
+            "p50": 4.034592,
+            "p95": 9.740096,
+            "p99": 9.779904,
+            "samples": 29
+          },
+          "before": {
+            "mean": 7.232980266666667,
+            "p50": 7.887328,
+            "p95": 9.455072,
+            "p99": 12.402176,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "2D3B799C0C1C3ACF795859E705796A3218FE81BE0E4919079D729EE6E214ECB3",
+      "afterPixelSha256": "FCF0E719413A6560A28FC46DA360475E69BF8524D81A8E2C712B996C54C8548F",
+      "beforeImageSha256": "080C2B06C90D1172357B80E83DFABA66DFC024E2F9BBF8411C29E70CA3FBA1A1",
+      "beforePixelSha256": "A96C3528687CC2BC2768B62FB93EF18267A2A12E3A251F3406A0ACA9FA29D8F9",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "inspection-180/MainBattleTankSingle-1920x1080-High-CloseTactical-Yaw180-Inspection30",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.2025375,
+            "p50": 9.8742,
+            "p95": 26.5175,
+            "p99": 28.7905,
+            "samples": 32
+          },
+          "before": {
+            "mean": 10.6211,
+            "p50": 7.8753,
+            "p95": 28.223,
+            "p99": 28.6886,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.5406035862068945,
+            "p50": 7.293568,
+            "p95": 8.957952,
+            "p99": 9.479008,
+            "samples": 29
+          },
+          "before": {
+            "mean": 5.536386133333334,
+            "p50": 4.010976,
+            "p95": 9.184352,
+            "p99": 11.485728,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "DCA7DEE1E7FD3B88E021A6A7D83F3C59F6F2E1B636F6A0690D3F3617D1B3E45A",
+      "afterPixelSha256": "100FDE75D66F174F644959E1867BB337E01968CDA6EB681D66AC47CE872A9B9D",
+      "beforeImageSha256": "7B5A834073AFDA96F292F67A1D316F4A4597A5195C38D07C354EAFD652049246",
+      "beforePixelSha256": "371F29BF3DA051F3ADA366E07CAC9914C89723211049524F199C535879B7AE79",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "inspection-270/MainBattleTankSingle-1920x1080-High-CloseTactical-Yaw270-Inspection30",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.445343750000001,
+            "p50": 8.7563,
+            "p95": 31.3842,
+            "p99": 31.7171,
+            "samples": 32
+          },
+          "before": {
+            "mean": 12.25839375,
+            "p50": 8.3123,
+            "p95": 31.5449,
+            "p99": 32.076,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.789136,
+            "p50": 7.804512,
+            "p95": 9.643936,
+            "p99": 9.69744,
+            "samples": 28
+          },
+          "before": {
+            "mean": 6.220778666666666,
+            "p50": 6.784544,
+            "p95": 9.216544,
+            "p99": 9.320608,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "A4D11451E58643DD55490E1C3A56D1EF9468CAD2A70AF6F7D588B4E3607B8DED",
+      "afterPixelSha256": "5700747131F4C661E938C2601B0BC5ED88524D7EFF56A46BAD667E39A643FF71",
+      "beforeImageSha256": "ADEFEC925AB2362B977F35631A91C567D220C895B0EC095887999787A2D6D8B7",
+      "beforePixelSha256": "7C8E31756E9ED01E00119939DAD9B9C08928716B7EAAC1E5E18D1D12985ED1E8",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "inspection-90/MainBattleTankSingle-1920x1080-High-CloseTactical-Yaw90-Inspection30",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 12.03120625,
+            "p50": 9.8069,
+            "p95": 33.0933,
+            "p99": 33.5724,
+            "samples": 32
+          },
+          "before": {
+            "mean": 11.103684375,
+            "p50": 10.2155,
+            "p95": 22.1891,
+            "p99": 29.904,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.755445333333335,
+            "p50": 6.857824,
+            "p95": 10.30384,
+            "p99": 11.4456,
+            "samples": 30
+          },
+          "before": {
+            "mean": 6.954610758620691,
+            "p50": 7.597472,
+            "p95": 10.446976,
+            "p99": 11.0656,
+            "samples": 29
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "4A93015B18C08B7033902EDB5490DE839B07751BB9EAC6A6615881F6C9CAF8FE",
+      "afterPixelSha256": "8E7CD20BA514217AE3259E39DA212DC5A47862D573B0D4F2648C52FCEFF05041",
+      "beforeImageSha256": "7FC58D93E949683C74C2E820E1151E2C27DFE5B3165083C7A779756CC778FE4D",
+      "beforePixelSha256": "03E7D8E5F62AEBADB9C5D52B1FB0ADC7C5EA92299F951D7A3F501873617DD68D",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "loads/MainBattleTankSingle-1920x1080-High-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.928346874999999,
+            "p50": 5.7568,
+            "p95": 35.4222,
+            "p99": 56.3546,
+            "samples": 32
+          },
+          "before": {
+            "mean": 10.171928124999999,
+            "p50": 9.6346,
+            "p95": 22.357,
+            "p99": 24.2172,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.704173333333334,
+            "p50": 7.056704,
+            "p95": 8.788192,
+            "p99": 10.13552,
+            "samples": 24
+          },
+          "before": {
+            "mean": 6.711141333333332,
+            "p50": 7.628832,
+            "p95": 9.473888,
+            "p99": 9.543232,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "EBCA72BC0B0E9DFADD7598EA2DA9DC5B5D535F7B7AB8D1271338CEF9738AFF0A",
+      "afterPixelSha256": "11E3CEBD5685982C9625C709902E489308776A4A636736B5E3C09A855B7C5547",
+      "beforeImageSha256": "16C04249A112D6A22697109B1B33380756E4866DF15BAD41A009357964420759",
+      "beforePixelSha256": "BD81A435051883CAEEB5F20C5D89608D2059E0DADCEBE8C7B9F830CC95717C7A",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 1,
+        "lod2Instances": 0,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 1,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 1,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "loads/MainBattleTankSingle-1920x1080-High-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 77,
+        "textureUploadCount": 154
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 12.330278125,
+            "p50": 9.415,
+            "p95": 30.8224,
+            "p99": 32.5399,
+            "samples": 32
+          },
+          "before": {
+            "mean": 10.255846874999998,
+            "p50": 9.4729,
+            "p95": 21.7258,
+            "p99": 22.4373,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.241414620689653,
+            "p50": 4.450784,
+            "p95": 9.624416,
+            "p99": 10.157728,
+            "samples": 29
+          },
+          "before": {
+            "mean": 7.103725866666667,
+            "p50": 7.49232,
+            "p95": 10.524704,
+            "p99": 10.747744,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "71BFCA9609CCC1F2C2C04203F6C839A1BA605A24CA3F6EC2CB4A466CAD9DDA6B",
+      "afterPixelSha256": "FDDC47572F5320F63003A5D9E355B18E799E87E4E84DE98BC98A38A3D0227082",
+      "beforeImageSha256": "71BFCA9609CCC1F2C2C04203F6C839A1BA605A24CA3F6EC2CB4A466CAD9DDA6B",
+      "beforePixelSha256": "FDDC47572F5320F63003A5D9E355B18E799E87E4E84DE98BC98A38A3D0227082",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 1,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 1,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 1,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "loads/MainBattleTankSingle-1920x1080-High-Strategic",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410660864,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": true,
+      "resources": {
+        "loadedTextureCount": 81,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44783476,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 88,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 154,
+        "textureUploadCount": 235
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.21463125,
+            "p50": 7.5416,
+            "p95": 30.9554,
+            "p99": 32.7469,
+            "samples": 32
+          },
+          "before": {
+            "mean": 9.480896875000001,
+            "p50": 8.5131,
+            "p95": 24.7907,
+            "p99": 27.4739,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.883759407407407,
+            "p50": 7.079328,
+            "p95": 10.862432,
+            "p99": 10.87472,
+            "samples": 27
+          },
+          "before": {
+            "mean": 7.280221866666665,
+            "p50": 7.564288,
+            "p95": 10.708736,
+            "p99": 11.415136,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "C4BB916652DA487F83F3E59D53A272188A30AF64F03EEB3E04700E90D4C36BEC",
+      "afterPixelSha256": "8B68EB43B5C05C4F4FB9963FD4608E04A3CD568CB0416E1BF4EC1BBA0473A4B7",
+      "beforeImageSha256": "04AF4274224C0E9BB906D50BCC93AF0D55C3CF9BA07D339E8BEA1914ECA93EF3",
+      "beforePixelSha256": "DCA2CAAC17A64B329BD421CA8401F3D99F2B44CE7C7D95D228CACDAB10CA3E92",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 4,
+        "culledInstances": 2,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 98,
+        "instanceBoundsTests": 100,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 1078,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 1078,
+        "totalInstances": 100,
+        "visibleInstances": 98,
+        "visibleVegetationInstances": 0
+      },
+      "key": "loads/MainBattleTankHundred-1920x1080-High-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 141713408
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 235,
+        "textureUploadCount": 312
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 15.328234375,
+            "p50": 15.5283,
+            "p95": 22.2559,
+            "p99": 23.7224,
+            "samples": 32
+          },
+          "before": {
+            "mean": 18.14699375,
+            "p50": 14.3436,
+            "p95": 84.8778,
+            "p99": 92.1067,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 12.281156266666667,
+            "p50": 14.17744,
+            "p95": 15.947008,
+            "p99": 16.127072,
+            "samples": 30
+          },
+          "before": {
+            "mean": 12.517309866666666,
+            "p50": 14.173568,
+            "p95": 20.458528,
+            "p99": 21.306976,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "2065746920BCC1C619E564F0E200DA98AD4FE948F8B9AAE33566624828B1E573",
+      "afterPixelSha256": "6B5037675544639C8825431694B74FC73943DB93687A8394B64E77FDCD8483F4",
+      "beforeImageSha256": "3218542302C1B904555B6167FEED2330E9F4B0F6188270DCB3312CFF52F3ADB0",
+      "beforePixelSha256": "F024B59C7DD436894257120772C7DAC5D123BECAEB706449A8A314D2D24DEB44",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 4,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 100,
+        "lod1Instances": 100,
+        "lod2Instances": 0,
+        "reducedLodInstances": 100,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 100,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 100,
+        "totalInstances": 100,
+        "visibleInstances": 100,
+        "visibleVegetationInstances": 0
+      },
+      "key": "loads/MainBattleTankHundred-1920x1080-High-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140255232
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 312,
+        "textureUploadCount": 389
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.195903125,
+            "p50": 10.4215,
+            "p95": 28.3708,
+            "p99": 30.2217,
+            "samples": 32
+          },
+          "before": {
+            "mean": 11.007590624999999,
+            "p50": 11.2222,
+            "p95": 22.9342,
+            "p99": 26.864,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.802932266666668,
+            "p50": 6.890464,
+            "p95": 8.61344,
+            "p99": 9.556576,
+            "samples": 30
+          },
+          "before": {
+            "mean": 7.090953600000001,
+            "p50": 7.394336,
+            "p95": 9.59888,
+            "p99": 11.782048,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "5974ED5F3211386B7DFBBE79E40426A3B95DE994B607B2AE3B76B91BDD3328E3",
+      "afterPixelSha256": "B8202C642E2F4E9A329DE1E4091E8B84DE3B22882801BDDCFCAA15D213402299",
+      "beforeImageSha256": "5974ED5F3211386B7DFBBE79E40426A3B95DE994B607B2AE3B76B91BDD3328E3",
+      "beforePixelSha256": "B8202C642E2F4E9A329DE1E4091E8B84DE3B22882801BDDCFCAA15D213402299",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 4,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 100,
+        "lod1Instances": 0,
+        "lod2Instances": 100,
+        "reducedLodInstances": 100,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 100,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 100,
+        "totalInstances": 100,
+        "visibleInstances": 100,
+        "visibleVegetationInstances": 0
+      },
+      "key": "loads/MainBattleTankHundred-1920x1080-High-Strategic",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410660864,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140255232
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": true,
+      "resources": {
+        "loadedTextureCount": 81,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44783476,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 88,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 389,
+        "textureUploadCount": 470
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 13.276887499999999,
+            "p50": 10.4104,
+            "p95": 31.1004,
+            "p99": 32.2058,
+            "samples": 32
+          },
+          "before": {
+            "mean": 10.594465625000005,
+            "p50": 10.1744,
+            "p95": 22.1992,
+            "p99": 26.5858,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.156276266666667,
+            "p50": 4.673184,
+            "p95": 10.287168,
+            "p99": 11.678112,
+            "samples": 30
+          },
+          "before": {
+            "mean": 8.210330666666668,
+            "p50": 8.764672,
+            "p95": 12.891648,
+            "p99": 13.396256,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "7B40726D4FEF1E973446E087B0FCCB7C18EFDBD2A80CCED3CE916F9CAD94E213",
+      "afterPixelSha256": "CED1EB3B79F21545CE65F800643EF51C463DEB1A488FBB80D482300504EAB62A",
+      "beforeImageSha256": "BBF8E7163E12E11267EA6EC23152818F691F7502BA912563D089FAA1B0C555A1",
+      "beforePixelSha256": "CF81E78792B0BC6F09D93617DB676A0E46C43682CBF36370E4B1EA1A1C87FFB3",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 232,
+        "clusterTests": 32,
+        "culledInstances": 669,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 331,
+        "instanceBoundsTests": 768,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 8,
+        "runtimeMeshInstances": 3641,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 3641,
+        "totalInstances": 1000,
+        "visibleInstances": 331,
+        "visibleVegetationInstances": 0
+      },
+      "key": "loads/MainBattleTankThousand-1920x1080-High-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 144285696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 470,
+        "textureUploadCount": 547
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 23.6718625,
+            "p50": 24.2654,
+            "p95": 31.2794,
+            "p99": 33.0335,
+            "samples": 32
+          },
+          "before": {
+            "mean": 51.97868437500001,
+            "p50": 25.5059,
+            "p95": 107.4366,
+            "p99": 109.029,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 22.856883199999995,
+            "p50": 23.93584,
+            "p95": 24.97584,
+            "p99": 25.089216,
+            "samples": 30
+          },
+          "before": {
+            "mean": 26.106693333333332,
+            "p50": 24.319616,
+            "p95": 34.49568,
+            "p99": 35.060896,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "5DCCE4F242E4DB590BB8051854105B39DCF48C194A302C8210AE58E9995FF18A",
+      "afterPixelSha256": "94951354012F738AB4CC3227241E340A7379BC73FC3CBD44C9CE7A89AACE935C",
+      "beforeImageSha256": "822BB77E7E265AE3E37E20339B81439E457AFFDB25E8ED4A5ACC156A35DA04C4",
+      "beforePixelSha256": "994F9D63C699ACC4B1B52426F381A1D65B1A527C90F38D92A330A94B0EFC6F82",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 32,
+        "culledInstances": 18,
+        "drawCalls": 1,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 1000,
+        "lod1Instances": 982,
+        "lod2Instances": 0,
+        "reducedLodInstances": 982,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 982,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 982,
+        "totalInstances": 1000,
+        "visibleInstances": 982,
+        "visibleVegetationInstances": 0
+      },
+      "key": "loads/MainBattleTankThousand-1920x1080-High-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140943360
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 547,
+        "textureUploadCount": 624
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 15.639415624999998,
+            "p50": 16.3996,
+            "p95": 19.7814,
+            "p99": 19.8159,
+            "samples": 32
+          },
+          "before": {
+            "mean": 17.254290625,
+            "p50": 17.5708,
+            "p95": 24.3139,
+            "p99": 32.2744,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 13.844241066666667,
+            "p50": 15.990784,
+            "p95": 16.701952,
+            "p99": 17.142144,
+            "samples": 30
+          },
+          "before": {
+            "mean": 14.813306666666666,
+            "p50": 15.87824,
+            "p95": 17.858304,
+            "p99": 17.870848,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "62853D1D69D2953264F1ED5A83056F20C10B5BD0DBA496B253209085896AD47C",
+      "afterPixelSha256": "DEC82A8013D2BF84640FB77543390E07A91017178381B3F7B5754CCA12A15041",
+      "beforeImageSha256": "62853D1D69D2953264F1ED5A83056F20C10B5BD0DBA496B253209085896AD47C",
+      "beforePixelSha256": "DEC82A8013D2BF84640FB77543390E07A91017178381B3F7B5754CCA12A15041",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 32,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 1000,
+        "lod1Instances": 0,
+        "lod2Instances": 1000,
+        "reducedLodInstances": 1000,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 1000,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 1000,
+        "totalInstances": 1000,
+        "visibleInstances": 1000,
+        "visibleVegetationInstances": 0
+      },
+      "key": "loads/MainBattleTankThousand-1920x1080-High-Strategic",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410660864,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140943360
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": true,
+      "resources": {
+        "loadedTextureCount": 81,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "residentTextureBytes": 44783476,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 88,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 624,
+        "textureUploadCount": 705
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 14.729581249999999,
+            "p50": 15.2635,
+            "p95": 27.4601,
+            "p99": 27.6723,
+            "samples": 32
+          },
+          "before": {
+            "mean": 11.378893749999998,
+            "p50": 12.1753,
+            "p95": 17.2771,
+            "p99": 20.3857,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 9.943597866666666,
+            "p50": 9.541696,
+            "p95": 15.468416,
+            "p99": 15.496096,
+            "samples": 30
+          },
+          "before": {
+            "mean": 10.422987733333336,
+            "p50": 11.07872,
+            "p95": 14.5488,
+            "p99": 15.284032,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "C2D744FE1C1D5FD57BC0292F406EE808D3B4E9D9AF45530A73A00A4AFBC81F3E",
+      "afterPixelSha256": "72F13E9F74D198AE2566F082CB8E4A37CD744D8608973340598A8FE7EDC5B94E",
+      "beforeImageSha256": "82B2997923008E430D1415C6BED780F23A1B6A7BEC6407BF97D277514509790C",
+      "beforePixelSha256": "A5758AB3A149C7BDAF7E35CCC8523EFA92BBFAC2D127D95D2BB116B89A291C4E",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "pose-1.55/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.55-Inspection30",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 9.823846875000001,
+            "p50": 8.1633,
+            "p95": 23.985,
+            "p99": 24.1068,
+            "samples": 32
+          },
+          "before": {
+            "mean": 10.545525,
+            "p50": 9.6708,
+            "p95": 20.7213,
+            "p99": 26.4343,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.1420736000000025,
+            "p50": 5.178688,
+            "p95": 9.133248,
+            "p99": 9.31584,
+            "samples": 30
+          },
+          "before": {
+            "mean": 7.0514979310344845,
+            "p50": 7.755744,
+            "p95": 9.364448,
+            "p99": 9.622848,
+            "samples": 29
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "50E9DEF61AA37E7795E98D6A1936B553487F45DAFD744457E06558860F18804C",
+      "afterPixelSha256": "A98183C79D019D64DA64CAF3E78A7CC46CF8E0F259AA3B3843228DA34183D2AD",
+      "beforeImageSha256": "3BCD66DE6EB272F61A68230D74A7FB4361E78F336EF5DF34C95EC0E85ADAA3A4",
+      "beforePixelSha256": "C69A8C874845CB69EF06F5667ECA4D66CF03F60F37F02B221DE2B3CF4D31AE85",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "pose-1.6/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.6-Inspection30",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 16.321815625,
+            "p50": 7.6249,
+            "p95": 51.6118,
+            "p99": 54.1503,
+            "samples": 32
+          },
+          "before": {
+            "mean": 10.769484375000001,
+            "p50": 7.814,
+            "p95": 26.8756,
+            "p99": 29.8413,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 5.7187394285714275,
+            "p50": 4.084576,
+            "p95": 8.803648,
+            "p99": 9.339392,
+            "samples": 28
+          },
+          "before": {
+            "mean": 5.845102344827587,
+            "p50": 5.311456,
+            "p95": 8.834688,
+            "p99": 9.208576,
+            "samples": 29
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "02B172A34677E306A9BBE8F237E4CF94175B05E7EAF739E4C715DAA74983E6F0",
+      "afterPixelSha256": "A3D3F28716C71C5F1BAB589CAA6A368324C90A0BC94407498A4AA9E844FC25A0",
+      "beforeImageSha256": "37ACB7DBA650988E9D94A30ECDE96F72B8513EA56093C6AA416F5A0C2027DD06",
+      "beforePixelSha256": "18D02AA48B5C4DE53BF1B7A49D8C641526E262F208DB90E3821A7DE8571EDDD7",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "pose-1.72/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.72-Inspection30",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 12.267812500000002,
+            "p50": 10.2347,
+            "p95": 31.9029,
+            "p99": 32.4211,
+            "samples": 32
+          },
+          "before": {
+            "mean": 9.454490625000002,
+            "p50": 8.8323,
+            "p95": 23.9639,
+            "p99": 26.8858,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 5.837012965517242,
+            "p50": 4.546112,
+            "p95": 9.393568,
+            "p99": 9.553632,
+            "samples": 29
+          },
+          "before": {
+            "mean": 6.271090133333333,
+            "p50": 6.828064,
+            "p95": 9.117408,
+            "p99": 9.137088,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "D42719D1FBC0E2E0948DEEB8BF61999C1D0EDFEE86154BFFC104879FD7764FD4",
+      "afterPixelSha256": "5E41326BCA0B1BB4E2F4B10D3038B39BCCC3BE723B16A1DFD56676518885CE65",
+      "beforeImageSha256": "94FD3E5233ECBBC5FF20308D565DEEF7FFC183B01342D4382DF45221C9415B26",
+      "beforePixelSha256": "F044E5C459C01B8523CB5ED6651CCE97DCBDFDB715E24308895ABA3C8CD00554",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "pose-1.9/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.9-Inspection30",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.781950000000002,
+            "p50": 10.2917,
+            "p95": 25.3421,
+            "p99": 27.6266,
+            "samples": 32
+          },
+          "before": {
+            "mean": 10.705562500000001,
+            "p50": 9.5938,
+            "p95": 22.3682,
+            "p99": 23.3653,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.5973397333333335,
+            "p50": 6.85664,
+            "p95": 9.523456,
+            "p99": 9.752288,
+            "samples": 30
+          },
+          "before": {
+            "mean": 6.567745066666665,
+            "p50": 5.6464,
+            "p95": 10.160032,
+            "p99": 10.4064,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "4A93015B18C08B7033902EDB5490DE839B07751BB9EAC6A6615881F6C9CAF8FE",
+      "afterPixelSha256": "8E7CD20BA514217AE3259E39DA212DC5A47862D573B0D4F2648C52FCEFF05041",
+      "beforeImageSha256": "7FC58D93E949683C74C2E820E1151E2C27DFE5B3165083C7A779756CC778FE4D",
+      "beforePixelSha256": "03E7D8E5F62AEBADB9C5D52B1FB0ADC7C5EA92299F951D7A3F501873617DD68D",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 9,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 1,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "reducedLodInstances": 0,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 11,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 11,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "sweep-CloseTactical/MainBattleTankSingle-1920x1080-High-CloseTactical-Sweep",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410304512,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140189696
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 78,
+        "peakLoadedTextureCount": 78,
+        "peakResidentTextureBytes": 44766316,
+        "peakShaderResourceDescriptorsUsed": 85,
+        "residentTextureBytes": 44766316,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 85,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 78
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 10.658425000000001,
+            "p50": 8.5146,
+            "p95": 23.5616,
+            "p99": 27.2419,
+            "samples": 32
+          },
+          "before": {
+            "mean": 17.556046875000003,
+            "p50": 10.498,
+            "p95": 43.9684,
+            "p99": 49.927,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.527496827586206,
+            "p50": 6.776032,
+            "p95": 9.714048,
+            "p99": 10.967008,
+            "samples": 29
+          },
+          "before": {
+            "mean": 6.106946133333335,
+            "p50": 4.07136,
+            "p95": 9.561248,
+            "p99": 12.185696,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "EBCA72BC0B0E9DFADD7598EA2DA9DC5B5D535F7B7AB8D1271338CEF9738AFF0A",
+      "afterPixelSha256": "11E3CEBD5685982C9625C709902E489308776A4A636736B5E3C09A855B7C5547",
+      "beforeImageSha256": "16C04249A112D6A22697109B1B33380756E4866DF15BAD41A009357964420759",
+      "beforePixelSha256": "BD81A435051883CAEEB5F20C5D89608D2059E0DADCEBE8C7B9F830CC95717C7A",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 0,
+        "clusterTests": 1,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 0,
+        "instanceBoundsTests": 1,
+        "lod1Instances": 1,
+        "lod2Instances": 0,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 0,
+        "runtimeMeshInstances": 1,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 1,
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "visibleVegetationInstances": 0
+      },
+      "key": "sweep-NormalGameplay/MainBattleTankSingle-1920x1080-High-NormalGameplay-Sweep",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410304512,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 144801792
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 78,
+        "peakLoadedTextureCount": 78,
+        "peakResidentTextureBytes": 44766316,
+        "peakShaderResourceDescriptorsUsed": 85,
+        "residentTextureBytes": 44766316,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 85,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 78
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 11.279824999999999,
+            "p50": 9.9241,
+            "p95": 27.9328,
+            "p99": 29.6935,
+            "samples": 32
+          },
+          "before": {
+            "mean": 11.743328125,
+            "p50": 11.0417,
+            "p95": 23.8552,
+            "p99": 24.8893,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 6.1870047999999995,
+            "p50": 4.447936,
+            "p95": 11.361696,
+            "p99": 11.509184,
+            "samples": 30
+          },
+          "before": {
+            "mean": 7.445380266666667,
+            "p50": 8.44816,
+            "p95": 10.580384,
+            "p99": 13.252448,
+            "samples": 30
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "7677414FFAB0480B6E063D8A109742D0DC5D66B7AE079D45252366424A39FCE0",
+      "afterPixelSha256": "1A23BC558DB8D56B564B7398BD39C53CB8453A6943E982763AF868A299244B50",
+      "beforeImageSha256": "44F890BDA0996F3506296FAF15E7A261A9C3873FC9D2884DF8BFE76E266219AA",
+      "beforePixelSha256": "C608B3321F67562542EB6B913CC4ACFB57E69AFD4E219F02A0F8B82D634A1514",
+      "instances": {
+        "animatedVegetationInstances": 0,
+        "clusterCulledInstances": 391,
+        "clusterTests": 17,
+        "culledInstances": 508,
+        "drawCalls": 27,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 10,
+        "instanceBoundsTests": 122,
+        "lod1Instances": 0,
+        "lod2Instances": 1,
+        "reducedLodInstances": 1,
+        "rejectedClusters": 13,
+        "runtimeMeshInstances": 104,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 104,
+        "totalInstances": 519,
+        "visibleInstances": 11,
+        "visibleVegetationInstances": 0
+      },
+      "key": "wet/MainBattleTankProduction-1920x1080-High-CloseTactical",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140361728
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 0,
+        "textureUploadCount": 77
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 12.41268125,
+            "p50": 9.9954,
+            "p95": 27.6878,
+            "p99": 31.7751,
+            "samples": 32
+          },
+          "before": {
+            "mean": 15.870753125,
+            "p50": 10.657,
+            "p95": 48.8189,
+            "p99": 53.394,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 9.288700307692308,
+            "p50": 9.439264,
+            "p95": 13.445312,
+            "p99": 14.278688,
+            "samples": 26
+          },
+          "before": {
+            "mean": 10.379130074074075,
+            "p50": 11.079904,
+            "p95": 13.295104,
+            "p99": 13.535424,
+            "samples": 27
+          }
+        }
+      }
+    },
+    {
+      "afterImageSha256": "823B825B8A78A7CBF3DCE5C7FBEBF178CC0CBC9BC2634A5A2769542C906DC25C",
+      "afterPixelSha256": "5FDC0060C62B29A08E0D34DE097CAFAE3827E2B9DAAA929631941FE4E9654E75",
+      "beforeImageSha256": "31FC6E30E8524E1C553B01C0945EB7754A364914C0EC06E2CC36E8768ABD5022",
+      "beforePixelSha256": "EEE738683A36AF5455345EC0DD4D5740B00BC06CE44135CB8E4F6F9B52AD421D",
+      "instances": {
+        "animatedVegetationInstances": 48,
+        "clusterCulledInstances": 263,
+        "clusterTests": 17,
+        "culledInstances": 422,
+        "drawCalls": 28,
+        "fallbackMeshInstances": 0,
+        "highLodInstances": 18,
+        "instanceBoundsTests": 250,
+        "lod1Instances": 78,
+        "lod2Instances": 1,
+        "reducedLodInstances": 79,
+        "rejectedClusters": 9,
+        "runtimeMeshInstances": 99,
+        "skippedDecalResources": 0,
+        "texturedRuntimeMeshInstances": 99,
+        "totalInstances": 519,
+        "visibleInstances": 97,
+        "visibleVegetationInstances": 48
+      },
+      "key": "wet/MainBattleTankProduction-1920x1080-High-NormalGameplay",
+      "materials": {
+        "bindingFailureCount": 0,
+        "loadedAnimationCount": 18,
+        "loadedAssetTextureCount": 29,
+        "loadedMaterialCount": 132,
+        "loadedMeshCount": 309,
+        "loadedSkinCount": 2,
+        "residentAnimationBytes": 175694,
+        "residentMeshBytes": 10940424,
+        "residentSkinBytes": 3623302
+      },
+      "memory": {
+        "available": true,
+        "failureReason": null,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 140275712
+      },
+      "motionReadbacks": 0,
+      "pixelEqual": false,
+      "resources": {
+        "loadedTextureCount": 77,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorCapacity": 4096,
+        "shaderResourceDescriptorsUsed": 84,
+        "textureBindingFailureCount": 0,
+        "textureReleaseCount": 77,
+        "textureUploadCount": 154
+      },
+      "timing": {
+        "cpu": {
+          "after": {
+            "mean": 13.040546874999999,
+            "p50": 11.7795,
+            "p95": 25.05,
+            "p99": 26.3913,
+            "samples": 32
+          },
+          "before": {
+            "mean": 13.277053124999997,
+            "p50": 12.2961,
+            "p95": 24.2219,
+            "p99": 30.1796,
+            "samples": 32
+          }
+        },
+        "gpu": {
+          "after": {
+            "mean": 9.934608592592596,
+            "p50": 10.235392,
+            "p95": 11.936864,
+            "p99": 12.562176,
+            "samples": 27
+          },
+          "before": {
+            "mean": 9.720200296296294,
+            "p50": 10.367872,
+            "p95": 11.955392,
+            "p99": 12.423104,
+            "samples": 27
+          }
+        }
+      }
+    }
+  ],
+  "device": {
+    "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+    "advanced": {
+      "meshShaderQuerySucceeded": true,
+      "meshShadersSupported": true,
+      "raytracingQuerySucceeded": true,
+      "raytracingSupported": true
+    },
+    "debugLayerEnabled": false,
+    "dedicatedVideoMemoryBytes": 25309478912,
+    "featureLevel": "Level_12_1",
+    "isSoftwareAdapter": false
+  },
+  "diagnostic15PercentExceedances": [
+    {
+      "after": 14.128281250000004,
+      "before": 12.138231249999999,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-1920x1080-Low-CloseTactical",
+      "percent": 16.394892789672344,
+      "statistic": "mean"
+    },
+    {
+      "after": 14.7923,
+      "before": 8.8997,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-1920x1080-Low-CloseTactical",
+      "percent": 66.21122060294167,
+      "statistic": "p50"
+    },
+    {
+      "after": 17.596911999999996,
+      "before": 14.648467199999999,
+      "domain": "gpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-Low-CloseTactical",
+      "percent": 20.128009024725802,
+      "statistic": "mean"
+    },
+    {
+      "after": 17.38864,
+      "before": 14.33936,
+      "domain": "gpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-Low-CloseTactical",
+      "percent": 21.265105276665075,
+      "statistic": "p50"
+    },
+    {
+      "after": 33.190628124999996,
+      "before": 24.165815625,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-Low-Strategic",
+      "percent": 37.34536686054848,
+      "statistic": "mean"
+    },
+    {
+      "after": 25.9573,
+      "before": 22.4221,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-Low-Strategic",
+      "percent": 15.766587429366563,
+      "statistic": "p50"
+    },
+    {
+      "after": 66.4494,
+      "before": 38.0993,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-Low-Strategic",
+      "percent": 74.4110784187636,
+      "statistic": "p95"
+    },
+    {
+      "after": 66.974,
+      "before": 40.1664,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-Low-Strategic",
+      "percent": 66.7413559592097,
+      "statistic": "p99"
+    },
+    {
+      "after": 60.3779,
+      "before": 42.8496,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-Medium-NormalGameplay",
+      "percent": 40.906566222321786,
+      "statistic": "p95"
+    },
+    {
+      "after": 75.0475,
+      "before": 44.185,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-Medium-NormalGameplay",
+      "percent": 69.84836482969332,
+      "statistic": "p99"
+    },
+    {
+      "after": 52.1596,
+      "before": 40.8069,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-High-CloseTactical",
+      "percent": 27.820540153748507,
+      "statistic": "p95"
+    },
+    {
+      "after": 63.936,
+      "before": 41.6848,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-High-CloseTactical",
+      "percent": 53.3796491766783,
+      "statistic": "p99"
+    },
+    {
+      "after": 35.284371875000005,
+      "before": 30.67935625,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-High-Strategic",
+      "percent": 15.010144239907252,
+      "statistic": "mean"
+    },
+    {
+      "after": 53.2908,
+      "before": 42.247,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-High-Strategic",
+      "percent": 26.14102776528511,
+      "statistic": "p95"
+    },
+    {
+      "after": 57.5556,
+      "before": 43.051,
+      "domain": "cpu",
+      "key": "gallery/MainBattleTankProduction-3840x2160-High-Strategic",
+      "percent": 33.69166802164874,
+      "statistic": "p99"
+    },
+    {
+      "after": 9.8742,
+      "before": 7.8753,
+      "domain": "cpu",
+      "key": "inspection-180/MainBattleTankSingle-1920x1080-High-CloseTactical-Yaw180-Inspection30",
+      "percent": 25.381890213706136,
+      "statistic": "p50"
+    },
+    {
+      "after": 6.5406035862068945,
+      "before": 5.536386133333334,
+      "domain": "gpu",
+      "key": "inspection-180/MainBattleTankSingle-1920x1080-High-CloseTactical-Yaw180-Inspection30",
+      "percent": 18.138500976790507,
+      "statistic": "mean"
+    },
+    {
+      "after": 7.293568,
+      "before": 4.010976,
+      "domain": "gpu",
+      "key": "inspection-180/MainBattleTankSingle-1920x1080-High-CloseTactical-Yaw180-Inspection30",
+      "percent": 81.84023040776107,
+      "statistic": "p50"
+    },
+    {
+      "after": 7.804512,
+      "before": 6.784544,
+      "domain": "gpu",
+      "key": "inspection-270/MainBattleTankSingle-1920x1080-High-CloseTactical-Yaw270-Inspection30",
+      "percent": 15.033700127819927,
+      "statistic": "p50"
+    },
+    {
+      "after": 33.0933,
+      "before": 22.1891,
+      "domain": "cpu",
+      "key": "inspection-90/MainBattleTankSingle-1920x1080-High-CloseTactical-Yaw90-Inspection30",
+      "percent": 49.14214636916323,
+      "statistic": "p95"
+    },
+    {
+      "after": 11.928346874999999,
+      "before": 10.171928124999999,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankSingle-1920x1080-High-CloseTactical",
+      "percent": 17.267313811264273,
+      "statistic": "mean"
+    },
+    {
+      "after": 35.4222,
+      "before": 22.357,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankSingle-1920x1080-High-CloseTactical",
+      "percent": 58.43896766113521,
+      "statistic": "p95"
+    },
+    {
+      "after": 56.3546,
+      "before": 24.2172,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankSingle-1920x1080-High-CloseTactical",
+      "percent": 132.70485440100424,
+      "statistic": "p99"
+    },
+    {
+      "after": 12.330278125,
+      "before": 10.255846874999998,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankSingle-1920x1080-High-NormalGameplay",
+      "percent": 20.22681574016776,
+      "statistic": "mean"
+    },
+    {
+      "after": 30.8224,
+      "before": 21.7258,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankSingle-1920x1080-High-NormalGameplay",
+      "percent": 41.87003470528128,
+      "statistic": "p95"
+    },
+    {
+      "after": 32.5399,
+      "before": 22.4373,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankSingle-1920x1080-High-NormalGameplay",
+      "percent": 45.025916665552465,
+      "statistic": "p99"
+    },
+    {
+      "after": 11.21463125,
+      "before": 9.480896875000001,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankSingle-1920x1080-High-Strategic",
+      "percent": 18.286607246743202,
+      "statistic": "mean"
+    },
+    {
+      "after": 30.9554,
+      "before": 24.7907,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankSingle-1920x1080-High-Strategic",
+      "percent": 24.86698641022642,
+      "statistic": "p95"
+    },
+    {
+      "after": 32.7469,
+      "before": 27.4739,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankSingle-1920x1080-High-Strategic",
+      "percent": 19.192761129653956,
+      "statistic": "p99"
+    },
+    {
+      "after": 28.3708,
+      "before": 22.9342,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankHundred-1920x1080-High-NormalGameplay",
+      "percent": 23.705208814783152,
+      "statistic": "p95"
+    },
+    {
+      "after": 13.276887499999999,
+      "before": 10.594465625000005,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankHundred-1920x1080-High-Strategic",
+      "percent": 25.319086114831713,
+      "statistic": "mean"
+    },
+    {
+      "after": 31.1004,
+      "before": 22.1992,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankHundred-1920x1080-High-Strategic",
+      "percent": 40.09694043028578,
+      "statistic": "p95"
+    },
+    {
+      "after": 32.2058,
+      "before": 26.5858,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankHundred-1920x1080-High-Strategic",
+      "percent": 21.139104333892544,
+      "statistic": "p99"
+    },
+    {
+      "after": 14.729581249999999,
+      "before": 11.378893749999998,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankThousand-1920x1080-High-Strategic",
+      "percent": 29.446513638463333,
+      "statistic": "mean"
+    },
+    {
+      "after": 15.2635,
+      "before": 12.1753,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankThousand-1920x1080-High-Strategic",
+      "percent": 25.36446740532061,
+      "statistic": "p50"
+    },
+    {
+      "after": 27.4601,
+      "before": 17.2771,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankThousand-1920x1080-High-Strategic",
+      "percent": 58.93928957984846,
+      "statistic": "p95"
+    },
+    {
+      "after": 27.6723,
+      "before": 20.3857,
+      "domain": "cpu",
+      "key": "loads/MainBattleTankThousand-1920x1080-High-Strategic",
+      "percent": 35.7436830719573,
+      "statistic": "p99"
+    },
+    {
+      "after": 23.985,
+      "before": 20.7213,
+      "domain": "cpu",
+      "key": "pose-1.55/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.55-Inspection30",
+      "percent": 15.750459671931782,
+      "statistic": "p95"
+    },
+    {
+      "after": 16.321815625,
+      "before": 10.769484375000001,
+      "domain": "cpu",
+      "key": "pose-1.6/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.6-Inspection30",
+      "percent": 51.556147505901336,
+      "statistic": "mean"
+    },
+    {
+      "after": 51.6118,
+      "before": 26.8756,
+      "domain": "cpu",
+      "key": "pose-1.6/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.6-Inspection30",
+      "percent": 92.03961958058613,
+      "statistic": "p95"
+    },
+    {
+      "after": 54.1503,
+      "before": 29.8413,
+      "domain": "cpu",
+      "key": "pose-1.6/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.6-Inspection30",
+      "percent": 81.46092831076395,
+      "statistic": "p99"
+    },
+    {
+      "after": 12.267812500000002,
+      "before": 9.454490625000002,
+      "domain": "cpu",
+      "key": "pose-1.72/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.72-Inspection30",
+      "percent": 29.75646162851846,
+      "statistic": "mean"
+    },
+    {
+      "after": 10.2347,
+      "before": 8.8323,
+      "domain": "cpu",
+      "key": "pose-1.72/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.72-Inspection30",
+      "percent": 15.878083851318458,
+      "statistic": "p50"
+    },
+    {
+      "after": 31.9029,
+      "before": 23.9639,
+      "domain": "cpu",
+      "key": "pose-1.72/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.72-Inspection30",
+      "percent": 33.12899820146136,
+      "statistic": "p95"
+    },
+    {
+      "after": 32.4211,
+      "before": 26.8858,
+      "domain": "cpu",
+      "key": "pose-1.72/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.72-Inspection30",
+      "percent": 20.58819153605249,
+      "statistic": "p99"
+    },
+    {
+      "after": 27.6266,
+      "before": 23.3653,
+      "domain": "cpu",
+      "key": "pose-1.9/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.9-Inspection30",
+      "percent": 18.23772859753565,
+      "statistic": "p99"
+    },
+    {
+      "after": 6.85664,
+      "before": 5.6464,
+      "domain": "gpu",
+      "key": "pose-1.9/MainBattleTankSingle-1920x1080-High-CloseTactical-MechanicalT1.9-Inspection30",
+      "percent": 21.433833947293856,
+      "statistic": "p50"
+    },
+    {
+      "after": 6.776032,
+      "before": 4.07136,
+      "domain": "gpu",
+      "key": "sweep-CloseTactical/MainBattleTankSingle-1920x1080-High-CloseTactical-Sweep",
+      "percent": 66.43165919987422,
+      "statistic": "p50"
+    },
+    {
+      "after": 27.9328,
+      "before": 23.8552,
+      "domain": "cpu",
+      "key": "sweep-NormalGameplay/MainBattleTankSingle-1920x1080-High-NormalGameplay-Sweep",
+      "percent": 17.09312854220464,
+      "statistic": "p95"
+    },
+    {
+      "after": 29.6935,
+      "before": 24.8893,
+      "domain": "cpu",
+      "key": "sweep-NormalGameplay/MainBattleTankSingle-1920x1080-High-NormalGameplay-Sweep",
+      "percent": 19.302270453568404,
+      "statistic": "p99"
+    }
+  ],
+  "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+  "geometryAndResourceCountsEqual": true,
+  "humanVisualAcceptance": "pending",
+  "limits": [
+    "Frozen snapshots and sampled recoil phases do not certify live gameplay or sustained FPS.",
+    "30/60/144-Hz contracts compare copied poses and compiled matrices, not native frame pacing.",
+    "Concurrent host activity and one before/after cohort prevent controlled timing acceptance.",
+    "Camera sweeps retain primary reset readbacks; motion readback count is recorded per case.",
+    "Native exact LOD-threshold/judder, renderer milestone and human art acceptance remain open.",
+    "Debug layer is disabled; zero warning counts are not debug-layer validation."
+  ],
+  "mergeAuthorized": false,
+  "performanceAcceptance": "pending",
+  "pixelEqualPairs": 9,
+  "repeatPixelsEqual": true,
+  "retainedFailures": [
+    "Two initial 120-second native contract timeouts during the saved positive export; deadline unchanged. Redundant positive-edit inspection removed; full qualifier passes.",
+    "First review plan rejected unsupported 130m inspection request; no inspection limit raised.",
+    "Next attempt rejected mechanical time for new scenes; explicit bounded request admission added and tested.",
+    "Pre-master-sync cohort closed intentionally after logistics PR273 advanced the integration base."
+  ],
+  "source": "92bff60f7f78f813a88c6d6a10bee47a89c9b3a9"
+}

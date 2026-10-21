@@ -1,5 +1,8 @@
 # Directorate Main Battle Tank production brief
 
+The bounded [armor finish refinement](TankSurfaceRefinement.md) records the current
+static armor UV migration, isolated tank review loads and separate acceptance gates.
+
 Current Blender source, art changes and supported edits are documented in
 [Blender tank production](BlenderTankProduction.md). The saved rest project and
 its reviewed GLB exports now own production geometry. The original recipe remains

@@ -1,0 +1,12 @@
+{
+  "afterBytes": 74844665,
+  "afterCount": 1363,
+  "base": "a391a5bb0c0e25f079fa394613a5f84dfe7e9728",
+  "beforeBytes": 74844665,
+  "beforeCount": 1363,
+  "changed": [
+    "unit.directorate.main_battle_tank",
+    "unit.directorate.main_battle_tank.lod1",
+    "unit.directorate.main_battle_tank.turret"
+  ]
+}
