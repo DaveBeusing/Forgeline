@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\fuel-ammunition-blender\build\artillery\author.py", line 60, in <module>
+    run(json.loads(Path(sys.argv[sys.argv.index('--request') + 1]).read_text(encoding='utf-8-sig')))
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\fuel-ammunition-blender\build\artillery\author.py", line 42, in run
+    count, images = mechanical.inspection(catalog, ids, families, geometries, output, args.render)
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\fuel-ammunition-blender\tools\blender\mechanical.py", line 160, in inspection
+    require(error<=2e-5,'Blender cannot represent this rigid hierarchy/scale within the runtime matrix tolerance')
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\fuel-ammunition-blender\tools\blender\asset_contract.py", line 22, in require
+    raise ValueError(message)
+ValueError: Blender cannot represent this rigid hierarchy/scale within the runtime matrix tolerance
+
+Error: script failed, file: 'C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\fuel-ammunition-blender\build\artillery\author.py', exiting.

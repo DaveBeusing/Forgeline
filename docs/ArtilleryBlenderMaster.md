@@ -81,7 +81,59 @@ matrix representability check after strict rest export. Its logs remain intact.
 The family-scoped flattened inspection addresses that representability limit;
 no runtime transform, source part hierarchy or comparison tolerance is changed.
 
+## Observed native checkpoint
+
+The qualified authoring/tool content is retained at
+`aeee2a3cf76e9f8565be6303f4802b0c6b601f35`, version `0.1.429-dev`.
+The first authoring run started before that commit was recorded; its exact family
+script content matches that commit. Source signatures bind the actual unchanged
+canonical artwork independently. Two genuine Blender projects and eight GLBs are
+retained under `assets/staged/artillery`; collision stays an independent reference.
+No external artwork, image, third-party mesh or new license input is introduced.
+
+Pinned Blender 5.2.2 x64 build `d13f752e3b9c`, executable SHA-256
+`f141a3c5754500e6f84361099a4cd53f0bb7662b6a0d2cfaaa8fbb63e92234a0`,
+saved both independent rest projects and reopened the first. All four scoped
+catalogs compile and pass source-less integrity. First/second/reopened source
+and runtime trees are byte-identical. Both opt-in typed tests pass: all mesh,
+material, dependency, LOD, collision, socket, mechanical range and surface-channel
+comparisons, plus 429 independent runtime pose matrices. Maximum matrix error is
+`0.000002026558`, below the unchanged `0.00002` tolerance. Eight invalid native
+edits reject and an unchanged saved rest project validates.
+
+Both the full Release solution and the focused test build pass with zero warnings
+or errors. All 29 existing portable source/export contracts pass. The dependency
+graph passes for 44 projects. The natural seed-2026 validation match terminates
+without forced outcomes at tick 55,210: Victory / CommandCoreDestroyed, winner 1,
+exit 0. This repeats the prior authoritative result without changing combat code.
+
+The three artillery-only scenes also build with zero warnings/errors in isolated
+`artifacts/arf` output, leaving the running full-suite binaries unchanged. All 98
+focused scene, authorized artillery aim and existing mechanical regression cases
+pass through `dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj
+--configuration Release --no-build --artifacts-path artifacts/arf -- --filter-class
+ForgeLine.Presentation.Tests.ArtilleryReferenceLoadTests
+ForgeLine.Presentation.Tests.VisualReferenceSceneTests
+ForgeLine.Presentation.Tests.ArtilleryAimPresentationTests
+ForgeLine.Presentation.Tests.MechanicalMotionTests
+ForgeLine.Presentation.Tests.MechanicalMotionQualityTests --parallel none`.
+The earlier direct-DLL invocation rejected its CLI option before running tests;
+its log remains under artifacts and is not counted as a passing test run.
+
+Original qualification, compiler/source-less reports, packed-image hashes,
+negative contracts, headless diagnostics and the failed first native attempt are
+retained under [`artillery/evidence`](artillery/evidence). The two small Blender
+PNGs are authoring inspections, not native game images or approved goldens.
+
 ## Integration decision
+
+`ArtillerySingle`, `ArtilleryRepeated100` and `ArtilleryRepeated1000` append native
+review scenes without renumbering existing scene identities. They reuse the same
+authoritative unit definition and immutable presentation extraction. Repeated
+scenes contain only artillery; a quarter share the existing fixed firing/recoil
+pose, with the existing travel/aim inputs. They contain no projectile or muzzle
+event and do not claim 100/1000 active simulation fire missions. Existing eight-unit
+gallery and mixed 1000-vehicle fixture behavior is preserved.
 
 This is a staged preservation/review candidate, not completed high-fidelity
 modernization or approved production adoption. Canonical definitions and renderer

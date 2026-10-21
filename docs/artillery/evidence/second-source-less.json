@@ -1,0 +1,83 @@
+{
+  "assetCount": 12,
+  "meshCount": 8,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 8089231,
+  "meshRuntimeBytes": 761365,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1671,
+  "catalogLoadDuration": "00:00:01.1942382",
+  "assetReadDuration": "00:00:00.5612798",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "unit.directorate.self_propelled_artillery",
+      "type": "mesh",
+      "runtimeBytes": 495880
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "unit.directorate.self_propelled_artillery.lod1",
+      "type": "mesh",
+      "runtimeBytes": 115920
+    },
+    {
+      "assetId": "unit.directorate.self_propelled_artillery.turret",
+      "type": "mesh",
+      "runtimeBytes": 67471
+    },
+    {
+      "assetId": "unit.directorate.self_propelled_artillery.lod2",
+      "type": "mesh",
+      "runtimeBytes": 53520
+    },
+    {
+      "assetId": "unit.directorate.self_propelled_artillery.wreck",
+      "type": "mesh",
+      "runtimeBytes": 13310
+    },
+    {
+      "assetId": "unit.directorate.self_propelled_artillery.critical",
+      "type": "mesh",
+      "runtimeBytes": 10004
+    },
+    {
+      "assetId": "unit.directorate.self_propelled_artillery.damaged",
+      "type": "mesh",
+      "runtimeBytes": 3759
+    },
+    {
+      "assetId": "material.directorate.unit.self_propelled_artillery",
+      "type": "material",
+      "runtimeBytes": 1671
+    },
+    {
+      "assetId": "unit.directorate.self_propelled_artillery.collision",
+      "type": "mesh",
+      "runtimeBytes": 1501
+    }
+  ],
+  "issues": [],
+  "success": true
+}

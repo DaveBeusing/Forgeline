@@ -1,0 +1,27 @@
+{
+  "canonicalSourcesUnchanged": true,
+  "inspectionImages": [
+    "unit.directorate.self_propelled_artillery-idle.png",
+    "unit.directorate.self_propelled_artillery-firing.png"
+  ],
+  "packedImages": [
+    {
+      "colorSpace": "sRGB",
+      "sha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+      "source": "materials/directorate/surfaces/production_surface_base.png"
+    },
+    {
+      "colorSpace": "Non-Color",
+      "sha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+      "source": "materials/directorate/surfaces/production_surface_normal.png"
+    },
+    {
+      "colorSpace": "Non-Color",
+      "sha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+      "source": "materials/directorate/surfaces/production_surface_orm.png"
+    }
+  ],
+  "poseSamples": 22,
+  "sourceSignature": "9f1f474f3cf79acf78170d69ee327db722ac1047d4b93a268989b57a9291032d",
+  "success": true
+}
