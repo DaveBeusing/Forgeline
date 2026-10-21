@@ -9,7 +9,7 @@ from pathlib import Path
 import bpy
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from asset_contract import Catalog, fixture_selection, geometry_stats, read_geometry, require, sha, write_glb, write_json
-from logistics_contract import FAMILIES, bindings, compare
+from logistics_contract import FAMILIES, bindings, compare, preserve_uvs
 from command_core_contract import material_source_hashes
 from mechanical import layers
 from production import surface_preview
@@ -153,6 +153,7 @@ def run(request):
             if aid in parts else __import__('asset_contract').compare_geometry(a, b))
         # Only family meshes are adopted; dependencies remain canonical.
         for aid in parts:
+            preserve_uvs(geometries[aid], results[aid])
             relative = original.definitions[aid][0].relative_to(original.root)
             definition = copy.deepcopy(original.definitions[aid][1])
             suffix = aid[len(root):].lstrip('.') or 'lod0'

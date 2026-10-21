@@ -33,6 +33,10 @@ service-socket empties and packed shared Base Color/Normal/ORM/emissive previews
 Engine coordinates remain +Y up/+Z forward, Blender +Z up/-Y forward, metre scale.
 Collections isolate the intact LOD0, reduced LODs, construction and damage states.
 The collision mesh is retained as a separate contract, not a generated hull.
+Source vertices use the established normalized building-local coordinates;
+authoritative instance scales are 14×8×14, 16×8×16 and 18×9×18 metres. The frozen
+family fixture checks the metre-scaled, translated and rotated socket positions.
+Do not apply these instance scales destructively to the normalized source meshes.
 
 `tools/blender/Invoke-BlenderLogistics.ps1 -Family <family> -OutputRoot <fresh-root>`
 opens the saved master and exports it. `-Action Author` imports the existing
@@ -44,6 +48,9 @@ Exports retain ordered section/material identities, topology, UV/tangent channel
 normals, pivots, bounds, sockets, state IDs, LOD references and collision references.
 Planar interior module translations can survive a save/reopen/export; unsupported
 topology, normal, UV, material, hierarchy, socket and scale edits fail explicitly.
+Unchanged UVs are recovered exactly from Blender's float32 preview encoding of
+`(u, 1-v)`. A genuine UV edit is rejected even inside the general round-trip
+tolerance; this removes arithmetic encoding drift without increasing a tolerance.
 Virtual static module ranges exist only in the DCC adapter, adding no runtime
 articulation or per-truck material binding. Runtime still uses one indexed section
 per family mesh and the established shared PBR atlases. No texture, shader,
@@ -72,9 +79,12 @@ The physical queue regression uses real family footprints/docks, mixed truck siz
 every fleet size from two through ten participants and all four cardinal orientations. Existing neighboring
 bay/blocked-exit tests and Loading/Transit/Unloading/Sustained reference scenes
 remain in force. New family-specific Repeated/Stress scenes publish exactly
-100/1,000 copied operational render instances, terrain-grounded and rotated through
+1/100/1,000 copied operational render instances, terrain-grounded and rotated through
 all four headings. They are diagnostic workloads, not economic simulations or
 evidence that every instance is simultaneously visible.
+Single instances use the existing gallery target. Repeated scenes are isolated
+render workloads; their intentionally absent player-experience HUD does not
+represent a missing building or unavailable mesh.
 
 ## Reproduction and acceptance
 

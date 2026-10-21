@@ -33,7 +33,7 @@ def pick(role):
     return next(o for o in bpy.context.scene.objects if o.get('fl_role') == role and o.get('fl_asset') == root)
 
 
-def reject(name, mutate):
+def reject(name, mutate, expected=None):
     bpy.ops.wm.open_mainfile(filepath=str(master))
     mutate()
     project = output / (str(len(results)) + '.blend')
@@ -42,6 +42,7 @@ def reject(name, mutate):
     try:
         export(project, output / ('reject-' + str(len(results))))
     except ValueError as error:
+        require(expected is None or expected in str(error), 'Wrong rejection gate: ' + str(error))
         results.append({'name': name, 'rejected': True, 'error': str(error)})
     else:
         raise AssertionError('Invalid logistics edit accepted: ' + name)
@@ -58,6 +59,17 @@ reject('added animation', lambda: pick('root').keyframe_insert(data_path='locati
 reject('untracked object', lambda: bpy.context.scene.collection.objects.link(bpy.data.objects.new('Extra', None)))
 reject('changed PBR graph', lambda: next(m for m in bpy.data.materials if m.get('fl_asset')).node_tree.nodes.new('ShaderNodeTexNoise'))
 reject('changed split normals', lambda: pick('geometry').data.normals_split_custom_set([(1,0,0)]*len(pick('geometry').data.loops)))
+
+
+def edit_uv():
+    mesh = pick('geometry').data
+    vertex = mesh.loops[0].vertex_index
+    for loop in mesh.loops:
+        if loop.vertex_index == vertex:
+            mesh.uv_layers.active.data[loop.index].uv.x += .0000005
+
+
+reject('small authored UV edit', edit_uv, 'Unsupported logistics UV edit')
 
 bpy.ops.wm.open_mainfile(filepath=str(master))
 kit = json.loads((source / 'buildings/directorate/authoring' / (family + '.kit.json')).read_text())

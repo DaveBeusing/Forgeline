@@ -16,6 +16,7 @@ foreach ($family in @('storage_depot','supply_depot','logistics_hub')) {
         & (Join-Path $PSScriptRoot 'Invoke-BlenderLogistics.ps1') -Family $family -OutputRoot (Join-Path $destination $name) -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
     }
     & (Join-Path $PSScriptRoot 'Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'tests/native_logistics_contract.py') -InputRoot assets/source -OutputRoot (Join-Path $destination 'native') -ScriptArguments @($family,$master) -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
+    & (Join-Path $PSScriptRoot 'Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'tests/native_logistics_sources.py') -InputRoot assets/source -OutputRoot (Join-Path $destination 'source-contracts') -ScriptArguments @($family,$master) -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
     $first = Join-Path $destination 'first/source'
     $files = @(Get-ChildItem -LiteralPath $first -File -Recurse)
     foreach ($variant in @('second/source','native/control/source')) {

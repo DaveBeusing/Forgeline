@@ -1,10 +1,27 @@
 """Family-local logistics preservation and physically bounded vertex editing."""
 import copy
 import math
+import struct
 
 from asset_contract import compare_geometry, geometry_stats, require
 
 FAMILIES = ('storage_depot', 'supply_depot', 'logistics_hub')
+
+
+def preserve_uvs(before, after):
+    """Invert only the exact float32 preview encoding, rejecting actual UV edits."""
+    def single(value):
+        return struct.unpack('<f', struct.pack('<f', value))[0]
+    for old, new in zip(before['primitives'], after['primitives']):
+        expected = old['attributes'].get('TEXCOORD_0')
+        if expected is None:
+            continue
+        actual = new['attributes']['TEXCOORD_0']
+        require(len(expected) == len(actual), 'Logistics UV vertex count changed')
+        for (u, v), (export_u, export_v) in zip(expected, actual):
+            require(export_u == single(u) and 1-export_v == single(1-v),
+                    'Unsupported logistics UV edit')
+        new['attributes']['TEXCOORD_0'] = copy.deepcopy(expected)
 
 
 def bindings(catalog, ids):
