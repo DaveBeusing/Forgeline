@@ -33,6 +33,9 @@ public sealed class OperationalBuildingReferenceSceneTests
         var first = VisualReferenceScene.Create(kind, terrain);
         Assert.Equal(first.Fingerprint, VisualReferenceScene.Create(kind, terrain).Fingerprint);
         Assert.Equal(source.Snapshot.Tick, first.Snapshot.Tick);
+        Assert.Equal(source.Snapshot.SessionId, first.Snapshot.SessionId);
+        Assert.NotNull(first.Snapshot.PlayerExperience);
+        Assert.Equal(source.Snapshot.PlayerExperience!.Value with { Selection = PlayerSelectionSummary.Empty }, first.Snapshot.PlayerExperience.Value);
         var instances = first.Snapshot.Instances.ToArray();
         Assert.Equal(count, instances.Length);
         Assert.Equal(count, instances.Select(x => x.Entity).Distinct().Count());

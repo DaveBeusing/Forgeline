@@ -43,9 +43,12 @@ internal static class OperationalBuildingReferenceScene
                 Transform = new(position, Quaternion.CreateFromAxisAngle(Vector3.UnitY, i % 4 * MathF.PI / 2), template.Transform.Scale)
             };
         }
-        var snapshot = new PresentationSnapshot(basis.Snapshot.Tick, basis.Snapshot.TickDuration, count, instances);
+        PlayerExperienceSnapshot? experience = basis.Snapshot.PlayerExperience is { } sourceExperience
+            ? sourceExperience with { Selection = PlayerSelectionSummary.Empty } : null;
+        var snapshot = new PresentationSnapshot(basis.Snapshot.Tick, basis.Snapshot.TickDuration, count, instances,
+            sessionId: basis.Snapshot.SessionId, playerExperience: experience);
         string fingerprint = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
-            { kind, version = 1, basis.Target, instances }, FingerprintOptions)));
+            { kind, version = 2, basis.Target, instances, snapshot.SessionId, snapshot.PlayerExperience }, FingerprintOptions)));
         return new(kind, basis.Target, snapshot, default, fingerprint);
     }
 }
