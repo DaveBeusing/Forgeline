@@ -86,6 +86,36 @@ Retaining refuses existing destinations. Portable verification checks master and
 export hashes, the exact fixture/family roster, current canonical source binding
 and actual exported geometry; file presence alone is insufficient.
 
+## Native review fixtures
+
+Four appended reference kinds keep all earlier numeric scene identities unchanged.
+`ResourceDepositsGallery` extracts twelve actual deposit components (four families
+by Untouched/Active/Depleted) and twelve completed Extractor presentations at the
+same X/Z positions. Quantities are copied fixture inputs; no economic production
+or extraction simulation runs. The single scene contains one Ferrous/extractor
+pair. The 100/1,000 scenes contain deposit instances alone, across all four families
+and existing states. These are immutable review snapshots, not new map placements.
+
+The fixture uses the current map family definitions and the same grounding and
+scale equations as `BattlefieldRuntime`: center plus half-height, and
+`(halfExtentX * 1.2, halfExtentY * 2, halfExtentZ * 1.2)`. Reference tests check
+counts, all four identities and three states, reproducible fingerprints, sampled
+height and extractor co-location. It does not certify working mine behavior.
+
+The opt-in complete-catalog test replaces only the eight compiled mineral mesh
+records in a separately sealed review catalog. All material/texture containers
+must match the canonical seed byte-for-byte, and the complete result must pass
+runtime integrity without sources. It never overwrites the seed or canonical
+source definitions. Pass both `FORGELINE_RESOURCE_MASTERS` and
+`FORGELINE_RESOURCE_RUNTIME_SEED` to the focused test, using a fresh overlay path.
+
+`build/resource-deposits/Capture-Review.ps1` compares the canonical seed and this
+complete overlay through the real player renderer: 1080p/4K, three zooms,
+Low/Medium/High, single/100/1,000, dark and wet. Its short 3-warmup/8-sample and
+two-repeat cohorts provide functional pictures/counters only. Four terrain
+materials, controlled sustained measurements and human review remain separate
+explicitly open gates.
+
 ## Integration decision and remaining gates
 
 Rendering qualification PR #268 is merged, but its recorded final five hosted
@@ -122,6 +152,19 @@ before tests at executable-path resolution; the native run above completed.
 The initial sandbox restore failed `NU1900` while contacting NuGet vulnerability
 data. The unchanged restore completed with network access, using two logical
 .NET processors and one MSBuild worker; vulnerability auditing stayed enabled.
+
+The complete canonical runtime seed passed compiler development verification and
+independent source-less integrity: **1,363 assets**, **74,844,434 container bytes**,
+zero issues. Its gameplay texture-container metric is 57,667,508 bytes after the
+existing explicit splash exclusion, below the unchanged 58,720,256-byte gate.
+These file lengths are distinct from GPU memory. This cache-backed compiler run
+is not described as a force-rebuild.
+
+The initial full Release solution build completed with **zero warnings and zero
+errors** (13m37.69s). Four new state-extraction cases passed; the four native
+compiled comparisons were correctly skipped before their required outputs existed.
+The first sandbox test invocation executed zero tests because the MTP named pipe
+was denied; the unchanged native invocation passed those four cases.
 
 The committed one-PATCH gate passed at `3dddf952`: `0.1.431` to `0.1.432`.
 `Validate-ProjectReferences.ps1` passed for 44 projects, without cycles or

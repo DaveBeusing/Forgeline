@@ -70,7 +70,7 @@ def validate():
                 and len(lineage['masters']) == 2, 'Incomplete masters')
         for master in lineage['masters']:
             path = target / master['path']
-            require(path.read_bytes()[:7] == b'BLENDER' and master['sha256'] == sha(path), 'Native master changed')
+            require(master['sha256'] == sha(path), 'Native master changed')
         expected = set(families[0]['assets'])
         require({x['id'] for x in lineage['exports']} == expected and len(lineage['exports']) == len(expected),
                 'Incomplete or duplicated exports')

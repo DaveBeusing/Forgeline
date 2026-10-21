@@ -14,7 +14,7 @@ public sealed class ResourceDepositReferenceSceneTests
     [InlineData(VisualReferenceSceneKind.ResourceDeposits1000, 1000, 0)]
     public void MineralReviewPreservesCanonicalGroundingAndCopiedStates(VisualReferenceSceneKind kind, int count, int extractors)
     {
-        var terrain = DevelopmentTerrainFactory.Create();
+        var terrain = DevelopmentTerrainFactory.CreateRepresentativeWorld();
         var first = VisualReferenceScene.Create(kind, terrain);
         var second = VisualReferenceScene.Create(kind, terrain);
         Assert.Equal(first.Fingerprint, second.Fingerprint);

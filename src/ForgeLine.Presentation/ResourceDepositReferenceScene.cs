@@ -70,8 +70,10 @@ internal static class ResourceDepositReferenceScene
         if (!snapshots.TryReadLatest(out PresentationSnapshot extracted))
             throw new InvalidOperationException("Mineral review snapshot was not published.");
         var instances = extracted.Instances.ToArray();
+        PlayerExperienceSnapshot? experience = basis.Snapshot.PlayerExperience is { } sourceExperience
+            ? sourceExperience with { Selection = PlayerSelectionSummary.Empty } : null;
         var snapshot = new PresentationSnapshot(extracted.Tick, extracted.TickDuration, extracted.SimulationEntityCount, instances,
-            sessionId: extracted.SessionId, playerExperience: basis.Snapshot.PlayerExperience);
+            sessionId: extracted.SessionId, playerExperience: experience);
         string fingerprint = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
             { kind, version = 1, target, instances }, FingerprintOptions)));
         return new(kind, target, snapshot, default, fingerprint);
