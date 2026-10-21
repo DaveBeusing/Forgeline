@@ -7,6 +7,35 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class VisualReferenceSceneTests
 {
     [Theory]
+    [InlineData(VisualReferenceSceneKind.StorageDepotSingle, 1, 4u)]
+    [InlineData(VisualReferenceSceneKind.SupplyDepotSingle, 1, 10u)]
+    [InlineData(VisualReferenceSceneKind.LogisticsHubSingle, 1, 8u)]
+    [InlineData(VisualReferenceSceneKind.StorageDepotRepeated, 100, 4u)]
+    [InlineData(VisualReferenceSceneKind.StorageDepotStress, 1000, 4u)]
+    [InlineData(VisualReferenceSceneKind.SupplyDepotRepeated, 100, 10u)]
+    [InlineData(VisualReferenceSceneKind.SupplyDepotStress, 1000, 10u)]
+    [InlineData(VisualReferenceSceneKind.LogisticsHubRepeated, 100, 8u)]
+    [InlineData(VisualReferenceSceneKind.LogisticsHubStress, 1000, 8u)]
+    public void LogisticsWorkloadsPreserveFamilyScaleAndGroundedCardinalInstances(VisualReferenceSceneKind kind, int count, uint building)
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(kind, terrain);
+        Assert.Equal(scene.Fingerprint, VisualReferenceScene.Create(kind, terrain).Fingerprint);
+        var instances = scene.Snapshot.Instances.ToArray();
+        Assert.Equal(count, instances.Length);
+        Assert.Equal(count, instances.Select(x => x.Entity).Distinct().Count());
+        Assert.Equal(count == 1 ? 1 : 4, instances.Select(x => x.Transform.Rotation).Distinct().Count());
+        var definition = DirectorateContent.CreateBuildingCatalog()[new(building)];
+        Assert.All(instances, instance =>
+        {
+            Assert.Equal(new BuildingId(building), instance.BuildingFeature.Building);
+            Assert.Equal(new System.Numerics.Vector3(definition.Footprint.Width, definition.Footprint.Height, definition.Footprint.Depth), instance.Transform.Scale);
+            Assert.True(terrain.TrySampleHeight(instance.Transform.Position.X, instance.Transform.Position.Z, out float height));
+            Assert.Equal(height + instance.Transform.Scale.Y * .5f, instance.Transform.Position.Y);
+        });
+    }
+
+    [Theory]
     [InlineData(VisualReferenceSceneKind.CommandCoreSingle, 1)]
     [InlineData(VisualReferenceSceneKind.CommandCoreRepeated, 100)]
     public void CommandCoreWorkloadsHaveExactCountsAndDeterministicCardinalRotations(VisualReferenceSceneKind kind, int count)

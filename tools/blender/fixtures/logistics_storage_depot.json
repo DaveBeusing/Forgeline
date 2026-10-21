@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.storage_depot",
+      "assets": [
+        "building.directorate.storage_depot",
+        "building.directorate.storage_depot.critical",
+        "building.directorate.storage_depot.damaged",
+        "building.directorate.storage_depot.destroyed",
+        "building.directorate.storage_depot.foundation",
+        "building.directorate.storage_depot.idle",
+        "building.directorate.storage_depot.lod1",
+        "building.directorate.storage_depot.lod2",
+        "building.directorate.storage_depot.partial_shell",
+        "building.directorate.storage_depot.structural_frame",
+        "building.directorate.storage_depot.unpowered"
+      ],
+      "instanceScale": [
+        14,
+        8,
+        14
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

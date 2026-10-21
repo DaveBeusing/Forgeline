@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.supply_depot",
+      "assets": [
+        "building.directorate.supply_depot",
+        "building.directorate.supply_depot.critical",
+        "building.directorate.supply_depot.damaged",
+        "building.directorate.supply_depot.destroyed",
+        "building.directorate.supply_depot.foundation",
+        "building.directorate.supply_depot.idle",
+        "building.directorate.supply_depot.lod1",
+        "building.directorate.supply_depot.lod2",
+        "building.directorate.supply_depot.partial_shell",
+        "building.directorate.supply_depot.structural_frame",
+        "building.directorate.supply_depot.unpowered"
+      ],
+      "instanceScale": [
+        16,
+        8,
+        16
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

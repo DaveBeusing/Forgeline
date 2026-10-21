@@ -1,24 +1,22 @@
 {
+  "collisionReference": "building.directorate.module.collision_box",
+  "collisionRequired": true,
   "id": "building.directorate.supply_depot",
-  "type": "mesh",
-  "source": "sources/logistics/supply_depot/lod0.gltf",
-  "materialReferences": [
-    "material.directorate.building.structural"
-  ],
   "lods": [
     {
-      "level": 1,
       "assetId": "building.directorate.supply_depot.lod1",
+      "level": 1,
       "maxDistance": 220
     },
     {
-      "level": 2,
       "assetId": "building.directorate.supply_depot.lod2",
+      "level": 2,
       "maxDistance": 620
     }
   ],
-  "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ],
   "sockets": [
     {
       "name": "supply_transfer",
@@ -38,5 +36,7 @@
       "y": -0.3265,
       "z": 0.44
     }
-  ]
+  ],
+  "source": "sources/logistics/supply_depot/blender/lod0.glb",
+  "type": "mesh"
 }
