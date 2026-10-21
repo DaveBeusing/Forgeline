@@ -20,6 +20,16 @@ materials, strategic symbols and shared Base Color/Normal/ORM textures.
 states. Active increases the existing tint and depleted uses the existing grey
 tint. These states derive from deposit data; separate mesh states are unnecessary.
 The demonstrated source gap is a missing native editable master for each family.
+
+| Family | High triangles / vertices | Reduced triangles / vertices |
+| --- | ---: | ---: |
+| Ferrous Ore | 400 / 1,200 | 100 / 300 |
+| Silicates | 30 / 80 | 18 / 48 |
+| Volatiles | 38 / 112 | 24 / 72 |
+| Rare Elements | 40 / 120 | 24 / 72 |
+
+These are parsed canonical source counts; density alone is not an art-acceptance
+criterion. Preservation adds no geometry or runtime texture payload.
 This preservation change does not claim newly designed geometry or new textures.
 
 The canonical ferrous export is the environment-kit revision, not its older
@@ -84,7 +94,10 @@ zero native records and leaves twelve product gates open. A merged milestone is
 not performance acceptance. Required paired physical timings, complete-frame and
 memory observations, lifecycle coverage and human visual approval remain open.
 Historical CI failures retain their original source identities; they are not
-attributed to the current base without reproduction.
+attributed to the current base without reproduction. On the audit base, main
+[CI 39579830636](https://github.com/DaveBeusing/Forgeline/actions/runs/39579830636)
+is still in progress at the recorded checkpoint. Its artillery-retention and
+movement workflows passed; these do not replace the complete required CI check.
 
 Production promotion is blocked. The staged masters do not by themselves satisfy
 end-to-end game integration. Still required are the accepted rendering baseline,
@@ -102,6 +115,19 @@ contention and discovery of unrelated staged tank work in that checkout. They
 are not counted as passing builds or completed authoring runs. Own files were
 copied with byte verification into a separate worktree on the audited base, then
 removed from the shared checkout; the unrelated staged files were left intact.
+
+The portable authoring suite passed **102 tests** with the installed Blender
+Python 3.13 runtime, in 238.229 seconds. Sandbox Python startup attempts failed
+before tests at executable-path resolution; the native run above completed.
+The initial sandbox restore failed `NU1900` while contacting NuGet vulnerability
+data. The unchanged restore completed with network access, using two logical
+.NET processors and one MSBuild worker; vulnerability auditing stayed enabled.
+
+The committed one-PATCH gate passed at `3dddf952`: `0.1.431` to `0.1.432`.
+`Validate-ProjectReferences.ps1` passed for 44 projects, without cycles or
+architecture-boundary violations. Ferrous has completed two independent native
+imports/exports and a reopened export; per-family rejection, compiler and typed
+checks remain separate.
 
 The final execution results belong in this section after their commands finish.
 Until then native master creation, deterministic export, compilation, typed
