@@ -16,4 +16,4 @@ foreach($yaw in @(0,90)){
  & $capture @common -Scenes InfrastructureBridgeDeck,InfrastructureFordDeck,InfrastructureCurveLong -Profiles High -Zooms CloseTactical -Displays 1920x1080 -InspectionDistanceMeters 30 -YawDegrees $yaw -OutputRoot "$OutputRoot/detail-$yaw"
 }
 & $capture @common -Scenes EnvironmentKitBridge,InfrastructureRoadJunctions,InfrastructureFordDeck -Profiles High -Zooms NormalGameplay,Strategic -Displays 1920x1080 -CameraPath Sweep -OutputRoot "$OutputRoot/sweep"
-& $capture @common -Scenes InfrastructureBridgeDeck,InfrastructureRoadJunctions -Profiles High -Zooms NormalGameplay -Displays 640x360,3440x1440 -OutputRoot "$OutputRoot/displays"
+& $capture @common -Scenes InfrastructureBridgeDeck,InfrastructureRoadJunctions -Profiles High -Zooms NormalGameplay -Displays 3440x1440 -OutputRoot "$OutputRoot/ultrawide"

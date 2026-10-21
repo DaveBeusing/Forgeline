@@ -38,7 +38,13 @@ internal static class InfrastructureReferenceScene
             target = Ground(terrain, target);
             var basis=VisualReferenceScene.Create(VisualReferenceSceneKind.EnvironmentKitBridge,terrain,false,assets);
             var backgroundInstances=basis.Snapshot.Instances.ToArray().ToList();
-            backgroundInstances.Add(sample.Truck with { Entity=new(0xE7400000,1),DebugIdentity=0xE7400000 });
+            var layout=CrossingVisualLayout.Create(CentralDivideBattlefield.Create(),terrain);
+            bool bridgeOperational=backgroundInstances.Any(x=>x.InfrastructureFeature.Kind==InfrastructurePresentationKind.RoadBridge &&
+                x.InfrastructureFeature.State==InfrastructurePresentationState.Operational);
+            bool fordOperational=backgroundInstances.Any(x=>x.InfrastructureFeature.Kind==InfrastructurePresentationKind.Ford &&
+                x.InfrastructureFeature.State==InfrastructurePresentationState.Operational);
+            var display=layout.GroundTruck(sample.Truck.Transform,true,bridgeOperational,fordOperational);
+            backgroundInstances.Add(sample.Truck with { Entity=new(0xE7400000,1),DebugIdentity=0xE7400000,Transform=display });
             var snapshot=new PresentationSnapshot(basis.Snapshot.Tick,basis.Snapshot.TickDuration,
                 basis.Snapshot.SimulationEntityCount+1,backgroundInstances.ToArray(),basis.Snapshot.Intelligence,new(1),basis.Snapshot.PlayerExperience);
             return Scene(kind, target, snapshot, sample.Trace);
