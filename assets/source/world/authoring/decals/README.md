@@ -33,3 +33,6 @@ rebaked cells to the canonical atlas, compiles a source-less scoped catalog and
 proves a real relief edit changes the normal bake while retaining the flat carrier.
 
 See [qualification and integration limits](../../../../../docs/BattlefieldDecalBakes.md).
+
+Both image paths and internal packed-image entry paths use the canonical relative
+texture locations. Saved masters contain no user-directory path prefixes.

@@ -5,8 +5,9 @@ The branch is synchronized with master `a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d
 0.1.438, exactly one PATCH above that base. The original 0.1.437 evidence below
 is retained as historical evidence on the preceding terrain materials; it is
 not relabelled as a result on the new master. The synchronized native/catalog/package
-qualification is recorded in the final integration section below. The 39
-measured decal authoring/material/texture inputs remain byte-identical.
+qualification is recorded in the final integration section below. The compiler-ready decal inputs remain byte-identical. The final native packed-
+path correction below updates eight authoring masters without changing their
+geometry, packed pixels or runtime exports.
 
 ## Integration audit
 
@@ -372,3 +373,22 @@ source and installed package remain `c7cbb542`.
 
 The corrected five authoring test classes pass locally: five passed, zero failed/
 skipped, 7m41.096s, using an actual fresh full production compile.
+
+
+## Packed image path correction
+
+The final portability audit found that Blender's visible image path was relative
+while its internal packed-image entry still retained an absolute authoring path.
+The exporter now assigns the canonical relative path to both properties. All
+eight masters are reopened and saved through actual Blender with these entries
+normalized; all three packed PNG byte hashes and the exported runtime carrier
+remain unchanged. A portable guard rejects stored user-directory path prefixes,
+and the native gate requires exactly one canonical relative packed entry for each
+of the three maps in both ordinary and isolated saved-master reopens.
+
+This updates eight authoring-file hashes and the exporter/gate, not the 31
+compiler-ready GLB/material/PNG/definition inputs. Runtime measurements and the
+installed package retain source `c7cbb542`; their production C# and compiler-ready
+inputs remain unchanged. The native saved-master gate is executed separately
+against the committed path-corrected sources, with its own source identity and
+new 39-file input index. Original authoring evidence remains historical.

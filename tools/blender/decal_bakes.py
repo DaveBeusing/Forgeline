@@ -262,10 +262,13 @@ def run(request):
                 name=node.label;item=bpy.data.images.load(str(paths[name]),check_existing=False)
                 item.colorspace_settings.name='sRGB' if name=='base' else 'Non-Color';item.pack()
                 assert bytes(item.packed_file.data)==paths[name].read_bytes()
-                item.filepath='//../../textures/decals/'+paths[name].name;node.image=item
+                item.filepath='//../../textures/decals/'+paths[name].name
+                for packed in item.packed_files: packed.filepath=item.filepath
+                node.image=item
             retained={n.image for n in low.data.materials[0].node_tree.nodes if n.type=='TEX_IMAGE'}
             for item in list(bpy.data.images):
                 if item not in retained:bpy.data.images.remove(item)
+            for item in retained:item.name=Path(item.filepath).name
             bpy.ops.wm.save_as_mainfile(filepath=str(out/f'{family}.blend'),check_existing=False,relative_remap=False,compress=True)
         if args.rebake:
             if args.edit_relief:
@@ -283,7 +286,7 @@ def run(request):
         packed=[]
         for node in low.data.materials[0].node_tree.nodes:
             if node.type=='TEX_IMAGE':
-                packed.append(dict(channel=node.label,colorSpace=node.image.colorspace_settings.name,filepath=node.image.filepath,sha256=hashlib.sha256(bytes(node.image.packed_file.data)).hexdigest()))
+                packed.append(dict(channel=node.label,colorSpace=node.image.colorspace_settings.name,filepath=node.image.filepath,packedPaths=[item.filepath for item in node.image.packed_files],sha256=hashlib.sha256(bytes(node.image.packed_file.data)).hexdigest()))
         write_json(out/'reopen.json',dict(success=True,family=family,packed=packed,exportSha256=hashlib.sha256((out/f'{family}.glb').read_bytes()).hexdigest()))
         return
     atlas={name:array('f',[0.])*(SIZE*SIZE*4) for name in ('base','normal','orm')}

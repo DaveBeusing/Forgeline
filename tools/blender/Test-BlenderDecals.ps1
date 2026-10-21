@@ -33,6 +33,7 @@ foreach($family in $families) {
             $name='decal_atlas'+$(if($map.channel -eq 'base'){''}else{'_'+$map.channel})+'.png'
             if($map.sha256 -ne (Get-FileHash (Join-Path $source "world/textures/decals/$name") -Algorithm SHA256).Hash.ToLowerInvariant()){throw 'Packed shared map differs from canonical bytes.'}
             if($map.colorSpace -ne $(if($map.channel -eq 'base'){'sRGB'}else{'Non-Color'})){throw 'Packed map has wrong color space.'}
+            if(@($map.packedPaths).Count -ne 1 -or $map.packedPaths[0].Replace('\','/') -ne "//../../textures/decals/$name"){throw 'Packed image entry path is not canonical-relative.'}
             if($map.filepath.Replace('\','/') -ne "//../../textures/decals/$name"){throw 'Packed map path is not canonical-relative.'}
         }
     }
