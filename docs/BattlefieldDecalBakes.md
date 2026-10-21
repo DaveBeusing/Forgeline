@@ -264,11 +264,12 @@ reviewable source/runtime candidate, not a claim of completed production accepta
 
 ## Integration on master a2a88f06: 0.1.438
 
-The final production source is `c7cbb542c77f56ce5de0988e043ad65495b12b37`,
+The measured runtime source is `c7cbb542c77f56ce5de0988e043ad65495b12b37`,
 based on fetched master `a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d`, version
 0.1.437. The candidate remains exactly one PATCH higher: **0.1.438**. Subsequent
 commits update catalog-count assertions and documentation/evidence; production
-code and assets remain unchanged. The original 0.1.437 results above keep
+runtime C# and compiler-ready assets remain unchanged; native authoring metadata
+is corrected separately below. The original 0.1.437 results above keep
 their original source identity.
 
 Merged terrain PR #284 preserves encoded texture payloads while migrating saved
@@ -392,3 +393,33 @@ installed package retain source `c7cbb542`; their production C# and compiler-rea
 inputs remain unchanged. The native saved-master gate is executed separately
 against the committed path-corrected sources, with its own source identity and
 new 39-file input index. Original authoring evidence remains historical.
+
+
+### Re-executed saved-master gate
+
+The committed path-corrected authoring source is
+`f7d63b7dc1531277a54851f4938cb276ecc9a6ba`. The complete pinned Blender gate
+passes again with a clean source tree: **16 saved-master reopens**, including
+isolated copies; all image and packed-entry paths canonical-relative; all **24
+rebaked channels exact**; **200** geometric TBN probes, maximum component error
+**0.099219**; a real edited relief changes its normal map while retaining the
+byte-identical flat carrier; scoped compilation and absent-source validation pass.
+The complete portable source suite now reports **127 passed**, including the new
+user-directory path guard. The five corrected full-catalog authoring tests report
+five passed, zero failed/skipped.
+
+Exactly eight native authoring hashes change. All **31 compiler-ready decal
+inputs**, all runtime C# and all active source definitions/PNGs/GLBs remain
+identical to runtime measurement/package source `c7cbb542`. Packed PNG bytes,
+geometry and baked pixels are unchanged. The earlier C7 39-file lineage is a
+historical observation; [fresh native input hashes](evidence/battlefield-decals/packed-paths/blender-result.json)
+record the final masters. Runtime images, timing and installed-package records
+retain their actual C7 identity and are not relabelled as new executions.
+
+[Packed-path evidence](evidence/battlefield-decals/packed-paths/evidence-index.json)
+indexes **337 original files**. The local archive
+`artifacts/battlefield-decal-packed-paths438.zip` is **3,325,026 bytes**, SHA-256
+`cfe6f26450c238232a23e9a57c0dac6dc891974b2948a49dee26ed8c83feb3a4`;
+every entry was read back and hash-verified. The actual native metadata is
+committed as reproducible gzip with portable path tokens. Final PR-head CI is
+verified independently; physical performance and human visual gates remain open.
