@@ -37,7 +37,7 @@ public sealed class ResourceDepositReferenceSceneTests
             float heightScale = MathF.Max(source.HalfExtents.Y * 2, minimumHeight);
             Assert.Equal(new Vector3(source.HalfExtents.X * 1.2f, heightScale, source.HalfExtents.Z * 1.2f), deposit.Transform.Scale);
             Assert.True(terrain.TrySampleHeight(deposit.Transform.Position.X, deposit.Transform.Position.Z, out float height));
-            Assert.Equal(height + heightScale * .5f, deposit.Transform.Position.Y, 5);
+            Assert.InRange(MathF.Abs(height + heightScale * .5f - deposit.Transform.Position.Y), 0, .00001f);
             Assert.True(deposit.WorldFeature.IsInspectable);
             if (extractors == 0) continue;
             Assert.Contains(instances, x => x.BuildingFeature.Building == BuildingIds.Extractor &&
