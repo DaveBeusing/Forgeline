@@ -6,7 +6,8 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from asset_contract import Catalog, read_geometry, sha
+from asset_contract import Catalog, read_geometry, sha, geometry_stats
+from collections import Counter
 from infrastructure_contract import canonical_geometry
 
 ROOT=Path(__file__).resolve().parents[3]
@@ -18,7 +19,7 @@ class InfrastructureContracts(unittest.TestCase):
         cls.catalog=Catalog(ROOT/'assets/source')
         cls.records=json.loads((ROOT/'tools/blender/fixtures/infrastructure_sources.json').read_text())['meshes']
 
-    def test_all_eighteen_canonical_meshes_preserve_original_channels_and_metadata(self):
+    def test_all_eighteen_meshes_preserve_bindings_and_only_two_reviewed_curves_change(self):
         self.assertEqual(18,len(self.records))
         for record in self.records:
             with self.subTest(asset=record['id']):
@@ -30,7 +31,40 @@ class InfrastructureContracts(unittest.TestCase):
                                  {k:v for k,v in definition.items() if k!='source'})
                 before=read_geometry(original,self.catalog.root,record['metadata'])
                 after=read_geometry(self.catalog.source(record['id']),self.catalog.root,definition)
-                self.assertEqual(before['primitives'],after['primitives'])
+                self.assertEqual(record['canonicalHash'],sha(self.catalog.source(record['id'])))
+                if record.get('refinement')=='continuous-closed-ribbon':
+                    self.assertIn(record['id'].rsplit('.',1)[1],('curve_short','curve_long'))
+                    self.check_curve(before,after)
+                else:self.assertEqual(before['primitives'],after['primitives'])
+
+    def check_curve(self,before,after):
+        old,new=geometry_stats(before),geometry_stats(after)
+        self.assertEqual(old['boundsMin'],new['boundsMin'])
+        self.assertEqual(old['boundsMax'],new['boundsMax'])
+        self.assertLessEqual(new['vertices'],old['vertices'])
+        self.assertLessEqual(new['triangles'],old['triangles'])
+        self.assertEqual(1,len(after['primitives']))
+        a,b=before['primitives'][0],after['primitives'][0]
+        for key in ('mesh','primitive','name','materialSlot'):self.assertEqual(a[key],b[key])
+        self.assertEqual(set(a['attributes']),set(b['attributes']))
+        for axis in (0,1):
+            lo=min(x[axis] for x in a['attributes']['TEXCOORD_0'])
+            hi=max(x[axis] for x in a['attributes']['TEXCOORD_0'])
+            for uv in b['attributes']['TEXCOORD_0']:self.assertTrue(lo<=uv[axis]<=hi)
+        positions=b['attributes']['POSITION'];indices=b['indices'];edges=Counter();adjacency={}
+        for i in range(0,len(indices),3):
+            face=[tuple(positions[j]) for j in indices[i:i+3]]
+            self.assertEqual(3,len(set(face)))
+            for a,b in zip(face,face[1:]+face[:1]):
+                edges[tuple(sorted((a,b)))]+=1
+                adjacency.setdefault(a,set()).add(b);adjacency.setdefault(b,set()).add(a)
+        self.assertTrue(all(count==2 for count in edges.values()),'Every welded edge must have two faces')
+        pending=[next(iter(adjacency))];seen=set()
+        while pending:
+            current=pending.pop()
+            if current in seen:continue
+            seen.add(current);pending.extend(adjacency[current]-seen)
+        self.assertEqual(len(adjacency),len(seen),'Curve must be one connected closed slab')
 
     def geometry(self):
         aid='infrastructure.directorate.bridge.road.intact'

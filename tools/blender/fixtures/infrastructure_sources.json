@@ -94,7 +94,7 @@
       }
     },
     {
-      "canonicalHash": "63b17903572c58c3afd13c6b885e3d1d5c6915f951ab9840ebd31e73335cb6bb",
+      "canonicalHash": "44c8bf53d7cd10233574c69b73e76a1bf062cb898bc2e34d4264ce4aa1afcc84",
       "canonicalSource": "infrastructure/directorate/sources/blender/road_curve_long.glb",
       "id": "infrastructure.directorate.road.curve_long",
       "metadata": {
@@ -108,6 +108,7 @@
       "originalHash": "941e4541097f4fcdaaf7830eb00ebc48e167783825380cc38cddd022f88b3bec",
       "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/road_curve_long.gltf",
+      "refinement": "continuous-closed-ribbon",
       "stats": {
         "boundsMax": [
           0.6394855380058289,
@@ -125,7 +126,7 @@
       }
     },
     {
-      "canonicalHash": "785d896cebcdb73f33ee7cee559a2a63d4032376fafc81b46372776224741363",
+      "canonicalHash": "a219d0a573ffb27672c7c081cd889c74e199f810c2809c0e5f7ccbe7423a5c8a",
       "canonicalSource": "infrastructure/directorate/sources/blender/road_curve_short.glb",
       "id": "infrastructure.directorate.road.curve_short",
       "metadata": {
@@ -139,6 +140,7 @@
       "originalHash": "af071f1647c830d644591b7e4602683391e2de83b397565946834ac30f43197b",
       "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/road_curve_short.gltf",
+      "refinement": "continuous-closed-ribbon",
       "stats": {
         "boundsMax": [
           0.5137459635734558,

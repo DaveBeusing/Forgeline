@@ -8,7 +8,7 @@ public sealed class InfrastructureSourceQualificationTests
     public static bool Enabled=>!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_INFRASTRUCTURE_ORIGINAL_RUNTIME"));
 
     [Fact(Skip="Compile original and canonical infrastructure sources first.",SkipUnless=nameof(Enabled))]
-    public void CanonicalBlenderSourcesPreserveAllCompiledGeometryAndBindings()
+    public void CanonicalBlenderSourcesPreserveBindingsAndBoundTheTwoContinuousCurveRefinements()
     {
         var original=RuntimeAssetCatalog.Load(Environment.GetEnvironmentVariable("FORGELINE_INFRASTRUCTURE_ORIGINAL_RUNTIME")!);
         var canonical=RuntimeAssetCatalog.Load(Environment.GetEnvironmentVariable("FORGELINE_INFRASTRUCTURE_CANONICAL_RUNTIME")!);
@@ -31,9 +31,30 @@ public sealed class InfrastructureSourceQualificationTests
             var b=RuntimeMeshData.FromPayload(canonical.Read(id).Payload);
             Assert.Equal(a.Attributes,b.Attributes);
             Assert.Equal(a.MaterialIds,b.MaterialIds);
-            Assert.Equal(a.Sections,b.Sections);
-            Assert.Equal(a.Indices,b.Indices);
-            Assert.Equal(a.Vertices.ToArray(),b.Vertices.ToArray());
+            bool shortCurve=before.Id=="infrastructure.directorate.road.curve_short";
+            bool longCurve=before.Id=="infrastructure.directorate.road.curve_long";
+            if(shortCurve||longCurve)
+            {
+                Assert.Equal(shortCurve?36:60,b.Vertices.Count);
+                Assert.Equal(shortCurve?60:108,b.Indices.Count);
+                Assert.True(b.Vertices.Count<=a.Vertices.Count);
+                Assert.True(b.Indices.Count<=a.Indices.Count);
+                Assert.Equal(a.Sections.Count,b.Sections.Count);
+                Assert.Equal(a.Sections[0].MaterialSlot,b.Sections[0].MaterialSlot);
+                CheckRange(x=>x.X);CheckRange(x=>x.Y);CheckRange(x=>x.Z);
+                CheckRange(x=>x.U);CheckRange(x=>x.V);
+                void CheckRange(Func<RuntimeMeshVertex,float> channel)
+                {
+                    Assert.Equal(a.Vertices.Min(channel),b.Vertices.Min(channel));
+                    Assert.Equal(a.Vertices.Max(channel),b.Vertices.Max(channel));
+                }
+            }
+            else
+            {
+                Assert.Equal(a.Sections,b.Sections);
+                Assert.Equal(a.Indices,b.Indices);
+                Assert.Equal(a.Vertices.ToArray(),b.Vertices.ToArray());
+            }
             if(!before.Id.Contains("collision",StringComparison.Ordinal))
                 Assert.Contains("infrastructure/directorate/sources/blender/",after.SourcePath.Replace('\\','/'),StringComparison.Ordinal);
             meshes++;
