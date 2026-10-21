@@ -18,6 +18,9 @@ internal sealed class CrossingVisualLayout
     internal Dictionary<string,RenderTransform> Crossings { get; }=new(StringComparer.Ordinal);
     internal Dictionary<string,RenderTransform> Aprons { get; }=new(StringComparer.Ordinal);
     internal List<RenderInstance> Approaches { get; }=[];
+    private RenderTransform? _bridgeCrack;
+    private RenderTransform _groundCrack;
+    private Vector2 _originalCrack;
 
     internal static CrossingVisualLayout Create(BattlefieldDefinition map,TerrainWorld terrain)
     {
@@ -80,6 +83,19 @@ internal sealed class CrossingVisualLayout
                 AddStrip(farTop,farPath[0]);
             }
             EmitPath(nearPath);EmitPath(farPath);
+            if(bridge)
+            foreach(var item in map.WorldObjects)
+            {
+                if(item.Key!="decal.crack.north")continue;
+                result._originalCrack=new(item.Position.X,item.Position.Z);
+                Vector3 offset=Vector3.Transform(new Vector3(item.Position.X-center.X,0,item.Position.Z-center.Z),rotation);
+                result._bridgeCrack=new(anchor+offset+normal*.004f,
+                    Quaternion.Normalize(Quaternion.Concatenate(Quaternion.CreateFromAxisAngle(Vector3.UnitY,item.RotationDegrees*MathF.PI/180),rotation)),item.Scale);
+                Vector3 crackGround=Ground(anchor+offset)+Vector3.UnitY*.04f;
+                result._groundCrack=new(crackGround,Quaternion.CreateFromAxisAngle(Vector3.UnitY,
+                    item.RotationDegrees*MathF.PI/180+yaw),item.Scale);
+            }
+
 
             Vector3[] ClearPath(Vector3 a,Vector3 b)
             {
@@ -170,6 +186,12 @@ internal sealed class CrossingVisualLayout
             result.Approaches.Add(new(new EntityId(id,1),new(position,rotation,scale),new(1),RenderMaterialHandle.Default,
                 RenderVisibilityMask.World,id,InfrastructureFeature:new(kind,InfrastructurePresentationState.Operational)));
         }
+    }
+
+    internal RenderTransform AlignBridgeCrack(in RenderTransform original,bool bridgeOperational=true)
+    {
+        if(_bridgeCrack is not {} aligned || Vector2.Distance(new(original.Position.X,original.Position.Z),_originalCrack)>.001f)return original;
+        return bridgeOperational?aligned:_groundCrack;
     }
 
     internal RenderTransform GroundTruck(in RenderTransform transform,bool cargo,bool bridgeOperational,bool fordOperational)

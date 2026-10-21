@@ -63,7 +63,10 @@ share the actual travel axis. Approach nodes and ramp endpoints are shared;
 terrain. Existing solid slabs and gravel shoulders extend below the terrain,
 with unchanged widths, source bounds and mesh/texture inventories.
 South Ford uses the existing road surface and two
-ramps. The 12m lane and paired 2.4m shoulders are retained; 234 static presentation
+ramps. The existing authored crack overlay follows the same bridge rotation and stays
+inside the rails; when the authoritative bridge is nonoperational it retains
+terrain grounding. Its map record, material and source quad remain unchanged.
+The 12m lane and paired 2.4m shoulders are retained; 234 static presentation
 instances cover the approaches. These identities do not consume simulation
 entities. Only drawn cargo/supply poses receive the operational crossing plane;
 original ECS transforms, movement, wheel travel, graph keys, navigation,

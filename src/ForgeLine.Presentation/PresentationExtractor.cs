@@ -378,6 +378,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 new RenderTransform(transform.Position, transform.Rotation, transform.Scale), worldFeature);
             if (_crossingLayout is not null)
             {
+                if (worldFeature.Visual == WorldVisualId.DecalConcreteCrack)
+                    renderTransform = _crossingLayout.AlignBridgeCrack(renderTransform,bridgeOperational);
                 if (infrastructureFeature.Kind is InfrastructurePresentationKind.RoadBridge or InfrastructurePresentationKind.Ford &&
                     entities.TryGetComponent(entity, out InfrastructurePresentationIdentity crossingIdentity) &&
                     _crossingLayout.Crossings.TryGetValue(crossingIdentity.Key, out var crossingTransform))

@@ -119,6 +119,41 @@ public sealed class CrossingVisualLayoutTests
         }
     }
 
+    [Fact]
+    public void AuthoredBridgeCrackFollowsTheDeckWithoutChangingItsMapTransformOrLeakingPastTheRails()
+    {
+        var map=CentralDivideBattlefield.Create();var terrain=CentralDivideTerrainFactory.Create(map);
+        var layout=CrossingVisualLayout.Create(map,terrain);
+        var item=map.WorldObjects.Single(x=>x.Key=="decal.crack.north");
+        Assert.True(terrain.TrySampleHeight(item.Position.X,item.Position.Z,out float ground));
+        var original=new RenderTransform(item.Position with { Y=ground+.04f },
+            Quaternion.CreateFromAxisAngle(Vector3.UnitY,item.RotationDegrees*MathF.PI/180),item.Scale);
+        var drawn=layout.AlignBridgeCrack(original);
+        Assert.Equal(original.Scale,drawn.Scale);
+        Assert.NotEqual(original,drawn);
+        var unrelated=original with { Position=original.Position+Vector3.UnitX };
+        Assert.Equal(unrelated,layout.AlignBridgeCrack(unrelated));
+        var destroyed=layout.AlignBridgeCrack(original,false);
+        Assert.True(terrain.TrySampleHeight(destroyed.Position.X,destroyed.Position.Z,out float destroyedGround));
+        Assert.Equal(destroyedGround+.04f,destroyed.Position.Y,4);
+        var feature=new InfrastructureFeaturePresentationMetadata(InfrastructurePresentationKind.RoadBridge,InfrastructurePresentationState.Operational);
+        var bridge=InfrastructurePresentationCatalog.AdjustWorldTransform(feature,layout.Crossings["crossing.north_bridge"].ToMatrix());
+        Assert.True(Matrix4x4.Invert(bridge,out var inverse));
+        for(int x=-1;x<=1;x+=2)
+        for(int z=-1;z<=1;z+=2)
+        {
+            Vector3 corner=Vector3.Transform(new(x*.5f,0,z*.5f),drawn.ToMatrix());
+            Vector3 local=Vector3.Transform(corner,inverse);
+            Assert.InRange(MathF.Abs(local.X),0,.46f);
+            Assert.InRange(MathF.Abs(local.Z),0,.5f);
+            Assert.True(layout.TryDrivingSurface(corner,out float floor,out var normal));
+            Assert.InRange(MathF.Abs((corner.Y-floor)*normal.Y-.004f),0,.0002f);
+            Assert.True(Vector3.Dot(Vector3.Transform(Vector3.UnitY,drawn.Rotation),normal)>.99999f);
+        }
+        Assert.Equal(new Vector3(1535,0,918),item.Position);
+        Assert.Equal(90,item.RotationDegrees);
+    }
+
     private static Vector3 RoadPoint(RenderInstance item,float x,float z)=>Vector3.Transform(new(x,-.42f,z),
         InfrastructurePresentationCatalog.AdjustWorldTransform(item.InfrastructureFeature,item.Transform.ToMatrix()));
 
