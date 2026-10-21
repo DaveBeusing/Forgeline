@@ -119,21 +119,23 @@ public sealed class CrossingVisualLayoutTests
         }
     }
 
-    [Fact]
-    public void AuthoredBridgeCrackFollowsTheDeckWithoutChangingItsMapTransformOrLeakingPastTheRails()
+    [Theory]
+    [InlineData("decal.crack.north",WorldVisualId.DecalConcreteCrack,18f,.004f)]
+    [InlineData("decal.roadwear.center",WorldVisualId.DecalRoadWear,42f,.003f)]
+    public void AuthoredBridgeOverlaysFollowTheDeckWithoutChangingTheMapOrLeakingPastTheRails(string key,WorldVisualId visual,float length,float lift)
     {
         var map=CentralDivideBattlefield.Create();var terrain=CentralDivideTerrainFactory.Create(map);
         var layout=CrossingVisualLayout.Create(map,terrain);
-        var item=map.WorldObjects.Single(x=>x.Key=="decal.crack.north");
+        var item=map.WorldObjects.Single(x=>x.Key==key);
         Assert.True(terrain.TrySampleHeight(item.Position.X,item.Position.Z,out float ground));
         var original=new RenderTransform(item.Position with { Y=ground+.04f },
             Quaternion.CreateFromAxisAngle(Vector3.UnitY,item.RotationDegrees*MathF.PI/180),item.Scale);
-        var drawn=layout.AlignBridgeCrack(original);
-        Assert.Equal(original.Scale,drawn.Scale);
+        var drawn=layout.AlignBridgeOverlay(original,visual);
+        Assert.Equal(original.Scale with { X=length },drawn.Scale);
         Assert.NotEqual(original,drawn);
         var unrelated=original with { Position=original.Position+Vector3.UnitX };
-        Assert.Equal(unrelated,layout.AlignBridgeCrack(unrelated));
-        var destroyed=layout.AlignBridgeCrack(original,false);
+        Assert.Equal(unrelated,layout.AlignBridgeOverlay(unrelated,visual));
+        var destroyed=layout.AlignBridgeOverlay(original,visual,false);
         Assert.True(terrain.TrySampleHeight(destroyed.Position.X,destroyed.Position.Z,out float destroyedGround));
         Assert.Equal(destroyedGround+.04f,destroyed.Position.Y,4);
         var feature=new InfrastructureFeaturePresentationMetadata(InfrastructurePresentationKind.RoadBridge,InfrastructurePresentationState.Operational);
@@ -146,11 +148,13 @@ public sealed class CrossingVisualLayoutTests
             Vector3 local=Vector3.Transform(corner,inverse);
             Assert.InRange(MathF.Abs(local.X),0,.46f);
             Assert.InRange(MathF.Abs(local.Z),0,.5f);
-            Assert.True(layout.TryDrivingSurface(corner,out float floor,out var normal));
-            Assert.InRange(MathF.Abs((corner.Y-floor)*normal.Y-.004f),0,.0002f);
+            // The worn14m strip includes deck margins beyond the unchanged12m driving lane.
+            Assert.InRange(MathF.Abs((local.Y+.07f)*layout.Crossings["crossing.north_bridge"].Scale.Y-lift),0,.0002f);
+            Vector3 normal=Vector3.Transform(Vector3.UnitY,layout.Crossings["crossing.north_bridge"].Rotation);
             Assert.True(Vector3.Dot(Vector3.Transform(Vector3.UnitY,drawn.Rotation),normal)>.99999f);
         }
-        Assert.Equal(new Vector3(1535,0,918),item.Position);
+        Assert.Equal(visual==WorldVisualId.DecalConcreteCrack?new Vector3(1535,0,918):new Vector3(1536,0,920),item.Position);
+        Assert.Equal(visual==WorldVisualId.DecalConcreteCrack?18:72,item.Scale.X);
         Assert.Equal(90,item.RotationDegrees);
     }
 

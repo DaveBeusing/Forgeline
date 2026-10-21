@@ -18,9 +18,8 @@ internal sealed class CrossingVisualLayout
     internal Dictionary<string,RenderTransform> Crossings { get; }=new(StringComparer.Ordinal);
     internal Dictionary<string,RenderTransform> Aprons { get; }=new(StringComparer.Ordinal);
     internal List<RenderInstance> Approaches { get; }=[];
-    private RenderTransform? _bridgeCrack;
-    private RenderTransform _groundCrack;
-    private Vector2 _originalCrack;
+    private readonly List<BridgeOverlay> _bridgeOverlays=[];
+    private readonly record struct BridgeOverlay(WorldVisualId Visual,Vector2 Original,RenderTransform Deck,RenderTransform Ground);
 
     internal static CrossingVisualLayout Create(BattlefieldDefinition map,TerrainWorld terrain)
     {
@@ -86,14 +85,15 @@ internal sealed class CrossingVisualLayout
             if(bridge)
             foreach(var item in map.WorldObjects)
             {
-                if(item.Key!="decal.crack.north")continue;
-                result._originalCrack=new(item.Position.X,item.Position.Z);
+                if(item.Key is not ("decal.crack.north" or "decal.roadwear.center"))continue;
                 Vector3 offset=Vector3.Transform(new Vector3(item.Position.X-center.X,0,item.Position.Z-center.Z),rotation);
-                result._bridgeCrack=new(anchor+offset+normal*.004f,
-                    Quaternion.Normalize(Quaternion.Concatenate(Quaternion.CreateFromAxisAngle(Vector3.UnitY,item.RotationDegrees*MathF.PI/180),rotation)),item.Scale);
-                Vector3 crackGround=Ground(anchor+offset)+Vector3.UnitY*.04f;
-                result._groundCrack=new(crackGround,Quaternion.CreateFromAxisAngle(Vector3.UnitY,
-                    item.RotationDegrees*MathF.PI/180+yaw),item.Scale);
+                Vector3 scale=item.Scale with { X=Math.Min(item.Scale.X,42) };
+                float lift=item.Visual==WorldVisualId.DecalConcreteCrack?.004f:.003f;
+                var deckOverlay=new RenderTransform(anchor+offset+normal*lift,
+                    Quaternion.Normalize(Quaternion.Concatenate(Quaternion.CreateFromAxisAngle(Vector3.UnitY,item.RotationDegrees*MathF.PI/180),rotation)),scale);
+                var groundOverlay=new RenderTransform(Ground(anchor+offset)+Vector3.UnitY*.04f,
+                    Quaternion.CreateFromAxisAngle(Vector3.UnitY,item.RotationDegrees*MathF.PI/180+yaw),scale);
+                result._bridgeOverlays.Add(new(item.Visual,new(item.Position.X,item.Position.Z),deckOverlay,groundOverlay));
             }
 
 
@@ -188,10 +188,14 @@ internal sealed class CrossingVisualLayout
         }
     }
 
-    internal RenderTransform AlignBridgeCrack(in RenderTransform original,bool bridgeOperational=true)
+    internal RenderTransform AlignBridgeOverlay(in RenderTransform original,WorldVisualId visual,bool bridgeOperational=true)
     {
-        if(_bridgeCrack is not {} aligned || Vector2.Distance(new(original.Position.X,original.Position.Z),_originalCrack)>.001f)return original;
-        return bridgeOperational?aligned:_groundCrack;
+        foreach(var overlay in _bridgeOverlays)
+        {
+            if(overlay.Visual!=visual || Vector2.Distance(new(original.Position.X,original.Position.Z),overlay.Original)>.001f)continue;
+            return bridgeOperational?overlay.Deck:overlay.Ground;
+        }
+        return original;
     }
 
     internal RenderTransform GroundTruck(in RenderTransform transform,bool cargo,bool bridgeOperational,bool fordOperational)
