@@ -1,12 +1,14 @@
 #requires -Version 7.4
 [CmdletBinding()]
-param([Parameter(Mandatory)][string]$OutputRoot, [string]$BlenderPath, [switch]$RenderPreviews)
+param([Parameter(Mandatory)][string]$OutputRoot, [string]$BlenderPath, [switch]$RenderPreviews,
+      [switch]$ReuseAuthored, [string]$MaterialCacheRoot)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath('../..', $PSScriptRoot)
 Import-Module (Join-Path $repo 'tools/blender/BlenderToolchain.psm1') -Force
 $output = Resolve-BlenderOutput -Path $OutputRoot -RepositoryRoot $repo
-if (Test-Path -LiteralPath $output) { throw 'Use fresh output.' }
+if ((Test-Path -LiteralPath $output) -and -not $ReuseAuthored) { throw 'Use fresh output.' }
+if ($MaterialCacheRoot) { $MaterialCacheRoot = [IO.Path]::GetFullPath($MaterialCacheRoot, $repo) }
 $compiler = Join-Path $repo 'tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll'
 function Read-Tree([string]$Path) {
     return @(Get-ChildItem -LiteralPath $Path -File -Recurse | Sort-Object FullName | ForEach-Object {
@@ -15,6 +17,8 @@ function Read-Tree([string]$Path) {
 }
 $before = Read-Tree (Join-Path $repo 'assets/source')
 $fixture = Join-Path $PSScriptRoot 'fixture.json'
+$canonicalRoot = [IO.Path]::GetFullPath('assets/source', $repo)
+if (-not $ReuseAuthored) {
 foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
     $familyRoot = Join-Path $output $family
     foreach ($variant in @('first','second','reopened')) {
@@ -26,13 +30,39 @@ foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
     }
     & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'native_contract.py') -InputRoot assets/source -OutputRoot (Join-Path $familyRoot 'native-contracts') -ScriptArguments @((Join-Path $familyRoot 'first/authoring.blend'), $fixture, "mesh.world.resource.$family") -BlenderPath $BlenderPath -TimeoutSeconds 480
 }
+}
+foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
+    $familyRoot = Join-Path $output $family
+    $native = Get-Content -LiteralPath (Join-Path $familyRoot 'native-contracts/native-contracts.json') -Raw | ConvertFrom-Json
+    if (-not $native.success -or -not $native.unchangedReopenAccepted -or $native.root -ne "mesh.world.resource.$family" -or
+        (Compare-Object @('animation','changed envelope','material slots','modifier','unbaked transform','unexpected object') @($native.rejected | Sort-Object))) {
+        throw "Incomplete native rejection evidence: $family"
+    }
+    foreach ($variant in @('first','second','reopened')) {
+        $report = Get-Content -LiteralPath (Join-Path $familyRoot "$variant/roundtrip-report.json") -Raw | ConvertFrom-Json
+        if (-not $report.success -or -not $report.productionSourcesUnchanged -or $report.meshes.Count -ne 2 -or
+            (Compare-Object @('mesh.world.resource.' + $family, 'mesh.world.resource.' + $family + '_lod1') @($report.meshes.id | Sort-Object))) { throw "Incomplete authored output: $family/$variant" }
+        foreach ($file in $report.sourceHashes.PSObject.Properties) {
+            $sourcePath = [IO.Path]::GetFullPath($file.Name, $canonicalRoot)
+            if (-not $sourcePath.StartsWith($canonicalRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+                (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash -ne $file.Value) { throw "Canonical source drift: $family/$variant/$($file.Name)" }
+        }
+    }
+}
 if (-not (Test-Path -LiteralPath $compiler)) { throw 'Build Release before compiling the preserved exports.' }
 foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
     $familyRoot = Join-Path $output $family
     foreach ($variant in @('baseline','first','second','reopened')) {
         $source = if ($variant -eq 'baseline') { Join-Path $familyRoot 'first/baseline-source' } else { Join-Path $familyRoot "$variant/source" }
         $runtime = Join-Path $familyRoot "$variant/runtime"
-        & dotnet $compiler --mode build --source $source --runtime $runtime --qualification-output (Join-Path $familyRoot "$variant-compile.json") 2>&1 | Out-File (Join-Path $familyRoot "$variant-compile.log") -Encoding utf8NoBOM
+        if (Test-Path -LiteralPath $runtime) { throw "Use fresh runtime output: $family/$variant" }
+        if ($MaterialCacheRoot) {
+            $seed = Join-Path $MaterialCacheRoot $family
+            $seedManifest = Get-Content -LiteralPath (Join-Path $seed 'manifest.json') -Raw | ConvertFrom-Json
+            if (@($seedManifest.assets).Count -ne 4 -or @($seedManifest.assets | Where-Object type -eq 'mesh').Count -ne 0) { throw 'Material cache must contain exactly four nonmesh records.' }
+            Copy-Item -LiteralPath $seed -Destination $runtime -Recurse
+        }
+        & dotnet $compiler --mode development --source $source --runtime $runtime --qualification-output (Join-Path $familyRoot "$variant-compile.json") 2>&1 | Out-File (Join-Path $familyRoot "$variant-compile.log") -Encoding utf8NoBOM
         if ($LASTEXITCODE -ne 0) { throw "Compile failed: $family/$variant" }
         & dotnet $compiler --mode validate --source (Join-Path $output 'absent-source') --runtime $runtime --qualification-output (Join-Path $familyRoot "$variant-source-less.json") 2>&1 | Out-File (Join-Path $familyRoot "$variant-source-less.log") -Encoding utf8NoBOM
         if ($LASTEXITCODE -ne 0) { throw "Source-less validation failed: $family/$variant" }
