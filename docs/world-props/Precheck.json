@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "repository": "DaveBeusing/Forgeline",
+  "integrationBranch": "master",
+  "sourceSha": "a524b0a8164390abe1e9cb38170e690f46147574",
+  "version": "0.1.436",
+  "remoteBranches": [
+    "master"
+  ],
+  "openPullRequests": [],
+  "relatedMergedPullRequests": [
+    47,
+    102,
+    149,
+    171,
+    181,
+    228,
+    229,
+    269,
+    268,
+    279,
+    280
+  ],
+  "unintegratedRelatedWork": [],
+  "reviewCommentsObserved": 0,
+  "existingFamilies": 22,
+  "existingVisualMeshes": 44,
+  "existingHighReducedLods": true,
+  "sharedIndustrialMaterial": "material.world.prop.industrial",
+  "nativeMasterGap": "No retained world prop rest/inspection masters; crate pilot remains evidence only",
+  "reuse": "Preserve current mesh geometry, UVs, material slots, LODs, collision references and presentation-only placements",
+  "scope": [
+    "build/world-props/",
+    "assets/staged/world-props/",
+    "44 world prop source definitions",
+    "assets/source/world/meshes/sources/blender/props/",
+    "prop reference scenes and tests",
+    "scoped workflow and documentation"
+  ],
+  "untouched": [
+    "Game and World sources",
+    "renderer and compiler contracts",
+    "shared materials and textures",
+    "vegetation",
+    "mineral deposits",
+    "road and bridge infrastructure definitions",
+    "map placement logic"
+  ],
+  "renderingMilestone": {
+    "pr": 268,
+    "merged": true,
+    "physicalPairedQualification": "pending",
+    "liveLifecycle": "pending",
+    "humanArtApproval": "pending",
+    "productionPromotion": "blocked"
+  },
+  "nativeCapability": {
+    "blender": "5.2.2",
+    "buildHash": "d13f752e3b9c",
+    "python": "3.13.13",
+    "architecture": "AMD64"
+  },
+  "requiredChecks": [
+    "Release build",
+    "project reference graph",
+    "source-less asset compiler",
+    "native Blender deterministic/reopened exports and negative contracts",
+    "typed compiled comparisons",
+    "map and replay authority",
+    "native D3D12 pictures and resource observations",
+    "full solution tests",
+    "reproducible installed package",
+    "current-source CI"
+  ],
+  "humanArtApproval": "pending"
+}
