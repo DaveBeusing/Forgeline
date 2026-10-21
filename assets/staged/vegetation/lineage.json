@@ -1,0 +1,139 @@
+{
+  "anatomyProducerSha256": "ff09dba7b7ef7f7a487071b7b99f3266770c3ca60cfc82044cd4f42a835cb9bc",
+  "blenderVersion": "5.2.2",
+  "canonicalBaseSha": "a524b0a8164390abe1e9cb38170e690f46147574",
+  "changes": [
+    {
+      "fromCell": 12,
+      "id": "mesh.world.vegetation.conifer",
+      "positionsNormalsAndIndicesUnchanged": true,
+      "stemVertices": 60,
+      "toCell": 10,
+      "triangles": 80
+    },
+    {
+      "fromCell": 12,
+      "id": "mesh.world.vegetation.conifer_lod1",
+      "positionsNormalsAndIndicesUnchanged": true,
+      "stemVertices": 36,
+      "toCell": 10,
+      "triangles": 48
+    },
+    {
+      "geometryRefined": true,
+      "id": "mesh.world.vegetation.scrub",
+      "originalBoundsAndBudgetsPreserved": true,
+      "triangles": 40
+    },
+    {
+      "geometryRefined": true,
+      "id": "mesh.world.vegetation.scrub_lod1",
+      "originalBoundsAndBudgetsPreserved": true,
+      "triangles": 24
+    },
+    {
+      "geometryRefined": true,
+      "id": "mesh.world.vegetation.grass_clump",
+      "originalBoundsAndBudgetsPreserved": true,
+      "triangles": 12
+    },
+    {
+      "geometryRefined": true,
+      "id": "mesh.world.vegetation.grass_clump_lod1",
+      "originalBoundsAndBudgetsPreserved": true,
+      "triangles": 6
+    }
+  ],
+  "editorialProducerSha256": "0b8d5e49ecc9715a2f3f374e0f0744de0386b098b0bf2ed10ab8482b002adbad",
+  "exports": [
+    {
+      "canonicalDefinition": "world/meshes/vegetation/conifer.asset.json",
+      "id": "mesh.world.vegetation.conifer",
+      "sha256": "79fce1013d108f615440bf5e5ec69f9d7d9b21899d45ecf8e4fa53966634246d",
+      "source": "mesh.world.vegetation.conifer.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/vegetation/conifer_lod1.asset.json",
+      "id": "mesh.world.vegetation.conifer_lod1",
+      "sha256": "b55ac3f59385627bfa81dd104732347b5f721035e53d5d124392c7350f793a3c",
+      "source": "mesh.world.vegetation.conifer_lod1.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/kit/broadleaf.asset.json",
+      "id": "mesh.world.vegetation.broadleaf",
+      "sha256": "d6f70fb7964c0ebe5c6bcd11aa15ad6f23965fc8b47e7251e68c34fb409ac920",
+      "source": "mesh.world.vegetation.broadleaf.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/kit/broadleaf_lod1.asset.json",
+      "id": "mesh.world.vegetation.broadleaf_lod1",
+      "sha256": "98afe3e64a8ff08dd8ff1cded16ca1ef1a53757cdaa7329dd7e4c770e6181f29",
+      "source": "mesh.world.vegetation.broadleaf_lod1.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/vegetation/scrub.asset.json",
+      "id": "mesh.world.vegetation.scrub",
+      "sha256": "8d800daa4a5f2f6f0f0b3aa75fc0163a4d822b9efd18c79802c4af7acb053746",
+      "source": "mesh.world.vegetation.scrub.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/vegetation/scrub_lod1.asset.json",
+      "id": "mesh.world.vegetation.scrub_lod1",
+      "sha256": "99dacd26bfa191bc43e5eb9bd779f87cc76f984a94af2c2700dea49dbb7e8e08",
+      "source": "mesh.world.vegetation.scrub_lod1.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/vegetation/grass_clump.asset.json",
+      "id": "mesh.world.vegetation.grass_clump",
+      "sha256": "34ea1bae5b771220488dfcccfb78a3b591fd83d7cc17fd41758b53ce2ebb8214",
+      "source": "mesh.world.vegetation.grass_clump.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/vegetation/grass_clump_lod1.asset.json",
+      "id": "mesh.world.vegetation.grass_clump_lod1",
+      "sha256": "54b136586dfe429d27545da4363e9ab63b5110f6e86e127f78d1bc2bd9c548d6",
+      "source": "mesh.world.vegetation.grass_clump_lod1.glb"
+    }
+  ],
+  "fixtureSha256": "3c1af7d5fd3b15766500e494a3557abeb35bb44f72611a63807710c78f76d210",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "conifer.blend",
+      "sha256": "7090edd3a7661e6403d773ed74022c0ed3ae399fc74cc7768af395e23ba07c4e"
+    },
+    {
+      "path": "broadleaf.blend",
+      "sha256": "cc0849defed0abf046e692489bfbd745de7aac190c090bab8cda23a52a4bf2ea"
+    },
+    {
+      "path": "scrub.blend",
+      "sha256": "5eda3caee7895ac44274c12a46b2d06b98f727572bac9b0a0b7639b99cac3b06"
+    },
+    {
+      "path": "grass_clump.blend",
+      "sha256": "e9b9f7db0ee37a47ef22139b843de9dbee801b1e661d1ab8687dcad2a5aa4224"
+    },
+    {
+      "path": "vegetation_inspection.blend",
+      "sha256": "ad09a9d0119bb8572a84563fdf3b19a28d1d98107295fd0b8f257a11632bd19b"
+    }
+  ],
+  "nativeProducerScripts": {
+    "author.py": "19a1fb20d27b1ddcb03b3a75b61a14f42bb94dd533d6244ec26699ef8612a1c6",
+    "edit_contract.py": "eb4df9bcdf4968372728484c602a39227aeb47207d30db9a03dc6a28b8a12809",
+    "geometry.py": "f598daedfd9d777696fa4ac2a687eb032b544542be6609c37744d5e143c81169",
+    "native_contract.py": "7200ef2df404f2e3911d75adcd88afb9ab550135c3018488b204d2833c1902a3",
+    "reopen_retained.py": "b0fcaca5247d1211d7018d3e45d81df9fc1c46bfd53de8b503b71f583c89289e",
+    "retained.py": "86527528571ece1f7a5fc2e052e5d9c84d1bec2f0b2381a98aa0cd03fe6b6bfe",
+    "runtime.py": "2247c8f4c8ce2690e99d9a792642f1687859c5032256e8990425f91d9bdb5034",
+    "test_contract.py": "00067291f8b0f8574b258314c7efd7b0a5466d384ef8a659f50d929331779056"
+  },
+  "newMaterials": 0,
+  "newTextures": 0,
+  "portableCanonicalSignature": "8fd8a3132b803ef5c76837d2864a0f26d18d0d9ffe79618225eee5d43647ebd9",
+  "schemaVersion": 1,
+  "sourceSha": "a524b0a8164390abe1e9cb38170e690f46147574",
+  "sourceWorkingTreeClean": false,
+  "status": "staged-not-promoted"
+}

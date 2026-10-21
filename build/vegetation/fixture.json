@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "mesh.world.vegetation.conifer",
+      "assets": [
+        "mesh.world.vegetation.conifer",
+        "mesh.world.vegetation.conifer_lod1"
+      ],
+      "instanceScale": [
+        7,
+        17,
+        7
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.vegetation.broadleaf",
+      "assets": [
+        "mesh.world.vegetation.broadleaf",
+        "mesh.world.vegetation.broadleaf_lod1"
+      ],
+      "instanceScale": [
+        7,
+        12,
+        7
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.vegetation.scrub",
+      "assets": [
+        "mesh.world.vegetation.scrub",
+        "mesh.world.vegetation.scrub_lod1"
+      ],
+      "instanceScale": [
+        6,
+        2.5,
+        5
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.vegetation.grass_clump",
+      "assets": [
+        "mesh.world.vegetation.grass_clump",
+        "mesh.world.vegetation.grass_clump_lod1"
+      ],
+      "instanceScale": [
+        7,
+        1,
+        6
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}
