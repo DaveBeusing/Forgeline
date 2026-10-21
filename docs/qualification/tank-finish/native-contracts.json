@@ -1,0 +1,42 @@
+{
+  "rejected": [
+    {
+      "case": "socket",
+      "error": "Socket world transform changed"
+    },
+    {
+      "case": "transform",
+      "error": "Mesh origin/axis/scale changed"
+    },
+    {
+      "case": "modifier",
+      "error": "Animation, constraints, modifiers and instances are unsupported"
+    },
+    {
+      "case": "action",
+      "error": "Scene animation is unsupported"
+    },
+    {
+      "case": "untracked",
+      "error": "Unsupported/untracked scene object"
+    },
+    {
+      "case": "material",
+      "error": "Material slot order/identity changed"
+    },
+    {
+      "case": "silhouette",
+      "error": "Tank silhouette bounds exceeded"
+    },
+    {
+      "case": "collision",
+      "error": "POSITION deviation 0.0009999871253967285 exceeds 1e-05; check axes/scale/geometry"
+    },
+    {
+      "case": "cannon",
+      "error": "Moving part geometry is locked to its mechanical anchor"
+    }
+  ],
+  "savedRestShapeEditExported": true,
+  "success": true
+}

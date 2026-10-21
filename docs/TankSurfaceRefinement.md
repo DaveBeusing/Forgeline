@@ -75,9 +75,9 @@ isolation; it must remain draft until those renderer gates and human tank art,
 live motion and sustained performance acceptance are satisfied. No budget,
 assertion, threshold, renderer contract or approved golden is relaxed.
 
-Executed results and source identities are retained separately in the native
-qualification evidence once produced. A declared capture plan is not an executed
-result, and a successful package is not human art approval.
+Executed source-bound records are retained in [native evidence](qualification/tank-finish/native-review.json)
+and [validation](qualification/tank-finish/validation.json). Package and current-head
+CI results are distinct from native and human acceptance.
 
 The saved positive-edit contract omits only its redundant inspection project.
 Both ordinary reopen exports retain full inspection/pose output. Strict source,
@@ -92,3 +92,87 @@ A following attempt exposed the missing capture-request whitelist entries for
 the new tank time scenes. Admission now explicitly includes those three scenes,
 with unchanged time, camera, sampling and evidence-preservation limits. Neither
 interrupted cohort is counted as the final paired matrix.
+
+## Observed current-base results
+
+Native/product source: 92bff60f7f78f813a88c6d6a10bee47a89c9b3a9, version 0.1.433-dev.
+Windows x64, .NET 10.0.12 / SDK 10.0.401, pinned Blender 5.2.2. Hardware is
+NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU, 25,309,478,912 dedicated
+VRAM bytes, native D3D12 Level 12_1, software false, debug layer disabled.
+
+The full current-base Release build has zero warnings/errors. All 115 portable
+Blender contracts, 99 scene/unit-LOD cases, six native-request cases and three
+compiled cadence comparisons pass. The compiled comparisons exercise all eight
+tank meshes, exact metadata/positions/normals/indices, preserved wheel batching
+and identical mechanical matrices at 30/60/144-Hz sample grids across all four
+damage states. They do not measure live display pacing.
+
+The complete real saved-master qualifier passes: two reopen exports and compiled
+outputs are byte equal; nine invalid edits reject against an unchanged control;
+a saved supported edit survives and changes only the damaged compiled mesh;
+source-less integrity passes. After the logistics-base synchronization, both
+the saved master hash and complete selected source-closure signature still match
+that qualified run exactly. The unchanged normal export path retains inspection
+projects and pose records.
+
+Both current catalogs contain 1,363 assets: 309 meshes, 901 textures, 132 materials,
+18 animations, two skins and one UI skin. Both occupy 74,844,665 runtime file bytes.
+Only the chassis, turret and LOD1 runtime hashes change. The other 1,360 containers
+are byte equal. Shared image/material bytes and allocated texture policies are
+unchanged; total container bytes are not a claim of device residency.
+
+All 41 planned native cases on each side complete structurally and reproduce
+their pixels on the second readback. Nine main before/after pairs are pixel equal;
+the other 32 include the intended finish differences. A supplementary paired
+20m detail capture also repeats exactly within each side. Recorded mesh, instance-draw, material,
+texture and descriptor counts match in every paired case, with zero mesh fallback
+or material/texture binding failure. Peak recorded texture residency is 44,812,076
+bytes and peak descriptors are 93, below the unchanged 64-MiB/512 scene gates.
+Recorded local/nonlocal device-memory observations remain in the raw archives;
+complete-memory and long-lifecycle acceptance remain separate gates.
+
+| Isolated High 1080p close load | GPU mean before / after ms | GPU p95 before / after ms | Instance draws |
+| --- | ---: | ---: | ---: |
+| 1 tank | 6.71 / 6.70 | 9.47 / 8.79 | 9 / 9 |
+| 100 tanks | 12.52 / 12.28 | 20.46 / 15.95 | 9 / 9 |
+| 1,000 tanks | 26.11 / 22.86 | 34.50 / 24.98 | 9 / 9 |
+
+These are observations, not a qualified speedup. CPU tails contain substantial
+outliers; valid GPU samples differ from the 32 requested samples in some cases.
+Across the complete cohort, 50 statistics exceed the unchanged 15% diagnostic
+comparison (43 CPU, seven GPU). Every value is retained. One paired cohort and
+concurrent host activity do not establish controlled performance or sustained FPS.
+The 1,000-tank close GPU mean also remains above a 16.67ms analysis target.
+The two camera sweeps record timing samples but zero motion-image readbacks;
+primary readbacks occur after camera reset. They do not approve moving-image
+seams, shimmer, exact threshold crossings or LOD judder.
+
+The runtime asset process/cache/error/source-less contracts pass. The strict
+seed-2026 full match ends at tick 55,210 with Completed/Victory/CommandCoreDestroyed,
+winner 1, 119 completed cargo orders, zero failed cargo orders and zero route
+failures. Package provenance and checksums accompany the generated archive; PR 278 records
+the executed reproducibility and fresh-install outcome. Its live required checks
+are the current-head CI authority.
+
+Original native PNGs: [before detail](qualification/tank-finish/before-detail.png),
+[after detail](qualification/tank-finish/after-detail.png),
+[before gallery](qualification/tank-finish/before-gallery.png),
+[after gallery](qualification/tank-finish/after-gallery.png). Raw native manifests
+and both catalog qualification reports are retained as lossless gzip files with
+original and compressed SHA-256 identities. No approved golden or human art
+acceptance is inferred from these records.
+
+## Distribution verification
+
+Publishing uses the qualified runtime root and writes source/build provenance,
+checksums and two-tree reproducibility results alongside the local archive.
+Fresh-install verification checks every file and runtime hash, rejects authoring
+formats/compiler files and launches the extracted player from outside the checkout.
+The package and its required CI remain independent from the open renderer and
+human art gates above. The delivered archive identity and executed outcomes are
+recorded on [PR 278](https://github.com/DaveBeusing/Forgeline/pull/278).
+
+```powershell
+./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible `
+  -RuntimeAssetRoot assets/runtime -OutputRoot artifacts/tank-package-433
+```
