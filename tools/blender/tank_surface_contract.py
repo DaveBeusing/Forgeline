@@ -22,7 +22,7 @@ def refine(aid, geometry, definition):
             # Preserve the chart, inset and texel density by translating one cell row.
             if math.floor(uv[0] * 4) == 0 and math.floor(uv[1] * 4) == 2:
                 require(index not in locked, 'Armor migration cannot change moving geometry')
-                uv[1] -= .5
+                primitive['attributes']['TEXCOORD_0'][index] = (uv[0], uv[1] - .5)
                 count += 1
     return result, count
 

@@ -12,7 +12,7 @@ class TankSurfaceContractTests(unittest.TestCase):
         return {'primitives': [{'mesh': 0, 'primitive': 0, 'name': 'armor', 'materialSlot': 0, 'indices': [0, 1, 2],
                 'attributes': {'POSITION': [[0, 0, 0], [1, 0, 0], [0, 1, 0]],
                                'NORMAL': [[0, 0, 1]] * 3,
-                               'TEXCOORD_0': [[.018, .518], [.232, .518], [.018, .732]]}}]}
+                               'TEXCOORD_0': [(.018, .518), (.232, .518), (.018, .732)]}}]}
 
     def test_only_chart_translation_changes(self):
         before = self.geometry()
@@ -41,7 +41,9 @@ class TankSurfaceContractTests(unittest.TestCase):
         after, _ = refine(ROOT, before, {})
         for channel in ('POSITION', 'NORMAL', 'TEXCOORD_0'):
             invalid = copy.deepcopy(after)
-            invalid['primitives'][0]['attributes'][channel][0][0] += .01
+            row = list(invalid['primitives'][0]['attributes'][channel][0])
+            row[0] += .01
+            invalid['primitives'][0]['attributes'][channel][0] = row
             with self.assertRaises(ValueError):
                 compare(ROOT, before, invalid, {})
 
