@@ -31,7 +31,8 @@ public sealed class WorldPropReferenceSceneTests
             Assert.True(terrain.TrySampleHeight(instance.Transform.Position.X, instance.Transform.Position.Z, out float ground));
             Assert.InRange(MathF.Abs(instance.Transform.Position.Y - instance.Transform.Scale.Y * .5f - ground), 0, .00001f);
             var placed = map.WorldObjects.FirstOrDefault(x => x.Visual == instance.WorldFeature.Visual);
-            if (!string.IsNullOrEmpty(placed.Key)) Assert.Equal(placed.Scale, instance.Transform.Scale);
+            if (!string.IsNullOrEmpty(placed.Key))
+                Assert.Contains(map.WorldObjects, x => x.Visual == instance.WorldFeature.Visual && x.Scale == instance.Transform.Scale);
             var definition = WorldPresentationCatalog.Get(instance.WorldFeature.Visual);
             Assert.StartsWith("mesh.world.prop.", definition.MeshAssetId, StringComparison.Ordinal);
             Assert.EndsWith("_lod1", definition.ReducedLodAssetId, StringComparison.Ordinal);

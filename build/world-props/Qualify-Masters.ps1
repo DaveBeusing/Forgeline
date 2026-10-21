@@ -1,7 +1,7 @@
 #requires -Version 7.4
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$OutputRoot, [string]$BlenderPath, [switch]$RenderPreviews,
-      [switch]$ReuseAuthored, [string]$MaterialCacheRoot, [switch]$NativeBatch, [string]$SourceRoot = 'assets/source')
+      [switch]$ReuseAuthored, [string]$MaterialCacheRoot, [switch]$NativeBatch, [string]$SourceRoot = 'assets/source', [ValidateRange(1,4)][int]$MaxParallel = 3)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath('../..', $PSScriptRoot)
@@ -22,7 +22,7 @@ $canonicalRoot = [IO.Path]::GetFullPath('assets/source', $repo)
 if (-not $ReuseAuthored -and $NativeBatch) {
     $batchArguments = @()
     if ($RenderPreviews) { $batchArguments += '--render' }
-    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'author_batch.py') -InputRoot $SourceRoot -OutputRoot $output -ScriptArguments $batchArguments -BlenderPath $BlenderPath -TimeoutSeconds 1800
+    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'author_batch.py') -InputRoot $SourceRoot -OutputRoot $output -ScriptArguments $batchArguments -BlenderPath $BlenderPath -TimeoutSeconds 3600
 }
 if (-not $ReuseAuthored -and -not $NativeBatch) {
 foreach ($family in $families) {
@@ -56,29 +56,20 @@ foreach ($family in $families) {
     }
 }
 if (-not (Test-Path -LiteralPath $compiler)) { throw 'Build Release before compiling the preserved exports.' }
-foreach ($family in $families) {
-    $familyRoot = Join-Path $output $family
-    foreach ($variant in @('baseline','first','second','reopened')) {
-        $source = if ($variant -eq 'baseline') { Join-Path $familyRoot 'first/baseline-source' } else { Join-Path $familyRoot "$variant/source" }
-        $runtime = Join-Path $familyRoot "$variant/runtime"
-        if (Test-Path -LiteralPath $runtime) { throw "Use fresh runtime output: $family/$variant" }
-        if ($MaterialCacheRoot) {
-            $seed = $MaterialCacheRoot
-            $seedManifest = Get-Content -LiteralPath (Join-Path $seed 'manifest.json') -Raw | ConvertFrom-Json
-            if (@($seedManifest.assets).Count -ne 4 -or @($seedManifest.assets | Where-Object type -eq 'mesh').Count -ne 0) { throw 'Material cache must contain exactly four nonmesh records.' }
-            [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($runtime))
-            Copy-Item -LiteralPath $seed -Destination $runtime -Recurse
-        }
-        & dotnet $compiler --mode development --source $source --runtime $runtime --qualification-output (Join-Path $familyRoot "$variant-compile.json") 2>&1 | Out-File (Join-Path $familyRoot "$variant-compile.log") -Encoding utf8NoBOM
-        if ($LASTEXITCODE -ne 0) { throw "Compile failed: $family/$variant" }
-        & dotnet $compiler --mode validate --source (Join-Path $output 'absent-source') --runtime $runtime --qualification-output (Join-Path $familyRoot "$variant-source-less.json") 2>&1 | Out-File (Join-Path $familyRoot "$variant-source-less.log") -Encoding utf8NoBOM
-        if ($LASTEXITCODE -ne 0) { throw "Source-less validation failed: $family/$variant" }
+$worker = Join-Path $PSScriptRoot 'Compile-Family.ps1'
+$results = $families | ForEach-Object -Parallel {
+    $family = $_
+    try {
+        $ErrorActionPreference = 'Stop'
+        $messages = @(& $using:worker -Family $family -OutputRoot $using:output -MaterialCacheRoot $using:MaterialCacheRoot)
+        [pscustomobject]@{ Family = $family; Success = $true; Message = ($messages -join '; ') }
     }
-    foreach ($variant in @('second','reopened')) {
-        foreach ($kind in @('source','runtime')) {
-            if (Compare-Object (Read-Tree (Join-Path $familyRoot "first/$kind")) (Read-Tree (Join-Path $familyRoot "$variant/$kind"))) { throw "Non-deterministic $family/$variant/$kind" }
-        }
-    }
+    catch { [pscustomobject]@{ Family = $family; Success = $false; Message = $_.Exception.Message } }
+} -ThrottleLimit $MaxParallel
+if (@($results).Count -ne $families.Count) { throw 'Incomplete family worker results.' }
+foreach ($result in $results) {
+    if (-not $result.Success) { throw "Family compiler failed: $($result.Family): $($result.Message)" }
+    Write-Output $result.Message
 }
 if (Compare-Object $before (Read-Tree (Join-Path $repo 'assets/source'))) { throw 'Canonical source bytes changed.' }
 $previous = $env:FORGELINE_PROP_MASTERS
@@ -89,7 +80,7 @@ try {
 }
 finally { $env:FORGELINE_PROP_MASTERS = $previous }
 @{ schemaVersion = 1; sourceSha = (& git -C $repo rev-parse HEAD); success = $true;
-   deterministicSourceAndRuntime = $true; sourceLessIntegrity = $true; typedCompiledComparison = $true;
+   parallelFamilies = $MaxParallel; deterministicSourceAndRuntime = $true; sourceLessIntegrity = $true; typedCompiledComparison = $true;
    canonicalSourcesUnchanged = $true; productionPromotion = 'blocked-pending-render-qualification';
    physicalPerformance = 'pending'; humanArtApproval = 'pending' } |
     ConvertTo-Json | Set-Content (Join-Path $output 'qualification.json') -Encoding utf8NoBOM

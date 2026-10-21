@@ -84,7 +84,8 @@ EnvironmentKitYard and EnvironmentKitBridge retain actual authored placements.
 IndustrialBase retains its existing production fixture. WorldPropsGallery adds
 22 copied presentation instances, while WorldPropSingle, WorldProps100 and
 WorldProps1000 provide bounded synthetic loads without allocating ECS entities.
-They use existing map scales when available and the existing half-height ground
+They prefer existing PresentationOnly yard/module scales, with legacy map scales
+as fallback, and retain the existing half-height ground
 anchor. They are inspection scenes, not new map placements or gameplay presets.
 
 The pre-existing bridge visual/logistics orientation mismatch described in

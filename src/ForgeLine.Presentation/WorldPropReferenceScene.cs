@@ -28,7 +28,9 @@ internal static class WorldPropReferenceScene
         for (int i = 0; i < count; i++)
         {
             var visual = (WorldVisualId)((int)WorldVisualId.PropRock + i % 22);
-            var placed = map.WorldObjects.FirstOrDefault(item => item.Visual == visual);
+            var placed = map.WorldObjects.FirstOrDefault(item => item.Visual == visual && item.PresentationOnly);
+            if (string.IsNullOrEmpty(placed.Key))
+                placed = map.WorldObjects.FirstOrDefault(item => item.Visual == visual);
             Vector3 scale = string.IsNullOrEmpty(placed.Key) ? new(4, 2, 4) : placed.Scale;
             Vector3 offset = count switch
             {
