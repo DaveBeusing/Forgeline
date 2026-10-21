@@ -375,8 +375,8 @@
       }
     },
     {
-      "canonicalHash": "d7edd45caa599dc3d2f35111a06011705f5db7ce39dd4c2eafc63780ce89951a",
-      "canonicalSource": "infrastructure/directorate/sources/blender/world_bridge_apron.glb",
+      "canonicalHash": "b18de57f560859ee764ae9765fc51fb44a06c607baef5ae5c3aa1bb44bf5ee5f",
+      "canonicalSource": "world/meshes/sources/blender/props/bridge_apron/high.glb",
       "id": "mesh.world.prop.bridge_apron",
       "metadata": {
         "collisionReference": "mesh.world.kit.collision_centered",
@@ -412,11 +412,12 @@
         "primitives": 1,
         "triangles": 136,
         "vertices": 288
-      }
+      },
+      "owner": "world-prop-masters"
     },
     {
-      "canonicalHash": "8b059ae0f6b1afbe983fdb6bad9bcb68cb75a47aa25466d8e40a6fa5729ba5a8",
-      "canonicalSource": "infrastructure/directorate/sources/blender/world_bridge_apron_lod1.glb",
+      "canonicalHash": "fd4a4554537817765ed6687ec3c0c011861fae1434a5d3e418d4f6832ab271f7",
+      "canonicalSource": "world/meshes/sources/blender/props/bridge_apron/reduced.glb",
       "id": "mesh.world.prop.bridge_apron_lod1",
       "metadata": {
         "id": "mesh.world.prop.bridge_apron_lod1",
@@ -443,11 +444,12 @@
         "primitives": 1,
         "triangles": 36,
         "vertices": 72
-      }
+      },
+      "owner": "world-prop-masters"
     },
     {
-      "canonicalHash": "a309b10fd28f32b6f88a478e3aa2259866273e9ebd5154902e52cfcb2686bef3",
-      "canonicalSource": "infrastructure/directorate/sources/blender/world_loading_apron.glb",
+      "canonicalHash": "c15997882b6533c98b6ed5fa1a8f9cb394529097ff65838642390489b44ffead",
+      "canonicalSource": "world/meshes/sources/blender/props/loading_apron/high.glb",
       "id": "mesh.world.prop.loading_apron",
       "metadata": {
         "collisionReference": "mesh.world.kit.collision_centered",
@@ -483,11 +485,12 @@
         "primitives": 1,
         "triangles": 160,
         "vertices": 336
-      }
+      },
+      "owner": "world-prop-masters"
     },
     {
       "canonicalHash": "7756fc84b15d3997980c67aa8191c36c96539a6bd70c0ccc70f3967287d31817",
-      "canonicalSource": "infrastructure/directorate/sources/blender/world_loading_apron_lod1.glb",
+      "canonicalSource": "world/meshes/sources/blender/props/loading_apron/reduced.glb",
       "id": "mesh.world.prop.loading_apron_lod1",
       "metadata": {
         "id": "mesh.world.prop.loading_apron_lod1",
@@ -514,11 +517,12 @@
         "primitives": 1,
         "triangles": 36,
         "vertices": 72
-      }
+      },
+      "owner": "world-prop-masters"
     },
     {
-      "canonicalHash": "c68423ed0849cbb66c8ecd5c936729c7b93d953480d60ff71b921a87349ec5c6",
-      "canonicalSource": "infrastructure/directorate/sources/blender/world_road_edge.glb",
+      "canonicalHash": "494f43ab913ef94f40da0d76139f3c0720fd0501ad82ffe2482b8af853d67524",
+      "canonicalSource": "world/meshes/sources/blender/props/road_edge/high.glb",
       "id": "mesh.world.prop.road_edge",
       "metadata": {
         "collisionReference": "mesh.world.kit.collision_centered",
@@ -554,11 +558,12 @@
         "primitives": 1,
         "triangles": 164,
         "vertices": 336
-      }
+      },
+      "owner": "world-prop-masters"
     },
     {
-      "canonicalHash": "2c6403fbb99b258b270958a1dbc6cb89e2d19f28dd2e1b691887b49301856ef8",
-      "canonicalSource": "infrastructure/directorate/sources/blender/world_road_edge_lod1.glb",
+      "canonicalHash": "495015c567bc0b273e27ce969f8c6c72b58acbf3c3c58a03d224755343e83ab0",
+      "canonicalSource": "world/meshes/sources/blender/props/road_edge/reduced.glb",
       "id": "mesh.world.prop.road_edge_lod1",
       "metadata": {
         "id": "mesh.world.prop.road_edge_lod1",
@@ -585,7 +590,8 @@
         "primitives": 1,
         "triangles": 24,
         "vertices": 48
-      }
+      },
+      "owner": "world-prop-masters"
     }
   ],
   "schemaVersion": 1

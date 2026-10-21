@@ -49,13 +49,36 @@ public sealed class InfrastructureSourceQualificationTests
                     Assert.Equal(a.Vertices.Max(channel),b.Vertices.Max(channel));
                 }
             }
+            else if(before.Id.StartsWith("mesh.world.prop.",StringComparison.Ordinal))
+            {
+                // Upstream prop masters preserve the original seed within the existing static export tolerances.
+                Assert.Equal(a.Sections,b.Sections);
+                Assert.Equal(a.Indices,b.Indices);
+                Assert.Equal(a.Vertices.Count,b.Vertices.Count);
+                for(int i=0;i<a.Vertices.Count;i++)
+                {
+                    var x=a.Vertices[i];var y=b.Vertices[i];
+                    Assert.InRange(MathF.Abs(x.X-y.X),0,.00001f);
+                    Assert.InRange(MathF.Abs(x.Y-y.Y),0,.00001f);
+                    Assert.InRange(MathF.Abs(x.Z-y.Z),0,.00001f);
+                    Assert.InRange(MathF.Abs(x.NormalX-y.NormalX),0,.00002f);
+                    Assert.InRange(MathF.Abs(x.NormalY-y.NormalY),0,.00002f);
+                    Assert.InRange(MathF.Abs(x.NormalZ-y.NormalZ),0,.00002f);
+                    Assert.InRange(MathF.Abs(x.U-y.U),0,.000001f);
+                    Assert.InRange(MathF.Abs(x.V-y.V),0,.000001f);
+                    Assert.InRange(MathF.Abs(x.TangentX-y.TangentX),0,.00002f);
+                    Assert.InRange(MathF.Abs(x.TangentY-y.TangentY),0,.00002f);
+                    Assert.InRange(MathF.Abs(x.TangentZ-y.TangentZ),0,.00002f);
+                    Assert.Equal(x.TangentW,y.TangentW);
+                }
+            }
             else
             {
                 Assert.Equal(a.Sections,b.Sections);
                 Assert.Equal(a.Indices,b.Indices);
                 Assert.Equal(a.Vertices.ToArray(),b.Vertices.ToArray());
             }
-            if(!before.Id.Contains("collision",StringComparison.Ordinal))
+            if(before.Id.StartsWith("infrastructure.directorate.",StringComparison.Ordinal))
                 Assert.Contains("infrastructure/directorate/sources/blender/",after.SourcePath.Replace('\\','/'),StringComparison.Ordinal);
             meshes++;
         }

@@ -1,6 +1,14 @@
 # Road, bridge and crossing Blender sources
 
-The existing Directorate infrastructure geometry is retained in three editable,
+Current master includes world-prop PR #283 at
+`34c69dd97db417d1982fd7bf75cb1baa197082f6` (0.1.438). This branch uses
+0.1.439 and reuses its six shared transition definitions and native masters.
+Active authoring here covers `roads.blend` and `bridge.blend` with twelve
+canonical GLBs; the redundant transition master/exports were removed. The
+historical inventory and paired measurements below predate that integration.
+See the detailed qualification for source boundaries.
+
+The measured Directorate infrastructure geometry was retained in three editable,
 packed-PBR Blender masters: `roads.blend`, `bridge.blend` and `transitions.blend`
 under `assets/source/infrastructure/directorate/authoring/`. The three families
 cover nine road meshes, three bridge states, and High/Reduced bridge aprons,
@@ -47,7 +55,8 @@ $fixture = (Resolve-Path tools/blender/fixtures/infrastructure.json).Path
 python -m unittest discover -s tools/blender/tests -p 'test_infrastructure_contract.py' -v
 ```
 
-Use `bridge` or `transitions` for the other masters. Export with `--action Export`
+Use `bridge` for the other active master; shared transitions use the integrated
+`build/world-props` authoring and qualification. Export with `--action Export`
 and `--blend-file` pointing to the saved master. Supported vertex edits stay
 inside the original bounds and a normalized 0.01 displacement; collision,
 topology, normals, UVs, materials, pivots and transforms remain locked. Physical

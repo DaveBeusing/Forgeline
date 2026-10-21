@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from asset_contract import Catalog, read_geometry, sha, geometry_stats
+from asset_contract import Catalog, read_geometry, sha, geometry_stats, compare_geometry
 from collections import Counter
 from infrastructure_contract import canonical_geometry
 
@@ -35,6 +35,9 @@ class InfrastructureContracts(unittest.TestCase):
                 if record.get('refinement')=='continuous-closed-ribbon':
                     self.assertIn(record['id'].rsplit('.',1)[1],('curve_short','curve_long'))
                     self.check_curve(before,after)
+                elif record.get('owner')=='world-prop-masters':
+                    compare_geometry(before,after)
+                    self.assertIn('world/meshes/sources/blender/props/',record['canonicalSource'])
                 else:self.assertEqual(before['primitives'],after['primitives'])
 
     def check_curve(self,before,after):

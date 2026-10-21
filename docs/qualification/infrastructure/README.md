@@ -5,6 +5,20 @@ integration. Human art approval, live motion, sustained/enclosing-frame
 performance, thermal and renderer lifecycle acceptance remain open. The branch
 is intended for a draft PR; no merge, release, tag or new golden is approved.
 
+Current integration supersedes the historical source inventory below: master
+`34c69dd97db417d1982fd7bf75cb1baa197082f6` includes world-prop PR #283
+and version 0.1.438. This branch is now 0.1.439. The six shared bridge-apron,
+road-edge and loading-apron High/Reduced definitions and their genuine masters
+are reused unchanged from that integration. Redundant transition master/GLBs
+from this branch were removed. Active infrastructure authoring covers two
+unchanged qualified masters and twelve GLBs. Shared source positions, normals,
+tangents, indices, bounds and materials match the historical seed exactly; UV
+rounding is at most 2.981e-8 within the existing static contract. See
+[SharedTransitions.json](SharedTransitions.json). Existing prop and vegetation
+scene IDs are preserved before the appended infrastructure range. Historical
+145-pair measurements and the three-master qualification below retain their
+original measured identities and are not claims about the later prop base.
+
 ## Source boundaries
 
 The ordered audit observed master `a524b0a8164390abe1e9cb38170e690f46147574`

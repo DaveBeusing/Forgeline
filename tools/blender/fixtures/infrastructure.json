@@ -74,26 +74,6 @@
       "instanceYawDegrees": 90,
       "name": "bridge",
       "root": "infrastructure.directorate.bridge.road.intact"
-    },
-    {
-      "assets": [
-        "mesh.world.prop.bridge_apron",
-        "mesh.world.prop.road_edge",
-        "mesh.world.prop.loading_apron"
-      ],
-      "instanceScale": [
-        18,
-        1,
-        8
-      ],
-      "instanceTranslation": [
-        0,
-        0,
-        0
-      ],
-      "instanceYawDegrees": 90,
-      "name": "transitions",
-      "root": "mesh.world.prop.bridge_apron"
     }
   ],
   "schemaVersion": 1

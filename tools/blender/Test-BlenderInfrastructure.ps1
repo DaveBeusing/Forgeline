@@ -57,5 +57,5 @@ foreach($family in $families){
         }
     }
 }
-@{success=$true;families=3;repeatedSourceAndRuntimeBytes=$true;sourceLessIntegrity=$true;nativeInvalidEditsRejected=$true;savedEditsReachOnlyIntendedMeshes=$true}|
+@{success=$true;families=$families.Count;repeatedSourceAndRuntimeBytes=$true;sourceLessIntegrity=$true;nativeInvalidEditsRejected=$true;savedEditsReachOnlyIntendedMeshes=$true}|
     ConvertTo-Json|Set-Content -LiteralPath (Join-Path $root 'qualification.json') -Encoding utf8NoBOM

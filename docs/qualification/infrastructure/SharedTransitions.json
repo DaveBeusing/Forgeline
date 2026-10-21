@@ -1,0 +1,73 @@
+{
+  "base": "34c69dd97db417d1982fd7bf75cb1baa197082f6",
+  "upstreamPr": 283,
+  "policy": "Reuse current master canonical sources and masters; remove duplicate transition master and exports. Existing static geometry tolerances apply only to these upstream sources. Road and bridge preservation remains strict.",
+  "reusedSources": [
+    {
+      "id": "mesh.world.prop.bridge_apron",
+      "source": "world/meshes/sources/blender/props/bridge_apron/high.glb",
+      "sha256": "b18de57f560859ee764ae9765fc51fb44a06c607baef5ae5c3aa1bb44bf5ee5f",
+      "deviationsFromHistoricalSeed": {
+        "POSITION": 0.0,
+        "NORMAL": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08,
+        "TANGENT": 0.0
+      }
+    },
+    {
+      "id": "mesh.world.prop.bridge_apron_lod1",
+      "source": "world/meshes/sources/blender/props/bridge_apron/reduced.glb",
+      "sha256": "fd4a4554537817765ed6687ec3c0c011861fae1434a5d3e418d4f6832ab271f7",
+      "deviationsFromHistoricalSeed": {
+        "POSITION": 0.0,
+        "NORMAL": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08,
+        "TANGENT": 0.0
+      }
+    },
+    {
+      "id": "mesh.world.prop.loading_apron",
+      "source": "world/meshes/sources/blender/props/loading_apron/high.glb",
+      "sha256": "c15997882b6533c98b6ed5fa1a8f9cb394529097ff65838642390489b44ffead",
+      "deviationsFromHistoricalSeed": {
+        "POSITION": 0.0,
+        "NORMAL": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09,
+        "TANGENT": 0.0
+      }
+    },
+    {
+      "id": "mesh.world.prop.loading_apron_lod1",
+      "source": "world/meshes/sources/blender/props/loading_apron/reduced.glb",
+      "sha256": "7756fc84b15d3997980c67aa8191c36c96539a6bd70c0ccc70f3967287d31817",
+      "deviationsFromHistoricalSeed": {
+        "POSITION": 0.0,
+        "NORMAL": 0.0,
+        "TEXCOORD_0": 0.0,
+        "TANGENT": 0.0
+      }
+    },
+    {
+      "id": "mesh.world.prop.road_edge",
+      "source": "world/meshes/sources/blender/props/road_edge/high.glb",
+      "sha256": "494f43ab913ef94f40da0d76139f3c0720fd0501ad82ffe2482b8af853d67524",
+      "deviationsFromHistoricalSeed": {
+        "POSITION": 0.0,
+        "NORMAL": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08,
+        "TANGENT": 0.0
+      }
+    },
+    {
+      "id": "mesh.world.prop.road_edge_lod1",
+      "source": "world/meshes/sources/blender/props/road_edge/reduced.glb",
+      "sha256": "495015c567bc0b273e27ce969f8c6c72b58acbf3c3c58a03d224755343e83ab0",
+      "deviationsFromHistoricalSeed": {
+        "POSITION": 0.0,
+        "NORMAL": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08,
+        "TANGENT": 0.0
+      }
+    }
+  ]
+}

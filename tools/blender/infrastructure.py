@@ -93,7 +93,7 @@ def run(request):
     try:
         parser=argparse.ArgumentParser()
         parser.add_argument('--action',choices=('Author','Export'),required=True)
-        parser.add_argument('--family',choices=('roads','bridge','transitions'),required=True)
+        parser.add_argument('--family',choices=('roads','bridge'),required=True)
         parser.add_argument('--fixtures',type=Path,required=True)
         parser.add_argument('--blend-file',type=Path)
         args=parser.parse_args(request['arguments'])
