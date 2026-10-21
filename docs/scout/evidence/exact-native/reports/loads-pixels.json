@@ -1,0 +1,1095 @@
+{
+  "imageGateRequested": false,
+  "commit": "b8f6baba7b0d97040537edf9544b8231fe02e15c",
+  "maximumChangedPixelFraction": 0.0,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "structural": "pass",
+  "pixelComparisonRequested": true,
+  "captures": [
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 4.804153846153847,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 10.597356249999999,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -0.2923187500000015,
+      "key": "ScoutSingle-1920x1080-Low-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 5.495826086956523,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.214025,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 0.8018843749999984,
+      "key": "ScoutSingle-1920x1080-Low-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 5.710521599999999,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 10.434978124999999,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 0.3041874999999976,
+      "key": "ScoutSingle-1920x1080-Low-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 6.972042666666668,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.262384375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -2.474237499999999,
+      "key": "ScoutRepeated100-1920x1080-Low-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 5.763658666666667,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 81.661946875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 67.76320312499999,
+      "key": "ScoutRepeated100-1920x1080-Low-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 6.751006933333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 57.367471875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 45.96474375,
+      "key": "ScoutRepeated100-1920x1080-Low-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 8.901083733333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.55461875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -9.66366875,
+      "key": "ScoutRepeated1000-1920x1080-Low-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 9.087828266666667,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 12.61449375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -0.6587250000000004,
+      "key": "ScoutRepeated1000-1920x1080-Low-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 7.864945777777778,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 12.648646874999999,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 1.8022687499999979,
+      "key": "ScoutRepeated1000-1920x1080-Low-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 8.25368,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.882246875000003,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -1.5390468749999933,
+      "key": "ScoutSingle-1920x1080-Medium-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 10.119875428571431,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 14.558203125000004,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -364.380328125,
+      "key": "ScoutSingle-1920x1080-Medium-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 9.204274133333335,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 14.587728125000002,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -0.8316343750000001,
+      "key": "ScoutSingle-1920x1080-Medium-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 10.623792,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 404.423171875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 343.26504374999996,
+      "key": "ScoutRepeated100-1920x1080-Medium-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 9.384196266666663,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 249.084528125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 235.22695937499998,
+      "key": "ScoutRepeated100-1920x1080-Medium-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 9.274336000000002,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 12.795915625,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -50.803240625,
+      "key": "ScoutRepeated100-1920x1080-Medium-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 14.585721600000003,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 62.366078125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 44.25728124999999,
+      "key": "ScoutRepeated1000-1920x1080-Medium-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 13.277986560000002,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 62.3448375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 44.69334375,
+      "key": "ScoutRepeated1000-1920x1080-Medium-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 10.200041599999999,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 58.990353125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 29.132131249999993,
+      "key": "ScoutRepeated1000-1920x1080-Medium-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 9.000519466666667,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 12.649465625000001,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -4.279787499999998,
+      "key": "ScoutSingle-1920x1080-High-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 10.493737931034481,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 17.412875000000003,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -34.60286875,
+      "key": "ScoutSingle-1920x1080-High-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 10.054169600000002,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 63.978190625,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 46.921128125,
+      "key": "ScoutSingle-1920x1080-High-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 10.905580800000001,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 59.37113125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 44.5076125,
+      "key": "ScoutRepeated100-1920x1080-High-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 10.149035733333335,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 60.763446875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 44.158146875,
+      "key": "ScoutRepeated100-1920x1080-High-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 10.238421333333331,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 12.96590625,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -1.4369187499999985,
+      "key": "ScoutRepeated100-1920x1080-High-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 15.537942399999999,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 16.366925000000002,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -1.6601656249999976,
+      "key": "ScoutRepeated1000-1920x1080-High-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 14.005882666666666,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 17.34538125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 0.47915000000000063,
+      "key": "ScoutRepeated1000-1920x1080-High-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 11.938554666666668,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 13.426621874999999,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -2.1541312500000025,
+      "key": "ScoutRepeated1000-1920x1080-High-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 17.275765333333332,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 71.09528750000001,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 42.17785937500001,
+      "key": "ScoutSingle-3840x2160-Low-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 18.072884266666666,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 72.57466562500001,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 46.84120000000001,
+      "key": "ScoutSingle-3840x2160-Low-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 17.757067733333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 167.2647875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 141.5839875,
+      "key": "ScoutSingle-3840x2160-Low-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 17.482916266666667,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 25.139190624999998,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 0.30395312499999605,
+      "key": "ScoutRepeated100-3840x2160-Low-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 16.955682133333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 122.998159375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 88.176428125,
+      "key": "ScoutRepeated100-3840x2160-Low-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 18.1294848,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 436.79777500000006,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 411.76080312500005,
+      "key": "ScoutRepeated100-3840x2160-Low-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 24.460306133333336,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 31.745803125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -13.941737500000006,
+      "key": "ScoutRepeated1000-3840x2160-Low-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 23.925572266666666,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 74.119153125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 47.419390625000005,
+      "key": "ScoutRepeated1000-3840x2160-Low-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 21.282661333333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 72.3486625,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 43.90995937500001,
+      "key": "ScoutRepeated1000-3840x2160-Low-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 30.487455999999998,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 77.740909375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 47.18963749999999,
+      "key": "ScoutSingle-3840x2160-Medium-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 30.44637226666667,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 77.66726875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 43.615475,
+      "key": "ScoutSingle-3840x2160-Medium-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 28.20094293333334,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 77.796959375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 43.83355,
+      "key": "ScoutSingle-3840x2160-Medium-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 28.567350400000006,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 70.058584375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 38.05882499999999,
+      "key": "ScoutRepeated100-3840x2160-Medium-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 26.679115733333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 76.41054375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 46.031496875,
+      "key": "ScoutRepeated100-3840x2160-Medium-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 27.277121066666666,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 76.88741562499999,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 47.05159687499999,
+      "key": "ScoutRepeated100-3840x2160-Medium-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 39.93722133333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 132.033228125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 91.96966875,
+      "key": "ScoutRepeated1000-3840x2160-Medium-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 35.477825066666675,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 82.16041249999999,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 46.0379375,
+      "key": "ScoutRepeated1000-3840x2160-Medium-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 29.043226074074074,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 118.69290312500002,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 86.79365000000001,
+      "key": "ScoutRepeated1000-3840x2160-Medium-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 31.015856,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 32.17009062500001,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -0.360134374999987,
+      "key": "ScoutSingle-3840x2160-High-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 33.49476965517241,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 97.19480312499999,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 63.81576249999999,
+      "key": "ScoutSingle-3840x2160-High-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 33.131603199999994,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 94.722571875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 58.61706875,
+      "key": "ScoutSingle-3840x2160-High-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 30.674577142857142,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 119.58888125000001,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 85.01523437500002,
+      "key": "ScoutRepeated100-3840x2160-High-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 26.557169066666674,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 324.116778125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -119.35591875,
+      "key": "ScoutRepeated100-3840x2160-High-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 30.544033066666668,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 31.716431249999992,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -127.96655624999997,
+      "key": "ScoutRepeated100-3840x2160-High-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 45.221809066666665,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 92.37070625000001,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -45.96927812499999,
+      "key": "ScoutRepeated1000-3840x2160-High-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 34.406075428571434,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 114.45035312499999,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 31.077646874999985,
+      "key": "ScoutRepeated1000-3840x2160-High-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 31.175522133333335,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 181.537515625,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 101.527278125,
+      "key": "ScoutRepeated1000-3840x2160-High-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    }
+  ],
+  "imageFailures": [],
+  "baselineCommit": "b8f6baba7b0d97040537edf9544b8231fe02e15c",
+  "channelTolerance": 0,
+  "visualAcceptance": "pending",
+  "schemaVersion": 1
+}

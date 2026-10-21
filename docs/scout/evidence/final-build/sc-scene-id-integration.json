@@ -1,0 +1,364 @@
+{
+  "baseSha": "3c732aa519bb54bec17070bcdad378c232ea9de1",
+  "preservedIds": [
+    {
+      "id": 0,
+      "name": "DaylightTerrain"
+    },
+    {
+      "id": 1,
+      "name": "IndustrialBase"
+    },
+    {
+      "id": 2,
+      "name": "FormationConvoy"
+    },
+    {
+      "id": 3,
+      "name": "LogisticsCorridor"
+    },
+    {
+      "id": 4,
+      "name": "DamageDestruction"
+    },
+    {
+      "id": 5,
+      "name": "BattlefieldCombat"
+    },
+    {
+      "id": 6,
+      "name": "MechanicalIdle"
+    },
+    {
+      "id": 7,
+      "name": "MechanicalMoving"
+    },
+    {
+      "id": 8,
+      "name": "MechanicalFiring"
+    },
+    {
+      "id": 9,
+      "name": "MechanicalLoading"
+    },
+    {
+      "id": 10,
+      "name": "MechanicalUnpowered"
+    },
+    {
+      "id": 11,
+      "name": "MechanicalBroken"
+    },
+    {
+      "id": 12,
+      "name": "DirectorateUnits"
+    },
+    {
+      "id": 13,
+      "name": "DirectorateBuildingStates"
+    },
+    {
+      "id": 14,
+      "name": "CommandCoreProduction"
+    },
+    {
+      "id": 15,
+      "name": "MainBattleTankProduction"
+    },
+    {
+      "id": 16,
+      "name": "MainBattleTankFormation"
+    },
+    {
+      "id": 17,
+      "name": "EnvironmentKitYard"
+    },
+    {
+      "id": 18,
+      "name": "EnvironmentKitBridge"
+    },
+    {
+      "id": 19,
+      "name": "EnvironmentKitRepeated"
+    },
+    {
+      "id": 20,
+      "name": "ExtractorProduction"
+    },
+    {
+      "id": 21,
+      "name": "SmelterProduction"
+    },
+    {
+      "id": 22,
+      "name": "ElectronicsPlantProduction"
+    },
+    {
+      "id": 23,
+      "name": "FuelRefineryProduction"
+    },
+    {
+      "id": 24,
+      "name": "AmmunitionPlantProduction"
+    },
+    {
+      "id": 25,
+      "name": "StorageDepotProduction"
+    },
+    {
+      "id": 26,
+      "name": "SupplyDepotProduction"
+    },
+    {
+      "id": 27,
+      "name": "LogisticsHubProduction"
+    },
+    {
+      "id": 28,
+      "name": "LogisticsLoadingProduction"
+    },
+    {
+      "id": 29,
+      "name": "LogisticsTransitProduction"
+    },
+    {
+      "id": 30,
+      "name": "LogisticsUnloadingProduction"
+    },
+    {
+      "id": 31,
+      "name": "LogisticsSustainedProduction"
+    },
+    {
+      "id": 32,
+      "name": "VehicleFactoryProduction"
+    },
+    {
+      "id": 33,
+      "name": "PowerPlantProduction"
+    },
+    {
+      "id": 34,
+      "name": "BarracksProduction"
+    },
+    {
+      "id": 35,
+      "name": "RadarProduction"
+    },
+    {
+      "id": 36,
+      "name": "OperationalBuildingsRepeated"
+    },
+    {
+      "id": 37,
+      "name": "InfantryRifleProduction"
+    },
+    {
+      "id": 38,
+      "name": "InfantryEngineerProduction"
+    },
+    {
+      "id": 39,
+      "name": "InfantryRepeated"
+    },
+    {
+      "id": 40,
+      "name": "InfantryBattleProduction"
+    },
+    {
+      "id": 41,
+      "name": "BattlefieldVariantProduction"
+    },
+    {
+      "id": 42,
+      "name": "ScoutVehicleProduction"
+    },
+    {
+      "id": 43,
+      "name": "ArtilleryProduction"
+    },
+    {
+      "id": 44,
+      "name": "CargoTruckProduction"
+    },
+    {
+      "id": 45,
+      "name": "SupplyTruckProduction"
+    },
+    {
+      "id": 46,
+      "name": "CombatSupportRepeated"
+    },
+    {
+      "id": 47,
+      "name": "MaterialFoundation"
+    },
+    {
+      "id": 48,
+      "name": "EffectsBarrage"
+    },
+    {
+      "id": 49,
+      "name": "IndustrialEffects"
+    },
+    {
+      "id": 50,
+      "name": "InfantrySkinning"
+    },
+    {
+      "id": 51,
+      "name": "InfantrySkinningRepeated"
+    },
+    {
+      "id": 52,
+      "name": "InfantrySkinningEngineer"
+    },
+    {
+      "id": 53,
+      "name": "CommandCoreSingle"
+    },
+    {
+      "id": 54,
+      "name": "CommandCoreRepeated"
+    },
+    {
+      "id": 55,
+      "name": "VehicleFactorySingle"
+    },
+    {
+      "id": 56,
+      "name": "VehicleFactoryRepeated"
+    },
+    {
+      "id": 57,
+      "name": "PowerPlantSingle"
+    },
+    {
+      "id": 58,
+      "name": "PowerPlantRepeated"
+    },
+    {
+      "id": 59,
+      "name": "BarracksSingle"
+    },
+    {
+      "id": 60,
+      "name": "BarracksRepeated"
+    },
+    {
+      "id": 61,
+      "name": "RadarSingle"
+    },
+    {
+      "id": 62,
+      "name": "RadarRepeated"
+    },
+    {
+      "id": 63,
+      "name": "CargoTruckSingle"
+    },
+    {
+      "id": 64,
+      "name": "CargoTruckHundred"
+    },
+    {
+      "id": 65,
+      "name": "CargoTruckRepeated"
+    },
+    {
+      "id": 66,
+      "name": "SupplyTruckSingle"
+    },
+    {
+      "id": 67,
+      "name": "SupplyTruckHundred"
+    },
+    {
+      "id": 68,
+      "name": "SupplyTruckRepeated"
+    },
+    {
+      "id": 69,
+      "name": "ArtillerySingle"
+    },
+    {
+      "id": 70,
+      "name": "ArtilleryRepeated100"
+    },
+    {
+      "id": 71,
+      "name": "ArtilleryRepeated1000"
+    },
+    {
+      "id": 72,
+      "name": "StorageDepotRepeated"
+    },
+    {
+      "id": 73,
+      "name": "StorageDepotStress"
+    },
+    {
+      "id": 74,
+      "name": "SupplyDepotRepeated"
+    },
+    {
+      "id": 75,
+      "name": "SupplyDepotStress"
+    },
+    {
+      "id": 76,
+      "name": "LogisticsHubRepeated"
+    },
+    {
+      "id": 77,
+      "name": "LogisticsHubStress"
+    },
+    {
+      "id": 78,
+      "name": "StorageDepotSingle"
+    },
+    {
+      "id": 79,
+      "name": "SupplyDepotSingle"
+    },
+    {
+      "id": 80,
+      "name": "LogisticsHubSingle"
+    },
+    {
+      "id": 81,
+      "name": "MainBattleTankSingle"
+    },
+    {
+      "id": 82,
+      "name": "MainBattleTankHundred"
+    },
+    {
+      "id": 83,
+      "name": "MainBattleTankThousand"
+    }
+  ],
+  "appended": [
+    {
+      "id": 84,
+      "name": "ScoutSingle"
+    },
+    {
+      "id": 85,
+      "name": "ScoutActive"
+    },
+    {
+      "id": 86,
+      "name": "ScoutSelected"
+    },
+    {
+      "id": 87,
+      "name": "ScoutRepeated100"
+    },
+    {
+      "id": 88,
+      "name": "ScoutRepeated1000"
+    }
+  ],
+  "masterDispatchPreserved": true
+}

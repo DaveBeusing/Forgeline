@@ -1,0 +1,22 @@
+[
+  {
+    "path": "loads-ScoutRepeated1000-3840x2160-Low-CloseTactical-before.png",
+    "sourceSha": "20b00ace08089ad44798941a4cfc5668ea2ef06c",
+    "captureKey": "ScoutRepeated1000-3840x2160-Low-CloseTactical",
+    "epoch": "sn1",
+    "group": "loads",
+    "role": "before",
+    "sha256": "99a2298240abf873d26522b4685224777e2355b1b40822c2d17a04928732ad00",
+    "bytes": 17653694
+  },
+  {
+    "path": "loads-ScoutRepeated1000-3840x2160-Low-CloseTactical-after.png",
+    "sourceSha": "20b00ace08089ad44798941a4cfc5668ea2ef06c",
+    "captureKey": "ScoutRepeated1000-3840x2160-Low-CloseTactical",
+    "epoch": "sn1",
+    "group": "loads",
+    "role": "after",
+    "sha256": "426c5b557f92235d2adcd629577348f52f574fbde8079e0ef86aa3290f2c8be6",
+    "bytes": 17651117
+  }
+]

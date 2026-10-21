@@ -1,0 +1,375 @@
+{
+  "imageGateRequested": false,
+  "commit": "b8f6baba7b0d97040537edf9544b8231fe02e15c",
+  "maximumChangedPixelFraction": 0.0,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "structural": "pass",
+  "pixelComparisonRequested": true,
+  "captures": [
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 6.884023703703702,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.13326875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -24.17145,
+      "key": "ScoutVehicleProduction-1920x1080-Low-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 6.812690133333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.056696875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -2.1312687500000003,
+      "key": "ScoutVehicleProduction-1920x1080-Low-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 6.1360384,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.190009375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -2.5738031249999995,
+      "key": "ScoutVehicleProduction-1920x1080-Low-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 8.349755733333332,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.461696874999998,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -3.2787031250000016,
+      "key": "ScoutVehicleProduction-1920x1080-Medium-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 8.479528533333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 12.022425,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -1.3826937500000014,
+      "key": "ScoutVehicleProduction-1920x1080-Medium-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 8.131537066666668,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 10.141446875,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -5.976153125000003,
+      "key": "ScoutVehicleProduction-1920x1080-Medium-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 8.459437866666667,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.590984375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -2.476221875000002,
+      "key": "ScoutVehicleProduction-1920x1080-High-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 8.785880533333334,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 12.907512500000001,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -0.11965312499999747,
+      "key": "ScoutVehicleProduction-1920x1080-High-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 10.1801376,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 11.961546874999998,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -2.424665625000001,
+      "key": "ScoutVehicleProduction-1920x1080-High-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 19.065009066666665,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 24.583359374999997,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -9.560696875000001,
+      "key": "ScoutVehicleProduction-3840x2160-Low-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 20.254723199999994,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 26.155528125,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -3.414349999999999,
+      "key": "ScoutVehicleProduction-3840x2160-Low-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 17.307080533333338,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 24.364165625000002,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -2.1305906249999964,
+      "key": "ScoutVehicleProduction-3840x2160-Low-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 31.670895999999992,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 31.478984375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -0.5570812500000066,
+      "key": "ScoutVehicleProduction-3840x2160-Medium-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 33.51724693333333,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 31.6732375,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 0.027328124999996817,
+      "key": "ScoutVehicleProduction-3840x2160-Medium-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 27.786123733333337,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 30.018615625000002,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -1.1177562499999993,
+      "key": "ScoutVehicleProduction-3840x2160-Medium-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 32.23082346666667,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 31.722893750000004,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 0.174728125000005,
+      "key": "ScoutVehicleProduction-3840x2160-High-CloseTactical",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 34.64941973333334,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 32.381953124999995,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": -0.5896187499999996,
+      "key": "ScoutVehicleProduction-3840x2160-High-NormalGameplay",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    },
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 31.163346133333334,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 31.463387499999993,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 0.40540937499998364,
+      "key": "ScoutVehicleProduction-3840x2160-High-Strategic",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    }
+  ],
+  "imageFailures": [],
+  "baselineCommit": "b8f6baba7b0d97040537edf9544b8231fe02e15c",
+  "channelTolerance": 0,
+  "visualAcceptance": "pending",
+  "schemaVersion": 1
+}

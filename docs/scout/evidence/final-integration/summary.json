@@ -1,0 +1,1782 @@
+{
+  "schemaVersion": 1,
+  "status": "structural-functional-review-not-production-acceptance",
+  "sourceSha": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+  "installedClient": true,
+  "device": {
+    "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+    "dedicatedVideoMemoryBytes": 25309478912,
+    "isSoftwareAdapter": false,
+    "featureLevel": "Level_12_1",
+    "debugLayerEnabled": false,
+    "advanced": {
+      "meshShaderQuerySucceeded": true,
+      "meshShadersSupported": true,
+      "raytracingQuerySucceeded": true,
+      "raytracingSupported": true
+    }
+  },
+  "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+  "captures": 18,
+  "pairs": 9,
+  "exactPairs": 9,
+  "nonexactPairs": 0,
+  "changedPixels": 0,
+  "maximumChannelDelta": 0,
+  "repeatReadbacks": 8,
+  "allCurrentRepeatsExact": true,
+  "warmups": 8,
+  "cpuSamples": 32,
+  "channelTolerance": 0,
+  "maximumChangedPixelFraction": 0,
+  "meshFallbacks": 0,
+  "materialBindingFailures": 0,
+  "textureBindingFailures": 0,
+  "submissionFaults": 0,
+  "pairedCountersEqual": true,
+  "counterMismatches": [],
+  "trackedResidentTextureBytes": {
+    "minimum": 22469216,
+    "maximum": 44812076
+  },
+  "srvDescriptorsUsed": {
+    "minimum": 53,
+    "maximum": 93
+  },
+  "dxgiWholeProcessLocalUsageBytes": {
+    "minimum": 410185728,
+    "maximum": 738996224
+  },
+  "dxgiWholeProcessNonlocalUsageBytes": {
+    "minimum": 116596736,
+    "maximum": 196325376
+  },
+  "motionImageCount": 0,
+  "groups": [
+    {
+      "group": "gallery",
+      "pairs": 1,
+      "exact": 1,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "group": "states",
+      "pairs": 3,
+      "exact": 3,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "group": "hundred",
+      "pairs": 1,
+      "exact": 1,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "group": "thousand-close",
+      "pairs": 1,
+      "exact": 1,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "group": "thousand-strategic",
+      "pairs": 1,
+      "exact": 1,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "group": "dark",
+      "pairs": 1,
+      "exact": 1,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "group": "wet",
+      "pairs": 1,
+      "exact": 1,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0
+    }
+  ],
+  "headers": [
+    {
+      "group": "gallery",
+      "role": "before",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "54866D50BFE065BC2B2DFC8A3EAF15D944476D145EEF0932A30233384CBBA5BF",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "gallery",
+      "role": "after",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "12BE371AD4A8955D03A36313A5831991BE414FE288F36EFBD80A340F06E0D9A1",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "states",
+      "role": "before",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "54866D50BFE065BC2B2DFC8A3EAF15D944476D145EEF0932A30233384CBBA5BF",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "states",
+      "role": "after",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "12BE371AD4A8955D03A36313A5831991BE414FE288F36EFBD80A340F06E0D9A1",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "hundred",
+      "role": "before",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "54866D50BFE065BC2B2DFC8A3EAF15D944476D145EEF0932A30233384CBBA5BF",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "hundred",
+      "role": "after",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "12BE371AD4A8955D03A36313A5831991BE414FE288F36EFBD80A340F06E0D9A1",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "thousand-close",
+      "role": "before",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "54866D50BFE065BC2B2DFC8A3EAF15D944476D145EEF0932A30233384CBBA5BF",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "thousand-close",
+      "role": "after",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "12BE371AD4A8955D03A36313A5831991BE414FE288F36EFBD80A340F06E0D9A1",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "thousand-strategic",
+      "role": "before",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "54866D50BFE065BC2B2DFC8A3EAF15D944476D145EEF0932A30233384CBBA5BF",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "thousand-strategic",
+      "role": "after",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "12BE371AD4A8955D03A36313A5831991BE414FE288F36EFBD80A340F06E0D9A1",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "dark",
+      "role": "before",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "54866D50BFE065BC2B2DFC8A3EAF15D944476D145EEF0932A30233384CBBA5BF",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "dark",
+      "role": "after",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "12BE371AD4A8955D03A36313A5831991BE414FE288F36EFBD80A340F06E0D9A1",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "wet",
+      "role": "before",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "54866D50BFE065BC2B2DFC8A3EAF15D944476D145EEF0932A30233384CBBA5BF",
+      "hostWindowDpi": 144
+    },
+    {
+      "group": "wet",
+      "role": "after",
+      "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "buildIdentity": "0.1.434-dev+9a2b60d7a046192de7aa663b0f7a83369919215a",
+      "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+      "software": false,
+      "clientAssemblySha256": "6C7B9BED5A511C3CE01DD7302E17D133B5EBB98FB96DD7ABF9A0C7F7AC6725C4",
+      "presentationAssemblySha256": "10A7BD1B95DC57C8D5E35ABFEFAA2697E04D74DD63F75F93E76177196579216C",
+      "runtimeFingerprint": "12BE371AD4A8955D03A36313A5831991BE414FE288F36EFBD80A340F06E0D9A1",
+      "hostWindowDpi": 144
+    }
+  ],
+  "reports": [
+    {
+      "group": "gallery",
+      "role": "before",
+      "path": "reports/gallery-before-manifest.json.gz",
+      "original": "artifacts/sn3/gallery/before/manifest.json",
+      "originalSha256": "b0c2bcc73bb8674be37013fa7d71c045de61cc607b87530805bdf1119607be12",
+      "gzipSha256": "92c136b7c71b437f78e33737cfbea4f830e5a95e1cea6655bccd7dfecf8bede3"
+    },
+    {
+      "group": "gallery",
+      "role": "after",
+      "path": "reports/gallery-after-manifest.json.gz",
+      "original": "artifacts/sn3/gallery/after/manifest.json",
+      "originalSha256": "b0bffba2b931cb2bbbe392eaa0a470abc615609958384f8105d0b4854367ff24",
+      "gzipSha256": "a279a2ecc7744b13f16176afe6e4da0e80bbc509eeee60f962c38a9dc4c6d2e2"
+    },
+    {
+      "group": "states",
+      "role": "before",
+      "path": "reports/states-before-manifest.json.gz",
+      "original": "artifacts/sn3/states/before/manifest.json",
+      "originalSha256": "c9e2e959934ae04516b0797db8aa1d131af5cf5c26a6ae6d7017be37b500f00b",
+      "gzipSha256": "b87d0a2115402a027851d6a84903f3af4518565d6ec31a7122058622a35ade73"
+    },
+    {
+      "group": "states",
+      "role": "after",
+      "path": "reports/states-after-manifest.json.gz",
+      "original": "artifacts/sn3/states/after/manifest.json",
+      "originalSha256": "dc535d6969497b8e8134f2fd44eacbdd72ea5883624dffbb3778d70cfca3a4cd",
+      "gzipSha256": "6e297461919855cee9663077e9d42796b38016afa2ed7f631b06d0242553cac2"
+    },
+    {
+      "group": "hundred",
+      "role": "before",
+      "path": "reports/hundred-before-manifest.json.gz",
+      "original": "artifacts/sn3/hundred/before/manifest.json",
+      "originalSha256": "51b2b1f0b134d5cc9fe5d3ef05b3800039be7ca84724200127a7d2032790adff",
+      "gzipSha256": "e76f5ef433885ad123b98b961eec2bb4e00fbe6309c8eeb4f16f7488cab138be"
+    },
+    {
+      "group": "hundred",
+      "role": "after",
+      "path": "reports/hundred-after-manifest.json.gz",
+      "original": "artifacts/sn3/hundred/after/manifest.json",
+      "originalSha256": "4806b0c2010c513276c6d03fe7c3ef2968bd0acdd640693261721b7d6a4a8b61",
+      "gzipSha256": "b284d2255eb7305f2bc030028d7226f444c7570d7836e14989629f8b865d1dfe"
+    },
+    {
+      "group": "thousand-close",
+      "role": "before",
+      "path": "reports/thousand-close-before-manifest.json.gz",
+      "original": "artifacts/sn3/thousand-close/before/manifest.json",
+      "originalSha256": "b2a1661547284a257f4303e3efbe995cb2aab0dd78abfcecbe1a8daaff3f9b92",
+      "gzipSha256": "4e62e0a4f0d950e5ef54ccbb66dfaca8409196a50acb99745ccc35060af24add"
+    },
+    {
+      "group": "thousand-close",
+      "role": "after",
+      "path": "reports/thousand-close-after-manifest.json.gz",
+      "original": "artifacts/sn3/thousand-close/after/manifest.json",
+      "originalSha256": "f80dc28873b7566b4b5bba398253430aab13cff1fc36751e5a20ca275139e149",
+      "gzipSha256": "6333cd739493cc90a6c06a64d53ce04918ca58df0791a9ad0aea5474fa4ff0f7"
+    },
+    {
+      "group": "thousand-strategic",
+      "role": "before",
+      "path": "reports/thousand-strategic-before-manifest.json.gz",
+      "original": "artifacts/sn3/thousand-strategic/before/manifest.json",
+      "originalSha256": "c88514760256b0dca0b3d7a3bbad585df6e1d61576a295604afcb3690afb36c4",
+      "gzipSha256": "16d5966e2d59e90b495ba77f4f7715af65974ee6f847941127135c6af488d82c"
+    },
+    {
+      "group": "thousand-strategic",
+      "role": "after",
+      "path": "reports/thousand-strategic-after-manifest.json.gz",
+      "original": "artifacts/sn3/thousand-strategic/after/manifest.json",
+      "originalSha256": "2d9582f178555962ddc7b135174f2bf893b5aaf2ad96b8ca8473d635d8b21f3b",
+      "gzipSha256": "c698e14214b7481529a2884ab0ba81423fe97b564514305e50b9bb5497e31d67"
+    },
+    {
+      "group": "dark",
+      "role": "before",
+      "path": "reports/dark-before-manifest.json.gz",
+      "original": "artifacts/sn3/dark/before/manifest.json",
+      "originalSha256": "b08fde3972aa507b01acfc3bf798975583750b1c2fefc15f99529e6186ca6cb1",
+      "gzipSha256": "b122553e8bd399dcac84c163f1d6118b8e8dd1604df67cc3d4fa72c021a2e48b"
+    },
+    {
+      "group": "dark",
+      "role": "after",
+      "path": "reports/dark-after-manifest.json.gz",
+      "original": "artifacts/sn3/dark/after/manifest.json",
+      "originalSha256": "00583dcb7cdc01c8d24926a7b383daf7d183d669515960ecf03680eb172083e9",
+      "gzipSha256": "23f97ca1f3743880cc5058515f7821d6dc8a511e771f2001be8d7aa777ebc934"
+    },
+    {
+      "group": "wet",
+      "role": "before",
+      "path": "reports/wet-before-manifest.json.gz",
+      "original": "artifacts/sn3/wet/before/manifest.json",
+      "originalSha256": "22e9e3d02c4badca91d96e204abb4aad62e3fa37d7344842e16d9916bf4c37c0",
+      "gzipSha256": "5b0b019e6fef7caeeccf6f20651a895e83693f211371604a96fe79c71b888560"
+    },
+    {
+      "group": "wet",
+      "role": "after",
+      "path": "reports/wet-after-manifest.json.gz",
+      "original": "artifacts/sn3/wet/after/manifest.json",
+      "originalSha256": "475b50c80e793edc4fdd0c16fbf9b5465868da2e2802240f35dcdfbc683f9dd0",
+      "gzipSha256": "08b17f485a0884caf9cb9fba742058e94be5672dae39ac0c76243877cc226da0"
+    }
+  ],
+  "rows": [
+    {
+      "group": "gallery",
+      "key": "ScoutVehicleProduction-1920x1080-High-NormalGameplay",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "withinTolerance": true,
+      "beforeImage": "ScoutVehicleProduction-1920x1080-High-NormalGameplay.png",
+      "beforeImageSha256": "E91CE0877BDE44AA8DD5FAF12AEBBE0704138A397A704B2BB24EE20E887BFBAA",
+      "afterImage": "ScoutVehicleProduction-1920x1080-High-NormalGameplay.png",
+      "afterImageSha256": "E91CE0877BDE44AA8DD5FAF12AEBBE0704138A397A704B2BB24EE20E887BFBAA",
+      "cpuBefore": {
+        "samples": 32,
+        "mean": 13.316649999999996,
+        "p50": 11.7639,
+        "p95": 26.7224,
+        "p99": 27.2029
+      },
+      "cpuAfter": {
+        "samples": 32,
+        "mean": 13.560909375000001,
+        "p50": 13.4248,
+        "p95": 27.2485,
+        "p99": 28.2217
+      },
+      "gpuBefore": {
+        "samples": 29,
+        "mean": 9.489091310344829,
+        "p50": 10.5768,
+        "p95": 12.31152,
+        "p99": 14.379968
+      },
+      "gpuAfter": {
+        "samples": 30,
+        "mean": 10.612176,
+        "p50": 11.592224,
+        "p95": 14.918944,
+        "p99": 17.812576
+      },
+      "instancesBefore": {
+        "totalInstances": 14,
+        "visibleInstances": 8,
+        "culledInstances": 6,
+        "drawCalls": 4,
+        "highLodInstances": 0,
+        "reducedLodInstances": 8,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 7,
+        "lod2Instances": 1,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "instancesAfter": {
+        "totalInstances": 14,
+        "visibleInstances": 8,
+        "culledInstances": 6,
+        "drawCalls": 4,
+        "highLodInstances": 0,
+        "reducedLodInstances": 8,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 7,
+        "lod2Instances": 1,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "materialsAfter": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "resourcesAfter": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 77,
+        "textureReleaseCount": 0
+      },
+      "submissionAfter": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 256,
+        "batchCapacity": 4,
+        "submittedInstances": 10,
+        "uploadBytes": 1120,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 690,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "memoryBefore": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 130715648,
+        "failureReason": null
+      },
+      "memoryAfter": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 130715648,
+        "failureReason": null
+      },
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "profile": "High",
+      "display": {
+        "width": 1920,
+        "height": 1080
+      },
+      "kind": "ScoutVehicleProduction"
+    },
+    {
+      "group": "states",
+      "key": "ScoutSingle-1920x1080-High-CloseTactical-Inspection20",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "withinTolerance": true,
+      "beforeImage": "ScoutSingle-1920x1080-High-CloseTactical-Inspection20.png",
+      "beforeImageSha256": "4B86360377B210FB445FE3D2F96288179D159BB39FD6337B698EE0478C85E139",
+      "afterImage": "ScoutSingle-1920x1080-High-CloseTactical-Inspection20.png",
+      "afterImageSha256": "4B86360377B210FB445FE3D2F96288179D159BB39FD6337B698EE0478C85E139",
+      "cpuBefore": {
+        "samples": 32,
+        "mean": 12.709746875000002,
+        "p50": 12.3923,
+        "p95": 26.3536,
+        "p99": 29.0043
+      },
+      "cpuAfter": {
+        "samples": 32,
+        "mean": 9.822378125000002,
+        "p50": 9.7621,
+        "p95": 19.8928,
+        "p99": 22.4261
+      },
+      "gpuBefore": {
+        "samples": 29,
+        "mean": 10.105926620689655,
+        "p50": 10.912992,
+        "p95": 13.696032,
+        "p99": 15.58352
+      },
+      "gpuAfter": {
+        "samples": 30,
+        "mean": 8.4819552,
+        "p50": 7.5224,
+        "p95": 12.106016,
+        "p99": 12.364768
+      },
+      "instancesBefore": {
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 1,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1,
+        "skippedDecalResources": 0
+      },
+      "instancesAfter": {
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 1,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1,
+        "skippedDecalResources": 0
+      },
+      "materialsAfter": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "resourcesAfter": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 77,
+        "textureReleaseCount": 0
+      },
+      "submissionAfter": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 10,
+        "uploadBytes": 1120,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 135,
+        "mechanicalPartInstances": 10,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "memoryBefore": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 121225216,
+        "failureReason": null
+      },
+      "memoryAfter": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 116596736,
+        "failureReason": null
+      },
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 20,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "profile": "High",
+      "display": {
+        "width": 1920,
+        "height": 1080
+      },
+      "kind": "ScoutSingle"
+    },
+    {
+      "group": "states",
+      "key": "ScoutActive-1920x1080-High-CloseTactical-Inspection20",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "withinTolerance": true,
+      "beforeImage": "ScoutActive-1920x1080-High-CloseTactical-Inspection20.png",
+      "beforeImageSha256": "7CEBEBEE052BABB57B1BD78B4D13E3C85FC4439B39631D7CDC49787690627CF0",
+      "afterImage": "ScoutActive-1920x1080-High-CloseTactical-Inspection20.png",
+      "afterImageSha256": "7CEBEBEE052BABB57B1BD78B4D13E3C85FC4439B39631D7CDC49787690627CF0",
+      "cpuBefore": {
+        "samples": 32,
+        "mean": 59.107915625,
+        "p50": 10.9963,
+        "p95": 27.0813,
+        "p99": 1546.9783
+      },
+      "cpuAfter": {
+        "samples": 32,
+        "mean": 14.94845,
+        "p50": 12.1662,
+        "p95": 38.9982,
+        "p99": 41.6064
+      },
+      "gpuBefore": {
+        "samples": 30,
+        "mean": 8.969514666666663,
+        "p50": 9.162624,
+        "p95": 12.359584,
+        "p99": 12.795712
+      },
+      "gpuAfter": {
+        "samples": 30,
+        "mean": 10.061655466666666,
+        "p50": 11.593216,
+        "p95": 12.269344,
+        "p99": 14.074432
+      },
+      "instancesBefore": {
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 1,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1,
+        "skippedDecalResources": 0
+      },
+      "instancesAfter": {
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 1,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1,
+        "skippedDecalResources": 0
+      },
+      "materialsAfter": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "resourcesAfter": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 154,
+        "textureReleaseCount": 77
+      },
+      "submissionAfter": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 10,
+        "uploadBytes": 1120,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 135,
+        "mechanicalPartInstances": 10,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "memoryBefore": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 121225216,
+        "failureReason": null
+      },
+      "memoryAfter": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 120791040,
+        "failureReason": null
+      },
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 20,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "profile": "High",
+      "display": {
+        "width": 1920,
+        "height": 1080
+      },
+      "kind": "ScoutActive"
+    },
+    {
+      "group": "states",
+      "key": "ScoutSelected-1920x1080-High-CloseTactical-Inspection20",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "withinTolerance": true,
+      "beforeImage": "ScoutSelected-1920x1080-High-CloseTactical-Inspection20.png",
+      "beforeImageSha256": "6BA0C226A687BFEF08CE732E5DE2CD1C2084CB83E6CB2A91800C83FC42B6F7C0",
+      "afterImage": "ScoutSelected-1920x1080-High-CloseTactical-Inspection20.png",
+      "afterImageSha256": "6BA0C226A687BFEF08CE732E5DE2CD1C2084CB83E6CB2A91800C83FC42B6F7C0",
+      "cpuBefore": {
+        "samples": 32,
+        "mean": 58.34541875,
+        "p50": 11.0246,
+        "p95": 24.8402,
+        "p99": 1517.0908
+      },
+      "cpuAfter": {
+        "samples": 32,
+        "mean": 89.84256562499999,
+        "p50": 13.2227,
+        "p95": 804.5287,
+        "p99": 873.4476
+      },
+      "gpuBefore": {
+        "samples": 30,
+        "mean": 8.863815466666667,
+        "p50": 9.080224,
+        "p95": 12.29552,
+        "p99": 12.352096
+      },
+      "gpuAfter": {
+        "samples": 30,
+        "mean": 9.380509866666667,
+        "p50": 10.385728,
+        "p95": 12.349888,
+        "p99": 13.18592
+      },
+      "instancesBefore": {
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 1,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1,
+        "skippedDecalResources": 0
+      },
+      "instancesAfter": {
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 1,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1,
+        "skippedDecalResources": 0
+      },
+      "materialsAfter": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "resourcesAfter": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 231,
+        "textureReleaseCount": 154
+      },
+      "submissionAfter": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 10,
+        "uploadBytes": 1120,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 135,
+        "mechanicalPartInstances": 10,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "memoryBefore": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 144818176,
+        "failureReason": null
+      },
+      "memoryAfter": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 145637376,
+        "failureReason": null
+      },
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 20,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "profile": "High",
+      "display": {
+        "width": 1920,
+        "height": 1080
+      },
+      "kind": "ScoutSelected"
+    },
+    {
+      "group": "hundred",
+      "key": "ScoutRepeated100-1920x1080-High-NormalGameplay",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "withinTolerance": true,
+      "beforeImage": "ScoutRepeated100-1920x1080-High-NormalGameplay.png",
+      "beforeImageSha256": "F4D21DF47D6873D299DEECBA76EDD6B007AC30337B1D56935AE826C52017D3A4",
+      "afterImage": "ScoutRepeated100-1920x1080-High-NormalGameplay.png",
+      "afterImageSha256": "F4D21DF47D6873D299DEECBA76EDD6B007AC30337B1D56935AE826C52017D3A4",
+      "cpuBefore": {
+        "samples": 32,
+        "mean": 224.705478125,
+        "p50": 13.6314,
+        "p95": 913.7694,
+        "p99": 921.6126
+      },
+      "cpuAfter": {
+        "samples": 32,
+        "mean": 11.795640625000003,
+        "p50": 11.7574,
+        "p95": 23.8638,
+        "p99": 24.9716
+      },
+      "gpuBefore": {
+        "samples": 30,
+        "mean": 10.918504533333335,
+        "p50": 11.387328,
+        "p95": 12.274304,
+        "p99": 13.554528
+      },
+      "gpuAfter": {
+        "samples": 30,
+        "mean": 9.7802976,
+        "p50": 10.019968,
+        "p95": 12.08752,
+        "p99": 12.293312
+      },
+      "instancesBefore": {
+        "totalInstances": 100,
+        "visibleInstances": 100,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 100,
+        "runtimeMeshInstances": 100,
+        "texturedRuntimeMeshInstances": 100,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 100,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 4,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 100,
+        "skippedDecalResources": 0
+      },
+      "instancesAfter": {
+        "totalInstances": 100,
+        "visibleInstances": 100,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 100,
+        "runtimeMeshInstances": 100,
+        "texturedRuntimeMeshInstances": 100,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 100,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 4,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 100,
+        "skippedDecalResources": 0
+      },
+      "materialsAfter": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "resourcesAfter": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 77,
+        "textureReleaseCount": 0
+      },
+      "submissionAfter": {
+        "stagingCapacity": 128,
+        "batchInstanceCapacity": 128,
+        "batchCapacity": 1,
+        "submittedInstances": 100,
+        "uploadBytes": 11200,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 5468,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "memoryBefore": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 121692160,
+        "failureReason": null
+      },
+      "memoryAfter": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 121257984,
+        "failureReason": null
+      },
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "profile": "High",
+      "display": {
+        "width": 1920,
+        "height": 1080
+      },
+      "kind": "ScoutRepeated100"
+    },
+    {
+      "group": "thousand-close",
+      "key": "ScoutRepeated1000-3840x2160-Low-CloseTactical",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "withinTolerance": true,
+      "beforeImage": "ScoutRepeated1000-3840x2160-Low-CloseTactical.png",
+      "beforeImageSha256": "99A2298240ABF873D26522B4685224777E2355B1B40822C2D17A04928732AD00",
+      "afterImage": "ScoutRepeated1000-3840x2160-Low-CloseTactical.png",
+      "afterImageSha256": "99A2298240ABF873D26522B4685224777E2355B1B40822C2D17A04928732AD00",
+      "cpuBefore": {
+        "samples": 32,
+        "mean": 86.00530312500001,
+        "p50": 35.3942,
+        "p95": 163.1066,
+        "p99": 1506.772
+      },
+      "cpuAfter": {
+        "samples": 32,
+        "mean": 44.559109375000006,
+        "p50": 44.0256,
+        "p95": 58.6559,
+        "p99": 82.6636
+      },
+      "gpuBefore": {
+        "samples": 30,
+        "mean": 21.8591648,
+        "p50": 24.034112,
+        "p95": 28.309568,
+        "p99": 28.649984
+      },
+      "gpuAfter": {
+        "samples": 31,
+        "mean": 18.478028387096778,
+        "p50": 18.887712,
+        "p95": 23.592288,
+        "p99": 24.016736
+      },
+      "instancesBefore": {
+        "totalInstances": 1000,
+        "visibleInstances": 307,
+        "culledInstances": 693,
+        "drawCalls": 11,
+        "highLodInstances": 147,
+        "reducedLodInstances": 160,
+        "runtimeMeshInstances": 814,
+        "texturedRuntimeMeshInstances": 814,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 160,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 10,
+        "clusterCulledInstances": 296,
+        "instanceBoundsTests": 704,
+        "skippedDecalResources": 0
+      },
+      "instancesAfter": {
+        "totalInstances": 1000,
+        "visibleInstances": 307,
+        "culledInstances": 693,
+        "drawCalls": 11,
+        "highLodInstances": 147,
+        "reducedLodInstances": 160,
+        "runtimeMeshInstances": 814,
+        "texturedRuntimeMeshInstances": 814,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 160,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 10,
+        "clusterCulledInstances": 296,
+        "instanceBoundsTests": 704,
+        "skippedDecalResources": 0
+      },
+      "materialsAfter": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "resourcesAfter": {
+        "loadedTextureCount": 46,
+        "residentTextureBytes": 22469216,
+        "shaderResourceDescriptorsUsed": 53,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 46,
+        "peakResidentTextureBytes": 22469216,
+        "peakShaderResourceDescriptorsUsed": 53,
+        "textureUploadCount": 46,
+        "textureReleaseCount": 0
+      },
+      "submissionAfter": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 6144,
+        "batchCapacity": 11,
+        "submittedInstances": 814,
+        "uploadBytes": 91168,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 43744,
+        "mechanicalPartInstances": 654,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "memoryBefore": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 520916992,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 196325376,
+        "failureReason": null
+      },
+      "memoryAfter": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 520916992,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 189394944,
+        "failureReason": null
+      },
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 120,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "profile": "Low",
+      "display": {
+        "width": 3840,
+        "height": 2160
+      },
+      "kind": "ScoutRepeated1000"
+    },
+    {
+      "group": "thousand-strategic",
+      "key": "ScoutRepeated1000-3840x2160-High-Strategic",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "withinTolerance": true,
+      "beforeImage": "ScoutRepeated1000-3840x2160-High-Strategic.png",
+      "beforeImageSha256": "86A9F10FC7691FB57A16DBB77CC0463D6D012DDD2B670B36C47BA78F0C002E26",
+      "afterImage": "ScoutRepeated1000-3840x2160-High-Strategic.png",
+      "afterImageSha256": "86A9F10FC7691FB57A16DBB77CC0463D6D012DDD2B670B36C47BA78F0C002E26",
+      "cpuBefore": {
+        "samples": 32,
+        "mean": 34.56937812499999,
+        "p50": 31.9461,
+        "p95": 73.7955,
+        "p99": 82.4034
+      },
+      "cpuAfter": {
+        "samples": 32,
+        "mean": 36.21492812500001,
+        "p50": 32.9494,
+        "p95": 84.7683,
+        "p99": 85.7843
+      },
+      "gpuBefore": {
+        "samples": 28,
+        "mean": 31.75944685714286,
+        "p50": 32.150304,
+        "p95": 34.599744,
+        "p99": 35.835552
+      },
+      "gpuAfter": {
+        "samples": 27,
+        "mean": 31.090125037037048,
+        "p50": 31.367392,
+        "p95": 35.229504,
+        "p99": 36.534112
+      },
+      "instancesBefore": {
+        "totalInstances": 1000,
+        "visibleInstances": 1000,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 1000,
+        "runtimeMeshInstances": 1000,
+        "texturedRuntimeMeshInstances": 1000,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 1000,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1000,
+        "skippedDecalResources": 0
+      },
+      "instancesAfter": {
+        "totalInstances": 1000,
+        "visibleInstances": 1000,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 1000,
+        "runtimeMeshInstances": 1000,
+        "texturedRuntimeMeshInstances": 1000,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 1000,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1000,
+        "skippedDecalResources": 0
+      },
+      "materialsAfter": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "resourcesAfter": {
+        "loadedTextureCount": 81,
+        "residentTextureBytes": 44783476,
+        "shaderResourceDescriptorsUsed": 88,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 81,
+        "peakResidentTextureBytes": 44783476,
+        "peakShaderResourceDescriptorsUsed": 88,
+        "textureUploadCount": 81,
+        "textureReleaseCount": 0
+      },
+      "submissionAfter": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 1024,
+        "batchCapacity": 1,
+        "submittedInstances": 1000,
+        "uploadBytes": 112000,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 43744,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "memoryBefore": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 738996224,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 191565824,
+        "failureReason": null
+      },
+      "memoryAfter": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 738996224,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 191565824,
+        "failureReason": null
+      },
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 1000,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "profile": "High",
+      "display": {
+        "width": 3840,
+        "height": 2160
+      },
+      "kind": "ScoutRepeated1000"
+    },
+    {
+      "group": "dark",
+      "key": "ScoutVehicleProduction-1920x1080-High-NormalGameplay",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "withinTolerance": true,
+      "beforeImage": "ScoutVehicleProduction-1920x1080-High-NormalGameplay.png",
+      "beforeImageSha256": "BA3935020D23C6EB601A4D2C91B1A632BA05066283D1AD09668F48741336486E",
+      "afterImage": "ScoutVehicleProduction-1920x1080-High-NormalGameplay.png",
+      "afterImageSha256": "BA3935020D23C6EB601A4D2C91B1A632BA05066283D1AD09668F48741336486E",
+      "cpuBefore": {
+        "samples": 32,
+        "mean": 12.719471875000002,
+        "p50": 12.7796,
+        "p95": 24.7309,
+        "p99": 28.6067
+      },
+      "cpuAfter": {
+        "samples": 32,
+        "mean": 11.576428125000001,
+        "p50": 11.5103,
+        "p95": 20.1889,
+        "p99": 20.7901
+      },
+      "gpuBefore": {
+        "samples": 30,
+        "mean": 9.288974933333332,
+        "p50": 9.849024,
+        "p95": 11.530464,
+        "p99": 12.5432
+      },
+      "gpuAfter": {
+        "samples": 30,
+        "mean": 8.524293333333333,
+        "p50": 8.909088,
+        "p95": 11.471296,
+        "p99": 11.500608
+      },
+      "instancesBefore": {
+        "totalInstances": 14,
+        "visibleInstances": 8,
+        "culledInstances": 6,
+        "drawCalls": 4,
+        "highLodInstances": 0,
+        "reducedLodInstances": 8,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 7,
+        "lod2Instances": 1,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "instancesAfter": {
+        "totalInstances": 14,
+        "visibleInstances": 8,
+        "culledInstances": 6,
+        "drawCalls": 4,
+        "highLodInstances": 0,
+        "reducedLodInstances": 8,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 7,
+        "lod2Instances": 1,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "materialsAfter": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "resourcesAfter": {
+        "loadedTextureCount": 86,
+        "residentTextureBytes": 44812076,
+        "shaderResourceDescriptorsUsed": 93,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 86,
+        "peakResidentTextureBytes": 44812076,
+        "peakShaderResourceDescriptorsUsed": 93,
+        "textureUploadCount": 86,
+        "textureReleaseCount": 0
+      },
+      "submissionAfter": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 256,
+        "batchCapacity": 4,
+        "submittedInstances": 10,
+        "uploadBytes": 1120,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 690,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "memoryBefore": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 411254784,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 130715648,
+        "failureReason": null
+      },
+      "memoryAfter": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 411254784,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 130715648,
+        "failureReason": null
+      },
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "profile": "High",
+      "display": {
+        "width": 1920,
+        "height": 1080
+      },
+      "kind": "ScoutVehicleProduction"
+    },
+    {
+      "group": "wet",
+      "key": "ScoutVehicleProduction-1920x1080-High-NormalGameplay",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "withinTolerance": true,
+      "beforeImage": "ScoutVehicleProduction-1920x1080-High-NormalGameplay.png",
+      "beforeImageSha256": "A24E470DDB78BB9641DE1FD7357023B8ECC9D268A4153E767DBBD804E84D7668",
+      "afterImage": "ScoutVehicleProduction-1920x1080-High-NormalGameplay.png",
+      "afterImageSha256": "A24E470DDB78BB9641DE1FD7357023B8ECC9D268A4153E767DBBD804E84D7668",
+      "cpuBefore": {
+        "samples": 32,
+        "mean": 12.458668750000001,
+        "p50": 12.2543,
+        "p95": 21.7941,
+        "p99": 25.2121
+      },
+      "cpuAfter": {
+        "samples": 32,
+        "mean": 14.813950000000002,
+        "p50": 12.0948,
+        "p95": 31.3803,
+        "p99": 32.696
+      },
+      "gpuBefore": {
+        "samples": 28,
+        "mean": 9.922164571428572,
+        "p50": 11.58496,
+        "p95": 12.505664,
+        "p99": 12.833632
+      },
+      "gpuAfter": {
+        "samples": 27,
+        "mean": 9.367642074074073,
+        "p50": 10.556416,
+        "p95": 12.781184,
+        "p99": 14.818016
+      },
+      "instancesBefore": {
+        "totalInstances": 14,
+        "visibleInstances": 8,
+        "culledInstances": 6,
+        "drawCalls": 4,
+        "highLodInstances": 0,
+        "reducedLodInstances": 8,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 7,
+        "lod2Instances": 1,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "instancesAfter": {
+        "totalInstances": 14,
+        "visibleInstances": 8,
+        "culledInstances": 6,
+        "drawCalls": 4,
+        "highLodInstances": 0,
+        "reducedLodInstances": 8,
+        "runtimeMeshInstances": 10,
+        "texturedRuntimeMeshInstances": 10,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 7,
+        "lod2Instances": 1,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "materialsAfter": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "resourcesAfter": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 77,
+        "textureReleaseCount": 0
+      },
+      "submissionAfter": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 256,
+        "batchCapacity": 4,
+        "submittedInstances": 10,
+        "uploadBytes": 1120,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 690,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "memoryBefore": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 130715648,
+        "failureReason": null
+      },
+      "memoryAfter": {
+        "available": true,
+        "localBudgetBytes": 24504172544,
+        "localUsageBytes": 410185728,
+        "nonLocalBudgetBytes": 50152030208,
+        "nonLocalUsageBytes": 130715648,
+        "failureReason": null
+      },
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "profile": "High",
+      "display": {
+        "width": 1920,
+        "height": 1080
+      },
+      "kind": "ScoutVehicleProduction"
+    }
+  ],
+  "humanVisualApproval": "pending",
+  "renderProductAcceptance": "open",
+  "liveMotionMovingLodAndLifecycleAcceptance": "pending",
+  "performanceNote": "Short sequential snapshots are observational; host load, clocks and thermal state were uncontrolled. Per-case original distributions are retained; no causal speedup or sustained FPS claim."
+}

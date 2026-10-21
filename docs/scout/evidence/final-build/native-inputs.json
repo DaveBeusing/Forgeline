@@ -1,0 +1,227 @@
+{
+  "sourceSha": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+  "copiedInputs": [
+    {
+      "path": "baseline\\runtime\\manifest.json",
+      "sha256": "5a8fe0a6654d4c72783fb2701eb055f5338578eec84741283485b83a2e4bad65"
+    },
+    {
+      "path": "baseline\\runtime\\materials\\material\\directorate\\unit\\scout_vehicle.flasset",
+      "sha256": "37efb95a1066be4576774d0479e3fa68b8e76f7bdf6957802d63d4374664d955"
+    },
+    {
+      "path": "baseline\\runtime\\meshes\\unit\\directorate\\scout_vehicle.flasset",
+      "sha256": "a9641bd61dea139a7bf2cbe83bb25228cdc49eb5da22c374e008fc4965151d03"
+    },
+    {
+      "path": "baseline\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\collision.flasset",
+      "sha256": "3d9f633fbd8acdce51e5302cf84d74560e3c85329b14c087f4bb760a83832dfe"
+    },
+    {
+      "path": "baseline\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\critical.flasset",
+      "sha256": "b674b83a7b888394a5044a2e0d6204f271e553556850ffc4e55bb7c3a7f996b4"
+    },
+    {
+      "path": "baseline\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\damaged.flasset",
+      "sha256": "73cb5a4d49884a0b2c164f9f6dccb972f6b499049bd5e5d2539917414a91f1fa"
+    },
+    {
+      "path": "baseline\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\lod1.flasset",
+      "sha256": "ed75935897320ce9281d98d14b9fecb904735ea1c56555189b4f27457e48bf0b"
+    },
+    {
+      "path": "baseline\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\lod2.flasset",
+      "sha256": "215d309f45c59fd2828fed8047b1f0992698e15155f04c0084e37f839e80d895"
+    },
+    {
+      "path": "baseline\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\turret.flasset",
+      "sha256": "5a8e2a46b09b4207696743f85def8a47dbaabf5e52b4ec7f5ce74d278a8807b4"
+    },
+    {
+      "path": "baseline\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\wreck.flasset",
+      "sha256": "f3f7913d34b5188a4554be5f61d75d067903218f25fca761fe3ff3ae922e7c0b"
+    },
+    {
+      "path": "baseline\\runtime\\textures\\texture\\directorate\\surface\\atlas_base.flasset",
+      "sha256": "b94390e25e0b38001c147a226f13d39ff51a4882f95ceda27c67384a022a8cec"
+    },
+    {
+      "path": "baseline\\runtime\\textures\\texture\\directorate\\surface\\atlas_normal.flasset",
+      "sha256": "5ba37562b698e17094b5090fe8a79b603ea1dc6f616dd8b125e5eb364d1ec8e2"
+    },
+    {
+      "path": "baseline\\runtime\\textures\\texture\\directorate\\surface\\atlas_orm.flasset",
+      "sha256": "fd5ab8bae616012e8e1157395bd01ba26b5fc8f99ddf902de869872e98b45b20"
+    },
+    {
+      "path": "first\\poses.json",
+      "sha256": "040fa17c7fd0fcd0b90abbe3f89d17a2bfdac03e893c9988fa5a57ec211432b1"
+    },
+    {
+      "path": "first\\runtime\\manifest.json",
+      "sha256": "3c94f0bd26dd2920d8d452fce856f0b0811616ecf2918aafbcbde6735d3a377c"
+    },
+    {
+      "path": "first\\runtime\\materials\\material\\directorate\\unit\\scout_vehicle.flasset",
+      "sha256": "37efb95a1066be4576774d0479e3fa68b8e76f7bdf6957802d63d4374664d955"
+    },
+    {
+      "path": "first\\runtime\\meshes\\unit\\directorate\\scout_vehicle.flasset",
+      "sha256": "33f11df17ccc0bd7803666daf19ca204530085dc90b53eb03499a98b60b0be50"
+    },
+    {
+      "path": "first\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\collision.flasset",
+      "sha256": "e7de0102e8429ea6bdcf96c36bd20ef68a36be7bd9746011f94b7e327164f2ec"
+    },
+    {
+      "path": "first\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\critical.flasset",
+      "sha256": "d747be6684e244b5f0f9185c90b48fbb1a63516ad44e5bd4011c1633c42281e8"
+    },
+    {
+      "path": "first\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\damaged.flasset",
+      "sha256": "d08f7d024a3a55c7d47adeb3530ac4f0f44f4ad372d147bc5d9283dd4e6dbdc5"
+    },
+    {
+      "path": "first\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\lod1.flasset",
+      "sha256": "bf632af5eca952e8f3adc27aa7773ecfecb1af5bae53b3167bedecaef633edc6"
+    },
+    {
+      "path": "first\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\lod2.flasset",
+      "sha256": "839c6c89c13b63978fa696cdec8bd8942542f2dd7f9d71464db5cb6ea2866c8e"
+    },
+    {
+      "path": "first\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\turret.flasset",
+      "sha256": "f23f509ab6a7d1341d149b4fab68ac10a2ee7fc05ef8dc32def65cb9a1d4f945"
+    },
+    {
+      "path": "first\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\wreck.flasset",
+      "sha256": "97eaf03143efe3906c3f32833e6762d076351e0c6e5880f2901038dec7146528"
+    },
+    {
+      "path": "first\\runtime\\textures\\texture\\directorate\\surface\\atlas_base.flasset",
+      "sha256": "b94390e25e0b38001c147a226f13d39ff51a4882f95ceda27c67384a022a8cec"
+    },
+    {
+      "path": "first\\runtime\\textures\\texture\\directorate\\surface\\atlas_normal.flasset",
+      "sha256": "5ba37562b698e17094b5090fe8a79b603ea1dc6f616dd8b125e5eb364d1ec8e2"
+    },
+    {
+      "path": "first\\runtime\\textures\\texture\\directorate\\surface\\atlas_orm.flasset",
+      "sha256": "fd5ab8bae616012e8e1157395bd01ba26b5fc8f99ddf902de869872e98b45b20"
+    },
+    {
+      "path": "reopened\\poses.json",
+      "sha256": "040fa17c7fd0fcd0b90abbe3f89d17a2bfdac03e893c9988fa5a57ec211432b1"
+    },
+    {
+      "path": "reopened\\runtime\\manifest.json",
+      "sha256": "3c94f0bd26dd2920d8d452fce856f0b0811616ecf2918aafbcbde6735d3a377c"
+    },
+    {
+      "path": "reopened\\runtime\\materials\\material\\directorate\\unit\\scout_vehicle.flasset",
+      "sha256": "37efb95a1066be4576774d0479e3fa68b8e76f7bdf6957802d63d4374664d955"
+    },
+    {
+      "path": "reopened\\runtime\\meshes\\unit\\directorate\\scout_vehicle.flasset",
+      "sha256": "33f11df17ccc0bd7803666daf19ca204530085dc90b53eb03499a98b60b0be50"
+    },
+    {
+      "path": "reopened\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\collision.flasset",
+      "sha256": "e7de0102e8429ea6bdcf96c36bd20ef68a36be7bd9746011f94b7e327164f2ec"
+    },
+    {
+      "path": "reopened\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\critical.flasset",
+      "sha256": "d747be6684e244b5f0f9185c90b48fbb1a63516ad44e5bd4011c1633c42281e8"
+    },
+    {
+      "path": "reopened\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\damaged.flasset",
+      "sha256": "d08f7d024a3a55c7d47adeb3530ac4f0f44f4ad372d147bc5d9283dd4e6dbdc5"
+    },
+    {
+      "path": "reopened\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\lod1.flasset",
+      "sha256": "bf632af5eca952e8f3adc27aa7773ecfecb1af5bae53b3167bedecaef633edc6"
+    },
+    {
+      "path": "reopened\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\lod2.flasset",
+      "sha256": "839c6c89c13b63978fa696cdec8bd8942542f2dd7f9d71464db5cb6ea2866c8e"
+    },
+    {
+      "path": "reopened\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\turret.flasset",
+      "sha256": "f23f509ab6a7d1341d149b4fab68ac10a2ee7fc05ef8dc32def65cb9a1d4f945"
+    },
+    {
+      "path": "reopened\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\wreck.flasset",
+      "sha256": "97eaf03143efe3906c3f32833e6762d076351e0c6e5880f2901038dec7146528"
+    },
+    {
+      "path": "reopened\\runtime\\textures\\texture\\directorate\\surface\\atlas_base.flasset",
+      "sha256": "b94390e25e0b38001c147a226f13d39ff51a4882f95ceda27c67384a022a8cec"
+    },
+    {
+      "path": "reopened\\runtime\\textures\\texture\\directorate\\surface\\atlas_normal.flasset",
+      "sha256": "5ba37562b698e17094b5090fe8a79b603ea1dc6f616dd8b125e5eb364d1ec8e2"
+    },
+    {
+      "path": "reopened\\runtime\\textures\\texture\\directorate\\surface\\atlas_orm.flasset",
+      "sha256": "fd5ab8bae616012e8e1157395bd01ba26b5fc8f99ddf902de869872e98b45b20"
+    },
+    {
+      "path": "second\\poses.json",
+      "sha256": "040fa17c7fd0fcd0b90abbe3f89d17a2bfdac03e893c9988fa5a57ec211432b1"
+    },
+    {
+      "path": "second\\runtime\\manifest.json",
+      "sha256": "3c94f0bd26dd2920d8d452fce856f0b0811616ecf2918aafbcbde6735d3a377c"
+    },
+    {
+      "path": "second\\runtime\\materials\\material\\directorate\\unit\\scout_vehicle.flasset",
+      "sha256": "37efb95a1066be4576774d0479e3fa68b8e76f7bdf6957802d63d4374664d955"
+    },
+    {
+      "path": "second\\runtime\\meshes\\unit\\directorate\\scout_vehicle.flasset",
+      "sha256": "33f11df17ccc0bd7803666daf19ca204530085dc90b53eb03499a98b60b0be50"
+    },
+    {
+      "path": "second\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\collision.flasset",
+      "sha256": "e7de0102e8429ea6bdcf96c36bd20ef68a36be7bd9746011f94b7e327164f2ec"
+    },
+    {
+      "path": "second\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\critical.flasset",
+      "sha256": "d747be6684e244b5f0f9185c90b48fbb1a63516ad44e5bd4011c1633c42281e8"
+    },
+    {
+      "path": "second\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\damaged.flasset",
+      "sha256": "d08f7d024a3a55c7d47adeb3530ac4f0f44f4ad372d147bc5d9283dd4e6dbdc5"
+    },
+    {
+      "path": "second\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\lod1.flasset",
+      "sha256": "bf632af5eca952e8f3adc27aa7773ecfecb1af5bae53b3167bedecaef633edc6"
+    },
+    {
+      "path": "second\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\lod2.flasset",
+      "sha256": "839c6c89c13b63978fa696cdec8bd8942542f2dd7f9d71464db5cb6ea2866c8e"
+    },
+    {
+      "path": "second\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\turret.flasset",
+      "sha256": "f23f509ab6a7d1341d149b4fab68ac10a2ee7fc05ef8dc32def65cb9a1d4f945"
+    },
+    {
+      "path": "second\\runtime\\meshes\\unit\\directorate\\scout_vehicle\\wreck.flasset",
+      "sha256": "97eaf03143efe3906c3f32833e6762d076351e0c6e5880f2901038dec7146528"
+    },
+    {
+      "path": "second\\runtime\\textures\\texture\\directorate\\surface\\atlas_base.flasset",
+      "sha256": "b94390e25e0b38001c147a226f13d39ff51a4882f95ceda27c67384a022a8cec"
+    },
+    {
+      "path": "second\\runtime\\textures\\texture\\directorate\\surface\\atlas_normal.flasset",
+      "sha256": "5ba37562b698e17094b5090fe8a79b603ea1dc6f616dd8b125e5eb364d1ec8e2"
+    },
+    {
+      "path": "second\\runtime\\textures\\texture\\directorate\\surface\\atlas_orm.flasset",
+      "sha256": "fd5ab8bae616012e8e1157395bd01ba26b5fc8f99ddf902de869872e98b45b20"
+    }
+  ],
+  "qualifiedRoot": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\scout-blender\\artifacts\\sc3",
+  "nativeQualificationSource": "fa503a2b62b15fc26f08a7bbff9b472f117abed1"
+}

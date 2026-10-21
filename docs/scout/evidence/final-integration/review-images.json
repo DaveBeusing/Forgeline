@@ -1,0 +1,52 @@
+[
+  {
+    "path": "states-ScoutSingle-1920x1080-High-CloseTactical-Inspection20-after.png",
+    "sourceSha": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+    "captureKey": "ScoutSingle-1920x1080-High-CloseTactical-Inspection20",
+    "epoch": "sn3",
+    "group": "states",
+    "role": "after",
+    "sha256": "4b86360377b210fb445fe3d2f96288179d159bb39fd6337b698ee0478c85e139",
+    "bytes": 3782216
+  },
+  {
+    "path": "states-ScoutSelected-1920x1080-High-CloseTactical-Inspection20-after.png",
+    "sourceSha": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+    "captureKey": "ScoutSelected-1920x1080-High-CloseTactical-Inspection20",
+    "epoch": "sn3",
+    "group": "states",
+    "role": "after",
+    "sha256": "6ba0c226a687bfef08ce732e5de2cd1c2084cb83e6cb2a91800c83fc42b6f7c0",
+    "bytes": 3790784
+  },
+  {
+    "path": "thousand-strategic-ScoutRepeated1000-3840x2160-High-Strategic-after.png",
+    "sourceSha": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+    "captureKey": "ScoutRepeated1000-3840x2160-High-Strategic",
+    "epoch": "sn3",
+    "group": "thousand-strategic",
+    "role": "after",
+    "sha256": "86a9f10fc7691fb57a16dbb77cc0463d6d012ddd2b670b36c47ba78f0c002e26",
+    "bytes": 19276486
+  },
+  {
+    "path": "dark-ScoutVehicleProduction-1920x1080-High-NormalGameplay-after.png",
+    "sourceSha": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+    "captureKey": "ScoutVehicleProduction-1920x1080-High-NormalGameplay",
+    "epoch": "sn3",
+    "group": "dark",
+    "role": "after",
+    "sha256": "ba3935020d23c6eb601a4d2c91b1a632ba05066283d1ad09668f48741336486e",
+    "bytes": 4550746
+  },
+  {
+    "path": "wet-ScoutVehicleProduction-1920x1080-High-NormalGameplay-after.png",
+    "sourceSha": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+    "captureKey": "ScoutVehicleProduction-1920x1080-High-NormalGameplay",
+    "epoch": "sn3",
+    "group": "wet",
+    "role": "after",
+    "sha256": "a24e470ddb78bb9641de1fd7357023b8ecc9d268a4153e767dbbd804e84d7668",
+    "bytes": 4671285
+  }
+]

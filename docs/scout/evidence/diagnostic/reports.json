@@ -1,0 +1,14 @@
+[
+  {
+    "role": "before",
+    "path": "before-manifest.json.gz",
+    "originalSha256": "8811eda1b3cccc31c2061b08c61519e27d7e11f5ba291442edeaa481e00a66ba",
+    "gzipSha256": "b65eac8ac4b808d261392bcf9833311f98fc1837e8750cf0e10e1763b0bb43ab"
+  },
+  {
+    "role": "after",
+    "path": "after-manifest.json.gz",
+    "originalSha256": "9fdc3f6200405e64c039db2635cc7d914902e11d81480cbfb13f834e1d1410fb",
+    "gzipSha256": "f1b2542a1e67edb8b99d842009b03d191e4f5cfd34744570c72a0a5369119bb4"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "path": "side-90-ScoutSingle-1920x1080-High-CloseTactical-Yaw90-Inspection20-after.png",
+    "sourceSha": "b8f6baba7b0d97040537edf9544b8231fe02e15c",
+    "captureKey": "ScoutSingle-1920x1080-High-CloseTactical-Yaw90-Inspection20",
+    "epoch": "sn2",
+    "group": "side-90",
+    "role": "after",
+    "sha256": "58e8e166124db727b6b84ac6eb783ee4d4d5e8c61572a15ff25f24c00a672f5a",
+    "bytes": 3691678
+  },
+  {
+    "path": "side-180-ScoutSingle-1920x1080-High-CloseTactical-Yaw180-Inspection20-after.png",
+    "sourceSha": "b8f6baba7b0d97040537edf9544b8231fe02e15c",
+    "captureKey": "ScoutSingle-1920x1080-High-CloseTactical-Yaw180-Inspection20",
+    "epoch": "sn2",
+    "group": "side-180",
+    "role": "after",
+    "sha256": "4ff420bc2422f16af3a380a81213d4ce60f31cba565357c0c7ceee6fd820f9fb",
+    "bytes": 3748542
+  }
+]

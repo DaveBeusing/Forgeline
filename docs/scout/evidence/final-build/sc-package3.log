@@ -1,0 +1,40 @@
+  Wiederherzustellende Projekte werden ermittelt...
+  "C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Core\ForgeLine.Core.csproj" wiederhergestellt (in 401 ms.).
+  "C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Assets\ForgeLine.Assets.csproj" wiederhergestellt (in 429 ms.).
+  "C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tools\ForgeLine.AssetCompiler\ForgeLine.AssetCompiler.csproj" wiederhergestellt (in 914 ms.).
+  ForgeLine.Core -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Core\bin\Release\net10.0\ForgeLine.Core.dll
+  ForgeLine.Assets -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Assets\bin\Release\net10.0\ForgeLine.Assets.dll
+  ForgeLine.AssetCompiler -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tools\ForgeLine.AssetCompiler\bin\Release\net10.0\ForgeLine.AssetCompiler.dll
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:09.83
+[asset:progress] log="C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\artifacts\sp3\asset-compilation.jsonl" pid=584
+[asset:progress] stage=mode state=validate id=- elapsedMs=138,9 stageMs=0,0 managedBytes=691864 workingSetBytes=29335552 privateBytes=8822784 peakWorkingSetBytes=29335552 memorySampleAgeMs=0,0 source="" player compilation is never allowed
+Asset compilation succeeded: 0 compiled, 0 unchanged.
+[asset:progress] stage=qualification state=started id=- elapsedMs=369,2 stageMs=0,0 managedBytes=951672 workingSetBytes=34504704 privateBytes=10076160 peakWorkingSetBytes=34504704 memorySampleAgeMs=0,0 source="" 
+[asset:progress] stage=qualification state=completed id=- elapsedMs=4357,3 stageMs=3996,5 managedBytes=27996160 workingSetBytes=130134016 privateBytes=101568512 peakWorkingSetBytes=170090496 memorySampleAgeMs=0,0 source="" 
+Runtime asset qualification succeeded: assets=1363 meshes=309 textures=901 materials=132 animations=18 skins=2 bytes=74844790 catalogLoadMs=344,752 assetReadMs=3613,418.
+[asset:footprint] id=texture.directorate.surface.atlas_base type=Texture bytes=5587812
+[asset:footprint] id=ui.atlas.directorate.icons.p1 type=Texture bytes=4195048
+[asset:footprint] id=ui.atlas.directorate.icons.p2 type=Texture bytes=4195048
+[asset:footprint] id=ui.atlas.directorate.core.p1 type=Texture bytes=4195045
+[asset:footprint] id=branding.forgeline.menu.directorate type=Texture bytes=3146855
+[asset:footprint] id=skin.directorate.combat_engineer type=Skin bytes=2129106
+[asset:footprint] id=skin.directorate.rifle_squad type=Skin bytes=1501305
+[asset:footprint] id=texture.world.terrain.crushed_gravel type=Texture bytes=1399111
+[asset:footprint] id=texture.world.terrain.concrete_base type=Texture bytes=1399108
+[asset:footprint] id=texture.world.terrain.cracked_earth type=Texture bytes=1399108
+[asset:footprint] id=texture.world.terrain.rocky_scrub type=Texture bytes=1399102
+[asset:footprint] id=texture.world.terrain.dark_ash type=Texture bytes=1399093
+Runtime asset qualification report written to 'C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\artifacts\sp3\asset-qualification.json'.
+UI atlas integrity, coverage, provenance and packaging contracts passed.
+UI atlas integrity, coverage, provenance and packaging contracts passed.
+844 packaged UI payloads verified; reference boards, unavailable roles and authoring tools/files excluded.
+Industrial audio source library: 60 unique clips; 15 loops; 20852160 PCM bytes; hashes and format passed. Gameplay binding remains separate.
+Four bounded original PCM cues, provenance and package identity passed.
+World audio playback metadata: 56 clips; identity and frame-based loop endpoints passed.
+Pre-alpha publish: C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\artifacts\sp3\win-x64\publish
+Pre-alpha archive: C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\artifacts\sp3\FORGELINE-0.1.434-dev-win-x64.zip
