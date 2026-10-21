@@ -49,6 +49,11 @@ The authored profile values remain deterministic development fallbacks. A determ
 
 ## Decals
 
+The existing families now have [editable Blender impression masters and matched
+baked PBR maps](BattlefieldDecalBakes.md), retaining the shared quad/material IDs,
+UV regions and presentation-only placement/lifetime. Qualification remains
+separate from human art and global renderer acceptance.
+
 The initial decal material family contains:
 
 - tire tracks;
