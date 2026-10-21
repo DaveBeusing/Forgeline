@@ -1,6 +1,5 @@
 using System.Numerics;
 using ForgeLine.Game;
-using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
@@ -14,7 +13,7 @@ public sealed class ResourceDepositReferenceSceneTests
     [InlineData(VisualReferenceSceneKind.ResourceDeposits1000, 1000, 0)]
     public void MineralReviewPreservesCanonicalGroundingAndCopiedStates(VisualReferenceSceneKind kind, int count, int extractors)
     {
-        var terrain = DevelopmentTerrainFactory.CreateRepresentativeWorld();
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
         var first = VisualReferenceScene.Create(kind, terrain);
         var second = VisualReferenceScene.Create(kind, terrain);
         Assert.Equal(first.Fingerprint, second.Fingerprint);
