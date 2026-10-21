@@ -41,7 +41,7 @@ foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
     foreach ($variant in @('first','second','reopened')) {
         $report = Get-Content -LiteralPath (Join-Path $familyRoot "$variant/roundtrip-report.json") -Raw | ConvertFrom-Json
         if (-not $report.success -or -not $report.productionSourcesUnchanged -or $report.meshes.Count -ne 2 -or
-            (Compare-Object @('mesh.world.resource.' + $family, 'mesh.world.resource.' + $family + '_lod1') @($report.meshes.id | Sort-Object))) { throw "Incomplete authored output: $family/$variant" }
+            (Compare-Object @("mesh.world.resource.$family", "mesh.world.resource.${family}_lod1") @($report.meshes.id | Sort-Object))) { throw "Incomplete authored output: $family/$variant" }
         foreach ($file in $report.sourceHashes.PSObject.Properties) {
             $sourcePath = [IO.Path]::GetFullPath($file.Name, $canonicalRoot)
             if (-not $sourcePath.StartsWith($canonicalRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
@@ -60,6 +60,7 @@ foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
             $seed = Join-Path $MaterialCacheRoot $family
             $seedManifest = Get-Content -LiteralPath (Join-Path $seed 'manifest.json') -Raw | ConvertFrom-Json
             if (@($seedManifest.assets).Count -ne 4 -or @($seedManifest.assets | Where-Object type -eq 'mesh').Count -ne 0) { throw 'Material cache must contain exactly four nonmesh records.' }
+            [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($runtime))
             Copy-Item -LiteralPath $seed -Destination $runtime -Recurse
         }
         & dotnet $compiler --mode development --source $source --runtime $runtime --qualification-output (Join-Path $familyRoot "$variant-compile.json") 2>&1 | Out-File (Join-Path $familyRoot "$variant-compile.log") -Encoding utf8NoBOM
