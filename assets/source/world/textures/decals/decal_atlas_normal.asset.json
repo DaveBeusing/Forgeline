@@ -1,0 +1,9 @@
+{
+  "id": "texture.world.decal.atlas_normal",
+  "type": "texture",
+  "source": "decal_atlas_normal.png",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureMaxDimension": 256,
+  "textureMaxMipLevels": 4
+}
