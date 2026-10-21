@@ -173,6 +173,30 @@ The local Blender checks were executed as their individual native/export/compile
 steps; the opt-in provisioned workflow job is registered but was not dispatched.
 Its runner availability is not established by these local results.
 
+## Current-base requalification
+
+After synchronization with `538ddc0bd49a722462bf185cfc118cf5a3e5008f`,
+final executable source is `fd64ce2fc29f0e12de6062624d40f01a0fa85b45`,
+**0.1.428-dev**. The final Release solution build has zero warnings/errors;
+the 44-project graph and single-PATCH gate pass. All 54 integrated qualification
+Python tests pass. The complete Client project now has 462 cases: 460 passed,
+two optional tests skipped. Combined with the unchanged, fully checked Asset,
+Presentation and other test sources, the final project totals are **3223 cases:
+3202 passed, 21 skipped, zero failures**. The 95 Blender contracts remain green.
+
+Three new 1080p High/NormalGameplay development captures cover the state gallery,
+single and 100-instance scenes. All match the earlier source's pixels exactly.
+The final reproducible 0.1.428 ZIP has SHA256
+`8ab639638366357a8b34f1d3d94f17ee67e9d370120e718e9adfc1135f16b9bb`.
+All 1487 fresh-install manifest hashes and 1363 runtime assets verify, with no
+authoring/compiler files. Three final installed-player views match the new
+development captures exactly. These six additional cases bring the retained
+native record to **67 cases**; the earlier matrix keeps its original revision.
+
+Current master build-test, navigation and evidence contracts passed. The two
+physical measurement/runner jobs were skipped, so their acceptance requirements
+remain open. New PR CI is assessed against the published head.
+
 ## Integration decision
 
 Keep the PR **draft**. [Renderer qualification #268](https://github.com/DaveBeusing/Forgeline/pull/268)

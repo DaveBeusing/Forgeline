@@ -15739,9 +15739,9 @@
       "logSha256": "7db5445596d4f043da8aa8e399e7c58303e88a4950b37f7fd1c40f40198b90b7"
     },
     "ForgeLine.Client.Tests": {
-      "total": 452,
+      "total": 462,
       "failed": 0,
-      "passed": 450,
+      "passed": 460,
       "skipped": 2,
       "logSha256": "2ee67ed5575885d3966c481c8e7c60327eae0f3a4f0437b3f977cf60ad3c706e"
     },
@@ -15831,9 +15831,9 @@
     }
   },
   "testTotals": {
-    "total": 3213,
+    "total": 3223,
     "failed": 0,
-    "passed": 3192,
+    "passed": 3202,
     "skipped": 21
   },
   "portableContracts": {
@@ -15842,5 +15842,379 @@
     "logSha256": "a45f98dc4d4de751edfc80891ce31045c3f8b0ff1dbcea16231729cabe2c8581"
   },
   "integrationBaseRevision": "538ddc0bd49a722462bf185cfc118cf5a3e5008f",
-  "productVersion": "0.1.428"
+  "productVersion": "0.1.428",
+  "currentBaseValidation": {
+    "integrationBase": "538ddc0bd49a722462bf185cfc118cf5a3e5008f",
+    "sourceCommit": "fd64ce2fc29f0e12de6062624d40f01a0fa85b45",
+    "version": "0.1.428-dev",
+    "productionSourceDiffFromMeasuredRevision": [],
+    "clientTests": {
+      "total": 462,
+      "failed": 0,
+      "passed": 460,
+      "skipped": 2
+    },
+    "integratedQualificationPythonTests": 54,
+    "developmentComparison": {
+      "success": true,
+      "commit": "fd64ce2fc29f0e12de6062624d40f01a0fa85b45",
+      "buildIdentity": "0.1.428-dev+fd64ce2fc29f0e12de6062624d40f01a0fa85b45",
+      "cases": [
+        {
+          "key": "CommandCoreProduction-1920x1080-High-NormalGameplay",
+          "pixelSha256": "3CB9025FBE7BBB3980C19ADC66A87C0BE705904F027C79AD527B2206F18629DE",
+          "historicalPixelsEqual": true
+        },
+        {
+          "key": "CommandCoreSingle-1920x1080-High-NormalGameplay",
+          "pixelSha256": "C14F14BA67D0D4875DEBFAE624167AB994B778A5700FBBF8F135DB471DAC1B12",
+          "historicalPixelsEqual": true
+        },
+        {
+          "key": "CommandCoreRepeated-1920x1080-High-NormalGameplay",
+          "pixelSha256": "B6B80315B60520DE53BED219FDAA68794DBAD81352FC35B7AEE7D9718C807193",
+          "historicalPixelsEqual": true
+        }
+      ]
+    },
+    "installedComparison": {
+      "success": true,
+      "commit": "fd64ce2fc29f0e12de6062624d40f01a0fa85b45",
+      "buildIdentity": "0.1.428-dev+fd64ce2fc29f0e12de6062624d40f01a0fa85b45",
+      "cases": [
+        {
+          "key": "CommandCoreProduction-1920x1080-High-NormalGameplay",
+          "pixelSha256": "3CB9025FBE7BBB3980C19ADC66A87C0BE705904F027C79AD527B2206F18629DE",
+          "developmentPixelsEqual": true
+        },
+        {
+          "key": "CommandCoreSingle-1920x1080-High-NormalGameplay",
+          "pixelSha256": "C14F14BA67D0D4875DEBFAE624167AB994B778A5700FBBF8F135DB471DAC1B12",
+          "developmentPixelsEqual": true
+        },
+        {
+          "key": "CommandCoreRepeated-1920x1080-High-NormalGameplay",
+          "pixelSha256": "B6B80315B60520DE53BED219FDAA68794DBAD81352FC35B7AEE7D9718C807193",
+          "developmentPixelsEqual": true
+        }
+      ]
+    },
+    "package": {
+      "success": true,
+      "version": "0.1.428-dev",
+      "packageSha256": "8ab639638366357a8b34f1d3d94f17ee67e9d370120e718e9adfc1135f16b9bb",
+      "verifiedManifestFiles": 1487,
+      "runtimeAssetCount": 1363,
+      "authoringOrCompilerFiles": [],
+      "freshExtraction": true
+    },
+    "nativeCases": {
+      "current-base": [
+        {
+          "key": "CommandCoreProduction-1920x1080-High-NormalGameplay",
+          "imageSha256": "CE8685E78703F148847E0098FA4B2297CFB4A9367E35866CB87097C592CE097C",
+          "pixelSha256": "3CB9025FBE7BBB3980C19ADC66A87C0BE705904F027C79AD527B2206F18629DE",
+          "cpu": {
+            "samples": 32,
+            "mean": 10.081999999999999,
+            "p50": 10.359,
+            "p95": 11.886,
+            "p99": 12.0621
+          },
+          "gpu": {
+            "samples": 31,
+            "mean": 5.347242322580647,
+            "p50": 5.216992,
+            "p95": 6.38432,
+            "p99": 6.876256
+          },
+          "instances": {
+            "totalInstances": 536,
+            "visibleInstances": 114,
+            "culledInstances": 422,
+            "drawCalls": 34,
+            "highLodInstances": 26,
+            "reducedLodInstances": 88,
+            "runtimeMeshInstances": 117,
+            "texturedRuntimeMeshInstances": 117,
+            "fallbackMeshInstances": 0,
+            "lod1Instances": 88,
+            "lod2Instances": 0,
+            "animatedVegetationInstances": 57,
+            "visibleVegetationInstances": 57,
+            "clusterTests": 17,
+            "rejectedClusters": 8,
+            "clusterCulledInstances": 248,
+            "instanceBoundsTests": 282,
+            "skippedDecalResources": 0
+          },
+          "materials": {
+            "loadedMaterialCount": 132,
+            "loadedAssetTextureCount": 29,
+            "bindingFailureCount": 0,
+            "loadedMeshCount": 309,
+            "residentMeshBytes": 10940424,
+            "loadedSkinCount": 2,
+            "residentSkinBytes": 3623302,
+            "loadedAnimationCount": 18,
+            "residentAnimationBytes": 175694
+          }
+        },
+        {
+          "key": "CommandCoreSingle-1920x1080-High-NormalGameplay",
+          "imageSha256": "1D22EF7F535965C5563CA2CEE8D97E7CC013A975ECA40B05DF8A4028A8D850AE",
+          "pixelSha256": "C14F14BA67D0D4875DEBFAE624167AB994B778A5700FBBF8F135DB471DAC1B12",
+          "cpu": {
+            "samples": 32,
+            "mean": 4.4782062499999995,
+            "p50": 4.6765,
+            "p95": 5.3359,
+            "p99": 5.3931
+          },
+          "gpu": {
+            "samples": 30,
+            "mean": 4.3974453333333345,
+            "p50": 4.3472,
+            "p95": 4.788512,
+            "p99": 4.831584
+          },
+          "instances": {
+            "totalInstances": 1,
+            "visibleInstances": 1,
+            "culledInstances": 0,
+            "drawCalls": 1,
+            "highLodInstances": 1,
+            "reducedLodInstances": 0,
+            "runtimeMeshInstances": 1,
+            "texturedRuntimeMeshInstances": 1,
+            "fallbackMeshInstances": 0,
+            "lod1Instances": 0,
+            "lod2Instances": 0,
+            "animatedVegetationInstances": 0,
+            "visibleVegetationInstances": 0,
+            "clusterTests": 1,
+            "rejectedClusters": 0,
+            "clusterCulledInstances": 0,
+            "instanceBoundsTests": 1,
+            "skippedDecalResources": 0
+          },
+          "materials": {
+            "loadedMaterialCount": 132,
+            "loadedAssetTextureCount": 29,
+            "bindingFailureCount": 0,
+            "loadedMeshCount": 309,
+            "residentMeshBytes": 10940424,
+            "loadedSkinCount": 2,
+            "residentSkinBytes": 3623302,
+            "loadedAnimationCount": 18,
+            "residentAnimationBytes": 175694
+          }
+        },
+        {
+          "key": "CommandCoreRepeated-1920x1080-High-NormalGameplay",
+          "imageSha256": "A227007B86D4728B26B486347B85B7077AE0A46DBC44860731BD9340C73EB826",
+          "pixelSha256": "B6B80315B60520DE53BED219FDAA68794DBAD81352FC35B7AEE7D9718C807193",
+          "cpu": {
+            "samples": 32,
+            "mean": 5.586712499999999,
+            "p50": 5.8879,
+            "p95": 6.8911,
+            "p99": 8.0185
+          },
+          "gpu": {
+            "samples": 30,
+            "mean": 5.872293333333333,
+            "p50": 5.769472,
+            "p95": 6.24656,
+            "p99": 6.262752
+          },
+          "instances": {
+            "totalInstances": 100,
+            "visibleInstances": 100,
+            "culledInstances": 0,
+            "drawCalls": 2,
+            "highLodInstances": 72,
+            "reducedLodInstances": 28,
+            "runtimeMeshInstances": 100,
+            "texturedRuntimeMeshInstances": 100,
+            "fallbackMeshInstances": 0,
+            "lod1Instances": 28,
+            "lod2Instances": 0,
+            "animatedVegetationInstances": 0,
+            "visibleVegetationInstances": 0,
+            "clusterTests": 4,
+            "rejectedClusters": 0,
+            "clusterCulledInstances": 0,
+            "instanceBoundsTests": 100,
+            "skippedDecalResources": 0
+          },
+          "materials": {
+            "loadedMaterialCount": 132,
+            "loadedAssetTextureCount": 29,
+            "bindingFailureCount": 0,
+            "loadedMeshCount": 309,
+            "residentMeshBytes": 10940424,
+            "loadedSkinCount": 2,
+            "residentSkinBytes": 3623302,
+            "loadedAnimationCount": 18,
+            "residentAnimationBytes": 175694
+          }
+        }
+      ],
+      "installed-current-base": [
+        {
+          "key": "CommandCoreProduction-1920x1080-High-NormalGameplay",
+          "imageSha256": "CE8685E78703F148847E0098FA4B2297CFB4A9367E35866CB87097C592CE097C",
+          "pixelSha256": "3CB9025FBE7BBB3980C19ADC66A87C0BE705904F027C79AD527B2206F18629DE",
+          "cpu": {
+            "samples": 32,
+            "mean": 8.51355625,
+            "p50": 8.6782,
+            "p95": 11.473,
+            "p99": 12.8395
+          },
+          "gpu": {
+            "samples": 29,
+            "mean": 5.545271172413794,
+            "p50": 5.43344,
+            "p95": 6.437184,
+            "p99": 6.478496
+          },
+          "instances": {
+            "totalInstances": 536,
+            "visibleInstances": 114,
+            "culledInstances": 422,
+            "drawCalls": 34,
+            "highLodInstances": 26,
+            "reducedLodInstances": 88,
+            "runtimeMeshInstances": 117,
+            "texturedRuntimeMeshInstances": 117,
+            "fallbackMeshInstances": 0,
+            "lod1Instances": 88,
+            "lod2Instances": 0,
+            "animatedVegetationInstances": 57,
+            "visibleVegetationInstances": 57,
+            "clusterTests": 17,
+            "rejectedClusters": 8,
+            "clusterCulledInstances": 248,
+            "instanceBoundsTests": 282,
+            "skippedDecalResources": 0
+          },
+          "materials": {
+            "loadedMaterialCount": 132,
+            "loadedAssetTextureCount": 29,
+            "bindingFailureCount": 0,
+            "loadedMeshCount": 309,
+            "residentMeshBytes": 10940424,
+            "loadedSkinCount": 2,
+            "residentSkinBytes": 3623302,
+            "loadedAnimationCount": 18,
+            "residentAnimationBytes": 175694
+          }
+        },
+        {
+          "key": "CommandCoreSingle-1920x1080-High-NormalGameplay",
+          "imageSha256": "1D22EF7F535965C5563CA2CEE8D97E7CC013A975ECA40B05DF8A4028A8D850AE",
+          "pixelSha256": "C14F14BA67D0D4875DEBFAE624167AB994B778A5700FBBF8F135DB471DAC1B12",
+          "cpu": {
+            "samples": 32,
+            "mean": 4.582678124999999,
+            "p50": 4.8024,
+            "p95": 5.5801,
+            "p99": 8.1457
+          },
+          "gpu": {
+            "samples": 30,
+            "mean": 4.5082336,
+            "p50": 4.380704,
+            "p95": 4.822688,
+            "p99": 7.028896
+          },
+          "instances": {
+            "totalInstances": 1,
+            "visibleInstances": 1,
+            "culledInstances": 0,
+            "drawCalls": 1,
+            "highLodInstances": 1,
+            "reducedLodInstances": 0,
+            "runtimeMeshInstances": 1,
+            "texturedRuntimeMeshInstances": 1,
+            "fallbackMeshInstances": 0,
+            "lod1Instances": 0,
+            "lod2Instances": 0,
+            "animatedVegetationInstances": 0,
+            "visibleVegetationInstances": 0,
+            "clusterTests": 1,
+            "rejectedClusters": 0,
+            "clusterCulledInstances": 0,
+            "instanceBoundsTests": 1,
+            "skippedDecalResources": 0
+          },
+          "materials": {
+            "loadedMaterialCount": 132,
+            "loadedAssetTextureCount": 29,
+            "bindingFailureCount": 0,
+            "loadedMeshCount": 309,
+            "residentMeshBytes": 10940424,
+            "loadedSkinCount": 2,
+            "residentSkinBytes": 3623302,
+            "loadedAnimationCount": 18,
+            "residentAnimationBytes": 175694
+          }
+        },
+        {
+          "key": "CommandCoreRepeated-1920x1080-High-NormalGameplay",
+          "imageSha256": "A227007B86D4728B26B486347B85B7077AE0A46DBC44860731BD9340C73EB826",
+          "pixelSha256": "B6B80315B60520DE53BED219FDAA68794DBAD81352FC35B7AEE7D9718C807193",
+          "cpu": {
+            "samples": 32,
+            "mean": 5.53171875,
+            "p50": 5.8271,
+            "p95": 6.4425,
+            "p99": 8.2249
+          },
+          "gpu": {
+            "samples": 30,
+            "mean": 5.894962133333333,
+            "p50": 5.775104,
+            "p95": 6.25008,
+            "p99": 7.222944
+          },
+          "instances": {
+            "totalInstances": 100,
+            "visibleInstances": 100,
+            "culledInstances": 0,
+            "drawCalls": 2,
+            "highLodInstances": 72,
+            "reducedLodInstances": 28,
+            "runtimeMeshInstances": 100,
+            "texturedRuntimeMeshInstances": 100,
+            "fallbackMeshInstances": 0,
+            "lod1Instances": 28,
+            "lod2Instances": 0,
+            "animatedVegetationInstances": 0,
+            "visibleVegetationInstances": 0,
+            "clusterTests": 4,
+            "rejectedClusters": 0,
+            "clusterCulledInstances": 0,
+            "instanceBoundsTests": 100,
+            "skippedDecalResources": 0
+          },
+          "materials": {
+            "loadedMaterialCount": 132,
+            "loadedAssetTextureCount": 29,
+            "bindingFailureCount": 0,
+            "loadedMeshCount": 309,
+            "residentMeshBytes": 10940424,
+            "loadedSkinCount": 2,
+            "residentSkinBytes": 3623302,
+            "loadedAnimationCount": 18,
+            "residentAnimationBytes": 175694
+          }
+        }
+      ]
+    },
+    "masterCi": "build-test, navigation and evidence contracts passed; physical jobs skipped"
+  },
+  "retainedNativeCaseCount": 67
 }
