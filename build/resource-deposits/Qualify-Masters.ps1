@@ -1,7 +1,7 @@
 #requires -Version 7.4
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$OutputRoot, [string]$BlenderPath, [switch]$RenderPreviews,
-      [switch]$ReuseAuthored, [string]$MaterialCacheRoot)
+      [switch]$ReuseAuthored, [string]$MaterialCacheRoot, [switch]$NativeBatch)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath('../..', $PSScriptRoot)
@@ -18,7 +18,12 @@ function Read-Tree([string]$Path) {
 $before = Read-Tree (Join-Path $repo 'assets/source')
 $fixture = Join-Path $PSScriptRoot 'fixture.json'
 $canonicalRoot = [IO.Path]::GetFullPath('assets/source', $repo)
-if (-not $ReuseAuthored) {
+if (-not $ReuseAuthored -and $NativeBatch) {
+    $batchArguments = @()
+    if ($RenderPreviews) { $batchArguments += '--render' }
+    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'author_batch.py') -InputRoot assets/source -OutputRoot $output -ScriptArguments $batchArguments -BlenderPath $BlenderPath -TimeoutSeconds 1800
+}
+if (-not $ReuseAuthored -and -not $NativeBatch) {
 foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
     $familyRoot = Join-Path $output $family
     foreach ($variant in @('first','second','reopened')) {

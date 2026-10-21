@@ -32,12 +32,15 @@ jobs:
       - uses: actions/checkout@v7
       - name: Verify native master hashes and High/Reduced exports
         shell: pwsh
-        run: python build/resource-deposits/retained.py
+        run: |
+          python build/resource-deposits/test_contract.py
+          if ($LASTEXITCODE -ne 0) { throw "Signature checks failed." }
+          python build/resource-deposits/retained.py
 
   native-minerals:
     if: github.event_name == 'workflow_dispatch'
     runs-on: [self-hosted, Windows, X64, blender]
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v6
@@ -46,9 +49,19 @@ jobs:
       - name: Build Release
         shell: pwsh
         run: dotnet build ForgeLine.sln --configuration Release -m:1
+      - name: Compile shared mineral materials once
+        shell: pwsh
+        run: |
+          python build/resource-deposits/prepare-materials.py artifacts/rd-ci-material-source
+          if ($LASTEXITCODE -ne 0) { throw "Material preparation failed." }
+          ./build/Build-RuntimeAssets.ps1 -Mode build -SourceRoot artifacts/rd-ci-material-source -RuntimeRoot artifacts/rd-ci-material-runtime -NoBuild
+          $env:FORGELINE_RESOURCE_RUNTIME_SEED = (Resolve-Path artifacts/rd-ci-material-runtime).Path
+          $env:FORGELINE_RESOURCE_MATERIAL_CACHE = Join-Path (Get-Location) 'artifacts/rd-ci-material-cache'
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj -c Release --no-build -- --filter-class '*ResourceDepositMaterialCacheTests'
+          if ($LASTEXITCODE -ne 0) { throw "Material cache verification failed." }
       - name: Save, reopen, export and qualify four mineral families
         shell: pwsh
-        run: ./build/resource-deposits/Qualify-Masters.ps1 -OutputRoot artifacts/rd-ci
+        run: ./build/resource-deposits/Qualify-Masters.ps1 -OutputRoot artifacts/rd-ci -MaterialCacheRoot artifacts/rd-ci-material-cache -NativeBatch
       - name: Retain native authoring evidence
         if: always()
         uses: actions/upload-artifact@v4
