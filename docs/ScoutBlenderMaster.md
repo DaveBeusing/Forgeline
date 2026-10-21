@@ -1,16 +1,23 @@
 # Scout Blender master
 
+## Current synchronization (0.1.435)
+
+PR 280 is synchronized with master 6445ed102bfbec4a5033917196f9464578086be4 (0.1.434), including infantry PR 277. All 90 master scene enum IDs are preserved; the six incoming infantry load scenes retain 84–89 and Scout appends at 90–94. The incoming infantry time-admission and dispatch logic are retained alongside the Scout dispatch. The branch contains exactly one PATCH increment to 0.1.435.
+
+The merged working tree passes the Release build with zero warnings/errors, 92 Scout/infantry/shared scene cases, 12 capture-request cases, the project-reference graph and the retained Scout master/export integrity check. Historical Blender, installed-package and native-image records below remain bound to their original revisions and 0.1.434 package; they are not relabelled as new 0.1.435 measurements. New hosted results must be evaluated at the synchronized PR head. Production promotion and human/render acceptance remain separate open gates.
+
+
 ## Result and integration decision
 
 The retained Scout candidate contains a genuine editable rest master, a separate packed PBR/pose inspection project, and eight deterministic GLB exports for unit.directorate.scout_vehicle. Existing six-wheel art, all three LODs, turret, damaged/critical/wreck geometry and independent collision are preserved. The demonstrated gap was the missing saved native master; PR 186 already supplied the modular art and typed mechanics. No unsupported lighting or gameplay change is introduced.
 
 Canonical source ownership remains held by the rendering residency lane in docs/rendering/parallelization/ParallelRenderOwnership.json. Accordingly, assets remain in assets/staged/scout. Complete sealed candidate catalogs are exercised by real installed players; this is review qualification, not production promotion. Render-product physical performance/memory/lifecycle acceptance and human art approval remain open; see [the product gate table](rendering/qualification/Qualification.md) and [missing integration records](rendering/qualification/IntegrationRequirements.md). Do not merge, tag, release or approve goldens on the strength of these observations.
 
-## Source audit and version
+## Original audit and measured 0.1.434 checkpoint
 
 Before branch creation, remote default master, its SHA/version, related branches, PRs/reviews/CI, existing source contracts and qualification/governance documents were inspected in the mandated order. The initial base was a6fe118583be842e00416bcb100d1210f3240a00 (0.1.431); integrated PRs 186, 268 and 274–276 were reused. No unfinished Scout branch or open Scout PR existed. PR 273 was then a separate logistics owner and subsequently merged. Later Draft PRs 277–279 were inspected for overlap: the returned file lists contain no Scout or shared production-surface changes. PR 278 subsequently merged at 3c732aa5 and is included; 277/279 remain separate. Incoming tank source, fixtures and time-admission changes are preserved from master, not reauthored here.
 
-Integration base: 3c732aa519bb54bec17070bcdad378c232ea9de1 (0.1.433). Branch art/scout-blender-master contains exactly one PATCH increment to 0.1.434. All 84 existing scene enum positions, including nine incoming logistics scenes and three incoming tank scenes, are preserved; the five Scout fixtures append at 84–88. Incoming logistics files retain their original owner. The preceding logistics base a391a5bb (0.1.432) completed CI and Movement quality successfully. At the current integration checkpoint, master 3c732aa5 Movement quality passes and its main CI is still in progress at Rendering benchmark qualification. Raw job results remain separate from the original base failure.
+At that measurement checkpoint, the integration base was 3c732aa519bb54bec17070bcdad378c232ea9de1 (0.1.433). Branch art/scout-blender-master contained exactly one PATCH increment to 0.1.434. All 84 existing scene enum positions, including nine incoming logistics scenes and three incoming tank scenes, are preserved; the five Scout fixtures append at 84–88. Incoming logistics files retain their original owner. The preceding logistics base a391a5bb (0.1.432) completed CI and Movement quality successfully. At the current integration checkpoint, master 3c732aa5 Movement quality passes and its main CI is still in progress at Rendering benchmark qualification. Raw job results remain separate from the original base failure.
 
 The original base CI failed FrontendMenuBackgroundTests.DeferredLoadNeverBlocksFirstMenuAndCancellationCreatesNoGpuResource at the unchanged five-second entered.Wait assertion (3224 passed, 33 skipped, one failed). The cause was not isolated. All five unchanged class tests pass locally. No timeout or unrelated frontend implementation was changed and no inherited failure waives this PR's checks.
 

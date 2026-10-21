@@ -8,6 +8,7 @@ import bpy
 from mathutils import Quaternion, Vector
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from asset_contract import read_geometry, game_to_blender, blender_to_game
+from infantry_surface import blender_uv, packed_surface, validate_packed_surface
 
 ACTIONS = ('idle','walk','run','aim','fire','reload','hit','suppression','death')
 BONES = ('pelvis','spine','head','upperarm_left','forearm_left','upperarm_right','forearm_right','thigh_left','shin_left','thigh_right','shin_right')
@@ -29,9 +30,10 @@ def build_family(source, output, family):
     mesh = bpy.data.meshes.new('SquadGeometry'); mesh.from_pydata([game_to_blender(p) for p in positions], [], triangles); mesh.update()
     obj = bpy.data.objects.new('Squad', mesh); bpy.context.collection.objects.link(obj)
     uv_layer = mesh.uv_layers.new(name='UVMap')
-    for loop in mesh.loops: uv_layer.data[loop.index].uv = uv[loop.vertex_index]
+    for loop in mesh.loops: uv_layer.data[loop.index].uv = blender_uv(uv[loop.vertex_index])
     mesh.normals_split_custom_set([game_to_blender(normals[loop.vertex_index]) for loop in mesh.loops])
     material = bpy.data.materials.new('Directorate infantry'); mesh.materials.append(material)
+    packed_surface(material, source)
     armature = bpy.data.armatures.new('InfantryRig'); rig = bpy.data.objects.new('InfantryRig', armature); bpy.context.collection.objects.link(rig)
     bpy.context.view_layer.objects.active = rig; rig.select_set(True); obj.select_set(False)
     bpy.ops.object.mode_set(mode='EDIT')
@@ -117,21 +119,25 @@ def build_family(source, output, family):
     rig.animation_data.use_nla = False
     scene.frame_set(0)
     rig.select_set(True); obj.select_set(True); bpy.context.view_layer.objects.active = rig
-    bpy.ops.wm.save_as_mainfile(filepath=str(output/f'{family}.blend'))
+    bpy.ops.wm.save_as_mainfile(filepath=str(output/f'{family}.blend'), relative_remap=False)
     export_rig(output/f'{family}.glb')
     return {'family':family,'bones':len(armature.bones),'vertices':len(positions),'triangles':len(triangles),'actions':list(ACTIONS),'sockets':recipe['sockets']}
 
 
 def export_rig(path):
+    # Native preview graphs stay in the editable master. Runtime material IDs
+    # resolve the existing compiled atlas; embedding it in every skin exceeds the
+    # bounded skin source size and duplicates authoritative texture ownership.
     bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,
         export_animations=True,export_animation_mode='NLA_TRACKS',export_force_sampling=True,export_frame_range=True,
-        export_skins=True,export_all_influences=False,export_tangents=True,export_materials='EXPORT',export_cameras=False,export_lights=False)
+        export_skins=True,export_all_influences=False,export_tangents=True,export_materials='PLACEHOLDER',export_cameras=False,export_lights=False)
 
 
 def reopen_family(source, output, family):
     master = source / f'units/directorate/authoring/infantry/{family}.blend'
     bpy.ops.wm.open_mainfile(filepath=str(master), load_ui=False, use_scripts=False)
     rig = bpy.data.objects['InfantryRig']; obj = bpy.data.objects['Squad']
+    preview_maps = validate_packed_surface(obj.data.materials[0], source)
     if len(rig.data.bones) != 44: raise ValueError('Unexpected infantry rig')
     samples = []
     tracks = rig.animation_data.nla_tracks
@@ -156,7 +162,7 @@ def reopen_family(source, output, family):
     original = curve.keyframe_points[1].co.y; curve.keyframe_points[1].co.y = original + .002
     export_rig(output/f'{family}-edited.glb')
     curve.keyframe_points[1].co.y = original
-    return dict(family=family,bones=44,actions=list(ACTIONS),samples=samples)
+    return dict(family=family,bones=44,actions=list(ACTIONS),samples=samples,packedImages=preview_maps)
 
 
 def main():
