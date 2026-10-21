@@ -29,7 +29,7 @@ def run(request):
     export_scene(catalog, ids, families, baseline,
                  lambda aid, a, b: compare_rest(aid, a, b, catalog.definitions[aid][1]))
     for obj in bpy.context.scene.objects:
-        if obj.get('fl_role') != 'geometry':
+        if obj.get('fl_role') != 'geometry' or not counts[obj.get('fl_asset')]:
             continue
         primitive = targets[obj['fl_asset']]['primitives'][obj['fl_primitive']]
         for loop in obj.data.loops:
