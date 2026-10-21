@@ -1,0 +1,45 @@
+name: Terrain PBR source qualification
+on:
+  pull_request:
+    paths:
+      - 'tools/blender/terrain_pbr*'
+      - 'tools/blender/*TerrainPbr.ps1'
+      - 'tools/blender/tests/*terrain_pbr*'
+      - 'assets/source/world/authoring/terrain/**'
+      - 'assets/source/world/textures/terrain/**'
+      - '.github/workflows/terrain-pbr.yml'
+  workflow_dispatch:
+    inputs:
+      native:
+        type: boolean
+        default: false
+        description: 'Run actual saved-master bakes on a provisioned Blender runner'
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: python -m unittest discover -s tools/blender/tests -p test_terrain_pbr_contract.py -v
+  saved-terrain:
+    if: github.event_name == 'workflow_dispatch' && inputs.native
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - shell: pwsh
+        run: ./tools/blender/Test-TerrainPbr.ps1 -OutputRoot artifacts/terrain-qualified
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: terrain-source-qualification
+          path: artifacts/terrain-qualified

@@ -1,11 +1,11 @@
 {
   "id": "texture.world.terrain.rocky_scrub_orm",
-  "type": "texture",
-  "source": "rocky_scrub_production_orm.png",
-  "textureUsage": "orm",
   "textureColorSpace": "linear",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
   "textureGenerateMipmaps": true,
   "textureMaxDimension": 512,
-  "textureFormat": "bc7Unorm",
-  "textureCompressionQuality": "balanced"
+  "textureUsage": "orm",
+  "type": "texture",
+  "source": "blender/rocky_scrub/rocky_scrub_production_orm.png"
 }

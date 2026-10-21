@@ -1,11 +1,11 @@
 {
   "id": "texture.world.terrain.dry_dirt_normal",
-  "type": "texture",
-  "source": "dry_dirt_production_normal.png",
-  "textureUsage": "normal",
   "textureColorSpace": "linear",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
   "textureGenerateMipmaps": true,
   "textureMaxDimension": 512,
-  "textureFormat": "bc7Unorm",
-  "textureCompressionQuality": "balanced"
+  "textureUsage": "normal",
+  "type": "texture",
+  "source": "blender/dry_dirt/dry_dirt_production_normal.png"
 }

@@ -1,0 +1,732 @@
+{
+  "schemaVersion": 1,
+  "baselineMaster": "a524b0a8164390abe1e9cb38170e690f46147574",
+  "version": "0.1.437-dev",
+  "masters": [
+    {
+      "family": "dry_dirt",
+      "path": "assets/source/world/authoring/terrain/dry_dirt.blend",
+      "bytes": 21153191,
+      "sha256": "f20ba3cd163e65a8a6fe6e3df929a49d2b1fc64c8b796c85acce5992898230ae",
+      "header": "BLENDER17-01"
+    },
+    {
+      "family": "rocky_scrub",
+      "path": "assets/source/world/authoring/terrain/rocky_scrub.blend",
+      "bytes": 25782855,
+      "sha256": "a648520ee2f4f07d9e1026473d696301e36897eeed3105d0d4379b2b739b2d1e",
+      "header": "BLENDER17-01"
+    },
+    {
+      "family": "cracked_earth",
+      "path": "assets/source/world/authoring/terrain/cracked_earth.blend",
+      "bytes": 22058789,
+      "sha256": "37887865d0cb30bfa0f72e2c22da992334dcb12e886635b0e711725046452d68",
+      "header": "BLENDER17-01"
+    },
+    {
+      "family": "bedrock",
+      "path": "assets/source/world/authoring/terrain/bedrock.blend",
+      "bytes": 22025795,
+      "sha256": "e4c5d3f3df0995b2b47684943ca488f730b276535f8fa9025da7d2151cc4b130",
+      "header": "BLENDER17-01"
+    },
+    {
+      "family": "crushed_gravel",
+      "path": "assets/source/world/authoring/terrain/crushed_gravel.blend",
+      "bytes": 35936100,
+      "sha256": "11467563906c8a9dd6275f30afc7c96c399b3a9c548686e54fc8c30b4cb6c6f1",
+      "header": "BLENDER17-01"
+    },
+    {
+      "family": "dark_ash",
+      "path": "assets/source/world/authoring/terrain/dark_ash.blend",
+      "bytes": 20795268,
+      "sha256": "4134fc7964ea7c2207bda294299549d05dc72f8a55ebabd1002b8602d33e085f",
+      "header": "BLENDER17-01"
+    },
+    {
+      "family": "concrete_base",
+      "path": "assets/source/world/authoring/terrain/concrete_base.blend",
+      "bytes": 21137212,
+      "sha256": "0decc0cc287e8ec389309ac1ddd8d83921c9cea76978c14ce3ca8d64e829e020",
+      "header": "BLENDER17-01"
+    }
+  ],
+  "maps": [
+    {
+      "family": "rocky_scrub",
+      "kind": "base",
+      "source": "assets/source/world/textures/terrain/blender/rocky_scrub/rocky_scrub_production_base.png",
+      "sha256": "b993a035e81a860f5dec21654175441e6d3115c31243016f086e13d84a778cc1",
+      "originalSha256": "a758c4aaf78c51cc3cc2bc6b07a6ed36771e037bfb1356c4d7c88df3fc94ec1d",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "rocky_scrub",
+      "kind": "normal",
+      "source": "assets/source/world/textures/terrain/blender/rocky_scrub/rocky_scrub_production_normal.png",
+      "sha256": "018be9db39d2a9b4c6725edf4b6bbcbefd5443e9b5984dcca71fc8ac3c5fd525",
+      "originalSha256": "67092b2e7d8a3163b9dc2933c58358eb6a9c5964f26641d56bbdb704cc2b8379",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "rocky_scrub",
+      "kind": "orm",
+      "source": "assets/source/world/textures/terrain/blender/rocky_scrub/rocky_scrub_production_orm.png",
+      "sha256": "6acb144293f79141c9b42391503bff88097569b947bf363527410f00f1e33f92",
+      "originalSha256": "45fc90eacc6f41599ae5a8d256bb26fc01a9858d05d57beb561c39797be3b1d7",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "dry_dirt",
+      "kind": "base",
+      "source": "assets/source/world/textures/terrain/blender/dry_dirt/dry_dirt_production_base.png",
+      "sha256": "75c72ff6e4734e906e50d495acaa2ba6fa0b8132a9cc6aae0db1ac2349f97bea",
+      "originalSha256": "71739d0f2ef609cb5afbd377ffaa755a92166d206a6e174ced4f7df691cfb532",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "dry_dirt",
+      "kind": "normal",
+      "source": "assets/source/world/textures/terrain/blender/dry_dirt/dry_dirt_production_normal.png",
+      "sha256": "aa7e1ef2be0223541f54061a2052a8bc694d2ae46b6d311e0b53788a461a8d82",
+      "originalSha256": "99494775b509c6802482c53e259de58c2a8e7dcaadb914e1b3f4bc784c6b74fe",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "dry_dirt",
+      "kind": "orm",
+      "source": "assets/source/world/textures/terrain/blender/dry_dirt/dry_dirt_production_orm.png",
+      "sha256": "6fed9ac41a5ef426fb988041321852e08e897131da40486149c85b50bc4c999d",
+      "originalSha256": "cb0da231fb9140ccdd05574c7d33ffd2312a5e3dd5a46aa93587e40ccc17ebe5",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "cracked_earth",
+      "kind": "base",
+      "source": "assets/source/world/textures/terrain/blender/cracked_earth/cracked_earth_production_base.png",
+      "sha256": "a2d0b146417242064949da7b429d98f60782f92f3aba0a400d6c9fff4763f774",
+      "originalSha256": "842867faca3468fd4a5b42fb435c1270e249997efeb91588c93fb12d79098f2c",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "cracked_earth",
+      "kind": "normal",
+      "source": "assets/source/world/textures/terrain/blender/cracked_earth/cracked_earth_production_normal.png",
+      "sha256": "983de5c712c6c1d80c28e3b7079122b204787387424eddf8105b6b2fe88f5715",
+      "originalSha256": "d529b9a87e4e2c7b3b93d532bd5ad33a993d40027c266410d2e98b9ccd014a5a",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "cracked_earth",
+      "kind": "orm",
+      "source": "assets/source/world/textures/terrain/blender/cracked_earth/cracked_earth_production_orm.png",
+      "sha256": "a39b6c5832afe19ddb142567cd90edf97bd28f94741e90dac4acdbc8e4a635e9",
+      "originalSha256": "5a8c20d8e1167ce28d610bbe3ba1048bf7d2e8d623dcd7c6a09238c78e8d296d",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "bedrock",
+      "kind": "base",
+      "source": "assets/source/world/textures/terrain/blender/bedrock/bedrock_production_base.png",
+      "sha256": "242882bad397b3dca7d4eb4bf95bf9992d11042cea4200fd2bf995b283984a51",
+      "originalSha256": "b42183b9366ec30663371b60447784af4cfffc356989bc7e8d69ba87843e7e87",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "bedrock",
+      "kind": "normal",
+      "source": "assets/source/world/textures/terrain/blender/bedrock/bedrock_production_normal.png",
+      "sha256": "1fcaa29859388f1c0511bbafea33a99725fd1f4366e7f228a3176ad8d0d54d9e",
+      "originalSha256": "519fb89492e9e67f45470fe9eaf6a97603a36e34bd3a34d8889b6c8c8f140b3b",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "bedrock",
+      "kind": "orm",
+      "source": "assets/source/world/textures/terrain/blender/bedrock/bedrock_production_orm.png",
+      "sha256": "d18b9dfa94924ecfca50e6340dea2ae6de67dddc9d28a4cb1c98e4eb1b3fac56",
+      "originalSha256": "8a8e687ae60deda922605c86d5ddcb2437a70183a3186d27f8e1a4a026776775",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "crushed_gravel",
+      "kind": "base",
+      "source": "assets/source/world/textures/terrain/blender/crushed_gravel/crushed_gravel_production_base.png",
+      "sha256": "762ffb96147ad77d6ea1a989ff5126b00df5a852c3b56230481e5b7589305f01",
+      "originalSha256": "9f9afe128866a771e078c69e7f236f58daf431d144a6818f6838a562ec4bd936",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "crushed_gravel",
+      "kind": "normal",
+      "source": "assets/source/world/textures/terrain/blender/crushed_gravel/crushed_gravel_production_normal.png",
+      "sha256": "7f9538d4209f3f0d720332c21b1205005078229af17558eb3459255c3fba6489",
+      "originalSha256": "3c54f3b1b2400c98d1ff171588947fb5ebe80ed9a5f4986c8d5f2cd2b1359fd0",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "crushed_gravel",
+      "kind": "orm",
+      "source": "assets/source/world/textures/terrain/blender/crushed_gravel/crushed_gravel_production_orm.png",
+      "sha256": "bd63e85f39602bfcda5a7832343249604ebf11e3bf912e89e95edb9f00fd4909",
+      "originalSha256": "67e7f25e233cd913d65920552833cbac377fd7009101b845561274195d6a9e25",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "dark_ash",
+      "kind": "base",
+      "source": "assets/source/world/textures/terrain/blender/dark_ash/dark_ash_production_base.png",
+      "sha256": "514e16498f168d3c3004e46cbd2f0e6150148e5139026c4647dffbf203f2e6cc",
+      "originalSha256": "293730df49152767611a84fca45ed3304ff3eaa8f6f4081215f6f56249e19e3d",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "dark_ash",
+      "kind": "normal",
+      "source": "assets/source/world/textures/terrain/blender/dark_ash/dark_ash_production_normal.png",
+      "sha256": "0da1044536c87a6072d6bb2a1e4ca4d978a409e1f0072d2592567358259728b1",
+      "originalSha256": "90ab6f689d024cae39f98b9d679baec1acf523dcf246b7fe72e0793546a84482",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "dark_ash",
+      "kind": "orm",
+      "source": "assets/source/world/textures/terrain/blender/dark_ash/dark_ash_production_orm.png",
+      "sha256": "35438e7e2f13a27280d177ae9be61cf30f099f7838f7206ed224ad6cbeca8cc1",
+      "originalSha256": "000d2433973b3415f15b6758c9b30fba2432b3b7898cbf80f3a96d38d9cdcb7a",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "concrete_base",
+      "kind": "base",
+      "source": "assets/source/world/textures/terrain/blender/concrete_base/concrete_base_production_base.png",
+      "sha256": "cc3da401e0c6e982c1d1143a54dcec8252be9b284a3077e428353b7d19669cb6",
+      "originalSha256": "3c5d82e349ecf8393e1b10479da358004005e42196bea15ab4631eb4815d6a3e",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "concrete_base",
+      "kind": "normal",
+      "source": "assets/source/world/textures/terrain/blender/concrete_base/concrete_base_production_normal.png",
+      "sha256": "960a8afc227a97ad1043dfa869e0e232c614e43ee25d727d9fd839ff62418551",
+      "originalSha256": "3ab4fd414e1bc4eb375346ac673d9cdb8a764691eb7aa797fd4e3616c5e3f49a",
+      "decodedPixelsIdentical": true
+    },
+    {
+      "family": "concrete_base",
+      "kind": "orm",
+      "source": "assets/source/world/textures/terrain/blender/concrete_base/concrete_base_production_orm.png",
+      "sha256": "0497047c175ced34a3d61dfe7820359e52729079a4ae0026fcd1897e0099ee63",
+      "originalSha256": "08f96fc4d17a7190d98d9d6fbcce5cee37d59c6d5c430f2a06a2bc5174d3b36b",
+      "decodedPixelsIdentical": true
+    }
+  ],
+  "originalBindings": [
+    {
+      "schemaVersion": 1,
+      "family": "rocky_scrub",
+      "tileMetres": 32,
+      "maps": {
+        "base": {
+          "definition": "world/textures/terrain/rocky_scrub.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.rocky_scrub",
+            "type": "texture",
+            "textureUsage": "baseColor",
+            "textureColorSpace": "srgb",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 1024,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/rocky_scrub_production_base.png",
+          "originalSha256": "a758c4aaf78c51cc3cc2bc6b07a6ed36771e037bfb1356c4d7c88df3fc94ec1d"
+        },
+        "normal": {
+          "definition": "world/textures/terrain/rocky_scrub_production_normal.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.rocky_scrub_normal",
+            "type": "texture",
+            "textureUsage": "normal",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/rocky_scrub_production_normal.png",
+          "originalSha256": "67092b2e7d8a3163b9dc2933c58358eb6a9c5964f26641d56bbdb704cc2b8379"
+        },
+        "orm": {
+          "definition": "world/textures/terrain/rocky_scrub_production_orm.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.rocky_scrub_orm",
+            "type": "texture",
+            "textureUsage": "orm",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/rocky_scrub_production_orm.png",
+          "originalSha256": "45fc90eacc6f41599ae5a8d256bb26fc01a9858d05d57beb561c39797be3b1d7"
+        }
+      },
+      "materials": {
+        "grass_ground": {
+          "baseColorTexture": "texture.world.terrain.rocky_scrub",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "normalTexture": "texture.world.terrain.rocky_scrub_normal",
+          "ormTexture": "texture.world.terrain.rocky_scrub_orm"
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "family": "dry_dirt",
+      "tileMetres": 32,
+      "maps": {
+        "base": {
+          "definition": "world/textures/terrain/dry_dirt.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.dry_dirt",
+            "type": "texture",
+            "textureUsage": "baseColor",
+            "textureColorSpace": "srgb",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 1024,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/dry_dirt_production_base.png",
+          "originalSha256": "71739d0f2ef609cb5afbd377ffaa755a92166d206a6e174ced4f7df691cfb532"
+        },
+        "normal": {
+          "definition": "world/textures/terrain/dry_dirt_production_normal.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.dry_dirt_normal",
+            "type": "texture",
+            "textureUsage": "normal",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/dry_dirt_production_normal.png",
+          "originalSha256": "99494775b509c6802482c53e259de58c2a8e7dcaadb914e1b3f4bc784c6b74fe"
+        },
+        "orm": {
+          "definition": "world/textures/terrain/dry_dirt_production_orm.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.dry_dirt_orm",
+            "type": "texture",
+            "textureUsage": "orm",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/dry_dirt_production_orm.png",
+          "originalSha256": "cb0da231fb9140ccdd05574c7d33ffd2312a5e3dd5a46aa93587e40ccc17ebe5"
+        }
+      },
+      "materials": {
+        "dirt": {
+          "baseColorTexture": "texture.world.terrain.dry_dirt",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "normalTexture": "texture.world.terrain.dry_dirt_normal",
+          "ormTexture": "texture.world.terrain.dry_dirt_orm"
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "family": "cracked_earth",
+      "tileMetres": 16,
+      "maps": {
+        "base": {
+          "definition": "world/textures/terrain/cracked_earth.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.cracked_earth",
+            "type": "texture",
+            "textureUsage": "baseColor",
+            "textureColorSpace": "srgb",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 1024,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/cracked_earth_production_base.png",
+          "originalSha256": "842867faca3468fd4a5b42fb435c1270e249997efeb91588c93fb12d79098f2c"
+        },
+        "normal": {
+          "definition": "world/textures/terrain/cracked_earth_production_normal.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.cracked_earth_normal",
+            "type": "texture",
+            "textureUsage": "normal",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/cracked_earth_production_normal.png",
+          "originalSha256": "d529b9a87e4e2c7b3b93d532bd5ad33a993d40027c266410d2e98b9ccd014a5a"
+        },
+        "orm": {
+          "definition": "world/textures/terrain/cracked_earth_production_orm.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.cracked_earth_orm",
+            "type": "texture",
+            "textureUsage": "orm",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/cracked_earth_production_orm.png",
+          "originalSha256": "5a8c20d8e1167ce28d610bbe3ba1048bf7d2e8d623dcd7c6a09238c78e8d296d"
+        }
+      },
+      "materials": {
+        "mud": {
+          "baseColorTexture": "texture.world.terrain.cracked_earth",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "normalTexture": "texture.world.terrain.cracked_earth_normal",
+          "ormTexture": "texture.world.terrain.cracked_earth_orm",
+          "uvScale": [
+            1.5,
+            1.5
+          ]
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "family": "bedrock",
+      "tileMetres": 32,
+      "maps": {
+        "base": {
+          "definition": "world/textures/terrain/bedrock.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.bedrock",
+            "type": "texture",
+            "textureUsage": "baseColor",
+            "textureColorSpace": "srgb",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 1024,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/bedrock_production_base.png",
+          "originalSha256": "b42183b9366ec30663371b60447784af4cfffc356989bc7e8d69ba87843e7e87"
+        },
+        "normal": {
+          "definition": "world/textures/terrain/bedrock_production_normal.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.bedrock_normal",
+            "type": "texture",
+            "textureUsage": "normal",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/bedrock_production_normal.png",
+          "originalSha256": "519fb89492e9e67f45470fe9eaf6a97603a36e34bd3a34d8889b6c8c8f140b3b"
+        },
+        "orm": {
+          "definition": "world/textures/terrain/bedrock_production_orm.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.bedrock_orm",
+            "type": "texture",
+            "textureUsage": "orm",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/bedrock_production_orm.png",
+          "originalSha256": "8a8e687ae60deda922605c86d5ddcb2437a70183a3186d27f8e1a4a026776775"
+        }
+      },
+      "materials": {
+        "rock": {
+          "baseColorTexture": "texture.world.terrain.bedrock",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "normalTexture": "texture.world.terrain.bedrock_normal",
+          "ormTexture": "texture.world.terrain.bedrock_orm"
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "family": "crushed_gravel",
+      "tileMetres": 12,
+      "maps": {
+        "base": {
+          "definition": "world/textures/terrain/crushed_gravel.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.crushed_gravel",
+            "type": "texture",
+            "textureUsage": "baseColor",
+            "textureColorSpace": "srgb",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 1024,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/crushed_gravel_production_base.png",
+          "originalSha256": "9f9afe128866a771e078c69e7f236f58daf431d144a6818f6838a562ec4bd936"
+        },
+        "normal": {
+          "definition": "world/textures/terrain/crushed_gravel_production_normal.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.crushed_gravel_normal",
+            "type": "texture",
+            "textureUsage": "normal",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/crushed_gravel_production_normal.png",
+          "originalSha256": "3c54f3b1b2400c98d1ff171588947fb5ebe80ed9a5f4986c8d5f2cd2b1359fd0"
+        },
+        "orm": {
+          "definition": "world/textures/terrain/crushed_gravel_production_orm.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.crushed_gravel_orm",
+            "type": "texture",
+            "textureUsage": "orm",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/crushed_gravel_production_orm.png",
+          "originalSha256": "67e7f25e233cd913d65920552833cbac377fd7009101b845561274195d6a9e25"
+        }
+      },
+      "materials": {
+        "gravel": {
+          "baseColorTexture": "texture.world.terrain.crushed_gravel",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "normalTexture": "texture.world.terrain.crushed_gravel_normal",
+          "ormTexture": "texture.world.terrain.crushed_gravel_orm",
+          "uvScale": [
+            2,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "family": "dark_ash",
+      "tileMetres": 21.333333333333332,
+      "maps": {
+        "base": {
+          "definition": "world/textures/terrain/dark_ash.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.dark_ash",
+            "type": "texture",
+            "textureUsage": "baseColor",
+            "textureColorSpace": "srgb",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 1024,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/dark_ash_production_base.png",
+          "originalSha256": "293730df49152767611a84fca45ed3304ff3eaa8f6f4081215f6f56249e19e3d"
+        },
+        "normal": {
+          "definition": "world/textures/terrain/dark_ash_production_normal.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.dark_ash_normal",
+            "type": "texture",
+            "textureUsage": "normal",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/dark_ash_production_normal.png",
+          "originalSha256": "90ab6f689d024cae39f98b9d679baec1acf523dcf246b7fe72e0793546a84482"
+        },
+        "orm": {
+          "definition": "world/textures/terrain/dark_ash_production_orm.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.dark_ash_orm",
+            "type": "texture",
+            "textureUsage": "orm",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/dark_ash_production_orm.png",
+          "originalSha256": "000d2433973b3415f15b6758c9b30fba2432b3b7898cbf80f3a96d38d9cdcb7a"
+        }
+      },
+      "materials": {
+        "industrial_ground": {
+          "baseColorTexture": "texture.world.terrain.dark_ash",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "normalTexture": "texture.world.terrain.dark_ash_normal",
+          "ormTexture": "texture.world.terrain.dark_ash_orm",
+          "uvScale": [
+            1.5,
+            1.5
+          ]
+        },
+        "scorched": {
+          "baseColorTexture": "texture.world.terrain.dark_ash",
+          "baseColorFactor": [
+            0.65,
+            0.6,
+            0.55,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "normalTexture": "texture.world.terrain.dark_ash_normal",
+          "ormTexture": "texture.world.terrain.dark_ash_orm",
+          "uvScale": [
+            1.25,
+            1.25
+          ]
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "family": "concrete_base",
+      "tileMetres": 16,
+      "maps": {
+        "base": {
+          "definition": "world/textures/terrain/concrete_base.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.concrete_base",
+            "type": "texture",
+            "textureUsage": "baseColor",
+            "textureColorSpace": "srgb",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 1024,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/concrete_base_production_base.png",
+          "originalSha256": "3c5d82e349ecf8393e1b10479da358004005e42196bea15ab4631eb4815d6a3e"
+        },
+        "normal": {
+          "definition": "world/textures/terrain/concrete_base_production_normal.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.concrete_base_normal",
+            "type": "texture",
+            "textureUsage": "normal",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/concrete_base_production_normal.png",
+          "originalSha256": "3ab4fd414e1bc4eb375346ac673d9cdb8a764691eb7aa797fd4e3616c5e3f49a"
+        },
+        "orm": {
+          "definition": "world/textures/terrain/concrete_base_production_orm.asset.json",
+          "policy": {
+            "id": "texture.world.terrain.concrete_base_orm",
+            "type": "texture",
+            "textureUsage": "orm",
+            "textureColorSpace": "linear",
+            "textureGenerateMipmaps": true,
+            "textureMaxDimension": 512,
+            "textureFormat": "bc7Unorm",
+            "textureCompressionQuality": "balanced"
+          },
+          "original": "world/textures/terrain/concrete_base_production_orm.png",
+          "originalSha256": "08f96fc4d17a7190d98d9d6fbcce5cee37d59c6d5c430f2a06a2bc5174d3b36b"
+        }
+      },
+      "materials": {
+        "concrete": {
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "baseColorTexture": "texture.world.terrain.concrete_base",
+          "normalTexture": "texture.world.terrain.concrete_base_normal",
+          "ormTexture": "texture.world.terrain.concrete_base_orm",
+          "uvScale": [
+            1.5,
+            1.5
+          ]
+        }
+      }
+    }
+  ],
+  "gameplayOrShaderChanges": false,
+  "humanArtAccepted": false
+}

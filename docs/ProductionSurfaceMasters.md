@@ -1,5 +1,11 @@
 # Production surface masters
 
+Current saved terrain material sources, deterministic Cycles export and the
+already-integrated BC7 terrain policy are described in
+[Terrain Blender sources](TerrainPbrBlender.md). Historical RGBA allocation
+figures below retain their original context; current source metadata and
+source-bound compiled measurements are authoritative.
+
 The physical material set has twenty-four native 4096 x 4096 lossless PNG
 masters: Base Color, tangent Normal and packed ORM for the shared sixteen-cell
 Directorate/world atlas and seven terrain families. These are independently
