@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "source": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+  "cases": [
+    {
+      "cohort": "gallery",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    },
+    {
+      "cohort": "dense-close",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    }
+  ],
+  "identicalCompiledFiles": 1366,
+  "publisherOnlyMediaFiles": 63,
+  "runtimeFingerprintDifference": "The publisher adds 63 media files; all compiled manifest/container files are byte-identical.",
+  "humanArtApproval": "pending"
+}
