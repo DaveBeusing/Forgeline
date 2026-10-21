@@ -23,7 +23,12 @@ Final comparison preparation rebased onto master
 `8e486734383075c39a914b71adf34d8c3311b7be` (0.1.437), adopting the
 integrated terrain sources and compact industrial profile from PR #284.
 The infrastructure PR advances exactly one PATCH to 0.1.438. Both final native
-comparison sides use that same terrain baseline.
+comparison sides use that same terrain baseline. Final source integration also
+includes vegetation PR #281 at master
+`a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d` (still 0.1.437). Existing
+vegetation scene IDs and factory routing are preserved, with the fifteen
+infrastructure scenes appended. The paired timing evidence remains attached to
+its measured terrain baseline; it is not relabelled as vegetation-base timing.
 
 Each state occupies its own named collection at the canonical origin. Show the
 desired collection to edit it. Engine coordinates are +Y up/+Z forward, Blender
@@ -88,3 +93,6 @@ Native image comparisons, final full-suite/headless parity and installed package
 evidence are recorded separately. Repeatable static pixels and sampled real
 movement do not establish live motion, sustained FPS, enclosing-frame or human
 art acceptance. No merge, tag, release or golden approval is part of this work.
+
+Detailed measurements, retained original images, source identity and integration
+checks are recorded in [Infrastructure qualification](qualification/infrastructure/README.md).

@@ -317,3 +317,7 @@ The integrated catalog contains 465 assets (282 meshes, 56 textures and 127
 materials). All thirteen building families retain dedicated construction and
 damage/wreck geometry. Industrial and logistics families retain dedicated idle asset bindings;
 logistics fixtures expose only reachable gameplay states.
+
+For current road/bridge/ford masters and graph-derived display transforms, see
+[Road, bridge and crossing Blender sources](InfrastructureBlenderMasters.md).
+Earlier captures in this document remain historical.
