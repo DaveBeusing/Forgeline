@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Core;
 using ForgeLine.Economy;
@@ -11,6 +12,56 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class ResourceDepositBlenderMasterTests
 {
+    public static bool OverlayEnabled => Enabled && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_RESOURCE_RUNTIME_SEED"));
+
+    [Fact(Skip = "Set qualified mineral exports and the complete canonical runtime seed.", SkipUnless = nameof(OverlayEnabled))]
+    public void CompleteReviewCatalogLoadsWithOnlyTheEightBlenderMeshReplacements()
+    {
+        string root = Environment.GetEnvironmentVariable("FORGELINE_RESOURCE_MASTERS")!;
+        string seed = Environment.GetEnvironmentVariable("FORGELINE_RESOURCE_RUNTIME_SEED")!;
+        var original = RuntimeAssetCatalog.Load(seed);
+        var replacements = new Dictionary<string, (RuntimeAssetRecord Record, string Root)>();
+        foreach (string family in new[] { "ferrous_ore", "silicates", "volatiles", "rare_elements" })
+        {
+            string source = Path.Combine(root, family, "second/runtime");
+            var catalog = RuntimeAssetCatalog.Load(source);
+            foreach (var record in catalog.Manifest.Assets)
+            {
+                var before = original.Get(AssetId.Parse(record.Id));
+                if (record.Type != RuntimeAssetType.Mesh)
+                {
+                    Assert.Equal(before.RuntimeHash, record.RuntimeHash);
+                    continue;
+                }
+                Assert.Equal(before.MaterialReferences, record.MaterialReferences);
+                Assert.Equal(before.Lods, record.Lods);
+                Assert.Equal(before.CollisionReference, record.CollisionReference);
+                replacements.Add(record.Id, (record, source));
+            }
+        }
+        Assert.Equal(8, replacements.Count);
+        string target = Path.Combine(root, "overlay/runtime");
+        Assert.False(Directory.Exists(target), "Use a fresh complete review overlay.");
+        Directory.CreateDirectory(target);
+        foreach (var record in original.Manifest.Assets)
+        {
+            bool replaced = replacements.TryGetValue(record.Id, out var replacement);
+            var selected = replaced ? replacement.Record : record;
+            string source = replaced ? replacement.Root : seed;
+            string path = Path.Combine(target, selected.RuntimePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.Copy(Path.Combine(source, selected.RuntimePath), path);
+        }
+        var manifest = RuntimeAssetIntegrity.SealManifest(original.Manifest with
+        {
+            Assets = original.Manifest.Assets.Select(record => replacements.TryGetValue(record.Id, out var replacement) ? replacement.Record : record).ToArray()
+        });
+        File.WriteAllBytes(Path.Combine(target, RuntimeAssetCatalog.ManifestFileName),
+            JsonSerializer.SerializeToUtf8Bytes(manifest, RuntimeAssetCatalog.CreateJsonOptions()));
+        Assert.True(RuntimeAssetQualification.Run(target, requireIntegrity: true).Success);
+        Assert.Equal(original.Manifest.Assets.Count, RuntimeAssetCatalog.Load(target).Manifest.Assets.Count);
+    }
+
     [Theory]
     [InlineData(0)]
     [InlineData(1)]
