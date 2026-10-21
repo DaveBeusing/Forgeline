@@ -16,7 +16,7 @@ separately owned. Vegetation, mineral deposits, terrain and decals are excluded.
 The current catalog already contains functional silhouettes, hollow pipes,
 flanges, supported gantry bays, atlas UVs, explicit normals and High/Reduced LODs.
 This work preserves that artwork and supplies the missing retained editable
-Blender sources. It does not infer a new throughput, lamp, damage or cargo state
+Blender sources, with one demonstrated straight-pipe axis correction. It does not infer a new throughput, lamp, damage or cargo state
 from decoration. The existing crate is one atlas-authored family; timber/metal
 regions retain their existing material and UV identity rather than new gameplay
 variants or duplicate stable IDs.
@@ -37,11 +37,39 @@ belongs in the runtime/player package. Source signatures normalize JSON/glTF
 line endings while raw hashes still detect changes during processing.
 
 Engine +Y up/+Z forward maps to Blender +Z up/-Y forward as (x,-z,y), in metres
-at unit scale. Pivots, bounds, winding, vertices, triangle/index order, UV0,
-normals, tangents, material slots, LOD distances and tooling collision references
-retain the existing contracts. Original ForgeLine provenance and shared
+at unit scale. Pivots, bounds, winding, topology, UV0, material slots, LOD distances and tooling
+collision references retain the existing contracts. Straight-pipe positions,
+normals and tangents receive the one baked rotation described below; other
+families preserve their geometry. Original ForgeLine provenance and shared
 Base Color (sRGB), Normal and ORM (linear) atlases are retained. No new texture,
 material, transparent billboard, mesh section or shader feature is introduced.
+
+## Straight-pipe axis correction
+
+The original high-detail pipe bore runs along source Z, while existing map
+instances scale X as their length: the legacy pipe is [12,4,4] and yard pipes
+are [9,2,2]. This stretches flange cross-sections and shortens the bore.
+The family-scoped correction bakes +90 degrees around game Y into both existing
+pipe LODs: (x,y,z) becomes (z,y,-x). Their unit-cube bounds, pivots, UVs, index
+order, material bindings and all map transforms stay unchanged. Tangents and
+normals rotate with the geometry and handedness remains unchanged. High/Reduced
+triangle counts remain 576/12. No extra batch, texture or source ID is added.
+
+Qualify-PipeAxis.ps1 independently saves/reopens the correction in actual
+Blender, compiles original and corrected sources, validates source-less loading
+and invokes a typed .NET test of the exact baked rotation. The binding command
+requires that separate qualification; it cannot silently turn a preservation
+comparison into approval of arbitrary edits. Already-bound sources are refused
+by the one-time correction producer. The final retained masters are imported
+and qualified against the corrected canonical GLBs.
+
+For authoring assemblies, the corrected straight pipe uses X as its centreline;
+3x1x1 reference scale pairs with the existing 3x1x3 elbow vocabulary at nominal
+one-metre flange size. Fences retain 8m module pitch, barriers 4m, and gantries
+retain supported footplates and an open loading bay. Existing map instances
+keep their original scales; these authoring dimensions introduce no sockets,
+new transport logic or physical collision authority. Exact live joint/terrain
+contact and moving LOD appearance remain visual review items.
 
 ## Gameplay and review fixtures
 

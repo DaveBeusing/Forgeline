@@ -1,7 +1,7 @@
 #requires -Version 7.4
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$OutputRoot, [string]$BlenderPath, [switch]$RenderPreviews,
-      [switch]$ReuseAuthored, [string]$MaterialCacheRoot, [switch]$NativeBatch)
+      [switch]$ReuseAuthored, [string]$MaterialCacheRoot, [switch]$NativeBatch, [string]$SourceRoot = 'assets/source')
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath('../..', $PSScriptRoot)
@@ -22,7 +22,7 @@ $canonicalRoot = [IO.Path]::GetFullPath('assets/source', $repo)
 if (-not $ReuseAuthored -and $NativeBatch) {
     $batchArguments = @()
     if ($RenderPreviews) { $batchArguments += '--render' }
-    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'author_batch.py') -InputRoot assets/source -OutputRoot $output -ScriptArguments $batchArguments -BlenderPath $BlenderPath -TimeoutSeconds 1800
+    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'author_batch.py') -InputRoot $SourceRoot -OutputRoot $output -ScriptArguments $batchArguments -BlenderPath $BlenderPath -TimeoutSeconds 1800
 }
 if (-not $ReuseAuthored -and -not $NativeBatch) {
 foreach ($family in $families) {
@@ -32,9 +32,9 @@ foreach ($family in $families) {
         if ($variant -eq 'first') { $arguments += '--inspect' }
         if ($variant -eq 'reopened') { $arguments += @('--blend-file', (Join-Path $familyRoot 'first/authoring.blend')) }
         if ($RenderPreviews -and $variant -eq 'first') { $arguments += '--render' }
-        & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'author.py') -InputRoot assets/source -OutputRoot (Join-Path $familyRoot $variant) -ScriptArguments $arguments -BlenderPath $BlenderPath -TimeoutSeconds 480
+        & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'author.py') -InputRoot $SourceRoot -OutputRoot (Join-Path $familyRoot $variant) -ScriptArguments $arguments -BlenderPath $BlenderPath -TimeoutSeconds 480
     }
-    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'native_contract.py') -InputRoot assets/source -OutputRoot (Join-Path $familyRoot 'native-contracts') -ScriptArguments @((Join-Path $familyRoot 'first/authoring.blend'), $fixture, "mesh.world.prop.$family") -BlenderPath $BlenderPath -TimeoutSeconds 480
+    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'native_contract.py') -InputRoot $SourceRoot -OutputRoot (Join-Path $familyRoot 'native-contracts') -ScriptArguments @((Join-Path $familyRoot 'first/authoring.blend'), $fixture, "mesh.world.prop.$family") -BlenderPath $BlenderPath -TimeoutSeconds 480
 }
 }
 foreach ($family in $families) {

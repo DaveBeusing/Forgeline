@@ -49,5 +49,20 @@ class PropSignatureTests(unittest.TestCase):
                 PropCatalog._frozen = None
 
 
+class PipeAxisTests(unittest.TestCase):
+    def test_baked_pipe_axis_retains_uv_topology_and_handedness(self):
+        from pipe_contract import align_straight_pipe
+        source = {'primitives': [{'attributes': {'POSITION': [(0, 0, .5)],
+            'NORMAL': [(0, 0, 1)], 'TANGENT': [(1, 0, 0, -1)],
+            'TEXCOORD_0': [(.125, .25)]}, 'indices': [0, 0, 0], 'materialSlot': 0}]}
+        result = align_straight_pipe(source)['primitives'][0]
+        self.assertEqual((.5, 0, 0), result['attributes']['POSITION'][0])
+        self.assertEqual((1, 0, 0), result['attributes']['NORMAL'][0])
+        self.assertEqual((0, 0, -1, -1), result['attributes']['TANGENT'][0])
+        self.assertEqual(source['primitives'][0]['attributes']['TEXCOORD_0'], result['attributes']['TEXCOORD_0'])
+        self.assertEqual(source['primitives'][0]['indices'], result['indices'])
+        self.assertEqual((0, 0, .5), source['primitives'][0]['attributes']['POSITION'][0])
+
+
 if __name__ == '__main__':
     unittest.main()
