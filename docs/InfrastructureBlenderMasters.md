@@ -19,6 +19,12 @@ rendering optimization and qualification PRs #258, #260, #263–#268 are integra
 but their full physical, lifecycle and human acceptance gates remain open.
 Source preservation does not establish production performance acceptance.
 
+Final comparison preparation rebased onto master
+`8e486734383075c39a914b71adf34d8c3311b7be` (0.1.437), adopting the
+integrated terrain sources and compact industrial profile from PR #284.
+The infrastructure PR advances exactly one PATCH to 0.1.438. Both final native
+comparison sides use that same terrain baseline.
+
 Each state occupies its own named collection at the canonical origin. Show the
 desired collection to edit it. Engine coordinates are +Y up/+Z forward, Blender
 coordinates +Z up/-Y forward, with meter units. Runtime instance scales remain
