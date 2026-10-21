@@ -33,7 +33,7 @@ for family in FAMILIES:
     rejected=[]
     for label,target,key,value in cases:
         original=getattr(target,key)
-        if hasattr(original,'copy'):original=original.copy()
+        if not isinstance(original,(str,int,float,bool)):original=tuple(original)
         setattr(target,key,value)
         try:
             try:validate(source,family)
