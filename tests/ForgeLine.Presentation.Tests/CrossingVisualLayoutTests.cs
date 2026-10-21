@@ -106,9 +106,9 @@ public sealed class CrossingVisualLayoutTests
             bool shoulder=item.InfrastructureFeature.Kind==InfrastructurePresentationKind.RoadShoulder;
             var world=InfrastructurePresentationCatalog.AdjustWorldTransform(item.InfrastructureFeature,item.Transform.ToMatrix());
             for(int i=0;i<=16;i++)
-            for(int lateral=-1;lateral<=1;lateral++)
+            for(int lateral=-6;lateral<=6;lateral++)
             {
-                float x=lateral*(shoulder?.08f:.5f),z=i/16f-.5f;
+                float x=lateral*(shoulder?.08f:.5f)/6,z=i/16f-.5f;
                 Vector3 top=Vector3.Transform(new(x,shoulder?-.43f:-.42f,z),world);
                 Vector3 bottom=Vector3.Transform(new(x,shoulder?-.49f:-.5f,z),world);
                 Assert.True(terrain.TrySampleHeight(top.X,top.Z,out float ground));
