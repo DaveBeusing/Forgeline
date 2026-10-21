@@ -23,10 +23,6 @@ foreach ($name in $sides) {
         & $capture @common -Scenes MainBattleTankSingle -Profiles High -Zooms CloseTactical -Displays 1920x1080 `
             -InspectionDistanceMeters 30 -YawDegrees $yaw -OutputRoot "$root/inspection-$yaw"
     }
-    foreach ($distance in 130,150,370,390) {
-        & $capture @common -Scenes MainBattleTankSingle -Profiles High -Zooms CloseTactical -Displays 1920x1080 `
-            -InspectionDistanceMeters $distance -OutputRoot "$root/lod-$distance"
-    }
     foreach ($weather in 'dark','wet') {
         $settings = if ($weather -eq 'dark') { @{WorldDaylight=.1} } else { @{CloudCover=.8;Wetness=1} }
         & $capture @common @settings -Scenes MainBattleTankProduction -Profiles High `
@@ -36,4 +32,9 @@ foreach ($name in $sides) {
         & $capture @common -Scenes MainBattleTankSingle -Profiles High -Zooms CloseTactical -Displays 1920x1080 `
             -InspectionDistanceMeters 30 -MechanicalSeconds $seconds -OutputRoot "$root/pose-$seconds"
     }
+    foreach ($zoom in 'CloseTactical','NormalGameplay') {
+        & $capture @common -Scenes MainBattleTankSingle -Profiles High -Zooms $zoom -Displays 1920x1080 `
+            -CameraPath Sweep -OutputRoot "$root/sweep-$zoom"
+    }
+
 }

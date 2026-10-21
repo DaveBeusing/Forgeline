@@ -52,7 +52,7 @@ gallery and formation layouts and default poses remain unchanged.
 
 `build/Invoke-TankSurfaceReview.ps1` declares paired native gallery observations at
 120/420/1000m, Low/Medium/High, 1080p/4K; isolated 1/100/1000 loads; four inspection
-yaws; both sides of the existing 140/380m LOD thresholds; dark/wet conditions and
+yaws; two supported camera sweeps; dark/wet conditions and
 four sampled recoil phases. Each case requests eight warmups, 32 timing samples
 and two repeat readbacks. Identical source binaries consume independently sealed
 before/after runtime catalogs. Deliberate picture differences require visual
@@ -81,3 +81,12 @@ The saved positive-edit contract omits only its redundant inspection project.
 Both ordinary reopen exports retain full inspection/pose output. Strict source,
 geometry, metadata and saved-edit validation still execute before this optional
 review output; the 120-second native test deadline is unchanged.
+
+The native inspection override remains bounded to 20–120m. Exact 140/380m
+selection boundaries are covered by existing unit tests and retained metadata;
+exact native threshold-crossing/judder approval remains pending. An initial
+review plan requested unsupported distances and was stopped before those cases.
+A following attempt exposed the missing capture-request whitelist entries for
+the new tank time scenes. Admission now explicitly includes those three scenes,
+with unchanged time, camera, sampling and evidence-preservation limits. Neither
+interrupted cohort is counted as the final paired matrix.
