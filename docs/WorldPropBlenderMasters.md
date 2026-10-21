@@ -172,7 +172,7 @@ filenames reduce that measured path to 239 characters; every renamed GLB hash
 remained identical. Failed/interrupted directories are retained as nonpasses,
 not reused as final qualification.
 
-## Final functional validation
+## Original functional qualification
 
 Branch art/world-prop-masters, draft PR [#283](https://github.com/DaveBeusing/Forgeline/pull/283),
 retains product source 3545a23125d5ca8b3c24d50a8e77d72175c5acf6. The integration
@@ -305,3 +305,16 @@ remains blocked on the existing controlled physical render qualification,
 complete live memory/timestamp/lifecycle measurements and explicit human art
 and moving-LOD approval. No renderer contract, gameplay placement, threshold,
 texture cap or golden has been changed to admit the props.
+
+## Current integration synchronization
+
+Master advanced during final CI through terrain PR #284 and vegetation PR #281.
+The prop branch is rebased onto a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d. The
+shared scene enum retains every current-master value, including all vegetation
+fixtures, and appends the four prop fixtures. Both scene dispatches are retained.
+Version 0.1.438 restores exactly one PATCH over the new 0.1.437 base.
+
+The existing native authoring records remain historical evidence for their
+recorded inputs. Rebased component equivalence, runtime comparison, solution,
+native player and installed-package results are requalified separately. These
+follow-up checks are pending until their new reports are retained.
