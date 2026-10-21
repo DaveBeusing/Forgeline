@@ -1,0 +1,1532 @@
+{
+  "schemaVersion": 1,
+  "archive": "authoring-runtime-evidence.zip",
+  "archiveSha256": "ab647ef5f6a8aad2aca37e5edc0c7933f063cfbe2886dce2062b7f41045cfb25",
+  "files": [
+    {
+      "path": "artifacts/v-package/asset-qualification.json",
+      "bytes": 2110,
+      "sha256": "6c2b6772d826e717767e1e616cfd6cb0b6719841059621fef46c80c80f55175a"
+    },
+    {
+      "path": "artifacts/v-package/FORGELINE-0.1.437-dev-win-x64.zip.provenance.json",
+      "bytes": 729,
+      "sha256": "7fcbe1429a84270fdcf2f1a2bc48249a366fb6d7160b862431d17dbe0115475d"
+    },
+    {
+      "path": "artifacts/v-package/FORGELINE-0.1.437-dev-win-x64.zip.sha256",
+      "bytes": 101,
+      "sha256": "cfc3011c9f0782f1765384a94464198d1c7048c7638be0999c3175a1306c09db"
+    },
+    {
+      "path": "artifacts/v-runtime/manifest.json",
+      "bytes": 1347166,
+      "sha256": "803cac07431c1f980bd652bfa2f4908449f4970c031825e6a90a74aae7320757"
+    },
+    {
+      "path": "artifacts/ve/report.json",
+      "bytes": 1229,
+      "sha256": "0e734e9954da8119342fdc277b3fe159f7de8197a341fa65ab599500e44f61b4"
+    },
+    {
+      "path": "artifacts/ve/runs/a55de9af258a4aef93e51b7f1c13e1ca/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "artifacts/ve/runs/a55de9af258a4aef93e51b7f1c13e1ca/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/ve/runs/a55de9af258a4aef93e51b7f1c13e1ca/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/ve/runs/a55de9af258a4aef93e51b7f1c13e1ca/report.json",
+      "bytes": 1229,
+      "sha256": "0e734e9954da8119342fdc277b3fe159f7de8197a341fa65ab599500e44f61b4"
+    },
+    {
+      "path": "artifacts/ve/runs/a55de9af258a4aef93e51b7f1c13e1ca/request.json",
+      "bytes": 515,
+      "sha256": "fa71aada7984d21af64f2cbc11d7cd390eaefbdf5488791858fc697b10190c93"
+    },
+    {
+      "path": "artifacts/ve/runs/a55de9af258a4aef93e51b7f1c13e1ca/script.stderr.log",
+      "bytes": 1497,
+      "sha256": "974942113475e2106382d46c6fab3f6bedfa148200006ed13b78f4a1a5e0d2df"
+    },
+    {
+      "path": "artifacts/ve/runs/a55de9af258a4aef93e51b7f1c13e1ca/script.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/ve/runs/a55de9af258a4aef93e51b7f1c13e1ca/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/ve/runs/a55de9af258a4aef93e51b7f1c13e1ca/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "artifacts/ve2/editorial-masters.json",
+      "bytes": 6329,
+      "sha256": "d38a3046a2ad4b44156ec56924985da07e23316c37a0035ec3945e89609be4f0"
+    },
+    {
+      "path": "artifacts/ve2/report.json",
+      "bytes": 781,
+      "sha256": "144be047490908dc9994e36e79e92f8b6da3ae890a2be4567f43da71d26338ec"
+    },
+    {
+      "path": "artifacts/ve2/runs/bdcc31394bb3447c9ae5294717160103/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "artifacts/ve2/runs/bdcc31394bb3447c9ae5294717160103/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/ve2/runs/bdcc31394bb3447c9ae5294717160103/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/ve2/runs/bdcc31394bb3447c9ae5294717160103/report.json",
+      "bytes": 781,
+      "sha256": "144be047490908dc9994e36e79e92f8b6da3ae890a2be4567f43da71d26338ec"
+    },
+    {
+      "path": "artifacts/ve2/runs/bdcc31394bb3447c9ae5294717160103/request.json",
+      "bytes": 517,
+      "sha256": "45545e906aac91eb1bee4cd72d7ed9b1fe1be62c2aa6f0bbc63837894c91b73b"
+    },
+    {
+      "path": "artifacts/ve2/runs/bdcc31394bb3447c9ae5294717160103/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/ve2/runs/bdcc31394bb3447c9ae5294717160103/script.stdout.log",
+      "bytes": 1638,
+      "sha256": "1df5bb5e38dcac4510ae4f7708d05b0b1d0e9ca013aa7834fe3e4395b750e31b"
+    },
+    {
+      "path": "artifacts/ve2/runs/bdcc31394bb3447c9ae5294717160103/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/ve2/runs/bdcc31394bb3447c9ae5294717160103/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "artifacts/vg-analyze.mjs",
+      "bytes": 6697,
+      "sha256": "d98cb04d6636fdf4c2590fcaaa0721fd832306b35d484cbb6a87ac8719dab4d5"
+    },
+    {
+      "path": "artifacts/vg-build.log",
+      "bytes": 8508,
+      "sha256": "d616fced53ae10ff985aeaa7b2fbbb08bbe8a312609396a3ad9af393593ad93c"
+    },
+    {
+      "path": "artifacts/vg-candidate-compile.json",
+      "bytes": 2110,
+      "sha256": "51bcddcaaad0a33c5516e258c1527eabc576c650e83018a1fa9fedf998f9fa1d"
+    },
+    {
+      "path": "artifacts/vg-candidate-compile.log",
+      "bytes": 1777262,
+      "sha256": "444155e39333f767895d62efb4d010215efc708110c840b2f7e9b2e184ccd348"
+    },
+    {
+      "path": "artifacts/vg-candidate-source-less.json",
+      "bytes": 2110,
+      "sha256": "7cff383f0877379487a8d6b532537053dbd8fac14210b602e1d1dbbfb313edf0"
+    },
+    {
+      "path": "artifacts/vg-candidate-source-less.log",
+      "bytes": 2071,
+      "sha256": "bd0dbc90dc5239c23ddc5c3279d66d47027954d852256d61c123592750501d20"
+    },
+    {
+      "path": "artifacts/vg-canonical-compile.json",
+      "bytes": 2110,
+      "sha256": "2cec5c468def269cd70ea7c9e773d76c4029ee68ddb03f37b505ff05ed8bf427"
+    },
+    {
+      "path": "artifacts/vg-canonical-compile.log",
+      "bytes": 1814611,
+      "sha256": "bf2c1e1d01ae1f55b967e3a3afb3e4d8fc5c193a59105c8f999bb31fd89f2c54"
+    },
+    {
+      "path": "artifacts/vg-canonical-source-less.json",
+      "bytes": 2110,
+      "sha256": "557032beba505daed95531d459b15551a0b914dc546daf48ba85d89fbaa51764"
+    },
+    {
+      "path": "artifacts/vg-canonical-source-less.log",
+      "bytes": 2972,
+      "sha256": "d96d33ec1b42062d642458e56a2be349c3b04902d9a1be0669dd3c60a4fb64af"
+    },
+    {
+      "path": "artifacts/vg-check/report.json",
+      "bytes": 785,
+      "sha256": "59cb1ccd35cf6794526f015a1f0f1b576e1d70d42f3812652d7df1f0b91e470d"
+    },
+    {
+      "path": "artifacts/vg-check/runs/ed234b93716e4a869f2865880585c2c0/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "artifacts/vg-check/runs/ed234b93716e4a869f2865880585c2c0/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg-check/runs/ed234b93716e4a869f2865880585c2c0/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/vg-check/runs/ed234b93716e4a869f2865880585c2c0/report.json",
+      "bytes": 785,
+      "sha256": "59cb1ccd35cf6794526f015a1f0f1b576e1d70d42f3812652d7df1f0b91e470d"
+    },
+    {
+      "path": "artifacts/vg-check/runs/ed234b93716e4a869f2865880585c2c0/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg-check/runs/ed234b93716e4a869f2865880585c2c0/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "artifacts/vg-collect.py",
+      "bytes": 1988,
+      "sha256": "7c0089555798be7ebe700b0e8fa39d7f8d45bdd0cafbac4e8bad69cd1226e1c2"
+    },
+    {
+      "path": "artifacts/vg-committed-build.log",
+      "bytes": 8508,
+      "sha256": "e6e9d3cb23e643b3e5e8c94008de512267f10f06a72a445dba37eeb504020192"
+    },
+    {
+      "path": "artifacts/vg-curate.mjs",
+      "bytes": 2491,
+      "sha256": "453c2b14491d38bfc3a7f122aad00ed35cadbbee49cd95c5d3b2739159da6188"
+    },
+    {
+      "path": "artifacts/vg-focused.log",
+      "bytes": 590,
+      "sha256": "9d04e19ac52d4a456aaa1f8641728ac897dc1f7a573b8a5a3d8cc310f921b5d4"
+    },
+    {
+      "path": "artifacts/vg-full-tests.log",
+      "bytes": 29569,
+      "sha256": "a7d8191ad67b7aca87a85f1fa0b839a45f6784c5928a80066f05a6a84ce24598"
+    },
+    {
+      "path": "artifacts/vg-gpu-telemetry.csv",
+      "bytes": 61673,
+      "sha256": "8ca2b00446baa2a7c59315467c7c5d266b3a80b09ebbd1611bb80729618af06e"
+    },
+    {
+      "path": "artifacts/vg-install.log",
+      "bytes": 55,
+      "sha256": "8a409f29c48efd2243ca786d6334153c3c9810e22e6e0d5fbf135cb580bba40b"
+    },
+    {
+      "path": "artifacts/vg-install.ps1",
+      "bytes": 3209,
+      "sha256": "05b3cc87914d181f490134772f774a008d248e7ad05c504facf276eac313beb6"
+    },
+    {
+      "path": "artifacts/vg-installation.json",
+      "bytes": 714,
+      "sha256": "91c0e134900c67eec434324c7c0b1900559c19505bc6ef2caf9485208e3f5cb5"
+    },
+    {
+      "path": "artifacts/vg-native-review.log",
+      "bytes": 2043,
+      "sha256": "c26eb045e8a6212bb808e87f2442e275ab3f68ff79c1f9e62cfd892f7c77e6ba"
+    },
+    {
+      "path": "artifacts/vg-portable-tests.log",
+      "bytes": 1067,
+      "sha256": "cd8844da3c05cfddc432edcc5ae8e447eda71cafa982c6ea14d81e8209cf572b"
+    },
+    {
+      "path": "artifacts/vg-project-references.log",
+      "bytes": 95,
+      "sha256": "7e04319867bbff733ec1ed528663f2733bf9d9b9091f1f603b4ecbfe9cc00fb4"
+    },
+    {
+      "path": "artifacts/vg-publish.log",
+      "bytes": 4834,
+      "sha256": "334fdd4b3dddfa4831b97b8c4dc27d241e654dd84c0bf5ca69a96bb4a0453a19"
+    },
+    {
+      "path": "artifacts/vg-qualification.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg-qualification3-retry.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg-qualification3.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg-restore.log",
+      "bytes": 8032,
+      "sha256": "7dc6a95db0830abcb07f215411407b7d4c2513d7261080086e443f82842efaab"
+    },
+    {
+      "path": "artifacts/vg-runtime-delta.json",
+      "bytes": 1319,
+      "sha256": "7063a7a39ba29d0ee262fb9611f4f128a30f7b72aa4cdf618cf7d38b9744a32c"
+    },
+    {
+      "path": "artifacts/vg-runtime-process-tests.log",
+      "bytes": 204,
+      "sha256": "8737551111a32a25975c1d96843839a99780e8efaaed1bd1e1dd17d8347d2dd6"
+    },
+    {
+      "path": "artifacts/vg-silhouette-check.log",
+      "bytes": 596,
+      "sha256": "2a34ca4dde130953714277d2a79c7a0bd52892748c1ae112fbe97c763d58b2d8"
+    },
+    {
+      "path": "artifacts/vg-silhouette-check.py",
+      "bytes": 1220,
+      "sha256": "01b49749f5d6706ad477e93972d6f470807ec2ce5d41022998fb02629d27c849"
+    },
+    {
+      "path": "artifacts/vg-source-overlay.log",
+      "bytes": 102,
+      "sha256": "e869fb7419c516dace02b71ec17a030d8eb6f023e648a9ce8b47c287ed8e2b6a"
+    },
+    {
+      "path": "artifacts/vg-telemetry.ps1",
+      "bytes": 1092,
+      "sha256": "9e37786e21df2b571dbc4ef7f5c0bfd18cf10b0e50172d842f800f83c5324a15"
+    },
+    {
+      "path": "artifacts/vg-typed-build.log",
+      "bytes": 3637,
+      "sha256": "7a98c6b877a16a829dd612e6fd2e7f0b22ebf0f6da30a9da76dc57f85da5f951"
+    },
+    {
+      "path": "artifacts/vg-typed-build2.log",
+      "bytes": 3637,
+      "sha256": "0e132222819b96db522df65f3b58fc902a2237087b8ee19b1195089f071390c9"
+    },
+    {
+      "path": "artifacts/vg-versioned-build.log",
+      "bytes": 8508,
+      "sha256": "98d3a9c654a41791a25398ac967f48166f819c5d332e423610f8d3ec1a6fe225"
+    },
+    {
+      "path": "artifacts/vg1/candidate-report.json",
+      "bytes": 763,
+      "sha256": "12bd5954ec042f6c427ead6372ababbcb4cd9efdfb7e509a1733ab581ca57054"
+    },
+    {
+      "path": "artifacts/vg1/conifer/first/roundtrip-report.json",
+      "bytes": 5918,
+      "sha256": "abd3d3face8ed7f56d1bc5b22687a151bf07eecc55ed470bb28b4f75583fc01c"
+    },
+    {
+      "path": "artifacts/vg1/conifer/fixture.json",
+      "bytes": 414,
+      "sha256": "e8e07f886878cd579e1465528fcd9e7d3121f0c2a6acc4b75b5ca34b28353b56"
+    },
+    {
+      "path": "artifacts/vg1/conifer/reopened/roundtrip-report.json",
+      "bytes": 5915,
+      "sha256": "67bb87a8daa6d128de23f68ff2453abf10902fb73525d062bbf29a026807bf34"
+    },
+    {
+      "path": "artifacts/vg1/conifer/second/roundtrip-report.json",
+      "bytes": 5918,
+      "sha256": "abd3d3face8ed7f56d1bc5b22687a151bf07eecc55ed470bb28b4f75583fc01c"
+    },
+    {
+      "path": "artifacts/vg1/report.json",
+      "bytes": 1232,
+      "sha256": "d82c53344ceee47a9b83d6f7e274f108586ce368935f9d6f2759e9aff72d17d9"
+    },
+    {
+      "path": "artifacts/vg1/runs/087adf8a21c5491bb9821dd9e963a6c2/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "artifacts/vg1/runs/087adf8a21c5491bb9821dd9e963a6c2/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg1/runs/087adf8a21c5491bb9821dd9e963a6c2/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/vg1/runs/087adf8a21c5491bb9821dd9e963a6c2/report.json",
+      "bytes": 1232,
+      "sha256": "d82c53344ceee47a9b83d6f7e274f108586ce368935f9d6f2759e9aff72d17d9"
+    },
+    {
+      "path": "artifacts/vg1/runs/087adf8a21c5491bb9821dd9e963a6c2/request.json",
+      "bytes": 512,
+      "sha256": "4612c9afee84ed00a86d5041ab33ff9bf9eb5f850cb7d8726bb3d9e212b1b12a"
+    },
+    {
+      "path": "artifacts/vg1/runs/087adf8a21c5491bb9821dd9e963a6c2/script.stderr.log",
+      "bytes": 2215,
+      "sha256": "f7eb0feec4714ba1047bfb3f522b3f561b90ca225353559a828d766b5644bcf5"
+    },
+    {
+      "path": "artifacts/vg1/runs/087adf8a21c5491bb9821dd9e963a6c2/script.stdout.log",
+      "bytes": 1016,
+      "sha256": "872548553e5a6bc58a4c2f55efaf33af55bbcb5beb2997bf24188fac047c8dc9"
+    },
+    {
+      "path": "artifacts/vg1/runs/087adf8a21c5491bb9821dd9e963a6c2/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg1/runs/087adf8a21c5491bb9821dd9e963a6c2/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "artifacts/vg2/baseline/compile.json",
+      "bytes": 2046,
+      "sha256": "736bc11dd8f4c12dcb2e9cfe352bac85d078b09b3a72dc7db86b9243ceeab0f5"
+    },
+    {
+      "path": "artifacts/vg2/baseline/compile.log",
+      "bytes": 22525,
+      "sha256": "32b65f453d0e590d0f66f5805e8f3dee363197d4efb0f6211a11fc104603b6f5"
+    },
+    {
+      "path": "artifacts/vg2/baseline/source-less.json",
+      "bytes": 2046,
+      "sha256": "b6bee2aa73b234e02bbbeff3ad3c79049ff55efc07a99cf8bfaae2d91b4dc147"
+    },
+    {
+      "path": "artifacts/vg2/baseline/source-less.log",
+      "bytes": 2027,
+      "sha256": "2b36c09f59c66557f1e7ef20e45d0aa8033882591dfc1590d0a0e1f2532efbc3"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/edit-check/edit-source/materials/directorate/surfaces/surface_atlas.asset.json",
+      "bytes": 358,
+      "sha256": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/edit-check/edit-source/materials/directorate/surfaces/surface_normal.asset.json",
+      "bytes": 361,
+      "sha256": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/edit-check/edit-source/materials/directorate/surfaces/surface_orm.asset.json",
+      "bytes": 351,
+      "sha256": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/edit-check/edit-source/world/materials/common/vegetation.asset.json",
+      "bytes": 107,
+      "sha256": "421644d9c5cf655998d989181dda7deb4c67bcb1272d25d4ad11136d86f8c50b"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/edit-check/edit-source/world/materials/common/vegetation.material.json",
+      "bytes": 339,
+      "sha256": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/edit-check/edit-source/world/meshes/kit/broadleaf.asset.json",
+      "bytes": 404,
+      "sha256": "6bc4a197a7d918471189a4b22b4c77497a5a35764f06483f30a086bb0c23c622"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/edit-check/edit-source/world/meshes/kit/broadleaf_lod1.asset.json",
+      "bytes": 188,
+      "sha256": "ed3e83ca5de84d5efcc7f434c229b3a865563e6ad8519d080729c0eacb74df7c"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/edit-check/edit-source/world/meshes/kit/collision_rooted.asset.json",
+      "bytes": 119,
+      "sha256": "2326f0879f457ba288e31d5604b995d13a81abd31023946878f480b5a8666170"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/edit-check/master-report.json",
+      "bytes": 341,
+      "sha256": "125a6b8c236164c2ac54a34ad6fb6ee47b2a93c451a883ed602c684ee4c4d4cf"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/first/roundtrip-report.json",
+      "bytes": 7564,
+      "sha256": "c7391c8714d81ef93a71bdcc3c4bd26d4c9165b69681bfde8f144cc7515e43e9"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/fixture.json",
+      "bytes": 420,
+      "sha256": "4d78a649a1005c68661af11f067e9b59a8df5ee173d9601037d1ac0289d5bbed"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/native-contracts/native-contracts.json",
+      "bytes": 264,
+      "sha256": "ecf4d8f602fef5414c20a4ed22fa9698a20124faf2c9b7316d5afa33145c00d2"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/native-contracts/request.json",
+      "bytes": 882,
+      "sha256": "e96463bd23a80123e1db52dc5a49476901705e445a521401a22dc56b67e8f746"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/reopened/roundtrip-report.json",
+      "bytes": 7561,
+      "sha256": "12f1088d1490b0a67131bde7d1634d8a93787299570d4d1536332ce0edd14268"
+    },
+    {
+      "path": "artifacts/vg2/broadleaf/second/roundtrip-report.json",
+      "bytes": 7564,
+      "sha256": "c7391c8714d81ef93a71bdcc3c4bd26d4c9165b69681bfde8f144cc7515e43e9"
+    },
+    {
+      "path": "artifacts/vg2/candidate-report.json",
+      "bytes": 763,
+      "sha256": "12bd5954ec042f6c427ead6372ababbcb4cd9efdfb7e509a1733ab581ca57054"
+    },
+    {
+      "path": "artifacts/vg2/conifer/edit-check/edit-source/materials/directorate/surfaces/surface_atlas.asset.json",
+      "bytes": 358,
+      "sha256": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c"
+    },
+    {
+      "path": "artifacts/vg2/conifer/edit-check/edit-source/materials/directorate/surfaces/surface_normal.asset.json",
+      "bytes": 361,
+      "sha256": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae"
+    },
+    {
+      "path": "artifacts/vg2/conifer/edit-check/edit-source/materials/directorate/surfaces/surface_orm.asset.json",
+      "bytes": 351,
+      "sha256": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+    },
+    {
+      "path": "artifacts/vg2/conifer/edit-check/edit-source/world/materials/common/vegetation.asset.json",
+      "bytes": 107,
+      "sha256": "421644d9c5cf655998d989181dda7deb4c67bcb1272d25d4ad11136d86f8c50b"
+    },
+    {
+      "path": "artifacts/vg2/conifer/edit-check/edit-source/world/materials/common/vegetation.material.json",
+      "bytes": 339,
+      "sha256": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53"
+    },
+    {
+      "path": "artifacts/vg2/conifer/edit-check/edit-source/world/meshes/vegetation/conifer.asset.json",
+      "bytes": 308,
+      "sha256": "4d809cd55eb0783dc8c19245c98bb56cbf479d8aa68212a8a5d134a2368d2518"
+    },
+    {
+      "path": "artifacts/vg2/conifer/edit-check/edit-source/world/meshes/vegetation/conifer_lod1.asset.json",
+      "bytes": 184,
+      "sha256": "8cab2834fbabf35839acc683470ac179040ec62650b7c4a62e53c2d80a860087"
+    },
+    {
+      "path": "artifacts/vg2/conifer/edit-check/master-report.json",
+      "bytes": 339,
+      "sha256": "7316e9b5892bdcabf35743b05ed94bccd468ccc22779395d2c62905ef1c6a9cc"
+    },
+    {
+      "path": "artifacts/vg2/conifer/first/roundtrip-report.json",
+      "bytes": 5918,
+      "sha256": "abd3d3face8ed7f56d1bc5b22687a151bf07eecc55ed470bb28b4f75583fc01c"
+    },
+    {
+      "path": "artifacts/vg2/conifer/fixture.json",
+      "bytes": 414,
+      "sha256": "e8e07f886878cd579e1465528fcd9e7d3121f0c2a6acc4b75b5ca34b28353b56"
+    },
+    {
+      "path": "artifacts/vg2/conifer/native-contracts/native-contracts.json",
+      "bytes": 262,
+      "sha256": "586dc0175273d7831eaf4c264a80eeec346b55894ac69c583bd30fe9ce5c097a"
+    },
+    {
+      "path": "artifacts/vg2/conifer/native-contracts/request.json",
+      "bytes": 876,
+      "sha256": "6b4235713d437d9c93b0ba05dd094164a5734a2cf7166faf0c609dcc4de63100"
+    },
+    {
+      "path": "artifacts/vg2/conifer/reopened/roundtrip-report.json",
+      "bytes": 5915,
+      "sha256": "67bb87a8daa6d128de23f68ff2453abf10902fb73525d062bbf29a026807bf34"
+    },
+    {
+      "path": "artifacts/vg2/conifer/second/roundtrip-report.json",
+      "bytes": 5918,
+      "sha256": "abd3d3face8ed7f56d1bc5b22687a151bf07eecc55ed470bb28b4f75583fc01c"
+    },
+    {
+      "path": "artifacts/vg2/edited/compile.json",
+      "bytes": 2046,
+      "sha256": "c98679ef4817e2ec9b0f80f59063e7fff0a5ccb02b30eb16b4739b952465e6bd"
+    },
+    {
+      "path": "artifacts/vg2/edited/compile.log",
+      "bytes": 43583,
+      "sha256": "355b1e743b4a7734e7484db4aa8ad10e23df44e919e759dfd6d08181779f24a7"
+    },
+    {
+      "path": "artifacts/vg2/edited/source-less.json",
+      "bytes": 2046,
+      "sha256": "6627902aef9d1a18452c37aeaa887d04f9c52307de47f64d7d7a2bd6222bf7b3"
+    },
+    {
+      "path": "artifacts/vg2/edited/source-less.log",
+      "bytes": 2025,
+      "sha256": "6538a600aa7f9d9ffbeb85a56454cd36842d2832a0741d434ed6d50ea221bcee"
+    },
+    {
+      "path": "artifacts/vg2/first/compile.json",
+      "bytes": 2046,
+      "sha256": "5f7957b1f721d1072a1250354fa4aac5e2d71b0681484c4dc1c6924a2fc39dce"
+    },
+    {
+      "path": "artifacts/vg2/first/compile.log",
+      "bytes": 43500,
+      "sha256": "d56222351f83b03c389f02df5a0e021143725c56896d829528e3ab8c1642a211"
+    },
+    {
+      "path": "artifacts/vg2/first/source-less.json",
+      "bytes": 2046,
+      "sha256": "b9dc0b7c3a55415c04aa2ec799280c9369859ae611490a03e99dadb98caba286"
+    },
+    {
+      "path": "artifacts/vg2/first/source-less.log",
+      "bytes": 2024,
+      "sha256": "18d75f12a2fc3da4c943821e4dbde39f4c2bb0a502ed766187931b3f78feb682"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/edit-check/edit-source/materials/directorate/surfaces/surface_atlas.asset.json",
+      "bytes": 358,
+      "sha256": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/edit-check/edit-source/materials/directorate/surfaces/surface_normal.asset.json",
+      "bytes": 361,
+      "sha256": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/edit-check/edit-source/materials/directorate/surfaces/surface_orm.asset.json",
+      "bytes": 351,
+      "sha256": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/edit-check/edit-source/world/materials/common/vegetation.asset.json",
+      "bytes": 107,
+      "sha256": "421644d9c5cf655998d989181dda7deb4c67bcb1272d25d4ad11136d86f8c50b"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/edit-check/edit-source/world/materials/common/vegetation.material.json",
+      "bytes": 339,
+      "sha256": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/edit-check/edit-source/world/meshes/vegetation/grass_clump.asset.json",
+      "bytes": 320,
+      "sha256": "866fe85969972d05b8a7dc0ce395d7df5239d6448e284b4891b0cd2fcdc7c0de"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/edit-check/edit-source/world/meshes/vegetation/grass_clump_lod1.asset.json",
+      "bytes": 192,
+      "sha256": "299a879d140566d830dd3f008c4741e021ce56f3fd33878210ee6576e9efeae1"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/edit-check/master-report.json",
+      "bytes": 342,
+      "sha256": "61212887792cee8bf19ff0233b90d4f8eda320e802d96685917a37eba8011ad1"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/first/roundtrip-report.json",
+      "bytes": 5870,
+      "sha256": "df82271762c8b7938e40c73193463caac08cc0a72985dfe4a26ae21879ed3ddf"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/fixture.json",
+      "bytes": 425,
+      "sha256": "3c0cec954fc2a74ea896efe39dae3a271d883e1f033b865def1961d4f21cdfd7"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/native-contracts/native-contracts.json",
+      "bytes": 266,
+      "sha256": "b1dfb1b2a5bedf5528877de29f2713ad9fa61d04f2e8cc90989df2c2696ba27e"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/native-contracts/request.json",
+      "bytes": 888,
+      "sha256": "5c0d7d063cc98e2ef747674af7c001b9a474d802c538065f86e62bab9b8eb482"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/reopened/roundtrip-report.json",
+      "bytes": 5867,
+      "sha256": "252e2b651eeb56f27d2efd6ad82326aa33f8bd70fb43fa66b399fde5b0191fc2"
+    },
+    {
+      "path": "artifacts/vg2/grass_clump/second/roundtrip-report.json",
+      "bytes": 5870,
+      "sha256": "df82271762c8b7938e40c73193463caac08cc0a72985dfe4a26ae21879ed3ddf"
+    },
+    {
+      "path": "artifacts/vg2/inputs.json",
+      "bytes": 166,
+      "sha256": "78beb264060c8eef6b9bbea5e4b877dd7b8d08c217363a577d6b0dbdf29621aa"
+    },
+    {
+      "path": "artifacts/vg2/native-batch.json",
+      "bytes": 5097,
+      "sha256": "0de8e351a1cc555a4cb70424d8649badbc4447ab32c9981c3c3571c94c59d623"
+    },
+    {
+      "path": "artifacts/vg2/qualification.json",
+      "bytes": 361,
+      "sha256": "ca0a6208efd2a587ae5375dbdac54250a31850f9ee6a19dd918f381abb81eeb5"
+    },
+    {
+      "path": "artifacts/vg2/reopened/compile.json",
+      "bytes": 2046,
+      "sha256": "4cacb78e1bbf990576925c837d5c69197f320688078b249b6a7d07a4a8663d11"
+    },
+    {
+      "path": "artifacts/vg2/reopened/compile.log",
+      "bytes": 43731,
+      "sha256": "bb9a228a522838d43cfe991759e46877c62948b0b90623d7590b32f07274fb6a"
+    },
+    {
+      "path": "artifacts/vg2/reopened/source-less.json",
+      "bytes": 2046,
+      "sha256": "02b17a1b519403b1b6ca68c1f039eac0a4b28749645a341fab8f5ae090798fba"
+    },
+    {
+      "path": "artifacts/vg2/reopened/source-less.log",
+      "bytes": 2028,
+      "sha256": "8d7de24f52179d8cdc8b97a71d5a52023aaf992906c4ed2024ba7b856518d285"
+    },
+    {
+      "path": "artifacts/vg2/report.json",
+      "bytes": 781,
+      "sha256": "881cca2dfb32aa47bda4d060640220a4b421bcb12e88c6acaf7b6d4cc910552c"
+    },
+    {
+      "path": "artifacts/vg2/runs/494fe53baf344a83975f86682de5d9d5/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "artifacts/vg2/runs/494fe53baf344a83975f86682de5d9d5/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg2/runs/494fe53baf344a83975f86682de5d9d5/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/vg2/runs/494fe53baf344a83975f86682de5d9d5/report.json",
+      "bytes": 781,
+      "sha256": "881cca2dfb32aa47bda4d060640220a4b421bcb12e88c6acaf7b6d4cc910552c"
+    },
+    {
+      "path": "artifacts/vg2/runs/494fe53baf344a83975f86682de5d9d5/request.json",
+      "bytes": 529,
+      "sha256": "41fdd63faf226439225c37ff8796448b9f6852c92adf90c8c085abc9f4b61e3a"
+    },
+    {
+      "path": "artifacts/vg2/runs/494fe53baf344a83975f86682de5d9d5/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg2/runs/494fe53baf344a83975f86682de5d9d5/script.stdout.log",
+      "bytes": 8926,
+      "sha256": "183258e489902344f9cfd936f952ebaf9bc3c701f3640679a1e6cc74186e2691"
+    },
+    {
+      "path": "artifacts/vg2/runs/494fe53baf344a83975f86682de5d9d5/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg2/runs/494fe53baf344a83975f86682de5d9d5/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "artifacts/vg2/runs/81c84d7d7de54b1cb789903f998f1a43/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "artifacts/vg2/runs/81c84d7d7de54b1cb789903f998f1a43/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg2/runs/81c84d7d7de54b1cb789903f998f1a43/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/vg2/runs/81c84d7d7de54b1cb789903f998f1a43/report.json",
+      "bytes": 1232,
+      "sha256": "ea8b418fa2c92ec052dc8b40a56a910e71c49a513eb2c7350679fda154c82be6"
+    },
+    {
+      "path": "artifacts/vg2/runs/81c84d7d7de54b1cb789903f998f1a43/request.json",
+      "bytes": 512,
+      "sha256": "f796fafb82661f9de01569bea0d960188af97a2556930a4984654e902ab9ccb0"
+    },
+    {
+      "path": "artifacts/vg2/runs/81c84d7d7de54b1cb789903f998f1a43/script.stderr.log",
+      "bytes": 1542,
+      "sha256": "e690175b48fda7d9fc92690128ffe6f3d6aa3f0d76bf4edbaa8c39b6490e45c3"
+    },
+    {
+      "path": "artifacts/vg2/runs/81c84d7d7de54b1cb789903f998f1a43/script.stdout.log",
+      "bytes": 3702,
+      "sha256": "1ad10a64958c71d1ffab91a14076e2deab29f352394edf1f662d2bea6ad38fc5"
+    },
+    {
+      "path": "artifacts/vg2/runs/81c84d7d7de54b1cb789903f998f1a43/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg2/runs/81c84d7d7de54b1cb789903f998f1a43/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "artifacts/vg2/scrub/edit-check/edit-source/materials/directorate/surfaces/surface_atlas.asset.json",
+      "bytes": 358,
+      "sha256": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c"
+    },
+    {
+      "path": "artifacts/vg2/scrub/edit-check/edit-source/materials/directorate/surfaces/surface_normal.asset.json",
+      "bytes": 361,
+      "sha256": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae"
+    },
+    {
+      "path": "artifacts/vg2/scrub/edit-check/edit-source/materials/directorate/surfaces/surface_orm.asset.json",
+      "bytes": 351,
+      "sha256": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+    },
+    {
+      "path": "artifacts/vg2/scrub/edit-check/edit-source/world/materials/common/vegetation.asset.json",
+      "bytes": 107,
+      "sha256": "421644d9c5cf655998d989181dda7deb4c67bcb1272d25d4ad11136d86f8c50b"
+    },
+    {
+      "path": "artifacts/vg2/scrub/edit-check/edit-source/world/materials/common/vegetation.material.json",
+      "bytes": 339,
+      "sha256": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53"
+    },
+    {
+      "path": "artifacts/vg2/scrub/edit-check/edit-source/world/meshes/vegetation/scrub.asset.json",
+      "bytes": 302,
+      "sha256": "c4d738b5d520f3afc53bc33e4db9c0d158bec7b13414f3e93fb1cbaa17798dfd"
+    },
+    {
+      "path": "artifacts/vg2/scrub/edit-check/edit-source/world/meshes/vegetation/scrub_lod1.asset.json",
+      "bytes": 180,
+      "sha256": "c75f68ed6b46a056d7bf7068e601e4269b27b083bafae9bec44e754cce46c32a"
+    },
+    {
+      "path": "artifacts/vg2/scrub/edit-check/master-report.json",
+      "bytes": 337,
+      "sha256": "e293eecb6707d65d758b3acbbd780a0f5684e0a31b27df463906bfe866e97984"
+    },
+    {
+      "path": "artifacts/vg2/scrub/first/roundtrip-report.json",
+      "bytes": 5865,
+      "sha256": "9c183fbb14ff617bac8f05937a24d6599830aa93c266ef4c8695cf7a83b5770b"
+    },
+    {
+      "path": "artifacts/vg2/scrub/fixture.json",
+      "bytes": 409,
+      "sha256": "f2359b9bff0f4644d8e1257c193f123a0e722554987134d4822b1b51592be224"
+    },
+    {
+      "path": "artifacts/vg2/scrub/native-contracts/native-contracts.json",
+      "bytes": 260,
+      "sha256": "6da5efe6143e45ea5d10b23f394e6b6de1f591ac1723e7402bb21720556722ad"
+    },
+    {
+      "path": "artifacts/vg2/scrub/native-contracts/request.json",
+      "bytes": 870,
+      "sha256": "6d2ff9e2acfb31e0d9e847fc6eb4e1973572ce28290378c8ab2dd7199ad3ff06"
+    },
+    {
+      "path": "artifacts/vg2/scrub/reopened/roundtrip-report.json",
+      "bytes": 5862,
+      "sha256": "0e8983cd162136010a3d4b6e1f9c30aaff27cec34b832ea5c5d833f20dd8b2df"
+    },
+    {
+      "path": "artifacts/vg2/scrub/second/roundtrip-report.json",
+      "bytes": 5865,
+      "sha256": "9c183fbb14ff617bac8f05937a24d6599830aa93c266ef4c8695cf7a83b5770b"
+    },
+    {
+      "path": "artifacts/vg2/second/compile.json",
+      "bytes": 2046,
+      "sha256": "147632783cdb8c6a1caa25bb7318b36ab857179b5da75ad44d7a5f2ee805b302"
+    },
+    {
+      "path": "artifacts/vg2/second/compile.log",
+      "bytes": 43553,
+      "sha256": "b4b49faea817cd8272b7dbbc05cef90ac5b86a6ea3001cd92b47ba7359ba79ad"
+    },
+    {
+      "path": "artifacts/vg2/second/source-less.json",
+      "bytes": 2046,
+      "sha256": "d2f3dfba59e27174219f83f23df8c0ab8d9d1e044e3d4afa4aa2218701e213fe"
+    },
+    {
+      "path": "artifacts/vg2/second/source-less.log",
+      "bytes": 2025,
+      "sha256": "8ea0613fd34d6a570c9f022a389727861eeed9bc4f1f59e1bbb8aca8e0e0ced9"
+    },
+    {
+      "path": "artifacts/vg2/typed-comparison.log",
+      "bytes": 587,
+      "sha256": "fe206dc78fd44495956b648c9eecfb1853f9977a1cacbafe0f210dc23a525d16"
+    },
+    {
+      "path": "artifacts/vg3/baseline/compile.json",
+      "bytes": 2046,
+      "sha256": "8fd145ef9a124b0a132108145802b1a433f92f6cb062a8a6758985fdca4dab09"
+    },
+    {
+      "path": "artifacts/vg3/baseline/compile.log",
+      "bytes": 23483,
+      "sha256": "8ad52e357df0e6a0dff576897e3feb8dff56c91a6381c44b0a0c797bc422ee22"
+    },
+    {
+      "path": "artifacts/vg3/baseline/source-less.json",
+      "bytes": 2046,
+      "sha256": "b92def466da892eea4f48b1d7856265fe884c8c37d4c561581acd4dfdb015c35"
+    },
+    {
+      "path": "artifacts/vg3/baseline/source-less.log",
+      "bytes": 2251,
+      "sha256": "03e2043df1e2bcd9176b637ad5a754aa124966f11194349ebb293c8fe7abd4f3"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/edit-check/edit-source/materials/directorate/surfaces/surface_atlas.asset.json",
+      "bytes": 358,
+      "sha256": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/edit-check/edit-source/materials/directorate/surfaces/surface_normal.asset.json",
+      "bytes": 361,
+      "sha256": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/edit-check/edit-source/materials/directorate/surfaces/surface_orm.asset.json",
+      "bytes": 351,
+      "sha256": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/edit-check/edit-source/world/materials/common/vegetation.asset.json",
+      "bytes": 107,
+      "sha256": "421644d9c5cf655998d989181dda7deb4c67bcb1272d25d4ad11136d86f8c50b"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/edit-check/edit-source/world/materials/common/vegetation.material.json",
+      "bytes": 339,
+      "sha256": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/edit-check/edit-source/world/meshes/kit/broadleaf.asset.json",
+      "bytes": 404,
+      "sha256": "6bc4a197a7d918471189a4b22b4c77497a5a35764f06483f30a086bb0c23c622"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/edit-check/edit-source/world/meshes/kit/broadleaf_lod1.asset.json",
+      "bytes": 188,
+      "sha256": "ed3e83ca5de84d5efcc7f434c229b3a865563e6ad8519d080729c0eacb74df7c"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/edit-check/edit-source/world/meshes/kit/collision_rooted.asset.json",
+      "bytes": 119,
+      "sha256": "2326f0879f457ba288e31d5604b995d13a81abd31023946878f480b5a8666170"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/edit-check/master-report.json",
+      "bytes": 341,
+      "sha256": "125a6b8c236164c2ac54a34ad6fb6ee47b2a93c451a883ed602c684ee4c4d4cf"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/first/roundtrip-report.json",
+      "bytes": 7564,
+      "sha256": "c7391c8714d81ef93a71bdcc3c4bd26d4c9165b69681bfde8f144cc7515e43e9"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/fixture.json",
+      "bytes": 420,
+      "sha256": "4d78a649a1005c68661af11f067e9b59a8df5ee173d9601037d1ac0289d5bbed"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/native-contracts/native-contracts.json",
+      "bytes": 264,
+      "sha256": "ecf4d8f602fef5414c20a4ed22fa9698a20124faf2c9b7316d5afa33145c00d2"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/native-contracts/request.json",
+      "bytes": 882,
+      "sha256": "c801c23823a948564b6e2a40f33fa977da9d87f298301488d2d4e1efcb8f8bff"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/reopened/roundtrip-report.json",
+      "bytes": 7561,
+      "sha256": "12f1088d1490b0a67131bde7d1634d8a93787299570d4d1536332ce0edd14268"
+    },
+    {
+      "path": "artifacts/vg3/broadleaf/second/roundtrip-report.json",
+      "bytes": 7564,
+      "sha256": "c7391c8714d81ef93a71bdcc3c4bd26d4c9165b69681bfde8f144cc7515e43e9"
+    },
+    {
+      "path": "artifacts/vg3/candidate-report.json",
+      "bytes": 1440,
+      "sha256": "5c2488b29e7043a6001322b0e00c6e90a8bd3d08b26b6b45c59c80675d7f4ee7"
+    },
+    {
+      "path": "artifacts/vg3/conifer/edit-check/edit-source/materials/directorate/surfaces/surface_atlas.asset.json",
+      "bytes": 358,
+      "sha256": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c"
+    },
+    {
+      "path": "artifacts/vg3/conifer/edit-check/edit-source/materials/directorate/surfaces/surface_normal.asset.json",
+      "bytes": 361,
+      "sha256": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae"
+    },
+    {
+      "path": "artifacts/vg3/conifer/edit-check/edit-source/materials/directorate/surfaces/surface_orm.asset.json",
+      "bytes": 351,
+      "sha256": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+    },
+    {
+      "path": "artifacts/vg3/conifer/edit-check/edit-source/world/materials/common/vegetation.asset.json",
+      "bytes": 107,
+      "sha256": "421644d9c5cf655998d989181dda7deb4c67bcb1272d25d4ad11136d86f8c50b"
+    },
+    {
+      "path": "artifacts/vg3/conifer/edit-check/edit-source/world/materials/common/vegetation.material.json",
+      "bytes": 339,
+      "sha256": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53"
+    },
+    {
+      "path": "artifacts/vg3/conifer/edit-check/edit-source/world/meshes/vegetation/conifer.asset.json",
+      "bytes": 308,
+      "sha256": "4d809cd55eb0783dc8c19245c98bb56cbf479d8aa68212a8a5d134a2368d2518"
+    },
+    {
+      "path": "artifacts/vg3/conifer/edit-check/edit-source/world/meshes/vegetation/conifer_lod1.asset.json",
+      "bytes": 184,
+      "sha256": "8cab2834fbabf35839acc683470ac179040ec62650b7c4a62e53c2d80a860087"
+    },
+    {
+      "path": "artifacts/vg3/conifer/edit-check/master-report.json",
+      "bytes": 339,
+      "sha256": "7316e9b5892bdcabf35743b05ed94bccd468ccc22779395d2c62905ef1c6a9cc"
+    },
+    {
+      "path": "artifacts/vg3/conifer/first/roundtrip-report.json",
+      "bytes": 5918,
+      "sha256": "abd3d3face8ed7f56d1bc5b22687a151bf07eecc55ed470bb28b4f75583fc01c"
+    },
+    {
+      "path": "artifacts/vg3/conifer/fixture.json",
+      "bytes": 414,
+      "sha256": "e8e07f886878cd579e1465528fcd9e7d3121f0c2a6acc4b75b5ca34b28353b56"
+    },
+    {
+      "path": "artifacts/vg3/conifer/native-contracts/native-contracts.json",
+      "bytes": 262,
+      "sha256": "586dc0175273d7831eaf4c264a80eeec346b55894ac69c583bd30fe9ce5c097a"
+    },
+    {
+      "path": "artifacts/vg3/conifer/native-contracts/request.json",
+      "bytes": 876,
+      "sha256": "b74e0cfe6997257c514cbc564e21bbb58d06f190c03d32cbd2bf51f5fb500b5d"
+    },
+    {
+      "path": "artifacts/vg3/conifer/reopened/roundtrip-report.json",
+      "bytes": 5915,
+      "sha256": "67bb87a8daa6d128de23f68ff2453abf10902fb73525d062bbf29a026807bf34"
+    },
+    {
+      "path": "artifacts/vg3/conifer/second/roundtrip-report.json",
+      "bytes": 5918,
+      "sha256": "abd3d3face8ed7f56d1bc5b22687a151bf07eecc55ed470bb28b4f75583fc01c"
+    },
+    {
+      "path": "artifacts/vg3/edited/compile.json",
+      "bytes": 2046,
+      "sha256": "b454e8549c5ada30bdc24dd10fab516e92072b28520b0488f859b365353a4076"
+    },
+    {
+      "path": "artifacts/vg3/edited/compile.log",
+      "bytes": 43580,
+      "sha256": "586fd891a1fd4f4f05b1563ed65df0d0fbc227cce8ee8ecd7dc8074f8ae26d4c"
+    },
+    {
+      "path": "artifacts/vg3/edited/source-less.json",
+      "bytes": 2046,
+      "sha256": "bfa2e9ccb66108b464f14f372fc2f098fc149b09e4e7d1b9e1bc661ad46fdcd4"
+    },
+    {
+      "path": "artifacts/vg3/edited/source-less.log",
+      "bytes": 2028,
+      "sha256": "51715d997af51c72b726ff1e77b0a63815db44a7a2d1f1590fbfdad3e257865b"
+    },
+    {
+      "path": "artifacts/vg3/editorial-masters.json",
+      "bytes": 6329,
+      "sha256": "d38a3046a2ad4b44156ec56924985da07e23316c37a0035ec3945e89609be4f0"
+    },
+    {
+      "path": "artifacts/vg3/first/compile.json",
+      "bytes": 2046,
+      "sha256": "53c531595a73251d452e95bd5e24fa71c3cfd6b0483faf578bd087bed4c7880d"
+    },
+    {
+      "path": "artifacts/vg3/first/compile.log",
+      "bytes": 43925,
+      "sha256": "f8d3c1fe53578e960e11445362b60ca6ddb17268ca018d60630e492d9ea77de2"
+    },
+    {
+      "path": "artifacts/vg3/first/source-less.json",
+      "bytes": 2046,
+      "sha256": "4f3a9e214550a92995bc4251e2c272a85d57c05f432a437ff98e29f0554f2a58"
+    },
+    {
+      "path": "artifacts/vg3/first/source-less.log",
+      "bytes": 2027,
+      "sha256": "436ac8ca1f97289405ea2b61d56bf6e3a5abd2297df75bb3b59d7b0888d61333"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/edit-check/edit-source/materials/directorate/surfaces/surface_atlas.asset.json",
+      "bytes": 358,
+      "sha256": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/edit-check/edit-source/materials/directorate/surfaces/surface_normal.asset.json",
+      "bytes": 361,
+      "sha256": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/edit-check/edit-source/materials/directorate/surfaces/surface_orm.asset.json",
+      "bytes": 351,
+      "sha256": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/edit-check/edit-source/world/materials/common/vegetation.asset.json",
+      "bytes": 107,
+      "sha256": "421644d9c5cf655998d989181dda7deb4c67bcb1272d25d4ad11136d86f8c50b"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/edit-check/edit-source/world/materials/common/vegetation.material.json",
+      "bytes": 339,
+      "sha256": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/edit-check/edit-source/world/meshes/vegetation/grass_clump.asset.json",
+      "bytes": 320,
+      "sha256": "866fe85969972d05b8a7dc0ce395d7df5239d6448e284b4891b0cd2fcdc7c0de"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/edit-check/edit-source/world/meshes/vegetation/grass_clump_lod1.asset.json",
+      "bytes": 192,
+      "sha256": "299a879d140566d830dd3f008c4741e021ce56f3fd33878210ee6576e9efeae1"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/edit-check/master-report.json",
+      "bytes": 343,
+      "sha256": "2cf1837db681ce512acc61dad9d2743a9ade94a9f8530671cf18bf6045ff1afb"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/first/roundtrip-report.json",
+      "bytes": 5898,
+      "sha256": "e764f70d530055591a49b978b583f6e693a0d1332b25d172a0497c26d745b655"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/fixture.json",
+      "bytes": 425,
+      "sha256": "3c0cec954fc2a74ea896efe39dae3a271d883e1f033b865def1961d4f21cdfd7"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/native-contracts/native-contracts.json",
+      "bytes": 266,
+      "sha256": "b1dfb1b2a5bedf5528877de29f2713ad9fa61d04f2e8cc90989df2c2696ba27e"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/native-contracts/request.json",
+      "bytes": 888,
+      "sha256": "39f1100a225ddd4d470688f91a8c017e6fa4619dd4e65e28b38bf23455c1bacc"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/reopened/roundtrip-report.json",
+      "bytes": 5895,
+      "sha256": "239f09ef3b9b9d9875af163d53ebc80dc13ef22b88fca9661407468afbddcfb9"
+    },
+    {
+      "path": "artifacts/vg3/grass_clump/second/roundtrip-report.json",
+      "bytes": 5898,
+      "sha256": "e764f70d530055591a49b978b583f6e693a0d1332b25d172a0497c26d745b655"
+    },
+    {
+      "path": "artifacts/vg3/inputs.json",
+      "bytes": 166,
+      "sha256": "78beb264060c8eef6b9bbea5e4b877dd7b8d08c217363a577d6b0dbdf29621aa"
+    },
+    {
+      "path": "artifacts/vg3/native-batch.json",
+      "bytes": 5185,
+      "sha256": "dd8c0f64e1959eb642bbfc9754ff6822299d4253e8a61d0d2caa27944144b2a7"
+    },
+    {
+      "path": "artifacts/vg3/qualification.json",
+      "bytes": 361,
+      "sha256": "ca0a6208efd2a587ae5375dbdac54250a31850f9ee6a19dd918f381abb81eeb5"
+    },
+    {
+      "path": "artifacts/vg3/reopened/compile.json",
+      "bytes": 2046,
+      "sha256": "c8f20040929e7724161ec34564b547f7dd138bd5f8675cf3799311dfa16bf4ad"
+    },
+    {
+      "path": "artifacts/vg3/reopened/compile.log",
+      "bytes": 43950,
+      "sha256": "86fe49e40daa117e06b05c30de9e788692c3151491880cbe31bed9984cfd1d15"
+    },
+    {
+      "path": "artifacts/vg3/reopened/source-less.json",
+      "bytes": 2046,
+      "sha256": "4371d035deaa19ccef9f9b943b98a2285510176ee4c8db947b4a09bc6e796eef"
+    },
+    {
+      "path": "artifacts/vg3/reopened/source-less.log",
+      "bytes": 2251,
+      "sha256": "0edaae7c911fc0cd79deb2386b8b7fbb05e92637c09710dd3ef81db099520319"
+    },
+    {
+      "path": "artifacts/vg3/report.json",
+      "bytes": 781,
+      "sha256": "c6a739302dd827aba8ca22ca3aaa08b77fcf18931a5bbaf542c3596c078d89b4"
+    },
+    {
+      "path": "artifacts/vg3/runs/bcd27b83c74146a5b4df57ab853e80f9/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "artifacts/vg3/runs/bcd27b83c74146a5b4df57ab853e80f9/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg3/runs/bcd27b83c74146a5b4df57ab853e80f9/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/vg3/runs/bcd27b83c74146a5b4df57ab853e80f9/report.json",
+      "bytes": 1232,
+      "sha256": "62e2bf4e2db3f4939f4909c4402ffac471668f822a9fd99ea87470cb326a6f69"
+    },
+    {
+      "path": "artifacts/vg3/runs/bcd27b83c74146a5b4df57ab853e80f9/request.json",
+      "bytes": 512,
+      "sha256": "8f7b43472780010aab406daec5e28cd1f00b67e714e8ee802f0b16257af4dfa1"
+    },
+    {
+      "path": "artifacts/vg3/runs/bcd27b83c74146a5b4df57ab853e80f9/script.stderr.log",
+      "bytes": 431,
+      "sha256": "6dee26a6b0bf9543b2e0e2d72ac454bbae366a40f6ba5cdc22ba113216851264"
+    },
+    {
+      "path": "artifacts/vg3/runs/bcd27b83c74146a5b4df57ab853e80f9/script.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/vg3/runs/bcd27b83c74146a5b4df57ab853e80f9/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg3/runs/bcd27b83c74146a5b4df57ab853e80f9/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "artifacts/vg3/runs/cc900b0fe54740b79b8e5d22f00d63a9/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "artifacts/vg3/runs/cc900b0fe54740b79b8e5d22f00d63a9/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg3/runs/cc900b0fe54740b79b8e5d22f00d63a9/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/vg3/runs/cc900b0fe54740b79b8e5d22f00d63a9/report.json",
+      "bytes": 781,
+      "sha256": "c6a739302dd827aba8ca22ca3aaa08b77fcf18931a5bbaf542c3596c078d89b4"
+    },
+    {
+      "path": "artifacts/vg3/runs/cc900b0fe54740b79b8e5d22f00d63a9/request.json",
+      "bytes": 512,
+      "sha256": "f860927ae2098cbd3b1cbf48677014c0d702f20e80c244234244aa30e0dc00e6"
+    },
+    {
+      "path": "artifacts/vg3/runs/cc900b0fe54740b79b8e5d22f00d63a9/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg3/runs/cc900b0fe54740b79b8e5d22f00d63a9/script.stdout.log",
+      "bytes": 10368,
+      "sha256": "55622d6da0c327eee005b95c22db36c0436a09b705961c92cd1abfa85357dd25"
+    },
+    {
+      "path": "artifacts/vg3/runs/cc900b0fe54740b79b8e5d22f00d63a9/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vg3/runs/cc900b0fe54740b79b8e5d22f00d63a9/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "artifacts/vg3/scrub/edit-check/edit-source/materials/directorate/surfaces/surface_atlas.asset.json",
+      "bytes": 358,
+      "sha256": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c"
+    },
+    {
+      "path": "artifacts/vg3/scrub/edit-check/edit-source/materials/directorate/surfaces/surface_normal.asset.json",
+      "bytes": 361,
+      "sha256": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae"
+    },
+    {
+      "path": "artifacts/vg3/scrub/edit-check/edit-source/materials/directorate/surfaces/surface_orm.asset.json",
+      "bytes": 351,
+      "sha256": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+    },
+    {
+      "path": "artifacts/vg3/scrub/edit-check/edit-source/world/materials/common/vegetation.asset.json",
+      "bytes": 107,
+      "sha256": "421644d9c5cf655998d989181dda7deb4c67bcb1272d25d4ad11136d86f8c50b"
+    },
+    {
+      "path": "artifacts/vg3/scrub/edit-check/edit-source/world/materials/common/vegetation.material.json",
+      "bytes": 339,
+      "sha256": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53"
+    },
+    {
+      "path": "artifacts/vg3/scrub/edit-check/edit-source/world/meshes/vegetation/scrub.asset.json",
+      "bytes": 302,
+      "sha256": "c4d738b5d520f3afc53bc33e4db9c0d158bec7b13414f3e93fb1cbaa17798dfd"
+    },
+    {
+      "path": "artifacts/vg3/scrub/edit-check/edit-source/world/meshes/vegetation/scrub_lod1.asset.json",
+      "bytes": 180,
+      "sha256": "c75f68ed6b46a056d7bf7068e601e4269b27b083bafae9bec44e754cce46c32a"
+    },
+    {
+      "path": "artifacts/vg3/scrub/edit-check/master-report.json",
+      "bytes": 337,
+      "sha256": "1bc3ec152a6fde491bcf013f97ad14c7cad5a003f306d4831adc53529d2896ae"
+    },
+    {
+      "path": "artifacts/vg3/scrub/first/roundtrip-report.json",
+      "bytes": 5893,
+      "sha256": "d21b092f89ee6b798be67e56d827917c863724397f1ef936366d7de03219cff0"
+    },
+    {
+      "path": "artifacts/vg3/scrub/fixture.json",
+      "bytes": 409,
+      "sha256": "f2359b9bff0f4644d8e1257c193f123a0e722554987134d4822b1b51592be224"
+    },
+    {
+      "path": "artifacts/vg3/scrub/native-contracts/native-contracts.json",
+      "bytes": 260,
+      "sha256": "6da5efe6143e45ea5d10b23f394e6b6de1f591ac1723e7402bb21720556722ad"
+    },
+    {
+      "path": "artifacts/vg3/scrub/native-contracts/request.json",
+      "bytes": 870,
+      "sha256": "954178c9a7f1635e2a73c690a12ac6ec66683fafb3c545d28785d815e94e59e1"
+    },
+    {
+      "path": "artifacts/vg3/scrub/reopened/roundtrip-report.json",
+      "bytes": 5890,
+      "sha256": "f92e2b6ebb189f7d63196948fb52796086010463c49a4848381ed3a664e68e0b"
+    },
+    {
+      "path": "artifacts/vg3/scrub/second/roundtrip-report.json",
+      "bytes": 5893,
+      "sha256": "d21b092f89ee6b798be67e56d827917c863724397f1ef936366d7de03219cff0"
+    },
+    {
+      "path": "artifacts/vg3/second/compile.json",
+      "bytes": 2046,
+      "sha256": "7b67b2a010552a877dd72f99763e1bc9f87492eedfbad84975763f8edc5e03a5"
+    },
+    {
+      "path": "artifacts/vg3/second/compile.log",
+      "bytes": 44025,
+      "sha256": "f03d26be62cb682180169ec9b94c363e9118d3904e50217ca3d9d114bbabfec3"
+    },
+    {
+      "path": "artifacts/vg3/second/source-less.json",
+      "bytes": 2046,
+      "sha256": "0980b6e04b433ab2ac01776f35ddad7e8ebcc201eea21996d058d629a0190c02"
+    },
+    {
+      "path": "artifacts/vg3/second/source-less.log",
+      "bytes": 2248,
+      "sha256": "b094207331fd38e21ca67761ca6bbe97e52b6ae86c9194e8bc8441bd506bec90"
+    },
+    {
+      "path": "artifacts/vg3/typed-comparison-31c9a739f28046eba1bafe59f563edc3.log",
+      "bytes": 1685,
+      "sha256": "9de94d9c1f7a5f431c205fc01c9813a335680f87ed532262a12cb929d0556edf"
+    },
+    {
+      "path": "artifacts/vg3/typed-comparison.log",
+      "bytes": 587,
+      "sha256": "922b30f4f17b3a0c0aed721f3b327de49f2cc0ae509c0b9dc7dd05e4648bde79"
+    },
+    {
+      "path": "artifacts/vr/broadleaf/roundtrip-report.json",
+      "bytes": 7561,
+      "sha256": "12f1088d1490b0a67131bde7d1634d8a93787299570d4d1536332ce0edd14268"
+    },
+    {
+      "path": "artifacts/vr/candidate-report.json",
+      "bytes": 1440,
+      "sha256": "5c2488b29e7043a6001322b0e00c6e90a8bd3d08b26b6b45c59c80675d7f4ee7"
+    },
+    {
+      "path": "artifacts/vr/conifer/roundtrip-report.json",
+      "bytes": 5915,
+      "sha256": "67bb87a8daa6d128de23f68ff2453abf10902fb73525d062bbf29a026807bf34"
+    },
+    {
+      "path": "artifacts/vr/grass_clump/roundtrip-report.json",
+      "bytes": 5895,
+      "sha256": "239f09ef3b9b9d9875af163d53ebc80dc13ef22b88fca9661407468afbddcfb9"
+    },
+    {
+      "path": "artifacts/vr/report.json",
+      "bytes": 780,
+      "sha256": "f3edb7fe43564803163ed840b85860f8e1f1a304cc36d4d9fa2a86f522c8d78d"
+    },
+    {
+      "path": "artifacts/vr/retained-native.json",
+      "bytes": 1077,
+      "sha256": "4d3716e2b8a403791661d9ed969141308f294f05a5bfab5d3cd83e8082a22d9c"
+    },
+    {
+      "path": "artifacts/vr/runs/1c9e713c0244499396dd0e11f7338e24/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "artifacts/vr/runs/1c9e713c0244499396dd0e11f7338e24/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vr/runs/1c9e713c0244499396dd0e11f7338e24/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "artifacts/vr/runs/1c9e713c0244499396dd0e11f7338e24/report.json",
+      "bytes": 780,
+      "sha256": "f3edb7fe43564803163ed840b85860f8e1f1a304cc36d4d9fa2a86f522c8d78d"
+    },
+    {
+      "path": "artifacts/vr/runs/1c9e713c0244499396dd0e11f7338e24/request.json",
+      "bytes": 490,
+      "sha256": "44734b6410a09669e4a830cdfa88b3c3caaf20f4e45e5d375bb0e64e9873176b"
+    },
+    {
+      "path": "artifacts/vr/runs/1c9e713c0244499396dd0e11f7338e24/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vr/runs/1c9e713c0244499396dd0e11f7338e24/script.stdout.log",
+      "bytes": 888,
+      "sha256": "c23362a79ca5d8837ac97761dd73455591af8a198d3d005d08fe1e795b867916"
+    },
+    {
+      "path": "artifacts/vr/runs/1c9e713c0244499396dd0e11f7338e24/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/vr/runs/1c9e713c0244499396dd0e11f7338e24/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "artifacts/vr/scrub/roundtrip-report.json",
+      "bytes": 5890,
+      "sha256": "f92e2b6ebb189f7d63196948fb52796086010463c49a4848381ed3a664e68e0b"
+    },
+    {
+      "path": "assets/runtime/manifest.json",
+      "bytes": 1347064,
+      "sha256": "d50b0ef2758545a3620db07eb17e639aafab2ded18a7152b3d95e54da6db8faa"
+    },
+    {
+      "path": "assets/staged/vegetation/lineage.json",
+      "bytes": 5579,
+      "sha256": "0d9b0592445b564d2fe7e51a247f387f1035d21996e44dd38a6bb3d1210ffe29"
+    }
+  ]
+}

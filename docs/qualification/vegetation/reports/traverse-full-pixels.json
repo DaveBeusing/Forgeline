@@ -1,0 +1,35 @@
+{
+  "imageFailures": [],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "captures": [
+    {
+      "cpuMeanDeltaMs": -18.844642187500014,
+      "pixelComparison": {
+        "MaximumChannelDelta": 71,
+        "MeanAbsoluteChannelDelta": 0.24050652398003472,
+        "ChangedPixels": 125563,
+        "ChangedPixelFraction": 0.034061143663194446,
+        "WithinTolerance": false
+      },
+      "visualReview": "pending",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "comparison": "pixels-require-human-review",
+      "sameSource": true,
+      "cpuMeanMs": 25.599617968749996,
+      "gpuMeanMs": 9.927397463414632,
+      "structural": "pass",
+      "sameRuntime": false,
+      "equivalentHardware": true,
+      "regionChanges": null
+    }
+  ],
+  "schemaVersion": 1,
+  "visualAcceptance": "pending",
+  "channelTolerance": 0,
+  "structural": "pass",
+  "maximumChangedPixelFraction": 0.0,
+  "baselineCommit": "0b4f6fb0b9340730ce65e022122af33f65bd3261",
+  "pixelComparisonRequested": true,
+  "imageGateRequested": false,
+  "commit": "0b4f6fb0b9340730ce65e022122af33f65bd3261"
+}

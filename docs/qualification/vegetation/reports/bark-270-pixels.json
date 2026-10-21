@@ -1,0 +1,35 @@
+{
+  "imageFailures": [],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "captures": [
+    {
+      "cpuMeanDeltaMs": -19.622971874999994,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "visualReview": "pending",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical-Yaw270-Inspection40",
+      "comparison": "exact-file-match",
+      "sameSource": true,
+      "cpuMeanMs": 13.298057812500002,
+      "gpuMeanMs": 6.202673269841268,
+      "structural": "pass",
+      "sameRuntime": false,
+      "equivalentHardware": true,
+      "regionChanges": null
+    }
+  ],
+  "schemaVersion": 1,
+  "visualAcceptance": "pending",
+  "channelTolerance": 0,
+  "structural": "pass",
+  "maximumChangedPixelFraction": 0.0,
+  "baselineCommit": "0b4f6fb0b9340730ce65e022122af33f65bd3261",
+  "pixelComparisonRequested": true,
+  "imageGateRequested": false,
+  "commit": "0b4f6fb0b9340730ce65e022122af33f65bd3261"
+}

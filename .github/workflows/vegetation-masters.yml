@@ -1,0 +1,57 @@
+name: Vegetation Blender master qualification
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/vegetation-masters.yml'
+      - 'build/vegetation/**'
+      - 'assets/staged/vegetation/**'
+      - 'tests/ForgeLine.Presentation.Tests/VegetationBlender*.cs'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/vegetation-masters.yml'
+      - 'build/vegetation/**'
+      - 'assets/staged/vegetation/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retained-vegetation:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify master hashes and all vegetation LOD/state exports
+        shell: pwsh
+        run: python -m unittest discover -s build/vegetation -p 'test_*.py' -v
+
+  native-vegetation:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Save, reopen, export and qualify vegetation rooted High/Reduced geometry
+        shell: pwsh
+        run: ./build/vegetation/Qualify-Masters.ps1 -OutputRoot artifacts/vg-ci
+      - name: Reopen checked-in masters and verify their eight exports
+        shell: pwsh
+        run: ./tools/blender/Invoke-Blender.ps1 -Action Script -Script build/vegetation/reopen_retained.py -InputRoot assets/source -OutputRoot artifacts/vr-ci -TimeoutSeconds 900
+      - name: Retain native authoring evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vegetation-master-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/vg-ci
+            artifacts/vr-ci
+          retention-days: 14
