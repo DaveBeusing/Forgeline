@@ -19,6 +19,13 @@ for family in FAMILIES:
     master=source/'world/authoring/terrain'/(family+'.blend');before=digest(master)
     bpy.ops.wm.open_mainfile(filepath=str(master),load_ui=False)
     record,obj,mat=validate(source,family);n=mat.node_tree.nodes
+    n['Tint'].outputs[0].default_value=(.8,1.2,1,1)
+    n['RoughnessBias'].outputs[0].default_value=-.05
+    n['DetailAmplitude'].outputs[0].default_value=.04
+    validate(source,family)
+    n['Tint'].outputs[0].default_value=(1,1,1,1)
+    n['RoughnessBias'].outputs[0].default_value=0
+    n['DetailAmplitude'].outputs[0].default_value=0
     cases=[('tint',n['Tint'].outputs[0],'default_value',(1.21,1,1,1)),
            ('roughness',n['RoughnessBias'].outputs[0],'default_value',.06),
            ('detail',n['DetailAmplitude'].outputs[0],'default_value',.05),
@@ -49,7 +56,7 @@ for family in FAMILIES:
     finally:n.remove(extra)
     validate(source,family)
     require(digest(master)==before,'Native controls modified the saved master')
-    results.append({'family':family,'masterSha256':before,'rejections':rejected})
+    results.append({'family':family,'masterSha256':before,'boundedEndpointsAccepted':True,'rejections':rejected})
     (out/'controls.json').write_text(json.dumps(results,indent=2)+'\n',encoding='utf-8')
 
 master=source/'world/authoring/terrain/dry_dirt.blend'

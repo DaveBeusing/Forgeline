@@ -3,6 +3,7 @@ import copy
 import hashlib
 import json
 import math
+import struct
 from pathlib import Path
 
 SLOTS = dict(grass_ground='rocky_scrub', dirt='dry_dirt', mud='cracked_earth',
@@ -76,7 +77,12 @@ def binding(root, family):
 
 
 def controls(tint, roughness_bias, detail):
-    require(len(tint) == 4 and tint[3] == 1 and all(math.isfinite(x) and .8 <= x <= 1.2 for x in tint[:3]),
+    def bounded(value, lower, upper):
+        # Blender sockets store float32; compare endpoints in that same domain.
+        f32 = lambda x: struct.unpack('<f',struct.pack('<f',x))[0]
+        try: return math.isfinite(value) and f32(lower) <= f32(value) <= f32(upper)
+        except (OverflowError,struct.error): return False
+    require(len(tint) == 4 and tint[3] == 1 and all(bounded(x,.8,1.2) for x in tint[:3]),
             'Linear tint must be bounded to 0.8..1.2 with opaque alpha')
-    require(math.isfinite(roughness_bias) and -.05 <= roughness_bias <= .05, 'Roughness bias exceeds 0.05')
-    require(math.isfinite(detail) and 0 <= detail <= .04, 'Periodic detail exceeds 0.04')
+    require(bounded(roughness_bias,-.05,.05), 'Roughness bias exceeds 0.05')
+    require(bounded(detail,0,.04), 'Periodic detail exceeds 0.04')
