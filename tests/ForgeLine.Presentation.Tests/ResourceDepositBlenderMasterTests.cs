@@ -72,6 +72,7 @@ public sealed class ResourceDepositBlenderMasterTests
         ResourceId[] resources = [ResourceIds.FerrousOre, ResourceIds.Silicates, ResourceIds.Volatiles, ResourceIds.RareElements];
         ResourceDepositPresentationState[] expected = [ResourceDepositPresentationState.Untouched, ResourceDepositPresentationState.Active, ResourceDepositPresentationState.Depleted];
         double[] quantities = [1000, 650, 0];
+        float[] heights = [8, 12, 4, 14];
         var simulation = new SimulationCoordinator();
         var snapshots = new PresentationSnapshotBuffer();
         simulation.RegisterTickObserver(new PresentationExtractor(snapshots));
@@ -94,7 +95,15 @@ public sealed class ResourceDepositBlenderMasterTests
             int state = (int)(instance.Transform.Position.X / 20);
             Assert.Equal(expected[state], instance.WorldFeature.ResourceState);
             Assert.True(instance.WorldFeature.IsInspectable);
-            Assert.Equal(new Vector3(12, 4, 12), instance.Transform.Scale);
+            Assert.Equal(new Vector3(12, heights[family], 12), instance.Transform.Scale);
+            Assert.Equal(1, instance.Transform.Position.Y - instance.Transform.Scale.Y * .5f, 5);
+            var source = simulation.Entities.GetComponent<WorldTransform>(instance.Entity);
+            Assert.Equal(new Vector3(state * 20, 3, 0), source.Position);
+            Assert.Equal(new Vector3(12, 4, 12), source.Scale);
+            var deposit = simulation.Entities.GetComponent<ResourceDeposit>(instance.Entity);
+            Assert.Equal(quantities[state], deposit.RemainingQuantity);
+            Assert.Equal(1000, deposit.TotalQuantity);
+            Assert.Equal(new AxisAlignedBounds(source.Position - new Vector3(5), source.Position + new Vector3(5)), deposit.Bounds);
             Assert.Equal(WorldPresentationIdentity.ForResource(resources[family]).Visual, instance.WorldFeature.Visual);
         }
     }

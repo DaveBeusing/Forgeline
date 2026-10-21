@@ -358,10 +358,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
             baseInstances[baseIndex++] =
                 new RenderInstance(
                     entity,
-                    new RenderTransform(
-                        transform.Position,
-                        transform.Rotation,
-                        transform.Scale),
+                    ResourceDepositVisualTransform.Apply(
+                        new RenderTransform(transform.Position, transform.Rotation, transform.Scale),
+                        worldFeature),
                     new RenderMeshHandle(
                         visual.VisualId),
                     RenderMaterialHandle.Default,

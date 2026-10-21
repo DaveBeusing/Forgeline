@@ -26,9 +26,18 @@ public sealed class ResourceDepositReferenceSceneTests
         foreach (var deposit in deposits)
         {
             var source = map.Resources.First(x => WorldPresentationIdentity.ForResource(x.ResourceId).Visual == deposit.WorldFeature.Visual);
-            Assert.Equal(new Vector3(source.HalfExtents.X * 1.2f, source.HalfExtents.Y * 2, source.HalfExtents.Z * 1.2f), deposit.Transform.Scale);
+            float minimumHeight = deposit.WorldFeature.Visual switch
+            {
+                WorldVisualId.ResourceFerrousOre => 8,
+                WorldVisualId.ResourceSilicates => 12,
+                WorldVisualId.ResourceVolatiles => 4,
+                WorldVisualId.ResourceRareElements => 14,
+                _ => throw new InvalidOperationException()
+            };
+            float heightScale = MathF.Max(source.HalfExtents.Y * 2, minimumHeight);
+            Assert.Equal(new Vector3(source.HalfExtents.X * 1.2f, heightScale, source.HalfExtents.Z * 1.2f), deposit.Transform.Scale);
             Assert.True(terrain.TrySampleHeight(deposit.Transform.Position.X, deposit.Transform.Position.Z, out float height));
-            Assert.Equal(height + source.HalfExtents.Y, deposit.Transform.Position.Y, 5);
+            Assert.Equal(height + heightScale * .5f, deposit.Transform.Position.Y, 5);
             Assert.True(deposit.WorldFeature.IsInspectable);
             if (extractors == 0) continue;
             Assert.Contains(instances, x => x.BuildingFeature.Building == BuildingIds.Extractor &&
