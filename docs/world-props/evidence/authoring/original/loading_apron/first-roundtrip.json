@@ -1,0 +1,213 @@
+{
+  "action": "RoundTrip",
+  "assetIds": [
+    "material.world.prop.industrial",
+    "mesh.world.kit.collision_centered",
+    "mesh.world.prop.loading_apron",
+    "mesh.world.prop.loading_apron_lod1",
+    "texture.directorate.surface.atlas_base",
+    "texture.directorate.surface.atlas_normal",
+    "texture.directorate.surface.atlas_orm"
+  ],
+  "axes": {
+    "blender": "right-handed +Z up / -Y forward",
+    "game": "right-handed +Y up / +Z forward",
+    "mapping": "(x,y,z) -> (x,-z,y)"
+  },
+  "deviations": {
+    "maximumEditorSplitNormalEncodingError": 5.0067901611328125e-06,
+    "maximumSocketInstanceWorldErrorMetres": 0.0,
+    "maximumSocketLocalError": 0.0
+  },
+  "errors": [],
+  "families": [
+    {
+      "assets": [
+        "mesh.world.prop.loading_apron",
+        "mesh.world.prop.loading_apron_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37,
+      "root": "mesh.world.prop.loading_apron"
+    }
+  ],
+  "meshes": [
+    {
+      "collisionReference": null,
+      "exportSha256": "d1148e826ef73f884ad312a82d7ff8cf79fab257715948430498a0cc6a81b636",
+      "exportStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "mesh.world.kit.collision_centered",
+      "lods": [],
+      "materialReferences": [],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "fae8addaeac7fec641ca710b551c43ed15c7cdb30af85f963159532c5ce9f583",
+      "sourceStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      }
+    },
+    {
+      "collisionReference": "mesh.world.kit.collision_centered",
+      "exportSha256": "c15997882b6533c98b6ed5fa1a8f9cb394529097ff65838642390489b44ffead",
+      "exportStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 160,
+        "vertices": 336
+      },
+      "id": "mesh.world.prop.loading_apron",
+      "lods": [
+        {
+          "assetId": "mesh.world.prop.loading_apron_lod1",
+          "level": 1,
+          "maxDistance": 260
+        }
+      ],
+      "materialReferences": [
+        "material.world.prop.industrial"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "6957599bab95b6bce393cf424d395684957d367bd7697ab89e770991e30c79d7",
+      "sourceStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 160,
+        "vertices": 336
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "7756fc84b15d3997980c67aa8191c36c96539a6bd70c0ccc70f3967287d31817",
+      "exportStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 36,
+        "vertices": 72
+      },
+      "id": "mesh.world.prop.loading_apron_lod1",
+      "lods": [],
+      "materialReferences": [
+        "material.world.prop.industrial"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "99c9b53b30e13715aa17002a8c19bc24a7c0e650be1dd5654da775870a3e6459",
+      "sourceStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 36,
+        "vertices": 72
+      }
+    }
+  ],
+  "productionSourcesUnchanged": true,
+  "schemaVersion": 1,
+  "sourceHashes": {
+    "materials/directorate/surfaces/production_surface_base.png": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+    "materials/directorate/surfaces/production_surface_normal.png": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+    "materials/directorate/surfaces/production_surface_orm.png": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+    "materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9",
+    "world/materials/common/industrial.asset.json": "48f146014ba4e4b2544d15f8983ad651ef1a20ac73b37aaff8fd48e1d35cdb2a",
+    "world/materials/common/industrial.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "world/meshes/kit/collision_centered.asset.json": "4df1224956788e98ecab0fbae37201caed4a3be33bde10ab411b5327e7c47581",
+    "world/meshes/kit/loading_apron.asset.json": "d4b2542dd5fe56a4db124435ccc6cf5476b6ec29234ec5ee660b29705c82334c",
+    "world/meshes/kit/loading_apron_lod1.asset.json": "2c7e7307d943411464e0401a2805ccb417a8a576c1c4b6e7de1b375b2a910690",
+    "world/meshes/sources/environment_kit/collision_centered.gltf": "fae8addaeac7fec641ca710b551c43ed15c7cdb30af85f963159532c5ce9f583",
+    "world/meshes/sources/environment_kit/loading_apron_high.gltf": "6957599bab95b6bce393cf424d395684957d367bd7697ab89e770991e30c79d7",
+    "world/meshes/sources/environment_kit/loading_apron_reduced.gltf": "99c9b53b30e13715aa17002a8c19bc24a7c0e650be1dd5654da775870a3e6459"
+  },
+  "sourceSignature": "7684a8a180c064481987bbdc198ba538b6892a0354f38e6a406e18e022247541",
+  "success": true
+}

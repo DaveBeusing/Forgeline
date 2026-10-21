@@ -156,14 +156,14 @@ Texture-container bytes remain 59,453,925; excluding the existing 1,786,417 spla
 bytes leaves 57,667,508 gameplay bytes below the unchanged 58,720,256-byte gate.
 This is a compiled-container metric, not complete measured GPU memory.
 
-The full Release build passed with zero warnings/errors. Focused checks passed
+The full Release build passed with zero warnings/errors. Earlier focused checks passed
 91 presentation/reference, three map-dressing, four updated gallery and three
 portable source/axis cases. The shared Blender portable suite passed 119 tests.
 The three-worker compiler proof passed twelve source-less catalogs. Cache lock,
 interruption/recovery, source-less and damaged-deployment process contracts pass.
 Map qualification passes 71 reachability and two alternatives each for navigation
-and roads. Exact master main CI also passes. Full solution, paired native player
-views, package/install and current-PR CI remain pending at this checkpoint.
+and roads. Exact master main CI also passes. These earlier checkpoints are
+separate from the final product-source results below.
 
 The first native attempt's material-slot mutation selected a materialless
 collision proxy; the scoped test now targets the visual root. A later bound
@@ -171,3 +171,137 @@ run correctly failed on a 275-character Windows source-clone path. Compact
 filenames reduce that measured path to 239 characters; every renamed GLB hash
 remained identical. Failed/interrupted directories are retained as nonpasses,
 not reused as final qualification.
+
+## Final functional validation
+
+Branch art/world-prop-masters, draft PR [#283](https://github.com/DaveBeusing/Forgeline/pull/283),
+retains product source 3545a23125d5ca8b3c24d50a8e77d72175c5acf6. The integration
+base remains a524b0a8164390abe1e9cb38170e690f46147574; version 0.1.437 is exactly
+one PATCH over 0.1.436. Subsequent evidence-only commits do not change compiled
+product sources. Their current CI status is reported on the PR.
+
+The final full Release solution run passed 3,297 tests, failed zero and skipped
+46 of 3,343 total in 31m 30s. All 22 prop-master cases and the exact pipe-axis
+case were enabled. Skips retain the existing other-family opt-ins, hardware
+performance opt-ins and unavailable debug-layer/lifetime prerequisites; they
+are not counted as passes. The exact product-source CI passed build-test,
+frame-contracts, navigation-movement, cpu-scale, retained-props and
+retained-minerals. Three provisioned/manual native jobs were skipped.
+[Validation](world-props/evidence/validation.json) and
+[product CI](world-props/evidence/product-ci.json) retain exact results and log hashes.
+
+### Native player observations
+
+The main matrix passed 48 before/after cases (96 original still PNGs). It covers
+1080p/4K/3440x1440, Low/Medium/High, close/normal/strategic cameras, actual
+yard/bridge/base scenes, all 22 families, 1/100/1,000 instances and dark/wet
+settings. Each side uses the same client binaries, hardware and settings,
+three warmups, eight sampled frames and two repeated readbacks. Runtime
+catalogs intentionally differ. Fifteen pairs are exact matches; the maximum
+changed-pixel fraction is 0.0024488812 (0.245%, the visible straight-pipe
+correction in the gallery). No image-similarity tolerance or golden is approved.
+
+Two supplementary paired camera traversals use 64 sampled frames per side:
+1,000 props at 1080p and the gallery at 2560x1440. Both retain identical
+per-frame instance, culling, High/Reduced and draw counts across all 64 frames.
+The 1,000-prop traversal ranges from 0 to 715 visible instances, 0 to 110 High
+and 0 to 612 Reduced instances. The 1440p run additionally retains 16 adjacent
+camera-pose PNGs. These scripted immutable snapshots cannot certify live
+gameplay routes, long lifecycle behavior, smooth motion or human LOD acceptance.
+
+Device: NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU, D3D12 feature level
+12_1, driver 32.0.15.9653, reported dedicated memory 25,309,478,912 bytes.
+Native output surfaces match their requested dimensions independently of the
+1280x720 host-window clamp. Raster DPI is 96; host DPI is 144. Debug layer was
+unavailable. The client reports .NET 10.0.12 on Windows build 26300.
+
+| High/Normal 1080p load | Visible before/after | Draw calls before/after | High/Reduced before/after |
+| --- | --- | --- | --- |
+| 1 | 1 / 1 | 1 / 1 | 0/1 / 0/1 |
+| 100 | 100 / 100 | 23 / 23 | 15/85 / 15/85 |
+| 1,000 | 715 / 715 | 25 / 25 | 116/599 / 116/599 |
+
+The Low/Strategic 1,000-prop case draws 999 visible Reduced instances in 22
+draws on both sides. All main and supplemental cases have zero mesh fallbacks,
+material/texture binding failures, submission faults and repeat mismatches.
+The main matrix also reports zero missing/dropped UI assets or glyphs.
+
+High load cases retain 44,743,436 logical resident texture bytes, 10,940,424
+resident mesh bytes and 81 descriptors on both sides. Across the main matrix,
+maximum reported logical texture residency is 45,017,996 bytes, descriptor use
+129 and observed DXGI local usage 750,845,952 bytes. These are scoped observations,
+not a complete frame-memory acceptance ledger or a new budget.
+
+For the 1,000-prop High/Normal case, CPU p50/p95/p99 before/after are
+7.181/43.953/43.953 ms and 7.333/30.190/30.190 ms (eight samples). GPU values
+are 8.157/12.162/12.162 ms and 10.443/11.705/11.705 ms (five completed timestamp
+samples per side). Background activity and clocks were uncontrolled. These
+small, non-counterbalanced samples do not establish a performance improvement
+or acceptance; all raw per-frame samples and hardware details are retained.
+
+[Main matrix](world-props/evidence/native-player/summary.json),
+[per-case metrics](world-props/evidence/native-player/captures.json),
+[pixel pairs](world-props/evidence/native-player/pixel-pairs.json),
+[1,000-prop traversal](world-props/evidence/native-player/supplement/traverse-thousand-summary.json)
+and [gallery sequence](world-props/evidence/native-player/supplement/gallery-sequence-summary.json)
+retain original report/image hashes. Ten representative stills and two final
+pose images are copied byte-for-byte; all original native files remain under
+artifacts/pv, artifacts/pt and artifacts/pseq in the local checkout.
+
+[Gallery before](world-props/evidence/native-player/images/gallery-before-WorldPropsGallery-1920x1080-High-CloseTactical.png) /
+[gallery after](world-props/evidence/native-player/images/gallery-after-WorldPropsGallery-1920x1080-High-CloseTactical.png).
+The baked correction visibly restores the straight pipe's circular cross-section
+without moving any placement. Yard and bridge review preserves existing
+placements; exact uneven-terrain contact and moving LOD appearance remain
+human review items. Four actual Blender inspection PNGs are retained separately
+in world-props/evidence/blender-inspection; they are not player screenshots.
+
+### Headless and installed package
+
+The seed-2026, 64-tick baseline/candidate match compares all 24 non-observational
+match fields exactly; eight time/allocation/GC fields are explicitly excluded.
+The terminal validation match ends at tick 55,210 with player 1 victorious,
+zero route failures and zero failed cargo orders.
+[Parity](world-props/evidence/gameplay/parity.json) and
+[terminal match](world-props/evidence/gameplay/terminal-match.json) retain results.
+
+The canonical Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible
+command passes with the qualified candidate runtime. Two independently
+published trees are hash-identical; the ZIP is produced once.
+FORGELINE-0.1.437-dev-win-x64.zip is 55,144,155 bytes, SHA-256
+c97a47e84f43f768068309a809d8067ec9d659937af2b634e0f1e2eedf471fdb.
+Its provenance records the clean product source above and SDK 10.0.401.
+The local archive is under artifacts/pp; no release or tag is created.
+
+A fresh extraction contains 1,488 files, including its manifest. All 1,487
+manifest entries hash correctly; no .blend/.glb/.gltf/Python/PowerShell/C# source
+or assets/source tree is included. Installed source-less validation resolves
+all 1,363 records, including all 44 scoped visual IDs. Runtime bytes match
+the qualified candidate exactly. Two measured native menu starts after one
+warmup pass readiness and both application-icon checks using isolated settings.
+
+Installed native gallery and 1,000-prop views pass with zero mesh fallbacks and
+zero binding failures: 22/715 visible props in 22/25 draws. The separate mixed
+match-client stress smoke completes with zero binding errors and 114 fallback
+instances. Its unchanged generic stress producer creates VisualIdentity(1)
+entities; that broad smoke is recorded separately from the scoped prop result.
+The package retains normal framework-dependent .NET runtime requirements.
+[Package and install](world-props/evidence/package/archive.json),
+[startup](world-props/evidence/package/startup.json) and
+[installed prop report](world-props/evidence/package/installed-prop-manifest.json)
+retain exact evidence.
+
+### Commit and integration boundaries
+
+- 75ef57ae35e1d665affc56c61aeabbf8d26583ae: preserved-family contract and isolated authoring qualification.
+- 22f5bde1a6ce4544462eb7ca963747ea5524b9c5: explicit baked straight-pipe axis qualification.
+- 744821b0559355888ac512f6cda2b598c878e3e4: bounded compiler workers and authentic fixture scales.
+- 09036b0261798a90e954adf840b74757384e2365: compact Windows-safe GLB source paths.
+- 3545a23125d5ca8b3c24d50a8e77d72175c5acf6: retained native masters and qualified canonical adoption.
+- Later commits retain documentation and immutable evidence only.
+
+Functional branch review is supported by these results. Production promotion
+remains blocked on the existing controlled physical render qualification,
+complete live memory/timestamp/lifecycle measurements and explicit human art
+and moving-LOD approval. No renderer contract, gameplay placement, threshold,
+texture cap or golden has been changed to admit the props.

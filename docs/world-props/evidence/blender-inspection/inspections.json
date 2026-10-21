@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "success": true,
+  "nativeMastersUnchanged": true,
+  "captures": [
+    {
+      "family": "crate",
+      "masterSha256": "1f2dc1d230f866ba02f05ef4fecde1e2b28da60c9c7ac63c9243523e09d19637",
+      "image": "crate-close.png",
+      "imageSha256": "f53fbfd2378a95f4037c39d2bbde50ee0acecd51bf31bc04bb094d7775a3e250",
+      "camera": "close",
+      "nativeBlenderVersion": "5.2.2 LTS"
+    },
+    {
+      "family": "loading_gantry",
+      "masterSha256": "c78a10d06da1d7e1d95a490443ab4f67a0bbba8084160784a8f1c2d67e2a581a",
+      "image": "loading_gantry-close.png",
+      "imageSha256": "2c10a0ddc092ef6bed25504320e6071eda0c0e7037f087459ec65ae9e0234142",
+      "camera": "close",
+      "nativeBlenderVersion": "5.2.2 LTS"
+    },
+    {
+      "family": "pipe_section",
+      "masterSha256": "d7181f63ff82cc053aa530483dee83692fe9a0d32c0572f7233dc9e7840d65e3",
+      "image": "pipe_section-close.png",
+      "imageSha256": "5fb931b51295a10ae9b8afa79f2983cebe3423725444e885d111874d096be700",
+      "camera": "close",
+      "nativeBlenderVersion": "5.2.2 LTS"
+    },
+    {
+      "family": "rock_slab",
+      "masterSha256": "cdba5594430637d84b4ebfd8c2a70a26552fda87363eaf828797983c4b91ae31",
+      "image": "rock_slab-close.png",
+      "imageSha256": "31ce23698bac17b30422756a456b8f48f4954516139ad7b8a374d8a29714c415",
+      "camera": "close",
+      "nativeBlenderVersion": "5.2.2 LTS"
+    }
+  ],
+  "humanArtApproval": "pending"
+}

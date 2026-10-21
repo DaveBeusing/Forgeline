@@ -1,0 +1,13 @@
+{
+  "canonicalSourcesUnchanged": true,
+  "humanArtApproval": "pending",
+  "schemaVersion": 1,
+  "boundsAndTopologyUnchanged": true,
+  "typedCompiledComparison": true,
+  "sourceLessIntegrity": true,
+  "deterministicSourceAndRuntime": true,
+  "sourceSha": "22f5bde1a6ce4544462eb7ca963747ea5524b9c5",
+  "sourceSignature": "939c38c62e8de79ea35e6799ef4e080c871f2495699f48e209b9073d170398cf",
+  "success": true,
+  "gameRotation": "positive-Y-90-degrees"
+}

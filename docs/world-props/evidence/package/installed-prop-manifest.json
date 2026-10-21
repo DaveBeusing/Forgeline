@@ -1,0 +1,4558 @@
+{
+  "schemaVersion": 1,
+  "status": "structural-pass",
+  "error": null,
+  "commit": "3545a23125d5ca8b3c24d50a8e77d72175c5acf6",
+  "buildIdentity": "0.1.437-dev\u002B3545a23125d5ca8b3c24d50a8e77d72175c5acf6",
+  "runtime": ".NET 10.0.12",
+  "environment": {
+    "os": "Microsoft Windows 10.0.26300",
+    "architecture": "X64",
+    "logicalProcessors": 8,
+    "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+    "configuration": "Release"
+  },
+  "runtimeFingerprint": "415EE8C913D1EB64B10E8B95EAA8E48691585C217CB0A1AAB3856D96903A01DB",
+  "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+  "software": false,
+  "fixtureVersion": 7,
+  "hostWindowDpi": 144,
+  "executionRequirement": "Thread-scoped display/system requirement during explicit capture; user sleep/lock and occlusion checks remain authoritative.",
+  "clientAssemblySha256": "259850140D491A6829B8EDBAD8A8BA6C3FAF8588289F96A12075F2C8049FC7F9",
+  "presentationAssemblySha256": "54DDDA44A00E2A2F96C570E981BBDDAD0424D80ECBAA2D5E3EB18B1379F72DE0",
+  "startupMilliseconds": 4517.9813,
+  "startupAllocatedBytes": 217885544,
+  "capturePath": "D3D12 swap-chain backbuffer readback before Present; full-resolution native output, independent of host-window clamp",
+  "method": "Immutable presentation states; completed extraction tick and frozen visual seconds recorded per case, VSync off, particle age.2s. CPU includes frame reuse/Present. Distinct completed GPU fences. Readbacks/PNG export excluded. No live gameplay or sustained-motion FPS claim.",
+  "warmups": 3,
+  "samples": 8,
+  "continueAfterMismatch": true,
+  "failedCaptures": [],
+  "captures": [
+    {
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 1408,
+        "batchCapacity": 22,
+        "submittedInstances": 22,
+        "uploadBytes": 2464,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 1346,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "key": "WorldPropsGallery-1920x1080-High-NormalGameplay",
+      "image": "WorldPropsGallery-1920x1080-High-NormalGameplay.png",
+      "imageSha256": "BA32BC7306AB56377A5F1876C78B762B5CCFA26A6C42BC22CB412A0BBE66F8D7",
+      "pixelSha256": "B09261BC62C4F5692924BBF798053668AFFD32612505762B0EC2F1F79E0AB305",
+      "kind": "WorldPropsGallery",
+      "fingerprint": "057DA88CEDE8835B48F2251F9C54C85CEC9A8DC0554A0210EE4298CC392B4B2C",
+      "ui": {
+        "scenario": "World",
+        "fixtureVersion": 3,
+        "layoutContract": 4,
+        "notifications": {
+          "bounds": {
+            "x": 1300,
+            "y": 72,
+            "width": 608,
+            "height": 224,
+            "right": 1908,
+            "bottom": 296,
+            "isEmpty": false
+          },
+          "fontSize": 14,
+          "count": 2,
+          "first": {
+            "item": {
+              "kind": "SupplyCritical",
+              "feedback": false,
+              "hidden": 0,
+              "local": false
+            },
+            "bounds": {
+              "x": 1300,
+              "y": 72,
+              "width": 608,
+              "height": 24.296875,
+              "right": 1908,
+              "bottom": 96.296875,
+              "isEmpty": false
+            },
+            "text": {
+              "x": 1327,
+              "y": 76,
+              "width": 487,
+              "height": 16.296875,
+              "right": 1814,
+              "bottom": 92.296875,
+              "isEmpty": false
+            },
+            "action": {
+              "x": 1818,
+              "y": 76,
+              "width": 86,
+              "height": 16.296875,
+              "right": 1904,
+              "bottom": 92.296875,
+              "isEmpty": false
+            },
+            "details": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "truncated": false,
+            "revision": 15547951598488466619,
+            "identity": {
+              "session": {
+                "value": 0,
+                "isSpecified": false
+              },
+              "kind": "None",
+              "started": {
+                "value": 0
+              },
+              "player": {
+                "value": 0,
+                "isSpecified": false
+              }
+            },
+            "expansionBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "expansionActive": false,
+            "interactiveBounds": {
+              "x": 1300,
+              "y": 72,
+              "width": 608,
+              "height": 24.296875,
+              "right": 1908,
+              "bottom": 96.296875,
+              "isEmpty": false
+            }
+          },
+          "second": {
+            "item": {
+              "kind": "LowPower",
+              "feedback": false,
+              "hidden": 0,
+              "local": false
+            },
+            "bounds": {
+              "x": 1300,
+              "y": 100.296875,
+              "width": 608,
+              "height": 24.296875,
+              "right": 1908,
+              "bottom": 124.59375,
+              "isEmpty": false
+            },
+            "text": {
+              "x": 1327,
+              "y": 104.296875,
+              "width": 487,
+              "height": 16.296875,
+              "right": 1814,
+              "bottom": 120.59375,
+              "isEmpty": false
+            },
+            "action": {
+              "x": 1818,
+              "y": 104.296875,
+              "width": 86,
+              "height": 16.296875,
+              "right": 1904,
+              "bottom": 120.59375,
+              "isEmpty": false
+            },
+            "details": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "truncated": false,
+            "revision": 14066782881462527895,
+            "identity": {
+              "session": {
+                "value": 0,
+                "isSpecified": false
+              },
+              "kind": "None",
+              "started": {
+                "value": 0
+              },
+              "player": {
+                "value": 0,
+                "isSpecified": false
+              }
+            },
+            "expansionBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "expansionActive": false,
+            "interactiveBounds": {
+              "x": 1300,
+              "y": 100.296875,
+              "width": 608,
+              "height": 24.296875,
+              "right": 1908,
+              "bottom": 124.59375,
+              "isEmpty": false
+            }
+          },
+          "third": {
+            "item": {
+              "kind": "None",
+              "feedback": false,
+              "hidden": 0,
+              "local": false
+            },
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "text": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "action": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "details": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "truncated": false,
+            "revision": 0,
+            "identity": {
+              "session": {
+                "value": 0,
+                "isSpecified": false
+              },
+              "kind": "None",
+              "started": {
+                "value": 0
+              },
+              "player": {
+                "value": 0,
+                "isSpecified": false
+              }
+            },
+            "expansionBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "expansionActive": false,
+            "interactiveBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            }
+          },
+          "overflow": {
+            "item": {
+              "kind": "None",
+              "feedback": false,
+              "hidden": 0,
+              "local": false
+            },
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "text": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "action": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "details": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "truncated": false,
+            "revision": 0,
+            "identity": {
+              "session": {
+                "value": 0,
+                "isSpecified": false
+              },
+              "kind": "None",
+              "started": {
+                "value": 0
+              },
+              "player": {
+                "value": 0,
+                "isSpecified": false
+              }
+            },
+            "expansionBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "expansionActive": false,
+            "interactiveBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            }
+          },
+          "revision": 1504200532,
+          "paintedBounds": {
+            "x": 1300,
+            "y": 72,
+            "width": 608,
+            "height": 52.59375,
+            "right": 1908,
+            "bottom": 124.59375,
+            "isEmpty": false
+          }
+        },
+        "skin": null,
+        "battlefieldSkin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 0,
+          "batches": 8,
+          "buffers": 32,
+          "draws": 11,
+          "vertices": 1446,
+          "vertexUploadBytes": 46272,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 12582912,
+          "prepared": true
+        },
+        "skinState": null,
+        "skinnedControls": null,
+        "layoutId": "GameplayHudLayout",
+        "tooltipBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0,
+          "isEmpty": true
+        },
+        "ringGeometry": null,
+        "interaction": {
+          "mode": "Closed",
+          "selectedIndex": 0,
+          "hoveredIndex": 0,
+          "pointerPressed": false,
+          "contextualHoveredIndex": 0,
+          "contextualPressed": false,
+          "contextualPending": false,
+          "targetingMode": "None"
+        },
+        "captureOffset": "Settled fixed state",
+        "regions": [],
+        "text": {
+          "glyphs": 207,
+          "vertices": 1242,
+          "missingGlyphs": 0,
+          "droppedGlyphs": 0,
+          "uploadBytes": 39744,
+          "atlasReady": true,
+          "failureReason": null
+        },
+        "vertices": 2760,
+        "background": null
+      },
+      "seed": 2026,
+      "tick": 32,
+      "captureVisualSeconds": 1.6,
+      "mechanicalSeconds": null,
+      "camera": {
+        "target": {
+          "x": 855,
+          "y": 6.7294483,
+          "z": 303
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "requestedDisplay": {
+        "width": 1920,
+        "height": 1080
+      },
+      "actualSurface": {
+        "width": 1920,
+        "height": 1080,
+        "bufferCount": 3,
+        "frameIndex": 0,
+        "isSuspended": false,
+        "presentMode": "Immediate",
+        "isOccluded": false,
+        "resizePending": false,
+        "resizeGeneration": 1,
+        "appliedResizeGeneration": 1,
+        "submittedFrameCount": 12,
+        "presentedFrameCount": 12
+      },
+      "hostWindow": {
+        "width": 1280,
+        "height": 720,
+        "isEmpty": false
+      },
+      "hostWindowDpi": 144,
+      "rasterDpi": 96,
+      "uiScale": 1,
+      "requestedQuality": "High",
+      "profile": {
+        "requested": "High",
+        "active": "High",
+        "linearScene": true,
+        "shadows": {
+          "quality": "High",
+          "enabled": true,
+          "resolution": 4096,
+          "cascadeCount": 1,
+          "radius": 750,
+          "maximumCasters": 8192,
+          "maximumDraws": 256
+        },
+        "atmosphere": "Height",
+        "particles": {
+          "quality": "High",
+          "capacity": 4096,
+          "maximumFallbackEffects": 128,
+          "maximumScreenCoverage": 2
+        },
+        "terrainDetail": {
+          "enabled": true,
+          "microTileMeters": 4,
+          "microColorStrength": 0.04,
+          "microNormalStrength": 0.06,
+          "rockSlopeStart": 0.25,
+          "rockSlopeEnd": 0.6
+        },
+        "lodDiameterScale": 1.1,
+        "postProcessing": {
+          "antialiasing": "High",
+          "whiteBalance": 0,
+          "tint": 0,
+          "contrast": 1,
+          "saturation": 1,
+          "edgeBlend": 0.3
+        },
+        "fallbackReason": null,
+        "resolutionScale": 1,
+        "textures": "Full",
+        "vegetationMotion": true,
+        "requestedSettings": {
+          "quality": "High",
+          "colorGrade": {
+            "antialiasing": "Disabled",
+            "whiteBalance": 0,
+            "tint": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "edgeBlend": 0
+          },
+          "resolutionScale": 1,
+          "antialiasing": null,
+          "shadows": null,
+          "textures": null,
+          "objectDetail": null,
+          "surfaceDetail": null,
+          "vegetationMotion": null,
+          "atmosphere": null,
+          "particles": null,
+          "environment": {
+            "daylight": 1,
+            "cloudCover": 0,
+            "wetness": 0
+          },
+          "vegetation": {
+            "density": 1,
+            "maximumDistanceMeters": 4000
+          },
+          "terrainResidency": {
+            "enabled": true,
+            "maximumResidentChunks": 128
+          }
+        },
+        "environment": {
+          "daylight": 1,
+          "cloudCover": 0,
+          "wetness": 0
+        },
+        "vegetation": {
+          "density": 1,
+          "maximumDistanceMeters": 4000
+        },
+        "terrainResidency": {
+          "enabled": true,
+          "maximumResidentChunks": 128
+        }
+      },
+      "lighting": {
+        "directionToLight": {
+          "x": 0.3674047,
+          "y": 0.8922686,
+          "z": -0.26243195
+        },
+        "directionalIntensity": 1.1,
+        "directionalColor": {
+          "x": 1,
+          "y": 0.96,
+          "z": 0.9
+        },
+        "ambientIntensity": 0.52,
+        "ambientColor": {
+          "x": 0.58,
+          "y": 0.66,
+          "z": 0.76
+        },
+        "exposure": 1.15,
+        "groundAmbientFactor": 0.42,
+        "toneMapping": "AcesFitted"
+      },
+      "localHaze": null,
+      "surfaceMarks": [],
+      "cpu": {
+        "samples": 8,
+        "mean": 7.3049,
+        "p50": 4.7803,
+        "p95": 15.9871,
+        "p99": 15.9871
+      },
+      "gpu": {
+        "samples": 6,
+        "mean": 6.887786666666668,
+        "p50": 6.756896,
+        "p95": 10.056352,
+        "p99": 10.056352
+      },
+      "fps": {
+        "samples": 8,
+        "mean": 175.44489294981653,
+        "p50": 169.1618032648228,
+        "p95": 257.1818018157035,
+        "p99": 257.1818018157035
+      },
+      "performance": {
+        "cpuFrames": [
+          {
+            "index": 0,
+            "milliseconds": 3.8883,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 0.7753999999999999,
+            "overlayMilliseconds": 0.6402,
+            "compositeMilliseconds": 0.0133,
+            "shadowMilliseconds": 0.9534,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 74,
+              "textureReleaseCount": 0
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 1,
+              "fenceWaitCount": 8,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 114753536,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 64,
+                "batchInstanceCapacity": 1408,
+                "batchCapacity": 22,
+                "submittedInstances": 22,
+                "uploadBytes": 2464,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 1346,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 4,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 0.1659,
+                "recordMilliseconds": 1.3841999999999999,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0,
+                "submissionFence": 47,
+                "presentMilliseconds": 1.0827,
+                "waitMilliseconds": 0.0008,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.111,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0304
+              },
+              "instances": {
+                "totalInstances": 22,
+                "visibleInstances": 22,
+                "culledInstances": 0,
+                "drawCalls": 22,
+                "highLodInstances": 3,
+                "reducedLodInstances": 19,
+                "runtimeMeshInstances": 22,
+                "texturedRuntimeMeshInstances": 22,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 19,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 1,
+                "rejectedClusters": 0,
+                "clusterCulledInstances": 0,
+                "instanceBoundsTests": 22,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0152,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 1,
+            "milliseconds": 4.0048,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 0.7636999999999999,
+            "overlayMilliseconds": 0.6013,
+            "compositeMilliseconds": 0.0123,
+            "shadowMilliseconds": 0.6477,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 74,
+              "textureReleaseCount": 0
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 1,
+              "fenceWaitCount": 8,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 114753536,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 64,
+                "batchInstanceCapacity": 1408,
+                "batchCapacity": 22,
+                "submittedInstances": 22,
+                "uploadBytes": 2464,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 1346,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 5,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 0.157,
+                "recordMilliseconds": 1.1112,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0,
+                "submissionFence": 47,
+                "presentMilliseconds": 1.5746,
+                "waitMilliseconds": 0.0007,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.1028,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0268
+              },
+              "instances": {
+                "totalInstances": 22,
+                "visibleInstances": 22,
+                "culledInstances": 0,
+                "drawCalls": 22,
+                "highLodInstances": 3,
+                "reducedLodInstances": 19,
+                "runtimeMeshInstances": 22,
+                "texturedRuntimeMeshInstances": 22,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 19,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 1,
+                "rejectedClusters": 0,
+                "clusterCulledInstances": 0,
+                "instanceBoundsTests": 22,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.014,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 2,
+            "milliseconds": 7.6679,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 0.9271000000000001,
+            "overlayMilliseconds": 0.5681,
+            "compositeMilliseconds": 0.023,
+            "shadowMilliseconds": 0.7333,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 74,
+              "textureReleaseCount": 0
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 1,
+              "fenceWaitCount": 8,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 114753536,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 64,
+                "batchInstanceCapacity": 1408,
+                "batchCapacity": 22,
+                "submittedInstances": 22,
+                "uploadBytes": 2464,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 1346,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 6,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 0.174,
+                "recordMilliseconds": 1.3013,
+                "submitMilliseconds": 0,
+                "retireMilliseconds": 0,
+                "submissionFence": 49,
+                "presentMilliseconds": 1.0886,
+                "waitMilliseconds": 0.0004,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.1089,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0259
+              },
+              "instances": {
+                "totalInstances": 22,
+                "visibleInstances": 22,
+                "culledInstances": 0,
+                "drawCalls": 22,
+                "highLodInstances": 3,
+                "reducedLodInstances": 19,
+                "runtimeMeshInstances": 22,
+                "texturedRuntimeMeshInstances": 22,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 19,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 1,
+                "rejectedClusters": 0,
+                "clusterCulledInstances": 0,
+                "instanceBoundsTests": 22,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.015,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 3,
+            "milliseconds": 5.9115,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 0.7757999999999999,
+            "overlayMilliseconds": 0.6048,
+            "compositeMilliseconds": 0.0147,
+            "shadowMilliseconds": 0.8764,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 74,
+              "textureReleaseCount": 0
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 1,
+              "fenceWaitCount": 8,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 114753536,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 64,
+                "batchInstanceCapacity": 1408,
+                "batchCapacity": 22,
+                "submittedInstances": 22,
+                "uploadBytes": 2464,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 1346,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 7,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 0.1642,
+                "recordMilliseconds": 1.3277999999999999,
+                "submitMilliseconds": 0,
+                "retireMilliseconds": 0,
+                "submissionFence": 50,
+                "presentMilliseconds": 3.2472,
+                "waitMilliseconds": 0.0007,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.1103,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0275
+              },
+              "instances": {
+                "totalInstances": 22,
+                "visibleInstances": 22,
+                "culledInstances": 0,
+                "drawCalls": 22,
+                "highLodInstances": 3,
+                "reducedLodInstances": 19,
+                "runtimeMeshInstances": 22,
+                "texturedRuntimeMeshInstances": 22,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 19,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 1,
+                "rejectedClusters": 0,
+                "clusterCulledInstances": 0,
+                "instanceBoundsTests": 22,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0146,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 4,
+            "milliseconds": 4.1228,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 0.7819999999999999,
+            "overlayMilliseconds": 0.7671,
+            "compositeMilliseconds": 0.0113,
+            "shadowMilliseconds": 0.7452,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 74,
+              "textureReleaseCount": 0
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 1,
+              "fenceWaitCount": 8,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 114753536,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 64,
+                "batchInstanceCapacity": 1408,
+                "batchCapacity": 22,
+                "submittedInstances": 22,
+                "uploadBytes": 2464,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 1346,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 8,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 0.1636,
+                "recordMilliseconds": 1.2261,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0,
+                "submissionFence": 50,
+                "presentMilliseconds": 1.4306,
+                "waitMilliseconds": 0.0005,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.1069,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0299
+              },
+              "instances": {
+                "totalInstances": 22,
+                "visibleInstances": 22,
+                "culledInstances": 0,
+                "drawCalls": 22,
+                "highLodInstances": 3,
+                "reducedLodInstances": 19,
+                "runtimeMeshInstances": 22,
+                "texturedRuntimeMeshInstances": 22,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 19,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 1,
+                "rejectedClusters": 0,
+                "clusterCulledInstances": 0,
+                "instanceBoundsTests": 22,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0148,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 5,
+            "milliseconds": 15.9871,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 0.7614,
+            "overlayMilliseconds": 0.6141,
+            "compositeMilliseconds": 0.0139,
+            "shadowMilliseconds": 0.7026,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 74,
+              "textureReleaseCount": 0
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 1,
+              "fenceWaitCount": 9,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 114753536,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 64,
+                "batchInstanceCapacity": 1408,
+                "batchCapacity": 22,
+                "submittedInstances": 22,
+                "uploadBytes": 2464,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 1346,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 9,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 0.151,
+                "recordMilliseconds": 1.163,
+                "submitMilliseconds": 0,
+                "retireMilliseconds": 0,
+                "submissionFence": 51,
+                "presentMilliseconds": 0.3628,
+                "waitMilliseconds": 7.3476,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.0979,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0238
+              },
+              "instances": {
+                "totalInstances": 22,
+                "visibleInstances": 22,
+                "culledInstances": 0,
+                "drawCalls": 22,
+                "highLodInstances": 3,
+                "reducedLodInstances": 19,
+                "runtimeMeshInstances": 22,
+                "texturedRuntimeMeshInstances": 22,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 19,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 1,
+                "rejectedClusters": 0,
+                "clusterCulledInstances": 0,
+                "instanceBoundsTests": 22,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0138,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 6,
+            "milliseconds": 12.0765,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 0.8418,
+            "overlayMilliseconds": 0.8202,
+            "compositeMilliseconds": 0.0138,
+            "shadowMilliseconds": 0.6965,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 74,
+              "textureReleaseCount": 0
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 1,
+              "fenceWaitCount": 10,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 114753536,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 64,
+                "batchInstanceCapacity": 1408,
+                "batchCapacity": 22,
+                "submittedInstances": 22,
+                "uploadBytes": 2464,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 1346,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 10,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 0.1481,
+                "recordMilliseconds": 1.1749,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0,
+                "submissionFence": 52,
+                "presentMilliseconds": 0.2878,
+                "waitMilliseconds": 8.9671,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.1042,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0248
+              },
+              "instances": {
+                "totalInstances": 22,
+                "visibleInstances": 22,
+                "culledInstances": 0,
+                "drawCalls": 22,
+                "highLodInstances": 3,
+                "reducedLodInstances": 19,
+                "runtimeMeshInstances": 22,
+                "texturedRuntimeMeshInstances": 22,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 19,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 1,
+                "rejectedClusters": 0,
+                "clusterCulledInstances": 0,
+                "instanceBoundsTests": 22,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0148,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 7,
+            "milliseconds": 4.7803,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 1.0167,
+            "overlayMilliseconds": 0.5608,
+            "compositeMilliseconds": 0.0222,
+            "shadowMilliseconds": 0.8994,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 74,
+              "textureReleaseCount": 0
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 1,
+              "fenceWaitCount": 11,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 114753536,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 64,
+                "batchInstanceCapacity": 1408,
+                "batchCapacity": 22,
+                "submittedInstances": 22,
+                "uploadBytes": 2464,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 1346,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 11,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 0.1777,
+                "recordMilliseconds": 1.5477,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0,
+                "submissionFence": 53,
+                "presentMilliseconds": 0.144,
+                "waitMilliseconds": 1.7399,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.1227,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0242
+              },
+              "instances": {
+                "totalInstances": 22,
+                "visibleInstances": 22,
+                "culledInstances": 0,
+                "drawCalls": 22,
+                "highLodInstances": 3,
+                "reducedLodInstances": 19,
+                "runtimeMeshInstances": 22,
+                "texturedRuntimeMeshInstances": 22,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 19,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 1,
+                "rejectedClusters": 0,
+                "clusterCulledInstances": 0,
+                "instanceBoundsTests": 22,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0176,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          }
+        ],
+        "gpuFrames": [
+          {
+            "fence": 49,
+            "frameMilliseconds": 8.221184,
+            "worldMilliseconds": 3.9345920000000003,
+            "overlayMilliseconds": 0.045888,
+            "compositeMilliseconds": 3.613632,
+            "shadowMilliseconds": 0.627072,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 3.613632
+          },
+          {
+            "fence": 50,
+            "frameMilliseconds": 6.756896,
+            "worldMilliseconds": 2.59856,
+            "overlayMilliseconds": 0.0392,
+            "compositeMilliseconds": 3.494144,
+            "shadowMilliseconds": 0.624992,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 3.494144
+          },
+          {
+            "fence": 51,
+            "frameMilliseconds": 8.237408,
+            "worldMilliseconds": 4.3415360000000005,
+            "overlayMilliseconds": 0.036192,
+            "compositeMilliseconds": 3.225728,
+            "shadowMilliseconds": 0.633952,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 3.225728
+          },
+          {
+            "fence": 52,
+            "frameMilliseconds": 3.886208,
+            "worldMilliseconds": 1.9882559999999998,
+            "overlayMilliseconds": 0.03856,
+            "compositeMilliseconds": 1.228352,
+            "shadowMilliseconds": 0.63104,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 1.228352
+          },
+          {
+            "fence": 53,
+            "frameMilliseconds": 4.168672,
+            "worldMilliseconds": 2.1238719999999995,
+            "overlayMilliseconds": 0.081696,
+            "compositeMilliseconds": 1.228384,
+            "shadowMilliseconds": 0.73472,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 1.228384
+          },
+          {
+            "fence": 56,
+            "frameMilliseconds": 10.056352,
+            "worldMilliseconds": 6.064384,
+            "overlayMilliseconds": 2.059808,
+            "compositeMilliseconds": 1.22704,
+            "shadowMilliseconds": 0.70512,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 1.22704
+          }
+        ],
+        "allocations": {
+          "samples": 8,
+          "mean": 56,
+          "p50": 56,
+          "p95": 56,
+          "p99": 56
+        },
+        "cpuPasses": {
+          "world": {
+            "samples": 8,
+            "mean": 0.8304874999999999,
+            "p50": 0.7757999999999999,
+            "p95": 1.0167,
+            "p99": 1.0167
+          },
+          "overlay": {
+            "samples": 8,
+            "mean": 0.647075,
+            "p50": 0.6048,
+            "p95": 0.8202,
+            "p99": 0.8202
+          },
+          "composite": {
+            "samples": 8,
+            "mean": 0.0155625,
+            "p50": 0.0138,
+            "p95": 0.023,
+            "p99": 0.023
+          },
+          "shadows": {
+            "samples": 8,
+            "mean": 0.7818125,
+            "p50": 0.7333,
+            "p95": 0.9534,
+            "p99": 0.9534
+          }
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 6.887786666666668,
+          "p50": 6.756896,
+          "p95": 10.056352,
+          "p99": 10.056352
+        },
+        "gpuPasses": {
+          "world": {
+            "samples": 6,
+            "mean": 3.5085333333333337,
+            "p50": 2.59856,
+            "p95": 6.064384,
+            "p99": 6.064384
+          },
+          "overlay": {
+            "samples": 6,
+            "mean": 0.3835573333333333,
+            "p50": 0.0392,
+            "p95": 2.059808,
+            "p99": 2.059808
+          },
+          "composite": {
+            "samples": 6,
+            "mean": 2.3362133333333333,
+            "p50": 1.228384,
+            "p95": 3.613632,
+            "p99": 3.613632
+          },
+          "shadows": {
+            "samples": 6,
+            "mean": 0.6594826666666666,
+            "p50": 0.63104,
+            "p95": 0.73472,
+            "p99": 0.73472
+          },
+          "particles": {
+            "samples": 0,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "atmosphere": {
+            "samples": 6,
+            "mean": 2.3362133333333333,
+            "p50": 1.228384,
+            "p95": 3.613632,
+            "p99": 3.613632
+          }
+        },
+        "gpuTiming": {
+          "available": true,
+          "timestampFrequencyHz": 1000000000,
+          "unavailableReason": null,
+          "method": "Direct-queue ticks * 1000 / frequency; readback only after submission fence completion. Warmup fences excluded. Latest completed diagnostics may skip intermediate fences; sample counts are explicit. Passes can overlap and must not be summed."
+        }
+      },
+      "run": {
+        "runProfile": "Warm",
+        "cameraPath": "Fixed",
+        "warmupFrames": 3,
+        "setupMilliseconds": 2977.2676,
+        "setupAllocatedBytes": 290946352,
+        "resourcesBeforeSetup": {
+          "loadedTextureCount": 0,
+          "residentTextureBytes": 0,
+          "shaderResourceDescriptorsUsed": 7,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 0,
+          "peakResidentTextureBytes": 0,
+          "peakShaderResourceDescriptorsUsed": 7,
+          "textureUploadCount": 0,
+          "textureReleaseCount": 0
+        },
+        "resourcesBeforeSamples": {
+          "loadedTextureCount": 74,
+          "residentTextureBytes": 44743436,
+          "shaderResourceDescriptorsUsed": 81,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 74,
+          "peakResidentTextureBytes": 44743436,
+          "peakShaderResourceDescriptorsUsed": 81,
+          "textureUploadCount": 74,
+          "textureReleaseCount": 0
+        },
+        "cameraPathVersion": 1,
+        "cameraSamples": 8,
+        "coldScope": "Fresh per-case renderers; process/device/runtime catalog and OS caches can already be warm. No OS/driver cache flush."
+      },
+      "decals": {
+        "active": 0,
+        "capacity": 0,
+        "published": 0,
+        "chunks": 0,
+        "spawned": 0,
+        "dropped": 0,
+        "expired": 0,
+        "retired": 0,
+        "migrated": 0
+      },
+      "terrain": {
+        "totalChunks": 144,
+        "visibleChunks": 13,
+        "culledChunks": 131,
+        "submittedTriangles": 21824,
+        "drawCalls": 13,
+        "uploadedBufferCount": 37,
+        "controlTextureCount": 36,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.2045,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 36,
+        "requiredChunks": 36,
+        "residentGeometryBytes": 1928928,
+        "residentControlBytes": 205920,
+        "chunkUploads": 36,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0323
+      },
+      "instances": {
+        "totalInstances": 22,
+        "visibleInstances": 22,
+        "culledInstances": 0,
+        "drawCalls": 22,
+        "highLodInstances": 3,
+        "reducedLodInstances": 19,
+        "runtimeMeshInstances": 22,
+        "texturedRuntimeMeshInstances": 22,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 19,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 22,
+        "skippedDecalResources": 0
+      },
+      "materials": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "particles": {
+        "quality": "High",
+        "activeParticles": 0,
+        "peakParticles": 0,
+        "activeEmitters": 0,
+        "capacity": 4096,
+        "emittedParticles": 0,
+        "droppedParticles": 0,
+        "fallbackEffects": 0,
+        "drawCalls": 0,
+        "bufferBytes": 786444,
+        "preparationCpuMilliseconds": 0.0137,
+        "screenCoverage": 0,
+        "byType": {
+          "smoke": 0,
+          "dust": 0,
+          "sparks": 0,
+          "blast": 0,
+          "fire": 0,
+          "muzzle": 0
+        },
+        "suppressedEffects": 0
+      },
+      "materialReference": null,
+      "hudVertices": 2760,
+      "graphics": {
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "surface": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 0,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 12,
+          "presentedFrameCount": 12
+        },
+        "postProcessing": {
+          "supported": true,
+          "antialiasing": "High",
+          "resolutionScale": 1,
+          "sceneTargets": 3,
+          "scenePayloadBytes": 49766400,
+          "intermediateTargets": 0,
+          "historyTargets": 0,
+          "maximumSceneSamples": 5,
+          "gpuSubmissionFence": 56,
+          "gpuMilliseconds": 1.22704
+        },
+        "frame": {
+          "plan": {
+            "output": {
+              "width": 1920,
+              "height": 1080,
+              "format": "Rgba8Unorm",
+              "lifetime": "BackBuffer",
+              "resourceCount": 3,
+              "payloadBytes": 24883200
+            },
+            "depth": {
+              "width": 1920,
+              "height": 1080,
+              "format": "Depth32Float",
+              "lifetime": "Surface",
+              "resourceCount": 1,
+              "payloadBytes": 8294400
+            },
+            "overlayDepth": null,
+            "depthShaderReadable": true,
+            "scene": {
+              "width": 1920,
+              "height": 1080,
+              "format": "Rgba16Float",
+              "lifetime": "BackBuffer",
+              "resourceCount": 3,
+              "payloadBytes": 49766400
+            },
+            "shadow": {
+              "width": 4096,
+              "height": 4096,
+              "format": "Depth32Float",
+              "lifetime": "BackBuffer",
+              "resourceCount": 3,
+              "payloadBytes": 201326592
+            },
+            "transientPayloadBytes": 251092992
+          },
+          "cpuSubmission": 12,
+          "worldCpuMilliseconds": 1.0167,
+          "overlayCpuMilliseconds": 0.5608,
+          "gpuSubmissionFence": 56,
+          "worldGpuMilliseconds": 6.064384,
+          "overlayGpuMilliseconds": 2.059808,
+          "frameWaitMilliseconds": 1.7399,
+          "presentMilliseconds": 0.144,
+          "compositeCpuMilliseconds": 0.0222,
+          "compositeDrawCalls": 1,
+          "compositeGpuMilliseconds": 1.22704,
+          "gpuTimingUnavailableReason": null,
+          "intermediateUnavailableReason": null
+        },
+        "particles": {
+          "depthEnabled": true,
+          "gpuSubmissionFence": 0,
+          "updateAndRenderGpuMilliseconds": null,
+          "depthDescriptors": 1
+        },
+        "directionalShadows": {
+          "quality": "High",
+          "resolution": 4096,
+          "cascadeCount": 1,
+          "texturePayloadBytes": 201326592,
+          "shaderResourceDescriptors": 3,
+          "drawCalls": 58,
+          "submittedCasters": 58,
+          "cpuMilliseconds": 0.8994,
+          "gpuSubmissionFence": 56,
+          "gpuMilliseconds": 0.70512,
+          "cpuSubmission": 12,
+          "constantUploadBytes": 3145728,
+          "maximumPcfDepthSamples": 4
+        },
+        "atmosphere": {
+          "quality": "Height",
+          "applied": true,
+          "depthDescriptors": 1,
+          "additionalTargetBytes": 0,
+          "effectiveDensity": 0.0012,
+          "cpuSubmission": 12,
+          "gpuSubmissionFence": 56,
+          "compositionGpuMilliseconds": 1.22704,
+          "unavailableReason": null,
+          "requiredScenePayloadBytes": 49766400,
+          "localHaze": null,
+          "maximumLocalDensityEvaluations": 0
+        },
+        "memory": {
+          "available": true,
+          "localBudgetBytes": 24504172544,
+          "localUsageBytes": 409829376,
+          "nonLocalBudgetBytes": 50152030208,
+          "nonLocalUsageBytes": 114753536,
+          "failureReason": null
+        },
+        "health": {
+          "liveResourceCount": 811,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 0,
+          "releasedResourceCount": 1,
+          "fenceWaitCount": 12,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "resources": {
+          "loadedTextureCount": 74,
+          "residentTextureBytes": 44743436,
+          "shaderResourceDescriptorsUsed": 81,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 74,
+          "peakResidentTextureBytes": 44743436,
+          "peakShaderResourceDescriptorsUsed": 81,
+          "textureUploadCount": 74,
+          "textureReleaseCount": 0
+        },
+        "gpuTimingAvailable": true,
+        "timestampFrequencyHz": 1000000000,
+        "gpuFrameMilliseconds": 10.056352,
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      "repeatPixelsEqual": true,
+      "repeatCaptures": 2,
+      "repeatFailures": [],
+      "captureInputs": [
+        {
+          "frameIndex": 0,
+          "fingerprint": "6E2F1C6006C42B281005011A17DC8DB4505528A81C495B54B49A8E91EE4DF484",
+          "shadowFingerprint": null
+        },
+        {
+          "frameIndex": 1,
+          "fingerprint": "6E2F1C6006C42B281005011A17DC8DB4505528A81C495B54B49A8E91EE4DF484",
+          "shadowFingerprint": null
+        }
+      ],
+      "motionImages": [],
+      "motionMethod": "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.",
+      "visualReview": "pending"
+    },
+    {
+      "submission": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 2240,
+        "batchCapacity": 35,
+        "submittedInstances": 715,
+        "uploadBytes": 80080,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 43744,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "key": "WorldProps1000-1920x1080-High-NormalGameplay",
+      "image": "WorldProps1000-1920x1080-High-NormalGameplay.png",
+      "imageSha256": "B4A036AFC6DCB3A515F6B6B8017EA3720218AA158FD440BAC0D619C8D7638AF6",
+      "pixelSha256": "2A6778CB31925193E65CAE02A13B9C14426A5607667A295ACD8CCB2E1AA411DC",
+      "kind": "WorldProps1000",
+      "fingerprint": "D4180098FAE657478EAC3753F104B368AF7A973D854CE4DEA61691C03E84A0FD",
+      "ui": {
+        "scenario": "World",
+        "fixtureVersion": 3,
+        "layoutContract": 4,
+        "notifications": {
+          "bounds": {
+            "x": 1300,
+            "y": 72,
+            "width": 608,
+            "height": 224,
+            "right": 1908,
+            "bottom": 296,
+            "isEmpty": false
+          },
+          "fontSize": 14,
+          "count": 2,
+          "first": {
+            "item": {
+              "kind": "SupplyCritical",
+              "feedback": false,
+              "hidden": 0,
+              "local": false
+            },
+            "bounds": {
+              "x": 1300,
+              "y": 72,
+              "width": 608,
+              "height": 24.296875,
+              "right": 1908,
+              "bottom": 96.296875,
+              "isEmpty": false
+            },
+            "text": {
+              "x": 1327,
+              "y": 76,
+              "width": 487,
+              "height": 16.296875,
+              "right": 1814,
+              "bottom": 92.296875,
+              "isEmpty": false
+            },
+            "action": {
+              "x": 1818,
+              "y": 76,
+              "width": 86,
+              "height": 16.296875,
+              "right": 1904,
+              "bottom": 92.296875,
+              "isEmpty": false
+            },
+            "details": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "truncated": false,
+            "revision": 15547951598488466619,
+            "identity": {
+              "session": {
+                "value": 0,
+                "isSpecified": false
+              },
+              "kind": "None",
+              "started": {
+                "value": 0
+              },
+              "player": {
+                "value": 0,
+                "isSpecified": false
+              }
+            },
+            "expansionBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "expansionActive": false,
+            "interactiveBounds": {
+              "x": 1300,
+              "y": 72,
+              "width": 608,
+              "height": 24.296875,
+              "right": 1908,
+              "bottom": 96.296875,
+              "isEmpty": false
+            }
+          },
+          "second": {
+            "item": {
+              "kind": "LowPower",
+              "feedback": false,
+              "hidden": 0,
+              "local": false
+            },
+            "bounds": {
+              "x": 1300,
+              "y": 100.296875,
+              "width": 608,
+              "height": 24.296875,
+              "right": 1908,
+              "bottom": 124.59375,
+              "isEmpty": false
+            },
+            "text": {
+              "x": 1327,
+              "y": 104.296875,
+              "width": 487,
+              "height": 16.296875,
+              "right": 1814,
+              "bottom": 120.59375,
+              "isEmpty": false
+            },
+            "action": {
+              "x": 1818,
+              "y": 104.296875,
+              "width": 86,
+              "height": 16.296875,
+              "right": 1904,
+              "bottom": 120.59375,
+              "isEmpty": false
+            },
+            "details": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "truncated": false,
+            "revision": 14066782881462527895,
+            "identity": {
+              "session": {
+                "value": 0,
+                "isSpecified": false
+              },
+              "kind": "None",
+              "started": {
+                "value": 0
+              },
+              "player": {
+                "value": 0,
+                "isSpecified": false
+              }
+            },
+            "expansionBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "expansionActive": false,
+            "interactiveBounds": {
+              "x": 1300,
+              "y": 100.296875,
+              "width": 608,
+              "height": 24.296875,
+              "right": 1908,
+              "bottom": 124.59375,
+              "isEmpty": false
+            }
+          },
+          "third": {
+            "item": {
+              "kind": "None",
+              "feedback": false,
+              "hidden": 0,
+              "local": false
+            },
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "text": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "action": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "details": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "truncated": false,
+            "revision": 0,
+            "identity": {
+              "session": {
+                "value": 0,
+                "isSpecified": false
+              },
+              "kind": "None",
+              "started": {
+                "value": 0
+              },
+              "player": {
+                "value": 0,
+                "isSpecified": false
+              }
+            },
+            "expansionBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "expansionActive": false,
+            "interactiveBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            }
+          },
+          "overflow": {
+            "item": {
+              "kind": "None",
+              "feedback": false,
+              "hidden": 0,
+              "local": false
+            },
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "text": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "action": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "details": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "truncated": false,
+            "revision": 0,
+            "identity": {
+              "session": {
+                "value": 0,
+                "isSpecified": false
+              },
+              "kind": "None",
+              "started": {
+                "value": 0
+              },
+              "player": {
+                "value": 0,
+                "isSpecified": false
+              }
+            },
+            "expansionBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            },
+            "expansionActive": false,
+            "interactiveBounds": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "right": 0,
+              "bottom": 0,
+              "isEmpty": true
+            }
+          },
+          "revision": 1504200532,
+          "paintedBounds": {
+            "x": 1300,
+            "y": 72,
+            "width": 608,
+            "height": 52.59375,
+            "right": 1908,
+            "bottom": 124.59375,
+            "isEmpty": false
+          }
+        },
+        "skin": null,
+        "battlefieldSkin": {
+          "coreBytes": 4194304,
+          "iconBytes": 8388608,
+          "portraitBytes": 0,
+          "batches": 8,
+          "buffers": 32,
+          "draws": 11,
+          "vertices": 1446,
+          "vertexUploadBytes": 46272,
+          "missingAssets": 0,
+          "droppedQuads": 0,
+          "residentPageBytes": 12582912,
+          "prepared": true
+        },
+        "skinState": null,
+        "skinnedControls": null,
+        "layoutId": "GameplayHudLayout",
+        "tooltipBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0,
+          "isEmpty": true
+        },
+        "ringGeometry": null,
+        "interaction": {
+          "mode": "Closed",
+          "selectedIndex": 0,
+          "hoveredIndex": 0,
+          "pointerPressed": false,
+          "contextualHoveredIndex": 0,
+          "contextualPressed": false,
+          "contextualPending": false,
+          "targetingMode": "None"
+        },
+        "captureOffset": "Settled fixed state",
+        "regions": [],
+        "text": {
+          "glyphs": 207,
+          "vertices": 1242,
+          "missingGlyphs": 0,
+          "droppedGlyphs": 0,
+          "uploadBytes": 39744,
+          "atlasReady": true,
+          "failureReason": null
+        },
+        "vertices": 2760,
+        "background": null
+      },
+      "seed": 2026,
+      "tick": 32,
+      "captureVisualSeconds": 1.6,
+      "mechanicalSeconds": null,
+      "camera": {
+        "target": {
+          "x": 855,
+          "y": 6.7294483,
+          "z": 303
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "requestedDisplay": {
+        "width": 1920,
+        "height": 1080
+      },
+      "actualSurface": {
+        "width": 1920,
+        "height": 1080,
+        "bufferCount": 3,
+        "frameIndex": 1,
+        "isSuspended": false,
+        "presentMode": "Immediate",
+        "isOccluded": false,
+        "resizePending": false,
+        "resizeGeneration": 1,
+        "appliedResizeGeneration": 1,
+        "submittedFrameCount": 25,
+        "presentedFrameCount": 25
+      },
+      "hostWindow": {
+        "width": 1280,
+        "height": 720,
+        "isEmpty": false
+      },
+      "hostWindowDpi": 144,
+      "rasterDpi": 96,
+      "uiScale": 1,
+      "requestedQuality": "High",
+      "profile": {
+        "requested": "High",
+        "active": "High",
+        "linearScene": true,
+        "shadows": {
+          "quality": "High",
+          "enabled": true,
+          "resolution": 4096,
+          "cascadeCount": 1,
+          "radius": 750,
+          "maximumCasters": 8192,
+          "maximumDraws": 256
+        },
+        "atmosphere": "Height",
+        "particles": {
+          "quality": "High",
+          "capacity": 4096,
+          "maximumFallbackEffects": 128,
+          "maximumScreenCoverage": 2
+        },
+        "terrainDetail": {
+          "enabled": true,
+          "microTileMeters": 4,
+          "microColorStrength": 0.04,
+          "microNormalStrength": 0.06,
+          "rockSlopeStart": 0.25,
+          "rockSlopeEnd": 0.6
+        },
+        "lodDiameterScale": 1.1,
+        "postProcessing": {
+          "antialiasing": "High",
+          "whiteBalance": 0,
+          "tint": 0,
+          "contrast": 1,
+          "saturation": 1,
+          "edgeBlend": 0.3
+        },
+        "fallbackReason": null,
+        "resolutionScale": 1,
+        "textures": "Full",
+        "vegetationMotion": true,
+        "requestedSettings": {
+          "quality": "High",
+          "colorGrade": {
+            "antialiasing": "Disabled",
+            "whiteBalance": 0,
+            "tint": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "edgeBlend": 0
+          },
+          "resolutionScale": 1,
+          "antialiasing": null,
+          "shadows": null,
+          "textures": null,
+          "objectDetail": null,
+          "surfaceDetail": null,
+          "vegetationMotion": null,
+          "atmosphere": null,
+          "particles": null,
+          "environment": {
+            "daylight": 1,
+            "cloudCover": 0,
+            "wetness": 0
+          },
+          "vegetation": {
+            "density": 1,
+            "maximumDistanceMeters": 4000
+          },
+          "terrainResidency": {
+            "enabled": true,
+            "maximumResidentChunks": 128
+          }
+        },
+        "environment": {
+          "daylight": 1,
+          "cloudCover": 0,
+          "wetness": 0
+        },
+        "vegetation": {
+          "density": 1,
+          "maximumDistanceMeters": 4000
+        },
+        "terrainResidency": {
+          "enabled": true,
+          "maximumResidentChunks": 128
+        }
+      },
+      "lighting": {
+        "directionToLight": {
+          "x": 0.3674047,
+          "y": 0.8922686,
+          "z": -0.26243195
+        },
+        "directionalIntensity": 1.1,
+        "directionalColor": {
+          "x": 1,
+          "y": 0.96,
+          "z": 0.9
+        },
+        "ambientIntensity": 0.52,
+        "ambientColor": {
+          "x": 0.58,
+          "y": 0.66,
+          "z": 0.76
+        },
+        "exposure": 1.15,
+        "groundAmbientFactor": 0.42,
+        "toneMapping": "AcesFitted"
+      },
+      "localHaze": null,
+      "surfaceMarks": [],
+      "cpu": {
+        "samples": 8,
+        "mean": 14.2077875,
+        "p50": 11.7379,
+        "p95": 26.5792,
+        "p99": 26.5792
+      },
+      "gpu": {
+        "samples": 6,
+        "mean": 8.155701333333333,
+        "p50": 8.37648,
+        "p95": 10.872512,
+        "p99": 10.872512
+      },
+      "fps": {
+        "samples": 8,
+        "mean": 75.95099832203988,
+        "p50": 84.11702360323683,
+        "p95": 89.75049362771496,
+        "p99": 89.75049362771496
+      },
+      "performance": {
+        "cpuFrames": [
+          {
+            "index": 0,
+            "milliseconds": 11.8882,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 2.6731999999999996,
+            "overlayMilliseconds": 1.3427,
+            "compositeMilliseconds": 0.0284,
+            "shadowMilliseconds": 3.5392,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 148,
+              "textureReleaseCount": 74
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 813,
+              "fenceWaitCount": 21,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 117407744,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 1024,
+                "batchInstanceCapacity": 2240,
+                "batchCapacity": 35,
+                "submittedInstances": 715,
+                "uploadBytes": 80080,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 43744,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 4,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 3.5975,
+                "recordMilliseconds": 5.829,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0.0001,
+                "submissionFence": 102,
+                "presentMilliseconds": 0.3781,
+                "waitMilliseconds": 0.0011,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.1055,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0122
+              },
+              "instances": {
+                "totalInstances": 1000,
+                "visibleInstances": 715,
+                "culledInstances": 285,
+                "drawCalls": 25,
+                "highLodInstances": 116,
+                "reducedLodInstances": 599,
+                "runtimeMeshInstances": 715,
+                "texturedRuntimeMeshInstances": 715,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 599,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 32,
+                "rejectedClusters": 1,
+                "clusterCulledInstances": 32,
+                "instanceBoundsTests": 968,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0267,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 1,
+            "milliseconds": 15.0344,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 6.2052000000000005,
+            "overlayMilliseconds": 1.3421,
+            "compositeMilliseconds": 0.0476,
+            "shadowMilliseconds": 3.3235,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 148,
+              "textureReleaseCount": 74
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 813,
+              "fenceWaitCount": 21,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 117407744,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 1024,
+                "batchInstanceCapacity": 2240,
+                "batchCapacity": 35,
+                "submittedInstances": 715,
+                "uploadBytes": 80080,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 43744,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 5,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 3.5601,
+                "recordMilliseconds": 9.2195,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0.0001,
+                "submissionFence": 104,
+                "presentMilliseconds": 0.2856,
+                "waitMilliseconds": 0.0006,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.0955,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.01
+              },
+              "instances": {
+                "totalInstances": 1000,
+                "visibleInstances": 715,
+                "culledInstances": 285,
+                "drawCalls": 25,
+                "highLodInstances": 116,
+                "reducedLodInstances": 599,
+                "runtimeMeshInstances": 715,
+                "texturedRuntimeMeshInstances": 715,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 599,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 32,
+                "rejectedClusters": 1,
+                "clusterCulledInstances": 32,
+                "instanceBoundsTests": 968,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0225,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 2,
+            "milliseconds": 11.7379,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 2.9385000000000003,
+            "overlayMilliseconds": 1.288,
+            "compositeMilliseconds": 0.0483,
+            "shadowMilliseconds": 3.4608,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 148,
+              "textureReleaseCount": 74
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 813,
+              "fenceWaitCount": 21,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 117407744,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 1024,
+                "batchInstanceCapacity": 2240,
+                "batchCapacity": 35,
+                "submittedInstances": 715,
+                "uploadBytes": 80080,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 43744,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 6,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 3.434,
+                "recordMilliseconds": 6.0695,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0.0001,
+                "submissionFence": 104,
+                "presentMilliseconds": 0.3039,
+                "waitMilliseconds": 0.0007,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.0899,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0097
+              },
+              "instances": {
+                "totalInstances": 1000,
+                "visibleInstances": 715,
+                "culledInstances": 285,
+                "drawCalls": 25,
+                "highLodInstances": 116,
+                "reducedLodInstances": 599,
+                "runtimeMeshInstances": 715,
+                "texturedRuntimeMeshInstances": 715,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 599,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 32,
+                "rejectedClusters": 1,
+                "clusterCulledInstances": 32,
+                "instanceBoundsTests": 968,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0218,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 3,
+            "milliseconds": 11.2606,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 2.6701,
+            "overlayMilliseconds": 1.2389,
+            "compositeMilliseconds": 0.02,
+            "shadowMilliseconds": 3.4008,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 148,
+              "textureReleaseCount": 74
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 813,
+              "fenceWaitCount": 21,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 117407744,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 1024,
+                "batchInstanceCapacity": 2240,
+                "batchCapacity": 35,
+                "submittedInstances": 715,
+                "uploadBytes": 80080,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 43744,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 7,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 3.4174,
+                "recordMilliseconds": 5.7846,
+                "submitMilliseconds": 0,
+                "retireMilliseconds": 0.0001,
+                "submissionFence": 105,
+                "presentMilliseconds": 0.2786,
+                "waitMilliseconds": 0.0014,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.091,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0092
+              },
+              "instances": {
+                "totalInstances": 1000,
+                "visibleInstances": 715,
+                "culledInstances": 285,
+                "drawCalls": 25,
+                "highLodInstances": 116,
+                "reducedLodInstances": 599,
+                "runtimeMeshInstances": 715,
+                "texturedRuntimeMeshInstances": 715,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 599,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 32,
+                "rejectedClusters": 1,
+                "clusterCulledInstances": 32,
+                "instanceBoundsTests": 968,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0222,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 4,
+            "milliseconds": 11.142,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 2.6180000000000003,
+            "overlayMilliseconds": 1.2695,
+            "compositeMilliseconds": 0.02,
+            "shadowMilliseconds": 3.2813,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 148,
+              "textureReleaseCount": 74
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 813,
+              "fenceWaitCount": 21,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 117407744,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 1024,
+                "batchInstanceCapacity": 2240,
+                "batchCapacity": 35,
+                "submittedInstances": 715,
+                "uploadBytes": 80080,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 43744,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 8,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 3.4238,
+                "recordMilliseconds": 5.6229,
+                "submitMilliseconds": 0.0002,
+                "retireMilliseconds": 0.0001,
+                "submissionFence": 106,
+                "presentMilliseconds": 0.3066,
+                "waitMilliseconds": 0.001,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.0901,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0094
+              },
+              "instances": {
+                "totalInstances": 1000,
+                "visibleInstances": 715,
+                "culledInstances": 285,
+                "drawCalls": 25,
+                "highLodInstances": 116,
+                "reducedLodInstances": 599,
+                "runtimeMeshInstances": 715,
+                "texturedRuntimeMeshInstances": 715,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 599,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 32,
+                "rejectedClusters": 1,
+                "clusterCulledInstances": 32,
+                "instanceBoundsTests": 968,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0217,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 5,
+            "milliseconds": 11.5816,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 2.6520000000000006,
+            "overlayMilliseconds": 1.2752,
+            "compositeMilliseconds": 0.0234,
+            "shadowMilliseconds": 3.6447,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 148,
+              "textureReleaseCount": 74
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 813,
+              "fenceWaitCount": 21,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 117407744,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 1024,
+                "batchInstanceCapacity": 2240,
+                "batchCapacity": 35,
+                "submittedInstances": 715,
+                "uploadBytes": 80080,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 43744,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 9,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 3.4611,
+                "recordMilliseconds": 6.0206,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0.0001,
+                "submissionFence": 107,
+                "presentMilliseconds": 0.2602,
+                "waitMilliseconds": 0.0007,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.0893,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0084
+              },
+              "instances": {
+                "totalInstances": 1000,
+                "visibleInstances": 715,
+                "culledInstances": 285,
+                "drawCalls": 25,
+                "highLodInstances": 116,
+                "reducedLodInstances": 599,
+                "runtimeMeshInstances": 715,
+                "texturedRuntimeMeshInstances": 715,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 599,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 32,
+                "rejectedClusters": 1,
+                "clusterCulledInstances": 32,
+                "instanceBoundsTests": 968,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0224,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 6,
+            "milliseconds": 26.5792,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 2.7361999999999997,
+            "overlayMilliseconds": 16.0703,
+            "compositeMilliseconds": 0.0251,
+            "shadowMilliseconds": 3.5124,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 148,
+              "textureReleaseCount": 74
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 813,
+              "fenceWaitCount": 21,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 117407744,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 1024,
+                "batchInstanceCapacity": 2240,
+                "batchCapacity": 35,
+                "submittedInstances": 715,
+                "uploadBytes": 80080,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 43744,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 10,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 3.5735,
+                "recordMilliseconds": 5.9523,
+                "submitMilliseconds": 0.0001,
+                "retireMilliseconds": 0.0001,
+                "submissionFence": 109,
+                "presentMilliseconds": 0.3353,
+                "waitMilliseconds": 0.0008,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.0926,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0094
+              },
+              "instances": {
+                "totalInstances": 1000,
+                "visibleInstances": 715,
+                "culledInstances": 285,
+                "drawCalls": 25,
+                "highLodInstances": 116,
+                "reducedLodInstances": 599,
+                "runtimeMeshInstances": 715,
+                "texturedRuntimeMeshInstances": 715,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 599,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 32,
+                "rejectedClusters": 1,
+                "clusterCulledInstances": 32,
+                "instanceBoundsTests": 968,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0247,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          },
+          {
+            "index": 7,
+            "milliseconds": 14.4384,
+            "allocatedBytes": 56,
+            "worldMilliseconds": 4.5442,
+            "overlayMilliseconds": 1.9131,
+            "compositeMilliseconds": 0.0478,
+            "shadowMilliseconds": 3.6946,
+            "resources": {
+              "loadedTextureCount": 74,
+              "residentTextureBytes": 44743436,
+              "shaderResourceDescriptorsUsed": 81,
+              "shaderResourceDescriptorCapacity": 4096,
+              "textureBindingFailureCount": 0,
+              "peakLoadedTextureCount": 74,
+              "peakResidentTextureBytes": 44743436,
+              "peakShaderResourceDescriptorsUsed": 81,
+              "textureUploadCount": 148,
+              "textureReleaseCount": 74
+            },
+            "health": {
+              "liveResourceCount": 811,
+              "pendingRetirementCount": 0,
+              "peakPendingRetirementCount": 0,
+              "releasedResourceCount": 813,
+              "fenceWaitCount": 21,
+              "submissionFaultCount": 0,
+              "failureReasonCode": null
+            },
+            "memory": {
+              "available": true,
+              "localBudgetBytes": 24504172544,
+              "localUsageBytes": 409829376,
+              "nonLocalBudgetBytes": 50152030208,
+              "nonLocalUsageBytes": 117407744,
+              "failureReason": null
+            },
+            "submission": {
+              "objects": {
+                "stagingCapacity": 1024,
+                "batchInstanceCapacity": 2240,
+                "batchCapacity": 35,
+                "submittedInstances": 715,
+                "uploadBytes": 80080,
+                "pipelineBindings": 1,
+                "textureBindings": 4,
+                "skinEvaluatedPoses": 0,
+                "skinStaticFallbacks": 0,
+                "skinUploadBytes": 0,
+                "snapshotIndexBytes": 43744,
+                "mechanicalPartInstances": 0,
+                "mechanicalTransformScratchBytes": 2048
+              },
+              "assetPreparation": {
+                "frameSequence": 11,
+                "sessionId": {
+                  "value": 0,
+                  "isSpecified": false
+                },
+                "snapshotTick": 32,
+                "prepareMilliseconds": 3.5603,
+                "recordMilliseconds": 7.8377,
+                "submitMilliseconds": 0.0002,
+                "retireMilliseconds": 0.0001,
+                "submissionFence": 109,
+                "presentMilliseconds": 0.3481,
+                "waitMilliseconds": 0.0015,
+                "uploadedTextureCount": 0,
+                "uploadedTextureBytes": null,
+                "logicalTextureBytes": 44743436,
+                "observedDxgiLocalUsageBytes": 409829376,
+                "failureStatus": null
+              },
+              "decals": {
+                "active": 0,
+                "capacity": 0,
+                "published": 0,
+                "chunks": 0,
+                "spawned": 0,
+                "dropped": 0,
+                "expired": 0,
+                "retired": 0,
+                "migrated": 0
+              },
+              "terrain": {
+                "totalChunks": 144,
+                "visibleChunks": 13,
+                "culledChunks": 131,
+                "submittedTriangles": 21824,
+                "drawCalls": 13,
+                "uploadedBufferCount": 37,
+                "controlTextureCount": 36,
+                "textureBindingsPerDraw": 13,
+                "maximumTextureSamplesPerPixel": 13,
+                "cpuSubmissionMilliseconds": 0.1069,
+                "surfaceDetailEnabled": true,
+                "rootSignatureDwords": 18,
+                "residentChunks": 36,
+                "requiredChunks": 36,
+                "residentGeometryBytes": 1928928,
+                "residentControlBytes": 205920,
+                "chunkUploads": 36,
+                "chunkEvictions": 0,
+                "residencyCpuMilliseconds": 0.0122
+              },
+              "instances": {
+                "totalInstances": 1000,
+                "visibleInstances": 715,
+                "culledInstances": 285,
+                "drawCalls": 25,
+                "highLodInstances": 116,
+                "reducedLodInstances": 599,
+                "runtimeMeshInstances": 715,
+                "texturedRuntimeMeshInstances": 715,
+                "fallbackMeshInstances": 0,
+                "lod1Instances": 599,
+                "lod2Instances": 0,
+                "animatedVegetationInstances": 0,
+                "visibleVegetationInstances": 0,
+                "clusterTests": 32,
+                "rejectedClusters": 1,
+                "clusterCulledInstances": 32,
+                "instanceBoundsTests": 968,
+                "skippedDecalResources": 0
+              },
+              "particles": {
+                "quality": "High",
+                "activeParticles": 0,
+                "peakParticles": 0,
+                "activeEmitters": 0,
+                "capacity": 4096,
+                "emittedParticles": 0,
+                "droppedParticles": 0,
+                "fallbackEffects": 0,
+                "drawCalls": 0,
+                "bufferBytes": 786444,
+                "preparationCpuMilliseconds": 0.0287,
+                "screenCoverage": 0,
+                "byType": {
+                  "smoke": 0,
+                  "dust": 0,
+                  "sparks": 0,
+                  "blast": 0,
+                  "fire": 0,
+                  "muzzle": 0
+                },
+                "suppressedEffects": 0
+              }
+            }
+          }
+        ],
+        "gpuFrames": [
+          {
+            "fence": 104,
+            "frameMilliseconds": 4.26832,
+            "worldMilliseconds": 2.2104,
+            "overlayMilliseconds": 0.04208,
+            "compositeMilliseconds": 1.235904,
+            "shadowMilliseconds": 0.779936,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 1.235904
+          },
+          {
+            "fence": 105,
+            "frameMilliseconds": 8.37648,
+            "worldMilliseconds": 4.145023999999999,
+            "overlayMilliseconds": 0.03408,
+            "compositeMilliseconds": 1.233504,
+            "shadowMilliseconds": 2.963872,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 1.233504
+          },
+          {
+            "fence": 106,
+            "frameMilliseconds": 10.425408,
+            "worldMilliseconds": 6.723872,
+            "overlayMilliseconds": 1.524992,
+            "compositeMilliseconds": 1.232896,
+            "shadowMilliseconds": 0.943648,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 1.232896
+          },
+          {
+            "fence": 107,
+            "frameMilliseconds": 10.872512,
+            "worldMilliseconds": 6.009184,
+            "overlayMilliseconds": 2.750944,
+            "compositeMilliseconds": 1.231776,
+            "shadowMilliseconds": 0.880608,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 1.231776
+          },
+          {
+            "fence": 109,
+            "frameMilliseconds": 4.25968,
+            "worldMilliseconds": 2.194112,
+            "overlayMilliseconds": 0.050976,
+            "compositeMilliseconds": 1.234496,
+            "shadowMilliseconds": 0.780096,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 1.234496
+          },
+          {
+            "fence": 111,
+            "frameMilliseconds": 10.731808,
+            "worldMilliseconds": 4.450816,
+            "overlayMilliseconds": 1.98928,
+            "compositeMilliseconds": 1.233952,
+            "shadowMilliseconds": 3.05776,
+            "particleMilliseconds": null,
+            "atmosphereMilliseconds": 1.233952
+          }
+        ],
+        "allocations": {
+          "samples": 8,
+          "mean": 56,
+          "p50": 56,
+          "p95": 56,
+          "p99": 56
+        },
+        "cpuPasses": {
+          "world": {
+            "samples": 8,
+            "mean": 3.379675,
+            "p50": 2.6731999999999996,
+            "p95": 6.2052000000000005,
+            "p99": 6.2052000000000005
+          },
+          "overlay": {
+            "samples": 8,
+            "mean": 3.217475,
+            "p50": 1.288,
+            "p95": 16.0703,
+            "p99": 16.0703
+          },
+          "composite": {
+            "samples": 8,
+            "mean": 0.032575,
+            "p50": 0.0251,
+            "p95": 0.0483,
+            "p99": 0.0483
+          },
+          "shadows": {
+            "samples": 8,
+            "mean": 3.4821625000000003,
+            "p50": 3.4608,
+            "p95": 3.6946,
+            "p99": 3.6946
+          }
+        },
+        "gpu": {
+          "samples": 6,
+          "mean": 8.155701333333333,
+          "p50": 8.37648,
+          "p95": 10.872512,
+          "p99": 10.872512
+        },
+        "gpuPasses": {
+          "world": {
+            "samples": 6,
+            "mean": 4.2889013333333335,
+            "p50": 4.145023999999999,
+            "p95": 6.723872,
+            "p99": 6.723872
+          },
+          "overlay": {
+            "samples": 6,
+            "mean": 1.065392,
+            "p50": 0.050976,
+            "p95": 2.750944,
+            "p99": 2.750944
+          },
+          "composite": {
+            "samples": 6,
+            "mean": 1.2337546666666668,
+            "p50": 1.233504,
+            "p95": 1.235904,
+            "p99": 1.235904
+          },
+          "shadows": {
+            "samples": 6,
+            "mean": 1.5676533333333333,
+            "p50": 0.880608,
+            "p95": 3.05776,
+            "p99": 3.05776
+          },
+          "particles": {
+            "samples": 0,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "atmosphere": {
+            "samples": 6,
+            "mean": 1.2337546666666668,
+            "p50": 1.233504,
+            "p95": 1.235904,
+            "p99": 1.235904
+          }
+        },
+        "gpuTiming": {
+          "available": true,
+          "timestampFrequencyHz": 1000000000,
+          "unavailableReason": null,
+          "method": "Direct-queue ticks * 1000 / frequency; readback only after submission fence completion. Warmup fences excluded. Latest completed diagnostics may skip intermediate fences; sample counts are explicit. Passes can overlap and must not be summed."
+        }
+      },
+      "run": {
+        "runProfile": "Warm",
+        "cameraPath": "Fixed",
+        "warmupFrames": 3,
+        "setupMilliseconds": 2876.9224,
+        "setupAllocatedBytes": 289321064,
+        "resourcesBeforeSetup": {
+          "loadedTextureCount": 0,
+          "residentTextureBytes": 0,
+          "shaderResourceDescriptorsUsed": 7,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 74,
+          "peakResidentTextureBytes": 44743436,
+          "peakShaderResourceDescriptorsUsed": 81,
+          "textureUploadCount": 74,
+          "textureReleaseCount": 74
+        },
+        "resourcesBeforeSamples": {
+          "loadedTextureCount": 74,
+          "residentTextureBytes": 44743436,
+          "shaderResourceDescriptorsUsed": 81,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 74,
+          "peakResidentTextureBytes": 44743436,
+          "peakShaderResourceDescriptorsUsed": 81,
+          "textureUploadCount": 148,
+          "textureReleaseCount": 74
+        },
+        "cameraPathVersion": 1,
+        "cameraSamples": 8,
+        "coldScope": "Fresh per-case renderers; process/device/runtime catalog and OS caches can already be warm. No OS/driver cache flush."
+      },
+      "decals": {
+        "active": 0,
+        "capacity": 0,
+        "published": 0,
+        "chunks": 0,
+        "spawned": 0,
+        "dropped": 0,
+        "expired": 0,
+        "retired": 0,
+        "migrated": 0
+      },
+      "terrain": {
+        "totalChunks": 144,
+        "visibleChunks": 13,
+        "culledChunks": 131,
+        "submittedTriangles": 21824,
+        "drawCalls": 13,
+        "uploadedBufferCount": 37,
+        "controlTextureCount": 36,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.1138,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 36,
+        "requiredChunks": 36,
+        "residentGeometryBytes": 1928928,
+        "residentControlBytes": 205920,
+        "chunkUploads": 36,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0238
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 715,
+        "culledInstances": 285,
+        "drawCalls": 25,
+        "highLodInstances": 116,
+        "reducedLodInstances": 599,
+        "runtimeMeshInstances": 715,
+        "texturedRuntimeMeshInstances": 715,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 599,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 1,
+        "clusterCulledInstances": 32,
+        "instanceBoundsTests": 968,
+        "skippedDecalResources": 0
+      },
+      "materials": {
+        "loadedMaterialCount": 132,
+        "loadedAssetTextureCount": 29,
+        "bindingFailureCount": 0,
+        "loadedMeshCount": 309,
+        "residentMeshBytes": 10940424,
+        "loadedSkinCount": 2,
+        "residentSkinBytes": 3623302,
+        "loadedAnimationCount": 18,
+        "residentAnimationBytes": 175694
+      },
+      "particles": {
+        "quality": "High",
+        "activeParticles": 0,
+        "peakParticles": 0,
+        "activeEmitters": 0,
+        "capacity": 4096,
+        "emittedParticles": 0,
+        "droppedParticles": 0,
+        "fallbackEffects": 0,
+        "drawCalls": 0,
+        "bufferBytes": 786444,
+        "preparationCpuMilliseconds": 0.0318,
+        "screenCoverage": 0,
+        "byType": {
+          "smoke": 0,
+          "dust": 0,
+          "sparks": 0,
+          "blast": 0,
+          "fire": 0,
+          "muzzle": 0
+        },
+        "suppressedEffects": 0
+      },
+      "materialReference": null,
+      "hudVertices": 2760,
+      "graphics": {
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "surface": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 1,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 25,
+          "presentedFrameCount": 25
+        },
+        "postProcessing": {
+          "supported": true,
+          "antialiasing": "High",
+          "resolutionScale": 1,
+          "sceneTargets": 3,
+          "scenePayloadBytes": 49766400,
+          "intermediateTargets": 0,
+          "historyTargets": 0,
+          "maximumSceneSamples": 5,
+          "gpuSubmissionFence": 111,
+          "gpuMilliseconds": 1.233952
+        },
+        "frame": {
+          "plan": {
+            "output": {
+              "width": 1920,
+              "height": 1080,
+              "format": "Rgba8Unorm",
+              "lifetime": "BackBuffer",
+              "resourceCount": 3,
+              "payloadBytes": 24883200
+            },
+            "depth": {
+              "width": 1920,
+              "height": 1080,
+              "format": "Depth32Float",
+              "lifetime": "Surface",
+              "resourceCount": 1,
+              "payloadBytes": 8294400
+            },
+            "overlayDepth": null,
+            "depthShaderReadable": true,
+            "scene": {
+              "width": 1920,
+              "height": 1080,
+              "format": "Rgba16Float",
+              "lifetime": "BackBuffer",
+              "resourceCount": 3,
+              "payloadBytes": 49766400
+            },
+            "shadow": {
+              "width": 4096,
+              "height": 4096,
+              "format": "Depth32Float",
+              "lifetime": "BackBuffer",
+              "resourceCount": 3,
+              "payloadBytes": 201326592
+            },
+            "transientPayloadBytes": 251092992
+          },
+          "cpuSubmission": 25,
+          "worldCpuMilliseconds": 4.5442,
+          "overlayCpuMilliseconds": 1.9131,
+          "gpuSubmissionFence": 111,
+          "worldGpuMilliseconds": 4.450816,
+          "overlayGpuMilliseconds": 1.98928,
+          "frameWaitMilliseconds": 0.0015,
+          "presentMilliseconds": 0.3481,
+          "compositeCpuMilliseconds": 0.0478,
+          "compositeDrawCalls": 1,
+          "compositeGpuMilliseconds": 1.233952,
+          "gpuTimingUnavailableReason": null,
+          "intermediateUnavailableReason": null
+        },
+        "particles": {
+          "depthEnabled": true,
+          "gpuSubmissionFence": 0,
+          "updateAndRenderGpuMilliseconds": null,
+          "depthDescriptors": 1
+        },
+        "directionalShadows": {
+          "quality": "High",
+          "resolution": 4096,
+          "cascadeCount": 1,
+          "texturePayloadBytes": 201326592,
+          "shaderResourceDescriptors": 3,
+          "drawCalls": 71,
+          "submittedCasters": 1036,
+          "cpuMilliseconds": 3.6946,
+          "gpuSubmissionFence": 111,
+          "gpuMilliseconds": 3.05776,
+          "cpuSubmission": 25,
+          "constantUploadBytes": 3145728,
+          "maximumPcfDepthSamples": 4
+        },
+        "atmosphere": {
+          "quality": "Height",
+          "applied": true,
+          "depthDescriptors": 1,
+          "additionalTargetBytes": 0,
+          "effectiveDensity": 0.0012,
+          "cpuSubmission": 25,
+          "gpuSubmissionFence": 111,
+          "compositionGpuMilliseconds": 1.233952,
+          "unavailableReason": null,
+          "requiredScenePayloadBytes": 49766400,
+          "localHaze": null,
+          "maximumLocalDensityEvaluations": 0
+        },
+        "memory": {
+          "available": true,
+          "localBudgetBytes": 24504172544,
+          "localUsageBytes": 409829376,
+          "nonLocalBudgetBytes": 50152030208,
+          "nonLocalUsageBytes": 117407744,
+          "failureReason": null
+        },
+        "health": {
+          "liveResourceCount": 811,
+          "pendingRetirementCount": 0,
+          "peakPendingRetirementCount": 0,
+          "releasedResourceCount": 813,
+          "fenceWaitCount": 22,
+          "submissionFaultCount": 0,
+          "failureReasonCode": null
+        },
+        "resources": {
+          "loadedTextureCount": 74,
+          "residentTextureBytes": 44743436,
+          "shaderResourceDescriptorsUsed": 81,
+          "shaderResourceDescriptorCapacity": 4096,
+          "textureBindingFailureCount": 0,
+          "peakLoadedTextureCount": 74,
+          "peakResidentTextureBytes": 44743436,
+          "peakShaderResourceDescriptorsUsed": 81,
+          "textureUploadCount": 148,
+          "textureReleaseCount": 74
+        },
+        "gpuTimingAvailable": true,
+        "timestampFrequencyHz": 1000000000,
+        "gpuFrameMilliseconds": 10.731808,
+        "debug": {
+          "enabled": false,
+          "warningCount": 0,
+          "errorCount": 0
+        }
+      },
+      "repeatPixelsEqual": true,
+      "repeatCaptures": 2,
+      "repeatFailures": [],
+      "captureInputs": [
+        {
+          "frameIndex": 1,
+          "fingerprint": "811B67EED4F40BB4349ADD97918B99F59B5402DD2B0EEEA01BF1EEC7CB36CDAF",
+          "shadowFingerprint": null
+        },
+        {
+          "frameIndex": 2,
+          "fingerprint": "811B67EED4F40BB4349ADD97918B99F59B5402DD2B0EEEA01BF1EEC7CB36CDAF",
+          "shadowFingerprint": null
+        }
+      ],
+      "motionImages": [],
+      "motionMethod": "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.",
+      "visualReview": "pending"
+    }
+  ],
+  "humanVisualAcceptance": "pending"
+}

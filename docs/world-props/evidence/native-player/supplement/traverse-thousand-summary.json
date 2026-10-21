@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "label": "traverse-thousand",
+  "sourceSha": "3545a23125d5ca8b3c24d50a8e77d72175c5acf6",
+  "warmups": 3,
+  "samplesPerSide": 64,
+  "repeatCaptures": 2,
+  "originalImagesVerified": 2,
+  "sameClientAndHardware": true,
+  "comparedFrameFields": [
+    "totalInstances",
+    "visibleInstances",
+    "culledInstances",
+    "drawCalls",
+    "highLodInstances",
+    "reducedLodInstances",
+    "runtimeMeshInstances",
+    "texturedRuntimeMeshInstances",
+    "fallbackMeshInstances"
+  ],
+  "frameDifferences": [],
+  "visibleRange": [
+    0,
+    715
+  ],
+  "highLodRange": [
+    0,
+    110
+  ],
+  "reducedLodRange": [
+    0,
+    612
+  ],
+  "maximumBindingFailures": 0,
+  "maximumSubmissionFaults": 0,
+  "files": [
+    {
+      "file": "traverse-thousand-before.json",
+      "originalArtifact": "artifacts/pt/before/manifest.json",
+      "sha256": "d84661a21aef9ccd7eebf8976ce72ef317b713b32ea8aa5290c71fdc82e14083"
+    },
+    {
+      "originalArtifact": "artifacts/pt/before/WorldProps1000-1920x1080-Medium-NormalGameplay-Traverse.png",
+      "sha256": "637a1ae3ca24c69d0084ac5971f44f685410ecf6c6d510cd00cc84d88c886a8c",
+      "bytes": 5107994,
+      "retained": null
+    },
+    {
+      "file": "traverse-thousand-after.json",
+      "originalArtifact": "artifacts/pt/after/manifest.json",
+      "sha256": "2911821805c6c24579c22ebdc2a06a7ef97f55e47d8b93f91122582c1f24fdac"
+    },
+    {
+      "originalArtifact": "artifacts/pt/after/WorldProps1000-1920x1080-Medium-NormalGameplay-Traverse.png",
+      "sha256": "5f3b6e2ff93b43863b769bc129ef41714a75f7a87da98e7a8f88e9b41239b841",
+      "bytes": 5108672,
+      "retained": null
+    }
+  ],
+  "physicalPerformanceAcceptance": "pending",
+  "movingLodHumanAcceptance": "pending",
+  "liveGameplayRoutes": "pending",
+  "note": "Scripted camera traversal over immutable prop snapshots. Adjacent pose readbacks, where present, are not a judder or sustained FPS measurement."
+}

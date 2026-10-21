@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "attempts": [
+    {
+      "artifactRoot": "artifacts/pa",
+      "status": "failed",
+      "reason": "Material-slot negative initially selected a materialless collision proxy; corrected visual-root selection was validated in later independent runs."
+    },
+    {
+      "artifactRoot": "artifacts/pb",
+      "status": "interrupted",
+      "reason": "Stopped to introduce a cached source catalog; not qualification evidence."
+    },
+    {
+      "artifactRoot": "artifacts/pc",
+      "status": "passed",
+      "authoringProducerSource": "75ef57ae35e1d665affc56c61aeabbf8d26583ae",
+      "qualificationSource": "22f5bde1a6ce4544462eb7ca963747ea5524b9c5",
+      "purpose": "Original glTF preservation qualification."
+    },
+    {
+      "artifactRoot": "artifacts/px2",
+      "status": "passed",
+      "source": "22f5bde1a6ce4544462eb7ca963747ea5524b9c5",
+      "purpose": "Explicit baked pipe-axis correction."
+    },
+    {
+      "artifactRoot": "artifacts/pd",
+      "status": "failed",
+      "reason": "Embedded Blender source clone exceeded Windows path limits (275 characters). No pass is inferred."
+    },
+    {
+      "artifactRoot": "artifacts/pe",
+      "status": "passed",
+      "source": "09036b0261798a90e954adf840b74757384e2365",
+      "purpose": "Final compact GLB bindings; maximum measured source-clone path 239 characters. Retained native masters and exports derive from this run."
+    }
+  ],
+  "retainedProductSource": "3545a23125d5ca8b3c24d50a8e77d72175c5acf6",
+  "humanArtApproval": "pending"
+}
