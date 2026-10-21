@@ -51,7 +51,8 @@ def run(request):
     for aid,result in results.items():
         canonical,maximum=canonical_geometry(geometries[aid],result,'.collision' in aid)
         if maximum>1e-6:changed.append(aid)
-        path,definition=catalog.definitions[aid];target=Path('_edited')/export_filename(aid)
+        # Keep import provenance identical; only the supported vertex edit may differ.
+        path,definition=catalog.definitions[aid];target=Path('_infrastructure')/export_filename(aid)
         write_glb(source/path.relative_to(catalog.root).parent/target,canonical)
         write_json(source/path.relative_to(catalog.root),dict(definition,source=target.as_posix()))
     require(changed==[root],'Saved supported edit did not change exactly its intended mesh')
