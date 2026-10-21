@@ -1,0 +1,76 @@
+{
+  "archiveSha256": "fe33702ceb79d5ffd982dbdd99fb600e17d6502e204b50d677a84128bccc0d34",
+  "sourceRevision": "8e85a329a9a8d86497f432ba904703f3f95c1dda",
+  "productVersion": "0.1.439",
+  "runtimeAssetSignature": "437f816bf1589396577f88b88cbdf913c67632fae34b8b8ed3b582f3c4f500ec",
+  "cleanSource": true,
+  "reproduciblePublishTrees": true,
+  "verifiedManifestFiles": 1487,
+  "sourceAndCompilerExcluded": true,
+  "freshExtractionOutsideCheckout": true,
+  "privateEmptyCwdAndSettings": true,
+  "sourceLessCatalogAssets": 1363,
+  "localHardwareCases": 8,
+  "installedHardwareCases": 4,
+  "installedImagePairs": [
+    {
+      "key": "InfrastructureBridgeDeck-1920x1080-High-CloseTactical-Yaw90-Inspection30",
+      "pixelSha256": "C219C1A807E9DA710D6EF4F77AC2EC31C512295F5804859D4189AE91CD3F6337",
+      "imageSha256": "BA53BDA16CBE4C1B5B17AFA44AED577617CA8EBE3DD30A4758D8F600297BC4CC",
+      "installedMatchesLocalExactly": true
+    },
+    {
+      "key": "InfrastructureFordDeck-1920x1080-High-CloseTactical-Yaw90-Inspection30",
+      "pixelSha256": "5B28275852326418046B28A984DE1D8B86898A2C308C56F2E05EE72C67C3A0AB",
+      "imageSha256": "DEB9146CF4467685B733EDD4110F730E48080EEE32D81A4073496F52BB08FEFC",
+      "installedMatchesLocalExactly": true
+    },
+    {
+      "key": "InfrastructureCurveLong-1920x1080-High-CloseTactical-Yaw90-Inspection30",
+      "pixelSha256": "B8963C84ACEE08DE4ECC99AD94713A78444CFA2ACF716D3961AB5DDD08562758",
+      "imageSha256": "96CA48D8B81439F20350049E07D4B6FE27E3482AF4DA26707FD446FE6825F05C",
+      "installedMatchesLocalExactly": true
+    },
+    {
+      "key": "InfrastructureRoadJunctions-1920x1080-High-NormalGameplay",
+      "pixelSha256": "F3226223C9AA7455919E937A0FEC41E1E6FEA848D6E1927E250F9C81A2548100",
+      "imageSha256": "F0A36E8B3B771FCFA9018B3D21DAF0BE45FF64A9DECC0BCA9F30FCFEDCA2D890",
+      "installedMatchesLocalExactly": true
+    }
+  ],
+  "historicalAfterImageComparison": [
+    {
+      "key": "InfrastructureBridgeDeck-1920x1080-High-CloseTactical-Yaw90-Inspection30",
+      "pixelEqualToMeasuredAfter": true
+    },
+    {
+      "key": "InfrastructureFordDeck-1920x1080-High-CloseTactical-Yaw90-Inspection30",
+      "pixelEqualToMeasuredAfter": true
+    },
+    {
+      "key": "InfrastructureCurveLong-1920x1080-High-CloseTactical-Yaw90-Inspection30",
+      "pixelEqualToMeasuredAfter": true
+    },
+    {
+      "key": "InfrastructureRoadJunctions-1920x1080-High-NormalGameplay",
+      "pixelEqualToMeasuredAfter": true
+    },
+    {
+      "key": "InfrastructureBridgeApproach-1920x1080-High-CloseTactical",
+      "pixelEqualToMeasuredAfter": true
+    },
+    {
+      "key": "InfrastructureBridgeExit-1920x1080-High-CloseTactical",
+      "pixelEqualToMeasuredAfter": true
+    },
+    {
+      "key": "InfrastructureFordApproach-1920x1080-High-CloseTactical",
+      "pixelEqualToMeasuredAfter": true
+    },
+    {
+      "key": "InfrastructureFordExit-1920x1080-High-CloseTactical",
+      "pixelEqualToMeasuredAfter": true
+    }
+  ],
+  "nativeAcceptance": "Structural repeatability and installed/local identity only; historical paired performance retains its measured terrain base."
+}

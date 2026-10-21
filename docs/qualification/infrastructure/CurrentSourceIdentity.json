@@ -1,0 +1,67 @@
+{
+  "success": true,
+  "integrationBase": "34c69dd97db417d1982fd7bf75cb1baa197082f6",
+  "masters": {
+    "roads": {
+      "sha256": "7c0fb7f5b6cef35dd6833874c743da64ffeafa287e0c238d7a14d6974b58e4bc",
+      "bytes": 17044208,
+      "sourceSignature": "d58497f7a834db37ff98492393497351a27aa4e7eafabd0919edc5e003a69325"
+    },
+    "bridge": {
+      "sha256": "83768a838faee5c8d48c206a433a671b40a118de68d822e71eb63f0688818821",
+      "bytes": 17034253,
+      "sourceSignature": "a3fcce8def525d5b0c57f9b5be9f8d0223c66389ea5d5a26e530cab1fc552a34"
+    }
+  },
+  "canonicalEqualsActualBlenderExports": [
+    {
+      "id": "infrastructure.directorate.road.curve_long",
+      "sha256": "44c8bf53d7cd10233574c69b73e76a1bf062cb898bc2e34d4264ce4aa1afcc84"
+    },
+    {
+      "id": "infrastructure.directorate.road.curve_short",
+      "sha256": "a219d0a573ffb27672c7c081cd889c74e199f810c2809c0e5f7ccbe7423a5c8a"
+    },
+    {
+      "id": "infrastructure.directorate.road.damaged",
+      "sha256": "6c50d9dcdb929dcab57267ade1990e0d1cc5b8ce36477b90f5f38e0b81a64785"
+    },
+    {
+      "id": "infrastructure.directorate.road.destroyed",
+      "sha256": "2cff333675bc33a46835e2019e041401bb70505247b1b44f05a7dcfbb56acf64"
+    },
+    {
+      "id": "infrastructure.directorate.road.junction_cross",
+      "sha256": "d9a7ff82f22eb82c36165128a0af6c42561e9e7724fd2075a103ea791a6d552a"
+    },
+    {
+      "id": "infrastructure.directorate.road.junction_t",
+      "sha256": "b7a9577ecf503a246769309f259df5382e18d025d0905c80200aae129df6796e"
+    },
+    {
+      "id": "infrastructure.directorate.road.shoulder",
+      "sha256": "8287085e0eaa3773cb1ebfff6604f02831947b3bfb89e20d43f245cbd0fec6ee"
+    },
+    {
+      "id": "infrastructure.directorate.road.straight",
+      "sha256": "39453cd049c7dde4bae8c39b54a6785570855887b4ca728ac0916fb5edac0508"
+    },
+    {
+      "id": "infrastructure.directorate.road.yard_transition",
+      "sha256": "d69e0e29efe08d4053531c53f3191837f689803840c7dc133378ea14736432fb"
+    },
+    {
+      "id": "infrastructure.directorate.bridge.road.damaged",
+      "sha256": "9273dc54590761cf4e3bc9654f0b89c57ddfc6293d590bd9c0d36f0cf00db9cb"
+    },
+    {
+      "id": "infrastructure.directorate.bridge.road.destroyed",
+      "sha256": "9824d2e58a39cc7bf46cd8bce4a6fa27a4db7ea0df09a29ba8adc6a6f6d82d28"
+    },
+    {
+      "id": "infrastructure.directorate.bridge.road.intact",
+      "sha256": "f4198224105d0c2e28750ad8a850ebf17b97914b41304b298071425a46ab94e9"
+    }
+  ],
+  "nativeProof": "The retained BlenderQualification.json contains completed real qualification of both unchanged active master families, including saved reopening and bounded edit rejection. The third historical family is superseded by unchanged upstream prop masters; see SharedTransitions.json."
+}

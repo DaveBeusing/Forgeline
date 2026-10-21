@@ -19,6 +19,10 @@ scene IDs are preserved before the appended infrastructure range. Historical
 145-pair measurements and the three-master qualification below retain their
 original measured identities and are not claims about the later prop base.
 
+For the completed current-base native and reproducible installed-package checks,
+see [Current integration](CurrentIntegration.md). The original paired matrix
+and its earlier source boundaries remain below.
+
 ## Source boundaries
 
 The ordered audit observed master `a524b0a8164390abe1e9cb38170e690f46147574`
