@@ -7,6 +7,9 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class VisualReferenceSceneTests
 {
     [Theory]
+    [InlineData(VisualReferenceSceneKind.StorageDepotSingle, 1, 4u)]
+    [InlineData(VisualReferenceSceneKind.SupplyDepotSingle, 1, 10u)]
+    [InlineData(VisualReferenceSceneKind.LogisticsHubSingle, 1, 8u)]
     [InlineData(VisualReferenceSceneKind.StorageDepotRepeated, 100, 4u)]
     [InlineData(VisualReferenceSceneKind.StorageDepotStress, 1000, 4u)]
     [InlineData(VisualReferenceSceneKind.SupplyDepotRepeated, 100, 10u)]
@@ -21,7 +24,7 @@ public sealed class VisualReferenceSceneTests
         var instances = scene.Snapshot.Instances.ToArray();
         Assert.Equal(count, instances.Length);
         Assert.Equal(count, instances.Select(x => x.Entity).Distinct().Count());
-        Assert.Equal(4, instances.Select(x => x.Transform.Rotation).Distinct().Count());
+        Assert.Equal(count == 1 ? 1 : 4, instances.Select(x => x.Transform.Rotation).Distinct().Count());
         var definition = DirectorateContent.CreateBuildingCatalog()[new(building)];
         Assert.All(instances, instance =>
         {

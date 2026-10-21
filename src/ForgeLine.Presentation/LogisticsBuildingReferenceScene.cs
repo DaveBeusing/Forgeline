@@ -16,8 +16,8 @@ internal static class LogisticsBuildingReferenceScene
     {
         var family = kind switch
         {
-            VisualReferenceSceneKind.StorageDepotRepeated or VisualReferenceSceneKind.StorageDepotStress => BuildingIds.StorageDepot,
-            VisualReferenceSceneKind.SupplyDepotRepeated or VisualReferenceSceneKind.SupplyDepotStress => BuildingIds.SupplyDepot,
+            VisualReferenceSceneKind.StorageDepotSingle or VisualReferenceSceneKind.StorageDepotRepeated or VisualReferenceSceneKind.StorageDepotStress => BuildingIds.StorageDepot,
+            VisualReferenceSceneKind.SupplyDepotSingle or VisualReferenceSceneKind.SupplyDepotRepeated or VisualReferenceSceneKind.SupplyDepotStress => BuildingIds.SupplyDepot,
             _ => BuildingIds.LogisticsHub
         };
         var gallery = family == BuildingIds.StorageDepot ? VisualReferenceSceneKind.StorageDepotProduction :
@@ -26,9 +26,10 @@ internal static class LogisticsBuildingReferenceScene
         RenderInstance template = basis.Snapshot.Instances.ToArray().First(instance =>
             instance.BuildingFeature.Building == family &&
             instance.BuildingFeature.State == BuildingPresentationState.Operational);
-        int count = kind is VisualReferenceSceneKind.StorageDepotStress or VisualReferenceSceneKind.SupplyDepotStress or VisualReferenceSceneKind.LogisticsHubStress ? 1000 : 100;
-        int columns = count == 1000 ? 32 : 10;
-        Vector3 target = new(512, 0, 512);
+        int count = kind is VisualReferenceSceneKind.StorageDepotStress or VisualReferenceSceneKind.SupplyDepotStress or VisualReferenceSceneKind.LogisticsHubStress ? 1000 :
+            kind is VisualReferenceSceneKind.StorageDepotSingle or VisualReferenceSceneKind.SupplyDepotSingle or VisualReferenceSceneKind.LogisticsHubSingle ? 1 : 100;
+        int columns = count == 1000 ? 32 : count == 100 ? 10 : 1;
+        Vector3 target = count == 1 ? basis.Target : new(512, 0, 512);
         var instances = new RenderInstance[count];
         for (int i = 0; i < count; i++)
         {
