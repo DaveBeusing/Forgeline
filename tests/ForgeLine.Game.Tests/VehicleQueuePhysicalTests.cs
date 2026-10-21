@@ -9,6 +9,23 @@ namespace ForgeLine.Game.Tests;
 public sealed class VehicleQueuePhysicalTests
 {
     [Theory]
+    [InlineData(4u)]
+    [InlineData(10u)]
+    [InlineData(8u)]
+    public void LogisticsFamiliesServiceTwoThroughTenTrucksAcrossEveryCardinalOrientation(uint family)
+    {
+        foreach (int count in new[] { 2, 10 })
+        for (int orientation = 0; orientation < 4; orientation++)
+        {
+            var fixture = new Traffic(count, false, new BuildingId(family), orientation);
+            for (int tick = 0; tick < 25_000 && fixture.Completed.Count < count; tick++)
+                fixture.Simulation.AdvanceOneTick();
+            Assert.Equal(fixture.Trucks, fixture.Completed);
+            Assert.False(fixture.Simulation.Entities.HasComponent<VehicleDockSlot>(fixture.Building));
+        }
+    }
+
+    [Theory]
     [InlineData(1, false)]
     [InlineData(3, false)]
     [InlineData(8, false)]
@@ -120,6 +137,7 @@ public sealed class VehicleQueuePhysicalTests
         private readonly SpatialGridIndex _spatial = new();
         private readonly SpatialIndexSynchronizer _synchronizer;
         private readonly HashSet<EntityId> _departing = new();
+        private readonly Quaternion _rotation;
         public SimulationCoordinator Simulation { get; } = new(ticksPerSecond: 20);
         public EntityId Building { get; }
         public EntityId[] Trucks { get; }
@@ -127,8 +145,9 @@ public sealed class VehicleQueuePhysicalTests
         public HashSet<EntityId> Ignored { get; } = new();
         public SimulationPhase Phase => SimulationPhase.Logistics;
 
-        public Traffic(int count, bool opposing)
+        public Traffic(int count, bool opposing, BuildingId? family = null, int quarterTurns = 0)
         {
+            _rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, quarterTurns * MathF.PI / 2);
             _synchronizer = new(_spatial);
             var terrain = new TerrainWorld(new WorldGridSettings { ChunkSizeMeters = 1024, HeightSamplesPerSide = 3 },
                 [new TerrainChunk(new(0, 0), new TerrainHeightfield(3, 1024, new float[9]))]);
@@ -138,6 +157,18 @@ public sealed class VehicleQueuePhysicalTests
             Simulation.Entities.AddComponent(Building, new WorldTransform(new(600, 0, 512), Quaternion.Identity, new(20, 8, 20)));
             Simulation.Entities.AddComponent(Building, new BuildingLoadingDock(new(0, 0, 14.5f), Vector3.UnitX, 12));
             Simulation.Entities.AddComponent(Building, new SpatialPresence(new(10, 4, 10), new(1, 2, SpatialMobility.Static)));
+            float lane = 14.5f;
+            if (family is BuildingId id)
+            {
+                var building = DirectorateContent.CreateBuildingCatalog()[id];
+                var size = new Vector3(building.Footprint.Width, building.Footprint.Height, building.Footprint.Depth);
+                Simulation.Entities.AddComponent(Building, new CompletedBuilding(id, new(1), SimulationTick.Zero));
+                Simulation.Entities.AddComponent(Building, new WorldTransform(new(600, size.Y * .5f, 512), _rotation, size));
+                var dock = building.LoadingDock!.Value;
+                Simulation.Entities.AddComponent(Building, dock);
+                Simulation.Entities.AddComponent(Building, new SpatialPresence(size * .5f, new(1, 2, SpatialMobility.Static)));
+                lane = dock.ServicePosition.Z;
+            }
             Trucks = new EntityId[count];
             for (int index = 0; index < count; index++)
             {
@@ -145,8 +176,8 @@ public sealed class VehicleQueuePhysicalTests
                 Trucks[index] = truck;
                 bool supply = index % 2 == 1;
                 Vector3 size = supply ? new(3.4f, 2.5f, 6.8f) : new(3.2f, 2.4f, 6.4f);
-                float heading = opposing && supply ? -MathF.PI / 2 : MathF.PI / 2;
-                Simulation.Entities.AddComponent(truck, new WorldTransform(new(560 - index * 14, 1, 526.5f + (opposing ? supply ? 20 : -20 : 0)),
+                float heading = (opposing && supply ? -MathF.PI / 2 : MathF.PI / 2) + quarterTurns * MathF.PI / 2;
+                Simulation.Entities.AddComponent(truck, new WorldTransform(Rotate(new(560 - index * 14, 1, 512 + lane + (opposing ? supply ? 20 : -20 : 0))),
                     Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading), size));
                 Simulation.Entities.AddComponent(truck, new ControllableEntity(new(1), ControllableEntityCategory.Unit));
                 Simulation.Entities.AddComponent(truck, new GroundMovement(13, 6.5f, 10, 2.35f, 2, 1, 5.8f, 8, 24, 1));
@@ -172,7 +203,7 @@ public sealed class VehicleQueuePhysicalTests
                     {
                         Completed.Add(truck);
                         // Normal onward travel must clear the departure area for the remaining fleet.
-                        context.Entities.AddComponent(truck, new MovementOrder(new(1), new(900, 1, 80 + Completed.Count * 35),
+                        context.Entities.AddComponent(truck, new MovementOrder(new(1), Rotate(new(900, 1, 80 + Completed.Count * 35)),
                             context.Tick, context.Tick));
                     }
                     continue;
@@ -184,6 +215,9 @@ public sealed class VehicleQueuePhysicalTests
                 _departing.Add(truck);
             }
         }
+
+        private Vector3 Rotate(Vector3 point) => new Vector3(600, 0, 512) +
+            Vector3.Transform(point - new Vector3(600, 0, 512), _rotation);
 
     }
 }
