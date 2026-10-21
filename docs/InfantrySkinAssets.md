@@ -2,6 +2,13 @@
 
 The two existing Directorate infantry roles use editable four-figure Blender masters in `assets/source/units/directorate/authoring/infantry`. Their LOD0 mesh IDs now reference separate `skin.directorate.*` assets and nine `animation.directorate.*` assets per role. LOD1/2, materials, collision, sockets, footprints, selection and gameplay identities retain their existing contracts. Each squad remains one simulation entity.
 
+The [infantry surface refinement](InfantrySurfaceRefinement.md) corrects the saved
+masters' reflected atlas V coordinates and packs the existing PBR maps for native
+editing. Rig reconstruction converts glTF top-left UVs to Blender bottom-left UVs;
+export returns to the original static-source convention. Material placeholders
+keep preview images out of bounded GLB skins; canonical material IDs resolve the
+shared compiled maps. Geometry, weights, rest rig and all action keys are retained.
+
 ## Rig and compiler
 
 Compiler 1.12.0 supports the bounded optional skin subset described in [the decision](adr/BoundedInfantrySkinning.md). Each figure has pelvis, spine, head, left/right upper arms, forearms, thighs and shins. Four figures share one 44-joint armature. Joint TR uses metre coordinates and unit scale. glTF inverse binds must be finite, invertible and match the rest hierarchy; weights must be nonnegative and sum to one, with at most four influences. Float `WEIGHTS_0` and unsigned byte/short `JOINTS_0` are supported. Morphs, sparse/normalized accessors, second influence sets, non-unit scale animation, required extensions and retargeting are rejected. Constant unit-scale channels exported by Blender are validated then omitted.
