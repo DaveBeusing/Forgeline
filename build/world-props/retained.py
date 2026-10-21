@@ -38,13 +38,14 @@ def bind(output, pipe_axis):
         exports = Catalog((pipe_axis if is_pipe else first.parent) / 'first/source')
         for aid in family['assets']:
             path, definition = catalog.definitions[aid]
-            target = ROOT / 'assets/source/world/meshes/sources/blender/props' / name / (aid + '.glb')
+            leaf = 'reduced.glb' if aid.endswith('_lod1') else 'high.glb'
+            target = ROOT / 'assets/source/world/meshes/sources/blender/props' / name / leaf
             require(not target.exists(), 'Never overwrite an existing production export')
             expected = read_geometry(catalog.source(aid), catalog.root, definition)
             if is_pipe:
                 expected = align_straight_pipe(expected)
             compare_geometry(expected, read_geometry(exports.source(aid), exports.root, definition))
-            updated = dict(definition, source='../sources/blender/props/' + name + '/' + aid + '.glb')
+            updated = dict(definition, source='../sources/blender/props/' + name + '/' + leaf)
             pending.append((path, updated, exports.source(aid), target))
     for path, definition, source, target in pending:
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -103,7 +104,7 @@ def validate():
             require(sha(target / master['path']) == master['sha256'], 'Native master bytes changed')
         require(len(lineage['exports']) == 2 and {e['id'] for e in lineage['exports']} == set(family['assets']), 'Missing High/Reduced exports')
         for entry in lineage['exports']:
-            require(catalog.definitions[entry['id']][1]['source'] == '../sources/blender/props/' + name + '/' + entry['id'] + '.glb', 'Binding changed')
+            require(catalog.definitions[entry['id']][1]['source'] == '../sources/blender/props/' + name + '/' + ('reduced.glb' if entry['id'].endswith('_lod1') else 'high.glb'), 'Binding changed')
             require(sha(catalog.source(entry['id'])) == entry['sha256'], 'Export changed')
     print('22 native rest/inspection master pairs and 44 bound High/Reduced GLBs match current source contracts')
 

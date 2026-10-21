@@ -28,7 +28,9 @@ retains a strictly exportable rest master and a separate packed-PBR inspection
 project. Reviewed GLBs bind the original 44 High/Reduced IDs under
 assets/source/world/meshes/sources/blender/props/. Existing glTF recipes and
 inputs remain available. Every definition field except its source path must
-match the audited original-bindings.json.
+match the audited original-bindings.json. Compact high.glb/reduced.glb filenames
+keep embedded Blender source clones below Windows file-path limits in deep
+worktrees; the stable IDs remain unchanged in their definitions.
 
 The adapter under build/world-props uses the existing bounded static importer,
 exporter, pinned Blender launcher and production PBR preview. Common Blender
