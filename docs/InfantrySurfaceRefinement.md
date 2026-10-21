@@ -1,5 +1,10 @@
 # Infantry atlas orientation refinement
 
+**Current PR: 0.1.434 on tank-integrated master `3c732aa5`.** See the final
+post-tank section and [current evidence index](qualification/infantry-surfaces/post-tank/index.json).
+Earlier 0.1.432/433 observations below retain their actual source identities.
+Performance qualification fails and human/global renderer acceptance stays open.
+
 This review candidate corrects a demonstrated UV-origin defect in the existing
 Rifle Squad and Combat Engineer masters. It does not replace the established art,
 re-rig the figures or claim complete high-fidelity art/animation acceptance.
@@ -330,3 +335,66 @@ This is a reviewable atlas-origin correction and portable authoring repair with
 functional/native/package evidence. It is **not** accepted high-fidelity
 modernization or a performance-qualified release. PR #277 stays draft; no merge,
 tag, release or golden approval is performed.
+
+## Post-tank master reconciliation: current 0.1.434
+
+During finalization, tank finish PR #278 advanced master to
+`3c732aa519bb54bec17070bcdad378c232ea9de1`, version 0.1.433. Real conflicts in
+the scene enum/time guard, client capture time admission and its tests are
+resolved by preserving both tank and infantry behavior. All **84** master scene
+IDs remain unchanged; the six infantry load references append after them.
+Both test groups survive. Version **0.1.434** is exactly one PATCH above this base.
+The infantry masters, GLBs, atlas maps, authoring helpers, compiler, skeletal
+renderer and gameplay code are unchanged by this reconciliation.
+
+The new clean measured/package source is
+`c85fd2987611de126963c93608cf3eda66636680`. Its Release solution build passes
+with zero warnings/errors. All **119** portable contracts pass. Focused tests
+pass: Assets **46**, Presentation **103**, Client **12**. Three optional compiled
+tank parity cases initially skip because their catalog environment is unset;
+all **three** are then explicitly rerun with the real old/new tank catalogs and
+pass at 30/60/144 Hz. There are **164 unique passing focused cases**, including
+those actual compiled geometry/binding/mechanical-matrix comparisons. Earlier
+Blender native and headless results retain their stated source; their infantry
+authoring/gameplay implementations have no intervening change.
+
+Fresh current-master baseline/candidate catalogs both validate without sources:
+1,363 assets, 74,844,665 bytes each, unchanged individual container sizes and
+metadata, the same four infantry payload changes and eighteen byte-identical
+animation payloads. The new candidate manifest SHA-256 is
+`3541dc2ae0f6275bf2b7c9b1357539f932598eae6c3b746cae1e790e50a5c579`,
+content signature
+`1226b257a9eb59a022a0605394a40dcecd4efd46f041582965d7a1287dcc2827`.
+
+Four additional native before/after pairs cover both role galleries at 20 m and
+both 1000-root loads at 40 m, High/1080p, with 8 warmups / 32 samples / 8 equal
+readbacks. Matching geometry/resource counters and zero fallback/binding failures
+are verified. **Performance still fails:** the current gallery has four engineer
+CPU statistic exceedances; the crowd cohort passes. No historical failure is
+discarded. Four further actual installed-player captures match this development
+source pixel-exactly. Across the original index and this source-bound addendum,
+there are **70 paired cases and 150 original PNGs**, including repeated settings.
+
+The current reproducible-publish-tree run produces
+`artifacts/ifpkg434/FORGELINE-0.1.434-dev-win-x64.zip`, **55,141,213 bytes**,
+SHA-256 `5b06d740b0e7f51d09aa863ec29a7b0771d86d15e77242e4d73a370fddf065f1`.
+Provenance records clean source `c85fd298`. Fresh extraction into sibling
+`infantry-player434` verifies all **1,487 hashes**. Published and installed
+source-less smoke tests both exit 0 without timeout. The same 1,364 compiled
+files are byte-identical to the candidate catalog, plus 63 publisher media files;
+no authoring assets/scripts/compiler ship. The earlier 0.1.433 package is retained
+as historical evidence and is not relabelled 0.1.434.
+
+[The post-tank index](qualification/infantry-surfaces/post-tank/index.json)
+retains twelve new original-image identities, two unchanged selected PNG copies,
+exact compressed raw logs/manifests/test results, package provenance and the
+53,278,121-byte complete local addendum archive, SHA-256
+`96cf20bb905653e801ca1ca975dbfd7daa6f8ca6448030e24e5ae010d93ea31d`.
+The two archives together retain every original image and raw measurement.
+Selected current images: [rifle](qualification/infantry-surfaces/post-tank/images/rifle.png)
+and [engineer](qualification/infantry-surfaces/post-tank/images/engineer.png).
+
+The subsequent documentation/evidence commit changes no production inputs from
+`c85fd298`; its current-head checks are tracked on PR #277. This remains a draft
+with failed physical performance qualification and pending human/global renderer
+acceptance. No merge, tag, release or golden approval is performed.
