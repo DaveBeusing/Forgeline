@@ -8,8 +8,11 @@ import bpy
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/blender'))
-from asset_contract import Catalog, fixture_selection, read_geometry, require, sha, write_json
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from mineral_contract import MineralCatalog as Catalog
+from asset_contract import fixture_selection, read_geometry, require, sha, write_json
 import roundtrip
+roundtrip.Catalog = Catalog
 import production
 
 

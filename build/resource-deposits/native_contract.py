@@ -7,7 +7,9 @@ import bpy
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/blender'))
-from asset_contract import Catalog, fixture_selection, read_geometry, write_json
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from mineral_contract import MineralCatalog as Catalog
+from asset_contract import fixture_selection, read_geometry, write_json
 from roundtrip import export_scene
 
 request = json.loads(Path(sys.argv[sys.argv.index('--request') + 1]).read_text(encoding='utf-8-sig'))
