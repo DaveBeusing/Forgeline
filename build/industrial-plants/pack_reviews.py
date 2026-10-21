@@ -34,9 +34,11 @@ def pack(request):
             images.append({'id': aid, 'sourceSha256': sha(source), 'colorSpace': expected})
         require(len(images) == len(textures) == 3, 'Expected complete Base Color/Normal/ORM set')
         bpy.context.preferences.filepaths.save_version = 0
+        bpy.context.scene.render.filepath = '//previews/' + family + '.png'
         target = output / (family + '_surfaces.blend')
         bpy.ops.wm.save_as_mainfile(filepath=str(target), check_existing=False, relative_remap=False)
-        records.append({'family': family, 'masterSha256': sha(target), 'packedImages': images})
+        records.append({'family': family, 'masterSha256': sha(target), 'packedImages': images,
+                        'renderPath': bpy.context.scene.render.filepath})
     write_json(output / 'packed-reviews.json', {'success': True, 'families': records})
 
 

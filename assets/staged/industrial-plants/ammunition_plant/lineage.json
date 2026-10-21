@@ -9,7 +9,7 @@
   "master": "ammunition_plant.blend",
   "masterSha256": "9052e2ade1888cc9ba7c1b7ecabbbd91295ef2f08798e052ac5547d04a4fcacc",
   "surfaceReviewMaster": "ammunition_plant_surfaces.blend",
-  "surfaceReviewMasterSha256": "da651a70315f5d5ceddc731a3d13f9fb3ea14a47f122733855f9268cb421a469",
+  "surfaceReviewMasterSha256": "2d966b7b0c8f4faced9c49645182ba477dd8e6d2cb00b7de541cd82535f4b82e",
   "exports": [
     {
       "id": "building.directorate.ammunition_plant",

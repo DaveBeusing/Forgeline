@@ -9,7 +9,7 @@
   "master": "fuel_refinery.blend",
   "masterSha256": "7630b30dabcdba35a1bf50fe8b0762f4aa55dc2946c21ffa31b09b23ca5a16f3",
   "surfaceReviewMaster": "fuel_refinery_surfaces.blend",
-  "surfaceReviewMasterSha256": "4e9b149e63742a962b252f5d27fc5eb071eb0dac075a586eb1a76e57ec90165f",
+  "surfaceReviewMasterSha256": "68fc13166d40082faca4cf3a752e997dcf37d9c7294a3b95718fd30efde0ce51",
   "exports": [
     {
       "id": "building.directorate.fuel_refinery",

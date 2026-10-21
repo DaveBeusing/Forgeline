@@ -2,7 +2,7 @@
   "families": [
     {
       "family": "fuel_refinery",
-      "masterSha256": "4e9b149e63742a962b252f5d27fc5eb071eb0dac075a586eb1a76e57ec90165f",
+      "masterSha256": "68fc13166d40082faca4cf3a752e997dcf37d9c7294a3b95718fd30efde0ce51",
       "packedImages": [
         {
           "colorSpace": "sRGB",
@@ -19,11 +19,12 @@
           "id": "texture.directorate.surface.atlas_orm",
           "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1"
         }
-      ]
+      ],
+      "renderPath": "//previews/fuel_refinery.png"
     },
     {
       "family": "ammunition_plant",
-      "masterSha256": "da651a70315f5d5ceddc731a3d13f9fb3ea14a47f122733855f9268cb421a469",
+      "masterSha256": "2d966b7b0c8f4faced9c49645182ba477dd8e6d2cb00b7de541cd82535f4b82e",
       "packedImages": [
         {
           "colorSpace": "sRGB",
@@ -40,7 +41,8 @@
           "id": "texture.directorate.surface.atlas_orm",
           "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1"
         }
-      ]
+      ],
+      "renderPath": "//previews/ammunition_plant.png"
     }
   ],
   "success": true
