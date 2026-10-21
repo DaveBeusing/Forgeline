@@ -15743,7 +15743,7 @@
       "failed": 0,
       "passed": 460,
       "skipped": 2,
-      "logSha256": "2ee67ed5575885d3966c481c8e7c60327eae0f3a4f0437b3f977cf60ad3c706e"
+      "logSha256": "3383261a2a274cae1323fe1a8a6a51b39f8ca53e11cb87dbd1b47b8e14a0a6a5"
     },
     "ForgeLine.Core.Tests": {
       "total": 3,
