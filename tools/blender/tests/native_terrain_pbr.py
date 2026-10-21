@@ -4,10 +4,12 @@ import json
 from pathlib import Path
 import sys
 import bpy
+import numpy as np
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from terrain_pbr import validate, export
 from terrain_pbr_contract import FAMILIES, digest, require
+from procedural_pbr import rgba
 
 p=argparse.ArgumentParser();p.add_argument('--request',required=True)
 request=json.loads(Path(p.parse_args(sys.argv[sys.argv.index('--')+1:]).request).read_text(encoding='utf-8-sig'))
@@ -56,4 +58,11 @@ mat=bpy.data.materials['Terrain:dry_dirt'];mat.node_tree.nodes['Tint'].outputs[0
 edited=out/'edited.blend';bpy.ops.wm.save_as_mainfile(filepath=str(edited),compress=True)
 report=export(source,'dry_dirt',edited,out/'positive')
 require(report['controls']['tint'][0]<.97,'Saved edit did not survive reopening')
+for kind in ('base','normal','orm'):
+    original=rgba(source/'world/textures/terrain'/f'dry_dirt_production_{kind}.png')
+    baked=rgba(out/'positive/source'/report['maps'][kind]['source'])
+    equal=np.array_equal(original,baked)
+    require(not equal if kind=='base' else equal, 'Saved tint must change only the Base Color pixels')
+report['basePixelsChanged']=True
+report['normalAndOrmPixelsUnchanged']=True
 (out/'qualification.json').write_text(json.dumps({'success':True,'families':results,'savedTintEdit':report},indent=2)+'\n',encoding='utf-8')

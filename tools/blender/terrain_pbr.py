@@ -211,6 +211,9 @@ def validate(source, family):
     require(obj.type == 'MESH' and len(obj.data.vertices) == 4 and len(obj.data.polygons) == 1 and
             len(obj.modifiers) == len(obj.constraints) == 0 and tuple(obj.location) == (0,0,0) and
             tuple(obj.rotation_euler) == (0,0,0) and tuple(obj.scale) == (1,1,1), 'Swatch transform/geometry changed')
+    require(obj.animation_data is None and obj.data.animation_data is None and obj.data.shape_keys is None and
+            len(obj.data.materials) == 1 and obj.data.materials[0].name == 'Terrain:'+family,
+            'Unsupported swatch animation/shape/material binding')
     require(all(abs(v.co.z) < 1e-6 and abs(abs(v.co.x)-TILES[family]/2) < 1e-5 and
                 abs(abs(v.co.y)-TILES[family]/2) < 1e-5 for v in obj.data.vertices), 'Physical repeat changed')
     require(len(obj.data.uv_layers) == 1 and obj.data.uv_layers.active.name == 'UV0' and
