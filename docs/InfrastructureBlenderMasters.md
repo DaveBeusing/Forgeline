@@ -6,8 +6,11 @@ under `assets/source/infrastructure/directorate/authoring/`. The three families
 cover nine road meshes, three bridge states, and High/Reduced bridge aprons,
 roadside drains and loading aprons. The existing shared collision proxy remains
 unchanged. Eighteen canonical GLBs are bound through the original stable asset
-definitions; every source vertex, normal, UV, primitive, material slot and index
-is preserved. The original glTF recipes remain available as reconstruction seeds.
+definitions. Sixteen meshes retain every original source channel and index.
+The two curve modules replace disconnected slabs with continuous closed ribbons
+inside the exact original bounds and atlas rectangle. The short curve uses
+20 triangles/36 vertices (previously 24/48); the long uses 36/60 (previously
+36/72). No existing collision proxy changes. The original glTF recipes remain available as reconstruction seeds.
 
 The source audit used master `a524b0a8164390abe1e9cb38170e690f46147574`,
 version 0.1.436. No related open PR or live remote branch existed. Integrated
@@ -47,9 +50,25 @@ supported edit changes exactly its intended compiled mesh. The opt-in
 `Infrastructure Blender masters` workflow requires a provisioned pinned Blender
 Windows runner; portable tests do not substitute for this native execution.
 
-The known bridge/path orientation difference documented in Modular Environment
-Kit is the targeted visual integration gap. Its correction, road approaches,
-native image comparisons, headless parity, final full suite and installed
-package evidence are recorded with subsequent integration validation. No merge,
-tag, release or golden approval is part of this work. Human art/live motion and
-controlled performance acceptance remain separate.
+Crossing render transforms now follow the current authoritative road endpoints.
+The North Bridge deck, two existing apron meshes and its west/east approaches
+share the actual travel axis. South Ford uses the existing road surface and two
+ramps. The 12m lane and paired 2.4m shoulders are retained; 234 static presentation
+instances cover the approaches. These identities do not consume simulation
+entities. Only drawn cargo/supply poses receive the operational crossing plane;
+original ECS transforms, movement, wheel travel, graph keys, navigation,
+traversability and infrastructure state rules remain authoritative.
+
+`CrossingVisualLayoutTests` checks edge alignment, unchanged map records,
+millimetre joins, physical contact, lane widths and terrain clearance. The native
+review driver is `build/Invoke-InfrastructureReview.ps1`: 145 hardware cases cover
+Low/Medium/High, 120/420/1000m, 1080p/4K, bright/dark/wet, four junctions, real
+moving cargo approach/deck/exit samples on both crossings, 1/100/1000 instances,
+30m detail views, camera sweeps and ultrawide. Eight warmups, 32 timing samples
+and two repeated images are used per case. The native contract permits 640x360
+only for software rendering; the rejected hardware request is not counted.
+
+Native image comparisons, final full-suite/headless parity and installed package
+evidence are recorded separately. Repeatable static pixels and sampled real
+movement do not establish live motion, sustained FPS, enclosing-frame or human
+art acceptance. No merge, tag, release or golden approval is part of this work.
