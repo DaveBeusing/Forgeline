@@ -1,0 +1,221 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Terrain material swatches"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0,
+        1
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "material.world.terrain.industrial_ground",
+      "translation": [
+        0.0,
+        0,
+        0
+      ]
+    },
+    {
+      "mesh": 1,
+      "name": "material.world.terrain.scorched",
+      "translation": [
+        25.599999999999998,
+        0,
+        0
+      ],
+      "scale": [
+        1.2,
+        1,
+        1.2
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 1
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "material.world.terrain.industrial_ground",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "baseColorTexture": {
+          "index": 0
+        },
+        "roughnessFactor": 1,
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      },
+      "normalTexture": {
+        "index": 1
+      },
+      "occlusionTexture": {
+        "index": 2
+      }
+    },
+    {
+      "name": "material.world.terrain.scorched",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.65,
+          0.6,
+          0.55,
+          1
+        ],
+        "baseColorTexture": {
+          "index": 0
+        },
+        "roughnessFactor": 1,
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      },
+      "normalTexture": {
+        "index": 1
+      },
+      "occlusionTexture": {
+        "index": 2
+      }
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "images": [
+    {
+      "uri": "dark_ash_production_base.png"
+    },
+    {
+      "uri": "dark_ash_production_normal.png"
+    },
+    {
+      "uri": "dark_ash_production_orm.png"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "sampler": 0
+    },
+    {
+      "source": 1,
+      "sampler": 0
+    },
+    {
+      "source": 2,
+      "sampler": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 140,
+      "uri": "data:application/octet-stream;base64,q6oqwQAAAACrqipBq6oqQQAAAACrqipBq6oqQQAAAACrqirBq6oqwQAAAACrqirBAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAIA/AACAPwAAgD8AAAAAAAAAAAAAAAAAAAEAAgAAAAIAAwA="
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 48
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48,
+      "byteLength": 48
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 96,
+      "byteLength": 32
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 128,
+      "byteLength": 12
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 4,
+      "type": "VEC3",
+      "min": [
+        -10.666666666666666,
+        0,
+        -10.666666666666666
+      ],
+      "max": [
+        10.666666666666666,
+        0,
+        10.666666666666666
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 4,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 4,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 6,
+      "type": "SCALAR"
+    }
+  ],
+  "extras": {
+    "purpose": "Material inspection only; no gameplay terrain mesh",
+    "effectiveRepeatMetres": 21.333333333333332
+  }
+}

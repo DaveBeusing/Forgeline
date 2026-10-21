@@ -1,11 +1,11 @@
 {
   "id": "texture.world.terrain.dark_ash",
-  "type": "texture",
-  "source": "dark_ash_production_base.png",
-  "textureUsage": "baseColor",
   "textureColorSpace": "srgb",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
   "textureGenerateMipmaps": true,
   "textureMaxDimension": 1024,
-  "textureFormat": "bc7Unorm",
-  "textureCompressionQuality": "balanced"
+  "textureUsage": "baseColor",
+  "type": "texture",
+  "source": "blender/dark_ash/dark_ash_production_base.png"
 }

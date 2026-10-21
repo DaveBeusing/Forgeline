@@ -1,11 +1,11 @@
 {
   "id": "texture.world.terrain.bedrock_normal",
-  "type": "texture",
-  "source": "bedrock_production_normal.png",
-  "textureUsage": "normal",
   "textureColorSpace": "linear",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
   "textureGenerateMipmaps": true,
   "textureMaxDimension": 512,
-  "textureFormat": "bc7Unorm",
-  "textureCompressionQuality": "balanced"
+  "textureUsage": "normal",
+  "type": "texture",
+  "source": "blender/bedrock/bedrock_production_normal.png"
 }

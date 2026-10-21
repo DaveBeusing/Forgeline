@@ -1,11 +1,11 @@
 {
   "id": "texture.world.terrain.cracked_earth",
-  "type": "texture",
-  "source": "cracked_earth_production_base.png",
-  "textureUsage": "baseColor",
   "textureColorSpace": "srgb",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
   "textureGenerateMipmaps": true,
   "textureMaxDimension": 1024,
-  "textureFormat": "bc7Unorm",
-  "textureCompressionQuality": "balanced"
+  "textureUsage": "baseColor",
+  "type": "texture",
+  "source": "blender/cracked_earth/cracked_earth_production_base.png"
 }
