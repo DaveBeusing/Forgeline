@@ -44,6 +44,7 @@ def run(request):
         if not counts[aid]:
             continue
         relative = catalog.source(aid).relative_to(catalog.root)
+        require(relative.suffix.lower() == '.glb', 'Adopt a reviewed GLB baseline before finish migration')
         write_glb(source / relative, geometry)
     candidate = Catalog(source)
     contract = json.loads(bpy.context.scene['fl_contract'])

@@ -1,5 +1,8 @@
 # Directorate tank Blender production
 
+The bounded [armor finish refinement](TankSurfaceRefinement.md) records the current
+static armor UV migration, isolated tank review loads and separate acceptance gates.
+
 The editable production source is
 `assets/source/units/directorate/authoring/main_battle_tank.blend`.
 Its seven compiler inputs are the GLB files under

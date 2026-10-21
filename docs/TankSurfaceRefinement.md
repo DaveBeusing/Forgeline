@@ -31,7 +31,8 @@ The one-time `tank_surface.py` migration validates the old saved master before
 editing, accepts only the declared static chart translation, writes the three
 canonical GLBs and saves the resulting rest master. It refuses an already-migrated
 source. The original kit remains the reconstruction seed; after an intentional
-seed reconstruction and `Author`, apply this explicit finish migration again.
+seed reconstruction and `Author`, first adopt its reviewed GLB baseline and saved
+master through the standard pipeline, then apply this explicit finish migration again.
 Never replace the saved master with an unreviewed reconstruction.
 
 ```powershell
