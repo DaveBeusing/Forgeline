@@ -1,3 +1,4 @@
 *.json -text -whitespace
 *.log -text -whitespace
 *.png binary
+*.sha256 -text -whitespace
