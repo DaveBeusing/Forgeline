@@ -1,4 +1,5 @@
 {
+  "authoringSourceSha": "ad6b88e06d8c0f99ae561a00429f694ef44c7470",
   "blenderVersion": "5.2.2",
   "boundPortableSourceSignature": "c182995729b8303a16cf2ba322565af3c13ff97c8af246de73a0a9b56eaf77d5",
   "canonicalSourcesUnchanged": false,
@@ -23,6 +24,19 @@
   "masters": [
     {
       "path": "volatiles.blend",
+      "sha256": "bc5c62efc208a700e97d6b3384e5490e63264d73a30c506c7b7a08fd1b1e9a5c"
+    },
+    {
+      "path": "volatiles_inspection.blend",
+      "sha256": "468aa206e1c2759f0712056b19debba16fc204a19aff5c59fbc74ceebd482dd0"
+    }
+  ],
+  "nativeContractSignaturePolicy": "lf-json-v1",
+  "nativeContractSourceSignature": "c182995729b8303a16cf2ba322565af3c13ff97c8af246de73a0a9b56eaf77d5",
+  "portableSourceSignature": "04c06e5837f327d2837efda1e14037d1e382baba5702f1aafae1ddba8a94bd89",
+  "previousNativeMasters": [
+    {
+      "path": "volatiles.blend",
       "sha256": "ede5d9d863ea16be7f991ecc23c74ec26fd9b6e37034c6df35862d754ae89b3d"
     },
     {
@@ -30,7 +44,6 @@
       "sha256": "25a8af354b048010c005fa17d7046b5696f1d3a1ab06dd3304196a7f6aa42b73"
     }
   ],
-  "portableSourceSignature": "04c06e5837f327d2837efda1e14037d1e382baba5702f1aafae1ddba8a94bd89",
   "schemaVersion": 1,
   "sourceSha": "1f351e14ab0f703006a641320502f26bb506087f",
   "sourceSignature": "eee316b4b0aab7feaa836a684c436e78be7ea7b4c925dd96593a7991812f878d",

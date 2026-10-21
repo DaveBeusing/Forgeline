@@ -1,0 +1,18 @@
+{
+  "blenderVersion": "5.2.2 LTS",
+  "families": [
+    "ferrous_ore",
+    "silicates",
+    "volatiles",
+    "rare_elements"
+  ],
+  "freshFactoryScenePerImport": true,
+  "schemaVersion": 1,
+  "scripts": {
+    "author.py": "233fc0d0f9737f1f3380d72d8f9675c784de975b6340e6ffede8ab53f0aa8157",
+    "author_batch.py": "afa02fc1d34e66dc30393474b7ee0d10f5f487b83e0adab8bde1d84f2fdeb9f4",
+    "mineral_contract.py": "6743affbb3130e5bd347c68eca2858f6da4721336a54fc6834d7c39bb23f1a3a",
+    "native_contract.py": "7f6480851ac299ad8ebc1f172375e4d9e4783acc4b00d4bce3c22e608ccb8da2"
+  },
+  "success": true
+}

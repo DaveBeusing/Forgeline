@@ -35,7 +35,7 @@ def retain(output):
         ids, families = fixture_selection(catalog, FIXTURE, ['mesh.world.resource.' + name])
         first = output / name / 'first'
         report = json.loads((first / 'roundtrip-report.json').read_text(encoding='utf-8'))
-        require(report['success'] and report['sourceSignature'] == catalog.signature(ids)[0], 'Source changed')
+        require(report['success'] and report['sourceSignature'] == portable_signature(catalog, ids), 'Source changed')
         target = TARGET / name
         target.mkdir(parents=True, exist_ok=False)
         masters = []
@@ -57,6 +57,41 @@ def retain(output):
                    'canonicalSourcesUnchanged': True, 'humanArtApproval': 'pending'})
 
 
+def refresh_native(output):
+    qualification = json.loads((output / 'qualification.json').read_text(encoding='utf-8-sig'))
+    require(all(qualification.get(k) is True for k in ('success', 'deterministicSourceAndRuntime',
+                'sourceLessIntegrity', 'typedCompiledComparison', 'canonicalSourcesUnchanged')),
+            'Native qualification is incomplete')
+    catalog = Catalog(ROOT / 'assets/source')
+    pending = []
+    for name in NAMES:
+        ids, _ = fixture_selection(catalog, FIXTURE, ['mesh.world.resource.' + name])
+        target = TARGET / name
+        lineage = json.loads((target / 'lineage.json').read_text(encoding='utf-8'))
+        signature = portable_signature(catalog, ids)
+        require(lineage['status'] == 'review-bound-not-accepted' and
+                lineage['boundPortableSourceSignature'] == signature, 'Bound source changed')
+        first = output / name / 'first'
+        report = json.loads((first / 'roundtrip-report.json').read_text(encoding='utf-8'))
+        require(report['success'] and report['sourceSignature'] == signature, 'Native signature is not portable')
+        exports = {entry['id']: entry['exportSha256'] for entry in report['meshes']}
+        require(exports == {entry['id']: entry['sha256'] for entry in lineage['exports']},
+                'Native refresh cannot change the retained exports')
+        for master in lineage['masters']:
+            require(sha(target / master['path']) == master['sha256'], 'Existing native edit would be overwritten')
+        replacements = [('authoring.blend', name + '.blend'), ('inspection.blend', name + '_inspection.blend')]
+        lineage['previousNativeMasters'] = lineage['masters']
+        lineage['masters'] = [{'path': filename, 'sha256': sha(first / source)} for source, filename in replacements]
+        lineage['authoringSourceSha'] = qualification['sourceSha']
+        lineage['nativeContractSourceSignature'] = signature
+        lineage['nativeContractSignaturePolicy'] = 'lf-json-v1'
+        pending.append((target, first, replacements, lineage))
+    for target, first, replacements, lineage in pending:
+        for source, filename in replacements:
+            shutil.copyfile(first / source, target / filename)
+        write_json(target / 'lineage.json', lineage)
+
+
 def validate():
     catalog = Catalog(ROOT / 'assets/source')
     for name in NAMES:
@@ -68,6 +103,9 @@ def validate():
             require(lineage['portableSourceSignature'] == portable_signature(catalog, ids), 'Canonical source changed')
         else:
             require(lineage['boundPortableSourceSignature'] == portable_signature(catalog, ids), 'Bound source changed')
+            require(lineage.get('nativeContractSignaturePolicy') == 'lf-json-v1' and
+                    lineage.get('nativeContractSourceSignature') == lineage['boundPortableSourceSignature'],
+                    'Native source contract needs a qualified refresh')
         require(lineage['fixtureSha256'] == sha(FIXTURE), 'Fixture changed')
         require({x['path'] for x in lineage['masters']} == {name + '.blend', name + '_inspection.blend'}
                 and len(lineage['masters']) == 2, 'Incomplete masters')
@@ -92,6 +130,10 @@ def validate():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 3 and sys.argv[1] == '--refresh-native':
+        refresh_native(Path(sys.argv[2]).resolve())
+    elif len(sys.argv) == 2:
         retain(Path(sys.argv[1]).resolve())
+    else:
+        require(len(sys.argv) == 1, 'Use no arguments, an initial retention root, or --refresh-native ROOT')
     validate()

@@ -72,7 +72,7 @@ Use the pinned SDK and Blender 5.2.2 x64, a clean checkout and fresh output path
 dotnet restore ForgeLine.sln --disable-parallel -m:1
 dotnet build ForgeLine.sln -c Release --no-restore --disable-build-servers -m:1
 pwsh ./tools/blender/Invoke-Blender.ps1 -Action Check -OutputRoot artifacts/resource-check
-pwsh ./build/resource-deposits/Qualify-Masters.ps1 -OutputRoot artifacts/resource-native -RenderPreviews
+pwsh ./build/resource-deposits/Qualify-Masters.ps1 -OutputRoot artifacts/rb -RenderPreviews -NativeBatch
 python build/resource-deposits/retained.py
 pwsh ./build/Validate-ProjectReferences.ps1
 pwsh ./build/Validate-SemVer.ps1 -BaseRef origin/master
@@ -150,3 +150,39 @@ Native hardware: NVIDIA RTX PRO 5000 Blackwell Laptop, 25,309,478,912 bytes repo
 VRAM, feature level 12_1, hardware rendering, debug layer off. Offscreen native
 1080p/4K backbuffers do not certify physical display performance. Production
 acceptance remains open until required gates pass.
+
+## Bound-master qualification update
+
+After the regular catalog switched to GLB, the old frozen source signature correctly
+refused export. The masters were regenerated against the bound sources. The mineral
+adapter now normalizes JSON/glTF line endings in its frozen contract signature while
+retaining raw source hashes for unchanged-input checks. Material/content/path changes
+still invalidate the contract. A regression test verifies portable line endings and
+rejection of changed material content. Shared exporter modules are unchanged.
+
+The final real-Blender run at ad6b88e06d8c0f99ae561a00429f694ef44c7470 used fresh
+factory scenes for every independent import in one pinned process (-NativeBatch).
+All four first/second/reopened runs, 24 actual native mutation rejections, 16 real
+compiler catalogs, 16 source-less validations and repeated source/runtime byte
+comparisons passed. The typed run passed 9 cases with the overlay helper skipped.
+All eight exported GLBs match the previously bound files byte-for-byte.
+
+For a qualified binding/signature migration only, retained.py --refresh-native
+artifacts/rb checks the complete qualification and unchanged exports before replacing
+the native projects. It refuses undeclared edits to existing masters. Previous
+master hashes remain in lineage and their original files remain in Git history.
+The current frozen-contract signature and authoring commit are recorded explicitly.
+
+On current master, the complete baseline contains 74,844,665 container bytes and
+the bound candidate 74,844,887 (+222 mesh metadata bytes), both 1,363 assets with
+zero issues. Only the eight mineral mesh payloads differ; every nonmesh payload
+is identical. Current-catalog.json retains those counts.
+
+The full Release solution build passed with zero warnings/errors (5m55.88s after
+a compiler file-lock retry). The complete solution test run executed 3,285 cases:
+3,246 passed, 37 optional skips, two native session-handoff timeouts during parallel
+cold production compilation. The isolated unchanged handoff class subsequently
+passed all 3 cases in 23.899s with the original deadlines. The asset module passed
+including its clean production compilation. No timeout, threshold or test filter
+was weakened. The initial missing conventional runtime prerequisite was resolved
+by restoring and validating the qualified catalog at assets/runtime.

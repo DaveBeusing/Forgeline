@@ -1,4 +1,5 @@
 {
+  "authoringSourceSha": "ad6b88e06d8c0f99ae561a00429f694ef44c7470",
   "blenderVersion": "5.2.2",
   "boundPortableSourceSignature": "649588e910d2b33b84db55032937a61d9f8089d4d63fd318ece764bb79d0413a",
   "canonicalSourcesUnchanged": false,
@@ -23,6 +24,19 @@
   "masters": [
     {
       "path": "ferrous_ore.blend",
+      "sha256": "14c8784574065950683aca8767345e30a64258ef1c0ff353054ca191aaa28d1c"
+    },
+    {
+      "path": "ferrous_ore_inspection.blend",
+      "sha256": "6bd90b5f4a94e6bcd6d1e64e9bc2ab34f5012563ae6a814abcb1a17036b8f048"
+    }
+  ],
+  "nativeContractSignaturePolicy": "lf-json-v1",
+  "nativeContractSourceSignature": "649588e910d2b33b84db55032937a61d9f8089d4d63fd318ece764bb79d0413a",
+  "portableSourceSignature": "b8a9250c3273e656d4e23d043188d66d346ecde26dc0979946064ab795d8ee52",
+  "previousNativeMasters": [
+    {
+      "path": "ferrous_ore.blend",
       "sha256": "11b43b567fb0315f7a134e360b2315e835f5cafb63cef5d28370a695909a486a"
     },
     {
@@ -30,7 +44,6 @@
       "sha256": "bcc9018441e7a797c3d0c99f8d91613efc701243ad9c7adf74ad22d97d4c4d70"
     }
   ],
-  "portableSourceSignature": "b8a9250c3273e656d4e23d043188d66d346ecde26dc0979946064ab795d8ee52",
   "schemaVersion": 1,
   "sourceSha": "1f351e14ab0f703006a641320502f26bb506087f",
   "sourceSignature": "5ef3d1dc1a8fba0fcd7f944a436a1e3ca38a9be5b3eafbe5193ca2823a1f8c81",
