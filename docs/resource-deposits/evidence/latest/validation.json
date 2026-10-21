@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "sourceSha": "525a329ee77e656a232e69efcecd6a35ce22bbea",
+  "baseSha": "3c732aa519bb54bec17070bcdad378c232ea9de1",
+  "version": "0.1.434",
+  "fullReleaseBuild": {
+    "warnings": 0,
+    "errors": 0,
+    "duration": "00:04:36.66"
+  },
+  "presentationIntegration": {
+    "total": 117,
+    "passed": 115,
+    "skipped": 2,
+    "failed": 0
+  },
+  "clientIntegration": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0
+  },
+  "retainedMasterReopen": {
+    "families": 4,
+    "exports": 8,
+    "byteIdentical": true
+  },
+  "previousBaseFullSuite": {
+    "baseSha": "a391a5bb0c0e25f079fa394613a5f84dfe7e9728",
+    "total": 3285,
+    "passed": 3246,
+    "skipped": 37,
+    "failed": 2,
+    "failures": "Native session-handoff timeouts during parallel cold compilation",
+    "isolatedUnchangedRerun": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "cleanProductionAssetModulePassed": true
+  },
+  "performanceAcceptance": "pending",
+  "humanArtApproval": "pending",
+  "currentHeadCi": "required-see-PR-checks"
+}

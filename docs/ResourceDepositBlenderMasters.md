@@ -1,188 +1,217 @@
 # Resource deposit Blender masters
 
-## Change and integration status
+## Current review status
 
-Four editable Blender 5.2.2 masters and separate packed-PBR inspection projects
-preserve existing mineral artwork. Eight verified High/Reduced GLB exports now
-bind existing resource mesh IDs in the regular source catalog. Shared materials,
-texture atlases, LOD thresholds, symbols and source-only entities are retained.
-This branch is a review candidate; it is not production acceptance.
+Review base: master **3c732aa519bb54bec17070bcdad378c232ea9de1**, version
+0.1.433. This PR has exactly one PATCH increment to **0.1.434**.
+The fully built, tested, rendered and packaged product snapshot is
+**525a329ee77e656a232e69efcecd6a35ce22bbea**. Subsequent evidence-only commits
+retain that exact execution identity.
 
-Native review exposed a second gap: map deposits have an X/Z scale of 50.4 meters
-but Y scale 8, making clusters appear almost flat. PresentationExtractor now
-applies minimum Y scales: Ferrous 16, Silicates 28, Volatiles 8, Rare Elements 32.
-It adjusts the copied render center by half the added height to preserve the
-ground anchor, retaining X/Z, rotation and taller authored transforms. Logical
-WorldTransform, bounds, extraction radius, quantities, economy, selection and
-intelligence authority remain unchanged. Source-only identities do not gain a
-ResourceDeposit component.
+Four editable Blender 5.2.2 rest masters and four separate packed-PBR inspection
+projects preserve the existing mineral artwork. Eight High/Reduced GLBs bind the
+existing mesh IDs in the regular source catalog. Shared materials, texture atlases,
+LOD thresholds, minimap symbols and source-only entities are retained.
+
+The branch is a review candidate. Production acceptance remains blocked by the
+rendering milestone's physical/performance gates and human art approval.
+
+## Visible change and gameplay boundary
+
+Native review exposed flattened silhouettes: map deposits use X/Z scale 50.4,
+but Y scale 8. PresentationExtractor now applies family-specific minimum Y scales:
+
+| Family | Minimum render Y scale | High triangles / vertices | Reduced triangles / vertices |
+| --- | ---: | ---: | ---: |
+| Ferrous Ore | 16 | 400 / 1,200 | 100 / 300 |
+| Silicates | 28 | 30 / 80 | 18 / 48 |
+| Volatiles | 8 | 38 / 112 | 24 / 72 |
+| Rare Elements | 32 | 40 / 120 | 24 / 72 |
+
+The copied render center rises by half the added height, preserving the ground
+anchor. X/Z, rotation and taller authored transforms are retained. Logical
+WorldTransform, resource bounds, extraction radius, quantities, economy,
+selection and intelligence authority remain unchanged. Source-only identities
+retain their existing behavior without gaining a ResourceDeposit component.
+
+The existing ferrous environment-kit revision is reused. Geometry density and
+runtime texture payload stay unchanged. Untouched/Active/Depleted use the real
+existing presentation states and tint treatment.
+
+Historical appearance before the height correction:
+
+![Historical flat presentation](resource-deposits/evidence/native/images/historical-flat-normal-1080.png)
+
+Current native player view, with all four families and three presentation states:
+
+![Current mineral gallery](resource-deposits/evidence/native/images/gallery-high-normal-1080-after.png)
+
+These illustrate appearance. The historical image predates later master
+synchronization and provides no controlled performance baseline.
 
 ## Audit and synchronization
 
-Initial ordered remote audit: master a6fe118583be842e00416bcb100d1210f3240a00,
-version 0.1.431-dev. Default/integration branch: master. Related resource PRs #47,
-#112, #181, Blender tooling #229, readiness #269 and rendering #268 were inspected
-along with branches, changed paths, CI and available review comments. Existing
-family silhouettes, PBR atlases and Untouched/Active/Depleted presentation are
-reused. No new depletion mechanism or texture state is invented.
+The ordered initial remote audit used master
+a6fe118583be842e00416bcb100d1210f3240a00, version 0.1.431-dev. Master is the
+default/integration branch. Related resource PRs #47, #112, #181, Blender #229,
+readiness #269 and rendering #268 were inspected alongside branches, changed
+paths, available review comments and CI. Existing art and state/material/LOD
+support were reused.
 
-During execution, logistics PR #273 merged. This branch was rebased onto master
-a391a5bb0c0e25f079fa394613a5f84dfe7e9728; its logistics enum IDs are preserved and
-resource kinds appended after them. The single PR PATCH delta is now 0.1.432 to
-0.1.433. Evidence retains actual historical identities rather than being relabeled.
+Logistics PR #273 subsequently merged at a391a5bb0c0e25f079fa394613a5f84dfe7e9728.
+Tank PR #278 subsequently merged at the current base above. This branch was
+rebased after each integration. Published logistics and tank reference enum IDs
+are preserved; resource kinds are appended after them. Versioning was reconciled
+against each latest base without accumulating multiple PATCH increments.
 
-| Family | High triangles / vertices | Reduced triangles / vertices |
-| --- | ---: | ---: |
-| Ferrous Ore | 400 / 1,200 | 100 / 300 |
-| Silicates | 30 / 80 | 18 / 48 |
-| Volatiles | 38 / 112 | 24 / 72 |
-| Rare Elements | 40 / 120 | 24 / 72 |
+## Authoring and source ownership
 
-These are actual source counts, not an art-acceptance score. Ferrous uses the
-current environment-kit revision rather than its older unused sibling. There is
-no extra texture payload or geometry density increase.
-
-## Source ownership
-
-assets/staged/resource-deposits/<family>/ retains each native rest master, packed
+assets/staged/resource-deposits/<family>/ retains the rest master, packed
 inspection project, two exports and lineage. Regular definitions under
 assets/source/world/meshes/resources/ reference byte-identical GLBs under
-sources/blender/<family>/. Lineage retains original binding/source signatures and
-the current bound portable signature. Status review-bound-not-accepted separates
-functional binding from approval. Original glTF files remain available.
+sources/blender/<family>/. Original glTF sources remain available.
 
-build/resource-deposits/author.py delegates to the bounded shared round-trip.
-Rest scenes retain metric scale, root pivots, engine-to-Blender (x,y,z) to
-(x,-z,y), topology, material order, normals, UVs and High/Reduced metadata.
-Inspection uses the existing surface helper with packed shared Base Color,
-Normal and ORM. Its roughness/metallic preview approximates the runtime shader;
-AO remains the game shader's responsibility. Inspection scenes are separate
-from compiler-accepted rest scenes. Blender does not enter the player package.
+Lineage records original bindings, portable source signatures, native/export
+hashes, previous native hashes and the current authoring contract. Status
+review-bound-not-accepted keeps the acceptance boundary explicit.
 
-The translated/rotated unit-scale fixture tests export contracts; it does not
-redefine logical envelopes. Six actual native mutations per family are rejected:
-unbaked transform, changed envelope, modifier, animation, material slots and
-unexpected object. Unchanged reopen/export is accepted.
+The family adapter delegates to the bounded shared round-trip. Rest scenes
+retain metric scale, root pivots, engine-to-Blender (x,y,z) to (x,-z,y), topology,
+material order, normals, UVs and High/Reduced metadata. The unit-scale,
+translated/rotated fixture probes authoring contracts independently of gameplay
+deposit dimensions.
+
+Inspection projects pack the existing Base Color, Normal and ORM sources.
+Their roughness/metallic preview approximates the runtime shader; AO is evaluated
+in game. Inspection graphs and cameras remain separate from compiler-accepted
+rest scenes. The player package contains zero .blend, .py, .gltf or .glb files.
+
+After GLB binding, the previous raw source signature correctly refused export.
+Masters were regenerated against current bindings. The mineral adapter now
+normalizes JSON/glTF line endings in its frozen signature and retains raw hashes
+for unchanged-input checks. Content/path/material changes still invalidate the
+contract. The signature regression test verifies both behaviors. Shared exporter
+module files remain unchanged.
 
 ## Reproduction
 
-Use the pinned SDK and Blender 5.2.2 x64, a clean checkout and fresh output paths:
+Use a clean checkout, pinned SDK and Blender 5.2.2 x64, and fresh short output
+paths. Short paths avoid Blender Python's Windows path-length boundary.
 
 ```powershell
 dotnet restore ForgeLine.sln --disable-parallel -m:1
 dotnet build ForgeLine.sln -c Release --no-restore --disable-build-servers -m:1
-pwsh ./tools/blender/Invoke-Blender.ps1 -Action Check -OutputRoot artifacts/resource-check
-pwsh ./build/resource-deposits/Qualify-Masters.ps1 -OutputRoot artifacts/rb -RenderPreviews -NativeBatch
+python build/resource-deposits/test_contract.py
 python build/resource-deposits/retained.py
+pwsh ./tools/blender/Invoke-Blender.ps1 -Action Check -OutputRoot artifacts/bcheck
+pwsh ./build/resource-deposits/Qualify-Masters.ps1 -OutputRoot artifacts/rb -NativeBatch
 pwsh ./build/Validate-ProjectReferences.ps1
 pwsh ./build/Validate-SemVer.ps1 -BaseRef origin/master
 ```
 
-Qualification creates independent first/second projects and reopens the first,
-then compiles baseline/first/second/reopened for each family. It checks current
-source hashes, absent-source integrity, repeated/reopened output bytes and typed
-compiled positions, normals, UVs, tangents, indices, material/LOD, socket and
-collision references. Sources must remain unchanged during the run. The retained
-verifier checks hashes, exact roster, bound IDs, geometry and portable signatures.
-Retention with a positional output root is initial-only and refuses existing files.
+Qualify-Masters creates independent first/second factory scenes and reopens the
+first saved project. Six actual native mutations per family must be rejected:
+unbaked transform, changed envelope, modifier, animation, material slots and
+unexpected object. Unchanged reopen/export must pass. NativeBatch runs these
+fresh scenes in one pinned process; the default mode uses separate processes.
 
-For a qualified full catalog, opt-in ResourceDepositMaterialCacheTests creates
-fresh four-record family seeds from verified material/texture containers. Set
-FORGELINE_RESOURCE_RUNTIME_SEED and a fresh FORGELINE_RESOURCE_MATERIAL_CACHE.
-Pass that destination to Qualify-Masters through -MaterialCacheRoot. Every variant
-still imports its two meshes through the real compiler. -ReuseAuthored requires
-native rejection/source-hash evidence and fresh runtime destinations.
+Each family has baseline/first/second/reopened compiler catalogs, absent-source
+integrity checks and repeated source/runtime byte comparisons. Typed tests compare
+positions, normals, UVs, tangents, indices, material/LOD, socket and collision
+references. Canonical sources must remain unchanged during qualification.
 
-## Native game review
+prepare-materials.py prepares four materials and three shared textures without
+mesh records. The native CI workflow compiles that source once, uses the opt-in
+ResourceDepositMaterialCacheTests to seal four verified family seeds, then passes
+-MaterialCacheRoot to qualification. Every variant still imports its two meshes
+through the actual compiler. ReuseAuthored checks native rejection evidence,
+current raw source hashes and fresh runtime destinations.
 
-Four immutable fixtures cover a single deposit/extractor pair, all four families
-by three real presentation states with twelve colocated extractors, and 100/1,000
-deposits. They use map definitions and sampled canonical ground height. No economic
-simulation runs in these art fixtures. Tests check identities, states, counts,
-deterministic fingerprints, grounding and co-location.
+For a qualified binding/signature migration, retained.py --refresh-native ROOT
+checks the entire qualification and unchanged exports before refreshing native
+files. It refuses undeclared edits to existing masters. Initial retention with
+a positional root refuses existing retained destinations.
 
-Capture-Review.ps1 uses the real D3D12 player and complete catalogs: three zooms,
-1080p/4K, Low/Medium/High, 1/100/1,000 instances, dark and wet. Its 3 warmups,
-8 samples and 2 repeats provide functional evidence, not sustained performance
-acceptance. Historical flat-height and intermediate-height runs each completed
-fourteen paired cases. Current-base results are recorded separately when complete.
+Capture-Review.ps1 takes complete baseline/candidate runtime roots and the actual
+built **ForgeLine.Client.exe** path. The native workflow uses Release win-x64
+output. Publish-PreAlpha.ps1 -VerifyReproducible verifies paired publish trees.
 
-## Observed evidence
+## Observed validation
 
-Pinned Blender check passed: 5.2.2 build d13f752e3b9c, SDK 10.0.401.
-Portable authoring: 102 tests passed with Blender Python 3.13.
-Two earlier full Release builds passed with zero warnings/errors. Architecture
-validation passed for 44 projects without cycles. Fixed seed 2026 ended naturally
-at tick 55,210 with CommandCoreDestroyed/Victory, winner 1.
+| Check | Observed result |
+| --- | --- |
+| Latest full Release solution build | 0 warnings, 0 errors; 4m36.66s |
+| Latest resource/world/reference/tank presentation tests | 115 passed, 2 optional helper skips |
+| Latest native client/reference capture tests | 9 passed, including session handoff |
+| Architecture and SemVer | 44 projects, no cycles; one PATCH to 0.1.434 |
+| Real Blender | 5.2.2 LTS, build d13f752e3b9c |
+| Bound-master native qualification | Four families; 24 mutation rejections; 16 compiler catalogs and 16 source-less validations; deterministic exports/runtime |
+| Typed compiled family comparisons | 9 passed, 1 optional full-overlay helper skipped |
+| Latest retained-master reopen | Four actual saved masters; all eight GLB exports byte-identical |
+| Native D3D12 comparisons | 14 paired cases / 28 images; zero changed pixels |
+| Runtime binding/resource observations | Zero fallback mesh instances, material/texture binding failures, submission faults or repeat-pixel mismatches |
+| Published player | Gallery renders all four families; pixels match review; source-less integrity passes |
+| Reproducible package | Two publish trees identical; 0 authoring files; 1,363 runtime records |
 
-All four first/second/reopened native projects and 24 mutation rejections passed.
-Sixteen real compiler catalogs passed, followed by sixteen absent-source
-validations and deterministic source/runtime comparisons. Typed family/full
-overlay tests passed nine cases. The overlay replaced only eight meshes in a
-sealed 1,363-record catalog. Canonical container bytes were 74,844,434; overlay
-74,844,604 (+170 mesh metadata bytes). Texture containers stayed 59,453,925 bytes;
-after the existing splash exclusion gameplay textures are 57,667,508, below the
-unchanged 58,720,256 gate. File lengths are not GPU residency. These runs used
-verified unchanged texture caches and are not claimed as force-rebuilds.
+The earlier complete solution run on the logistics base executed 3,285 cases:
+3,246 passed, 37 optional skips and two native session-handoff timeouts during
+parallel cold production compilation. The unchanged isolated class subsequently
+passed all three cases with the original deadlines. Its asset module passed,
+including clean production compilation. The latest-base targeted results are
+listed separately above. No timeout or performance threshold was increased.
 
-The initial cold repeated texture run was interrupted, not passed. A copied
-runtime folder correctly tripped the fresh-output guard. Native-only evidence
-was copied with hashes from artifacts/rd2 into rd4, checked against actual sources
-and completed with material-only cache seeds. Native origin is rd2; rd4 is resumed
-compiler qualification. The raw evidence index hashes retained bytes. Sandbox
-Python/path and test-pipe failures executed no tests; later native runs passed.
-A grounding assertion exposed float rounding at a decimal boundary; it now uses
-an absolute 0.00001-meter bound.
+Earlier evidence also includes 102 passing portable authoring tests, a complete
+typed full-catalog overlay comparison and fixed seed 2026 ending naturally at
+tick 55,210 with CommandCoreDestroyed/Victory, winner 1. Those retain their actual
+historical source identities.
 
-## Acceptance boundaries
+The first cold repeated texture run was interrupted. A copied runtime folder
+correctly tripped the fresh-output guard. Native-only evidence was resumed with
+verified material-only seeds. A stale master signature and a long output path
+were correctly rejected before the final regenerated run. These failed or
+interrupted attempts are excluded from passing results.
 
-Rendering PR #268 is merged, but its physical/performance/human gates were not all
-accepted. Neither that merge nor deterministic pictures implies qualification.
-No budget, golden, threshold, gameplay rule or renderer ownership is relaxed.
-No merge, release or golden approval is performed.
+## Runtime, images and package evidence
 
-Separate gates remain: current-source complete CI, four terrain-material review,
-real extraction/depletion play review, moving-camera LOD/lifecycle coverage,
-controlled sustained paired CPU/GPU timings and resource churn, reproducible
-installed-player qualification and explicit human art acceptance.
+The current complete baseline contains 74,844,665 container bytes; the bound
+candidate contains 74,844,887 (+222 mesh metadata bytes). Both have 1,363 assets.
+Only eight resource mesh payloads differ; every nonmesh payload is identical.
+Texture containers stay at 59,453,925 bytes. After the existing splash exclusion,
+gameplay textures are 57,667,508, below the unchanged 58,720,256-byte gate.
+Container file lengths and live GPU residency are recorded as separate metrics.
 
-Native hardware: NVIDIA RTX PRO 5000 Blackwell Laptop, 25,309,478,912 bytes reported
-VRAM, feature level 12_1, hardware rendering, debug layer off. Offscreen native
-1080p/4K backbuffers do not certify physical display performance. Production
-acceptance remains open until required gates pass.
+The actual device is NVIDIA RTX PRO 5000 Blackwell Laptop, feature level 12_1,
+25,309,478,912 bytes reported dedicated VRAM, hardware rendering, debug layer off.
+The matrix covers 1080p/4K, three zooms, Low/Medium/High, 1/100/1,000 instances,
+dark and wet. Three warmups, eight CPU samples and two repeat captures provide
+functional evidence. GPU sample counts and quantiles are retained per case.
 
-## Bound-master qualification update
+All 28 original PNGs, one historical appearance image and one published-player
+image are retained with compact metrics and original manifest hashes in
+resource-deposits/evidence/native/. Latest source-less/catalog/reopen/validation
+records are under evidence/latest/. The index hashes retained bytes.
 
-After the regular catalog switched to GLB, the old frozen source signature correctly
-refused export. The masters were regenerated against the bound sources. The mineral
-adapter now normalizes JSON/glTF line endings in its frozen contract signature while
-retaining raw source hashes for unchanged-input checks. Material/content/path changes
-still invalidate the contract. A regression test verifies portable line endings and
-rejection of changed material content. Shared exporter modules are unchanged.
+The 0.1.434-dev package was built from clean snapshot
+525a329ee77e656a232e69efcecd6a35ce22bbea. Archive SHA-256:
+8bf9851849549bca4c321c82a341df08658c5a97f4d269e5dcda592a80329cba.
+Package UI, font/icon and audio contracts passed. Published-player integrity
+was checked against an absent source root.
 
-The final real-Blender run at ad6b88e06d8c0f99ae561a00429f694ef44c7470 used fresh
-factory scenes for every independent import in one pinned process (-NativeBatch).
-All four first/second/reopened runs, 24 actual native mutation rejections, 16 real
-compiler catalogs, 16 source-less validations and repeated source/runtime byte
-comparisons passed. The typed run passed 9 cases with the overlay helper skipped.
-All eight exported GLBs match the previously bound files byte-for-byte.
+## Remaining acceptance gates
 
-For a qualified binding/signature migration only, retained.py --refresh-native
-artifacts/rb checks the complete qualification and unchanged exports before replacing
-the native projects. It refuses undeclared edits to existing masters. Previous
-master hashes remain in lineage and their original files remain in Git history.
-The current frozen-contract signature and authoring commit are recorded explicitly.
+Rendering PR #268 is merged, but its recorded physical/performance/human gates
+were not all accepted. A merged milestone and deterministic pictures do not
+establish production qualification.
 
-On current master, the complete baseline contains 74,844,665 container bytes and
-the bound candidate 74,844,887 (+222 mesh metadata bytes), both 1,363 assets with
-zero issues. Only the eight mineral mesh payloads differ; every nonmesh payload
-is identical. Current-catalog.json retains those counts.
+Required gates remain: current-head complete CI, four terrain-material review,
+real extraction/depletion placement review, moving-camera LOD/lifecycle coverage,
+controlled sustained CPU/GPU and resource-churn measurements, and explicit human
+art approval. Native backbuffer captures do not qualify physical display timing.
 
-The full Release solution build passed with zero warnings/errors (5m55.88s after
-a compiler file-lock retry). The complete solution test run executed 3,285 cases:
-3,246 passed, 37 optional skips, two native session-handoff timeouts during parallel
-cold production compilation. The isolated unchanged handoff class subsequently
-passed all 3 cases in 23.899s with the original deadlines. The asset module passed
-including its clean production compilation. No timeout, threshold or test filter
-was weakened. The initial missing conventional runtime prerequisite was resolved
-by restoring and validating the qualified catalog at assets/runtime.
+The centered ferrous stress fixture obscures much of its colocated extractor.
+Real placement visibility needs review before art acceptance. The fixture uses
+copied presentation states and completed-building appearances; economic behavior
+remains covered by the existing game tests and needs the separate play review.
+
+No budget, golden or gameplay rule is relaxed. No merge, release, tag or golden
+approval is performed.

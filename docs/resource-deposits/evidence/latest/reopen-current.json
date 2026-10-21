@@ -1,0 +1,26 @@
+{
+  "families": [
+    {
+      "exportsUnchanged": true,
+      "family": "ferrous_ore",
+      "sourceSignature": "649588e910d2b33b84db55032937a61d9f8089d4d63fd318ece764bb79d0413a"
+    },
+    {
+      "exportsUnchanged": true,
+      "family": "silicates",
+      "sourceSignature": "499ffcb657692029ecc9df362366b9e7912dacb71be6a07be528ca90eec89df4"
+    },
+    {
+      "exportsUnchanged": true,
+      "family": "volatiles",
+      "sourceSignature": "c182995729b8303a16cf2ba322565af3c13ff97c8af246de73a0a9b56eaf77d5"
+    },
+    {
+      "exportsUnchanged": true,
+      "family": "rare_elements",
+      "sourceSignature": "9e5711a13ffc9db308af5ca067d2247b2b6dd6ad95637ec54292b565b489152d"
+    }
+  ],
+  "schemaVersion": 1,
+  "success": true
+}
