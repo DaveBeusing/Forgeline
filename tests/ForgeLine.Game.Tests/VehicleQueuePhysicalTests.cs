@@ -10,6 +10,10 @@ public sealed class VehicleQueuePhysicalTests
 {
     [Theory]
     [InlineData(1, false)]
+    [InlineData(2, false)]
+    [InlineData(10, false)]
+    [InlineData(2, true)]
+    [InlineData(10, true)]
     [InlineData(3, false)]
     [InlineData(8, false)]
     [InlineData(20, false)]
