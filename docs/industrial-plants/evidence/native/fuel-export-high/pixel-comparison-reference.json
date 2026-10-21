@@ -1,0 +1,135 @@
+{
+  "maximumChangedPixelFraction": 0.0,
+  "schemaVersion": 1,
+  "channelTolerance": 0,
+  "commit": "de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+  "visualAcceptance": "pending",
+  "pixelComparisonRequested": true,
+  "imageGateRequested": false,
+  "baselineCommit": "de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "structural": "pass",
+  "captures": [
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 10.331462499999999,
+      "visualReview": "pending",
+      "gpuMeanMs": 8.449632000000001,
+      "comparison": "exact-file-match",
+      "sameRuntime": false,
+      "key": "FuelRefineryProduction-1920x1080-High-CloseTactical",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -40.50705
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 10.8445875,
+      "visualReview": "pending",
+      "gpuMeanMs": 10.686208,
+      "comparison": "exact-file-match",
+      "sameRuntime": false,
+      "key": "FuelRefineryProduction-1920x1080-High-NormalGameplay",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -0.4387250000000016
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 9.3874125,
+      "visualReview": "pending",
+      "gpuMeanMs": 9.417210666666668,
+      "comparison": "exact-file-match",
+      "sameRuntime": false,
+      "key": "FuelRefineryProduction-1920x1080-High-Strategic",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -3.6963749999999997
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 3.014081790123457E-08,
+        "ChangedPixels": 1,
+        "ChangedPixelFraction": 1.2056327160493827E-07,
+        "WithinTolerance": false
+      },
+      "cpuMeanMs": 23.072312500000002,
+      "visualReview": "pending",
+      "gpuMeanMs": 31.625248,
+      "comparison": "pixels-require-human-review",
+      "sameRuntime": false,
+      "key": "FuelRefineryProduction-3840x2160-High-CloseTactical",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -38.77077499999999
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 23.181275,
+      "visualReview": "pending",
+      "gpuMeanMs": 34.140367999999995,
+      "comparison": "exact-file-match",
+      "sameRuntime": false,
+      "key": "FuelRefineryProduction-3840x2160-High-NormalGameplay",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -42.403875
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 23.658825,
+      "visualReview": "pending",
+      "gpuMeanMs": 31.89811733333333,
+      "comparison": "exact-file-match",
+      "sameRuntime": false,
+      "key": "FuelRefineryProduction-3840x2160-High-Strategic",
+      "equivalentHardware": true,
+      "sameSource": true,
+      "structural": "pass",
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -2.2088375000000013
+    }
+  ],
+  "imageFailures": []
+}

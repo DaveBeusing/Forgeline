@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "status": "staged-not-promoted",
+  "sourceSha": "a1cfd0f89e4c047733520063073cbfe7b654f384",
+  "sourceSignature": "5dc75e02c5e7bf0607c1d27c97bfcc5f8b84f2785ce8d1e61df3d8deb6a32b63",
+  "portableSourceSignature": "4df1cd1790610999b62555080ee4f924adc66dd1da93df1f82ee669953ea9a1b",
+  "fixtureSha256": "152c514c530b475c6ec8f36f3763c51c1b9f96abb21077490e37ae40233b458e",
+  "blenderVersion": "5.2.2",
+  "master": "fuel_refinery.blend",
+  "masterSha256": "7630b30dabcdba35a1bf50fe8b0762f4aa55dc2946c21ffa31b09b23ca5a16f3",
+  "surfaceReviewMaster": "fuel_refinery_surfaces.blend",
+  "surfaceReviewMasterSha256": "68fc13166d40082faca4cf3a752e997dcf37d9c7294a3b95718fd30efde0ce51",
+  "exports": [
+    {
+      "id": "building.directorate.fuel_refinery",
+      "source": "building.directorate.fuel_refinery.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery.asset.json",
+      "sha256": "8a824d2b5d38e01e71c5b01873d2bd8f87d932fbe91167102a0633ca09075405"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.critical",
+      "source": "building.directorate.fuel_refinery.critical.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_critical.asset.json",
+      "sha256": "fbd5245e3c53772a0e100c842842086b41d7b8c84b9ae4aa2c2e5c81111c4684"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.damaged",
+      "source": "building.directorate.fuel_refinery.damaged.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_damaged.asset.json",
+      "sha256": "8f5dcaf356152137f2766929e7b0a101be74d2c81d3bd0920094b80ab6a917a2"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.destroyed",
+      "source": "building.directorate.fuel_refinery.destroyed.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_destroyed.asset.json",
+      "sha256": "a376df1fc661c1a329eee390aacc718d524e39ab282af52e86f7ea1c59f676bf"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.foundation",
+      "source": "building.directorate.fuel_refinery.foundation.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_foundation.asset.json",
+      "sha256": "72a596229a7b552362f48ff5457d8daa934d614a1a6b4e42d753e2aaf403b5b5"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.idle",
+      "source": "building.directorate.fuel_refinery.idle.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_idle.asset.json",
+      "sha256": "7618380dcd087e38ab128b8aa88784e33d01f84d9706771a80c731bc4ad43e62"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.lod1",
+      "source": "building.directorate.fuel_refinery.lod1.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_lod1.asset.json",
+      "sha256": "e70ef78c03b4b6cbb4254cfd8b8354c2fdf6fa37b1595d8b755752ba636dc5b1"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.lod2",
+      "source": "building.directorate.fuel_refinery.lod2.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_lod2.asset.json",
+      "sha256": "4bc3b2026c946de16ecc305d7c76ac5440255e36f0f78044da550cfa52e349c8"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.partial_shell",
+      "source": "building.directorate.fuel_refinery.partial_shell.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_partial_shell.asset.json",
+      "sha256": "12a07b5224df4b0df23556f944447d4c4935b3f122be79e45d2644bf39a3bab1"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.structural_frame",
+      "source": "building.directorate.fuel_refinery.structural_frame.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_structural_frame.asset.json",
+      "sha256": "1c40cd8a15ed964cca2d473b9100a5e25b6e719b1d81d355b53fef8f24e6783e"
+    },
+    {
+      "id": "building.directorate.fuel_refinery.unpowered",
+      "source": "building.directorate.fuel_refinery.unpowered.glb",
+      "canonicalDefinition": "buildings/directorate/fuel_refinery_unpowered.asset.json",
+      "sha256": "ac62d7ea903cc227ebed8e0be69a850725f348c519a1378df8fe0c5bc45a78e2"
+    }
+  ],
+  "canonicalSourcesUnchanged": true,
+  "promotionGate": "Current render qualification, source ownership release, native/package/performance and human visual acceptance required."
+}

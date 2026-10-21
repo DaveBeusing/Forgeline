@@ -1,0 +1,12 @@
+{
+  "source": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+  "runtimeLoadedFromPackage": true,
+  "archiveSha256": "BE6CCE12E90739FADE9FDED1D35F6FB726D7EF2D76E5321124EFDAB9A4F3EE06",
+  "method": "Fresh child settings; authoritative packaged runtime root; player archive contains no source, Blender or compiler; child PATH contains only system and .NET directories. System-wide Blender installation is not removed.",
+  "startedUtc": "2026-10-21T00:12:53.2271668Z",
+  "authoringFilesInArchive": 0,
+  "archiveEntries": 1532,
+  "timedOut": false,
+  "exitCode": 0,
+  "completedUtc": "2026-10-21T00:13:07.5155169Z"
+}

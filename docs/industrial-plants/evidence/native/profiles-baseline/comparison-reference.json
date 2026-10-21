@@ -1,0 +1,71 @@
+{
+  "imageFailures": [],
+  "visualAcceptance": "pending",
+  "structural": "pass",
+  "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+  "captures": [
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 6.965167999999999,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 8.49545,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "FuelRefineryProduction-1920x1080-Low-NormalGameplay"
+    },
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 6.9391616,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 7.3345,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "AmmunitionPlantProduction-1920x1080-Low-NormalGameplay"
+    },
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 9.019056,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 9.07545,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "FuelRefineryProduction-1920x1080-Medium-NormalGameplay"
+    },
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 9.308575999999999,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 13.360837499999999,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "AmmunitionPlantProduction-1920x1080-Medium-NormalGameplay"
+    }
+  ],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "pixelComparisonRequested": false,
+  "maximumChangedPixelFraction": 0.0,
+  "imageGateRequested": false,
+  "schemaVersion": 1,
+  "channelTolerance": 0,
+  "baselineCommit": null
+}

@@ -1,0 +1,95 @@
+{
+  "imageFailures": [],
+  "visualAcceptance": "pending",
+  "structural": "pass",
+  "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+  "captures": [
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "gpuMeanMs": 7.021362285714285,
+      "structural": "pass",
+      "cpuMeanDeltaMs": 1.4865375000000007,
+      "sameRuntime": false,
+      "cpuMeanMs": 9.9819875,
+      "sameSource": true,
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "FuelRefineryProduction-1920x1080-Low-NormalGameplay"
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "gpuMeanMs": 7.546432000000001,
+      "structural": "pass",
+      "cpuMeanDeltaMs": 0.33199999999999985,
+      "sameRuntime": false,
+      "cpuMeanMs": 7.6665,
+      "sameSource": true,
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "AmmunitionPlantProduction-1920x1080-Low-NormalGameplay"
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "gpuMeanMs": 7.9961813333333325,
+      "structural": "pass",
+      "cpuMeanDeltaMs": -1.5057999999999998,
+      "sameRuntime": false,
+      "cpuMeanMs": 7.56965,
+      "sameSource": true,
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "FuelRefineryProduction-1920x1080-Medium-NormalGameplay"
+    },
+    {
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "gpuMeanMs": 9.572704,
+      "structural": "pass",
+      "cpuMeanDeltaMs": -2.024075,
+      "sameRuntime": false,
+      "cpuMeanMs": 11.336762499999999,
+      "sameSource": true,
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "AmmunitionPlantProduction-1920x1080-Medium-NormalGameplay"
+    }
+  ],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "pixelComparisonRequested": true,
+  "maximumChangedPixelFraction": 0.0,
+  "imageGateRequested": false,
+  "schemaVersion": 1,
+  "channelTolerance": 0,
+  "baselineCommit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076"
+}

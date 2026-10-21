@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "status": "functional-review-not-production-acceptance",
+  "fullRawImages": "Retained unchanged in the listed local artifacts directories; checked-in gallery is a selected subset.",
+  "imageToleranceChanged": false,
+  "humanVisualApproval": "pending",
+  "physicalPerformance": "pending",
+  "datasets": [
+    {
+      "name": "fuel-baseline-high",
+      "rawRoot": "artifacts/ibf",
+      "commit": "de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+      "buildIdentity": "0.1.427-dev+de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+      "manifestSha256": "77cb9e7417f89a313770aba91b656d9089591b715d9dcd9478a3cddff3a34e9a",
+      "captures": 6,
+      "selectedImages": [
+        "FuelRefineryProduction-1920x1080-High-NormalGameplay.png"
+      ]
+    },
+    {
+      "name": "fuel-export-high",
+      "rawRoot": "artifacts/if",
+      "commit": "de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+      "buildIdentity": "0.1.427-dev+de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+      "manifestSha256": "1c3f5422d2f5939552c8c883d8d248994a304a6371da0ddb201f4ba0fbb44dd6",
+      "captures": 6,
+      "selectedImages": [
+        "FuelRefineryProduction-1920x1080-High-NormalGameplay.png",
+        "FuelRefineryProduction-3840x2160-High-NormalGameplay.png"
+      ]
+    },
+    {
+      "name": "ammunition-baseline-high",
+      "rawRoot": "artifacts/iba",
+      "commit": "de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+      "buildIdentity": "0.1.427-dev+de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+      "manifestSha256": "767570641987120eb269a133d91e25862b4b3d6da105c7a8549683f9f71af025",
+      "captures": 6,
+      "selectedImages": [
+        "AmmunitionPlantProduction-1920x1080-High-NormalGameplay.png"
+      ]
+    },
+    {
+      "name": "ammunition-export-high",
+      "rawRoot": "artifacts/ia",
+      "commit": "de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+      "buildIdentity": "0.1.427-dev+de5991b07b01b0b30c5be3feab4cd6a419d0b06e",
+      "manifestSha256": "dfd7646a2dfeb902485a9a774e2ea378681b2da7d25b77b5db155ccc90418fca",
+      "captures": 6,
+      "selectedImages": [
+        "AmmunitionPlantProduction-1920x1080-High-NormalGameplay.png",
+        "AmmunitionPlantProduction-3840x2160-High-NormalGameplay.png"
+      ]
+    },
+    {
+      "name": "profiles-baseline",
+      "rawRoot": "artifacts/spb",
+      "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "buildIdentity": "0.1.428-dev+f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "manifestSha256": "1c80fdb8f5696f0f58245a54da75885df40b26afc31d415a649841e1d784a0ce",
+      "captures": 4,
+      "selectedImages": []
+    },
+    {
+      "name": "profiles-installed",
+      "rawRoot": "artifacts/spc",
+      "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "buildIdentity": "0.1.428-dev+f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "manifestSha256": "80f25d557a2737204817f5c4df254a8732e650a81b898fc95b8d9ab683874223",
+      "captures": 4,
+      "selectedImages": []
+    },
+    {
+      "name": "dark-baseline",
+      "rawRoot": "artifacts/sdb",
+      "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "buildIdentity": "0.1.428-dev+f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "manifestSha256": "cf7392bec7dbf3ab57d2da2d31307778339297b13dc2c99d0d2f54b094fecef2",
+      "captures": 2,
+      "selectedImages": []
+    },
+    {
+      "name": "dark-installed",
+      "rawRoot": "artifacts/sdc",
+      "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "buildIdentity": "0.1.428-dev+f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "manifestSha256": "47678e0f44f74c41d0c7a60aa3786c8bd8a121bf4945441a2ac75b7ba0abe201",
+      "captures": 2,
+      "selectedImages": [
+        "AmmunitionPlantProduction-1920x1080-High-NormalGameplay.png"
+      ]
+    },
+    {
+      "name": "wet-baseline",
+      "rawRoot": "artifacts/swb",
+      "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "buildIdentity": "0.1.428-dev+f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "manifestSha256": "356f3198e1b5bc8c7f846e44a4b792de755925782c234d857dc8a6ebd6c61ab3",
+      "captures": 2,
+      "selectedImages": []
+    },
+    {
+      "name": "wet-installed",
+      "rawRoot": "artifacts/swc",
+      "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "buildIdentity": "0.1.428-dev+f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "manifestSha256": "253df9de49cda11214454308a992cecbd96472e56e88455506553275b0e5b5b0",
+      "captures": 2,
+      "selectedImages": [
+        "FuelRefineryProduction-1920x1080-High-NormalGameplay.png"
+      ]
+    },
+    {
+      "name": "logistics-baseline",
+      "rawRoot": "artifacts/stb",
+      "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "buildIdentity": "0.1.428-dev+f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "manifestSha256": "6bd7680078f0d1f599bc51d6576ed51ec5377f026eb3f54ef0eba5dc9a45d9e9",
+      "captures": 4,
+      "selectedImages": []
+    },
+    {
+      "name": "logistics-installed",
+      "rawRoot": "artifacts/stc",
+      "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "buildIdentity": "0.1.428-dev+f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+      "manifestSha256": "d7157dfe41f698df3d4ab6744181b22f1c3af31866aba3ddb8f09de34637dbdc",
+      "captures": 4,
+      "selectedImages": [
+        "LogisticsLoadingProduction-1920x1080-High-NormalGameplay.png",
+        "LogisticsSustainedProduction-1920x1080-High-NormalGameplay.png"
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "baseline": "fuel-baseline-high",
+      "candidate": "fuel-export-high",
+      "cases": 6,
+      "changedPixels": 1,
+      "maximumChannelDelta": 1,
+      "resourceCountersEqual": true
+    },
+    {
+      "baseline": "ammunition-baseline-high",
+      "candidate": "ammunition-export-high",
+      "cases": 6,
+      "changedPixels": 14,
+      "maximumChannelDelta": 1,
+      "resourceCountersEqual": true
+    },
+    {
+      "baseline": "profiles-baseline",
+      "candidate": "profiles-installed",
+      "cases": 4,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "resourceCountersEqual": true
+    },
+    {
+      "baseline": "dark-baseline",
+      "candidate": "dark-installed",
+      "cases": 2,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "resourceCountersEqual": true
+    },
+    {
+      "baseline": "wet-baseline",
+      "candidate": "wet-installed",
+      "cases": 2,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "resourceCountersEqual": true
+    },
+    {
+      "baseline": "logistics-baseline",
+      "candidate": "logistics-installed",
+      "cases": 4,
+      "changedPixels": 0,
+      "maximumChannelDelta": 0,
+      "resourceCountersEqual": true
+    }
+  ],
+  "totalCaptures": 48,
+  "totalMatchedPairs": 24
+}

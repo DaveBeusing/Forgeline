@@ -1,0 +1,902 @@
+{
+  "assetIds": [
+    "building.directorate.ammunition_plant",
+    "building.directorate.ammunition_plant.critical",
+    "building.directorate.ammunition_plant.damaged",
+    "building.directorate.ammunition_plant.destroyed",
+    "building.directorate.ammunition_plant.foundation",
+    "building.directorate.ammunition_plant.idle",
+    "building.directorate.ammunition_plant.lod1",
+    "building.directorate.ammunition_plant.lod2",
+    "building.directorate.ammunition_plant.partial_shell",
+    "building.directorate.ammunition_plant.structural_frame",
+    "building.directorate.ammunition_plant.unpowered",
+    "building.directorate.module.collision_box",
+    "material.directorate.building.structural",
+    "texture.directorate.surface.atlas_base",
+    "texture.directorate.surface.atlas_normal",
+    "texture.directorate.surface.atlas_orm"
+  ],
+  "collisionSourcesUnchanged": true,
+  "errors": [],
+  "inventory": [
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.27000001072883606,
+        0.4099999964237213
+      ],
+      "boundsMin": [
+        -0.44999998807907104,
+        -0.5,
+        -0.41999998688697815
+      ],
+      "estimatedVertexBytes": 104832,
+      "id": "building.directorate.ammunition_plant",
+      "indexBytes": 12768,
+      "lods": [
+        {
+          "assetId": "building.directorate.ammunition_plant.lod1",
+          "level": 1,
+          "maxDistance": 220
+        },
+        {
+          "assetId": "building.directorate.ammunition_plant.lod2",
+          "level": 2,
+          "maxDistance": 620
+        }
+      ],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 1064,
+      "vertices": 2184
+    },
+    {
+      "boundsMax": [
+        -0.20000000298023224,
+        -0.10373086482286453,
+        -0.15000000596046448
+      ],
+      "boundsMin": [
+        -0.38999998569488525,
+        -0.4300000071525574,
+        -0.35794731974601746
+      ],
+      "estimatedVertexBytes": 5184,
+      "id": "building.directorate.ammunition_plant.critical",
+      "indexBytes": 720,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 60,
+      "vertices": 108
+    },
+    {
+      "boundsMax": [
+        0.3793768286705017,
+        -0.15152259171009064,
+        0.3449999988079071
+      ],
+      "boundsMin": [
+        -0.38999998569488525,
+        -0.4350000023841858,
+        0.24500000476837158
+      ],
+      "estimatedVertexBytes": 4032,
+      "id": "building.directorate.ammunition_plant.damaged",
+      "indexBytes": 576,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 48,
+      "vertices": 84
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        -0.07999999821186066,
+        0.4099999964237213
+      ],
+      "boundsMin": [
+        -0.44999998807907104,
+        -0.5,
+        -0.41999998688697815
+      ],
+      "estimatedVertexBytes": 8640,
+      "id": "building.directorate.ammunition_plant.destroyed",
+      "indexBytes": 1152,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 96,
+      "vertices": 180
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        -0.46000000834465027,
+        0.4099999964237213
+      ],
+      "boundsMin": [
+        -0.44999998807907104,
+        -0.5,
+        -0.41999998688697815
+      ],
+      "estimatedVertexBytes": 1152,
+      "id": "building.directorate.ammunition_plant.foundation",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 24
+    },
+    {
+      "boundsMax": [
+        -0.19499999284744263,
+        -0.20000000298023224,
+        0.40799999237060547
+      ],
+      "boundsMin": [
+        -0.3449999988079071,
+        -0.3700000047683716,
+        0.39800000190734863
+      ],
+      "estimatedVertexBytes": 2304,
+      "id": "building.directorate.ammunition_plant.idle",
+      "indexBytes": 288,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 24,
+      "vertices": 48
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.27000001072883606,
+        0.4099999964237213
+      ],
+      "boundsMin": [
+        -0.44999998807907104,
+        -0.5,
+        -0.41999998688697815
+      ],
+      "estimatedVertexBytes": 23616,
+      "id": "building.directorate.ammunition_plant.lod1",
+      "indexBytes": 3168,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 264,
+      "vertices": 492
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.27000001072883606,
+        0.4099999964237213
+      ],
+      "boundsMin": [
+        -0.44999998807907104,
+        -0.5,
+        -0.41999998688697815
+      ],
+      "estimatedVertexBytes": 20160,
+      "id": "building.directorate.ammunition_plant.lod2",
+      "indexBytes": 2592,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 216,
+      "vertices": 420
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.27000001072883606,
+        0.4099999964237213
+      ],
+      "boundsMin": [
+        -0.44999998807907104,
+        -0.5,
+        -0.41999998688697815
+      ],
+      "estimatedVertexBytes": 20736,
+      "id": "building.directorate.ammunition_plant.partial_shell",
+      "indexBytes": 2592,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 216,
+      "vertices": 432
+    },
+    {
+      "boundsMax": [
+        0.4099999964237213,
+        0.10000000149011612,
+        0.4099999964237213
+      ],
+      "boundsMin": [
+        -0.44999998807907104,
+        -0.5,
+        -0.41999998688697815
+      ],
+      "estimatedVertexBytes": 6912,
+      "id": "building.directorate.ammunition_plant.structural_frame",
+      "indexBytes": 864,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 72,
+      "vertices": 144
+    },
+    {
+      "boundsMax": [
+        -0.3149999976158142,
+        -0.17550432682037354,
+        0.4020000100135803
+      ],
+      "boundsMin": [
+        -0.42500001192092896,
+        -0.41999998688697815,
+        0.3400000035762787
+      ],
+      "estimatedVertexBytes": 4032,
+      "id": "building.directorate.ammunition_plant.unpowered",
+      "indexBytes": 576,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 48,
+      "vertices": 84
+    },
+    {
+      "boundsMax": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "boundsMin": [
+        -0.5,
+        -0.5,
+        -0.5
+      ],
+      "estimatedVertexBytes": 384,
+      "id": "building.directorate.module.collision_box",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 8
+    }
+  ],
+  "meshes": [
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.27000001072883606,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 1064,
+        "vertices": 2184
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.27000001072883606,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 1064,
+        "vertices": 2184
+      },
+      "estimatedCompiledGeometryBytes": 117600,
+      "id": "building.directorate.ammunition_plant",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.20000000298023224,
+          -0.10373086482286453,
+          -0.15000000596046448
+        ],
+        "boundsMin": [
+          -0.38999998569488525,
+          -0.4300000071525574,
+          -0.35794731974601746
+        ],
+        "primitives": 1,
+        "triangles": 60,
+        "vertices": 108
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.20000000298023224,
+          -0.10373086482286453,
+          -0.15000000596046448
+        ],
+        "boundsMin": [
+          -0.38999998569488525,
+          -0.4300000071525574,
+          -0.35794731974601746
+        ],
+        "primitives": 1,
+        "triangles": 60,
+        "vertices": 108
+      },
+      "estimatedCompiledGeometryBytes": 5904,
+      "id": "building.directorate.ammunition_plant.critical",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.critical"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.3793768286705017,
+          -0.15152259171009064,
+          0.3449999988079071
+        ],
+        "boundsMin": [
+          -0.38999998569488525,
+          -0.4350000023841858,
+          0.24500000476837158
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "candidate": {
+        "boundsMax": [
+          0.3793768286705017,
+          -0.15152259171009064,
+          0.3449999988079071
+        ],
+        "boundsMin": [
+          -0.38999998569488525,
+          -0.4350000023841858,
+          0.24500000476837158
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "estimatedCompiledGeometryBytes": 4608,
+      "id": "building.directorate.ammunition_plant.damaged",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.damaged"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          -0.07999999821186066,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 96,
+        "vertices": 180
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          -0.07999999821186066,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 96,
+        "vertices": 180
+      },
+      "estimatedCompiledGeometryBytes": 9792,
+      "id": "building.directorate.ammunition_plant.destroyed",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.destroyed"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          -0.46000000834465027,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          -0.46000000834465027,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "estimatedCompiledGeometryBytes": 1296,
+      "id": "building.directorate.ammunition_plant.foundation",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.foundation"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.19499999284744263,
+          -0.20000000298023224,
+          0.40799999237060547
+        ],
+        "boundsMin": [
+          -0.3449999988079071,
+          -0.3700000047683716,
+          0.39800000190734863
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.19499999284744263,
+          -0.20000000298023224,
+          0.40799999237060547
+        ],
+        "boundsMin": [
+          -0.3449999988079071,
+          -0.3700000047683716,
+          0.39800000190734863
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "estimatedCompiledGeometryBytes": 2592,
+      "id": "building.directorate.ammunition_plant.idle",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.idle"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.27000001072883606,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 264,
+        "vertices": 492
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.27000001072883606,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 264,
+        "vertices": 492
+      },
+      "estimatedCompiledGeometryBytes": 26784,
+      "id": "building.directorate.ammunition_plant.lod1",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.lod1"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.27000001072883606,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 216,
+        "vertices": 420
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.27000001072883606,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 216,
+        "vertices": 420
+      },
+      "estimatedCompiledGeometryBytes": 22752,
+      "id": "building.directorate.ammunition_plant.lod2",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.lod2"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.27000001072883606,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 216,
+        "vertices": 432
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.27000001072883606,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 216,
+        "vertices": 432
+      },
+      "estimatedCompiledGeometryBytes": 23328,
+      "id": "building.directorate.ammunition_plant.partial_shell",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.partial_shell"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.10000000149011612,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "candidate": {
+        "boundsMax": [
+          0.4099999964237213,
+          0.10000000149011612,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.44999998807907104,
+          -0.5,
+          -0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "estimatedCompiledGeometryBytes": 7776,
+      "id": "building.directorate.ammunition_plant.structural_frame",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.structural_frame"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.3149999976158142,
+          -0.17550432682037354,
+          0.4020000100135803
+        ],
+        "boundsMin": [
+          -0.42500001192092896,
+          -0.41999998688697815,
+          0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.3149999976158142,
+          -0.17550432682037354,
+          0.4020000100135803
+        ],
+        "boundsMin": [
+          -0.42500001192092896,
+          -0.41999998688697815,
+          0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "estimatedCompiledGeometryBytes": 4608,
+      "id": "building.directorate.ammunition_plant.unpowered",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.ammunition_plant.unpowered"
+    }
+  ],
+  "previews": [
+    {
+      "assetId": "building.directorate.ammunition_plant",
+      "camera": "close",
+      "distanceInAssetExtents": 3.896187548885198,
+      "file": "building.directorate.ammunition_plant-close.png"
+    },
+    {
+      "assetId": "building.directorate.ammunition_plant",
+      "camera": "normal",
+      "distanceInAssetExtents": 6.3755796254485055,
+      "file": "building.directorate.ammunition_plant-normal.png"
+    },
+    {
+      "assetId": "building.directorate.ammunition_plant",
+      "camera": "strategic",
+      "distanceInAssetExtents": 12.042761514736066,
+      "file": "building.directorate.ammunition_plant-strategic.png"
+    }
+  ],
+  "productionSourcesUnchanged": true,
+  "profileSha256": "3110232ad137d5658e0ec38ae834ad8b4edcfc838376bc2f7a2da5dd5d100d93",
+  "schemaVersion": 1,
+  "sourceHashes": {
+    "buildings/directorate/ammunition_plant.asset.json": "aef8960d54e24ecb4a834d1a1835c2c1fc87104474d554f0b3eacc9886c0e764",
+    "buildings/directorate/ammunition_plant_critical.asset.json": "ad991d00e7795694dd807234964011a400a83cb6c6ac4bc1c0c1d10533c30fd4",
+    "buildings/directorate/ammunition_plant_damaged.asset.json": "b5007f70f720853afdecbdddd7659a107e6eeb4d5993a473da1eb6c3e058e84c",
+    "buildings/directorate/ammunition_plant_destroyed.asset.json": "2e6d478e7113f2131779b93569fb0fb523fe85d7b3b866aff90b918e4cc49baa",
+    "buildings/directorate/ammunition_plant_foundation.asset.json": "90878aa98332ec08e7b50d65944c1d416d652f722648ec49720085a4f7075d1c",
+    "buildings/directorate/ammunition_plant_idle.asset.json": "a4fc93e12f0f6995a12e9fdd950d47dfbe8173c61d36c8f8c677739d22cfabcb",
+    "buildings/directorate/ammunition_plant_lod1.asset.json": "bdcbb806d1873a124bb818bcb3cd1a750656b3c2779f8f8f2f5383db89b319d0",
+    "buildings/directorate/ammunition_plant_lod2.asset.json": "76149a0df65a4da6e1b46def2b092678e12df2e5ef0a9395d1d737e2ef66332c",
+    "buildings/directorate/ammunition_plant_partial_shell.asset.json": "4805e365880df1c4acf9a3bb187694d1734eaae96aaf5669acab0de1a21a6e2a",
+    "buildings/directorate/ammunition_plant_structural_frame.asset.json": "45582159f13ac48a2d31a47cba645e003a6d6c23d51651c4fec415b0013c67c2",
+    "buildings/directorate/ammunition_plant_unpowered.asset.json": "800ebc0459578f2ff20089f68e17336d50190151b639029d8785e9a7368520d6",
+    "buildings/directorate/materials/structural.asset.json": "3692dc0effd7a964b33d05610534729780cf4f4920b5230425495ced7ec543b8",
+    "buildings/directorate/materials/structural.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "buildings/directorate/modules/collision_box.asset.json": "b5ac3e871a08eabff5bb20cddf65de2d928f0d7728b7cdd3cd5669205c4ee637",
+    "buildings/directorate/sources/industrial/ammunition_plant/critical.gltf": "8195ea2279c67a435e044dcfdf3739aeaa036da595bae12ab18ba2165c098098",
+    "buildings/directorate/sources/industrial/ammunition_plant/damaged.gltf": "4f58525cc84e1a3aa98293419818d5c5f4986ebb88e4758f0640f4f7edfe7f97",
+    "buildings/directorate/sources/industrial/ammunition_plant/destroyed.gltf": "ddf068706e74de5143991798e43dc67e9f9ffcb0d4cf9e82decccd12763dfb2e",
+    "buildings/directorate/sources/industrial/ammunition_plant/foundation.gltf": "2c79dc3987db05d8efa704249deede278db4a0884a610a55f5b7f867c84cf370",
+    "buildings/directorate/sources/industrial/ammunition_plant/idle.gltf": "fa02812b93057a1c0c836b9b43950e028717236c0e3aaf2c59d90db24f29ff25",
+    "buildings/directorate/sources/industrial/ammunition_plant/lod0.gltf": "279e43eb54380a8d620d005ccdabf3c6f7b11cf85202fdab041bd91e13ee7ca5",
+    "buildings/directorate/sources/industrial/ammunition_plant/lod1.gltf": "91abbe8463c54bbc0815955c2a2378ce2a04a58766f3d06788fbab51a6be54d6",
+    "buildings/directorate/sources/industrial/ammunition_plant/lod2.gltf": "d3e2acf1a0409adecfff25944de106a80326449c47e9528f3e951abb0214d35f",
+    "buildings/directorate/sources/industrial/ammunition_plant/partial_shell.gltf": "bed3174337c4dad6e7d3cafae74071eee6d3297285d9fb5638442046f6199915",
+    "buildings/directorate/sources/industrial/ammunition_plant/structural_frame.gltf": "edf4a10d748427e6d5167b4595fcc6e311d5e10d6590c95151c048f1765c7140",
+    "buildings/directorate/sources/industrial/ammunition_plant/unpowered.gltf": "fc92dae11b12bf0feb9e0e1debd5b59017ab90a3b60ed1b98f718f4e1b8fae68",
+    "buildings/directorate/sources/module_collision_box.gltf": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+    "materials/directorate/surfaces/production_surface_base.png": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+    "materials/directorate/surfaces/production_surface_normal.png": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+    "materials/directorate/surfaces/production_surface_orm.png": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+    "materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9"
+  },
+  "sourceSignature": "f0e6565c033e5ad4077ed0f4f4191af1ce9758fce026b1d98f2fd298c780f064",
+  "success": true,
+  "texturePayloadBytes": 7323648,
+  "textures": [
+    {
+      "colorSpace": "srgb",
+      "estimatedPayloadBytes": 5586944,
+      "format": "BC7",
+      "height": 2048,
+      "id": "texture.directorate.surface.atlas_base",
+      "mipLevels": 5,
+      "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+      "usage": "baseColor",
+      "width": 2048
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 1392640,
+      "format": "BC7",
+      "height": 1024,
+      "id": "texture.directorate.surface.atlas_normal",
+      "mipLevels": 4,
+      "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+      "usage": "normal",
+      "width": 1024
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 344064,
+      "format": "BC7",
+      "height": 512,
+      "id": "texture.directorate.surface.atlas_orm",
+      "mipLevels": 3,
+      "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+      "usage": "orm",
+      "width": 512
+    }
+  ]
+}

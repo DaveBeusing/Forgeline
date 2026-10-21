@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.ammunition_plant",
+      "assets": [
+        "building.directorate.ammunition_plant",
+        "building.directorate.ammunition_plant.critical",
+        "building.directorate.ammunition_plant.damaged",
+        "building.directorate.ammunition_plant.destroyed",
+        "building.directorate.ammunition_plant.foundation",
+        "building.directorate.ammunition_plant.idle",
+        "building.directorate.ammunition_plant.lod1",
+        "building.directorate.ammunition_plant.lod2",
+        "building.directorate.ammunition_plant.partial_shell",
+        "building.directorate.ammunition_plant.structural_frame",
+        "building.directorate.ammunition_plant.unpowered"
+      ],
+      "instanceScale": [
+        18,
+        10,
+        18
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

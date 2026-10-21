@@ -1,0 +1,43 @@
+{
+  "imageFailures": [],
+  "visualAcceptance": "pending",
+  "structural": "pass",
+  "commit": "f9fbcb87a90c35b4b5d0e4f27cbd693eecf32076",
+  "captures": [
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 8.43808,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 18.890887499999998,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "FuelRefineryProduction-1920x1080-High-NormalGameplay"
+    },
+    {
+      "pixelComparison": null,
+      "gpuMeanMs": 14.080133333333334,
+      "structural": "pass",
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "cpuMeanMs": 11.6534125,
+      "sameSource": false,
+      "comparison": "no-matched-baseline",
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "visualReview": "pending",
+      "key": "AmmunitionPlantProduction-1920x1080-High-NormalGameplay"
+    }
+  ],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "pixelComparisonRequested": false,
+  "maximumChangedPixelFraction": 0.0,
+  "imageGateRequested": false,
+  "schemaVersion": 1,
+  "channelTolerance": 0,
+  "baselineCommit": null
+}
