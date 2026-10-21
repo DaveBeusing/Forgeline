@@ -12,6 +12,7 @@ family, master = request['arguments']
 master = Path(master)
 output = Path(request['outputRoot'])
 source = Path(request['inputRoot'])
+root = 'building.directorate.' + family
 catalog = Catalog(source)
 fixture = Path(__file__).resolve().parents[1] / 'fixtures' / ('logistics_' + family + '.json')
 ids, _ = fixture_selection(catalog, fixture, [])
@@ -29,7 +30,7 @@ results = []
 
 
 def pick(role):
-    return next(o for o in bpy.context.scene.objects if o.get('fl_role') == role)
+    return next(o for o in bpy.context.scene.objects if o.get('fl_role') == role and o.get('fl_asset') == root)
 
 
 def reject(name, mutate):
@@ -59,7 +60,6 @@ reject('changed PBR graph', lambda: next(m for m in bpy.data.materials if m.get(
 reject('changed split normals', lambda: pick('geometry').data.normals_split_custom_set([(1,0,0)]*len(pick('geometry').data.loops)))
 
 bpy.ops.wm.open_mainfile(filepath=str(master))
-root = 'building.directorate.' + family
 kit = json.loads((source / 'buildings/directorate/authoring' / (family + '.kit.json')).read_text())
 # Translate a complete interior module, keeping every triangle plane and socket.
 obj = next(o for o in bpy.context.scene.objects if o.get('fl_role') == 'geometry'
