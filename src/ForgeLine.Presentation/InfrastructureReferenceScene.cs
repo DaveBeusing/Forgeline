@@ -20,8 +20,8 @@ internal static class InfrastructureReferenceScene
     private sealed record Chart(InfrastructurePresentationKind Kind, Vector2[] Path);
     private static readonly Chart[] Charts =
     [
-        new(InfrastructurePresentationKind.RoadCurveShort, [new(-.48f,-.15f),new(-.22f,-.15f),new(.18f,.20f),new(.40f,.20f)]),
-        new(InfrastructurePresentationKind.RoadCurveLong, [new(-.50f,-.22f),new(-.28f,-.22f),new(.03f,.02f),new(.30f,.28f),new(.50f,.28f)]),
+        new(InfrastructurePresentationKind.RoadCurveShort, [new(-.559627f,-.213554f),new(-.210647f,-.213554f),new(.393537f,.390630f)]),
+        new(InfrastructurePresentationKind.RoadCurveLong, [new(-.647507f,-.247372f),new(-.28f,-.247372f),new(.03f,.02f),new(.30f,.433774f),new(.639486f,.433774f)]),
         new(InfrastructurePresentationKind.RoadJunctionT, [new(0,.42f),new(0,.03f),new(.42f,.03f)]),
         new(InfrastructurePresentationKind.RoadJunctionCross, [new(-.42f,0),Vector2.Zero,new(.42f,0)])
     ];
