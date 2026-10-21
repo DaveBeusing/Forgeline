@@ -1,0 +1,11 @@
+{
+  "baseColorFactor": [1, 1, 1, 1],
+  "metallicFactor": 1,
+  "roughnessFactor": 1,
+  "baseColorTexture": "texture.directorate.surface.atlas_base",
+  "normalTexture": "texture.directorate.surface.atlas_normal",
+  "ormTexture": "texture.directorate.surface.atlas_orm",
+  "emissiveTexture": "texture.directorate.building.command_core.emissive",
+  "emissiveMultiplier": 0.6,
+  "uvScale": [1, 1]
+}

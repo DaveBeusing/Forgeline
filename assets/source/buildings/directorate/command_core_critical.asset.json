@@ -1,8 +1,8 @@
 {
   "id": "building.directorate.command_core.critical",
-  "type": "mesh",
-  "source": "sources/command_core/command_core_critical.gltf",
   "materialReferences": [
-    "material.directorate.building.critical"
-  ]
+    "material.directorate.building.command_core.critical"
+  ],
+  "source": "sources/command_core/blender/critical.glb",
+  "type": "mesh"
 }

@@ -1,0 +1,11 @@
+{
+  "id": "texture.directorate.building.command_core.emissive",
+  "type": "texture",
+  "source": "command_core_emissive.png",
+  "textureUsage": "emissive",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced",
+  "textureMaxDimension": 32
+}

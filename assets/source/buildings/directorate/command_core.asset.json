@@ -1,24 +1,22 @@
 {
+  "collisionReference": "building.directorate.module.collision_box",
+  "collisionRequired": true,
   "id": "building.directorate.command_core",
-  "type": "mesh",
-  "source": "sources/command_core/command_core_assembled_lod0.gltf",
-  "materialReferences": [
-    "material.directorate.building.structural"
-  ],
   "lods": [
     {
-      "level": 1,
       "assetId": "building.directorate.command_core.lod1",
+      "level": 1,
       "maxDistance": 220
     },
     {
-      "level": 2,
       "assetId": "building.directorate.command_core.lod2",
+      "level": 2,
       "maxDistance": 620
     }
   ],
-  "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box",
+  "materialReferences": [
+    "material.directorate.building.command_core"
+  ],
   "sockets": [
     {
       "name": "communications",
@@ -38,5 +36,7 @@
       "y": 0.19,
       "z": 0.05
     }
-  ]
+  ],
+  "source": "sources/command_core/blender/lod0.glb",
+  "type": "mesh"
 }

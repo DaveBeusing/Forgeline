@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.command_core",
+      "assets": [
+        "building.directorate.command_core",
+        "building.directorate.command_core.lod1",
+        "building.directorate.command_core.lod2",
+        "building.directorate.command_core.foundation",
+        "building.directorate.command_core.structural_frame",
+        "building.directorate.command_core.partial_shell",
+        "building.directorate.command_core.unpowered",
+        "building.directorate.command_core.damaged",
+        "building.directorate.command_core.critical",
+        "building.directorate.command_core.destroyed",
+        "material.directorate.building.command_core",
+        "material.directorate.building.command_core.unpowered",
+        "material.directorate.building.command_core.damaged",
+        "material.directorate.building.command_core.critical",
+        "material.directorate.building.command_core.destroyed"
+      ],
+      "instanceScale": [20, 12, 20],
+      "instanceTranslation": [17, 5, -29],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

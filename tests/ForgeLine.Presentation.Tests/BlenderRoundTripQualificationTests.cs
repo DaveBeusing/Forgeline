@@ -30,8 +30,8 @@ public sealed class BlenderRoundTripQualificationTests
     public void BuildingVehicleAndPropPreserveCompiledContracts()
     {
         CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_READINESS_ROOT")!),
-            ["first", "second", "reopened"], false, expectedTriangles: 15696,
-            expectedAssets: 32, expectedMeshes: 21, baselineFolder: "baseline/runtime");
+            ["first", "second", "reopened"], false, expectedTriangles: 13184,
+            expectedAssets: 33, expectedMeshes: 21, baselineFolder: "baseline/runtime");
     }
 
     public static bool ProductionEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_PRODUCTION_ROOT"));
@@ -56,8 +56,8 @@ public sealed class BlenderRoundTripQualificationTests
         CompareExports(Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_MOTION_ROOT")!), ["first", "second", "reopened"], true, "_rigid/", 10536);
     }
 
-    private static void CompareExports(string root, string[] variants, bool prepared, string folder = "_prepared/", int expectedTriangles = 15640,
-        int expectedAssets = 29, int expectedMeshes = 19, string baselineFolder = "baseline-runtime")
+    private static void CompareExports(string root, string[] variants, bool prepared, string folder = "_prepared/", int expectedTriangles = 13128,
+        int expectedAssets = 30, int expectedMeshes = 19, string baselineFolder = "baseline-runtime")
     {
         var baseline = RuntimeAssetCatalog.Load(Path.Combine(root, baselineFolder));
         Assert.Equal(expectedAssets, baseline.Manifest.Assets.Count);

@@ -17,6 +17,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  command-core-production:
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 45
+    env:
+      FORGELINE_BLENDER_PATH: ${{ inputs.blender_executable }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Qualify saved Command Core and source-less exports
+        shell: pwsh
+        run: ./tools/blender/Test-BlenderCommandCore.ps1 -OutputRoot artifacts/cc-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Retain Command Core evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: command-core-production-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/cc-*
+          retention-days: 14
+
   export-smoke:
     runs-on: [self-hosted, Windows, X64, blender]
     timeout-minutes: 15

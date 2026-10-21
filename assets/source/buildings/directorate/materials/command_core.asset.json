@@ -1,0 +1,5 @@
+{
+  "id": "material.directorate.building.command_core",
+  "type": "material",
+  "source": "command_core.material.json"
+}

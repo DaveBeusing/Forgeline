@@ -242,7 +242,22 @@ public static class BuildingPresentationCatalog
         });
 
     public static string ResolveMaterialAssetId(
-        in BuildingFeaturePresentationMetadata feature) =>
+        in BuildingFeaturePresentationMetadata feature)
+    {
+        if (feature.Building == BuildingIds.CommandCore && !feature.IsConstruction)
+        {
+            const string core = "material.directorate.building.command_core";
+            return feature.State switch
+            {
+                BuildingPresentationState.Unpowered => core + ".unpowered",
+                BuildingPresentationState.Damaged => core + ".damaged",
+                BuildingPresentationState.Critical => core + ".critical",
+                BuildingPresentationState.Destroyed => core + ".destroyed",
+                _ => core
+            };
+        }
+
+        return
         feature.State switch
         {
             BuildingPresentationState.Unpowered =>
@@ -256,6 +271,7 @@ public static class BuildingPresentationCatalog
             _ =>
                 StructuralMaterialAssetId
         };
+    }
 
     public static Vector4 ResolveFallbackTint(
         in BuildingFeaturePresentationMetadata feature)
@@ -435,7 +451,9 @@ public static class BuildingPresentationCatalog
                     mesh,
                     $"{mesh}.lod1",
                     $"{mesh}.lod2",
-                    StructuralMaterialAssetId,
+                    building == BuildingIds.CommandCore
+                        ? "material.directorate.building.command_core"
+                        : StructuralMaterialAssetId,
                     CollisionAssetId,
                     $"material.directorate.symbol.building.{symbol}",
                     tint,

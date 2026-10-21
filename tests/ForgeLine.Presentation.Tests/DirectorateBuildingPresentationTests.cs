@@ -12,6 +12,22 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class DirectorateBuildingPresentationTests
 {
     [Theory]
+    [InlineData(BuildingPresentationState.Operational, "")]
+    [InlineData(BuildingPresentationState.Unpowered, ".unpowered")]
+    [InlineData(BuildingPresentationState.Damaged, ".damaged")]
+    [InlineData(BuildingPresentationState.Critical, ".critical")]
+    [InlineData(BuildingPresentationState.Destroyed, ".destroyed")]
+    public void CommandCoreUsesItsReviewedFamilyMaterials(BuildingPresentationState state, string suffix)
+    {
+        var core = new BuildingFeaturePresentationMetadata(BuildingIds.CommandCore, state);
+        Assert.Equal("material.directorate.building.command_core" + suffix,
+            BuildingPresentationCatalog.ResolveMaterialAssetId(core));
+        var construction = core with { State = BuildingPresentationState.ConstructionFoundation };
+        Assert.Equal("material.directorate.building.structural",
+            BuildingPresentationCatalog.ResolveMaterialAssetId(construction));
+    }
+
+    [Theory]
     [InlineData("extractor")]
     [InlineData("smelter")]
     [InlineData("electronics_plant")]
