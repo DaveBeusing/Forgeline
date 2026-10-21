@@ -32,7 +32,7 @@ def pack(request):
             require(image.colorspace_settings.name == expected, 'Texture color space changed')
             image.filepath_raw = '//../../../source/' + source.relative_to(catalog.root).as_posix()
             images.append({'id': aid, 'sourceSha256': sha(source), 'colorSpace': expected})
-        require(len(images) == len(textures) == 3, 'Expected complete Base Color/Normal/ORM set')
+        require(len(images) == len(textures) == 4, 'Expected shared Base Color/Normal/ORM and existing emissive set')
         bpy.context.preferences.filepaths.save_version = 0
         bpy.context.scene.render.filepath = '//previews/' + family + '.png'
         target = output / (family + '_surfaces.blend')

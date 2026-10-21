@@ -24,7 +24,7 @@ public sealed class BlenderRoundTripQualificationTests
     {
         string root = Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_OPERATIONAL_BLENDER_ROOT")!);
         CompareExports(Path.Combine(root, family), ["first", "second", "reopened"], false,
-            expectedTriangles: triangles, expectedAssets: 15, expectedMeshes: 11, baselineFolder: "baseline/runtime");
+            expectedTriangles: triangles, expectedAssets: 20, expectedMeshes: 11, baselineFolder: "baseline/runtime");
     }
 
     public static bool IndustrialEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_INDUSTRIAL_BLENDER_ROOT"));
@@ -161,6 +161,52 @@ public sealed class BlenderRoundTripQualificationTests
             Assert.True(RuntimeAssetQualification.Run(target,requireIntegrity:true).Success);
         }
         File.WriteAllText(Path.Combine(root,"runtime-comparison.json"),JsonSerializer.Serialize(reports,ReportOptions));
+    }
+
+    public static bool OperationalOverlayEnabled => OperationalEnabled &&
+        !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_RUNTIME_SEED"));
+
+    [Fact(Skip = "Set operational exports and a qualified full runtime seed.", SkipUnless = nameof(OperationalOverlayEnabled))]
+    public void CombinedOperationalExportsLoadWithoutSourceFiles()
+    {
+        string root = Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_OPERATIONAL_BLENDER_ROOT")!);
+        string seed = Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_RUNTIME_SEED")!);
+        var original = RuntimeAssetCatalog.Load(seed);
+        var replacements = new Dictionary<string, (RuntimeAssetRecord Record, string Root)>();
+        foreach (string family in new[] { "vehicle_factory", "power_plant", "barracks", "radar" })
+        {
+            string replacementRoot = Path.Combine(root, family, "second/runtime");
+            var exported = RuntimeAssetCatalog.Load(replacementRoot);
+            foreach (var record in exported.Manifest.Assets.Where(x => x.Id.StartsWith("building.directorate." + family, StringComparison.Ordinal)))
+                Assert.True(replacements.TryAdd(record.Id, (record, replacementRoot)));
+        }
+        Assert.Equal(40, replacements.Count);
+        string target = Path.Combine(root, "combined/runtime");
+        Assert.False(Directory.Exists(target), "Use a fresh combined runtime directory.");
+        foreach (var record in original.Manifest.Assets)
+        {
+            bool replaced = replacements.TryGetValue(record.Id, out var replacement);
+            var chosen = replaced ? replacement.Record : record;
+            string source = replaced ? replacement.Root : seed;
+            string file = Path.Combine(target, chosen.RuntimePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(file)!);
+            File.Copy(Path.Combine(source, chosen.RuntimePath), file, overwrite: false);
+        }
+        var manifest = RuntimeAssetIntegrity.SealManifest(original.Manifest with
+        {
+            Assets = original.Manifest.Assets.Select(x => replacements.TryGetValue(x.Id, out var replacement) ? replacement.Record : x).ToArray()
+        });
+        Assert.Equal(original.Manifest.Assets.Count, manifest.Assets.Count);
+        File.WriteAllBytes(Path.Combine(target, RuntimeAssetCatalog.ManifestFileName),
+            JsonSerializer.SerializeToUtf8Bytes(manifest, RuntimeAssetCatalog.CreateJsonOptions()));
+        Assert.True(RuntimeAssetQualification.Run(target, requireIntegrity: true).Success);
+        var candidate = RuntimeAssetCatalog.Load(target);
+        foreach (var record in manifest.Assets)
+        {
+            Assert.True(candidate.Read(AssetId.Parse(record.Id)).Payload.Length > 0);
+            if (!replacements.ContainsKey(record.Id))
+                Assert.Equal(original.Get(AssetId.Parse(record.Id)).RuntimeHash, record.RuntimeHash);
+        }
     }
 
     private static MechanicalPartBinding[] Bindings(RuntimeAssetRecord record) => record.MechanicalParts.Select(part =>
