@@ -2,11 +2,16 @@
 
 ## Current review status
 
-Review base: master **3c732aa519bb54bec17070bcdad378c232ea9de1**, version
-0.1.433. This PR has exactly one PATCH increment to **0.1.434**.
-The fully built, tested, rendered and packaged product snapshot is
-**525a329ee77e656a232e69efcecd6a35ce22bbea**. Subsequent evidence-only commits
-retain that exact execution identity.
+Integration base: master **6445ed102bfbec4a5033917196f9464578086be4**, version
+0.1.434, including infantry refinement PR #277. This PR has exactly one PATCH
+increment to **0.1.435**. The merge preserves every published master scene ID
+and appends the four resource scene kinds after the six infantry load scenes.
+
+The retained native rendering and package evidence below belongs to the earlier
+tank-integrated base **3c732aa519bb54bec17070bcdad378c232ea9de1** and product
+snapshot **525a329ee77e656a232e69efcecd6a35ce22bbea**, version 0.1.434. Those
+images, metrics and package hashes retain their original execution identities;
+they do not qualify the new infantry-integrated product.
 
 Four editable Blender 5.2.2 rest masters and four separate packed-PBR inspection
 projects preserve the existing mineral artwork. Eight High/Reduced GLBs bind the
@@ -15,6 +20,20 @@ LOD thresholds, minimap symbols and source-only entities are retained.
 
 The branch is a review candidate. Production acceptance remains blocked by the
 rendering milestone's physical/performance gates and human art approval.
+
+## Infantry integration validation
+
+Master 6445ed102bfbec4a5033917196f9464578086be4 was merged into this branch.
+The enum conflict retains all 90 published scene IDs in their master order and
+appends four resource kinds. Both infantry and resource dispatch paths remain.
+Version 0.1.435 is one PATCH above that base.
+
+The combined working tree passed the full Release solution build with zero
+warnings/errors, 131 presentation/resource/reference/tank/infantry tests and
+15 client capture/loading tests. Two optional full-catalog/cache helpers were
+skipped. The retained-master verifier and portable-signature regression test
+also passed. This conflict-resolution checkpoint adds no new native images,
+package or performance qualification. The acceptance gates below remain open.
 
 ## Visible change and gameplay boundary
 
@@ -59,7 +78,7 @@ paths, available review comments and CI. Existing art and state/material/LOD
 support were reused.
 
 Logistics PR #273 subsequently merged at a391a5bb0c0e25f079fa394613a5f84dfe7e9728.
-Tank PR #278 subsequently merged at the current base above. This branch was
+Tank PR #278 subsequently merged at 3c732aa519bb54bec17070bcdad378c232ea9de1. This branch was
 rebased after each integration. Published logistics and tank reference enum IDs
 are preserved; resource kinds are appended after them. Versioning was reconciled
 against each latest base without accumulating multiple PATCH increments.
