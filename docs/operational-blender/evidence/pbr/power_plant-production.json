@@ -1,0 +1,857 @@
+{
+  "assetIds": [
+    "building.directorate.module.collision_box",
+    "building.directorate.power_plant",
+    "building.directorate.power_plant.critical",
+    "building.directorate.power_plant.damaged",
+    "building.directorate.power_plant.destroyed",
+    "building.directorate.power_plant.foundation",
+    "building.directorate.power_plant.lod1",
+    "building.directorate.power_plant.lod2",
+    "building.directorate.power_plant.partial_shell",
+    "building.directorate.power_plant.structural_frame",
+    "building.directorate.power_plant.unpowered",
+    "material.directorate.building.critical",
+    "material.directorate.building.damaged",
+    "material.directorate.building.destroyed",
+    "material.directorate.building.structural",
+    "material.directorate.building.unpowered",
+    "texture.directorate.material.status_emissive",
+    "texture.directorate.surface.atlas_base",
+    "texture.directorate.surface.atlas_normal",
+    "texture.directorate.surface.atlas_orm"
+  ],
+  "collisionSourcesUnchanged": true,
+  "errors": [],
+  "inventory": [
+    {
+      "boundsMax": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "boundsMin": [
+        -0.5,
+        -0.5,
+        -0.5
+      ],
+      "estimatedVertexBytes": 384,
+      "id": "building.directorate.module.collision_box",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 8
+    },
+    {
+      "boundsMax": [
+        0.41999998688697815,
+        0.550000011920929,
+        0.4699999988079071
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.3400000035762787
+      ],
+      "estimatedVertexBytes": 95232,
+      "id": "building.directorate.power_plant",
+      "indexBytes": 12192,
+      "lods": [
+        {
+          "assetId": "building.directorate.power_plant.lod1",
+          "level": 1,
+          "maxDistance": 220
+        },
+        {
+          "assetId": "building.directorate.power_plant.lod2",
+          "level": 2,
+          "maxDistance": 620
+        }
+      ],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 1016,
+      "vertices": 1984
+    },
+    {
+      "boundsMax": [
+        0.34646111726760864,
+        -0.2041861116886139,
+        0.4176216423511505
+      ],
+      "boundsMin": [
+        -0.3700000047683716,
+        -0.4558138847351074,
+        0.28999999165534973
+      ],
+      "estimatedVertexBytes": 8832,
+      "id": "building.directorate.power_plant.critical",
+      "indexBytes": 1104,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.critical"
+      ],
+      "primitives": 1,
+      "triangles": 92,
+      "vertices": 184
+    },
+    {
+      "boundsMax": [
+        -0.18000000715255737,
+        -0.2620428800582886,
+        -0.1769188493490219
+      ],
+      "boundsMin": [
+        -0.3499999940395355,
+        -0.44999998807907104,
+        -0.25999999046325684
+      ],
+      "estimatedVertexBytes": 4032,
+      "id": "building.directorate.power_plant.damaged",
+      "indexBytes": 576,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.damaged"
+      ],
+      "primitives": 1,
+      "triangles": 48,
+      "vertices": 84
+    },
+    {
+      "boundsMax": [
+        0.41999998688697815,
+        -0.24831195175647736,
+        0.4699999988079071
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.3400000035762787
+      ],
+      "estimatedVertexBytes": 15168,
+      "id": "building.directorate.power_plant.destroyed",
+      "indexBytes": 1968,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.destroyed"
+      ],
+      "primitives": 1,
+      "triangles": 164,
+      "vertices": 316
+    },
+    {
+      "boundsMax": [
+        0.41999998688697815,
+        -0.4699999988079071,
+        0.4699999988079071
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.3400000035762787
+      ],
+      "estimatedVertexBytes": 1152,
+      "id": "building.directorate.power_plant.foundation",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 24
+    },
+    {
+      "boundsMax": [
+        0.41999998688697815,
+        0.550000011920929,
+        0.4699999988079071
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.3400000035762787
+      ],
+      "estimatedVertexBytes": 45696,
+      "id": "building.directorate.power_plant.lod1",
+      "indexBytes": 5856,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 488,
+      "vertices": 952
+    },
+    {
+      "boundsMax": [
+        0.41999998688697815,
+        0.550000011920929,
+        0.4699999988079071
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.3400000035762787
+      ],
+      "estimatedVertexBytes": 17280,
+      "id": "building.directorate.power_plant.lod2",
+      "indexBytes": 2160,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 180,
+      "vertices": 360
+    },
+    {
+      "boundsMax": [
+        0.41999998688697815,
+        0.48500001430511475,
+        0.4699999988079071
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.3400000035762787
+      ],
+      "estimatedVertexBytes": 14976,
+      "id": "building.directorate.power_plant.partial_shell",
+      "indexBytes": 1872,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 156,
+      "vertices": 312
+    },
+    {
+      "boundsMax": [
+        0.41999998688697815,
+        0.48500001430511475,
+        0.4699999988079071
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.5,
+        -0.3400000035762787
+      ],
+      "estimatedVertexBytes": 10368,
+      "id": "building.directorate.power_plant.structural_frame",
+      "indexBytes": 1296,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 108,
+      "vertices": 216
+    },
+    {
+      "boundsMax": [
+        -0.25,
+        -0.18000000715255737,
+        0.45500001311302185
+      ],
+      "boundsMin": [
+        -0.3799999952316284,
+        -0.3799999952316284,
+        0.4449999928474426
+      ],
+      "estimatedVertexBytes": 1152,
+      "id": "building.directorate.power_plant.unpowered",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.unpowered"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 24
+    }
+  ],
+  "meshes": [
+    {
+      "baseline": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.550000011920929,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 1016,
+        "vertices": 1984
+      },
+      "candidate": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.550000011920929,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 1016,
+        "vertices": 1984
+      },
+      "estimatedCompiledGeometryBytes": 107424,
+      "id": "building.directorate.power_plant",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.34646111726760864,
+          -0.2041861116886139,
+          0.4176216423511505
+        ],
+        "boundsMin": [
+          -0.3700000047683716,
+          -0.4558138847351074,
+          0.28999999165534973
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      },
+      "candidate": {
+        "boundsMax": [
+          0.34646111726760864,
+          -0.2041861116886139,
+          0.4176216423511505
+        ],
+        "boundsMin": [
+          -0.3700000047683716,
+          -0.4558138847351074,
+          0.28999999165534973
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      },
+      "estimatedCompiledGeometryBytes": 9936,
+      "id": "building.directorate.power_plant.critical",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant.critical"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.18000000715255737,
+          -0.2620428800582886,
+          -0.1769188493490219
+        ],
+        "boundsMin": [
+          -0.3499999940395355,
+          -0.44999998807907104,
+          -0.25999999046325684
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.18000000715255737,
+          -0.2620428800582886,
+          -0.1769188493490219
+        ],
+        "boundsMin": [
+          -0.3499999940395355,
+          -0.44999998807907104,
+          -0.25999999046325684
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "estimatedCompiledGeometryBytes": 4608,
+      "id": "building.directorate.power_plant.damaged",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant.damaged"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.41999998688697815,
+          -0.24831195175647736,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 164,
+        "vertices": 316
+      },
+      "candidate": {
+        "boundsMax": [
+          0.41999998688697815,
+          -0.24831195175647736,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 164,
+        "vertices": 316
+      },
+      "estimatedCompiledGeometryBytes": 17136,
+      "id": "building.directorate.power_plant.destroyed",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant.destroyed"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.41999998688697815,
+          -0.4699999988079071,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "candidate": {
+        "boundsMax": [
+          0.41999998688697815,
+          -0.4699999988079071,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "estimatedCompiledGeometryBytes": 1296,
+      "id": "building.directorate.power_plant.foundation",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant.foundation"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.550000011920929,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 488,
+        "vertices": 952
+      },
+      "candidate": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.550000011920929,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 488,
+        "vertices": 952
+      },
+      "estimatedCompiledGeometryBytes": 51552,
+      "id": "building.directorate.power_plant.lod1",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant.lod1"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.550000011920929,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 180,
+        "vertices": 360
+      },
+      "candidate": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.550000011920929,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 180,
+        "vertices": 360
+      },
+      "estimatedCompiledGeometryBytes": 19440,
+      "id": "building.directorate.power_plant.lod2",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant.lod2"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.48500001430511475,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 156,
+        "vertices": 312
+      },
+      "candidate": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.48500001430511475,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 156,
+        "vertices": 312
+      },
+      "estimatedCompiledGeometryBytes": 16848,
+      "id": "building.directorate.power_plant.partial_shell",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant.partial_shell"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.48500001430511475,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      },
+      "candidate": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.48500001430511475,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      },
+      "estimatedCompiledGeometryBytes": 11664,
+      "id": "building.directorate.power_plant.structural_frame",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant.structural_frame"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.25,
+          -0.18000000715255737,
+          0.45500001311302185
+        ],
+        "boundsMin": [
+          -0.3799999952316284,
+          -0.3799999952316284,
+          0.4449999928474426
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.25,
+          -0.18000000715255737,
+          0.45500001311302185
+        ],
+        "boundsMin": [
+          -0.3799999952316284,
+          -0.3799999952316284,
+          0.4449999928474426
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "estimatedCompiledGeometryBytes": 1296,
+      "id": "building.directorate.power_plant.unpowered",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.power_plant.unpowered"
+    }
+  ],
+  "previews": [
+    {
+      "assetId": "building.directorate.power_plant",
+      "camera": "close",
+      "distanceInAssetExtents": 3.5354524691884675,
+      "file": "building.directorate.power_plant-close.png"
+    },
+    {
+      "assetId": "building.directorate.power_plant",
+      "camera": "normal",
+      "distanceInAssetExtents": 5.785285858672038,
+      "file": "building.directorate.power_plant-normal.png"
+    },
+    {
+      "assetId": "building.directorate.power_plant",
+      "camera": "strategic",
+      "distanceInAssetExtents": 10.927762177491626,
+      "file": "building.directorate.power_plant-strategic.png"
+    }
+  ],
+  "productionSourcesUnchanged": true,
+  "profileSha256": "6bb2d762da12b9e20c732f41c02a506999f377a2956621b1b3f66b6a05ad0d75",
+  "schemaVersion": 1,
+  "sourceHashes": {
+    "buildings/directorate/materials/critical.asset.json": "8c1a6eb4672ce7f238674b5a76f5f8f64ac39528d9cd27b069bd8eb99ee41fa1",
+    "buildings/directorate/materials/critical.material.json": "6e8256d9cd4d811f22f1c0ba8fed303c2fd358e6c9d11af01bad92ace16050b7",
+    "buildings/directorate/materials/damaged.asset.json": "b5d1c0f60bef36661b4525cb7e8c52e5cb46260bfd1c02b9a56c18987f5b5e3e",
+    "buildings/directorate/materials/damaged.material.json": "a1c57cb49c08c1caf03c030e80e57894f254ef8d4e38469fe4a0199c2b2bc636",
+    "buildings/directorate/materials/destroyed.asset.json": "e89a774bce9c320f7a2548c01ecae150863d593f54a63ec936dc5972c9d48eb3",
+    "buildings/directorate/materials/destroyed.material.json": "0a2a981e9afa9ea4477b9fe541ad85b203370686bb36d2effa9ec47cf774ad67",
+    "buildings/directorate/materials/structural.asset.json": "3692dc0effd7a964b33d05610534729780cf4f4920b5230425495ced7ec543b8",
+    "buildings/directorate/materials/structural.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "buildings/directorate/materials/unpowered.asset.json": "f4847dd15d0d5bb22bcdb9eb4529875fe438ddb0ed76f4815ba91e6b18f87fa8",
+    "buildings/directorate/materials/unpowered.material.json": "8373a93e0dbdacae3829d65406c18fb45daa571d01afe73df9cf87652e4590e6",
+    "buildings/directorate/modules/collision_box.asset.json": "b5ac3e871a08eabff5bb20cddf65de2d928f0d7728b7cdd3cd5669205c4ee637",
+    "buildings/directorate/power_plant.asset.json": "d5a6ff17a9c60234494f4dc89a213247b7e6fd39bd43c21c7c3a19c10b9c8850",
+    "buildings/directorate/power_plant_critical.asset.json": "7640cbae3065cb05fea972b404c3811ec5010de4fb110db7c1c4fb7f47c0b8bc",
+    "buildings/directorate/power_plant_damaged.asset.json": "745f3c8ae01e9539ab29b18d8ab31b02e99637648c87ae7decb313dab941cf45",
+    "buildings/directorate/power_plant_destroyed.asset.json": "fd63873b19765d6504db89646863a848c3b206492c0cb5d0ec58b773c2d5ce4c",
+    "buildings/directorate/power_plant_foundation.asset.json": "f63ff780fba3672a48c364308387ac05d176b21c9cec574d094b976a86f41c43",
+    "buildings/directorate/power_plant_lod1.asset.json": "869431a6c56b8bff2efbcfd3400a135f2275e9eb2b4791b4dfa741281d7d1954",
+    "buildings/directorate/power_plant_lod2.asset.json": "a7a2cd2aa979644e7052c0996b4f1273887ce555c3f73cfe166849f9c199b577",
+    "buildings/directorate/power_plant_partial_shell.asset.json": "08e33b60dcf037d20740bb741719036cf135801e0be6d2bb5dec36160d1d3838",
+    "buildings/directorate/power_plant_structural_frame.asset.json": "d8a3ca9eb9ac3a0ff4c6ee5ee6ec403e5fcbce64b6bb71c31445b98d827af70b",
+    "buildings/directorate/power_plant_unpowered.asset.json": "09e2b13cf09247855df40dbf3f728bda6de77eeaf019856d98f6c4e07903a3db",
+    "buildings/directorate/sources/module_collision_box.gltf": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+    "buildings/directorate/sources/operational/power_plant_critical.gltf": "5e76d9f398d1537923acad65c52f0894513c9273c3afe8bfed6553bb933a8836",
+    "buildings/directorate/sources/operational/power_plant_damaged.gltf": "1d324e3543456c03b416cc126f05d143c1b8685594f7d042ead52e6724ce39d0",
+    "buildings/directorate/sources/operational/power_plant_destroyed.gltf": "9cfb5a5a1636817dd45f90ba85a27e0239740ec2690935a6e5497b4f9143cf92",
+    "buildings/directorate/sources/operational/power_plant_foundation.gltf": "df9de5e02020b66c69777d42edb1da78631b88cc02208244af9e81a064f1d16f",
+    "buildings/directorate/sources/operational/power_plant_lod0.gltf": "b0ed0635a956e98c8909f03fd39035f4d473a977bd471ddca56c16927dcff8a7",
+    "buildings/directorate/sources/operational/power_plant_lod1.gltf": "4c35fd2a0922e88d4b7fe66b5000bbb48ec1692d99aaa81b76c14bd04a5a5686",
+    "buildings/directorate/sources/operational/power_plant_lod2.gltf": "99e92d2b580225bc2b666184588975f1152efe3d49a298e8428c3cc58fd43208",
+    "buildings/directorate/sources/operational/power_plant_partial_shell.gltf": "14e4c1f607dce8d47f0fe1a3a02afc33bb089e6ff5b569321e80c36c299d8231",
+    "buildings/directorate/sources/operational/power_plant_structural_frame.gltf": "a42a7ab69442529d05a77288f4abecbedd03d235390ffd086313798041b24586",
+    "buildings/directorate/sources/operational/power_plant_unpowered.gltf": "522b8489f445770bec22a4ecc658636436d28701e8d33c092af4a8f7a311e891",
+    "materials/directorate/surfaces/production_surface_base.png": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+    "materials/directorate/surfaces/production_surface_normal.png": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+    "materials/directorate/surfaces/production_surface_orm.png": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+    "materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9",
+    "materials/directorate/textures/status_emissive.asset.json": "464a32ad532fa18cfc149cc1f6f3e887c156025dca9cf8308485fcadac83b5d0",
+    "materials/directorate/textures/status_emissive.tga": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6"
+  },
+  "sourceSignature": "33ecb0974efd02b87f28f4bea6f9c37c18fdafb78b823dea5f31f1190ac5c3e7",
+  "success": true,
+  "texturePayloadBytes": 7325040,
+  "textures": [
+    {
+      "colorSpace": "srgb",
+      "estimatedPayloadBytes": 1392,
+      "format": "BC7",
+      "height": 32,
+      "id": "texture.directorate.material.status_emissive",
+      "mipLevels": 6,
+      "sourceSha256": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6",
+      "usage": "emissive",
+      "width": 32
+    },
+    {
+      "colorSpace": "srgb",
+      "estimatedPayloadBytes": 5586944,
+      "format": "BC7",
+      "height": 2048,
+      "id": "texture.directorate.surface.atlas_base",
+      "mipLevels": 5,
+      "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+      "usage": "baseColor",
+      "width": 2048
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 1392640,
+      "format": "BC7",
+      "height": 1024,
+      "id": "texture.directorate.surface.atlas_normal",
+      "mipLevels": 4,
+      "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+      "usage": "normal",
+      "width": 1024
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 344064,
+      "format": "BC7",
+      "height": 512,
+      "id": "texture.directorate.surface.atlas_orm",
+      "mipLevels": 3,
+      "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+      "usage": "orm",
+      "width": 512
+    }
+  ]
+}

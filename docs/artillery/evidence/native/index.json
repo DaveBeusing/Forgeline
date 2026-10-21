@@ -1,0 +1,1570 @@
+{
+  "schemaVersion": 1,
+  "sourceSha": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "preservation": {
+    "schemaVersion": 1,
+    "sourceSha": "2f561376c8b938d7d081987353612ab2e8fc2094",
+    "pairs": 17,
+    "images": 34,
+    "originalPngBytes": 245079332,
+    "uniquePngHashes": 21,
+    "changedPixels": 30,
+    "maximumChannelDelta": 2,
+    "allCountersEqual": true,
+    "physicalPerformance": "pending",
+    "humanArtApproval": "pending",
+    "captures": [
+      {
+        "cohort": "artifacts\\arc\\dark",
+        "key": "ArtilleryProduction-1920x1080-High-NormalGameplay",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 4,
+          "highLodInstances": 0,
+          "reducedLodInstances": 8,
+          "runtimeMeshInstances": 10,
+          "texturedRuntimeMeshInstances": 10,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 7,
+          "lod2Instances": 1,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\gallery",
+        "key": "ArtilleryProduction-1920x1080-High-CloseTactical",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 9,
+          "highLodInstances": 7,
+          "reducedLodInstances": 1,
+          "runtimeMeshInstances": 94,
+          "texturedRuntimeMeshInstances": 94,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 0,
+          "lod2Instances": 1,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\gallery",
+        "key": "ArtilleryProduction-1920x1080-High-NormalGameplay",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 4,
+          "highLodInstances": 0,
+          "reducedLodInstances": 8,
+          "runtimeMeshInstances": 10,
+          "texturedRuntimeMeshInstances": 10,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 7,
+          "lod2Instances": 1,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\gallery",
+        "key": "ArtilleryProduction-1920x1080-High-Strategic",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 2,
+          "highLodInstances": 0,
+          "reducedLodInstances": 8,
+          "runtimeMeshInstances": 8,
+          "texturedRuntimeMeshInstances": 8,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 0,
+          "lod2Instances": 8,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\gallery",
+        "key": "ArtilleryProduction-3840x2160-High-CloseTactical",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 9,
+          "highLodInstances": 7,
+          "reducedLodInstances": 1,
+          "runtimeMeshInstances": 94,
+          "texturedRuntimeMeshInstances": 94,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 0,
+          "lod2Instances": 1,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\gallery",
+        "key": "ArtilleryProduction-3840x2160-High-NormalGameplay",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 4,
+          "highLodInstances": 0,
+          "reducedLodInstances": 8,
+          "runtimeMeshInstances": 10,
+          "texturedRuntimeMeshInstances": 10,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 7,
+          "lod2Instances": 1,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\gallery",
+        "key": "ArtilleryProduction-3840x2160-High-Strategic",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 2,
+          "highLodInstances": 0,
+          "reducedLodInstances": 8,
+          "runtimeMeshInstances": 8,
+          "texturedRuntimeMeshInstances": 8,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 0,
+          "lod2Instances": 8,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\loads",
+        "key": "ArtillerySingle-1920x1080-High-NormalGameplay",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 1,
+          "visibleInstances": 1,
+          "culledInstances": 0,
+          "drawCalls": 1,
+          "highLodInstances": 0,
+          "reducedLodInstances": 1,
+          "runtimeMeshInstances": 1,
+          "texturedRuntimeMeshInstances": 1,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 1,
+          "lod2Instances": 0,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 1,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\loads",
+        "key": "ArtilleryRepeated100-1920x1080-High-NormalGameplay",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 100,
+          "visibleInstances": 100,
+          "culledInstances": 0,
+          "drawCalls": 1,
+          "highLodInstances": 0,
+          "reducedLodInstances": 100,
+          "runtimeMeshInstances": 100,
+          "texturedRuntimeMeshInstances": 100,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 100,
+          "lod2Instances": 0,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 4,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 100,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\loads",
+        "key": "ArtilleryRepeated1000-1920x1080-High-NormalGameplay",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 1000,
+          "visibleInstances": 979,
+          "culledInstances": 21,
+          "drawCalls": 1,
+          "highLodInstances": 0,
+          "reducedLodInstances": 979,
+          "runtimeMeshInstances": 979,
+          "texturedRuntimeMeshInstances": 979,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 979,
+          "lod2Instances": 0,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 32,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 1000,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\quality",
+        "key": "ArtilleryProduction-1920x1080-Low-NormalGameplay",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 4,
+          "highLodInstances": 0,
+          "reducedLodInstances": 8,
+          "runtimeMeshInstances": 10,
+          "texturedRuntimeMeshInstances": 10,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 7,
+          "lod2Instances": 1,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\quality",
+        "key": "ArtilleryProduction-1920x1080-Medium-NormalGameplay",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 4,
+          "highLodInstances": 0,
+          "reducedLodInstances": 8,
+          "runtimeMeshInstances": 10,
+          "texturedRuntimeMeshInstances": 10,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 7,
+          "lod2Instances": 1,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arc\\strategic",
+        "key": "ArtilleryRepeated1000-1920x1080-Low-Strategic",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 1000,
+          "visibleInstances": 1000,
+          "culledInstances": 0,
+          "drawCalls": 1,
+          "highLodInstances": 0,
+          "reducedLodInstances": 1000,
+          "runtimeMeshInstances": 1000,
+          "texturedRuntimeMeshInstances": 1000,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 0,
+          "lod2Instances": 1000,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 32,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 1000,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 1,
+        "maximumChannelDelta": 1
+      },
+      {
+        "cohort": "artifacts\\arc\\wet",
+        "key": "ArtilleryProduction-1920x1080-High-NormalGameplay",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 14,
+          "visibleInstances": 8,
+          "culledInstances": 6,
+          "drawCalls": 4,
+          "highLodInstances": 0,
+          "reducedLodInstances": 8,
+          "runtimeMeshInstances": 10,
+          "texturedRuntimeMeshInstances": 10,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 7,
+          "lod2Instances": 1,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 8,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 0,
+        "maximumChannelDelta": 0
+      },
+      {
+        "cohort": "artifacts\\arx\\close-loads",
+        "key": "ArtilleryRepeated100-1920x1080-High-CloseTactical-Inspection70",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 100,
+          "visibleInstances": 84,
+          "culledInstances": 16,
+          "drawCalls": 6,
+          "highLodInstances": 84,
+          "reducedLodInstances": 0,
+          "runtimeMeshInstances": 1092,
+          "texturedRuntimeMeshInstances": 1092,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 0,
+          "lod2Instances": 0,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 4,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 100,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 13,
+        "maximumChannelDelta": 2
+      },
+      {
+        "cohort": "artifacts\\arx\\close-loads",
+        "key": "ArtilleryRepeated1000-1920x1080-High-CloseTactical-Inspection70",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 1000,
+          "visibleInstances": 125,
+          "culledInstances": 875,
+          "drawCalls": 6,
+          "highLodInstances": 125,
+          "reducedLodInstances": 0,
+          "runtimeMeshInstances": 1625,
+          "texturedRuntimeMeshInstances": 1625,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 0,
+          "lod2Instances": 0,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 32,
+          "rejectedClusters": 13,
+          "clusterCulledInstances": 392,
+          "instanceBoundsTests": 608,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 15,
+        "maximumChannelDelta": 2
+      },
+      {
+        "cohort": "artifacts\\arx\\inspection",
+        "key": "ArtillerySingle-1920x1080-High-CloseTactical-Inspection30",
+        "counterEquality": {
+          "instances": true,
+          "resources": true,
+          "materials": true
+        },
+        "instances": {
+          "totalInstances": 1,
+          "visibleInstances": 1,
+          "culledInstances": 0,
+          "drawCalls": 6,
+          "highLodInstances": 1,
+          "reducedLodInstances": 0,
+          "runtimeMeshInstances": 13,
+          "texturedRuntimeMeshInstances": 13,
+          "fallbackMeshInstances": 0,
+          "lod1Instances": 0,
+          "lod2Instances": 0,
+          "animatedVegetationInstances": 0,
+          "visibleVegetationInstances": 0,
+          "clusterTests": 1,
+          "rejectedClusters": 0,
+          "clusterCulledInstances": 0,
+          "instanceBoundsTests": 1,
+          "skippedDecalResources": 0
+        },
+        "changedPixels": 1,
+        "maximumChannelDelta": 1
+      }
+    ],
+    "originalImages": [
+      {
+        "path": "artifacts\\arc\\dark\\before\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+        "bytes": 4552445,
+        "sha256": "a464066dca66e389da19b462f2120b50cc12855db094d8b2c19e0e871324fd2b"
+      },
+      {
+        "path": "artifacts\\arc\\dark\\after\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+        "bytes": 4552445,
+        "sha256": "a464066dca66e389da19b462f2120b50cc12855db094d8b2c19e0e871324fd2b"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-1920x1080-High-CloseTactical.png",
+        "bytes": 4441457,
+        "sha256": "3b36ca8d0b6180f671dc7971d104052bb95549ed686f0b6e7b9a78b54eb57689"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+        "bytes": 4828347,
+        "sha256": "c52a95c459954dfa740c87c0b017ddb666040fdfb7bc3da76e66508ab431342f"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-1920x1080-High-Strategic.png",
+        "bytes": 4693415,
+        "sha256": "327618752e3b7963334df62ebb4209356e12f1915aeeb2e9f1396d347a480d40"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-3840x2160-High-CloseTactical.png",
+        "bytes": 17099768,
+        "sha256": "ecd77ff7704d9c6acb2d44f585d3ef8c7e50f5f35c86651018f1599c902d484e"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-3840x2160-High-NormalGameplay.png",
+        "bytes": 19416197,
+        "sha256": "0d124fe90fe56a35f251ac5e8c05bbcf4c4b1d3b8cf5b300c77621d821841f6a"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-3840x2160-High-Strategic.png",
+        "bytes": 19155251,
+        "sha256": "0aee14058671097cca87fa1837b8bb51b729694929abc9ac103c5a7f0d8b176b"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-1920x1080-High-CloseTactical.png",
+        "bytes": 4441457,
+        "sha256": "3b36ca8d0b6180f671dc7971d104052bb95549ed686f0b6e7b9a78b54eb57689"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+        "bytes": 4828347,
+        "sha256": "c52a95c459954dfa740c87c0b017ddb666040fdfb7bc3da76e66508ab431342f"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-1920x1080-High-Strategic.png",
+        "bytes": 4693415,
+        "sha256": "327618752e3b7963334df62ebb4209356e12f1915aeeb2e9f1396d347a480d40"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-3840x2160-High-CloseTactical.png",
+        "bytes": 17099768,
+        "sha256": "ecd77ff7704d9c6acb2d44f585d3ef8c7e50f5f35c86651018f1599c902d484e"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-3840x2160-High-NormalGameplay.png",
+        "bytes": 19416197,
+        "sha256": "0d124fe90fe56a35f251ac5e8c05bbcf4c4b1d3b8cf5b300c77621d821841f6a"
+      },
+      {
+        "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-3840x2160-High-Strategic.png",
+        "bytes": 19155251,
+        "sha256": "0aee14058671097cca87fa1837b8bb51b729694929abc9ac103c5a7f0d8b176b"
+      },
+      {
+        "path": "artifacts\\arc\\loads\\before\\ArtillerySingle-1920x1080-High-NormalGameplay.png",
+        "bytes": 4824906,
+        "sha256": "e0fcc38e3da1766d2bf3d1189b4c0c71e407110d855c197406910f447b20d984"
+      },
+      {
+        "path": "artifacts\\arc\\loads\\before\\ArtilleryRepeated100-1920x1080-High-NormalGameplay.png",
+        "bytes": 4868435,
+        "sha256": "d65040b8b2d0c6998a2f4b5759b390ea3157ce6d3ae7275f7437c869e961b39c"
+      },
+      {
+        "path": "artifacts\\arc\\loads\\before\\ArtilleryRepeated1000-1920x1080-High-NormalGameplay.png",
+        "bytes": 5190722,
+        "sha256": "33c135b82b6372d378b4d14dd70bacb2383e091f4bb5ec37ce52c780c2d893fe"
+      },
+      {
+        "path": "artifacts\\arc\\loads\\after\\ArtillerySingle-1920x1080-High-NormalGameplay.png",
+        "bytes": 4824906,
+        "sha256": "e0fcc38e3da1766d2bf3d1189b4c0c71e407110d855c197406910f447b20d984"
+      },
+      {
+        "path": "artifacts\\arc\\loads\\after\\ArtilleryRepeated100-1920x1080-High-NormalGameplay.png",
+        "bytes": 4868435,
+        "sha256": "d65040b8b2d0c6998a2f4b5759b390ea3157ce6d3ae7275f7437c869e961b39c"
+      },
+      {
+        "path": "artifacts\\arc\\loads\\after\\ArtilleryRepeated1000-1920x1080-High-NormalGameplay.png",
+        "bytes": 5190722,
+        "sha256": "33c135b82b6372d378b4d14dd70bacb2383e091f4bb5ec37ce52c780c2d893fe"
+      },
+      {
+        "path": "artifacts\\arc\\quality\\before\\ArtilleryProduction-1920x1080-Low-NormalGameplay.png",
+        "bytes": 5202044,
+        "sha256": "85d46d5347a154c0e52454a7e534f11f468b822d382a4967554132e346aeb1f2"
+      },
+      {
+        "path": "artifacts\\arc\\quality\\before\\ArtilleryProduction-1920x1080-Medium-NormalGameplay.png",
+        "bytes": 4830673,
+        "sha256": "2b7945f97eb22960f4d9c8ca8a554fc65b2c85220e8c10e0bf83b27a21d8bb42"
+      },
+      {
+        "path": "artifacts\\arc\\quality\\after\\ArtilleryProduction-1920x1080-Low-NormalGameplay.png",
+        "bytes": 5202044,
+        "sha256": "85d46d5347a154c0e52454a7e534f11f468b822d382a4967554132e346aeb1f2"
+      },
+      {
+        "path": "artifacts\\arc\\quality\\after\\ArtilleryProduction-1920x1080-Medium-NormalGameplay.png",
+        "bytes": 4830673,
+        "sha256": "2b7945f97eb22960f4d9c8ca8a554fc65b2c85220e8c10e0bf83b27a21d8bb42"
+      },
+      {
+        "path": "artifacts\\arc\\strategic\\before\\ArtilleryRepeated1000-1920x1080-Low-Strategic.png",
+        "bytes": 4883060,
+        "sha256": "bbae9481a057c966809e89a96b29e232dde7aa6abad8a5e81fc9957262e87b3e"
+      },
+      {
+        "path": "artifacts\\arc\\strategic\\after\\ArtilleryRepeated1000-1920x1080-Low-Strategic.png",
+        "bytes": 4883061,
+        "sha256": "1c2f19c7f310c96f98482928d8c0a1ec326154f9ba1ac449ffbdcbdcf4abec42"
+      },
+      {
+        "path": "artifacts\\arc\\wet\\before\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+        "bytes": 4672622,
+        "sha256": "1c0063d51ee5c3e04c38720e8ee5cede2b2f926928739f58d5c05f71683b9a0b"
+      },
+      {
+        "path": "artifacts\\arc\\wet\\after\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+        "bytes": 4672622,
+        "sha256": "1c0063d51ee5c3e04c38720e8ee5cede2b2f926928739f58d5c05f71683b9a0b"
+      },
+      {
+        "path": "artifacts\\arx\\close-loads\\before\\ArtilleryRepeated100-1920x1080-High-CloseTactical-Inspection70.png",
+        "bytes": 4894438,
+        "sha256": "bb617ee7529f2ed58d3cf35cd71440b7e09808dc9b325905e138791ec5d906c3"
+      },
+      {
+        "path": "artifacts\\arx\\close-loads\\before\\ArtilleryRepeated1000-1920x1080-High-CloseTactical-Inspection70.png",
+        "bytes": 4929949,
+        "sha256": "ff9aaf9bbefcc028bb118b2ceefe27f37090c0e687e2ee4411e0c095703e5c51"
+      },
+      {
+        "path": "artifacts\\arx\\close-loads\\after\\ArtilleryRepeated100-1920x1080-High-CloseTactical-Inspection70.png",
+        "bytes": 4894423,
+        "sha256": "29a5f6bf759bb4bfa3369134317e89ca10138459543109f3262bd837dc72a7df"
+      },
+      {
+        "path": "artifacts\\arx\\close-loads\\after\\ArtilleryRepeated1000-1920x1080-High-CloseTactical-Inspection70.png",
+        "bytes": 4930257,
+        "sha256": "5c4d9d085071d8c52e7eaa217aa57362775a2b13f6cb53f914e2ba30a84c206d"
+      },
+      {
+        "path": "artifacts\\arx\\inspection\\before\\ArtillerySingle-1920x1080-High-CloseTactical-Inspection30.png",
+        "bytes": 4055790,
+        "sha256": "2f4dd6ab3b9d5c5ac40d186df428146032db062aa136a31123d8925060987cd7"
+      },
+      {
+        "path": "artifacts\\arx\\inspection\\after\\ArtillerySingle-1920x1080-High-CloseTactical-Inspection30.png",
+        "bytes": 4055790,
+        "sha256": "4e9e532bac039f2122e7e258da17f36639b2a4d4accc8d60b26f193e81701a34"
+      }
+    ]
+  },
+  "compiledRuntimeIdentity": {
+    "candidateFileCount": 1364,
+    "installedFileCount": 1427,
+    "candidateOnly": [],
+    "installedOnly": [
+      "audio/alerts/base_under_attack.wav",
+      "audio/alerts/invalid_order.wav",
+      "audio/alerts/power_low.wav",
+      "audio/alerts/power_restored.wav",
+      "audio/alerts/research_complete.wav",
+      "audio/alerts/supply_critical.wav",
+      "audio/alerts/supply_low.wav",
+      "audio/alerts/unit_ready.wav",
+      "audio/ambience/battlefield_loop.wav",
+      "audio/ambience/industrial_loop.wav",
+      "audio/ambience/wind_loop.wav",
+      "audio/combat/artillery_fire_01.wav",
+      "audio/combat/artillery_fire_02.wav",
+      "audio/combat/artillery_fire_03.wav",
+      "audio/combat/explosion_building.wav",
+      "audio/combat/explosion_small.wav",
+      "audio/combat/explosion_vehicle.wav",
+      "audio/combat/impact_concrete.wav",
+      "audio/combat/impact_dirt.wav",
+      "audio/combat/impact_metal.wav",
+      "audio/combat/incoming_artillery.wav",
+      "audio/combat/machine_gun_fire_01.wav",
+      "audio/combat/machine_gun_fire_02.wav",
+      "audio/combat/machine_gun_fire_03.wav",
+      "audio/combat/rifle_fire_01.wav",
+      "audio/combat/rifle_fire_02.wav",
+      "audio/combat/rifle_fire_03.wav",
+      "audio/combat/rocket_launch.wav",
+      "audio/combat/tank_fire_01.wav",
+      "audio/combat/tank_fire_02.wav",
+      "audio/combat/tank_fire_03.wav",
+      "audio/construction/complete.wav",
+      "audio/construction/place.wav",
+      "audio/construction/start.wav",
+      "audio/events/defeat.wav",
+      "audio/events/victory.wav",
+      "audio/industry/depot_loop.wav",
+      "audio/industry/extractor_loop.wav",
+      "audio/industry/factory_loop.wav",
+      "audio/industry/power_plant_loop.wav",
+      "audio/industry/refinery_loop.wav",
+      "audio/industry/smelter_loop.wav",
+      "audio/logistics/cargo_load.wav",
+      "audio/logistics/cargo_unload.wav",
+      "audio/logistics/rearm.wav",
+      "audio/logistics/refuel.wav",
+      "audio/logistics/repair.wav",
+      "audio/logistics/supply_complete.wav",
+      "audio/playback.json",
+      "audio/ui/accepted.wav",
+      "audio/ui/intent.wav",
+      "audio/ui/navigation.wav",
+      "audio/ui/rejected.wav",
+      "audio/vehicles/engine_start.wav",
+      "audio/vehicles/engine_stop.wav",
+      "audio/vehicles/scout_idle_loop.wav",
+      "audio/vehicles/scout_move_loop.wav",
+      "audio/vehicles/tank_idle_loop.wav",
+      "audio/vehicles/tank_move_loop.wav",
+      "audio/vehicles/truck_idle_loop.wav",
+      "audio/vehicles/truck_move_loop.wav",
+      "branding/studio-intro.mp4",
+      "branding/studio-intro.wav"
+    ],
+    "changedCommonFiles": []
+  },
+  "installedComparisons": [
+    {
+      "cohort": "gallery",
+      "key": "ArtilleryProduction-1920x1080-High-CloseTactical",
+      "pixels": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "nativeWholeDirectoryFingerprintEquality": false,
+      "compiledCatalogAndPayloadBytesEqual": true
+    },
+    {
+      "cohort": "inspection",
+      "key": "ArtillerySingle-1920x1080-High-CloseTactical-Inspection30",
+      "pixels": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "nativeWholeDirectoryFingerprintEquality": false,
+      "compiledCatalogAndPayloadBytesEqual": true
+    },
+    {
+      "cohort": "load",
+      "key": "ArtilleryRepeated1000-1920x1080-High-CloseTactical-Inspection70",
+      "pixels": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "nativeWholeDirectoryFingerprintEquality": false,
+      "compiledCatalogAndPayloadBytesEqual": true
+    }
+  ],
+  "allInstalledPixelsExact": true,
+  "originalImageCount": 37,
+  "originalImageBytes": 258506836,
+  "originalImages": [
+    {
+      "path": "artifacts\\arc\\dark\\before\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+      "bytes": 4552445,
+      "sha256": "a464066dca66e389da19b462f2120b50cc12855db094d8b2c19e0e871324fd2b"
+    },
+    {
+      "path": "artifacts\\arc\\dark\\after\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+      "bytes": 4552445,
+      "sha256": "a464066dca66e389da19b462f2120b50cc12855db094d8b2c19e0e871324fd2b"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-1920x1080-High-CloseTactical.png",
+      "bytes": 4441457,
+      "sha256": "3b36ca8d0b6180f671dc7971d104052bb95549ed686f0b6e7b9a78b54eb57689"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+      "bytes": 4828347,
+      "sha256": "c52a95c459954dfa740c87c0b017ddb666040fdfb7bc3da76e66508ab431342f"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-1920x1080-High-Strategic.png",
+      "bytes": 4693415,
+      "sha256": "327618752e3b7963334df62ebb4209356e12f1915aeeb2e9f1396d347a480d40"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-3840x2160-High-CloseTactical.png",
+      "bytes": 17099768,
+      "sha256": "ecd77ff7704d9c6acb2d44f585d3ef8c7e50f5f35c86651018f1599c902d484e"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-3840x2160-High-NormalGameplay.png",
+      "bytes": 19416197,
+      "sha256": "0d124fe90fe56a35f251ac5e8c05bbcf4c4b1d3b8cf5b300c77621d821841f6a"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-3840x2160-High-Strategic.png",
+      "bytes": 19155251,
+      "sha256": "0aee14058671097cca87fa1837b8bb51b729694929abc9ac103c5a7f0d8b176b"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-1920x1080-High-CloseTactical.png",
+      "bytes": 4441457,
+      "sha256": "3b36ca8d0b6180f671dc7971d104052bb95549ed686f0b6e7b9a78b54eb57689"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+      "bytes": 4828347,
+      "sha256": "c52a95c459954dfa740c87c0b017ddb666040fdfb7bc3da76e66508ab431342f"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-1920x1080-High-Strategic.png",
+      "bytes": 4693415,
+      "sha256": "327618752e3b7963334df62ebb4209356e12f1915aeeb2e9f1396d347a480d40"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-3840x2160-High-CloseTactical.png",
+      "bytes": 17099768,
+      "sha256": "ecd77ff7704d9c6acb2d44f585d3ef8c7e50f5f35c86651018f1599c902d484e"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-3840x2160-High-NormalGameplay.png",
+      "bytes": 19416197,
+      "sha256": "0d124fe90fe56a35f251ac5e8c05bbcf4c4b1d3b8cf5b300c77621d821841f6a"
+    },
+    {
+      "path": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-3840x2160-High-Strategic.png",
+      "bytes": 19155251,
+      "sha256": "0aee14058671097cca87fa1837b8bb51b729694929abc9ac103c5a7f0d8b176b"
+    },
+    {
+      "path": "artifacts\\arc\\loads\\before\\ArtillerySingle-1920x1080-High-NormalGameplay.png",
+      "bytes": 4824906,
+      "sha256": "e0fcc38e3da1766d2bf3d1189b4c0c71e407110d855c197406910f447b20d984"
+    },
+    {
+      "path": "artifacts\\arc\\loads\\before\\ArtilleryRepeated100-1920x1080-High-NormalGameplay.png",
+      "bytes": 4868435,
+      "sha256": "d65040b8b2d0c6998a2f4b5759b390ea3157ce6d3ae7275f7437c869e961b39c"
+    },
+    {
+      "path": "artifacts\\arc\\loads\\before\\ArtilleryRepeated1000-1920x1080-High-NormalGameplay.png",
+      "bytes": 5190722,
+      "sha256": "33c135b82b6372d378b4d14dd70bacb2383e091f4bb5ec37ce52c780c2d893fe"
+    },
+    {
+      "path": "artifacts\\arc\\loads\\after\\ArtillerySingle-1920x1080-High-NormalGameplay.png",
+      "bytes": 4824906,
+      "sha256": "e0fcc38e3da1766d2bf3d1189b4c0c71e407110d855c197406910f447b20d984"
+    },
+    {
+      "path": "artifacts\\arc\\loads\\after\\ArtilleryRepeated100-1920x1080-High-NormalGameplay.png",
+      "bytes": 4868435,
+      "sha256": "d65040b8b2d0c6998a2f4b5759b390ea3157ce6d3ae7275f7437c869e961b39c"
+    },
+    {
+      "path": "artifacts\\arc\\loads\\after\\ArtilleryRepeated1000-1920x1080-High-NormalGameplay.png",
+      "bytes": 5190722,
+      "sha256": "33c135b82b6372d378b4d14dd70bacb2383e091f4bb5ec37ce52c780c2d893fe"
+    },
+    {
+      "path": "artifacts\\arc\\quality\\before\\ArtilleryProduction-1920x1080-Low-NormalGameplay.png",
+      "bytes": 5202044,
+      "sha256": "85d46d5347a154c0e52454a7e534f11f468b822d382a4967554132e346aeb1f2"
+    },
+    {
+      "path": "artifacts\\arc\\quality\\before\\ArtilleryProduction-1920x1080-Medium-NormalGameplay.png",
+      "bytes": 4830673,
+      "sha256": "2b7945f97eb22960f4d9c8ca8a554fc65b2c85220e8c10e0bf83b27a21d8bb42"
+    },
+    {
+      "path": "artifacts\\arc\\quality\\after\\ArtilleryProduction-1920x1080-Low-NormalGameplay.png",
+      "bytes": 5202044,
+      "sha256": "85d46d5347a154c0e52454a7e534f11f468b822d382a4967554132e346aeb1f2"
+    },
+    {
+      "path": "artifacts\\arc\\quality\\after\\ArtilleryProduction-1920x1080-Medium-NormalGameplay.png",
+      "bytes": 4830673,
+      "sha256": "2b7945f97eb22960f4d9c8ca8a554fc65b2c85220e8c10e0bf83b27a21d8bb42"
+    },
+    {
+      "path": "artifacts\\arc\\strategic\\before\\ArtilleryRepeated1000-1920x1080-Low-Strategic.png",
+      "bytes": 4883060,
+      "sha256": "bbae9481a057c966809e89a96b29e232dde7aa6abad8a5e81fc9957262e87b3e"
+    },
+    {
+      "path": "artifacts\\arc\\strategic\\after\\ArtilleryRepeated1000-1920x1080-Low-Strategic.png",
+      "bytes": 4883061,
+      "sha256": "1c2f19c7f310c96f98482928d8c0a1ec326154f9ba1ac449ffbdcbdcf4abec42"
+    },
+    {
+      "path": "artifacts\\arc\\wet\\before\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+      "bytes": 4672622,
+      "sha256": "1c0063d51ee5c3e04c38720e8ee5cede2b2f926928739f58d5c05f71683b9a0b"
+    },
+    {
+      "path": "artifacts\\arc\\wet\\after\\ArtilleryProduction-1920x1080-High-NormalGameplay.png",
+      "bytes": 4672622,
+      "sha256": "1c0063d51ee5c3e04c38720e8ee5cede2b2f926928739f58d5c05f71683b9a0b"
+    },
+    {
+      "path": "artifacts\\arx\\close-loads\\before\\ArtilleryRepeated100-1920x1080-High-CloseTactical-Inspection70.png",
+      "bytes": 4894438,
+      "sha256": "bb617ee7529f2ed58d3cf35cd71440b7e09808dc9b325905e138791ec5d906c3"
+    },
+    {
+      "path": "artifacts\\arx\\close-loads\\before\\ArtilleryRepeated1000-1920x1080-High-CloseTactical-Inspection70.png",
+      "bytes": 4929949,
+      "sha256": "ff9aaf9bbefcc028bb118b2ceefe27f37090c0e687e2ee4411e0c095703e5c51"
+    },
+    {
+      "path": "artifacts\\arx\\close-loads\\after\\ArtilleryRepeated100-1920x1080-High-CloseTactical-Inspection70.png",
+      "bytes": 4894423,
+      "sha256": "29a5f6bf759bb4bfa3369134317e89ca10138459543109f3262bd837dc72a7df"
+    },
+    {
+      "path": "artifacts\\arx\\close-loads\\after\\ArtilleryRepeated1000-1920x1080-High-CloseTactical-Inspection70.png",
+      "bytes": 4930257,
+      "sha256": "5c4d9d085071d8c52e7eaa217aa57362775a2b13f6cb53f914e2ba30a84c206d"
+    },
+    {
+      "path": "artifacts\\arx\\inspection\\before\\ArtillerySingle-1920x1080-High-CloseTactical-Inspection30.png",
+      "bytes": 4055790,
+      "sha256": "2f4dd6ab3b9d5c5ac40d186df428146032db062aa136a31123d8925060987cd7"
+    },
+    {
+      "path": "artifacts\\arx\\inspection\\after\\ArtillerySingle-1920x1080-High-CloseTactical-Inspection30.png",
+      "bytes": 4055790,
+      "sha256": "4e9e532bac039f2122e7e258da17f36639b2a4d4accc8d60b26f193e81701a34"
+    },
+    {
+      "path": "artifacts\\ari\\gallery\\ArtilleryProduction-1920x1080-High-CloseTactical.png",
+      "bytes": 4441457,
+      "sha256": "3b36ca8d0b6180f671dc7971d104052bb95549ed686f0b6e7b9a78b54eb57689"
+    },
+    {
+      "path": "artifacts\\ari\\inspection\\ArtillerySingle-1920x1080-High-CloseTactical-Inspection30.png",
+      "bytes": 4055790,
+      "sha256": "4e9e532bac039f2122e7e258da17f36639b2a4d4accc8d60b26f193e81701a34"
+    },
+    {
+      "path": "artifacts\\ari\\load\\ArtilleryRepeated1000-1920x1080-High-CloseTactical-Inspection70.png",
+      "bytes": 4930257,
+      "sha256": "5c4d9d085071d8c52e7eaa217aa57362775a2b13f6cb53f914e2ba30a84c206d"
+    }
+  ],
+  "retainedFiles": [
+    {
+      "original": "artifacts\\arc\\dark\\pixels.json",
+      "retained": "native/matrix/dark/pixels-reference.json",
+      "sha256": "4edb0b3081e0e7c5cdaf4592618ae7fb692c227ee0d73592f4bcead83ae69456",
+      "bytes": 1178
+    },
+    {
+      "original": "artifacts\\arc\\dark\\before\\manifest.json",
+      "retained": "native/matrix/dark/before-manifest-reference.json",
+      "sha256": "f25787f879f58008064b4ecc4a8f048268cb9ee8b859e1c33ea332d2c8266c9a",
+      "bytes": 80713
+    },
+    {
+      "original": "artifacts\\arc\\dark\\before\\comparison.json",
+      "retained": "native/matrix/dark/before-comparison-reference.json",
+      "sha256": "f9dba9f5bc825c758f748553107a3d888a02aac294054b8748cd013dc52b97cf",
+      "bytes": 969
+    },
+    {
+      "original": "artifacts\\arc\\dark\\before.request.json",
+      "retained": "native/matrix/dark/before-request-reference.json",
+      "sha256": "bcfc0406a7d82b65a45e8eab8b110fcf9ce56cc24cd34de3427357439fdae522",
+      "bytes": 1467
+    },
+    {
+      "original": "artifacts\\arc\\dark\\after\\manifest.json",
+      "retained": "native/matrix/dark/after-manifest-reference.json",
+      "sha256": "d29710cf3ce1fac4b07397ddc1042bc904b325e17e346e358fc96420e9068e64",
+      "bytes": 80997
+    },
+    {
+      "original": "artifacts\\arc\\dark\\after\\comparison.json",
+      "retained": "native/matrix/dark/after-comparison-reference.json",
+      "sha256": "92e926161f9ed04195317747f0c6a11fdc76f5913719bc1f6d70bae79cfe4cf8",
+      "bytes": 996
+    },
+    {
+      "original": "artifacts\\arc\\dark\\after.request.json",
+      "retained": "native/matrix/dark/after-request-reference.json",
+      "sha256": "792f2b8887be3489c397e73eac70c4ee0fe8b07f987c1aea041de90a6f23679e",
+      "bytes": 1484
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\pixels.json",
+      "retained": "native/matrix/gallery/pixels-reference.json",
+      "sha256": "f321b0c7a1eb1d56e0eb2f3a8def83ff6e7846b1ed71b0f509ee97232689b4a3",
+      "bytes": 4382
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\before\\manifest.json",
+      "retained": "native/matrix/gallery/before-manifest-reference.json",
+      "sha256": "b9783391727d11760ba7c49cbca03582f0e8bdc42e295b23fcb59c0f0b5b5448",
+      "bytes": 474201
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\before\\comparison.json",
+      "retained": "native/matrix/gallery/before-comparison-reference.json",
+      "sha256": "3eba365431b9526cb35c9034a568969bac544e94239d33e3fa1e8c2bfa7cf9a9",
+      "bytes": 3181
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\before.request.json",
+      "retained": "native/matrix/gallery/before-request-reference.json",
+      "sha256": "b33a8a4b6585c35e2ae811fd38da595fd7a4f53110b4c6e9667d0d1b3f7d7fc9",
+      "bytes": 1568
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\after\\manifest.json",
+      "retained": "native/matrix/gallery/after-manifest-reference.json",
+      "sha256": "3626d8d61bc907f2be35ecf8442123eebacbe59864a2b3422ceb2d3ba8ed77c0",
+      "bytes": 472648
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\after\\comparison.json",
+      "retained": "native/matrix/gallery/after-comparison-reference.json",
+      "sha256": "91841bf6f4367b70471befe863074c94afab52eec680db93e218de3debcde8ad",
+      "bytes": 3285
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\after.request.json",
+      "retained": "native/matrix/gallery/after-request-reference.json",
+      "sha256": "db93d2dc3c025d23d84f168cbcaac43d3c9d897d97980f9b36c4c8aaa80c99e2",
+      "bytes": 1585
+    },
+    {
+      "original": "artifacts\\arc\\loads\\pixels.json",
+      "retained": "native/matrix/loads/pixels-reference.json",
+      "sha256": "1e3c7fad190d47ed47f196526540c1aeb949ad9afce7313bfe1f31a0fa2b9b85",
+      "bytes": 2461
+    },
+    {
+      "original": "artifacts\\arc\\loads\\before\\manifest.json",
+      "retained": "native/matrix/loads/before-manifest-reference.json",
+      "sha256": "c4d8b2e7e82e3b559b8968c58a62f7024321c03502758ff855d5477e15a7fbdf",
+      "bytes": 238278
+    },
+    {
+      "original": "artifacts\\arc\\loads\\before\\comparison.json",
+      "retained": "native/matrix/loads/before-comparison-reference.json",
+      "sha256": "9621f50f6b0af399a62c7d3a2fc47bd3394213a7abb2519b37714d0382e4fcd0",
+      "bytes": 1853
+    },
+    {
+      "original": "artifacts\\arc\\loads\\before.request.json",
+      "retained": "native/matrix/loads/before-request-reference.json",
+      "sha256": "cdbff31ad78d421bd0664132094dc75882d1cda9597731f3230673880145a706",
+      "bytes": 1522
+    },
+    {
+      "original": "artifacts\\arc\\loads\\after\\manifest.json",
+      "retained": "native/matrix/loads/after-manifest-reference.json",
+      "sha256": "614d4d51cf36fbf5bf58a5e0eafbb6f7d2cc01ec7764e38832a0bbe983528f6c",
+      "bytes": 238528
+    },
+    {
+      "original": "artifacts\\arc\\loads\\after\\comparison.json",
+      "retained": "native/matrix/loads/after-comparison-reference.json",
+      "sha256": "ee49cc8b17498698f1eecbf618386fd6d6586ae34c41dd6f931ec1f401149bb7",
+      "bytes": 1913
+    },
+    {
+      "original": "artifacts\\arc\\loads\\after.request.json",
+      "retained": "native/matrix/loads/after-request-reference.json",
+      "sha256": "9de4004e8e5d27cfd908cc3835efdd70801d92bbe58d9b8e341f5b1725165dc5",
+      "bytes": 1539
+    },
+    {
+      "original": "artifacts\\arc\\quality\\pixels.json",
+      "retained": "native/matrix/quality/pixels-reference.json",
+      "sha256": "b2624710a17d4ae2d147eca74adcf36edce631095b7638a815a80fa3dd1b6a3a",
+      "bytes": 1844
+    },
+    {
+      "original": "artifacts\\arc\\quality\\before\\manifest.json",
+      "retained": "native/matrix/quality/before-manifest-reference.json",
+      "sha256": "c6c9d2bf0d63a62986a5fc02aeff889fcbdc8b49b751166e06af78fca11afbf9",
+      "bytes": 159942
+    },
+    {
+      "original": "artifacts\\arc\\quality\\before\\comparison.json",
+      "retained": "native/matrix/quality/before-comparison-reference.json",
+      "sha256": "e1eb10ecf41705a859de59d51ef384ac6b6aa3bc361891871e5b1d048b04c855",
+      "bytes": 1414
+    },
+    {
+      "original": "artifacts\\arc\\quality\\before.request.json",
+      "retained": "native/matrix/quality/before-request-reference.json",
+      "sha256": "957aae4f50fc1596e9ee69719b8b69c6279e4d7ab42734a222f915a08ba55ddb",
+      "bytes": 1483
+    },
+    {
+      "original": "artifacts\\arc\\quality\\after\\manifest.json",
+      "retained": "native/matrix/quality/after-manifest-reference.json",
+      "sha256": "4eacd5e25cb0a0792ff48324129055bd8cadb32cbb75c25acec7e78cb9c38754",
+      "bytes": 159481
+    },
+    {
+      "original": "artifacts\\arc\\quality\\after\\comparison.json",
+      "retained": "native/matrix/quality/after-comparison-reference.json",
+      "sha256": "0ccf711471544e66664545e7debaf03c4dda3a9c7945f76f27dbb5ece1b077b7",
+      "bytes": 1479
+    },
+    {
+      "original": "artifacts\\arc\\quality\\after.request.json",
+      "retained": "native/matrix/quality/after-request-reference.json",
+      "sha256": "4266bb073d6a4261b7a732e9cd3a74b81f7e888e05464bbe1f7f7d73b41d7b48",
+      "bytes": 1500
+    },
+    {
+      "original": "artifacts\\arc\\strategic\\pixels.json",
+      "retained": "native/matrix/strategic/pixels-reference.json",
+      "sha256": "cbd0ba685b8e7bf73ca28d9730634a080ebf38323f6676ed2442e7c92dbbc510",
+      "bytes": 1237
+    },
+    {
+      "original": "artifacts\\arc\\strategic\\before\\manifest.json",
+      "retained": "native/matrix/strategic/before-manifest-reference.json",
+      "sha256": "f1d901199ca7a52c776f1b6f6e39605d783c7866aff5f9427834072872ddd741",
+      "bytes": 80351
+    },
+    {
+      "original": "artifacts\\arc\\strategic\\before\\comparison.json",
+      "retained": "native/matrix/strategic/before-comparison-reference.json",
+      "sha256": "28c234289b41121d70090005c898d1c6dea19f927ec8ec9dbfbae8c8d4103e32",
+      "bytes": 975
+    },
+    {
+      "original": "artifacts\\arc\\strategic\\before.request.json",
+      "retained": "native/matrix/strategic/before-request-reference.json",
+      "sha256": "f035b3a07820e03848775e576b5929bea63140e686a18727ced97570ff859041",
+      "bytes": 1467
+    },
+    {
+      "original": "artifacts\\arc\\strategic\\after\\manifest.json",
+      "retained": "native/matrix/strategic/after-manifest-reference.json",
+      "sha256": "295e735410b0853bef5ca73dd0f295eec0fc268829dc22b43fda00f4466abe67",
+      "bytes": 80949
+    },
+    {
+      "original": "artifacts\\arc\\strategic\\after\\comparison.json",
+      "retained": "native/matrix/strategic/after-comparison-reference.json",
+      "sha256": "5d0e1800d19aa307fad7a686d741b465837d2dba7285ee0a5995f39b4910df85",
+      "bytes": 1017
+    },
+    {
+      "original": "artifacts\\arc\\strategic\\after.request.json",
+      "retained": "native/matrix/strategic/after-request-reference.json",
+      "sha256": "afce964c1502c9fc6ae54966eb92f494dcb8ff66bce927257b0415f21bc5571f",
+      "bytes": 1484
+    },
+    {
+      "original": "artifacts\\arc\\wet\\pixels.json",
+      "retained": "native/matrix/wet/pixels-reference.json",
+      "sha256": "baee5f318e767b3297b67342e1a81ce65bceba240fa574e2a6525b067105acb5",
+      "bytes": 1200
+    },
+    {
+      "original": "artifacts\\arc\\wet\\before\\manifest.json",
+      "retained": "native/matrix/wet/before-manifest-reference.json",
+      "sha256": "9401a6a110b3bd8bfd779968dbfd1abed2a4b12be120ec45ec065bcc36e1dd53",
+      "bytes": 80602
+    },
+    {
+      "original": "artifacts\\arc\\wet\\before\\comparison.json",
+      "retained": "native/matrix/wet/before-comparison-reference.json",
+      "sha256": "b0ef2aad5098afdbe70a07a02baa9090e2743339f8e1a600244ab79994875575",
+      "bytes": 970
+    },
+    {
+      "original": "artifacts\\arc\\wet\\before.request.json",
+      "retained": "native/matrix/wet/before-request-reference.json",
+      "sha256": "25f85747afb9b3932ad53f327d3d7c1276166fc532d915e6659d7f8eb2b5401e",
+      "bytes": 1466
+    },
+    {
+      "original": "artifacts\\arc\\wet\\after\\manifest.json",
+      "retained": "native/matrix/wet/after-manifest-reference.json",
+      "sha256": "c07999c58ace1401eb448a4543fe16b8550d4b0b800111e48a077839d18ff184",
+      "bytes": 80263
+    },
+    {
+      "original": "artifacts\\arc\\wet\\after\\comparison.json",
+      "retained": "native/matrix/wet/after-comparison-reference.json",
+      "sha256": "02eb7e5188e0fbb45adc9ffa0b07b309fe87a258468f5d543197bceeebadcdd0",
+      "bytes": 1018
+    },
+    {
+      "original": "artifacts\\arc\\wet\\after.request.json",
+      "retained": "native/matrix/wet/after-request-reference.json",
+      "sha256": "b96fea720a0bc4b3e36158d132db3479307095be5a450325429a69ac1d1d8e6d",
+      "bytes": 1483
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\pixels.json",
+      "retained": "native/close/close-loads/pixels-reference.json",
+      "sha256": "bfa0e7e77c14fcef8ac463b71257b29c1b4041fbf0e1645dc25631d906fd2a0b",
+      "bytes": 1944
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\verified-pixels.json",
+      "retained": "native/close/close-loads/verified-pixels-reference.json",
+      "sha256": "a6d9e16b6b97ce25e47a04e87facb7972a59a8671f175b5d523902dfb3abfd9e",
+      "bytes": 1944
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\before\\manifest.json",
+      "retained": "native/close/close-loads/before-manifest-reference.json",
+      "sha256": "8600879ce7e20029bce32870fc300ae17f460acfec40655abb7e5c435adcd398",
+      "bytes": 160205
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\before\\comparison.json",
+      "retained": "native/close/close-loads/before-comparison-reference.json",
+      "sha256": "cf62310d2ee66cae1091de9f1f3ada57604c94691c97ea9cfd56e36aa24d03d4",
+      "bytes": 1443
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\before.request.json",
+      "retained": "native/close/close-loads/before-request-reference.json",
+      "sha256": "96e5ca0c8f4222a10b9e61e032c80ad812085968f99d8be57893bfce496746cf",
+      "bytes": 1504
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\after\\manifest.json",
+      "retained": "native/close/close-loads/after-manifest-reference.json",
+      "sha256": "3a07ceca8d43d5c03c22e79e5c084c6ea6369e42e1d51b6c6d59ddcf2e8c704e",
+      "bytes": 159343
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\after\\comparison.json",
+      "retained": "native/close/close-loads/after-comparison-reference.json",
+      "sha256": "fc089fb536b591f70590bd3a64c658748fc2d4cf4a8fe3af7a7e4b5e82899bdd",
+      "bytes": 1502
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\after.request.json",
+      "retained": "native/close/close-loads/after-request-reference.json",
+      "sha256": "3703ef8bad2609871d401d383cab0a0f54fdc86ccc745384f9fc258639dbd5fd",
+      "bytes": 1521
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\pixels.json",
+      "retained": "native/close/inspection/pixels-reference.json",
+      "sha256": "52b2a66f11fd32f1ef3cdc145f76660ade33f7a220ed787eb6522a6aa131ca7c",
+      "bytes": 1255
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\verified-pixels.json",
+      "retained": "native/close/inspection/verified-pixels-reference.json",
+      "sha256": "e79d9c69b713f37e9799ad7a89f1dc11f999781b47afc0c4e7804b0076f0f365",
+      "bytes": 1255
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\before\\manifest.json",
+      "retained": "native/close/inspection/before-manifest-reference.json",
+      "sha256": "b24faec8340503732c20758eaa8b0cd642dc112168b761fdd771f9d07af620e0",
+      "bytes": 80467
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\before\\comparison.json",
+      "retained": "native/close/inspection/before-comparison-reference.json",
+      "sha256": "f568658bc5f950b05fbfa41a4063dadd480c4515a75be503ab16dd774f7b6948",
+      "bytes": 978
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\before.request.json",
+      "retained": "native/close/inspection/before-request-reference.json",
+      "sha256": "0a9c20dd3ddf487758053673b16749b83fa5dc275ef744340c248acbfbab482d",
+      "bytes": 1468
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\after\\manifest.json",
+      "retained": "native/close/inspection/after-manifest-reference.json",
+      "sha256": "022d825d4266e123a42a9857b33bc609d7bbbeadcefc63c1eb7fe04032964848",
+      "bytes": 80036
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\after\\comparison.json",
+      "retained": "native/close/inspection/after-comparison-reference.json",
+      "sha256": "3ab5344954fd9b80994f3839772dee93d0701810e1d0f9250592521442c31c03",
+      "bytes": 1035
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\after.request.json",
+      "retained": "native/close/inspection/after-request-reference.json",
+      "sha256": "f277d697c207dfe80c4a80e0a7cc6b825c460a2559d003468679b5ff5ac7b288",
+      "bytes": 1485
+    },
+    {
+      "original": "artifacts\\ari\\gallery\\manifest.json",
+      "retained": "native/installed/gallery/manifest-reference.json",
+      "sha256": "b88cd920bbf7590748f88aa5c1ef5b03da20a52d6322049a1a4fc095595cbf4f",
+      "bytes": 81012
+    },
+    {
+      "original": "artifacts\\ari\\gallery\\comparison.json",
+      "retained": "native/installed/gallery/comparison-reference.json",
+      "sha256": "9bf2135c85414f7ee8656012cc9edbb8ffe1f912e5cfd5cc511198ddfde69b1b",
+      "bytes": 1017
+    },
+    {
+      "original": "artifacts\\ari\\gallery\\pixels.json",
+      "retained": "native/installed/gallery/pixels-reference.json",
+      "sha256": "874db7909ac11d23795eda914be6549f8aa781a16caaf80ba220b0e8ec30adc2",
+      "bytes": 1199
+    },
+    {
+      "original": "artifacts\\ari\\gallery.request.json",
+      "retained": "native/installed/gallery/request-reference.json",
+      "sha256": "140c5a20390413646191ad9e3ae9940e25083a5f78f5ded9bcd02aca76e56a75",
+      "bytes": 1478
+    },
+    {
+      "original": "artifacts\\ari\\inspection\\manifest.json",
+      "retained": "native/installed/inspection/manifest-reference.json",
+      "sha256": "9b1f6ff17aeee8a9f232ba161a7959b606058305fcccb847aa097bd061974308",
+      "bytes": 80468
+    },
+    {
+      "original": "artifacts\\ari\\inspection\\comparison.json",
+      "retained": "native/installed/inspection/comparison-reference.json",
+      "sha256": "3a5566ed17a616a43a8c3132bc127350491914386bd0b40567a0aa1e28a16f4b",
+      "bytes": 1026
+    },
+    {
+      "original": "artifacts\\ari\\inspection\\pixels.json",
+      "retained": "native/installed/inspection/pixels-reference.json",
+      "sha256": "cc06a82ea1c6cdbda36b2af786e9277428da666b7bce7e97482bbc0233a204e9",
+      "bytes": 1208
+    },
+    {
+      "original": "artifacts\\ari\\inspection.request.json",
+      "retained": "native/installed/inspection/request-reference.json",
+      "sha256": "f0bea603bbfe5f498f984bf97d13580e499f24efb7c9211b38a3d45904c4a2db",
+      "bytes": 1478
+    },
+    {
+      "original": "artifacts\\ari\\load\\manifest.json",
+      "retained": "native/installed/load/manifest-reference.json",
+      "sha256": "9d8ad7e3982ff890f0b78eb75781667035e5788b414a61735fc4ff8e76431fa7",
+      "bytes": 80798
+    },
+    {
+      "original": "artifacts\\ari\\load\\comparison.json",
+      "retained": "native/installed/load/comparison-reference.json",
+      "sha256": "ac9d0849092604a31687efe8252140098172911ce652077cc84c77512e2b1c8b",
+      "bytes": 1024
+    },
+    {
+      "original": "artifacts\\ari\\load\\pixels.json",
+      "retained": "native/installed/load/pixels-reference.json",
+      "sha256": "0d875485003cd2930613f72f62f11f7c55d374bea05466cb29dfbdd656e344bb",
+      "bytes": 1206
+    },
+    {
+      "original": "artifacts\\ari\\load.request.json",
+      "retained": "native/installed/load/request-reference.json",
+      "sha256": "e700e05fe3665c7cd781e8bdbddfc416572251c05c88feb7f9b93f14ef317061",
+      "bytes": 1478
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-1920x1080-High-CloseTactical.png",
+      "retained": "native/gallery/before-close-1080.png",
+      "sha256": "3b36ca8d0b6180f671dc7971d104052bb95549ed686f0b6e7b9a78b54eb57689",
+      "bytes": 4441457
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-1920x1080-High-CloseTactical.png",
+      "retained": "native/gallery/after-close-1080.png",
+      "sha256": "3b36ca8d0b6180f671dc7971d104052bb95549ed686f0b6e7b9a78b54eb57689",
+      "bytes": 4441457
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\before\\ArtilleryProduction-3840x2160-High-CloseTactical.png",
+      "retained": "native/gallery/before-close-4k.png",
+      "sha256": "ecd77ff7704d9c6acb2d44f585d3ef8c7e50f5f35c86651018f1599c902d484e",
+      "bytes": 17099768
+    },
+    {
+      "original": "artifacts\\arc\\gallery\\after\\ArtilleryProduction-3840x2160-High-CloseTactical.png",
+      "retained": "native/gallery/after-close-4k.png",
+      "sha256": "ecd77ff7704d9c6acb2d44f585d3ef8c7e50f5f35c86651018f1599c902d484e",
+      "bytes": 17099768
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\before\\ArtillerySingle-1920x1080-High-CloseTactical-Inspection30.png",
+      "retained": "native/gallery/before-inspection.png",
+      "sha256": "2f4dd6ab3b9d5c5ac40d186df428146032db062aa136a31123d8925060987cd7",
+      "bytes": 4055790
+    },
+    {
+      "original": "artifacts\\arx\\inspection\\after\\ArtillerySingle-1920x1080-High-CloseTactical-Inspection30.png",
+      "retained": "native/gallery/after-inspection.png",
+      "sha256": "4e9e532bac039f2122e7e258da17f36639b2a4d4accc8d60b26f193e81701a34",
+      "bytes": 4055790
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\before\\ArtilleryRepeated1000-1920x1080-High-CloseTactical-Inspection70.png",
+      "retained": "native/gallery/before-1000-close.png",
+      "sha256": "ff9aaf9bbefcc028bb118b2ceefe27f37090c0e687e2ee4411e0c095703e5c51",
+      "bytes": 4929949
+    },
+    {
+      "original": "artifacts\\arx\\close-loads\\after\\ArtilleryRepeated1000-1920x1080-High-CloseTactical-Inspection70.png",
+      "retained": "native/gallery/after-1000-close.png",
+      "sha256": "5c4d9d085071d8c52e7eaa217aa57362775a2b13f6cb53f914e2ba30a84c206d",
+      "bytes": 4930257
+    },
+    {
+      "original": "artifacts\\arc\\strategic\\before\\ArtilleryRepeated1000-1920x1080-Low-Strategic.png",
+      "retained": "native/gallery/before-1000-strategic.png",
+      "sha256": "bbae9481a057c966809e89a96b29e232dde7aa6abad8a5e81fc9957262e87b3e",
+      "bytes": 4883060
+    },
+    {
+      "original": "artifacts\\arc\\strategic\\after\\ArtilleryRepeated1000-1920x1080-Low-Strategic.png",
+      "retained": "native/gallery/after-1000-strategic.png",
+      "sha256": "1c2f19c7f310c96f98482928d8c0a1ec326154f9ba1ac449ffbdcbdcf4abec42",
+      "bytes": 4883061
+    },
+    {
+      "original": "artifacts\\ari\\inspection\\ArtillerySingle-1920x1080-High-CloseTactical-Inspection30.png",
+      "retained": "native/gallery/installed-inspection.png",
+      "sha256": "4e9e532bac039f2122e7e258da17f36639b2a4d4accc8d60b26f193e81701a34",
+      "bytes": 4055790
+    },
+    {
+      "original": "artifacts\\arb-qualification.json",
+      "retained": "full-baseline.json",
+      "sha256": "8369da4cb44a4984cc40ed114d3f04b25ae034ada3ecd7de2d52c9c2e7bc377d",
+      "bytes": 2110
+    },
+    {
+      "original": "artifacts\\artillery-baseline-source-less.json",
+      "retained": "full-baseline-source-less.json",
+      "sha256": "5ad701f87209828a19a277050064963896fe21212c78e34886f9259a25a5221b",
+      "bytes": 2110
+    },
+    {
+      "original": "artifacts\\artillery-candidate-source-less.json",
+      "retained": "full-candidate-source-less.json",
+      "sha256": "7384a273d8880ac7b69762666f81521924a6de4686a1b564db01f9ced02e0ddc",
+      "bytes": 2110
+    },
+    {
+      "original": "artifacts\\arpkg\\win-x64\\publish\\build-provenance.json",
+      "retained": "package-provenance.json",
+      "sha256": "51e23737ed57adcdc6397589b2fb7c06b3de7a13bf66e13a51a40c7e945f30a0",
+      "bytes": 729
+    },
+    {
+      "original": "artifacts\\artillery-extraction.json",
+      "retained": "extraction.json",
+      "sha256": "f353944276532201b004f67b37130607d8e41ed0721ddde35ce468d82000d9c2",
+      "bytes": 421
+    },
+    {
+      "original": "artifacts\\arps\\status.json",
+      "retained": "published-player.json",
+      "sha256": "32430bf65b35360b8b3f538b27362919a4edeb2af8e6960cdc8d118b7031f89d",
+      "bytes": 621
+    },
+    {
+      "original": "artifacts\\arpsx\\status.json",
+      "retained": "extracted-player.json",
+      "sha256": "f4544b1e85517639ad295503b7a9fc599f9325c8547c4337377e3369945e3f1a",
+      "bytes": 621
+    },
+    {
+      "original": "artifacts\\artillery-runtime-file-comparison.json",
+      "retained": "runtime-file-comparison.json",
+      "sha256": "176597e2b0e4f20427a92126048e9b7d0cd758275418eb715d43c45c59d8da0e",
+      "bytes": 2609
+    }
+  ],
+  "gallery": "Selected unchanged PNGs only; renamed raw JSON references are not a complete standalone capture directory.",
+  "completeLocalEvidenceRoots": [
+    "artifacts/arc",
+    "artifacts/arx",
+    "artifacts/ari"
+  ],
+  "humanArtApproval": "pending",
+  "controlledPhysicalPerformance": "pending",
+  "supplementalWrapper": {
+    "exit": 1,
+    "reason": "Post-capture outer log redirection syntax; all six native captures and initial comparisons had already completed.",
+    "independentRevalidationExit": 0,
+    "reports": "native/close/*/verified-pixels-reference.json"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "families": [
+    {
+      "family": "cargo_truck",
+      "rejected": [
+        {
+          "case": "socket",
+          "error": "Socket world transform changed"
+        },
+        {
+          "case": "root_scale",
+          "error": "Truck physical root transform changed"
+        },
+        {
+          "case": "transform",
+          "error": "Mesh origin/axis/scale changed"
+        },
+        {
+          "case": "modifier",
+          "error": "Animation, constraints, modifiers and instances are unsupported"
+        },
+        {
+          "case": "action",
+          "error": "Scene animation is unsupported"
+        },
+        {
+          "case": "untracked",
+          "error": "Unsupported/untracked scene object"
+        },
+        {
+          "case": "material",
+          "error": "Truck PBR preview graph changed"
+        },
+        {
+          "case": "wheel",
+          "error": "Truck wheel geometry is locked to its mechanical anchor"
+        },
+        {
+          "case": "silhouette",
+          "error": "Truck silhouette envelope exceeded"
+        },
+        {
+          "case": "collision",
+          "error": "POSITION deviation 0.0009999871253967285 exceeds 1e-05; check axes/scale/geometry"
+        }
+      ],
+      "savedComponentEditChangesOnlyLod0": true
+    },
+    {
+      "family": "supply_truck",
+      "rejected": [
+        {
+          "case": "socket",
+          "error": "Socket world transform changed"
+        },
+        {
+          "case": "root_scale",
+          "error": "Truck physical root transform changed"
+        },
+        {
+          "case": "transform",
+          "error": "Mesh origin/axis/scale changed"
+        },
+        {
+          "case": "modifier",
+          "error": "Animation, constraints, modifiers and instances are unsupported"
+        },
+        {
+          "case": "action",
+          "error": "Scene animation is unsupported"
+        },
+        {
+          "case": "untracked",
+          "error": "Unsupported/untracked scene object"
+        },
+        {
+          "case": "material",
+          "error": "Truck PBR preview graph changed"
+        },
+        {
+          "case": "wheel",
+          "error": "Truck wheel geometry is locked to its mechanical anchor"
+        },
+        {
+          "case": "silhouette",
+          "error": "Truck silhouette envelope exceeded"
+        },
+        {
+          "case": "collision",
+          "error": "POSITION deviation 0.0009999871253967285 exceeds 1e-05; check axes/scale/geometry"
+        }
+      ],
+      "savedComponentEditChangesOnlyLod0": true
+    }
+  ],
+  "success": true
+}

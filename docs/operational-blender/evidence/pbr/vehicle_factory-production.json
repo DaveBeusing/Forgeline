@@ -1,0 +1,857 @@
+{
+  "assetIds": [
+    "building.directorate.module.collision_box",
+    "building.directorate.vehicle_factory",
+    "building.directorate.vehicle_factory.critical",
+    "building.directorate.vehicle_factory.damaged",
+    "building.directorate.vehicle_factory.destroyed",
+    "building.directorate.vehicle_factory.foundation",
+    "building.directorate.vehicle_factory.lod1",
+    "building.directorate.vehicle_factory.lod2",
+    "building.directorate.vehicle_factory.partial_shell",
+    "building.directorate.vehicle_factory.structural_frame",
+    "building.directorate.vehicle_factory.unpowered",
+    "material.directorate.building.critical",
+    "material.directorate.building.damaged",
+    "material.directorate.building.destroyed",
+    "material.directorate.building.structural",
+    "material.directorate.building.unpowered",
+    "texture.directorate.material.status_emissive",
+    "texture.directorate.surface.atlas_base",
+    "texture.directorate.surface.atlas_normal",
+    "texture.directorate.surface.atlas_orm"
+  ],
+  "collisionSourcesUnchanged": true,
+  "errors": [],
+  "inventory": [
+    {
+      "boundsMax": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "boundsMin": [
+        -0.5,
+        -0.5,
+        -0.5
+      ],
+      "estimatedVertexBytes": 384,
+      "id": "building.directorate.module.collision_box",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 8
+    },
+    {
+      "boundsMax": [
+        0.47999998927116394,
+        0.41999998688697815,
+        0.49000000953674316
+      ],
+      "boundsMin": [
+        -0.47999998927116394,
+        -0.5,
+        -0.38999998569488525
+      ],
+      "estimatedVertexBytes": 51840,
+      "id": "building.directorate.vehicle_factory",
+      "indexBytes": 6480,
+      "lods": [
+        {
+          "assetId": "building.directorate.vehicle_factory.lod1",
+          "level": 1,
+          "maxDistance": 220
+        },
+        {
+          "assetId": "building.directorate.vehicle_factory.lod2",
+          "level": 2,
+          "maxDistance": 620
+        }
+      ],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 540,
+      "vertices": 1080
+    },
+    {
+      "boundsMax": [
+        0.40646111965179443,
+        -0.2041861116886139,
+        0.4376216530799866
+      ],
+      "boundsMin": [
+        -0.41999998688697815,
+        -0.4558138847351074,
+        0.3100000023841858
+      ],
+      "estimatedVertexBytes": 8832,
+      "id": "building.directorate.vehicle_factory.critical",
+      "indexBytes": 1104,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.critical"
+      ],
+      "primitives": 1,
+      "triangles": 92,
+      "vertices": 184
+    },
+    {
+      "boundsMax": [
+        -0.23000000417232513,
+        -0.2620428800582886,
+        -0.22691884636878967
+      ],
+      "boundsMin": [
+        -0.4000000059604645,
+        -0.44999998807907104,
+        -0.3100000023841858
+      ],
+      "estimatedVertexBytes": 4032,
+      "id": "building.directorate.vehicle_factory.damaged",
+      "indexBytes": 576,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.damaged"
+      ],
+      "primitives": 1,
+      "triangles": 48,
+      "vertices": 84
+    },
+    {
+      "boundsMax": [
+        0.47999998927116394,
+        -0.17000000178813934,
+        0.49000000953674316
+      ],
+      "boundsMin": [
+        -0.47999998927116394,
+        -0.5,
+        -0.38999998569488525
+      ],
+      "estimatedVertexBytes": 8640,
+      "id": "building.directorate.vehicle_factory.destroyed",
+      "indexBytes": 1152,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.destroyed"
+      ],
+      "primitives": 1,
+      "triangles": 96,
+      "vertices": 180
+    },
+    {
+      "boundsMax": [
+        0.47999998927116394,
+        -0.4699999988079071,
+        0.49000000953674316
+      ],
+      "boundsMin": [
+        -0.47999998927116394,
+        -0.5,
+        -0.38999998569488525
+      ],
+      "estimatedVertexBytes": 1152,
+      "id": "building.directorate.vehicle_factory.foundation",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 24
+    },
+    {
+      "boundsMax": [
+        0.47999998927116394,
+        0.41999998688697815,
+        0.49000000953674316
+      ],
+      "boundsMin": [
+        -0.47999998927116394,
+        -0.5,
+        -0.38999998569488525
+      ],
+      "estimatedVertexBytes": 23040,
+      "id": "building.directorate.vehicle_factory.lod1",
+      "indexBytes": 2880,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 240,
+      "vertices": 480
+    },
+    {
+      "boundsMax": [
+        0.47999998927116394,
+        0.41999998688697815,
+        0.49000000953674316
+      ],
+      "boundsMin": [
+        -0.47999998927116394,
+        -0.5,
+        -0.38999998569488525
+      ],
+      "estimatedVertexBytes": 19584,
+      "id": "building.directorate.vehicle_factory.lod2",
+      "indexBytes": 2448,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 204,
+      "vertices": 408
+    },
+    {
+      "boundsMax": [
+        0.47999998927116394,
+        0.35499998927116394,
+        0.49000000953674316
+      ],
+      "boundsMin": [
+        -0.47999998927116394,
+        -0.5,
+        -0.38999998569488525
+      ],
+      "estimatedVertexBytes": 18432,
+      "id": "building.directorate.vehicle_factory.partial_shell",
+      "indexBytes": 2304,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 192,
+      "vertices": 384
+    },
+    {
+      "boundsMax": [
+        0.47999998927116394,
+        0.35499998927116394,
+        0.49000000953674316
+      ],
+      "boundsMin": [
+        -0.47999998927116394,
+        -0.5,
+        -0.38999998569488525
+      ],
+      "estimatedVertexBytes": 10368,
+      "id": "building.directorate.vehicle_factory.structural_frame",
+      "indexBytes": 1296,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.structural"
+      ],
+      "primitives": 1,
+      "triangles": 108,
+      "vertices": 216
+    },
+    {
+      "boundsMax": [
+        -0.30000001192092896,
+        -0.18000000715255737,
+        0.4749999940395355
+      ],
+      "boundsMin": [
+        -0.4300000071525574,
+        -0.3799999952316284,
+        0.4650000035762787
+      ],
+      "estimatedVertexBytes": 1152,
+      "id": "building.directorate.vehicle_factory.unpowered",
+      "indexBytes": 144,
+      "lods": [],
+      "orderedMaterials": [
+        "material.directorate.building.unpowered"
+      ],
+      "primitives": 1,
+      "triangles": 12,
+      "vertices": 24
+    }
+  ],
+  "meshes": [
+    {
+      "baseline": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 540,
+        "vertices": 1080
+      },
+      "candidate": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 540,
+        "vertices": 1080
+      },
+      "estimatedCompiledGeometryBytes": 58320,
+      "id": "building.directorate.vehicle_factory",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.40646111965179443,
+          -0.2041861116886139,
+          0.4376216530799866
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.4558138847351074,
+          0.3100000023841858
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      },
+      "candidate": {
+        "boundsMax": [
+          0.40646111965179443,
+          -0.2041861116886139,
+          0.4376216530799866
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.4558138847351074,
+          0.3100000023841858
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      },
+      "estimatedCompiledGeometryBytes": 9936,
+      "id": "building.directorate.vehicle_factory.critical",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory.critical"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.23000000417232513,
+          -0.2620428800582886,
+          -0.22691884636878967
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.44999998807907104,
+          -0.3100000023841858
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.23000000417232513,
+          -0.2620428800582886,
+          -0.22691884636878967
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.44999998807907104,
+          -0.3100000023841858
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "estimatedCompiledGeometryBytes": 4608,
+      "id": "building.directorate.vehicle_factory.damaged",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory.damaged"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.47999998927116394,
+          -0.17000000178813934,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 96,
+        "vertices": 180
+      },
+      "candidate": {
+        "boundsMax": [
+          0.47999998927116394,
+          -0.17000000178813934,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 96,
+        "vertices": 180
+      },
+      "estimatedCompiledGeometryBytes": 9792,
+      "id": "building.directorate.vehicle_factory.destroyed",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory.destroyed"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.47999998927116394,
+          -0.4699999988079071,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "candidate": {
+        "boundsMax": [
+          0.47999998927116394,
+          -0.4699999988079071,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "estimatedCompiledGeometryBytes": 1296,
+      "id": "building.directorate.vehicle_factory.foundation",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory.foundation"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 240,
+        "vertices": 480
+      },
+      "candidate": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 240,
+        "vertices": 480
+      },
+      "estimatedCompiledGeometryBytes": 25920,
+      "id": "building.directorate.vehicle_factory.lod1",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory.lod1"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 204,
+        "vertices": 408
+      },
+      "candidate": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.41999998688697815,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 204,
+        "vertices": 408
+      },
+      "estimatedCompiledGeometryBytes": 22032,
+      "id": "building.directorate.vehicle_factory.lod2",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory.lod2"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.35499998927116394,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 192,
+        "vertices": 384
+      },
+      "candidate": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.35499998927116394,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 192,
+        "vertices": 384
+      },
+      "estimatedCompiledGeometryBytes": 20736,
+      "id": "building.directorate.vehicle_factory.partial_shell",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory.partial_shell"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.35499998927116394,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      },
+      "candidate": {
+        "boundsMax": [
+          0.47999998927116394,
+          0.35499998927116394,
+          0.49000000953674316
+        ],
+        "boundsMin": [
+          -0.47999998927116394,
+          -0.5,
+          -0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      },
+      "estimatedCompiledGeometryBytes": 11664,
+      "id": "building.directorate.vehicle_factory.structural_frame",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory.structural_frame"
+    },
+    {
+      "baseline": {
+        "boundsMax": [
+          -0.30000001192092896,
+          -0.18000000715255737,
+          0.4749999940395355
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.3799999952316284,
+          0.4650000035762787
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "candidate": {
+        "boundsMax": [
+          -0.30000001192092896,
+          -0.18000000715255737,
+          0.4749999940395355
+        ],
+        "boundsMin": [
+          -0.4300000071525574,
+          -0.3799999952316284,
+          0.4650000035762787
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "estimatedCompiledGeometryBytes": 1296,
+      "id": "building.directorate.vehicle_factory.unpowered",
+      "minimumSilhouetteIou": 1.0,
+      "relativeBoundsError": 0.0,
+      "silhouetteIou": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sourceId": "building.directorate.vehicle_factory.unpowered"
+    }
+  ],
+  "previews": [
+    {
+      "assetId": "building.directorate.vehicle_factory",
+      "camera": "close",
+      "distanceInAssetExtents": 3.9143790756672154,
+      "file": "building.directorate.vehicle_factory-close.png"
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory",
+      "camera": "normal",
+      "distanceInAssetExtents": 6.405347578364533,
+      "file": "building.directorate.vehicle_factory-normal.png"
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory",
+      "camera": "strategic",
+      "distanceInAssetExtents": 12.098989870244118,
+      "file": "building.directorate.vehicle_factory-strategic.png"
+    }
+  ],
+  "productionSourcesUnchanged": true,
+  "profileSha256": "6f98acdaffcfac8561910b695cffa152f9c29366ace348c07c6a26556958259d",
+  "schemaVersion": 1,
+  "sourceHashes": {
+    "buildings/directorate/materials/critical.asset.json": "8c1a6eb4672ce7f238674b5a76f5f8f64ac39528d9cd27b069bd8eb99ee41fa1",
+    "buildings/directorate/materials/critical.material.json": "6e8256d9cd4d811f22f1c0ba8fed303c2fd358e6c9d11af01bad92ace16050b7",
+    "buildings/directorate/materials/damaged.asset.json": "b5d1c0f60bef36661b4525cb7e8c52e5cb46260bfd1c02b9a56c18987f5b5e3e",
+    "buildings/directorate/materials/damaged.material.json": "a1c57cb49c08c1caf03c030e80e57894f254ef8d4e38469fe4a0199c2b2bc636",
+    "buildings/directorate/materials/destroyed.asset.json": "e89a774bce9c320f7a2548c01ecae150863d593f54a63ec936dc5972c9d48eb3",
+    "buildings/directorate/materials/destroyed.material.json": "0a2a981e9afa9ea4477b9fe541ad85b203370686bb36d2effa9ec47cf774ad67",
+    "buildings/directorate/materials/structural.asset.json": "3692dc0effd7a964b33d05610534729780cf4f4920b5230425495ced7ec543b8",
+    "buildings/directorate/materials/structural.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "buildings/directorate/materials/unpowered.asset.json": "f4847dd15d0d5bb22bcdb9eb4529875fe438ddb0ed76f4815ba91e6b18f87fa8",
+    "buildings/directorate/materials/unpowered.material.json": "8373a93e0dbdacae3829d65406c18fb45daa571d01afe73df9cf87652e4590e6",
+    "buildings/directorate/modules/collision_box.asset.json": "b5ac3e871a08eabff5bb20cddf65de2d928f0d7728b7cdd3cd5669205c4ee637",
+    "buildings/directorate/sources/module_collision_box.gltf": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+    "buildings/directorate/sources/operational/vehicle_factory_critical.gltf": "a39e658c6ce44a4115b59b2242991497b21ca8394f3095927ace049d14ace809",
+    "buildings/directorate/sources/operational/vehicle_factory_damaged.gltf": "55010cff2baf36b13c7e8adcae07b90ccaa18417abb33e545627b208bdd78c23",
+    "buildings/directorate/sources/operational/vehicle_factory_destroyed.gltf": "23d97a74b39c2929c23e3cca25357345d57f506b2f8953e58c9bfeb6c5cc67c3",
+    "buildings/directorate/sources/operational/vehicle_factory_foundation.gltf": "adf055a5c0a7ae6ad21d51db4c798cb8a8364a9cf8fe3bd7e88d4d63dadaf574",
+    "buildings/directorate/sources/operational/vehicle_factory_lod0.gltf": "7ad961942521bd0990108ac335a08ed4a3be5f7586d775468b64f4f2aed57866",
+    "buildings/directorate/sources/operational/vehicle_factory_lod1.gltf": "7e70454f8082e58c9b419159bb8e06096eac5cf81de1fe8af7a3d985afc09ba4",
+    "buildings/directorate/sources/operational/vehicle_factory_lod2.gltf": "679208bd408f6f813a1165f4bfb8bd220648032b541e9b09260a721b1fbb282f",
+    "buildings/directorate/sources/operational/vehicle_factory_partial_shell.gltf": "d176aea98e3a7b867f56f4487025ceaa60301be6fd1d32188170af160d224cf1",
+    "buildings/directorate/sources/operational/vehicle_factory_structural_frame.gltf": "20204c8a0463c996743468d4b0d6cbede8c81fdd22741bff6815effceb3882e6",
+    "buildings/directorate/sources/operational/vehicle_factory_unpowered.gltf": "03864ca06dfe932f62e14c8284a1a5fa71ebb2e3ed3af7d8575c8b358a745c52",
+    "buildings/directorate/vehicle_factory.asset.json": "9779aa56d4f81a397df980fea4f247f8f2b619db7aff71e9056677c172d8b799",
+    "buildings/directorate/vehicle_factory_critical.asset.json": "4798811664c869321f4335b52672e739a6fc94915806a2868a36dd44618a0e08",
+    "buildings/directorate/vehicle_factory_damaged.asset.json": "74304a72c2b8a384e7902ec6dc4a98796bd65ce539e269883f85ece6d1dac4c8",
+    "buildings/directorate/vehicle_factory_destroyed.asset.json": "b6f13032644be74bc797fba10631400f6e31862626ee2572ee1e4dfa2b1584db",
+    "buildings/directorate/vehicle_factory_foundation.asset.json": "542fa7786bae150ec5af9f252b9c09da9a79461290390beeecf40b76de5f5fe0",
+    "buildings/directorate/vehicle_factory_lod1.asset.json": "a50289eb82aa953793b7cdbc607e3c71eadb87ad3763c9354792caace2e82114",
+    "buildings/directorate/vehicle_factory_lod2.asset.json": "344dc5b9810a99adfb229213b962be6e3b99284994aa0cff615ae31db3dc478d",
+    "buildings/directorate/vehicle_factory_partial_shell.asset.json": "7edbdf650e3c73835c308f1f7d94edb5c60eb0b22aad4d53f2de03b61203b449",
+    "buildings/directorate/vehicle_factory_structural_frame.asset.json": "0b462566b2bfa058b4ef88c70b5d7e5457f1c7424a83646fe6d3b69b4c6b24c3",
+    "buildings/directorate/vehicle_factory_unpowered.asset.json": "b11b6c057b63ef54f0663e3d302ee51388b4c8f3be4de887452762ae9681901d",
+    "materials/directorate/surfaces/production_surface_base.png": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+    "materials/directorate/surfaces/production_surface_normal.png": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+    "materials/directorate/surfaces/production_surface_orm.png": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+    "materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9",
+    "materials/directorate/textures/status_emissive.asset.json": "464a32ad532fa18cfc149cc1f6f3e887c156025dca9cf8308485fcadac83b5d0",
+    "materials/directorate/textures/status_emissive.tga": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6"
+  },
+  "sourceSignature": "fc5992e0050a5aa3bc41ec7425088630317dadda79f55b2afba2f4d9657496fd",
+  "success": true,
+  "texturePayloadBytes": 7325040,
+  "textures": [
+    {
+      "colorSpace": "srgb",
+      "estimatedPayloadBytes": 1392,
+      "format": "BC7",
+      "height": 32,
+      "id": "texture.directorate.material.status_emissive",
+      "mipLevels": 6,
+      "sourceSha256": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6",
+      "usage": "emissive",
+      "width": 32
+    },
+    {
+      "colorSpace": "srgb",
+      "estimatedPayloadBytes": 5586944,
+      "format": "BC7",
+      "height": 2048,
+      "id": "texture.directorate.surface.atlas_base",
+      "mipLevels": 5,
+      "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+      "usage": "baseColor",
+      "width": 2048
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 1392640,
+      "format": "BC7",
+      "height": 1024,
+      "id": "texture.directorate.surface.atlas_normal",
+      "mipLevels": 4,
+      "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+      "usage": "normal",
+      "width": 1024
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 344064,
+      "format": "BC7",
+      "height": 512,
+      "id": "texture.directorate.surface.atlas_orm",
+      "mipLevels": 3,
+      "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+      "usage": "orm",
+      "width": 512
+    }
+  ]
+}

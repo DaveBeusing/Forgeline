@@ -1,0 +1,143 @@
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64) erfolgreich (14s 867ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Graphics.Tests.RenderParallelization.SceneClearOptimizationTests.CommonSceneClearHasNoWarningsAcrossBuffersAndScaleRecreation(requireDebugLayer: True)
+  D3D12 debug layer is unavailable.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Graphics.Tests.ResourceScheduling.NativeUploadSchedulingTests.InitializedStaticBuffersCopyAndDrawWithoutDebugWarnings(requireDebugLayer: True)
+  D3D12 debug layer is unavailable.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: False)
+  Set FORGELINE_GPU_LIFETIME_TESTS=1 for native lifetime qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: True)
+  Set FORGELINE_GPU_LIFETIME_TESTS=1 for native lifetime qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64) erfolgreich (7m 26s 769ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64) erfolgreich (6s 059ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64) erfolgreich (7s 842ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64) erfolgreich (6m 39s 549ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64) erfolgreich (4s 109ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Client.Tests.WorldAudioMixerTests.NativeWorldMixerStreamsAndReleasesOnTheRealDevice
+  Not run (due to explicit test filtering)
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Client.Tests.UiAudioReliabilityTests.NativeBuffersAndAsynchronousResultPlaybackReleaseOnTheRealDevice
+  Not run (due to explicit test filtering)
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64) erfolgreich (1m 44s 850ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.AtmospherePerformanceQualificationTests.CompareEquivalentTerrainAcrossAtmosphericModesAndZooms
+  Set FORGELINE_ATMOSPHERE_BENCHMARK_OUTPUT for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.MaterialQuality.MaterialSequenceTests.CaptureControlledMaterialPanAndZoomPairs
+  Set FORGELINE_MATERIAL_SEQUENCE_OUTPUT and FORGELINE_MATERIAL_BASELINE_ASSEMBLY for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.ScenePassPerformanceQualificationTests.CompareDirectAndLinearSceneOnEquivalentNativeWorkloads
+  Set FORGELINE_PASS_BENCHMARK_OUTPUT for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureProductionMaterialsAtFixedCentralDivideViewpoints
+  Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated production terrain measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureVegetationMotionWithIdenticalProductionBatches
+  Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated vegetation measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.RenderQualityQualificationTests.CaptureProductionQualityProfilesWithTerrainEffectsAndSelectionOverlays
+  Set FORGELINE_QUALITY_QUALIFICATION_OUTPUT for isolated hardware qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.DirectionalShadowPerformanceTests.CompareEquivalentDenseWorkloadsAcrossQualityAndRtsZoom
+  Set FORGELINE_SHADOW_BENCHMARK_OUTPUT for isolated hardware shadow measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.RigidAuthoringPreservesCompiledGeometryAndBatching
+  Set FORGELINE_BLENDER_MOTION_ROOT after rigid authoring exports.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "power_plant", triangles: 2288)
+  Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "barracks", triangles: 1056)
+  Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "radar", triangles: 1920)
+  Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "vehicle_factory", triangles: 1556)
+  Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.BuildingVehicleAndPropPreserveCompiledContracts
+  Set FORGELINE_BLENDER_READINESS_ROOT after the staged three-family exports.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.ExportedProductionMeshesPreserveRuntimeContractsAndMechanicalBatching
+  Set FORGELINE_BLENDER_ROUNDTRIP_ROOT after native Blender fixture exports.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.CombinedOperationalExportsLoadWithoutSourceFiles
+  Set operational exports and a qualified full runtime seed.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.DefaultSurfacePreparationPreservesCompiledGeometryAndBatching
+  Set FORGELINE_BLENDER_PRODUCTION_ROOT after native surface qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: "smelter", triangles: 2588)
+  Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: "electronics_plant", triangles: 2152)
+  Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: "extractor", triangles: 2508)
+  Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.IndustrialPlantMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels(family: "ammunition_plant")
+  Run build/industrial-plants/Qualify-Masters.ps1 with real Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.IndustrialPlantMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels(family: "fuel_refinery")
+  Run build/industrial-plants/Qualify-Masters.ps1 with real Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.ParticlePerformanceQualificationTests.MeasureBoundedProductionEffectsAtRtsViewpoints
+  Set FORGELINE_PARTICLE_QUALIFICATION_OUTPUT for isolated hardware qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderMechanicalQualificationTests.EditedPivotsPreserveStaticGeometryAndCanonicalRangeSharing
+  Set FORGELINE_BLENDER_MOTION_ROOT after native rigid authoring.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderMechanicalQualificationTests.BlenderPoseMatricesMatchRuntimeRigidCompositionIncludingEditedBindings
+  Set FORGELINE_BLENDER_MOTION_ROOT after native rigid authoring.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.EffectSubmission.ParticleOrderingQualificationTests.MeasureEquivalentParticleOrderingInPairedCohorts
+  Set FORGELINE_PARTICLE_CPU_QUALIFICATION_OUTPUT for isolated CPU ordering qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) erfolgreich (4m 53s 695ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64) erfolgreich (22m 03s 905ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64) erfolgreich (1s 869ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64) erfolgreich (1s 520ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64) erfolgreich (3s 207ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64) erfolgreich (1s 986ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64) erfolgreich (3s 417ms)
+
+Testlaufzusammenfassung: Bestanden!
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64) erfolgreich (7s 842ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64) erfolgreich (14s 867ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64) erfolgreich (1s 520ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64) erfolgreich (6s 059ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64) erfolgreich (1m 44s 850ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) erfolgreich (4m 53s 695ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64) erfolgreich (1s 869ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64) erfolgreich (3s 207ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64) erfolgreich (6m 39s 549ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64) erfolgreich (7m 26s 769ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64) erfolgreich (22m 03s 905ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64) erfolgreich (4s 109ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64) erfolgreich (1s 986ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64) erfolgreich (3s 417ms)
+
+  gesamt: 3233
+  fehlgeschlagen: 0
+  erfolgreich: 3202
+  übersprungen: 31
+  Dauer: 46m 48s 517ms

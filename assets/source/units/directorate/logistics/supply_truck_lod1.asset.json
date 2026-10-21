@@ -1,8 +1,8 @@
 {
   "id": "unit.directorate.supply_truck.lod1",
-  "type": "mesh",
-  "source": "../sources/combat_support/supply_truck/lod1.gltf",
   "materialReferences": [
     "material.directorate.unit.supply_truck"
-  ]
+  ],
+  "source": "../sources/combat_support/supply_truck/blender/lod1.glb",
+  "type": "mesh"
 }

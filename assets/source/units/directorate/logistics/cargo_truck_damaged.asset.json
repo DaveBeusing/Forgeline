@@ -1,8 +1,8 @@
 {
   "id": "unit.directorate.cargo_truck.damaged",
-  "type": "mesh",
-  "source": "../sources/combat_support/cargo_truck/damaged.gltf",
   "materialReferences": [
     "material.directorate.unit.cargo_truck"
-  ]
+  ],
+  "source": "../sources/combat_support/cargo_truck/blender/damaged.glb",
+  "type": "mesh"
 }

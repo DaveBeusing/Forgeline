@@ -1,0 +1,135 @@
+{
+  "baselineCommit": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "visualAcceptance": "pending",
+  "pixelComparisonRequested": true,
+  "channelTolerance": 0,
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0,
+  "captures": [
+    {
+      "gpuMeanMs": 5.532310857142856,
+      "key": "ArtilleryProduction-1920x1080-High-CloseTactical",
+      "sameRuntime": false,
+      "cpuMeanMs": 16.6408625,
+      "visualReview": "pending",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "exact-file-match",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 4.2658249999999995,
+      "equivalentHardware": true
+    },
+    {
+      "gpuMeanMs": 5.499845333333333,
+      "key": "ArtilleryProduction-1920x1080-High-NormalGameplay",
+      "sameRuntime": false,
+      "cpuMeanMs": 10.421375000000001,
+      "visualReview": "pending",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "exact-file-match",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 3.5786750000000005,
+      "equivalentHardware": true
+    },
+    {
+      "gpuMeanMs": 6.850149333333334,
+      "key": "ArtilleryProduction-1920x1080-High-Strategic",
+      "sameRuntime": false,
+      "cpuMeanMs": 5.3565000000000005,
+      "visualReview": "pending",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "exact-file-match",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.5417375000000009,
+      "equivalentHardware": true
+    },
+    {
+      "gpuMeanMs": 16.740677333333334,
+      "key": "ArtilleryProduction-3840x2160-High-CloseTactical",
+      "sameRuntime": false,
+      "cpuMeanMs": 12.4730375,
+      "visualReview": "pending",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "exact-file-match",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -4.306374999999999,
+      "equivalentHardware": true
+    },
+    {
+      "gpuMeanMs": 16.190648000000003,
+      "key": "ArtilleryProduction-3840x2160-High-NormalGameplay",
+      "sameRuntime": false,
+      "cpuMeanMs": 19.6294875,
+      "visualReview": "pending",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "exact-file-match",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 5.9500125,
+      "equivalentHardware": true
+    },
+    {
+      "gpuMeanMs": 15.986378666666667,
+      "key": "ArtilleryProduction-3840x2160-High-Strategic",
+      "sameRuntime": false,
+      "cpuMeanMs": 11.68385,
+      "visualReview": "pending",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "exact-file-match",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -1.9537750000000038,
+      "equivalentHardware": true
+    }
+  ],
+  "structural": "pass",
+  "commit": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "imageGateRequested": false,
+  "imageFailures": [],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred."
+}

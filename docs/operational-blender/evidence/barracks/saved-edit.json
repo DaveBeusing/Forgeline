@@ -1,0 +1,14 @@
+{
+  "canonicalYDelta": 0.0010000020265579215,
+  "editAsset": "building.directorate.barracks",
+  "editIsQualificationOnly": true,
+  "editVertex": 125,
+  "family": "building.directorate.barracks",
+  "meshCount": 11,
+  "organizedMasterReopened": true,
+  "productionPromotion": "pending",
+  "savedVertexEditReopenedAndExported": true,
+  "schemaVersion": 1,
+  "sourceSignature": "95f4383495bc2f2f61d4c1e15f51a6c025ee660a776f32093cf40f15b4a73b12",
+  "success": true
+}

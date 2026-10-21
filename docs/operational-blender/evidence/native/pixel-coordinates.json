@@ -1,0 +1,112 @@
+[
+  {
+    "name": "baseline-repeat-failure",
+    "a": "artifacts/opvb/galleries/failed-RadarProduction-1920x1080-Medium-NormalGameplay-first.png",
+    "b": "artifacts/opvb/galleries/failed-RadarProduction-1920x1080-Medium-NormalGameplay-repeat-02.png",
+    "points": [
+      {
+        "x": 260,
+        "y": 48,
+        "before": [
+          133,
+          137,
+          124,
+          255
+        ],
+        "after": [
+          133,
+          138,
+          124,
+          255
+        ]
+      }
+    ]
+  },
+  {
+    "name": "barracks-medium-close",
+    "a": "artifacts/opvb2/galleries/BarracksProduction-1920x1080-Medium-CloseTactical.png",
+    "b": "artifacts/opva2/galleries/BarracksProduction-1920x1080-Medium-CloseTactical.png",
+    "points": [
+      {
+        "x": 775,
+        "y": 367,
+        "before": [
+          45,
+          53,
+          58,
+          255
+        ],
+        "after": [
+          45,
+          53,
+          59,
+          255
+        ]
+      },
+      {
+        "x": 1236,
+        "y": 380,
+        "before": [
+          45,
+          52,
+          49,
+          255
+        ],
+        "after": [
+          45,
+          51,
+          49,
+          255
+        ]
+      },
+      {
+        "x": 1167,
+        "y": 391,
+        "before": [
+          173,
+          110,
+          58,
+          255
+        ],
+        "after": [
+          173,
+          109,
+          58,
+          255
+        ]
+      },
+      {
+        "x": 1166,
+        "y": 392,
+        "before": [
+          166,
+          105,
+          57,
+          255
+        ],
+        "after": [
+          166,
+          106,
+          60,
+          255
+        ]
+      },
+      {
+        "x": 1241,
+        "y": 797,
+        "before": [
+          83,
+          95,
+          102,
+          255
+        ],
+        "after": [
+          84,
+          95,
+          102,
+          255
+        ]
+      }
+    ]
+  }
+]

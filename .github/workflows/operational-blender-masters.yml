@@ -1,0 +1,59 @@
+name: Operational building master qualification
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/operational-blender-masters.yml'
+      - 'build/operational-blender/**'
+      - 'assets/staged/operational-buildings/**'
+      - 'tests/ForgeLine.Presentation.Tests/BlenderRoundTripQualificationTests.cs'
+      - 'tests/ForgeLine.Presentation.Tests/OperationalBuildingReferenceSceneTests.cs'
+      - 'src/ForgeLine.Presentation/OperationalBuildingReferenceScene.cs'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/operational-blender-masters.yml'
+      - 'build/operational-blender/**'
+      - 'assets/staged/operational-buildings/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retained-contracts:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify saved master hashes and every staged LOD/state export
+        shell: pwsh
+        run: python build/operational-blender/validate_retained.py
+
+  native-masters:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Save, reopen, export and compile all four families
+        shell: pwsh
+        run: ./build/operational-blender/Qualify-Masters.ps1 -OutputRoot artifacts/om-ci
+      - name: Reopen checked-in masters and verify exact staged exports
+        shell: pwsh
+        run: ./build/operational-blender/Test-RetainedMasters.ps1 -OutputRoot artifacts/or-ci
+      - name: Retain native authoring evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: operational-blender-masters-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/om-ci
+            artifacts/or-ci
+          retention-days: 14

@@ -1,24 +1,111 @@
 {
+  "collisionReference": "unit.directorate.supply_truck.collision",
+  "collisionRequired": true,
   "id": "unit.directorate.supply_truck",
-  "type": "mesh",
-  "source": "../sources/combat_support/supply_truck/lod0.gltf",
-  "materialReferences": [
-    "material.directorate.unit.supply_truck"
-  ],
   "lods": [
     {
-      "level": 1,
       "assetId": "unit.directorate.supply_truck.lod1",
+      "level": 1,
       "maxDistance": 130
     },
     {
-      "level": 2,
       "assetId": "unit.directorate.supply_truck.lod2",
+      "level": 2,
       "maxDistance": 360
     }
   ],
-  "collisionRequired": true,
-  "collisionReference": "unit.directorate.supply_truck.collision",
+  "materialReferences": [
+    "material.directorate.unit.supply_truck"
+  ],
+  "mechanicalParts": [
+    {
+      "firstIndex": 0,
+      "indexCount": 5958,
+      "motion": "static",
+      "name": "body",
+      "parent": -1
+    },
+    {
+      "firstIndex": 5958,
+      "indexCount": 840,
+      "motion": "wheel",
+      "name": "wheel_n1_n2_4",
+      "parent": 0,
+      "rate": 2.3255813953488373,
+      "socket": "motion_wheel_n1_n2_4",
+      "travel": 0
+    },
+    {
+      "firstIndex": 6798,
+      "indexCount": 840,
+      "motion": "wheel",
+      "name": "wheel_1_n2_4",
+      "parent": 0,
+      "rate": 2.3255813953488373,
+      "socket": "motion_wheel_1_n2_4",
+      "travel": 0
+    },
+    {
+      "firstIndex": 7638,
+      "indexCount": 840,
+      "motion": "wheel",
+      "name": "wheel_n1_n1_25",
+      "parent": 0,
+      "rate": 2.3255813953488373,
+      "socket": "motion_wheel_n1_n1_25",
+      "travel": 0
+    },
+    {
+      "firstIndex": 8478,
+      "indexCount": 840,
+      "motion": "wheel",
+      "name": "wheel_1_n1_25",
+      "parent": 0,
+      "rate": 2.3255813953488373,
+      "socket": "motion_wheel_1_n1_25",
+      "travel": 0
+    },
+    {
+      "firstIndex": 9318,
+      "indexCount": 840,
+      "motion": "wheel",
+      "name": "wheel_n1_1_35",
+      "parent": 0,
+      "rate": 2.3255813953488373,
+      "socket": "motion_wheel_n1_1_35",
+      "travel": 0
+    },
+    {
+      "firstIndex": 10158,
+      "indexCount": 840,
+      "motion": "wheel",
+      "name": "wheel_1_1_35",
+      "parent": 0,
+      "rate": 2.3255813953488373,
+      "socket": "motion_wheel_1_1_35",
+      "travel": 0
+    },
+    {
+      "firstIndex": 10998,
+      "indexCount": 840,
+      "motion": "wheel",
+      "name": "wheel_n1_2_38",
+      "parent": 0,
+      "rate": 2.3255813953488373,
+      "socket": "motion_wheel_n1_2_38",
+      "travel": 0
+    },
+    {
+      "firstIndex": 11838,
+      "indexCount": 840,
+      "motion": "wheel",
+      "name": "wheel_1_2_38",
+      "parent": 0,
+      "rate": 2.3255813953488373,
+      "socket": "motion_wheel_1_2_38",
+      "travel": 0
+    }
+  ],
   "sockets": [
     {
       "name": "cargo_load",
@@ -81,93 +168,6 @@
       "z": 0.35
     }
   ],
-  "mechanicalParts": [
-    {
-      "name": "body",
-      "firstIndex": 0,
-      "indexCount": 5958,
-      "parent": -1,
-      "motion": "static"
-    },
-    {
-      "name": "wheel_n1_n2_4",
-      "firstIndex": 5958,
-      "indexCount": 840,
-      "parent": 0,
-      "motion": "wheel",
-      "socket": "motion_wheel_n1_n2_4",
-      "rate": 2.3255813953488373,
-      "travel": 0
-    },
-    {
-      "name": "wheel_1_n2_4",
-      "firstIndex": 6798,
-      "indexCount": 840,
-      "parent": 0,
-      "motion": "wheel",
-      "socket": "motion_wheel_1_n2_4",
-      "rate": 2.3255813953488373,
-      "travel": 0
-    },
-    {
-      "name": "wheel_n1_n1_25",
-      "firstIndex": 7638,
-      "indexCount": 840,
-      "parent": 0,
-      "motion": "wheel",
-      "socket": "motion_wheel_n1_n1_25",
-      "rate": 2.3255813953488373,
-      "travel": 0
-    },
-    {
-      "name": "wheel_1_n1_25",
-      "firstIndex": 8478,
-      "indexCount": 840,
-      "parent": 0,
-      "motion": "wheel",
-      "socket": "motion_wheel_1_n1_25",
-      "rate": 2.3255813953488373,
-      "travel": 0
-    },
-    {
-      "name": "wheel_n1_1_35",
-      "firstIndex": 9318,
-      "indexCount": 840,
-      "parent": 0,
-      "motion": "wheel",
-      "socket": "motion_wheel_n1_1_35",
-      "rate": 2.3255813953488373,
-      "travel": 0
-    },
-    {
-      "name": "wheel_1_1_35",
-      "firstIndex": 10158,
-      "indexCount": 840,
-      "parent": 0,
-      "motion": "wheel",
-      "socket": "motion_wheel_1_1_35",
-      "rate": 2.3255813953488373,
-      "travel": 0
-    },
-    {
-      "name": "wheel_n1_2_38",
-      "firstIndex": 10998,
-      "indexCount": 840,
-      "parent": 0,
-      "motion": "wheel",
-      "socket": "motion_wheel_n1_2_38",
-      "rate": 2.3255813953488373,
-      "travel": 0
-    },
-    {
-      "name": "wheel_1_2_38",
-      "firstIndex": 11838,
-      "indexCount": 840,
-      "parent": 0,
-      "motion": "wheel",
-      "socket": "motion_wheel_1_2_38",
-      "rate": 2.3255813953488373,
-      "travel": 0
-    }
-  ]
+  "source": "../sources/combat_support/supply_truck/blender/lod0.glb",
+  "type": "mesh"
 }
