@@ -249,3 +249,10 @@ remain pending. Owned artillery elevation remains clamped and may not align with
 steep close-range parabolic trajectories. Cargo payload geometry is cosmetic;
 inventory quantity remains authoritative. CI acceptance must refer to the final
 published PR head. No merge, release tag or public package is implied.
+
+## Native logistics truck masters
+
+Cargo and Supply now have separate saved Blender production masters and guarded
+GLB exports. See [truck ownership, editing and qualification](LogisticsTruckBlender.md).
+The existing recipe geometry, physical dimensions, wheel bindings and family roles
+remain the reviewed baseline.

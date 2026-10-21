@@ -308,3 +308,21 @@ operational building loads, general reference scenes, aim and mechanical motion.
 Retained-master validation confirms both Blender projects and all eight exports
 match current canonical sources; the 44-project reference graph remains acyclic.
 These are merge validation results, not a new native capture or package run.
+
+Master advanced again during that push: `8b85daf2fdcdffdffa2889f078802040e2650492`
+integrates PR #275 and its truck sources/reference scenes. The subsequent merge
+preserves all **69** integrated enum IDs, appends artillery after the truck scenes,
+and combines family selection/count/placement with the existing artillery-only
+cosmetic poses. Truck and mixed-family behavior retain master's implementation.
+The current PR version is **0.1.431**, one PATCH above master's 0.1.430; the earlier
+0.1.430 reconciliation and 0.1.429 package are historical checkpoints.
+
+Second reconciliation validation: Release solution build passes with zero
+warnings/errors (56.64 seconds). The expanded selected test run passes: **114
+passed, two optional truck catalog comparisons skipped, zero failed** (37.107
+seconds). The skipped comparisons require separately compiled before/after truck
+catalogs; all six truck reference workloads execute and pass. Artillery native
+geometry/pose checks execute against the existing qualified master data. Retained
+artillery hashes/geometry, all 69 integrated enum IDs, the 44-project graph and
+whitespace checks pass. This does not rerun the incoming PR's native truck capture
+or relabel any historical package evidence.

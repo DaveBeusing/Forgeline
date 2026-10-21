@@ -102,6 +102,8 @@ def export(kit, shared, names, lod, path, articulated=False):
 
 
 def author(family, output, update):
+    if update and family in ('cargo_truck', 'supply_truck') and (SOURCE/'authoring'/f'{family}.blend').is_file():
+        raise ValueError('Saved Blender master owns truck metadata; use Invoke-BlenderLogisticsTruck.ps1')
     kit = json.loads((SOURCE/'authoring'/f'{family}.kit.json').read_text(encoding='utf-8'))
     shared = json.loads((SOURCE/'authoring/combat_support.modules.json').read_text(encoding='utf-8'))['modules']
     reports, metadata = {}, {}
