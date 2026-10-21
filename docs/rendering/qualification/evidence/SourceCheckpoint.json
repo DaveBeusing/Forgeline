@@ -1,0 +1,317 @@
+{
+  "schemaVersion": 1,
+  "recordKind": "source-checkpoint",
+  "observedAtUtc": "2026-10-20T20:20:35Z",
+  "repository": "DaveBeusing/Forgeline",
+  "analysisMaster": {
+    "sha": "e42ae48346bbb1331b7a548a72fc0905ae6d184a",
+    "version": "0.1.424-dev",
+    "source": "https://github.com/DaveBeusing/Forgeline/commit/e42ae48346bbb1331b7a548a72fc0905ae6d184a",
+    "runtimeAssetFingerprint": null,
+    "measurements": [],
+    "qualification": "open"
+  },
+  "historicalWorkOrderAnchor": {
+    "sha": "874b1652bc272ef648120a0b1de9bc85edf5f70c",
+    "date": "2026-10-16",
+    "role": "historical analysis only"
+  },
+  "foundation": {
+    "integratedFoundationSha": "17810ee192fac495173a7e9da44c973595833f2b",
+    "integratedRepairSha": "d4c7b62077c98500d6309cdd6c6dbf5e6bd6490c",
+    "releaseRecordPr": 241,
+    "parallelReleased": true,
+    "manifest": "docs/rendering/parallelization/ParallelRenderOwnership.json",
+    "manifestBlobSha": "7b52eec8896de6e235118a7a2575091a21ab80fd",
+    "acceptanceRecord": "docs/rendering/parallelization/Acceptance.json",
+    "acceptanceRecordBlobSha": "575458ec4601bf7ef7f54c8c967f1a8a48308fd1",
+    "measurementAttribution": "Historical foundation evidence retains its own measured source; none is reattributed to current master."
+  },
+  "activeOtherWork": {
+    "branch": "performance/composition-effects",
+    "observedSha": "e121263ababc9d2f51ee38ac507fc6da34fdeaef",
+    "filesOverlap": false,
+    "overlapCheck": "Current-master comparison has only composition/effect owned production, test, build and documentation paths."
+  },
+  "currentCi": {
+    "runId": 39488943266,
+    "jobId": 118856962021,
+    "attempt": 1,
+    "headSha": "e42ae48346bbb1331b7a548a72fc0905ae6d184a",
+    "conclusion": "failure",
+    "workflow": ".github/workflows/ci.yml",
+    "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39488943266/job/118856962021",
+    "failedStep": 4,
+    "failedStepName": "Validate one version increment per PR",
+    "versionBaseSha": "cdf97fb9a8ef277cf75d451476a21128d398007c",
+    "expectedVersion": "0.1.425",
+    "actualVersion": "0.1.424",
+    "exitCode": 1,
+    "skippedSteps": [
+      {
+        "number": 5,
+        "name": "Version and metadata contracts"
+      },
+      {
+        "number": 6,
+        "name": "Set up .NET"
+      },
+      {
+        "number": 7,
+        "name": "Restore"
+      },
+      {
+        "number": 8,
+        "name": "Validate project references"
+      },
+      {
+        "number": 9,
+        "name": "Validate bundled UI font resources"
+      },
+      {
+        "number": 10,
+        "name": "UI motion, optional sound and preference contracts"
+      },
+      {
+        "number": 11,
+        "name": "World audio playback catalog"
+      },
+      {
+        "number": 12,
+        "name": "Cargo transport recovery regression"
+      },
+      {
+        "number": 13,
+        "name": "Cargo propulsion Fuel and docking contracts"
+      },
+      {
+        "number": 14,
+        "name": "Distribution FIFO and dispatch fairness contracts"
+      },
+      {
+        "number": 15,
+        "name": "Build"
+      },
+      {
+        "number": 16,
+        "name": "Cargo fleet capacity diagnosis and alert lifecycle"
+      },
+      {
+        "number": 17,
+        "name": "Logistics order identity and quantity contracts"
+      },
+      {
+        "number": 18,
+        "name": "Set up source-contract Python"
+      },
+      {
+        "number": 19,
+        "name": "Blender source geometry contracts"
+      },
+      {
+        "number": 20,
+        "name": "Render boundary ownership and shader source contracts"
+      },
+      {
+        "number": 21,
+        "name": "Render boundary and publication contracts"
+      },
+      {
+        "number": 22,
+        "name": "Rigid motion lifecycle and allocation contracts"
+      },
+      {
+        "number": 23,
+        "name": "Rigid clip compilation and deployment contracts"
+      },
+      {
+        "number": 24,
+        "name": "Blender launcher protocol contracts"
+      },
+      {
+        "number": 25,
+        "name": "UI audio reliability and industrial source contracts"
+      },
+      {
+        "number": 26,
+        "name": "World audio extraction, visibility and deterministic publication contracts"
+      },
+      {
+        "number": 27,
+        "name": "Graphics budget gate input contracts"
+      },
+      {
+        "number": 28,
+        "name": "UI qualification matrix coverage contracts"
+      },
+      {
+        "number": 29,
+        "name": "Compile and qualify canonical map"
+      },
+      {
+        "number": 30,
+        "name": "Adaptive frontend geometry and interaction contracts"
+      },
+      {
+        "number": 31,
+        "name": "Battlefield HUD hierarchy and interaction contracts"
+      },
+      {
+        "number": 32,
+        "name": "UI motion and feedback interaction contracts"
+      },
+      {
+        "number": 33,
+        "name": "Native UI typography contracts"
+      },
+      {
+        "number": 34,
+        "name": "Native material BRDF and HDR contracts"
+      },
+      {
+        "number": 35,
+        "name": "Graphics quality and display contracts"
+      },
+      {
+        "number": 36,
+        "name": "Single object ring interaction contracts"
+      },
+      {
+        "number": 37,
+        "name": "Compile and qualify runtime assets"
+      },
+      {
+        "number": 38,
+        "name": "Runtime asset process contracts"
+      },
+      {
+        "number": 39,
+        "name": "Compiled UI atlas and ordered skin contracts"
+      },
+      {
+        "number": 40,
+        "name": "Graphical battlefield skin identity and native lifetime contracts"
+      },
+      {
+        "number": 41,
+        "name": "Directorate skin package integrity and source exclusion"
+      },
+      {
+        "number": 42,
+        "name": "Graphical economy work states and operations privacy contracts"
+      },
+      {
+        "number": 43,
+        "name": "Tactical artwork privacy and native pointer ownership"
+      },
+      {
+        "number": 44,
+        "name": "Graphical frontend skin and pointer contracts"
+      },
+      {
+        "number": 45,
+        "name": "Cinematic menu image and native lifecycle contracts"
+      },
+      {
+        "number": 46,
+        "name": "World environment and terrain residency contracts"
+      },
+      {
+        "number": 47,
+        "name": "Combat industrial effects and decal contracts"
+      },
+      {
+        "number": 48,
+        "name": "Reference evidence report contracts"
+      },
+      {
+        "number": 49,
+        "name": "Reference performance and image contracts without GPU"
+      },
+      {
+        "number": 50,
+        "name": "UI reference geometry and input contracts"
+      },
+      {
+        "number": 51,
+        "name": "Software UI reference smoke (no physical visual acceptance)"
+      },
+      {
+        "number": 52,
+        "name": "Native WARP reference capture"
+      },
+      {
+        "number": 53,
+        "name": "Windows apphost reference completion contract"
+      },
+      {
+        "number": 54,
+        "name": "Windows window mode and visual qualification smoke"
+      },
+      {
+        "number": 55,
+        "name": "Rendering benchmark qualification"
+      },
+      {
+        "number": 56,
+        "name": "Headless diagnostics smoke test"
+      },
+      {
+        "number": 57,
+        "name": "Lightweight entity stress smoke"
+      },
+      {
+        "number": 58,
+        "name": "Save and replay recovery smoke"
+      },
+      {
+        "number": 59,
+        "name": "Test"
+      },
+      {
+        "number": 60,
+        "name": "Publish reproducible pre-alpha package"
+      },
+      {
+        "number": 61,
+        "name": "Packaged client fresh-install smoke"
+      },
+      {
+        "number": 62,
+        "name": "Packaged startup menu lifecycle"
+      },
+      {
+        "number": 63,
+        "name": "Two-opponent full-match validation"
+      },
+      {
+        "number": 64,
+        "name": "Upload pre-alpha package"
+      }
+    ],
+    "previousHistoricalStep37Failure": "Not reproduced or reattributed. Current failure occurs before build.",
+    "logTextSha256": "5e2c0c3e51ec169e53857154c3715cf8b213701b0d5b8411ebe3acaf85c96027",
+    "logExcerpt": [
+      "2026-10-20T20:07:10.4793503Z      | Each PR requires exactly one PATCH increment: expected 0.1.425, received 0.1.424. Run Increment-PrVersion.ps1",
+      "2026-10-20T20:07:10.5351895Z ##[error]Process completed with exit code 1."
+    ]
+  },
+  "unmeasuredCurrentGates": {
+    "compiledGameplayTextureBytes": null,
+    "selectedCombatGroupAllocatedBytes": null,
+    "completeReleaseBuild": null,
+    "completeSolutionTests": null,
+    "nativeD3D12Performance": null,
+    "sourceLessRuntimeAssetParity": null,
+    "liveThirtyMinuteSoak": null,
+    "humanVisualReview": null
+  },
+  "availableExecution": {
+    "os": "Linux",
+    "dotnetAvailable": false,
+    "pwshAvailable": false,
+    "nativeWindowsD3D12Available": false,
+    "performanceRunnerInventory": "unverified",
+    "performanceRunnerInventoryReason": "GitHub connector rejects the actions/runners URL (HTTP 400 INVALID_ARGUMENT); this does not prove runner absence."
+  }
+}

@@ -1,0 +1,320 @@
+# Render qualification checkpoint
+
+Status: **qualification tooling implemented; native product acceptance open**.
+The implementation preserves evidence and enforces validation boundaries.
+Unavailable product metrics and unexecuted hardware checks remain open. This
+checkpoint contains no newly measured GPU speedup, complete-frame timing or
+memory-plateau claim.
+
+## Baseline pre-check, 20 October 2026
+
+The checked current master is
+`e42ae48346bbb1331b7a548a72fc0905ae6d184a`, product `0.1.424-dev`,
+SDK `10.0.401` with `latestPatch`, C# 14 and Microsoft.Testing.Platform.
+The older analysis source `874b1652bc272ef648120a0b1de9bc85edf5f70c`
+is a historical anchor, not this implementation's baseline measurement.
+
+The foundation is integrated at
+`17810ee192fac495173a7e9da44c973595833f2b`; its repair is integrated at
+`d4c7b62077c98500d6309cdd6c6dbf5e6bd6490c`. The accepted
+[release record](../parallelization/Acceptance.json) is present on current master
+with `parallelReleased: true`. PR #241 recorded explicit owner approval of the
+six foundation images. That approval covers the foundation comparison and does
+not accept later rendering changes or this qualification's native matrix.
+
+At the pre-check there were no open PRs. The remote composition/effects branch
+was an independent, disjoint rendering workstream. This qualification starts on
+`testing/render-performance-qualification` from the checked master. No existing
+qualification implementation was replaced.
+
+## Current mandatory CI failure
+
+[Current master CI run 39488943266](https://github.com/DaveBeusing/Forgeline/actions/runs/39488943266),
+[job 118856962021](https://github.com/DaveBeusing/Forgeline/actions/runs/39488943266/job/118856962021),
+failed at step 4, `Validate one version increment per PR`. The full fetched job
+log reports at 20:07:10 UTC that the policy expected **0.1.425** but received
+**0.1.424**. Its explicit version base was
+`cdf97fb9a8ef277cf75d451476a21128d398007c`, and its head was the checked
+`e42ae48346bbb1331b7a548a72fc0905ae6d184a`.
+
+All subsequent build, complete-test, content, WARP, window-mode, benchmark,
+source-less package and full-match validation steps were skipped. Consequently,
+this run does not establish a current content-budget or allocation result.
+[Movement quality run 39488943365](https://github.com/DaveBeusing/Forgeline/actions/runs/39488943365)
+passed for the same master, but does not replace the required main CI.
+
+[Earlier main CI run 39481874522](https://github.com/DaveBeusing/Forgeline/actions/runs/39481874522)
+was verified successful at source
+`ef83d2d586aa2f0059bc6b860f95a1bc085ef917`. Its job steps include successful
+runtime assets, full tests, native WARP, windows and packaging. This is a
+different source; it is not substituted for the failed integrated master run.
+
+The historical 8,104-byte allocation discrepancy and 99,608,050 compiled texture
+bytes described by the earlier analysis were not reproduced in the current
+pre-check. The latter refers to compiled gameplay texture/container content
+against a 56-MiB gate, not physical GPU memory. Current master CI stopped before
+those checks. Their old values must not be serialized as current observations.
+
+The workstream's isolated PATCH preparation follows the current master-plus-one
+policy. A later successful PR run can establish its own source validation; it
+cannot rewrite the failed baseline run or manufacture missing baseline samples.
+
+## Available execution and runner evidence
+
+The local execution system provides Python and Git. `dotnet` and `pwsh` were not
+on PATH, and no Windows/D3D12 execution surface was available at the pre-check.
+The existing `frame-hotpaths.yml` uses `windows-latest` for functional and
+allocation checks, not a verified physical performance runner.
+
+The read-only repository runner-inventory request to
+`GET /repos/DaveBeusing/Forgeline/actions/runners?per_page=100` was rejected by
+the available GitHub connector with `HTTP 400 / INVALID_ARGUMENT` because the
+endpoint was not allowed. **Runner availability is unverified.** This response
+does not prove that no runner exists. No runner was installed and no physical
+workflow was queued based solely on label names.
+
+The optional workflow requires its own successful hosted inventory check before
+scheduling native execution. A permissions error, unavailable runner or failed
+exact-source CI produces an open admission result. WARP and hosted contracts
+cannot stand in for qualified hardware.
+
+## Gate table
+
+| Gate | Current evidence boundary |
+| --- | --- |
+| Foundation and path ownership | Integrated accepted manifest; dedicated paths validated separately |
+| Evidence/statistical contracts | Executable Python and PowerShell regression suites; final run records accompany the implementation commits |
+| Focused real-sample regression | Client sample boundary tests plus the existing renderer/extraction/index classes |
+| Full source-pinned CI | Pre-existing master version failure; candidate checks must be evaluated at their actual SHA |
+| Compiled content | Current baseline run skipped the gate; no invented byte result |
+| Native paired timing | Unexecuted for this qualification; physical-runner admission unverified |
+| Observed hardware stability | Current collector reports thermal state unavailable; a measured condition provider is required even with a reviewed calibration record |
+| Complete live-client frame | Exporter lacks the enclosing host interval; supplemental producer requires serial integration |
+| Raw GPU timestamp proof | Derived native timings available in the format; original tick/completion observations require serial export |
+| Full GPU memory and allocation budgets | Scoped existing counters are insufficient for the complete independent gates |
+| Moving 30-minute lifecycle | Required actual workload and comparable resource plateau remain unexecuted |
+| Native pixel and motion review | No new review decision; previous foundation approval is kept separate |
+
+See [integration requirements](IntegrationRequirements.md) for exact missing
+records and frozen owner paths. A report with one open or failed required gate is
+not accepted. The physical workflow uses `--require-accepted` and retains that
+status even if individual capture commands return success.
+
+## Implementation verification checkpoint
+
+[Draft PR #268](https://github.com/DaveBeusing/Forgeline/pull/268) contains the
+qualification implementation on `testing/render-performance-qualification`.
+The initial implementation source is
+`8458f89af9397c8566e2f898ae8838a0dddee04a`, with the isolated product PATCH
+`0.1.425-dev` against master `e42ae48346bbb1331b7a548a72fc0905ae6d184a`.
+The remote contents of all 15 qualification files at the initial PR head matched
+the reviewed local Git blob identities.
+
+The local Python command
+`python -m unittest discover -s build/rendering/qualification -p 'test_*.py' -q`
+passed 54 tests. The existing ownership checker accepted all 15 dedicated paths;
+the only additional path was the separately inspected one-line PATCH change.
+Workflow YAML parsed successfully. The ten new Client test cases were checked
+against the existing collector signatures and friend-assembly access.
+
+The first [qualification run 39494628556](https://github.com/DaveBeusing/Forgeline/actions/runs/39494628556/job/118876342527)
+passed all 54 Python tests and nine existing ownership tests on Windows. Step 7,
+`PowerShell command journaling and orchestration contracts`, then failed with
+exit 1 because internal asynchronous-copy return values accompanied the command
+journal. The consumer could not obtain `exitCode` from that mixed result.
+Subsequent steps in that job were skipped. The correction suppresses those four
+internal return values and adds single-journal assertions for success, native
+failure, a thrown child error and timeout. This failed attempt remains part of
+the record; it is not rerun without a code change.
+
+The [following qualification run 39495339363](https://github.com/DaveBeusing/Forgeline/actions/runs/39495339363/job/118878843053)
+on `7daf88b8b4502357f3af2eebd6358e5711e6d806` passed the new single-journal
+and native-exit assertions, then failed the literal-argument output assertion.
+Its old test cleanup did not retain the actual child bytes, so a specific
+encoding cause cannot be claimed retrospectively. The test now emits explicit
+UTF-8 bytes, compares the complete expected byte sequence and prints both hex
+values on mismatch. Failed synthetic fixtures and journals are copied to a fresh,
+checksum-verified artifact before cleanup; retention failure keeps the original
+temporary evidence. Native command logs continue to preserve original bytes.
+
+The [initial main CI run 39494628176](https://github.com/DaveBeusing/Forgeline/actions/runs/39494628176/job/118876342772)
+passed its version and metadata checks on that exact source. This establishes
+that the proposed PATCH satisfies the PR rule; it does not revise the older
+failed master result. The first and following main attempts were later canceled
+after source corrections while compiling runtime assets. Neither completed the
+mandatory suite, and neither substitutes for a successful current-source run.
+
+### Verified executable checkpoint
+
+The following results were verified for the exact executable source
+`8d4748d3228c49e50ae26600c1c65938687ef9dd` on 20 October 2026. They do not
+automatically apply to a later source revision.
+
+| Workflow | Actual run | Result at checkpoint |
+| --- | --- | --- |
+| Render qualification | [39496210338, job 118881794257](https://github.com/DaveBeusing/Forgeline/actions/runs/39496210338/job/118881794257) | Completed successfully: evidence/ownership contracts, PowerShell orchestration and existing reference tools, complete PlanOnly report, Release build, runtime fixtures and real frame/renderer regression checks. Both physical jobs were skipped. |
+| Frame hot paths | [39496209906, job 118881793062](https://github.com/DaveBeusing/Forgeline/actions/runs/39496209906/job/118881793062) | Completed successfully, including the unchanged allocation guards and CPU report contracts. |
+| Scalability qualification | [39496209828, job 118881792067](https://github.com/DaveBeusing/Forgeline/actions/runs/39496209828/job/118881792067) | CPU qualification completed successfully. The separate native-reference job was skipped. |
+| Movement quality | [39496209816, job 118881793623](https://github.com/DaveBeusing/Forgeline/actions/runs/39496209816/job/118881793623) | Completed successfully. |
+| Main CI | [39496209833, job 118881998515](https://github.com/DaveBeusing/Forgeline/actions/runs/39496209833/job/118881998515) | At 21:16 UTC, steps 1 through 40 were successful, including versioning, Release build, runtime assets and compiled UI-atlas contracts. The complete suite and package steps had not run. This was not a completed mandatory-CI result. |
+
+The full qualification job/step response establishes its success. Original log
+download was unavailable through the observed execution service, so no additional
+PowerShell assertion count or detailed C# result count is inferred from step
+names. The implementation contains ten new C# cases, and their focused test step
+completed successfully. The 54 local Python tests have a separately retained
+successful command result.
+
+The following documentation revision records the precise compiled-content and
+historical allocation context in
+[integration requirements](IntegrationRequirements.md#exact-compiled-content-metric).
+It preserves the known distinction between an analysis anchor and the unknown
+original measurement SHA for the historical 8,104-byte discrepancy. Current
+tooltip/status zero-allocation coverage, the separate bounded summary contract,
+actual warmup windows, GC/tiering configuration and MTP reproduction commands
+are documented without changing those tests or their budgets.
+
+The final branch revision requires its own complete main CI and current hosted
+checks. The PR's validation section records that final source and the actual
+outcomes. Review those runs before resuming; an earlier successful workflow or
+an incomplete/superseded main attempt is not a substitute.
+
+Native admission, thermal observations, full live-client timing, original GPU
+timestamps, complete budgets, the moving lifecycle and human review remain the
+specific outstanding acceptance requirements described above. The status stays
+**implemented, not yet accepted** while any required gate is open or failed.
+
+## Resume and integration
+
+Read the actual branch commits, PR checks and retained attempt files first.
+Revalidate current master and the one-PATCH delta before integration. The
+remaining sequence is to finish the implementation's hosted validation, obtain
+source-specific successful mandatory checks, verify reviewed hardware/capacity,
+execute the fixed native matrix and lifecycle workload, bind the remaining
+product evidence through serial integration, and record exact human review.
+No rerun, updated image, merge, tag or release is authorized by this checkpoint.
+
+This implementation does not repair frozen renderer or central workflow files,
+raise content/timing budgets, disable tests or accept new goldens. Required
+out-of-scope failures remain visible with their source and reproduction context.
+
+## Master reconciliation, 20 October 2026
+
+During hosted verification, master advanced from
+`e42ae48346bbb1331b7a548a72fc0905ae6d184a` to
+`2b4b61ece625d1311c9ee5564cf513dadf2d1123` through
+[PR #267](https://github.com/DaveBeusing/Forgeline/pull/267). Its product version
+is `0.1.425-dev`. The qualification branch integrates that exact master and
+adjusts its isolated version delta to **`0.1.426-dev`**, exactly one PATCH above
+the new base. The earlier `0.1.425-dev` checkpoint remains historical; it does
+not reserve or duplicate the new master's version.
+
+The base delta changes composition shaders, particle submission/ordering and
+that workstream's tests and evidence. None of the 15 qualification paths or the
+four invoked central capture/comparison scripts changed. The shared version
+file had identical `425` blobs on both branches. The integration keeps the
+master's complete tree and overlays only the qualification-owned paths, then
+applies the isolated `425` to `426` change. No functional conflict is resolved by
+choosing an entire branch's version of unrelated files.
+
+The required ownership base is now the integrated master
+`2b4b61ece625d1311c9ee5564cf513dadf2d1123`; the workflow already obtains it
+from the PR event. Earlier baseline/cohort identities stay pinned to their
+actual sources. The original source checkpoint and all older CI records are not
+relabelled as measurements of the new master.
+
+The native sample/export schemas remain unchanged, but the new implementation
+changes what several measurements contain. `PreparationCpuMilliseconds` now
+times the inner particle submission; wrapper diagnostics copying and argument
+validation sit outside that subphase. The enclosing native CPU interval still
+includes outer preparation, rendering and Present. Retained depth-key,
+candidate and authorization scratch also changes managed memory, while
+`BufferBytes` still describes renderer GPU buffers rather than total memory.
+Neither subphase timing nor that buffer counter establishes the complete-frame
+timing or memory gate.
+
+Particle depth ordering, copied-snapshot admission and event priority affect
+moving, off-axis and dense effects. Composition changes also affect the regular
+shader paths while `COMPOSITION_SHARED_LINEAR` remains disabled. Equal asset,
+profile and runtime fingerprints therefore do not prove an unchanged image:
+`qualityChanged` does not detect internal shader edits. Comparisons across
+these intentional changes require visual-candidate context and fresh human
+image/motion review. The additional WARP composition tests, synthetic CPU
+ordering checks and current-thread preparation allocation test (64 warmups,
+128 calls) do not replace the fixed 512-sample full-frame measurement or moving
+lifecycle evidence.
+
+Before this base change was reconciled,
+[qualification run 39499174312](https://github.com/DaveBeusing/Forgeline/actions/runs/39499174312/job/118891971370)
+completed successfully on `f4f3bed845e1106972f5c32fe903df2f251592c1`, including
+all executed ownership, Python, PowerShell, PlanOnly, Release, runtime and
+frame/renderer steps. Its two physical jobs were skipped. Frame hot paths,
+Scalability CPU qualification and Movement quality also passed. The associated
+main CI was still incomplete. These results describe the
+old source; the integrated branch requires its own complete validation.
+
+The actual new-master
+[CI run 39499494041](https://github.com/DaveBeusing/Forgeline/actions/runs/39499494041/job/118893071655)
+passed versioning, Release build and steps through the single-object ring
+contracts, and was compiling runtime assets at the reconciliation check. Its
+complete suite was not yet established. The independently checked earlier
+[full-suite run 39491919890](https://github.com/DaveBeusing/Forgeline/actions/runs/39491919890/job/118867002375)
+on PR #267's functional source
+`7a42e0c4299bc0a822edd5bffb3e4c7309bbe547` failed step 59, `Test`.
+Steps 1 through 58 passed; package/product steps 60 through 64 were skipped.
+The exact failing test was not recovered in the recorded diagnostics. This is a
+known unresolved prior result, not proof of a particular regression in the
+integrated master or this qualification. The qualification must not replace either result with a claim
+based on green partial checks.
+
+The PR records the integrated source SHA and the eventual exact-source workflow
+results. Native timing, complete host/timestamp/memory exports, hardware
+conditions, lifecycle execution and human review remain open regardless of a
+successful hosted build. Recheck master and the net single-PATCH delta again
+before integration; no merge, tag or release follows from these checkpoints.
+
+## Asset-readiness master reconciliation
+
+Master advanced again through
+[PR #269](https://github.com/DaveBeusing/Forgeline/pull/269), from
+`2b4b61ece625d1311c9ee5564cf513dadf2d1123` to
+`d3acf9b0fb94da75ecfd26173cc387398f317096`, version `0.1.426-dev`.
+The qualification branch incorporates that complete tree and adjusts its
+isolated PATCH to **`0.1.427-dev`**. The prior `426` version file is identical
+on both sides. Qualification ownership and the current PR base now refer to
+this newer master; older cohort identities retain their original sources.
+
+This delta adds asset-readiness inventory/evidence, Blender tooling, six portable
+inventory tests and an opt-in typed Blender comparison. Its optional comparison
+parameters retain the existing defaults. It changes no production renderer,
+runtime asset source, qualification-owned path or central capture/comparison
+script. The native pilot recorded by that separate change is bound to
+`e822ec063c91cb103d3dace66b458fd9ec418b59` and uses three warmups
+and eight samples for three 1080p High/NormalGameplay scene pairs. Its repeated
+images are not independent AB/BA timing pairs. Those
+source-specific functional images do not satisfy this qualification's five
+paired repetitions, 512 warm samples, full matrix, lifecycle or human review.
+
+The preceding integrated source
+`1a0117802db3079fec315426d1b5486d7a680c34` completed all five hosted workflows
+successfully. Its
+[main CI 39502665822](https://github.com/DaveBeusing/Forgeline/actions/runs/39502665822/job/118904296158)
+passed the full suite, reproducible package, fresh-install and startup checks,
+two-opponent full-match validation and artifact uploads. The corresponding
+[master CI 39499494041](https://github.com/DaveBeusing/Forgeline/actions/runs/39499494041/job/118893071655)
+also completed successfully on `2b4b61ece625d1311c9ee5564cf513dadf2d1123`.
+
+The preceding qualification's PlanOnly artifact, ID `12302113270`, has ZIP
+SHA-256 `7f8dce6226f6c9f72c53ec79bc0afbf37612d37049b70646e02a934a69daf5ac`,
+matching GitHub metadata. It preserves 216 cases per side/pair, five pairs,
+512 warm samples, 64 warmups and 128 cold samples. It contains no native
+observations; all twelve product gates are open. These successful checks and
+the verified plan remain evidence of that preceding source, not the new merge.
+
+The PR records the new integrated head and its own actual CI results. The new
+master's exact-source main run is
+[39506391125](https://github.com/DaveBeusing/Forgeline/actions/runs/39506391125).
+No earlier successful run is substituted for either new source. The remaining
+native and serial integration requirements stay open; status remains
+**implemented, not yet accepted**.
+
