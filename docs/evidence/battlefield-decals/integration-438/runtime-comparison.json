@@ -1,0 +1,226 @@
+{
+  "success": true,
+  "beforeAssets": 1363,
+  "afterAssets": 1365,
+  "newIds": [
+    "texture.world.decal.atlas_normal",
+    "texture.world.decal.atlas_orm"
+  ],
+  "changedPayloads": [
+    "material.world.decal.blast_mark",
+    "material.world.decal.concrete_crack",
+    "material.world.decal.oil_stain",
+    "material.world.decal.road_wear",
+    "material.world.decal.scorch_mark",
+    "material.world.decal.shell_impact",
+    "material.world.decal.tire_tracks",
+    "material.world.decal.tracked_vehicle_marks",
+    "mesh.world.decal.quad",
+    "texture.world.decal.atlas_base"
+  ],
+  "unchangedPayloads": 1353,
+  "metadataChanges": [
+    {
+      "id": "material.world.decal.blast_mark",
+      "field": "dependencies",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.blast_mark",
+      "field": "textureReferences",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.concrete_crack",
+      "field": "dependencies",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.concrete_crack",
+      "field": "textureReferences",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.oil_stain",
+      "field": "dependencies",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.oil_stain",
+      "field": "textureReferences",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.road_wear",
+      "field": "dependencies",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.road_wear",
+      "field": "textureReferences",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.scorch_mark",
+      "field": "dependencies",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.scorch_mark",
+      "field": "textureReferences",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.shell_impact",
+      "field": "dependencies",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.shell_impact",
+      "field": "textureReferences",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.tire_tracks",
+      "field": "dependencies",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.tire_tracks",
+      "field": "textureReferences",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.tracked_vehicle_marks",
+      "field": "dependencies",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    },
+    {
+      "id": "material.world.decal.tracked_vehicle_marks",
+      "field": "textureReferences",
+      "before": [
+        "texture.world.decal.atlas_base"
+      ],
+      "after": [
+        "texture.world.decal.atlas_base",
+        "texture.world.decal.atlas_normal",
+        "texture.world.decal.atlas_orm"
+      ]
+    }
+  ],
+  "beforeTotalBytes": 74845298,
+  "afterTotalBytes": 75112982,
+  "beforeTextureContainerBytes": 59454336,
+  "afterTextureContainerBytes": 59719691,
+  "gameplayTextureContainerBytes": 57933274,
+  "unchangedGameplayLimit": 58720256,
+  "residentAtlasTexels": 783360,
+  "headroomBytes": 786982,
+  "beforeManifestSha256": "d9975cdcf5da0b0e03f30087457a11ccd6c6e7866eb267b866d57e33c1a0449d",
+  "afterManifestSha256": "f7d0d6adb9d6fa4da19afcdd0c521911b457837c168dcb538c845d38f6a66cd7"
+}

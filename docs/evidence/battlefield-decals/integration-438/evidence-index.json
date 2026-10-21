@@ -1,0 +1,644 @@
+{
+  "source": "c7cbb542c77f56ce5de0988e043ad65495b12b37",
+  "master": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "version": "0.1.438",
+  "rawArchive": {
+    "path": "artifacts/battlefield-decal-integration438.zip",
+    "bytes": 105030101,
+    "sha256": "ff3058943dcaeff0e09839211c21579f21d9e3a7215ef74fdb9c0d02efc34fc2",
+    "entries": 125,
+    "allEntryHashesVerified": true
+  },
+  "originalFiles": [
+    {
+      "path": "capture_decal438r2.ps1",
+      "bytes": 3447,
+      "sha256": "df7305ab861372b54fdd056dd85ce34c41a4b32bfa3cb7946558bd51a8669872"
+    },
+    {
+      "path": "capture_installed_decal438r2.ps1",
+      "bytes": 1357,
+      "sha256": "9eba9810140e34668388c8c0e0205cd646633c9713515d3ffe8c81b17f9ccc08"
+    },
+    {
+      "path": "compare_decal438r2_equivalence.py",
+      "bytes": 1743,
+      "sha256": "586b8a5d125ed64fe9868be2befc66661def496ebee62c2dd97bb4e61472a33c"
+    },
+    {
+      "path": "compare_decal438r2_runtime.py",
+      "bytes": 2696,
+      "sha256": "9912ec8e7530629739fc44f8dc91e5b7e0ef5269ea4c88cd14a07e49c0feb126"
+    },
+    {
+      "path": "dcn438r2/dense-close/after/comparison.json",
+      "bytes": 973,
+      "sha256": "d0d9cc9cc08ecb66bf02d0d273ce97ec4a64f867cc93c4d4bb9ae48875254599"
+    },
+    {
+      "path": "dcn438r2/dense-close/after/Decals1000-1920x1080-High-CloseTactical-Inspection80.png",
+      "bytes": 4990611,
+      "sha256": "406a3ce7ce2d19146f94bfcf58b848f4b12e0d74bfd1aa2290e817f9fee29de0"
+    },
+    {
+      "path": "dcn438r2/dense-close/after/manifest.json",
+      "bytes": 228136,
+      "sha256": "1b0212fbd076dcc50da2f2be40e525987f977fb3d2e7011c21c1583336617c8f"
+    },
+    {
+      "path": "dcn438r2/dense-close/after.request.json",
+      "bytes": 1471,
+      "sha256": "a8b1b695ff8a7d16b1207070ca56a27d28ae66bd9274de59fd56734e3719f2ce"
+    },
+    {
+      "path": "dcn438r2/dense-close/before/comparison.json",
+      "bytes": 973,
+      "sha256": "80eba7a2ed43b0e553d5f3dd0435d3eb2a1bd2226f777410c9bbbc29e1fae41d"
+    },
+    {
+      "path": "dcn438r2/dense-close/before/Decals1000-1920x1080-High-CloseTactical-Inspection80.png",
+      "bytes": 6083763,
+      "sha256": "6a9f5c0414577e281937d015aacc7fa29639a5caa59624712ca4bc38cbf6a59a"
+    },
+    {
+      "path": "dcn438r2/dense-close/before/manifest.json",
+      "bytes": 228120,
+      "sha256": "dd92a114ceb731bde3c7a847587a184ba1ae08fba6220f3a24045b3fe19a1026"
+    },
+    {
+      "path": "dcn438r2/dense-close/before.request.json",
+      "bytes": 1472,
+      "sha256": "a6d31c38a50e34c632ff645ae2f347e7756e33c427496c22f4694feca93a2df1"
+    },
+    {
+      "path": "dcn438r2/dense-close/performance.json",
+      "bytes": 2858,
+      "sha256": "dd61aebd871783871865ef63d56be9a02967ab981fe3499a249ac6841450c71e"
+    },
+    {
+      "path": "dcn438r2/dense-close/pixels.json",
+      "bytes": 1252,
+      "sha256": "ee715c4f095892305183228815d8e0bf07a4af753c7cc0cd63312910deaf541c"
+    },
+    {
+      "path": "dcn438r2/dense-close-after.log",
+      "bytes": 68,
+      "sha256": "ec79445ad855ad3d2ecb0b14b7f287771fdc7557d5c3c14feb4ee190c16a91a3"
+    },
+    {
+      "path": "dcn438r2/dense-close-before.log",
+      "bytes": 68,
+      "sha256": "ec79445ad855ad3d2ecb0b14b7f287771fdc7557d5c3c14feb4ee190c16a91a3"
+    },
+    {
+      "path": "dcn438r2/dense-close-performance.log",
+      "bytes": 88,
+      "sha256": "71b80b1c358340df7a21d430492396da63c09a09d5c0f0e7d969306f13b3dfc0"
+    },
+    {
+      "path": "dcn438r2/dense-close-pixels.log",
+      "bytes": 68,
+      "sha256": "ec79445ad855ad3d2ecb0b14b7f287771fdc7557d5c3c14feb4ee190c16a91a3"
+    },
+    {
+      "path": "dcn438r2/gallery/after/comparison.json",
+      "bytes": 3279,
+      "sha256": "d04395dba8d332d84d0860bed5f2490dba634642c7e14846594bb7c0906db3a3"
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4119553,
+      "sha256": "f0d43cdfceb6dde1e9cfcd5bb5aa4d4ed273afd3cae607c3933adb0cd07c4cbf"
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4256088,
+      "sha256": "b8eb3bf0c66b2bb5d20b122ee36c0d75c147e8e97ff0dfd60a48ae6d2432f48c"
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4215121,
+      "sha256": "03ca549c3abe9efd4c8a3de3dd4fec7312c022bfbe6747ebfc768d1d08a2380b"
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 5116907,
+      "sha256": "7913745cf1d4d695d53eaf5fe29a3b066534de95d61ed142f3a8867f7156513c"
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 3935961,
+      "sha256": "5e7a2a7a23f4575602ccd03f477cabc19adef9b7b01a659f50440a80848796bf"
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalsOverlap-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4189649,
+      "sha256": "508f5f8b9a6655c07c8dd51f29e972087e60862cd194be4bcaab0ba5eb1da0b2"
+    },
+    {
+      "path": "dcn438r2/gallery/after/manifest.json",
+      "bytes": 1352046,
+      "sha256": "f5f5268747bdd74d0bc9e598d259bac2d94d935c64b23c3ef07825607a77d6a5"
+    },
+    {
+      "path": "dcn438r2/gallery/after.request.json",
+      "bytes": 1605,
+      "sha256": "93d368f5535a40946014ce77412415ede7fe92fe255e0beef4540632fea5ffef"
+    },
+    {
+      "path": "dcn438r2/gallery/before/comparison.json",
+      "bytes": 3272,
+      "sha256": "ce5a79282fb2cf51f9f22df236b74ad281958edf447e5e3a95f188b0ffb54182"
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4265200,
+      "sha256": "9d34f88952c27574738fd5aae891bd9b57973592302cae96cde88d4aa8c5a524"
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4370052,
+      "sha256": "ef0a865349fe99d84d11af2707b69297738c4b8153dcf84724e5aa03db56c94b"
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4342385,
+      "sha256": "b857518b805717408db943b9d46ec2c413ad198ea19fa820bd0bb0c3a6296a20"
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 5210229,
+      "sha256": "d320abe643da22f44d68fda27f449126c4bfa45b9c531bd9e146a9271ec76234"
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4074355,
+      "sha256": "f87423a3e254fb846c6a06b4f368bfe0d11afd4f97117280e44018e1ecae34f0"
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalsOverlap-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4493154,
+      "sha256": "dd318dc345ba64b8f26b11ca65ff55616e37ae187089b9a54171bb9a96c75863"
+    },
+    {
+      "path": "dcn438r2/gallery/before/manifest.json",
+      "bytes": 1352114,
+      "sha256": "aec0a3017cdb091c5526b7133a067c0ed7061dd3fbdd0aa54f5167db4cd74b0d"
+    },
+    {
+      "path": "dcn438r2/gallery/before.request.json",
+      "bytes": 1606,
+      "sha256": "f3797a785e25fd791aeaa9b6e90a1299aa4d4b4516ddc89e5f2f9c727baec9b4"
+    },
+    {
+      "path": "dcn438r2/gallery/performance.json",
+      "bytes": 15250,
+      "sha256": "bd2cf860c52a1e8a8272775d1235f9dee4c1095f9452158fc364f6e5b0fd44e4"
+    },
+    {
+      "path": "dcn438r2/gallery/pixels.json",
+      "bytes": 4763,
+      "sha256": "6b826db1ece96e3138d2e8c1ef76fc235408e3ddec6d27d6fad83a9095c8211b"
+    },
+    {
+      "path": "dcn438r2/gallery-after.log",
+      "bytes": 68,
+      "sha256": "db0fcefaa15dfa8554b57b84a5ae6e247589fd8c4437117aea0fdc92a80342c8"
+    },
+    {
+      "path": "dcn438r2/gallery-before.log",
+      "bytes": 68,
+      "sha256": "db0fcefaa15dfa8554b57b84a5ae6e247589fd8c4437117aea0fdc92a80342c8"
+    },
+    {
+      "path": "dcn438r2/gallery-performance.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dcn438r2/gallery-pixels.log",
+      "bytes": 68,
+      "sha256": "db0fcefaa15dfa8554b57b84a5ae6e247589fd8c4437117aea0fdc92a80342c8"
+    },
+    {
+      "path": "dcn438r2/gpu-continuous.csv",
+      "bytes": 20630,
+      "sha256": "9effe14f2edef57c369cb939b084550446292b9180bf620cc3e0b9b3699e0fd7"
+    },
+    {
+      "path": "dcn438r2/gpu.csv",
+      "bytes": 1866,
+      "sha256": "a079f83669ab86f7f90503f5b0a260f827cbec1310bfdc02122fd80c3f3d8189"
+    },
+    {
+      "path": "dcn438r2/loads/after/comparison.json",
+      "bytes": 1834,
+      "sha256": "61b4a970a12eece1329b40949225c4e756a5288ecd80887b994292aa1af65d90"
+    },
+    {
+      "path": "dcn438r2/loads/after/Decals100-1920x1080-High-NormalGameplay.png",
+      "bytes": 4026490,
+      "sha256": "3605b502ee010def7b14bbd2e6c514ec43e9dedf927faf67a37c6f095488f5d6"
+    },
+    {
+      "path": "dcn438r2/loads/after/Decals1000-1920x1080-High-NormalGameplay.png",
+      "bytes": 4103672,
+      "sha256": "ee732006fa7904516a65fb9b19ffbf5610cc89778dc8f44e269faab8bbf9bea7"
+    },
+    {
+      "path": "dcn438r2/loads/after/DecalSingle-1920x1080-High-NormalGameplay.png",
+      "bytes": 4017662,
+      "sha256": "c3d30c3b1e2a180d2f91c65267cf1a96a8b01a622af69337c5fe8adad975961b"
+    },
+    {
+      "path": "dcn438r2/loads/after/manifest.json",
+      "bytes": 678343,
+      "sha256": "b523d1902e3f428cec7eab25188077b1edee7e0235f6f7f56214ff114b5e2dd7"
+    },
+    {
+      "path": "dcn438r2/loads/after.request.json",
+      "bytes": 1503,
+      "sha256": "73b4c032b22ed18139c14fa708f54122ad6986b72d434770084458d65e214fe2"
+    },
+    {
+      "path": "dcn438r2/loads/before/comparison.json",
+      "bytes": 1839,
+      "sha256": "582f5d46f3c950109a962eb9fe2f8bcd53f4d97ded43c01d3026753fa0ebb279"
+    },
+    {
+      "path": "dcn438r2/loads/before/Decals100-1920x1080-High-NormalGameplay.png",
+      "bytes": 4039931,
+      "sha256": "e443e29fe0d94008da009faace5a27eb053ff9eeee3c7a08544055cd5078e110"
+    },
+    {
+      "path": "dcn438r2/loads/before/Decals1000-1920x1080-High-NormalGameplay.png",
+      "bytes": 4224166,
+      "sha256": "c4046f8bd55ecdf41311bdb5ee27bf7e23cb6affc41ced07ed4f59f6ffe141cf"
+    },
+    {
+      "path": "dcn438r2/loads/before/DecalSingle-1920x1080-High-NormalGameplay.png",
+      "bytes": 4017410,
+      "sha256": "a43bb28f4c9500fcfd9a080ba944998f2148b4eab5321e00dac46c1c769d513a"
+    },
+    {
+      "path": "dcn438r2/loads/before/manifest.json",
+      "bytes": 677620,
+      "sha256": "7716f1d1435f802fe5457bf60225d8d6de166af0d09c9b70afe01459c54f2cd0"
+    },
+    {
+      "path": "dcn438r2/loads/before.request.json",
+      "bytes": 1504,
+      "sha256": "87d9d001794710108ce598d23fd02207c8d78135ef8ea62d41bec1ff9c4bcdef"
+    },
+    {
+      "path": "dcn438r2/loads/performance.json",
+      "bytes": 7767,
+      "sha256": "81ee83edbcf18afd0fe510a335fcf03200995df5be7a13a0a51562054c90d6dd"
+    },
+    {
+      "path": "dcn438r2/loads/pixels.json",
+      "bytes": 2601,
+      "sha256": "ba16068e6150c4fb5500a47e021b594e4e2aedec2e41f02198400d49c51577ed"
+    },
+    {
+      "path": "dcn438r2/loads-after.log",
+      "bytes": 68,
+      "sha256": "ac7cd11e99629adf8c4104b203a75e41de8eb389024da7e35d47c3c8ed3edfa4"
+    },
+    {
+      "path": "dcn438r2/loads-before.log",
+      "bytes": 68,
+      "sha256": "ac7cd11e99629adf8c4104b203a75e41de8eb389024da7e35d47c3c8ed3edfa4"
+    },
+    {
+      "path": "dcn438r2/loads-performance.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dcn438r2/loads-pixels.log",
+      "bytes": 68,
+      "sha256": "ac7cd11e99629adf8c4104b203a75e41de8eb389024da7e35d47c3c8ed3edfa4"
+    },
+    {
+      "path": "dcn438r2/planned-matrix.json",
+      "bytes": 911,
+      "sha256": "5742d2c648de0ff51a717e09f0349b4944cb808fb975234fce874651281de432"
+    },
+    {
+      "path": "dcn438r2/summary.json",
+      "bytes": 942,
+      "sha256": "324fcb53b74a1b121d595cb22fa208a8e49ae96d1e37254a0e5634ac9fcfbca2"
+    },
+    {
+      "path": "dcni438r2/dense-close/comparison.json",
+      "bytes": 1029,
+      "sha256": "974f473c4642c3c334bb2818d8dcc5b95e7960cb6b2fcc7c391c45668578062a"
+    },
+    {
+      "path": "dcni438r2/dense-close/Decals1000-1920x1080-High-CloseTactical-Inspection80.png",
+      "bytes": 4990611,
+      "sha256": "406a3ce7ce2d19146f94bfcf58b848f4b12e0d74bfd1aa2290e817f9fee29de0"
+    },
+    {
+      "path": "dcni438r2/dense-close/manifest.json",
+      "bytes": 224355,
+      "sha256": "590801a17f72116c082cbf25b18534e3d38abb41a7016b42d462e9e004d293ad"
+    },
+    {
+      "path": "dcni438r2/dense-close/pixels.json",
+      "bytes": 1211,
+      "sha256": "3bf8bea530307d30e0be3a51e79609027886d12abe110c88ea0047e76ab0e678"
+    },
+    {
+      "path": "dcni438r2/dense-close.request.json",
+      "bytes": 1459,
+      "sha256": "2269fcb78c7fb88ef79cd1eafb3d990668dd09d3680e4db3f08185aa5846c21b"
+    },
+    {
+      "path": "dcni438r2/gallery/comparison.json",
+      "bytes": 2430,
+      "sha256": "aac5c47a415248822dee71321aa434ebf1b605b96e8ad91b780c508f9553cb7e"
+    },
+    {
+      "path": "dcni438r2/gallery/DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4119553,
+      "sha256": "f0d43cdfceb6dde1e9cfcd5bb5aa4d4ed273afd3cae607c3933adb0cd07c4cbf"
+    },
+    {
+      "path": "dcni438r2/gallery/DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4256088,
+      "sha256": "b8eb3bf0c66b2bb5d20b122ee36c0d75c147e8e97ff0dfd60a48ae6d2432f48c"
+    },
+    {
+      "path": "dcni438r2/gallery/DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4215121,
+      "sha256": "03ca549c3abe9efd4c8a3de3dd4fec7312c022bfbe6747ebfc768d1d08a2380b"
+    },
+    {
+      "path": "dcni438r2/gallery/DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 5116907,
+      "sha256": "7913745cf1d4d695d53eaf5fe29a3b066534de95d61ed142f3a8867f7156513c"
+    },
+    {
+      "path": "dcni438r2/gallery/manifest.json",
+      "bytes": 901758,
+      "sha256": "ce9b20d46f7bddd083ef2e3186ac2a9a85fb69c2618d416edae2b75dbf44ad0b"
+    },
+    {
+      "path": "dcni438r2/gallery/pixels.json",
+      "bytes": 3161,
+      "sha256": "078d9549257afa575ef9be48ab674aaa3e870f3bb8f7064c72eb814ab1227dc9"
+    },
+    {
+      "path": "dcni438r2/gallery.request.json",
+      "bytes": 1545,
+      "sha256": "368b882f7d4a813e59bc514e9d286554bbc15ae37b52422b8d875bbd0f3b186e"
+    },
+    {
+      "path": "dcni438r2/summary.json",
+      "bytes": 147,
+      "sha256": "bd26138da8f77059df9ccb92b6f70acefa051d8629c80c4454e38f27dd8c5c78"
+    },
+    {
+      "path": "decal438-inherited-frame-failure.log",
+      "bytes": 25737,
+      "sha256": "9db50b032f30b63d0c2b0d63c70eae6293d22bdf9cff25a7d0111b93424d4f75"
+    },
+    {
+      "path": "decal438r2-after-assets.json",
+      "bytes": 2110,
+      "sha256": "6b49f55db2038eca0baea49b8e8199478ba7f632bf8a417aa4d227f7b92a8102"
+    },
+    {
+      "path": "decal438r2-after-compile.log",
+      "bytes": 1803202,
+      "sha256": "d9bf5992ae569a7231bf226e9ab297e8ea2f7df39888ad45f1123daa9c5018f2"
+    },
+    {
+      "path": "decal438r2-after-source-less.log",
+      "bytes": 1887,
+      "sha256": "9bfbea72222a00c8b3804423f97bfc52281a7284bca7b030c19aa3f0349957be"
+    },
+    {
+      "path": "decal438r2-asset-tests.log",
+      "bytes": 596,
+      "sha256": "63d1f9a8727c57a9828d0f9686ae8567d1d695aeb7eb387442ec4bca688abdac"
+    },
+    {
+      "path": "decal438r2-before-assets.json",
+      "bytes": 2110,
+      "sha256": "ab6cb5adb87ead6fc6b020f66b4c947e5c1ea223c2b5d1843b3e669cc4bfe29f"
+    },
+    {
+      "path": "decal438r2-before-compile.log",
+      "bytes": 1907065,
+      "sha256": "743c9a46b9102be354df62731e4685b1e7980e0e19538133a4df721dfac4178e"
+    },
+    {
+      "path": "decal438r2-before-source-less.log",
+      "bytes": 1885,
+      "sha256": "47481b18666aa7e70dfb97bfe1bcef69c4930a3740649a6e50403362a18cc116"
+    },
+    {
+      "path": "decal438r2-build.log",
+      "bytes": 9458,
+      "sha256": "79ac43a0074e9b0d0ad0c3f2366d2a79af4b8d50dadc99c8c0aaf5db7cc151e7"
+    },
+    {
+      "path": "decal438r2-evidence-bundle.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal438r2-image-continuity.json",
+      "bytes": 14161,
+      "sha256": "1a6f3213c28a0eebdc052c4c2296d55cac3d4aec6c93335771795aee0a7bd01e"
+    },
+    {
+      "path": "decal438r2-installation.json",
+      "bytes": 707,
+      "sha256": "89a2a1b2b0acd166c6fc99fb3f5fdf33c221991a767cb1a86b8bda45bbad9d12"
+    },
+    {
+      "path": "decal438r2-installation.log",
+      "bytes": 707,
+      "sha256": "89a2a1b2b0acd166c6fc99fb3f5fdf33c221991a767cb1a86b8bda45bbad9d12"
+    },
+    {
+      "path": "decal438r2-installed-captures.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal438r2-installed-dense-close-pixels.log",
+      "bytes": 68,
+      "sha256": "ec79445ad855ad3d2ecb0b14b7f287771fdc7557d5c3c14feb4ee190c16a91a3"
+    },
+    {
+      "path": "decal438r2-installed-dense-close.log",
+      "bytes": 68,
+      "sha256": "ec79445ad855ad3d2ecb0b14b7f287771fdc7557d5c3c14feb4ee190c16a91a3"
+    },
+    {
+      "path": "decal438r2-installed-gallery-pixels.log",
+      "bytes": 68,
+      "sha256": "5e51e12a8ea03bdcde197f6be7e87dacf8b6a126a1635d502a722d0b47f3170f"
+    },
+    {
+      "path": "decal438r2-installed-gallery.log",
+      "bytes": 68,
+      "sha256": "5e51e12a8ea03bdcde197f6be7e87dacf8b6a126a1635d502a722d0b47f3170f"
+    },
+    {
+      "path": "decal438r2-installed-smoke/settings/FORGELINE/settings.json",
+      "bytes": 2116,
+      "sha256": "b6c286de08c3493b91a186c580d03bc424ac0e3148f4b806e12f0324cc38c8a0"
+    },
+    {
+      "path": "decal438r2-installed-smoke/startup.json",
+      "bytes": 10923,
+      "sha256": "d557cdbe9233d326c36b5962ff1d85a852121b3acf0fdb6c877fb97967fe6c59"
+    },
+    {
+      "path": "decal438r2-installed-smoke/status.json",
+      "bytes": 389,
+      "sha256": "dbf863e68496425e2db26656e3c7f4b748b3c6df88dff5a0aa5c1be049d54cb5"
+    },
+    {
+      "path": "decal438r2-installed-smoke/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal438r2-installed-smoke/stdout.log",
+      "bytes": 4697,
+      "sha256": "d57808fd55acff7461f5bd942412e1525ff963b5703f7e6c76e1496fd9511357"
+    },
+    {
+      "path": "decal438r2-installed-smoke/visual.json",
+      "bytes": 9674,
+      "sha256": "aa22a6610735b74d91dc54f9ff0cadf7cb75cb5dc8a834f2a7a34a5d0597930a"
+    },
+    {
+      "path": "decal438r2-native-inventory.json",
+      "bytes": 113485,
+      "sha256": "3bf93b0bdc4a5ff03398cfe441011af173b1f6a2863c0b7260b6660ce0842f99"
+    },
+    {
+      "path": "decal438r2-native-inventory.log",
+      "bytes": 619,
+      "sha256": "5a4512f0340eba3231816cb9d228678e9702777a69eec3707f238a348a65846e"
+    },
+    {
+      "path": "decal438r2-native-matrix.log",
+      "bytes": 177,
+      "sha256": "dd5c9973b476714accafb6fa2a66e6d71c8d0fcb2d59d35f60b65eb012d87c07"
+    },
+    {
+      "path": "decal438r2-package-status.json",
+      "bytes": 201,
+      "sha256": "89e276ccb50f721cb377bb5e22eb8e2beb167529b5dc5efa4ed61cd64c5bed33"
+    },
+    {
+      "path": "decal438r2-package.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal438r2-publish.log",
+      "bytes": 4409,
+      "sha256": "2d0870901bf068800889c8b50f4400ef1e92c413df1cba82f7965576fab124ea"
+    },
+    {
+      "path": "decal438r2-published-smoke/settings/FORGELINE/settings.json",
+      "bytes": 2116,
+      "sha256": "b6c286de08c3493b91a186c580d03bc424ac0e3148f4b806e12f0324cc38c8a0"
+    },
+    {
+      "path": "decal438r2-published-smoke/startup.json",
+      "bytes": 10947,
+      "sha256": "a29ef15e470dd28bf3266d50f007a8d2a0553e90c0cc40492dc33bb19323bfdc"
+    },
+    {
+      "path": "decal438r2-published-smoke/status.json",
+      "bytes": 434,
+      "sha256": "cdac22e410f73685d309ceb43e2f4912ed89d34640788706168e2cf58acc95e2"
+    },
+    {
+      "path": "decal438r2-published-smoke/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal438r2-published-smoke/stdout.log",
+      "bytes": 4739,
+      "sha256": "69e95aa90cfbb02caef141085c1ef5ef31373c76309b38df62f7cd4b312a34b7"
+    },
+    {
+      "path": "decal438r2-published-smoke/visual.json",
+      "bytes": 9674,
+      "sha256": "37aba04da58c94eb246f5aa5a8e59d115b6257cda6abb88f231d84c2d97421fc"
+    },
+    {
+      "path": "decal438r2-quality.json",
+      "bytes": 1679,
+      "sha256": "38aac0de146c57fdd38c590b6b6e876145f8120dc6ce2506eb59c9d819627fe0"
+    },
+    {
+      "path": "decal438r2-reference-tests.log",
+      "bytes": 1033,
+      "sha256": "3575e8b1877ca008851157fe671202e724c3ab48364383509d88485d0ef8ce7b"
+    },
+    {
+      "path": "decal438r2-runtime-comparison.json",
+      "bytes": 6381,
+      "sha256": "cfc24596e041a35bb76927f39be73e94880b574ffcbca35094f1f5a113aa0187"
+    },
+    {
+      "path": "decal438r2-runtime-comparison.log",
+      "bytes": 1830,
+      "sha256": "aa6e6e662acdc28f08de2754fdab090404cfbd7211dc63d4adfa67a7ea5f60ef"
+    },
+    {
+      "path": "decal438r2-runtime-equivalence.json",
+      "bytes": 1234,
+      "sha256": "ff1948315e55ab2ded5ce1e6bb457ff7448b12b29a613a46b533f57e17be7677"
+    },
+    {
+      "path": "decal438r2-runtime-equivalence.log",
+      "bytes": 1234,
+      "sha256": "ff1948315e55ab2ded5ce1e6bb457ff7448b12b29a613a46b533f57e17be7677"
+    },
+    {
+      "path": "decal438r2-source-lineage.json",
+      "bytes": 16815,
+      "sha256": "cb79e0422fd087d72ea4ccc0b5c1b850be1876fb418db6d8c16e0eadd721b6da"
+    },
+    {
+      "path": "decal438r2-vegetation-contracts.log",
+      "bytes": 1066,
+      "sha256": "7e6b949154b6d042cabdbfa6c89fca5199cfa8c2605a9ace439d87223b4585d1"
+    },
+    {
+      "path": "install_decal438r2.py",
+      "bytes": 1777,
+      "sha256": "f000db8ae2c857b9b318b26bc1438ad9760a6bd05eb500d27e67b99e489d2a60"
+    },
+    {
+      "path": "inventory_decal438r2_captures.py",
+      "bytes": 6364,
+      "sha256": "020f78149d8240da14fd3952454c9019af76d22eb67c4e3e245759e23df3f916"
+    },
+    {
+      "path": "package_decal438r2.ps1",
+      "bytes": 2653,
+      "sha256": "00efd8321055f60254fa3bd17f0aa4ad8f1f91fea37485f0b566ad24ed32b2d8"
+    }
+  ],
+  "metadataGzipSha256": "9e1352c078701fd9a9404f43cf6aa80fe5338999f156e211987611f94856141a",
+  "historicalEvidenceIndex": "../evidence-index.json",
+  "metadataPathPolicy": "Committed JSON paths use repository/workspace tokens; archived originals remain unchanged.",
+  "humanArtApproval": "pending",
+  "physicalAcceptance": "pending"
+}

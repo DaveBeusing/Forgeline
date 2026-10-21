@@ -4,8 +4,8 @@ The branch is synchronized with master `a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d
 (merged terrain PR #284 and staged vegetation PR #281), version 0.1.437. The decal candidate is now
 0.1.438, exactly one PATCH above that base. The original 0.1.437 evidence below
 is retained as historical evidence on the preceding terrain materials; it is
-not relabelled as a result on the new master. Refreshed native/catalog/package
-qualification on the integrated terrain follows below when complete. The 39
+not relabelled as a result on the new master. The synchronized native/catalog/package
+qualification is recorded in the final integration section below. The 39
 measured decal authoring/material/texture inputs remain byte-identical.
 
 ## Integration audit
@@ -104,7 +104,7 @@ substrates and preservation of the live publication cap. The dedicated native
 workflow is opt-in on provisioned Blender runners; hosted contracts are distinct
 from its actual authoring execution.
 
-## Executed qualification
+## Original 0.1.437 qualification (retained)
 
 All native measurements and the player package bind to clean production commit
 `cdfa458581cbc70be7563f111f75b9b6618d6fa1` (0.1.437), against the audited
@@ -259,3 +259,104 @@ complete-frame, memory/thermal/lifecycle and human visual gates remain open;
 local failed timing gates additionally prevent performance promotion. No merge,
 release, tag or golden approval is made. The intended result is a reproducible,
 reviewable source/runtime candidate, not a claim of completed production acceptance.
+
+
+## Integration on master a2a88f06: 0.1.438
+
+The final production source is `c7cbb542c77f56ce5de0988e043ad65495b12b37`,
+based on fetched master `a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d`, version
+0.1.437. The candidate remains exactly one PATCH higher: **0.1.438**. Subsequent
+commits add documentation/evidence only. The original 0.1.437 results above keep
+their original source identity.
+
+Merged terrain PR #284 preserves encoded texture payloads while migrating saved
+sources and changing standard industrial blend regions. Merged vegetation PR
+#281 adds staged masters and diagnostic scenes, outside the canonical runtime
+source root. Their related reviews/comments were empty. #284's head has an
+inherited frame-contract failure: 101 passed / one failed when DXC rejected an
+HLSL-version argument containing unexpected bytes. The original log is retained;
+its cause is not attributed to terrain/decal art, and the unchanged shadercompiler
+is not rewritten here. Its main check and the new master's main check were still
+running when audited. #281's frame/navigation/CPU/retained-source checks passed;
+its optional native job was skipped. These observations are not a passed-global-
+renderer acceptance claim.
+
+The scene conflict is resolved by retaining all **103** existing master enum
+ordinals and both factory dispatches. The nine decal kinds are appended at
+103-111. Terrain profile changes are retained. The decal fixture replaces standard
+blend regions with its own single substrate region and contains no vegetation.
+[Source lineage](evidence/battlefield-decals/integration-438/source-lineage.json)
+verifies the original eleven decal baseline files against latest-master Git blobs
+and all 39 measured authoring/material/texture files against their original
+native-gate SHA-256 values. The existing 16 reopens / 24 exact channel rebakes /
+200 TBN probes apply to those unchanged files; they are not relabelled as newly
+executed Blender runs.
+
+Clean Release solution build: **zero warnings/errors, 45.16s**. Both actual
+scoped compiler/decode/source-less tests pass. Integrated decal, lifecycle,
+terrain and vegetation presentation tests: **32 passed, one skipped**; the skip
+is the inherited opt-in native vegetation gate. Six retained vegetation source
+contracts pass. The 126 portable Blender contracts passed during terrain
+synchronization; the tools/Blender contract inputs remain unchanged by the staged
+vegetation integration. Final-head CI is checked independently in PR #282.
+
+Both current complete catalogs compile and validate against an explicitly absent
+source directory. Every encoded payload and stable dependency/bounds/LOD/socket/
+mechanical field matches its corresponding original measured catalog: all 1,363
+before and 1,365 after assets. The terrain source-path metadata adds **411 bytes**;
+there is no texture-payload or dimension increase. The intended decal comparison
+still changes precisely ten existing payloads and adds only the two shared map
+IDs. Current after containers total **75,112,982 bytes**, including **59,719,691**
+texture-container bytes. Gameplay texture containers are **57,933,274**, leaving
+**786,982 bytes** under the unchanged 56 MiB limit. Decal resident texels remain
+**783,360 bytes**. See [catalog scope](evidence/battlefield-decals/integration-438/runtime-comparison.json)
+and [encoded equivalence](evidence/battlefield-decals/integration-438/runtime-equivalence.json).
+
+### Fresh native and installed controls
+
+The synchronized executable supplies **ten fresh before/after pairs**: six
+High/1080p galleries (four substrates, slope, overlap), three normal-distance
+1/100/1,000 workloads and the 1,000-decal 80m close view. Each has eight matching
+repeat readbacks, zero material/texture binding failures or fallback meshes,
+and matching paired geometry/camera/terrain/submission counters. All **twenty
+new PNGs are byte-identical** to their corresponding original controls, while
+source identities remain distinct. Fixture fingerprints change with the appended
+scene enum ordinals. [Image continuity](evidence/battlefield-decals/integration-438/image-continuity.json)
+records both identities and every matching image hash. The previously committed
+concrete/asphalt/dense-close images therefore also represent these exact current
+pixels; the original dark/wet/quality/4K matrix remains explicitly historical.
+
+The fresh gallery and load cohorts fail the same 15% timing gate; dense-close
+passes. None is rerun to select a passing result. CPU/GPU means, p50/p95/p99,
+actual GPU fence counts, resources and raw frames are retained. The current
+trace has **149** samples, all P8 at **172-180 MHz**, memory clock
+405 MHz, **10.38-17.73 W** and
+**41-42 degrees C**.
+Physical performance acceptance remains open. These ten cases peak at
+**45,070,076 resident texture bytes / 94 descriptors**, with no fixed-camera
+sample-phase texture/des-criptor churn. At full quality the decal maps still add
+263,720 resident bytes and two descriptors. See [current inventory](evidence/battlefield-decals/integration-438/native-inventory.json)
+and [GPU trace summary](evidence/battlefield-decals/integration-438/gpu-observations.json).
+
+A fresh reproducible **0.1.438** package from the synchronized source is
+**55,174,259 bytes**, SHA-256
+`97c04206d85284579d6f4e317c4ee28352bfc7d79fca426162110339c3e22974`. Both independent publish trees agree. All 1,489 fresh
+installation file hashes pass; all 1,366 compiled manifest/container files equal
+the measured current runtime, plus the same 63 publisher media files. No Blender,
+GLB/glTF or Python/PowerShell source is packaged. Published and freshly extracted
+players both start with isolated settings/package runtime and exit zero. Five
+installed native views reproduce the synchronized measured pixels exactly. The
+package's overall runtime fingerprint remains different because of the added
+media files. [Installation](evidence/battlefield-decals/integration-438/installation.json)
+and [package status](evidence/battlefield-decals/integration-438/package-status.json)
+retain the actual source and clean-tree identity.
+
+The new raw archive `artifacts/battlefield-decal-integration438.zip` contains **125 original
+files / 105,030,101 bytes**, SHA-256 `ff3058943dcaeff0e09839211c21579f21d9e3a7215ef74fdb9c0d02efc34fc2`. Every archived
+entry was read back and hash-verified. The [integration index](evidence/battlefield-decals/integration-438/evidence-index.json)
+and reproducible metadata gzip are committed; original native PNGs stay unchanged
+in the indexed local archive. The original 0.1.437 archive is retained separately.
+
+PR #282 stays **draft**: current and historical failed timing gates, the broader
+physical renderer qualification and human visual acceptance remain open. No
+merge, release, tag or golden approval is performed.
