@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.power_plant",
+      "assets": [
+        "building.directorate.power_plant",
+        "building.directorate.power_plant.lod1",
+        "building.directorate.power_plant.lod2",
+        "building.directorate.power_plant.foundation",
+        "building.directorate.power_plant.structural_frame",
+        "building.directorate.power_plant.partial_shell",
+        "building.directorate.power_plant.unpowered",
+        "building.directorate.power_plant.damaged",
+        "building.directorate.power_plant.critical",
+        "building.directorate.power_plant.destroyed"
+      ],
+      "instanceScale": [
+        16,
+        10,
+        16
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

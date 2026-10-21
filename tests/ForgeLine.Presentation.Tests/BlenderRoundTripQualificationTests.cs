@@ -13,6 +13,20 @@ public sealed class BlenderRoundTripQualificationTests
 
     public static bool ReadinessEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_BLENDER_READINESS_ROOT"));
 
+    public static bool OperationalEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_OPERATIONAL_BLENDER_ROOT"));
+
+    [Theory(Skip = "Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.", SkipUnless = nameof(OperationalEnabled))]
+    [InlineData("vehicle_factory", 1556)]
+    [InlineData("power_plant", 2288)]
+    [InlineData("barracks", 1056)]
+    [InlineData("radar", 1920)]
+    public void OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(string family, int triangles)
+    {
+        string root = Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_OPERATIONAL_BLENDER_ROOT")!);
+        CompareExports(Path.Combine(root, family), ["first", "second", "reopened"], false,
+            expectedTriangles: triangles, expectedAssets: 15, expectedMeshes: 11, baselineFolder: "baseline/runtime");
+    }
+
     public static bool IndustrialEnabled => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_INDUSTRIAL_BLENDER_ROOT"));
 
     [Theory(Skip = "Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.", SkipUnless = nameof(IndustrialEnabled))]
