@@ -13,7 +13,7 @@ from mathutils import Vector
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from asset_contract import Catalog, fixture_selection, geometry_stats, read_geometry, require, sha, write_glb, write_json
-from command_core_contract import ROOT, SUFFIXES, MATERIAL, bindings, compare, refined_kit, material_for
+from command_core_contract import ROOT, SUFFIXES, MATERIAL, bindings, compare, refined_kit, material_for, material_source_hashes
 from mechanical import layers
 from production import surface_preview
 from roundtrip import import_scene, export_scene, preview_state
@@ -58,6 +58,8 @@ def preview(catalog, ids):
         if matching:
             image['cc_source_hash'] = sha(catalog.source(matching))
             image.filepath = '//' + os.path.relpath(catalog.source(matching), catalog.root / 'buildings/directorate/authoring').replace('\\', '/')
+            for packed in image.packed_files:
+                packed.filepath = image.filepath
     bpy.context.scene['cc_preview'] = json.dumps({aid: graph_signature(bpy.data.materials[aid])
         for aid in ids if catalog.definitions[aid][1]['type'] == 'material'}, sort_keys=True)
     bpy.context.scene['cc_texture_payload_bytes'] = sum(row['estimatedPayloadBytes'] for row in costs)
@@ -68,7 +70,7 @@ def scalar_materials(catalog, ids):
     for aid, signature in expected.items():
         material = bpy.data.materials.get(aid)
         require(material and graph_signature(material) == signature, 'Unsupported material preview edit')
-        require(material.get('cc_material_source_hash') == sha(catalog.source(aid)), 'Material source changed; refresh the reviewed preview explicitly')
+        require(material.get('cc_material_source_hash') in material_source_hashes(catalog.source(aid)), 'Material source changed; refresh the reviewed preview explicitly')
         material_source = json.loads(catalog.source(aid).read_text(encoding='utf-8-sig'))
         for node in material.node_tree.nodes:
             if node.type == 'TEX_IMAGE':

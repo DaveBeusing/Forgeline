@@ -1,5 +1,6 @@
 """Family-local source, geometry and surface limits for the Command Core."""
 import copy
+import hashlib
 import json
 import math
 import struct
@@ -19,6 +20,13 @@ MINIMUM = (-.505, -.5, -.34)
 MAXIMUM = (.505, .56, .48)
 
 
+def material_source_hashes(path):
+    """Preserve exact text content across Git's LF/CRLF checkout conversion."""
+    raw = Path(path).read_bytes()
+    lf = raw.replace(b'\r\n', b'\n')
+    return {hashlib.sha256(data).hexdigest() for data in (raw, lf, lf.replace(b'\n', b'\r\n'))}
+
+
 def material_for(suffix):
     if suffix in ('', '.lod1', '.lod2'):
         return MATERIAL
@@ -32,8 +40,6 @@ def bindings(catalog, ids):
     for aid in ids:
         definition = copy.deepcopy(catalog.definitions[aid][1])
         definition.pop('source', None)
-        if aid.startswith(ROOT) and material_for(aid[len(ROOT):]):
-            definition['materialReferences'] = [material_for(aid[len(ROOT):])]
         result[aid] = definition
     return result
 

@@ -69,6 +69,10 @@ regenerates or saves over it. Exported source definitions and GLBs go into
 generated runtime buffers. Packed preview textures are checked by content,
 color space and graph binding, independent of Blender's relative path remapping.
 Material JSON and source texture hashes must match the reviewed preview.
+Material text hashes accept Git's LF/CRLF checkout conversion; value changes
+and changed source material references remain rejected. Binary texture checks
+remain byte-exact. The legacy kit generator writes separate historical glTF
+filenames; current runtime definitions reference only `blender/*.glb` outputs.
 Free-form shader graphs are preview data, not a new runtime shader interface.
 
 `-Action Author` is a one-time bootstrap into a fresh artifact directory, using

@@ -1,5 +1,6 @@
 """Command Core scope, fixed resource ceilings and numeric emissive semantics."""
 import copy
+import hashlib
 import json
 import struct
 import sys
@@ -10,12 +11,30 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from asset_contract import Catalog, read_geometry, socket_world
-from command_core_contract import ROOT, TRIANGLES, compare, refined_kit, write_emissive
+from command_core_contract import ROOT, TRIANGLES, bindings, compare, refined_kit, write_emissive, material_source_hashes
 
 REPO = Path(__file__).resolve().parents[3]
 
 
 class CommandCoreContractTests(unittest.TestCase):
+    def test_frozen_bindings_do_not_mask_source_material_reference_edits(self):
+        catalog = Catalog(REPO / 'assets/source')
+        before = bindings(catalog, [ROOT])
+        catalog.definitions[ROOT][1]['materialReferences'] = ['material.directorate.building.command_core.critical']
+        self.assertNotEqual(before, bindings(catalog, [ROOT]))
+
+    def test_material_hash_accepts_checkout_line_endings_and_rejects_content_edits(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'material.json'
+            original = b'{\n  "roughnessFactor": 0.8\n}\n'
+            path.write_bytes(original)
+            expected = material_source_hashes(path)
+            self.assertIn(hashlib.sha256(original).hexdigest(), expected)
+            path.write_bytes(original.replace(b'\n', b'\r\n'))
+            self.assertEqual(expected, material_source_hashes(path))
+            path.write_bytes(original.replace(b'0.8', b'0.9'))
+            self.assertTrue(expected.isdisjoint(material_source_hashes(path)))
+
     def test_bootstrap_preserves_original_recipe_and_state_vocabulary(self):
         path = REPO / 'assets/source/buildings/directorate/authoring/command_core.kit.json'
         original = json.loads(path.read_text())
@@ -55,9 +74,12 @@ class CommandCoreContractTests(unittest.TestCase):
 
     def test_source_geometry_and_authority_remain_bounded(self):
         catalog = Catalog(REPO / 'assets/source')
+        self.assertTrue((REPO / 'assets/source/buildings/directorate/authoring/command_core.blend').is_file())
         for suffix in TRIANGLES:
             aid = ROOT + suffix
             definition = catalog.definitions[aid][1]
+            self.assertEqual(catalog.source(aid).suffix, '.glb')
+            self.assertEqual(catalog.source(aid).parent.name, 'blender')
             geometry = read_geometry(catalog.source(aid), catalog.root, definition)
             self.assertEqual(compare(aid, geometry, geometry, definition)['maximumAuthoredPositionEdit'], 0)
         primary = catalog.definitions[ROOT][1]

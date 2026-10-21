@@ -14,6 +14,7 @@ foreach ($name in @('first','second')) {
     & (Join-Path $PSScriptRoot 'Invoke-BlenderCommandCore.ps1') -OutputRoot (Join-Path $root $name) -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
 }
 & (Join-Path $PSScriptRoot 'Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'tests/native_command_core_contract.py') -InputRoot assets/source -OutputRoot (Join-Path $root 'native') -ScriptArguments @($master,$fixture) -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
+& (Join-Path $PSScriptRoot 'Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'tests/native_command_core_sources.py') -InputRoot assets/source -OutputRoot (Join-Path $root 'source-contracts') -ScriptArguments @($master,$fixture) -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
 $first = Join-Path $root 'first/source'
 $files = @(Get-ChildItem -LiteralPath $first -File -Recurse)
 foreach ($variant in @('second/source','native/control/source')) {
