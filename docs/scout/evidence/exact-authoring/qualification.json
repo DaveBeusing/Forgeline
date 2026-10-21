@@ -1,0 +1,13 @@
+{
+  "sourceLessIntegrity": true,
+  "physicalPerformance": "pending",
+  "humanArtApproval": "pending",
+  "sourceSha": "fa503a2b62b15fc26f08a7bbff9b472f117abed1",
+  "qualifiedRuntimeSeed": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\scout-blender\\artifacts\\sc2",
+  "schemaVersion": 1,
+  "canonicalSourcesUnchanged": true,
+  "typedCompiledComparison": true,
+  "productionPromotion": "blocked-pending-render-qualification",
+  "success": true,
+  "deterministicSourceAndRuntime": true
+}

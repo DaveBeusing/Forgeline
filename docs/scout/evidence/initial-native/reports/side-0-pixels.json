@@ -1,0 +1,35 @@
+{
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "channelTolerance": 0,
+  "imageFailures": [],
+  "structural": "pass",
+  "captures": [
+    {
+      "comparison": "pixels-require-human-review",
+      "regionChanges": null,
+      "sameSource": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.2056327160493827E-07,
+        "ChangedPixels": 1,
+        "ChangedPixelFraction": 4.822530864197531E-07,
+        "WithinTolerance": false
+      },
+      "structural": "pass",
+      "key": "ScoutSingle-1920x1080-High-CloseTactical-Yaw0-Inspection20",
+      "cpuMeanDeltaMs": 8.50811875,
+      "equivalentHardware": true,
+      "gpuMeanMs": 10.202170666666664,
+      "sameRuntime": false,
+      "cpuMeanMs": 23.768240625,
+      "visualReview": "pending"
+    }
+  ],
+  "commit": "20b00ace08089ad44798941a4cfc5668ea2ef06c",
+  "pixelComparisonRequested": true,
+  "baselineCommit": "20b00ace08089ad44798941a4cfc5668ea2ef06c",
+  "maximumChangedPixelFraction": 0.0,
+  "imageGateRequested": false,
+  "visualAcceptance": "pending",
+  "schemaVersion": 1
+}

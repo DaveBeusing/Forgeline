@@ -1,0 +1,152 @@
+{
+  "assets": [
+    {
+      "finalDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "id": "unit.directorate.scout_vehicle",
+      "nativeReadback": "native-readback-glb/unit.directorate.scout_vehicle.glb",
+      "nativeReadbackDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 2.9802322387695312e-08,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "nativeReadbackSha256": "061004219c000e8391d7e20971eddfdba8a8a821d910cebbd6d6053a7a5d4ce3",
+      "sourceFloatExportSha256": "6defb5bd91906fdc67b214786f13c512ecd5b67ccf8f6cc6f65f2185a4f27a58"
+    },
+    {
+      "finalDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "id": "unit.directorate.scout_vehicle.collision",
+      "nativeReadback": "native-readback-glb/unit.directorate.scout_vehicle.collision.glb",
+      "nativeReadbackDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "nativeReadbackSha256": "4a8b8d6c316908eeb908c026fb6d59f4b5b2a822c963b26b6478ccc2c4343a3e",
+      "sourceFloatExportSha256": "4a8b8d6c316908eeb908c026fb6d59f4b5b2a822c963b26b6478ccc2c4343a3e"
+    },
+    {
+      "finalDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "id": "unit.directorate.scout_vehicle.critical",
+      "nativeReadback": "native-readback-glb/unit.directorate.scout_vehicle.critical.glb",
+      "nativeReadbackDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 1.4901161193847656e-08
+      },
+      "nativeReadbackSha256": "b9b95b89fc67bee963c2ce238e51088850518bfeb55e441fb76b45dca074dba8",
+      "sourceFloatExportSha256": "5c3252ae91915df04305dc7e67058147e8f5e888135f2310d864e28f29197947"
+    },
+    {
+      "finalDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "id": "unit.directorate.scout_vehicle.damaged",
+      "nativeReadback": "native-readback-glb/unit.directorate.scout_vehicle.damaged.glb",
+      "nativeReadbackDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "nativeReadbackSha256": "b250d25205d6ce9096fd4fe9f94bd83958aed3190921449f241f8add073b5fa1",
+      "sourceFloatExportSha256": "2465838c04791343c1aa3a570402fc105037d7a7f550d0f416f3f4ea1114abf4"
+    },
+    {
+      "finalDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "id": "unit.directorate.scout_vehicle.lod1",
+      "nativeReadback": "native-readback-glb/unit.directorate.scout_vehicle.lod1.glb",
+      "nativeReadbackDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 1.4901161193847656e-08
+      },
+      "nativeReadbackSha256": "e53c662b4da0d092ed4823291a356b225371e9ecba0d0de92d6c711ee8927a1b",
+      "sourceFloatExportSha256": "7b88697f897c07182f171fffc524e10d771cdcd915d73af88b7ba5899b001376"
+    },
+    {
+      "finalDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "id": "unit.directorate.scout_vehicle.lod2",
+      "nativeReadback": "native-readback-glb/unit.directorate.scout_vehicle.lod2.glb",
+      "nativeReadbackDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "nativeReadbackSha256": "af7591009e2163122395336b09a58d97aa723a3dcbe0bc3fea601abb039df2f7",
+      "sourceFloatExportSha256": "2cf4779f358b896ef08fab1b276f1aea01927f2b3cfcc66422835bf21a3c473c"
+    },
+    {
+      "finalDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "id": "unit.directorate.scout_vehicle.turret",
+      "nativeReadback": "native-readback-glb/unit.directorate.scout_vehicle.turret.glb",
+      "nativeReadbackDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.9802322387695312e-08
+      },
+      "nativeReadbackSha256": "a5fce7face10dcda55c5e2112190318ffd36b25bd18878be323e09812797e848",
+      "sourceFloatExportSha256": "0eb0a1c0b07289fe0d7bb8f59ed2bae277fe06eab6981079216e0ef68dceaeb9"
+    },
+    {
+      "finalDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "id": "unit.directorate.scout_vehicle.wreck",
+      "nativeReadback": "native-readback-glb/unit.directorate.scout_vehicle.wreck.glb",
+      "nativeReadbackDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 1.4901161193847656e-08
+      },
+      "nativeReadbackSha256": "352baca19cef56df065bbc76649b9e93dbfb592aeee38bd48897e447d9ce99e5",
+      "sourceFloatExportSha256": "c3c3db641a4dbcd0c2d1a6165a756d46821f1ef1fa5b6c6d2d4875fddf66b323"
+    }
+  ],
+  "maximumEditorStorageNoise": 5e-08,
+  "nativeSceneValidatedBeforeSerialization": true,
+  "schemaVersion": 1,
+  "sourceAttributesExact": true
+}

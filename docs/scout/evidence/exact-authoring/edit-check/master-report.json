@@ -1,0 +1,14 @@
+{
+  "canonicalYDelta": 0.0009999871253967276,
+  "editAsset": "unit.directorate.scout_vehicle",
+  "editIsQualificationOnly": true,
+  "editVertex": 1314,
+  "family": "unit.directorate.scout_vehicle",
+  "meshCount": 8,
+  "organizedMasterReopened": true,
+  "productionPromotion": "pending",
+  "savedVertexEditReopenedAndExported": true,
+  "schemaVersion": 1,
+  "sourceSignature": "f3a92ee418e2a4214a8942a83e4445847e72719c9cd97d42cc5499c003abedf2",
+  "success": true
+}

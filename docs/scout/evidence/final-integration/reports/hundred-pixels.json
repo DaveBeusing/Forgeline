@@ -1,0 +1,35 @@
+{
+  "structural": "pass",
+  "visualAcceptance": "pending",
+  "imageGateRequested": false,
+  "pixelComparisonRequested": true,
+  "imageFailures": [],
+  "baselineCommit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+  "maximumChangedPixelFraction": 0.0,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "captures": [
+    {
+      "structural": "pass",
+      "visualReview": "pending",
+      "key": "ScoutRepeated100-1920x1080-High-NormalGameplay",
+      "regionChanges": null,
+      "gpuMeanMs": 9.7802976,
+      "cpuMeanDeltaMs": -212.9098375,
+      "cpuMeanMs": 11.795640625000003,
+      "equivalentHardware": true,
+      "comparison": "exact-file-match",
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "sameSource": true,
+      "sameRuntime": false
+    }
+  ],
+  "schemaVersion": 1,
+  "commit": "9a2b60d7a046192de7aa663b0f7a83369919215a",
+  "channelTolerance": 0
+}

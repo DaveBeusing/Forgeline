@@ -1,0 +1,14 @@
+{
+  "authoringAndCompilerFiles": 0,
+  "zipSha256": "0e1ed744a6377a405b69185a76a3410195802dbc15dc6a2175f9339002dc78b0",
+  "installedSmokeExit": 0,
+  "sourceSha": "20b00ace08089ad44798941a4cfc5668ea2ef06c",
+  "settings": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\scout-install\\fresh-settings",
+  "genericStressIsNotScoutWorkload": true,
+  "sourceTreeClean": true,
+  "player": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\scout-install\\player",
+  "childPath": "Windows System32 and .NET only",
+  "smokeWorkingDirectoryFiles": 0,
+  "schemaVersion": 1,
+  "verifiedFiles": 1487
+}

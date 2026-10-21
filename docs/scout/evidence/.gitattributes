@@ -1,0 +1,6 @@
+* -text -whitespace
+*.json -text -whitespace
+*.log -text -whitespace
+*.png binary
+*.gz binary
+*.sha256 -text -whitespace

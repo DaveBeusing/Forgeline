@@ -1,0 +1,49 @@
+  ForgeLine.Core -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Core\bin\Release\net10.0\ForgeLine.Core.dll
+  ForgeLine.Ecs -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Ecs\bin\Release\net10.0\ForgeLine.Ecs.dll
+  ForgeLine.Jobs -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Jobs\bin\Release\net10.0\ForgeLine.Jobs.dll
+  ForgeLine.Audio -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Audio\bin\Release\net10.0\ForgeLine.Audio.dll
+  ForgeLine.Platform.Windows -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Platform.Windows\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.dll
+  ForgeLine.Assets -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Assets\bin\Release\net10.0\ForgeLine.Assets.dll
+  ForgeLine.Core.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll
+  ForgeLine.Jobs.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll
+  ForgeLine.Ecs.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll
+  ForgeLine.Editor -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tools\ForgeLine.Editor\bin\Release\net10.0\ForgeLine.Editor.dll
+  ForgeLine.AssetCompiler -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tools\ForgeLine.AssetCompiler\bin\Release\net10.0\ForgeLine.AssetCompiler.dll
+  ForgeLine.Input -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Input\bin\Release\net10.0-windows\ForgeLine.Input.dll
+  ForgeLine.Platform.Windows.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll
+  ForgeLine.Graphics -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Graphics\bin\Release\net10.0-windows\ForgeLine.Graphics.dll
+  ForgeLine.Ecs.Benchmarks -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\benchmarks\ForgeLine.Ecs.Benchmarks\bin\Release\net10.0\ForgeLine.Ecs.Benchmarks.dll
+  ForgeLine.World -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.World\bin\Release\net10.0\ForgeLine.World.dll
+  ForgeLine.Input.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll
+  ForgeLine.Assets.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll
+  ForgeLine.World.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll
+  ForgeLine.Navigation -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Navigation\bin\Release\net10.0\ForgeLine.Navigation.dll
+  ForgeLine.Graphics.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll
+  ForgeLine.Simulation -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Simulation\bin\Release\net10.0\ForgeLine.Simulation.dll
+  ForgeLine.Navigation.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll
+  ForgeLine.Intelligence -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Intelligence\bin\Release\net10.0\ForgeLine.Intelligence.dll
+  ForgeLine.Economy -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Economy\bin\Release\net10.0\ForgeLine.Economy.dll
+  ForgeLine.Simulation.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll
+  ForgeLine.Logistics -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Logistics\bin\Release\net10.0\ForgeLine.Logistics.dll
+  ForgeLine.Combat -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Combat\bin\Release\net10.0\ForgeLine.Combat.dll
+  ForgeLine.Logistics.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll
+  ForgeLine.AI -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.AI\bin\Release\net10.0\ForgeLine.AI.dll
+  ForgeLine.Game -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Game\bin\Release\net10.0\ForgeLine.Game.dll
+  ForgeLine.Game.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll
+  ForgeLine.Simulation.Benchmarks -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\benchmarks\ForgeLine.Simulation.Benchmarks\bin\Release\net10.0\ForgeLine.Simulation.Benchmarks.dll
+  ForgeLine.Navigation.Benchmarks -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\benchmarks\ForgeLine.Navigation.Benchmarks\bin\Release\net10.0\ForgeLine.Navigation.Benchmarks.dll
+  ForgeLine.Headless -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Headless\bin\Release\net10.0\ForgeLine.Headless.dll
+  ForgeLine.MapCompiler -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tools\ForgeLine.MapCompiler\bin\Release\net10.0\ForgeLine.MapCompiler.dll
+  ForgeLine.Presentation -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Presentation\bin\Release\net10.0-windows\ForgeLine.Presentation.dll
+  ForgeLine.UiArtwork -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tools\ForgeLine.UiArtwork\bin\Release\net10.0-windows\ForgeLine.UiArtwork.dll
+  ForgeLine.UI -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.UI\bin\Release\net10.0-windows\ForgeLine.UI.dll
+  ForgeLine.Presentation.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll
+  ForgeLine.Client -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\src\ForgeLine.Client\bin\Release\net10.0-windows\win-x64\ForgeLine.Client.dll
+  ForgeLine.Client.Tests -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll
+  ForgeLine.Rendering.Benchmarks -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\benchmarks\ForgeLine.Rendering.Benchmarks\bin\Release\net10.0-windows\ForgeLine.Rendering.Benchmarks.dll
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:01:18.82

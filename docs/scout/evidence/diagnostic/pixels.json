@@ -1,0 +1,35 @@
+{
+  "channelTolerance": 0,
+  "imageFailures": [],
+  "baselineCommit": "20b00ace08089ad44798941a4cfc5668ea2ef06c",
+  "captures": [
+    {
+      "regionChanges": null,
+      "cpuMeanDeltaMs": -15.494253125,
+      "sameRuntime": false,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "comparison": "exact-file-match",
+      "gpuMeanMs": 24.741323733333335,
+      "key": "ScoutRepeated1000-3840x2160-Low-CloseTactical",
+      "equivalentHardware": true,
+      "structural": "pass",
+      "visualReview": "pending",
+      "sameSource": true,
+      "cpuMeanMs": 28.50608125000001
+    }
+  ],
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0,
+  "pixelComparisonRequested": true,
+  "visualAcceptance": "pending",
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "structural": "pass",
+  "commit": "20b00ace08089ad44798941a4cfc5668ea2ef06c",
+  "imageGateRequested": false
+}

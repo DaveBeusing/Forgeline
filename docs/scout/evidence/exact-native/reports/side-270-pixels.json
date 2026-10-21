@@ -1,0 +1,35 @@
+{
+  "imageGateRequested": false,
+  "commit": "b8f6baba7b0d97040537edf9544b8231fe02e15c",
+  "maximumChangedPixelFraction": 0.0,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "structural": "pass",
+  "pixelComparisonRequested": true,
+  "captures": [
+    {
+      "sameSource": true,
+      "structural": "pass",
+      "gpuMeanMs": 11.152945066666666,
+      "regionChanges": null,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "cpuMeanMs": 14.893640625,
+      "sameRuntime": false,
+      "cpuMeanDeltaMs": 1.1974093749999977,
+      "key": "ScoutSingle-1920x1080-High-CloseTactical-Yaw270-Inspection20",
+      "comparison": "exact-file-match",
+      "equivalentHardware": true,
+      "visualReview": "pending"
+    }
+  ],
+  "imageFailures": [],
+  "baselineCommit": "b8f6baba7b0d97040537edf9544b8231fe02e15c",
+  "channelTolerance": 0,
+  "visualAcceptance": "pending",
+  "schemaVersion": 1
+}

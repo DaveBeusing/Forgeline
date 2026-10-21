@@ -1,0 +1,10 @@
+{
+  "stage": "initial-staging-copy",
+  "result": "FileExistsError",
+  "cause": "Git-attributes-only target directory had been pre-created before the first retention copy.",
+  "correction": "Accept only an otherwise empty attributes target; require explicit qualified refresh and preserve the prior candidate for any subsequent replacement.",
+  "sourceCommitNotRecorded": true,
+  "originalFullProcessLogRetained": false,
+  "evidenceLevel": "recorded execution outcome; no reconstructed process log",
+  "laterRetainedVerification": "../final-build/sc-retained3.log"
+}

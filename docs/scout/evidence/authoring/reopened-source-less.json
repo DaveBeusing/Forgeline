@@ -1,0 +1,83 @@
+{
+  "assetCount": 12,
+  "meshCount": 8,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7748415,
+  "meshRuntimeBytes": 420582,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1638,
+  "catalogLoadDuration": "00:00:01.1249362",
+  "assetReadDuration": "00:00:00.6999398",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "unit.directorate.scout_vehicle",
+      "type": "mesh",
+      "runtimeBytes": 265997
+    },
+    {
+      "assetId": "unit.directorate.scout_vehicle.lod1",
+      "type": "mesh",
+      "runtimeBytes": 72890
+    },
+    {
+      "assetId": "unit.directorate.scout_vehicle.lod2",
+      "type": "mesh",
+      "runtimeBytes": 30590
+    },
+    {
+      "assetId": "unit.directorate.scout_vehicle.turret",
+      "type": "mesh",
+      "runtimeBytes": 22798
+    },
+    {
+      "assetId": "unit.directorate.scout_vehicle.wreck",
+      "type": "mesh",
+      "runtimeBytes": 13239
+    },
+    {
+      "assetId": "unit.directorate.scout_vehicle.critical",
+      "type": "mesh",
+      "runtimeBytes": 9920
+    },
+    {
+      "assetId": "unit.directorate.scout_vehicle.damaged",
+      "type": "mesh",
+      "runtimeBytes": 3680
+    },
+    {
+      "assetId": "material.directorate.unit.scout_vehicle",
+      "type": "material",
+      "runtimeBytes": 1638
+    },
+    {
+      "assetId": "unit.directorate.scout_vehicle.collision",
+      "type": "mesh",
+      "runtimeBytes": 1468
+    }
+  ],
+  "issues": [],
+  "success": true
+}

@@ -1,0 +1,549 @@
+build-test	Test	﻿2026-10-21T10:14:29.1083964Z ##[group]Run dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1
+build-test	Test	2026-10-21T10:14:29.1085326Z ^[[36;1mdotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1^[[0m
+build-test	Test	2026-10-21T10:14:29.1158086Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+build-test	Test	2026-10-21T10:14:29.1158585Z env:
+build-test	Test	2026-10-21T10:14:29.1158960Z   DOTNET_CLI_TELEMETRY_OPTOUT: 1
+build-test	Test	2026-10-21T10:14:29.1159427Z   DOTNET_NOLOGO: 1
+build-test	Test	2026-10-21T10:14:29.1159858Z   TESTINGPLATFORM_TELEMETRY_OPTOUT: 1
+build-test	Test	2026-10-21T10:14:29.1160334Z   FORGELINE_BUILD_VERSION: 0.1.431-dev
+build-test	Test	2026-10-21T10:14:29.1160764Z   DOTNET_ROOT: C:\Program Files\dotnet
+build-test	Test	2026-10-21T10:14:29.1161155Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.13.16\x64
+build-test	Test	2026-10-21T10:14:29.1161663Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.13.16\x64/lib/pkgconfig
+build-test	Test	2026-10-21T10:14:29.1162177Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+build-test	Test	2026-10-21T10:14:29.1162831Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+build-test	Test	2026-10-21T10:14:29.1163670Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+build-test	Test	2026-10-21T10:14:29.1164038Z ##[endgroup]
+build-test	Test	2026-10-21T10:14:30.6367034Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:14:31.1245016Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(488ms)^[[m
+build-test	Test	2026-10-21T10:14:31.4095692Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:14:32.2216505Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(812ms)^[[m
+build-test	Test	2026-10-21T10:14:32.5212418Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:14:32.9734075Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(451ms)^[[m
+build-test	Test	2026-10-21T10:14:33.2429240Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:14:33.7420841Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(499ms)^[[m
+build-test	Test	2026-10-21T10:14:33.9931258Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:14:35.6640365Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(1s 670ms)^[[m
+build-test	Test	2026-10-21T10:14:35.9302823Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:14:36.5106955Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(580ms)^[[m
+build-test	Test	2026-10-21T10:14:36.8002400Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:14:37.4596629Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(659ms)^[[m
+build-test	Test	2026-10-21T10:14:37.7130957Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:14:42.0325510Z ^[[33mskipped^[[m ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: True)
+build-test	Test	2026-10-21T10:14:42.0373012Z   Set FORGELINE_GPU_LIFETIME_TESTS=1 for native lifetime qualification.
+build-test	Test	2026-10-21T10:14:42.0374304Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:14:42.0376202Z ^[[33mskipped^[[m ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: False)
+build-test	Test	2026-10-21T10:14:42.0378518Z   Set FORGELINE_GPU_LIFETIME_TESTS=1 for native lifetime qualification.
+build-test	Test	2026-10-21T10:14:42.0380523Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:13.4932657Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(35s 780ms)^[[m
+build-test	Test	2026-10-21T10:15:13.7593286Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:14.2817028Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(522ms)^[[m
+build-test	Test	2026-10-21T10:15:14.5563748Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:34.5691734Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderMechanicalQualificationTests.EditedPivotsPreserveStaticGeometryAndCanonicalRangeSharing
+build-test	Test	2026-10-21T10:15:34.5697825Z   Set FORGELINE_BLENDER_MOTION_ROOT after native rigid authoring.
+build-test	Test	2026-10-21T10:15:34.5699806Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:34.6624418Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderMechanicalQualificationTests.BlenderPoseMatricesMatchRuntimeRigidCompositionIncludingEditedBindings
+build-test	Test	2026-10-21T10:15:34.6693517Z   Set FORGELINE_BLENDER_MOTION_ROOT after native rigid authoring.
+build-test	Test	2026-10-21T10:15:34.6849063Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:37.9476296Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.ArtilleryBlenderMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels
+build-test	Test	2026-10-21T10:15:37.9761919Z   Run build/artillery/Qualify-Master.ps1 with real Blender first.
+build-test	Test	2026-10-21T10:15:37.9859355Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:39.3951278Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.LogisticsTruckBlenderTests.BlenderBindingsPreserveExactCompiledGeometryAndWheelBatching(family: "supply_truck")
+build-test	Test	2026-10-21T10:15:39.4120490Z   Set FORGELINE_TRUCK_BASELINE_RUNTIME and FORGELINE_TRUCK_CURRENT_RUNTIME after compiling both catalogs.
+build-test	Test	2026-10-21T10:15:39.4398413Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:39.4599460Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.LogisticsTruckBlenderTests.BlenderBindingsPreserveExactCompiledGeometryAndWheelBatching(family: "cargo_truck")
+build-test	Test	2026-10-21T10:15:39.4784145Z   Set FORGELINE_TRUCK_BASELINE_RUNTIME and FORGELINE_TRUCK_CURRENT_RUNTIME after compiling both catalogs.
+build-test	Test	2026-10-21T10:15:39.5075836Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.8530126Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.ParticlePerformanceQualificationTests.MeasureBoundedProductionEffectsAtRtsViewpoints
+build-test	Test	2026-10-21T10:15:40.8533634Z   Set FORGELINE_PARTICLE_QUALIFICATION_OUTPUT for isolated hardware qualification.
+build-test	Test	2026-10-21T10:15:40.8536608Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9158645Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.RigidAuthoringPreservesCompiledGeometryAndBatching
+build-test	Test	2026-10-21T10:15:40.9162561Z   Set FORGELINE_BLENDER_MOTION_ROOT after rigid authoring exports.
+build-test	Test	2026-10-21T10:15:40.9166253Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9170683Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: "electronics_plant", triangles: 2152)
+build-test	Test	2026-10-21T10:15:40.9174468Z   Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.
+build-test	Test	2026-10-21T10:15:40.9177492Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9182075Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: "smelter", triangles: 2588)
+build-test	Test	2026-10-21T10:15:40.9186718Z   Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.
+build-test	Test	2026-10-21T10:15:40.9190240Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9194549Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: "extractor", triangles: 2508)
+build-test	Test	2026-10-21T10:15:40.9198508Z   Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.
+build-test	Test	2026-10-21T10:15:40.9201813Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9206053Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.CombinedOperationalExportsLoadWithoutSourceFiles
+build-test	Test	2026-10-21T10:15:40.9209505Z   Set operational exports and a qualified full runtime seed.
+build-test	Test	2026-10-21T10:15:40.9212370Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9216166Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.ExportedProductionMeshesPreserveRuntimeContractsAndMechanicalBatching
+build-test	Test	2026-10-21T10:15:40.9219386Z   Set FORGELINE_BLENDER_ROUNDTRIP_ROOT after native Blender fixture exports.
+build-test	Test	2026-10-21T10:15:40.9222457Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9227706Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "vehicle_factory", triangles: 1556)
+build-test	Test	2026-10-21T10:15:40.9231378Z   Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+build-test	Test	2026-10-21T10:15:40.9234414Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9238316Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "radar", triangles: 1920)
+build-test	Test	2026-10-21T10:15:40.9241778Z   Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+build-test	Test	2026-10-21T10:15:40.9244866Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9249192Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "barracks", triangles: 1056)
+build-test	Test	2026-10-21T10:15:40.9253075Z   Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+build-test	Test	2026-10-21T10:15:40.9256001Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9259911Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "power_plant", triangles: 2288)
+build-test	Test	2026-10-21T10:15:40.9263259Z   Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+build-test	Test	2026-10-21T10:15:40.9266365Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9269875Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.BuildingVehicleAndPropPreserveCompiledContracts
+build-test	Test	2026-10-21T10:15:40.9272964Z   Set FORGELINE_BLENDER_READINESS_ROOT after the staged three-family exports.
+build-test	Test	2026-10-21T10:15:40.9276173Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9279886Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.DefaultSurfacePreparationPreservesCompiledGeometryAndBatching
+build-test	Test	2026-10-21T10:15:40.9283798Z   Set FORGELINE_BLENDER_PRODUCTION_ROOT after native surface qualification.
+build-test	Test	2026-10-21T10:15:40.9286734Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9290428Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.EffectSubmission.ParticleOrderingQualificationTests.MeasureEquivalentParticleOrderingInPairedCohorts
+build-test	Test	2026-10-21T10:15:40.9293704Z   Set FORGELINE_PARTICLE_CPU_QUALIFICATION_OUTPUT for isolated CPU ordering qualification.
+build-test	Test	2026-10-21T10:15:40.9296648Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9375696Z ^[[31mfailed^[[m ForgeLine.Presentation.Tests.FrontendMenuBackgroundTests.DeferredLoadNeverBlocksFirstMenuAndCancellationCreatesNoGpuResource ^[[90m(5s 008ms)^[[m
+build-test	Test	2026-10-21T10:15:40.9380108Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:40.9383022Z ^[[31m  Assert.True() Failure
+build-test	Test	2026-10-21T10:15:40.9385475Z   Expected: True
+build-test	Test	2026-10-21T10:15:40.9387620Z   Actual:   False
+build-test	Test	2026-10-21T10:15:40.9391328Z ^[[m^[[90m    at ForgeLine.Presentation.Tests.FrontendMenuBackgroundTests.DeferredLoadNeverBlocksFirstMenuAndCancellationCreatesNoGpuResource() in /_/tests/ForgeLine.Presentation.Tests/FrontendMenuBackgroundTests.cs:17^[[90m
+build-test	Test	2026-10-21T10:15:40.9395039Z     at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+build-test	Test	2026-10-21T10:15:40.9397822Z     at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+build-test	Test	2026-10-21T10:15:41.0142168Z ^[[m^[[33mskipped^[[m ForgeLine.Presentation.Tests.IndustrialPlantMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels(family: "fuel_refinery")
+build-test	Test	2026-10-21T10:15:41.0143804Z   Run build/industrial-plants/Qualify-Masters.ps1 with real Blender first.
+build-test	Test	2026-10-21T10:15:41.0151557Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:41.0153662Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.IndustrialPlantMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels(family: "ammunition_plant")
+build-test	Test	2026-10-21T10:15:41.0155339Z   Run build/industrial-plants/Qualify-Masters.ps1 with real Blender first.
+build-test	Test	2026-10-21T10:15:41.0156529Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:41.0158803Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.ArtilleryBlenderPoseTests.BlenderPoseMatricesMatchRuntimeRigidCompositionForArtillery
+build-test	Test	2026-10-21T10:15:41.0160063Z   Set FORGELINE_ARTILLERY_MASTER after native rigid authoring.
+build-test	Test	2026-10-21T10:15:41.0161218Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:56.3241840Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.DirectionalShadowPerformanceTests.CompareEquivalentDenseWorkloadsAcrossQualityAndRtsZoom
+build-test	Test	2026-10-21T10:15:56.3243342Z   Set FORGELINE_SHADOW_BENCHMARK_OUTPUT for isolated hardware shadow measurement.
+build-test	Test	2026-10-21T10:15:56.3244789Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:56.3251407Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.ScenePassPerformanceQualificationTests.CompareDirectAndLinearSceneOnEquivalentNativeWorkloads
+build-test	Test	2026-10-21T10:15:56.3259930Z   Set FORGELINE_PASS_BENCHMARK_OUTPUT for isolated hardware measurement.
+build-test	Test	2026-10-21T10:15:56.3261240Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:56.3263277Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureProductionMaterialsAtFixedCentralDivideViewpoints
+build-test	Test	2026-10-21T10:15:56.3265235Z   Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated production terrain measurement.
+build-test	Test	2026-10-21T10:15:56.3266692Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:56.3268448Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureVegetationMotionWithIdenticalProductionBatches
+build-test	Test	2026-10-21T10:15:56.3269897Z   Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated vegetation measurement.
+build-test	Test	2026-10-21T10:15:56.3271048Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:15:56.3272754Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.AtmospherePerformanceQualificationTests.CompareEquivalentTerrainAcrossAtmosphericModesAndZooms
+build-test	Test	2026-10-21T10:15:56.3273841Z   Set FORGELINE_ATMOSPHERE_BENCHMARK_OUTPUT for isolated hardware measurement.
+build-test	Test	2026-10-21T10:15:56.3274600Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:16:17.1965842Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.RenderQualityQualificationTests.CaptureProductionQualityProfilesWithTerrainEffectsAndSelectionOverlays
+build-test	Test	2026-10-21T10:16:17.1969396Z   Set FORGELINE_QUALITY_QUALIFICATION_OUTPUT for isolated hardware qualification.
+build-test	Test	2026-10-21T10:16:17.1971647Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:16:28.2095298Z ^[[33mskipped^[[m ForgeLine.Presentation.Tests.MaterialQuality.MaterialSequenceTests.CaptureControlledMaterialPanAndZoomPairs
+build-test	Test	2026-10-21T10:16:28.2108283Z   Set FORGELINE_MATERIAL_SEQUENCE_OUTPUT and FORGELINE_MATERIAL_BASELINE_ASSEMBLY for isolated hardware measurement.
+build-test	Test	2026-10-21T10:16:28.2112793Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:16:31.6889551Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) ^[[31mfailed with 1 error(s)^[[m ^[[90m(1m 17s 132ms)^[[m
+build-test	Test	2026-10-21T10:16:31.6891405Z Exit code: 2
+build-test	Test	2026-10-21T10:16:31.6894697Z   Standard output: [graphics:material] fallback asset="material.directorate.unit.main_battle_tank" reason="material asset is missing or has the wrong runtime type"
+build-test	Test	2026-10-21T10:16:31.6896495Z   [graphics:material] fallback asset="material.directorate.unit.main_battle_tank" reason="material asset is missing or has the wrong runtime type"
+build-test	Test	2026-10-21T10:16:31.6899576Z   [graphics:material] fallback asset="texture.residency.other" reason="Required pinned visual assets exceed the 96 MiB resident policy."
+build-test	Test	2026-10-21T10:16:31.6901016Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6902293Z   [graphics:surface] size=320x240 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6903332Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6904296Z   [graphics:surface] size=256x160 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6905276Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6906246Z   [graphics:surface] size=320x240 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6907501Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6908455Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6909224Z   [graphics:resize-request] requested=640x400 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.6910126Z   [graphics:resize-apply] requested=640x400 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.6910893Z   [graphics:resize-synchronized] generation=1 completedFence=25
+build-test	Test	2026-10-21T10:16:31.6911682Z   [graphics:resize-applied] size=640x400 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.6913820Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6915154Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6915894Z   [graphics:resize-request] requested=640x400 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.6916705Z   [graphics:resize-apply] requested=640x400 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.6917449Z   [graphics:resize-synchronized] generation=1 completedFence=25
+build-test	Test	2026-10-21T10:16:31.6918205Z   [graphics:resize-applied] size=640x400 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.6919553Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6920509Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6921268Z   [graphics:resize-request] requested=640x400 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.6922356Z   [graphics:resize-apply] requested=640x400 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.6923119Z   [graphics:resize-synchronized] generation=1 completedFence=28
+build-test	Test	2026-10-21T10:16:31.6923870Z   [graphics:resize-applied] size=640x400 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.6924919Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6925926Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6926934Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=True
+build-test	Test	2026-10-21T10:16:31.6928631Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6929872Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6930970Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6932013Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6933139Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6934291Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6935683Z   [graphics:surface] size=768x480 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6936715Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6938523Z   [graphics:surface] size=1024x640 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6940726Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6941740Z   [graphics:surface] size=1024x640 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6942776Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6943843Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6944854Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6946048Z   [graphics:surface] size=1024x640 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6947038Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6948075Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6949087Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6950089Z   [graphics:surface] size=768x480 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6951105Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6952103Z   [graphics:surface] size=768x480 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6953176Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6954184Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6955219Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6956220Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6957228Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6958438Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6959507Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6960565Z   [graphics:surface] size=320x240 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6961594Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6962799Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6963436Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.6964114Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.6964974Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.6965882Z   [graphics:resize-synchronized] generation=2 completedFence=38
+build-test	Test	2026-10-21T10:16:31.6966839Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.6967941Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6968875Z   [graphics:surface] size=768x480 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6969533Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.6970305Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.6971375Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.6972166Z   [graphics:resize-synchronized] generation=2 completedFence=26
+build-test	Test	2026-10-21T10:16:31.6973045Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.6974419Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6976152Z   [graphics:surface] size=1024x640 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6976861Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.6977607Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.6978753Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.6979561Z   [graphics:resize-synchronized] generation=2 completedFence=26
+build-test	Test	2026-10-21T10:16:31.6980375Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.6981711Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6982677Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6983330Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.6984208Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.6985064Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.6986609Z   [graphics:resize-synchronized] generation=2 completedFence=26
+build-test	Test	2026-10-21T10:16:31.6987674Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.6988782Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6989815Z   [graphics:surface] size=768x480 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6990534Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.6991267Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.6992079Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.6992857Z   [graphics:resize-synchronized] generation=2 completedFence=26
+build-test	Test	2026-10-21T10:16:31.6993629Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.6994723Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.6995764Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.6996433Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.6997142Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.6997966Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.6998742Z   [graphics:resize-synchronized] generation=2 completedFence=26
+build-test	Test	2026-10-21T10:16:31.6999506Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7000972Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7001987Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7002691Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.7003399Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.7004168Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7004924Z   [graphics:resize-synchronized] generation=2 completedFence=39
+build-test	Test	2026-10-21T10:16:31.7005697Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7006795Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7008146Z   [graphics:surface] size=1024x640 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7008804Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.7009537Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.7010320Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7011047Z   [graphics:resize-synchronized] generation=2 completedFence=26
+build-test	Test	2026-10-21T10:16:31.7011764Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7012788Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7013730Z   [graphics:surface] size=1024x640 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7014381Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.7015253Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.7016001Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7016747Z   [graphics:resize-synchronized] generation=2 completedFence=26
+build-test	Test	2026-10-21T10:16:31.7017592Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7018639Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7019580Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7020535Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.7021263Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.7022101Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7022850Z   [graphics:resize-synchronized] generation=2 completedFence=26
+build-test	Test	2026-10-21T10:16:31.7023723Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7024784Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7025740Z   [graphics:surface] size=768x480 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7026352Z   [graphics:resize-request] requested=0x0 action=suspend
+build-test	Test	2026-10-21T10:16:31.7027049Z   [graphics:resize-request] requested=400x300 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.7027860Z   [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7028615Z   [graphics:resize-synchronized] generation=2 completedFence=26
+build-test	Test	2026-10-21T10:16:31.7029373Z   [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7030450Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7031400Z   [graphics:surface] size=320x200 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7032354Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7033312Z   [graphics:surface] size=320x200 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7034092Z   [graphics:resize-request] requested=400x300 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7034863Z   [graphics:resize-apply] requested=400x300 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7035635Z   [graphics:resize-synchronized] generation=1 completedFence=14
+build-test	Test	2026-10-21T10:16:31.7036401Z   [graphics:resize-applied] size=400x300 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7037428Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7038386Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7040225Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7041322Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7042073Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7042807Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7043842Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7044783Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7045464Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7046211Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7046935Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7047707Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7048886Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7049831Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7050524Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7051366Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7052079Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7052809Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7053901Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7054841Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7055527Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7056309Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7057126Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7057855Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7058868Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7059827Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7061340Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7062407Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7063171Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7063931Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7064984Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7065960Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7066654Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7067483Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7068206Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7068949Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7070616Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7071675Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7072368Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7073100Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7074074Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7074846Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7075867Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7076814Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7077480Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7078213Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7078933Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7079618Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7080633Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7081862Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7082680Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7083408Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7084113Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7084942Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7085975Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7086954Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7087631Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7088351Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7089051Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7089785Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7090779Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7091718Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7092418Z   [graphics:resize-request] requested=640x360 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7093228Z   [graphics:resize-apply] requested=640x360 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7093971Z   [graphics:resize-synchronized] generation=1 completedFence=10
+build-test	Test	2026-10-21T10:16:31.7094743Z   [graphics:resize-applied] size=640x360 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7095783Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7096716Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7097400Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7099155Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7100090Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7100901Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7102050Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7103089Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7103863Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7104720Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7105522Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7106325Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7107824Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7108868Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7109631Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7110459Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7111256Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7112076Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7113175Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7114219Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7114987Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7115846Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7116778Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7117548Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7119165Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7120225Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7120975Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7121849Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7122661Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7123512Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7124669Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7125688Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7126377Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7127171Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7128009Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7128752Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7129846Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7130826Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7131562Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7132330Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7133089Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7133801Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7134870Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7135855Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7136570Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7137348Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7138092Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7139215Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7140342Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7141756Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7142582Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7143316Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7144155Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7144945Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7146101Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7147072Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7147795Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7148591Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7149325Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7150249Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7151289Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7152234Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7153044Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7153844Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7154646Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7155407Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7156483Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7157457Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7158180Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7160305Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7161190Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7161970Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7163120Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7164119Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7164858Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7165656Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7166428Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7167187Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7168266Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7169278Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7169999Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7170843Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7171604Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7172390Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7173473Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7174469Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7175228Z   [graphics:resize-request] requested=16x16 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7176292Z   [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7177066Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7177826Z   [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7178890Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7180189Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7181185Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7182166Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7183229Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7184201Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7185349Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7186322Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7187321Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7188389Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7189366Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7190295Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7191280Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7192195Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7193146Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7194122Z   [graphics:surface] size=256x256 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7195117Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7196145Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7197144Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7198134Z   [graphics:surface] size=1028x749 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7198885Z   [graphics:resize-request] requested=1600x900 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7199977Z   [graphics:resize-apply] requested=1600x900 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7200760Z   [graphics:resize-synchronized] generation=1 completedFence=1
+build-test	Test	2026-10-21T10:16:31.7201557Z   [graphics:resize-applied] size=1600x900 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7202650Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7203710Z   [graphics:surface] size=1028x749 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7204738Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7205730Z   [graphics:surface] size=1028x749 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7206726Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7207662Z   [graphics:surface] size=320x200 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7208622Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=True
+build-test	Test	2026-10-21T10:16:31.7209845Z   [graphics:surface] size=640x360 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7210817Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=True
+build-test	Test	2026-10-21T10:16:31.7211738Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7212737Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=True
+build-test	Test	2026-10-21T10:16:31.7213707Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7214718Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7215701Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7216750Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7217748Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7218825Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=True
+build-test	Test	2026-10-21T10:16:31.7220122Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7221184Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7222157Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7223166Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7224174Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7225149Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7226139Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7227147Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7228111Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7229095Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7230057Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7231084Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7232026Z   [graphics:surface] size=512x320 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7233028Z   [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+build-test	Test	2026-10-21T10:16:31.7234016Z   [graphics:surface] size=1028x720 buffers=3 present=Immediate
+build-test	Test	2026-10-21T10:16:31.7234777Z   [graphics:resize-request] requested=1280x720 generation=1 action=queued
+build-test	Test	2026-10-21T10:16:31.7235597Z   [graphics:resize-apply] requested=1280x720 generation=1 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7236377Z   [graphics:resize-synchronized] generation=1 completedFence=3
+build-test	Test	2026-10-21T10:16:31.7237197Z   [graphics:resize-applied] size=1280x720 generation=1 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7238035Z   [graphics:resize-request] requested=1600x900 generation=2 action=queued
+build-test	Test	2026-10-21T10:16:31.7238836Z   [graphics:resize-apply] requested=1600x900 generation=2 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7239626Z   [graphics:resize-synchronized] generation=2 completedFence=12
+build-test	Test	2026-10-21T10:16:31.7240790Z   [graphics:resize-applied] size=1600x900 generation=2 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7241615Z   [graphics:resize-request] requested=1280x720 generation=3 action=queued
+build-test	Test	2026-10-21T10:16:31.7242421Z   [graphics:resize-apply] requested=1280x720 generation=3 phase=synchronize
+build-test	Test	2026-10-21T10:16:31.7243424Z   [graphics:resize-synchronized] generation=3 completedFence=21
+build-test	Test	2026-10-21T10:16:31.7244274Z   [graphics:resize-applied] size=1280x720 generation=3 frameIndex=0 buffers=3
+build-test	Test	2026-10-21T10:16:31.7245303Z   Error output: [ui:font] Bundled UI font unavailable. Reinstall the application. Font texture unavailable.
+build-test	Test	2026-10-21T10:16:31.7246378Z   [ui:font] Bundled UI font unavailable. Reinstall the application. Font texture unavailable.
+build-test	Test	2026-10-21T10:16:31.7247340Z   [frontend:image:fallback] Optional menu image is absent; using command interface fallback.
+build-test	Test	2026-10-21T10:16:31.7248160Z   [frontend:image:fallback] Reinstall optional menu image.
+build-test	Test	2026-10-21T10:16:31.7248821Z   [frontend:image:fallback] Texture unavailable.
+build-test	Test	2026-10-21T10:16:31.7249875Z   [ui:skin:failed] Required UI skin unavailable. Reinstall the complete player. Runtime asset 'ui.skin.directorate.compiled' was not found.
+build-test	Test	2026-10-21T10:16:31.9771844Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:16:32.6068790Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(629ms)^[[m
+build-test	Test	2026-10-21T10:16:32.8526427Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:18:29.8982485Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(1m 57s 045ms)^[[m
+build-test	Test	2026-10-21T10:18:30.1464634Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:18:40.7423918Z ^[[33mskipped^[[m ForgeLine.Client.Tests.WorldAudioMixerTests.NativeWorldMixerStreamsAndReleasesOnTheRealDevice
+build-test	Test	2026-10-21T10:18:40.7425192Z   Not run (due to explicit test filtering)
+build-test	Test	2026-10-21T10:18:40.7426139Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:18:43.7156632Z ^[[33mskipped^[[m ForgeLine.Client.Tests.UiAudioReliabilityTests.NativeBuffersAndAsynchronousResultPlaybackReleaseOnTheRealDevice
+build-test	Test	2026-10-21T10:18:43.7158080Z   Not run (due to explicit test filtering)
+build-test	Test	2026-10-21T10:18:43.7159671Z   from D:\a\Forgeline\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:18:46.5784881Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(16s 432ms)^[[m
+build-test	Test	2026-10-21T10:18:46.8210880Z Running tests from D:\a\Forgeline\Forgeline\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64)
+build-test	Test	2026-10-21T10:32:19.5618362Z ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(13m 32s 743ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5666191Z 
+build-test	Test	2026-10-21T10:32:19.5679929Z ^[[31mTest run summary: Failed!
+build-test	Test	2026-10-21T10:32:19.5681400Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(13m 32s 743ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5683241Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(812ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5685075Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(1s 670ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5686745Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(580ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5688720Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(629ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5691013Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(659ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5692138Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(522ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5693221Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(1m 57s 045ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5694357Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(16s 432ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5695665Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(35s 780ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5697524Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) ^[[31mfailed with 1 error(s)^[[m ^[[90m(1m 17s 132ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5699660Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(488ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5701766Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(451ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5702788Z   ^[[mD:\a\Forgeline\Forgeline\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(499ms)^[[m
+build-test	Test	2026-10-21T10:32:19.5703315Z 
+build-test	Test	2026-10-21T10:32:19.5703499Z ^[[m  total: 3258
+build-test	Test	2026-10-21T10:32:19.5703815Z ^[[31m  failed: 1
+build-test	Test	2026-10-21T10:32:19.5704129Z ^[[m  succeeded: 3224
+build-test	Test	2026-10-21T10:32:19.5704415Z   skipped: 33
+build-test	Test	2026-10-21T10:32:19.5704816Z   duration: 17m 49s 195ms
+build-test	Test	2026-10-21T10:32:19.5705388Z Test run completed with non-success exit code: 2 (see: https://aka.ms/testingplatform/exitcodes)
+build-test	Test	2026-10-21T10:32:19.7089666Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "action": "Check",
+  "success": true,
+  "runRoot": "C:\\Users\\david.beusing\\.codex\\.chatgpt-projects\\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\\work\\scout-blender\\artifacts\\sc-toolchain\\runs\\c7287fe4db0240738913566463b4e367",
+  "toolchain": {
+    "executable": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+    "executableSha256": "f141a3c5754500e6f84361099a4cd53f0bb7662b6a0d2cfaaa8fbb63e92234a0",
+    "capabilities": {
+      "background": true,
+      "bpy": true,
+      "buildHash": "d13f752e3b9c",
+      "machine": "AMD64",
+      "pointerBits": 64,
+      "pythonVersion": "3.13.13",
+      "schemaVersion": 1,
+      "system": "Windows",
+      "version": "5.2.2",
+      "versionCycle": "release"
+    }
+  },
+  "error": null
+}
