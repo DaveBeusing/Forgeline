@@ -443,24 +443,7 @@ public sealed class TerrainPresentationProfile
                         78.0f,
                         58.0f),
                     12.0f),
-                new(
-                    TerrainMaterialSlot.IndustrialGround,
-                    new Vector2(
-                        650.0f,
-                        520.0f),
-                    new Vector2(
-                        150.0f,
-                        120.0f),
-                    70.0f),
-                new(
-                    TerrainMaterialSlot.IndustrialGround,
-                    new Vector2(
-                        2_420.0f,
-                        2_560.0f),
-                    new Vector2(
-                        150.0f,
-                        120.0f),
-                    70.0f),
+                .. CreateIndustrialGroundRegions(),
                 new(
                     TerrainMaterialSlot.Scorched,
                     new Vector2(
@@ -471,6 +454,23 @@ public sealed class TerrainPresentationProfile
                         80.0f),
                     35.0f)
             ]);
+    }
+
+    private static IEnumerable<TerrainBlendRegion> CreateIndustrialGroundRegions()
+    {
+        // Compact working areas and soft offset fringes replace the isolated 300x240m rectangles.
+        foreach (var (center, orientation) in new[]
+        {
+            (new Vector2(650, 520), 1f),
+            (new Vector2(2420, 2560), -1f)
+        })
+        {
+            yield return new(TerrainMaterialSlot.IndustrialGround, center, new(48, 34), 58, .12f * orientation);
+            yield return new(TerrainMaterialSlot.IndustrialGround, center + new Vector2(72, 42) * orientation,
+                new(22, 14), 30, -.24f * orientation, .32f);
+            yield return new(TerrainMaterialSlot.IndustrialGround, center + new Vector2(-58, -42) * orientation,
+                new(18, 12), 28, .35f * orientation, .34f);
+        }
     }
 
     private static IEnumerable<TerrainBlendRegion> CreateRoadRegions()
