@@ -134,5 +134,40 @@ human visual approval remain separate open gates. No budget, threshold or
 golden is relaxed. No production promotion, merge, tag or release is authorized
 by a saved master, passing schema or repeatable still image.
 
-Current-source build/test/compiler/native/package results are recorded as they
-complete; unexecuted work remains pending.
+## Native authoring and runtime checkpoint
+
+Original-source preservation at 22f5bde1a6ce4544462eb7ca963747ea5524b9c5 passed
+88 compiler/source-less catalogs and all 22 typed family comparisons. Its actual
+authoring producer scripts match 75ef57ae35e1d665affc56c61aeabbf8d26583ae.
+The explicit pipe correction at 22f5bde1a6ce4544462eb7ca963747ea5524b9c5 passed
+independent/reopened native exports, four compiler/source-less catalogs and the
+exact typed rotation test.
+
+Final compact-binding producer source 09036b0261798a90e954adf840b74757384e2365
+passed all 22 native families, 132 actual mutation rejections, 88 compiler/source-
+less catalogs and 22 typed comparisons. All repeated/reopened source/runtime
+bytes match. The retained verifier confirms 22 rest/inspection pairs and 44
+canonical exports against the current source contracts.
+
+Both full catalogs contain 1363 assets. Original/candidate container sizes
+are 74,844,887 / 74,844,758 bytes. Exactly 44 scoped prop containers differ; every
+unrelated runtime hash and all metadata/material/LOD/collision references match.
+Texture-container bytes remain 59,453,925; excluding the existing 1,786,417 splash
+bytes leaves 57,667,508 gameplay bytes below the unchanged 58,720,256-byte gate.
+This is a compiled-container metric, not complete measured GPU memory.
+
+The full Release build passed with zero warnings/errors. Focused checks passed
+91 presentation/reference, three map-dressing, four updated gallery and three
+portable source/axis cases. The shared Blender portable suite passed 119 tests.
+The three-worker compiler proof passed twelve source-less catalogs. Cache lock,
+interruption/recovery, source-less and damaged-deployment process contracts pass.
+Map qualification passes 71 reachability and two alternatives each for navigation
+and roads. Exact master main CI also passes. Full solution, paired native player
+views, package/install and current-PR CI remain pending at this checkpoint.
+
+The first native attempt's material-slot mutation selected a materialless
+collision proxy; the scoped test now targets the visual root. A later bound
+run correctly failed on a 275-character Windows source-clone path. Compact
+filenames reduce that measured path to 239 characters; every renamed GLB hash
+remained identical. Failed/interrupted directories are retained as nonpasses,
+not reused as final qualification.

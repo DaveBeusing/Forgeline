@@ -1,15 +1,15 @@
 {
   "id": "mesh.world.prop.crate",
-  "type": "mesh",
-  "source": "../sources/mesh_world_prop_crate_production.gltf",
+  "lods": [
+    {
+      "assetId": "mesh.world.prop.crate_lod1",
+      "level": 1,
+      "maxDistance": 200
+    }
+  ],
   "materialReferences": [
     "material.world.prop.industrial"
   ],
-  "lods": [
-    {
-      "level": 1,
-      "assetId": "mesh.world.prop.crate_lod1",
-      "maxDistance": 200
-    }
-  ]
+  "source": "../sources/blender/props/crate/high.glb",
+  "type": "mesh"
 }

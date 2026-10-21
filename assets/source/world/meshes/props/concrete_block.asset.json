@@ -1,15 +1,15 @@
 {
   "id": "mesh.world.prop.concrete_block",
-  "type": "mesh",
-  "source": "../sources/mesh_world_prop_concrete_block_production.gltf",
+  "lods": [
+    {
+      "assetId": "mesh.world.prop.concrete_block_lod1",
+      "level": 1,
+      "maxDistance": 260
+    }
+  ],
   "materialReferences": [
     "material.world.prop.industrial"
   ],
-  "lods": [
-    {
-      "level": 1,
-      "assetId": "mesh.world.prop.concrete_block_lod1",
-      "maxDistance": 260
-    }
-  ]
+  "source": "../sources/blender/props/concrete_block/high.glb",
+  "type": "mesh"
 }

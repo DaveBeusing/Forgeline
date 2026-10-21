@@ -1,0 +1,33 @@
+{
+  "blenderVersion": "5.2.2",
+  "exports": [
+    {
+      "definition": "world/meshes/kit/rock_slab.asset.json",
+      "id": "mesh.world.prop.rock_slab",
+      "sha256": "17e73a98034ee8eaf158c151cd93ac946a858b449d53695542d224f79b590358"
+    },
+    {
+      "definition": "world/meshes/kit/rock_slab_lod1.asset.json",
+      "id": "mesh.world.prop.rock_slab_lod1",
+      "sha256": "3c78a3f6c6bf82fd0002b9c05ee3ba77fba0640f316f0947afd6ebacacd8fd3b"
+    }
+  ],
+  "fixtureSha256": "56da1a8e466046d0e7bbcb04683b960228f48f75cf98fa1ec22f9be8c8fca1a9",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "rock_slab.blend",
+      "sha256": "f70760a362c39ffda6bd503ce9cbce4d35527123960f06a4deb06708ffa19a5f"
+    },
+    {
+      "path": "rock_slab_inspection.blend",
+      "sha256": "cdba5594430637d84b4ebfd8c2a70a26552fda87363eaf828797983c4b91ae31"
+    }
+  ],
+  "physicalPerformance": "pending",
+  "schemaVersion": 1,
+  "signaturePolicy": "lf-json-v1",
+  "sourceSha": "09036b0261798a90e954adf840b74757384e2365",
+  "sourceSignature": "cb479ebed9926a87804fdcb99a2229cef49af6c3fe4e5c472f4086c25c21010a",
+  "status": "review-bound-not-accepted"
+}

@@ -1,17 +1,17 @@
 {
+  "collisionReference": "mesh.world.kit.collision_centered",
+  "collisionRequired": true,
   "id": "mesh.world.prop.service_fence",
-  "type": "mesh",
-  "source": "../sources/environment_kit/service_fence_high.gltf",
-  "materialReferences": [
-    "material.world.prop.industrial"
-  ],
   "lods": [
     {
-      "level": 1,
       "assetId": "mesh.world.prop.service_fence_lod1",
+      "level": 1,
       "maxDistance": 300
     }
   ],
-  "collisionReference": "mesh.world.kit.collision_centered",
-  "collisionRequired": true
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "source": "../sources/blender/props/service_fence/high.glb",
+  "type": "mesh"
 }

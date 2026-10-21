@@ -1,8 +1,8 @@
 {
   "id": "mesh.world.prop.scorched_barrier_lod1",
-  "type": "mesh",
   "materialReferences": [
     "material.world.prop.industrial"
   ],
-  "source": "../sources/battlefield/scorched_barrier_lod1.gltf"
+  "source": "../sources/blender/props/scorched_barrier/reduced.glb",
+  "type": "mesh"
 }

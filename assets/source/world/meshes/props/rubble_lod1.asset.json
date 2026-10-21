@@ -1,8 +1,8 @@
 {
   "id": "mesh.world.prop.rubble_lod1",
-  "type": "mesh",
-  "source": "../sources/battlefield/rubble_lod1.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
-  ]
+  ],
+  "source": "../sources/blender/props/rubble/reduced.glb",
+  "type": "mesh"
 }

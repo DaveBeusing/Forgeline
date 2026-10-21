@@ -1,15 +1,15 @@
 {
   "id": "mesh.world.prop.rock",
-  "type": "mesh",
-  "source": "../sources/mesh_world_prop_rock_production.gltf",
+  "lods": [
+    {
+      "assetId": "mesh.world.prop.rock_lod1",
+      "level": 1,
+      "maxDistance": 220
+    }
+  ],
   "materialReferences": [
     "material.world.prop.industrial"
   ],
-  "lods": [
-    {
-      "level": 1,
-      "assetId": "mesh.world.prop.rock_lod1",
-      "maxDistance": 220
-    }
-  ]
+  "source": "../sources/blender/props/rock/high.glb",
+  "type": "mesh"
 }

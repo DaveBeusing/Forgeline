@@ -1,0 +1,33 @@
+{
+  "blenderVersion": "5.2.2",
+  "exports": [
+    {
+      "definition": "world/meshes/props/utility_box.asset.json",
+      "id": "mesh.world.prop.utility_box",
+      "sha256": "276ace504922027e7f02df72d956360fa1c060da2c33a824bc10d6bf857caaa3"
+    },
+    {
+      "definition": "world/meshes/props/utility_box_lod1.asset.json",
+      "id": "mesh.world.prop.utility_box_lod1",
+      "sha256": "f37de8ac35fbe8472bd3f5977f60d7f8b89b1d675329f970dabcff1b7935ffed"
+    }
+  ],
+  "fixtureSha256": "56da1a8e466046d0e7bbcb04683b960228f48f75cf98fa1ec22f9be8c8fca1a9",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "utility_box.blend",
+      "sha256": "9ddae86cd3a257fd86995512c0662d8ec54833076b8095c7d40f985ef0234ef7"
+    },
+    {
+      "path": "utility_box_inspection.blend",
+      "sha256": "ecf2091a44443535903d0c5f42b88421734200259f2fd7e7fcabe587fd0aa981"
+    }
+  ],
+  "physicalPerformance": "pending",
+  "schemaVersion": 1,
+  "signaturePolicy": "lf-json-v1",
+  "sourceSha": "09036b0261798a90e954adf840b74757384e2365",
+  "sourceSignature": "102447114d978b142b6bcf0ad5fbb58d792718a79b99937a04c2b7277741dcce",
+  "status": "review-bound-not-accepted"
+}

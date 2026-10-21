@@ -1,17 +1,17 @@
 {
+  "collisionReference": "mesh.world.kit.collision_centered",
+  "collisionRequired": true,
   "id": "mesh.world.prop.rock_slab",
-  "type": "mesh",
-  "source": "../sources/environment_kit/rock_slab_high.gltf",
-  "materialReferences": [
-    "material.world.prop.industrial"
-  ],
   "lods": [
     {
-      "level": 1,
       "assetId": "mesh.world.prop.rock_slab_lod1",
+      "level": 1,
       "maxDistance": 220
     }
   ],
-  "collisionReference": "mesh.world.kit.collision_centered",
-  "collisionRequired": true
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "source": "../sources/blender/props/rock_slab/high.glb",
+  "type": "mesh"
 }

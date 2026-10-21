@@ -1,8 +1,8 @@
 {
   "id": "mesh.world.prop.loading_gantry_lod1",
-  "type": "mesh",
-  "source": "../sources/environment_kit/loading_gantry_reduced.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
-  ]
+  ],
+  "source": "../sources/blender/props/loading_gantry/reduced.glb",
+  "type": "mesh"
 }

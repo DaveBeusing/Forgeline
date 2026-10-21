@@ -1,15 +1,15 @@
 {
   "id": "mesh.world.prop.pallet",
-  "type": "mesh",
-  "source": "../sources/mesh_world_prop_pallet_production.gltf",
+  "lods": [
+    {
+      "assetId": "mesh.world.prop.pallet_lod1",
+      "level": 1,
+      "maxDistance": 180
+    }
+  ],
   "materialReferences": [
     "material.world.prop.industrial"
   ],
-  "lods": [
-    {
-      "level": 1,
-      "assetId": "mesh.world.prop.pallet_lod1",
-      "maxDistance": 180
-    }
-  ]
+  "source": "../sources/blender/props/pallet/high.glb",
+  "type": "mesh"
 }
