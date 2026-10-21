@@ -18,6 +18,7 @@ def run(request):
     parser.add_argument('--fixtures', required=True, type=Path)
     parser.add_argument('--family', required=True)
     parser.add_argument('--blend-file', type=Path)
+    parser.add_argument('--inspect', action='store_true')
     parser.add_argument('--render', action='store_true')
     args = parser.parse_args(request['arguments'])
     root = 'mesh.world.resource.' + args.family
@@ -25,6 +26,8 @@ def run(request):
     if args.blend_file:
         forwarded += ['--action', 'Export', '--blend-file', str(args.blend_file)]
     roundtrip.run(dict(request, arguments=forwarded))
+    if not (args.inspect or args.render):
+        return
     output = Path(request['outputRoot'])
     catalog = Catalog(request['inputRoot'])
     ids, families = fixture_selection(catalog, args.fixtures, [root])

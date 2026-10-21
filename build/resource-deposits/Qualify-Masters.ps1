@@ -19,6 +19,7 @@ foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
     $familyRoot = Join-Path $output $family
     foreach ($variant in @('first','second','reopened')) {
         $arguments = @('--fixtures', $fixture, '--family', $family)
+        if ($variant -eq 'first') { $arguments += '--inspect' }
         if ($variant -eq 'reopened') { $arguments += @('--blend-file', (Join-Path $familyRoot 'first/authoring.blend')) }
         if ($RenderPreviews -and $variant -eq 'first') { $arguments += '--render' }
         & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'author.py') -InputRoot assets/source -OutputRoot (Join-Path $familyRoot $variant) -ScriptArguments $arguments -BlenderPath $BlenderPath -TimeoutSeconds 480
