@@ -6,19 +6,22 @@ using ForgeLine.World;
 namespace ForgeLine.Presentation;
 
 // Derived scenery over existing geography. No graph, blocker or ECS transform is changed.
-internal sealed class CrossingVisualLayout(TerrainWorld terrain)
+internal sealed class CrossingVisualLayout
 {
     private static readonly (float Cargo,float Supply) TruckOffsets=CreateTruckOffsets();
+    private const float Clearance=.03f;
+    private static readonly float[] CrossSamples=[-9,-8.4f,-6,0,6,8.4f,9];
     private readonly List<DrivingSurface> _surfaces=[];
-    private readonly record struct DrivingSurface(Vector3 Center,Vector3 Direction,Vector3 Normal,bool Bridge);
+    private readonly List<DrivingCorridor> _corridors=[];
+    private readonly record struct DrivingSurface(Vector3 Center,Vector3 Direction,Vector3 Normal,float HalfLength,bool Bridge);
+    private readonly record struct DrivingCorridor(Vector3 Center,Vector3 Direction,float HalfLength,bool Bridge);
     internal Dictionary<string,RenderTransform> Crossings { get; }=new(StringComparer.Ordinal);
     internal Dictionary<string,RenderTransform> Aprons { get; }=new(StringComparer.Ordinal);
     internal List<RenderInstance> Approaches { get; }=[];
 
     internal static CrossingVisualLayout Create(BattlefieldDefinition map,TerrainWorld terrain)
     {
-        var result=new CrossingVisualLayout(terrain);
-        ReadOnlySpan<float> lateralSamples=[-6,0,6];
+        var result=new CrossingVisualLayout();
         foreach(var crossing in map.Crossings)
         {
             var edge=map.RoadEdges.Single(x=>x.Key==crossing.LogisticsEdgeKey);
@@ -38,53 +41,111 @@ internal sealed class CrossingVisualLayout(TerrainWorld terrain)
             Vector3 anchor=(near+far)*.5f;
             float crown=0;
             for(int i=0;i<=16;i++)
-            foreach(float lateral in lateralSamples)
+            foreach(float lateral in CrossSamples)
             {
                 Vector3 p=Vector3.Lerp(near,far,i/16f)+side*lateral;
                 crown=Math.Max(crown,Ground(p).Y-PlaneHeight(anchor,normal,p));
             }
-            anchor.Y+=crown+.021f;
-            result._surfaces.Add(new(anchor,direction,normal,bridge));
+            anchor.Y+=crown+Clearance;
+            Vector3 nearTop=near with { Y=PlaneHeight(anchor,normal,near) };
+            Vector3 farTop=far with { Y=PlaneHeight(anchor,normal,far) };
+            Vector3[] nearPath=ClearPath(start,Ground(center-direction*29));
+            Vector3[] farPath=ClearPath(Ground(center+direction*29),end);
+            // Raising both ramp endpoints clears its interior without breaking a shared road edge.
+            float nearLift=RequiredLift(nearPath[^1],nearTop),farLift=RequiredLift(farTop,farPath[0]);
+            nearPath[^1]+=Vector3.UnitY*nearLift;nearTop+=Vector3.UnitY*nearLift;
+            farPath[0]+=Vector3.UnitY*farLift;farTop+=Vector3.UnitY*farLift;
+            span=farTop-nearTop;
+            rotation=Pose(nearTop,farTop);
+            normal=Vector3.Transform(Vector3.UnitY,rotation);
+            anchor=(nearTop+farTop)*.5f;
+            AddSurface(nearTop,farTop);
+            result._corridors.Add(new(center,direction,Math.Max(MathF.Abs(Vector3.Dot(start-center,direction)),MathF.Abs(Vector3.Dot(end-center,direction))),bridge));
             // Catalog lift plus the authored top: bridge (.25-.07)*4; road (.48-.42)*.35.
             float floorOffset=bridge?.72f:.021f;
             result.Crossings.Add(crossing.Key,new(anchor-normal*floorOffset,rotation,
                 new(bridge?18:12,bridge?4:.35f,span.Length())));
-            Vector3 nearTop=near with { Y=PlaneHeight(anchor,normal,near) };
-            Vector3 farTop=far with { Y=PlaneHeight(anchor,normal,far) };
-            Vector3 nearRoad=Ground(center-direction*29),farRoad=Ground(center+direction*29);
             if(bridge)
             {
                 if(crossing.Key=="crossing.north_bridge")
                 {
-                    result.Aprons.Add("kit.bridge-apron.north",Apron(nearTop,nearRoad,-direction));
-                    result.Aprons.Add("kit.bridge-apron.south",Apron(farTop,farRoad,direction));
+                    result.Aprons.Add("kit.bridge-apron.north",Apron(nearTop,nearPath[^1],-direction));
+                    result.Aprons.Add("kit.bridge-apron.south",Apron(farTop,farPath[0],direction));
                 }
+                AddSurface(nearPath[^1],nearTop);AddSurface(farTop,farPath[0]);
             }
             else
             {
-                AddStrip(nearRoad+Vector3.UnitY*.021f,nearTop,true);
-                AddStrip(farTop,farRoad+Vector3.UnitY*.021f,true);
+                AddStrip(nearPath[^1],nearTop);
+                AddStrip(farTop,farPath[0]);
             }
-            AddApproach(start,nearRoad);
-            AddApproach(farRoad,end);
+            EmitPath(nearPath);EmitPath(farPath);
 
-            void AddApproach(Vector3 a,Vector3 b)
+            Vector3[] ClearPath(Vector3 a,Vector3 b)
             {
                 float length=Vector2.Distance(new(a.X,a.Z),new(b.X,b.Z));
                 int segments=Math.Max(1,(int)MathF.Ceiling(length/8));
+                var points=new Vector3[segments+1];
+                for(int i=0;i<=segments;i++)
+                {
+                    Vector3 point=Vector3.Lerp(a,b,(float)i/segments);
+                    float height=Ground(point).Y;
+                    foreach(float lateral in CrossSamples)height=Math.Max(height,Ground(point+side*lateral).Y);
+                    points[i]=point with { Y=height+Clearance };
+                }
                 for(int i=0;i<segments;i++)
-                    AddStrip(Ground(Vector3.Lerp(a,b,(float)i/segments)),Ground(Vector3.Lerp(a,b,(float)(i+1)/segments)),false);
+                {
+                    float lift=RequiredLift(points[i],points[i+1]);
+                    points[i]+=Vector3.UnitY*lift;points[i+1]+=Vector3.UnitY*lift;
+                }
+                return points;
             }
-            void AddStrip(Vector3 a,Vector3 b,bool floorEndpoints)
+            float RequiredLift(Vector3 a,Vector3 b)
+            {
+                float lift=0;
+                for(int i=0;i<=16;i++)
+                foreach(float lateral in CrossSamples)
+                {
+                    Vector3 point=Vector3.Lerp(a,b,i/16f)+side*lateral;
+                    lift=Math.Max(lift,Ground(point).Y+Clearance-point.Y);
+                }
+                return lift>0?lift+.0001f:0;
+            }
+            void EmitPath(Vector3[] path)
+            {
+                for(int i=1;i<path.Length;i++)AddStrip(path[i-1],path[i]);
+            }
+            Quaternion Pose(Vector3 a,Vector3 b)
             {
                 Vector3 delta=b-a;
-                float horizontal=new Vector2(delta.X,delta.Z).Length();
-                Quaternion pose=Quaternion.CreateFromYawPitchRoll(yaw,-MathF.Atan2(delta.Y,horizontal),0);
+                return Quaternion.CreateFromYawPitchRoll(yaw,-MathF.Atan2(delta.Y,new Vector2(delta.X,delta.Z).Length()),0);
+            }
+            void AddSurface(Vector3 a,Vector3 b)
+            {
+                result._surfaces.Add(new((a+b)*.5f,direction,Vector3.Transform(Vector3.UnitY,Pose(a,b)),
+                    Vector2.Distance(new(a.X,a.Z),new(b.X,b.Z))*.5f,bridge));
+            }
+            void AddStrip(Vector3 a,Vector3 b)
+            {
+                Vector3 delta=b-a;
+                Quaternion pose=Pose(a,b);
                 Vector3 up=Vector3.Transform(Vector3.UnitY,pose);
-                Vector3 origin=(a+b)*.5f-(floorEndpoints?up*.021f:Vector3.Zero);
-                Add(origin,pose,new(12,.35f,delta.Length()),InfrastructurePresentationKind.RoadSegment);
-                Add(origin-side*7.2f+up*.021f,pose,new(15,.30f,delta.Length()),InfrastructurePresentationKind.RoadShoulder);
-                Add(origin+side*7.2f+up*.021f,pose,new(15,.30f,delta.Length()),InfrastructurePresentationKind.RoadShoulder);
+                float gap=0;
+                for(int i=0;i<=16;i++)
+                foreach(float lateral in CrossSamples)
+                {
+                    Vector3 point=Vector3.Lerp(a,b,i/16f)+side*lateral;
+                    gap=Math.Max(gap,point.Y-Ground(point).Y);
+                }
+                // Extend the existing solid slab and gravel support below the terrain, never float a thin tile.
+                float roadHeight=Math.Max(.35f,(gap+Clearance)*up.Y/.08f);
+                float shoulderHeight=Math.Max(.30f,(gap+Clearance)*up.Y/.06f);
+                Vector3 floor=(a+b)*.5f;
+                Add(floor-up*(.06f*roadHeight),pose,new(12,roadHeight,delta.Length()),InfrastructurePresentationKind.RoadSegment);
+                Vector3 shoulderRoot=floor+up*(.01f*shoulderHeight-.003f);
+                Add(shoulderRoot-side*7.2f,pose,new(15,shoulderHeight,delta.Length()),InfrastructurePresentationKind.RoadShoulder);
+                Add(shoulderRoot+side*7.2f,pose,new(15,shoulderHeight,delta.Length()),InfrastructurePresentationKind.RoadShoulder);
+                AddSurface(a,b);
             }
         }
         return result;
@@ -94,9 +155,8 @@ internal sealed class CrossingVisualLayout(TerrainWorld terrain)
             if(!terrain.TrySampleHeight(p.X,p.Z,out float h)) throw new InvalidOperationException("Crossing visual lies outside terrain.");
             return p with { Y=h };
         }
-        static RenderTransform Apron(Vector3 high,Vector3 lowGround,Vector3 outward)
+        static RenderTransform Apron(Vector3 high,Vector3 low,Vector3 outward)
         {
-            Vector3 low=lowGround+Vector3.UnitY*.021f;
             Vector3 delta=low-high;
             float depth=MathF.Sqrt(delta.LengthSquared()-.058f*.058f);
             float pitch=MathF.Atan2(-.058f,depth)-MathF.Atan2(delta.Y,8);
@@ -125,24 +185,18 @@ internal sealed class CrossingVisualLayout(TerrainWorld terrain)
 
     internal bool TryDrivingSurface(Vector3 point,out float height,out Vector3 normal,bool bridgeOperational=true,bool fordOperational=true)
     {
-        foreach(var surface in _surfaces)
+        foreach(var corridor in _corridors)
         {
-            if(surface.Bridge?!bridgeOperational:!fordOperational) continue;
-            Vector3 delta=point-surface.Center;
-            float along=Vector3.Dot(delta,surface.Direction);
-            float lateral=Vector3.Dot(delta,Vector3.Cross(Vector3.UnitY,surface.Direction));
-            if(MathF.Abs(along)>29||MathF.Abs(lateral)>6) continue;
-            normal=surface.Normal;
-            if(MathF.Abs(along)<=21)
-            { height=PlaneHeight(surface.Center,normal,point);return true; }
-            Vector3 outward=surface.Direction*MathF.Sign(along);
-            Vector3 edge=surface.Center+outward*21,outside=surface.Center+outward*29;
-            if(!terrain.TrySampleHeight(outside.X,outside.Z,out float ground)) throw new InvalidOperationException("Crossing apron lies outside terrain.");
-            float high=PlaneHeight(surface.Center,normal,edge),low=ground+.021f;
-            float slope=(low-high)/8;
-            normal=Vector3.Normalize(Vector3.UnitY-outward*slope);
-            height=high+(MathF.Abs(along)-21)*slope;
-            return true;
+            if(corridor.Bridge?!bridgeOperational:!fordOperational)continue;
+            Vector3 delta=point-corridor.Center;
+            if(MathF.Abs(Vector3.Dot(delta,corridor.Direction))>corridor.HalfLength+.001f ||
+                MathF.Abs(Vector3.Dot(delta,Vector3.Cross(Vector3.UnitY,corridor.Direction)))>6)continue;
+            foreach(var surface in _surfaces)
+            {
+                if(surface.Bridge!=corridor.Bridge)continue;
+                if(MathF.Abs(Vector3.Dot(point-surface.Center,surface.Direction))>surface.HalfLength+.001f)continue;
+                normal=surface.Normal;height=PlaneHeight(surface.Center,normal,point);return true;
+            }
         }
         height=0;normal=Vector3.UnitY;return false;
     }

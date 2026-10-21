@@ -58,7 +58,11 @@ Windows runner; portable tests do not substitute for this native execution.
 
 Crossing render transforms now follow the current authoritative road endpoints.
 The North Bridge deck, two existing apron meshes and its west/east approaches
-share the actual travel axis. South Ford uses the existing road surface and two
+share the actual travel axis. Approach nodes and ramp endpoints are shared;
+17 samples per tile across seven lateral positions lift the drawn floor above
+terrain. Existing solid slabs and gravel shoulders extend below the terrain,
+with unchanged widths, source bounds and mesh/texture inventories.
+South Ford uses the existing road surface and two
 ramps. The 12m lane and paired 2.4m shoulders are retained; 234 static presentation
 instances cover the approaches. These identities do not consume simulation
 entities. Only drawn cargo/supply poses receive the operational crossing plane;

@@ -47,7 +47,11 @@ public sealed class CrossingVisualLayoutTests
             Assert.InRange(MathF.Abs(low.X-outsideX),0,.001f);
             Assert.InRange(MathF.Abs(low.Z-920),0,.001f);
             Assert.True(terrain.TrySampleHeight(outsideX,920,out float height));
-            Assert.InRange(MathF.Abs(low.Y-height-.021f),0,.001f);
+            Assert.True(low.Y>=height+.029f);
+            var roadEnds=layout.Approaches.Where(x=>x.InfrastructureFeature.Kind==InfrastructurePresentationKind.RoadSegment)
+                .SelectMany(x=>new[] { RoadPoint(x,0,-.5f),RoadPoint(x,0,.5f) })
+                .Where(x=>MathF.Abs(x.X-outsideX)<.001f&&MathF.Abs(x.Z-920)<.001f).ToArray();
+            Assert.InRange(Vector3.Distance(low,Assert.Single(roadEnds)),0,.001f);
         }
     }
 
@@ -75,7 +79,7 @@ public sealed class CrossingVisualLayoutTests
         var map=CentralDivideBattlefield.Create();var terrain=CentralDivideTerrainFactory.Create(map);
         var layout=CrossingVisualLayout.Create(map,terrain);
         var units=DirectorateContent.CreateUnitCatalog();
-        foreach(float x in new float[] { 1511,1520,1536,1552,1561 })
+        foreach(float x in new float[] { 1380,1486,1500,1511,1520,1536,1552,1561,1575,1586,1692 })
         foreach(bool cargo in new bool[] { true,false })
         {
             var definition=units[cargo?UnitIds.CargoTruck:UnitIds.SupplyTruck];
@@ -91,6 +95,32 @@ public sealed class CrossingVisualLayoutTests
             Assert.Equal(original,layout.GroundTruck(original,cargo,false,false));
         }
     }
+
+    [Fact]
+    public void EveryApproachAndShoulderClearsTerrainAcrossItsWidthWithSolidGroundedSupport()
+    {
+        var map=CentralDivideBattlefield.Create();var terrain=CentralDivideTerrainFactory.Create(map);
+        var layout=CrossingVisualLayout.Create(map,terrain);
+        foreach(var item in layout.Approaches)
+        {
+            bool shoulder=item.InfrastructureFeature.Kind==InfrastructurePresentationKind.RoadShoulder;
+            var world=InfrastructurePresentationCatalog.AdjustWorldTransform(item.InfrastructureFeature,item.Transform.ToMatrix());
+            for(int i=0;i<=16;i++)
+            for(int lateral=-1;lateral<=1;lateral++)
+            {
+                float x=lateral*(shoulder?.08f:.5f),z=i/16f-.5f;
+                Vector3 top=Vector3.Transform(new(x,shoulder?-.43f:-.42f,z),world);
+                Vector3 bottom=Vector3.Transform(new(x,shoulder?-.49f:-.5f,z),world);
+                Assert.True(terrain.TrySampleHeight(top.X,top.Z,out float ground));
+                Assert.True(top.Y>=ground+(shoulder?.025f:.028f),$"Road surface intersects terrain at {top}.");
+                Assert.True(terrain.TrySampleHeight(bottom.X,bottom.Z,out float under));
+                Assert.True(bottom.Y<=under+.001f,$"Support floats above terrain at {bottom}.");
+            }
+        }
+    }
+
+    private static Vector3 RoadPoint(RenderInstance item,float x,float z)=>Vector3.Transform(new(x,-.42f,z),
+        InfrastructurePresentationCatalog.AdjustWorldTransform(item.InfrastructureFeature,item.Transform.ToMatrix()));
 
     [Theory]
     [InlineData(920)]
