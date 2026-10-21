@@ -4,7 +4,7 @@ The branch is synchronized with master `34c69dd97db417d1982fd7bf75cb1baa197082f6
 (merged terrain #284, staged vegetation #281 and world-prop #283), version
 0.1.438. The current decal candidate is **0.1.439**, exactly one PATCH higher.
 Earlier qualification sections retain their actual source identities and versions.
-The final integration refresh follows below; the path-corrected native masters
+The final integration results are recorded below; the path-corrected native masters
 retain their separately verified `f7d63b7d` input hashes.
 
 ## Integration audit
@@ -421,3 +421,95 @@ indexes **337 original files**. The local archive
 every entry was read back and hash-verified. The actual native metadata is
 committed as reproducible gzip with portable path tokens. Final PR-head CI is
 verified independently; physical performance and human visual gates remain open.
+
+
+## Final integration on master 34c69dd9: 0.1.439
+
+Fetched master `34c69dd97db417d1982fd7bf75cb1baa197082f6` integrates world-prop
+PR #283 and tracks 0.1.438. The current candidate is **0.1.439**, exactly one
+PATCH higher. Measured runtime/build/package source:
+`7c6c3e93af6ceddba897b08a4db514de6e14668d`. Later commits add recorded evidence
+only. Historical 0.1.437/0.1.438 records retain their actual identities.
+
+The reference-scene conflict retains every one of the **107** existing master
+ordinals and both prop/decal dispatches, appending the nine decal scenes at
+107-115. The complete set of **39** decal authoring/texture/material/GLB inputs
+is byte-identical to the path-corrected native source `f7d63b7d`, so its genuine
+16 reopens / 24 exact channel rebakes / 200 TBN probes / relief-edit control
+remain directly applicable. No authoring execution is relabelled with a new
+source SHA. See [current lineage](evidence/battlefield-decals/integration-439/source-lineage.json).
+
+The latest prop PR's reviews/comments were empty. Its retained-prop, frame,
+CPU-scale and navigation checks passed; optional native jobs were skipped. Its
+main CI failed at the unchanged UI feedback zero-allocation test (expected zero,
+observed 3,968 bytes). That original log is retained separately, without causal
+attribution to prop/decal artwork or relaxation of the audio allocation gate.
+
+### Latest-base checks and catalogs
+
+- Release solution build: zero warnings/errors, **1m27.53s**.
+- Entire asset test project: **172 passed, zero failed/skipped**, 17m52.908s. This includes the exact 1,365-count assertions and real decal BC7/RGBA/source-less tests.
+- Merged presentation/terrain/vegetation/prop checks: **36 passed, 23 skipped**, zero failures. The skipped cases are inherited opt-in native prop gates.
+- Three prop source contracts pass; **22** retained rest/inspection master pairs and **44** High/Reduced exports match their source contracts.
+- Complete before/after catalogs compile and validate against an explicitly absent source path. The original eleven decal baseline files are overlaid on a fresh clone of the current source, retaining current prop geometry on both sides.
+
+Current catalog scope remains 1,363 before / 1,365 after assets. Exactly ten
+existing decal payloads change and two shared texture IDs are added; 1,353
+existing payloads remain byte-identical within that pair. Current after containers
+total **75,112,853 bytes**, texture containers **59,719,691**, and gameplay texture
+containers **57,933,274**. The unchanged 56 MiB limit leaves **786,982 bytes**.
+Shared decal resident texels remain **783,360 bytes**.
+
+Relative to the previous runtime baseline, **28** payloads change, all within the
+**44** integrated prop mesh IDs; stable dependency/bounds/LOD/collision/socket/
+mechanical metadata remains identical. All textures, materials, decal meshes and
+other unrelated payloads match. The prop meshes are absent from every pure decal
+fixture. This observed classification replaces the earlier read-only hypothesis
+that only two pipe payloads would differ; the failed hypothesis log is retained.
+Both current sides include the integrated props. See [current scope](evidence/battlefield-decals/integration-439/runtime-comparison.json)
+and [base-change classification](evidence/battlefield-decals/integration-439/runtime-equivalence.json).
+
+### Current-source images, timing and installation
+
+The current executable produces **ten fresh paired settings / twenty original
+PNG files**: six substrate/slope/overlap galleries, 1/100/1,000 normal-distance
+loads and the dense 1,000-decal close view. Every eight-repeat readback agrees;
+all paired geometry/camera/terrain/submission counters match; no fallback mesh,
+material/texture binding failure or submission fault is reported. All twenty
+PNGs match the corresponding historical originals byte-for-byte. The five
+freshly installed native views also reproduce current pixels exactly. These
+matches establish image continuity while preserving distinct source identities;
+the original broader 43-pair matrix remains explicitly historical.
+
+Gallery and load cohorts fail the unchanged 15% timing gate; dense-close passes.
+No failed timing observation is dropped or relabelled. Current full-quality maps
+add the same 263,720 resident bytes / two textures / two descriptors. Fixed-camera
+sample phases have no resource churn. These ten cases peak at **45,070,076
+resident texture bytes / 94 descriptors**, within the unchanged 4,096 capacity.
+The GPU trace has **149** samples, all P8 at 172-180 MHz, memory clock
+405 MHz, 10.77-16.71 W and
+41-42 degrees C.
+Shared-workstation timings cannot qualify sustained physical performance.
+[Native inventory](evidence/battlefield-decals/integration-439/native-inventory.json)
+and [image continuity](evidence/battlefield-decals/integration-439/image-continuity.json)
+retain full distributions, counters and source/image hashes.
+
+The fresh reproducible **0.1.439** ZIP is **55,174,759 bytes**,
+SHA-256 `3dbd77276b7c88e88f290ca863f27526725c2f0c90deddef44f522722858e760`. Its two independent publish trees match. All
+1,489 installation hashes pass; all 1,366 compiled manifest/container files equal
+the measured current runtime, plus the same 63 publisher media files. Both fresh-
+settings package starts exit zero. No Blender, GLB/glTF or Python/PowerShell
+source is packaged. Its whole-runtime fingerprint differs because of publisher
+media additions; it is not relabelled identical. See [installation](evidence/battlefield-decals/integration-439/installation.json)
+and [package result](evidence/battlefield-decals/integration-439/package-status.json).
+
+The current [evidence index](evidence/battlefield-decals/integration-439/evidence-index.json)
+retains **129 original files**. Local archive `artifacts/battlefield-decal-integration439.zip`:
+**105,081,311 bytes**, SHA-256 `c8eb3ba1d96fc7cfec54d32003790fcc746812b707f07f03d811b87ed7dcaefd`. All entries were
+read back and hash-verified. Reproducible metadata gzip and source indexes are
+committed; the original native PNGs remain unchanged in the indexed archive.
+Earlier archives remain separate and retain their source identities.
+
+Final-head CI is verified in PR #282. The PR stays **draft** while failed timing
+cohorts, broader physical renderer gates and human visual acceptance remain open.
+No merge, release, tag or golden approval is performed.

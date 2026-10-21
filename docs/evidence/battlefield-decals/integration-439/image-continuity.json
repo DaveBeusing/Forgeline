@@ -1,0 +1,245 @@
+{
+  "success": true,
+  "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+  "currentMaster": "34c69dd97db417d1982fd7bf75cb1baa197082f6",
+  "currentControls": [
+    {
+      "cohort": "gallery",
+      "side": "before",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "9D34F88952C27574738FD5AAE891BD9B57973592302CAE96CDE88D4AA8C5A524",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "before",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "EF0A865349FE99D84D11AF2707B69297738C4B8153DCF84724E5AA03DB56C94B",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "before",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "B857518B805717408DB943B9D46EC2C413AD198EA19FA820BD0BB0C3A6296A20",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "before",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "D320ABE643DA22F44D68FDA27F449126C4BFA45B9C531BD9E146A9271EC76234",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "before",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "F87423A3E254FB846C6A06B4F368BFE0D11AFD4F97117280E44018E1ECAE34F0",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "before",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "DD318DC345BA64B8F26B11CA65FF55616E37AE187089B9A54171BB9A96C75863",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "after",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "F0D43CDFCEB6DDE1E9CFCD5BB5AA4D4ED273AFD3CAE607C3933ADB0CD07C4CBF",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "after",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "B8EB3BF0C66B2BB5D20B122EE36C0D75C147E8E97FF0DFD60A48AE6D2432F48C",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "after",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "03CA549C3ABE9EFD4C8A3DE3DD4FEC7312C022BFBE6747EBFC768D1D08A2380B",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "after",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "7913745CF1D4D695D53EAF5FE29A3B066534DE95D61ED142F3A8867F7156513C",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "after",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "5E7A2A7A23F4575602CCD03F477CABC19ADEF9B7B01A659F50440A80848796BF",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "gallery",
+      "side": "after",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "508F5F8B9A6655C07C8DD51F29E972087E60862CD194BE4BCAAB0BA5EB1DA0B2",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "loads",
+      "side": "before",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "A43BB28F4C9500FCFD9A080BA944998F2148B4EAB5321E00DAC46C1C769D513A",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "loads",
+      "side": "before",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "E443E29FE0D94008DA009FAACE5A27EB053FF9EEEE3C7A08544055CD5078E110",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "loads",
+      "side": "before",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "C4046F8BD55ECDF41311BDB5EE27BF7E23CB6AFFC41CED07ED4F59F6FFE141CF",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "loads",
+      "side": "after",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "C3D30C3B1E2A180D2F91C65267CF1A96A8B01A622AF69337C5FE8ADAD975961B",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "loads",
+      "side": "after",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "3605B502EE010DEF7B14BBD2E6C514EC43E9DEDF927FAF67A37C6F095488F5D6",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "loads",
+      "side": "after",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "EE732006FA7904516A65FB9B19FFBF5610CC89778DC8F44E269FAAB8BBF9BEA7",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "dense-close",
+      "side": "before",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "6A9F5C0414577E281937D015AACC7FA29639A5CAA59624712CA4BC38CBF6A59A",
+      "identicalPixels": true,
+      "identicalPng": true
+    },
+    {
+      "cohort": "dense-close",
+      "side": "after",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "originalSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+      "currentSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+      "imageSha256": "406A3CE7CE2D19146F94BFCF58B848F4B12E0D74BFD1AA2290E817F9FEE29DE0",
+      "identicalPixels": true,
+      "identicalPng": true
+    }
+  ],
+  "installedCases": [
+    {
+      "cohort": "gallery",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    },
+    {
+      "cohort": "dense-close",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "sameSource": true,
+      "sameRuntimeFingerprint": false,
+      "changedPixels": 0
+    }
+  ],
+  "interpretation": "Fresh twenty control PNGs match the historical originals byte-for-byte; sources remain distinct. Current prop payload changes are present on both sides and are not submitted by decal fixtures. Package adds 63 media files while compiled files remain identical."
+}
