@@ -26,8 +26,9 @@ reviewed in isolation; no merge, release, golden approval or production acceptan
 is performed.
 
 Branch `art/infantry-equipment-refinement` starts directly from that master.
-Version 0.1.432 is one PATCH above the audited base; reconcile against latest
-master before integration. No renderer/compiler/gameplay budget is increased.
+Initial version 0.1.432 is one PATCH above that audited base. The later master
+reconciliation below advances the current PR to 0.1.433. No renderer/compiler/
+gameplay budget is increased.
 
 ## Demonstrated quality gap and change
 
@@ -181,3 +182,31 @@ an edited idle key and eight source-less scoped catalogs. Each reopen now also
 checks actual packed PNG bytes, sRGB/linear color spaces and correctly resolving
 canonical-relative image paths. No rig, animation or runtime GLB changes accompany
 the saved-path repair.
+
+## Completed native matrix and master reconciliation
+
+The continuation at clean source `57a632b5afad82eac5c988d818a6c1a5c4caaa98`
+completes thirty pairs / 60 original images in `artifacts/ifn2`. Together with
+the first batch, there are **44 pairs / 88 originals**, covering the planned
+forty distinct cases plus four repeated gallery pairs. The ten distance/quality
+pairs retain source `f3eda9de`; the thirty continuation pairs retain `57a632b5`.
+No failed overall attempt is relabelled, and no source identity is substituted.
+
+At the actual 40 m High/1080p crowd view, each role submits 1/100/**551 visible of
+1000 input** LOD0 squads (4/400/2204 figures). The 1000-root cases evaluate three
+shared poses, submit four instance draws, and report zero skin/static or mesh
+fallbacks. Recorded skin upload storage is 4,720,032 rifle / 6,731,424 engineer
+bytes; this is the existing diagnostic counter, not complete GPU memory. The
+nine-action galleries evaluate nine poses. Existing sixteen-variant, 16-MiB per
+frame-slot/four-slot and CPU skin-cache caps remain unchanged.
+
+Master advanced through logistics PR #273 during capture. Synchronization uses
+`a391a5bb0c0e25f079fa394613a5f84dfe7e9728` (0.1.432). All **81** integrated
+scene numeric IDs, including the nine logistics references, are preserved; the
+six unintegrated infantry references append after them. The current PR is
+**0.1.433**, exactly one PATCH above that base. Both logistics and infantry
+dispatch paths remain intact. That master changes logistics sources/references
+and fleet tests; it does not change infantry master/GLB/atlas ownership or the
+skeletal renderer/compiler. Existing native observations retain their historical
+sources and 0.1.432 build identities. Fresh integrated catalogs, affected tests,
+native load/gallery checks and packaging are qualified separately below.

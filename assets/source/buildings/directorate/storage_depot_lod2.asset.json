@@ -1,8 +1,8 @@
 {
   "id": "building.directorate.storage_depot.lod2",
-  "type": "mesh",
-  "source": "sources/logistics/storage_depot/lod2.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
-  ]
+  ],
+  "source": "sources/logistics/storage_depot/blender/lod2.glb",
+  "type": "mesh"
 }

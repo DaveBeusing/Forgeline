@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.logistics_hub",
+      "assets": [
+        "building.directorate.logistics_hub",
+        "building.directorate.logistics_hub.critical",
+        "building.directorate.logistics_hub.damaged",
+        "building.directorate.logistics_hub.destroyed",
+        "building.directorate.logistics_hub.foundation",
+        "building.directorate.logistics_hub.idle",
+        "building.directorate.logistics_hub.lod1",
+        "building.directorate.logistics_hub.lod2",
+        "building.directorate.logistics_hub.partial_shell",
+        "building.directorate.logistics_hub.structural_frame",
+        "building.directorate.logistics_hub.unpowered"
+      ],
+      "instanceScale": [
+        18,
+        9,
+        18
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}
