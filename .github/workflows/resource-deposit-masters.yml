@@ -6,6 +6,9 @@ on:
       - '.github/workflows/resource-deposit-masters.yml'
       - 'build/resource-deposits/**'
       - 'assets/staged/resource-deposits/**'
+      - 'assets/source/world/meshes/resources/**'
+      - 'assets/source/world/meshes/sources/blender/**'
+      - 'src/ForgeLine.Presentation/ResourceDeposit*.cs'
       - 'tests/ForgeLine.Presentation.Tests/ResourceDepositBlenderMasterTests.cs'
   push:
     branches: [master]
@@ -13,6 +16,9 @@ on:
       - '.github/workflows/resource-deposit-masters.yml'
       - 'build/resource-deposits/**'
       - 'assets/staged/resource-deposits/**'
+      - 'assets/source/world/meshes/resources/**'
+      - 'assets/source/world/meshes/sources/blender/**'
+      - 'src/ForgeLine.Presentation/ResourceDeposit*.cs'
   workflow_dispatch:
 
 permissions:

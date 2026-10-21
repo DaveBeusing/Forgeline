@@ -1,25 +1,35 @@
 # Resource deposit Blender masters
 
-## Scope and audit
+## Change and integration status
 
-Audit base: remote `master` at `a6fe118583be842e00416bcb100d1210f3240a00`,
-tracked version `0.1.431-dev`, observed 2026-10-21. The repository default and
-integration branch is `master`. A fresh Git fetch confirmed this identity.
+Four editable Blender 5.2.2 masters and separate packed-PBR inspection projects
+preserve existing mineral artwork. Eight verified High/Reduced GLB exports now
+bind existing resource mesh IDs in the regular source catalog. Shared materials,
+texture atlases, LOD thresholds, symbols and source-only entities are retained.
+This branch is a review candidate; it is not production acceptance.
 
-The remote branch inventory contained `master` and `art/logistics-blender`.
-The only open PR was the unrelated logistics preservation PR #273. Resource
-presentation (#47), distinct mineral silhouettes (#112), the ferrous kit revision
-(#181), bounded Blender material/LOD tooling (#229), and the source-readiness
-pilot (#269) are integrated. Their existing work is reused. Related resource and
-rendering PR searches, changed paths and available review comments were inspected;
-the resource/round-trip PRs had no review comments.
+Native review exposed a second gap: map deposits have an X/Z scale of 50.4 meters
+but Y scale 8, making clusters appear almost flat. PresentationExtractor now
+applies minimum Y scales: Ferrous 16, Silicates 28, Volatiles 8, Rare Elements 32.
+It adjusts the copied render center by half the added height to preserve the
+ground anchor, retaining X/Z, rotation and taller authored transforms. Logical
+WorldTransform, bounds, extraction radius, quantities, economy, selection and
+intelligence authority remain unchanged. Source-only identities do not gain a
+ResourceDeposit component.
 
-All four families already resolve distinct High/Reduced geometry, stable
-materials, strategic symbols and shared Base Color/Normal/ORM textures.
-`WorldPresentationCatalog` already consumes Untouched/Active/Depleted presentation
-states. Active increases the existing tint and depleted uses the existing grey
-tint. These states derive from deposit data; separate mesh states are unnecessary.
-The demonstrated source gap is a missing native editable master for each family.
+## Audit and synchronization
+
+Initial ordered remote audit: master a6fe118583be842e00416bcb100d1210f3240a00,
+version 0.1.431-dev. Default/integration branch: master. Related resource PRs #47,
+#112, #181, Blender tooling #229, readiness #269 and rendering #268 were inspected
+along with branches, changed paths, CI and available review comments. Existing
+family silhouettes, PBR atlases and Untouched/Active/Depleted presentation are
+reused. No new depletion mechanism or texture state is invented.
+
+During execution, logistics PR #273 merged. This branch was rebased onto master
+a391a5bb0c0e25f079fa394613a5f84dfe7e9728; its logistics enum IDs are preserved and
+resource kinds appended after them. The single PR PATCH delta is now 0.1.432 to
+0.1.433. Evidence retains actual historical identities rather than being relabeled.
 
 | Family | High triangles / vertices | Reduced triangles / vertices |
 | --- | ---: | ---: |
@@ -28,150 +38,115 @@ The demonstrated source gap is a missing native editable master for each family.
 | Volatiles | 38 / 112 | 24 / 72 |
 | Rare Elements | 40 / 120 | 24 / 72 |
 
-These are parsed canonical source counts; density alone is not an art-acceptance
-criterion. Preservation adds no geometry or runtime texture payload.
-This preservation change does not claim newly designed geometry or new textures.
+These are actual source counts, not an art-acceptance score. Ferrous uses the
+current environment-kit revision rather than its older unused sibling. There is
+no extra texture payload or geometry density increase.
 
-The canonical ferrous export is the environment-kit revision, not its older
-unused glTF sibling. The fixture resolves metadata through the current catalog
-and follows its actual source paths and dependency closure. This also retains
-the original source-only entities and all stable IDs.
+## Source ownership
 
-## Authoring and retained files
+assets/staged/resource-deposits/<family>/ retains each native rest master, packed
+inspection project, two exports and lineage. Regular definitions under
+assets/source/world/meshes/resources/ reference byte-identical GLBs under
+sources/blender/<family>/. Lineage retains original binding/source signatures and
+the current bound portable signature. Status review-bound-not-accepted separates
+functional binding from approval. Original glTF files remain available.
 
-`build/resource-deposits/author.py` delegates strict rest import/export to
-`tools/blender/roundtrip.py`. Each family gets its own native rest project and
-High/Reduced GLB exports. The shared texture masters are packed into a separate
-inspection project using the existing bounded PBR preview helper. Inspection
-graphs/cameras are deliberately separate from the compiler's accepted rest scene.
-Packed inspection is an approximation of the runtime shader, not native D3D12
-evidence; its ORM preview uses roughness/metallic and leaves AO to the game shader.
+build/resource-deposits/author.py delegates to the bounded shared round-trip.
+Rest scenes retain metric scale, root pivots, engine-to-Blender (x,y,z) to
+(x,-z,y), topology, material order, normals, UVs and High/Reduced metadata.
+Inspection uses the existing surface helper with packed shared Base Color,
+Normal and ORM. Its roughness/metallic preview approximates the runtime shader;
+AO remains the game shader's responsibility. Inspection scenes are separate
+from compiler-accepted rest scenes. Blender does not enter the player package.
 
-No canonical `assets/source/`, compiler, shared material or renderer file is
-changed. The renderer ownership record still holds those source paths, and its
-qualification gates remain open. `assets/staged/resource-deposits/<family>/`
-contains preservation candidates only. The `lineage.json` records bind each
-master/export to the canonical definitions and a portable source signature.
-
-Rest scenes retain engine `(x,y,z)` to Blender `(x,-z,y)` mapping, metric scale 1,
-root pivots, indexed topology, ordered material slots, source normal/tangent/UV
-channels and High/Reduced metadata. The fixture's translated/rotated unit-scale
-frame is an authoring contract probe, not a replacement gameplay deposit envelope.
-Terrain placement, extractor radius, quantities, collision, selection and
-intelligence remain owned by existing game/presentation code.
+The translated/rotated unit-scale fixture tests export contracts; it does not
+redefine logical envelopes. Six actual native mutations per family are rejected:
+unbaked transform, changed envelope, modifier, animation, material slots and
+unexpected object. Unchanged reopen/export is accepted.
 
 ## Reproduction
 
-Use a fresh output path in a clean checkout and the pinned .NET SDK and Blender
-5.2.2 x64. Build serially to avoid competing build-node pools:
+Use the pinned SDK and Blender 5.2.2 x64, a clean checkout and fresh output paths:
 
 ```powershell
 dotnet restore ForgeLine.sln --disable-parallel -m:1
-dotnet build ForgeLine.sln --configuration Release --no-restore --disable-build-servers -m:1
+dotnet build ForgeLine.sln -c Release --no-restore --disable-build-servers -m:1
 pwsh ./tools/blender/Invoke-Blender.ps1 -Action Check -OutputRoot artifacts/resource-check
-pwsh ./build/resource-deposits/Qualify-Masters.ps1 -OutputRoot artifacts/rd1 -RenderPreviews
-python build/resource-deposits/retained.py artifacts/rd1
+pwsh ./build/resource-deposits/Qualify-Masters.ps1 -OutputRoot artifacts/resource-native -RenderPreviews
 python build/resource-deposits/retained.py
+pwsh ./build/Validate-ProjectReferences.ps1
+pwsh ./build/Validate-SemVer.ps1 -BaseRef origin/master
 ```
 
-Qualification creates two independent masters per family, reopens/re-exports the
-first and tests six invalid native edits per family. It separately compiles
-baseline, first, second and reopened catalogs, validates all with absent source
-roots and compares repeated/reopened source/runtime bytes. The opt-in typed test
-compares actual compiled geometry, UVs, normals, tangents, indices, material/LOD
-references and unchanged nonmesh container hashes. The original canonical source
-tree must remain byte-identical.
+Qualification creates independent first/second projects and reopens the first,
+then compiles baseline/first/second/reopened for each family. It checks current
+source hashes, absent-source integrity, repeated/reopened output bytes and typed
+compiled positions, normals, UVs, tangents, indices, material/LOD, socket and
+collision references. Sources must remain unchanged during the run. The retained
+verifier checks hashes, exact roster, bound IDs, geometry and portable signatures.
+Retention with a positional output root is initial-only and refuses existing files.
 
-Retaining refuses existing destinations. Portable verification checks master and
-export hashes, the exact fixture/family roster, current canonical source binding
-and actual exported geometry; file presence alone is insufficient.
+For a qualified full catalog, opt-in ResourceDepositMaterialCacheTests creates
+fresh four-record family seeds from verified material/texture containers. Set
+FORGELINE_RESOURCE_RUNTIME_SEED and a fresh FORGELINE_RESOURCE_MATERIAL_CACHE.
+Pass that destination to Qualify-Masters through -MaterialCacheRoot. Every variant
+still imports its two meshes through the real compiler. -ReuseAuthored requires
+native rejection/source-hash evidence and fresh runtime destinations.
 
-## Native review fixtures
+## Native game review
 
-Four appended reference kinds keep all earlier numeric scene identities unchanged.
-`ResourceDepositsGallery` extracts twelve actual deposit components (four families
-by Untouched/Active/Depleted) and twelve completed Extractor presentations at the
-same X/Z positions. Quantities are copied fixture inputs; no economic production
-or extraction simulation runs. The single scene contains one Ferrous/extractor
-pair. The 100/1,000 scenes contain deposit instances alone, across all four families
-and existing states. These are immutable review snapshots, not new map placements.
+Four immutable fixtures cover a single deposit/extractor pair, all four families
+by three real presentation states with twelve colocated extractors, and 100/1,000
+deposits. They use map definitions and sampled canonical ground height. No economic
+simulation runs in these art fixtures. Tests check identities, states, counts,
+deterministic fingerprints, grounding and co-location.
 
-The fixture uses the current map family definitions and the same grounding and
-scale equations as `BattlefieldRuntime`: center plus half-height, and
-`(halfExtentX * 1.2, halfExtentY * 2, halfExtentZ * 1.2)`. Reference tests check
-counts, all four identities and three states, reproducible fingerprints, sampled
-height and extractor co-location. It does not certify working mine behavior.
+Capture-Review.ps1 uses the real D3D12 player and complete catalogs: three zooms,
+1080p/4K, Low/Medium/High, 1/100/1,000 instances, dark and wet. Its 3 warmups,
+8 samples and 2 repeats provide functional evidence, not sustained performance
+acceptance. Historical flat-height and intermediate-height runs each completed
+fourteen paired cases. Current-base results are recorded separately when complete.
 
-The opt-in complete-catalog test replaces only the eight compiled mineral mesh
-records in a separately sealed review catalog. All material/texture containers
-must match the canonical seed byte-for-byte, and the complete result must pass
-runtime integrity without sources. It never overwrites the seed or canonical
-source definitions. Pass both `FORGELINE_RESOURCE_MASTERS` and
-`FORGELINE_RESOURCE_RUNTIME_SEED` to the focused test, using a fresh overlay path.
+## Observed evidence
 
-`build/resource-deposits/Capture-Review.ps1` compares the canonical seed and this
-complete overlay through the real player renderer: 1080p/4K, three zooms,
-Low/Medium/High, single/100/1,000, dark and wet. Its short 3-warmup/8-sample and
-two-repeat cohorts provide functional pictures/counters only. Four terrain
-materials, controlled sustained measurements and human review remain separate
-explicitly open gates.
+Pinned Blender check passed: 5.2.2 build d13f752e3b9c, SDK 10.0.401.
+Portable authoring: 102 tests passed with Blender Python 3.13.
+Two earlier full Release builds passed with zero warnings/errors. Architecture
+validation passed for 44 projects without cycles. Fixed seed 2026 ended naturally
+at tick 55,210 with CommandCoreDestroyed/Victory, winner 1.
 
-## Integration decision and remaining gates
+All four first/second/reopened native projects and 24 mutation rejections passed.
+Sixteen real compiler catalogs passed, followed by sixteen absent-source
+validations and deterministic source/runtime comparisons. Typed family/full
+overlay tests passed nine cases. The overlay replaced only eight meshes in a
+sealed 1,363-record catalog. Canonical container bytes were 74,844,434; overlay
+74,844,604 (+170 mesh metadata bytes). Texture containers stayed 59,453,925 bytes;
+after the existing splash exclusion gameplay textures are 57,667,508, below the
+unchanged 58,720,256 gate. File lengths are not GPU residency. These runs used
+verified unchanged texture caches and are not claimed as force-rebuilds.
 
-Rendering qualification PR #268 is merged, but its recorded final five hosted
-workflows passed with physical jobs skipped. Its retained PlanOnly report contains
-zero native records and leaves twelve product gates open. A merged milestone is
-not performance acceptance. Required paired physical timings, complete-frame and
-memory observations, lifecycle coverage and human visual approval remain open.
-Historical CI failures retain their original source identities; they are not
-attributed to the current base without reproduction. On the audit base, main
-[CI 39579830636](https://github.com/DaveBeusing/Forgeline/actions/runs/39579830636)
-is still in progress at the recorded checkpoint. Its artillery-retention and
-movement workflows passed; these do not replace the complete required CI check.
+The initial cold repeated texture run was interrupted, not passed. A copied
+runtime folder correctly tripped the fresh-output guard. Native-only evidence
+was copied with hashes from artifacts/rd2 into rd4, checked against actual sources
+and completed with material-only cache seeds. Native origin is rd2; rd4 is resumed
+compiler qualification. The raw evidence index hashes retained bytes. Sandbox
+Python/path and test-pipe failures executed no tests; later native runs passed.
+A grounding assertion exposed float rounding at a decimal boundary; it now uses
+an absolute 0.00001-meter bound.
 
-Production promotion is blocked. The staged masters do not by themselves satisfy
-end-to-end game integration. Still required are the accepted rendering baseline,
-current-source full CI, native before/after pictures at all required zooms,
-profiles/displays and four terrain materials, extractor co-location and real
-depletion review, 1/100/1,000-instance culling/LOD/resource qualification, sustained
-paired performance measurements, reproducible installed-player verification and
-explicit human art approval. No budgets, thresholds or goldens are changed.
+## Acceptance boundaries
 
-## Execution evidence
+Rendering PR #268 is merged, but its physical/performance/human gates were not all
+accepted. Neither that merge nor deterministic pictures implies qualification.
+No budget, golden, threshold, gameplay rule or renderer ownership is relaxed.
+No merge, release or golden approval is performed.
 
-The initial pinned Blender Check passed in the original clean checkout with SDK
-10.0.401. The first restore and authoring attempts were interrupted after resource
-contention and discovery of unrelated staged tank work in that checkout. They
-are not counted as passing builds or completed authoring runs. Own files were
-copied with byte verification into a separate worktree on the audited base, then
-removed from the shared checkout; the unrelated staged files were left intact.
+Separate gates remain: current-source complete CI, four terrain-material review,
+real extraction/depletion play review, moving-camera LOD/lifecycle coverage,
+controlled sustained paired CPU/GPU timings and resource churn, reproducible
+installed-player qualification and explicit human art acceptance.
 
-The portable authoring suite passed **102 tests** with the installed Blender
-Python 3.13 runtime, in 238.229 seconds. Sandbox Python startup attempts failed
-before tests at executable-path resolution; the native run above completed.
-The initial sandbox restore failed `NU1900` while contacting NuGet vulnerability
-data. The unchanged restore completed with network access, using two logical
-.NET processors and one MSBuild worker; vulnerability auditing stayed enabled.
-
-The complete canonical runtime seed passed compiler development verification and
-independent source-less integrity: **1,363 assets**, **74,844,434 container bytes**,
-zero issues. Its gameplay texture-container metric is 57,667,508 bytes after the
-existing explicit splash exclusion, below the unchanged 58,720,256-byte gate.
-These file lengths are distinct from GPU memory. This cache-backed compiler run
-is not described as a force-rebuild.
-
-The initial full Release solution build completed with **zero warnings and zero
-errors** (13m37.69s). Four new state-extraction cases passed; the four native
-compiled comparisons were correctly skipped before their required outputs existed.
-The first sandbox test invocation executed zero tests because the MTP named pipe
-was denied; the unchanged native invocation passed those four cases.
-
-The committed one-PATCH gate passed at `3dddf952`: `0.1.431` to `0.1.432`.
-`Validate-ProjectReferences.ps1` passed for 44 projects, without cycles or
-architecture-boundary violations. Ferrous has completed two independent native
-imports/exports and a reopened export; per-family rejection, compiler and typed
-checks remain separate.
-
-The final execution results belong in this section after their commands finish.
-Until then native master creation, deterministic export, compilation, typed
-comparison, full tests, package and native-render qualification are **pending**.
+Native hardware: NVIDIA RTX PRO 5000 Blackwell Laptop, 25,309,478,912 bytes reported
+VRAM, feature level 12_1, hardware rendering, debug layer off. Offscreen native
+1080p/4K backbuffers do not certify physical display performance. Production
+acceptance remains open until required gates pass.
