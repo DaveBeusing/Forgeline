@@ -16,6 +16,7 @@ from mechanical import layers
 from roundtrip import import_scene, export_scene, close_matrix
 from roundtrip import preview_state
 from production import surface_preview
+from command_core_contract import material_source_hashes
 from tank import restore_normals
 
 
@@ -57,8 +58,12 @@ def pack_preview(catalog, ids):
 
 def validate_preview(catalog, ids):
     scene = bpy.context.scene
-    require(json.loads(scene['fl_truck_surfaces']) == {aid: sha(catalog.source(aid)) for aid in ids
-        if catalog.definitions[aid][1]['type'] in ('material', 'texture')}, 'Truck material or texture source changed')
+    expected = json.loads(scene['fl_truck_surfaces'])
+    surfaces = {aid for aid in ids if catalog.definitions[aid][1]['type'] in ('material', 'texture')}
+    require(set(expected) == surfaces, 'Truck surface dependency set changed')
+    for aid in surfaces:
+        allowed = material_source_hashes(catalog.source(aid)) if catalog.definitions[aid][1]['type'] == 'material' else {sha(catalog.source(aid))}
+        require(expected[aid] in allowed, 'Truck material or texture source changed')
     for aid, signature in json.loads(scene['fl_truck_preview']).items():
         material = bpy.data.materials.get(aid)
         require(material and graph_signature(material) == signature, 'Truck PBR preview graph changed')

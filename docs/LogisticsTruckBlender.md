@@ -166,3 +166,10 @@ CPU/GPU p50/p95/p99 and memory/descriptor observations are retained, but short
 immutable captures do not qualify sustained gameplay FPS, live LOD/animation
 judder or debug-layer behavior. Existing budgets and the 15% comparison policy
 are unchanged. Renderer lane acceptance and human truck art review remain open.
+
+Material source verification reuses the established LF/CRLF hash equivalence
+from the Command Core contract. Git checkout newline conversion is accepted;
+material content changes and texture byte changes remain rejected. Native
+qualification exports both families from LF source clones and compares the GLBs,
+then rejects an intentional material-factor edit. Binary masters, GLBs and raw
+qualification records have explicit Git byte-preservation attributes.
