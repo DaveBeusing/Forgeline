@@ -314,7 +314,69 @@ shared scene enum retains every current-master value, including all vegetation
 fixtures, and appends the four prop fixtures. Both scene dispatches are retained.
 Version 0.1.438 restores exactly one PATCH over the new 0.1.437 base.
 
-The existing native authoring records remain historical evidence for their
-recorded inputs. Rebased component equivalence, runtime comparison, solution,
-native player and installed-package results are requalified separately. These
-follow-up checks are pending until their new reports are retained.
+The existing native authoring records remain bound to their actual recorded
+inputs. Current [component equivalence](world-props/current-evidence/component-equivalence.json)
+confirms byte-identical rest/inspection masters, 44 GLBs, canonical prop inputs
+and static authoring modules. The retained verifier passes on the rebased
+source. No family is reauthored to synchronize unrelated terrain or vegetation.
+
+Current product source is 828984660fb60b32df6609c7b686828dfa0335d2, version 0.1.438.
+Its Release build passes with zero warnings/errors. The full local solution
+passes 3,305 tests, fails zero and skips 47 of 3,352 total in 22m 30s. All 23
+scoped native-artifact cases are enabled. Eight merged prop/vegetation scene
+cases, three prop portable cases and 122 shared portable Blender tests pass.
+All six enabled product-source CI jobs pass; three optional native jobs are
+skipped. [Current validation](world-props/current-evidence/validation.json) and
+[CI](world-props/current-evidence/product-ci.json) retain exact results.
+
+The current master main CI itself stopped at the inherited version gate:
+expected 0.1.438, received 0.1.437. Downstream master checks were skipped. This
+is recorded as an inherited failure, not a functional pass. The branch's
+0.1.438 passes the one-PATCH rule against that exact 0.1.437 base.
+[Inherited master CI](world-props/current-evidence/inherited-master-ci.json).
+
+Both current-base catalogs qualify all 1,363 records without sources. Exactly
+44 prop containers differ; every unrelated runtime hash and all protected
+metadata remain identical. Container sizes are 74,845,298 / 74,845,169 bytes.
+Both contain 59,454,336 texture-container bytes, including the unchanged
+1,786,417 splash bytes; gameplay bytes are 57,667,919 below the unchanged
+58,720,256-byte cap. The 411-byte texture-header increase from the historical
+catalog belongs to the integrated terrain source paths on both sides.
+[Current catalog comparison](world-props/current-evidence/runtime/catalog-comparison.json).
+
+All 48 paired fixed native cases were executed again on the current source
+and terrain profile. The two 64-frame paired traversals were also repeated.
+There are 100 original stills and 16 adjacent-pose images, plus two installed
+views. All pairs use identical current binaries/hardware/settings. All repeat
+readbacks match; mesh fallbacks, binding failures and submission faults are zero.
+Fifteen main pairs are exact; maximum changed-pixel fraction remains 0.0024488812.
+The 1,000-prop High/Normal case retains 715 visible instances in 25 draws;
+Low/Strategic retains 999 in 22. Both 64-frame instance/LOD/draw sequences match
+exactly across their pair. All raw CPU/GPU samples and resource observations
+are retained, with the same physical-performance and human-review boundaries.
+[Current matrix](world-props/current-evidence/native-player/summary.json),
+[metrics](world-props/current-evidence/native-player/captures.json),
+[traversal](world-props/current-evidence/native-player/supplement/traverse-thousand-summary.json)
+and [sequence](world-props/current-evidence/native-player/supplement/gallery-sequence-summary.json).
+
+The current seed-2026, 64-tick run still matches all 24 non-observational match
+fields of the actual historical baseline. Authority-domain source is
+byte-identical across those inputs, as recorded separately. The current CI's
+two-opponent full-match check also passes.
+[Current parity](world-props/current-evidence/gameplay/parity.json).
+
+The new canonical reproducible package is
+FORGELINE-0.1.438-dev-win-x64.zip, 55,145,878 bytes, SHA-256
+a5f6c41bc1417c8f5f354b7f463761511bcb94203f0a7773aab68d3a02fd2b88.
+Two publish trees match. Fresh extraction verifies all 1,487 manifest entries
+(1,488 files including the manifest), excludes authoring sources and validates
+all 1,363 records/44 scoped IDs with an absent source root. Two measured menu
+starts after one warmup pass readiness and native icons. Installed gallery
+and 1,000-prop views pass with zero fallbacks/binding failures.
+[Current package](world-props/current-evidence/package/archive.json) and
+[startup](world-props/current-evidence/package/startup.json).
+
+The source stays a draft review candidate. Controlled physical timing, complete
+live memory/timestamp/lifecycle measurements and explicit human art/moving-LOD
+acceptance remain open. No merge, tag, release, budget relaxation or golden
+approval is implied by these functional checks.

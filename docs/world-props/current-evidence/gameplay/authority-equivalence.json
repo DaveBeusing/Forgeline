@@ -1,0 +1,19 @@
+{
+  "sourceChanges": [],
+  "fixedSeedComparison": "24 non-observational fields match at 64 ticks, seed 2026",
+  "schemaVersion": 1,
+  "baselineSource": "a524b0a8164390abe1e9cb38170e690f46147574",
+  "byteIdenticalAuthorityDomains": [
+    "src/ForgeLine.Game",
+    "src/ForgeLine.World",
+    "src/ForgeLine.AI",
+    "src/ForgeLine.Ecs",
+    "src/ForgeLine.Core",
+    "src/ForgeLine.Simulation",
+    "src/ForgeLine.Navigation",
+    "src/ForgeLine.Combat",
+    "src/ForgeLine.Logistics",
+    "src/ForgeLine.Economy"
+  ],
+  "sourceSha": "828984660fb60b32df6609c7b686828dfa0335d2"
+}

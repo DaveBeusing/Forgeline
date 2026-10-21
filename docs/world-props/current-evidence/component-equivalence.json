@@ -1,0 +1,22 @@
+{
+  "changedComponents": [],
+  "baseSha": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "sourceSha": "828984660fb60b32df6609c7b686828dfa0335d2",
+  "retainedVerifier": "22 rest/inspection pairs and 44 bound GLBs match",
+  "byteIdenticalComponents": [
+    "assets/staged/world-props",
+    "build/world-props",
+    "assets/source/world/meshes",
+    "assets/source/materials/directorate/surfaces",
+    "assets/source/world/materials/common",
+    "tools/blender/roundtrip.py",
+    "tools/blender/production.py",
+    "tools/blender/production_contract.py",
+    "tools/blender/asset_contract.py",
+    "tools/blender/Invoke-Blender.ps1",
+    "tools/blender/toolchain.json"
+  ],
+  "schemaVersion": 1,
+  "historicalQualification": "880f78885993e098457aebc5fd342309e66afe85",
+  "authoringRequalification": "Historical native results retained for byte-identical component inputs"
+}

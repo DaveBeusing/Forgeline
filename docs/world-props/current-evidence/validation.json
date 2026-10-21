@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "sourceSha": "828984660fb60b32df6609c7b686828dfa0335d2",
+  "baseSha": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "version": "0.1.438",
+  "releaseBuild": {
+    "success": true,
+    "warnings": 0,
+    "errors": 0
+  },
+  "fullSolution": {
+    "success": true,
+    "total": 3352,
+    "passed": 3305,
+    "failed": 0,
+    "skipped": 47,
+    "duration": "22m 30s 028ms",
+    "command": "dotnet test --solution ForgeLine.sln -c Release --no-build --max-parallel-test-modules 1",
+    "environment": {
+      "DOTNET_PROCESSOR_COUNT": 8,
+      "FORGELINE_PROP_MASTERS": "artifacts/pe",
+      "FORGELINE_PROP_PIPE_AXIS": "artifacts/px2"
+    },
+    "propOptInCases": 23,
+    "propOptInsSkipped": false,
+    "skippedTests": [
+      "ForgeLine.Graphics.Tests.RenderParallelization.SceneClearOptimizationTests.CommonSceneClearHasNoWarningsAcrossBuffersAndScaleRecreation(requireDebugLayer: True)\r",
+      "ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: False)\r",
+      "ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: True)\r",
+      "ForgeLine.Graphics.Tests.ResourceScheduling.NativeUploadSchedulingTests.InitializedStaticBuffersCopyAndDrawWithoutDebugWarnings(requireDebugLayer: True)\r",
+      "ForgeLine.Presentation.Tests.LogisticsTruckBlenderTests.BlenderBindingsPreserveExactCompiledGeometryAndWheelBatching(family: \"supply_truck\")\r",
+      "ForgeLine.Presentation.Tests.LogisticsTruckBlenderTests.BlenderBindingsPreserveExactCompiledGeometryAndWheelBatching(family: \"cargo_truck\")\r",
+      "ForgeLine.Presentation.Tests.ResourceDepositMaterialCacheTests.SeedOnlyVerifiedUnchangedMaterialsAndTexturesForIndependentMeshCompiles\r",
+      "ForgeLine.Presentation.Tests.TankFinishQualificationTests.FinishPreservesCompiledGeometryBindingsAndSampledMechanicalMatrices(hz: 30)\r",
+      "ForgeLine.Presentation.Tests.TankFinishQualificationTests.FinishPreservesCompiledGeometryBindingsAndSampledMechanicalMatrices(hz: 60)\r",
+      "ForgeLine.Presentation.Tests.TankFinishQualificationTests.FinishPreservesCompiledGeometryBindingsAndSampledMechanicalMatrices(hz: 144)\r",
+      "ForgeLine.Presentation.Tests.ScoutBlenderPoseTests.BlenderPoseMatricesMatchRuntimeRigidCompositionForScout\r",
+      "ForgeLine.Presentation.Tests.VegetationBlenderMasterTests.CompiledExportsPreserveLodBoundsPbrChannelsAndScopedFamilyChanges\r",
+      "ForgeLine.Presentation.Tests.BlenderMechanicalQualificationTests.BlenderPoseMatricesMatchRuntimeRigidCompositionIncludingEditedBindings\r",
+      "ForgeLine.Presentation.Tests.BlenderMechanicalQualificationTests.EditedPivotsPreserveStaticGeometryAndCanonicalRangeSharing\r",
+      "ForgeLine.Presentation.Tests.EffectSubmission.ParticleOrderingQualificationTests.MeasureEquivalentParticleOrderingInPairedCohorts\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: \"vehicle_factory\", triangles: 1556)\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: \"radar\", triangles: 1920)\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: \"power_plant\", triangles: 2288)\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: \"barracks\", triangles: 1056)\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.BuildingVehicleAndPropPreserveCompiledContracts\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.RigidAuthoringPreservesCompiledGeometryAndBatching\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.ExportedProductionMeshesPreserveRuntimeContractsAndMechanicalBatching\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.DefaultSurfacePreparationPreservesCompiledGeometryAndBatching\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.CombinedOperationalExportsLoadWithoutSourceFiles\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: \"smelter\", triangles: 2588)\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: \"electronics_plant\", triangles: 2152)\r",
+      "ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: \"extractor\", triangles: 2508)\r",
+      "ForgeLine.Presentation.Tests.ResourceDepositBlenderMasterTests.ReopenedMastersPreserveCompiledLodsBoundsAndMaterialChannels(family: \"rare_elements\")\r",
+      "ForgeLine.Presentation.Tests.ResourceDepositBlenderMasterTests.ReopenedMastersPreserveCompiledLodsBoundsAndMaterialChannels(family: \"silicates\")\r",
+      "ForgeLine.Presentation.Tests.ResourceDepositBlenderMasterTests.ReopenedMastersPreserveCompiledLodsBoundsAndMaterialChannels(family: \"volatiles\")\r",
+      "ForgeLine.Presentation.Tests.ResourceDepositBlenderMasterTests.ReopenedMastersPreserveCompiledLodsBoundsAndMaterialChannels(family: \"ferrous_ore\")\r",
+      "ForgeLine.Presentation.Tests.ResourceDepositBlenderMasterTests.CompleteReviewCatalogLoadsWithOnlyTheEightBlenderMeshReplacements\r",
+      "ForgeLine.Presentation.Tests.ArtilleryBlenderMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels\r",
+      "ForgeLine.Presentation.Tests.ScoutBlenderMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels\r",
+      "ForgeLine.Presentation.Tests.IndustrialPlantMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels(family: \"ammunition_plant\")\r",
+      "ForgeLine.Presentation.Tests.IndustrialPlantMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels(family: \"fuel_refinery\")\r",
+      "ForgeLine.Presentation.Tests.ParticlePerformanceQualificationTests.MeasureBoundedProductionEffectsAtRtsViewpoints\r",
+      "ForgeLine.Presentation.Tests.ArtilleryBlenderPoseTests.BlenderPoseMatricesMatchRuntimeRigidCompositionForArtillery\r",
+      "ForgeLine.Presentation.Tests.MaterialQuality.MaterialSequenceTests.CaptureControlledMaterialPanAndZoomPairs\r",
+      "ForgeLine.Presentation.Tests.AtmospherePerformanceQualificationTests.CompareEquivalentTerrainAcrossAtmosphericModesAndZooms\r",
+      "ForgeLine.Presentation.Tests.ScenePassPerformanceQualificationTests.CompareDirectAndLinearSceneOnEquivalentNativeWorkloads\r",
+      "ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureVegetationMotionWithIdenticalProductionBatches\r",
+      "ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureProductionMaterialsAtFixedCentralDivideViewpoints\r",
+      "ForgeLine.Presentation.Tests.DirectionalShadowPerformanceTests.CompareEquivalentDenseWorkloadsAcrossQualityAndRtsZoom\r",
+      "ForgeLine.Presentation.Tests.RenderQualityQualificationTests.CaptureProductionQualityProfilesWithTerrainEffectsAndSelectionOverlays\r",
+      "ForgeLine.Client.Tests.UiAudioReliabilityTests.NativeBuffersAndAsynchronousResultPlaybackReleaseOnTheRealDevice\r",
+      "ForgeLine.Client.Tests.WorldAudioMixerTests.NativeWorldMixerStreamsAndReleasesOnTheRealDevice\r"
+    ]
+  },
+  "mergedSceneTests": {
+    "passed": 8,
+    "failed": 0
+  },
+  "portablePropCases": {
+    "passed": 3,
+    "failed": 0
+  },
+  "portableBlenderTests": {
+    "passed": 122,
+    "failed": 0
+  },
+  "rawLogs": [
+    {
+      "artifact": "artifacts/props-rebased-build.log",
+      "bytes": 9282,
+      "sha256": "0f5da99484d4647fc66f981db3729485690c1adf660ae22cb3c92748c433b8fa"
+    },
+    {
+      "artifact": "artifacts/props-rebased-full-tests.log",
+      "bytes": 31171,
+      "sha256": "c22adc597c217effe36a78d056f430c2ef1e7965d21358892ffa6481dce62de7"
+    },
+    {
+      "artifact": "artifacts/props-current-portable.log",
+      "bytes": 106,
+      "sha256": "fe0b42728d59e030b5675f71ab69f42ade16e217ed0457ec1291aa7e31f768cf"
+    },
+    {
+      "artifact": "artifacts/props-current-blender-portable.log",
+      "bytes": 228,
+      "sha256": "e81ae4149bb8c1efd9da5912985cca89e05d6da96e2a18147e2bc3dd4f39e363"
+    },
+    {
+      "artifact": "artifacts/props-current-scene-tests.log",
+      "bytes": 624,
+      "sha256": "6221ebb255698334f706794b3a502f788635fbe4e5e6083f2f06f1c966594e53"
+    }
+  ],
+  "physicalPerformanceAcceptance": "pending",
+  "humanArtApproval": "pending"
+}

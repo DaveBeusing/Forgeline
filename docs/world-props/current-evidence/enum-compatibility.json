@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "sourceSha": "828984660fb60b32df6609c7b686828dfa0335d2",
+  "preservedMasterEnumValues": 103,
+  "allExistingValuesPreserved": true,
+  "appendedScenes": [
+    "WorldPropsGallery",
+    "WorldPropSingle",
+    "WorldProps100",
+    "WorldProps1000"
+  ],
+  "appendedValues": [
+    103,
+    104,
+    105,
+    106
+  ]
+}

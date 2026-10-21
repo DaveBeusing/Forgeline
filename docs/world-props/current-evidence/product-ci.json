@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "sourceSha": "828984660fb60b32df6609c7b686828dfa0335d2",
+  "integrationBase": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "version": "0.1.438",
+  "checks": [
+    {
+      "name": "native-minerals",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39663927346/job/119443838053"
+    },
+    {
+      "name": "native-reference",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39663927248/job/119443837641"
+    },
+    {
+      "name": "native-props",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39663927321/job/119443837507"
+    },
+    {
+      "name": "retained-minerals",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39663927346/job/119443836483"
+    },
+    {
+      "name": "build-test",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39663927263/job/119443835921"
+    },
+    {
+      "name": "navigation-movement",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39663927239/job/119443835741"
+    },
+    {
+      "name": "retained-props",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39663927321/job/119443835432"
+    },
+    {
+      "name": "frame-contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39663927280/job/119443835380"
+    },
+    {
+      "name": "cpu-scale",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39663927248/job/119443835240"
+    }
+  ]
+}

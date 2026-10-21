@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "excludesSelf": true,
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 98,
+      "sha256": "1beec4d9608f145ceabc1a54d39c0c57ca4ef2951771a3c66814ddf999dac3fa"
+    },
+    {
+      "path": "component-equivalence.json",
+      "bytes": 892,
+      "sha256": "d372541e88068a676fa14d9fe8afafac9d6d03c02173f4ef67969daae1059951"
+    },
+    {
+      "path": "enum-compatibility.json",
+      "bytes": 413,
+      "sha256": "76e455dfed26c7ec07449875d5c334e5adf88b7d6af76b25f899767448e37f2d"
+    },
+    {
+      "path": "gameplay/authority-equivalence.json",
+      "bytes": 596,
+      "sha256": "8ec859a0591744370c597c182a227f2ecb9f51914ce5a7f4647ca307c5e1b9f4"
+    },
+    {
+      "path": "gameplay/parity.json",
+      "bytes": 9312,
+      "sha256": "bc558aa7194c07bd757d41b7005715e4f62e3262fe11cb000cb51d43430152eb"
+    },
+    {
+      "path": "inherited-master-ci.json",
+      "bytes": 690,
+      "sha256": "9d7156e31e95a8f65a7fbfe7d839a8583c10cde780b64145a2807bd918ca6a55"
+    },
+    {
+      "path": "native-player/captures.json",
+      "bytes": 5824485,
+      "sha256": "03baee0e41179f8e47d1c7f8b309e4c713f37706b1d53d6af419d8bbab4a5a3c"
+    },
+    {
+      "path": "native-player/images/dark-after-WorldPropsGallery-1920x1080-High-NormalGameplay.png",
+      "bytes": 4888246,
+      "sha256": "7807170d626830bae872509c0d2cdf1e2873d1826b4926d3b04eda3ef84cf09c"
+    },
+    {
+      "path": "native-player/images/dark-before-WorldPropsGallery-1920x1080-High-NormalGameplay.png",
+      "bytes": 4888165,
+      "sha256": "c846afce91cb732799940f017fa76ec29115e5091045b99a6ef892a4b0fc6c95"
+    },
+    {
+      "path": "native-player/images/environment-after-EnvironmentKitYard-1920x1080-High-NormalGameplay.png",
+      "bytes": 5043368,
+      "sha256": "d02f5fa4f80ebd4e6cb6c98214ce77201f5cb179f3bb437933a5231e9ea9c53b"
+    },
+    {
+      "path": "native-player/images/environment-before-EnvironmentKitYard-1920x1080-High-NormalGameplay.png",
+      "bytes": 5043334,
+      "sha256": "47c6c885fdae2667b67d765870dcc017d204e6154c5e8c97eb493d6c05647c76"
+    },
+    {
+      "path": "native-player/images/gallery-after-WorldPropsGallery-1920x1080-High-CloseTactical.png",
+      "bytes": 5284984,
+      "sha256": "0cdc715a2b9c5d7398bb131f128b6a807f07784c7d5fce935548f33bc6b54b94"
+    },
+    {
+      "path": "native-player/images/gallery-before-WorldPropsGallery-1920x1080-High-CloseTactical.png",
+      "bytes": 5284606,
+      "sha256": "c1ad3ba9e97d6a04287a3dd39a939f228d00ee1327a1799f7c614028750cef83"
+    },
+    {
+      "path": "native-player/images/strategic-after-WorldProps1000-1920x1080-Low-Strategic.png",
+      "bytes": 4044306,
+      "sha256": "fe0fa253b49ac4508c45643486b9b34506d2a0975ae5fcf034d2d901b6678426"
+    },
+    {
+      "path": "native-player/images/strategic-before-WorldProps1000-1920x1080-Low-Strategic.png",
+      "bytes": 4044702,
+      "sha256": "e79b0a45e9c5168d16f2b5019760ebd7b5be12ccd3e32860952f085aaee72a50"
+    },
+    {
+      "path": "native-player/images/wet-after-WorldPropsGallery-1920x1080-High-NormalGameplay.png",
+      "bytes": 4912117,
+      "sha256": "b1c1ad22e987ce35bd082f8cc426c523461e2b8810e305f17a86a43bfa679979"
+    },
+    {
+      "path": "native-player/images/wet-before-WorldPropsGallery-1920x1080-High-NormalGameplay.png",
+      "bytes": 4912284,
+      "sha256": "e56a5e3520561127523daa63360a77f9059cf9b9eec7d389251e61496014b049"
+    },
+    {
+      "path": "native-player/manifests.json",
+      "bytes": 28752,
+      "sha256": "dd9976ffd3736cb032d8ed2fe17250221196d51de0cd4dedc52cb050de731a84"
+    },
+    {
+      "path": "native-player/pixel-pairs.json",
+      "bytes": 30434,
+      "sha256": "2026892b10a13efc6c99e5acb2eb80eafdf05caf728d5a672b59fb93adbeb669"
+    },
+    {
+      "path": "native-player/summary.json",
+      "bytes": 837,
+      "sha256": "3a48cb50d3bee80d60b25ae77127aae2a915ab21458353632057c614f2b67018"
+    },
+    {
+      "path": "native-player/supplement/gallery-sequence-after-last-pose.png",
+      "bytes": 8939670,
+      "sha256": "620f93048f2db90b4e390e326691d1d563127a132cee9c7e47d0db5b56e302e6"
+    },
+    {
+      "path": "native-player/supplement/gallery-sequence-after.json",
+      "bytes": 423437,
+      "sha256": "fee53a490005775aedef73dc1a584f69849c7f264ac13eb989723e74003b9977"
+    },
+    {
+      "path": "native-player/supplement/gallery-sequence-before-last-pose.png",
+      "bytes": 8939184,
+      "sha256": "caf6141ab629c1ab27b8fa248785f343b4b119cbc3a040a3619318e41e4c40e0"
+    },
+    {
+      "path": "native-player/supplement/gallery-sequence-before.json",
+      "bytes": 423369,
+      "sha256": "6a7f328a75b10b240808671ce02534e96bb4fc254939f980d3fa6bee58a8656d"
+    },
+    {
+      "path": "native-player/supplement/gallery-sequence-summary.json",
+      "bytes": 6304,
+      "sha256": "ee284ebcb16654458212ec4771f6f42d5d2266f3e10ab79aae8015a33f1bfb98"
+    },
+    {
+      "path": "native-player/supplement/traverse-thousand-after.json",
+      "bytes": 420137,
+      "sha256": "e23e0bf88b8cf4056b90d37f12855600984f99da7bd7dabb24570a05fb8c06f9"
+    },
+    {
+      "path": "native-player/supplement/traverse-thousand-before.json",
+      "bytes": 419719,
+      "sha256": "d6521a06f0261dc1063fb60fe3d65c6cb8c7cdb4ce1b5187012a514996d81354"
+    },
+    {
+      "path": "native-player/supplement/traverse-thousand-summary.json",
+      "bytes": 1931,
+      "sha256": "81a02623c9379c8cb7505144b41fc61a4ba477de912a621f0c50ec696f1ed6da"
+    },
+    {
+      "path": "package/archive.json",
+      "bytes": 2456,
+      "sha256": "9bce04d61aa8ec51561637dfd818fb2a6e8c9d1617972b404dd90d65c3f0e999"
+    },
+    {
+      "path": "package/build-provenance.json",
+      "bytes": 729,
+      "sha256": "3393cc0e98c43e1c85d8e49734b00b22773f6d269d74a7f8b34c4ac089d1ee69"
+    },
+    {
+      "path": "package/catalog-qualification.json",
+      "bytes": 2110,
+      "sha256": "09f7a73d5df348ee48ba6bb9b8efe3cf1806a0d3091c674f98b349a9536d32e9"
+    },
+    {
+      "path": "package/installed-catalog.json",
+      "bytes": 2110,
+      "sha256": "37638e92047687da9fca0a09aa4429821ef837cb095465370ef8c263bd2f1ab5"
+    },
+    {
+      "path": "package/installed-prop-manifest.json",
+      "bytes": 157183,
+      "sha256": "adde43274f66085539381e501eaf037459ea83e4133ad088032dbdd037436a20"
+    },
+    {
+      "path": "package/startup.json",
+      "bytes": 3115,
+      "sha256": "49e69a5c6da9e113f166c54d909dbf6ec5e67ac9575b5815b68f79d37fec242a"
+    },
+    {
+      "path": "product-ci.json",
+      "bytes": 2019,
+      "sha256": "6f4d40a016f1aed88e87fd1226e00b406531ef7f911ef8bd1feab05068d987f6"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1446,
+      "sha256": "71b485101882390ee57d4577da17483a95dc015da02ffc8a1a1e2d97a40fdeee"
+    },
+    {
+      "path": "runtime/baseline-compile.json",
+      "bytes": 2110,
+      "sha256": "b159323662f6c42ea162ab0f24c780dde670b4176c44ea20782f58cfab8c018d"
+    },
+    {
+      "path": "runtime/baseline-source-less.json",
+      "bytes": 2110,
+      "sha256": "cbe8cc345bd29839edbd15fd6637875e49368c55eecdb62d93b7104bfb2821f4"
+    },
+    {
+      "path": "runtime/candidate-compile.json",
+      "bytes": 2110,
+      "sha256": "dffbef3b529e0e62cf3d33e1daac9a1f1f7ba730ffde19abcaef5846ef070c0b"
+    },
+    {
+      "path": "runtime/candidate-source-less.json",
+      "bytes": 2110,
+      "sha256": "c3699783125156f3b1e4b40474061b89479e2b47ab3b66683b54423187dd2692"
+    },
+    {
+      "path": "runtime/catalog-comparison.json",
+      "bytes": 14104,
+      "sha256": "c0084e9952b5efa89c31747c8293f83b6387bf51b7097736392963ede5e67dab"
+    },
+    {
+      "path": "validation.json",
+      "bytes": 8786,
+      "sha256": "6892e6c7a83b5ac62f1f3a944bcf7745ad22e33ece1091556325fe41d69ff40f"
+    }
+  ]
+}
