@@ -29,6 +29,24 @@ public sealed class VisualReferenceCaptureTests
         Assert.Throws<ArgumentOutOfRangeException>(() => (request with { Scenes = [kind, VisualReferenceSceneKind.DaylightTerrain] }).Validate());
     }
 
+    [Theory]
+    [InlineData(VisualReferenceSceneKind.MainBattleTankSingle)]
+    [InlineData(VisualReferenceSceneKind.MainBattleTankHundred)]
+    [InlineData(VisualReferenceSceneKind.MainBattleTankThousand)]
+    public void TankWorkloadsAdmitBoundedMechanicalTimeBeforeNativeStartup(VisualReferenceSceneKind kind)
+    {
+        var request = new VisualReferenceCaptureRequest
+        {
+            OutputRoot = "unused", RuntimeRoot = "unused", Commit = new('a', 40),
+            Scenes = [kind], MechanicalSeconds = 1.6
+        };
+        request.Validate();
+        foreach (double seconds in new[] { -1d, 121d, double.NaN, double.PositiveInfinity })
+            Assert.Throws<ArgumentOutOfRangeException>(() => (request with { MechanicalSeconds = seconds }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (request with
+            { Scenes = [kind, VisualReferenceSceneKind.BattlefieldCombat] }).Validate());
+    }
+
     [Fact]
     public void RejectedAndFailedRequestsCannotOverwriteExistingEvidence()
     {

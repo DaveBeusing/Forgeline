@@ -55,3 +55,11 @@ docs/qualification/logistics-trucks.json text eol=lf
 docs/qualification/logistics-trucks/*.json -text -whitespace
 docs/qualification/logistics-trucks/*.json.gz binary
 docs/qualification/logistics-trucks/*.png binary
+
+# Saved tank sources and immutable native finish evidence.
+assets/source/units/directorate/authoring/main_battle_tank.blend binary
+assets/source/units/directorate/sources/main_battle_tank/blender/*.glb binary
+docs/qualification/tank-finish/*.json.gz binary
+docs/qualification/tank-finish/*.png binary
+docs/qualification/tank-finish/*.json text eol=lf
+tools/blender/fixtures/tank_finish_sources.json text eol=lf

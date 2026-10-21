@@ -1,0 +1,68 @@
+{
+  "base": "a391a5bb0c0e25f079fa394613a5f84dfe7e9728",
+  "productSource": "92bff60f7f78f813a88c6d6a10bee47a89c9b3a9",
+  "version": "0.1.433",
+  "releaseBuild": {
+    "warnings": 0,
+    "errors": 0
+  },
+  "tests": {
+    "portableBlender": 115,
+    "sceneAndUnitLod": 99,
+    "nativeCaptureRequest": 6,
+    "compiledCadenceParity": 3
+  },
+  "blender": {
+    "version": "5.2.2",
+    "fullQualifierPassed": true,
+    "invalidEditsRejected": 9,
+    "savedPositiveEditCompiled": true,
+    "reopenedExportsByteEqual": true,
+    "compiledOutputsByteEqual": true,
+    "sourceLess": true,
+    "sourceIdentity": {
+      "sourceClosureMatchesQualifiedBlenderRun": true,
+      "savedMasterMatchesQualifiedBlenderRun": true,
+      "sourceSignature": "a1b7d1ef6539c16c6a4635a268b480ab6e03bcf2964b74db6052931e1999d831",
+      "masterSha256": "affe3add79bfc6c34fbbeae4ffce3138160b3e77aa99d57384a3bb5d8bd50eee"
+    }
+  },
+  "runtimePipelineContracts": true,
+  "terminal": {
+    "seed": 2026,
+    "ticks": 55210,
+    "lifecycle": {
+      "Phase": "Completed",
+      "Outcome": "Victory",
+      "TerminationReason": "CommandCoreDestroyed",
+      "Winner": 1,
+      "DefeatedPlayer": 2,
+      "StartedAtTick": 0,
+      "CompletedAtTick": 55210,
+      "FinalizedAtTick": 55210,
+      "LastTransitionAtTick": 55210,
+      "TransitionCount": 4
+    },
+    "completedCargoOrders": 119,
+    "failedCargoOrders": 0,
+    "routeFailures": 0
+  },
+  "native": {
+    "pairs": 41,
+    "additionalDetailPairs": 1,
+    "repeatPixelsEqual": true,
+    "fallbackMeshes": 0,
+    "bindingFailures": 0,
+    "pixelEqualMainPairs": 9,
+    "resourceCountsEqual": true,
+    "diagnosticTimingExceedances": 50,
+    "performanceAcceptance": "pending"
+  },
+  "humanArtAcceptance": "pending",
+  "integration": "draft",
+  "deliveryRecords": {
+    "package": "Generated archive SHA-256 and build-provenance sidecars; outcome recorded in PR 278",
+    "currentHeadCi": "Required checks on PR 278",
+    "pullRequest": "https://github.com/DaveBeusing/Forgeline/pull/278"
+  }
+}
