@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from asset_contract import Catalog, read_geometry
-from logistics_truck_contract import FAMILIES, SUFFIXES, compare, component_parts
+from logistics_truck_contract import FAMILIES, SUFFIXES, canonical_export, compare, component_parts
 
 
 class LogisticsTruckContractTests(unittest.TestCase):
@@ -70,6 +70,16 @@ class LogisticsTruckContractTests(unittest.TestCase):
         after['primitives'][0]['attributes']['TEXCOORD_0'][0] = (0, 0)
         with self.assertRaisesRegex(ValueError, 'TEXCOORD_0'):
             compare(aid, before, after, definition)
+
+    def test_canonical_export_removes_roundoff_and_preserves_real_edit(self):
+        _, _, before = self.geometry()
+        after = copy.deepcopy(before)
+        positions = after['primitives'][0]['attributes']['POSITION']
+        positions[0] = (positions[0][0]+1e-8, *positions[0][1:])
+        positions[1] = (positions[1][0]+.001, *positions[1][1:])
+        result = canonical_export(before, after)['primitives'][0]['attributes']['POSITION']
+        self.assertEqual(result[0], before['primitives'][0]['attributes']['POSITION'][0])
+        self.assertEqual(result[1], positions[1])
 
 
 if __name__ == '__main__':

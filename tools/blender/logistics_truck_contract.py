@@ -1,7 +1,7 @@
 """Preserve truck components and runtime articulation in saved Blender masters."""
 import copy
 import math
-from asset_contract import compare_geometry, require
+from asset_contract import POSITION_EPS, compare_geometry, require
 
 FAMILIES = ('cargo_truck', 'supply_truck')
 SUFFIXES = ('', '.lod1', '.lod2', '.damaged', '.critical', '.wreck', '.collision')
@@ -10,6 +10,20 @@ SUFFIXES = ('', '.lod1', '.lod2', '.damaged', '.critical', '.wreck', '.collision
 def metadata(catalog, ids):
     return {aid: {key: value for key, value in catalog.definitions[aid][1].items()
                   if key != 'source'} for aid in ids}
+
+
+def canonical_export(before, after):
+    """Remove editor round-off while retaining intentional rest-position edits."""
+    result = copy.deepcopy(after)
+    for original, exported in zip(before['primitives'], result['primitives']):
+        for semantic, values in original['attributes'].items():
+            if semantic != 'POSITION':
+                exported['attributes'][semantic] = copy.deepcopy(values)
+            else:
+                exported['attributes'][semantic] = [tuple(a if abs(a-b) <= POSITION_EPS else b
+                    for a, b in zip(old, new)) for old, new in
+                    zip(values, exported['attributes'][semantic])]
+    return result
 
 
 def component_parts(definition, geometry):

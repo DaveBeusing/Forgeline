@@ -10,7 +10,7 @@ import bpy
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from asset_contract import Catalog, compare_geometry, fixture_selection, read_geometry, require, sha, write_glb, write_json
-from logistics_truck_contract import FAMILIES, SUFFIXES, compare, component_parts, metadata
+from logistics_truck_contract import FAMILIES, SUFFIXES, canonical_export, compare, component_parts, metadata
 from mechanical import layers
 from roundtrip import import_scene, export_scene
 from roundtrip import preview_state
@@ -144,7 +144,7 @@ def run(request):
             relative = path.relative_to(catalog.root)
             target = Path('../sources/combat_support') / args.family / 'blender' / (aid + '.glb')
             destination = source / relative.parent / target
-            write_glb(destination, geometry)
+            write_glb(destination, canonical_export(geometries[aid], geometry))
             updated = copy.deepcopy(definition)
             updated['source'] = target.as_posix()
             write_json(source / relative, updated)
