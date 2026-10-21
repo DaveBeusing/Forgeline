@@ -114,3 +114,55 @@ Current-head required CI, native evidence, reproducible installed-package eviden
 and human art review remain separate gates. Branch-local authoring and visual
 qualification do not declare production integration approved. Detailed observed
 results and remaining blockers belong in the retained qualification evidence.
+
+## Observed production qualification
+
+Production source: `151ed196d071cb431ed783769a0cebbf6e2c3ea4`.
+The preceding baseline binary is `4b9333d1`; the source/test/tool/build trees
+are identical across the asset-binding commit. The original full runtime catalog
+was independently retained and validated without source directories.
+
+| Check | Observed result |
+| --- | --- |
+| Frozen and final serialized Release builds | Passed, zero warnings/errors |
+| Existing plus truck Blender Python contracts | 102 passed |
+| Isolated truck workload tests | Six passed |
+| Mixed physical FIFO, including 2/10 trucks and opposing approaches | 17 passed |
+| Exact compiled mesh/channel/socket/wheel-batching parity | Two cases, all 14 meshes passed |
+| Actual Blender 5.2.2 saved masters | Reopened twice per family; source and compiled bytes equal |
+| Unsupported saved edits | 20 rejected across both families |
+| Saved positive cab edits | Export and compile; only intended LOD0 changes |
+| Native D3D12 before/after matrix | 68 pairs, exact native pixels and repeated captures |
+| Compiled catalog | 1,363 assets; 309 meshes, 901 textures, 132 materials; 74,844,434 bytes |
+
+The catalog increases by 84 container bytes for source provenance. Geometry,
+texture/material records and GPU mesh data retain the baseline. The matrix covers
+Low/Medium/High, close/normal/strategic, 1080p/4K, dark/wet surfaces, four inspection
+yaws, per-family 1/100/1,000-instance scenes and four physical logistics states.
+Original numerical reports, source identities, CPU/GPU distributions, resource
+observations and SHA-256 hashes are in the [portable evidence index](qualification/logistics-trucks.json).
+The compressed reports retain their exact original bytes. Four original native
+PNGs are retained in [the evidence directory](qualification/logistics-trucks/).
+
+The adapter and masters were first committed at `bd242361`, canonical export
+qualification at `64589e17`, physical display/path normalization at `20cdd04f`,
+workloads/parity at `76876925`, physical queue coverage at `4b9333d1`, and runtime
+bindings at `151ed196`. The separate version commit `7804b9da` retains exactly one
+PATCH. Source ownership and qualification workflow documentation are separate.
+
+Retained local failed attempts include long Windows output paths and build-copy
+locks while a real asset compiler was active. Short normalized GLB paths and a
+subsequent serialized build pass without changing compiler/runtime contracts.
+The first complete parallel local suite also reports a native Client session
+handoff deadline failure. Its cause is unestablished; the failure is retained,
+and limits/assertions remain unchanged. Complete-suite, isolated rerun, package,
+installed-player and current hosted results are tracked on [PR #275](https://github.com/DaveBeusing/Forgeline/pull/275)
+with their exact source identities rather than inferred from this native matrix.
+
+The adapter NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU uses hardware
+D3D12 Level 12_1. Debug layer is disabled. Concurrent background authoring/build
+work and large CPU outliers prevent a controlled performance-improvement claim.
+CPU/GPU p50/p95/p99 and memory/descriptor observations are retained, but short
+immutable captures do not qualify sustained gameplay FPS, live LOD/animation
+judder or debug-layer behavior. Existing budgets and the 15% comparison policy
+are unchanged. Renderer lane acceptance and human truck art review remain open.
