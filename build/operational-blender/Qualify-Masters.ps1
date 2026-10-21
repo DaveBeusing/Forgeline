@@ -37,7 +37,7 @@ foreach ($familyContract in $contracts) {
     }
     & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $repo 'build/blender/industrial/master.py') -InputRoot assets/source -OutputRoot (Join-Path $directory 'master') -ScriptArguments @((Join-Path $directory 'first/authoring.blend'),$fixture) -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
     & $roundTrip -Action Export -BlendFile (Join-Path $directory 'master/authoring.blend') -OutputRoot (Join-Path $directory 'reopened') -FixtureContract $fixture -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
-    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $repo 'tools/blender/tests/native_asset_contract.py') -InputRoot assets/source -OutputRoot (Join-Path $directory 'native-contracts') -ScriptArguments @((Join-Path $directory 'first/authoring.blend'),$fixture) -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
+    & (Join-Path $repo 'tools/blender/Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'native_contract.py') -InputRoot assets/source -OutputRoot (Join-Path $directory 'native-contracts') -ScriptArguments @((Join-Path $directory 'first/authoring.blend'),$fixture) -BlenderPath $BlenderPath -TimeoutSeconds $TimeoutSeconds
     foreach ($variant in @('baseline','first','second','reopened','edited')) {
         $source = if ($variant -eq 'baseline') { Join-Path $directory 'first/baseline-source' } elseif ($variant -eq 'edited') { Join-Path $directory 'master/edit-source' } else { Join-Path $directory "$variant/source" }
         $runtime = Join-Path $directory "$variant/runtime"
@@ -59,7 +59,8 @@ foreach ($familyContract in $contracts) {
         meshes = $report.meshes
         repeatedAndReopenedExports = 'passed'
         sourceLessCompiler = 'passed'
-        nativeSceneRejections = 'passed'
+        nativeSceneRejections = 'passed-applicable-cases'
+        nativeRejectionCases = @((Get-Content -Raw -LiteralPath (Join-Path $directory 'native-contracts/native-contracts.json') | ConvertFrom-Json).cases).Count
         savedVertexEdit = 'passed'
         masterSha256 = (Get-FileHash -LiteralPath (Join-Path $directory 'master/authoring.blend') -Algorithm SHA256).Hash.ToLowerInvariant()
     }
