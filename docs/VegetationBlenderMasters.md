@@ -119,3 +119,7 @@ These are local functional results before the source commit; authoring lineage
 records the checked canonical base, actual producer hashes and the dirty
 working-tree context explicitly. Source-controlled master replay and installed
 native captures bind their own subsequent committed source identities.
+
+## Installed native checkpoint
+
+The complete source-bound [qualification and original image index](qualification/vegetation/Qualification.md) records 91 native pairs, exact per-case resource counters and unresolved timing/art gates. The installed candidate demonstrates in-game adoption; canonical promotion remains blocked.

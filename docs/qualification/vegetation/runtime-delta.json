@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "baselineAssets": 1363,
+  "candidateAssets": 1363,
+  "changed": [
+    {
+      "id": "mesh.world.vegetation.broadleaf",
+      "type": "mesh",
+      "beforeBytes": 81297,
+      "afterBytes": 81305
+    },
+    {
+      "id": "mesh.world.vegetation.broadleaf_lod1",
+      "type": "mesh",
+      "beforeBytes": 20115,
+      "afterBytes": 20125
+    },
+    {
+      "id": "mesh.world.vegetation.conifer",
+      "type": "mesh",
+      "beforeBytes": 13635,
+      "afterBytes": 13649
+    },
+    {
+      "id": "mesh.world.vegetation.conifer_lod1",
+      "type": "mesh",
+      "beforeBytes": 8494,
+      "afterBytes": 8508
+    },
+    {
+      "id": "mesh.world.vegetation.grass_clump",
+      "type": "mesh",
+      "beforeBytes": 3033,
+      "afterBytes": 3047
+    },
+    {
+      "id": "mesh.world.vegetation.grass_clump_lod1",
+      "type": "mesh",
+      "beforeBytes": 1954,
+      "afterBytes": 1968
+    },
+    {
+      "id": "mesh.world.vegetation.scrub",
+      "type": "mesh",
+      "beforeBytes": 7385,
+      "afterBytes": 7399
+    },
+    {
+      "id": "mesh.world.vegetation.scrub_lod1",
+      "type": "mesh",
+      "beforeBytes": 4744,
+      "afterBytes": 4758
+    }
+  ],
+  "baselineBytes": 74844887,
+  "candidateBytes": 74844989,
+  "baselineTextureBytes": 59453925,
+  "candidateTextureBytes": 59453925
+}

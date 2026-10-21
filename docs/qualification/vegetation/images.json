@@ -1,0 +1,2679 @@
+{
+  "schemaVersion": 1,
+  "pictures": [
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Low-CloseTactical",
+      "role": "before",
+      "sha256": "6977bd80ea2b4f090dd641d80201297c1195c2b433abed9609136fab507b20de",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/001-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Low-CloseTactical",
+      "role": "after",
+      "sha256": "6977bd80ea2b4f090dd641d80201297c1195c2b433abed9609136fab507b20de",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/001-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Low-NormalGameplay",
+      "role": "before",
+      "sha256": "c8dac52efb8ea0fed5503a59c9b2e98021b3a1176604a84d967d82f8596666ae",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/002-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Low-NormalGameplay",
+      "role": "after",
+      "sha256": "c8dac52efb8ea0fed5503a59c9b2e98021b3a1176604a84d967d82f8596666ae",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/002-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Low-Strategic",
+      "role": "before",
+      "sha256": "3b096c3559869858e7d102b0697013cb1f1b5a21879ef1046e6c138f4238740e",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/003-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Low-Strategic",
+      "role": "after",
+      "sha256": "3b096c3559869858e7d102b0697013cb1f1b5a21879ef1046e6c138f4238740e",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/003-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Low-CloseTactical",
+      "role": "before",
+      "sha256": "dd615b1090106a7db70a5c3130431a8f9c49f876591f3bae5df7e71e0f74aed1",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/004-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Low-CloseTactical",
+      "role": "after",
+      "sha256": "7b0d04bdf80e2753270c0f4693fbe58c9319df5d60ecf60d06519460da9ed125",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/004-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Low-NormalGameplay",
+      "role": "before",
+      "sha256": "7ab5e1f912587e408a479fb25b9f81d8dc6bd8c93d2101e60e7bdcf15c852372",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/005-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Low-NormalGameplay",
+      "role": "after",
+      "sha256": "4ebce11641ea82d3a90b7806fc3ed3f0fd8df8c331797907f7adda121a933fde",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/005-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Low-Strategic",
+      "role": "before",
+      "sha256": "0a5e2c657bf4c88eaf6f978b15744ed55805c044afc2a75cadb1a177490cc6d9",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/006-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Low-Strategic",
+      "role": "after",
+      "sha256": "1affeab36160d32354dcbf4b93597d4be63a00755a673c777948cd055f16c7c9",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/006-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Low-CloseTactical",
+      "role": "before",
+      "sha256": "b2f5f1c5561b1abce6c49e8a63782f3c1e4e65a808067e335ee6a5017d2e8a34",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/007-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Low-CloseTactical",
+      "role": "after",
+      "sha256": "64aeaff78601c52a482bd0b46ab8a525c49e3c5256414d957404a869ca071892",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/007-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Low-NormalGameplay",
+      "role": "before",
+      "sha256": "47a6c260da31801bc8d9bb0da520f12d4bbd4745e63364674ba23d0d49afbcb5",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/008-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-01.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Low-NormalGameplay",
+      "role": "after",
+      "sha256": "e624f346bcf1bae27d78e125ba7508545905cc92c92a5ff2f54b7619ba386d15",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/008-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Low-Strategic",
+      "role": "before",
+      "sha256": "e27eebb83cefd28e23b47507bd1fb207ff21052c1fe02a2de0ed837534163623",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/009-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Low-Strategic",
+      "role": "after",
+      "sha256": "92d5d680f79e0cf867aeb88ebfe1a794008315fec7dec12f858d4a10a7739cea",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/009-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Low-CloseTactical",
+      "role": "before",
+      "sha256": "a287f16a09eaa9109fc2d665e39749dfe359366d7ce98eb701274d7af4253cb2",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/010-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Low-CloseTactical",
+      "role": "after",
+      "sha256": "be81d1337f9fdde53df77ba7ff8b982cd3bd996f2ea8d6036324f7ec50cd1ee6",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/010-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Low-NormalGameplay",
+      "role": "before",
+      "sha256": "31b810c4a86bf377cad6cc1d9a101b84074d9238b4a44963d71ed8523efa6184",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/011-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Low-NormalGameplay",
+      "role": "after",
+      "sha256": "861ae7efa2d42de108931e49ac84537cffee158a7f48d32dbd6baef2ef07c65c",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/011-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Low-Strategic",
+      "role": "before",
+      "sha256": "fd0fdcc5463c553142024b13176da91d1ff3e73f4c4625aee9824296334d9b63",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/012-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Low-Strategic",
+      "role": "after",
+      "sha256": "61931746fe2b4ccce9dcef065810ebd9fc173fa1aa82dad837383c353352f199",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/012-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Medium-CloseTactical",
+      "role": "before",
+      "sha256": "12f6f1531d4676c10c22bcf864bc38e859ffefce20e66fb81bd892e095c50cc3",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/013-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Medium-CloseTactical",
+      "role": "after",
+      "sha256": "12f6f1531d4676c10c22bcf864bc38e859ffefce20e66fb81bd892e095c50cc3",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/013-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Medium-NormalGameplay",
+      "role": "before",
+      "sha256": "9bcb17c08c457e11f01c844ed47cfd1a150f9be21fdc4698e1edf937aeafdde9",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/014-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Medium-NormalGameplay",
+      "role": "after",
+      "sha256": "9bcb17c08c457e11f01c844ed47cfd1a150f9be21fdc4698e1edf937aeafdde9",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/014-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Medium-Strategic",
+      "role": "before",
+      "sha256": "493084b3df6f58c708f355e42cf7005eb44f0f0a36e4f4bcf5a49dd1095bf0bc",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/015-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-Medium-Strategic",
+      "role": "after",
+      "sha256": "493084b3df6f58c708f355e42cf7005eb44f0f0a36e4f4bcf5a49dd1095bf0bc",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/015-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-02.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Medium-CloseTactical",
+      "role": "before",
+      "sha256": "248c0c34ce2a6563346f3db1a9d30abbe9b88417368fb60e07611703bcaf4448",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/016-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Medium-CloseTactical",
+      "role": "after",
+      "sha256": "7c39b2e328ab379084c2c5ad27d483cc8be716f42610f737c1d56fd3198265d5",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/016-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Medium-NormalGameplay",
+      "role": "before",
+      "sha256": "c7d40123bf864acc2478cd66a7bf1f36b5c5eb8d849ee4f10f38e249b7bc1119",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/017-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Medium-NormalGameplay",
+      "role": "after",
+      "sha256": "64316f8878c19bdfb516c783c94968e32bf1ddabb37e9e5c505986bf4dc1397a",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/017-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Medium-Strategic",
+      "role": "before",
+      "sha256": "ac98eed69302f6d947e42074b9602dd9e622d20ca170635bf9552b544caa1688",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/018-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-Medium-Strategic",
+      "role": "after",
+      "sha256": "99b7d1e252d7035b6daf8da68cedb22a008620a1c1b3a42d5d0c99daaba3b5e4",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/018-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Medium-CloseTactical",
+      "role": "before",
+      "sha256": "c3551c044081956882fbabbe5f4d39908a7fc25c37e950114a87417d3bd32f10",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/019-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Medium-CloseTactical",
+      "role": "after",
+      "sha256": "a58648448dc6fa8456890c4686ddc6f07e5b51c3130ffc85493a8e211a4a3183",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/019-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Medium-NormalGameplay",
+      "role": "before",
+      "sha256": "a5d20c5ea0219e5ce81046e0048c6e8e1c9d4e233aa0bb8532140987c0106d75",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/020-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Medium-NormalGameplay",
+      "role": "after",
+      "sha256": "d1554470f431b75f4f61e0c57c00fc4e4cf90f0e0f841410473c4b3292eb4c96",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/020-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Medium-Strategic",
+      "role": "before",
+      "sha256": "c6bfefb9ea829ef6136d7de0f2b9a6f6af043ccc6c6aa6c35dffaa279a384d31",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/021-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-Medium-Strategic",
+      "role": "after",
+      "sha256": "658f15b178a75e1ba95b820daa33fdcfda0df2a49e363f58a82b39ee2955b1f8",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/021-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-03.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Medium-CloseTactical",
+      "role": "before",
+      "sha256": "239b300aec8ffd02a7fa0524369171de4c4ff631aa7f93f7267af7dedcc530e7",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/022-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Medium-CloseTactical",
+      "role": "after",
+      "sha256": "e223a7d5996dc774417f14ab2a6e20454f3868f201d45a81d4f5de303b03505f",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/022-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Medium-NormalGameplay",
+      "role": "before",
+      "sha256": "6501ad9dac86f72eec99d525ee7d777897d93389e81cfbfb0affa44d256d05d3",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/023-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Medium-NormalGameplay",
+      "role": "after",
+      "sha256": "ed27aecf2419419453bb3c679f0f2f428af1e73207f7ea70f864db9604a40ea2",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/023-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Medium-Strategic",
+      "role": "before",
+      "sha256": "d39fccdedb6cb4030f9f77cfa6b98a348eb8278250190b0e69ed496ceb16c848",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/024-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-Medium-Strategic",
+      "role": "after",
+      "sha256": "ef93045888404fd046b99a5d4feaa85b6ee601fe698414a11b55f44f7d56b252",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/024-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical",
+      "role": "before",
+      "sha256": "773e7aa92f8780bf0d2ddbbeb10619ef4739f64c7e7c5094553c60b5b32ff929",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/025-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical",
+      "role": "after",
+      "sha256": "773e7aa92f8780bf0d2ddbbeb10619ef4739f64c7e7c5094553c60b5b32ff929",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/025-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-High-NormalGameplay",
+      "role": "before",
+      "sha256": "26e3ce21c1e5c284388ef70afc0d27c054fe0ac95050f3a7618618d6e54b9ad1",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/026-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-High-NormalGameplay",
+      "role": "after",
+      "sha256": "26e3ce21c1e5c284388ef70afc0d27c054fe0ac95050f3a7618618d6e54b9ad1",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/026-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-High-Strategic",
+      "role": "before",
+      "sha256": "359f36c3e325335d20e188a262e1737b0300d7fc2bedca41d2070408b2a875dc",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-1920x1080-High-Strategic.png",
+      "archiveMember": "images/027-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-1920x1080-High-Strategic",
+      "role": "after",
+      "sha256": "359f36c3e325335d20e188a262e1737b0300d7fc2bedca41d2070408b2a875dc",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-1920x1080-High-Strategic.png",
+      "archiveMember": "images/027-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-High-CloseTactical",
+      "role": "before",
+      "sha256": "349efbf0e205e474976cb3b926484d2dff3da66a4c23cc6451f4edfa4ab3032b",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/028-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-High-CloseTactical",
+      "role": "after",
+      "sha256": "75569a969351862418efcb177a870a9051fdf5d07698d7629e094b34b9420bdf",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/028-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-High-NormalGameplay",
+      "role": "before",
+      "sha256": "ccc50b36717b5e81379bcf8ca52f0a9d5e92248cea925facd59c55ea62106ea0",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/029-before.png",
+      "previewPath": "images/029-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-04.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-High-NormalGameplay",
+      "role": "after",
+      "sha256": "cfda09416e4d575bf1460843da4295a195d3659d10d5b3d8b62a8a018ff08c6f",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/029-after.png",
+      "previewPath": "images/029-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-High-Strategic",
+      "role": "before",
+      "sha256": "15b1a084bb556171b4b9fe10a0c179b56999bfa6bd65be5ffa65c64baf00155d",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-1920x1080-High-Strategic.png",
+      "archiveMember": "images/030-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-1920x1080-High-Strategic",
+      "role": "after",
+      "sha256": "19e7e61a8ac2817517203060f254228edb87d0ff421591bb6e6bbfb283672bc4",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-1920x1080-High-Strategic.png",
+      "archiveMember": "images/030-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-High-CloseTactical",
+      "role": "before",
+      "sha256": "5e8e6e905595774425d72dc4957e6d8ab4978315e22eb8c9d7c3697a89a53631",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/031-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-High-CloseTactical",
+      "role": "after",
+      "sha256": "0376caea6167991dfbb2573d326eceb72b88419d42c6eef406d53104a5dde42d",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/031-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-High-NormalGameplay",
+      "role": "before",
+      "sha256": "bcf23c86c77485732a27090a528c91acb0417ca937c202a2c000c133eec0af10",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/032-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-High-NormalGameplay",
+      "role": "after",
+      "sha256": "c385e36f258ce2055090818ec1e17ecbadd0c2455b8e19817887dd7adac05ba2",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/032-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-High-Strategic",
+      "role": "before",
+      "sha256": "7c3e668baefd10fd08e961c29a10e2b4dd2ad90161c33d9de75eab34bac70931",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-1920x1080-High-Strategic.png",
+      "archiveMember": "images/033-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-1920x1080-High-Strategic",
+      "role": "after",
+      "sha256": "0f3e45019ce7a6afd40ccd3fc782d78ce0d7f5dabf4b5032fc88af57099c64cf",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-1920x1080-High-Strategic.png",
+      "archiveMember": "images/033-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-High-CloseTactical",
+      "role": "before",
+      "sha256": "4879095ba538b3812725523a256954110d786426b4c43a6db3fef338202602b6",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/034-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-High-CloseTactical",
+      "role": "after",
+      "sha256": "99b3e225abab096b29e1811c88a6fda0afda9834ac1d011f1529a64dc455fe6e",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/034-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-High-NormalGameplay",
+      "role": "before",
+      "sha256": "a6591298a4eb8f01b80a762d3bebe04697252323c49dfb82c9f4ab26215416fb",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/035-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-05.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-High-NormalGameplay",
+      "role": "after",
+      "sha256": "a29d6830fd83fbd75ce98d72e3914b2e04d1d04c659bc9e3c1e41143034f6e5b",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/035-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-06.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-High-Strategic",
+      "role": "before",
+      "sha256": "4d02e1d8c927cce07fa49390b364f43483821d806622fea60cb7741e0138ff7a",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-1920x1080-High-Strategic.png",
+      "archiveMember": "images/036-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-06.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-1920x1080-High-Strategic",
+      "role": "after",
+      "sha256": "5843e594bff41c392d3497bc6f72e47ec3e630b5d9483ac46e76fb0c4441e17f",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-1920x1080-High-Strategic.png",
+      "archiveMember": "images/036-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-06.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Low-CloseTactical",
+      "role": "before",
+      "sha256": "a9282b19dba8c3ae0b169387cf9850efd7154303f53e574561b4b03828b9600d",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-3840x2160-Low-CloseTactical.png",
+      "archiveMember": "images/037-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-06.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Low-CloseTactical",
+      "role": "after",
+      "sha256": "a9282b19dba8c3ae0b169387cf9850efd7154303f53e574561b4b03828b9600d",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-3840x2160-Low-CloseTactical.png",
+      "archiveMember": "images/037-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-06.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Low-NormalGameplay",
+      "role": "before",
+      "sha256": "d58ae40169c867814263fd168cfbc678730e629f34f2c3c25a020a7be401df6c",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-3840x2160-Low-NormalGameplay.png",
+      "archiveMember": "images/038-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-06.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Low-NormalGameplay",
+      "role": "after",
+      "sha256": "d58ae40169c867814263fd168cfbc678730e629f34f2c3c25a020a7be401df6c",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-3840x2160-Low-NormalGameplay.png",
+      "archiveMember": "images/038-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-06.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Low-Strategic",
+      "role": "before",
+      "sha256": "b1d55ec11c90c3eea93380decab8b554878f318c26e6cb411986ac9b75d6c7b5",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-3840x2160-Low-Strategic.png",
+      "archiveMember": "images/039-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-07.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Low-Strategic",
+      "role": "after",
+      "sha256": "b1d55ec11c90c3eea93380decab8b554878f318c26e6cb411986ac9b75d6c7b5",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-3840x2160-Low-Strategic.png",
+      "archiveMember": "images/039-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-07.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Low-CloseTactical",
+      "role": "before",
+      "sha256": "aaa1c1d0412e670d1e939678742cb022fd23263ab43250d2bad4647baffd9720",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-3840x2160-Low-CloseTactical.png",
+      "archiveMember": "images/040-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-07.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Low-CloseTactical",
+      "role": "after",
+      "sha256": "e99a51dd0ee389d5a0644fbc97c9468032250233ad528d7ee70afaacb2e83003",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-3840x2160-Low-CloseTactical.png",
+      "archiveMember": "images/040-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-07.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Low-NormalGameplay",
+      "role": "before",
+      "sha256": "2dc5e8329ce372b64abbeed334dc3634c12fddf1376c8fd4c6504ca239ce2f45",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-3840x2160-Low-NormalGameplay.png",
+      "archiveMember": "images/041-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-08.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Low-NormalGameplay",
+      "role": "after",
+      "sha256": "7bcce2e3aad025109d6760fb3046077de94278a17bc485ce6dd708966e7c86ac",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-3840x2160-Low-NormalGameplay.png",
+      "archiveMember": "images/041-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-08.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Low-Strategic",
+      "role": "before",
+      "sha256": "a93cd114bc8c57247f485d21e5b9d68495d7cae1c4ebb550d6567dc1fb2726c1",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-3840x2160-Low-Strategic.png",
+      "archiveMember": "images/042-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-09.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Low-Strategic",
+      "role": "after",
+      "sha256": "18d1005cec117f07ea067572132d5c145600c953bb43353cb4ce52f9c1e74475",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-3840x2160-Low-Strategic.png",
+      "archiveMember": "images/042-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-09.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Low-CloseTactical",
+      "role": "before",
+      "sha256": "7e6e5d365006fffdfb6586291a9fe8dedfecb9c6c952df502ba0eee121336045",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-3840x2160-Low-CloseTactical.png",
+      "archiveMember": "images/043-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-09.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Low-CloseTactical",
+      "role": "after",
+      "sha256": "7f091804fd5625aa25c77641c224ae2d88f378ed2ab4ab0868684fc384bfc6f1",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-3840x2160-Low-CloseTactical.png",
+      "archiveMember": "images/043-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-10.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Low-NormalGameplay",
+      "role": "before",
+      "sha256": "aea63618ba96967a8247cb91bf2b518c89ef78e3584a7aedeee633d782e3caae",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-3840x2160-Low-NormalGameplay.png",
+      "archiveMember": "images/044-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-10.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Low-NormalGameplay",
+      "role": "after",
+      "sha256": "51fbd19078bf14222480bd66b9dcdbb24af1dfbcf5b9f72e7caeda985f36cdac",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-3840x2160-Low-NormalGameplay.png",
+      "archiveMember": "images/044-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-10.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Low-Strategic",
+      "role": "before",
+      "sha256": "fea216b921c7da80aeaafa67b8db9838627a339296cb47b7631ae5005c42ab99",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-3840x2160-Low-Strategic.png",
+      "archiveMember": "images/045-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-11.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Low-Strategic",
+      "role": "after",
+      "sha256": "b401fb10348fff5272730ef47967e73688897d7deab4f45ad91e481d89047d17",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-3840x2160-Low-Strategic.png",
+      "archiveMember": "images/045-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-11.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Low-CloseTactical",
+      "role": "before",
+      "sha256": "4c290bbdeaf6a603c8f9541dd88f0fcf8f55ebc789527001c6fa43e35d49fbdf",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-3840x2160-Low-CloseTactical.png",
+      "archiveMember": "images/046-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-11.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Low-CloseTactical",
+      "role": "after",
+      "sha256": "e5ef057513185a26da112047d438a7602a2cbe68af13781b3b091079ded00c15",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-3840x2160-Low-CloseTactical.png",
+      "archiveMember": "images/046-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-12.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Low-NormalGameplay",
+      "role": "before",
+      "sha256": "a83c0a5e5087e689d6288fa39df77c8710389ba55bfdde584e797ec9921b5db8",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-3840x2160-Low-NormalGameplay.png",
+      "archiveMember": "images/047-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-12.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Low-NormalGameplay",
+      "role": "after",
+      "sha256": "d46e0942c98f3b012f92b095890beb4cc77b3bb0ddde94325e606a1653e80b44",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-3840x2160-Low-NormalGameplay.png",
+      "archiveMember": "images/047-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-13.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Low-Strategic",
+      "role": "before",
+      "sha256": "e1cf0340268e1fbe43af10f04c93f37ae1df946c252311b4c46cd8afd7a2f4de",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-3840x2160-Low-Strategic.png",
+      "archiveMember": "images/048-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-13.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Low-Strategic",
+      "role": "after",
+      "sha256": "96fd8192fc206529ffcdaf1fed7975f8f291d7c06d0c39005c186cdfd6924d2f",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-3840x2160-Low-Strategic.png",
+      "archiveMember": "images/048-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-14.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Medium-CloseTactical",
+      "role": "before",
+      "sha256": "1a8980591068965524984963dece2e63e78ce15f0b2df97766317350f38aa771",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-3840x2160-Medium-CloseTactical.png",
+      "archiveMember": "images/049-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-14.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Medium-CloseTactical",
+      "role": "after",
+      "sha256": "1a8980591068965524984963dece2e63e78ce15f0b2df97766317350f38aa771",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-3840x2160-Medium-CloseTactical.png",
+      "archiveMember": "images/049-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-14.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Medium-NormalGameplay",
+      "role": "before",
+      "sha256": "6e2cc3154269bc940b2a2d8c594518a22f644aae57662831e2d8fb4a9bb1241e",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-3840x2160-Medium-NormalGameplay.png",
+      "archiveMember": "images/050-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-14.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Medium-NormalGameplay",
+      "role": "after",
+      "sha256": "6e2cc3154269bc940b2a2d8c594518a22f644aae57662831e2d8fb4a9bb1241e",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-3840x2160-Medium-NormalGameplay.png",
+      "archiveMember": "images/050-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-14.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Medium-Strategic",
+      "role": "before",
+      "sha256": "7b4aff3e55e55923bb5597a9950ee29d4ce13081b0554edccff29c55a56347d3",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-3840x2160-Medium-Strategic.png",
+      "archiveMember": "images/051-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-15.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-Medium-Strategic",
+      "role": "after",
+      "sha256": "7b4aff3e55e55923bb5597a9950ee29d4ce13081b0554edccff29c55a56347d3",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-3840x2160-Medium-Strategic.png",
+      "archiveMember": "images/051-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-15.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Medium-CloseTactical",
+      "role": "before",
+      "sha256": "9c7aa1a3f5c717ab32b8e3d302b2fcd59dcf03a3509fe3127184fc7e4ec1c384",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-3840x2160-Medium-CloseTactical.png",
+      "archiveMember": "images/052-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-15.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Medium-CloseTactical",
+      "role": "after",
+      "sha256": "637ca89c0dbbfd50e0aae74fa069a36b8d66a7f661c00aa3b8dddeb1a5c192cf",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-3840x2160-Medium-CloseTactical.png",
+      "archiveMember": "images/052-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-15.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Medium-NormalGameplay",
+      "role": "before",
+      "sha256": "d28c6d7365f5ac343e14849617d6a7896d1a7bc2ce1d6b41721f734b4b532329",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-3840x2160-Medium-NormalGameplay.png",
+      "archiveMember": "images/053-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-16.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Medium-NormalGameplay",
+      "role": "after",
+      "sha256": "2cb4dd02fdbb3977d6055768c69d604ef8363f3b28ad93fde77906613ab9ac09",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-3840x2160-Medium-NormalGameplay.png",
+      "archiveMember": "images/053-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-16.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Medium-Strategic",
+      "role": "before",
+      "sha256": "53debb7aa45f604082e9410e72c7e1381316db2ebc460c5ef6a3e94f59a8a429",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-3840x2160-Medium-Strategic.png",
+      "archiveMember": "images/054-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-16.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-Medium-Strategic",
+      "role": "after",
+      "sha256": "91b2ba19577942100d12b34e94a23878ae01024870393c7b86987033846af132",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-3840x2160-Medium-Strategic.png",
+      "archiveMember": "images/054-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-17.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Medium-CloseTactical",
+      "role": "before",
+      "sha256": "7a3a75fea80b108899eb3d4e2d50a6f5673369dd7787fdf9482af9a689db15d3",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-3840x2160-Medium-CloseTactical.png",
+      "archiveMember": "images/055-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-17.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Medium-CloseTactical",
+      "role": "after",
+      "sha256": "1a0c30e80a41dd71ac4b88b4633c49f9181c94f891482154b79eeb528f88a395",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-3840x2160-Medium-CloseTactical.png",
+      "archiveMember": "images/055-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-17.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Medium-NormalGameplay",
+      "role": "before",
+      "sha256": "985e81fca339c0c498eb0b526b2d6fb2474e2757c18510281cabde2158c2ace9",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-3840x2160-Medium-NormalGameplay.png",
+      "archiveMember": "images/056-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-18.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Medium-NormalGameplay",
+      "role": "after",
+      "sha256": "06558e4dbbde2995f7678a42e31260b6c4c98f9eda2f2b4103c85ee76d2d4f13",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-3840x2160-Medium-NormalGameplay.png",
+      "archiveMember": "images/056-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-18.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Medium-Strategic",
+      "role": "before",
+      "sha256": "8c8ed178e8bdca65c0d2aaf5aa86a53c27d0627ee4223d3bc080105ffd6cd3f4",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-3840x2160-Medium-Strategic.png",
+      "archiveMember": "images/057-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-18.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-Medium-Strategic",
+      "role": "after",
+      "sha256": "390d2c4e1f5fe545263909deaa2c32e6cfd37008bb7704366ff06c81f11ffa13",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-3840x2160-Medium-Strategic.png",
+      "archiveMember": "images/057-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-19.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Medium-CloseTactical",
+      "role": "before",
+      "sha256": "d3291ffd6ed564f9d78eb938fdebcf75b1364bd47cd2ad6ed45a6ba65034973d",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-3840x2160-Medium-CloseTactical.png",
+      "archiveMember": "images/058-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-19.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Medium-CloseTactical",
+      "role": "after",
+      "sha256": "2600be5c87da47721520db62ba41f78c1e62518e454a5e27a3f20e95a1f9afa5",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-3840x2160-Medium-CloseTactical.png",
+      "archiveMember": "images/058-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-19.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Medium-NormalGameplay",
+      "role": "before",
+      "sha256": "7bbda2eb5dce58bd3527b259bd807b3df2924d4da8bb3c653e42075c5cede35d",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-3840x2160-Medium-NormalGameplay.png",
+      "archiveMember": "images/059-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-20.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Medium-NormalGameplay",
+      "role": "after",
+      "sha256": "4d059522c5a600ef5192ef7b3796d227aae19aebf475c5fd2f7c670d65403591",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-3840x2160-Medium-NormalGameplay.png",
+      "archiveMember": "images/059-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-20.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Medium-Strategic",
+      "role": "before",
+      "sha256": "c9161446d8527ddf711131adf0729a37f18b670c31ae8d27fce7801fbb43dfec",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-3840x2160-Medium-Strategic.png",
+      "archiveMember": "images/060-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-20.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-Medium-Strategic",
+      "role": "after",
+      "sha256": "c08b530ca80dc1d4998527a3856f444362e4013df65511a3e8d452261c152c88",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-3840x2160-Medium-Strategic.png",
+      "archiveMember": "images/060-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-21.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-High-CloseTactical",
+      "role": "before",
+      "sha256": "ba27ff45d25f221a898d3f592797f9630c2e568bd343e4076462b2923822070e",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-3840x2160-High-CloseTactical.png",
+      "archiveMember": "images/061-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-21.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-High-CloseTactical",
+      "role": "after",
+      "sha256": "ba27ff45d25f221a898d3f592797f9630c2e568bd343e4076462b2923822070e",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-3840x2160-High-CloseTactical.png",
+      "archiveMember": "images/061-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-21.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-High-NormalGameplay",
+      "role": "before",
+      "sha256": "fe4268b2b435d90e5307c54fe0eedeeebd8c189bb92119222bef324d15c9ad04",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/062-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-21.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-High-NormalGameplay",
+      "role": "after",
+      "sha256": "fe4268b2b435d90e5307c54fe0eedeeebd8c189bb92119222bef324d15c9ad04",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/062-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-21.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-High-Strategic",
+      "role": "before",
+      "sha256": "ef11e5d145fcfd3bd46821ad033548edfe40effaa6d732c5567ce1feb787889a",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationSingle-3840x2160-High-Strategic.png",
+      "archiveMember": "images/063-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-22.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationSingle-3840x2160-High-Strategic",
+      "role": "after",
+      "sha256": "ef11e5d145fcfd3bd46821ad033548edfe40effaa6d732c5567ce1feb787889a",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationSingle-3840x2160-High-Strategic.png",
+      "archiveMember": "images/063-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-22.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-High-CloseTactical",
+      "role": "before",
+      "sha256": "3346547d9dab89a307e8ac9e33d38c9a884fb6a4729f40aa43cf72e6251e04e4",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-3840x2160-High-CloseTactical.png",
+      "archiveMember": "images/064-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-22.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-High-CloseTactical",
+      "role": "after",
+      "sha256": "5ebb7a3b19fb88d7f50be2b385b24a061c5f0c220ed86f59eabbf6680d88d063",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-3840x2160-High-CloseTactical.png",
+      "archiveMember": "images/064-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-22.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-High-NormalGameplay",
+      "role": "before",
+      "sha256": "43381ad6fb036ba9e996fc91de22d3a1a4528d17aa354aee3a8efce2c2a35b7c",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/065-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-23.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-High-NormalGameplay",
+      "role": "after",
+      "sha256": "6360feaaaee0d13b9b7e09c91bb75b15b83fbf042f992478b33b6cbd05c8a379",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/065-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-23.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-High-Strategic",
+      "role": "before",
+      "sha256": "779f0d66fd48dcc267853aac13f73bbcd5372ad716ae9bdbe5c034b76eb6adad",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationGrove-3840x2160-High-Strategic.png",
+      "archiveMember": "images/066-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-23.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationGrove-3840x2160-High-Strategic",
+      "role": "after",
+      "sha256": "5f5281dacd710e8a53bc051ce409dbbb1bf4f6be730835c2558d39e758ce5723",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationGrove-3840x2160-High-Strategic.png",
+      "archiveMember": "images/066-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-24.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-High-CloseTactical",
+      "role": "before",
+      "sha256": "664d2cf7607c79e6e7cccd92bcd2d5c3da3fc2e972462ce3e32ba0d10c4d2786",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-3840x2160-High-CloseTactical.png",
+      "archiveMember": "images/067-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-24.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-High-CloseTactical",
+      "role": "after",
+      "sha256": "8b62cd2ce76efcc883f5e1a2515ab0d4683ca7d97acc225bd4aca47ce09d176c",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-3840x2160-High-CloseTactical.png",
+      "archiveMember": "images/067-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-24.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-High-NormalGameplay",
+      "role": "before",
+      "sha256": "7d480ce80eb51ed436df7e2a24e7eff2e955435bdd528126190432d7092bccba",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/068-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-25.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-High-NormalGameplay",
+      "role": "after",
+      "sha256": "454d40ca88361066e7bf044fff5236a2321ac9e65404ced0eeeb11323eceabf1",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/068-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-25.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-High-Strategic",
+      "role": "before",
+      "sha256": "3c6c37abc35a0a56b0cbdd35417769c3cd8a6ae2c4673b0a424270feb8dca1b2",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated100-3840x2160-High-Strategic.png",
+      "archiveMember": "images/069-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-25.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated100-3840x2160-High-Strategic",
+      "role": "after",
+      "sha256": "36e862f986cc2c465956d039a8d05939febbb371f7b2f1151ed3ed2f5d6a7b39",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated100-3840x2160-High-Strategic.png",
+      "archiveMember": "images/069-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-26.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-High-CloseTactical",
+      "role": "before",
+      "sha256": "ae39243483a939aefebbc7c31ec78119c462f0d028ca7967896b1edbcb534460",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-3840x2160-High-CloseTactical.png",
+      "archiveMember": "images/070-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-26.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-High-CloseTactical",
+      "role": "after",
+      "sha256": "5d1f75e116add49bb987f58b49edf954bdfa39dcaf4350b7d666bfd8b4227a7b",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-3840x2160-High-CloseTactical.png",
+      "archiveMember": "images/070-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-26.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-High-NormalGameplay",
+      "role": "before",
+      "sha256": "381e13cee391592dd058964ec0b3e0e3b6c7654423b8d73a05c8ff87f431ba25",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/071-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-27.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-High-NormalGameplay",
+      "role": "after",
+      "sha256": "889d4078152c715b3e2f8808e4e3da49645f357d98c58e6d2284f58f9de91bbb",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/071-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-27.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-High-Strategic",
+      "role": "before",
+      "sha256": "2f728f503c2e4f31272caff2d6690d21ecba0fe89a8907f82c0ebe7d7eeb9535",
+      "original": "artifacts/vn/groves-and-loads/before/VegetationRepeated1000-3840x2160-High-Strategic.png",
+      "archiveMember": "images/072-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-27.zip"
+    },
+    {
+      "group": "groves-and-loads",
+      "key": "VegetationRepeated1000-3840x2160-High-Strategic",
+      "role": "after",
+      "sha256": "db80ff508e25041c2088904d99c216be10a744eb86ce4312340c8e9eea83fcc8",
+      "original": "artifacts/vn/groves-and-loads/after/VegetationRepeated1000-3840x2160-High-Strategic.png",
+      "archiveMember": "images/072-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-28.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Low-CloseTactical",
+      "role": "before",
+      "sha256": "fd16ba44dfa9bce033666888072aa5240e3163a064683433b6541145955d3a38",
+      "original": "artifacts/vn/density-half/before/VegetationRepeated1000-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/073-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-28.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Low-CloseTactical",
+      "role": "after",
+      "sha256": "30fb46a28e076e00a59073d845ed5d5851c53ae6d33f92b69dfaa29a6929a632",
+      "original": "artifacts/vn/density-half/after/VegetationRepeated1000-1920x1080-Low-CloseTactical.png",
+      "archiveMember": "images/073-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-28.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Low-NormalGameplay",
+      "role": "before",
+      "sha256": "8eed93a0d52cddfbfc3e077063addc37d7f683a16153293790f94c409d6eb9f5",
+      "original": "artifacts/vn/density-half/before/VegetationRepeated1000-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/074-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-28.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Low-NormalGameplay",
+      "role": "after",
+      "sha256": "36b84fd28665cc158e98390c1ee28dff75094b349d6d1a197ca5a7572efac652",
+      "original": "artifacts/vn/density-half/after/VegetationRepeated1000-1920x1080-Low-NormalGameplay.png",
+      "archiveMember": "images/074-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-28.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Low-Strategic",
+      "role": "before",
+      "sha256": "67c3c648cbfc28a9d148bf2f8d51a85956ba596405febe1a302114b5132196eb",
+      "original": "artifacts/vn/density-half/before/VegetationRepeated1000-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/075-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-28.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Low-Strategic",
+      "role": "after",
+      "sha256": "686979628ad1c72617af121cb577731eae1608eea94b83a7f8349e7572d657b8",
+      "original": "artifacts/vn/density-half/after/VegetationRepeated1000-1920x1080-Low-Strategic.png",
+      "archiveMember": "images/075-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-28.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Medium-CloseTactical",
+      "role": "before",
+      "sha256": "26b1a0f8adcfed54047a77fda9720860ad3a6ad78e602443b3d8105afb3b4180",
+      "original": "artifacts/vn/density-half/before/VegetationRepeated1000-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/076-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-28.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Medium-CloseTactical",
+      "role": "after",
+      "sha256": "2a335cb8f8a9ee1289e77e78191fe358154f216948afd3aade44c28fdb71b3b8",
+      "original": "artifacts/vn/density-half/after/VegetationRepeated1000-1920x1080-Medium-CloseTactical.png",
+      "archiveMember": "images/076-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-28.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Medium-NormalGameplay",
+      "role": "before",
+      "sha256": "b81ac0ab3b524a0bfd9bf74e3a00055470ab2c40bb55ab1b21b68af850253b85",
+      "original": "artifacts/vn/density-half/before/VegetationRepeated1000-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/077-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Medium-NormalGameplay",
+      "role": "after",
+      "sha256": "9891540848cad971ca8da3aa8fb77ca12f2b4ab021d892b976602343b2b05ca0",
+      "original": "artifacts/vn/density-half/after/VegetationRepeated1000-1920x1080-Medium-NormalGameplay.png",
+      "archiveMember": "images/077-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Medium-Strategic",
+      "role": "before",
+      "sha256": "f3b88a44b63a82428864b8b7711d107931a7a330111bc0f14102b5798cdc8235",
+      "original": "artifacts/vn/density-half/before/VegetationRepeated1000-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/078-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-Medium-Strategic",
+      "role": "after",
+      "sha256": "7a791474351d9144fb8a6730068aee2c09c141172bba9757152cf50becd2ca31",
+      "original": "artifacts/vn/density-half/after/VegetationRepeated1000-1920x1080-Medium-Strategic.png",
+      "archiveMember": "images/078-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-High-CloseTactical",
+      "role": "before",
+      "sha256": "4ca65eee86762308c2a509dad15dc1ce7c338d3adf5b4d8cb11a1d3fef3681a1",
+      "original": "artifacts/vn/density-half/before/VegetationRepeated1000-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/079-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-High-CloseTactical",
+      "role": "after",
+      "sha256": "f343fef06ac17b5576d7c470904e37fb9a86f2661fff6d9b034f3a71b5b9ff9e",
+      "original": "artifacts/vn/density-half/after/VegetationRepeated1000-1920x1080-High-CloseTactical.png",
+      "archiveMember": "images/079-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-High-NormalGameplay",
+      "role": "before",
+      "sha256": "764300f2cf427111ec955fe794fa1f85504c4b78d8610f847c4d649b25243d2d",
+      "original": "artifacts/vn/density-half/before/VegetationRepeated1000-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/080-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-High-NormalGameplay",
+      "role": "after",
+      "sha256": "9ddc1807fe7a8da678eede4c7eca1a178d849e7ee1175a9fcdf7c96b5c0b25cc",
+      "original": "artifacts/vn/density-half/after/VegetationRepeated1000-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/080-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-High-Strategic",
+      "role": "before",
+      "sha256": "f4d34ffbb08463b3a9b139271048f54b52b1a0c02845e9c2dd35ca773f1cacfe",
+      "original": "artifacts/vn/density-half/before/VegetationRepeated1000-1920x1080-High-Strategic.png",
+      "archiveMember": "images/081-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "density-half",
+      "key": "VegetationRepeated1000-1920x1080-High-Strategic",
+      "role": "after",
+      "sha256": "98c4763c9859cf1670e2d9c5c0bd0fc24f279ac010614276fc08ffc3c14903fe",
+      "original": "artifacts/vn/density-half/after/VegetationRepeated1000-1920x1080-High-Strategic.png",
+      "archiveMember": "images/081-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "dark",
+      "key": "VegetationGrove-1920x1080-High-NormalGameplay",
+      "role": "before",
+      "sha256": "c2c99dbbb09f93a5285153ed34cb8ca1b034fb174584c7744b7b2aaad8a136d6",
+      "original": "artifacts/vn/dark/before/VegetationGrove-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/082-before.png",
+      "previewPath": "images/082-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "dark",
+      "key": "VegetationGrove-1920x1080-High-NormalGameplay",
+      "role": "after",
+      "sha256": "73c3025fb52233e865fabb69227f2d2b90a3668bea528adf45176a66f09873c5",
+      "original": "artifacts/vn/dark/after/VegetationGrove-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/082-after.png",
+      "previewPath": "images/082-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-29.zip"
+    },
+    {
+      "group": "dark",
+      "key": "VegetationGrove-3840x2160-High-NormalGameplay",
+      "role": "before",
+      "sha256": "160d6e0d37fc0f8bcccdfdbfc1eb9bce0bec681e0b58ad6c1471f934ee794f7f",
+      "original": "artifacts/vn/dark/before/VegetationGrove-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/083-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-30.zip"
+    },
+    {
+      "group": "dark",
+      "key": "VegetationGrove-3840x2160-High-NormalGameplay",
+      "role": "after",
+      "sha256": "8617a91cb2aa275ae26638fa3f092a100e6ee851bf047742ff632a090948df47",
+      "original": "artifacts/vn/dark/after/VegetationGrove-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/083-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-30.zip"
+    },
+    {
+      "group": "wet",
+      "key": "VegetationGrove-1920x1080-High-NormalGameplay",
+      "role": "before",
+      "sha256": "e749fdbcb2224f3f748aa958d105a6bd2c0eea87f205ac34ea77e4f35efe2471",
+      "original": "artifacts/vn/wet/before/VegetationGrove-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/084-before.png",
+      "previewPath": "images/084-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-30.zip"
+    },
+    {
+      "group": "wet",
+      "key": "VegetationGrove-1920x1080-High-NormalGameplay",
+      "role": "after",
+      "sha256": "2c5c1d24446a6c050f5c693366a0ae8d77774d49685dc5fa72bfc367c766f172",
+      "original": "artifacts/vn/wet/after/VegetationGrove-1920x1080-High-NormalGameplay.png",
+      "archiveMember": "images/084-after.png",
+      "previewPath": "images/084-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-30.zip"
+    },
+    {
+      "group": "wet",
+      "key": "VegetationGrove-3840x2160-High-NormalGameplay",
+      "role": "before",
+      "sha256": "f421ef928f36eaad6127d9ef5b60df765c47111ecd38d48e84fb52f90d6c3ba9",
+      "original": "artifacts/vn/wet/before/VegetationGrove-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/085-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-31.zip"
+    },
+    {
+      "group": "wet",
+      "key": "VegetationGrove-3840x2160-High-NormalGameplay",
+      "role": "after",
+      "sha256": "eb5446a8d65f7dce344d9b160ce766ecfd6e77775650448833d7146ece1c1d75",
+      "original": "artifacts/vn/wet/after/VegetationGrove-3840x2160-High-NormalGameplay.png",
+      "archiveMember": "images/085-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-31.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "5c4271f33e85865ae065e2c82f031e2eeb10aa3ead5c6d2489001a45c46f1beb",
+      "original": "artifacts/vn/traverse-full/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse.png",
+      "archiveMember": "images/086-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-31.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "da4aab42f4efd57d0dea25308b5c15235647a0467159e5c6cb7e0628119af05e",
+      "original": "artifacts/vn/traverse-full/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse.png",
+      "archiveMember": "images/086-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-31.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "32e9866b51af32c0b8abced86bddfd463544179715a1f5ac39f01d039b94759e",
+      "original": "artifacts/vn/traverse-half/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse.png",
+      "archiveMember": "images/087-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "f58b33dddee39b88b77d33bd4f4189eeb45f50e801786ee97c092a9daa8fca34",
+      "original": "artifacts/vn/traverse-half/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse.png",
+      "archiveMember": "images/087-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "bark-0",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical-Yaw0-Inspection40",
+      "role": "before",
+      "sha256": "d237042352c1c3f39278087b93e1e5853d81b61cb3d0e56540e861732913a5db",
+      "original": "artifacts/vn/bark-0/before/VegetationSingle-1920x1080-High-CloseTactical-Yaw0-Inspection40.png",
+      "archiveMember": "images/088-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "bark-0",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical-Yaw0-Inspection40",
+      "role": "after",
+      "sha256": "d237042352c1c3f39278087b93e1e5853d81b61cb3d0e56540e861732913a5db",
+      "original": "artifacts/vn/bark-0/after/VegetationSingle-1920x1080-High-CloseTactical-Yaw0-Inspection40.png",
+      "archiveMember": "images/088-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "bark-90",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical-Yaw90-Inspection40",
+      "role": "before",
+      "sha256": "d60602a0c088e661d991055b823cea691b4950653d015112844f0761f865dcda",
+      "original": "artifacts/vn/bark-90/before/VegetationSingle-1920x1080-High-CloseTactical-Yaw90-Inspection40.png",
+      "archiveMember": "images/089-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "bark-90",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical-Yaw90-Inspection40",
+      "role": "after",
+      "sha256": "d60602a0c088e661d991055b823cea691b4950653d015112844f0761f865dcda",
+      "original": "artifacts/vn/bark-90/after/VegetationSingle-1920x1080-High-CloseTactical-Yaw90-Inspection40.png",
+      "archiveMember": "images/089-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "bark-180",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical-Yaw180-Inspection40",
+      "role": "before",
+      "sha256": "6b1ad71cf941f4d7c4b753195403983b062223d513dd78ef01e27559a2438d21",
+      "original": "artifacts/vn/bark-180/before/VegetationSingle-1920x1080-High-CloseTactical-Yaw180-Inspection40.png",
+      "archiveMember": "images/090-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "bark-180",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical-Yaw180-Inspection40",
+      "role": "after",
+      "sha256": "6b1ad71cf941f4d7c4b753195403983b062223d513dd78ef01e27559a2438d21",
+      "original": "artifacts/vn/bark-180/after/VegetationSingle-1920x1080-High-CloseTactical-Yaw180-Inspection40.png",
+      "archiveMember": "images/090-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "bark-270",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical-Yaw270-Inspection40",
+      "role": "before",
+      "sha256": "0bdc9997c545f380c55c8438bfd1c2bcd5feaf564ff84a23241675d8d0830066",
+      "original": "artifacts/vn/bark-270/before/VegetationSingle-1920x1080-High-CloseTactical-Yaw270-Inspection40.png",
+      "archiveMember": "images/091-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "bark-270",
+      "key": "VegetationSingle-1920x1080-High-CloseTactical-Yaw270-Inspection40",
+      "role": "after",
+      "sha256": "0bdc9997c545f380c55c8438bfd1c2bcd5feaf564ff84a23241675d8d0830066",
+      "original": "artifacts/vn/bark-270/after/VegetationSingle-1920x1080-High-CloseTactical-Yaw270-Inspection40.png",
+      "archiveMember": "images/091-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "5c4271f33e85865ae065e2c82f031e2eeb10aa3ead5c6d2489001a45c46f1beb",
+      "original": "artifacts/vn/traverse-full/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-00.png",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/086-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-31.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "29bb249ef23924969c566394ff7a7f9aba25d028a9e6125878cd1ca824113cd8",
+      "original": "artifacts/vn/traverse-full/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-01.png",
+      "camera": {
+        "target": {
+          "x": 650.5,
+          "y": 6.2121563,
+          "z": 520.5
+        },
+        "yawRadians": 0.7903982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-before-1.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "5c4b5c617db02c0f4eb07bdd9dae25768c2e5b5f3652965710f68a4e8873cc30",
+      "original": "artifacts/vn/traverse-full/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-02.png",
+      "camera": {
+        "target": {
+          "x": 651,
+          "y": 6.2121563,
+          "z": 521
+        },
+        "yawRadians": 0.7953982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-before-2.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "ec1ff96a894aed144adbb90a7b71389225807ad3906ed5f8ea5770a49577fb28",
+      "original": "artifacts/vn/traverse-full/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-03.png",
+      "camera": {
+        "target": {
+          "x": 651.5,
+          "y": 6.2121563,
+          "z": 521.5
+        },
+        "yawRadians": 0.8003982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-before-3.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-33.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "1ce1bd3fe82ce649abc09be899b15dfe2acb4763604900a7fb253eb7282cc74c",
+      "original": "artifacts/vn/traverse-full/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-04.png",
+      "camera": {
+        "target": {
+          "x": 652,
+          "y": 6.2121563,
+          "z": 522
+        },
+        "yawRadians": 0.80539817,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-before-4.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-33.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "477d1cf4815793c78c0221ead8de8d4fc3f8412567ff6a12629d677ca32e3b9c",
+      "original": "artifacts/vn/traverse-full/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-05.png",
+      "camera": {
+        "target": {
+          "x": 652.5,
+          "y": 6.2121563,
+          "z": 522.5
+        },
+        "yawRadians": 0.81039816,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-before-5.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-33.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "ca1e32c2be5e1fdcaae034ab72277b022b9f69750d29791eb04174b5c8b142fb",
+      "original": "artifacts/vn/traverse-full/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-06.png",
+      "camera": {
+        "target": {
+          "x": 653,
+          "y": 6.2121563,
+          "z": 523
+        },
+        "yawRadians": 0.81539816,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-before-6.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-33.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "bcf2808e471f766f1a6b59fe1a4e56ff4ab64b61278da56022f3ef3d85584b4d",
+      "original": "artifacts/vn/traverse-full/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-07.png",
+      "camera": {
+        "target": {
+          "x": 653.5,
+          "y": 6.2121563,
+          "z": 523.5
+        },
+        "yawRadians": 0.8203982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-before-7.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-33.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "da4aab42f4efd57d0dea25308b5c15235647a0467159e5c6cb7e0628119af05e",
+      "original": "artifacts/vn/traverse-full/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-00.png",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/086-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-31.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "9b6c23668cc387e7330396bb1759b8f71ca742fd20d0a6e9c5c7dbdd53950de0",
+      "original": "artifacts/vn/traverse-full/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-01.png",
+      "camera": {
+        "target": {
+          "x": 650.5,
+          "y": 6.2121563,
+          "z": 520.5
+        },
+        "yawRadians": 0.7903982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-after-1.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-33.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "f15838a0738da5aff6b63d4450551a3ef1d9a56b25177d967314af9496d43957",
+      "original": "artifacts/vn/traverse-full/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-02.png",
+      "camera": {
+        "target": {
+          "x": 651,
+          "y": 6.2121563,
+          "z": 521
+        },
+        "yawRadians": 0.7953982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-after-2.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-34.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "03585a31af71a20f14529f420a7a8a7debb12db27c05c4c348c705c95688ab12",
+      "original": "artifacts/vn/traverse-full/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-03.png",
+      "camera": {
+        "target": {
+          "x": 651.5,
+          "y": 6.2121563,
+          "z": 521.5
+        },
+        "yawRadians": 0.8003982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-after-3.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-34.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "5b0535a9a332d08f2f9e0e3d750e8c45fe71d40095be828fd551ceaaea74e1c7",
+      "original": "artifacts/vn/traverse-full/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-04.png",
+      "camera": {
+        "target": {
+          "x": 652,
+          "y": 6.2121563,
+          "z": 522
+        },
+        "yawRadians": 0.80539817,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-after-4.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-34.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "fd77ececabeb797d2f7ddba90ff589f703adc484d4162607016f44b9772b0521",
+      "original": "artifacts/vn/traverse-full/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-05.png",
+      "camera": {
+        "target": {
+          "x": 652.5,
+          "y": 6.2121563,
+          "z": 522.5
+        },
+        "yawRadians": 0.81039816,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-after-5.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-34.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "5f23fb2012e9154ddd3d8e1c65958a822215dac28df4747761cf5876b8d6c82e",
+      "original": "artifacts/vn/traverse-full/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-06.png",
+      "camera": {
+        "target": {
+          "x": 653,
+          "y": 6.2121563,
+          "z": 523
+        },
+        "yawRadians": 0.81539816,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-after-6.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-34.zip"
+    },
+    {
+      "group": "traverse-full",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "95ed9c47f544e04493c7b8f1ef5cfad7244a15725f5ed1e6e051e6e12f870ae0",
+      "original": "artifacts/vn/traverse-full/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-07.png",
+      "camera": {
+        "target": {
+          "x": 653.5,
+          "y": 6.2121563,
+          "z": 523.5
+        },
+        "yawRadians": 0.8203982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-full-after-7.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-34.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "32e9866b51af32c0b8abced86bddfd463544179715a1f5ac39f01d039b94759e",
+      "original": "artifacts/vn/traverse-half/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-00.png",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/087-before.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "b6ed1e1c45bea8df4e4518cf116e697848b29917906ee61f75e1d3474a96bb32",
+      "original": "artifacts/vn/traverse-half/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-01.png",
+      "camera": {
+        "target": {
+          "x": 650.5,
+          "y": 6.2121563,
+          "z": 520.5
+        },
+        "yawRadians": 0.7903982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-before-1.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-35.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "1c689e8a03425f3af826b2a4509a2902f3f20d1f790f687d3336b664ee4f5a60",
+      "original": "artifacts/vn/traverse-half/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-02.png",
+      "camera": {
+        "target": {
+          "x": 651,
+          "y": 6.2121563,
+          "z": 521
+        },
+        "yawRadians": 0.7953982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-before-2.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-35.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "55d54e6ce052400291c6cf6ba15f35fd9a7a76e9532cb18c9c659ae162c79d04",
+      "original": "artifacts/vn/traverse-half/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-03.png",
+      "camera": {
+        "target": {
+          "x": 651.5,
+          "y": 6.2121563,
+          "z": 521.5
+        },
+        "yawRadians": 0.8003982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-before-3.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-35.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "d7286c94fa44d6cba47d9e220967cbdc0529c5bc0f57cd3db47de59ee010e5d2",
+      "original": "artifacts/vn/traverse-half/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-04.png",
+      "camera": {
+        "target": {
+          "x": 652,
+          "y": 6.2121563,
+          "z": 522
+        },
+        "yawRadians": 0.80539817,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-before-4.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-35.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "bc93a3447fc75798bddb07513fe0ec7f00bf95acf0be1f7b028ec583ac4bcc8e",
+      "original": "artifacts/vn/traverse-half/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-05.png",
+      "camera": {
+        "target": {
+          "x": 652.5,
+          "y": 6.2121563,
+          "z": 522.5
+        },
+        "yawRadians": 0.81039816,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-before-5.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-35.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "9e09c6925f7831ff2836fb14220727f53f0f00d2afcd96516036e038accc1588",
+      "original": "artifacts/vn/traverse-half/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-06.png",
+      "camera": {
+        "target": {
+          "x": 653,
+          "y": 6.2121563,
+          "z": 523
+        },
+        "yawRadians": 0.81539816,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-before-6.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-35.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "before",
+      "sha256": "78b47f3f3828a45aeb2abc79e7771d526e54b639f1c65e6957e786d7cc9e5fb2",
+      "original": "artifacts/vn/traverse-half/before/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-07.png",
+      "camera": {
+        "target": {
+          "x": 653.5,
+          "y": 6.2121563,
+          "z": 523.5
+        },
+        "yawRadians": 0.8203982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-before-7.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-36.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "f58b33dddee39b88b77d33bd4f4189eeb45f50e801786ee97c092a9daa8fca34",
+      "original": "artifacts/vn/traverse-half/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-00.png",
+      "camera": {
+        "target": {
+          "x": 650,
+          "y": 6.2121563,
+          "z": 520
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/087-after.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-32.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "07360ca53317ad50373b9cef88c3182876dbc6576c67bf1008d424c3c8aaf8ef",
+      "original": "artifacts/vn/traverse-half/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-01.png",
+      "camera": {
+        "target": {
+          "x": 650.5,
+          "y": 6.2121563,
+          "z": 520.5
+        },
+        "yawRadians": 0.7903982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-after-1.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-36.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "7faaf6570772b637730dbef067a47f8beb73da4051ecc03324720d61396b5678",
+      "original": "artifacts/vn/traverse-half/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-02.png",
+      "camera": {
+        "target": {
+          "x": 651,
+          "y": 6.2121563,
+          "z": 521
+        },
+        "yawRadians": 0.7953982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-after-2.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-36.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "429a36d0732b2e9dca857ceac6962ce4f06445ac528e0ff7ae6f582e7fabce7e",
+      "original": "artifacts/vn/traverse-half/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-03.png",
+      "camera": {
+        "target": {
+          "x": 651.5,
+          "y": 6.2121563,
+          "z": 521.5
+        },
+        "yawRadians": 0.8003982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-after-3.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-36.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "2168eb37590432457021515a51536ee9b4dfefd15ab7be0119e7987dd4b25073",
+      "original": "artifacts/vn/traverse-half/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-04.png",
+      "camera": {
+        "target": {
+          "x": 652,
+          "y": 6.2121563,
+          "z": 522
+        },
+        "yawRadians": 0.80539817,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-after-4.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-36.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "7f041a6cbc6523fdd5117e9694f9f2a78baa7749a4edf6fb3a5cf6b9707441ea",
+      "original": "artifacts/vn/traverse-half/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-05.png",
+      "camera": {
+        "target": {
+          "x": 652.5,
+          "y": 6.2121563,
+          "z": 522.5
+        },
+        "yawRadians": 0.81039816,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-after-5.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-36.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "ba393d8c47c73bde1f7b87ac11587c7eaa31a4a850b978844b174596379af02c",
+      "original": "artifacts/vn/traverse-half/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-06.png",
+      "camera": {
+        "target": {
+          "x": 653,
+          "y": 6.2121563,
+          "z": 523
+        },
+        "yawRadians": 0.81539816,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-after-6.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-37.zip"
+    },
+    {
+      "group": "traverse-half",
+      "key": "VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse",
+      "role": "after",
+      "sha256": "6684aa4631649eadddcb0cdf15ae6e11c49627e4cce8cbb0bec0ca575557a2fe",
+      "original": "artifacts/vn/traverse-half/after/VegetationRepeated1000-2560x1440-Medium-NormalGameplay-Traverse-motion-07.png",
+      "camera": {
+        "target": {
+          "x": 653.5,
+          "y": 6.2121563,
+          "z": 523.5
+        },
+        "yawRadians": 0.8203982,
+        "pitchRadians": -0.9599311,
+        "distance": 420,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "archiveMember": "images/m-traverse-half-after-7.png",
+      "retainedLocalArchive": "artifacts/vg-image-archives/images-37.zip"
+    }
+  ],
+  "archives": [
+    {
+      "path": "artifacts/vg-image-archives/images-01.zip",
+      "bytes": 54978763,
+      "sha256": "bf991a4e3c00871e088e74deffd29a26bc477fa415d665cc756ed0c3d03173cf",
+      "uniquePictures": 12,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-02.zip",
+      "bytes": 55721469,
+      "sha256": "29eb07ae616de9a52e3f29c07169a6546ebba0ebb8e6ff9d80f58bc3fa82172a",
+      "uniquePictures": 12,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-03.zip",
+      "bytes": 53624323,
+      "sha256": "6b4a1a5a90366765573aeb807f95c5c89e19a3938231eea9758ec1b4aa3ae76d",
+      "uniquePictures": 12,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-04.zip",
+      "bytes": 53883754,
+      "sha256": "99437d96b83daeb559951c82ac79b1302b31c7b01f8fc5a5e5ab820fce6c8def",
+      "uniquePictures": 12,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-05.zip",
+      "bytes": 54160342,
+      "sha256": "59eb34a4f2b3b9f0d9015e8d91e1ef769ff9eedbc46e0ff458a7b3943557bc45",
+      "uniquePictures": 12,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-06.zip",
+      "bytes": 49806146,
+      "sha256": "9ea7e720b2261763329615ca38e8efca0d00b13f85fa9718f178ba4280a94c02",
+      "uniquePictures": 5,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-07.zip",
+      "bytes": 50934622,
+      "sha256": "627bccd4ade39bfa4fa63fd32416e769a4eab0f1f055d338e58a3e39a0f54ced",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-08.zip",
+      "bytes": 40371173,
+      "sha256": "6b46b9757c64230c04316f6c9e88d02e82e5e33751e9252b0c3e5b7268914421",
+      "uniquePictures": 2,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-09.zip",
+      "bytes": 53844062,
+      "sha256": "148d3f9d835d27c76d70a0379cf48b49aba9110a6c0ea4a7056a890e74990a67",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-10.zip",
+      "bytes": 56961629,
+      "sha256": "34a74a4b54a23cfdd0603e5a6eefe3a3b5960d1706f9b3855bd1894f1b6cd2e3",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-11.zip",
+      "bytes": 54077055,
+      "sha256": "aed36b8e2380cd5ff1da0c75d8cd8b1263acd3d2332471806a8e002fbe4d1fab",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-12.zip",
+      "bytes": 37171188,
+      "sha256": "a20be300fc050feea0640e0f57904423817faa6549a2a82515c597e1e8618d51",
+      "uniquePictures": 2,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-13.zip",
+      "bytes": 39348209,
+      "sha256": "150bc1a0dd1a589d0cb2de2b45bfad2a92a8aaddf86b440cfd35b5fa831d8f9c",
+      "uniquePictures": 2,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-14.zip",
+      "bytes": 53309415,
+      "sha256": "52e2508b48298cec83ba309a9c229c6fdc46be20ea7200568ba0266f0e474192",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-15.zip",
+      "bytes": 50927968,
+      "sha256": "5ca0700bd8368e1cdb252eafbb233f58658bdcaadb79b9d6340d3f7ce40b9feb",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-16.zip",
+      "bytes": 55382974,
+      "sha256": "8f4e4e54141b0b2ede19cc35b7944dbd19438b26eebbd3f395dcfba8ea6b9823",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-17.zip",
+      "bytes": 51512313,
+      "sha256": "edc1eb9dfbe2f33d1c389ed29ce4bc9585541201bdd7b5fc5e8fbaf6ed83ef5a",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-18.zip",
+      "bytes": 55559568,
+      "sha256": "a7e068aab68a1a268d00ffa7339a3d550c3a7454186d0068b3b08ef5ac2485b0",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-19.zip",
+      "bytes": 51882750,
+      "sha256": "b46a493450915f9e78fffe48e908a6209c8c4acda2bb93f4b7671eea02e27af6",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-20.zip",
+      "bytes": 56944500,
+      "sha256": "0f79f1fb7d9aaab453173226472520d653fa4845e7a9c696694ac7a190ea901c",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-21.zip",
+      "bytes": 52928149,
+      "sha256": "5c4c185205c5f7ba2858b237383446ed1e804667ee99a13750b13f8cd06d9876",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-22.zip",
+      "bytes": 50908385,
+      "sha256": "24ee82c731ff00cf769f456a2d17c750aaf4dc01461717e498eeaf5471b43b09",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-23.zip",
+      "bytes": 55320602,
+      "sha256": "be5f8904320dfba9eac38d0fbf559ba40a49be777a817db97820e9d07b271580",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-24.zip",
+      "bytes": 51487055,
+      "sha256": "b9f45d9f2d0ba3b009d4119a4a2904fcb7055470e737cfcb4582626001c6cfae",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-25.zip",
+      "bytes": 55495011,
+      "sha256": "0158ed594827f4e6c20885dc4c20ae2da7ab158d2bb6eb298dadebdab2e765f9",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-26.zip",
+      "bytes": 51865963,
+      "sha256": "7df248de97dcdb20695596df46920cdca6754fd1a6aa66e5a174101399b5ece7",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-27.zip",
+      "bytes": 56893708,
+      "sha256": "9949c4f86232cc1cca1790d195fcb14f28d808c088f6c49577da4156f63d00bb",
+      "uniquePictures": 3,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-28.zip",
+      "bytes": 54838408,
+      "sha256": "c09785b1b7579d088fb566d4d79a48c7428b903a6485fc5e21eca653a50c8dee",
+      "uniquePictures": 9,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-29.zip",
+      "bytes": 54167135,
+      "sha256": "244fda801917046d7ae795847a30a71d6b4055dc0e9d556d0bd542bb22842fc5",
+      "uniquePictures": 12,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-30.zip",
+      "bytes": 43915761,
+      "sha256": "47a11292ffc74e71de7e29b381e7730768101f90df62de7220e2f31a48211737",
+      "uniquePictures": 4,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-31.zip",
+      "bytes": 52528168,
+      "sha256": "ae8acebdfde0f649ac3e193b13eaffc0b997d542c4d8e1a4755f861f0943c00a",
+      "uniquePictures": 4,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-32.zip",
+      "bytes": 49240313,
+      "sha256": "7a080a26fefc8b486e3d0b0b8bbbc8696ab023737adeb9e3048247b493b8537a",
+      "uniquePictures": 8,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-33.zip",
+      "bytes": 51038209,
+      "sha256": "d90a1d886d4c6e459658c8f81869ad43b14e39a7d7b2520d6fafa61d3f7c0e50",
+      "uniquePictures": 6,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-34.zip",
+      "bytes": 50903641,
+      "sha256": "4937a97cd52cd5ea974820bfc5116755baad60507727dfaa01b1ffe572a47e43",
+      "uniquePictures": 6,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-35.zip",
+      "bytes": 49998848,
+      "sha256": "ff566deef514caf9f2401911c8371cbbe65f8d90ca24acbbac01061744aa390a",
+      "uniquePictures": 6,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-36.zip",
+      "bytes": 49922931,
+      "sha256": "66a70871cf31afa8309256fc9a43a92fa2754eb295dfbd698149ef1655e9b47c",
+      "uniquePictures": 6,
+      "storage": "retained locally; not included in Git"
+    },
+    {
+      "path": "artifacts/vg-image-archives/images-37.zip",
+      "bytes": 16643730,
+      "sha256": "847e609b6a69d435a782f3a0c5fe520657274ad23d7e18e2f155ca0dc4f97758",
+      "uniquePictures": 2,
+      "storage": "retained locally; not included in Git"
+    }
+  ],
+  "storage": "All original PNG bytes are retained locally in artifacts/vg-original-evidence-images and lossless ZIP parts under artifacts/vg-image-archives; all hashes were verified after extraction. Git contains six full-resolution PNG previews, the complete capture/checksum index and all metric reports. Full image archives are not included in Git."
+}

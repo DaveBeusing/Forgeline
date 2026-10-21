@@ -1,0 +1,15 @@
+{
+  "settings": "installed/fresh-settings",
+  "smokeWorkingDirectoryFiles": 0,
+  "sourceSha": "0b4f6fb0b9340730ce65e022122af33f65bd3261",
+  "sourceTreeClean": true,
+  "childPath": "Windows System32 and .NET only",
+  "schemaVersion": 1,
+  "installedSmokeExit": 0,
+  "verifiedFiles": 1487,
+  "genericStressIsNotVegetationWorkload": true,
+  "player": "installed/player",
+  "zipSha256": "f6cf80d075f3b9ad844569320436ab6e4b3e634dde48b2b39b2d9da6c3071b7a",
+  "authoringAndCompilerFiles": 0,
+  "originalSha256": "91c0e134900c67eec434324c7c0b1900559c19505bc6ef2caf9485208e3f5cb5"
+}
