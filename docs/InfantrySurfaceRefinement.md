@@ -210,3 +210,123 @@ and fleet tests; it does not change infantry master/GLB/atlas ownership or the
 skeletal renderer/compiler. Existing native observations retain their historical
 sources and 0.1.432 build identities. Fresh integrated catalogs, affected tests,
 native load/gallery checks and packaging are qualified separately below.
+
+## Final integrated implementation and functional results
+
+The measured implementation and packaged player are clean source
+`1991b0c2abbed292ee2a90b7df0e08822f933154`, version **0.1.433-dev**, on
+master `a391a5bb0c0e25f079fa394613a5f84dfe7e9728`. The later evidence commit
+changes documentation and retained evidence only. It does not relabel historical
+captures or replace the package's recorded source with the evidence commit.
+
+The integrated Release solution builds with zero warnings/errors. Focused tests
+pass: Assets **46**, Presentation **92**, Client **9**, with zero skipped. All
+**114** portable Blender contract tests pass. The real Blender 5.2.2 authoring
+gate passes again on the final saved masters, including actual action mutation,
+reopening, packed-map bytes/color spaces/paths and source-less compiled parity.
+The 44-project graph is acyclic. The actual headless central-divide validation
+match reaches **Victory / CommandCoreDestroyed**, player 1, tick **55,210** with
+seed 2026 and an 80,000-tick bound. This verifies termination, not physical timing.
+
+Fresh integrated before/after catalogs each contain **1,363 assets and 74,844,665
+container bytes**; every container length, ID, reference and metadata record is
+unchanged. Exactly four payloads change (two skins and their two LOD0 meshes),
+1,359 remain byte-identical, and all eighteen animation payloads remain
+byte-identical. Gameplay texture container storage is **57,667,508 bytes**, below
+the unchanged 56-MiB limit. No asset/compiler/renderer/gameplay budget is raised.
+The current candidate manifest SHA-256 is
+`a21607f5c916b8d4ed9f5f5df83bf0c8a201c5a44f4ab841c68038bf55799078`;
+its content signature is
+`984d9402cc2748dfd7b8985e0074576c0fa87ed75f80e50f603c23a1ced8a1eb`.
+
+Implementation-source hosted checks all finish: [build-test](https://github.com/DaveBeusing/Forgeline/actions/runs/39591628645/job/119194226434),
+[navigation-movement](https://github.com/DaveBeusing/Forgeline/actions/runs/39591628644/job/119193744021),
+[cpu-scale](https://github.com/DaveBeusing/Forgeline/actions/runs/39591628730/job/119193743928)
+and [frame-contracts](https://github.com/DaveBeusing/Forgeline/actions/runs/39591628651/job/119193743753)
+pass; optional native-reference is skipped. Hosted checks do not substitute for
+the local physical results below. Current evidence-head checks remain visible on
+[draft PR #277](https://github.com/DaveBeusing/Forgeline/pull/277).
+
+## Final native observations and failed performance qualification
+
+The integrated source adds fourteen before/after pairs and two rear views in
+`artifacts/ifn3`, four installed-player views in `ifni`, and predetermined ABBA
+repeats in `ifp` and `ifpc`. The complete inventory contains **66 paired cases,
+138 original PNGs, 697,023,933 image bytes**. These include repeated settings;
+they are not 138 distinct visual scenarios. All originals verify their recorded
+SHA-256, actual dimensions and eight equal readbacks. All paired geometry,
+instance/submission/resource counters, fixtures, cameras, profiles, lighting,
+DPI and times agree. There are zero mesh/skin fallbacks or material/texture
+binding failures. Sixteen pairs are PNG-byte-identical. Corrected LOD0 surfaces
+produce the intended changes in the other fifty pairs.
+
+The maximum observed tracked texture residency is **44,812,076 bytes**, descriptor
+usage **93/4096**, and evaluated poses **9/16**. Maximum recorded skin upload
+storage is **20,194,272 bytes across three frame slots**; the unchanged cap is
+16 MiB per slot with at most four slots. Neither diagnostic is a complete VRAM
+measurement or approval of the global memory/frame/lifecycle gate.
+
+**Performance qualification fails.** The unchanged
+`Compare-ReferencePerformance.ps1 -GatePerformance` applies a 15% bound to CPU/GPU
+mean, p50, p95 and p99. Across the sixteen initial cohorts, two pass and fourteen
+fail, with 94 statistic exceedances and zero unqualified cases. One retained
+short phase sample moves CPU mean from 21.516 to 58.869 ms; another moves GPU
+mean from 12.481 to 16.751 ms. Neither is discarded as an outlier.
+
+The predetermined integrated ABBA repeats use 32 warmups, 128 measured frames and
+eight readbacks per case, with baseline A / candidate B / candidate C / baseline D.
+All four gallery comparisons (rifle phases 0 and .75, B/A and C/D) fail, retaining
+eight statistic exceedances. Both two-role 1000-root crowd comparisons at phase
+.375 pass, with zero exceedances. These successful crowd repeats do not erase
+the original failed close-load cohort. Same-runtime controls fail five of six
+cohorts (ten statistic exceedances), demonstrating observed drift without
+establishing its cause or waiving any failed asset comparison.
+
+Read-only, one-second NVIDIA telemetry is retained throughout both repeat batches:
+546 gallery and 1,115 crowd samples, all **P8**, graphics clock **172–180 MHz**,
+maximum utilization **100%**, temperatures **42–44 C**, observed peak power
+**18.63 / 20.29 W**, power limit reported **[N/A]**. This is not a qualified
+normal-power benchmark and does not establish a configured power cap. No power
+settings, thresholds, workload sizes or renderer hot paths are changed. Further
+physical qualification needs a controlled operating environment and must retain
+these failures. Human art/animation/LOD-transition review and the broader renderer
+physical timing, complete memory/frame and lifecycle gates remain open.
+
+## Reproducible package and fresh installation
+
+The actual clean-source `Publish-PreAlpha.ps1 -VerifyReproducible` run produces
+`artifacts/ifpkg/FORGELINE-0.1.433-dev-win-x64.zip`: **55,140,397 bytes**, SHA-256
+`CB5BE6680BCC98A7543D8C652601F00988661DA2BE87391FA944B43C4A30EE0F`.
+Both independently published checksum trees agree; this does not assert two
+independently generated ZIP files are byte-identical. Provenance records the
+clean implementation source, SDK 10.0.401 and the exact runtime content signature.
+No Blender source, glTF/GLB, exporter script, source tree or compiler ships.
+
+A fresh extraction into the sibling `infantry-player433` directory, outside the
+checkout, verifies **all 1,487 file hashes**. Both published-directory and fresh
+installation source-less smoke tests exit 0. Their child PATH contains only
+system/.NET locations; Blender remains installed on the workstation. The
+installation contains all **1,364 compiled files byte-identically**, plus 63
+existing publisher-added media files. Those extras explain differing directory
+fingerprints. All four installed-player native views are pixel-exact to the
+matching integrated development views, with eight repeat readbacks each.
+
+## Review evidence and remaining acceptance
+
+[Evidence index](qualification/infantry-surfaces/index.json) records every original
+image's source/key/path/dimensions/size/SHA-256, ten unmodified selected PNG copies,
+exact original and retained hashes for gzip-compressed metadata/logs, telemetry,
+failed attempts, and the complete local evidence archive's size/hash. Gzip
+decompression restores the original bytes. Raw frame samples and failed gates
+are retained alongside successful checks. The complete local archive contains
+all 138 original PNGs and original metadata; it is separate from the player ZIP.
+
+| Role | Original integrated baseline | Corrected integrated candidate |
+| --- | --- | --- |
+| Rifle Squad | [1080p / 20 m](qualification/infantry-surfaces/images/ifn3/gallery/before/InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png) | [1080p / 20 m](qualification/infantry-surfaces/images/ifn3/gallery/after/InfantrySkinning-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png) |
+| Combat Engineer | [1080p / 20 m](qualification/infantry-surfaces/images/ifn3/gallery/before/InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png) | [1080p / 20 m](qualification/infantry-surfaces/images/ifn3/gallery/after/InfantrySkinningEngineer-1920x1080-High-CloseTactical-MechanicalT0.375-Inspection20.png) |
+
+This is a reviewable atlas-origin correction and portable authoring repair with
+functional/native/package evidence. It is **not** accepted high-fidelity
+modernization or a performance-qualified release. PR #277 stays draft; no merge,
+tag, release or golden approval is performed.

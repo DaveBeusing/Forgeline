@@ -1,0 +1,3 @@
+*.gz binary
+*.png binary
+*.json text eol=lf
