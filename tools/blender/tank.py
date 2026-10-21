@@ -33,7 +33,7 @@ def restore_normals():
 def run(request):
     output=Path(request['outputRoot']);report={'success':False,'errors':[]}
     try:
-        parser=argparse.ArgumentParser();parser.add_argument('--action',choices=['Author','Export'],required=True);parser.add_argument('--fixtures',type=Path,required=True);parser.add_argument('--blend-file',type=Path);parser.add_argument('--render',action='store_true');args=parser.parse_args(request['arguments'])
+        parser=argparse.ArgumentParser();parser.add_argument('--action',choices=['Author','Export'],required=True);parser.add_argument('--fixtures',type=Path,required=True);parser.add_argument('--blend-file',type=Path);parser.add_argument('--render',action='store_true');parser.add_argument('--no-inspection',action='store_true');args=parser.parse_args(request['arguments'])
         catalog=Catalog(request['inputRoot']);ids,families=fixture_selection(catalog,args.fixtures,[])
         original=catalog.signature(ids)[0];geometries={aid:read_geometry(catalog.source(aid),catalog.root,catalog.definitions[aid][1]) for aid in ids if catalog.definitions[aid][1]['type']=='mesh'}
         if args.action=='Author':
@@ -50,7 +50,7 @@ def run(request):
             path,definition=catalog.definitions[aid];relative=path.relative_to(catalog.root);updated=copy.deepcopy(definition)
             target=Path('../sources/main_battle_tank/blender')/(aid+'.glb');write_glb(source/relative.parent/target,geometry);updated['source']=target.as_posix();write_json(source/relative,updated)
         Catalog(source).validate(ids)
-        samples,images=inspection(catalog,ids,families,results,output,args.render,preview_resolution=(768,432))
+        samples,images=([],[]) if args.no_inspection else inspection(catalog,ids,families,results,output,args.render,preview_resolution=(768,432))
         require(catalog.signature(ids)[0]==original,'Input sources changed during export')
         report.update(success=True,sourceSignature=original,blendSha256=sha(args.blend_file) if args.blend_file else sha(output/'main_battle_tank.blend'),meshes=meshes,deviations=deviations,poseSamples=samples,previewImages=images)
     except Exception as error:report['errors'].append(str(error));raise

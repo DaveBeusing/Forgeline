@@ -1,7 +1,9 @@
 #requires -Version 7.4
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$OutputRoot,[string]$BlenderPath,[switch]$RenderPreviews,
-    [string]$CompilerPath='tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll')
+    [string]$CompilerPath='tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll',
+    [string]$SourceRoot='assets/source',
+    [string]$BlendFile='assets/source/units/directorate/authoring/main_battle_tank.blend')
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'BlenderToolchain.psm1') -Force
@@ -9,14 +11,15 @@ $repo=[IO.Path]::GetFullPath('../..',$PSScriptRoot)
 $root=Resolve-BlenderOutput -Path $OutputRoot -RepositoryRoot $repo
 if(Test-Path -LiteralPath $root){throw 'Use a fresh tank qualification output.'}
 [void][IO.Directory]::CreateDirectory($root)
-$blend=Join-Path $repo 'assets/source/units/directorate/authoring/main_battle_tank.blend'
+$blend=[IO.Path]::GetFullPath($BlendFile,$repo)
+$inputSource=[IO.Path]::GetFullPath($SourceRoot,$repo)
 $compiler=[IO.Path]::GetFullPath($CompilerPath,$repo)
 if(-not(Test-Path -LiteralPath $compiler)){throw 'Build the Release asset compiler first.'}
 foreach($name in @('first','second')){
-    & (Join-Path $PSScriptRoot 'Invoke-BlenderTank.ps1') -Action Export -BlendFile $blend -OutputRoot (Join-Path $root $name) -BlenderPath $BlenderPath -RenderPreviews:($RenderPreviews -and $name -eq 'first')
+    & (Join-Path $PSScriptRoot 'Invoke-BlenderTank.ps1') -Action Export -SourceRoot $inputSource -BlendFile $blend -OutputRoot (Join-Path $root $name) -BlenderPath $BlenderPath -RenderPreviews:($RenderPreviews -and $name -eq 'first')
     if(-not $?){throw "Tank export failed: $name"}
 }
-& (Join-Path $PSScriptRoot 'Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'tests/native_tank_contract.py') -InputRoot (Join-Path $repo 'assets/source') -OutputRoot (Join-Path $root 'contracts') -BlenderPath $BlenderPath
+& (Join-Path $PSScriptRoot 'Invoke-Blender.ps1') -Action Script -Script (Join-Path $PSScriptRoot 'tests/native_tank_contract.py') -InputRoot $inputSource -ScriptArguments @('--blend-file',$blend) -OutputRoot (Join-Path $root 'contracts') -BlenderPath $BlenderPath
 if(-not $?){throw 'Native saved-project checks failed.'}
 function Read-Tree([string]$Path){
     @(Get-ChildItem -LiteralPath $Path -Recurse -File|Sort-Object FullName|ForEach-Object{[IO.Path]::GetRelativePath($Path,$_.FullName)+':'+(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash})

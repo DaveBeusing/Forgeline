@@ -1,0 +1,1832 @@
+{
+  "baselineMaster": "b32bf04671fb579e01a7e282eac76ff91c5b2f1d",
+  "blenderVersion": "5.2.2",
+  "coordinates": {
+    "blender": "+Z up, -Y forward",
+    "engine": "+Y up, +Z forward",
+    "geometry": "normalized building-local, authoritative metre instance scale"
+  },
+  "families": [
+    {
+      "family": "storage_depot",
+      "instanceScaleMetres": [
+        14,
+        8,
+        14
+      ],
+      "kitCanonicalLfSha256": "8587a41acaac50838994d6ae60e7bb0098416b232172468ca660dbb4c97d7bdf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "masterSha256": "6e245fb82e7dedb286c6fe25e9e9d733f63df04bf070b7054088b01a4ef4cf62"
+    },
+    {
+      "family": "supply_depot",
+      "instanceScaleMetres": [
+        16,
+        8,
+        16
+      ],
+      "kitCanonicalLfSha256": "34a79d011ab8a295a18260868c3f5c0bbc3a765aaf3081f4b1871c843e32b654",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "masterSha256": "37b216ff170b28117a0af336933eed651190f741d1d9178b25d2cb627918ab60"
+    },
+    {
+      "family": "logistics_hub",
+      "instanceScaleMetres": [
+        18,
+        9,
+        18
+      ],
+      "kitCanonicalLfSha256": "10b1095fbce7b1c9445805bf0fdd3003dd94cc58a7dcc358cfc2e620f75d3b14",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "masterSha256": "b588754cd4255d579468c368f869082a2f73e45dc6d2405bff5d527780ca4367"
+    }
+  ],
+  "meshes": [
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 3436,
+        "vertices": 7428
+      },
+      "exportSha256": "1050e26f083793b5295c71daaadc519a329d93675ded1c6ae6cc4b09ed88a3c7",
+      "exportStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 3436,
+        "vertices": 7428
+      },
+      "id": "building.directorate.storage_depot",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/lod0.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "collisionReference": "building.directorate.module.collision_box",
+        "collisionRequired": true,
+        "id": "building.directorate.storage_depot",
+        "lods": [
+          {
+            "assetId": "building.directorate.storage_depot.lod1",
+            "level": 1,
+            "maxDistance": 220
+          },
+          {
+            "assetId": "building.directorate.storage_depot.lod2",
+            "level": 2,
+            "maxDistance": 620
+          }
+        ],
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "sockets": [
+          {
+            "name": "service_access",
+            "x": 0.15,
+            "y": -0.4,
+            "z": 0.42
+          },
+          {
+            "name": "gantry_pivot",
+            "x": 0,
+            "y": 0.0885,
+            "z": -0.1
+          },
+          {
+            "name": "cargo_load",
+            "x": 0,
+            "y": -0.3265,
+            "z": 0.42
+          }
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/lod0.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.10000000149011612,
+          0.08433933556079865,
+          0.41499999165534973
+        ],
+        "boundsMin": [
+          -0.1628948450088501,
+          -0.4650000035762787,
+          0.15710516273975372
+        ],
+        "primitives": 1,
+        "triangles": 68,
+        "vertices": 132
+      },
+      "exportSha256": "a2e7bcd78b134a105560d512bcc3e91f0ddd5c1d7f080f0af42e5c344af2adec",
+      "exportStats": {
+        "boundsMax": [
+          0.10000000149011612,
+          0.08433933556079865,
+          0.41499999165534973
+        ],
+        "boundsMin": [
+          -0.1628948450088501,
+          -0.4650000035762787,
+          0.15710516273975372
+        ],
+        "primitives": 1,
+        "triangles": 68,
+        "vertices": 132
+      },
+      "id": "building.directorate.storage_depot.critical",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/critical.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.critical",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/critical.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_critical.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.09000000357627869,
+          -0.3514520823955536,
+          0.42500001192092896
+        ],
+        "boundsMin": [
+          -0.07703640311956406,
+          -0.4675479233264923,
+          0.36826637387275696
+        ],
+        "primitives": 1,
+        "triangles": 44,
+        "vertices": 84
+      },
+      "exportSha256": "07e1cfb426ecc0caa05842e8fe268322759e0cf27658ac2f77c11891dbb920e5",
+      "exportStats": {
+        "boundsMax": [
+          0.09000000357627869,
+          -0.3514520823955536,
+          0.42500001192092896
+        ],
+        "boundsMin": [
+          -0.07703640311956406,
+          -0.4675479233264923,
+          0.36826637387275696
+        ],
+        "primitives": 1,
+        "triangles": 44,
+        "vertices": 84
+      },
+      "id": "building.directorate.storage_depot.damaged",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/damaged.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.damaged",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/damaged.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_damaged.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          -0.27000001072883606,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 80,
+        "vertices": 156
+      },
+      "exportSha256": "c922918c11bafec681952ff0bf72d1c7d17002997b588e59f82a86c0f17dfa0d",
+      "exportStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          -0.27000001072883606,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 80,
+        "vertices": 156
+      },
+      "id": "building.directorate.storage_depot.destroyed",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/destroyed.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.destroyed",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/destroyed.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_destroyed.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          -0.4650000035762787,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "exportSha256": "f9e84672956d9e8b4a66eb18857525deceab46c0f894ecbd9ea00f3a12f1230a",
+      "exportStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          -0.4650000035762787,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.storage_depot.foundation",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/foundation.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.foundation",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/foundation.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_foundation.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.10499999672174454,
+          -0.2800000011920929,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.10499999672174454,
+          -0.4300000071525574,
+          0.39500001072883606
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "exportSha256": "887c6fabcef3f69b10e8d2bf917a6bfc56daaeb4dc2b4f41bed5c955b4e38adc",
+      "exportStats": {
+        "boundsMax": [
+          0.10499999672174454,
+          -0.2800000011920929,
+          0.4099999964237213
+        ],
+        "boundsMin": [
+          -0.10499999672174454,
+          -0.4300000071525574,
+          0.39500001072883606
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.storage_depot.idle",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/idle.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.idle",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/idle.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_idle.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 348,
+        "vertices": 684
+      },
+      "exportSha256": "f5fd2fb34dc0c9eb46254262ef357bfade3c051a2c8291438b4f92c2702ca466",
+      "exportStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 348,
+        "vertices": 684
+      },
+      "id": "building.directorate.storage_depot.lod1",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/lod1.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.lod1",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/lod1.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_lod1.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 176,
+        "vertices": 348
+      },
+      "exportSha256": "47d5dbe099ee9b92c3542d65107ec442bf4b376665accabfe455711387e512f5",
+      "exportStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 176,
+        "vertices": 348
+      },
+      "id": "building.directorate.storage_depot.lod2",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/lod2.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.lod2",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/lod2.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_lod2.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 140,
+        "vertices": 282
+      },
+      "exportSha256": "26c28698a9b9004714be7aca7798223ffd53fb40d7520cc282c50200553b934a",
+      "exportStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 140,
+        "vertices": 282
+      },
+      "id": "building.directorate.storage_depot.partial_shell",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/partial_shell.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.partial_shell",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/partial_shell.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_partial_shell.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "exportSha256": "32fbcec60cf6b64637d23486cbdcacd739f7b1b7d4b9402b2e69d414148927ff",
+      "exportStats": {
+        "boundsMax": [
+          0.46000000834465027,
+          0.1599999964237213,
+          0.44999998807907104
+        ],
+        "boundsMin": [
+          -0.46000000834465027,
+          -0.5,
+          -0.4000000059604645
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "id": "building.directorate.storage_depot.structural_frame",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/structural_frame.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.structural_frame",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/structural_frame.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_structural_frame.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.10499999672174454,
+          -0.24500000476837158,
+          0.41499999165534973
+        ],
+        "boundsMin": [
+          -0.10499999672174454,
+          -0.4300000071525574,
+          0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "exportSha256": "b8a4e0554c8ee2ad742c577a5bf0a11ab28964154a544a875ab80a98242429bc",
+      "exportStats": {
+        "boundsMax": [
+          0.10499999672174454,
+          -0.24500000476837158,
+          0.41499999165534973
+        ],
+        "boundsMin": [
+          -0.10499999672174454,
+          -0.4300000071525574,
+          0.38999998569488525
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "id": "building.directorate.storage_depot.unpowered",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/storage_depot/unpowered.gltf",
+      "master": "assets/source/buildings/directorate/authoring/storage_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.storage_depot.unpowered",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/blender/unpowered.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/storage_depot_unpowered.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20874999463558197,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 1860,
+        "vertices": 3792
+      },
+      "exportSha256": "fa26d95766e5ab7859daf672d31870d81f2cbca02963f0d70a3e645babe5b408",
+      "exportStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20874999463558197,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 1860,
+        "vertices": 3792
+      },
+      "id": "building.directorate.supply_depot",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/lod0.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "collisionReference": "building.directorate.module.collision_box",
+        "collisionRequired": true,
+        "id": "building.directorate.supply_depot",
+        "lods": [
+          {
+            "assetId": "building.directorate.supply_depot.lod1",
+            "level": 1,
+            "maxDistance": 220
+          },
+          {
+            "assetId": "building.directorate.supply_depot.lod2",
+            "level": 2,
+            "maxDistance": 620
+          }
+        ],
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "sockets": [
+          {
+            "name": "supply_transfer",
+            "x": -0.14,
+            "y": -0.35,
+            "z": 0.44
+          },
+          {
+            "name": "gantry_pivot",
+            "x": -0.14,
+            "y": -0.055,
+            "z": 0.31
+          },
+          {
+            "name": "cargo_load",
+            "x": 0.26,
+            "y": -0.3265,
+            "z": 0.44
+          }
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/lod0.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.36000001430511475,
+          -0.024383503943681717,
+          0.4350000023841858
+        ],
+        "boundsMin": [
+          -0.13568928837776184,
+          -0.4650000035762787,
+          0.1860099732875824
+        ],
+        "primitives": 1,
+        "triangles": 68,
+        "vertices": 132
+      },
+      "exportSha256": "97160712332011d6e287ff7baadda5be67e2622892344bf0864fda6e13a7b7db",
+      "exportStats": {
+        "boundsMax": [
+          0.36000001430511475,
+          -0.024383503943681717,
+          0.4350000023841858
+        ],
+        "boundsMin": [
+          -0.13568928837776184,
+          -0.4650000035762787,
+          0.1860099732875824
+        ],
+        "primitives": 1,
+        "triangles": 68,
+        "vertices": 132
+      },
+      "id": "building.directorate.supply_depot.critical",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/critical.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.critical",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/critical.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_critical.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.3499999940395355,
+          -0.3189089894294739,
+          0.4449999928474426
+        ],
+        "boundsMin": [
+          0.1850000023841858,
+          -0.4650909900665283,
+          0.3528582751750946
+        ],
+        "primitives": 1,
+        "triangles": 44,
+        "vertices": 84
+      },
+      "exportSha256": "f2f8db9a20530a377edbe71d596c22abc7c0d220f30e81177b49ee058722ccee",
+      "exportStats": {
+        "boundsMax": [
+          0.3499999940395355,
+          -0.3189089894294739,
+          0.4449999928474426
+        ],
+        "boundsMin": [
+          0.1850000023841858,
+          -0.4650909900665283,
+          0.3528582751750946
+        ],
+        "primitives": 1,
+        "triangles": 44,
+        "vertices": 84
+      },
+      "id": "building.directorate.supply_depot.damaged",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/damaged.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.damaged",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/damaged.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_damaged.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          -0.27000001072883606,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 104,
+        "vertices": 192
+      },
+      "exportSha256": "be8e2efa67b3530ec012c3221b69dde87ab8dc552f7a9f3d6173467454023fd6",
+      "exportStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          -0.27000001072883606,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 104,
+        "vertices": 192
+      },
+      "id": "building.directorate.supply_depot.destroyed",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/destroyed.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.destroyed",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/destroyed.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_destroyed.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          -0.4650000035762787,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "exportSha256": "19ff50d2d989d5468e1908753ae93663e9abfc1352a1425d4d3eeac346588a8c",
+      "exportStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          -0.4650000035762787,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.supply_depot.foundation",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/foundation.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.foundation",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/foundation.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_foundation.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.36500000953674316,
+          -0.2800000011920929,
+          0.4300000071525574
+        ],
+        "boundsMin": [
+          0.1550000011920929,
+          -0.4300000071525574,
+          0.41499999165534973
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "exportSha256": "4741946ea2ebe95ae73b44d9e51c355f958d3fdf0dbdf454f1c913ac8d505118",
+      "exportStats": {
+        "boundsMax": [
+          0.36500000953674316,
+          -0.2800000011920929,
+          0.4300000071525574
+        ],
+        "boundsMin": [
+          0.1550000011920929,
+          -0.4300000071525574,
+          0.41499999165534973
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.supply_depot.idle",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/idle.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.idle",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/idle.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_idle.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20874999463558197,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 484,
+        "vertices": 912
+      },
+      "exportSha256": "c51206bb36ee9bf10ceea0af1991b0f1bb7a354d4e9ac44f0b8368438e3bbf3f",
+      "exportStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20874999463558197,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 484,
+        "vertices": 912
+      },
+      "id": "building.directorate.supply_depot.lod1",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/lod1.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.lod1",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/lod1.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_lod1.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20874999463558197,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 300,
+        "vertices": 576
+      },
+      "exportSha256": "f73f3cd3d096036a7a2d72743014bb85f4702bd1cf6f302d9621bcf1a19e70e0",
+      "exportStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20874999463558197,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 300,
+        "vertices": 576
+      },
+      "id": "building.directorate.supply_depot.lod2",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/lod2.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.lod2",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/lod2.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_lod2.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20999999344348907,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 140,
+        "vertices": 264
+      },
+      "exportSha256": "cc6e83bc9197a72b0d8c26357412632aa1d7e6bde94557a28436c42416bb3212",
+      "exportStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20999999344348907,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 140,
+        "vertices": 264
+      },
+      "id": "building.directorate.supply_depot.partial_shell",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/partial_shell.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.partial_shell",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/partial_shell.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_partial_shell.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20999999344348907,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "exportSha256": "26eb2df47831d090991708024e06ce938f9c0d4c55cf7bc96195d0d71138dce1",
+      "exportStats": {
+        "boundsMax": [
+          0.4399999976158142,
+          0.20999999344348907,
+          0.4699999988079071
+        ],
+        "boundsMin": [
+          -0.4000000059604645,
+          -0.5,
+          -0.3400000035762787
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "id": "building.directorate.supply_depot.structural_frame",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/structural_frame.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.structural_frame",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/structural_frame.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_structural_frame.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.36500000953674316,
+          -0.24500000476837158,
+          0.4350000023841858
+        ],
+        "boundsMin": [
+          0.1550000011920929,
+          -0.4300000071525574,
+          0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "exportSha256": "4bb5892cdb0a468f39a0faa2ac903650992e7fc5b47d791060ab5758ab6e7a1d",
+      "exportStats": {
+        "boundsMax": [
+          0.36500000953674316,
+          -0.24500000476837158,
+          0.4350000023841858
+        ],
+        "boundsMin": [
+          0.1550000011920929,
+          -0.4300000071525574,
+          0.4099999964237213
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "id": "building.directorate.supply_depot.unpowered",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/supply_depot/unpowered.gltf",
+      "master": "assets/source/buildings/directorate/authoring/supply_depot.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.supply_depot.unpowered",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/blender/unpowered.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/supply_depot_unpowered.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 5856,
+        "vertices": 12672
+      },
+      "exportSha256": "ab3b7eac6d071124e7a3f4411e89c49f56354311d0a8e97b460b336746fec55d",
+      "exportStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 5856,
+        "vertices": 12672
+      },
+      "id": "building.directorate.logistics_hub",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/lod0.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "collisionReference": "building.directorate.module.collision_box",
+        "collisionRequired": true,
+        "id": "building.directorate.logistics_hub",
+        "lods": [
+          {
+            "assetId": "building.directorate.logistics_hub.lod1",
+            "level": 1,
+            "maxDistance": 220
+          },
+          {
+            "assetId": "building.directorate.logistics_hub.lod2",
+            "level": 2,
+            "maxDistance": 620
+          }
+        ],
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "sockets": [
+          {
+            "name": "service_access",
+            "x": 0.2,
+            "y": -0.4,
+            "z": 0.45
+          },
+          {
+            "name": "gantry_pivot",
+            "x": 0,
+            "y": 0.245,
+            "z": -0.25
+          },
+          {
+            "name": "cargo_load",
+            "x": 0,
+            "y": -0.3457777777777778,
+            "z": 0.45
+          }
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/lod0.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.10000000149011612,
+          0.2493106722831726,
+          0.4449999928474426
+        ],
+        "boundsMin": [
+          -0.16507868468761444,
+          -0.4650000035762787,
+          0.2501569986343384
+        ],
+        "primitives": 1,
+        "triangles": 68,
+        "vertices": 132
+      },
+      "exportSha256": "f956777dfcebfea9e5df671e4dd1d15dd8c43acb93b1f999c1ae49cff1e6988d",
+      "exportStats": {
+        "boundsMax": [
+          0.10000000149011612,
+          0.2493106722831726,
+          0.4449999928474426
+        ],
+        "boundsMin": [
+          -0.16507868468761444,
+          -0.4650000035762787,
+          0.2501569986343384
+        ],
+        "primitives": 1,
+        "triangles": 68,
+        "vertices": 132
+      },
+      "id": "building.directorate.logistics_hub.critical",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/critical.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.critical",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/critical.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_critical.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.09877697378396988,
+          -0.36000001430511475,
+          0.45500001311302185
+        ],
+        "boundsMin": [
+          -0.07500000298023224,
+          -0.466701477766037,
+          0.39897024631500244
+        ],
+        "primitives": 1,
+        "triangles": 44,
+        "vertices": 84
+      },
+      "exportSha256": "be7dacdea3c0a2e89d0d275f26cde084fad609b3b56010a72126227a786e2e3a",
+      "exportStats": {
+        "boundsMax": [
+          0.09877697378396988,
+          -0.36000001430511475,
+          0.45500001311302185
+        ],
+        "boundsMin": [
+          -0.07500000298023224,
+          -0.466701477766037,
+          0.39897024631500244
+        ],
+        "primitives": 1,
+        "triangles": 44,
+        "vertices": 84
+      },
+      "id": "building.directorate.logistics_hub.damaged",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/damaged.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.damaged",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/damaged.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_damaged.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          -0.15748333930969238,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 204
+      },
+      "exportSha256": "a92b11fb9a1aedaed68d9d1f7844f4f1e6a21f02699de6474f6b3170a67fcb37",
+      "exportStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          -0.15748333930969238,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 204
+      },
+      "id": "building.directorate.logistics_hub.destroyed",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/destroyed.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.destroyed",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/destroyed.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_destroyed.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          -0.4650000035762787,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "exportSha256": "b1e4848b545faed1e0c1940cbdd83cdd3abc7eabf200458d2783abbdaddcb518",
+      "exportStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          -0.4650000035762787,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.logistics_hub.foundation",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/foundation.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.foundation",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/foundation.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_foundation.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.10499999672174454,
+          -0.2800000011920929,
+          0.4399999976158142
+        ],
+        "boundsMin": [
+          -0.10499999672174454,
+          -0.4300000071525574,
+          0.42500001192092896
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "exportSha256": "fe4a5b53fd37bb2aa418237434f7302e5b7adb954454ff3a86a76f61152dd950",
+      "exportStats": {
+        "boundsMax": [
+          0.10499999672174454,
+          -0.2800000011920929,
+          0.4399999976158142
+        ],
+        "boundsMin": [
+          -0.10499999672174454,
+          -0.4300000071525574,
+          0.42500001192092896
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.logistics_hub.idle",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/idle.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.idle",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/idle.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_idle.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 432,
+        "vertices": 840
+      },
+      "exportSha256": "02744486d81785f959db3805affbd2809e87d99b55e937a6aed2d52f0effe809",
+      "exportStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 432,
+        "vertices": 840
+      },
+      "id": "building.directorate.logistics_hub.lod1",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/lod1.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.lod1",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/lod1.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_lod1.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 276,
+        "vertices": 540
+      },
+      "exportSha256": "087ba7436fc0c07f9b2e89371095fe3688995e00902fb76bf650db7a0945306f",
+      "exportStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 276,
+        "vertices": 540
+      },
+      "id": "building.directorate.logistics_hub.lod2",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/lod2.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.lod2",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/lod2.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_lod2.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 96,
+        "vertices": 192
+      },
+      "exportSha256": "db11f2248dd942d1055ee7a303a02d591dee4f4d11a1bcba3631370020f296ca",
+      "exportStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 96,
+        "vertices": 192
+      },
+      "id": "building.directorate.logistics_hub.partial_shell",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/partial_shell.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.partial_shell",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/partial_shell.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_partial_shell.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "exportSha256": "2557f6167928dff8be0406070c2e04a8da744a6f10f39ed4c20899a1c7afa760",
+      "exportStats": {
+        "boundsMax": [
+          0.41999998688697815,
+          0.3499999940395355,
+          0.47999998927116394
+        ],
+        "boundsMin": [
+          -0.41999998688697815,
+          -0.5,
+          -0.35499998927116394
+        ],
+        "primitives": 1,
+        "triangles": 72,
+        "vertices": 144
+      },
+      "id": "building.directorate.logistics_hub.structural_frame",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/structural_frame.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.structural_frame",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/structural_frame.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_structural_frame.asset.json"
+    },
+    {
+      "baselineStats": {
+        "boundsMax": [
+          0.10499999672174454,
+          -0.24500000476837158,
+          0.4449999928474426
+        ],
+        "boundsMin": [
+          -0.10499999672174454,
+          -0.4300000071525574,
+          0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "exportSha256": "c42e0860c03d4c5f1cf6b71595503c4ea315bc9e39e5827fea23f7986d5828d7",
+      "exportStats": {
+        "boundsMax": [
+          0.10499999672174454,
+          -0.24500000476837158,
+          0.4449999928474426
+        ],
+        "boundsMin": [
+          -0.10499999672174454,
+          -0.4300000071525574,
+          0.41999998688697815
+        ],
+        "primitives": 1,
+        "triangles": 24,
+        "vertices": 48
+      },
+      "id": "building.directorate.logistics_hub.unpowered",
+      "legacySource": "assets/source/buildings/directorate/sources/logistics/logistics_hub/unpowered.gltf",
+      "master": "assets/source/buildings/directorate/authoring/logistics_hub.blend",
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "metadata": {
+        "id": "building.directorate.logistics_hub.unpowered",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "type": "mesh"
+      },
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/blender/unpowered.glb",
+      "sourceDefinition": "assets/source/buildings/directorate/logistics_hub_unpowered.asset.json"
+    }
+  ],
+  "schemaVersion": 1
+}

@@ -1,5 +1,5 @@
 """Exercise real saved-project edits and rejection without altering production sources."""
-import json,sys
+import argparse,json,sys
 from pathlib import Path
 import bpy
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -10,6 +10,7 @@ from roundtrip import export_scene
 
 def run(request):
     root=Path(__file__).resolve().parents[3];catalog=Catalog(request['inputRoot']);fixture=root/'tools/blender/fixtures/tank.json';ids,families=fixture_selection(catalog,fixture,[]);output=Path(request['outputRoot']);blend=root/'assets/source/units/directorate/authoring/main_battle_tank.blend'
+    parser=argparse.ArgumentParser();parser.add_argument('--blend-file',type=Path,default=blend);args=parser.parse_args(request.get('arguments',[]));blend=args.blend_file.resolve()
     geometries={aid:read_geometry(catalog.source(aid),catalog.root,catalog.definitions[aid][1]) for aid in ids if catalog.definitions[aid][1]['type']=='mesh'}
     load_project(catalog,ids,families,blend);restore_normals()
     export_scene(catalog,ids,families,geometries,lambda aid,a,b:compare(aid,a,b,catalog.definitions[aid][1]))
@@ -35,7 +36,7 @@ def run(request):
     obj=next(o for o in bpy.context.scene.objects if o.get('fl_role')=='geometry' and o.get('fl_asset')==ROOT+'.damaged')
     for v in obj.data.vertices:v.co.x+=.001
     bpy.ops.wm.save_as_mainfile(filepath=str(output/'edited.blend'),check_existing=False)
-    edited=output/'edited';edited.mkdir();export_tank({'inputRoot':request['inputRoot'],'outputRoot':str(edited),'arguments':['--action','Export','--fixtures',str(fixture),'--blend-file',str(output/'edited.blend')]})
+    edited=output/'edited';edited.mkdir();export_tank({'inputRoot':request['inputRoot'],'outputRoot':str(edited),'arguments':['--action','Export','--fixtures',str(fixture),'--blend-file',str(output/'edited.blend'),'--no-inspection']})
     candidate=Catalog(edited/'source');aid=ROOT+'.damaged';result=read_geometry(candidate.source(aid),candidate.root,candidate.definitions[aid][1])
     for old,new in zip(geometries[aid]['primitives'],result['primitives']):
         for a,b in zip(old['attributes']['POSITION'],new['attributes']['POSITION']):

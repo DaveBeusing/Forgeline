@@ -1,8 +1,8 @@
 {
   "id": "building.directorate.logistics_hub.idle",
-  "type": "mesh",
-  "source": "sources/logistics/logistics_hub/idle.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
-  ]
+  ],
+  "source": "sources/logistics/logistics_hub/blender/idle.glb",
+  "type": "mesh"
 }

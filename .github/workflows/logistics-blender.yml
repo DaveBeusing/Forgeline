@@ -1,0 +1,39 @@
+name: Logistics Blender
+on:
+  pull_request:
+    paths: ['tools/blender/logistics*', 'tools/blender/*BlenderLogistics.ps1', 'tools/blender/fixtures/logistics*', 'tools/blender/tests/*logistics*', 'assets/source/buildings/directorate/**', '.github/workflows/logistics-blender.yml']
+  workflow_dispatch:
+    inputs:
+      native:
+        description: Run on a provisioned Blender 5.2.2 Windows x64 runner
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - run: python -m unittest discover -s tools/blender/tests -p test_logistics_contract.py
+  saved-masters:
+    if: github.event_name == 'workflow_dispatch' && inputs.native
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - run: dotnet build ForgeLine.sln --configuration Release
+      - shell: pwsh
+        run: ./tools/blender/Test-BlenderLogistics.ps1 -OutputRoot artifacts/lg-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: logistics-blender-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/lg-ci-*
+          retention-days: 14
