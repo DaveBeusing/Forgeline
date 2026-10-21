@@ -1,7 +1,7 @@
 name: Logistics Blender
 on:
   pull_request:
-    paths: ['tools/blender/logistics*', 'tools/blender/*BlenderLogistics.ps1', 'tools/blender/tests/*logistics*', 'assets/source/buildings/directorate/**', '.github/workflows/logistics-blender.yml']
+    paths: ['tools/blender/logistics*', 'tools/blender/*BlenderLogistics.ps1', 'tools/blender/fixtures/logistics*', 'tools/blender/tests/*logistics*', 'assets/source/buildings/directorate/**', '.github/workflows/logistics-blender.yml']
   workflow_dispatch:
     inputs:
       native:

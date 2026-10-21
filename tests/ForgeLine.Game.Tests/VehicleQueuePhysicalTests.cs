@@ -14,7 +14,7 @@ public sealed class VehicleQueuePhysicalTests
     [InlineData(8u)]
     public void LogisticsFamiliesServiceTwoThroughTenTrucksAcrossEveryCardinalOrientation(uint family)
     {
-        foreach (int count in new[] { 2, 10 })
+        foreach (int count in Enumerable.Range(2, 9))
         for (int orientation = 0; orientation < 4; orientation++)
         {
             var fixture = new Traffic(count, false, new BuildingId(family), orientation);
@@ -162,11 +162,11 @@ public sealed class VehicleQueuePhysicalTests
             {
                 var building = DirectorateContent.CreateBuildingCatalog()[id];
                 var size = new Vector3(building.Footprint.Width, building.Footprint.Height, building.Footprint.Depth);
-                Simulation.Entities.AddComponent(Building, new CompletedBuilding(id, new(1), SimulationTick.Zero));
-                Simulation.Entities.AddComponent(Building, new WorldTransform(new(600, size.Y * .5f, 512), _rotation, size));
+                Simulation.Entities.SetComponent(Building, new CompletedBuilding(id, new(1), SimulationTick.Zero));
+                Simulation.Entities.SetComponent(Building, new WorldTransform(new(600, size.Y * .5f, 512), _rotation, size));
                 var dock = building.LoadingDock!.Value;
-                Simulation.Entities.AddComponent(Building, dock);
-                Simulation.Entities.AddComponent(Building, new SpatialPresence(size * .5f, new(1, 2, SpatialMobility.Static)));
+                Simulation.Entities.SetComponent(Building, dock);
+                Simulation.Entities.SetComponent(Building, new SpatialPresence(size * .5f, new(1, 2, SpatialMobility.Static)));
                 lane = dock.ServicePosition.Z;
             }
             Trucks = new EntityId[count];

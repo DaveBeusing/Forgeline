@@ -69,7 +69,7 @@ the building role, never a fabricated live amount. Actual FIFO and exclusive exi
 ownership remain the simulation's responsibility.
 
 The physical queue regression uses real family footprints/docks, mixed truck sizes,
-two and ten participants and all four cardinal orientations. Existing neighboring
+every fleet size from two through ten participants and all four cardinal orientations. Existing neighboring
 bay/blocked-exit tests and Loading/Transit/Unloading/Sustained reference scenes
 remain in force. New family-specific Repeated/Stress scenes publish exactly
 100/1,000 copied operational render instances, terrain-grounded and rotated through
