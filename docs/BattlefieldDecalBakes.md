@@ -1,5 +1,13 @@
 # Battlefield decal bakes
 
+The branch is synchronized with master `a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d`
+(merged terrain PR #284 and staged vegetation PR #281), version 0.1.437. The decal candidate is now
+0.1.438, exactly one PATCH above that base. The original 0.1.437 evidence below
+is retained as historical evidence on the preceding terrain materials; it is
+not relabelled as a result on the new master. Refreshed native/catalog/package
+qualification on the integrated terrain follows below when complete. The 39
+measured decal authoring/material/texture inputs remain byte-identical.
+
 ## Integration audit
 
 Audited remote integration/default branch `master` at
