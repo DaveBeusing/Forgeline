@@ -1,0 +1,52 @@
+name: Resource deposit Blender masters
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/resource-deposit-masters.yml'
+      - 'build/resource-deposits/**'
+      - 'assets/staged/resource-deposits/**'
+      - 'tests/ForgeLine.Presentation.Tests/ResourceDepositBlenderMasterTests.cs'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/resource-deposit-masters.yml'
+      - 'build/resource-deposits/**'
+      - 'assets/staged/resource-deposits/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retained-minerals:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify native master hashes and High/Reduced exports
+        shell: pwsh
+        run: python build/resource-deposits/retained.py
+
+  native-minerals:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release -m:1
+      - name: Save, reopen, export and qualify four mineral families
+        shell: pwsh
+        run: ./build/resource-deposits/Qualify-Masters.ps1 -OutputRoot artifacts/rd-ci
+      - name: Retain native authoring evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-deposit-masters-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/rd-ci
+          retention-days: 14

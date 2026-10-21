@@ -1,0 +1,53 @@
+{
+  "assetCount": 6,
+  "meshCount": 2,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7408127,
+  "meshRuntimeBytes": 80297,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1635,
+  "catalogLoadDuration": "00:00:00.0055029",
+  "assetReadDuration": "00:00:00.0433410",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "mesh.world.resource.ferrous_ore",
+      "type": "mesh",
+      "runtimeBytes": 63624
+    },
+    {
+      "assetId": "mesh.world.resource.ferrous_ore_lod1",
+      "type": "mesh",
+      "runtimeBytes": 16673
+    },
+    {
+      "assetId": "material.world.resource.ferrous_ore",
+      "type": "material",
+      "runtimeBytes": 1635
+    }
+  ],
+  "issues": [],
+  "success": true
+}

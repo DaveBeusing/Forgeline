@@ -1,0 +1,35 @@
+{
+  "blenderVersion": "5.2.2",
+  "canonicalSourcesUnchanged": true,
+  "exports": [
+    {
+      "canonicalDefinition": "world/meshes/resources/rare_elements.asset.json",
+      "id": "mesh.world.resource.rare_elements",
+      "sha256": "96848c4f799438490760ba55cf4efab6eca5baff262ddf4d297aa592dfeae9bb",
+      "source": "mesh.world.resource.rare_elements.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/resources/rare_elements_lod1.asset.json",
+      "id": "mesh.world.resource.rare_elements_lod1",
+      "sha256": "12af2ded7385e891131a55a07f0d0ef0a28b1f1eb9822abbb4e77620c800a11a",
+      "source": "mesh.world.resource.rare_elements_lod1.glb"
+    }
+  ],
+  "fixtureSha256": "867f64a6f4021c78cd6c98554a36ae8acbdb7d3e853c4e4ae62c790a2b46aead",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "rare_elements.blend",
+      "sha256": "ce04dfa0a5526d21e8990ff553dd6975ae720678895d44d2fc271b881a7be112"
+    },
+    {
+      "path": "rare_elements_inspection.blend",
+      "sha256": "5c5616b91894e7bc938c4b6bf33903763afc256a25d2af29c3c2e08545aaea00"
+    }
+  ],
+  "portableSourceSignature": "cc9be7e34ba3068a243f7c84e78d0b525e053388df5fbb3dbb81240aa7244278",
+  "schemaVersion": 1,
+  "sourceSha": "1f351e14ab0f703006a641320502f26bb506087f",
+  "sourceSignature": "bd3518396d2cb65b2935f80d985254aafde45920bda3cdd996ec0d2e07e28d8f",
+  "status": "staged-not-promoted"
+}

@@ -1,0 +1,35 @@
+{
+  "blenderVersion": "5.2.2",
+  "canonicalSourcesUnchanged": true,
+  "exports": [
+    {
+      "canonicalDefinition": "world/meshes/resources/silicates.asset.json",
+      "id": "mesh.world.resource.silicates",
+      "sha256": "840f0dbc14e9980e8cf82492a930cdb46461d57eefea8e0b634a9e797377031c",
+      "source": "mesh.world.resource.silicates.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/resources/silicates_lod1.asset.json",
+      "id": "mesh.world.resource.silicates_lod1",
+      "sha256": "b8ed051d00e060f6eaed52904525451102af19efdbe249fd4030ef55fc7f3f27",
+      "source": "mesh.world.resource.silicates_lod1.glb"
+    }
+  ],
+  "fixtureSha256": "867f64a6f4021c78cd6c98554a36ae8acbdb7d3e853c4e4ae62c790a2b46aead",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "silicates.blend",
+      "sha256": "2a6469087ba839b2d86acf4d876c1042076415a645614275b4d359e4cac13152"
+    },
+    {
+      "path": "silicates_inspection.blend",
+      "sha256": "0c39733190e3cf46d054ca605f77a1a4567bbec131fdd3e68e6c3fbbdf229c7b"
+    }
+  ],
+  "portableSourceSignature": "a5aae63e8c48fb49542ee922321b3fd4b8a4cb38be9e1bd2f5e06b1103614a59",
+  "schemaVersion": 1,
+  "sourceSha": "1f351e14ab0f703006a641320502f26bb506087f",
+  "sourceSignature": "79a43522efa3bad6d62b107ae0f032ec0b879d2afa4c69f5865f929dfb74c64e",
+  "status": "staged-not-promoted"
+}

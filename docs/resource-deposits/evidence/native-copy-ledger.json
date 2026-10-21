@@ -1,0 +1,1544 @@
+{
+  "textureSources": "validated-by-compiler-source-hashes",
+  "runtimeOutputsCopied": false,
+  "schemaVersion": 1,
+  "copies": [
+    {
+      "path": "ferrous_ore/first/authoring.blend",
+      "sha256": "11B43B567FB0315F7A134E360B2315E835F5CAFB63CEF5D28370A695909A486A"
+    },
+    {
+      "path": "ferrous_ore/first/inspection.blend",
+      "sha256": "BCC9018441E7A797C3D0C99F8D91613EFC701243AD9C7ADF74AD22D97D4C4D70"
+    },
+    {
+      "path": "ferrous_ore/first/inspection.json",
+      "sha256": "85FE400C418AE882D9828405FAC1C7ED16C9EF77BF79D8A4E1D165F04E7801A9"
+    },
+    {
+      "path": "ferrous_ore/first/report.json",
+      "sha256": "A191071DF80EBBF89F134DE6687BC6BD826DB04331D8FB76F3961871E2C93362"
+    },
+    {
+      "path": "ferrous_ore/first/roundtrip-report.json",
+      "sha256": "7F9890AD93C26FC9FE8DCCE7E39B706AD5824C64750B4FA1447C2CCF2BF9318A"
+    },
+    {
+      "path": "ferrous_ore/first/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "ferrous_ore/first/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "ferrous_ore/first/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "ferrous_ore/first/baseline-source\\world\\materials\\resources\\ferrous_ore.asset.json",
+      "sha256": "35551760FA800C54E017A789D29B93A995DE32DA05E46C3131152D963683E4D5"
+    },
+    {
+      "path": "ferrous_ore/first/baseline-source\\world\\materials\\resources\\ferrous_ore.material.json",
+      "sha256": "B27D4A9CDF400BCC7E112D06568BE3818681D22E2993EA2F1B67A7709043808A"
+    },
+    {
+      "path": "ferrous_ore/first/baseline-source\\world\\meshes\\resources\\ferrous_ore_lod1.asset.json",
+      "sha256": "E7A4B0443FEAA1764C75CCE564962AD58F2A1F8A14F0CEF80D2AF7FB6A8C6AE3"
+    },
+    {
+      "path": "ferrous_ore/first/baseline-source\\world\\meshes\\resources\\ferrous_ore.asset.json",
+      "sha256": "5312F85609A866637C8DC556FD69905694B461DA639DF27D9BA70D05FA01943F"
+    },
+    {
+      "path": "ferrous_ore/first/runs\\c114d73397994a51a3ef53bb1c521d2e\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "ferrous_ore/first/runs\\c114d73397994a51a3ef53bb1c521d2e\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/first/runs\\c114d73397994a51a3ef53bb1c521d2e\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "ferrous_ore/first/runs\\c114d73397994a51a3ef53bb1c521d2e\\report.json",
+      "sha256": "A191071DF80EBBF89F134DE6687BC6BD826DB04331D8FB76F3961871E2C93362"
+    },
+    {
+      "path": "ferrous_ore/first/runs\\c114d73397994a51a3ef53bb1c521d2e\\request.json",
+      "sha256": "FE3A78202FD890F565063B942C3472807E5518ABF838397E170698B52578F9F8"
+    },
+    {
+      "path": "ferrous_ore/first/runs\\c114d73397994a51a3ef53bb1c521d2e\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/first/runs\\c114d73397994a51a3ef53bb1c521d2e\\script.stdout.log",
+      "sha256": "386AF0F61EC4807E5B16FCADA138C1DD3CE9195D2A7235CB67BDA0AE19D41825"
+    },
+    {
+      "path": "ferrous_ore/first/runs\\c114d73397994a51a3ef53bb1c521d2e\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/first/runs\\c114d73397994a51a3ef53bb1c521d2e\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "ferrous_ore/first/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "ferrous_ore/first/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "ferrous_ore/first/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "ferrous_ore/first/source\\world\\materials\\resources\\ferrous_ore.asset.json",
+      "sha256": "35551760FA800C54E017A789D29B93A995DE32DA05E46C3131152D963683E4D5"
+    },
+    {
+      "path": "ferrous_ore/first/source\\world\\materials\\resources\\ferrous_ore.material.json",
+      "sha256": "B27D4A9CDF400BCC7E112D06568BE3818681D22E2993EA2F1B67A7709043808A"
+    },
+    {
+      "path": "ferrous_ore/first/source\\world\\meshes\\resources\\ferrous_ore_lod1.asset.json",
+      "sha256": "D4C6B9764F3D574F08D822C41E7D8EF316BD3333C8E47ECDA9ECFFBA2688BA8E"
+    },
+    {
+      "path": "ferrous_ore/first/source\\world\\meshes\\resources\\ferrous_ore.asset.json",
+      "sha256": "4E7E8B7DDAEEAB469721A978379A4A7DC1D2CB9614EC51B4731786341AE3EE90"
+    },
+    {
+      "path": "ferrous_ore/first/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.ferrous_ore_lod1.glb",
+      "sha256": "7E836F337B1395DD598686657958A1EFC50B0E8F52D1E7D1DFB361BAC101AB3F"
+    },
+    {
+      "path": "ferrous_ore/first/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.ferrous_ore.glb",
+      "sha256": "5A776F5DCC103A1EC07A06DE063B88244AD8276F8622F60FBAAADCAB5C445DDB"
+    },
+    {
+      "path": "ferrous_ore/second/authoring.blend",
+      "sha256": "C1801A7286E42D3DFEF47E365B3E3896073B17DBAF180CB5248B34B3B825C8FF"
+    },
+    {
+      "path": "ferrous_ore/second/report.json",
+      "sha256": "E7AC769D39E49A4712A1BB3E948FC0F394EF1837E2FFD6799D0544B77CABAC57"
+    },
+    {
+      "path": "ferrous_ore/second/roundtrip-report.json",
+      "sha256": "7F9890AD93C26FC9FE8DCCE7E39B706AD5824C64750B4FA1447C2CCF2BF9318A"
+    },
+    {
+      "path": "ferrous_ore/second/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "ferrous_ore/second/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "ferrous_ore/second/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "ferrous_ore/second/baseline-source\\world\\materials\\resources\\ferrous_ore.asset.json",
+      "sha256": "35551760FA800C54E017A789D29B93A995DE32DA05E46C3131152D963683E4D5"
+    },
+    {
+      "path": "ferrous_ore/second/baseline-source\\world\\materials\\resources\\ferrous_ore.material.json",
+      "sha256": "B27D4A9CDF400BCC7E112D06568BE3818681D22E2993EA2F1B67A7709043808A"
+    },
+    {
+      "path": "ferrous_ore/second/baseline-source\\world\\meshes\\resources\\ferrous_ore_lod1.asset.json",
+      "sha256": "E7A4B0443FEAA1764C75CCE564962AD58F2A1F8A14F0CEF80D2AF7FB6A8C6AE3"
+    },
+    {
+      "path": "ferrous_ore/second/baseline-source\\world\\meshes\\resources\\ferrous_ore.asset.json",
+      "sha256": "5312F85609A866637C8DC556FD69905694B461DA639DF27D9BA70D05FA01943F"
+    },
+    {
+      "path": "ferrous_ore/second/runs\\632ab45b216048a8bf08e21805d9a90c\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "ferrous_ore/second/runs\\632ab45b216048a8bf08e21805d9a90c\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/second/runs\\632ab45b216048a8bf08e21805d9a90c\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "ferrous_ore/second/runs\\632ab45b216048a8bf08e21805d9a90c\\report.json",
+      "sha256": "E7AC769D39E49A4712A1BB3E948FC0F394EF1837E2FFD6799D0544B77CABAC57"
+    },
+    {
+      "path": "ferrous_ore/second/runs\\632ab45b216048a8bf08e21805d9a90c\\request.json",
+      "sha256": "E787B9BF228C201C5C2D3E48B43A4237BC523F7120CCFFA75650FCF32150FC57"
+    },
+    {
+      "path": "ferrous_ore/second/runs\\632ab45b216048a8bf08e21805d9a90c\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/second/runs\\632ab45b216048a8bf08e21805d9a90c\\script.stdout.log",
+      "sha256": "ECEC5F1950C97D8B159F9DA9211134F0DE409CAF8CE1471C95EEEA9A22329DCB"
+    },
+    {
+      "path": "ferrous_ore/second/runs\\632ab45b216048a8bf08e21805d9a90c\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/second/runs\\632ab45b216048a8bf08e21805d9a90c\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "ferrous_ore/second/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "ferrous_ore/second/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "ferrous_ore/second/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "ferrous_ore/second/source\\world\\materials\\resources\\ferrous_ore.asset.json",
+      "sha256": "35551760FA800C54E017A789D29B93A995DE32DA05E46C3131152D963683E4D5"
+    },
+    {
+      "path": "ferrous_ore/second/source\\world\\materials\\resources\\ferrous_ore.material.json",
+      "sha256": "B27D4A9CDF400BCC7E112D06568BE3818681D22E2993EA2F1B67A7709043808A"
+    },
+    {
+      "path": "ferrous_ore/second/source\\world\\meshes\\resources\\ferrous_ore_lod1.asset.json",
+      "sha256": "D4C6B9764F3D574F08D822C41E7D8EF316BD3333C8E47ECDA9ECFFBA2688BA8E"
+    },
+    {
+      "path": "ferrous_ore/second/source\\world\\meshes\\resources\\ferrous_ore.asset.json",
+      "sha256": "4E7E8B7DDAEEAB469721A978379A4A7DC1D2CB9614EC51B4731786341AE3EE90"
+    },
+    {
+      "path": "ferrous_ore/second/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.ferrous_ore_lod1.glb",
+      "sha256": "7E836F337B1395DD598686657958A1EFC50B0E8F52D1E7D1DFB361BAC101AB3F"
+    },
+    {
+      "path": "ferrous_ore/second/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.ferrous_ore.glb",
+      "sha256": "5A776F5DCC103A1EC07A06DE063B88244AD8276F8622F60FBAAADCAB5C445DDB"
+    },
+    {
+      "path": "ferrous_ore/reopened/report.json",
+      "sha256": "FA7C97FA78811E6C77DBDDE2AEBF13B6CF083FC37045ADC371B69750C51ECE27"
+    },
+    {
+      "path": "ferrous_ore/reopened/roundtrip-report.json",
+      "sha256": "68909F1922853936136BB7E14EB9DD420AD82E751033E6CB0DE4910B2D094881"
+    },
+    {
+      "path": "ferrous_ore/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "ferrous_ore/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "ferrous_ore/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "ferrous_ore/reopened/baseline-source\\world\\materials\\resources\\ferrous_ore.asset.json",
+      "sha256": "35551760FA800C54E017A789D29B93A995DE32DA05E46C3131152D963683E4D5"
+    },
+    {
+      "path": "ferrous_ore/reopened/baseline-source\\world\\materials\\resources\\ferrous_ore.material.json",
+      "sha256": "B27D4A9CDF400BCC7E112D06568BE3818681D22E2993EA2F1B67A7709043808A"
+    },
+    {
+      "path": "ferrous_ore/reopened/baseline-source\\world\\meshes\\resources\\ferrous_ore_lod1.asset.json",
+      "sha256": "E7A4B0443FEAA1764C75CCE564962AD58F2A1F8A14F0CEF80D2AF7FB6A8C6AE3"
+    },
+    {
+      "path": "ferrous_ore/reopened/baseline-source\\world\\meshes\\resources\\ferrous_ore.asset.json",
+      "sha256": "5312F85609A866637C8DC556FD69905694B461DA639DF27D9BA70D05FA01943F"
+    },
+    {
+      "path": "ferrous_ore/reopened/runs\\df15a95b13484405afb3f563c5d23acd\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "ferrous_ore/reopened/runs\\df15a95b13484405afb3f563c5d23acd\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/reopened/runs\\df15a95b13484405afb3f563c5d23acd\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "ferrous_ore/reopened/runs\\df15a95b13484405afb3f563c5d23acd\\report.json",
+      "sha256": "FA7C97FA78811E6C77DBDDE2AEBF13B6CF083FC37045ADC371B69750C51ECE27"
+    },
+    {
+      "path": "ferrous_ore/reopened/runs\\df15a95b13484405afb3f563c5d23acd\\request.json",
+      "sha256": "7BB53EFA9AD2C1F73828CFB575395435D4981D420AF9122E8A6E2F6ED2CF643E"
+    },
+    {
+      "path": "ferrous_ore/reopened/runs\\df15a95b13484405afb3f563c5d23acd\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/reopened/runs\\df15a95b13484405afb3f563c5d23acd\\script.stdout.log",
+      "sha256": "E59A81260AC4BFB0E17C06CDD91BD1FEF35607DB64F404A766E9EAB30375F500"
+    },
+    {
+      "path": "ferrous_ore/reopened/runs\\df15a95b13484405afb3f563c5d23acd\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/reopened/runs\\df15a95b13484405afb3f563c5d23acd\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "ferrous_ore/reopened/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "ferrous_ore/reopened/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "ferrous_ore/reopened/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "ferrous_ore/reopened/source\\world\\materials\\resources\\ferrous_ore.asset.json",
+      "sha256": "35551760FA800C54E017A789D29B93A995DE32DA05E46C3131152D963683E4D5"
+    },
+    {
+      "path": "ferrous_ore/reopened/source\\world\\materials\\resources\\ferrous_ore.material.json",
+      "sha256": "B27D4A9CDF400BCC7E112D06568BE3818681D22E2993EA2F1B67A7709043808A"
+    },
+    {
+      "path": "ferrous_ore/reopened/source\\world\\meshes\\resources\\ferrous_ore_lod1.asset.json",
+      "sha256": "D4C6B9764F3D574F08D822C41E7D8EF316BD3333C8E47ECDA9ECFFBA2688BA8E"
+    },
+    {
+      "path": "ferrous_ore/reopened/source\\world\\meshes\\resources\\ferrous_ore.asset.json",
+      "sha256": "4E7E8B7DDAEEAB469721A978379A4A7DC1D2CB9614EC51B4731786341AE3EE90"
+    },
+    {
+      "path": "ferrous_ore/reopened/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.ferrous_ore_lod1.glb",
+      "sha256": "7E836F337B1395DD598686657958A1EFC50B0E8F52D1E7D1DFB361BAC101AB3F"
+    },
+    {
+      "path": "ferrous_ore/reopened/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.ferrous_ore.glb",
+      "sha256": "5A776F5DCC103A1EC07A06DE063B88244AD8276F8622F60FBAAADCAB5C445DDB"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/native-contracts.json",
+      "sha256": "DACEF8C8BC4F8D09727846BAA9D3DDB712407B6F03C216A581270EC899F4A7F9"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/report.json",
+      "sha256": "189E16C7896B1440906944259AF6497AAB924FEF49D9D5FCD27DABB99F905B6E"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/runs\\cb8ee52a63124297a722bbc41a4e55d8\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/runs\\cb8ee52a63124297a722bbc41a4e55d8\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/runs\\cb8ee52a63124297a722bbc41a4e55d8\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/runs\\cb8ee52a63124297a722bbc41a4e55d8\\report.json",
+      "sha256": "189E16C7896B1440906944259AF6497AAB924FEF49D9D5FCD27DABB99F905B6E"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/runs\\cb8ee52a63124297a722bbc41a4e55d8\\request.json",
+      "sha256": "EA185FA35DB5DF26E930451774AB3DCC433623F080E584111AC8507802898ADC"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/runs\\cb8ee52a63124297a722bbc41a4e55d8\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/runs\\cb8ee52a63124297a722bbc41a4e55d8\\script.stdout.log",
+      "sha256": "ECBDE9ABFFEC4E9FAA99EC122E68BF317B3C108C60981AF5A31D9876052D22D0"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/runs\\cb8ee52a63124297a722bbc41a4e55d8\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "ferrous_ore/native-contracts/runs\\cb8ee52a63124297a722bbc41a4e55d8\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "silicates/first/authoring.blend",
+      "sha256": "2A6469087BA839B2D86ACF4D876C1042076415A645614275B4D359E4CAC13152"
+    },
+    {
+      "path": "silicates/first/inspection.blend",
+      "sha256": "0C39733190E3CF46D054CA605F77A1A4567BBEC131FDD3E68E6C3FBBDF229C7B"
+    },
+    {
+      "path": "silicates/first/inspection.json",
+      "sha256": "67EAF137706446B275528C56926A43E86F2F6504BAF4952CD4667A6721225E8B"
+    },
+    {
+      "path": "silicates/first/report.json",
+      "sha256": "9EB5C358DCA7FC4DC22771DC37664DF771E80DC16BE848428B7A2E059545752C"
+    },
+    {
+      "path": "silicates/first/roundtrip-report.json",
+      "sha256": "819EA8A7775DB23DFA01A1445D4942DDB2EDC64EAA785F15949D24AFFF5F4B65"
+    },
+    {
+      "path": "silicates/first/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "silicates/first/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "silicates/first/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "silicates/first/baseline-source\\world\\materials\\resources\\silicates.asset.json",
+      "sha256": "AAB31DE1A1D2B9253C80A2420D3495535AE851C6C42E429910685D7E81EDEBB8"
+    },
+    {
+      "path": "silicates/first/baseline-source\\world\\materials\\resources\\silicates.material.json",
+      "sha256": "46BB683F6F2CF58287A75A24D623BFC25DF629FB16415AC319A8FF2690F0AC26"
+    },
+    {
+      "path": "silicates/first/baseline-source\\world\\meshes\\resources\\silicates_lod1.asset.json",
+      "sha256": "BFE87179ACA48A8C0BBA8645F4BAEF8BB2B6DAC29D39016221A34CEA727B9612"
+    },
+    {
+      "path": "silicates/first/baseline-source\\world\\meshes\\resources\\silicates.asset.json",
+      "sha256": "742DB947505C80BD95B98A35588DD483D3F4DEE21A724E1017FF0B2E6D30BBE8"
+    },
+    {
+      "path": "silicates/first/runs\\cd0ea72cc097458e88dc606e021aa7ae\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "silicates/first/runs\\cd0ea72cc097458e88dc606e021aa7ae\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/first/runs\\cd0ea72cc097458e88dc606e021aa7ae\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "silicates/first/runs\\cd0ea72cc097458e88dc606e021aa7ae\\report.json",
+      "sha256": "9EB5C358DCA7FC4DC22771DC37664DF771E80DC16BE848428B7A2E059545752C"
+    },
+    {
+      "path": "silicates/first/runs\\cd0ea72cc097458e88dc606e021aa7ae\\request.json",
+      "sha256": "34F3EA38B574B613BB32D3E1CA0D225EEE3C91352CA8DB8D802CFEBCD20607BE"
+    },
+    {
+      "path": "silicates/first/runs\\cd0ea72cc097458e88dc606e021aa7ae\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/first/runs\\cd0ea72cc097458e88dc606e021aa7ae\\script.stdout.log",
+      "sha256": "54DF8582825D7B95FBBAC151073CB7DB6B1DCEAD0EB9D776468D6B1A36231DAC"
+    },
+    {
+      "path": "silicates/first/runs\\cd0ea72cc097458e88dc606e021aa7ae\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/first/runs\\cd0ea72cc097458e88dc606e021aa7ae\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "silicates/first/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "silicates/first/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "silicates/first/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "silicates/first/source\\world\\materials\\resources\\silicates.asset.json",
+      "sha256": "AAB31DE1A1D2B9253C80A2420D3495535AE851C6C42E429910685D7E81EDEBB8"
+    },
+    {
+      "path": "silicates/first/source\\world\\materials\\resources\\silicates.material.json",
+      "sha256": "46BB683F6F2CF58287A75A24D623BFC25DF629FB16415AC319A8FF2690F0AC26"
+    },
+    {
+      "path": "silicates/first/source\\world\\meshes\\resources\\silicates_lod1.asset.json",
+      "sha256": "EC4FF96772E7EAACF05D3430AE030E776CEB3A335B7014E3D347DB2196EB6980"
+    },
+    {
+      "path": "silicates/first/source\\world\\meshes\\resources\\silicates.asset.json",
+      "sha256": "88BCA7087BB798BD6E2A4E01E52E7286EBB36CD78BA86C9BD13270E6934AE58B"
+    },
+    {
+      "path": "silicates/first/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.silicates_lod1.glb",
+      "sha256": "B8ED051D00E060F6EAED52904525451102AF19EFDBE249FD4030EF55FC7F3F27"
+    },
+    {
+      "path": "silicates/first/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.silicates.glb",
+      "sha256": "840F0DBC14E9980E8CF82492A930CDB46461D57EEFEA8E0B634A9E797377031C"
+    },
+    {
+      "path": "silicates/second/authoring.blend",
+      "sha256": "ECE1902188D72A1E86A796D28B709F3CE13DB41CF2F246214785E6296520DB74"
+    },
+    {
+      "path": "silicates/second/report.json",
+      "sha256": "005F112730408CE4A969942C01C0D2B963F0E201F8D24C1B4999456C130BE9EE"
+    },
+    {
+      "path": "silicates/second/roundtrip-report.json",
+      "sha256": "819EA8A7775DB23DFA01A1445D4942DDB2EDC64EAA785F15949D24AFFF5F4B65"
+    },
+    {
+      "path": "silicates/second/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "silicates/second/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "silicates/second/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "silicates/second/baseline-source\\world\\materials\\resources\\silicates.asset.json",
+      "sha256": "AAB31DE1A1D2B9253C80A2420D3495535AE851C6C42E429910685D7E81EDEBB8"
+    },
+    {
+      "path": "silicates/second/baseline-source\\world\\materials\\resources\\silicates.material.json",
+      "sha256": "46BB683F6F2CF58287A75A24D623BFC25DF629FB16415AC319A8FF2690F0AC26"
+    },
+    {
+      "path": "silicates/second/baseline-source\\world\\meshes\\resources\\silicates_lod1.asset.json",
+      "sha256": "BFE87179ACA48A8C0BBA8645F4BAEF8BB2B6DAC29D39016221A34CEA727B9612"
+    },
+    {
+      "path": "silicates/second/baseline-source\\world\\meshes\\resources\\silicates.asset.json",
+      "sha256": "742DB947505C80BD95B98A35588DD483D3F4DEE21A724E1017FF0B2E6D30BBE8"
+    },
+    {
+      "path": "silicates/second/runs\\c64b51550c64425cb34482a3da1ffc56\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "silicates/second/runs\\c64b51550c64425cb34482a3da1ffc56\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/second/runs\\c64b51550c64425cb34482a3da1ffc56\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "silicates/second/runs\\c64b51550c64425cb34482a3da1ffc56\\report.json",
+      "sha256": "005F112730408CE4A969942C01C0D2B963F0E201F8D24C1B4999456C130BE9EE"
+    },
+    {
+      "path": "silicates/second/runs\\c64b51550c64425cb34482a3da1ffc56\\request.json",
+      "sha256": "0D5D05AAAE45D9A5366D456B5E6A58B4253A32291B5C3D466753190A6CB92212"
+    },
+    {
+      "path": "silicates/second/runs\\c64b51550c64425cb34482a3da1ffc56\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/second/runs\\c64b51550c64425cb34482a3da1ffc56\\script.stdout.log",
+      "sha256": "ECEC5F1950C97D8B159F9DA9211134F0DE409CAF8CE1471C95EEEA9A22329DCB"
+    },
+    {
+      "path": "silicates/second/runs\\c64b51550c64425cb34482a3da1ffc56\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/second/runs\\c64b51550c64425cb34482a3da1ffc56\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "silicates/second/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "silicates/second/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "silicates/second/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "silicates/second/source\\world\\materials\\resources\\silicates.asset.json",
+      "sha256": "AAB31DE1A1D2B9253C80A2420D3495535AE851C6C42E429910685D7E81EDEBB8"
+    },
+    {
+      "path": "silicates/second/source\\world\\materials\\resources\\silicates.material.json",
+      "sha256": "46BB683F6F2CF58287A75A24D623BFC25DF629FB16415AC319A8FF2690F0AC26"
+    },
+    {
+      "path": "silicates/second/source\\world\\meshes\\resources\\silicates_lod1.asset.json",
+      "sha256": "EC4FF96772E7EAACF05D3430AE030E776CEB3A335B7014E3D347DB2196EB6980"
+    },
+    {
+      "path": "silicates/second/source\\world\\meshes\\resources\\silicates.asset.json",
+      "sha256": "88BCA7087BB798BD6E2A4E01E52E7286EBB36CD78BA86C9BD13270E6934AE58B"
+    },
+    {
+      "path": "silicates/second/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.silicates_lod1.glb",
+      "sha256": "B8ED051D00E060F6EAED52904525451102AF19EFDBE249FD4030EF55FC7F3F27"
+    },
+    {
+      "path": "silicates/second/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.silicates.glb",
+      "sha256": "840F0DBC14E9980E8CF82492A930CDB46461D57EEFEA8E0B634A9E797377031C"
+    },
+    {
+      "path": "silicates/reopened/report.json",
+      "sha256": "FFF2E5E636D2462A3965D35FEE353B5D615AFA331DD8EDAAEF0D215C6B410AEF"
+    },
+    {
+      "path": "silicates/reopened/roundtrip-report.json",
+      "sha256": "4E911B4480D74B0A47F85F91903790438D66D5CCC24E8A8A627015976677678E"
+    },
+    {
+      "path": "silicates/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "silicates/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "silicates/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "silicates/reopened/baseline-source\\world\\materials\\resources\\silicates.asset.json",
+      "sha256": "AAB31DE1A1D2B9253C80A2420D3495535AE851C6C42E429910685D7E81EDEBB8"
+    },
+    {
+      "path": "silicates/reopened/baseline-source\\world\\materials\\resources\\silicates.material.json",
+      "sha256": "46BB683F6F2CF58287A75A24D623BFC25DF629FB16415AC319A8FF2690F0AC26"
+    },
+    {
+      "path": "silicates/reopened/baseline-source\\world\\meshes\\resources\\silicates_lod1.asset.json",
+      "sha256": "BFE87179ACA48A8C0BBA8645F4BAEF8BB2B6DAC29D39016221A34CEA727B9612"
+    },
+    {
+      "path": "silicates/reopened/baseline-source\\world\\meshes\\resources\\silicates.asset.json",
+      "sha256": "742DB947505C80BD95B98A35588DD483D3F4DEE21A724E1017FF0B2E6D30BBE8"
+    },
+    {
+      "path": "silicates/reopened/runs\\fc016754f0854ceeba939a2a243422e0\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "silicates/reopened/runs\\fc016754f0854ceeba939a2a243422e0\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/reopened/runs\\fc016754f0854ceeba939a2a243422e0\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "silicates/reopened/runs\\fc016754f0854ceeba939a2a243422e0\\report.json",
+      "sha256": "FFF2E5E636D2462A3965D35FEE353B5D615AFA331DD8EDAAEF0D215C6B410AEF"
+    },
+    {
+      "path": "silicates/reopened/runs\\fc016754f0854ceeba939a2a243422e0\\request.json",
+      "sha256": "CD47247F56FA1A4E691F65D2AF68822420322A9CC1FCE24B7BC0F9F9C21440FE"
+    },
+    {
+      "path": "silicates/reopened/runs\\fc016754f0854ceeba939a2a243422e0\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/reopened/runs\\fc016754f0854ceeba939a2a243422e0\\script.stdout.log",
+      "sha256": "8070E41D789E1622A37B084844447740EF0597481641695FB705FD7663E4949A"
+    },
+    {
+      "path": "silicates/reopened/runs\\fc016754f0854ceeba939a2a243422e0\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/reopened/runs\\fc016754f0854ceeba939a2a243422e0\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "silicates/reopened/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "silicates/reopened/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "silicates/reopened/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "silicates/reopened/source\\world\\materials\\resources\\silicates.asset.json",
+      "sha256": "AAB31DE1A1D2B9253C80A2420D3495535AE851C6C42E429910685D7E81EDEBB8"
+    },
+    {
+      "path": "silicates/reopened/source\\world\\materials\\resources\\silicates.material.json",
+      "sha256": "46BB683F6F2CF58287A75A24D623BFC25DF629FB16415AC319A8FF2690F0AC26"
+    },
+    {
+      "path": "silicates/reopened/source\\world\\meshes\\resources\\silicates_lod1.asset.json",
+      "sha256": "EC4FF96772E7EAACF05D3430AE030E776CEB3A335B7014E3D347DB2196EB6980"
+    },
+    {
+      "path": "silicates/reopened/source\\world\\meshes\\resources\\silicates.asset.json",
+      "sha256": "88BCA7087BB798BD6E2A4E01E52E7286EBB36CD78BA86C9BD13270E6934AE58B"
+    },
+    {
+      "path": "silicates/reopened/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.silicates_lod1.glb",
+      "sha256": "B8ED051D00E060F6EAED52904525451102AF19EFDBE249FD4030EF55FC7F3F27"
+    },
+    {
+      "path": "silicates/reopened/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.silicates.glb",
+      "sha256": "840F0DBC14E9980E8CF82492A930CDB46461D57EEFEA8E0B634A9E797377031C"
+    },
+    {
+      "path": "silicates/native-contracts/native-contracts.json",
+      "sha256": "13A9CE61F7AA18B3F56C39ECC0A818F9A264B9CB3FE529D7D43865DB48FC8D96"
+    },
+    {
+      "path": "silicates/native-contracts/report.json",
+      "sha256": "CB5CDD830BC8866E6FFB9597A4812CFCFBF8FFB8547B37A9FB5F601800D26677"
+    },
+    {
+      "path": "silicates/native-contracts/runs\\15e5cc61de114ec0a81b93dfee4e3314\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "silicates/native-contracts/runs\\15e5cc61de114ec0a81b93dfee4e3314\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/native-contracts/runs\\15e5cc61de114ec0a81b93dfee4e3314\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "silicates/native-contracts/runs\\15e5cc61de114ec0a81b93dfee4e3314\\report.json",
+      "sha256": "CB5CDD830BC8866E6FFB9597A4812CFCFBF8FFB8547B37A9FB5F601800D26677"
+    },
+    {
+      "path": "silicates/native-contracts/runs\\15e5cc61de114ec0a81b93dfee4e3314\\request.json",
+      "sha256": "621F275E2EBAF3D65DA591673F401600E96940F36997EA06F27E155BA4BC1751"
+    },
+    {
+      "path": "silicates/native-contracts/runs\\15e5cc61de114ec0a81b93dfee4e3314\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/native-contracts/runs\\15e5cc61de114ec0a81b93dfee4e3314\\script.stdout.log",
+      "sha256": "7A6E5913F1D8388971BD3F9B25B7ECC6FC090FAC40DB1BCAD3316C4D3C8CC5FA"
+    },
+    {
+      "path": "silicates/native-contracts/runs\\15e5cc61de114ec0a81b93dfee4e3314\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "silicates/native-contracts/runs\\15e5cc61de114ec0a81b93dfee4e3314\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "volatiles/first/authoring.blend",
+      "sha256": "EDE5D9D863EA16BE7F991ECC23C74EC26FD9B6E37034C6DF35862D754AE89B3D"
+    },
+    {
+      "path": "volatiles/first/inspection.blend",
+      "sha256": "25A8AF354B048010C005FA17D7046B5696F1D3A1AB06DD3304196A7F6AA42B73"
+    },
+    {
+      "path": "volatiles/first/inspection.json",
+      "sha256": "F5601C98503EF73B6DCC532B072987814BD1CD396EDA19C681FF30EFF4D4C326"
+    },
+    {
+      "path": "volatiles/first/report.json",
+      "sha256": "7E52EC67E9914F27038BFB2F076D85584D5A6CCC7302C8639927D001B770A56C"
+    },
+    {
+      "path": "volatiles/first/roundtrip-report.json",
+      "sha256": "0D736AABDBF81AB982EEF5D46DBE766464CE0F68FEC71D8B825AACC42AA5B30F"
+    },
+    {
+      "path": "volatiles/first/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "volatiles/first/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "volatiles/first/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "volatiles/first/baseline-source\\world\\materials\\resources\\volatiles.asset.json",
+      "sha256": "1B50A8FA911ACA3DF956C6192306814C2EE89953D362CAD2E23407DA69D72DA0"
+    },
+    {
+      "path": "volatiles/first/baseline-source\\world\\materials\\resources\\volatiles.material.json",
+      "sha256": "07DE636EA96BE3750685518AE2445A6FD01A04832FF3290B29E2E8DF9C03D55E"
+    },
+    {
+      "path": "volatiles/first/baseline-source\\world\\meshes\\resources\\volatiles_lod1.asset.json",
+      "sha256": "B2108DDFBDB696D61467921F3A5E8142B77CA72D26E5497C011B7A8CB9725664"
+    },
+    {
+      "path": "volatiles/first/baseline-source\\world\\meshes\\resources\\volatiles.asset.json",
+      "sha256": "7918D69D82D465C660609F7A61523AC3CCE4B60F6E942EF84BC18DB06CEDA99B"
+    },
+    {
+      "path": "volatiles/first/runs\\4c09e475a5bc4d6998e3a9c5cf7070aa\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "volatiles/first/runs\\4c09e475a5bc4d6998e3a9c5cf7070aa\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/first/runs\\4c09e475a5bc4d6998e3a9c5cf7070aa\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "volatiles/first/runs\\4c09e475a5bc4d6998e3a9c5cf7070aa\\report.json",
+      "sha256": "7E52EC67E9914F27038BFB2F076D85584D5A6CCC7302C8639927D001B770A56C"
+    },
+    {
+      "path": "volatiles/first/runs\\4c09e475a5bc4d6998e3a9c5cf7070aa\\request.json",
+      "sha256": "05FE8676AFABCF99F079894F04BB0FE2F664A32CDA0DF53643D11225C49A6AA1"
+    },
+    {
+      "path": "volatiles/first/runs\\4c09e475a5bc4d6998e3a9c5cf7070aa\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/first/runs\\4c09e475a5bc4d6998e3a9c5cf7070aa\\script.stdout.log",
+      "sha256": "4CAFE65369CA23C94D627A40B881683D12E6ED81962AB163D7083B4C520942EC"
+    },
+    {
+      "path": "volatiles/first/runs\\4c09e475a5bc4d6998e3a9c5cf7070aa\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/first/runs\\4c09e475a5bc4d6998e3a9c5cf7070aa\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "volatiles/first/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "volatiles/first/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "volatiles/first/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "volatiles/first/source\\world\\materials\\resources\\volatiles.asset.json",
+      "sha256": "1B50A8FA911ACA3DF956C6192306814C2EE89953D362CAD2E23407DA69D72DA0"
+    },
+    {
+      "path": "volatiles/first/source\\world\\materials\\resources\\volatiles.material.json",
+      "sha256": "07DE636EA96BE3750685518AE2445A6FD01A04832FF3290B29E2E8DF9C03D55E"
+    },
+    {
+      "path": "volatiles/first/source\\world\\meshes\\resources\\volatiles_lod1.asset.json",
+      "sha256": "84DEA02821FA61A0D101F7CC0F293A2FEAF647D90FB502BB2489E5161A9D91E1"
+    },
+    {
+      "path": "volatiles/first/source\\world\\meshes\\resources\\volatiles.asset.json",
+      "sha256": "50336A3D2685ECD380DBD64B5BC4D1400C59ED5B8254F05C0D1E8E805DEC18F3"
+    },
+    {
+      "path": "volatiles/first/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.volatiles_lod1.glb",
+      "sha256": "FA440AA6745ACA2C09F7FF083DBA4DB9434C3F440C1A106339409AA290091203"
+    },
+    {
+      "path": "volatiles/first/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.volatiles.glb",
+      "sha256": "8822D1809EF568D0B9EDD0AF95F9F0A179FBE00DC7D69848981310DB8FF4B483"
+    },
+    {
+      "path": "volatiles/second/authoring.blend",
+      "sha256": "900CB470065EE73590CD3B497D4BA2645870091FAEF6A068D7BDA6294A2DD321"
+    },
+    {
+      "path": "volatiles/second/report.json",
+      "sha256": "0D712D74F079055E13ECB1AFA053728D1FD8EAECE4E882909CD03A20E116FFDA"
+    },
+    {
+      "path": "volatiles/second/roundtrip-report.json",
+      "sha256": "0D736AABDBF81AB982EEF5D46DBE766464CE0F68FEC71D8B825AACC42AA5B30F"
+    },
+    {
+      "path": "volatiles/second/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "volatiles/second/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "volatiles/second/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "volatiles/second/baseline-source\\world\\materials\\resources\\volatiles.asset.json",
+      "sha256": "1B50A8FA911ACA3DF956C6192306814C2EE89953D362CAD2E23407DA69D72DA0"
+    },
+    {
+      "path": "volatiles/second/baseline-source\\world\\materials\\resources\\volatiles.material.json",
+      "sha256": "07DE636EA96BE3750685518AE2445A6FD01A04832FF3290B29E2E8DF9C03D55E"
+    },
+    {
+      "path": "volatiles/second/baseline-source\\world\\meshes\\resources\\volatiles_lod1.asset.json",
+      "sha256": "B2108DDFBDB696D61467921F3A5E8142B77CA72D26E5497C011B7A8CB9725664"
+    },
+    {
+      "path": "volatiles/second/baseline-source\\world\\meshes\\resources\\volatiles.asset.json",
+      "sha256": "7918D69D82D465C660609F7A61523AC3CCE4B60F6E942EF84BC18DB06CEDA99B"
+    },
+    {
+      "path": "volatiles/second/runs\\7d92195bb6c34edba3da388d7b8a582b\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "volatiles/second/runs\\7d92195bb6c34edba3da388d7b8a582b\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/second/runs\\7d92195bb6c34edba3da388d7b8a582b\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "volatiles/second/runs\\7d92195bb6c34edba3da388d7b8a582b\\report.json",
+      "sha256": "0D712D74F079055E13ECB1AFA053728D1FD8EAECE4E882909CD03A20E116FFDA"
+    },
+    {
+      "path": "volatiles/second/runs\\7d92195bb6c34edba3da388d7b8a582b\\request.json",
+      "sha256": "204687152B0DF116EC1E6804161B83A3EF7BF76BBDD17BC133A1BB674338AEB6"
+    },
+    {
+      "path": "volatiles/second/runs\\7d92195bb6c34edba3da388d7b8a582b\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/second/runs\\7d92195bb6c34edba3da388d7b8a582b\\script.stdout.log",
+      "sha256": "ECEC5F1950C97D8B159F9DA9211134F0DE409CAF8CE1471C95EEEA9A22329DCB"
+    },
+    {
+      "path": "volatiles/second/runs\\7d92195bb6c34edba3da388d7b8a582b\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/second/runs\\7d92195bb6c34edba3da388d7b8a582b\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "volatiles/second/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "volatiles/second/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "volatiles/second/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "volatiles/second/source\\world\\materials\\resources\\volatiles.asset.json",
+      "sha256": "1B50A8FA911ACA3DF956C6192306814C2EE89953D362CAD2E23407DA69D72DA0"
+    },
+    {
+      "path": "volatiles/second/source\\world\\materials\\resources\\volatiles.material.json",
+      "sha256": "07DE636EA96BE3750685518AE2445A6FD01A04832FF3290B29E2E8DF9C03D55E"
+    },
+    {
+      "path": "volatiles/second/source\\world\\meshes\\resources\\volatiles_lod1.asset.json",
+      "sha256": "84DEA02821FA61A0D101F7CC0F293A2FEAF647D90FB502BB2489E5161A9D91E1"
+    },
+    {
+      "path": "volatiles/second/source\\world\\meshes\\resources\\volatiles.asset.json",
+      "sha256": "50336A3D2685ECD380DBD64B5BC4D1400C59ED5B8254F05C0D1E8E805DEC18F3"
+    },
+    {
+      "path": "volatiles/second/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.volatiles_lod1.glb",
+      "sha256": "FA440AA6745ACA2C09F7FF083DBA4DB9434C3F440C1A106339409AA290091203"
+    },
+    {
+      "path": "volatiles/second/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.volatiles.glb",
+      "sha256": "8822D1809EF568D0B9EDD0AF95F9F0A179FBE00DC7D69848981310DB8FF4B483"
+    },
+    {
+      "path": "volatiles/reopened/report.json",
+      "sha256": "6F0326C7ECD724A3A8298D60659D7EFC55A24F429CBB41442D9D6569DA8F6EC7"
+    },
+    {
+      "path": "volatiles/reopened/roundtrip-report.json",
+      "sha256": "9E6A2B24DD46D5BA3E7721F09E09A4A9525A07DC9BAE7A13A2F97FDC29A3067C"
+    },
+    {
+      "path": "volatiles/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "volatiles/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "volatiles/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "volatiles/reopened/baseline-source\\world\\materials\\resources\\volatiles.asset.json",
+      "sha256": "1B50A8FA911ACA3DF956C6192306814C2EE89953D362CAD2E23407DA69D72DA0"
+    },
+    {
+      "path": "volatiles/reopened/baseline-source\\world\\materials\\resources\\volatiles.material.json",
+      "sha256": "07DE636EA96BE3750685518AE2445A6FD01A04832FF3290B29E2E8DF9C03D55E"
+    },
+    {
+      "path": "volatiles/reopened/baseline-source\\world\\meshes\\resources\\volatiles_lod1.asset.json",
+      "sha256": "B2108DDFBDB696D61467921F3A5E8142B77CA72D26E5497C011B7A8CB9725664"
+    },
+    {
+      "path": "volatiles/reopened/baseline-source\\world\\meshes\\resources\\volatiles.asset.json",
+      "sha256": "7918D69D82D465C660609F7A61523AC3CCE4B60F6E942EF84BC18DB06CEDA99B"
+    },
+    {
+      "path": "volatiles/reopened/runs\\23164f4009ea4d2589c4ba4564b87b66\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "volatiles/reopened/runs\\23164f4009ea4d2589c4ba4564b87b66\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/reopened/runs\\23164f4009ea4d2589c4ba4564b87b66\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "volatiles/reopened/runs\\23164f4009ea4d2589c4ba4564b87b66\\report.json",
+      "sha256": "6F0326C7ECD724A3A8298D60659D7EFC55A24F429CBB41442D9D6569DA8F6EC7"
+    },
+    {
+      "path": "volatiles/reopened/runs\\23164f4009ea4d2589c4ba4564b87b66\\request.json",
+      "sha256": "D5F0FBD74C7D9D681F907B4D5378B0D7A7C28926E66B36744B536209B7824743"
+    },
+    {
+      "path": "volatiles/reopened/runs\\23164f4009ea4d2589c4ba4564b87b66\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/reopened/runs\\23164f4009ea4d2589c4ba4564b87b66\\script.stdout.log",
+      "sha256": "45C647AC6D0CE56C1E89B0A45A565329C388D8E3E8FDB409FAE339B7BA9E70DB"
+    },
+    {
+      "path": "volatiles/reopened/runs\\23164f4009ea4d2589c4ba4564b87b66\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/reopened/runs\\23164f4009ea4d2589c4ba4564b87b66\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "volatiles/reopened/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "volatiles/reopened/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "volatiles/reopened/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "volatiles/reopened/source\\world\\materials\\resources\\volatiles.asset.json",
+      "sha256": "1B50A8FA911ACA3DF956C6192306814C2EE89953D362CAD2E23407DA69D72DA0"
+    },
+    {
+      "path": "volatiles/reopened/source\\world\\materials\\resources\\volatiles.material.json",
+      "sha256": "07DE636EA96BE3750685518AE2445A6FD01A04832FF3290B29E2E8DF9C03D55E"
+    },
+    {
+      "path": "volatiles/reopened/source\\world\\meshes\\resources\\volatiles_lod1.asset.json",
+      "sha256": "84DEA02821FA61A0D101F7CC0F293A2FEAF647D90FB502BB2489E5161A9D91E1"
+    },
+    {
+      "path": "volatiles/reopened/source\\world\\meshes\\resources\\volatiles.asset.json",
+      "sha256": "50336A3D2685ECD380DBD64B5BC4D1400C59ED5B8254F05C0D1E8E805DEC18F3"
+    },
+    {
+      "path": "volatiles/reopened/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.volatiles_lod1.glb",
+      "sha256": "FA440AA6745ACA2C09F7FF083DBA4DB9434C3F440C1A106339409AA290091203"
+    },
+    {
+      "path": "volatiles/reopened/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.volatiles.glb",
+      "sha256": "8822D1809EF568D0B9EDD0AF95F9F0A179FBE00DC7D69848981310DB8FF4B483"
+    },
+    {
+      "path": "volatiles/native-contracts/native-contracts.json",
+      "sha256": "331509EE14E0A1EC3340C9F2A9F343D4500786814C5E52F610D28B79826C7307"
+    },
+    {
+      "path": "volatiles/native-contracts/report.json",
+      "sha256": "06520D4FEA3A1CF3BF6EF50FD0D4A19A0AC864DCD2154F858B2753F44B467052"
+    },
+    {
+      "path": "volatiles/native-contracts/runs\\24285a8cbf344fc1aa25c782bb790882\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "volatiles/native-contracts/runs\\24285a8cbf344fc1aa25c782bb790882\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/native-contracts/runs\\24285a8cbf344fc1aa25c782bb790882\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "volatiles/native-contracts/runs\\24285a8cbf344fc1aa25c782bb790882\\report.json",
+      "sha256": "06520D4FEA3A1CF3BF6EF50FD0D4A19A0AC864DCD2154F858B2753F44B467052"
+    },
+    {
+      "path": "volatiles/native-contracts/runs\\24285a8cbf344fc1aa25c782bb790882\\request.json",
+      "sha256": "6AE3CAA28309426827776C20EF2196BC0CE23036EDC9DB03ED68F5EC4C65D32D"
+    },
+    {
+      "path": "volatiles/native-contracts/runs\\24285a8cbf344fc1aa25c782bb790882\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/native-contracts/runs\\24285a8cbf344fc1aa25c782bb790882\\script.stdout.log",
+      "sha256": "CE3397BA2D8E6E92EA07F4043555B94E3E603BCD8AA8C937F3E1D05DBF607BBD"
+    },
+    {
+      "path": "volatiles/native-contracts/runs\\24285a8cbf344fc1aa25c782bb790882\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "volatiles/native-contracts/runs\\24285a8cbf344fc1aa25c782bb790882\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "rare_elements/first/authoring.blend",
+      "sha256": "CE04DFA0A5526D21E8990FF553DD6975AE720678895D44D2FC271B881A7BE112"
+    },
+    {
+      "path": "rare_elements/first/inspection.blend",
+      "sha256": "5C5616B91894E7BC938C4B6BF33903763AFC256A25D2AF29C3C2E08545AAEA00"
+    },
+    {
+      "path": "rare_elements/first/inspection.json",
+      "sha256": "B7840423D64D64CB39375CAC22203FC00D461C3A0DE608B2768147B0FC7E6B12"
+    },
+    {
+      "path": "rare_elements/first/report.json",
+      "sha256": "C5B1C777DF035D17307D718DF526CFD230D0EC8C2DDF86021A6F532698AE9783"
+    },
+    {
+      "path": "rare_elements/first/roundtrip-report.json",
+      "sha256": "CD060949DF956E17523FAFDCF649717A5191BDF32D90F1A32BDC3A1DE919FC64"
+    },
+    {
+      "path": "rare_elements/first/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "rare_elements/first/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "rare_elements/first/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "rare_elements/first/baseline-source\\world\\materials\\resources\\rare_elements.asset.json",
+      "sha256": "7EDC3121D50328AFE0E82667FB30FA3C579213BB9EDA6CC5B5B1A4F969C7560E"
+    },
+    {
+      "path": "rare_elements/first/baseline-source\\world\\materials\\resources\\rare_elements.material.json",
+      "sha256": "12A56ED3DDC625C083DCEAA290DB14278428197868A3CD4F3319B4A1BE4E98A7"
+    },
+    {
+      "path": "rare_elements/first/baseline-source\\world\\meshes\\resources\\rare_elements_lod1.asset.json",
+      "sha256": "C20657F3B363579AF76AB01C47591EE2C69CA330B9A4C60AF34E6732406AAA49"
+    },
+    {
+      "path": "rare_elements/first/baseline-source\\world\\meshes\\resources\\rare_elements.asset.json",
+      "sha256": "59216DD94A7261EDD94F9E15DE7F3D2FBDA207B1D4194935EC823000B62523B7"
+    },
+    {
+      "path": "rare_elements/first/runs\\6aad5049321c4b5caa96a65f889f253b\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "rare_elements/first/runs\\6aad5049321c4b5caa96a65f889f253b\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/first/runs\\6aad5049321c4b5caa96a65f889f253b\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "rare_elements/first/runs\\6aad5049321c4b5caa96a65f889f253b\\report.json",
+      "sha256": "C5B1C777DF035D17307D718DF526CFD230D0EC8C2DDF86021A6F532698AE9783"
+    },
+    {
+      "path": "rare_elements/first/runs\\6aad5049321c4b5caa96a65f889f253b\\request.json",
+      "sha256": "DC7A4ED8AEB13DEE7A415F304AB5B7E1E94D9DDB518C3E246463B644C349577D"
+    },
+    {
+      "path": "rare_elements/first/runs\\6aad5049321c4b5caa96a65f889f253b\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/first/runs\\6aad5049321c4b5caa96a65f889f253b\\script.stdout.log",
+      "sha256": "084741D12AC5A9E4C621B73113B7DC84A9F926633181C5208F485C1119E19F1F"
+    },
+    {
+      "path": "rare_elements/first/runs\\6aad5049321c4b5caa96a65f889f253b\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/first/runs\\6aad5049321c4b5caa96a65f889f253b\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "rare_elements/first/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "rare_elements/first/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "rare_elements/first/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "rare_elements/first/source\\world\\materials\\resources\\rare_elements.asset.json",
+      "sha256": "7EDC3121D50328AFE0E82667FB30FA3C579213BB9EDA6CC5B5B1A4F969C7560E"
+    },
+    {
+      "path": "rare_elements/first/source\\world\\materials\\resources\\rare_elements.material.json",
+      "sha256": "12A56ED3DDC625C083DCEAA290DB14278428197868A3CD4F3319B4A1BE4E98A7"
+    },
+    {
+      "path": "rare_elements/first/source\\world\\meshes\\resources\\rare_elements_lod1.asset.json",
+      "sha256": "707F15B44C3A401B06347F31EF67076FF2313ADA6B559B4E19AB40B415F6623C"
+    },
+    {
+      "path": "rare_elements/first/source\\world\\meshes\\resources\\rare_elements.asset.json",
+      "sha256": "651EE8614E13EF39D14F04A97C1268E8BCBC415EF5D4DE0F5C07E30BC4665632"
+    },
+    {
+      "path": "rare_elements/first/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.rare_elements_lod1.glb",
+      "sha256": "12AF2DED7385E891131A55A07F0D0EF0A28B1F1EB9822ABBB4E77620C800A11A"
+    },
+    {
+      "path": "rare_elements/first/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.rare_elements.glb",
+      "sha256": "96848C4F799438490760BA55CF4EFAB6ECA5BAFF262DDF4D297AA592DFEAE9BB"
+    },
+    {
+      "path": "rare_elements/second/authoring.blend",
+      "sha256": "41254E679DF5F534DFF98BD46B9914C8F1635983B2A503A4240D301EECCEF669"
+    },
+    {
+      "path": "rare_elements/second/report.json",
+      "sha256": "676F1DA58BEE2AE339FED93E6C0C4ACCF7E703E12AA4C3DA799C53AEA01EAB7C"
+    },
+    {
+      "path": "rare_elements/second/roundtrip-report.json",
+      "sha256": "CD060949DF956E17523FAFDCF649717A5191BDF32D90F1A32BDC3A1DE919FC64"
+    },
+    {
+      "path": "rare_elements/second/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "rare_elements/second/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "rare_elements/second/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "rare_elements/second/baseline-source\\world\\materials\\resources\\rare_elements.asset.json",
+      "sha256": "7EDC3121D50328AFE0E82667FB30FA3C579213BB9EDA6CC5B5B1A4F969C7560E"
+    },
+    {
+      "path": "rare_elements/second/baseline-source\\world\\materials\\resources\\rare_elements.material.json",
+      "sha256": "12A56ED3DDC625C083DCEAA290DB14278428197868A3CD4F3319B4A1BE4E98A7"
+    },
+    {
+      "path": "rare_elements/second/baseline-source\\world\\meshes\\resources\\rare_elements_lod1.asset.json",
+      "sha256": "C20657F3B363579AF76AB01C47591EE2C69CA330B9A4C60AF34E6732406AAA49"
+    },
+    {
+      "path": "rare_elements/second/baseline-source\\world\\meshes\\resources\\rare_elements.asset.json",
+      "sha256": "59216DD94A7261EDD94F9E15DE7F3D2FBDA207B1D4194935EC823000B62523B7"
+    },
+    {
+      "path": "rare_elements/second/runs\\a7c16b34db3f4645aa8edbc46247f507\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "rare_elements/second/runs\\a7c16b34db3f4645aa8edbc46247f507\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/second/runs\\a7c16b34db3f4645aa8edbc46247f507\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "rare_elements/second/runs\\a7c16b34db3f4645aa8edbc46247f507\\report.json",
+      "sha256": "676F1DA58BEE2AE339FED93E6C0C4ACCF7E703E12AA4C3DA799C53AEA01EAB7C"
+    },
+    {
+      "path": "rare_elements/second/runs\\a7c16b34db3f4645aa8edbc46247f507\\request.json",
+      "sha256": "E14758566F6F579F24BB56E7D17E4D751C6749B8572CB9DF7DB30503F171CB0B"
+    },
+    {
+      "path": "rare_elements/second/runs\\a7c16b34db3f4645aa8edbc46247f507\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/second/runs\\a7c16b34db3f4645aa8edbc46247f507\\script.stdout.log",
+      "sha256": "ECEC5F1950C97D8B159F9DA9211134F0DE409CAF8CE1471C95EEEA9A22329DCB"
+    },
+    {
+      "path": "rare_elements/second/runs\\a7c16b34db3f4645aa8edbc46247f507\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/second/runs\\a7c16b34db3f4645aa8edbc46247f507\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "rare_elements/second/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "rare_elements/second/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "rare_elements/second/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "rare_elements/second/source\\world\\materials\\resources\\rare_elements.asset.json",
+      "sha256": "7EDC3121D50328AFE0E82667FB30FA3C579213BB9EDA6CC5B5B1A4F969C7560E"
+    },
+    {
+      "path": "rare_elements/second/source\\world\\materials\\resources\\rare_elements.material.json",
+      "sha256": "12A56ED3DDC625C083DCEAA290DB14278428197868A3CD4F3319B4A1BE4E98A7"
+    },
+    {
+      "path": "rare_elements/second/source\\world\\meshes\\resources\\rare_elements_lod1.asset.json",
+      "sha256": "707F15B44C3A401B06347F31EF67076FF2313ADA6B559B4E19AB40B415F6623C"
+    },
+    {
+      "path": "rare_elements/second/source\\world\\meshes\\resources\\rare_elements.asset.json",
+      "sha256": "651EE8614E13EF39D14F04A97C1268E8BCBC415EF5D4DE0F5C07E30BC4665632"
+    },
+    {
+      "path": "rare_elements/second/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.rare_elements_lod1.glb",
+      "sha256": "12AF2DED7385E891131A55A07F0D0EF0A28B1F1EB9822ABBB4E77620C800A11A"
+    },
+    {
+      "path": "rare_elements/second/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.rare_elements.glb",
+      "sha256": "96848C4F799438490760BA55CF4EFAB6ECA5BAFF262DDF4D297AA592DFEAE9BB"
+    },
+    {
+      "path": "rare_elements/reopened/report.json",
+      "sha256": "82CD17AC1E15361F5A4697A1B37B967800316DDE207B0479CF4C803ED11AB2A2"
+    },
+    {
+      "path": "rare_elements/reopened/roundtrip-report.json",
+      "sha256": "4B5359F572AB92E1F158DED424CB446FEB5FECEDC56BEF0EEDA776EC7313021F"
+    },
+    {
+      "path": "rare_elements/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "rare_elements/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "rare_elements/reopened/baseline-source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "rare_elements/reopened/baseline-source\\world\\materials\\resources\\rare_elements.asset.json",
+      "sha256": "7EDC3121D50328AFE0E82667FB30FA3C579213BB9EDA6CC5B5B1A4F969C7560E"
+    },
+    {
+      "path": "rare_elements/reopened/baseline-source\\world\\materials\\resources\\rare_elements.material.json",
+      "sha256": "12A56ED3DDC625C083DCEAA290DB14278428197868A3CD4F3319B4A1BE4E98A7"
+    },
+    {
+      "path": "rare_elements/reopened/baseline-source\\world\\meshes\\resources\\rare_elements_lod1.asset.json",
+      "sha256": "C20657F3B363579AF76AB01C47591EE2C69CA330B9A4C60AF34E6732406AAA49"
+    },
+    {
+      "path": "rare_elements/reopened/baseline-source\\world\\meshes\\resources\\rare_elements.asset.json",
+      "sha256": "59216DD94A7261EDD94F9E15DE7F3D2FBDA207B1D4194935EC823000B62523B7"
+    },
+    {
+      "path": "rare_elements/reopened/runs\\61e1385e79a14872a499b6801fd67c52\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "rare_elements/reopened/runs\\61e1385e79a14872a499b6801fd67c52\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/reopened/runs\\61e1385e79a14872a499b6801fd67c52\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "rare_elements/reopened/runs\\61e1385e79a14872a499b6801fd67c52\\report.json",
+      "sha256": "82CD17AC1E15361F5A4697A1B37B967800316DDE207B0479CF4C803ED11AB2A2"
+    },
+    {
+      "path": "rare_elements/reopened/runs\\61e1385e79a14872a499b6801fd67c52\\request.json",
+      "sha256": "9AA42860FCE2C5C08F9765D66E6FDAAE3C2A6BE9F4708BF2C3C6045FE624A231"
+    },
+    {
+      "path": "rare_elements/reopened/runs\\61e1385e79a14872a499b6801fd67c52\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/reopened/runs\\61e1385e79a14872a499b6801fd67c52\\script.stdout.log",
+      "sha256": "D1C4821EC45FB73B6A0D8BA7BE7332648C2BE0537805069F9DD4FEAE0CCD82CA"
+    },
+    {
+      "path": "rare_elements/reopened/runs\\61e1385e79a14872a499b6801fd67c52\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/reopened/runs\\61e1385e79a14872a499b6801fd67c52\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    },
+    {
+      "path": "rare_elements/reopened/source\\materials\\directorate\\surfaces\\surface_atlas.asset.json",
+      "sha256": "43435878CAAB2E72988868412481C32D4FB70CD330E0E8D14303C66B6FEDF43C"
+    },
+    {
+      "path": "rare_elements/reopened/source\\materials\\directorate\\surfaces\\surface_normal.asset.json",
+      "sha256": "3376F123412607282EA351430076AA6AF54B5E1546DFB6B87A60DE211E4E51AE"
+    },
+    {
+      "path": "rare_elements/reopened/source\\materials\\directorate\\surfaces\\surface_orm.asset.json",
+      "sha256": "6930A01BDF3F2B46ACA2C9F905E8DE2A1CFACD967DA46B8A7913DB7C15DB2CF9"
+    },
+    {
+      "path": "rare_elements/reopened/source\\world\\materials\\resources\\rare_elements.asset.json",
+      "sha256": "7EDC3121D50328AFE0E82667FB30FA3C579213BB9EDA6CC5B5B1A4F969C7560E"
+    },
+    {
+      "path": "rare_elements/reopened/source\\world\\materials\\resources\\rare_elements.material.json",
+      "sha256": "12A56ED3DDC625C083DCEAA290DB14278428197868A3CD4F3319B4A1BE4E98A7"
+    },
+    {
+      "path": "rare_elements/reopened/source\\world\\meshes\\resources\\rare_elements_lod1.asset.json",
+      "sha256": "707F15B44C3A401B06347F31EF67076FF2313ADA6B559B4E19AB40B415F6623C"
+    },
+    {
+      "path": "rare_elements/reopened/source\\world\\meshes\\resources\\rare_elements.asset.json",
+      "sha256": "651EE8614E13EF39D14F04A97C1268E8BCBC415EF5D4DE0F5C07E30BC4665632"
+    },
+    {
+      "path": "rare_elements/reopened/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.rare_elements_lod1.glb",
+      "sha256": "12AF2DED7385E891131A55A07F0D0EF0A28B1F1EB9822ABBB4E77620C800A11A"
+    },
+    {
+      "path": "rare_elements/reopened/source\\world\\meshes\\resources\\_roundtrip\\mesh.world.resource.rare_elements.glb",
+      "sha256": "96848C4F799438490760BA55CF4EFAB6ECA5BAFF262DDF4D297AA592DFEAE9BB"
+    },
+    {
+      "path": "rare_elements/native-contracts/native-contracts.json",
+      "sha256": "3F1683B00A30114ED106003E531652EBB7C96BE6C11B65566C87B3AAA786A18D"
+    },
+    {
+      "path": "rare_elements/native-contracts/report.json",
+      "sha256": "AF178C0867E043457017ABB93633693A3CE2735AFB69F2103FA111A5F3D58E45"
+    },
+    {
+      "path": "rare_elements/native-contracts/runs\\fdc88b9917b04f95b6e21c6cc3acc245\\probe.json",
+      "sha256": "C3CE4625616606B901FCFB2B977818D41D82D63F59591286E794780D2B5E6E2F"
+    },
+    {
+      "path": "rare_elements/native-contracts/runs\\fdc88b9917b04f95b6e21c6cc3acc245\\probe.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/native-contracts/runs\\fdc88b9917b04f95b6e21c6cc3acc245\\probe.stdout.log",
+      "sha256": "97D86596EBB4B251766E918C0D9BF06A43700C9DD1A14119B4F72D7659133D0C"
+    },
+    {
+      "path": "rare_elements/native-contracts/runs\\fdc88b9917b04f95b6e21c6cc3acc245\\report.json",
+      "sha256": "AF178C0867E043457017ABB93633693A3CE2735AFB69F2103FA111A5F3D58E45"
+    },
+    {
+      "path": "rare_elements/native-contracts/runs\\fdc88b9917b04f95b6e21c6cc3acc245\\request.json",
+      "sha256": "8A5F2DDF10D5C82F4F40391C8111F1AC3E1610E612D403BB150AC5AA440D5DF1"
+    },
+    {
+      "path": "rare_elements/native-contracts/runs\\fdc88b9917b04f95b6e21c6cc3acc245\\script.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/native-contracts/runs\\fdc88b9917b04f95b6e21c6cc3acc245\\script.stdout.log",
+      "sha256": "9B53D8F7306F87040C32138B65005510A48492E35A7BA9F862B93B67011F55F4"
+    },
+    {
+      "path": "rare_elements/native-contracts/runs\\fdc88b9917b04f95b6e21c6cc3acc245\\version.stderr.log",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "rare_elements/native-contracts/runs\\fdc88b9917b04f95b6e21c6cc3acc245\\version.stdout.log",
+      "sha256": "A4FD0C844130585E6015428DEE33BA3613ADDD63B756C84445157A5E50D898E3"
+    }
+  ],
+  "origin": "../rd2"
+}

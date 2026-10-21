@@ -1,0 +1,53 @@
+{
+  "assetCount": 6,
+  "meshCount": 2,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7340096,
+  "meshRuntimeBytes": 12261,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1640,
+  "catalogLoadDuration": "00:00:00.0073763",
+  "assetReadDuration": "00:00:00.0646024",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "mesh.world.resource.rare_elements",
+      "type": "mesh",
+      "runtimeBytes": 7455
+    },
+    {
+      "assetId": "mesh.world.resource.rare_elements_lod1",
+      "type": "mesh",
+      "runtimeBytes": 4806
+    },
+    {
+      "assetId": "material.world.resource.rare_elements",
+      "type": "material",
+      "runtimeBytes": 1640
+    }
+  ],
+  "issues": [],
+  "success": true
+}
