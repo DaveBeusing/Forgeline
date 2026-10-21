@@ -1,0 +1,188 @@
+{
+  "success": true,
+  "masters": {
+    "roads": {
+      "sha256": "7c0fb7f5b6cef35dd6833874c743da64ffeafa287e0c238d7a14d6974b58e4bc",
+      "bytes": 17044208,
+      "sourceSignature": "d58497f7a834db37ff98492393497351a27aa4e7eafabd0919edc5e003a69325"
+    },
+    "bridge": {
+      "sha256": "83768a838faee5c8d48c206a433a671b40a118de68d822e71eb63f0688818821",
+      "bytes": 17034253,
+      "sourceSignature": "a3fcce8def525d5b0c57f9b5be9f8d0223c66389ea5d5a26e530cab1fc552a34"
+    },
+    "transitions": {
+      "sha256": "999e1ec8ba13bb8b250968dd7560336303ddadafc4101c103f63e5f504e20511",
+      "bytes": 17038384,
+      "sourceSignature": "390320908a4affc3f3dfa290c9561ba562b3bb275037c23b67a7d540f04572bf"
+    }
+  },
+  "canonicalEqualsActualBlenderExports": [
+    {
+      "id": "infrastructure.directorate.road.curve_long",
+      "sha256": "44c8bf53d7cd10233574c69b73e76a1bf062cb898bc2e34d4264ce4aa1afcc84"
+    },
+    {
+      "id": "infrastructure.directorate.road.curve_short",
+      "sha256": "a219d0a573ffb27672c7c081cd889c74e199f810c2809c0e5f7ccbe7423a5c8a"
+    },
+    {
+      "id": "infrastructure.directorate.road.damaged",
+      "sha256": "6c50d9dcdb929dcab57267ade1990e0d1cc5b8ce36477b90f5f38e0b81a64785"
+    },
+    {
+      "id": "infrastructure.directorate.road.destroyed",
+      "sha256": "2cff333675bc33a46835e2019e041401bb70505247b1b44f05a7dcfbb56acf64"
+    },
+    {
+      "id": "infrastructure.directorate.road.junction_cross",
+      "sha256": "d9a7ff82f22eb82c36165128a0af6c42561e9e7724fd2075a103ea791a6d552a"
+    },
+    {
+      "id": "infrastructure.directorate.road.junction_t",
+      "sha256": "b7a9577ecf503a246769309f259df5382e18d025d0905c80200aae129df6796e"
+    },
+    {
+      "id": "infrastructure.directorate.road.shoulder",
+      "sha256": "8287085e0eaa3773cb1ebfff6604f02831947b3bfb89e20d43f245cbd0fec6ee"
+    },
+    {
+      "id": "infrastructure.directorate.road.straight",
+      "sha256": "39453cd049c7dde4bae8c39b54a6785570855887b4ca728ac0916fb5edac0508"
+    },
+    {
+      "id": "infrastructure.directorate.road.yard_transition",
+      "sha256": "d69e0e29efe08d4053531c53f3191837f689803840c7dc133378ea14736432fb"
+    },
+    {
+      "id": "infrastructure.directorate.bridge.road.damaged",
+      "sha256": "9273dc54590761cf4e3bc9654f0b89c57ddfc6293d590bd9c0d36f0cf00db9cb"
+    },
+    {
+      "id": "infrastructure.directorate.bridge.road.destroyed",
+      "sha256": "9824d2e58a39cc7bf46cd8bce4a6fa27a4db7ea0df09a29ba8adc6a6f6d82d28"
+    },
+    {
+      "id": "infrastructure.directorate.bridge.road.intact",
+      "sha256": "f4198224105d0c2e28750ad8a850ebf17b97914b41304b298071425a46ab94e9"
+    },
+    {
+      "id": "mesh.world.prop.bridge_apron",
+      "sha256": "d7edd45caa599dc3d2f35111a06011705f5db7ce39dd4c2eafc63780ce89951a"
+    },
+    {
+      "id": "mesh.world.prop.bridge_apron_lod1",
+      "sha256": "8b059ae0f6b1afbe983fdb6bad9bcb68cb75a47aa25466d8e40a6fa5729ba5a8"
+    },
+    {
+      "id": "mesh.world.prop.loading_apron",
+      "sha256": "a309b10fd28f32b6f88a478e3aa2259866273e9ebd5154902e52cfcb2686bef3"
+    },
+    {
+      "id": "mesh.world.prop.loading_apron_lod1",
+      "sha256": "7756fc84b15d3997980c67aa8191c36c96539a6bd70c0ccc70f3967287d31817"
+    },
+    {
+      "id": "mesh.world.prop.road_edge",
+      "sha256": "c68423ed0849cbb66c8ecd5c936729c7b93d953480d60ff71b921a87349ec5c6"
+    },
+    {
+      "id": "mesh.world.prop.road_edge_lod1",
+      "sha256": "2c6403fbb99b258b270958a1dbc6cb89e2d19f28dd2e1b691887b49301856ef8"
+    }
+  ],
+  "changedImportContainers": [
+    {
+      "id": "infrastructure.directorate.bridge.road.damaged",
+      "oldBytes": 21916,
+      "newBytes": 21911
+    },
+    {
+      "id": "infrastructure.directorate.bridge.road.destroyed",
+      "oldBytes": 20626,
+      "newBytes": 20621
+    },
+    {
+      "id": "infrastructure.directorate.bridge.road.intact",
+      "oldBytes": 10141,
+      "newBytes": 10148
+    },
+    {
+      "id": "infrastructure.directorate.road.curve_long",
+      "oldBytes": 4971,
+      "newBytes": 4402
+    },
+    {
+      "id": "infrastructure.directorate.road.curve_short",
+      "oldBytes": 3679,
+      "newBytes": 3062
+    },
+    {
+      "id": "infrastructure.directorate.road.damaged",
+      "oldBytes": 11451,
+      "newBytes": 11446
+    },
+    {
+      "id": "infrastructure.directorate.road.destroyed",
+      "oldBytes": 10161,
+      "newBytes": 10156
+    },
+    {
+      "id": "infrastructure.directorate.road.junction_cross",
+      "oldBytes": 3661,
+      "newBytes": 3668
+    },
+    {
+      "id": "infrastructure.directorate.road.junction_t",
+      "oldBytes": 3650,
+      "newBytes": 3657
+    },
+    {
+      "id": "infrastructure.directorate.road.shoulder",
+      "oldBytes": 2377,
+      "newBytes": 2384
+    },
+    {
+      "id": "infrastructure.directorate.road.straight",
+      "oldBytes": 2347,
+      "newBytes": 2354
+    },
+    {
+      "id": "infrastructure.directorate.road.yard_transition",
+      "oldBytes": 3666,
+      "newBytes": 3673
+    },
+    {
+      "id": "mesh.world.prop.bridge_apron",
+      "oldBytes": 16690,
+      "newBytes": 16696
+    },
+    {
+      "id": "mesh.world.prop.bridge_apron_lod1",
+      "oldBytes": 4902,
+      "newBytes": 4910
+    },
+    {
+      "id": "mesh.world.prop.loading_apron",
+      "oldBytes": 19287,
+      "newBytes": 19293
+    },
+    {
+      "id": "mesh.world.prop.loading_apron_lod1",
+      "oldBytes": 4905,
+      "newBytes": 4913
+    },
+    {
+      "id": "mesh.world.prop.road_edge",
+      "oldBytes": 19315,
+      "newBytes": 19321
+    },
+    {
+      "id": "mesh.world.prop.road_edge_lod1",
+      "oldBytes": 3597,
+      "newBytes": 3605
+    }
+  ],
+  "containerByteDelta": -1122,
+  "typedGeometryAndBindingParity": "27 bindings; 17 unchanged meshes; 2 bounded continuous curves; passed"
+}

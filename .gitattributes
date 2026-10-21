@@ -70,3 +70,4 @@ tools/blender/fixtures/infrastructure*.json text eol=lf
 docs/qualification/infrastructure/*.json text eol=lf
 docs/qualification/infrastructure/*.json.gz binary
 docs/qualification/infrastructure/*.png binary
+docs/qualification/infrastructure/**/*.png binary
