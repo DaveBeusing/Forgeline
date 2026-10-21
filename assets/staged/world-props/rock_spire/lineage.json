@@ -1,0 +1,33 @@
+{
+  "blenderVersion": "5.2.2",
+  "exports": [
+    {
+      "definition": "world/meshes/kit/rock_spire.asset.json",
+      "id": "mesh.world.prop.rock_spire",
+      "sha256": "8ed033b3b6669b5b9fcf9c2407a3b01a96060a3ee174bc4e0dfebcda84018694"
+    },
+    {
+      "definition": "world/meshes/kit/rock_spire_lod1.asset.json",
+      "id": "mesh.world.prop.rock_spire_lod1",
+      "sha256": "ea6a61c0ca604d3cdd3082f6129d76899d3dfbeb5654725f0fda0a6fca6f5145"
+    }
+  ],
+  "fixtureSha256": "56da1a8e466046d0e7bbcb04683b960228f48f75cf98fa1ec22f9be8c8fca1a9",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "rock_spire.blend",
+      "sha256": "c1a004cc68bf323ab5243affe1c3881c2e67590a8af087b1342267c090a98552"
+    },
+    {
+      "path": "rock_spire_inspection.blend",
+      "sha256": "499a916f132036fc7301a3ab04f282effb2db0d82afff602e9458e96cad9702c"
+    }
+  ],
+  "physicalPerformance": "pending",
+  "schemaVersion": 1,
+  "signaturePolicy": "lf-json-v1",
+  "sourceSha": "09036b0261798a90e954adf840b74757384e2365",
+  "sourceSignature": "94d1b40166d2ed12e5d7ce385a4b599e5d3df24a2227701eaf250bac38d4d0f6",
+  "status": "review-bound-not-accepted"
+}

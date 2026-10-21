@@ -1,15 +1,15 @@
 {
   "id": "mesh.world.prop.industrial_light_signage",
-  "type": "mesh",
-  "source": "../sources/mesh_world_prop_industrial_light_signage_production.gltf",
+  "lods": [
+    {
+      "assetId": "mesh.world.prop.industrial_light_signage_lod1",
+      "level": 1,
+      "maxDistance": 320
+    }
+  ],
   "materialReferences": [
     "material.world.prop.industrial"
   ],
-  "lods": [
-    {
-      "level": 1,
-      "assetId": "mesh.world.prop.industrial_light_signage_lod1",
-      "maxDistance": 320
-    }
-  ]
+  "source": "../sources/blender/props/industrial_light_signage/high.glb",
+  "type": "mesh"
 }

@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "label": "gallery-sequence",
+  "sourceSha": "828984660fb60b32df6609c7b686828dfa0335d2",
+  "warmups": 3,
+  "samplesPerSide": 64,
+  "repeatCaptures": 2,
+  "originalImagesVerified": 18,
+  "sameClientAndHardware": true,
+  "comparedFrameFields": [
+    "totalInstances",
+    "visibleInstances",
+    "culledInstances",
+    "drawCalls",
+    "highLodInstances",
+    "reducedLodInstances",
+    "runtimeMeshInstances",
+    "texturedRuntimeMeshInstances",
+    "fallbackMeshInstances"
+  ],
+  "frameDifferences": [],
+  "visibleRange": [
+    0,
+    22
+  ],
+  "highLodRange": [
+    0,
+    3
+  ],
+  "reducedLodRange": [
+    0,
+    19
+  ],
+  "maximumBindingFailures": 0,
+  "maximumSubmissionFaults": 0,
+  "files": [
+    {
+      "file": "gallery-sequence-before.json",
+      "originalArtifact": "artifacts/pseq2/before/manifest.json",
+      "sha256": "6a7f328a75b10b240808671ce02534e96bb4fc254939f980d3fa6bee58a8656d"
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/before/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse.png",
+      "sha256": "cc195a263caa11d27e8d78e8e75f5035bd265afc53528d16b50b1d47df2722ee",
+      "bytes": 8910343,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/before/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-00.png",
+      "sha256": "cc195a263caa11d27e8d78e8e75f5035bd265afc53528d16b50b1d47df2722ee",
+      "bytes": 8910343,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/before/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-01.png",
+      "sha256": "51942d14f0ae7cb3aa587af7d2b134699c2b127a5fd730b7ee74b3f778483f29",
+      "bytes": 8918056,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/before/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-02.png",
+      "sha256": "80007ff9bec853624ec9ed59c5d9ef4cb064743afe3dcbc0e25efdc95ff5711a",
+      "bytes": 8925624,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/before/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-03.png",
+      "sha256": "43db047fb4d2b6114c59f52493478891af43ab2dedecbc3b4c7ef5bb0fda3268",
+      "bytes": 8928420,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/before/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-04.png",
+      "sha256": "18753c0eeb96d156f5453b713693c9700f90afe21969f50b45d2876b353ac45f",
+      "bytes": 8930030,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/before/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-05.png",
+      "sha256": "017abbc377bc7f42b6dbe8086af141bae491c54987815bfcc281a1f452862e70",
+      "bytes": 8934546,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/before/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-06.png",
+      "sha256": "9a410c53f13d52d32f2956429a392ad5e0ac4eb117fb3a08ae348992b8b38994",
+      "bytes": 8937247,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/before/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-07.png",
+      "sha256": "caf6141ab629c1ab27b8fa248785f343b4b119cbc3a040a3619318e41e4c40e0",
+      "bytes": 8939184,
+      "retained": "gallery-sequence-before-last-pose.png"
+    },
+    {
+      "file": "gallery-sequence-after.json",
+      "originalArtifact": "artifacts/pseq2/after/manifest.json",
+      "sha256": "fee53a490005775aedef73dc1a584f69849c7f264ac13eb989723e74003b9977"
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/after/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse.png",
+      "sha256": "948ad8382624d94924da34289e13d40abedda7ec8f23b26b508006883e973958",
+      "bytes": 8910240,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/after/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-00.png",
+      "sha256": "948ad8382624d94924da34289e13d40abedda7ec8f23b26b508006883e973958",
+      "bytes": 8910240,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/after/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-01.png",
+      "sha256": "5de13ca354fba93090de191aca87b264f73fd06dd924cf96a7db58230128a8c2",
+      "bytes": 8918344,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/after/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-02.png",
+      "sha256": "cbc4e127840ad4082b84337b04662d33e8f6b928a98a27283fcec83939fe8f9a",
+      "bytes": 8926083,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/after/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-03.png",
+      "sha256": "3cb2c0e1aafc4cdb9e0639aaef4a2aac315d322a43936c0621a0e899ad9b2c92",
+      "bytes": 8928461,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/after/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-04.png",
+      "sha256": "3a309af7885bd01295a98160acee56f5e3b3ac03b35ee81916f79d5d6bd41b7e",
+      "bytes": 8930162,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/after/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-05.png",
+      "sha256": "f6560785595042145d836d8c4c036f1b649e5aea250afa822ace98d91ea92dd8",
+      "bytes": 8933936,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/after/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-06.png",
+      "sha256": "5c9bff0a7437e3b19a3d07dbc71c3a9938893056598f1d33223a4237dd14d9a3",
+      "bytes": 8937233,
+      "retained": null
+    },
+    {
+      "originalArtifact": "artifacts/pseq2/after/WorldPropsGallery-2560x1440-Medium-NormalGameplay-Traverse-motion-07.png",
+      "sha256": "620f93048f2db90b4e390e326691d1d563127a132cee9c7e47d0db5b56e302e6",
+      "bytes": 8939670,
+      "retained": "gallery-sequence-after-last-pose.png"
+    }
+  ],
+  "physicalPerformanceAcceptance": "pending",
+  "movingLodHumanAcceptance": "pending",
+  "liveGameplayRoutes": "pending",
+  "note": "Scripted camera traversal over immutable prop snapshots. Adjacent pose readbacks, where present, are not a judder or sustained FPS measurement."
+}

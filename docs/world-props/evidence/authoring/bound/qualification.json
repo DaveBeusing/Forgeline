@@ -1,0 +1,13 @@
+{
+  "parallelFamilies": 3,
+  "physicalPerformance": "pending",
+  "deterministicSourceAndRuntime": true,
+  "canonicalSourcesUnchanged": true,
+  "humanArtApproval": "pending",
+  "schemaVersion": 1,
+  "productionPromotion": "blocked-pending-render-qualification",
+  "sourceLessIntegrity": true,
+  "typedCompiledComparison": true,
+  "success": true,
+  "sourceSha": "09036b0261798a90e954adf840b74757384e2365"
+}

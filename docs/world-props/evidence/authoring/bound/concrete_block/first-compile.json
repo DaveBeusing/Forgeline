@@ -1,0 +1,53 @@
+{
+  "assetCount": 6,
+  "meshCount": 2,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7336438,
+  "meshRuntimeBytes": 8631,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1612,
+  "catalogLoadDuration": "00:00:00.0128026",
+  "assetReadDuration": "00:00:00.1349648",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "mesh.world.prop.concrete_block",
+      "type": "mesh",
+      "runtimeBytes": 6310
+    },
+    {
+      "assetId": "mesh.world.prop.concrete_block_lod1",
+      "type": "mesh",
+      "runtimeBytes": 2321
+    },
+    {
+      "assetId": "material.world.prop.industrial",
+      "type": "material",
+      "runtimeBytes": 1612
+    }
+  ],
+  "issues": [],
+  "success": true
+}

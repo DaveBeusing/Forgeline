@@ -1,0 +1,23 @@
+{
+  "samples": 8,
+  "schemaVersion": 1,
+  "warmups": 3,
+  "performanceAcceptance": "pending-controlled-physical-measurements",
+  "sourceSha": "828984660fb60b32df6609c7b686828dfa0335d2",
+  "repeatCaptures": 2,
+  "movingLodAndLiveRoutes": "pending",
+  "humanArtApproval": "pending",
+  "functionalCommandsCompleted": true,
+  "integrationBase": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "version": "0.1.438",
+  "captureCount": 96,
+  "verifiedMotionImageCount": 0,
+  "retainedOriginalImageCount": 10,
+  "pairCount": 48,
+  "sameClientAcrossPairs": true,
+  "zeroRepeatMismatches": true,
+  "maximumFallbackMeshes": 0,
+  "maximumBindingFailures": 0,
+  "maximumSubmissionFaults": 0,
+  "backgroundActivity": "Other local validation and unrelated work may run concurrently. Functional observations only; timing is not performance acceptance."
+}

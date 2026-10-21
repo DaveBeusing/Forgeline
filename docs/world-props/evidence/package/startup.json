@@ -1,0 +1,93 @@
+{
+  "measuredAtUtc": "2026-10-21T18:27:57.7154860+00:00",
+  "cpu": [
+    {
+      "Name": "Intel(R) Core(TM) Ultra 9 285HX",
+      "NumberOfCores": 24,
+      "NumberOfLogicalProcessors": 24
+    }
+  ],
+  "graphics": [
+    {
+      "Name": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+      "DriverVersion": "32.0.15.9653"
+    },
+    {
+      "Name": "Intel(R) Graphics",
+      "DriverVersion": "32.0.101.8724"
+    }
+  ],
+  "cacheCondition": "Warm repetitions after one excluded warmup; no cache eviction or reboot",
+  "requiresApplicationIcons": true,
+  "includesStudioIntro": false,
+  "baselineExitHook": false,
+  "observations": [
+    {
+      "sample": 0,
+      "warmup": true,
+      "launchToWindowObservationMs": 13931.2844,
+      "launchToExitMs": 16943.2784,
+      "nativeIconChecks": 162,
+      "nativeIconProbeMisses": 1,
+      "phases": {
+        "MainMenuInteractive": 13694.4455,
+        "RuntimeAssetsReady": 12100.3285,
+        "StudioSplashFirstFrame": null,
+        "GraphicsReady": 13545.9496,
+        "FirstPresentedFrame": 13644.4733,
+        "NativeBootstrapFirstFrame": 11245.8718,
+        "WindowVisible": 11245.7644
+      },
+      "report": "artifacts/props-installed-startup/launch-0.json",
+      "originalReportSha256": "663d05b6e1fdb4e86176a0dd6cb3b9624bcad384fe85ec8fd789b111eef716b8",
+      "applicationReadiness": "Ready",
+      "sessionReadiness": "NotRequested",
+      "droppedEvents": 0
+    },
+    {
+      "sample": 1,
+      "warmup": false,
+      "launchToWindowObservationMs": 919.6601,
+      "launchToExitMs": 9227.6954,
+      "nativeIconChecks": 308,
+      "nativeIconProbeMisses": 7,
+      "phases": {
+        "MainMenuInteractive": 8260.7391,
+        "RuntimeAssetsReady": 4773.8491,
+        "StudioSplashFirstFrame": null,
+        "GraphicsReady": 8099.5538,
+        "FirstPresentedFrame": 8212.347,
+        "NativeBootstrapFirstFrame": 447.5899,
+        "WindowVisible": 447.3156
+      },
+      "report": "artifacts/props-installed-startup/launch-1.json",
+      "originalReportSha256": "fd1155a94e22ee667440d0b2ac96f014087124bfba52bb14ffdf19ab4230e6e1",
+      "applicationReadiness": "Ready",
+      "sessionReadiness": "NotRequested",
+      "droppedEvents": 0
+    },
+    {
+      "sample": 2,
+      "warmup": false,
+      "launchToWindowObservationMs": 703.0538,
+      "launchToExitMs": 3228.9221,
+      "nativeIconChecks": 137,
+      "nativeIconProbeMisses": 1,
+      "phases": {
+        "MainMenuInteractive": 2399.149,
+        "RuntimeAssetsReady": 1119.2097,
+        "StudioSplashFirstFrame": null,
+        "GraphicsReady": 2248.0724,
+        "FirstPresentedFrame": 2353.6985,
+        "NativeBootstrapFirstFrame": 307.2116,
+        "WindowVisible": 307.0042
+      },
+      "report": "artifacts/props-installed-startup/launch-2.json",
+      "originalReportSha256": "1892934ee2662c0896f7c825b9215ebd47088f78664ff75ea02f3d22cd7f9c26",
+      "applicationReadiness": "Ready",
+      "sessionReadiness": "NotRequested",
+      "droppedEvents": 0
+    }
+  ],
+  "originalReportSha256": "71c119fb43e4da94dfc8e6da307f963128f5ac66c2a0099174a680c368296870"
+}

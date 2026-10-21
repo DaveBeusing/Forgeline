@@ -1,0 +1,53 @@
+{
+  "assetCount": 6,
+  "meshCount": 2,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7336552,
+  "meshRuntimeBytes": 8745,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1612,
+  "catalogLoadDuration": "00:00:00.0131719",
+  "assetReadDuration": "00:00:00.1042682",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "mesh.world.prop.industrial_light_signage",
+      "type": "mesh",
+      "runtimeBytes": 6402
+    },
+    {
+      "assetId": "mesh.world.prop.industrial_light_signage_lod1",
+      "type": "mesh",
+      "runtimeBytes": 2343
+    },
+    {
+      "assetId": "material.world.prop.industrial",
+      "type": "material",
+      "runtimeBytes": 1612
+    }
+  ],
+  "issues": [],
+  "success": true
+}

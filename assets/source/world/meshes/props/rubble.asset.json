@@ -1,15 +1,15 @@
 {
   "id": "mesh.world.prop.rubble",
-  "type": "mesh",
-  "source": "../sources/battlefield/rubble_lod0.gltf",
+  "lods": [
+    {
+      "assetId": "mesh.world.prop.rubble_lod1",
+      "level": 1,
+      "maxDistance": 220
+    }
+  ],
   "materialReferences": [
     "material.world.prop.industrial"
   ],
-  "lods": [
-    {
-      "level": 1,
-      "assetId": "mesh.world.prop.rubble_lod1",
-      "maxDistance": 220
-    }
-  ]
+  "source": "../sources/blender/props/rubble/high.glb",
+  "type": "mesh"
 }

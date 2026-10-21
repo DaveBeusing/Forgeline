@@ -1,8 +1,8 @@
 {
   "id": "mesh.world.prop.bridge_apron_lod1",
-  "type": "mesh",
-  "source": "../sources/environment_kit/bridge_apron_reduced.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
-  ]
+  ],
+  "source": "../sources/blender/props/bridge_apron/reduced.glb",
+  "type": "mesh"
 }

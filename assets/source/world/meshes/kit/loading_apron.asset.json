@@ -1,17 +1,17 @@
 {
+  "collisionReference": "mesh.world.kit.collision_centered",
+  "collisionRequired": true,
   "id": "mesh.world.prop.loading_apron",
-  "type": "mesh",
-  "source": "../sources/environment_kit/loading_apron_high.gltf",
-  "materialReferences": [
-    "material.world.prop.industrial"
-  ],
   "lods": [
     {
-      "level": 1,
       "assetId": "mesh.world.prop.loading_apron_lod1",
+      "level": 1,
       "maxDistance": 260
     }
   ],
-  "collisionReference": "mesh.world.kit.collision_centered",
-  "collisionRequired": true
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "source": "../sources/blender/props/loading_apron/high.glb",
+  "type": "mesh"
 }

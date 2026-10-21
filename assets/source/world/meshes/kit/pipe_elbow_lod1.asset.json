@@ -1,8 +1,8 @@
 {
   "id": "mesh.world.prop.pipe_elbow_lod1",
-  "type": "mesh",
-  "source": "../sources/environment_kit/pipe_elbow_reduced.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
-  ]
+  ],
+  "source": "../sources/blender/props/pipe_elbow/reduced.glb",
+  "type": "mesh"
 }

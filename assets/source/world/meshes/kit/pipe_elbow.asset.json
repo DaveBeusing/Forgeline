@@ -1,17 +1,17 @@
 {
+  "collisionReference": "mesh.world.kit.collision_centered",
+  "collisionRequired": true,
   "id": "mesh.world.prop.pipe_elbow",
-  "type": "mesh",
-  "source": "../sources/environment_kit/pipe_elbow_high.gltf",
-  "materialReferences": [
-    "material.world.prop.industrial"
-  ],
   "lods": [
     {
-      "level": 1,
       "assetId": "mesh.world.prop.pipe_elbow_lod1",
+      "level": 1,
       "maxDistance": 240
     }
   ],
-  "collisionReference": "mesh.world.kit.collision_centered",
-  "collisionRequired": true
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "source": "../sources/blender/props/pipe_elbow/high.glb",
+  "type": "mesh"
 }

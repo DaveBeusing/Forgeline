@@ -1,8 +1,8 @@
 {
   "id": "mesh.world.prop.drum_lod1",
-  "type": "mesh",
-  "source": "../sources/mesh_world_prop_drum_lod1.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
-  ]
+  ],
+  "source": "../sources/blender/props/drum/reduced.glb",
+  "type": "mesh"
 }

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "action": "Script",
+  "success": true,
+  "toolchain": {
+    "executable": "Blender 5.2/blender.exe",
+    "executableSha256": "f141a3c5754500e6f84361099a4cd53f0bb7662b6a0d2cfaaa8fbb63e92234a0",
+    "capabilities": {
+      "background": true,
+      "bpy": true,
+      "buildHash": "d13f752e3b9c",
+      "machine": "AMD64",
+      "pointerBits": 64,
+      "pythonVersion": "3.13.13",
+      "schemaVersion": 1,
+      "system": "Windows",
+      "version": "5.2.2",
+      "versionCycle": "release"
+    }
+  },
+  "error": null,
+  "originalReportSha256": "11673f7b8d8891e8620a9dd2d4d7c8958fb04a77e11a40faa696b4c4b632276f"
+}

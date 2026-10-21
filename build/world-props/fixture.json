@@ -1,0 +1,401 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "mesh.world.prop.barrier",
+      "assets": [
+        "mesh.world.prop.barrier",
+        "mesh.world.prop.barrier_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.barrier_module",
+      "assets": [
+        "mesh.world.prop.barrier_module",
+        "mesh.world.prop.barrier_module_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.bridge_apron",
+      "assets": [
+        "mesh.world.prop.bridge_apron",
+        "mesh.world.prop.bridge_apron_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.burst_pipe",
+      "assets": [
+        "mesh.world.prop.burst_pipe",
+        "mesh.world.prop.burst_pipe_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.concrete_block",
+      "assets": [
+        "mesh.world.prop.concrete_block",
+        "mesh.world.prop.concrete_block_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.crate",
+      "assets": [
+        "mesh.world.prop.crate",
+        "mesh.world.prop.crate_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.drum",
+      "assets": [
+        "mesh.world.prop.drum",
+        "mesh.world.prop.drum_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.fence",
+      "assets": [
+        "mesh.world.prop.fence",
+        "mesh.world.prop.fence_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.industrial_light_signage",
+      "assets": [
+        "mesh.world.prop.industrial_light_signage",
+        "mesh.world.prop.industrial_light_signage_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.loading_apron",
+      "assets": [
+        "mesh.world.prop.loading_apron",
+        "mesh.world.prop.loading_apron_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.loading_gantry",
+      "assets": [
+        "mesh.world.prop.loading_gantry",
+        "mesh.world.prop.loading_gantry_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.pallet",
+      "assets": [
+        "mesh.world.prop.pallet",
+        "mesh.world.prop.pallet_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.pipe_elbow",
+      "assets": [
+        "mesh.world.prop.pipe_elbow",
+        "mesh.world.prop.pipe_elbow_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.pipe_section",
+      "assets": [
+        "mesh.world.prop.pipe_section",
+        "mesh.world.prop.pipe_section_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.road_edge",
+      "assets": [
+        "mesh.world.prop.road_edge",
+        "mesh.world.prop.road_edge_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.rock",
+      "assets": [
+        "mesh.world.prop.rock",
+        "mesh.world.prop.rock_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.rock_slab",
+      "assets": [
+        "mesh.world.prop.rock_slab",
+        "mesh.world.prop.rock_slab_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.rock_spire",
+      "assets": [
+        "mesh.world.prop.rock_spire",
+        "mesh.world.prop.rock_spire_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.rubble",
+      "assets": [
+        "mesh.world.prop.rubble",
+        "mesh.world.prop.rubble_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.scorched_barrier",
+      "assets": [
+        "mesh.world.prop.scorched_barrier",
+        "mesh.world.prop.scorched_barrier_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.service_fence",
+      "assets": [
+        "mesh.world.prop.service_fence",
+        "mesh.world.prop.service_fence_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "mesh.world.prop.utility_box",
+      "assets": [
+        "mesh.world.prop.utility_box",
+        "mesh.world.prop.utility_box_lod1"
+      ],
+      "instanceScale": [
+        3,
+        1.2,
+        2
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 {
   "id": "mesh.world.prop.barrier_lod1",
-  "type": "mesh",
-  "source": "../sources/mesh_world_prop_barrier_lod1.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
-  ]
+  ],
+  "source": "../sources/blender/props/barrier/reduced.glb",
+  "type": "mesh"
 }

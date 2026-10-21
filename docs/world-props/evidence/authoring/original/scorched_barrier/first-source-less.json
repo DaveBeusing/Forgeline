@@ -1,0 +1,58 @@
+{
+  "assetCount": 7,
+  "meshCount": 3,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7356890,
+  "meshRuntimeBytes": 29083,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1612,
+  "catalogLoadDuration": "00:00:00.5245027",
+  "assetReadDuration": "00:00:00.1580467",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "mesh.world.prop.scorched_barrier",
+      "type": "mesh",
+      "runtimeBytes": 19988
+    },
+    {
+      "assetId": "mesh.world.prop.scorched_barrier_lod1",
+      "type": "mesh",
+      "runtimeBytes": 6897
+    },
+    {
+      "assetId": "mesh.world.kit.collision_centered",
+      "type": "mesh",
+      "runtimeBytes": 2198
+    },
+    {
+      "assetId": "material.world.prop.industrial",
+      "type": "material",
+      "runtimeBytes": 1612
+    }
+  ],
+  "issues": [],
+  "success": true
+}

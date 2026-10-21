@@ -1,0 +1,33 @@
+{
+  "blenderVersion": "5.2.2",
+  "exports": [
+    {
+      "definition": "world/meshes/kit/road_edge.asset.json",
+      "id": "mesh.world.prop.road_edge",
+      "sha256": "494f43ab913ef94f40da0d76139f3c0720fd0501ad82ffe2482b8af853d67524"
+    },
+    {
+      "definition": "world/meshes/kit/road_edge_lod1.asset.json",
+      "id": "mesh.world.prop.road_edge_lod1",
+      "sha256": "495015c567bc0b273e27ce969f8c6c72b58acbf3c3c58a03d224755343e83ab0"
+    }
+  ],
+  "fixtureSha256": "56da1a8e466046d0e7bbcb04683b960228f48f75cf98fa1ec22f9be8c8fca1a9",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "road_edge.blend",
+      "sha256": "08eafa418cebc47b6f5a247a437c6a281fde933f57d6b4ebb33173af0e1949a3"
+    },
+    {
+      "path": "road_edge_inspection.blend",
+      "sha256": "321665102e14e0e237aa5529c19d741a5849eca0e086a7a82e545df056a54b15"
+    }
+  ],
+  "physicalPerformance": "pending",
+  "schemaVersion": 1,
+  "signaturePolicy": "lf-json-v1",
+  "sourceSha": "09036b0261798a90e954adf840b74757384e2365",
+  "sourceSignature": "43a6b9d886366ddde206997776195ccdf1da4a7f8cc79b05e5aef394cace6fcc",
+  "status": "review-bound-not-accepted"
+}

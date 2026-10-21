@@ -1,0 +1,36 @@
+{
+  "blenderVersion": "5.2.2 LTS",
+  "families": [
+    "barrier",
+    "barrier_module",
+    "bridge_apron",
+    "burst_pipe",
+    "concrete_block",
+    "crate",
+    "drum",
+    "fence",
+    "industrial_light_signage",
+    "loading_apron",
+    "loading_gantry",
+    "pallet",
+    "pipe_elbow",
+    "pipe_section",
+    "road_edge",
+    "rock",
+    "rock_slab",
+    "rock_spire",
+    "rubble",
+    "scorched_barrier",
+    "service_fence",
+    "utility_box"
+  ],
+  "freshFactoryScenePerImport": true,
+  "schemaVersion": 1,
+  "scripts": {
+    "author.py": "dbca6e4837c6762d430ea2a5677ecf98cba7aee2ca4f2325ae37b55e5a2c3846",
+    "author_batch.py": "ebd4d6165ac58cd6a75b86679d9145f54cb0afce269a62e1bbd9b2cc1138ebd2",
+    "native_contract.py": "04cf61aa21041c3c74f9c952ca20e0af2c0d64ddffd9e9c3a777542ad9ff705e",
+    "prop_contract.py": "0d604e621336413ff724f3d01bf387e7a9618e522ef0bf1e2360673e7f557bfa"
+  },
+  "success": true
+}

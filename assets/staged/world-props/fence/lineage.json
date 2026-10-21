@@ -1,0 +1,33 @@
+{
+  "blenderVersion": "5.2.2",
+  "exports": [
+    {
+      "definition": "world/meshes/props/fence.asset.json",
+      "id": "mesh.world.prop.fence",
+      "sha256": "542c89154dae0067aee7f43dca080a8f2f30b7537bc03b9ed231bc8379f26f3a"
+    },
+    {
+      "definition": "world/meshes/props/fence_lod1.asset.json",
+      "id": "mesh.world.prop.fence_lod1",
+      "sha256": "67ed45aeec87a4a23c84f215c7a85f89f3bfd94fe144672d3b5919a315488ebc"
+    }
+  ],
+  "fixtureSha256": "56da1a8e466046d0e7bbcb04683b960228f48f75cf98fa1ec22f9be8c8fca1a9",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "fence.blend",
+      "sha256": "a6b8345af0fd766a6184803b762f8d10cd6e4f1375d5fba8715c42ddc3982ca9"
+    },
+    {
+      "path": "fence_inspection.blend",
+      "sha256": "527ae230a675eb71046a1e5a7b2ba9bb096919315ce6c6d94f2f035bdfa8ef94"
+    }
+  ],
+  "physicalPerformance": "pending",
+  "schemaVersion": 1,
+  "signaturePolicy": "lf-json-v1",
+  "sourceSha": "09036b0261798a90e954adf840b74757384e2365",
+  "sourceSignature": "9c8e4b6d4b61e36520426b4b36e75f4d0973e6a803952d04a8139102ac566489",
+  "status": "review-bound-not-accepted"
+}

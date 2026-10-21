@@ -1,17 +1,17 @@
 {
+  "collisionReference": "mesh.world.kit.collision_centered",
+  "collisionRequired": true,
   "id": "mesh.world.prop.road_edge",
-  "type": "mesh",
-  "source": "../sources/environment_kit/road_edge_high.gltf",
-  "materialReferences": [
-    "material.world.prop.industrial"
-  ],
   "lods": [
     {
-      "level": 1,
       "assetId": "mesh.world.prop.road_edge_lod1",
+      "level": 1,
       "maxDistance": 240
     }
   ],
-  "collisionReference": "mesh.world.kit.collision_centered",
-  "collisionRequired": true
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "source": "../sources/blender/props/road_edge/high.glb",
+  "type": "mesh"
 }

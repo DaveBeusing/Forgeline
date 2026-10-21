@@ -1,0 +1,33 @@
+{
+  "blenderVersion": "5.2.2",
+  "exports": [
+    {
+      "definition": "world/meshes/props/concrete_block.asset.json",
+      "id": "mesh.world.prop.concrete_block",
+      "sha256": "893eed9c2f0195e3c778d0597350d63d62ee499917cb693d1a018960837d5f79"
+    },
+    {
+      "definition": "world/meshes/props/concrete_block_lod1.asset.json",
+      "id": "mesh.world.prop.concrete_block_lod1",
+      "sha256": "33441f94443de012415c8ac75b19605a57331d71e8ebafb30fd5a5e7069ea505"
+    }
+  ],
+  "fixtureSha256": "56da1a8e466046d0e7bbcb04683b960228f48f75cf98fa1ec22f9be8c8fca1a9",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "concrete_block.blend",
+      "sha256": "f56054912e9ffb2912811d5f4273347cb477690a3d887c8e9a0badf365d7a63d"
+    },
+    {
+      "path": "concrete_block_inspection.blend",
+      "sha256": "3fee147d2d8f7c31893f174ced062e9d2d77ef8479e3278c23cbf521274f88c6"
+    }
+  ],
+  "physicalPerformance": "pending",
+  "schemaVersion": 1,
+  "signaturePolicy": "lf-json-v1",
+  "sourceSha": "09036b0261798a90e954adf840b74757384e2365",
+  "sourceSignature": "56c4c3d4be543d87334f382ac368e7c4a355dbbd44b300a2701b6cca7d5e66c3",
+  "status": "review-bound-not-accepted"
+}

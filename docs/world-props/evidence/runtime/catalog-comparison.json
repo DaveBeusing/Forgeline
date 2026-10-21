@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "success": true,
+  "assetCount": 1363,
+  "scopedVisualMeshes": 44,
+  "manifestSha256": [
+    "d50b0ef2758545a3620db07eb17e639aafab2ded18a7152b3d95e54da6db8faa",
+    "29cda573c0f340ea9ba2589a8315cfe7f3ef5ba6bd51dd176ade5a2b780b65b6"
+  ],
+  "changedRecords": [
+    {
+      "id": "mesh.world.prop.barrier",
+      "baselineHash": "5e261b73342c77bc4070441f2eb020fff61233a991881a87d894f468b2f1fd8c",
+      "candidateHash": "4203fab4e5b96bf3637d92e4aa6fc601272e673e9cd41c33c99e47329f1ffdba",
+      "baselineBytes": 6278,
+      "candidateBytes": 6269
+    },
+    {
+      "id": "mesh.world.prop.barrier_lod1",
+      "baselineHash": "9ddd767b4ec8c4b6bc31372c17100f3ed689cd201cdfc63d5098248806aab82c",
+      "candidateHash": "2e60d71a62c47f2ef60594beaaf7d885fc77908c27a8272e8db2df2214e25386",
+      "baselineBytes": 2292,
+      "candidateBytes": 2292
+    },
+    {
+      "id": "mesh.world.prop.barrier_module",
+      "baselineHash": "3204aa3198251d53601b39e1bb633586c78e3f17839ba5db878569fbbab29477",
+      "candidateHash": "57e74540b220c5d06ee6b31d7190b964cd34842fb4a0a96615889a9e2af1ede7",
+      "baselineBytes": 27068,
+      "candidateBytes": 27065
+    },
+    {
+      "id": "mesh.world.prop.barrier_module_lod1",
+      "baselineHash": "eaa121fb7f3a3ea3abe43f7c05a743df250d89054da5f2a44f3a06549bfbce44",
+      "candidateHash": "869c363192584c4802208f3e37d73f479ecc08ba1812dc73c54bd26c5ef43112",
+      "baselineBytes": 3612,
+      "candidateBytes": 3609
+    },
+    {
+      "id": "mesh.world.prop.bridge_apron",
+      "baselineHash": "2003716ad5a19fa411453a8028c301c30462c15241de2deaca9acdabf02b161c",
+      "candidateHash": "675713ba62f400ba80bc8b624d659c43aca5003d80d6c2491d10b5ed73c9fd14",
+      "baselineBytes": 16690,
+      "candidateBytes": 16687
+    },
+    {
+      "id": "mesh.world.prop.bridge_apron_lod1",
+      "baselineHash": "8feff50865814f167e60e5ed1a83269f63e658a9319b02658e07773a4e267a79",
+      "candidateHash": "181ac7ccc7724a19270c08ffbb965bf3513c9f48307f9e247a0f3f116cc4f9ef",
+      "baselineBytes": 4902,
+      "candidateBytes": 4899
+    },
+    {
+      "id": "mesh.world.prop.burst_pipe",
+      "baselineHash": "6adeef1da997b629f69db2639e49fa2b997b0b43874c7ef13ad42a0fa81e65c1",
+      "candidateHash": "0608a65fb08dc8a0a4555718d9b3f3d7f28a4a5ad02bcb16c51b6bcddbaffe23",
+      "baselineBytes": 32307,
+      "candidateBytes": 32308
+    },
+    {
+      "id": "mesh.world.prop.burst_pipe_lod1",
+      "baselineHash": "1e508b740cbfaf11172139a15d41e095bcabbbfb886a6d27b522199107672118",
+      "candidateHash": "ced4fa83d31db2b267b8e367ab8fba24ab85727550b78b2a7667bc94e6e8796e",
+      "baselineBytes": 17880,
+      "candidateBytes": 17884
+    },
+    {
+      "id": "mesh.world.prop.concrete_block",
+      "baselineHash": "58cdc60c81bb9b892796bd5cae516ab4f9a10f29106148f4dab124f0f1ff28a0",
+      "candidateHash": "ef39327a70c003d406fd06ba63dd0890bc03108b94f835ecf80c8e1cb09ff8de",
+      "baselineBytes": 6313,
+      "candidateBytes": 6304
+    },
+    {
+      "id": "mesh.world.prop.concrete_block_lod1",
+      "baselineHash": "47f02368dcb52256a2ab1e73c9fd0b9fd30ffe72283b851f3fbfa063c9deea6c",
+      "candidateHash": "63395242803f2cebc53716d2a544e95da9283743c2cfdf74576bfec196f0a86e",
+      "baselineBytes": 2313,
+      "candidateBytes": 2313
+    },
+    {
+      "id": "mesh.world.prop.crate",
+      "baselineHash": "28136b142b4b6a0a55548c6f12ac12b2ee374e90784a0c90cf9f3c5038d718f0",
+      "candidateHash": "d3dea63863614ad6830da34fcb42555e5db34c0ce0aafade0c9f8e9a354bf1df",
+      "baselineBytes": 6268,
+      "candidateBytes": 6259
+    },
+    {
+      "id": "mesh.world.prop.crate_lod1",
+      "baselineHash": "6cfd21885403e056a613a8562512acec6f6614bf477f763ceae9a366630a3882",
+      "candidateHash": "d8c525b627fe3baa7d5a4785524b1f5d55711faf43fcf3ccfd408550700f6703",
+      "baselineBytes": 2286,
+      "candidateBytes": 2286
+    },
+    {
+      "id": "mesh.world.prop.drum",
+      "baselineHash": "63332f572e51adda5058f9794abfc9e95583918ff8fe7589232550af4dd828eb",
+      "candidateHash": "e89c7ef6bad6eaf97f75e39d99ce74430ed625bc24fbcad2095717548f8af01f",
+      "baselineBytes": 98039,
+      "candidateBytes": 98030
+    },
+    {
+      "id": "mesh.world.prop.drum_lod1",
+      "baselineHash": "66cddf28d513eba14bf9a1d2c79e102634c00db6670f5767e2a7ce0f5186864f",
+      "candidateHash": "0ebb51292b7408a729f99b0837e116c874086d863d52137e855f7c63656f000f",
+      "baselineBytes": 2283,
+      "candidateBytes": 2283
+    },
+    {
+      "id": "mesh.world.prop.fence",
+      "baselineHash": "6f07d0606a68851cdc9f6d3bf2857dbf40cd5d71f0a3be4a47549c6084254a4c",
+      "candidateHash": "242e172d07a3e2152012a18939887bceae231468a4fb46482e81d0ed18e50b3f",
+      "baselineBytes": 20572,
+      "candidateBytes": 20563
+    },
+    {
+      "id": "mesh.world.prop.fence_lod1",
+      "baselineHash": "26794eb8120a61197e12ec86fed61f8ed03d804fc0b593c03a36fc5bad6dd5c4",
+      "candidateHash": "ea4472e612999ecc1e965809fb9df785807c24f1668a88bedc98741a7e97eb69",
+      "baselineBytes": 2286,
+      "candidateBytes": 2286
+    },
+    {
+      "id": "mesh.world.prop.industrial_light_signage",
+      "baselineHash": "4970767a6616b2bff9190acade5c9cf5ae1977bafe062ca2792bfaabb184bd0a",
+      "candidateHash": "71f38617dd596fa7cd69f9ab6b7f3eba7f2b59c32c1dbce7b341de813db3aa2e",
+      "baselineBytes": 6411,
+      "candidateBytes": 6402
+    },
+    {
+      "id": "mesh.world.prop.industrial_light_signage_lod1",
+      "baselineHash": "871a938b016af227998bc5f3d5af6928cca11e21af79da3e7edea3f3ef5f281d",
+      "candidateHash": "169ac5b06ed15ca26e0a70405094fd50dd1655257ef59bc670b0f2c19b5b318b",
+      "baselineBytes": 2343,
+      "candidateBytes": 2343
+    },
+    {
+      "id": "mesh.world.prop.loading_apron",
+      "baselineHash": "e09c1bf09666aa7c06e0510f30130800c30d3376abaf2b0795bc62b7f1871d35",
+      "candidateHash": "aa45ea388454fe97917b62a4cd59bc21afaba5504d9dc6c984a8b993c653fda9",
+      "baselineBytes": 19287,
+      "candidateBytes": 19284
+    },
+    {
+      "id": "mesh.world.prop.loading_apron_lod1",
+      "baselineHash": "2bbef07219ac74b16e0785829114ae676fb77fb129fb639557fdd30691102edb",
+      "candidateHash": "e8aa860c32b498c9e85c56a3c5ca693642455d3dffae13d7c66dab1662a273b5",
+      "baselineBytes": 4905,
+      "candidateBytes": 4902
+    },
+    {
+      "id": "mesh.world.prop.loading_gantry",
+      "baselineHash": "291d772a03238c45ce896ff2f3c9040ada870074f269c67ce20d7133ceef221a",
+      "candidateHash": "5594edbfab373f5de21f2b406b145ee9fa439568ba1feed320a82ddce88c49be",
+      "baselineBytes": 64700,
+      "candidateBytes": 64697
+    },
+    {
+      "id": "mesh.world.prop.loading_gantry_lod1",
+      "baselineHash": "8f2f12537d8f3b211cab54eec3c34867f0f69998d3d6f9e1066d892ad681c5f0",
+      "candidateHash": "d6d63cb3432d61399fc1b649c654db06900b7f5aabaea206a5479f522a5baa5a",
+      "baselineBytes": 17244,
+      "candidateBytes": 17241
+    },
+    {
+      "id": "mesh.world.prop.pallet",
+      "baselineHash": "da9bdd79c8024d09af3e1c9f9fea88c23f9e77dbbcec1aed67f5ec306af57f30",
+      "candidateHash": "a9398a64a05d3844059350133c7aaa69d11b2fbb989ef20bc02a556a9e0c9836",
+      "baselineBytes": 25761,
+      "candidateBytes": 25752
+    },
+    {
+      "id": "mesh.world.prop.pallet_lod1",
+      "baselineHash": "0045423cd19837b60c481efa956a5e64c28bd2d74acf6bf6c623377f948e8a20",
+      "candidateHash": "e55e9fbb2a0a30ca8b6cd726c022089a4793011b51d65d58054bcfb0cc34a6d0",
+      "baselineBytes": 2289,
+      "candidateBytes": 2289
+    },
+    {
+      "id": "mesh.world.prop.pipe_elbow",
+      "baselineHash": "f12d6509462f67ab3496bcdc6d72c00dc79eaa59ff740df529154a9751cdb4ea",
+      "candidateHash": "bacf59a3d1a1ac83986d661d74b9d59016eb5c13785c98f79fa89e65966a49c6",
+      "baselineBytes": 99720,
+      "candidateBytes": 99717
+    },
+    {
+      "id": "mesh.world.prop.pipe_elbow_lod1",
+      "baselineHash": "06688173f058444e2eabfaa1284f6136a267bbd233f4befb44280fa7a38b407a",
+      "candidateHash": "4255dfc5275818c20740616f7d5582ef24ce51c38b71c5163a493fd81126e01a",
+      "baselineBytes": 26928,
+      "candidateBytes": 26925
+    },
+    {
+      "id": "mesh.world.prop.pipe_section",
+      "baselineHash": "defacdce4399bc17392f95a6fc48fd4fb87f0392192807f38b0200a5964fd4a1",
+      "candidateHash": "8105d4945671d1598a024fccbe8293f2701c87b3e545fdc29608631afc1ab214",
+      "baselineBytes": 63375,
+      "candidateBytes": 63366
+    },
+    {
+      "id": "mesh.world.prop.pipe_section_lod1",
+      "baselineHash": "ba41cb17a057ef9eff3415af9979a6aa4f7dd28e03ca7d5fbda35c62978d6f46",
+      "candidateHash": "e3df6dbdf7c0c78124847f93d2c1408864590d094a0f20c70ebbf1dee9c9fb2b",
+      "baselineBytes": 2307,
+      "candidateBytes": 2307
+    },
+    {
+      "id": "mesh.world.prop.road_edge",
+      "baselineHash": "09be37a7d5896c69ebe2c38a8288f27bb6b1cc9316b046cdaf98a44d48215f2f",
+      "candidateHash": "0df7360e6337201fd97a634db9f4b2318691594e98599cfe669c43aa795b3248",
+      "baselineBytes": 19315,
+      "candidateBytes": 19312
+    },
+    {
+      "id": "mesh.world.prop.road_edge_lod1",
+      "baselineHash": "655ec9f401ea2f5f18383e91a02cb576de6c1f10be08591a721d6cf6b2329920",
+      "candidateHash": "183062f6a92d1c6ac72b09832c621642a4ec9c81050f066878a9eb96159df597",
+      "baselineBytes": 3597,
+      "candidateBytes": 3594
+    },
+    {
+      "id": "mesh.world.prop.rock",
+      "baselineHash": "ee84d149db1e6f94df1165aab976655fd2e274e22060753b1379453ce539c99e",
+      "candidateHash": "a9a98d366102c672848f390a87a6a6bfcb51dabbb7ddba8bf9d016784819e8b7",
+      "baselineBytes": 3623,
+      "candidateBytes": 3614
+    },
+    {
+      "id": "mesh.world.prop.rock_lod1",
+      "baselineHash": "e00fefc4e71871ceb41b782d4e898c83d92ca1c316e28ed867dad7a1c89f40db",
+      "candidateHash": "4e74abc0e311216fb7186548083fc9aa1e4998c4a726bfe61a248b14ad6a90ee",
+      "baselineBytes": 2283,
+      "candidateBytes": 2283
+    },
+    {
+      "id": "mesh.world.prop.rock_slab",
+      "baselineHash": "83f117c591a535bcb652433327ee6faf1d751864008a373dc3ab660ea0378b0f",
+      "candidateHash": "b3bca7c9fe66e5f5de07d9658e8bdce149ffa7cd231641a2a61d1fedb662e25a",
+      "baselineBytes": 31171,
+      "candidateBytes": 31168
+    },
+    {
+      "id": "mesh.world.prop.rock_slab_lod1",
+      "baselineHash": "5d0d49420238f19cac129a365ecf7271975345c759a7b2065e07667b405382d5",
+      "candidateHash": "712d04d4e46ebf6cdc7988aba59c2ddcb7675bb7ab99457480522e267e376a95",
+      "baselineBytes": 8493,
+      "candidateBytes": 8490
+    },
+    {
+      "id": "mesh.world.prop.rock_spire",
+      "baselineHash": "b2ba6282270046fcf91aa4a80b29c9b826ff16226a5be6835bd5c8e53e5bec89",
+      "candidateHash": "60cd94deb62f21aedbcf3eb7b98719a39ae5a6a9b4af39398e54d1cabe2616ca",
+      "baselineBytes": 31176,
+      "candidateBytes": 31173
+    },
+    {
+      "id": "mesh.world.prop.rock_spire_lod1",
+      "baselineHash": "b107343d0175024783febfb525ecd6c14cd3c2e89470e7ba8b46752a904d49ee",
+      "candidateHash": "ac5107c66c28b243b982b072e4effdb72fef25d384eaf6845a1017375d75683b",
+      "baselineBytes": 8496,
+      "candidateBytes": 8493
+    },
+    {
+      "id": "mesh.world.prop.rubble",
+      "baselineHash": "ba6f08613b2c9f95195610ff870d7b008f2794d6deb55a784dca39f64c8e7a32",
+      "candidateHash": "c75a49477bb5b9995726dfeda6f2e43cd264b764160f041b48b31bfa1e11d1ea",
+      "baselineBytes": 43381,
+      "candidateBytes": 43382
+    },
+    {
+      "id": "mesh.world.prop.rubble_lod1",
+      "baselineHash": "23a5a2c034d085c3482ba82b4642279eee277aef8a80fc73d31ced0f1f15e616",
+      "candidateHash": "dc4575b888af54e0599eb89732a4350af44bd10cc7c5183b8f503706fc9596bb",
+      "baselineBytes": 17323,
+      "candidateBytes": 17327
+    },
+    {
+      "id": "mesh.world.prop.scorched_barrier",
+      "baselineHash": "cfdb95230cf55993e2823e6cb08fed4d684acb03e6280c6da9f96ea38a40755a",
+      "candidateHash": "0b4bd282662192a23bc99858e562fb8c3ad0721aa2df37f7d434a1b7df862c36",
+      "baselineBytes": 19981,
+      "candidateBytes": 19982
+    },
+    {
+      "id": "mesh.world.prop.scorched_barrier_lod1",
+      "baselineHash": "63bcc5cacf703c2d3249aad902b0ae093bc90468925387647716fdc7af6cf9de",
+      "candidateHash": "b0cc3d34ac8dc3864df558a720f636f4b8ce3fb9e54c1500d5a9caf78cec04e0",
+      "baselineBytes": 6885,
+      "candidateBytes": 6889
+    },
+    {
+      "id": "mesh.world.prop.service_fence",
+      "baselineHash": "83699533616910ad9eeba068a37a4094148be273a5d1212e2acee1424ff5c3df",
+      "candidateHash": "f6e6853c0e01b01b3e8204628745f47a9494e5b3936e4285fa6dcdedf303f669",
+      "baselineBytes": 32249,
+      "candidateBytes": 32246
+    },
+    {
+      "id": "mesh.world.prop.service_fence_lod1",
+      "baselineHash": "4fa20ad9b29ead6203a196fef3cf04f0b6ea0bce08270710b69e3eee1413605c",
+      "candidateHash": "228ddd9ef26e765eaa8235cf4d8c9916039385c6237c3c1fff25d4247fb8c00d",
+      "baselineBytes": 15275,
+      "candidateBytes": 15272
+    },
+    {
+      "id": "mesh.world.prop.utility_box",
+      "baselineHash": "84db4d2f550a78a5259d2573a5052a443b2aa9f7de3de59202cdf0b8ed13ce32",
+      "candidateHash": "9094e71a07f235d131261b665d5d45a0a4fdd84f9d845b846c6a2498c8b9913d",
+      "baselineBytes": 6298,
+      "candidateBytes": 6289
+    },
+    {
+      "id": "mesh.world.prop.utility_box_lod1",
+      "baselineHash": "409dc8c0f70989d0911c0431c87a11f255680f613a4066e51a7fff0fcf379436",
+      "candidateHash": "1431bff8511ece8bbd93d1cc40bd1038d2020879a10c4662c515be3069b99c2d",
+      "baselineBytes": 2304,
+      "candidateBytes": 2304
+    }
+  ],
+  "unrelatedRuntimeChanges": 0,
+  "metadataPreserved": true,
+  "totalContainerBytes": [
+    74844887,
+    74844758
+  ],
+  "textureContainerBytes": [
+    59453925,
+    59453925
+  ],
+  "sourceLessIntegrity": "retain separate canonical compiler validation reports",
+  "typedGeometryComparison": "retain separate native family qualification",
+  "performanceAcceptance": "pending"
+}

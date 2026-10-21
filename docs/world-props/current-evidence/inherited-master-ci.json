@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "job": "https://github.com/DaveBeusing/Forgeline/actions/runs/39661309170/job/119434787665",
+  "status": "failure",
+  "phase": "Validate one version increment per PR",
+  "expectedVersion": "0.1.438",
+  "actualVersion": "0.1.437",
+  "downstreamBuildAndTests": "skipped",
+  "originalLogSha256": "d72e655edfb9309023eedba3824852c4a02dc6ad29876f2d2ac5b55fb6c1dcf1",
+  "relevantLines": [
+    "2026-10-21T19:25:34.0299353Z      | Each PR requires exactly one PATCH increment: expected 0.1.438, received 0.1.437. Run Increment-PrVersion.ps1"
+  ],
+  "branchVersion": "0.1.438",
+  "branchVersionValidation": "pass"
+}

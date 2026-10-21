@@ -1,0 +1,58 @@
+{
+  "assetCount": 7,
+  "meshCount": 3,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7351601,
+  "meshRuntimeBytes": 23794,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1612,
+  "catalogLoadDuration": "00:00:00.3244583",
+  "assetReadDuration": "00:00:00.0903922",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "mesh.world.prop.bridge_apron",
+      "type": "mesh",
+      "runtimeBytes": 16691
+    },
+    {
+      "assetId": "mesh.world.prop.bridge_apron_lod1",
+      "type": "mesh",
+      "runtimeBytes": 4905
+    },
+    {
+      "assetId": "mesh.world.kit.collision_centered",
+      "type": "mesh",
+      "runtimeBytes": 2198
+    },
+    {
+      "assetId": "material.world.prop.industrial",
+      "type": "material",
+      "runtimeBytes": 1612
+    }
+  ],
+  "issues": [],
+  "success": true
+}

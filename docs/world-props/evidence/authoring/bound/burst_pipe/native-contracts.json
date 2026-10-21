@@ -1,0 +1,13 @@
+{
+  "rejected": [
+    "unbaked transform",
+    "changed envelope",
+    "modifier",
+    "animation",
+    "material slots",
+    "unexpected object"
+  ],
+  "root": "mesh.world.prop.burst_pipe",
+  "success": true,
+  "unchangedReopenAccepted": true
+}

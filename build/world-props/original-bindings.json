@@ -1,0 +1,666 @@
+{
+  "schemaVersion": 1,
+  "sourceSha": "a524b0a8164390abe1e9cb38170e690f46147574",
+  "bindings": [
+    {
+      "path": "world/meshes/props/barrier.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.barrier",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_barrier_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.barrier_lod1",
+            "maxDistance": 260
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/barrier_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.barrier_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_barrier_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/burst_pipe.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.burst_pipe",
+        "type": "mesh",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.burst_pipe_lod1",
+            "maxDistance": 240
+          }
+        ],
+        "source": "../sources/battlefield/burst_pipe_lod0.gltf",
+        "collisionRequired": true,
+        "collisionReference": "mesh.world.kit.collision_centered"
+      }
+    },
+    {
+      "path": "world/meshes/props/burst_pipe_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.burst_pipe_lod1",
+        "type": "mesh",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "source": "../sources/battlefield/burst_pipe_lod1.gltf"
+      }
+    },
+    {
+      "path": "world/meshes/props/concrete_block.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.concrete_block",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_concrete_block_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.concrete_block_lod1",
+            "maxDistance": 260
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/concrete_block_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.concrete_block_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_concrete_block_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/crate.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.crate",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_crate_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.crate_lod1",
+            "maxDistance": 200
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/crate_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.crate_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_crate_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/drum.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.drum",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_drum_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.drum_lod1",
+            "maxDistance": 200
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/drum_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.drum_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_drum_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/fence.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.fence",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_fence_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.fence_lod1",
+            "maxDistance": 300
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/fence_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.fence_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_fence_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/industrial_light_signage.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.industrial_light_signage",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_industrial_light_signage_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.industrial_light_signage_lod1",
+            "maxDistance": 320
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/industrial_light_signage_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.industrial_light_signage_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_industrial_light_signage_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/pallet.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.pallet",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_pallet_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.pallet_lod1",
+            "maxDistance": 180
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/pallet_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.pallet_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_pallet_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/pipe_section.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.pipe_section",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_pipe_section_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.pipe_section_lod1",
+            "maxDistance": 240
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/pipe_section_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.pipe_section_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_pipe_section_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/rock.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.rock",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_rock_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.rock_lod1",
+            "maxDistance": 220
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/rock_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.rock_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_rock_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/rubble.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.rubble",
+        "type": "mesh",
+        "source": "../sources/battlefield/rubble_lod0.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.rubble_lod1",
+            "maxDistance": 220
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/rubble_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.rubble_lod1",
+        "type": "mesh",
+        "source": "../sources/battlefield/rubble_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/scorched_barrier.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.scorched_barrier",
+        "type": "mesh",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.scorched_barrier_lod1",
+            "maxDistance": 260
+          }
+        ],
+        "source": "../sources/battlefield/scorched_barrier_lod0.gltf",
+        "collisionRequired": true,
+        "collisionReference": "mesh.world.kit.collision_centered"
+      }
+    },
+    {
+      "path": "world/meshes/props/scorched_barrier_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.scorched_barrier_lod1",
+        "type": "mesh",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "source": "../sources/battlefield/scorched_barrier_lod1.gltf"
+      }
+    },
+    {
+      "path": "world/meshes/props/utility_box.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.utility_box",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_utility_box_production.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.utility_box_lod1",
+            "maxDistance": 220
+          }
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/props/utility_box_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.utility_box_lod1",
+        "type": "mesh",
+        "source": "../sources/mesh_world_prop_utility_box_lod1.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/kit/barrier_module.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.barrier_module",
+        "type": "mesh",
+        "source": "../sources/environment_kit/barrier_module_high.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.barrier_module_lod1",
+            "maxDistance": 260
+          }
+        ],
+        "collisionReference": "mesh.world.kit.collision_centered",
+        "collisionRequired": true
+      }
+    },
+    {
+      "path": "world/meshes/kit/barrier_module_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.barrier_module_lod1",
+        "type": "mesh",
+        "source": "../sources/environment_kit/barrier_module_reduced.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/kit/bridge_apron.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.bridge_apron",
+        "type": "mesh",
+        "source": "../sources/environment_kit/bridge_apron_high.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.bridge_apron_lod1",
+            "maxDistance": 260
+          }
+        ],
+        "collisionReference": "mesh.world.kit.collision_centered",
+        "collisionRequired": true
+      }
+    },
+    {
+      "path": "world/meshes/kit/bridge_apron_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.bridge_apron_lod1",
+        "type": "mesh",
+        "source": "../sources/environment_kit/bridge_apron_reduced.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/kit/loading_apron.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.loading_apron",
+        "type": "mesh",
+        "source": "../sources/environment_kit/loading_apron_high.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.loading_apron_lod1",
+            "maxDistance": 260
+          }
+        ],
+        "collisionReference": "mesh.world.kit.collision_centered",
+        "collisionRequired": true
+      }
+    },
+    {
+      "path": "world/meshes/kit/loading_apron_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.loading_apron_lod1",
+        "type": "mesh",
+        "source": "../sources/environment_kit/loading_apron_reduced.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/kit/loading_gantry.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.loading_gantry",
+        "type": "mesh",
+        "source": "../sources/environment_kit/loading_gantry_high.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.loading_gantry_lod1",
+            "maxDistance": 300
+          }
+        ],
+        "collisionReference": "mesh.world.kit.collision_centered",
+        "collisionRequired": true
+      }
+    },
+    {
+      "path": "world/meshes/kit/loading_gantry_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.loading_gantry_lod1",
+        "type": "mesh",
+        "source": "../sources/environment_kit/loading_gantry_reduced.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/kit/pipe_elbow.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.pipe_elbow",
+        "type": "mesh",
+        "source": "../sources/environment_kit/pipe_elbow_high.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.pipe_elbow_lod1",
+            "maxDistance": 240
+          }
+        ],
+        "collisionReference": "mesh.world.kit.collision_centered",
+        "collisionRequired": true
+      }
+    },
+    {
+      "path": "world/meshes/kit/pipe_elbow_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.pipe_elbow_lod1",
+        "type": "mesh",
+        "source": "../sources/environment_kit/pipe_elbow_reduced.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/kit/road_edge.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.road_edge",
+        "type": "mesh",
+        "source": "../sources/environment_kit/road_edge_high.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.road_edge_lod1",
+            "maxDistance": 240
+          }
+        ],
+        "collisionReference": "mesh.world.kit.collision_centered",
+        "collisionRequired": true
+      }
+    },
+    {
+      "path": "world/meshes/kit/road_edge_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.road_edge_lod1",
+        "type": "mesh",
+        "source": "../sources/environment_kit/road_edge_reduced.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/kit/rock_slab.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.rock_slab",
+        "type": "mesh",
+        "source": "../sources/environment_kit/rock_slab_high.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.rock_slab_lod1",
+            "maxDistance": 220
+          }
+        ],
+        "collisionReference": "mesh.world.kit.collision_centered",
+        "collisionRequired": true
+      }
+    },
+    {
+      "path": "world/meshes/kit/rock_slab_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.rock_slab_lod1",
+        "type": "mesh",
+        "source": "../sources/environment_kit/rock_slab_reduced.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/kit/rock_spire.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.rock_spire",
+        "type": "mesh",
+        "source": "../sources/environment_kit/rock_spire_high.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.rock_spire_lod1",
+            "maxDistance": 220
+          }
+        ],
+        "collisionReference": "mesh.world.kit.collision_centered",
+        "collisionRequired": true
+      }
+    },
+    {
+      "path": "world/meshes/kit/rock_spire_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.rock_spire_lod1",
+        "type": "mesh",
+        "source": "../sources/environment_kit/rock_spire_reduced.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    },
+    {
+      "path": "world/meshes/kit/service_fence.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.service_fence",
+        "type": "mesh",
+        "source": "../sources/environment_kit/service_fence_high.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ],
+        "lods": [
+          {
+            "level": 1,
+            "assetId": "mesh.world.prop.service_fence_lod1",
+            "maxDistance": 300
+          }
+        ],
+        "collisionReference": "mesh.world.kit.collision_centered",
+        "collisionRequired": true
+      }
+    },
+    {
+      "path": "world/meshes/kit/service_fence_lod1.asset.json",
+      "definition": {
+        "id": "mesh.world.prop.service_fence_lod1",
+        "type": "mesh",
+        "source": "../sources/environment_kit/service_fence_reduced.gltf",
+        "materialReferences": [
+          "material.world.prop.industrial"
+        ]
+      }
+    }
+  ]
+}

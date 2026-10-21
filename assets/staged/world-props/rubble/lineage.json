@@ -1,0 +1,33 @@
+{
+  "blenderVersion": "5.2.2",
+  "exports": [
+    {
+      "definition": "world/meshes/props/rubble.asset.json",
+      "id": "mesh.world.prop.rubble",
+      "sha256": "c16f3c41ce7398518f42599f23f28b0dcfa3a0f26b48056bf2e40007144e8081"
+    },
+    {
+      "definition": "world/meshes/props/rubble_lod1.asset.json",
+      "id": "mesh.world.prop.rubble_lod1",
+      "sha256": "c6ee68d518495021da02be41590fb46ee966a2fccfba2d99617d44f56f23ed9f"
+    }
+  ],
+  "fixtureSha256": "56da1a8e466046d0e7bbcb04683b960228f48f75cf98fa1ec22f9be8c8fca1a9",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "rubble.blend",
+      "sha256": "d5340a6f04c91b7328ec2843e894c7f69637ecf65e0b7cadaf0ad234dce5f2f6"
+    },
+    {
+      "path": "rubble_inspection.blend",
+      "sha256": "fe09e8e78e89eae7d881e3e9764c082d69befdb6a7dcdedd4c5705c932abfe22"
+    }
+  ],
+  "physicalPerformance": "pending",
+  "schemaVersion": 1,
+  "signaturePolicy": "lf-json-v1",
+  "sourceSha": "09036b0261798a90e954adf840b74757384e2365",
+  "sourceSignature": "42f1b2104660ea86817ab497633f0877d0f06196f5f2f2b0df3874585b54ec7c",
+  "status": "review-bound-not-accepted"
+}

@@ -1,0 +1,83 @@
+{
+  "assetCount": 1363,
+  "meshCount": 309,
+  "textureCount": 901,
+  "materialCount": 132,
+  "skinCount": 2,
+  "skinRuntimeBytes": 3630411,
+  "animationCount": 18,
+  "animationRuntimeBytes": 189114,
+  "uiSkinCount": 1,
+  "uiSkinRuntimeBytes": 99652,
+  "totalRuntimeBytes": 74845169,
+  "meshRuntimeBytes": 11307775,
+  "textureRuntimeBytes": 59454336,
+  "studioSplashTextureRuntimeBytes": 1786417,
+  "materialRuntimeBytes": 163881,
+  "catalogLoadDuration": "00:00:00.5324751",
+  "assetReadDuration": "00:00:03.7858492",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "ui.atlas.directorate.icons.p1",
+      "type": "texture",
+      "runtimeBytes": 4195048
+    },
+    {
+      "assetId": "ui.atlas.directorate.icons.p2",
+      "type": "texture",
+      "runtimeBytes": 4195048
+    },
+    {
+      "assetId": "ui.atlas.directorate.core.p1",
+      "type": "texture",
+      "runtimeBytes": 4195045
+    },
+    {
+      "assetId": "branding.forgeline.menu.directorate",
+      "type": "texture",
+      "runtimeBytes": 3146855
+    },
+    {
+      "assetId": "skin.directorate.combat_engineer",
+      "type": "skin",
+      "runtimeBytes": 2129106
+    },
+    {
+      "assetId": "skin.directorate.rifle_squad",
+      "type": "skin",
+      "runtimeBytes": 1501305
+    },
+    {
+      "assetId": "texture.world.terrain.crushed_gravel",
+      "type": "texture",
+      "runtimeBytes": 1399134
+    },
+    {
+      "assetId": "texture.world.terrain.concrete_base",
+      "type": "texture",
+      "runtimeBytes": 1399130
+    },
+    {
+      "assetId": "texture.world.terrain.cracked_earth",
+      "type": "texture",
+      "runtimeBytes": 1399130
+    },
+    {
+      "assetId": "texture.world.terrain.rocky_scrub",
+      "type": "texture",
+      "runtimeBytes": 1399122
+    },
+    {
+      "assetId": "texture.world.terrain.dark_ash",
+      "type": "texture",
+      "runtimeBytes": 1399110
+    }
+  ],
+  "issues": [],
+  "success": true
+}

@@ -1,0 +1,83 @@
+name: World prop Blender masters
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/world-prop-masters.yml'
+      - 'build/world-props/**'
+      - 'assets/staged/world-props/**'
+      - 'assets/source/world/meshes/props/**'
+      - 'assets/source/world/meshes/kit/**'
+      - 'assets/source/world/meshes/sources/blender/props/**'
+      - 'assets/source/world/materials/common/industrial*'
+      - 'assets/source/materials/directorate/surfaces/**'
+      - 'tools/blender/asset_contract.py'
+      - 'tools/blender/roundtrip.py'
+      - 'tools/blender/production.py'
+      - 'src/ForgeLine.Presentation/WorldPropReferenceScene.cs'
+      - 'tests/ForgeLine.Presentation.Tests/WorldProp*.cs'
+  push:
+    branches: [master]
+    paths:
+      - 'build/world-props/**'
+      - 'assets/staged/world-props/**'
+      - 'assets/source/world/meshes/props/**'
+      - 'assets/source/world/meshes/kit/**'
+      - 'assets/source/world/meshes/sources/blender/props/**'
+      - 'assets/source/world/materials/common/industrial*'
+      - 'assets/source/materials/directorate/surfaces/**'
+      - 'tools/blender/asset_contract.py'
+      - 'tools/blender/roundtrip.py'
+      - 'tools/blender/production.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retained-props:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify retained editable masters and exact High/Reduced bindings
+        shell: pwsh
+        run: |
+          python build/world-props/test_contract.py
+          if ($LASTEXITCODE -ne 0) { throw 'Portable source contract failed.' }
+          python build/world-props/retained.py
+          if ($LASTEXITCODE -ne 0) { throw 'Retained prop source changed.' }
+
+  native-props:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release -m:1
+      - name: Compile shared industrial PBR material once
+        shell: pwsh
+        run: |
+          python build/world-props/prepare-materials.py artifacts/prop-material-source
+          if ($LASTEXITCODE -ne 0) { throw 'Material source preparation failed.' }
+          ./build/Build-RuntimeAssets.ps1 -Mode build -NoBuild -SourceRoot artifacts/prop-material-source -RuntimeRoot artifacts/prop-material-runtime -QualificationOutput artifacts/prop-materials.json
+      - name: Prepare exact prop dependency snapshot
+        shell: pwsh
+        run: |
+          python build/world-props/prepare-source.py artifacts/prop-source
+          if ($LASTEXITCODE -ne 0) { throw 'Scoped source preparation failed.' }
+      - name: Save independent masters, reopen and qualify every family
+        shell: pwsh
+        run: ./build/world-props/Qualify-Masters.ps1 -OutputRoot artifacts/prop-native -SourceRoot artifacts/prop-source -MaterialCacheRoot artifacts/prop-material-runtime -NativeBatch
+      - name: Retain real Blender and compiler evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-prop-masters-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/prop-native
+          retention-days: 14

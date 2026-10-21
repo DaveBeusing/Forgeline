@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "sourceSha": "3545a23125d5ca8b3c24d50a8e77d72175c5acf6",
+  "integrationBase": "a524b0a8164390abe1e9cb38170e690f46147574",
+  "checks": [
+    {
+      "name": "native-props",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39646350651/job/119382832420"
+    },
+    {
+      "name": "frame-contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39646350795/job/119382832012"
+    },
+    {
+      "name": "native-reference",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39646350373/job/119382831714"
+    },
+    {
+      "name": "native-minerals",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39646350608/job/119382831576"
+    },
+    {
+      "name": "retained-props",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39646350651/job/119382830087"
+    },
+    {
+      "name": "navigation-movement",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39646350497/job/119382830049"
+    },
+    {
+      "name": "retained-minerals",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39646350608/job/119382829830"
+    },
+    {
+      "name": "cpu-scale",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39646350373/job/119382829726"
+    },
+    {
+      "name": "build-test",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/39646350406/job/119382829657"
+    }
+  ]
+}

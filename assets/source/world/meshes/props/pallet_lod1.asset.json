@@ -1,8 +1,8 @@
 {
   "id": "mesh.world.prop.pallet_lod1",
-  "type": "mesh",
-  "source": "../sources/mesh_world_prop_pallet_lod1.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
-  ]
+  ],
+  "source": "../sources/blender/props/pallet/reduced.glb",
+  "type": "mesh"
 }
