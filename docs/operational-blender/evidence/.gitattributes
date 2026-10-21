@@ -1,0 +1,3 @@
+*.json -text -whitespace
+*.log -text -whitespace
+*.png binary

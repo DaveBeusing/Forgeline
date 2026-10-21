@@ -1,0 +1,83 @@
+{
+  "assetCount": 20,
+  "meshCount": 11,
+  "textureCount": 4,
+  "materialCount": 5,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7592920,
+  "meshRuntimeBytes": 255975,
+  "textureRuntimeBytes": 7328479,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 8466,
+  "catalogLoadDuration": "00:00:01.3094733",
+  "assetReadDuration": "00:00:01.0105558",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "building.directorate.power_plant",
+      "type": "mesh",
+      "runtimeBytes": 109456
+    },
+    {
+      "assetId": "building.directorate.power_plant.lod1",
+      "type": "mesh",
+      "runtimeBytes": 52621
+    },
+    {
+      "assetId": "building.directorate.power_plant.lod2",
+      "type": "mesh",
+      "runtimeBytes": 20509
+    },
+    {
+      "assetId": "building.directorate.power_plant.destroyed",
+      "type": "mesh",
+      "runtimeBytes": 18224
+    },
+    {
+      "assetId": "building.directorate.power_plant.partial_shell",
+      "type": "mesh",
+      "runtimeBytes": 17945
+    },
+    {
+      "assetId": "building.directorate.power_plant.structural_frame",
+      "type": "mesh",
+      "runtimeBytes": 12770
+    },
+    {
+      "assetId": "building.directorate.power_plant.critical",
+      "type": "mesh",
+      "runtimeBytes": 11036
+    },
+    {
+      "assetId": "building.directorate.power_plant.damaged",
+      "type": "mesh",
+      "runtimeBytes": 5693
+    },
+    {
+      "assetId": "building.directorate.module.collision_box",
+      "type": "mesh",
+      "runtimeBytes": 2956
+    }
+  ],
+  "issues": [],
+  "success": true
+}

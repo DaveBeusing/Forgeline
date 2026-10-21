@@ -1,0 +1,104 @@
+{
+  "cases": [
+    {
+      "error": "Scene metre unit scale changed",
+      "name": "wrong scene units",
+      "rejected": true
+    },
+    {
+      "error": "Asset origin/axis transform changed",
+      "name": "wrong root axes",
+      "rejected": true
+    },
+    {
+      "error": "Missing socket: building.directorate.radar/motion_radar_array",
+      "name": "missing socket",
+      "rejected": true
+    },
+    {
+      "error": "Socket world transform changed",
+      "name": "moved socket",
+      "rejected": true
+    },
+    {
+      "error": "Socket world transform changed",
+      "name": "rotated socket",
+      "rejected": true
+    },
+    {
+      "error": "Part origin/pivot changed",
+      "name": "changed mechanical pivot",
+      "rejected": true
+    },
+    {
+      "error": "Missing root: building.directorate.radar.damaged/None",
+      "name": "missing state root",
+      "rejected": true
+    },
+    {
+      "error": "POSITION deviation 2.5 exceeds 1e-05; check axes/scale/geometry",
+      "name": "changed geometry",
+      "rejected": true
+    },
+    {
+      "error": "UV channels changed",
+      "name": "removed UV channel",
+      "rejected": true
+    },
+    {
+      "error": "Logical object name changed",
+      "name": "changed logical name",
+      "rejected": true
+    },
+    {
+      "error": "Animation, constraints, modifiers and instances are unsupported",
+      "name": "unsupported modifier",
+      "rejected": true
+    },
+    {
+      "error": "Unsupported material node graph",
+      "name": "changed material nodes",
+      "rejected": true
+    },
+    {
+      "error": "Authored normal channels removed",
+      "name": "removed authored normal",
+      "rejected": true
+    },
+    {
+      "error": "Shared vertex split changes source identity: building.directorate.radar/NORMAL/0",
+      "name": "changed authored normal",
+      "rejected": true
+    },
+    {
+      "error": "Blender split-normal preview changed",
+      "name": "changed split-normal preview",
+      "rejected": true
+    },
+    {
+      "error": "Mesh parent/type/morph/edit mode changed",
+      "name": "uncommitted edit mode",
+      "rejected": true
+    },
+    {
+      "error": "Material slot order/identity changed",
+      "name": "reordered material slots",
+      "rejected": true
+    },
+    {
+      "error": "Primitive material assignment changed",
+      "name": "wrong primitive material",
+      "rejected": true
+    },
+    {
+      "error": "TANGENT deviation 2.0 exceeds 1e-05; check axes/scale/geometry",
+      "name": "changed tangent handedness",
+      "rejected": true
+    }
+  ],
+  "nativeBlender": true,
+  "notApplicable": [],
+  "sourceSocketCount": 1,
+  "success": true,
+  "syntheticTwoSlotTangentPositive": true
+}

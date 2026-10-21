@@ -1,0 +1,83 @@
+{
+  "assetCount": 20,
+  "meshCount": 11,
+  "textureCount": 4,
+  "materialCount": 5,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7517674,
+  "meshRuntimeBytes": 180729,
+  "textureRuntimeBytes": 7328479,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 8466,
+  "catalogLoadDuration": "00:00:00.0499346",
+  "assetReadDuration": "00:00:00.1373337",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory",
+      "type": "mesh",
+      "runtimeBytes": 60736
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory.lod1",
+      "type": "mesh",
+      "runtimeBytes": 26990
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory.lod2",
+      "type": "mesh",
+      "runtimeBytes": 23102
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory.partial_shell",
+      "type": "mesh",
+      "runtimeBytes": 21834
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory.structural_frame",
+      "type": "mesh",
+      "runtimeBytes": 12771
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory.critical",
+      "type": "mesh",
+      "runtimeBytes": 11037
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory.destroyed",
+      "type": "mesh",
+      "runtimeBytes": 10875
+    },
+    {
+      "assetId": "building.directorate.vehicle_factory.damaged",
+      "type": "mesh",
+      "runtimeBytes": 5693
+    },
+    {
+      "assetId": "building.directorate.module.collision_box",
+      "type": "mesh",
+      "runtimeBytes": 2925
+    }
+  ],
+  "issues": [],
+  "success": true
+}

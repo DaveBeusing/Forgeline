@@ -1,0 +1,14 @@
+{
+  "canonicalYDelta": 0.0009999871253967276,
+  "editAsset": "building.directorate.power_plant",
+  "editIsQualificationOnly": true,
+  "editVertex": 146,
+  "family": "building.directorate.power_plant",
+  "meshCount": 11,
+  "organizedMasterReopened": true,
+  "productionPromotion": "pending",
+  "savedVertexEditReopenedAndExported": true,
+  "schemaVersion": 1,
+  "sourceSignature": "33ecb0974efd02b87f28f4bea6f9c37c18fdafb78b823dea5f31f1190ac5c3e7",
+  "success": true
+}
