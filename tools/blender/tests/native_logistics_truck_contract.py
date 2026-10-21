@@ -19,12 +19,14 @@ def run(request):
         root = 'unit.directorate.' + family
         master = repository / 'assets/source/units/directorate/authoring' / (family + '.blend')
         rejected = []
-        for case in ('socket', 'transform', 'modifier', 'action', 'untracked', 'material', 'wheel', 'silhouette', 'collision'):
+        for case in ('socket', 'root_scale', 'transform', 'modifier', 'action', 'untracked', 'material', 'wheel', 'silhouette', 'collision'):
             bpy.ops.wm.open_mainfile(filepath=str(master))
             obj = next(o for o in bpy.context.scene.objects if o.get('fl_role') == 'geometry' and
                        o.get('fl_asset') == root)
             if case == 'socket':
                 next(o for o in bpy.context.scene.objects if o.get('fl_role') == 'socket').location.x += .01
+            elif case == 'root_scale':
+                next(o for o in bpy.context.scene.objects if o.get('fl_role') == 'root').scale.x += .01
             elif case == 'transform':
                 obj.location.x += .01
             elif case == 'modifier':
@@ -47,7 +49,7 @@ def run(request):
                                  o.get('fl_asset') == root + '.collision')
                 collision.data.vertices[0].co.x += .001
             saved = output / (family + '-' + case + '.blend')
-            bpy.ops.wm.save_as_mainfile(filepath=str(saved), check_existing=False)
+            bpy.ops.wm.save_as_mainfile(filepath=str(saved), check_existing=False, compress=True)
             target = output / family / case
             target.mkdir(parents=True)
             try:
@@ -64,7 +66,7 @@ def run(request):
             for vertex in obj.data.vertices:
                 vertex.co.x += .001
         saved = output / (family + '-edited.blend')
-        bpy.ops.wm.save_as_mainfile(filepath=str(saved), check_existing=False)
+        bpy.ops.wm.save_as_mainfile(filepath=str(saved), check_existing=False, compress=True)
         target = output / family / 'edited'
         target.mkdir(parents=True)
         export_truck(dict(inputRoot=request['inputRoot'], outputRoot=str(target), arguments=[

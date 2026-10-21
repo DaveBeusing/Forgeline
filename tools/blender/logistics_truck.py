@@ -7,12 +7,13 @@ import os
 import sys
 from pathlib import Path
 import bpy
+from mathutils import Matrix
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from asset_contract import Catalog, compare_geometry, fixture_selection, read_geometry, require, sha, write_glb, write_json
 from logistics_truck_contract import FAMILIES, SUFFIXES, canonical_export, compare, component_parts, metadata
 from mechanical import layers
-from roundtrip import import_scene, export_scene
+from roundtrip import import_scene, export_scene, close_matrix
 from roundtrip import preview_state
 from production import surface_preview
 from tank import restore_normals
@@ -72,6 +73,30 @@ def validate_preview(catalog, ids):
         material['fl_preview'] = preview_state(material)
 
 
+def physical_view(family, geometries, importing):
+    scale = family['instanceScale']
+    height = geometries[family['root']]['document']['extras']['heightOffsetMeters']
+    expected = Matrix.Diagonal((scale[0], scale[2], scale[1], 1))
+    expected.translation = (0, 0, height)
+    scene = bpy.context.scene
+    contract = dict(scale=scale, heightOffsetMeters=height)
+    if not importing:
+        require(json.loads(scene.get('fl_truck_display', 'null')) == contract, 'Truck physical display contract changed')
+    for obj in scene.objects:
+        if obj.get('fl_role') != 'root':
+            continue
+        if importing:
+            obj.matrix_world = expected
+            obj.lock_location = (True, True, True)
+            obj.lock_rotation = (True, True, True)
+            obj.lock_scale = (True, True, True)
+        else:
+            close_matrix(obj.matrix_world, expected, 'Truck physical root transform changed')
+            obj.matrix_world = Matrix.Identity(4)
+    scene['fl_truck_display'] = json.dumps(contract, sort_keys=True)
+    bpy.context.view_layer.update()
+
+
 def run(request):
     output = Path(request['outputRoot'])
     report = {'schemaVersion': 1, 'success': False, 'errors': []}
@@ -120,13 +145,15 @@ def run(request):
             require(contract['ids'] == ids and contract['families'] == families, 'Truck family changed')
             contract['sourceSignature'] = catalog.signature(ids)[0]
             scene['fl_contract'] = json.dumps(contract, sort_keys=True)
+            physical_view(families[0], geometries, False)
             validate_preview(catalog, ids)
         restore_normals()
         results, meshes, deviations = export_scene(catalog, ids, families, geometries,
             lambda aid, before, after: compare(aid, before, after, catalog.definitions[aid][1]))
         if args.action == 'Author':
             pack_preview(catalog, ids)
-            bpy.ops.wm.save_as_mainfile(filepath=str(output / (args.family + '.blend')), check_existing=False)
+            physical_view(families[0], geometries, True)
+            bpy.ops.wm.save_as_mainfile(filepath=str(output / (args.family + '.blend')), check_existing=False, compress=True)
         # The fine authoring partition is never promoted into runtime articulation.
         for aid, parts in runtime_parts.items():
             definition = catalog.definitions[aid][1]
@@ -142,8 +169,9 @@ def run(request):
                 continue
             path, definition = catalog.definitions[aid]
             relative = path.relative_to(catalog.root)
-            target = Path('../sources/combat_support') / args.family / 'blender' / (aid + '.glb')
-            destination = source / relative.parent / target
+            filename = (aid[len(root):].lstrip('.') or 'lod0') + '.glb'
+            target = Path('../sources/combat_support') / args.family / 'blender' / filename
+            destination = (source / relative.parent / target).resolve()
             write_glb(destination, canonical_export(geometries[aid], geometry))
             updated = copy.deepcopy(definition)
             updated['source'] = target.as_posix()
