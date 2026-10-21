@@ -1,5 +1,8 @@
 # Command Core Blender production source
 
+Measured results and current promotion gates are recorded in
+[CommandCoreBlenderQualification.md](CommandCoreBlenderQualification.md).
+
 The editable production master is
 `assets/source/buildings/directorate/authoring/command_core.blend`.
 It contains the existing ten mesh identities: three intact LODs, three
