@@ -125,3 +125,59 @@ role loads/general reference tests: **83 passed, zero skipped** (39.702 seconds)
 The project graph validates 44 projects without cycles. Three new portable source
 tests pass, including both real production-role GLBs and negative reflected-UV/
 shifted-geometry cases. Full portable/native/player results are recorded separately.
+
+## Native checkpoint and capture admission repair
+
+Clean implementation source `f3eda9de1c9fc032796cbf999b4cbecaf623a92c` passes a
+source-bound solution rebuild with zero warnings/errors (32.03 seconds). An earlier
+overlapping build failed because the running catalog validator held compiler
+files open; its original log is retained. Both full 1,363-asset catalogs validate
+without sources. Each is **74,844,434 container bytes**, with every individual
+container length unchanged. IDs, dependencies, material/texture references, LODs,
+collision, sockets, mechanical metadata and bounds are identical. Of 1,363 payloads,
+**1,359 are byte-identical**: only the two skinned LOD0 meshes and two skins change.
+All eighteen animation payloads remain byte-identical; their container hashes
+change only because their source GLB hash changes. No texture/material payload grows.
+
+The first native batch (`artifacts/ifn`) completes fourteen pairs / 28 original
+images: four nine-action gallery cases (1080p/4K), six default-distance cases and
+four Low/Medium cases. All fourteen pairs repeat independently eight times and
+have zero binding/mesh fallback failures. All ten static-distance/quality pairs
+are PNG-byte-identical; the four close LOD0 gallery pairs change as expected.
+Actual default cameras select LOD1 at CloseTactical and LOD2 at NormalGameplay/
+Strategic for both roles; these pictures are not counted as animated LOD0 loads.
+
+That batch then **fails**, before graphics startup, on the first pure load request:
+the client's separate MechanicalSeconds allowlist had not admitted the appended
+scene kinds. A separate actual-process probe reproduces exit 1 and the exact
+ArgumentOutOfRangeException. The existing gallery/distance/quality records retain
+their original source identity and are not relabelled as a successful full batch.
+The follow-up adds precisely those six scene kinds to bounded capture admission;
+all nine focused client request/image-contract tests pass (20.380 seconds), including
+six new phase-boundary cases. No renderer, timing threshold or workload is changed.
+
+Continuation uses a fresh root and repeats the gallery on the repaired source,
+then runs all load/dark/wet/phase cohorts. `-SkipCohorts distances,quality` explicitly
+retains the ten already completed pairs on their original source. Combining these
+source-bound subsets covers the original forty-pair matrix; the repeated gallery
+is additional evidence. This is a capture-input validation change, not evidence
+that earlier source hashes are identical to the later source.
+
+The repeat-refinement check also found duplicate packed maps: Save As remapped
+relative paths for the staging directory before the master was relocated to its
+canonical location. The helper now identifies exact canonical packed bytes for
+reuse and disables staging-path remapping when saving canonical-relative paths.
+Both failed diagnostic attempts are retained. Corrected UV error is measured after the edit;
+the earlier report's similarly named field was an input-alternative diagnostic.
+The independent exported-corner contract remains the authority for output UV error.
+
+The repaired native refinement succeeds (`artifacts/infantry-idempotent-3`): both
+GLBs remain byte-identical, both saved masters retain exactly three canonical
+packed maps and corrected native UV error is zero. Four focused portable tests
+pass, including rejection of an unchecked extra mesh. The final saved masters
+then pass the complete existing native authoring gate again at
+`artifacts/infantry-native-final`: two reopens per role, all-action payload parity,
+an edited idle key and eight source-less scoped catalogs. Each reopen now also
+checks actual packed PNG bytes, sRGB/linear color spaces and correctly resolving
+canonical-relative image paths. No rig, animation or runtime GLB changes accompany
+the saved-path repair.

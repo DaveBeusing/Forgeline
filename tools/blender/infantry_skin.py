@@ -8,7 +8,7 @@ import bpy
 from mathutils import Quaternion, Vector
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from asset_contract import read_geometry, game_to_blender, blender_to_game
-from infantry_surface import blender_uv, packed_surface
+from infantry_surface import blender_uv, packed_surface, validate_packed_surface
 
 ACTIONS = ('idle','walk','run','aim','fire','reload','hit','suppression','death')
 BONES = ('pelvis','spine','head','upperarm_left','forearm_left','upperarm_right','forearm_right','thigh_left','shin_left','thigh_right','shin_right')
@@ -119,7 +119,7 @@ def build_family(source, output, family):
     rig.animation_data.use_nla = False
     scene.frame_set(0)
     rig.select_set(True); obj.select_set(True); bpy.context.view_layer.objects.active = rig
-    bpy.ops.wm.save_as_mainfile(filepath=str(output/f'{family}.blend'))
+    bpy.ops.wm.save_as_mainfile(filepath=str(output/f'{family}.blend'), relative_remap=False)
     export_rig(output/f'{family}.glb')
     return {'family':family,'bones':len(armature.bones),'vertices':len(positions),'triangles':len(triangles),'actions':list(ACTIONS),'sockets':recipe['sockets']}
 
@@ -137,6 +137,7 @@ def reopen_family(source, output, family):
     master = source / f'units/directorate/authoring/infantry/{family}.blend'
     bpy.ops.wm.open_mainfile(filepath=str(master), load_ui=False, use_scripts=False)
     rig = bpy.data.objects['InfantryRig']; obj = bpy.data.objects['Squad']
+    preview_maps = validate_packed_surface(obj.data.materials[0], source)
     if len(rig.data.bones) != 44: raise ValueError('Unexpected infantry rig')
     samples = []
     tracks = rig.animation_data.nla_tracks
@@ -161,7 +162,7 @@ def reopen_family(source, output, family):
     original = curve.keyframe_points[1].co.y; curve.keyframe_points[1].co.y = original + .002
     export_rig(output/f'{family}-edited.glb')
     curve.keyframe_points[1].co.y = original
-    return dict(family=family,bones=44,actions=list(ACTIONS),samples=samples)
+    return dict(family=family,bones=44,actions=list(ACTIONS),samples=samples,packedImages=preview_maps)
 
 
 def main():

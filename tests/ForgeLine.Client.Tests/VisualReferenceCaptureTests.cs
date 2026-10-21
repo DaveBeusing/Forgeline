@@ -10,6 +10,25 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class VisualReferenceCaptureTests
 {
+    [Theory]
+    [InlineData(VisualReferenceSceneKind.InfantryRifleSingle)]
+    [InlineData(VisualReferenceSceneKind.InfantryRifleHundred)]
+    [InlineData(VisualReferenceSceneKind.InfantryRifleThousand)]
+    [InlineData(VisualReferenceSceneKind.InfantryEngineerSingle)]
+    [InlineData(VisualReferenceSceneKind.InfantryEngineerHundred)]
+    [InlineData(VisualReferenceSceneKind.InfantryEngineerThousand)]
+    public void InfantryLoadRequestsAcceptBoundedCopiedPhaseBeforeNativeStartup(VisualReferenceSceneKind kind)
+    {
+        var request = new VisualReferenceCaptureRequest
+        { OutputRoot = "unused", RuntimeRoot = "unused", Commit = new('a', 40), Scenes = [kind], MechanicalSeconds = .375 };
+        request.Validate();
+        foreach (double phase in new[] { 0d, .625, 120d })
+            (request with { MechanicalSeconds = phase }).Validate();
+        foreach (double phase in new[] { -1d, 121d, double.NaN, double.PositiveInfinity })
+            Assert.Throws<ArgumentOutOfRangeException>(() => (request with { MechanicalSeconds = phase }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (request with { Scenes = [kind, VisualReferenceSceneKind.DaylightTerrain] }).Validate());
+    }
+
     [Fact]
     public void RejectedAndFailedRequestsCannotOverwriteExistingEvidence()
     {

@@ -13,6 +13,13 @@ SOURCE = Path(__file__).resolve().parents[3] / 'assets/source/units/directorate'
 
 
 class InfantrySurfaceTests(unittest.TestCase):
+    def test_additional_mesh_cannot_hide_unchecked_geometry(self):
+        root, binary = contract.document(SOURCE / 'authoring/infantry/rifle_squad.glb')
+        root['meshes'].append(deepcopy(root['meshes'][0]))
+        with patch.object(contract, 'document', return_value=(root, binary)):
+            with self.assertRaisesRegex(ValueError, 'exactly one infantry mesh'):
+                contract.corners('extra-mesh')
+
     def test_production_roles_match_static_source_corners(self):
         for family in ('rifle_squad', 'combat_engineer'):
             with self.subTest(family=family):

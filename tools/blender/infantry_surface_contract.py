@@ -27,6 +27,8 @@ def accessor(root, binary, index):
 
 def corners(path):
     root, binary = document(path)
+    if len(root['meshes']) != 1:
+        raise ValueError('Expected exactly one infantry mesh; do not silently ignore geometry')
     result = []
     for primitive in root['meshes'][0]['primitives']:
         attrs = {name:accessor(root, binary, index) for name, index in primitive['attributes'].items()}

@@ -54,6 +54,9 @@ def main(request):
         if new_error >= 1e-6:
             for loop in obj.data.loops:
                 layer.data[loop.index].uv = blender_uv(uv[loop.vertex_index])
+        output_error = max(abs(layer.data[l.index].uv[k] - blender_uv(uv[l.vertex_index])[k])
+                           for l in obj.data.loops for k in (0, 1))
+        require(output_error < 1e-6, 'Corrected native UVs differ from source convention')
         packed_surface(obj.data.materials[0], source)
         obj['atlas_uv_origin'] = 'glTF-top-left; Blender V=1-glTF V'
         require(before == preserved_state(obj, rig), 'Geometry, weights, joints or actions changed')
@@ -65,11 +68,13 @@ def main(request):
         packed = [dict(name=i.name, sha256=hashlib.sha256(bytes(i.packed_file.data)).hexdigest(),
                        colorSpace=i.colorspace_settings.name, path=i.filepath)
                   for i in bpy.data.images if i.packed_file]
-        require(len(packed) == 3, 'Expected exactly three packed atlas maps')
-        bpy.ops.wm.save_as_mainfile(filepath=str(output / f'{family}.blend'), check_existing=False)
+        require(len(packed) == 3, f'Expected exactly three packed atlas maps: {packed}')
+        # Paths target the canonical master location, not this isolated stage.
+        bpy.ops.wm.save_as_mainfile(filepath=str(output / f'{family}.blend'), check_existing=False, relative_remap=False)
         records.append(dict(family=family, originalMasterSha256=sha(master),
                             preservedStateSha256=before, packedImages=packed,
-                            previousUvError=old_error, correctedUvError=new_error,
+                            inputErrorToUnconvertedUvs=old_error, inputErrorToConvertedUvs=new_error,
+                            correctedUvError=output_error,
                             exportSha256=sha(output / f'{family}.glb')))
     (output / 'surface-report.json').write_text(json.dumps(dict(blender=bpy.app.version_string,
         success=True, families=records), indent=2) + '\n', encoding='utf-8')

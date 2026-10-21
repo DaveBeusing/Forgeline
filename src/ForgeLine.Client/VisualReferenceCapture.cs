@@ -66,7 +66,8 @@ internal sealed record VisualReferenceCaptureRequest
         if (!Enum.IsDefined(RunProfile) || !Enum.IsDefined(CameraPath)) throw new ArgumentException("Unsupported performance profile or camera path.");
         if (Commit is null || Commit.Length != 40 || Commit.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("Capture requires a complete source commit.");
         if (MechanicalSeconds is double seconds && (!double.IsFinite(seconds) || seconds is < 0 or > RuntimeAnimationData.MaximumDuration ||
-            Scenes is null || Scenes.Any(s => s is not (VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation or VisualReferenceSceneKind.InfantrySkinning or VisualReferenceSceneKind.InfantrySkinningRepeated or VisualReferenceSceneKind.InfantrySkinningEngineer))))
+            Scenes is null || Scenes.Any(s => s is not (VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation or VisualReferenceSceneKind.InfantrySkinning or VisualReferenceSceneKind.InfantrySkinningRepeated or VisualReferenceSceneKind.InfantrySkinningEngineer) &&
+                s is not (>= VisualReferenceSceneKind.InfantryRifleSingle and <= VisualReferenceSceneKind.InfantryEngineerThousand))))
             throw new ArgumentOutOfRangeException(nameof(MechanicalSeconds));
         if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
         if (RepeatCaptures is < 2 or > 128) throw new ArgumentOutOfRangeException(nameof(RepeatCaptures));

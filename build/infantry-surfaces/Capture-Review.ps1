@@ -3,7 +3,8 @@
 param([Parameter(Mandatory)][string]$BaselineRuntime,
       [Parameter(Mandatory)][string]$CandidateRuntime,
       [Parameter(Mandatory)][string]$ClientPath,
-      [Parameter(Mandatory)][string]$OutputRoot)
+      [Parameter(Mandatory)][string]$OutputRoot,
+      [string[]]$SkipCohorts = @())
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath('../..', $PSScriptRoot)
@@ -27,7 +28,11 @@ foreach ($phase in @(0,.25,.5,.75,1)) {
     $cohorts += @{Name="phase-$phase";Scenes=$roles;Profiles=@('High');Zooms=@('CloseTactical');Displays=@('1920x1080');InspectionDistanceMeters=20;MechanicalSeconds=$phase}
 }
 $results = @()
+foreach ($name in $SkipCohorts) {
+    if ($name -notin $cohorts.Name) { throw "Unknown cohort: $name" }
+}
 foreach ($cohort in $cohorts) {
+    if ($cohort.Name -in $SkipCohorts) { continue }
     $settings = @{MechanicalSeconds=.375}
     foreach ($key in $cohort.Keys) { if ($key -ne 'Name') { $settings[$key]=$cohort[$key] } }
     $before = Join-Path $output "$($cohort.Name)/before"
@@ -37,6 +42,6 @@ foreach ($cohort in $cohorts) {
     & "$repo/build/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $after -BaselineRoot $before -ComparePixels -ReportPath (Join-Path $output "$($cohort.Name)/pixels.json")
     $results += @{name=$cohort.Name;before=$before;after=$after}
 }
-@{sourceSha=(& git -C $repo rev-parse HEAD);cohorts=$results;warmups=8;samples=32;repeatCaptures=8;
+@{sourceSha=(& git -C $repo rev-parse HEAD);cohorts=$results;skippedCohorts=$SkipCohorts;warmups=8;samples=32;repeatCaptures=8;
     humanArtApproval='pending';controlledPerformanceAcceptance='pending';motionScope='sampled phases, not live movement approval'} |
     ConvertTo-Json -Depth 8 | Set-Content (Join-Path $output 'summary.json') -Encoding utf8NoBOM
