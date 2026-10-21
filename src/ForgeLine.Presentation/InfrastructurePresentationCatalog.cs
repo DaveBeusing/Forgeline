@@ -67,6 +67,8 @@ public static class InfrastructurePresentationCatalog
                 "infrastructure.directorate.road.junction_t",
             InfrastructurePresentationKind.RoadJunctionCross =>
                 "infrastructure.directorate.road.junction_cross",
+            InfrastructurePresentationKind.RoadYardTransition =>
+                "infrastructure.directorate.road.yard_transition",
             InfrastructurePresentationKind.RoadSegment or
             InfrastructurePresentationKind.Ford =>
                 feature.State switch
@@ -164,7 +166,8 @@ public static class InfrastructurePresentationCatalog
                 InfrastructurePresentationKind.RoadCurveShort or
                 InfrastructurePresentationKind.RoadCurveLong or
                 InfrastructurePresentationKind.RoadJunctionT or
-                InfrastructurePresentationKind.RoadJunctionCross =>
+                InfrastructurePresentationKind.RoadJunctionCross or
+                InfrastructurePresentationKind.RoadYardTransition =>
                     0.49f,
                 InfrastructurePresentationKind.RoadSegment or
                 InfrastructurePresentationKind.Ford =>

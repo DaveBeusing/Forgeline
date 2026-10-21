@@ -12,7 +12,8 @@
         "source": "../sources/battlefield/bridge_damaged.gltf",
         "type": "mesh"
       },
-      "originalHash": "db4ba96444b6baeef27a451fe5b996233c73d9727db85532a8134799aa60bb92",
+      "originalHash": "4ae3d57c57040dc084c20bc0d4a349ffd24235762dc36ee9a45a31aaa5317baf",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/battlefield/bridge_damaged.gltf",
       "stats": {
         "boundsMax": [
@@ -42,7 +43,8 @@
         "source": "../sources/battlefield/bridge_destroyed.gltf",
         "type": "mesh"
       },
-      "originalHash": "0212ca705975694af10f915155aa511f4e87d0b3bb7c4ef062958c6f6af4a849",
+      "originalHash": "e3627c22a3a1577e92ef341bee0b9e1c66f31f6851d1fca119da72b4d2358971",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/battlefield/bridge_destroyed.gltf",
       "stats": {
         "boundsMax": [
@@ -72,7 +74,8 @@
         "source": "../sources/bridge_intact.gltf",
         "type": "mesh"
       },
-      "originalHash": "c51534d90e068b2df2959f36d6bda9b1232dfc8c433e8c110d735e3343f383bc",
+      "originalHash": "3779dcaa646b7da2775955ef6c6cdf97522c971cbd5b7c7d41135f8a4529a903",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/bridge_intact.gltf",
       "stats": {
         "boundsMax": [
@@ -102,7 +105,8 @@
         "source": "../sources/road_curve_long.gltf",
         "type": "mesh"
       },
-      "originalHash": "30693ed61774dc762526833be70e1f0e9bb490c617c4f2b253ab52560465753c",
+      "originalHash": "941e4541097f4fcdaaf7830eb00ebc48e167783825380cc38cddd022f88b3bec",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/road_curve_long.gltf",
       "stats": {
         "boundsMax": [
@@ -132,7 +136,8 @@
         "source": "../sources/road_curve_short.gltf",
         "type": "mesh"
       },
-      "originalHash": "65b2538cb9d28c6d49d91d1527a497d475ab96223223ccf92009be9b22e3fb97",
+      "originalHash": "af071f1647c830d644591b7e4602683391e2de83b397565946834ac30f43197b",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/road_curve_short.gltf",
       "stats": {
         "boundsMax": [
@@ -162,7 +167,8 @@
         "source": "../sources/battlefield/road_damaged.gltf",
         "type": "mesh"
       },
-      "originalHash": "edae47611b1d1ab9041bf1fa6b4f05e0a78f2f9170669270fe6e75485978803f",
+      "originalHash": "b02ca2f943d8486252cef74f23c408f74a4301f9e478cbfdd5d329b5fc729a0a",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/battlefield/road_damaged.gltf",
       "stats": {
         "boundsMax": [
@@ -192,7 +198,8 @@
         "source": "../sources/battlefield/road_destroyed.gltf",
         "type": "mesh"
       },
-      "originalHash": "a36b9958b9ce434c166a33cb6a5ec0a803bcaadbe694413e1b5180b08e4f3bd7",
+      "originalHash": "d1fef3d889920b69b0da8a7966267251d1cee64a7090a6947d99acd494ce997a",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/battlefield/road_destroyed.gltf",
       "stats": {
         "boundsMax": [
@@ -222,7 +229,8 @@
         "source": "../sources/road_junction_cross.gltf",
         "type": "mesh"
       },
-      "originalHash": "bbc1216b5df2859f8ea5d1e63305e6ef792a07713f9e319a50d3ae27ef1d1bbc",
+      "originalHash": "6ee8b381545f4ded2285d3c8d7e929fd8e2c51a0ca148a55f22e1e6d74088cf9",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/road_junction_cross.gltf",
       "stats": {
         "boundsMax": [
@@ -252,7 +260,8 @@
         "source": "../sources/road_junction_t.gltf",
         "type": "mesh"
       },
-      "originalHash": "598c2d601c95ad9fe4e711b3fb1bfa4af6d25e60ddaa4627c021ca18459451de",
+      "originalHash": "7a33621b714f3768ea050edad239fa975f009b65dc3a03b0ddc3ed769e49f478",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/road_junction_t.gltf",
       "stats": {
         "boundsMax": [
@@ -282,7 +291,8 @@
         "source": "../sources/road_shoulder.gltf",
         "type": "mesh"
       },
-      "originalHash": "e9c780129ba5e79553132cd9311a549b0a97a3c9a9ece03cb722c286578b6709",
+      "originalHash": "a11e23635515dc30313568380bae76ccee7817343342dcdff86338a4556707f1",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/road_shoulder.gltf",
       "stats": {
         "boundsMax": [
@@ -312,7 +322,8 @@
         "source": "../sources/road_straight.gltf",
         "type": "mesh"
       },
-      "originalHash": "fd58a5296cfae858c3348e12f2d221dbea0b7a84ee4e6ae49a3a75ef9bb35aac",
+      "originalHash": "e8f598bd6ec964bd8f04e8c33b06d4ee1eccfc05ad8446eb5d32e9bf7a5b0887",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/road_straight.gltf",
       "stats": {
         "boundsMax": [
@@ -342,7 +353,8 @@
         "source": "../sources/road_yard_transition.gltf",
         "type": "mesh"
       },
-      "originalHash": "b2ca2a347683818525008bd9b493acfc307cd6a128a523a6089873f6a97b661c",
+      "originalHash": "77023dd89f6da0cfbb7d783c6c5351e7329cbb54f1e94ded837da7353afdbd48",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "infrastructure/directorate/sources/road_yard_transition.gltf",
       "stats": {
         "boundsMax": [
@@ -381,7 +393,8 @@
         "source": "../sources/environment_kit/bridge_apron_high.gltf",
         "type": "mesh"
       },
-      "originalHash": "41175306c9ff1ce327609b2088aa4d6b9cc2b7232b0409cb42c8b8c979cf7f4a",
+      "originalHash": "89773e0ad0b03e8747decbfc6f753484989b16e467bdc5f9f556d6c7fa774347",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "world/meshes/sources/environment_kit/bridge_apron_high.gltf",
       "stats": {
         "boundsMax": [
@@ -411,7 +424,8 @@
         "source": "../sources/environment_kit/bridge_apron_reduced.gltf",
         "type": "mesh"
       },
-      "originalHash": "9cefbb9a5f4603df32bb924d6dd795c57d055a2f9cd6d72a1b2896be09d85bc3",
+      "originalHash": "61b734f09e8bf5a43de05f13886cca2afeaa3877ff200a61b082a19df4450b94",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "world/meshes/sources/environment_kit/bridge_apron_reduced.gltf",
       "stats": {
         "boundsMax": [
@@ -450,7 +464,8 @@
         "source": "../sources/environment_kit/loading_apron_high.gltf",
         "type": "mesh"
       },
-      "originalHash": "6957599bab95b6bce393cf424d395684957d367bd7697ab89e770991e30c79d7",
+      "originalHash": "d44f9f9a7819e7dd5313ed54683462b3bd8202f9842905a250847d8c951d9c85",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "world/meshes/sources/environment_kit/loading_apron_high.gltf",
       "stats": {
         "boundsMax": [
@@ -480,7 +495,8 @@
         "source": "../sources/environment_kit/loading_apron_reduced.gltf",
         "type": "mesh"
       },
-      "originalHash": "99c9b53b30e13715aa17002a8c19bc24a7c0e650be1dd5654da775870a3e6459",
+      "originalHash": "daeeba794666d836b2cef8d990a8eba8c03a52a1e3a18147195b9b68b073ef52",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "world/meshes/sources/environment_kit/loading_apron_reduced.gltf",
       "stats": {
         "boundsMax": [
@@ -519,7 +535,8 @@
         "source": "../sources/environment_kit/road_edge_high.gltf",
         "type": "mesh"
       },
-      "originalHash": "da784a9c64c24c1db0b299b21e978d8c7ea89a2e3d15f67e10e13d10f18fb86d",
+      "originalHash": "a95f2f6db6caeb8625d3fbe7bdc961f28f2efd4f94b9c17d0bf0bad8c9bbd897",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "world/meshes/sources/environment_kit/road_edge_high.gltf",
       "stats": {
         "boundsMax": [
@@ -549,7 +566,8 @@
         "source": "../sources/environment_kit/road_edge_reduced.gltf",
         "type": "mesh"
       },
-      "originalHash": "300e74a2ff573232bcd2aa2e5fe3c52eed8dacad75ecc69ef8f501db7fdbfcbf",
+      "originalHash": "91a765c8fc75dfc01bead89fef25fbe0c86b96a738723268b6615cbca38dbe4e",
+      "originalHashMode": "lf-normalized-json",
       "originalSource": "world/meshes/sources/environment_kit/road_edge_reduced.gltf",
       "stats": {
         "boundsMax": [

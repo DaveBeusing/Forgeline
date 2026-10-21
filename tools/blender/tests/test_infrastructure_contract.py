@@ -1,5 +1,6 @@
 import copy
 import json
+import hashlib
 import sys
 import unittest
 from pathlib import Path
@@ -22,7 +23,8 @@ class InfrastructureContracts(unittest.TestCase):
         for record in self.records:
             with self.subTest(asset=record['id']):
                 original=self.catalog.root/record['originalSource']
-                self.assertEqual(record['originalHash'],sha(original))
+                self.assertEqual('lf-normalized-json',record['originalHashMode'])
+                self.assertEqual(record['originalHash'],hashlib.sha256(original.read_bytes().replace(b'\r\n',b'\n')).hexdigest())
                 definition=self.catalog.definitions[record['id']][1]
                 self.assertEqual({k:v for k,v in record['metadata'].items() if k!='source'},
                                  {k:v for k,v in definition.items() if k!='source'})
