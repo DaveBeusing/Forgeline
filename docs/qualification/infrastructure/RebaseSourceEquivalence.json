@@ -1,0 +1,9 @@
+{
+  "measuredBase": "8e486734383075c39a914b71adf34d8c3311b7be",
+  "integrationBase": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "checkedFiles": 46,
+  "changedFiles": [
+    "src/ForgeLine.Presentation/VisualReferenceScene.cs"
+  ],
+  "reason": "Preserve existing vegetation scene enum IDs and factory routing; append infrastructure scene IDs."
+}

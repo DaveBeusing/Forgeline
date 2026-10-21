@@ -122,6 +122,19 @@ python -m unittest discover -s tools/blender/tests -p 'test_*contract.py' -v
 dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
 ```
 
+The fixed-seed terminal comparison is retained in
+[HeadlessComparison.json](HeadlessComparison.json): seed 2026, 80,000-tick cap,
+required terminal result at tick 55,210, winner 1, 119 completed cargo orders,
+zero failed cargo orders and zero route failures. Every authoritative match field
+and the complete gameplay telemetry JSON are exactly equal. Only elapsed-time,
+throughput, tick timing, allocation and GC observations are excluded. The
+production-file rebase check is retained in
+[RebaseSourceEquivalence.json](RebaseSourceEquivalence.json).
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --seed 2026 --ticks 80000 --require-terminal --diagnostics-output artifacts/headless-after.json --telemetry-output artifacts/headless-after-telemetry.json
+```
+
 ## Retained failed attempts
 
 Authoring initially exceeded the unchanged 120s deadline scanning the full
