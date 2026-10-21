@@ -266,7 +266,8 @@ reviewable source/runtime candidate, not a claim of completed production accepta
 The final production source is `c7cbb542c77f56ce5de0988e043ad65495b12b37`,
 based on fetched master `a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d`, version
 0.1.437. The candidate remains exactly one PATCH higher: **0.1.438**. Subsequent
-commits add documentation/evidence only. The original 0.1.437 results above keep
+commits update catalog-count assertions and documentation/evidence; production
+code and assets remain unchanged. The original 0.1.437 results above keep
 their original source identity.
 
 Merged terrain PR #284 preserves encoded texture payloads while migrating saved
@@ -360,3 +361,14 @@ in the indexed local archive. The original 0.1.437 archive is retained separatel
 PR #282 stays **draft**: current and historical failed timing gates, the broader
 physical renderer qualification and human visual acceptance remain open. No
 merge, release, tag or golden approval is performed.
+
+The full CI run at `cb1d9461` found five stale exact catalog-count assertions:
+unit, UI, VFX, world and building authoring tests expected 1,363 instead of 1,365.
+The only added IDs are the shared decal normal and ORM maps. These five exact
+expectations are updated to 1,365; no lower bound, dynamic count or budget
+relaxation replaces them. Original CI failure logs are retained separately.
+This correction changes tests and documentation only; the measured production
+source and installed package remain `c7cbb542`.
+
+The corrected five authoring test classes pass locally: five passed, zero failed/
+skipped, 7m41.096s, using an actual fresh full production compile.
