@@ -10,8 +10,8 @@
   "files": [
     {
       "path": ".gitattributes",
-      "bytes": 101,
-      "sha256": "d54815d6580c7131165f42a3a524f12568a44a83f87c4f43d312e528c9b06c8f"
+      "bytes": 121,
+      "sha256": "f2dde06001ab8cf8b9c5febb473f5c71f6a0f96fc74a5a990b8f99621b6e93e3"
     },
     {
       "path": "authoring/baseline-compile.json",
