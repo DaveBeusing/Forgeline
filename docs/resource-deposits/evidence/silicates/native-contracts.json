@@ -1,0 +1,13 @@
+{
+  "rejected": [
+    "unbaked transform",
+    "changed envelope",
+    "modifier",
+    "animation",
+    "material slots",
+    "unexpected object"
+  ],
+  "root": "mesh.world.resource.silicates",
+  "success": true,
+  "unchangedReopenAccepted": true
+}

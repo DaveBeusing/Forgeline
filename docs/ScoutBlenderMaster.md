@@ -1,11 +1,10 @@
 # Scout Blender master
 
-## Current synchronization (0.1.435)
+## Current synchronization (0.1.436)
 
-PR 280 is synchronized with master 6445ed102bfbec4a5033917196f9464578086be4 (0.1.434), including infantry PR 277. All 90 master scene enum IDs are preserved; the six incoming infantry load scenes retain 84–89 and Scout appends at 90–94. The incoming infantry time-admission and dispatch logic are retained alongside the Scout dispatch. The branch contains exactly one PATCH increment to 0.1.435.
+PR 280 is synchronized with master f151362883134eda0fe50f8fb70d9102b3635446 (0.1.435), including resource-deposit PR 279 and infantry PR 277. All 94 master scene enum IDs are preserved. Resource-deposit scenes retain 90–93, infantry scenes retain 84–89, and Scout appends at 94–98. The resource-deposit, infantry and Scout dispatch paths are retained. The branch contains exactly one PATCH increment to 0.1.436.
 
-The merged working tree passes the Release build with zero warnings/errors, 92 Scout/infantry/shared scene cases, 12 capture-request cases, the project-reference graph and the retained Scout master/export integrity check. Historical Blender, installed-package and native-image records below remain bound to their original revisions and 0.1.434 package; they are not relabelled as new 0.1.435 measurements. New hosted results must be evaluated at the synchronized PR head. Production promotion and human/render acceptance remain separate open gates.
-
+The merged working tree passes the Release build with zero warnings/errors, 97 Scout/infantry/resource/shared scene cases, 12 capture-request cases, the 44-project reference graph and the retained Scout master/export integrity check. Scout masters, exports and historical evidence remain unchanged. Native Blender, installed-package and image records below retain their original revisions and 0.1.434 package identity; they are not relabelled as new 0.1.436 measurements. Hosted checks must be evaluated at the synchronized PR head. Production promotion and human/render acceptance remain separate open gates.
 
 ## Result and integration decision
 

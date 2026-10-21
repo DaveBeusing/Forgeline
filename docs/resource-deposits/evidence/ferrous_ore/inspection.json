@@ -1,0 +1,79 @@
+{
+  "family": "mesh.world.resource.ferrous_ore",
+  "humanArtApproval": "pending",
+  "packedImages": [
+    {
+      "colorSpace": "sRGB",
+      "sha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+      "source": "materials/directorate/surfaces/production_surface_base.png"
+    },
+    {
+      "colorSpace": "Non-Color",
+      "sha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+      "source": "materials/directorate/surfaces/production_surface_normal.png"
+    },
+    {
+      "colorSpace": "Non-Color",
+      "sha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+      "source": "materials/directorate/surfaces/production_surface_orm.png"
+    }
+  ],
+  "previews": [
+    {
+      "assetId": "mesh.world.resource.ferrous_ore",
+      "camera": "close",
+      "distanceInAssetExtents": 3.5323089732569297,
+      "file": "mesh.world.resource.ferrous_ore-close.png"
+    },
+    {
+      "assetId": "mesh.world.resource.ferrous_ore",
+      "camera": "normal",
+      "distanceInAssetExtents": 5.780141956238612,
+      "file": "mesh.world.resource.ferrous_ore-normal.png"
+    },
+    {
+      "assetId": "mesh.world.resource.ferrous_ore",
+      "camera": "strategic",
+      "distanceInAssetExtents": 10.9180459173396,
+      "file": "mesh.world.resource.ferrous_ore-strategic.png"
+    }
+  ],
+  "schemaVersion": 1,
+  "sourceSignature": "5ef3d1dc1a8fba0fcd7f944a436a1e3ca38a9be5b3eafbe5193ca2823a1f8c81",
+  "success": true,
+  "textures": [
+    {
+      "colorSpace": "srgb",
+      "estimatedPayloadBytes": 5586944,
+      "format": "BC7",
+      "height": 2048,
+      "id": "texture.directorate.surface.atlas_base",
+      "mipLevels": 5,
+      "sourceSha256": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+      "usage": "baseColor",
+      "width": 2048
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 1392640,
+      "format": "BC7",
+      "height": 1024,
+      "id": "texture.directorate.surface.atlas_normal",
+      "mipLevels": 4,
+      "sourceSha256": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+      "usage": "normal",
+      "width": 1024
+    },
+    {
+      "colorSpace": "linear",
+      "estimatedPayloadBytes": 344064,
+      "format": "BC7",
+      "height": 512,
+      "id": "texture.directorate.surface.atlas_orm",
+      "mipLevels": 3,
+      "sourceSha256": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+      "usage": "orm",
+      "width": 512
+    }
+  ]
+}

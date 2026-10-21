@@ -1,0 +1,51 @@
+{
+  "authoringSourceSha": "ad6b88e06d8c0f99ae561a00429f694ef44c7470",
+  "blenderVersion": "5.2.2",
+  "boundPortableSourceSignature": "c182995729b8303a16cf2ba322565af3c13ff97c8af246de73a0a9b56eaf77d5",
+  "canonicalSourcesUnchanged": false,
+  "exports": [
+    {
+      "canonicalDefinition": "world/meshes/resources/volatiles.asset.json",
+      "id": "mesh.world.resource.volatiles",
+      "previousCanonicalSource": "../sources/resource_volatiles.gltf",
+      "sha256": "8822d1809ef568d0b9edd0af95f9f0a179fbe00dc7d69848981310db8ff4b483",
+      "source": "mesh.world.resource.volatiles.glb"
+    },
+    {
+      "canonicalDefinition": "world/meshes/resources/volatiles_lod1.asset.json",
+      "id": "mesh.world.resource.volatiles_lod1",
+      "previousCanonicalSource": "../sources/resource_volatiles_lod1.gltf",
+      "sha256": "fa440aa6745aca2c09f7ff083dba4db9434c3f440c1a106339409aa290091203",
+      "source": "mesh.world.resource.volatiles_lod1.glb"
+    }
+  ],
+  "fixtureSha256": "867f64a6f4021c78cd6c98554a36ae8acbdb7d3e853c4e4ae62c790a2b46aead",
+  "humanArtApproval": "pending",
+  "masters": [
+    {
+      "path": "volatiles.blend",
+      "sha256": "bc5c62efc208a700e97d6b3384e5490e63264d73a30c506c7b7a08fd1b1e9a5c"
+    },
+    {
+      "path": "volatiles_inspection.blend",
+      "sha256": "468aa206e1c2759f0712056b19debba16fc204a19aff5c59fbc74ceebd482dd0"
+    }
+  ],
+  "nativeContractSignaturePolicy": "lf-json-v1",
+  "nativeContractSourceSignature": "c182995729b8303a16cf2ba322565af3c13ff97c8af246de73a0a9b56eaf77d5",
+  "portableSourceSignature": "04c06e5837f327d2837efda1e14037d1e382baba5702f1aafae1ddba8a94bd89",
+  "previousNativeMasters": [
+    {
+      "path": "volatiles.blend",
+      "sha256": "ede5d9d863ea16be7f991ecc23c74ec26fd9b6e37034c6df35862d754ae89b3d"
+    },
+    {
+      "path": "volatiles_inspection.blend",
+      "sha256": "25a8af354b048010c005fa17d7046b5696f1d3a1ab06dd3304196a7f6aa42b73"
+    }
+  ],
+  "schemaVersion": 1,
+  "sourceSha": "1f351e14ab0f703006a641320502f26bb506087f",
+  "sourceSignature": "eee316b4b0aab7feaa836a684c436e78be7ea7b4c925dd96593a7991812f878d",
+  "status": "review-bound-not-accepted"
+}

@@ -1,0 +1,53 @@
+{
+  "assetCount": 6,
+  "meshCount": 2,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7336817,
+  "meshRuntimeBytes": 8994,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1628,
+  "catalogLoadDuration": "00:00:00.0072968",
+  "assetReadDuration": "00:00:00.0662581",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "mesh.world.resource.silicates",
+      "type": "mesh",
+      "runtimeBytes": 5410
+    },
+    {
+      "assetId": "mesh.world.resource.silicates_lod1",
+      "type": "mesh",
+      "runtimeBytes": 3584
+    },
+    {
+      "assetId": "material.world.resource.silicates",
+      "type": "material",
+      "runtimeBytes": 1628
+    }
+  ],
+  "issues": [],
+  "success": true
+}

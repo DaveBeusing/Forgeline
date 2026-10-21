@@ -1,0 +1,53 @@
+{
+  "assetCount": 6,
+  "meshCount": 2,
+  "textureCount": 3,
+  "materialCount": 1,
+  "skinCount": 0,
+  "skinRuntimeBytes": 0,
+  "animationCount": 0,
+  "animationRuntimeBytes": 0,
+  "uiSkinCount": 0,
+  "uiSkinRuntimeBytes": 0,
+  "totalRuntimeBytes": 7339662,
+  "meshRuntimeBytes": 11838,
+  "textureRuntimeBytes": 7326195,
+  "studioSplashTextureRuntimeBytes": 0,
+  "materialRuntimeBytes": 1629,
+  "catalogLoadDuration": "00:00:00.2253079",
+  "assetReadDuration": "00:00:00.0752581",
+  "largestAssets": [
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393494
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_orm",
+      "type": "texture",
+      "runtimeBytes": 344889
+    },
+    {
+      "assetId": "mesh.world.resource.volatiles",
+      "type": "mesh",
+      "runtimeBytes": 7037
+    },
+    {
+      "assetId": "mesh.world.resource.volatiles_lod1",
+      "type": "mesh",
+      "runtimeBytes": 4801
+    },
+    {
+      "assetId": "material.world.resource.volatiles",
+      "type": "material",
+      "runtimeBytes": 1629
+    }
+  ],
+  "issues": [],
+  "success": true
+}
