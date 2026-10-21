@@ -1,0 +1,293 @@
+{
+  "baselineMaster": "a6fe118583be842e00416bcb100d1210f3240a00",
+  "checks": {
+    "portable": {
+      "failed": 0,
+      "logSha256": "206bf05c44b3e5a99929269b811e873ec8f9f246217641e0ec56a3fc442c0329",
+      "passed": 110
+    },
+    "realDockTests": {
+      "failed": 0,
+      "logSha256": "beaa93e7436c5be1f78a4bba089fcc84a0484c81ad4671d755d9a23d2ed555f0",
+      "passed": 20
+    },
+    "releaseBuild": {
+      "failed": 0,
+      "logSha256": "ae3dd0977d3f2bd960f6060755609a24bc8b0a9c14d414233f9174e56bfdd41e",
+      "passed": null
+    },
+    "sceneTests": {
+      "failed": 0,
+      "logSha256": "800ffce9de7b3afeaa88155b34e74cbda93d1d616e966eddcd129d2288bf6227",
+      "passed": 81
+    }
+  },
+  "exactOnePatch": true,
+  "humanArtAccepted": false,
+  "masterSceneIdsPreserved": true,
+  "nativeComparisons": [
+    {
+      "cohort": "current432",
+      "imageSha256": "1DB638CE8C840D98D72FD4435F193BDF185345611C93021C7865C7047070AA83",
+      "key": "StorageDepotProduction-1920x1080-High-NormalGameplay",
+      "pixelSha256": "E3F14E4E5BA2E31056D7AD96264AE878DD16BF16A0C0E567FA01990FF355E5AA",
+      "pngIdenticalToOriginal": true,
+      "rgbaIdenticalToOriginal": true
+    },
+    {
+      "cohort": "current432",
+      "imageSha256": "0F6A38BE3B2EFFA6A865E105B2227E30378094507F598A7AECB7CED22660FA00",
+      "key": "SupplyDepotProduction-1920x1080-High-NormalGameplay",
+      "pixelSha256": "84F86AC34A60616F0F312F4A482124B108C81C6263F0B13438648A98E3B5F4A3",
+      "pngIdenticalToOriginal": true,
+      "rgbaIdenticalToOriginal": true
+    },
+    {
+      "cohort": "current432",
+      "imageSha256": "D35D09CCDE86978C03AAC310D3C578D92ADEB6A186F0A1DB5695A9F4D51B4FAC",
+      "key": "LogisticsHubProduction-1920x1080-High-NormalGameplay",
+      "pixelSha256": "430AF337FAEB0086E36A1A7363CD798CA80E97B2B5B9575373B3A40A95314F53",
+      "pngIdenticalToOriginal": true,
+      "rgbaIdenticalToOriginal": true
+    },
+    {
+      "cohort": "current432",
+      "imageSha256": "B8E55BB5EE2C247111945F35A5D65E9E156057A81442EB00C3451CA62961B82E",
+      "key": "LogisticsLoadingProduction-1920x1080-High-NormalGameplay",
+      "pixelSha256": "D4CF6E11A58621DE8CA1893E0DEB097624F380A7076C6370F8B25AD23115A0E8",
+      "pngIdenticalToOriginal": true,
+      "rgbaIdenticalToOriginal": true
+    },
+    {
+      "cohort": "installed432",
+      "imageSha256": "1DB638CE8C840D98D72FD4435F193BDF185345611C93021C7865C7047070AA83",
+      "key": "StorageDepotProduction-1920x1080-High-NormalGameplay",
+      "pixelSha256": "E3F14E4E5BA2E31056D7AD96264AE878DD16BF16A0C0E567FA01990FF355E5AA",
+      "pngIdenticalToOriginal": true,
+      "rgbaIdenticalToOriginal": true
+    },
+    {
+      "cohort": "installed432",
+      "imageSha256": "0F6A38BE3B2EFFA6A865E105B2227E30378094507F598A7AECB7CED22660FA00",
+      "key": "SupplyDepotProduction-1920x1080-High-NormalGameplay",
+      "pixelSha256": "84F86AC34A60616F0F312F4A482124B108C81C6263F0B13438648A98E3B5F4A3",
+      "pngIdenticalToOriginal": true,
+      "rgbaIdenticalToOriginal": true
+    },
+    {
+      "cohort": "installed432",
+      "imageSha256": "D35D09CCDE86978C03AAC310D3C578D92ADEB6A186F0A1DB5695A9F4D51B4FAC",
+      "key": "LogisticsHubProduction-1920x1080-High-NormalGameplay",
+      "pixelSha256": "430AF337FAEB0086E36A1A7363CD798CA80E97B2B5B9575373B3A40A95314F53",
+      "pngIdenticalToOriginal": true,
+      "rgbaIdenticalToOriginal": true
+    },
+    {
+      "cohort": "installed432",
+      "imageSha256": "B8E55BB5EE2C247111945F35A5D65E9E156057A81442EB00C3451CA62961B82E",
+      "key": "LogisticsLoadingProduction-1920x1080-High-NormalGameplay",
+      "pixelSha256": "D4CF6E11A58621DE8CA1893E0DEB097624F380A7076C6370F8B25AD23115A0E8",
+      "pngIdenticalToOriginal": true,
+      "rgbaIdenticalToOriginal": true
+    }
+  ],
+  "nativeRawCount": 8,
+  "nativeSamplesSha256": "21d876bd52391791d456d24aa07fb4e9187964fe5f861280589ff5cb38b164dc",
+  "package": {
+    "archiveBytes": 55139506,
+    "archiveSha256": "065c0c309f3b45849e6a68e585dbf6d3057bb402269e44c79f72e03e6bae9873",
+    "authoringOrCompilerFiles": 0,
+    "reproduciblePublish": true,
+    "runtimeAssetSignature": "ab3465429675dc60c31a5fe37e9df808b1567a9e40699191d42df8b9d9394d8f",
+    "sourceRevision": "382a99cc9996f2137747a2500fa33f878f81aca8",
+    "sourceTreeClean": true,
+    "verifiedManifestFiles": 1487,
+    "version": "0.1.432-dev"
+  },
+  "performanceAccepted": false,
+  "productionPromotionAccepted": false,
+  "runtime": {
+    "animationCount": 18,
+    "animationRuntimeBytes": 189114,
+    "assetCount": 1363,
+    "assetReadDuration": "00:00:08.0264413",
+    "catalogLoadDuration": "00:00:00.0559001",
+    "issues": [],
+    "largestAssets": [
+      {
+        "assetId": "texture.directorate.surface.atlas_base",
+        "runtimeBytes": 5587812,
+        "type": "texture"
+      },
+      {
+        "assetId": "ui.atlas.directorate.icons.p1",
+        "runtimeBytes": 4195048,
+        "type": "texture"
+      },
+      {
+        "assetId": "ui.atlas.directorate.icons.p2",
+        "runtimeBytes": 4195048,
+        "type": "texture"
+      },
+      {
+        "assetId": "ui.atlas.directorate.core.p1",
+        "runtimeBytes": 4195045,
+        "type": "texture"
+      },
+      {
+        "assetId": "branding.forgeline.menu.directorate",
+        "runtimeBytes": 3146855,
+        "type": "texture"
+      },
+      {
+        "assetId": "skin.directorate.combat_engineer",
+        "runtimeBytes": 2129106,
+        "type": "skin"
+      },
+      {
+        "assetId": "skin.directorate.rifle_squad",
+        "runtimeBytes": 1501305,
+        "type": "skin"
+      },
+      {
+        "assetId": "texture.world.terrain.crushed_gravel",
+        "runtimeBytes": 1399111,
+        "type": "texture"
+      },
+      {
+        "assetId": "texture.world.terrain.concrete_base",
+        "runtimeBytes": 1399108,
+        "type": "texture"
+      },
+      {
+        "assetId": "texture.world.terrain.cracked_earth",
+        "runtimeBytes": 1399108,
+        "type": "texture"
+      },
+      {
+        "assetId": "texture.world.terrain.rocky_scrub",
+        "runtimeBytes": 1399102,
+        "type": "texture"
+      },
+      {
+        "assetId": "texture.world.terrain.dark_ash",
+        "runtimeBytes": 1399093,
+        "type": "texture"
+      }
+    ],
+    "materialCount": 132,
+    "materialRuntimeBytes": 163881,
+    "meshCount": 309,
+    "meshRuntimeBytes": 11307682,
+    "skinCount": 2,
+    "skinRuntimeBytes": 3630411,
+    "studioSplashTextureRuntimeBytes": 1786417,
+    "success": true,
+    "textureCount": 901,
+    "textureRuntimeBytes": 59453925,
+    "totalRuntimeBytes": 74844665,
+    "uiSkinCount": 1,
+    "uiSkinRuntimeBytes": 99652
+  },
+  "runtimeChangesSinceOriginalQualification": [
+    "unit.directorate.cargo_truck",
+    "unit.directorate.cargo_truck.critical",
+    "unit.directorate.cargo_truck.damaged",
+    "unit.directorate.cargo_truck.lod1",
+    "unit.directorate.cargo_truck.lod2",
+    "unit.directorate.cargo_truck.wreck",
+    "unit.directorate.supply_truck",
+    "unit.directorate.supply_truck.critical",
+    "unit.directorate.supply_truck.damaged",
+    "unit.directorate.supply_truck.lod1",
+    "unit.directorate.supply_truck.lod2",
+    "unit.directorate.supply_truck.wreck"
+  ],
+  "savedMastersAnd33ExportsUnchanged": true,
+  "schemaVersion": 1,
+  "sourceLessValidation": {
+    "animationCount": 18,
+    "animationRuntimeBytes": 189114,
+    "assetCount": 1363,
+    "assetReadDuration": "00:00:09.9658214",
+    "catalogLoadDuration": "00:00:00.7928709",
+    "issues": [],
+    "largestAssets": [
+      {
+        "assetId": "texture.directorate.surface.atlas_base",
+        "runtimeBytes": 5587812,
+        "type": "texture"
+      },
+      {
+        "assetId": "ui.atlas.directorate.icons.p1",
+        "runtimeBytes": 4195048,
+        "type": "texture"
+      },
+      {
+        "assetId": "ui.atlas.directorate.icons.p2",
+        "runtimeBytes": 4195048,
+        "type": "texture"
+      },
+      {
+        "assetId": "ui.atlas.directorate.core.p1",
+        "runtimeBytes": 4195045,
+        "type": "texture"
+      },
+      {
+        "assetId": "branding.forgeline.menu.directorate",
+        "runtimeBytes": 3146855,
+        "type": "texture"
+      },
+      {
+        "assetId": "skin.directorate.combat_engineer",
+        "runtimeBytes": 2129106,
+        "type": "skin"
+      },
+      {
+        "assetId": "skin.directorate.rifle_squad",
+        "runtimeBytes": 1501305,
+        "type": "skin"
+      },
+      {
+        "assetId": "texture.world.terrain.crushed_gravel",
+        "runtimeBytes": 1399111,
+        "type": "texture"
+      },
+      {
+        "assetId": "texture.world.terrain.concrete_base",
+        "runtimeBytes": 1399108,
+        "type": "texture"
+      },
+      {
+        "assetId": "texture.world.terrain.cracked_earth",
+        "runtimeBytes": 1399108,
+        "type": "texture"
+      },
+      {
+        "assetId": "texture.world.terrain.rocky_scrub",
+        "runtimeBytes": 1399102,
+        "type": "texture"
+      },
+      {
+        "assetId": "texture.world.terrain.dark_ash",
+        "runtimeBytes": 1399093,
+        "type": "texture"
+      }
+    ],
+    "materialCount": 132,
+    "materialRuntimeBytes": 163881,
+    "meshCount": 309,
+    "meshRuntimeBytes": 11307682,
+    "skinCount": 2,
+    "skinRuntimeBytes": 3630411,
+    "studioSplashTextureRuntimeBytes": 1786417,
+    "success": true,
+    "textureCount": 901,
+    "textureRuntimeBytes": 59453925,
+    "totalRuntimeBytes": 74844665,
+    "uiSkinCount": 1,
+    "uiSkinRuntimeBytes": 99652
+  },
+  "testedSourceCommit": "382a99cc9996f2137747a2500fa33f878f81aca8",
+  "version": "0.1.432-dev"
+}

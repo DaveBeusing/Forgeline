@@ -1,24 +1,22 @@
 {
+  "collisionReference": "building.directorate.module.collision_box",
+  "collisionRequired": true,
   "id": "building.directorate.logistics_hub",
-  "type": "mesh",
-  "source": "sources/logistics/logistics_hub/lod0.gltf",
-  "materialReferences": [
-    "material.directorate.building.structural"
-  ],
   "lods": [
     {
-      "level": 1,
       "assetId": "building.directorate.logistics_hub.lod1",
+      "level": 1,
       "maxDistance": 220
     },
     {
-      "level": 2,
       "assetId": "building.directorate.logistics_hub.lod2",
+      "level": 2,
       "maxDistance": 620
     }
   ],
-  "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ],
   "sockets": [
     {
       "name": "service_access",
@@ -38,5 +36,7 @@
       "y": -0.3457777777777778,
       "z": 0.45
     }
-  ]
+  ],
+  "source": "sources/logistics/logistics_hub/blender/lod0.glb",
+  "type": "mesh"
 }
