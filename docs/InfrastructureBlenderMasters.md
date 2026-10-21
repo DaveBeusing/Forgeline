@@ -65,7 +65,8 @@ with unchanged widths, source bounds and mesh/texture inventories.
 South Ford uses the existing road surface and two
 ramps. The existing authored road-wear and crack overlays follow the same bridge
 rotation and stay inside the rails. The drawn road-wear length fits the 42m
-deck; its authoritative 72m map value remains unchanged. Both overlays return
+deck; its authoritative 72m map value remains unchanged. The intact opaque deck occludes terrain wear, so this covered ground layer
+is omitted; the crack overlay remains on the concrete. Both overlays return
 to terrain grounding when the authoritative bridge is nonoperational. Their
 map records, materials and source quad remain unchanged.
 The 12m lane and paired 2.4m shoulders are retained; 234 static presentation

@@ -121,7 +121,7 @@ public sealed class CrossingVisualLayoutTests
 
     [Theory]
     [InlineData("decal.crack.north",WorldVisualId.DecalConcreteCrack,18f,.004f)]
-    [InlineData("decal.roadwear.center",WorldVisualId.DecalRoadWear,42f,.003f)]
+    [InlineData("decal.roadwear.center",WorldVisualId.DecalRoadWear,42f,-.01f)]
     public void AuthoredBridgeOverlaysFollowTheDeckWithoutChangingTheMapOrLeakingPastTheRails(string key,WorldVisualId visual,float length,float lift)
     {
         var map=CentralDivideBattlefield.Create();var terrain=CentralDivideTerrainFactory.Create(map);
@@ -131,6 +131,8 @@ public sealed class CrossingVisualLayoutTests
         var original=new RenderTransform(item.Position with { Y=ground+.04f },
             Quaternion.CreateFromAxisAngle(Vector3.UnitY,item.RotationDegrees*MathF.PI/180),item.Scale);
         var drawn=layout.AlignBridgeOverlay(original,visual);
+        Assert.Equal(visual==WorldVisualId.DecalRoadWear,layout.IsCoveredGroundWear(original,visual,true));
+        Assert.False(layout.IsCoveredGroundWear(original,visual,false));
         Assert.Equal(original.Scale with { X=length },drawn.Scale);
         Assert.NotEqual(original,drawn);
         var unrelated=original with { Position=original.Position+Vector3.UnitX };

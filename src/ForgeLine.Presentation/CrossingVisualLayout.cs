@@ -88,7 +88,7 @@ internal sealed class CrossingVisualLayout
                 if(item.Key is not ("decal.crack.north" or "decal.roadwear.center"))continue;
                 Vector3 offset=Vector3.Transform(new Vector3(item.Position.X-center.X,0,item.Position.Z-center.Z),rotation);
                 Vector3 scale=item.Scale with { X=Math.Min(item.Scale.X,42) };
-                float lift=item.Visual==WorldVisualId.DecalConcreteCrack?.004f:.003f;
+                float lift=item.Visual==WorldVisualId.DecalConcreteCrack?.004f:-.01f;
                 var deckOverlay=new RenderTransform(anchor+offset+normal*lift,
                     Quaternion.Normalize(Quaternion.Concatenate(Quaternion.CreateFromAxisAngle(Vector3.UnitY,item.RotationDegrees*MathF.PI/180),rotation)),scale);
                 var groundOverlay=new RenderTransform(Ground(anchor+offset)+Vector3.UnitY*.04f,
@@ -186,6 +186,14 @@ internal sealed class CrossingVisualLayout
             result.Approaches.Add(new(new EntityId(id,1),new(position,rotation,scale),new(1),RenderMaterialHandle.Default,
                 RenderVisibilityMask.World,id,InfrastructureFeature:new(kind,InfrastructurePresentationState.Operational)));
         }
+    }
+
+    internal bool IsCoveredGroundWear(in RenderTransform original,WorldVisualId visual,bool bridgeOperational)
+    {
+        if(!bridgeOperational||visual!=WorldVisualId.DecalRoadWear)return false;
+        foreach(var overlay in _bridgeOverlays)
+            if(overlay.Visual==visual&&Vector2.Distance(new(original.Position.X,original.Position.Z),overlay.Original)<=.001f)return true;
+        return false;
     }
 
     internal RenderTransform AlignBridgeOverlay(in RenderTransform original,WorldVisualId visual,bool bridgeOperational=true)
