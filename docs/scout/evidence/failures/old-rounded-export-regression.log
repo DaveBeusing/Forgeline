@@ -1,0 +1,21 @@
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+fehlerhaft ForgeLine.Presentation.Tests.ScoutBlenderMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels (401ms)
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Assert.Equal() Failure: Collections differ
+             ↓ (pos 0)
+  Expected: [RuntimeMeshVertex { X = -0,29, Y = -0,25833333, Z = -0,43269232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,018, V = 0,018, TangentX = 1, TangentY = 0, TangentZ = 0, TangentW = 1 }, RuntimeMeshVertex { X = 0,29, Y = -0,25833333, Z = -0,43269232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,2119375, V = 0,018, TangentX = 1, TangentY = 0, TangentZ = 0, TangentW = 1 }, RuntimeMeshVertex { X = 0,35, Y = -0,25833333, Z = -0,30769232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,232, V = 0,232, TangentX = 1, TangentY = 0, TangentZ = 0, TangentW = 1 }, RuntimeMeshVertex { X = -0,29, Y = -0,25833333, Z = -0,43269232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,018, V = 0,018, TangentX = 0,98145545, TangentY = 0, TangentZ = 0,19169052, TangentW = 1 }, RuntimeMeshVertex { X = 0,35, Y = -0,25833333, Z = -0,30769232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,232, V = 0,018, TangentX = 0,98145545, TangentY = 0, TangentZ = 0,19169052, TangentW = 1 }, ···]
+  Actual:   [RuntimeMeshVertex { X = -0,29, Y = -0,25833333, Z = -0,43269232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,018, V = 0,018000007, TangentX = 1, TangentY = 0, TangentZ = 0, TangentW = 1 }, RuntimeMeshVertex { X = 0,29, Y = -0,25833333, Z = -0,43269232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,2119375, V = 0,018000007, TangentX = 1, TangentY = 0, TangentZ = 0, TangentW = 1 }, RuntimeMeshVertex { X = 0,35, Y = -0,25833333, Z = -0,30769232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,232, V = 0,232, TangentX = 1, TangentY = 0, TangentZ = 0, TangentW = 1 }, RuntimeMeshVertex { X = -0,29, Y = -0,25833333, Z = -0,43269232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,018, V = 0,018000007, TangentX = 0,98145545, TangentY = 0, TangentZ = 0,19169052, TangentW = 1 }, RuntimeMeshVertex { X = 0,35, Y = -0,25833333, Z = -0,30769232, NormalX = 0, NormalY = -1, NormalZ = 0, U = 0,232, V = 0,018000007, TangentX = 0,98145545, TangentY = 0, TangentZ = 0,19169052, TangentW = 1 }, ···]
+             ↑ (pos 0)
+    um ForgeLine.Presentation.Tests.ScoutBlenderMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels() in C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Presentation.Tests\ScoutBlenderMasterTests.cs:48
+    um System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    um System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\scout-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) fehlerhaft mit 1 Fehler(n) (7s 582ms)
+Exitcode: 2
+
+Testlaufzusammenfassung: Fehler!
+  gesamt: 1
+  fehlgeschlagen: 1
+  erfolgreich: 0
+  übersprungen: 0
+  Dauer: 10s 252ms
+Der Testlauf wurde mit einem nicht erfolgreichen Exitcode abgeschlossen: 2 (siehe: https://aka.ms/testingplatform/exitcodes)

@@ -125,3 +125,30 @@ All 72 pre-existing scene enum IDs are retained; five Scout IDs are appended.
 The first staging copy encountered the pre-created Git-attributes-only directory.
 The corrected guard accepts only this empty metadata target and still rejects
 overwriting any saved master/export candidate.
+
+## Exact source-channel preservation
+
+The first installed matrix (source 20b00ace) completed 91 pairs: 69 exact and 22
+nonexact, 179 changed pixels total with maximum channel delta 44. Its eight-repeat
+readbacks were exact, all counters matched, and no fallback/binding/submission
+fault occurred. These are historical observations, not an accepted image result.
+The strongest 4K/Low/1000 case becomes pixel-exact in a controlled diagnostic when
+canonical source vertex values are serialized without Blender storage noise.
+
+The family adapter still validates the real native scene through the shared strict
+exporter. It then rejects channel deviations beyond 0.00000005, retains the original
+readback GLBs and report separately, and serializes the unchanged source floats.
+The final eight GLBs have exactly matching source channels. No common exporter,
+renderer, material, texture, gameplay field or tolerance is changed. The .NET
+comparison now additionally requires exact RuntimeMeshVertex sequences, including
+compiled tangents. The old rounded outputs fail this assertion; the corrected
+three actual native exports pass. All 330 pose matrices retain maximum error
+0.0000038146973, and eleven unsupported edits reject, including a 0.000001 source-Y
+geometry edit that would exceed the narrower preservation contract.
+
+[Exact native qualification](scout/evidence/exact-authoring/qualification.json) is
+bound to fa503a2b62b15fc26f08a7bbff9b472f117abed1. Its optional runtime seed reuses
+previously qualified material/texture containers, recompiles changed mesh records
+through development mode, and revalidates every scoped payload without sources.
+The default provisioned workflow still performs fresh cold builds. Updated native
+masters/exports and a complete new installed matrix remain separate checkpoints.

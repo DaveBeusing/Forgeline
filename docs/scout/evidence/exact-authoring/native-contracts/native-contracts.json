@@ -1,0 +1,17 @@
+{
+  "rejected": [
+    "geometry edit beyond storage noise",
+    "unknown motion",
+    "unbounded rate",
+    "changed bounded rate",
+    "missing motion property",
+    "unbaked frame transform",
+    "arbitrary animation",
+    "locked weapon pivot",
+    "gameplay muzzle socket",
+    "changed sensor clock rate",
+    "sensor pivot drift"
+  ],
+  "success": true,
+  "unchangedRestAccepted": true
+}
