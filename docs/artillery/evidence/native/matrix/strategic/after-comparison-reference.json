@@ -1,0 +1,29 @@
+{
+  "baselineCommit": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "visualAcceptance": "pending",
+  "pixelComparisonRequested": false,
+  "channelTolerance": 0,
+  "schemaVersion": 1,
+  "maximumChangedPixelFraction": 0.0,
+  "captures": [
+    {
+      "gpuMeanMs": 4.411836,
+      "key": "ArtilleryRepeated1000-1920x1080-Low-Strategic",
+      "sameRuntime": false,
+      "cpuMeanMs": 27.1422625,
+      "visualReview": "pending",
+      "pixelComparison": null,
+      "regionChanges": null,
+      "structural": "pass",
+      "comparison": "pixels-require-human-review",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -109.58639999999998,
+      "equivalentHardware": true
+    }
+  ],
+  "structural": "pass",
+  "commit": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "imageGateRequested": false,
+  "imageFailures": [],
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred."
+}

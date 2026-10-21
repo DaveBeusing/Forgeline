@@ -1,0 +1,29 @@
+{
+  "imageGateRequested": false,
+  "maximumChangedPixelFraction": 0.0,
+  "imageFailures": [],
+  "visualAcceptance": "pending",
+  "pixelComparisonRequested": false,
+  "channelTolerance": 0,
+  "schemaVersion": 1,
+  "structural": "pass",
+  "commit": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "baselineCommit": null,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "captures": [
+    {
+      "gpuMeanMs": 5.011396571428571,
+      "cpuMeanMs": 6.0857375,
+      "cpuMeanDeltaMs": null,
+      "sameRuntime": false,
+      "visualReview": "pending",
+      "key": "ArtillerySingle-1920x1080-High-CloseTactical-Inspection30",
+      "comparison": "no-matched-baseline",
+      "structural": "pass",
+      "pixelComparison": null,
+      "equivalentHardware": false,
+      "regionChanges": null,
+      "sameSource": false
+    }
+  ]
+}

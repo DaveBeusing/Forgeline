@@ -1,0 +1,29 @@
+{
+  "channelTolerance": 0,
+  "baselineCommit": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "captures": [
+    {
+      "equivalentHardware": true,
+      "sameRuntime": false,
+      "gpuMeanMs": 4.995064,
+      "sameSource": true,
+      "visualReview": "pending",
+      "structural": "pass",
+      "key": "ArtilleryProduction-1920x1080-High-CloseTactical",
+      "cpuMeanDeltaMs": -0.7884124999999997,
+      "pixelComparison": null,
+      "regionChanges": null,
+      "comparison": "exact-file-match",
+      "cpuMeanMs": 15.852450000000001
+    }
+  ],
+  "pixelComparisonRequested": false,
+  "structural": "pass",
+  "visualAcceptance": "pending",
+  "imageFailures": [],
+  "schemaVersion": 1,
+  "commit": "2f561376c8b938d7d081987353612ab2e8fc2094",
+  "imageGateRequested": false,
+  "maximumChangedPixelFraction": 0.0,
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred."
+}
