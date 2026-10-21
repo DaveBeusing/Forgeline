@@ -1,0 +1,1439 @@
+{
+  "schemaVersion": 1,
+  "analysisBase": "d3acf9b0fb94da75ecfd26173cc387398f317096",
+  "executableSource": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+  "branch": "assets/industrial-blender-masters",
+  "pullRequest": "https://github.com/DaveBeusing/Forgeline/pull/270",
+  "trackedVersion": "0.1.427-dev",
+  "canonicalDefinitionsChanged": false,
+  "sharedMaterialsChanged": false,
+  "newArtClaimed": false,
+  "masters": 3,
+  "familyGlbExports": 33,
+  "blender": {
+    "executableSha256": "f141a3c5754500e6f84361099a4cd53f0bb7662b6a0d2cfaaa8fbb63e92234a0",
+    "background": true,
+    "bpy": true,
+    "buildHash": "d13f752e3b9c",
+    "machine": "AMD64",
+    "pointerBits": 64,
+    "pythonVersion": "3.13.13",
+    "schemaVersion": 1,
+    "system": "Windows",
+    "version": "5.2.2",
+    "versionCycle": "release"
+  },
+  "familyEvidence": [
+    {
+      "family": "extractor",
+      "sourceSignature": "78dd2cc78926ed652a2a6ec0d3beb7a8f4710422fee73392cc2dc0c019e21034",
+      "masters": "fc584aef0690dd344e98eda743c02083c6a1c53817659638e14a2e30f2e27968",
+      "authoritativeInputsUnchanged": true,
+      "sourceAndRuntimeRepeatedBytesEqual": true,
+      "sourceTreeSha256": "a73075588c1241827dbd77a587c13cee8a3821d6e57a4a7d7e0071c472022526",
+      "runtimeTreeSha256": "674482ca8a7e37d880e8345d43640bd75f9f700c873e96c70ac7a04b9b186356",
+      "savedEdit": {
+        "canonicalYDelta": 0.0009999871253967276,
+        "editAsset": "building.directorate.extractor",
+        "editIsQualificationOnly": true,
+        "editVertex": 338,
+        "family": "building.directorate.extractor",
+        "meshCount": 12,
+        "organizedMasterReopened": true,
+        "productionPromotion": "pending",
+        "savedVertexEditReopenedAndExported": true,
+        "schemaVersion": 1,
+        "sourceSignature": "78dd2cc78926ed652a2a6ec0d3beb7a8f4710422fee73392cc2dc0c019e21034",
+        "success": true
+      },
+      "negativeSceneCases": 19,
+      "syntheticTwoSlotTangentPositive": true,
+      "catalogs": [
+        {
+          "variant": "baseline",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "43ff9be69de54dabe628634a8652ce73739bfd7c5f1b5ea8b9885f8855430523",
+          "sourceLessSha256": "56b049035fe241b564a98c9dee8f628f911c1604ab50e1d28b131186df53ce2b",
+          "success": true
+        },
+        {
+          "variant": "first",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "eca39c8e834efd397815e918b9453471755382ca4fe56dff327f47486de8809e",
+          "sourceLessSha256": "49224f40271740c0a73aa3b91299be0fb9aed8cc7820bf35d997a6628795d4c1",
+          "success": true
+        },
+        {
+          "variant": "second",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "71e67065c7c53126fde5a7b8d24aa85ee91b5336915a737c4d2fe791c8ca592d",
+          "sourceLessSha256": "abd79a7cefb059b556e427aa52c4ebd13c0156ef58583e3fb446ecb673e83c64",
+          "success": true
+        },
+        {
+          "variant": "reopened",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "e4e58bbe4445b470a634b98e7a22a35265bc833dad3e77a56a592bf05deebc61",
+          "sourceLessSha256": "35a52bbf21f1048c122c4b9569512aa9f0af631972ecb2418010601ae2ba04b0",
+          "success": true
+        },
+        {
+          "variant": "edited",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "58168ea45d9467a85ad6d2197bc9825d839263d6ad7efdaf955a8d69bb5ecc6a",
+          "sourceLessSha256": "9210f257f77b919b3a030d427f7f0605bd0fd0ce117f6c58a45ddbcc80c32c69",
+          "success": true
+        }
+      ],
+      "typedComparisons": [
+        {
+          "variant": "first",
+          "meshes": 12,
+          "triangles": 2508,
+          "parts": 0,
+          "maximumPositionError": 0,
+          "maximumTangentError": 0.0000014564313,
+          "mechanicalBatchIdentityPreserved": true
+        },
+        {
+          "variant": "second",
+          "meshes": 12,
+          "triangles": 2508,
+          "parts": 0,
+          "maximumPositionError": 0,
+          "maximumTangentError": 0.0000014564313,
+          "mechanicalBatchIdentityPreserved": true
+        },
+        {
+          "variant": "reopened",
+          "meshes": 12,
+          "triangles": 2508,
+          "parts": 0,
+          "maximumPositionError": 0,
+          "maximumTangentError": 0.0000014564313,
+          "mechanicalBatchIdentityPreserved": true
+        }
+      ]
+    },
+    {
+      "family": "smelter",
+      "sourceSignature": "9396576191711720c210cc9fbc8975ced4f1bfb55a71f805d65cb758a7055d93",
+      "masters": "23ba8f47226d04efe272725c57b17a6f74aadd38234e094e477bae56c9c7a68c",
+      "authoritativeInputsUnchanged": true,
+      "sourceAndRuntimeRepeatedBytesEqual": true,
+      "sourceTreeSha256": "4bae9bfe962964758b44d4448d0ef8424bd8353b787e15a3ddbfa8dd23c1876b",
+      "runtimeTreeSha256": "154eccb044fdc3427a6e3dd1c7ee4d44078bc4d1327606dae9e997dc1e4415db",
+      "savedEdit": {
+        "canonicalYDelta": 0.0009999871253967276,
+        "editAsset": "building.directorate.smelter",
+        "editIsQualificationOnly": true,
+        "editVertex": 578,
+        "family": "building.directorate.smelter",
+        "meshCount": 12,
+        "organizedMasterReopened": true,
+        "productionPromotion": "pending",
+        "savedVertexEditReopenedAndExported": true,
+        "schemaVersion": 1,
+        "sourceSignature": "9396576191711720c210cc9fbc8975ced4f1bfb55a71f805d65cb758a7055d93",
+        "success": true
+      },
+      "negativeSceneCases": 19,
+      "syntheticTwoSlotTangentPositive": true,
+      "catalogs": [
+        {
+          "variant": "baseline",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "d7722aecc7a34746617a0fc5c2dd075dba5ef480c603e4015415b51ed61ffc4f",
+          "sourceLessSha256": "968432955e4a290b14bcadd4e079feb0a2fbf0c364ce51af7a37796f97b915a2",
+          "success": true
+        },
+        {
+          "variant": "first",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "461d28e2835e201c3abc949579c399b347d910b440e88713720e7aa10e34c10a",
+          "sourceLessSha256": "33c907a22faa129e78ce1b80f2e5e1ea5ca07bd0acdbffff17bf75ca18135650",
+          "success": true
+        },
+        {
+          "variant": "second",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "9a1a6250ffbddb06e252e49cdc52f43817a7408ae001fe4d10807017a6e5f654",
+          "sourceLessSha256": "5e190fccb282c9e2c734938936e128bc93f574c3906f7eec32983565ffad69d5",
+          "success": true
+        },
+        {
+          "variant": "reopened",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "fc29aadd41c6579553b7e2315cf25d90c4594af5cc7110b8c9964b69f769c61e",
+          "sourceLessSha256": "d3f9755a1240f5b7e199735adb3549b7e80c5b7f527d61bdc2824438aa23dd5c",
+          "success": true
+        },
+        {
+          "variant": "edited",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "7685c31ba0bdb8ded81209322a86092f195280810d8b331f8939868c1c8944e9",
+          "sourceLessSha256": "8c8bfc9c21ed33f0f39b8f655806d501f134e8aa3078e4f1cee9b36bbc51213f",
+          "success": true
+        }
+      ],
+      "typedComparisons": [
+        {
+          "variant": "first",
+          "meshes": 12,
+          "triangles": 2588,
+          "parts": 0,
+          "maximumPositionError": 0,
+          "maximumTangentError": 0.000001386689,
+          "mechanicalBatchIdentityPreserved": true
+        },
+        {
+          "variant": "second",
+          "meshes": 12,
+          "triangles": 2588,
+          "parts": 0,
+          "maximumPositionError": 0,
+          "maximumTangentError": 0.000001386689,
+          "mechanicalBatchIdentityPreserved": true
+        },
+        {
+          "variant": "reopened",
+          "meshes": 12,
+          "triangles": 2588,
+          "parts": 0,
+          "maximumPositionError": 0,
+          "maximumTangentError": 0.000001386689,
+          "mechanicalBatchIdentityPreserved": true
+        }
+      ]
+    },
+    {
+      "family": "electronics_plant",
+      "sourceSignature": "bcf82db3997b0b4834614bd66f3cf11a2f61aa570f8375b1a3ae6de4dde2ad82",
+      "masters": "36f10d224e1a7b6ce44ebf711b82c229b070c44fd09e8a5bb2ae94efd6bcec6b",
+      "authoritativeInputsUnchanged": true,
+      "sourceAndRuntimeRepeatedBytesEqual": true,
+      "sourceTreeSha256": "5120e39c93eda27623dd805797a7513dd66a39752347c1ab3aa58d0ab11ff067",
+      "runtimeTreeSha256": "be44a55d17600cf132e8d190d3bfe83ddfed69098399e9ebf4e4078d68e5f630",
+      "savedEdit": {
+        "canonicalYDelta": 0.0009999871253967276,
+        "editAsset": "building.directorate.electronics_plant",
+        "editIsQualificationOnly": true,
+        "editVertex": 842,
+        "family": "building.directorate.electronics_plant",
+        "meshCount": 12,
+        "organizedMasterReopened": true,
+        "productionPromotion": "pending",
+        "savedVertexEditReopenedAndExported": true,
+        "schemaVersion": 1,
+        "sourceSignature": "bcf82db3997b0b4834614bd66f3cf11a2f61aa570f8375b1a3ae6de4dde2ad82",
+        "success": true
+      },
+      "negativeSceneCases": 19,
+      "syntheticTwoSlotTangentPositive": true,
+      "catalogs": [
+        {
+          "variant": "baseline",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "045fca931c5b6163b0468998f40390c15d264da5c46908a2456cca77e5af9cd0",
+          "sourceLessSha256": "48e7c333232276d0d6b9b97f46dfe10cc25487cebe3d01cb6511da29411b5435",
+          "success": true
+        },
+        {
+          "variant": "first",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "812b71b6ed49577467b3f4e0006615255d0648d0ef0052fddb2eb4891021237a",
+          "sourceLessSha256": "4509a1af2cf0016d7e12dcb4c3411b9fb5ac42247b4f6edef3e568b0c8e05d60",
+          "success": true
+        },
+        {
+          "variant": "second",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "fcf6957271c414aae5a8967a54bf9bea15065111510b4944d93327f7d4fa85c6",
+          "sourceLessSha256": "9abe502a535b6028ab4e0862cc866b9c182daf60d2c09bb50c00ef4cb33537cb",
+          "success": true
+        },
+        {
+          "variant": "reopened",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "53f40e3e6c08f9707cb6edfa464d458713b8f3747720104fd65facde6af02975",
+          "sourceLessSha256": "7a6806d37c4eb13bbb5b417e7efe29caa4ba5b1b25a2b8a2f1428854a1862cd7",
+          "success": true
+        },
+        {
+          "variant": "edited",
+          "assets": 16,
+          "meshes": 12,
+          "compileSha256": "cf2bb3a8347c06977918164ee0a8c32cbadaf13ddb5c369aa8d873d0f1ed5786",
+          "sourceLessSha256": "085fcc972ba77c5db5a3d703743ed81da6b0f25093eef3aeacc56ccbf8eb90e7",
+          "success": true
+        }
+      ],
+      "typedComparisons": [
+        {
+          "variant": "first",
+          "meshes": 12,
+          "triangles": 2152,
+          "parts": 0,
+          "maximumPositionError": 0,
+          "maximumTangentError": 0.0000012262487,
+          "mechanicalBatchIdentityPreserved": true
+        },
+        {
+          "variant": "second",
+          "meshes": 12,
+          "triangles": 2152,
+          "parts": 0,
+          "maximumPositionError": 0,
+          "maximumTangentError": 0.0000012262487,
+          "mechanicalBatchIdentityPreserved": true
+        },
+        {
+          "variant": "reopened",
+          "meshes": 12,
+          "triangles": 2152,
+          "parts": 0,
+          "maximumPositionError": 0,
+          "maximumTangentError": 0.0000012262487,
+          "mechanicalBatchIdentityPreserved": true
+        }
+      ]
+    }
+  ],
+  "canonical": {
+    "assets": 1357,
+    "bytes": 75122812,
+    "compiled": 0,
+    "unchanged": 1357,
+    "success": true,
+    "qualificationSha256": "1e319a3cbd5212844be0e4ecea2253b2b2a63ae1634fcf64037db51d10c76ae1"
+  },
+  "portableContracts": {
+    "passed": 88
+  },
+  "targetedBuildingTests": {
+    "passed": 26
+  },
+  "typedRuntimeTests": {
+    "passed": 3,
+    "skipped": 4
+  },
+  "releaseBuild": {
+    "passed": true,
+    "warnings": 0,
+    "errors": 0
+  },
+  "completeReleaseSuite": {
+    "status": "passed",
+    "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+    "total": 3208,
+    "passed": 3184,
+    "skipped": 24,
+    "failed": 0,
+    "duration": "21m45.851s",
+    "log": "artifacts/industrial-final-tests.log",
+    "logSha256": "e4d1d3de024cc77c230d064da5c400bb50c83c8e548125b1491975cecf3a07de"
+  },
+  "native": {
+    "purpose": "static functional source export review; galleries are not live logistics",
+    "pairs": 9,
+    "exactPairs": 7,
+    "rows": [
+      {
+        "family": "extractor",
+        "key": "ExtractorProduction-1920x1080-High-NormalGameplay",
+        "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+        "beforeImage": "native-before/ExtractorProduction-1920x1080-High-NormalGameplay.png",
+        "afterImage": "native-after/ExtractorProduction-1920x1080-High-NormalGameplay.png",
+        "beforeImageSha256": "03f01c90854c7df7718178768624882bf21d3a61ebc280639a36dc9c4b020d4e",
+        "afterImageSha256": "03f01c90854c7df7718178768624882bf21d3a61ebc280639a36dc9c4b020d4e",
+        "beforePixelSha256": "07315081fd61e6102934adf1b776f48dfd420c1a9296447e0af6b78be31b97fd",
+        "afterPixelSha256": "07315081fd61e6102934adf1b776f48dfd420c1a9296447e0af6b78be31b97fd",
+        "pixelExact": true,
+        "differingPixels": [],
+        "maximumChannelDelta": 0,
+        "channelTolerance": 0,
+        "accepted": false,
+        "repeatPixelsEqual": true,
+        "baselineManifestSha256": "90aa11435c039c229fdaf42c48eb3519922ba81f6bc91df2b712df8a9a8d5db4",
+        "candidateManifestSha256": "700ada523493a9580067a84dab4176dfa9de605dd0a699452bbc9872cedee496",
+        "baselineRuntimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "candidateRuntimeFingerprint": "F5B2FDD3F4C5E812D96B7F90AAE58027D3A0CD6B41D475E1C780F6957CE34248",
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+        "display": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 0,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 12,
+          "presentedFrameCount": 12
+        },
+        "profile": "High",
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "seed": 2026,
+        "tick": 32,
+        "warmups": 3,
+        "samples": 8,
+        "materialBindingFailures": 0,
+        "textureBindingFailures": 0,
+        "meshFallbacks": 0,
+        "beforeResidentMeshBytes": 11230152,
+        "afterResidentMeshBytes": 11230152,
+        "beforeResidentTextureBytes": 44759204,
+        "afterResidentTextureBytes": 44759204,
+        "beforeCpu": {
+          "samples": 8,
+          "mean": 11.846174999999999,
+          "p50": 10.8964,
+          "p95": 17.2755,
+          "p99": 17.2755
+        },
+        "afterCpu": {
+          "samples": 8,
+          "mean": 21.99305,
+          "p50": 23.0513,
+          "p95": 24.6124,
+          "p99": 24.6124
+        },
+        "beforeGpu": {
+          "samples": 7,
+          "mean": 9.366121142857143,
+          "p50": 10.943232,
+          "p95": 14.737312,
+          "p99": 14.737312
+        },
+        "afterGpu": {
+          "samples": 8,
+          "mean": 6.14526,
+          "p50": 5.173248,
+          "p95": 9.961024,
+          "p99": 9.961024
+        },
+        "timingQualification": "not established by this short functional cohort",
+        "humanVisualApproval": "pending"
+      },
+      {
+        "family": "smelter",
+        "key": "SmelterProduction-1920x1080-High-NormalGameplay",
+        "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+        "beforeImage": "native-before/SmelterProduction-1920x1080-High-NormalGameplay.png",
+        "afterImage": "native-after/SmelterProduction-1920x1080-High-NormalGameplay.png",
+        "beforeImageSha256": "d3d5a959228114d9118e7ad4123cc930f859ec2b0f6455423ff737590db0ce4a",
+        "afterImageSha256": "d3d5a959228114d9118e7ad4123cc930f859ec2b0f6455423ff737590db0ce4a",
+        "beforePixelSha256": "a7019af9a6ec12a14cc0d980203a0bac4c2549c8f079f28a88c658ef0b8e3276",
+        "afterPixelSha256": "a7019af9a6ec12a14cc0d980203a0bac4c2549c8f079f28a88c658ef0b8e3276",
+        "pixelExact": true,
+        "differingPixels": [],
+        "maximumChannelDelta": 0,
+        "channelTolerance": 0,
+        "accepted": false,
+        "repeatPixelsEqual": true,
+        "baselineManifestSha256": "90aa11435c039c229fdaf42c48eb3519922ba81f6bc91df2b712df8a9a8d5db4",
+        "candidateManifestSha256": "fa76031afb1b71f719b82985421aca1a386e33416db2e3176ceda62d860cf757",
+        "baselineRuntimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "candidateRuntimeFingerprint": "A806CE70BB5AB2AE59402A35BAE8AF43645C20C595CDF97DCEC552C9D3C76773",
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+        "display": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 0,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 12,
+          "presentedFrameCount": 12
+        },
+        "profile": "High",
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "seed": 2026,
+        "tick": 32,
+        "warmups": 3,
+        "samples": 8,
+        "materialBindingFailures": 0,
+        "textureBindingFailures": 0,
+        "meshFallbacks": 0,
+        "beforeResidentMeshBytes": 11230152,
+        "afterResidentMeshBytes": 11230152,
+        "beforeResidentTextureBytes": 44759204,
+        "afterResidentTextureBytes": 44759204,
+        "beforeCpu": {
+          "samples": 8,
+          "mean": 11.796425,
+          "p50": 8.9856,
+          "p95": 21.1113,
+          "p99": 21.1113
+        },
+        "afterCpu": {
+          "samples": 8,
+          "mean": 22.585625000000004,
+          "p50": 23.4198,
+          "p95": 25.7118,
+          "p99": 25.7118
+        },
+        "beforeGpu": {
+          "samples": 6,
+          "mean": 12.600591999999999,
+          "p50": 11.632992,
+          "p95": 15.02096,
+          "p99": 15.02096
+        },
+        "afterGpu": {
+          "samples": 8,
+          "mean": 8.722704,
+          "p50": 7.21152,
+          "p95": 12.0088,
+          "p99": 12.0088
+        },
+        "timingQualification": "not established by this short functional cohort",
+        "humanVisualApproval": "pending"
+      },
+      {
+        "family": "electronics_plant",
+        "key": "ElectronicsPlantProduction-1920x1080-High-NormalGameplay",
+        "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+        "beforeImage": "native-before/ElectronicsPlantProduction-1920x1080-High-NormalGameplay.png",
+        "afterImage": "native-after/ElectronicsPlantProduction-1920x1080-High-NormalGameplay.png",
+        "beforeImageSha256": "ad24e235572264ab9c372555f11886a67e1f7a96b98fc00cfe69033bdb1e8ab2",
+        "afterImageSha256": "ad24e235572264ab9c372555f11886a67e1f7a96b98fc00cfe69033bdb1e8ab2",
+        "beforePixelSha256": "380d01c3d8f6fc4a9d321f5082054761013efbeac25951cf983e696c49e90f1e",
+        "afterPixelSha256": "380d01c3d8f6fc4a9d321f5082054761013efbeac25951cf983e696c49e90f1e",
+        "pixelExact": true,
+        "differingPixels": [],
+        "maximumChannelDelta": 0,
+        "channelTolerance": 0,
+        "accepted": false,
+        "repeatPixelsEqual": true,
+        "baselineManifestSha256": "90aa11435c039c229fdaf42c48eb3519922ba81f6bc91df2b712df8a9a8d5db4",
+        "candidateManifestSha256": "fe850b015594698e124f19e9b7d7557c2def07a297d3df36a1c6101d1620d515",
+        "baselineRuntimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "candidateRuntimeFingerprint": "493D3F2FD45B48F6FD3AADF663CA830359BDD1F470AB94D992163056CC332CA0",
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+        "display": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 0,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 12,
+          "presentedFrameCount": 12
+        },
+        "profile": "High",
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 420,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "seed": 2026,
+        "tick": 32,
+        "warmups": 3,
+        "samples": 8,
+        "materialBindingFailures": 0,
+        "textureBindingFailures": 0,
+        "meshFallbacks": 0,
+        "beforeResidentMeshBytes": 11230152,
+        "afterResidentMeshBytes": 11230152,
+        "beforeResidentTextureBytes": 44759204,
+        "afterResidentTextureBytes": 44759204,
+        "beforeCpu": {
+          "samples": 8,
+          "mean": 6.235424999999999,
+          "p50": 4.3106,
+          "p95": 16.5074,
+          "p99": 16.5074
+        },
+        "afterCpu": {
+          "samples": 8,
+          "mean": 21.8295375,
+          "p50": 21.8599,
+          "p95": 22.57,
+          "p99": 22.57
+        },
+        "beforeGpu": {
+          "samples": 6,
+          "mean": 8.706357333333335,
+          "p50": 6.981376,
+          "p95": 11.408512,
+          "p99": 11.408512
+        },
+        "afterGpu": {
+          "samples": 8,
+          "mean": 7.992844000000001,
+          "p50": 5.29904,
+          "p95": 12.256064,
+          "p99": 12.256064
+        },
+        "timingQualification": "not established by this short functional cohort",
+        "humanVisualApproval": "pending"
+      },
+      {
+        "family": "extractor",
+        "key": "ExtractorProduction-1920x1080-High-CloseTactical",
+        "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+        "beforeImage": "native-before/ExtractorProduction-1920x1080-High-CloseTactical.png",
+        "afterImage": "native-after/ExtractorProduction-1920x1080-High-CloseTactical.png",
+        "beforeImageSha256": "e5b52e05bf5c9077ebc9cf1671bccae7a6faad4b60b5356865d9abac595217d0",
+        "afterImageSha256": "e5b52e05bf5c9077ebc9cf1671bccae7a6faad4b60b5356865d9abac595217d0",
+        "beforePixelSha256": "c2d46e55150897015067c7ac429edfe0781ea35c1797278510f896476cc8d6f2",
+        "afterPixelSha256": "c2d46e55150897015067c7ac429edfe0781ea35c1797278510f896476cc8d6f2",
+        "pixelExact": true,
+        "differingPixels": [],
+        "maximumChannelDelta": 0,
+        "channelTolerance": 0,
+        "accepted": false,
+        "repeatPixelsEqual": true,
+        "baselineManifestSha256": "a90d9ab4f288ae6f19a34d87bba1d5affbb3382b111e8b701134412ce2b129d1",
+        "candidateManifestSha256": "48bdb0566877c77f6ba3cb43f06a27e489891fbf37c1091bafad5768dae87754",
+        "baselineRuntimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "candidateRuntimeFingerprint": "F5B2FDD3F4C5E812D96B7F90AAE58027D3A0CD6B41D475E1C780F6957CE34248",
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+        "display": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 0,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 12,
+          "presentedFrameCount": 12
+        },
+        "profile": "High",
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "seed": 2026,
+        "tick": 32,
+        "warmups": 3,
+        "samples": 8,
+        "materialBindingFailures": 0,
+        "textureBindingFailures": 0,
+        "meshFallbacks": 0,
+        "beforeResidentMeshBytes": 11230152,
+        "afterResidentMeshBytes": 11230152,
+        "beforeResidentTextureBytes": 44759204,
+        "afterResidentTextureBytes": 44759204,
+        "beforeCpu": {
+          "samples": 8,
+          "mean": 19.845174999999998,
+          "p50": 15.7824,
+          "p95": 33.5378,
+          "p99": 33.5378
+        },
+        "afterCpu": {
+          "samples": 8,
+          "mean": 18.5512375,
+          "p50": 18.3753,
+          "p95": 19.5011,
+          "p99": 19.5011
+        },
+        "beforeGpu": {
+          "samples": 7,
+          "mean": 6.6302262857142855,
+          "p50": 5.029664,
+          "p95": 11.78096,
+          "p99": 11.78096
+        },
+        "afterGpu": {
+          "samples": 8,
+          "mean": 9.718656000000001,
+          "p50": 9.812224,
+          "p95": 11.355648,
+          "p99": 11.355648
+        },
+        "timingQualification": "not established by this short functional cohort",
+        "humanVisualApproval": "pending"
+      },
+      {
+        "family": "extractor",
+        "key": "ExtractorProduction-1920x1080-High-Strategic",
+        "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+        "beforeImage": "native-before/ExtractorProduction-1920x1080-High-Strategic.png",
+        "afterImage": "native-after/ExtractorProduction-1920x1080-High-Strategic.png",
+        "beforeImageSha256": "9539b7807ff35cdefb24048d950259fc522de6852c1472a272486b3283353188",
+        "afterImageSha256": "9539b7807ff35cdefb24048d950259fc522de6852c1472a272486b3283353188",
+        "beforePixelSha256": "2d74d1a473897a7c52fbecc25de625fa35312396327ba02030f1bac8e2436ef5",
+        "afterPixelSha256": "2d74d1a473897a7c52fbecc25de625fa35312396327ba02030f1bac8e2436ef5",
+        "pixelExact": true,
+        "differingPixels": [],
+        "maximumChannelDelta": 0,
+        "channelTolerance": 0,
+        "accepted": false,
+        "repeatPixelsEqual": true,
+        "baselineManifestSha256": "a90d9ab4f288ae6f19a34d87bba1d5affbb3382b111e8b701134412ce2b129d1",
+        "candidateManifestSha256": "48bdb0566877c77f6ba3cb43f06a27e489891fbf37c1091bafad5768dae87754",
+        "baselineRuntimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "candidateRuntimeFingerprint": "F5B2FDD3F4C5E812D96B7F90AAE58027D3A0CD6B41D475E1C780F6957CE34248",
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+        "display": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 1,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 25,
+          "presentedFrameCount": 25
+        },
+        "profile": "High",
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "seed": 2026,
+        "tick": 32,
+        "warmups": 3,
+        "samples": 8,
+        "materialBindingFailures": 0,
+        "textureBindingFailures": 0,
+        "meshFallbacks": 0,
+        "beforeResidentMeshBytes": 11230152,
+        "afterResidentMeshBytes": 11230152,
+        "beforeResidentTextureBytes": 44782084,
+        "afterResidentTextureBytes": 44782084,
+        "beforeCpu": {
+          "samples": 8,
+          "mean": 12.1591625,
+          "p50": 10.5054,
+          "p95": 17.9839,
+          "p99": 17.9839
+        },
+        "afterCpu": {
+          "samples": 8,
+          "mean": 9.5228375,
+          "p50": 7.7561,
+          "p95": 14.1993,
+          "p99": 14.1993
+        },
+        "beforeGpu": {
+          "samples": 6,
+          "mean": 9.935263999999998,
+          "p50": 8.410976,
+          "p95": 13.76528,
+          "p99": 13.76528
+        },
+        "afterGpu": {
+          "samples": 6,
+          "mean": 10.112117333333334,
+          "p50": 9.496672,
+          "p95": 14.808544,
+          "p99": 14.808544
+        },
+        "timingQualification": "not established by this short functional cohort",
+        "humanVisualApproval": "pending"
+      },
+      {
+        "family": "smelter",
+        "key": "SmelterProduction-1920x1080-High-CloseTactical",
+        "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+        "beforeImage": "native-before/SmelterProduction-1920x1080-High-CloseTactical.png",
+        "afterImage": "native-after/SmelterProduction-1920x1080-High-CloseTactical.png",
+        "beforeImageSha256": "946448add4a39396cd7e609a25adc4df5d11cb33f0781e9358e944c423929ce6",
+        "afterImageSha256": "128b7dfbe62f1a718d8432783049bd58d568ad0e7d8a44e93b58fad857c2f94f",
+        "beforePixelSha256": "fbb8b2ac270c61d3e7e780f2e9b6e087258111f2794dc727bd592b40d95d72d9",
+        "afterPixelSha256": "a1a0cb0b5902d2f55361004835d1b83f25b9d5385791c44983b7e7e6059e9e3d",
+        "pixelExact": false,
+        "differingPixels": [
+          {
+            "x": 1197,
+            "y": 680,
+            "before": [
+              61,
+              73,
+              81,
+              255
+            ],
+            "after": [
+              62,
+              73,
+              81,
+              255
+            ]
+          },
+          {
+            "x": 1172,
+            "y": 730,
+            "before": [
+              56,
+              66,
+              76,
+              255
+            ],
+            "after": [
+              56,
+              66,
+              75,
+              255
+            ]
+          }
+        ],
+        "maximumChannelDelta": 1,
+        "channelTolerance": 0,
+        "accepted": false,
+        "repeatPixelsEqual": true,
+        "baselineManifestSha256": "a90d9ab4f288ae6f19a34d87bba1d5affbb3382b111e8b701134412ce2b129d1",
+        "candidateManifestSha256": "b8f6b90254b834241d57533a3b87aceec9622a47de4db4c74c2ecf8b853c0bce",
+        "baselineRuntimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "candidateRuntimeFingerprint": "A806CE70BB5AB2AE59402A35BAE8AF43645C20C595CDF97DCEC552C9D3C76773",
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+        "display": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 0,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 12,
+          "presentedFrameCount": 12
+        },
+        "profile": "High",
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "seed": 2026,
+        "tick": 32,
+        "warmups": 3,
+        "samples": 8,
+        "materialBindingFailures": 0,
+        "textureBindingFailures": 0,
+        "meshFallbacks": 0,
+        "beforeResidentMeshBytes": 11230152,
+        "afterResidentMeshBytes": 11230152,
+        "beforeResidentTextureBytes": 44759204,
+        "afterResidentTextureBytes": 44759204,
+        "beforeCpu": {
+          "samples": 8,
+          "mean": 7.835075,
+          "p50": 6.223,
+          "p95": 18.0057,
+          "p99": 18.0057
+        },
+        "afterCpu": {
+          "samples": 8,
+          "mean": 16.3098375,
+          "p50": 15.9336,
+          "p95": 19.3191,
+          "p99": 19.3191
+        },
+        "beforeGpu": {
+          "samples": 6,
+          "mean": 9.782496,
+          "p50": 9.698272,
+          "p95": 11.953984,
+          "p99": 11.953984
+        },
+        "afterGpu": {
+          "samples": 7,
+          "mean": 9.973211428571428,
+          "p50": 10.338592,
+          "p95": 12.215456,
+          "p99": 12.215456
+        },
+        "timingQualification": "not established by this short functional cohort",
+        "humanVisualApproval": "pending"
+      },
+      {
+        "family": "smelter",
+        "key": "SmelterProduction-1920x1080-High-Strategic",
+        "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+        "beforeImage": "native-before/SmelterProduction-1920x1080-High-Strategic.png",
+        "afterImage": "native-after/SmelterProduction-1920x1080-High-Strategic.png",
+        "beforeImageSha256": "b2153f1c2c757e4accc2628065381fe22838742bfd16a36e8e0d436f6dcb4e74",
+        "afterImageSha256": "b2153f1c2c757e4accc2628065381fe22838742bfd16a36e8e0d436f6dcb4e74",
+        "beforePixelSha256": "4bb1da4143554ac7fc501c3e458250230c677e5754858540a843f78d3060cd97",
+        "afterPixelSha256": "4bb1da4143554ac7fc501c3e458250230c677e5754858540a843f78d3060cd97",
+        "pixelExact": true,
+        "differingPixels": [],
+        "maximumChannelDelta": 0,
+        "channelTolerance": 0,
+        "accepted": false,
+        "repeatPixelsEqual": true,
+        "baselineManifestSha256": "a90d9ab4f288ae6f19a34d87bba1d5affbb3382b111e8b701134412ce2b129d1",
+        "candidateManifestSha256": "b8f6b90254b834241d57533a3b87aceec9622a47de4db4c74c2ecf8b853c0bce",
+        "baselineRuntimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "candidateRuntimeFingerprint": "A806CE70BB5AB2AE59402A35BAE8AF43645C20C595CDF97DCEC552C9D3C76773",
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+        "display": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 1,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 25,
+          "presentedFrameCount": 25
+        },
+        "profile": "High",
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "seed": 2026,
+        "tick": 32,
+        "warmups": 3,
+        "samples": 8,
+        "materialBindingFailures": 0,
+        "textureBindingFailures": 0,
+        "meshFallbacks": 0,
+        "beforeResidentMeshBytes": 11230152,
+        "afterResidentMeshBytes": 11230152,
+        "beforeResidentTextureBytes": 44782084,
+        "afterResidentTextureBytes": 44782084,
+        "beforeCpu": {
+          "samples": 8,
+          "mean": 8.1939375,
+          "p50": 4.266,
+          "p95": 19.796,
+          "p99": 19.796
+        },
+        "afterCpu": {
+          "samples": 8,
+          "mean": 9.975312500000001,
+          "p50": 9.027,
+          "p95": 13.4846,
+          "p99": 13.4846
+        },
+        "beforeGpu": {
+          "samples": 6,
+          "mean": 9.323077333333334,
+          "p50": 6.631744,
+          "p95": 13.799072,
+          "p99": 13.799072
+        },
+        "afterGpu": {
+          "samples": 6,
+          "mean": 11.487098666666666,
+          "p50": 10.524704,
+          "p95": 15.045888,
+          "p99": 15.045888
+        },
+        "timingQualification": "not established by this short functional cohort",
+        "humanVisualApproval": "pending"
+      },
+      {
+        "family": "electronics_plant",
+        "key": "ElectronicsPlantProduction-1920x1080-High-CloseTactical",
+        "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+        "beforeImage": "native-before/ElectronicsPlantProduction-1920x1080-High-CloseTactical.png",
+        "afterImage": "native-after/ElectronicsPlantProduction-1920x1080-High-CloseTactical.png",
+        "beforeImageSha256": "074cbfa0e826485685114795b088321626d25717d0840200e73787d9a8b92496",
+        "afterImageSha256": "ab40b5742b15a1f7e1bb1b3a47bdc0efcf017c1cc2aa7a2eaae31c98d2246e37",
+        "beforePixelSha256": "9b4a9376de1880edae5007e4f7fc50899329c8b47dcf999e1c5f430a626e23e1",
+        "afterPixelSha256": "b04a044ed6b1be43b0d2a3ed30c48084e1e3de1175320e99310214fb6d1d9488",
+        "pixelExact": false,
+        "differingPixels": [
+          {
+            "x": 472,
+            "y": 468,
+            "before": [
+              102,
+              111,
+              116,
+              255
+            ],
+            "after": [
+              102,
+              111,
+              117,
+              255
+            ]
+          },
+          {
+            "x": 1157,
+            "y": 719,
+            "before": [
+              29,
+              36,
+              40,
+              255
+            ],
+            "after": [
+              29,
+              35,
+              40,
+              255
+            ]
+          }
+        ],
+        "maximumChannelDelta": 1,
+        "channelTolerance": 0,
+        "accepted": false,
+        "repeatPixelsEqual": true,
+        "baselineManifestSha256": "a90d9ab4f288ae6f19a34d87bba1d5affbb3382b111e8b701134412ce2b129d1",
+        "candidateManifestSha256": "f25910ddcc3766e520163ba65e00c2075f258a122494424075f27b6add7466be",
+        "baselineRuntimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "candidateRuntimeFingerprint": "493D3F2FD45B48F6FD3AADF663CA830359BDD1F470AB94D992163056CC332CA0",
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+        "display": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 0,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 12,
+          "presentedFrameCount": 12
+        },
+        "profile": "High",
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 120,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "seed": 2026,
+        "tick": 32,
+        "warmups": 3,
+        "samples": 8,
+        "materialBindingFailures": 0,
+        "textureBindingFailures": 0,
+        "meshFallbacks": 0,
+        "beforeResidentMeshBytes": 11230152,
+        "afterResidentMeshBytes": 11230152,
+        "beforeResidentTextureBytes": 44759204,
+        "afterResidentTextureBytes": 44759204,
+        "beforeCpu": {
+          "samples": 8,
+          "mean": 9.0330125,
+          "p50": 11.9405,
+          "p95": 15.2446,
+          "p99": 15.2446
+        },
+        "afterCpu": {
+          "samples": 8,
+          "mean": 20.534950000000002,
+          "p50": 20.4089,
+          "p95": 22.2341,
+          "p99": 22.2341
+        },
+        "beforeGpu": {
+          "samples": 6,
+          "mean": 10.182826666666665,
+          "p50": 11.72928,
+          "p95": 12.831872,
+          "p99": 12.831872
+        },
+        "afterGpu": {
+          "samples": 8,
+          "mean": 8.32418,
+          "p50": 5.22128,
+          "p95": 12.423392,
+          "p99": 12.423392
+        },
+        "timingQualification": "not established by this short functional cohort",
+        "humanVisualApproval": "pending"
+      },
+      {
+        "family": "electronics_plant",
+        "key": "ElectronicsPlantProduction-1920x1080-High-Strategic",
+        "source": "e8d277cbd2f8cc868afd3c298547361a5abbbd40",
+        "beforeImage": "native-before/ElectronicsPlantProduction-1920x1080-High-Strategic.png",
+        "afterImage": "native-after/ElectronicsPlantProduction-1920x1080-High-Strategic.png",
+        "beforeImageSha256": "9f8ca16f3db73083fb809e984db5cf098b142c943d947a644ade2675998e0968",
+        "afterImageSha256": "9f8ca16f3db73083fb809e984db5cf098b142c943d947a644ade2675998e0968",
+        "beforePixelSha256": "d0d973ce4729159d33e4e324061346dc98a1e528054c904bd0007e4e2e17d614",
+        "afterPixelSha256": "d0d973ce4729159d33e4e324061346dc98a1e528054c904bd0007e4e2e17d614",
+        "pixelExact": true,
+        "differingPixels": [],
+        "maximumChannelDelta": 0,
+        "channelTolerance": 0,
+        "accepted": false,
+        "repeatPixelsEqual": true,
+        "baselineManifestSha256": "a90d9ab4f288ae6f19a34d87bba1d5affbb3382b111e8b701134412ce2b129d1",
+        "candidateManifestSha256": "f25910ddcc3766e520163ba65e00c2075f258a122494424075f27b6add7466be",
+        "baselineRuntimeFingerprint": "DDA6CF3F2A2DEB662A3190637A15D800F5D6B8D7DD8EAE66CEC7D3061EEBCE99",
+        "candidateRuntimeFingerprint": "493D3F2FD45B48F6FD3AADF663CA830359BDD1F470AB94D992163056CC332CA0",
+        "device": {
+          "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+          "dedicatedVideoMemoryBytes": 25309478912,
+          "isSoftwareAdapter": false,
+          "featureLevel": "Level_12_1",
+          "debugLayerEnabled": false,
+          "advanced": {
+            "meshShaderQuerySucceeded": true,
+            "meshShadersSupported": true,
+            "raytracingQuerySucceeded": true,
+            "raytracingSupported": true
+          }
+        },
+        "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+        "display": {
+          "width": 1920,
+          "height": 1080,
+          "bufferCount": 3,
+          "frameIndex": 1,
+          "isSuspended": false,
+          "presentMode": "Immediate",
+          "isOccluded": false,
+          "resizePending": false,
+          "resizeGeneration": 1,
+          "appliedResizeGeneration": 1,
+          "submittedFrameCount": 25,
+          "presentedFrameCount": 25
+        },
+        "profile": "High",
+        "camera": {
+          "target": {
+            "x": 650,
+            "y": 6.2121563,
+            "z": 520
+          },
+          "yawRadians": 0.7853982,
+          "pitchRadians": -0.9599311,
+          "distance": 1000,
+          "hasPointerPosition": false,
+          "pointerPosition": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "seed": 2026,
+        "tick": 32,
+        "warmups": 3,
+        "samples": 8,
+        "materialBindingFailures": 0,
+        "textureBindingFailures": 0,
+        "meshFallbacks": 0,
+        "beforeResidentMeshBytes": 11230152,
+        "afterResidentMeshBytes": 11230152,
+        "beforeResidentTextureBytes": 44782084,
+        "afterResidentTextureBytes": 44782084,
+        "beforeCpu": {
+          "samples": 8,
+          "mean": 8.639025,
+          "p50": 5.3171,
+          "p95": 18.9629,
+          "p99": 18.9629
+        },
+        "afterCpu": {
+          "samples": 8,
+          "mean": 10.328349999999999,
+          "p50": 8.6352,
+          "p95": 15.8462,
+          "p99": 15.8462
+        },
+        "beforeGpu": {
+          "samples": 6,
+          "mean": 8.515242666666666,
+          "p50": 6.675584,
+          "p95": 13.784896,
+          "p99": 13.784896
+        },
+        "afterGpu": {
+          "samples": 5,
+          "mean": 10.4735872,
+          "p50": 11.625632,
+          "p95": 12.972192,
+          "p99": 12.972192
+        },
+        "timingQualification": "not established by this short functional cohort",
+        "humanVisualApproval": "pending"
+      }
+    ],
+    "performanceAccepted": false,
+    "debugLayerQualified": false,
+    "humanVisualApproval": "pending"
+  },
+  "acceptance": {
+    "renderMilestone": "tooling integrated; twelve product gates open; no physical qualification records",
+    "productionPromotion": "blocked",
+    "fullDisplayProfileWeatherStateStressMatrix": "pending",
+    "liveLogisticsAndFourRotations": "pending",
+    "sustainedPairedPerformanceAndResidency": "pending",
+    "installedSourceLessPackage": "pending",
+    "fixedSeedScenicComparison": "pending",
+    "exactHeadCi": "pending",
+    "humanVisualApproval": "pending"
+  },
+  "retainedAttempts": [
+    {
+      "root": "artifacts/industrial-masters-qualified",
+      "result": "failed: Windows path length during edited GLB write; shortened output and edited filenames"
+    },
+    {
+      "root": "artifacts/im1/smelter/native-contracts",
+      "result": "failed: UV test selected a valid UV-less collision mesh; test now selects a UV-bearing geometry mesh"
+    },
+    {
+      "root": "artifacts/inx",
+      "result": "failed invocation: native PowerShell array flattening; typed-array rerun in artifacts/inx2 passed"
+    },
+    {
+      "root": "artifacts/im2",
+      "result": "failed: case-insensitive PowerShell parameter/loop variable collision; renamed loop variable; im3 passed"
+    },
+    {
+      "log": "artifacts/industrial-final-build.log",
+      "result": "failed: build overlapped live compiler DLL; subsequent serial builds passed"
+    },
+    {
+      "log": "artifacts/industrial-full-tests.log",
+      "result": "canceled parallel suite; not a pass"
+    },
+    {
+      "log": "artifacts/industrial-serial-tests.log",
+      "result": "canceled after missing runtime catalog caused native menu/cursor failures; canonical catalog subsequently verified"
+    },
+    {
+      "log": "artifacts/industrial-complete-tests.log",
+      "result": "canceled after missing reference boards in sparse checkout; checkout subsequently completed"
+    }
+  ],
+  "integrationMasterObserved": "538ddc0bd49a722462bf185cfc118cf5a3e5008f",
+  "renderGateObserved": {
+    "pullRequest": 268,
+    "merged": true,
+    "head": "37ad6e0428894ecbc12aac8181c9092a1924230b",
+    "productGatesOpen": 12,
+    "nativeRecordsInPublishedPlan": 0,
+    "sourceHoldReleased": false
+  },
+  "priorCi": {
+    "source": "d76be8452226cd37f4da3b2fa9f86105e2b1bd6e",
+    "allFourWorkflows": "passed",
+    "mainRun": 39510199252
+  }
+}

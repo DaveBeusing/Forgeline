@@ -12,6 +12,8 @@ meshes plus the shared collision reference. The 33 family GLBs are under
 `exports/`. `SourceBindings.json` maps every export to its original definition,
 ordered material/LOD/socket metadata, input signature and binary SHA-256.
 These files are a staged snapshot; canonical discovery remains unchanged.
+See [qualification and native before/after evidence](Qualification.md) for exact
+results, retained failures, the two close-view pixel differences and open gates.
 
 ## Audit and promotion boundary
 
