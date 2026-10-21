@@ -76,3 +76,8 @@ assertion, threshold, renderer contract or approved golden is relaxed.
 Executed results and source identities are retained separately in the native
 qualification evidence once produced. A declared capture plan is not an executed
 result, and a successful package is not human art approval.
+
+The saved positive-edit contract omits only its redundant inspection project.
+Both ordinary reopen exports retain full inspection/pose output. Strict source,
+geometry, metadata and saved-edit validation still execute before this optional
+review output; the 120-second native test deadline is unchanged.

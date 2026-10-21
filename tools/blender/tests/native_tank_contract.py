@@ -36,7 +36,7 @@ def run(request):
     obj=next(o for o in bpy.context.scene.objects if o.get('fl_role')=='geometry' and o.get('fl_asset')==ROOT+'.damaged')
     for v in obj.data.vertices:v.co.x+=.001
     bpy.ops.wm.save_as_mainfile(filepath=str(output/'edited.blend'),check_existing=False)
-    edited=output/'edited';edited.mkdir();export_tank({'inputRoot':request['inputRoot'],'outputRoot':str(edited),'arguments':['--action','Export','--fixtures',str(fixture),'--blend-file',str(output/'edited.blend')]})
+    edited=output/'edited';edited.mkdir();export_tank({'inputRoot':request['inputRoot'],'outputRoot':str(edited),'arguments':['--action','Export','--fixtures',str(fixture),'--blend-file',str(output/'edited.blend'),'--no-inspection']})
     candidate=Catalog(edited/'source');aid=ROOT+'.damaged';result=read_geometry(candidate.source(aid),candidate.root,candidate.definitions[aid][1])
     for old,new in zip(geometries[aid]['primitives'],result['primitives']):
         for a,b in zip(old['attributes']['POSITION'],new['attributes']['POSITION']):
