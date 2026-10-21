@@ -33,7 +33,7 @@ foreach($family in $families) {
             $name='decal_atlas'+$(if($map.channel -eq 'base'){''}else{'_'+$map.channel})+'.png'
             if($map.sha256 -ne (Get-FileHash (Join-Path $source "world/textures/decals/$name") -Algorithm SHA256).Hash.ToLowerInvariant()){throw 'Packed shared map differs from canonical bytes.'}
             if($map.colorSpace -ne $(if($map.channel -eq 'base'){'sRGB'}else{'Non-Color'})){throw 'Packed map has wrong color space.'}
-            if($map.filepath -ne "//../../textures/decals/$name"){throw 'Packed map path is not canonical-relative.'}
+            if($map.filepath.Replace('\','/') -ne "//../../textures/decals/$name"){throw 'Packed map path is not canonical-relative.'}
         }
     }
     & "$PSScriptRoot/Invoke-Blender.ps1" -Action Script -Script "$PSScriptRoot/decal_bakes.py" -InputRoot $source -OutputRoot (Join-Path $output "rebakes/$family") -ScriptArguments @('--reopen',$master,'--rebake') -TimeoutSeconds 600

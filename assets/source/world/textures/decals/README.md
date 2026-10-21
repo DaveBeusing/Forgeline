@@ -4,7 +4,8 @@ Original Blender-baked RGBA atlases, 1024 x 1024, four columns and two rows. Row
 
 The existing color/straight-alpha map remains capped at 512 with four mip levels.
 Shared tangent Normal and ORM maps are capped at 256 with four levels, using
-lossless RGBA8. Their combined resident texel storage is 2,088,960 bytes. Color
+BC7 for base/ORM and lossless RGBA8 for tangent normals. Their combined resident
+texel storage is 783,360 bytes. Color
 is sRGB; normal and ORM are linear (R AO, G roughness, B metallic). Soil, soot,
 oil and concrete remain nonmetallic. Oil uses a low roughness, while dusty wear
 retains a rough response. Source color contains no directional lighting/specular.

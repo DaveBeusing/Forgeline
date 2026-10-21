@@ -51,7 +51,7 @@ normals, normalized UVs, bounds and materialless section. Only a derived tangent
 channel is added. Its source now points to the saved master export. All eight
 material IDs, cell transforms and map/event placements are retained. All maps
 share the existing four-mip limit; base remains capped at 512 and the two new
-numeric maps at 256. Expected lossless resident texels total 2,088,960 bytes;
+numeric maps at 256. BC7 base/ORM and lossless RGBA8 normals target 783,360 resident bytes;
 actual compiled/global/resource results are recorded below when executed.
 
 The production pool remains 512 active / 16 per 256m anchor cell / 128 published,
@@ -104,3 +104,17 @@ freshly installed player package and current-head CI are pending. Human visual
 approval and the broader physical renderer qualification remain separate open
 gates. Authoring or repeatable pixels alone do not qualify art, animation or
 sustained frame rate. The technical PR remains draft until acceptance is assessed.
+
+The first complete RGBA8 catalog exceeded the unchanged 56 MiB gameplay texture
+container budget by 518,207 bytes. Its failed catalog and logs are retained.
+Base and ORM use the existing balanced BC7 encoder; normals remain lossless, with
+all four mip levels compared to separately compiled RGBA8 references. Thresholds
+are RGB PSNR >=32 dB, mean/max alpha byte error <=2/16, and normal angular
+mean/99th-percentile/maximum <=2/6/12 degrees. The first native reopen check
+passed byte hashes but rejected Windows separators; the comparison now normalizes
+separators while retaining the exact canonical relative path requirement.
+
+Balanced BC7 normal compression failed the fixed maximum angular error (15.06
+degrees); Best reduced it to 13.86 degrees but also failed the same 12-degree
+threshold. Both failed runs remain recorded. The chosen lossless normal map
+preserves the bake exactly while compressed base/ORM still provide budget room.

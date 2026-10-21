@@ -5,5 +5,7 @@
   "textureUsage": "orm",
   "textureColorSpace": "linear",
   "textureMaxDimension": 256,
-  "textureMaxMipLevels": 4
+  "textureMaxMipLevels": 4,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
 }

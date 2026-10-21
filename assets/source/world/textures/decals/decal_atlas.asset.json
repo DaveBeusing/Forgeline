@@ -5,5 +5,7 @@
   "textureUsage": "baseColor",
   "textureColorSpace": "srgb",
   "textureMaxDimension": 512,
-  "textureMaxMipLevels": 4
+  "textureMaxMipLevels": 4,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
 }
