@@ -1,0 +1,95 @@
+{
+  "imageGateRequested": false,
+  "baselineCommit": "cf32514d2ac39fbb0fd2d94410c8b1069279610a",
+  "commit": "cf32514d2ac39fbb0fd2d94410c8b1069279610a",
+  "structural": "pass",
+  "pixelComparisonRequested": true,
+  "captures": [
+    {
+      "cpuMeanDeltaMs": -0.16796249999999446,
+      "comparison": "pixels-require-human-review",
+      "structural": "pass",
+      "visualReview": "pending",
+      "regionChanges": null,
+      "equivalentHardware": true,
+      "gpuMeanMs": 8.656066133333331,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.808449074074074E-07,
+        "ChangedPixels": 6,
+        "ChangedPixelFraction": 7.233796296296296E-07,
+        "WithinTolerance": false
+      },
+      "sameRuntime": false,
+      "key": "VehicleFactoryRepeated-3840x2160-Low-Strategic",
+      "sameSource": true,
+      "cpuMeanMs": 30.396909375000003
+    },
+    {
+      "cpuMeanDeltaMs": -28.1957625,
+      "comparison": "exact-file-match",
+      "structural": "pass",
+      "visualReview": "pending",
+      "regionChanges": null,
+      "equivalentHardware": true,
+      "gpuMeanMs": 8.099420799999999,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "sameRuntime": false,
+      "key": "PowerPlantRepeated-3840x2160-Low-Strategic",
+      "sameSource": true,
+      "cpuMeanMs": 16.456940625
+    },
+    {
+      "cpuMeanDeltaMs": -14.5039625,
+      "comparison": "pixels-require-human-review",
+      "structural": "pass",
+      "visualReview": "pending",
+      "regionChanges": null,
+      "equivalentHardware": true,
+      "gpuMeanMs": 8.111146666666667,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 3.014081790123457E-08,
+        "ChangedPixels": 1,
+        "ChangedPixelFraction": 1.2056327160493827E-07,
+        "WithinTolerance": false
+      },
+      "sameRuntime": false,
+      "key": "BarracksRepeated-3840x2160-Low-Strategic",
+      "sameSource": true,
+      "cpuMeanMs": 16.538428125000003
+    },
+    {
+      "cpuMeanDeltaMs": -0.16785312499999705,
+      "comparison": "exact-file-match",
+      "structural": "pass",
+      "visualReview": "pending",
+      "regionChanges": null,
+      "equivalentHardware": true,
+      "gpuMeanMs": 8.018626133333335,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "sameRuntime": false,
+      "key": "RadarRepeated-3840x2160-Low-Strategic",
+      "sameSource": true,
+      "cpuMeanMs": 16.484225000000002
+    }
+  ],
+  "maximumChangedPixelFraction": 0.0,
+  "visualAcceptance": "pending",
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "imageFailures": [],
+  "channelTolerance": 0,
+  "schemaVersion": 1
+}

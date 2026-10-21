@@ -1,0 +1,84 @@
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.AtmospherePerformanceQualificationTests.CompareEquivalentTerrainAcrossAtmosphericModesAndZooms
+  Set FORGELINE_ATMOSPHERE_BENCHMARK_OUTPUT for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.MaterialQuality.MaterialSequenceTests.CaptureControlledMaterialPanAndZoomPairs
+  Set FORGELINE_MATERIAL_SEQUENCE_OUTPUT and FORGELINE_MATERIAL_BASELINE_ASSEMBLY for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.ScenePassPerformanceQualificationTests.CompareDirectAndLinearSceneOnEquivalentNativeWorkloads
+  Set FORGELINE_PASS_BENCHMARK_OUTPUT for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureProductionMaterialsAtFixedCentralDivideViewpoints
+  Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated production terrain measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureVegetationMotionWithIdenticalProductionBatches
+  Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated vegetation measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.RenderQualityQualificationTests.CaptureProductionQualityProfilesWithTerrainEffectsAndSelectionOverlays
+  Set FORGELINE_QUALITY_QUALIFICATION_OUTPUT for isolated hardware qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.DirectionalShadowPerformanceTests.CompareEquivalentDenseWorkloadsAcrossQualityAndRtsZoom
+  Set FORGELINE_SHADOW_BENCHMARK_OUTPUT for isolated hardware shadow measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.RigidAuthoringPreservesCompiledGeometryAndBatching
+  Set FORGELINE_BLENDER_MOTION_ROOT after rigid authoring exports.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "power_plant", triangles: 2288)
+  Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "barracks", triangles: 1056)
+  Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "radar", triangles: 1920)
+  Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.OperationalMastersPreserveCompiledStatesLodsAndMechanicalBatching(family: "vehicle_factory", triangles: 1556)
+  Run build/operational-blender/Qualify-Masters.ps1 with native Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.BuildingVehicleAndPropPreserveCompiledContracts
+  Set FORGELINE_BLENDER_READINESS_ROOT after the staged three-family exports.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.ExportedProductionMeshesPreserveRuntimeContractsAndMechanicalBatching
+  Set FORGELINE_BLENDER_ROUNDTRIP_ROOT after native Blender fixture exports.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.CombinedOperationalExportsLoadWithoutSourceFiles
+  Set operational exports and a qualified full runtime seed.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.DefaultSurfacePreparationPreservesCompiledGeometryAndBatching
+  Set FORGELINE_BLENDER_PRODUCTION_ROOT after native surface qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: "smelter", triangles: 2588)
+  Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: "electronics_plant", triangles: 2152)
+  Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderRoundTripQualificationTests.IndustrialMastersPreserveCompiledGeometryAndStateContracts(family: "extractor", triangles: 2508)
+  Set FORGELINE_INDUSTRIAL_BLENDER_ROOT after native industrial master qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.IndustrialPlantMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels(family: "ammunition_plant")
+  Run build/industrial-plants/Qualify-Masters.ps1 with real Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.IndustrialPlantMasterTests.SavedMastersPreserveCompiledStatesLodsSocketsAndSurfaceChannels(family: "fuel_refinery")
+  Run build/industrial-plants/Qualify-Masters.ps1 with real Blender first.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.ParticlePerformanceQualificationTests.MeasureBoundedProductionEffectsAtRtsViewpoints
+  Set FORGELINE_PARTICLE_QUALIFICATION_OUTPUT for isolated hardware qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderMechanicalQualificationTests.EditedPivotsPreserveStaticGeometryAndCanonicalRangeSharing
+  Set FORGELINE_BLENDER_MOTION_ROOT after native rigid authoring.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.BlenderMechanicalQualificationTests.BlenderPoseMatricesMatchRuntimeRigidCompositionIncludingEditedBindings
+  Set FORGELINE_BLENDER_MOTION_ROOT after native rigid authoring.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.EffectSubmission.ParticleOrderingQualificationTests.MeasureEquivalentParticleOrderingInPairedCohorts
+  Set FORGELINE_PARTICLE_CPU_QUALIFICATION_OUTPUT for isolated CPU ordering qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\operational-blender\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) erfolgreich (2m 39s 449ms)
+
+Testlaufzusammenfassung: Bestanden!
+  gesamt: 1597
+  fehlgeschlagen: 0
+  erfolgreich: 1572
+  übersprungen: 25
+  Dauer: 2m 41s 021ms

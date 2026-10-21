@@ -1,0 +1,495 @@
+{
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "imageFailures": [],
+  "maximumChangedPixelFraction": 0.0,
+  "channelTolerance": 0,
+  "structural": "pass",
+  "imageGateRequested": false,
+  "visualAcceptance": "pending",
+  "commit": "cf32514d2ac39fbb0fd2d94410c8b1069279610a",
+  "captures": [
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.04309687499999981,
+      "key": "VehicleFactoryRepeated-1920x1080-Low-NormalGameplay",
+      "gpuMeanMs": 3.530409599999999,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 4.3567625,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 6.028163580246913E-07,
+        "ChangedPixels": 5,
+        "ChangedPixelFraction": 2.4112654320987654E-06,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.020349999999999646,
+      "key": "PowerPlantRepeated-1920x1080-Low-NormalGameplay",
+      "gpuMeanMs": 3.1162394482758615,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 4.316975,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.2056327160493827E-07,
+        "ChangedPixels": 1,
+        "ChangedPixelFraction": 4.822530864197531E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.03074375000000007,
+      "key": "BarracksRepeated-1920x1080-Low-NormalGameplay",
+      "gpuMeanMs": 2.918165333333333,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 4.213540624999999,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 2.4112654320987655E-07,
+        "ChangedPixels": 2,
+        "ChangedPixelFraction": 9.645061728395062E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.029631249999999554,
+      "key": "RadarRepeated-1920x1080-Low-NormalGameplay",
+      "gpuMeanMs": 2.8570474666666668,
+      "comparison": "exact-file-match",
+      "cpuMeanMs": 4.24805,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.0009062500000007745,
+      "key": "VehicleFactoryRepeated-1920x1080-Medium-NormalGameplay",
+      "gpuMeanMs": 5.001300266666665,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 4.777671874999999,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 2,
+        "MeanAbsoluteChannelDelta": 2.0495756172839506E-06,
+        "ChangedPixels": 11,
+        "ChangedPixelFraction": 5.304783950617284E-06,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.0355406250000021,
+      "key": "PowerPlantRepeated-1920x1080-Medium-NormalGameplay",
+      "gpuMeanMs": 4.494035199999999,
+      "comparison": "exact-file-match",
+      "cpuMeanMs": 4.460031249999999,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.003265625000000938,
+      "key": "BarracksRepeated-1920x1080-Medium-NormalGameplay",
+      "gpuMeanMs": 4.374616533333334,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 4.454750000000001,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.2056327160493827E-07,
+        "ChangedPixels": 1,
+        "ChangedPixelFraction": 4.822530864197531E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.006075000000000053,
+      "key": "RadarRepeated-1920x1080-Medium-NormalGameplay",
+      "gpuMeanMs": 4.359863466666666,
+      "comparison": "exact-file-match",
+      "cpuMeanMs": 4.43779375,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.01338125000000101,
+      "key": "VehicleFactoryRepeated-1920x1080-High-NormalGameplay",
+      "gpuMeanMs": 5.4018784,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 5.068646875,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.5673225308641974E-06,
+        "ChangedPixels": 11,
+        "ChangedPixelFraction": 5.304783950617284E-06,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.021996875000001026,
+      "key": "PowerPlantRepeated-1920x1080-High-NormalGameplay",
+      "gpuMeanMs": 4.814123733333333,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 4.588434375,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.2056327160493827E-07,
+        "ChangedPixels": 1,
+        "ChangedPixelFraction": 4.822530864197531E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.0049218749999999645,
+      "key": "BarracksRepeated-1920x1080-High-NormalGameplay",
+      "gpuMeanMs": 4.732706133333333,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 4.613540625,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 2.4112654320987655E-07,
+        "ChangedPixels": 2,
+        "ChangedPixelFraction": 9.645061728395062E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.03085625000000114,
+      "key": "RadarRepeated-1920x1080-High-NormalGameplay",
+      "gpuMeanMs": 4.759453866666666,
+      "comparison": "exact-file-match",
+      "cpuMeanMs": 4.545865624999999,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 72.039375,
+      "key": "VehicleFactoryRepeated-3840x2160-Low-NormalGameplay",
+      "gpuMeanMs": 10.187027200000001,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 116.79940625,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 9.946469907407407E-07,
+        "ChangedPixels": 29,
+        "ChangedPixelFraction": 3.49633487654321E-06,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.07792499999999691,
+      "key": "PowerPlantRepeated-3840x2160-Low-NormalGameplay",
+      "gpuMeanMs": 9.239675733333332,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 16.618559374999997,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 6.028163580246914E-08,
+        "ChangedPixels": 2,
+        "ChangedPixelFraction": 2.4112654320987655E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.12195937500000298,
+      "key": "BarracksRepeated-3840x2160-Low-NormalGameplay",
+      "gpuMeanMs": 9.338724266666668,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 16.589284375000002,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 3.3154899691358023E-07,
+        "ChangedPixels": 11,
+        "ChangedPixelFraction": 1.326195987654321E-06,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -14.283703124999999,
+      "key": "RadarRepeated-3840x2160-Low-NormalGameplay",
+      "gpuMeanMs": 8.997666133333333,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 16.73656875,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.2056327160493827E-07,
+        "ChangedPixels": 4,
+        "ChangedPixelFraction": 4.822530864197531E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 14.549271874999999,
+      "key": "VehicleFactoryRepeated-3840x2160-Medium-NormalGameplay",
+      "gpuMeanMs": 16.512829866666664,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 31.344534375,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 2,
+        "MeanAbsoluteChannelDelta": 2.3811246141975307E-06,
+        "ChangedPixels": 69,
+        "ChangedPixelFraction": 8.318865740740741E-06,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.0011874999999967883,
+      "key": "PowerPlantRepeated-3840x2160-Medium-NormalGameplay",
+      "gpuMeanMs": 13.908925866666666,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 16.68379375,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.808449074074074E-07,
+        "ChangedPixels": 6,
+        "ChangedPixelFraction": 7.233796296296296E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.19481562499999683,
+      "key": "BarracksRepeated-3840x2160-Medium-NormalGameplay",
+      "gpuMeanMs": 14.192017066666667,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 31.138453125000005,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 3.0140817901234567E-07,
+        "ChangedPixels": 9,
+        "ChangedPixelFraction": 1.0850694444444444E-06,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -14.556181249999998,
+      "key": "RadarRepeated-3840x2160-Medium-NormalGameplay",
+      "gpuMeanMs": 13.55120106666667,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 16.676934375,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 2.10985725308642E-07,
+        "ChangedPixels": 6,
+        "ChangedPixelFraction": 7.233796296296296E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.3266375000000039,
+      "key": "VehicleFactoryRepeated-3840x2160-High-NormalGameplay",
+      "gpuMeanMs": 17.14163093333333,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 31.903434375000003,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 3,
+        "MeanAbsoluteChannelDelta": 2.592110339506173E-06,
+        "ChangedPixels": 67,
+        "ChangedPixelFraction": 8.077739197530864E-06,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.15888749999999874,
+      "key": "PowerPlantRepeated-3840x2160-High-NormalGameplay",
+      "gpuMeanMs": 14.432878933333338,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 16.626865625,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.808449074074074E-07,
+        "ChangedPixels": 6,
+        "ChangedPixelFraction": 7.233796296296296E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 14.78848125,
+      "key": "BarracksRepeated-3840x2160-High-NormalGameplay",
+      "gpuMeanMs": 14.531428266666666,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 31.19674375,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 3.9183063271604936E-07,
+        "ChangedPixels": 12,
+        "ChangedPixelFraction": 1.4467592592592592E-06,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.2383999999999986,
+      "key": "RadarRepeated-3840x2160-High-NormalGameplay",
+      "gpuMeanMs": 14.086130133333333,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 16.3906125,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.2056327160493827E-07,
+        "ChangedPixels": 3,
+        "ChangedPixelFraction": 3.616898148148148E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    }
+  ],
+  "baselineCommit": "cf32514d2ac39fbb0fd2d94410c8b1069279610a",
+  "pixelComparisonRequested": true,
+  "schemaVersion": 1
+}

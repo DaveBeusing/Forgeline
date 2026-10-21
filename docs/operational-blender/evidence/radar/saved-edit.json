@@ -1,0 +1,14 @@
+{
+  "canonicalYDelta": 0.0009999871253967276,
+  "editAsset": "building.directorate.radar",
+  "editIsQualificationOnly": true,
+  "editVertex": 146,
+  "family": "building.directorate.radar",
+  "meshCount": 11,
+  "organizedMasterReopened": true,
+  "productionPromotion": "pending",
+  "savedVertexEditReopenedAndExported": true,
+  "schemaVersion": 1,
+  "sourceSignature": "01ce59ffe942879ab4a73252947a00f33fc4dade246a21cf9a3aa6b5cc578dcd",
+  "success": true
+}

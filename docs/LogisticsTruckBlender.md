@@ -108,7 +108,7 @@ The integrated foundation acceptance records technical qualification and project
 owner native approval on 19 October 2026. Later renderer lanes retain their own
 acceptance limitations. Current master CI run 39547596264 fails its version gate
 before build/tests. That inherited outcome is separate from this branch's checks.
-Exactly one PR PATCH is prepared: 0.1.428 to 0.1.429.
+Exactly one PR PATCH is prepared against current master: 0.1.429 to 0.1.430. The retained package and native evidence below were produced at 0.1.429 before synchronizing the reference-scene additions from master.
 
 Current-head required CI, native evidence, reproducible installed-package evidence
 and human art review remain separate gates. Branch-local authoring and visual

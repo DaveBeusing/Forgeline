@@ -1,0 +1,1959 @@
+{
+  "families": [
+    {
+      "componentGroups": [
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "structural_columns/column_0",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "structural_columns/column_1",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "structural_columns/column_2",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "structural_columns/column_3",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_hall/left_hall_wall",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_hall/right_hall_wall",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_hall/rear_hall_wall",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_hall/left_portal_jamb",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_hall/right_portal_jamb",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_hall/door_lintel",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_hall/roof",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_lanes/lane_0",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_lanes/lane_1",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_lanes/lane_2",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "assembly_lanes/lane_3",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "roof_ventilation/roof_monitor",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "roof_ventilation/vent_louver_0",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "roof_ventilation/vent_louver_1",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "roof_ventilation/vent_louver_2",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "roof_ventilation/vent_louver_3",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "roof_ventilation/vent_louver_4",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "static_gantry_rails/gantry_rail_0",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "static_gantry_rails/gantry_rail_1",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "loading_door/armored_loading_leaf",
+          "object": "01:0:loading_door",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "loading_door/door_rib_0",
+          "object": "01:0:loading_door",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "loading_door/door_rib_1",
+          "object": "01:0:loading_door",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "loading_door/door_rib_2",
+          "object": "01:0:loading_door",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "loading_door/door_rib_3",
+          "object": "01:0:loading_door",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "loading_door/door_rib_4",
+          "object": "01:0:loading_door",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "overhead_crane/cross_beam",
+          "object": "01:0:overhead_crane",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "overhead_crane/trolley",
+          "object": "01:0:overhead_crane",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory",
+          "group": "overhead_crane/hoist",
+          "object": "01:0:overhead_crane",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "structural_columns/column_0",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "structural_columns/column_1",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "structural_columns/column_2",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "structural_columns/column_3",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_hall/left_hall_wall",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_hall/right_hall_wall",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_hall/rear_hall_wall",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_hall/left_portal_jamb",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_hall/right_portal_jamb",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_hall/door_lintel",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_hall/roof",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_lanes/lane_0",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_lanes/lane_1",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_lanes/lane_2",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "assembly_lanes/lane_3",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "roof_ventilation/roof_monitor",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "static_gantry_rails/gantry_rail_0",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "static_gantry_rails/gantry_rail_1",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod1",
+          "group": "loading_door/armored_loading_leaf",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "structural_columns/column_0",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "structural_columns/column_1",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "structural_columns/column_2",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "structural_columns/column_3",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_hall/left_hall_wall",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_hall/right_hall_wall",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_hall/rear_hall_wall",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_hall/left_portal_jamb",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_hall/right_portal_jamb",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_hall/door_lintel",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_hall/roof",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_lanes/lane_0",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_lanes/lane_1",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_lanes/lane_2",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "assembly_lanes/lane_3",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.lod2",
+          "group": "roof_ventilation/roof_monitor",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.foundation",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.structural_frame",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.structural_frame",
+          "group": "structural_columns/column_0",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.structural_frame",
+          "group": "structural_columns/column_1",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.structural_frame",
+          "group": "structural_columns/column_2",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.structural_frame",
+          "group": "structural_columns/column_3",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_0",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_1",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_longbeam_0",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_longbeam_1",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "structural_columns/column_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "structural_columns/column_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "structural_columns/column_2",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "structural_columns/column_3",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "assembly_hall/left_hall_wall",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "assembly_hall/right_hall_wall",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "assembly_hall/rear_hall_wall",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "assembly_hall/left_portal_jamb",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "assembly_hall/right_portal_jamb",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "assembly_hall/door_lintel",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "assembly_hall/roof",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_longbeam_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_longbeam_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.unpowered",
+          "group": "service_shutdown/isolated_service_cover",
+          "object": "10:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.damaged",
+          "group": "damaged_structure/broken_brace",
+          "object": "03:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.damaged",
+          "group": "damaged_structure/broken_pipe",
+          "object": "03:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.critical",
+          "group": "critical_structure/collapsed_roof_sheet",
+          "object": "02:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.critical",
+          "group": "critical_structure/ruptured_service",
+          "object": "02:0:whole",
+          "vertices": 160
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.destroyed",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.destroyed",
+          "group": "collapsed_frame/fallen_wall",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.destroyed",
+          "group": "collapsed_frame/fallen_roof",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.destroyed",
+          "group": "collapsed_frame/fallen_support",
+          "object": "04:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.destroyed",
+          "group": "wreck_portal/broken_portal_left",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.vehicle_factory.destroyed",
+          "group": "wreck_portal/fallen_gantry",
+          "object": "04:0:whole",
+          "vertices": 24
+        }
+      ],
+      "exactExports": 10,
+      "family": "vehicle_factory",
+      "masterSha256": "bc9318a26dd5fe1eaf30fc2f118d1d8741308c23ff85dab1846b36066f7168d2",
+      "originalMasterSha256": "374de19be0b557e403d392a1e3df9680153fdf26b9d7601e398a9e39a1c47932",
+      "reopened": true,
+      "sourceSignature": "fc5992e0050a5aa3bc41ec7425088630317dadda79f55b2afba2f4d9657496fd"
+    },
+    {
+      "componentGroups": [
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "generation_hall/generation_housing",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "generation_hall/hall_roof",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "exhaust_stacks/exhaust_0",
+          "object": "01:0:body",
+          "vertices": 256
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "exhaust_stacks/exhaust_1",
+          "object": "01:0:body",
+          "vertices": 256
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "exhaust_flanges/flange_0",
+          "object": "01:0:body",
+          "vertices": 256
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "exhaust_flanges/flange_1",
+          "object": "01:0:body",
+          "vertices": 256
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "distribution_yard/transformer_0",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "distribution_yard/transformer_1",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "transformer_fittings/insulator_0",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "transformer_fittings/insulator_1",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "transformer_fittings/cooling_fin_0",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "transformer_fittings/cooling_fin_1",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "transformer_fittings/cooling_fin_2",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "transformer_fittings/cooling_fin_3",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "transformer_fittings/cooling_fin_4",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "transformer_fittings/cooling_fin_5",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "transformer_fittings/cooling_fin_6",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "service_enclosure/control_room",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "service_enclosure/service_door",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "service_enclosure/cooling_shroud",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "cooling_rotor/fan_hub",
+          "object": "01:0:cooling_fan",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "cooling_rotor/fan_blade_0",
+          "object": "01:0:cooling_fan",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "cooling_rotor/fan_blade_1",
+          "object": "01:0:cooling_fan",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "cooling_rotor/fan_blade_2",
+          "object": "01:0:cooling_fan",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant",
+          "group": "cooling_rotor/fan_blade_3",
+          "object": "01:0:cooling_fan",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "generation_hall/generation_housing",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "generation_hall/hall_roof",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "exhaust_stacks/exhaust_0",
+          "object": "06:0:whole",
+          "vertices": 160
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "exhaust_stacks/exhaust_1",
+          "object": "06:0:whole",
+          "vertices": 160
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "exhaust_flanges/flange_0",
+          "object": "06:0:whole",
+          "vertices": 160
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "exhaust_flanges/flange_1",
+          "object": "06:0:whole",
+          "vertices": 160
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "distribution_yard/transformer_0",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "distribution_yard/transformer_1",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "transformer_fittings/insulator_0",
+          "object": "06:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "transformer_fittings/insulator_1",
+          "object": "06:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "service_enclosure/control_room",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "service_enclosure/service_door",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod1",
+          "group": "service_enclosure/cooling_shroud",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod2",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod2",
+          "group": "generation_hall/generation_housing",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod2",
+          "group": "generation_hall/hall_roof",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod2",
+          "group": "exhaust_stacks/exhaust_0",
+          "object": "07:0:whole",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.power_plant.lod2",
+          "group": "exhaust_stacks/exhaust_1",
+          "object": "07:0:whole",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.power_plant.lod2",
+          "group": "distribution_yard/transformer_0",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod2",
+          "group": "distribution_yard/transformer_1",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod2",
+          "group": "service_enclosure/control_room",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.lod2",
+          "group": "service_enclosure/cooling_shroud",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.foundation",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.structural_frame",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.structural_frame",
+          "group": "structural_columns/column_0",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.structural_frame",
+          "group": "structural_columns/column_1",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.structural_frame",
+          "group": "structural_columns/column_2",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.structural_frame",
+          "group": "structural_columns/column_3",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_0",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_1",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_longbeam_0",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_longbeam_1",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "structural_columns/column_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "structural_columns/column_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "structural_columns/column_2",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "structural_columns/column_3",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "generation_hall/generation_housing",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "generation_hall/hall_roof",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "distribution_yard/transformer_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "distribution_yard/transformer_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_longbeam_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_longbeam_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.unpowered",
+          "group": "service_shutdown/isolated_service_cover",
+          "object": "10:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.damaged",
+          "group": "damaged_structure/broken_brace",
+          "object": "03:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.damaged",
+          "group": "damaged_structure/broken_pipe",
+          "object": "03:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.power_plant.critical",
+          "group": "critical_structure/collapsed_roof_sheet",
+          "object": "02:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.critical",
+          "group": "critical_structure/ruptured_service",
+          "object": "02:0:whole",
+          "vertices": 160
+        },
+        {
+          "asset": "building.directorate.power_plant.destroyed",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.destroyed",
+          "group": "collapsed_frame/fallen_wall",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.destroyed",
+          "group": "collapsed_frame/fallen_roof",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.power_plant.destroyed",
+          "group": "collapsed_frame/fallen_support",
+          "object": "04:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.power_plant.destroyed",
+          "group": "wreck_generator/broken_stack",
+          "object": "04:0:whole",
+          "vertices": 160
+        },
+        {
+          "asset": "building.directorate.power_plant.destroyed",
+          "group": "wreck_generator/crushed_transformer",
+          "object": "04:0:whole",
+          "vertices": 24
+        }
+      ],
+      "exactExports": 10,
+      "family": "power_plant",
+      "masterSha256": "b802e592d080beb286ae165275f6104ea3621240acc9fe4d6d87954e82a4159c",
+      "originalMasterSha256": "22a4c9dd63e7dc10cffa3db1916b0bf06d74524b6c41210b8338a87119592cc8",
+      "reopened": true,
+      "sourceSignature": "33ecb0974efd02b87f28f4bea6f9c37c18fdafb78b823dea5f31f1190ac5c3e7"
+    },
+    {
+      "componentGroups": [
+        {
+          "asset": "building.directorate.barracks",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "west_quarters/west_housing",
+          "object": "00:0:whole",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "west_quarters/west_pitched_roof",
+          "object": "00:0:whole",
+          "vertices": 30
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "west_entrances/west_canopy",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "west_entrances/west_door",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "west_windows/west_window_0",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "west_windows/west_window_1",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "west_windows/west_window_2",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "east_quarters/east_housing",
+          "object": "00:0:whole",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "east_quarters/east_pitched_roof",
+          "object": "00:0:whole",
+          "vertices": 30
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "east_entrances/east_canopy",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "east_entrances/east_door",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "east_windows/east_window_0",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "east_windows/east_window_1",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "east_windows/east_window_2",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "infantry_circulation/central_path",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks",
+          "group": "infantry_circulation/deployment_step",
+          "object": "00:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "west_quarters/west_housing",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "west_quarters/west_pitched_roof",
+          "object": "05:0:whole",
+          "vertices": 30
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "west_entrances/west_canopy",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "west_entrances/west_door",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "east_quarters/east_housing",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "east_quarters/east_pitched_roof",
+          "object": "05:0:whole",
+          "vertices": 30
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "east_entrances/east_canopy",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "east_entrances/east_door",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "infantry_circulation/central_path",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod1",
+          "group": "infantry_circulation/deployment_step",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod2",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod2",
+          "group": "west_quarters/west_housing",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod2",
+          "group": "west_quarters/west_pitched_roof",
+          "object": "06:0:whole",
+          "vertices": 30
+        },
+        {
+          "asset": "building.directorate.barracks.lod2",
+          "group": "east_quarters/east_housing",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod2",
+          "group": "east_quarters/east_pitched_roof",
+          "object": "06:0:whole",
+          "vertices": 30
+        },
+        {
+          "asset": "building.directorate.barracks.lod2",
+          "group": "infantry_circulation/central_path",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.lod2",
+          "group": "infantry_circulation/deployment_step",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.foundation",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.structural_frame",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.structural_frame",
+          "group": "structural_columns/column_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.structural_frame",
+          "group": "structural_columns/column_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.structural_frame",
+          "group": "structural_columns/column_2",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.structural_frame",
+          "group": "structural_columns/column_3",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_longbeam_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_longbeam_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "structural_columns/column_0",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "structural_columns/column_1",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "structural_columns/column_2",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "structural_columns/column_3",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "west_quarters/west_housing",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "west_quarters/west_pitched_roof",
+          "object": "07:0:whole",
+          "vertices": 30
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "east_quarters/east_housing",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "east_quarters/east_pitched_roof",
+          "object": "07:0:whole",
+          "vertices": 30
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_0",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_1",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_longbeam_0",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_longbeam_1",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.unpowered",
+          "group": "service_shutdown/isolated_service_cover",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.damaged",
+          "group": "damaged_structure/broken_brace",
+          "object": "02:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.damaged",
+          "group": "damaged_structure/broken_pipe",
+          "object": "02:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.barracks.critical",
+          "group": "critical_structure/collapsed_roof_sheet",
+          "object": "01:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.critical",
+          "group": "critical_structure/ruptured_service",
+          "object": "01:0:whole",
+          "vertices": 160
+        },
+        {
+          "asset": "building.directorate.barracks.destroyed",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "03:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.destroyed",
+          "group": "collapsed_frame/fallen_wall",
+          "object": "03:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.destroyed",
+          "group": "collapsed_frame/fallen_roof",
+          "object": "03:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.barracks.destroyed",
+          "group": "collapsed_frame/fallen_support",
+          "object": "03:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.barracks.destroyed",
+          "group": "quarters_wreck/fallen_quarters_roof",
+          "object": "03:0:whole",
+          "vertices": 30
+        },
+        {
+          "asset": "building.directorate.barracks.destroyed",
+          "group": "quarters_wreck/broken_east_quarters",
+          "object": "03:0:whole",
+          "vertices": 24
+        }
+      ],
+      "exactExports": 10,
+      "family": "barracks",
+      "masterSha256": "44bbb5649ad37780d12a878d332036bbb9ca88b499a210b88ba3aab7c9470001",
+      "originalMasterSha256": "fb32d3d3ea149fe2548f2e1391dcf4d62fcc6d5eb836061a888816233cc33fa6",
+      "reopened": true,
+      "sourceSignature": "95f4383495bc2f2f61d4c1e15f51a6c025ee660a776f32093cf40f15b4a73b12"
+    },
+    {
+      "componentGroups": [
+        {
+          "asset": "building.directorate.radar",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar",
+          "group": "electronics_enclosure/receiver_room",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.radar",
+          "group": "electronics_enclosure/service_hatch",
+          "object": "01:0:body",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar",
+          "group": "mast_support/bearing_mast",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.radar",
+          "group": "mast_support/west_brace",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.radar",
+          "group": "mast_support/east_brace",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.radar",
+          "group": "mast_support/forward_brace",
+          "object": "01:0:body",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.radar",
+          "group": "receiver_array/concave_reflector",
+          "object": "01:0:radar_array",
+          "vertices": 816
+        },
+        {
+          "asset": "building.directorate.radar",
+          "group": "receiver_array/receiver_feed",
+          "object": "01:0:radar_array",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.radar",
+          "group": "receiver_array/array_bearing",
+          "object": "01:0:radar_array",
+          "vertices": 96
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "electronics_enclosure/receiver_room",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "electronics_enclosure/service_hatch",
+          "object": "06:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "mast_support/bearing_mast",
+          "object": "06:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "mast_support/west_brace",
+          "object": "06:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "mast_support/east_brace",
+          "object": "06:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "mast_support/forward_brace",
+          "object": "06:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "receiver_array/concave_reflector",
+          "object": "06:0:whole",
+          "vertices": 216
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "receiver_array/receiver_feed",
+          "object": "06:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.radar.lod1",
+          "group": "receiver_array/array_bearing",
+          "object": "06:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.radar.lod2",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.lod2",
+          "group": "electronics_enclosure/receiver_room",
+          "object": "07:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.lod2",
+          "group": "mast_support/bearing_mast",
+          "object": "07:0:whole",
+          "vertices": 36
+        },
+        {
+          "asset": "building.directorate.radar.lod2",
+          "group": "mast_support/west_brace",
+          "object": "07:0:whole",
+          "vertices": 36
+        },
+        {
+          "asset": "building.directorate.radar.lod2",
+          "group": "mast_support/east_brace",
+          "object": "07:0:whole",
+          "vertices": 36
+        },
+        {
+          "asset": "building.directorate.radar.lod2",
+          "group": "mast_support/forward_brace",
+          "object": "07:0:whole",
+          "vertices": 36
+        },
+        {
+          "asset": "building.directorate.radar.lod2",
+          "group": "receiver_array/concave_reflector",
+          "object": "07:0:whole",
+          "vertices": 80
+        },
+        {
+          "asset": "building.directorate.radar.lod2",
+          "group": "receiver_array/array_bearing",
+          "object": "07:0:whole",
+          "vertices": 36
+        },
+        {
+          "asset": "building.directorate.radar.foundation",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "05:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.structural_frame",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.structural_frame",
+          "group": "structural_columns/column_0",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.structural_frame",
+          "group": "structural_columns/column_1",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.structural_frame",
+          "group": "structural_columns/column_2",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.structural_frame",
+          "group": "structural_columns/column_3",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_0",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_1",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_longbeam_0",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.structural_frame",
+          "group": "temporary_build_scaffold/scaffold_longbeam_1",
+          "object": "09:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "structural_columns/column_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "structural_columns/column_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "structural_columns/column_2",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "structural_columns/column_3",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "electronics_enclosure/receiver_room",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "electronics_enclosure/service_hatch",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_crossbeam_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_longbeam_0",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.partial_shell",
+          "group": "temporary_build_scaffold/scaffold_longbeam_1",
+          "object": "08:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.unpowered",
+          "group": "service_shutdown/isolated_service_cover",
+          "object": "10:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.damaged",
+          "group": "damaged_structure/broken_brace",
+          "object": "03:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.damaged",
+          "group": "damaged_structure/broken_pipe",
+          "object": "03:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.radar.critical",
+          "group": "critical_structure/collapsed_roof_sheet",
+          "object": "02:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.critical",
+          "group": "critical_structure/ruptured_service",
+          "object": "02:0:whole",
+          "vertices": 160
+        },
+        {
+          "asset": "building.directorate.radar.destroyed",
+          "group": "terrain_plinth/reinforced_foundation",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.destroyed",
+          "group": "collapsed_frame/fallen_wall",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.destroyed",
+          "group": "collapsed_frame/fallen_roof",
+          "object": "04:0:whole",
+          "vertices": 24
+        },
+        {
+          "asset": "building.directorate.radar.destroyed",
+          "group": "collapsed_frame/fallen_support",
+          "object": "04:0:whole",
+          "vertices": 60
+        },
+        {
+          "asset": "building.directorate.radar.destroyed",
+          "group": "array_wreck/collapsed_reflector",
+          "object": "04:0:whole",
+          "vertices": 180
+        },
+        {
+          "asset": "building.directorate.radar.destroyed",
+          "group": "array_wreck/broken_mast",
+          "object": "04:0:whole",
+          "vertices": 60
+        }
+      ],
+      "exactExports": 10,
+      "family": "radar",
+      "masterSha256": "79851b74aab2230a57763a88480f15046a712fe10ad63d4c7bd51ce918894857",
+      "originalMasterSha256": "b3145e22639ccb6b020c2d80dab12a3c80194662cb4c7e83e3ad3746834fb6b7",
+      "reopened": true,
+      "sourceSignature": "01ce59ffe942879ab4a73252947a00f33fc4dade246a21cf9a3aa6b5cc578dcd"
+    }
+  ],
+  "success": true
+}

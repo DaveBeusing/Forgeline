@@ -1,0 +1,26 @@
+{
+  "families": [
+    {
+      "exactGlbExports": 10,
+      "masterSha256": "bc9318a26dd5fe1eaf30fc2f118d1d8741308c23ff85dab1846b36066f7168d2",
+      "family": "vehicle_factory"
+    },
+    {
+      "exactGlbExports": 10,
+      "masterSha256": "b802e592d080beb286ae165275f6104ea3621240acc9fe4d6d87954e82a4159c",
+      "family": "power_plant"
+    },
+    {
+      "exactGlbExports": 10,
+      "masterSha256": "44bbb5649ad37780d12a878d332036bbb9ca88b499a210b88ba3aab7c9470001",
+      "family": "barracks"
+    },
+    {
+      "exactGlbExports": 10,
+      "masterSha256": "79851b74aab2230a57763a88480f15046a712fe10ad63d4c7bd51ce918894857",
+      "family": "radar"
+    }
+  ],
+  "schemaVersion": 1,
+  "success": true
+}

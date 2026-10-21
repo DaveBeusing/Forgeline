@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "method": "Unmodified native PNG copies; complete originals remain at documented artifacts roots.",
+  "images": [
+    {
+      "source": "artifacts/opvb2/galleries/VehicleFactoryProduction-1920x1080-High-NormalGameplay.png",
+      "target": "vehicle_factory-before.png",
+      "kind": "gallery",
+      "sha256": "e34d970969bc6d55280e5e5eeb001d77370456c7fa18b805b1e66997c16f7b67"
+    },
+    {
+      "source": "artifacts/opva2/galleries/VehicleFactoryProduction-1920x1080-High-NormalGameplay.png",
+      "target": "vehicle_factory-after.png",
+      "kind": "gallery",
+      "sha256": "e34d970969bc6d55280e5e5eeb001d77370456c7fa18b805b1e66997c16f7b67"
+    },
+    {
+      "source": "artifacts/opva2/side-180/VehicleFactorySingle-1920x1080-High-CloseTactical-Yaw180.png",
+      "target": "vehicle_factory-single-front.png",
+      "kind": "single",
+      "sha256": "5271585157ff16caf1aada146131b273c0f976b643b95b6477eac362786b7420"
+    },
+    {
+      "source": "artifacts/opvb2/galleries/PowerPlantProduction-1920x1080-High-NormalGameplay.png",
+      "target": "power_plant-before.png",
+      "kind": "gallery",
+      "sha256": "31cc1e39af25751a18437b8ffb9cb297d2e59d50ae51cd99f88a4e46a76dd625"
+    },
+    {
+      "source": "artifacts/opva2/galleries/PowerPlantProduction-1920x1080-High-NormalGameplay.png",
+      "target": "power_plant-after.png",
+      "kind": "gallery",
+      "sha256": "31cc1e39af25751a18437b8ffb9cb297d2e59d50ae51cd99f88a4e46a76dd625"
+    },
+    {
+      "source": "artifacts/opva2/side-180/PowerPlantSingle-1920x1080-High-CloseTactical-Yaw180.png",
+      "target": "power_plant-single-front.png",
+      "kind": "single",
+      "sha256": "33a48c75b8ff0a5aa39bc5f5f1090baad454d018c7c985efa579a51b0dad48cc"
+    },
+    {
+      "source": "artifacts/opvb2/galleries/BarracksProduction-1920x1080-High-NormalGameplay.png",
+      "target": "barracks-before.png",
+      "kind": "gallery",
+      "sha256": "ed0e9105bfcc5b4542be1dbb4519fe91bba9a6a178f9064bf6ba5fb4c55223f2"
+    },
+    {
+      "source": "artifacts/opva2/galleries/BarracksProduction-1920x1080-High-NormalGameplay.png",
+      "target": "barracks-after.png",
+      "kind": "gallery",
+      "sha256": "ed0e9105bfcc5b4542be1dbb4519fe91bba9a6a178f9064bf6ba5fb4c55223f2"
+    },
+    {
+      "source": "artifacts/opva2/side-180/BarracksSingle-1920x1080-High-CloseTactical-Yaw180.png",
+      "target": "barracks-single-front.png",
+      "kind": "single",
+      "sha256": "a955f0e3f16a5e42110ca9a2fb6e42b5ed8eb320ca8522722f10a12d6aff2438"
+    },
+    {
+      "source": "artifacts/opvb2/galleries/RadarProduction-1920x1080-High-NormalGameplay.png",
+      "target": "radar-before.png",
+      "kind": "gallery",
+      "sha256": "3c2019af629f28c9be5ed029d7e817093bbce2c79731f0a2db75deb21dc3bbbb"
+    },
+    {
+      "source": "artifacts/opva2/galleries/RadarProduction-1920x1080-High-NormalGameplay.png",
+      "target": "radar-after.png",
+      "kind": "gallery",
+      "sha256": "3c2019af629f28c9be5ed029d7e817093bbce2c79731f0a2db75deb21dc3bbbb"
+    },
+    {
+      "source": "artifacts/opva2/side-180/RadarSingle-1920x1080-High-CloseTactical-Yaw180.png",
+      "target": "radar-single-front.png",
+      "kind": "single",
+      "sha256": "287771e68360d361cfd94f180870141099aaf7af6bebc771b62a740de1c0367f"
+    },
+    {
+      "source": "artifacts/opvb2/thousand/OperationalBuildingsRepeated-1920x1080-Medium-NormalGameplay.png",
+      "target": "thousand-before.png",
+      "kind": "mixed-1000",
+      "sha256": "1e16c65255a8f3ff05de4687f4b26037d6b4cb06d43dbe4ae498275926af401c"
+    },
+    {
+      "source": "artifacts/opvb2/galleries/BarracksProduction-1920x1080-Medium-CloseTactical.png",
+      "target": "barracks-medium-close-before.png",
+      "kind": "highest-channel-observation",
+      "sha256": "6b06fc8678abcea3654f9e6ec3560ac4cfd0971f7fc568273a2e85df6fb5a02e"
+    },
+    {
+      "source": "artifacts/opva2/thousand/OperationalBuildingsRepeated-1920x1080-Medium-NormalGameplay.png",
+      "target": "thousand-after.png",
+      "kind": "mixed-1000",
+      "sha256": "3a5ff7ddba8ead8bc12af99bcd61ba6faf1f3996e33a1bd9a3f30b01a1836010"
+    },
+    {
+      "source": "artifacts/opva2/galleries/BarracksProduction-1920x1080-Medium-CloseTactical.png",
+      "target": "barracks-medium-close-after.png",
+      "kind": "highest-channel-observation",
+      "sha256": "3fb04ff1907d573b7b46110bc74bc6dea58340f622b53cfd13b77a8a1fa744f4"
+    }
+  ]
+}

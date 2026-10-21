@@ -1,0 +1,670 @@
+{
+  "action": "RoundTrip",
+  "assetIds": [
+    "building.directorate.module.collision_box",
+    "building.directorate.radar",
+    "building.directorate.radar.critical",
+    "building.directorate.radar.damaged",
+    "building.directorate.radar.destroyed",
+    "building.directorate.radar.foundation",
+    "building.directorate.radar.lod1",
+    "building.directorate.radar.lod2",
+    "building.directorate.radar.partial_shell",
+    "building.directorate.radar.structural_frame",
+    "building.directorate.radar.unpowered",
+    "material.directorate.building.critical",
+    "material.directorate.building.damaged",
+    "material.directorate.building.destroyed",
+    "material.directorate.building.structural",
+    "material.directorate.building.unpowered",
+    "texture.directorate.material.status_emissive",
+    "texture.directorate.surface.atlas_base",
+    "texture.directorate.surface.atlas_normal",
+    "texture.directorate.surface.atlas_orm"
+  ],
+  "axes": {
+    "blender": "right-handed +Z up / -Y forward",
+    "game": "right-handed +Y up / +Z forward",
+    "mapping": "(x,y,z) -> (x,-z,y)"
+  },
+  "deviations": {
+    "maximumEditorSplitNormalEncodingError": 2.0740886619745766e-05,
+    "maximumSocketInstanceWorldErrorMetres": 6.437301536266204e-08,
+    "maximumSocketLocalError": 3.576278662098531e-09
+  },
+  "errors": [],
+  "families": [
+    {
+      "assets": [
+        "building.directorate.radar",
+        "building.directorate.radar.lod1",
+        "building.directorate.radar.lod2",
+        "building.directorate.radar.foundation",
+        "building.directorate.radar.structural_frame",
+        "building.directorate.radar.partial_shell",
+        "building.directorate.radar.unpowered",
+        "building.directorate.radar.damaged",
+        "building.directorate.radar.critical",
+        "building.directorate.radar.destroyed"
+      ],
+      "instanceScale": [
+        14,
+        18,
+        14
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37,
+      "root": "building.directorate.radar"
+    }
+  ],
+  "meshes": [
+    {
+      "collisionReference": null,
+      "exportSha256": "c010fe716a820acd09deef0cf2365d292a2e79dcf1b69b46582f7b5c7e034f0b",
+      "exportStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 8
+      },
+      "id": "building.directorate.module.collision_box",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+      "sourceStats": {
+        "boundsMax": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "boundsMin": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 8
+      }
+    },
+    {
+      "collisionReference": "building.directorate.module.collision_box",
+      "exportSha256": "6beef476cb5135d39d3613d05a7147378658e24f77d9bd49d662675b16268ff4",
+      "exportStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.49619999527931213,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 812,
+        "vertices": 1536
+      },
+      "id": "building.directorate.radar",
+      "lods": [
+        {
+          "assetId": "building.directorate.radar.lod1",
+          "level": 1,
+          "maxDistance": 220
+        },
+        {
+          "assetId": "building.directorate.radar.lod2",
+          "level": 2,
+          "maxDistance": 620
+        }
+      ],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 2.2351741790771484e-08
+      },
+      "mechanicalPartNames": [
+        "body",
+        "radar_array"
+      ],
+      "sockets": [
+        {
+          "exported": [
+            0.0,
+            0.2849999964237213,
+            0.0
+          ],
+          "instanceWorldErrorMetres": 6.437301536266204e-08,
+          "localError": 3.576278662098531e-09,
+          "name": "motion_radar_array",
+          "source": [
+            0,
+            0.285,
+            0
+          ]
+        }
+      ],
+      "sourceSha256": "d35dd12a891e38b1a4520cbb8e38bf3f10d9eeaab39e85d1f1fda4f0a1c3c256",
+      "sourceStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.49619999527931213,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 812,
+        "vertices": 1536
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "0e79d09ec3d021c83b4182bbd46b76747a36de73fcd6d08d2b47cf174e0975a8",
+      "exportStats": {
+        "boundsMax": [
+          0.2664611339569092,
+          -0.2041861116886139,
+          0.24762164056301117
+        ],
+        "boundsMin": [
+          -0.2800000011920929,
+          -0.4558138847351074,
+          0.11999999731779099
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      },
+      "id": "building.directorate.radar.critical",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.critical"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "6cb0605523a3fe95769f546036d0593f880cc31d7b7c6fa06339b81bc904fada",
+      "sourceStats": {
+        "boundsMax": [
+          0.2664611339569092,
+          -0.2041861116886139,
+          0.24762164056301117
+        ],
+        "boundsMin": [
+          -0.2800000011920929,
+          -0.4558138847351074,
+          0.11999999731779099
+        ],
+        "primitives": 1,
+        "triangles": 92,
+        "vertices": 184
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "9187dbdcb9390e873b2e2fdcd4d06255e949ed2d29bce9be94995bc78427e6aa",
+      "exportStats": {
+        "boundsMax": [
+          -0.09000000357627869,
+          -0.2620428800582886,
+          -0.136918842792511
+        ],
+        "boundsMin": [
+          -0.25999999046325684,
+          -0.44999998807907104,
+          -0.2199999988079071
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      },
+      "id": "building.directorate.radar.damaged",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.damaged"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "ad6869db36aa4766e11d837fedb42b5a7b0cd6acf40110337279504950638518",
+      "sourceStats": {
+        "boundsMax": [
+          -0.09000000357627869,
+          -0.2620428800582886,
+          -0.136918842792511
+        ],
+        "boundsMin": [
+          -0.25999999046325684,
+          -0.44999998807907104,
+          -0.2199999988079071
+        ],
+        "primitives": 1,
+        "triangles": 48,
+        "vertices": 84
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "74af9b964992d9221b67352cf80bf5a5903b347597cbb32cfde2ad79a4a6ad86",
+      "exportStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          -0.22248589992523193,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 188,
+        "vertices": 372
+      },
+      "id": "building.directorate.radar.destroyed",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.destroyed"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "1941631f8b2638126de10cd8db30034a45c85c473c905032b1d5194f474e9be6",
+      "sourceStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          -0.22248589992523193,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 188,
+        "vertices": 372
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "5e0165c47defc7b54f980bb57570f0b91bf0553b3709d8ff03a15601780b6d57",
+      "exportStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          -0.4699999988079071,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.radar.foundation",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "ff56922c9e36498d59c28b9f17983d6a03d2547b8fdf64f41a8f4c4f0558d95f",
+      "sourceStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          -0.4699999988079071,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "08991285ab440f6c09a19a40c34c3f3ca575ef3cf2564fea9259a1180aa5101e",
+      "exportStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.49619999527931213,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 348,
+        "vertices": 648
+      },
+      "id": "building.directorate.radar.lod1",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 1.4901161193847656e-08
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "e8283dece2c1c45be8a32114f28dd4f6237f9bfb3614e2a2af46c78cea055477",
+      "sourceStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.49619999527931213,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 348,
+        "vertices": 648
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "796555af320a51d550d8860f4b91363afcb1cd7288e7ba4b35db64228f1a188e",
+      "exportStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.49619999527931213,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 156,
+        "vertices": 308
+      },
+      "id": "building.directorate.radar.lod2",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "ab8e8de4e2975ad2b27fdd6526a019cc567607e4ee1e6825ae2159a7ba4102c9",
+      "sourceStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.49619999527931213,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 156,
+        "vertices": 308
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "68498a92546699032b52642f044f0474086d79bf1ccc2792d276d1626b4005f4",
+      "exportStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.4350000023841858,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 132,
+        "vertices": 264
+      },
+      "id": "building.directorate.radar.partial_shell",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "0e3bd3841376ce69267c1b3fbf78e492d298e57779c8ee821471d5f6d3214f53",
+      "sourceStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.4350000023841858,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 132,
+        "vertices": 264
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "57a6e7dd384e0e269694867461fad2e2d262f08b3e3cd471a1b625a0af452412",
+      "exportStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.4350000023841858,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      },
+      "id": "building.directorate.radar.structural_frame",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.structural"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 7.450580596923828e-09
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "7a18c7b37cf3bc5f15a341771daa080cfd21e794906a251a7fda3d727b94339b",
+      "sourceStats": {
+        "boundsMax": [
+          0.3400000035762787,
+          0.4350000023841858,
+          0.30000001192092896
+        ],
+        "boundsMin": [
+          -0.3400000035762787,
+          -0.5,
+          -0.30000001192092896
+        ],
+        "primitives": 1,
+        "triangles": 108,
+        "vertices": 216
+      }
+    },
+    {
+      "collisionReference": null,
+      "exportSha256": "68cba3a62eb2b65047b1387616ebbb54f33daa49caa29180f359c399fa20b8b4",
+      "exportStats": {
+        "boundsMax": [
+          -0.1599999964237213,
+          -0.18000000715255737,
+          0.2849999964237213
+        ],
+        "boundsMin": [
+          -0.28999999165534973,
+          -0.3799999952316284,
+          0.2750000059604645
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      },
+      "id": "building.directorate.radar.unpowered",
+      "lods": [],
+      "materialReferences": [
+        "material.directorate.building.unpowered"
+      ],
+      "maximumDeviations": {
+        "NORMAL": 0.0,
+        "POSITION": 0.0,
+        "TANGENT": 0.0,
+        "TEXCOORD_0": 0.0
+      },
+      "mechanicalPartNames": [],
+      "sockets": [],
+      "sourceSha256": "0ee2a9263ddefa2a83c1db8d6c1d20145f0f18f1306380d7785bf3b030b272c4",
+      "sourceStats": {
+        "boundsMax": [
+          -0.1599999964237213,
+          -0.18000000715255737,
+          0.2849999964237213
+        ],
+        "boundsMin": [
+          -0.28999999165534973,
+          -0.3799999952316284,
+          0.2750000059604645
+        ],
+        "primitives": 1,
+        "triangles": 12,
+        "vertices": 24
+      }
+    }
+  ],
+  "productionSourcesUnchanged": true,
+  "schemaVersion": 1,
+  "sourceHashes": {
+    "buildings/directorate/materials/critical.asset.json": "8c1a6eb4672ce7f238674b5a76f5f8f64ac39528d9cd27b069bd8eb99ee41fa1",
+    "buildings/directorate/materials/critical.material.json": "6e8256d9cd4d811f22f1c0ba8fed303c2fd358e6c9d11af01bad92ace16050b7",
+    "buildings/directorate/materials/damaged.asset.json": "b5d1c0f60bef36661b4525cb7e8c52e5cb46260bfd1c02b9a56c18987f5b5e3e",
+    "buildings/directorate/materials/damaged.material.json": "a1c57cb49c08c1caf03c030e80e57894f254ef8d4e38469fe4a0199c2b2bc636",
+    "buildings/directorate/materials/destroyed.asset.json": "e89a774bce9c320f7a2548c01ecae150863d593f54a63ec936dc5972c9d48eb3",
+    "buildings/directorate/materials/destroyed.material.json": "0a2a981e9afa9ea4477b9fe541ad85b203370686bb36d2effa9ec47cf774ad67",
+    "buildings/directorate/materials/structural.asset.json": "3692dc0effd7a964b33d05610534729780cf4f4920b5230425495ced7ec543b8",
+    "buildings/directorate/materials/structural.material.json": "ddc0ec3db066ea730ec51727c38f869cb6bfd8879c49b2475a8b5f3c336e3a53",
+    "buildings/directorate/materials/unpowered.asset.json": "f4847dd15d0d5bb22bcdb9eb4529875fe438ddb0ed76f4815ba91e6b18f87fa8",
+    "buildings/directorate/materials/unpowered.material.json": "8373a93e0dbdacae3829d65406c18fb45daa571d01afe73df9cf87652e4590e6",
+    "buildings/directorate/modules/collision_box.asset.json": "b5ac3e871a08eabff5bb20cddf65de2d928f0d7728b7cdd3cd5669205c4ee637",
+    "buildings/directorate/radar.asset.json": "08f045f67d3091a56387074b27e1985540d7ce385f278dea0aee4e9fffcfec94",
+    "buildings/directorate/radar_critical.asset.json": "85a8b8dd6520058e87bcce5635a79ee4903b1f5efa58ecab903bf8e232b54bdc",
+    "buildings/directorate/radar_damaged.asset.json": "5bd64961242cb788d3b3d41d57ce6a1db74598b1e2e3a2d63b8970c8ae161c6a",
+    "buildings/directorate/radar_destroyed.asset.json": "538e291771f95dc2053347ecd3d504c2f098a4651ff9d896505fc4f504012524",
+    "buildings/directorate/radar_foundation.asset.json": "e03c504c81ae1f998e5c7c15ed25ffee6b3ce6efc25d9ff991224b276cb0b68f",
+    "buildings/directorate/radar_lod1.asset.json": "febb6a1fc7572d52d8ee70a7e87c601971adef35ee5b155f2b834bc1eb31571c",
+    "buildings/directorate/radar_lod2.asset.json": "307dfc228475d29c874a384c8d5830b07e58517c8eb2582c12a85a1504908c35",
+    "buildings/directorate/radar_partial_shell.asset.json": "bb859113f99833f81349e104a153586ccd086bf1c1b73db4a6a0543b9e602e46",
+    "buildings/directorate/radar_structural_frame.asset.json": "b9b2ff8d2f2e598ae0d129801214613be8c81d85417144383c6ec7e350cccf8d",
+    "buildings/directorate/radar_unpowered.asset.json": "7685ee5e4f397485a683123d4ce0a49a1729526b8a06a8b80a59dd75eeb6d217",
+    "buildings/directorate/sources/module_collision_box.gltf": "3a869d5612214b95628898b1f97248b55b389dad37436c01ba939dc18e0508bc",
+    "buildings/directorate/sources/operational/radar_critical.gltf": "6cb0605523a3fe95769f546036d0593f880cc31d7b7c6fa06339b81bc904fada",
+    "buildings/directorate/sources/operational/radar_damaged.gltf": "ad6869db36aa4766e11d837fedb42b5a7b0cd6acf40110337279504950638518",
+    "buildings/directorate/sources/operational/radar_destroyed.gltf": "1941631f8b2638126de10cd8db30034a45c85c473c905032b1d5194f474e9be6",
+    "buildings/directorate/sources/operational/radar_foundation.gltf": "ff56922c9e36498d59c28b9f17983d6a03d2547b8fdf64f41a8f4c4f0558d95f",
+    "buildings/directorate/sources/operational/radar_lod0.gltf": "d35dd12a891e38b1a4520cbb8e38bf3f10d9eeaab39e85d1f1fda4f0a1c3c256",
+    "buildings/directorate/sources/operational/radar_lod1.gltf": "e8283dece2c1c45be8a32114f28dd4f6237f9bfb3614e2a2af46c78cea055477",
+    "buildings/directorate/sources/operational/radar_lod2.gltf": "ab8e8de4e2975ad2b27fdd6526a019cc567607e4ee1e6825ae2159a7ba4102c9",
+    "buildings/directorate/sources/operational/radar_partial_shell.gltf": "0e3bd3841376ce69267c1b3fbf78e492d298e57779c8ee821471d5f6d3214f53",
+    "buildings/directorate/sources/operational/radar_structural_frame.gltf": "7a18c7b37cf3bc5f15a341771daa080cfd21e794906a251a7fda3d727b94339b",
+    "buildings/directorate/sources/operational/radar_unpowered.gltf": "0ee2a9263ddefa2a83c1db8d6c1d20145f0f18f1306380d7785bf3b030b272c4",
+    "materials/directorate/surfaces/production_surface_base.png": "de2d4185c1cb543bf7d1188d31850095f0a065bd38d81513e142ffdcd7849aa0",
+    "materials/directorate/surfaces/production_surface_normal.png": "be279624fcb42772a93bb627a9c3d7e0446db7e7f34a3f42130c561ceea450d2",
+    "materials/directorate/surfaces/production_surface_orm.png": "4e12c0b99707ed570f308863f7a3510e929dbed38f3428cb5eea942f7e93f9c1",
+    "materials/directorate/surfaces/surface_atlas.asset.json": "43435878caab2e72988868412481c32d4fb70cd330e0e8d14303c66b6fedf43c",
+    "materials/directorate/surfaces/surface_normal.asset.json": "3376f123412607282ea351430076aa6af54b5e1546dfb6b87a60de211e4e51ae",
+    "materials/directorate/surfaces/surface_orm.asset.json": "6930a01bdf3f2b46aca2c9f905e8de2a1cfacd967da46b8a7913db7c15db2cf9",
+    "materials/directorate/textures/status_emissive.asset.json": "464a32ad532fa18cfc149cc1f6f3e887c156025dca9cf8308485fcadac83b5d0",
+    "materials/directorate/textures/status_emissive.tga": "4273544c77c3715f6a13273134b8359264c892e4122deb6088b2e01bbe8881f6"
+  },
+  "sourceSignature": "01ce59ffe942879ab4a73252947a00f33fc4dade246a21cf9a3aa6b5cc578dcd",
+  "success": true
+}

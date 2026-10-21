@@ -1,0 +1,95 @@
+{
+  "policy": "Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.",
+  "imageFailures": [],
+  "maximumChangedPixelFraction": 0.0,
+  "channelTolerance": 0,
+  "structural": "pass",
+  "imageGateRequested": false,
+  "visualAcceptance": "pending",
+  "commit": "cf32514d2ac39fbb0fd2d94410c8b1069279610a",
+  "captures": [
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.0015593750000002515,
+      "key": "VehicleFactorySingle-1920x1080-High-CloseTactical-Yaw180",
+      "gpuMeanMs": 4.2509984,
+      "comparison": "exact-file-match",
+      "cpuMeanMs": 4.376871875000001,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.01231250000000017,
+      "key": "PowerPlantSingle-1920x1080-High-CloseTactical-Yaw180",
+      "gpuMeanMs": 4.207407999999999,
+      "comparison": "exact-file-match",
+      "cpuMeanMs": 4.43209375,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": 0.050553124999998644,
+      "key": "BarracksSingle-1920x1080-High-CloseTactical-Yaw180",
+      "gpuMeanMs": 4.268255999999999,
+      "comparison": "pixels-require-human-review",
+      "cpuMeanMs": 4.437999999999999,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 1,
+        "MeanAbsoluteChannelDelta": 1.2056327160493827E-07,
+        "ChangedPixels": 1,
+        "ChangedPixelFraction": 4.822530864197531E-07,
+        "WithinTolerance": false
+      },
+      "regionChanges": null
+    },
+    {
+      "sameRuntime": false,
+      "structural": "pass",
+      "sameSource": true,
+      "cpuMeanDeltaMs": -0.020784374999999855,
+      "key": "RadarSingle-1920x1080-High-CloseTactical-Yaw180",
+      "gpuMeanMs": 4.181862399999999,
+      "comparison": "exact-file-match",
+      "cpuMeanMs": 4.3892718749999995,
+      "visualReview": "pending",
+      "equivalentHardware": true,
+      "pixelComparison": {
+        "MaximumChannelDelta": 0,
+        "MeanAbsoluteChannelDelta": 0.0,
+        "ChangedPixels": 0,
+        "ChangedPixelFraction": 0.0,
+        "WithinTolerance": true
+      },
+      "regionChanges": null
+    }
+  ],
+  "baselineCommit": "cf32514d2ac39fbb0fd2d94410c8b1069279610a",
+  "pixelComparisonRequested": true,
+  "schemaVersion": 1
+}

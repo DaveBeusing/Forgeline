@@ -1,0 +1,199 @@
+{
+  "blenderVersion": "5.2.2",
+  "canonicalSourcesUnchanged": true,
+  "componentSelectionGroups": 60,
+  "exports": [
+    {
+      "canonicalDefinition": "buildings/directorate/radar.asset.json",
+      "definition": {
+        "collisionReference": "building.directorate.module.collision_box",
+        "collisionRequired": true,
+        "id": "building.directorate.radar",
+        "lods": [
+          {
+            "assetId": "building.directorate.radar.lod1",
+            "level": 1,
+            "maxDistance": 220
+          },
+          {
+            "assetId": "building.directorate.radar.lod2",
+            "level": 2,
+            "maxDistance": 620
+          }
+        ],
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "mechanicalParts": [
+          {
+            "firstIndex": 0,
+            "indexCount": 924,
+            "motion": "static",
+            "name": "body",
+            "parent": -1
+          },
+          {
+            "firstIndex": 924,
+            "indexCount": 1512,
+            "motion": "radar",
+            "name": "radar_array",
+            "parent": -1,
+            "rate": 0.6,
+            "socket": "motion_radar_array",
+            "travel": 0
+          }
+        ],
+        "sockets": [
+          {
+            "name": "motion_radar_array",
+            "x": 0,
+            "y": 0.285,
+            "z": 0
+          }
+        ],
+        "source": "sources/operational/radar_lod0.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar",
+      "sha256": "6beef476cb5135d39d3613d05a7147378658e24f77d9bd49d662675b16268ff4",
+      "source": "building.directorate.radar.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/radar_lod1.asset.json",
+      "definition": {
+        "id": "building.directorate.radar.lod1",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/radar_lod1.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar.lod1",
+      "sha256": "08991285ab440f6c09a19a40c34c3f3ca575ef3cf2564fea9259a1180aa5101e",
+      "source": "building.directorate.radar.lod1.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/radar_lod2.asset.json",
+      "definition": {
+        "id": "building.directorate.radar.lod2",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/radar_lod2.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar.lod2",
+      "sha256": "796555af320a51d550d8860f4b91363afcb1cd7288e7ba4b35db64228f1a188e",
+      "source": "building.directorate.radar.lod2.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/radar_foundation.asset.json",
+      "definition": {
+        "id": "building.directorate.radar.foundation",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/radar_foundation.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar.foundation",
+      "sha256": "5e0165c47defc7b54f980bb57570f0b91bf0553b3709d8ff03a15601780b6d57",
+      "source": "building.directorate.radar.foundation.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/radar_structural_frame.asset.json",
+      "definition": {
+        "id": "building.directorate.radar.structural_frame",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/radar_structural_frame.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar.structural_frame",
+      "sha256": "57a6e7dd384e0e269694867461fad2e2d262f08b3e3cd471a1b625a0af452412",
+      "source": "building.directorate.radar.structural_frame.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/radar_partial_shell.asset.json",
+      "definition": {
+        "id": "building.directorate.radar.partial_shell",
+        "materialReferences": [
+          "material.directorate.building.structural"
+        ],
+        "source": "sources/operational/radar_partial_shell.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar.partial_shell",
+      "sha256": "68498a92546699032b52642f044f0474086d79bf1ccc2792d276d1626b4005f4",
+      "source": "building.directorate.radar.partial_shell.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/radar_unpowered.asset.json",
+      "definition": {
+        "id": "building.directorate.radar.unpowered",
+        "materialReferences": [
+          "material.directorate.building.unpowered"
+        ],
+        "source": "sources/operational/radar_unpowered.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar.unpowered",
+      "sha256": "68cba3a62eb2b65047b1387616ebbb54f33daa49caa29180f359c399fa20b8b4",
+      "source": "building.directorate.radar.unpowered.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/radar_damaged.asset.json",
+      "definition": {
+        "id": "building.directorate.radar.damaged",
+        "materialReferences": [
+          "material.directorate.building.damaged"
+        ],
+        "source": "sources/operational/radar_damaged.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar.damaged",
+      "sha256": "9187dbdcb9390e873b2e2fdcd4d06255e949ed2d29bce9be94995bc78427e6aa",
+      "source": "building.directorate.radar.damaged.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/radar_critical.asset.json",
+      "definition": {
+        "id": "building.directorate.radar.critical",
+        "materialReferences": [
+          "material.directorate.building.critical"
+        ],
+        "source": "sources/operational/radar_critical.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar.critical",
+      "sha256": "0e79d09ec3d021c83b4182bbd46b76747a36de73fcd6d08d2b47cf174e0975a8",
+      "source": "building.directorate.radar.critical.glb"
+    },
+    {
+      "canonicalDefinition": "buildings/directorate/radar_destroyed.asset.json",
+      "definition": {
+        "id": "building.directorate.radar.destroyed",
+        "materialReferences": [
+          "material.directorate.building.destroyed"
+        ],
+        "source": "sources/operational/radar_destroyed.gltf",
+        "type": "mesh"
+      },
+      "id": "building.directorate.radar.destroyed",
+      "sha256": "74af9b964992d9221b67352cf80bf5a5903b347597cbb32cfde2ad79a4a6ad86",
+      "source": "building.directorate.radar.destroyed.glb"
+    }
+  ],
+  "fixtureSha256": "fb31fb1c49f9c9b5d435dd6513f20c27695d8e7a7e9ffeb24c89ef0e1b2def4d",
+  "master": "radar.blend",
+  "masterSha256": "79851b74aab2230a57763a88480f15046a712fe10ad63d4c7bd51ce918894857",
+  "portableSourceSignature": "3835d044942093f0860f50f82c2c8e9927ea5afbf39b4a5b6c4ba3ad40c613e2",
+  "productionPromoted": false,
+  "schemaVersion": 1,
+  "sourceSha": "6454ec14c520f7650d62e9e71634de9b230d32dc",
+  "sourceSignature": "01ce59ffe942879ab4a73252947a00f33fc4dade246a21cf9a3aa6b5cc578dcd",
+  "status": "staged-not-promoted",
+  "surfaceReviewMaster": "radar_surfaces.blend",
+  "surfaceReviewMasterSha256": "df5ecc6164d5dc76212084b5ef70299b71d7c90e3490ba75ce46a0640405d29d"
+}

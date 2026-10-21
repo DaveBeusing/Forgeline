@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "building.directorate.radar",
+      "assets": [
+        "building.directorate.radar",
+        "building.directorate.radar.lod1",
+        "building.directorate.radar.lod2",
+        "building.directorate.radar.foundation",
+        "building.directorate.radar.structural_frame",
+        "building.directorate.radar.partial_shell",
+        "building.directorate.radar.unpowered",
+        "building.directorate.radar.damaged",
+        "building.directorate.radar.critical",
+        "building.directorate.radar.destroyed"
+      ],
+      "instanceScale": [
+        14,
+        18,
+        14
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

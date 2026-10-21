@@ -1,0 +1,64 @@
+{
+  "families": [
+    {
+      "compiledSourceLessCatalogs": 5,
+      "deterministicExportsAndRuntime": true,
+      "family": "vehicle_factory",
+      "masterSha256": "374de19be0b557e403d392a1e3df9680153fdf26b9d7601e398a9e39a1c47932",
+      "nativeRejectedCases": 19,
+      "notApplicable": [],
+      "originalOutputRoot": "artifacts\\om1\\vehicle_factory",
+      "sourceSignature": "fc5992e0050a5aa3bc41ec7425088630317dadda79f55b2afba2f4d9657496fd"
+    },
+    {
+      "compiledSourceLessCatalogs": 5,
+      "deterministicExportsAndRuntime": true,
+      "family": "power_plant",
+      "masterSha256": "22a4c9dd63e7dc10cffa3db1916b0bf06d74524b6c41210b8338a87119592cc8",
+      "nativeRejectedCases": 19,
+      "notApplicable": [],
+      "originalOutputRoot": "artifacts\\om1\\power_plant",
+      "sourceSignature": "33ecb0974efd02b87f28f4bea6f9c37c18fdafb78b823dea5f31f1190ac5c3e7"
+    },
+    {
+      "compiledSourceLessCatalogs": 5,
+      "deterministicExportsAndRuntime": true,
+      "family": "barracks",
+      "masterSha256": "fb32d3d3ea149fe2548f2e1391dcf4d62fcc6d5eb836061a888816233cc33fa6",
+      "nativeRejectedCases": 17,
+      "notApplicable": [
+        {
+          "name": "missing socket",
+          "reason": "No named sockets in the unchanged family source contract."
+        },
+        {
+          "name": "moved socket",
+          "reason": "No named sockets in the unchanged family source contract."
+        },
+        {
+          "name": "rotated socket",
+          "reason": "No named sockets in the unchanged family source contract."
+        }
+      ],
+      "originalOutputRoot": "artifacts\\omb\\barracks",
+      "sourceSignature": "95f4383495bc2f2f61d4c1e15f51a6c025ee660a776f32093cf40f15b4a73b12"
+    },
+    {
+      "compiledSourceLessCatalogs": 5,
+      "deterministicExportsAndRuntime": true,
+      "family": "radar",
+      "masterSha256": "b3145e22639ccb6b020c2d80dab12a3c80194662cb4c7e83e3ad3746834fb6b7",
+      "nativeRejectedCases": 19,
+      "notApplicable": [],
+      "originalOutputRoot": "artifacts\\omr\\radar",
+      "sourceSignature": "01ce59ffe942879ab4a73252947a00f33fc4dade246a21cf9a3aa6b5cc578dcd"
+    }
+  ],
+  "humanVisualApproval": "pending",
+  "productionPromotion": "blocked-render-qualification",
+  "productionSourceUnchanged": true,
+  "schemaVersion": 1,
+  "sourceSha": "6454ec14c520f7650d62e9e71634de9b230d32dc",
+  "sourceShaMeaning": "Aggregation source; original producing identities remain in the unmodified launcher reports.",
+  "typedCompiledContracts": "passed"
+}
