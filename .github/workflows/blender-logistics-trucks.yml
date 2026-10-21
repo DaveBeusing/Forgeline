@@ -1,0 +1,43 @@
+name: Logistics truck Blender qualification
+
+on:
+  workflow_dispatch:
+    inputs:
+      blender_executable:
+        description: Optional pinned Blender executable path
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blender-logistics-trucks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  saved-truck-masters:
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 45
+    env:
+      FORGELINE_BLENDER_PATH: ${{ inputs.blender_executable }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release compiler
+        shell: pwsh
+        run: dotnet build tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release
+      - name: Qualify both saved masters and source-less exports
+        shell: pwsh
+        run: ./tools/blender/Test-BlenderLogisticsTruck.ps1 -OutputRoot artifacts/trucks
+      - name: Retain native evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logistics-truck-blender-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/trucks
+          retention-days: 14

@@ -167,3 +167,9 @@ Independent rigid clips: [supported assets and native review](../../docs/RigidCl
 `infantry_skin.py` reconstructs the four-figure Directorate rigs from retained component geometry. `Test-BlenderInfantry.ps1` reopens production masters, checks repeated compiled payload parity, performs an actual key edit and validates source-less loading. See [skin contracts and commands](../../docs/InfantrySkinAssets.md).
 
 The optional [procedural CPU atlas producer](../../docs/ProceduralPbrProduction.md) preserves the existing atlas and runtime budgets in isolated, verifiable source generations. Production promotion and art approval remain explicit; see its qualification report.
+
+## Logistics truck masters
+
+Use `Invoke-BlenderLogisticsTruck.ps1` to export the saved Cargo/Supply masters and
+`Test-BlenderLogisticsTruck.ps1` for native saved-edit, reproducibility and source-less
+compiler checks. See [truck production](../../docs/LogisticsTruckBlender.md).

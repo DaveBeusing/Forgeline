@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {
+      "root": "unit.directorate.cargo_truck",
+      "assets": [
+        "unit.directorate.cargo_truck",
+        "unit.directorate.cargo_truck.collision",
+        "unit.directorate.cargo_truck.critical",
+        "unit.directorate.cargo_truck.damaged",
+        "unit.directorate.cargo_truck.lod1",
+        "unit.directorate.cargo_truck.lod2",
+        "unit.directorate.cargo_truck.wreck"
+      ],
+      "instanceScale": [
+        3.2,
+        2.4,
+        6.4
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    },
+    {
+      "root": "unit.directorate.supply_truck",
+      "assets": [
+        "unit.directorate.supply_truck",
+        "unit.directorate.supply_truck.collision",
+        "unit.directorate.supply_truck.critical",
+        "unit.directorate.supply_truck.damaged",
+        "unit.directorate.supply_truck.lod1",
+        "unit.directorate.supply_truck.lod2",
+        "unit.directorate.supply_truck.wreck"
+      ],
+      "instanceScale": [
+        3.4,
+        2.5,
+        6.8
+      ],
+      "instanceTranslation": [
+        17,
+        5,
+        -29
+      ],
+      "instanceYawDegrees": 37
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 {
   "id": "unit.directorate.cargo_truck.lod2",
-  "type": "mesh",
-  "source": "../sources/combat_support/cargo_truck/lod2.gltf",
   "materialReferences": [
     "material.directorate.unit.cargo_truck"
-  ]
+  ],
+  "source": "../sources/combat_support/cargo_truck/blender/lod2.glb",
+  "type": "mesh"
 }

@@ -47,3 +47,11 @@ assets/source/materials/directorate/authoring/procedural/recipe.json -text -whit
 docs/review/procedural-pbr/**/*.json -text -whitespace
 docs/review/procedural-pbr/**/*.png binary
 docs/review/procedural-pbr/gpu-*.txt -text -whitespace
+
+# Native truck sources and qualification hashes retain their bytes.
+assets/source/units/directorate/authoring/*_truck.blend binary
+assets/source/units/directorate/sources/combat_support/*_truck/blender/*.glb binary
+docs/qualification/logistics-trucks.json text eol=lf
+docs/qualification/logistics-trucks/*.json -text -whitespace
+docs/qualification/logistics-trucks/*.json.gz binary
+docs/qualification/logistics-trucks/*.png binary
