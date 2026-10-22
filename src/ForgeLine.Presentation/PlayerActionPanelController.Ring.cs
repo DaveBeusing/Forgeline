@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Game;
 using ForgeLine.Input;
 using ForgeLine.Platform;
 using ForgeLine.Simulation;
