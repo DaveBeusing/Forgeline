@@ -124,6 +124,18 @@ Resource deposits are normal presentation instances and therefore visible outsid
 
 The four families now use distinct clustered source geometry instead of sharing the generic world box. Ferrous Ore reads as dense blocky ore masses; Silicates use a vertical shard/spire cluster; Volatiles use lower faceted nodules; Rare Elements use a sparse, sharply vertical asymmetric shard cluster. Reduced LOD assets preserve the same family silhouette with fewer primitives. Material tint reinforces identity but is not the primary role signal.
 
+### Resource visual variation contract
+
+[Resource deposit visual language](ResourceDepositVisualLanguage.md) defines the
+target grounded silhouettes, four weighted cluster morphologies per family,
+fragment/size composition, deterministic presentation seed protocol, stable
+bindings, conservative bounds, fallback behavior and manual acceptance matrix.
+Its [declarative fixture](fixtures/resource-deposit-visual-language.v1.json) is
+specification data, not a runtime or CI loader. Existing family IDs and the
+High/Reduced state/tint implementation remain the integrated baseline described
+above. Optional asset variants, field layouts and dispatch require separate
+integration; this documentation does not claim native art or performance approval.
+
 ### Presentation states
 
 `PresentationExtractor` maps authoritative deposit state into:

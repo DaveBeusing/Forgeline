@@ -374,8 +374,8 @@ No runtime loader or automatic CI consumer is claimed.
 
 Existing regression owners are Presentation's `ResourceDepositReferenceSceneTests`,
 `ResourceDepositBlenderMasterTests`, `ResourceDepositMaterialCacheTests`,
-`PresentationExtractionTests`, `WorldPresentationCatalogTests` and instance-renderer
-tests, plus Simulation extraction/inventory tests and Game visibility/map tests.
+`PresentationExtractionTests`, `WorldPresentationTests` and `SimpleInstanceRendererTests`,
+plus Simulation extraction/inventory tests and Game visibility/map tests.
 Use actual current test names when adding executable fixtures. No new headless
 dependency on Presentation, Assets or Graphics is allowed.
 
