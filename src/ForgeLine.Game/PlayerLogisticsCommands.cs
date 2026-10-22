@@ -121,6 +121,10 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
 
     public EntityId CreatedConvoy { get; private set; }
 
+    public ReadOnlySpan<EntityId> ConvoyTrucks => _convoyTrucks;
+
+    public ReadOnlySpan<EntityId> ConvoyEscorts => _convoyEscorts;
+
     public static PlayerLogisticsActionCommand CreateCargoConvoy(
         PlayerId issuer,
         ReadOnlySpan<EntityId> trucks,
