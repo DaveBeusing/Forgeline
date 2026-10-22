@@ -315,7 +315,7 @@ public sealed class PlayerActionReadModelTests
         Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Electronics && t.Target == 24);
         Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Fuel && t.Target == 60);
         Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Ammunition && t.Target == 40);
-        Assert.All(logistics.Policies, p => Assert.Equal(10, p.DesiredTarget));
+        Assert.All(logistics.Policies, p => Assert.Equal(100, p.DesiredTarget));
     }
 
     [Fact]
