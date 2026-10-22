@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace ForgeLine.Input;
 
-public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement }
+public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement, Demolish }
 public enum GameplayBindingScope : byte { Global, Dock }
 public readonly record struct GameplayBindingDefinition(GameplayAction Action, PlatformKey DefaultKey, string Label, GameplayBindingScope Scope);
 public readonly record struct GameplayBindingOverride(GameplayAction Action, PlatformKey Key);
