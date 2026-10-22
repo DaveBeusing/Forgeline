@@ -1,5 +1,9 @@
 # Asset Pipeline
 
+[Graphics asset bindings](GraphicsAssetBindings.md) describes typed runtime
+dependency checks, payload material/texture validation, compiler 1.12.1 slot-order
+preservation and the extended residency binding inventory.
+
 Integrated UI source/container hashes, source-less package identity and unchanged
 resource-budget failures are recorded in
 [graphical interface qualification](GraphicalInterfaceQualification.md).
