@@ -9,6 +9,54 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class MatchPersistenceTests
 {
+    [Fact]
+    public void ConvoyCommandsRoundTripThroughSaveAndReplayWithoutLosingMembers()
+    {
+        using MatchRuntime original = CreateScenario(seed: 9221);
+        PlayerId issuer = original.GetBase(new PlayerId(1)).Player;
+        EntityId owned = original.GetBase(issuer).StartingUnits[0];
+        EntityId foreign = original.GetBase(new PlayerId(2)).StartingUnits[0];
+        EntityId escort = original.GetBase(issuer).StartingUnits[1];
+
+        var create = PlayerLogisticsActionCommand.CreateCargoConvoy(
+            issuer, [owned, foreign], [escort], original.Simulation.CurrentTick);
+        original.Simulation.SubmitCommand(create,
+            original.Simulation.CurrentTick.Next(),
+            new SimulationCommandSource(issuer.Value));
+        original.Simulation.AdvanceOneTick();
+        Assert.False(create.Accepted);
+        Assert.Equal(PlayerLogisticsActionFailureReason.ConvoyIneligible, create.FailureReason);
+
+        var dissolve = PlayerLogisticsActionCommand.DissolveCargoConvoy(
+            issuer, EntityId.Invalid, original.Simulation.CurrentTick);
+        original.Simulation.SubmitCommand(dissolve,
+            original.Simulation.CurrentTick.Next(),
+            new SimulationCommandSource(issuer.Value));
+        original.Simulation.AdvanceOneTick();
+        Assert.False(dissolve.Accepted);
+
+        MatchSaveData save = MatchPersistenceService.CaptureSave(original);
+        MatchReplayData replay = MatchPersistenceService.CaptureReplay(original);
+        var convoyCommand = Assert.Single(replay.Commands,
+            command => command.LogisticsOperation ==
+                PlayerLogisticsActionOperation.CreateCargoConvoy);
+        Assert.Equal(2, convoyCommand.IntValue);
+        Assert.Equal(new[] { owned, foreign, escort }, convoyCommand.Entities);
+        Assert.Contains(replay.Commands, command =>
+            command.LogisticsOperation == PlayerLogisticsActionOperation.DissolveCargoConvoy);
+
+        using MatchRuntime restored = MatchPersistenceService.Restore(
+            MatchPersistenceSerializer.DeserializeSave(
+                MatchPersistenceSerializer.SerializeSave(save)));
+        using MatchRuntime playback = MatchPersistenceService.PlayReplay(
+            MatchPersistenceSerializer.DeserializeReplay(
+                MatchPersistenceSerializer.SerializeReplay(replay)));
+        Assert.Equal(save.StateSha256,
+            MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+        Assert.Equal(save.StateSha256,
+            MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
