@@ -1,7 +1,8 @@
 # Resource deposit variant rendering
 
-Implementation base: `master` at `421d5a21416b6bf3fc1675311d49d161d87f57da`
-(product 0.1.456). Geometry, visual-language and PBR source PRs are integrated.
+Final integration base: `master` at `c8da15fce589b661de2813683b22aa77fa1bd7e2`
+(product 0.1.457), including the field producer and renderer inventory. Geometry,
+visual-language and PBR source PRs are integrated.
 This change binds those assets through the existing instanced renderer. No new
 renderer, pass, vertex format, simulation component, authoritative resource rule,
 HUD action, cargo behavior, save format or gameplay picking volume is introduced.
@@ -36,7 +37,8 @@ existing single cluster. It copies values only after the existing extraction
 visibility filter. State, remaining amount, camera, quality, tick and transient
 entity indices do not choose a new variant. Recycling an entity with a new
 generation does not inherit the old selection. Plain/legacy extractors without
-authored map keys and the original four reference scenes keep canonical metadata.
+authored map keys keep canonical root metadata. Field clusters carry their own
+copied selections as described below.
 
 `ResourceTint` is a separate bounded RGB multiplier, not a material/batch identity.
 Zero means the legacy neutral multiplier; nonfinite/out-of-family-range inputs
@@ -94,7 +96,9 @@ failure record; it is not a passing artwork capture.
 
 `InstanceRenderDiagnostics.ResourceDeposits` records visible requests, resolved
 variants, canonical fallbacks, invalid selections/transforms, missing resources
-and retained High LODs. A skipped missing visual is not reported as geometric
+and retained High LODs. These are part-level counts, with explicit High/Reduced
+part counters; the existing visibility/LOD totals continue to count parent roots.
+A skipped missing visual is not reported as geometric
 culling. Existing total/visible/cull, LOD, draw and binding counters remain available.
 `GetResourceBatchDiagnostics()` is an explicit out-of-frame snapshot of actual
 mesh/material IDs, instance counts, indices and logical 112-byte instance uploads.
@@ -105,7 +109,8 @@ material resident mesh bytes, frame logical texture bytes, native DXGI observati
 and CPU/GPU frame distributions alongside them; do not add shared residency per batch.
 
 The old `ResourceDepositSingle`, `ResourceDepositsGallery` (12), `ResourceDeposits100`
-and `ResourceDeposits1000` retain their numerical IDs and authored snapshot inputs.
+and `ResourceDeposits1000` retain their numerical IDs and integrated field-layout,
+grounding and state inputs. Cluster selection metadata now binds their surfaces.
 Four scenes append after `InfrastructureFordExit`, without replacing old goldens:
 
 | Scene | Authored input | Terrain |
@@ -115,31 +120,36 @@ Four scenes append after `InfrastructureFordExit`, without replacing old goldens
 | ResourceDepositVariantsMud | Same inventory | Mud |
 | ResourceDepositVariantLoad1000 | 1,000 copied deposits, repeated inventory | Grass |
 
+The new inventory scenes explicitly clear their basis's ResourceField and select
+one known cluster per copied root, so the 576 combinations are not overwritten by
+field composition. The original scenes separately exercise the real field producer.
 All use actual sampled terrain height, varied fixed yaw and the normal renderer.
 Input count is not a claim of simultaneous visibility or complete native coverage
 from a single view. Inspect/framing sweeps and close single-family rows remain
 necessary. Terrain profiles affect review surfaces, not simulation terrain.
 
-## Field producer integration boundary
+## Field integration
 
-The separate field-composition branch was not integrated into the recorded master.
-Its committed contract exposes ordinal, transform, High/Reduced IDs, tint and crust
-per copied cluster; that branch also has its own changes in shared submission files.
-Its incomplete/uncommitted edits are not imported here. Current gameplay receives
-fixed variant selection for the existing root cluster; this PR does not spawn
-additional field fragments or claim multi-cluster depletion qualification.
+The field producer integrated through master during implementation. Its immutable
+cluster contract now additionally carries the approved `VariantKey`/count/surface.
+Keep its already-selected layout/size, grounded transform, tint, crust, quota and
+depletion behavior. Its independent `resource-field/1` protocol gains only a
+`surface` channel per authored anchor ordinal; it does not switch to the root's
+`resource-visual/1` protocol or alter any existing seed channel.
 
-For serial integration of that producer, each approved pair can be translated by
-`ResourceDepositVariantCatalog.TrySelectAssetPair(visual, highId, reducedId,
-surfaceIndex, out selection)`. Copy that selection and bounded tint into each
-child's WorldFeature before the common resource-binding branch; use the authored
-anchor ordinal for the seed. Reject a foreign/mismatched pair, use the field's
-grounded transform and aggregate bounds, keep the parent's picking identity and
-child-stable LOD identity, and do not multiply the field tint twice. Retain this
-PR's complete-pair/material fallback rather than the field branch's earlier
-independent-mesh fallback. Resolve these shared submission hunks serially when the
-field branch merges. Full multi-cluster integration/qualification is an explicit
-dependency gate, not claimed complete by the root-cluster rendering here.
+Each child is adapted to the common resource-binding branch, retaining the parent
+entity/picking identity and ordinal-based debug/LOD identity. The adapter validates
+the copied High/Reduced IDs against the approved binding or the explicit canonical
+pair. Requested selection metadata survives the producer's canonical metadata
+fallback, so the renderer can diagnose an incomplete optional variant pair.
+Legacy copied clusters without selection metadata can be translated by
+`TrySelectAssetPair`; canonical pairs remain neutral defaults and foreign/mismatched
+pairs become diagnosed invalid selections. Field tint is composed exactly once.
+
+Shared submission hunks are reconciled with the integrated producer's aggregate
+and child bounds, Prepare/record traversal, root counters and shadow admission.
+There is no feature-branch implementation dependency remaining. Multi-cluster
+depletion, native field appearance and performance still require manual acceptance.
 
 ## Execution and manual acceptance — NOT EXECUTED
 
@@ -185,6 +195,6 @@ Prepare valid sealed omission catalogs for missing optional High/Reduced/materia
 canonical Reduced/High and incorrect family-slot cases; test declared corrupt
 payloads/dependencies as startup failures. Record actual fallback counters and no
 hidden uploads. Compare 100/1000 cull rates, batches/draws, upload/capacity bytes,
-resident logical/native bytes and controlled frame-time distributions. Multi-cluster
-field rows remain BLOCKED until the producer integration described above exists.
-All native, package, performance and human acceptance remain pending.
+resident logical/native bytes and controlled frame-time distributions, including
+the integrated multi-cluster fields at full/partial/zero quantity. All native,
+package, performance and human acceptance remain pending.

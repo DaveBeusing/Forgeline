@@ -19,4 +19,6 @@ public readonly record struct RenderInstance(
     [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     DecalFeaturePresentationMetadata DecalFeature = default,
     [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
-    ConveyorFeaturePresentationMetadata ConveyorFeature = default);
+    ConveyorFeaturePresentationMetadata ConveyorFeature = default,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    ResourceDepositField? ResourceField = null);

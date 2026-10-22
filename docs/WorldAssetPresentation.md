@@ -143,6 +143,12 @@ documentation does not claim native art or performance approval.
 
 ### Presentation states
 
+[Deterministic field composition](ResourceDepositFieldComposition.md) now adds
+copied terrain-grounded cluster fields with a 4096-part snapshot budget and
+remaining-fraction depletion. It retains one inspectable root per deposit and
+separate conservative render bounds. Its additive `resource-field/1` protocol
+extends the earlier single-cluster visual contract; native acceptance is pending.
+
 `PresentationExtractor` maps authoritative deposit state into:
 
 - `Untouched`: remaining quantity is still at the initial total;

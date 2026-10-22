@@ -13,9 +13,11 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class RuntimeDecalMaterialTests
 {
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ResourceVariantsKeepSurfaceOverridesAndFallbackAsCompleteLodPairs(bool completePair)
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    public void ResourceVariantsKeepSurfaceOverridesAndFallbackAsCompleteLodPairs(bool completePair, bool fieldParts)
     {
         string root = Path.Combine(Path.GetTempPath(), "forgeline-resource-bindings-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
@@ -42,9 +44,21 @@ public sealed class RuntimeDecalMaterialTests
             File.WriteAllText(Path.Combine(root, RuntimeAssetCatalog.ManifestFileName),
                 JsonSerializer.Serialize(new RuntimeAssetManifest { CompilerVersion = "test", Assets = records }, RuntimeAssetCatalog.CreateJsonOptions()));
             var camera = new RtsCamera(new() { InitialDistance = 12 });
+            ResourceDepositField? field = fieldParts ? ResourceDepositFieldComposition.WithRemaining(
+            [
+                new(0, new(camera.Target, Quaternion.Identity, new(4)), binding.HighMeshAssetId, binding.ReducedMeshAssetId,
+                    new(.96f,.95f,.92f,1), true) { Variant = feature.ResourceVariant },
+                new(1, new(camera.Target, Quaternion.Identity, new(4)), binding.HighMeshAssetId, binding.ReducedMeshAssetId,
+                    new(.96f,.95f,.92f,1), false) { Variant = feature.ResourceVariant }
+            ], 1) : null;
+            var rootFeature = fieldParts ? feature with
+            {
+                ResourceVariant = ResourceDepositVariantCatalog.SelectAuthored(visual, 0, 1),
+                ResourceTint = new(1.04f, 1.02f, 1)
+            } : feature;
             var instances = Enumerable.Range(0, 100).Select(i => new RenderInstance(new((uint)i + 1, 1),
                 new(camera.Target, Quaternion.Identity, new(4)), new(1), RenderMaterialHandle.Default,
-                RenderVisibilityMask.World, WorldFeature: feature)).ToArray();
+                RenderVisibilityMask.World, WorldFeature: rootFeature, ResourceField: field)).ToArray();
             var snapshots = new PresentationSnapshotBuffer();
             snapshots.Publish(new(new SimulationTick(1), TimeSpan.FromMilliseconds(50), instances.Length, instances));
             var world = new RenderWorld();
@@ -55,13 +69,16 @@ public sealed class RuntimeDecalMaterialTests
             var batch = Assert.Single(renderer.GetResourceBatchDiagnostics());
             Assert.Equal(completePair ? binding.HighMeshAssetId : canonical.MeshAssetId, batch.Mesh);
             Assert.Equal(completePair ? binding.MaterialAssetId : canonical.MaterialAssetId, batch.Material);
-            Assert.Equal(100, batch.Instances);
-            Assert.Equal(11200, batch.InstanceUploadBytes);
+            int expectedParts = fieldParts ? 200 : 100;
+            Assert.Equal(expectedParts, batch.Instances);
+            Assert.Equal(expectedParts * 112L, batch.InstanceUploadBytes);
+            Assert.Equal(100, renderer.LastDiagnostics.VisibleInstances);
             Assert.Equal(1, renderer.LastDiagnostics.DrawCalls);
-            Assert.Equal(completePair ? 100 : 0, renderer.ResourceDiagnostics.VariantInstances);
-            Assert.Equal(completePair ? 0 : 100, renderer.ResourceDiagnostics.CanonicalFallbacks);
+            Assert.Equal(completePair ? expectedParts : 0, renderer.ResourceDiagnostics.VariantInstances);
+            Assert.Equal(completePair ? 0 : expectedParts, renderer.ResourceDiagnostics.CanonicalFallbacks);
             Assert.NotNull(context.InstanceBuffer);
             var uploaded = MemoryMarshal.Cast<byte, float>(context.InstanceBuffer!.Upload);
+            Assert.Equal(fieldParts ? .96f : 1, uploaded[16]);
             Assert.Equal(completePair ? -1.5f : 0, uploaded[25]);
             Assert.Equal(completePair ? -.5f : 0, uploaded[26]);
         }

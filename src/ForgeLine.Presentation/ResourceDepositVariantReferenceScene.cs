@@ -43,6 +43,7 @@ internal static class ResourceDepositVariantReferenceScene
             position.Y = height + instance.Transform.Scale.Y * .5f;
             instances[i] = instance with
             {
+                ResourceField = null,
                 Transform = instance.Transform with { Position = position, Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, (i % 7) * MathF.Tau / 7) },
                 WorldFeature = instance.WorldFeature with
                 {

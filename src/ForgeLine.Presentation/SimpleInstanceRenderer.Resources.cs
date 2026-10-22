@@ -5,13 +5,34 @@ namespace ForgeLine.Presentation;
 
 public readonly record struct ResourceDepositRenderDiagnostics(
     int VisibleRequests, int VariantInstances, int CanonicalFallbacks,
-    int InvalidSelections, int MissingResources, int RetainedHighLodInstances, int InvalidTransforms = 0);
+    int InvalidSelections, int MissingResources, int RetainedHighLodInstances, int InvalidTransforms = 0,
+    int HighLodParts = 0, int ReducedLodParts = 0);
 
 public readonly record struct ResourceDepositBatchDiagnostics(
     string Mesh, string Material, int Instances, int IndicesPerInstance, long InstanceUploadBytes);
 
 public sealed partial class SimpleInstanceRenderer
 {
+    private static WorldFeaturePresentationMetadata FieldResourceFeature(in WorldFeaturePresentationMetadata root,
+        in ResourceDepositFieldCluster cluster)
+    {
+        var result = root with { ResourceTint = new(cluster.Tint.X, cluster.Tint.Y, cluster.Tint.Z) };
+        var canonical = WorldPresentationCatalog.Get(root.Visual);
+        bool canonicalPair = string.Equals(cluster.MeshAssetId, canonical.MeshAssetId, StringComparison.Ordinal) &&
+            string.Equals(cluster.ReducedMeshAssetId, canonical.ReducedLodAssetId, StringComparison.Ordinal);
+        if (cluster.Variant.IsSpecified)
+        {
+            result = result with { ResourceVariant = cluster.Variant };
+            if (ResourceDepositVariantCatalog.TryResolve(result, out var binding) && (canonicalPair ||
+                string.Equals(cluster.MeshAssetId, binding.HighMeshAssetId, StringComparison.Ordinal) &&
+                string.Equals(cluster.ReducedMeshAssetId, binding.ReducedMeshAssetId, StringComparison.Ordinal))) return result;
+        }
+        else if (ResourceDepositVariantCatalog.TrySelectAssetPair(root.Visual, cluster.MeshAssetId, cluster.ReducedMeshAssetId,
+            0, out var selection)) return result with { ResourceVariant = selection };
+        else if (canonicalPair) return result with { ResourceVariant = default };
+        return result with { ResourceVariant = new("invalid-field-pair", ResourceDepositVariantCatalog.VariantCount) };
+    }
+
     private readonly Dictionary<(WorldVisualId, ResourceDepositVariantSelection), ResourceBinding> _resourceBindings = [];
     public ResourceDepositRenderDiagnostics ResourceDiagnostics { get; private set; }
 
@@ -64,6 +85,9 @@ public sealed partial class SimpleInstanceRenderer
             ResourceDiagnostics = ResourceDiagnostics with { CanonicalFallbacks = ResourceDiagnostics.CanonicalFallbacks + 1 };
         bool reduced = requested == WorldAssetLod.Reduced && binding.HasReduced;
         actual = reduced ? WorldAssetLod.Reduced : WorldAssetLod.High;
+        ResourceDiagnostics = reduced
+            ? ResourceDiagnostics with { ReducedLodParts = ResourceDiagnostics.ReducedLodParts + 1 }
+            : ResourceDiagnostics with { HighLodParts = ResourceDiagnostics.HighLodParts + 1 };
         if (requested == WorldAssetLod.Reduced && !reduced)
             ResourceDiagnostics = ResourceDiagnostics with { RetainedHighLodInstances = ResourceDiagnostics.RetainedHighLodInstances + 1 };
         mesh = reduced ? binding.Reduced : binding.High;

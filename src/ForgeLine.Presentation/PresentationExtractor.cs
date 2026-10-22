@@ -27,6 +27,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     private readonly PresentationExtractionContext? _extraction;
     private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly Dictionary<EntityId, (WorldVisualId Visual, ResourceDepositVariantSelection Selection, Vector3 Tint)> _resourceVariants = [];
+    private readonly ResourceDepositFieldComposer? _resourceFields;
     private readonly RenderInstance[] _staticDressing = [];
     private readonly CrossingVisualLayout? _crossingLayout;
     private readonly EntityId[] _visualCrossingEntities = [];
@@ -56,7 +57,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
         FactionIntelligenceStore? intelligence = null,
         FactionId viewingFaction = default,
         AxisAlignedBounds? intelligenceWorldBounds = null,
-        RuntimeAssetCatalog? runtimeAssets = null)
+        RuntimeAssetCatalog? runtimeAssets = null,
+        ITerrainQuery? resourceTerrain = null)
     {
         _buffer =
             buffer ??
@@ -65,6 +67,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
         _viewingFaction = viewingFaction;
         _intelligenceWorldBounds = intelligenceWorldBounds;
         _runtimeAssets = runtimeAssets;
+        _resourceFields = resourceTerrain is null ? null : new(resourceTerrain, runtimeAssets);
 
         if (_intelligence is not null &&
             !_viewingFaction.IsSpecified)
@@ -90,6 +93,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     {
         _extraction = extraction;
         _resourceVariants = ResourceDepositVariantSeed.CreateMap(extraction.Scenario);
+        _resourceFields = ResourceDepositFieldComposer.Create(extraction.Scenario, runtimeAssets);
         _worldAudio = new();
         _crossingLayout = CrossingVisualLayout.Create(extraction.Scenario.Battlefield, extraction.Scenario.Terrain);
         _visualCrossingEntities = extraction.Scenario.BattlefieldRuntime.CrossingEntities.Values.ToArray();
@@ -167,6 +171,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
         RenderInstance[] instances =
             CaptureRenderInstances(
                 context);
+        _resourceFields?.Apply(instances, context.Entities);
 
         PlayerExperienceSnapshot? playerExperience =
             _extraction is null

@@ -55,7 +55,7 @@ internal sealed class SubmissionFrameCache
     {
         Interpolations++;
         RenderInstance instance = world.GetInterpolatedInstance(index, _alpha);
-        AxisAlignedBounds bounds = instance.MechanicalPose.Infantry.IsSpecified ? SkinPresentationBounds.Resolve(instance) :
+        AxisAlignedBounds bounds = instance.ResourceField is not null || instance.MechanicalPose.Infantry.IsSpecified ? SkinPresentationBounds.Resolve(instance) :
             _seconds.HasValue ? VegetationVisualMotion.CullingBounds(instance) : SkinPresentationBounds.Resolve(instance);
         return new(instance, bounds, instance.Transform.ToMatrix());
     }

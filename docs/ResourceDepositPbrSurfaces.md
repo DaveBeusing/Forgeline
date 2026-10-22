@@ -93,8 +93,9 @@ The additional material IDs are inputs to the presentation-only
 [resource selector](ResourceDepositRendering.md). It maps approved surface indices
 to these existing IDs through the current shader interface. Canonical IDs still
 select the weathered default. Authored map/deposit keys select fixed root-cluster
-variants; full multi-cluster field composition and its native qualification remain
-a separate integration gate. Full repeat suppression is not claimed.
+variants. Integrated field composition now supplies the same copied binding contract
+per cluster, with its own stable surface channel. Native field/material qualification
+remains pending. Full repeat suppression is not claimed.
 
 Untouched/Active/Depleted keep their existing authoritative presentation tint.
 Material `emissiveMultiplier` is zero and no resource emissive texture is bound.
