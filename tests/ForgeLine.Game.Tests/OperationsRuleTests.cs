@@ -88,8 +88,9 @@ public sealed class OperationsRuleTests
         Assert.Equal(OperationsRuleResult.Applied, row.Result);
         Assert.Equal(1, row.ActionCount);
         Assert.Equal(initialStock, scenario.Inventories.GetTotalQuantity(input));
-        var policies = scenario.Simulation.Entities.Query<LogisticsStockPolicy>(
-            QueryIterationOrder.StableByEntityIndex).ToArray();
+        var policies = new List<EntityId>();
+        foreach (EntityId policyEntity in scenario.Simulation.Entities.Query<LogisticsStockPolicy>(
+                     QueryIterationOrder.StableByEntityIndex)) policies.Add(policyEntity);
         Assert.Single(policies.Where(p =>
             scenario.Simulation.Entities.GetComponent<LogisticsStockPolicy>(p).TargetEntity == facility &&
             scenario.Simulation.Entities.GetComponent<LogisticsStockPolicy>(p).ResourceId == ResourceIds.FerrousOre));
@@ -116,8 +117,8 @@ public sealed class OperationsRuleTests
         scenario.Simulation.RunTicks(10);
         Assert.Equal(OperationsRuleResult.ManualOverride,
             Assert.Single(scenario.OperationsRules.Capture(Owner)).Result);
-        Assert.All(scenario.Simulation.Entities.Query<LogisticsStockPolicy>(),
-            p => Assert.False(scenario.Simulation.Entities.GetComponent<LogisticsStockPolicy>(p).Enabled));
+        foreach (EntityId policyEntity in scenario.Simulation.Entities.Query<LogisticsStockPolicy>())
+            Assert.False(scenario.Simulation.Entities.GetComponent<LogisticsStockPolicy>(policyEntity).Enabled);
     }
 
     [Fact]
