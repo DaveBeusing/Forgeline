@@ -589,6 +589,30 @@ public sealed class PlayerCommandBoundaryTests
         Assert.Equal(
             PlayerLogisticsActionFailureReason.InvalidThresholds,
             nonFiniteResult.ActionFailure);
+
+        PlayerCommandSubmissionReceipt invalidPriority =
+            gateway.SubmitLogisticsStockPolicy(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
+                ResourceIds.FerrousOre,
+                10.0, 20.0, 30.0,
+                (LogisticsStockPriority)byte.MaxValue,
+                enabled: true,
+                scenario.Simulation.CurrentTick);
+        Assert.True(invalidPriority.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out PlayerCommandResultReadModel priorityResult));
+        Assert.Equal(PlayerCommandFeedbackState.Rejected, priorityResult.State);
+        Assert.Equal(PlayerLogisticsActionFailureReason.InvalidPriority, priorityResult.ActionFailure);
+        Assert.DoesNotContain(
+            scenario.Simulation.Entities.Query<LogisticsStockPolicy>(),
+            entity =>
+            {
+                LogisticsStockPolicy candidate = scenario.Simulation.Entities
+                    .GetComponent<LogisticsStockPolicy>(entity);
+                return candidate.TargetEntity == scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore &&
+                    candidate.ResourceId == ResourceIds.FerrousOre;
+            });
     }
 
     [Fact]
