@@ -76,6 +76,13 @@ public sealed class RuntimeAssetCatalog
 
         foreach (RuntimeAssetRecord record in manifest.Assets)
         {
+            if (manifest.IntegrityVersion != 0)
+            {
+                ValidateReferences(record.MaterialReferences, RuntimeAssetType.Material);
+                ValidateReferences(record.TextureReferences, RuntimeAssetType.Texture);
+                ValidateReferences(record.Lods.Select(static lod => lod.AssetId), RuntimeAssetType.Mesh);
+                if (record.CollisionReference is { } collision) ValidateReferences([collision], RuntimeAssetType.Mesh);
+            }
             if (record.AnimationReferences.Count > (record.Type == RuntimeAssetType.Skin ? 9 : 1) || record.AnimationReferences.Count > 0 && record.Type is not (RuntimeAssetType.Mesh or RuntimeAssetType.Skin))
                 throw new InvalidDataException("Mesh/skin clip reference count or owner type is invalid.");
             if (record.SkinReference is { } skinReference && (record.Type != RuntimeAssetType.Mesh || !record.Dependencies.Contains(skinReference, StringComparer.Ordinal) ||
@@ -85,6 +92,14 @@ public sealed class RuntimeAssetCatalog
                 if (!record.Dependencies.Contains(reference, StringComparer.Ordinal) ||
                     !records.TryGetValue(AssetId.Parse(reference), out var clip) || clip.Type != RuntimeAssetType.Animation)
                     throw new InvalidDataException($"Mesh '{record.Id}' has an invalid typed clip dependency '{reference}'.");
+
+            void ValidateReferences(IEnumerable<string> references, RuntimeAssetType type)
+            {
+                foreach (string reference in references)
+                    if (!AssetId.TryParse(reference, out var id) || !record.Dependencies.Contains(reference, StringComparer.Ordinal) ||
+                        !records.TryGetValue(id, out var target) || target.Type != type)
+                        throw new InvalidDataException($"Asset '{record.Id}' has an invalid explicit {type} dependency '{reference}'.");
+            }
         }
         return new RuntimeAssetCatalog(normalizedRoot, manifest, records);
     }

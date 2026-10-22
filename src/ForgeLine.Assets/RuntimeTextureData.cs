@@ -517,6 +517,10 @@ public sealed class RuntimeTextureData
             throw new InvalidDataException("BC7 top-level dimensions must be multiples of four.");
         }
 
+        if (Usage is RuntimeTextureUsage.BaseColor or RuntimeTextureUsage.Emissive &&
+            ColorSpace != RuntimeTextureColorSpace.Srgb)
+            throw new InvalidDataException($"Runtime texture usage {Usage} requires sRGB color space.");
+
         if (Usage is RuntimeTextureUsage.Normal or
             RuntimeTextureUsage.Orm or
             RuntimeTextureUsage.GenericData or

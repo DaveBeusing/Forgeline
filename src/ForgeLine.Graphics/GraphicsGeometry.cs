@@ -24,6 +24,8 @@ public readonly record struct GraphicsVertexElement(
 {
     internal void Validate()
     {
+        if (!Enum.IsDefined(Format)) throw new ArgumentOutOfRangeException(nameof(Format));
+        if (!Enum.IsDefined(InputRate)) throw new ArgumentOutOfRangeException(nameof(InputRate));
         if (string.IsNullOrWhiteSpace(SemanticName))
         {
             throw new ArgumentException(

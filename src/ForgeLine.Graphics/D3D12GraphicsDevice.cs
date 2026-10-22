@@ -444,9 +444,11 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                         ? null
                         : rootParameters.ToArray(),
                     samplers));
-        rootSignature.Name = "ForgeLine Graphics Root Signature";
-
-        InputElementDescription[] inputElements = description.VertexElements
+        ID3D12PipelineState? pipelineState = null;
+        try
+        {
+            rootSignature.Name = "ForgeLine Graphics Root Signature";
+            InputElementDescription[] inputElements = description.VertexElements
             .Select(
                 static element =>
                     new InputElementDescription(
@@ -470,8 +472,6 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                         checked((uint)element.InstanceStepRate)))
             .ToArray();
 
-        try
-        {
             GraphicsPipelineStateDescription pipelineStateDescription = new()
             {
                 RootSignature = rootSignature,
@@ -531,7 +531,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 pipelineStateDescription.BlendState = blend;
             }
 
-            ID3D12PipelineState pipelineState =
+            pipelineState =
                 _device.CreateGraphicsPipelineState(pipelineStateDescription);
             pipelineState.Name = "ForgeLine Graphics Pipeline";
 
@@ -543,6 +543,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
         catch
         {
+            pipelineState?.Dispose();
             rootSignature.Dispose();
             throw;
         }

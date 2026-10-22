@@ -7,7 +7,15 @@ public sealed record ResidencyTextureInventory(int Width, int Height, string For
     long Rgba8EquivalentBytes);
 public sealed record ResidencyInventoryEntry(string Id, string Type, string ContentSignature,
     string Source, string[] Dependencies, string[] MaterialConsumers, long ContainerBytes,
-    long PayloadBytes, ResidencyTextureInventory? Texture);
+    long PayloadBytes, ResidencyTextureInventory? Texture)
+{
+    public IReadOnlyList<string> MeshMaterialSlots { get; init; } = [];
+    public IReadOnlyList<ResidencyMaterialTextureSlot> MaterialTextureSlots { get; init; } = [];
+    public IReadOnlyList<AssetLodReference> Lods { get; init; } = [];
+    public IReadOnlyList<string> AnimationReferences { get; init; } = [];
+    public string? SkinReference { get; init; }
+}
+public sealed record ResidencyMaterialTextureSlot(string Semantic, string? AssetId);
 public sealed record AssetResidencyInventoryReport(string ContentSignature, int MipSkip,
     long ContainerBytes, long PayloadBytes, long CompiledGameplayTextureBytes,
     long CompiledStudioTextureBytes, long LogicalTextureMipBytes, long EffectiveUploadMipBytes,
@@ -25,9 +33,11 @@ public static class AssetResidencyInventory
         ArgumentOutOfRangeException.ThrowIfNegative(mipSkip);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(mipSkip, 3);
         var consumers = new Dictionary<AssetId, List<string>>();
+        var materials = new Dictionary<AssetId, RuntimeMaterialData>();
         foreach (var material in catalog.Manifest.Assets.Where(static x => x.Type == RuntimeAssetType.Material))
         {
             var data = RuntimeMaterialData.FromPayload(catalog.Read(AssetId.Parse(material.Id)).Payload);
+            materials.Add(AssetId.Parse(material.Id), data);
             foreach (var id in new[] { data.BaseColorTexture, data.NormalTexture, data.OrmTexture, data.EmissiveTexture })
                 if (id is { } texture)
                 {
@@ -66,9 +76,23 @@ public static class AssetResidencyInventory
                 if (record.Id.StartsWith("branding.undefined_behavior.splash.", StringComparison.Ordinal)) studio = checked(studio + container);
                 else gameplay = checked(gameplay + container);
             }
+            IReadOnlyList<string> materialSlots = record.Type switch
+            {
+                RuntimeAssetType.Mesh => RuntimeMeshData.FromPayload(content.Payload).MaterialIds,
+                RuntimeAssetType.Skin => RuntimeSkinData.FromPayload(content.Payload).Mesh.MaterialIds,
+                _ => []
+            };
+            IReadOnlyList<ResidencyMaterialTextureSlot> textureSlots = materials.TryGetValue(id, out var materialData)
+                ? [new("baseColor", materialData.BaseColorTexture?.Value), new("normal", materialData.NormalTexture?.Value),
+                   new("orm", materialData.OrmTexture?.Value), new("emissive", materialData.EmissiveTexture?.Value)]
+                : [];
             entries.Add(new(record.Id, record.Type.ToString(), record.RuntimeHash, record.SourcePath,
                 record.Dependencies.ToArray(), consumers.TryGetValue(id, out var users) ? users.Order(StringComparer.Ordinal).ToArray() : [],
-                container, content.Payload.LongLength, texture));
+                container, content.Payload.LongLength, texture)
+            {
+                MeshMaterialSlots = materialSlots, MaterialTextureSlots = textureSlots,
+                Lods = record.Lods, AnimationReferences = record.AnimationReferences, SkinReference = record.SkinReference
+            });
         }
         return new(catalog.Manifest.ContentSignature, mipSkip, total, payload, gameplay, studio, logical, upload,
             gameplay <= GameplayTextureBudgetBytes, GameplayTextureBudgetBytes, null, null, null, entries);
