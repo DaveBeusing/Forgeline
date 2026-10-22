@@ -132,6 +132,67 @@ public sealed class CargoTransportSystemTests
     }
 
     [Fact]
+    public void RouteChangeDissolvesConvoyWithoutDeletingActiveShipments()
+    {
+        var (fixture, first, second, group) = CreateActiveConvoy();
+        double conserved = fixture.TotalConservedQuantity(first, second);
+        _ = fixture.AddIntermediateNode(new Vector3(28, 0, 28));
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.False(fixture.Simulation.Entities.IsAlive(group));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMember>(first));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMember>(second));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMotionConstraint>(first));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMotionConstraint>(second));
+        Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(first));
+        Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(second));
+        Assert.Equal(conserved, fixture.TotalConservedQuantity(first, second));
+    }
+
+    [Fact]
+    public void DestroyedConvoyLeaderReleasesSurvivingTruckToIndividualDelivery()
+    {
+        var (fixture, first, second, group) = CreateActiveConvoy();
+        Assert.True(fixture.Simulation.Entities.DestroyEntity(first));
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.False(fixture.Simulation.Entities.IsAlive(group));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMember>(second));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMotionConstraint>(second));
+        Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(second));
+    }
+
+    private static (TransportFixture Fixture, EntityId First, EntityId Second, EntityId Group)
+        CreateActiveConvoy()
+    {
+        TransportFixture fixture = CreateFixture(sourceQuantity: 100);
+        fixture.ConnectDirect();
+        EntityId first = fixture.CreateTruckAtSource();
+        EntityId second = fixture.CreateTruckAtSource();
+        foreach (EntityId truck in new[] { first, second })
+            Assert.True(fixture.TransportSystem.TryAssignOrder(
+                fixture.Simulation.Entities, truck,
+                new CargoTransportOrder(fixture.SourceNode, fixture.DestinationNode,
+                    ResourceIds.FerrousOre, 25, SimulationTick.Zero),
+                SimulationTick.Zero));
+        RunUntil(fixture, () => new[] { first, second }.All(truck =>
+            fixture.Simulation.Entities.TryGetComponent(truck, out CargoTransportRouteState route) &&
+            route.Route is not null &&
+            fixture.Simulation.Entities.TryGetComponent(truck, out CargoTransportRuntimeState state) &&
+            state.Lifecycle == CargoTransportLifecycleState.ToDestination));
+
+        var request = PlayerLogisticsActionCommand.CreateCargoConvoy(
+            LocalPlayer, [first, second], [], fixture.Simulation.CurrentTick);
+        fixture.Simulation.SubmitCommand(request,
+            fixture.Simulation.CurrentTick.Next(),
+            new SimulationCommandSource(LocalPlayer.Value));
+        fixture.Simulation.AdvanceOneTick();
+        Assert.True(request.Accepted);
+        Assert.True(fixture.Simulation.Entities.IsAlive(request.CreatedConvoy));
+        return (fixture, first, second, request.CreatedConvoy);
+    }
+
+    [Fact]
     public void ConvoyRejectsDuplicatesWithoutChangingCargoOrders()
     {
         TransportFixture fixture = CreateFixture(sourceQuantity: 100);
