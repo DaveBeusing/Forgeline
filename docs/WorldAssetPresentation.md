@@ -132,9 +132,11 @@ fragment/size composition, deterministic presentation seed protocol, stable
 bindings, conservative bounds, fallback behavior and manual acceptance matrix.
 Its [declarative fixture](fixtures/resource-deposit-visual-language.v1.json) is
 specification data, not a runtime or CI loader. Existing family IDs and the
-High/Reduced state/tint implementation remain the integrated baseline described
-above. Optional asset variants, field layouts and dispatch require separate
-integration; this documentation does not claim native art or performance approval.
+High/Reduced state/tint implementation remain stable. Integrated
+[cluster geometry](ResourceDepositClusterGeometry.md) now supplies grounded source
+forms and optional variants, superseding the earlier vertical-shard description.
+Field layouts and variant dispatch require separate integration; this
+documentation does not claim native art or performance approval.
 
 ### Presentation states
 

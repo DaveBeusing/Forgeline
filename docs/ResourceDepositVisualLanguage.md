@@ -4,24 +4,26 @@
 
 Normative art and interchange specification, schema `resource-visual/1`.
 Implementation baseline: `master` at
-`8e2935abaa8486b2b72125ac7354ac729381de3f`, product version 0.1.453.
+`b726ff9c00b7dc74cf285219fa58440acf663e16`, product version 0.1.454.
 This document defines requirements for subsequent asset, field-composition and
 rendering integration. It does not claim that those requirements are implemented
 or visually accepted. Human art acceptance and all execution remain pending.
 
 The integrated baseline has four stable family bindings, High/Reduced selection,
-copied Untouched/Active/Depleted states and tint changes. Its Silicates and Rare
-Elements still emphasize vertical shards. The grounded silhouettes below are
-the intended replacement direction. No simulation, spawn, renderer, production
+copied Untouched/Active/Depleted states and tint changes. PR #303 adds grounded
+cluster geometry and optional variant assets; runtime still selects canonical
+family bindings. The detailed grammar below is the art acceptance target, not a
+claim that every new mesh has passed it. No simulation, spawn, renderer, production
 mesh, texture, material or save/replay format changes belong to this document.
 
-Reuse the layout keys already authored on the separate
-`art/resource-cluster-families` branch (geometry contract commit `8d8e3526`).
-That branch is not part of this document's implementation base. Its native
-masters, 3 size classes and optional LOD2 must be integrated and qualified
-separately. Never cherry-pick its assets into this documentation PR or silently
-rename its keys. Existing runtime IDs remain authoritative when optional bindings
-are unavailable. The seed and probability contract here extends that work.
+Reuse the layout keys authored in `art/resource-cluster-families` (geometry
+contract commit `8d8e3526`), integrated through PR #303 during this work. See
+[cluster geometry](ResourceDepositClusterGeometry.md). This documentation branch
+contains that current master; it contributes no additional assets. Native
+masters, 3 size classes and optional LOD2 still require separate qualification
+and dispatch. Never silently rename their keys. Existing runtime IDs remain
+authoritative when optional bindings are unavailable. The seed and probability
+contract here extends that work.
 
 Asset work owns editable meshes, shared PBR surfaces and fixed variant bindings.
 Terrain work owns bounded visual layouts within already authorized deposit
@@ -97,7 +99,7 @@ cluster's size key. Let D be that cluster's occupied horizontal diameter.
 
 Counts are authoring targets, not independent runtime entities or required draw
 calls. Distinct joined fracture faces may represent multiple fragments at Reduced.
-Geometry already authored on the parallel branch must be reviewed against these
+Geometry already authored in the integrated cluster set must be reviewed against these
 targets; its existence is not evidence that every target is met. Do not exceed
 existing geometry or GPU budgets to meet counts; preserve primary masses first.
 Silhouette review may justify a documented per-layout count exception while
@@ -255,7 +257,7 @@ failure to fix in authored topology or form design, not by reseeding at runtime.
 
 ### Bounds, LOD and controlled fallback
 
-The parallel geometry convention is engine Y-up, centered source pivot (0,0,0),
+The integrated cluster convention is engine Y-up, centered source pivot (0,0,0),
 ground Y=-0.5 and normalized source envelope [-0.5,0.5] on every axis. Small,
 medium and large occupied spans are at most 0.68, 0.86 and 1.00. All LODs share
 one normalization; do not normalize each mesh independently. Render bounds must
@@ -403,7 +405,8 @@ from local execution. CI passing never constitutes native or human art approval.
 
 **NOT EXECUTED:** builds, tests, contract-fixture automation, manual CI dispatch,
 Blender reopen/export qualification, native captures and GPU/performance review.
-Integration gates remain: asset-branch review/merge, stable field-anchor metadata,
+PR #303 has integrated the geometry sources. Remaining gates are asset art review,
+stable field-anchor metadata,
 presentation variant dispatch, expanded review fixtures, full native matrix,
 human art acceptance and existing performance/resource acceptance. Documentation
 can integrate independently without representing these gates as complete.
