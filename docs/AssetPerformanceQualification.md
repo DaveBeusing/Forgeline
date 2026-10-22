@@ -201,7 +201,7 @@ Readability has priority over decorative geometry. An optimization that lowers c
 
 ## Current Engineering Budgets
 
-The engine architecture defines the current prototype targets:
+The engine architecture defines the current engineering targets:
 
 - at least 60 FPS on target hardware;
 - therefore a nominal 16.67 ms total frame budget at 60 FPS;
