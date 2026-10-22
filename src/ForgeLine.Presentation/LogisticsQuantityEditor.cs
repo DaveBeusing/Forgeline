@@ -27,6 +27,28 @@ internal static class LogisticsQuantityEditor
         return (current, false, direction < 0 ? lowerReason : upperReason);
     }
 
+    internal static (double Next, bool Allowed, string Reason) DecideField(
+        PlayerStockThresholdField field, double minimum, double target,
+        double maximum, double capacity, int direction)
+    {
+        return field switch
+        {
+            PlayerStockThresholdField.Minimum => Decide(
+                minimum, direction, Minimum, target,
+                "MINIMUM IS 50", "INCREASE TARGET FIRST"),
+            PlayerStockThresholdField.Target => Decide(
+                target, direction, Math.Max(Minimum, minimum), maximum,
+                "DECREASE MIN FIRST", "INCREASE MAX FIRST"),
+            PlayerStockThresholdField.Maximum => Decide(
+                maximum, direction, Math.Max(Minimum, target),
+                capacity > 0
+                    ? direction > 0 ? capacity : Math.Max(maximum, capacity)
+                    : double.MaxValue,
+                "DECREASE TARGET FIRST", "INVENTORY CAPACITY REACHED"),
+            _ => (0, false, "UNAVAILABLE")
+        };
+    }
+
     internal static double Adjust(double current, int direction, double lower = Minimum, double upper = double.MaxValue)
     {
         if (direction == 0 || !double.IsFinite(current) || current < 0 ||
