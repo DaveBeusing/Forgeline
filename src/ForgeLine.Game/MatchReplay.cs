@@ -18,7 +18,9 @@ public enum ReplayCommandKind : byte
     EndMatch = 7,
     Surrender = 8,
     SetMatchPaused = 9,
-    Technology = 10
+    Technology = 10,
+    Demolition = 11,
+    CancelConstruction = 12
 }
 
 public sealed record RecordedSimulationCommand
@@ -289,6 +291,25 @@ public static class ReplayCommandCodec
                     };
                 return true;
 
+            case DemolishBuildingsCommand command:
+                recorded = Base(ReplayCommandKind.Demolition) with
+                {
+                    Issuer = command.Issuer,
+                    SubmittedAtTick = command.SubmittedAtTick.Value,
+                    Entities = command.Targets.ToArray(),
+                    CorrelationId = command.CorrelationId.Value
+                };
+                return true;
+
+            case CancelConstructionCommand command:
+                recorded = Base(ReplayCommandKind.CancelConstruction) with
+                {
+                    Issuer = command.Issuer,
+                    SubmittedAtTick = command.SubmittedAtTick.Value,
+                    TargetEntity = command.ConstructionSite
+                };
+                return true;
+
             case PlayerProductionActionCommand command:
                 recorded =
                     Base(
@@ -514,6 +535,19 @@ public static class ReplayCommandCodec
                     submittedAtTick,
                     new PlayerCommandCorrelationId(
                         command.CorrelationId)),
+
+            ReplayCommandKind.Demolition =>
+                new DemolishBuildingsCommand(
+                    command.Issuer,
+                    command.Entities,
+                    submittedAtTick,
+                    new PlayerCommandCorrelationId(command.CorrelationId)),
+
+            ReplayCommandKind.CancelConstruction =>
+                new CancelConstructionCommand(
+                    command.Issuer,
+                    command.TargetEntity,
+                    submittedAtTick),
 
             ReplayCommandKind.Production =>
                 DecodeProduction(
