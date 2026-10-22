@@ -55,7 +55,8 @@ public sealed class GameplayBindingRegistry
         new(GameplayAction.ExtractorPlacement, PlatformKey.F6, "PLACE EXTRACTOR", GameplayBindingScope.Global),
         new(GameplayAction.StoragePlacement, PlatformKey.F7, "PLACE STORAGE", GameplayBindingScope.Global),
         new(GameplayAction.SmelterPlacement, PlatformKey.F8, "PLACE SMELTER", GameplayBindingScope.Global),
-        new(GameplayAction.RotatePlacement, PlatformKey.F9, "ROTATE BUILDING", GameplayBindingScope.Global)
+        new(GameplayAction.RotatePlacement, PlatformKey.F9, "ROTATE BUILDING", GameplayBindingScope.Global),
+        new(GameplayAction.Demolish, PlatformKey.Delete, "DEMOLISH BUILDING", GameplayBindingScope.Global)
     ];
     public static IReadOnlyList<GameplayBindingDefinition> Definitions { get; } = Array.AsReadOnly(DefinitionsArray);
     public static GameplayBindingRegistry Default { get; } = new(new());
