@@ -307,7 +307,7 @@ public sealed class MatchRuntime : IDisposable
                 logistics,
                 inventories,
                 navigation, docking) { Progress = progress };
-        var operationsRules = new OperationsRuleSystem(simulation, inventories, recipes);
+        var operationsRules = new OperationsRuleSystem(simulation, inventories, recipes, battlefieldRuntime.MatchStateEntity);
         var automatedDistribution =
             new AutomatedDistributionSystem(
                 logistics,
