@@ -196,6 +196,10 @@ public sealed class BuildingDemolitionSystem : ISimulationSystem
             if (context.Entities.GetComponent<UnitProductionRequest>(request).Facility == entity)
                 return Fail(BuildingDemolitionFailure.ProductionActive);
 
+        foreach (EntityId request in context.Entities.Query<TechnologyResearchRequest>())
+            if (context.Entities.GetComponent<TechnologyResearchRequest>(request).Facility == entity)
+                return Fail(BuildingDemolitionFailure.ProductionActive);
+
         // Inventory contents are not construction materials: never silently
         // delete stock or reservations when removing a storage/production site.
         HashSet<InventoryId> attachedInventories = [];
