@@ -702,6 +702,13 @@ public sealed partial class PlayerActionPanelController
         }
 
         PlayerStockPolicyActionReadModel policy = logistics.Policies[SelectedIndex];
+        if (!policy.HasPolicy && logistics.InventoryCapacity > 0 &&
+            logistics.InventoryCapacity < LogisticsQuantityEditor.Minimum)
+        {
+            Feedback = "INVENTORY CAPACITY BELOW 50";
+            _feedbackRemaining = TimeSpan.FromSeconds(4);
+            return;
+        }
         _pendingRequest =
             PlayerActionRequest.SetStockPolicy(
                 logistics.Entity,
@@ -1345,29 +1352,19 @@ public sealed partial class PlayerActionPanelController
             return;
         }
 
-        // Policies retain their exact previous values until the player edits one field.
-        // The three thresholds remain independently editable and always ordered.
+        var decision = PlayerActionDockHudModel.DecideStockAdjustment(
+            CreateView(1920, 1080, actions), actions.Logistics, direction);
+        if (!decision.Allowed)
+        {
+            Feedback = decision.Reason;
+            _feedbackRemaining = TimeSpan.FromSeconds(3);
+            return;
+        }
         switch (StockThresholdField)
         {
-            case PlayerStockThresholdField.Minimum:
-                _stockMinimum = LogisticsQuantityEditor.Adjust(
-                    _stockMinimum, direction, upper: _stockTarget);
-                break;
-
-            case PlayerStockThresholdField.Target:
-                _stockTarget = LogisticsQuantityEditor.Adjust(
-                    _stockTarget, direction, lower: Math.Max(LogisticsQuantityEditor.Minimum, _stockMinimum),
-                    upper: _stockMaximum);
-                break;
-
-            case PlayerStockThresholdField.Maximum:
-                _stockMaximum = LogisticsQuantityEditor.Adjust(
-                    _stockMaximum, direction, lower: Math.Max(LogisticsQuantityEditor.Minimum, _stockTarget),
-                    upper: actions.Logistics.InventoryCapacity > 0
-                        ? direction > 0 ? actions.Logistics.InventoryCapacity
-                            : Math.Max(_stockMaximum, actions.Logistics.InventoryCapacity)
-                        : double.MaxValue);
-                break;
+            case PlayerStockThresholdField.Minimum: _stockMinimum = decision.Next; break;
+            case PlayerStockThresholdField.Target: _stockTarget = decision.Next; break;
+            case PlayerStockThresholdField.Maximum: _stockMaximum = decision.Next; break;
         }
     }
 
