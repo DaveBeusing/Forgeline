@@ -17,4 +17,6 @@ public readonly record struct RenderInstance(
     VfxFeaturePresentationMetadata VfxFeature = default,
     MechanicalPose MechanicalPose = default,
     [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
-    DecalFeaturePresentationMetadata DecalFeature = default);
+    DecalFeaturePresentationMetadata DecalFeature = default,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    ConveyorFeaturePresentationMetadata ConveyorFeature = default);

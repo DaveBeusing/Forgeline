@@ -516,6 +516,15 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
                 highLod++;
             }
+            else if (instance.ConveyorFeature.IsSpecified)
+            {
+                materialAssetId="material.infrastructure.directorate.conveyor";
+                float conveyorDistance=Vector3.Distance(camera.Position,instance.Transform.Position);
+                int conveyorLod=conveyorDistance>420?2:conveyorDistance>140?1:0;
+                usesRuntimeMesh=_runtimeAssets is not null &&
+                    TryGetMesh(instance.ConveyorFeature.Mesh(conveyorLod),out runtimeMesh,out runtimeMeshId) && runtimeMesh.IsValid;
+                highLod++;
+            }
             else if (instance.InfrastructureFeature.IsSpecified)
             {
                 materialAssetId =
@@ -1248,6 +1257,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 BuildingPresentationCatalog.ResolveFallbackTint(
                     instance.BuildingFeature);
         }
+
+        if (instance.ConveyorFeature.IsSpecified) return runtimeTint ?? Vector4.One;
 
         if (instance.InfrastructureFeature.IsSpecified)
         {

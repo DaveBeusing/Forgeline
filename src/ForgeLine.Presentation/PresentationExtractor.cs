@@ -262,7 +262,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     context, _extraction, interaction.HoveredEntity),
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
                 _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction) : null,
-                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience, cargoFleet) : null) { DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
+                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience, cargoFleet) : null) { Conveyors = CaptureConveyors(context), DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
                     SelectedOrders = _extraction is null || interaction.SelectedEntities.Count == 0
                         ? null
                         : SelectedUnitOrderSnapshotFactory.Capture(context, _extraction, interaction.SelectedEntities),
@@ -272,6 +272,18 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                         interaction.HoverSessionId == _extraction.Scenario.Simulation.SessionId
                             ? interaction.HoveredEntity : default) });
         _previousCombatGroups = combatGroups;
+    }
+
+    private ConveyorConstructionReadModel? CaptureConveyors(SimulationContext context)
+    {
+        if (_extraction is null) return null;
+        var request=_extraction.Interaction.CaptureConveyorRequest();
+        var service=_extraction.Scenario.Services.Conveyors;
+        ConveyorPlan? plan=request is {} r && r.Issuer==_extraction.Player?
+            service.Preview(context.Entities,_extraction.Player,r.Request,_extraction.Side.CommandCore):null;
+        double available=context.Entities.TryGetComponent(_extraction.Side.CommandCore,out InventoryStorage storage)?
+            _extraction.Scenario.Inventories.GetAvailableQuantity(storage.InventoryId,ResourceIds.Steel):0;
+        return new(request?.Id??0,context.Tick,plan,available,ConveyorConstructionService.Capture(context.Entities,_extraction.Player),ConveyorConstructionService.CapturePorts(context.Entities,_extraction.Player));
     }
 
     private RenderInstance[] CaptureRenderInstances(
@@ -307,6 +319,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 fordOperational |= identity.Kind == InfrastructurePresentationKind.Ford;
             }
         }
+        var conveyorStates=_extraction is null?new Dictionary<EntityId,ConveyorLinkStatus>():
+            ConveyorConstructionService.Capture(entities,_extraction.Player).ToDictionary(p=>p.Entity,p=>p.Status);
         foreach (EntityId entity in entities.Query<
                      WorldTransform,
                      VisualIdentity>(
@@ -393,6 +407,16 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     renderTransform = _crossingLayout.GroundTruck(renderTransform, unitFeature.Unit == UnitIds.CargoTruck,
                         bridgeOperational, fordOperational);
             }
+            ConveyorFeaturePresentationMetadata conveyor=default;
+            if (entities.TryGetComponent(entity,out ConveyorPiece piece))
+            {
+                string state=piece.Placement.IsSupport || piece.Placement.Module==ConveyorModule.Endcap?"structural_intact":"idle_no_input";
+                if(conveyorStates.TryGetValue(entity,out ConveyorLinkStatus link))state=ConveyorFeaturePresentationMetadata.Surface(link);
+                if (entities.TryGetComponent(entity,out HealthState health) && health.Fraction<.7)
+                    state=health.IsDepleted?"destroyed":health.Fraction<.25?"critical":"damaged";
+                conveyor=new(piece.Placement,state);
+                renderTransform=new(piece.Placement.Pivot,piece.Placement.Rotation,new Vector3(18));
+            }
             baseInstances[baseIndex++] =
                 new RenderInstance(
                     entity,
@@ -407,6 +431,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     unitFeature,
                     buildingFeature,
                     infrastructureFeature,
+                    ConveyorFeature: conveyor,
                     MechanicalPose: unitFeature.IsSpecified || buildingFeature.IsSpecified
                         ? _mechanicalHistory.Capture(entity, transform.Position, transform.Rotation,
                             unitFeature.IsSpecified && !unitFeature.IsWreck || buildingFeature.State == BuildingPresentationState.Operational,

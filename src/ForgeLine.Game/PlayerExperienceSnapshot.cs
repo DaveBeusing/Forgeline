@@ -72,7 +72,8 @@ public enum PlayerSelectionKind : byte
     Unit = 1,
     Building = 2,
     Construction = 3,
-    Mixed = 4
+    Mixed = 4,
+    Infrastructure = 5
 }
 
 public enum PlayerWorkKind : byte
@@ -663,6 +664,8 @@ public static class PlayerExperienceSnapshotFactory
                 commonBuildingId,
                 units,
                 buildings);
+        if(ownedCount==1 && entities.TryGetComponent(primary,out ConveyorPiece conveyor))
+            displayName="Conveyor / "+ConveyorGeometry.Slug(conveyor.Placement.Module);
         bool hasSingleEntityDetails =
             ownedCount == 1;
 
@@ -964,6 +967,7 @@ public static class PlayerExperienceSnapshotFactory
         EntityRegistry entities,
         EntityId entity)
     {
+        if (entities.HasComponent<ConveyorPiece>(entity)) return PlayerSelectionKind.Infrastructure;
         if (entities.HasComponent<ConstructionSite>(entity))
         {
             return PlayerSelectionKind.Construction;

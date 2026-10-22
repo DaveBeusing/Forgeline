@@ -56,6 +56,11 @@ public sealed class PresentationInteractionState
     private EntityId _hoveredEntity;
     private SimulationSessionId _hoverSessionId;
     private bool _operationsOpen;
+    private ConveyorPreviewRequest? _conveyorRequest;
+    public void SetConveyorRequest(ConveyorPreviewRequest? request)
+    { lock (_gate) _conveyorRequest=request; }
+    public ConveyorPreviewRequest? CaptureConveyorRequest()
+    { lock (_gate) return _conveyorRequest; }
 
     public void SetOperationsOpen(bool open)
     {

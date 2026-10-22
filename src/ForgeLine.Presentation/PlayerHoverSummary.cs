@@ -12,7 +12,8 @@ public enum PlayerHoverCategory : byte
     Building,
     Construction,
     Deposit,
-    IdentifiedContact
+    IdentifiedContact,
+    Conveyor
 }
 
 // Facts are authorized before publication. Unavailable numeric facts are nullable.
@@ -45,6 +46,16 @@ internal static class PlayerHoverSummaryFactory
         bool owned = entities.TryGetComponent(entity, out ControllableEntity control) &&
             control.Owner == extraction.Player;
 
+        if (owned && entities.TryGetComponent(entity,out ConveyorPiece conveyor))
+        {
+            var detail=PlayerExperienceSnapshotFactory.CaptureSelection(entities,extraction.Player,new[]{entity},
+                scenario.Inventories,scenario.Production,scenario.UnitProduction,
+                scenario.Services.UnitDefinitions,scenario.Services.BuildingDefinitions);
+            return new(entity,scenario.Simulation.SessionId,context.Tick,PlayerHoverCategory.Conveyor,
+                "Conveyor / "+ConveyorGeometry.Slug(conveyor.Placement.Module),RtsUiIcon.CommandBuild,detail,
+                ExtractionState:ConveyorConstructionService.Capture(entities,extraction.Player).First(p=>p.Entity==entity).Status.ToString(),
+                Requirement:"BUILD MENU: CONVEYOR; V CYCLES BUILD / REMOVE / REPLACE / REPAIR. LOCAL TRANSPORT SIMULATION IS NOT ENABLED BY CONSTRUCTION.");
+        }
         if (owned)
         {
             var details = PlayerExperienceSnapshotFactory.CaptureSelection(entities, extraction.Player,

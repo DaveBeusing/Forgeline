@@ -351,6 +351,7 @@ public static class RtsUiIconCatalog
         };
 
     public static RtsUiIcon ResolveBuildingRole(BuildingId building) =>
+        building.Value>=ConveyorGeometry.MenuBase ? RtsUiIcon.CommandBuild :
         building switch
         {
             var id when id == BuildingIds.CommandCore || id == BuildingIds.Radar =>

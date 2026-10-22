@@ -20,6 +20,12 @@ No tests or gameplay/camera smokes were executed for this material delivery.
 
 ## Original design contract
 
+Paid construction, path previews, edits and the limited explicit building-port
+content are now connected to the client and simulation; see
+[Construction and UX](../../../../../docs/ConveyorConstructionPlacementAndUX.md).
+This does not enable conveyor resource flow. Manual interaction, camera and
+save/replay acceptance remains pending.
+
 `conveyor-kit.v1.json` is the **editable preproduction design contract**. It is
 separate from the real model/asset definitions beside it and is not a playable
 conveyor feature.
