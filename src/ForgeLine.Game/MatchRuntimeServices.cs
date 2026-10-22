@@ -21,6 +21,7 @@ public sealed class MatchRuntimeServices
         BuildingPlacementService buildingPlacement,
         BuildingCommandProcessingSystem buildingCommands,
         BuildingConstructionSystem buildingConstruction,
+        BuildingDemolitionSystem demolition,
         UnitProductionSystem unitProduction,
         TechnologyResearchSystem technologyResearch,
         GroundMovementSystem groundMovement,
@@ -51,6 +52,7 @@ public sealed class MatchRuntimeServices
         BuildingPlacement = buildingPlacement;
         BuildingCommands = buildingCommands;
         BuildingConstruction = buildingConstruction;
+        Demolition = demolition;
         UnitProduction = unitProduction;
         TechnologyResearch =
             technologyResearch ??
@@ -95,6 +97,8 @@ public sealed class MatchRuntimeServices
     public BuildingCommandProcessingSystem BuildingCommands { get; }
 
     public BuildingConstructionSystem BuildingConstruction { get; }
+
+    public BuildingDemolitionSystem Demolition { get; }
 
     public UnitProductionSystem UnitProduction { get; }
 
