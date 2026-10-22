@@ -40,6 +40,25 @@ public sealed class OperationsActionGuidanceTests
         Assert.Equal("OPEN LOGISTICS", OperationsActionGuidance.NextAction(advice.PrimaryReason));
     }
 
+    [Fact]
+    public void ProductionFailureDoesNotEraseAnIndependentTransportLifecycle()
+    {
+        var selected = new EntityId(12, 3);
+        var diagnosis = new OperationsDiagnosisSnapshot(new(1), new(7), new(1),
+        [
+            Row(selected, OperationsDiagnosisReason.NoInput, OperationsDiagnosisSubject.Production, "NoInput"),
+            Row(selected, OperationsDiagnosisReason.None, OperationsDiagnosisSubject.StockPolicy, "Waiting"),
+            Row(selected, OperationsDiagnosisReason.None, OperationsDiagnosisSubject.TransportRequest, "InTransit")
+        ]);
+        Assert.Equal(OperationsDiagnosisSubject.Production,
+            OperationsActionGuidance.ForEntity(diagnosis, selected)!.Value.Subject);
+        var transport = Assert.IsType<OperationsDiagnosisRow>(
+            OperationsActionGuidance.TransportForEntity(diagnosis, selected));
+        Assert.Equal(OperationsDiagnosisSubject.TransportRequest, transport.Subject);
+        Assert.Equal("InTransit", transport.Status);
+        Assert.Null(OperationsActionGuidance.TransportForEntity(diagnosis, new(12, 4)));
+    }
+
     [Theory]
     [InlineData(OperationsDiagnosisReason.NoPower, "CHECK POWER")]
     [InlineData(OperationsDiagnosisReason.NoSourceStock, "CHECK SOURCE STOCK")]
