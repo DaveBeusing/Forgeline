@@ -130,6 +130,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
 
     public SimulationPhase Phase => SimulationPhase.AiDecisions;
 
+    public bool Matches(SimulationCoordinator simulation) => ReferenceEquals(_simulation, simulation);
+
     public IReadOnlyList<OperationsRuleReadModel> Capture(PlayerId owner)
     {
         var rows = new List<OperationsRuleReadModel>();
