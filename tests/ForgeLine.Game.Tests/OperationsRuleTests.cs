@@ -141,7 +141,7 @@ public sealed class OperationsRuleTests
         Assert.Equal(1, paused.ActionCount);
 
         Assert.True(scenario.Inventories.Remove(output, ResourceIds.Steel, 10).Succeeded);
-        scenario.Simulation.RunTicks(25);
+        scenario.Simulation.AdvanceOneTick();
         var recovered = Assert.Single(scenario.OperationsRules.Capture(Owner));
         Assert.False(recovered.ManagedProductionRequest.IsValid);
         Assert.Equal(2, recovered.ActionCount);
@@ -181,8 +181,8 @@ public sealed class OperationsRuleTests
         var definition = InputRule(scenario.GetBase(Owner).CommandCore);
         var command = new OperationsRuleCommand(scenario.OperationsRules,
             OperationsRuleOperation.Upsert, definition, 0, true, SimulationTick.Zero);
-        var envelope = new SimulationCommandEnvelope(command, new SimulationTick(1),
-            new SimulationCommandSource(Owner.Value), 1);
+        var envelope = new SimulationCommandEnvelope(new SimulationTick(1), 1,
+            new SimulationCommandSource(Owner.Value), command);
         Assert.True(ReplayCommandCodec.TryEncode(envelope, out var encoded));
         Assert.NotNull(encoded);
         Assert.Equal(ReplayCommandKind.OperationsRule, encoded.Kind);
