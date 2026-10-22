@@ -35,3 +35,16 @@ A group status is informational and must not become a material-transfer trigger.
 - Validation: focused Game and Presentation tests before full Release build, Microsoft.Testing.Platform solution test suite and required `build-test`, Movement quality, scalability, save/replay and natural terminal-match gates
 
 The system's goal is deliberate, physically believable pacing; it does not promise that two independent cargo trucks share a single hierarchical-navigation computation. Performance measurements must distinguish convoy coordination overhead from existing per-truck pathfinding and may not count route reuse that did not occur.
+
+
+## Reproducible 10/50/100 performance qualification
+
+`CargoConvoyBenchmarks` isolates one temporary convoy containing equal numbers of 10, 50 or 100 synthetic pre-routed trucks and ground escorts. It benchmarks twenty 20 Hz coordination ticks and a bounded owner-filtered capture. Each source fixture uses a real generation-aware entity, a real LogisticsNetwork route and the production command/convoy systems. Physical transfer, navigation path search, fuel consumption and bay occupancy are **not executed** in this isolated fixture; the existing CargoTransport, Formation and navigation benchmarks cover those domains independently.
+
+Run on the configured SDK and Release build:
+
+```powershell
+dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release -- --filter '*CargoConvoyBenchmarks*'
+```
+
+Record wall time, allocated bytes, hardware, scenario parameters and comparative cargo/movement baselines before proposing a performance threshold. No measured throughput, frame-time target or shared-path speedup is claimed solely because the benchmark source compiles.
