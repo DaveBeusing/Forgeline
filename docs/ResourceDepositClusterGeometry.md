@@ -5,6 +5,11 @@ canonical resource shapes with modular geological clusters. Existing resource,
 High/Reduced mesh, material and symbol IDs are retained. No renderer, field-spawn,
 simulation, navigation, texture or material-source changes are included.
 
+Final integration base: `8e2935abaa8486b2b72125ac7354ac729381de3f` (0.1.453,
+conveyor flow integration). The branch contains that master unchanged and prepares
+exactly one net PATCH increment to 0.1.454. No build or test was started after this
+integration either.
+
 ## Frozen geometry naming and morphology
 
 `assets/source/world/authoring/resource_clusters/variants.json` owns the geometry
