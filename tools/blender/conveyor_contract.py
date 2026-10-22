@@ -44,6 +44,7 @@ EXPECTED_PORTS = {
 MANDATORY_STATES = {
     "flowing", "idle_no_input", "disconnected", "congested",
     "blocked", "unpowered", "damaged", "critical", "destroyed",
+    "structural_intact",
 }
 
 
@@ -104,6 +105,8 @@ def validate(kit: dict) -> None:
              len(set(slugs)) == len(slugs) and len(set(identities)) == len(identities),
              "V1 module catalog is incomplete or has duplicated identity")
 
+    known_states = set(names)
+    all_variants = []
     for module in modules:
         slug = module["slug"]
         _require(module["assetId"].startswith("infrastructure.directorate.conveyor."),
@@ -116,6 +119,21 @@ def validate(kit: dict) -> None:
         _require(module["role"] in EXPECTED_PORTS, f"{slug}: unsupported function")
         _require(all(math.isfinite(x) and x > 0 for x in module["footprintMeters"]),
                  f"{slug}: nonpositive footprint")
+        variants = module["variants"]
+        variant_states = [variant["state"] for variant in variants]
+        expected_variants = (
+            {"structural_intact", "damaged", "critical", "destroyed"}
+            if module["role"] in ("structure", "closure")
+            else known_states - {"structural_intact"}
+        )
+        _require(set(variant_states) == expected_variants and
+                 len(variants) == len(expected_variants),
+                 f"{slug}: required state variants are missing or duplicated")
+        for variant in variants:
+            _require(variant["assetId"] == module["assetId"] + "." + variant["state"] and
+                     variant["runtimeStatus"] == "not_compiled",
+                     f"{slug}: state asset identity or non-runtime status invalid")
+            all_variants.append(variant["assetId"])
         ports = module["ports"]
         counts = tuple(sum(p["kind"] == kind for p in ports)
                        for kind in ("input", "output", "cap"))
@@ -138,6 +156,8 @@ def validate(kit: dict) -> None:
             _require(abs(point[1] - expected_y) <= 1e-7,
                      f"{slug}: port Y does not match elevation tier")
 
+    _require(len(all_variants) == len(set(all_variants)),
+             "Variant asset identifiers must remain globally unique")
     curve = module_by_slug(kit, "conveyor_curve_90")
     _require(curve["radiusMeters"] == 4 and
              set(curve["handednessVariants"]) == {"left", "right"},
