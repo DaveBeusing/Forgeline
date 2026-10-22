@@ -326,6 +326,32 @@ public sealed class OperationsTests
     }
 
     [Fact]
+    public void ReplacedFacilityGenerationCannotAcquireHeldRowPress()
+    {
+        var oldEntity = new EntityId(3, 2);
+        var replacement = new EntityId(3, 3);
+        var oldData = new OperationsSnapshot(new(1), new(4), new(1), [Facility(oldEntity)], [], [], 1, 0);
+        var newData = new OperationsSnapshot(new(1), new(4), new(1), [Facility(replacement)], [], [], 1, 0);
+        var oldSnapshot = Snapshot(oldData);
+        var newSnapshot = Snapshot(newData);
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var controller = new OperationsController();
+        controller.Update(input, oldSnapshot, layout, interaction);
+        controller.OpenCategory(OperationsCategory.All, oldSnapshot.SessionId, interaction);
+        Edge(input, PlatformInputEventKind.MouseButtonDown, OperationsLayout.Control(layout, 3));
+        controller.Update(input, oldSnapshot, layout, interaction);
+        Edge(input, PlatformInputEventKind.MouseButtonUp, OperationsLayout.Control(layout, 3));
+        controller.Update(input, newSnapshot, layout, interaction);
+        Assert.False(controller.View.Selected.IsValid);
+
+        Click(input, OperationsLayout.Control(layout, 3));
+        controller.Update(input, newSnapshot, layout, interaction);
+        Assert.Equal(replacement, controller.View.Selected);
+    }
+
+    [Fact]
     public void ShortClicksSelectAndOpenExistingControlsWithoutSubmittingCommands()
     {
         var entity = new EntityId(3, 2);
