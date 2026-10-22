@@ -14,7 +14,7 @@ public sealed class ResourceDepositField
 
     public IReadOnlyList<ResourceDepositFieldCluster> Clusters { get; }
     public AxisAlignedBounds Bounds { get; }
-    public int Version => 1;
+    public int Version { get; } = 1;
 }
 
 public readonly record struct ResourceDepositFieldCluster(
