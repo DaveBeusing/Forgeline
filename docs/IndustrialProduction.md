@@ -214,3 +214,7 @@ The proposed [Base Conveyor Logistics](BaseConveyorLogistics.md) design enables 
 ## Production and logistics diagnosis
 
 When an owned processing facility is selected, the [Operations Diagnosis](OperationsDiagnosis.md) reports its current production status and proven block reason separately from stock-policy demand and transport progress. A `NoInput` state means the local input is not sufficient; an outstanding request or cargo en route does not count as delivered material. `NoPower`, `Paused` and `OutputFull` retain their authoritative production meanings. The diagnosis is informational and never resumes a request, changes a recipe or transfers inventory.
+
+## Optional operations rules
+
+The opt-in [Operations Rules and Recovery](OperationsAutomation.md) automation can install one missing explicitly configured input stock policy or temporarily pause and resume an output-blocked production request. It uses the existing validated commands, does not bypass physical transport, and yields to manual overrides. Normal production and distribution systems already stop and retry their own work; enabling a rule is not required for normal operation.
