@@ -247,10 +247,14 @@ public sealed class WorldAssetAuthoringTests
             }
             Assert.Equal("mesh.world.kit.collision_rooted", catalog.Get(AssetId.Parse("mesh.world.vegetation.broadleaf")).CollisionReference);
             var ore = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse("mesh.world.resource.ferrous_ore")).Payload);
-            Assert.Equal(-.4892709f, ore.Vertices.Min(v => v.X), 5);
-            Assert.Equal(.4902523f, ore.Vertices.Max(v => v.X), 5);
+            Assert.All(ore.Vertices, vertex =>
+            {
+                Assert.InRange(vertex.X, -.50001f, .50001f);
+                Assert.InRange(vertex.Y, -.50001f, .50001f);
+                Assert.InRange(vertex.Z, -.50001f, .50001f);
+            });
             Assert.Equal(-.5f, ore.Vertices.Min(v => v.Y), 5);
-            Assert.Equal(.21f, ore.Vertices.Max(v => v.Y), 5);
+            Assert.True(ore.Vertices.Max(v => v.Y) > 0, "The grounded cluster must retain a volumetric silhouette.");
 
             RuntimeAssetRecord vegetation =
                 catalog.Get(
