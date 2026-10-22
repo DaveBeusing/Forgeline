@@ -880,6 +880,8 @@ internal static class PlayerActionDockHudModel
                     "THRESHOLDS",
                 PlayerLogisticsActionFailureReason.ResupplyUnavailable =>
                     "NO RESUPPLY",
+                PlayerLogisticsActionFailureReason.InvalidPriority =>
+                    "INVALID PRIORITY",
                 _ =>
                     "ACTION REJECTED"
             };
