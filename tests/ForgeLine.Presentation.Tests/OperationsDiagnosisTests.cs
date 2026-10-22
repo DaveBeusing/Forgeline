@@ -73,8 +73,8 @@ public sealed class OperationsDiagnosisTests
     {
         var noPower = new PlayerProductionFacilityActionReadModel(Facility, default, default,
             ProductionStatus.NoPower, ProductionBlockReason.NoPower, 0, [], []);
-        var noInput = noPower is { } ? new PlayerProductionFacilityActionReadModel(
-            Facility, default, default, ProductionStatus.NoInput, ProductionBlockReason.NoInput, 0, [], []) : null;
+        var noInput = new PlayerProductionFacilityActionReadModel(
+            Facility, default, default, ProductionStatus.NoInput, ProductionBlockReason.NoInput, 0, [], []);
         Assert.Equal(OperationsDiagnosisReason.NoPower,
             Assert.Single(Snapshot(production: noPower).Diagnosis!.Rows).PrimaryReason);
         Assert.Equal(OperationsDiagnosisReason.NoInput,
