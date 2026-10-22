@@ -338,7 +338,9 @@ internal sealed class ClientApplication
                 artilleryWeapons:
                     scenario.Services.ArtilleryWeapons,
                 technologies:
-                    scenario.Services.TechnologyDefinitions);
+                    scenario.Services.TechnologyDefinitions,
+                demolition:
+                    scenario.Services.Demolition);
         var presentationExtraction =
             new PresentationExtractionContext(
                 scenario,
@@ -1533,6 +1535,26 @@ internal sealed class ClientApplication
 
                 presentationInteraction.SetSelection(
                     selectionController.Selection.Entities);
+
+                // Building rings do not own Delete. Dialogs, key rebinding,
+                // placement, targeting and inactive game states do.
+                if (inputState.WasKeyPressed(_gameplayBindings.Key(GameplayAction.Demolish)) &&
+                    !simulationPaused && !modalFrame &&
+                    window.IsFocused && !window.IsMinimized &&
+                    !buildingPlacementController.IsActive &&
+                    !tacticalTargetingController.IsActive)
+                {
+                    EntityId[] demolitionTargets = selectionController.Selection.Entities.ToArray();
+                    if (demolitionTargets.Length > 0)
+                    {
+                        SimulationTick observedTick =
+                            currentSnapshot?.Tick ?? SimulationTick.Zero;
+                        RequireSubmission(
+                            simulationHost,
+                            gateway => gateway.SubmitDemolition(
+                                LocalPlayer, demolitionTargets, observedTick));
+                    }
+                }
 
                 if (buildingPlacementController.TryTakePlacementRequest(
                         out BuildingPlacementRequest placementRequest))
