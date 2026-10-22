@@ -10,6 +10,7 @@ public sealed class SelectedUnitOrderOverlay
     public const float LineAlpha = 0.22f;
     public const int MaximumTargets = 1024;
     private readonly HashSet<Vector3> _targets = [];
+    private readonly List<Vector3> _orderedTargets = [];
 
     public int LastConnectionCount { get; private set; }
     public int LastUniqueTargetCount { get; private set; }
@@ -31,6 +32,7 @@ public sealed class SelectedUnitOrderOverlay
         ArgumentNullException.ThrowIfNull(camera);
         LastConnectionCount = LastUniqueTargetCount = 0;
         _targets.Clear();
+        _orderedTargets.Clear();
         draw.Clear();
 
         SelectedUnitOrderSnapshot? orders = world.CurrentSnapshot?.SelectedOrders;
@@ -64,14 +66,24 @@ public sealed class SelectedUnitOrderOverlay
             // Several formation members may share one destination. Blend a
             // given pulse once, not once per member.
             if (_targets.Count < MaximumTargets && _targets.Add(order.Target))
+            {
+                _orderedTargets.Add(order.Target);
                 LastUniqueTargetCount++;
+            }
         }
 
         float pulse = reducedMotion ? 0.0f :
             MathF.Sin((float)(presentationTime.TotalSeconds * (MathF.Tau / 1.2)));
         float radius = metersPerPixel * (3.0f + pulse * 0.45f);
         Vector4 dot = stroke with { W = reducedMotion ? 0.65f : 0.60f + 0.10f * pulse };
-        foreach (Vector3 target in _targets)
+        _orderedTargets.Sort(static (a, b) =>
+        {
+            int first = a.X.CompareTo(b.X);
+            if (first != 0) return first;
+            int second = a.Z.CompareTo(b.Z);
+            return second != 0 ? second : a.Y.CompareTo(b.Y);
+        });
+        foreach (Vector3 target in _orderedTargets)
         {
             // Seven closely spaced horizontal chords form a compact,
             // approximately filled target disc without a per-target draw.
