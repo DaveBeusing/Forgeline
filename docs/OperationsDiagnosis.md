@@ -37,6 +37,8 @@ Select an owned building or Cargo Truck. Inspect its existing production/logisti
 
 The optional onboarding card uses this same current, owned diagnosis when no more specific production or logistics feedback is already available. Opening a facility or existing controls only changes presentation focus; no command is issued, shipment confirmed, automatic retry started or alert fabricated. No new panel, chart, notification or control is introduced here.
 
+Operations clicks now require a matching press and release within the same control, including across separate frames. Held gestures are canceled on resize, session changes, modal capture or focus loss. Facility-row presses bind to the reported generation-aware entity: if the row changes before release, that press cannot select its replacement. Disabled existing-control entries consume input without navigating. This does not alter the separately managed radial-menu command gesture contract.
+
 The current player readmodel exposes only the selected entity and its authorized request endpoints. It does not provide a whole-base dependency graph, power-network accounting for the selected row, or guaranteed availability of source-side inventory. These remain explicitly unobserved rather than being inferred. Source, truck or destination entity IDs must be revalidated at command dispatch; diagnosis is not a dispatch permission.
 
 ## Validation
