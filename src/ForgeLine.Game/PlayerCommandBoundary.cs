@@ -26,7 +26,8 @@ public enum PlayerCommandKind : byte
     Tactical = 8,
     Artillery = 9,
     Surrender = 10,
-    Technology = 11
+    Technology = 11,
+    Demolition = 12
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -59,7 +60,8 @@ public readonly record struct PlayerCommandResultReadModel(
     PlayerLogisticsActionFailureReason ActionFailure =
         PlayerLogisticsActionFailureReason.None,
     PlayerTacticalActionFailureReason TacticalFailure =
-        PlayerTacticalActionFailureReason.None);
+        PlayerTacticalActionFailureReason.None,
+    BuildingDemolitionTargetResult[]? DemolitionTargets = null);
 
 public sealed class PlayerCommandResultBuffer
 {
@@ -122,6 +124,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
 {
     private readonly SimulationCoordinator _simulation;
     private readonly BuildingCommandProcessingSystem _buildingCommands;
+    private readonly BuildingDemolitionSystem? _demolition;
     private readonly EntityId _matchStateEntity;
     private readonly PlayerCommandResultBuffer _results;
     private readonly List<PendingCommand> _pending = new();
@@ -140,7 +143,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         FactionIntelligenceStore? intelligence = null,
         WeaponCatalog? weapons = null,
         ArtilleryWeaponCatalog? artilleryWeapons = null,
-        TechnologyDefinitionCatalog? technologies = null)
+        TechnologyDefinitionCatalog? technologies = null,
+        BuildingDemolitionSystem? demolition = null)
     {
         _simulation =
             simulation ??
@@ -148,6 +152,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         _buildingCommands =
             buildingCommands ??
             throw new ArgumentNullException(nameof(buildingCommands));
+        _demolition = demolition;
 
         if (!matchStateEntity.IsValid)
         {
@@ -280,6 +285,29 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+
+    public PlayerCommandSubmissionReceipt SubmitDemolition(
+        PlayerId issuer,
+        IReadOnlyList<EntityId> targets,
+        SimulationTick observedTick)
+    {
+        if (_demolition is null)
+            throw new InvalidOperationException("Building demolition is unavailable in this session.");
+        if (!TryBeginSubmission(
+                PlayerCommandKind.Demolition,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+            return rejected;
+
+        var command = new DemolishBuildingsCommand(issuer, targets, observedTick, correlation);
+        SimulationCommandEnvelope envelope = _simulation.SubmitCommand(command, targetTick, source);
+        _pending.Add(PendingCommand.ForDemolition(correlation, envelope, command));
+        return AcceptedReceipt(correlation, PlayerCommandKind.Demolition, source, observedTick, envelope);
+    }
 
     public PlayerCommandSubmissionReceipt SubmitProduction(
         PlayerId issuer,
@@ -1223,6 +1251,24 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     buildResult.ResolvedAtTick);
             }
 
+            case PlayerCommandKind.Demolition:
+            {
+                if (_demolition is null || !_demolition.TryTakeResult(
+                        pending.CorrelationId, out BuildingDemolitionBatchResult demolition))
+                    return null;
+                return new PlayerCommandResultReadModel(
+                    SessionId,
+                    pending.CorrelationId,
+                    pending.Kind,
+                    ResolveState(demolition.AcceptedTargets, demolition.RejectedTargets),
+                    demolition.AcceptedTargets,
+                    demolition.RejectedTargets,
+                    BuildCommandRejectionReason.None,
+                    BuildingPlacementFailureReason.None,
+                    demolition.ResolvedAtTick,
+                    DemolitionTargets: demolition.Targets);
+            }
+
             case PlayerCommandKind.Production:
             {
                 PlayerProductionActionCommand command =
@@ -1491,7 +1537,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             {
                 PlayerCommandKind.Movement =>
                     PlayerCommandFeedbackKind.Movement,
-                PlayerCommandKind.Construction =>
+                PlayerCommandKind.Construction or PlayerCommandKind.Demolition =>
                     PlayerCommandFeedbackKind.Construction,
                 PlayerCommandKind.Production =>
                     PlayerCommandFeedbackKind.Production,
@@ -1533,8 +1579,26 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         PlayerTacticalActionCommand? TacticalCommand,
         PlayerCommandResultReadModel? Result,
         SurrenderCommand? SurrenderCommand = null,
-        PlayerTechnologyActionCommand? TechnologyCommand = null)
+        PlayerTechnologyActionCommand? TechnologyCommand = null,
+        DemolishBuildingsCommand? DemolitionCommand = null)
     {
+        public static PendingCommand ForDemolition(
+            PlayerCommandCorrelationId correlation,
+            in SimulationCommandEnvelope envelope,
+            DemolishBuildingsCommand command) =>
+            new(
+                correlation,
+                PlayerCommandKind.Demolition,
+                envelope,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                DemolitionCommand: command);
+
         public static PendingCommand ForMovement(
             PlayerCommandCorrelationId correlation,
             in SimulationCommandEnvelope envelope,
