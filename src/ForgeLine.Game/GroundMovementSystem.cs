@@ -229,6 +229,23 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             return;
         }
 
+        if (entities.TryGetComponent(entity, out CargoConvoyMotionConstraint convoyHold) &&
+            convoyHold.Hold)
+        {
+            var waiting = state with
+            {
+                Velocity = Vector3.Zero,
+                Status = GroundMovementStatus.TacticallyPaused,
+                ObservedOrderTick = order.AcceptedAtTick,
+                PreviousDistanceToTarget = distanceToTarget,
+                StalledTicks = 0
+            };
+            entities.SetComponent(entity, waiting);
+            AddDebugAgent(entity, position, waiting, movement, order.WorldTarget,
+                hasTarget: true);
+            return;
+        }
+
         if (entities.TryGetComponent(
                 entity,
                 out SuppressionMovementConstraint suppressionConstraint) &&
@@ -392,6 +409,9 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
                 maximumSpeed,
                 formationConstraint.MaximumSpeed);
         }
+
+        if (entities.TryGetComponent(entity, out CargoConvoyMotionConstraint convoyPacing))
+            maximumSpeed = MathF.Min(maximumSpeed, convoyPacing.MaximumSpeed);
 
         float desiredSpeed = MathF.Min(
             maximumSpeed,
