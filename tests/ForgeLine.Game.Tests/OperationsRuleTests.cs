@@ -231,6 +231,9 @@ public sealed class OperationsRuleTests
         e.AddComponent(facility, new ControllableEntity(owner, ControllableEntityCategory.Building));
         e.AddComponent(facility, new ProductionFacility(input, output,
             ProductionCapability.SteelProcessing, SimulationTick.Zero));
+        e.AddComponent(facility, new PowerNetworkMembership(new PowerNetworkId(100_000)));
+        e.AddComponent(facility, new PowerGenerator(100.0));
+        e.AddComponent(facility, new PowerConsumer(1.0, PowerPriority.Industrial, enabled: true));
         return facility;
     }
 
