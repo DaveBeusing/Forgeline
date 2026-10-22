@@ -397,6 +397,10 @@ public static class ReplayCommandCodec
                             command.Target,
                         SecondaryEntity =
                             command.PolicyEntity,
+                        Entities =
+                            command.Operation == PlayerLogisticsActionOperation.CreateCargoConvoy
+                                ? [.. command.ConvoyTrucks.ToArray(), .. command.ConvoyEscorts.ToArray()]
+                                : [],
                         ResourceId =
                             command.ResourceId,
                         LogisticsOperation =
@@ -413,7 +417,8 @@ public static class ReplayCommandCodec
                             command.DesiredTarget,
                         Value3 =
                             command.DesiredMaximum,
-                        IntValue = 0,
+                        IntValue = command.Operation == PlayerLogisticsActionOperation.CreateCargoConvoy
+                            ? command.ConvoyTrucks.Length : 0,
                         CorrelationId = 0,
                         PreserveCombatIntent = false,
                         Position = default
@@ -744,10 +749,34 @@ public static class ReplayCommandCodec
                     command.SupplyPriority,
                     submittedAtTick),
 
+            PlayerLogisticsActionOperation.CreateCargoConvoy =>
+                DecodeCargoConvoy(command, submittedAtTick),
+
+            PlayerLogisticsActionOperation.DissolveCargoConvoy =>
+                PlayerLogisticsActionCommand.DissolveCargoConvoy(
+                    command.Issuer, command.TargetEntity, submittedAtTick),
+
             _ =>
                 throw new InvalidDataException(
                     $"Logistics replay operation '{command.LogisticsOperation}' is invalid.")
         };
+
+    private static PlayerLogisticsActionCommand DecodeCargoConvoy(
+        RecordedSimulationCommand command,
+        SimulationTick submittedAtTick)
+    {
+        if (command.Entities is null || command.IntValue < 0 ||
+            command.IntValue > command.Entities.Length)
+        {
+            throw new InvalidDataException("Convoy replay member boundary is invalid.");
+        }
+
+        return PlayerLogisticsActionCommand.CreateCargoConvoy(
+            command.Issuer,
+            command.Entities.AsSpan(0, command.IntValue),
+            command.Entities.AsSpan(command.IntValue),
+            submittedAtTick);
+    }
 
     private static PlayerTacticalActionCommand DecodeTactical(
         RecordedSimulationCommand command,
