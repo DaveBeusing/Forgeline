@@ -18,6 +18,32 @@ When an owned logistics building or assigned vehicle is selected or hovered, the
 
 All requirements and explanatory cost lists come from the active recipe/unit catalog. A changed catalog updates the preview; there is no fixed Scout cost table in help. Additional steps range from 1 to 100. A preview includes current reservations (still physically stored until consumption) and outstanding demand, without adding assigned loads twice. It rejects a proposal whose combined projected occupancy exceeds shared storage. Free space is not allocated independently to every material. Existing stock unrelated to the recipe also occupies storage; consume or move it before retrying a rejected proposal.
 
+## Manual quantity editing
+
+Opening LOGISTICS for a resource without a saved stock policy prepares a local
+MIN 50 / TARGET 100 / MAX 150 draft. The draft is not saved and does not place
+an order until APPLY POLICY is submitted and accepted. If a known shared total
+inventory capacity is 100–149, the default is 50/100/100; at 50–99 it is
+50/50/50. Below 50 there is no valid new manual draft. An unspecified capacity
+does not mean the inventory has zero physical space.
+
+Choose the field with FIELD and use the existing increase/decrease controls
+(or their configured keys). Manual threshold edits land on exact 50-unit
+boundaries. Existing saved values, including zero and values such as 75,
+remain unchanged until that particular field is edited. Editing never silently
+changes another threshold. MIN must be no greater than TARGET, and TARGET no
+greater than MAX. If an increase is blocked, raise the next threshold first
+(for example, raise MAX before TARGET). When a decrease is blocked, lower the
+previous threshold first. An unavailable step is shown disabled with a reason.
+The total inventory capacity also restricts increasing MAX; the editor never
+substitutes an incomplete step such as 25.
+
+INPUTS continues to derive actual recipe materials and its additional production
+steps remain 1–100 in single steps, independent of the manual quantity grid.
+ORDER entries remain read-only. Requested, reserved, loaded and delivered cargo
+are real quantities selected by the logistics simulation and need not be
+multiples of 50. No editor change itself guarantees a delivery.
+
 ## Policy meanings
 
 - MIN triggers replenishment when stock plus outstanding requests falls below it.
