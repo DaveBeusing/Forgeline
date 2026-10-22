@@ -112,6 +112,7 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
     }
 
     private readonly SimulationCoordinator _simulation;
+    private readonly EntityId _matchStateEntity;
     private readonly InventoryStore _inventories;
     private readonly ProductionRecipeCatalog _recipes;
     private readonly List<Entry> _entries = [];
@@ -120,11 +121,13 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
 
     public OperationsRuleSystem(
         SimulationCoordinator simulation, InventoryStore inventories,
-        ProductionRecipeCatalog recipes)
+        ProductionRecipeCatalog recipes, EntityId matchStateEntity)
     {
         _simulation = simulation ?? throw new ArgumentNullException(nameof(simulation));
         _inventories = inventories ?? throw new ArgumentNullException(nameof(inventories));
         _recipes = recipes ?? throw new ArgumentNullException(nameof(recipes));
+        if (!matchStateEntity.IsValid) throw new ArgumentOutOfRangeException(nameof(matchStateEntity));
+        _matchStateEntity = matchStateEntity;
         _simulation.CommandSubmitted += OnCommandSubmitted;
     }
 
@@ -147,7 +150,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
         SimulationContext context, OperationsRuleOperation operation,
         OperationsRuleDefinition definition, uint expectedRevision, bool enabled)
     {
-        if (!definition.Owner.IsSpecified || definition.Id == 0 || !Enum.IsDefined(operation))
+        if (!MatchRunning(context.Entities) || !definition.Owner.IsSpecified ||
+            definition.Id == 0 || !Enum.IsDefined(operation))
             return OperationsRuleResult.InvalidDefinition;
 
         int index = _entries.FindIndex(e => e.Definition.Owner == definition.Owner &&
@@ -214,6 +218,10 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
         return OperationsRuleResult.Applied;
     }
 
+    private bool MatchRunning(EntityRegistry entities) =>
+        entities.TryGetComponent(_matchStateEntity, out MatchState state) &&
+        state.Lifecycle == MatchLifecyclePhase.Running;
+
     private static bool ValidDefinition(in OperationsRuleDefinition d) =>
         d.Facility.IsValid && d.CooldownTicks is >= 5 and <= 10_000 &&
         Enum.IsDefined(d.Template) && Enum.IsDefined(d.Priority) &&
@@ -256,6 +264,7 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
             _manualPauses.RemoveAt(i);
         }
 
+        if (!MatchRunning(context.Entities)) return;
         int evaluated = 0;
         foreach (Entry entry in _entries)
         {
