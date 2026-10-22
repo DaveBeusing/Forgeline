@@ -66,6 +66,10 @@ tools/blender/fixtures/tank_finish_sources.json text eol=lf
 
 assets/source/infrastructure/directorate/authoring/*.blend binary
 assets/source/infrastructure/directorate/sources/blender/*.glb binary
+
+# Portable resource material masters and byte-hashed procedural recipes.
+assets/source/world/authoring/resource_surfaces/*.blend binary
+assets/source/world/authoring/resource_surfaces/recipes.json -text -whitespace
 tools/blender/fixtures/infrastructure*.json text eol=lf
 docs/qualification/infrastructure/*.json text eol=lf
 docs/qualification/infrastructure/*.json.gz binary

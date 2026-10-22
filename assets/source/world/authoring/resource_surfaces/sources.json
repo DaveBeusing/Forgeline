@@ -1,0 +1,139 @@
+{
+  "blenderVersion": "5.2.2",
+  "families": [
+    {
+      "family": "ferrous_ore",
+      "layers": {
+        "base": {
+          "bytes": 1110313,
+          "path": "world/textures/resources/ferrous_ore_base.png",
+          "sha256": "ef82bed1774b9cc7893ac9dbccecab3e189e822a5f36556707ac37b44c1798ff"
+        },
+        "height": {
+          "bytes": 501482,
+          "path": "world/authoring/resource_surfaces/ferrous_ore_height.png",
+          "sha256": "f5c28cd9a9610b8ddd15488986f301d4f9c7a35b45355a65c82a97b3ac7037e4"
+        },
+        "normal": {
+          "bytes": 605258,
+          "path": "world/textures/resources/ferrous_ore_normal.png",
+          "sha256": "a0f68acdcea5c77c06105bae57b4f5d4ad15167d369bdda57e09a45cb00a3151"
+        },
+        "orm": {
+          "bytes": 927090,
+          "path": "world/textures/resources/ferrous_ore_orm.png",
+          "sha256": "6a5e03a2bf165a173455449d4609d3d5a47eb6abf158e2a7b4ef92930233114f"
+        },
+        "zones": {
+          "bytes": 854405,
+          "path": "world/authoring/resource_surfaces/ferrous_ore_zones.png",
+          "sha256": "6bba60b15797d0d1cff052860b3d637a6009c4dececc80eebddc3ded87b3eee6"
+        }
+      },
+      "nativeSha256": "79f707beb5cb0b8e4e56dfe485c8ce9bd39d64f4fa9ccd71d03740324ae28c72",
+      "nativeSource": "world/authoring/resource_surfaces/ferrous_ore.blend"
+    },
+    {
+      "family": "silicates",
+      "layers": {
+        "base": {
+          "bytes": 1107806,
+          "path": "world/textures/resources/silicates_base.png",
+          "sha256": "a0a757f7855c18586433848e2eeaee63d378a589890ddda017d1d785fe2bb142"
+        },
+        "height": {
+          "bytes": 522401,
+          "path": "world/authoring/resource_surfaces/silicates_height.png",
+          "sha256": "9faddbee304310dc623e663884ec2b11650592116cebf29d1fa0ee31f197913d"
+        },
+        "normal": {
+          "bytes": 647936,
+          "path": "world/textures/resources/silicates_normal.png",
+          "sha256": "c1ecc074af83bc0a20aec2d85e8e66356ab2a1c485ace8f957ffa5abbb512c44"
+        },
+        "orm": {
+          "bytes": 976351,
+          "path": "world/textures/resources/silicates_orm.png",
+          "sha256": "93b7f523c54decf614ca81fdf6b6dc48f3bbf53bf341c27d9cf49ad68a8c4da5"
+        },
+        "zones": {
+          "bytes": 1055531,
+          "path": "world/authoring/resource_surfaces/silicates_zones.png",
+          "sha256": "a5016382ba3fe12bbe2d20e7484d24c7836c1964e108a1384280a2968819ec04"
+        }
+      },
+      "nativeSha256": "cd473152bed6c5beaf7d23bed7bd36753c3d0d43df51565613f9c3b95ec53e2e",
+      "nativeSource": "world/authoring/resource_surfaces/silicates.blend"
+    },
+    {
+      "family": "volatiles",
+      "layers": {
+        "base": {
+          "bytes": 1034716,
+          "path": "world/textures/resources/volatiles_base.png",
+          "sha256": "cdda976a252ec044a465413caef75259e021030f2bff22165d334aa28c423d58"
+        },
+        "height": {
+          "bytes": 486158,
+          "path": "world/authoring/resource_surfaces/volatiles_height.png",
+          "sha256": "3b55722f7bc4c7ca997ed0e8545a582d623093a85e6e7593357bca5004adcc8d"
+        },
+        "normal": {
+          "bytes": 523416,
+          "path": "world/textures/resources/volatiles_normal.png",
+          "sha256": "5e4373e82d395ba50ae342c05b499affce5b7cc665c2d6346a2d050a38543b5c"
+        },
+        "orm": {
+          "bytes": 779651,
+          "path": "world/textures/resources/volatiles_orm.png",
+          "sha256": "5113a415653343f1e9664e6b7243e684c8da719ad7562eb60334c0dd2aa67562"
+        },
+        "zones": {
+          "bytes": 903010,
+          "path": "world/authoring/resource_surfaces/volatiles_zones.png",
+          "sha256": "b0d2000ad76cb3198a0a898c393027ecabd567ac05584a574036e152217ddb60"
+        }
+      },
+      "nativeSha256": "70a1cf3d0b2ce1d2d3320863f72797df4db31f744b6e3d9b59c68abdee182941",
+      "nativeSource": "world/authoring/resource_surfaces/volatiles.blend"
+    },
+    {
+      "family": "rare_elements",
+      "layers": {
+        "base": {
+          "bytes": 1024709,
+          "path": "world/textures/resources/rare_elements_base.png",
+          "sha256": "561a38cd014e21669f734632cc630c86e2e3222169ca5e378e2c2fc49b2fe02f"
+        },
+        "height": {
+          "bytes": 432094,
+          "path": "world/authoring/resource_surfaces/rare_elements_height.png",
+          "sha256": "da54a7760f78e1d7a233dbf8f71e1ced48b0faf5c01e2446a6fe6940f447d7eb"
+        },
+        "normal": {
+          "bytes": 473888,
+          "path": "world/textures/resources/rare_elements_normal.png",
+          "sha256": "249cb59aa2bdb04eab3e83130a4bb83980f602e76b19355b4cf88d85fad914ec"
+        },
+        "orm": {
+          "bytes": 880172,
+          "path": "world/textures/resources/rare_elements_orm.png",
+          "sha256": "296945a99ce1faf25f82ecdf6f77afabb62dfc31dd6b146260fac98c3715da7f"
+        },
+        "zones": {
+          "bytes": 811748,
+          "path": "world/authoring/resource_surfaces/rare_elements_zones.png",
+          "sha256": "25e98a07dd50563b49f8da27215a99f5bb8e8a6c105eb9396d12b93d44af5813"
+        }
+      },
+      "nativeSha256": "948f278916f6d9697a18ae303ac25f827fe61840ffd1773f6859ac50cd147977",
+      "nativeSource": "world/authoring/resource_surfaces/rare_elements.blend"
+    }
+  ],
+  "humanArtApproval": "pending",
+  "numpyVersion": "2.3.4",
+  "recipeSha256": "cae9d08c9f8763c5809cd32d21fd947fbdcd1ccedf3a83f5d7b901e2e6989f5f",
+  "schemaVersion": 1,
+  "status": "authored-not-validated",
+  "validation": "NOT EXECUTED"
+}
