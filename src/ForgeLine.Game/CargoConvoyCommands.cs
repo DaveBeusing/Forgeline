@@ -10,7 +10,6 @@ internal static class CargoConvoyCommands
 {
     public static bool TryCreate(
         SimulationContext context,
-        LogisticsNetwork network,
         PlayerId issuer,
         ReadOnlySpan<EntityId> requestedTrucks,
         ReadOnlySpan<EntityId> requestedEscorts,
@@ -33,8 +32,8 @@ internal static class CargoConvoyCommands
                 context.Entities.HasComponent<CargoConvoyMember>(truck))
                 return false;
             if (!CargoConvoyEligibility.TryGetTruck(
-                    context.Entities, network, issuer, truck, order.Origin,
-                    order.Destination, network.Version, out _))
+                    context.Entities, issuer, truck, order.Origin,
+                    order.Destination, currentRoute.Route.Version, out _))
                 return false;
             trucks.Add(truck);
         }
@@ -73,7 +72,7 @@ internal static class CargoConvoyCommands
         created = context.Entities.CreateEntity();
         context.Entities.AddComponent(created, new CargoConvoyGroup(
             issuer, trucks[0], primary.Origin, primary.Destination,
-            network.Version, CargoConvoyStatus.Rendezvous,
+            leaderRoute.Route!.Version, CargoConvoyStatus.Rendezvous,
             context.Tick, context.Tick));
         foreach (EntityId truck in trucks)
             context.Entities.AddComponent(truck, new CargoConvoyMember(created));
