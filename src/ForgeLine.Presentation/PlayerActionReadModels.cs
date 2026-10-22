@@ -1420,6 +1420,7 @@ internal static class PlayerActionSnapshotFactory
             ResolveDistributionStatus(
                 scenario,
                 entities,
+                tick,
                 policyEntity,
                 out PlayerDistributionActionState distributionState,
                 out LogisticsTransportRequestFailureReason failure,
@@ -1505,6 +1506,8 @@ internal static class PlayerActionSnapshotFactory
             entities.TryGetComponent(target, out ControllableEntity owner) && owner.Owner == local.Owner;
         double Outstanding(EntityId policyId, bool assignedOnly)
         {
+            if (!policyId.IsValid ||
+                scenario.AutomatedDistribution.LastDebugSnapshot.Tick != tick) return 0;
             double total = 0;
             foreach (var request in scenario.AutomatedDistribution.LastDebugSnapshot.Requests)
                 if (request.PolicyEntity == policyId && request.State is not (LogisticsTransportRequestState.Completed or LogisticsTransportRequestState.Failed))
@@ -1529,6 +1532,8 @@ internal static class PlayerActionSnapshotFactory
         }
         EntityId Source(EntityId policyId)
         {
+            if (!policyId.IsValid ||
+                scenario.AutomatedDistribution.LastDebugSnapshot.Tick != tick) return EntityId.Invalid;
             foreach (var request in scenario.AutomatedDistribution.LastDebugSnapshot.Requests.Reverse())
                 if (request.PolicyEntity == policyId && request.State is (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
                     scenario.Logistics.TryGetNode(request.Origin, out var source) && Owned(source.Entity)) return source.Entity;
@@ -1703,6 +1708,7 @@ internal static class PlayerActionSnapshotFactory
     private static void ResolveDistributionStatus(
         MatchRuntime scenario,
         EntityRegistry entities,
+        SimulationTick tick,
         EntityId policyEntity,
         out PlayerDistributionActionState state,
         out LogisticsTransportRequestFailureReason failure,
@@ -1714,7 +1720,8 @@ internal static class PlayerActionSnapshotFactory
         bottleneck = LogisticsBottleneckReason.None;
         assignedTruck = EntityId.Invalid;
 
-        if (!policyEntity.IsValid)
+        if (!policyEntity.IsValid ||
+            scenario.AutomatedDistribution.LastDebugSnapshot.Tick != tick)
         {
             return;
         }
