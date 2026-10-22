@@ -53,6 +53,9 @@ public sealed class GameplayBindingEditorTests
         var model = Model(); model.SetGameplayBindings(new GameplayBindings().With(GameplayAction.Build, PlatformKey.Z));
         var editor = new SettingsInteractionModel(); editor.Focus(FrontendSettingsField.BindingKey);
         editor.Adjust(model, 1);
+        Assert.Equal(PlatformKey.Delete, editor.BindingCandidate); Assert.False(editor.CanApply);
+        Assert.Contains("CONFLICT", editor.BindingFeedback);
+        editor.Adjust(model, 1);
         Assert.Equal(PlatformKey.Unknown, editor.BindingCandidate); Assert.False(editor.CanApply);
         editor.Adjust(model, 1);
         Assert.Equal(PlatformKey.W, editor.BindingCandidate); Assert.False(editor.CanApply);
