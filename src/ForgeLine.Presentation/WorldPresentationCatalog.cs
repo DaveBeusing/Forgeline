@@ -38,6 +38,12 @@ public readonly record struct WorldFeaturePresentationMetadata(
 {
     public static WorldFeaturePresentationMetadata None => default;
 
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public ResourceDepositVariantSelection ResourceVariant { get; init; }
+
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public Vector3 ResourceTint { get; init; }
+
     public bool IsSpecified =>
         Visual != WorldVisualId.None;
 
