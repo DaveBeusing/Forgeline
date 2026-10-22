@@ -91,6 +91,12 @@ public sealed partial class PlayerActionPanelController
     private bool _contextualPressed;
     private TimeSpan _feedbackRemaining;
     public string Feedback { get; private set; } = string.Empty;
+    public void ShowDemolitionFeedback(string message)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(message);
+        Feedback = message;
+        _feedbackRemaining = TimeSpan.FromSeconds(5);
+    }
     public void AdvanceFeedback(TimeSpan elapsed)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(elapsed, TimeSpan.Zero);
