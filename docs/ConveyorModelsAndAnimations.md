@@ -141,12 +141,13 @@ against the actual state geometry.
 
 ## Materials and LOD handoff
 
-All render meshes bind the existing `material.world.prop.industrial` and its
-shared Directorate BaseColor/Normal/ORM atlas. UV charts stay inside the existing
-4x4 cells with the established inset. Blender previews reference those same
-three source maps by relative paths. No duplicate texture, material, sampler or
-new resource cap is added. This leaves texturing/wear refinements to the later
-conveyor material package without blocking real model/definition delivery.
+The original model delivery used `material.world.prop.industrial`. The subsequent
+[conveyor material package](ConveyorMaterialsAndTextures.md) now binds all render
+records and saved Blender masters to `material.infrastructure.directorate.conveyor`
+with its shared BaseColor/Normal/ORM/emission atlas. Charts retain the 4x4 grid and
+established inset. Runtime IDs, ports, clips and collision/selection policies are
+preserved; finish changes add small static status inlays to the frame part.
+See the material handoff for channel, mask, state and texture-budget details.
 
 Each state and default identity has LOD0/LOD1/LOD2, with existing compiler LOD
 references at 140m and 420m. These are initial authored handoff distances;
@@ -163,6 +164,9 @@ three shared textures. It reports no issues. This is a source/asset build, not
 an executed test suite or physical/render acceptance. The final build includes the two real raised-tier support variants. No
 full-game source build or gameplay/renderer acceptance is claimed.
 [Build receipt](ConveyorModelBuild.json) records counts and source identities.
+This is historical evidence for the original model generation; current material
+generation hashes and build counts are in
+[ConveyorMaterialBuild.json](ConveyorMaterialBuild.json).
 Runtime cache and intermediate outputs remain under artifacts and are not
 committed as authored content.
 

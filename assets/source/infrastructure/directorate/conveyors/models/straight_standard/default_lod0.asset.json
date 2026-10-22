@@ -3,7 +3,7 @@
   "type": "mesh",
   "source": "idle_no_input_lod0.glb",
   "materialReferences": [
-    "material.world.prop.industrial"
+    "material.infrastructure.directorate.conveyor"
   ],
   "collisionRequired": true,
   "collisionReference": "infrastructure.directorate.conveyor.straight_standard.collision",

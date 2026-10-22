@@ -3,7 +3,7 @@
   "type": "mesh",
   "source": "flowing_lod1.glb",
   "materialReferences": [
-    "material.world.prop.industrial"
+    "material.infrastructure.directorate.conveyor"
   ],
   "collisionRequired": true,
   "collisionReference": "infrastructure.directorate.conveyor.curve_90.collision",
@@ -31,29 +31,13 @@
     {
       "name": "frame",
       "firstIndex": 0,
-      "indexCount": 1932,
+      "indexCount": 2004,
       "parent": -1,
       "motion": "static",
       "socket": "origin"
     },
     {
       "name": "belt_0_0",
-      "firstIndex": 1932,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static",
-      "socket": "origin"
-    },
-    {
-      "name": "belt_0_1",
-      "firstIndex": 1968,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static",
-      "socket": "origin"
-    },
-    {
-      "name": "belt_0_2",
       "firstIndex": 2004,
       "indexCount": 36,
       "parent": -1,
@@ -61,7 +45,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_3",
+      "name": "belt_0_1",
       "firstIndex": 2040,
       "indexCount": 36,
       "parent": -1,
@@ -69,8 +53,24 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_4",
+      "name": "belt_0_2",
       "firstIndex": 2076,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_3",
+      "firstIndex": 2112,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_4",
+      "firstIndex": 2148,
       "indexCount": 36,
       "parent": -1,
       "motion": "static",

@@ -8,7 +8,9 @@ import copy, json, math, struct
 from pathlib import Path
 
 FRAME=18.0
-MATERIAL='material.world.prop.industrial'
+MATERIAL='material.infrastructure.directorate.conveyor'
+STATUS={'flowing':4,'idle_no_input':12,'congested':13,'blocked':13,
+        'unpowered':9,'disconnected':15,'damaged':8,'critical':11,'structural_intact':14}
 ROOT=Path(__file__).resolve().parents[2]
 KIT=ROOT/'assets/source/infrastructure/directorate/conveyors/conveyor-kit.v1.json'
 
@@ -193,7 +195,7 @@ def assemble(m,state,lod):
             if lod<2:
                 for distance in [i*.85+.55 for i in range(max(1,int(length/.85)-1))]:
                     p,d=path_point(path,min(distance,length-.45));side=unit(cross((0,1,0),d))
-                    center=add(p,(0,-.3,0));static.cylinder(add(center,mul(side,-1)),add(center,mul(side,1)),.09,7,cellsides)
+                    center=add(p,(0,-.3,0));static.cylinder(add(center,mul(side,-1)),add(center,mul(side,1)),.09,3,cellsides)
             # Direction chevrons remain visible on static far LODs and paused belt states.
             for distance in [length*.3,length*.65]:
                 p,d=path_point(path,distance);side=unit(cross((0,1,0),d));p=add(p,(0,.013,0))
@@ -237,6 +239,25 @@ def assemble(m,state,lod):
         for i in range(0,len(static.indices),3):
             tri=static.indices[i:i+3];a,b,c=[static.positions[k] for k in tri];n=unit(cross(sub(b,a),sub(c,a)))
             for k in tri:static.normals[k]=n
+    # Finish is encoded in UV cell choice; no runtime material mutation or shader
+    # mask binding. Keep foundation/rubber properties even on damaged modules.
+    if state in ('damaged','critical'):
+        target=8 if state=='damaged' else 11
+        for i,(u,v) in enumerate(static.uvs):
+            if int(u*4)+4*int(v*4)==0:
+                static.uvs[i]=(u+(target%4)*.25,v+(target//4)*.25)
+    if not destroyed:
+        if paths:
+            x,y,z=paths[0][0]
+            # Printed top-facing status on existing service drive, away from belt.
+            static.box((x+1.0,y-.045,z+.29),(x+1.31,y-.035,z+.86),STATUS[state])
+            static.box((x+1.00,y-.034,z+.29),(x+1.12,y-.024,z+.44),14)
+        elif m['role']=='structure':
+            x=0 if m['shape']=='single_column' else -1.6
+            y=5.2+2*m.get('supportTier',0)
+            static.box((x-.22,y+.005,-.22),(x+.22,y+.015,.22),STATUS[state])
+        else:
+            static.box((-.42,6.305,-.16),(.42,6.315,.16),STATUS[state])
     if destroyed:
         moving=[]
         if paths:

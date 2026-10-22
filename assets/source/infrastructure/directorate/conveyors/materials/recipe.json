@@ -1,0 +1,210 @@
+{
+  "schema": "forgeline.conveyor_surfaces",
+  "schemaVersion": 1,
+  "generator": "tools/blender/conveyor_surfaces.py",
+  "sourceSize": 2048,
+  "grid": [
+    4,
+    4
+  ],
+  "cells": [
+    {
+      "index": 0,
+      "name": "painted_frame",
+      "baseSRGB8": [
+        82,
+        91,
+        64
+      ],
+      "roughness": 0.72,
+      "metallic": 0
+    },
+    {
+      "index": 1,
+      "name": "structural_steel",
+      "baseSRGB8": [
+        76,
+        82,
+        84
+      ],
+      "roughness": 0.56,
+      "metallic": 0.88
+    },
+    {
+      "index": 2,
+      "name": "belt_composite",
+      "baseSRGB8": [
+        30,
+        33,
+        31
+      ],
+      "roughness": 0.94,
+      "metallic": 0
+    },
+    {
+      "index": 3,
+      "name": "roller_rubber",
+      "baseSRGB8": [
+        40,
+        43,
+        41
+      ],
+      "roughness": 0.94,
+      "metallic": 0
+    },
+    {
+      "index": 4,
+      "name": "flow_indicator",
+      "baseSRGB8": [
+        34,
+        40,
+        36
+      ],
+      "roughness": 0.78,
+      "metallic": 0
+    },
+    {
+      "index": 5,
+      "name": "hazard_paint",
+      "baseSRGB8": [
+        183,
+        132,
+        46
+      ],
+      "roughness": 0.78,
+      "metallic": 0
+    },
+    {
+      "index": 6,
+      "name": "concrete",
+      "baseSRGB8": [
+        126,
+        126,
+        112
+      ],
+      "roughness": 0.91,
+      "metallic": 0
+    },
+    {
+      "index": 7,
+      "name": "roller_steel",
+      "baseSRGB8": [
+        94,
+        100,
+        101
+      ],
+      "roughness": 0.65,
+      "metallic": 0.85
+    },
+    {
+      "index": 8,
+      "name": "worn_paint",
+      "baseSRGB8": [
+        82,
+        91,
+        64
+      ],
+      "roughness": 0.72,
+      "metallic": 0
+    },
+    {
+      "index": 9,
+      "name": "offline_indicator",
+      "baseSRGB8": [
+        42,
+        46,
+        43
+      ],
+      "roughness": 0.82,
+      "metallic": 0
+    },
+    {
+      "index": 10,
+      "name": "cargo_pack",
+      "baseSRGB8": [
+        104,
+        95,
+        66
+      ],
+      "roughness": 0.88,
+      "metallic": 0
+    },
+    {
+      "index": 11,
+      "name": "critical_scorch",
+      "baseSRGB8": [
+        55,
+        54,
+        43
+      ],
+      "roughness": 0.83,
+      "metallic": 0
+    },
+    {
+      "index": 12,
+      "name": "idle_indicator",
+      "baseSRGB8": [
+        43,
+        48,
+        42
+      ],
+      "roughness": 0.78,
+      "metallic": 0
+    },
+    {
+      "index": 13,
+      "name": "blocked_indicator",
+      "baseSRGB8": [
+        48,
+        43,
+        33
+      ],
+      "roughness": 0.78,
+      "metallic": 0
+    },
+    {
+      "index": 14,
+      "name": "directorate_service",
+      "baseSRGB8": [
+        82,
+        91,
+        64
+      ],
+      "roughness": 0.72,
+      "metallic": 0
+    },
+    {
+      "index": 15,
+      "name": "disconnected_indicator",
+      "baseSRGB8": [
+        43,
+        45,
+        40
+      ],
+      "roughness": 0.78,
+      "metallic": 0
+    }
+  ],
+  "wearMaskChannels": {
+    "R": "dirt",
+    "G": "substrate exposure / chips",
+    "B": "heat / soot"
+  },
+  "maskPolicy": "source-only; baked into PBR maps, no runtime shader mask parameter",
+  "statusCells": {
+    "flowing": 4,
+    "idle_no_input": 12,
+    "congested": 13,
+    "blocked": 13,
+    "unpowered": 9,
+    "disconnected": 15,
+    "damaged": 8,
+    "critical": 11,
+    "structural_intact": 14
+  },
+  "emissiveMultiplier": 0.35,
+  "alpha": "opaque",
+  "normal": "tangent +Y, generated from common height field; no baked illumination",
+  "testsExecuted": false,
+  "manualAcceptance": "pending"
+}

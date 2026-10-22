@@ -1,0 +1,12 @@
+{
+  "id": "texture.infrastructure.directorate.conveyor.normal",
+  "type": "texture",
+  "source": "conveyor_normal.png",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 1024,
+  "textureFormat": "bc7Unorm",
+  "textureMaxMipLevels": 4,
+  "textureCompressionQuality": "balanced"
+}

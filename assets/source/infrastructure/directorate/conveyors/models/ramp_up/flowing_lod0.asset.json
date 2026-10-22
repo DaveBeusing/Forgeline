@@ -3,7 +3,7 @@
   "type": "mesh",
   "source": "flowing_lod0.glb",
   "materialReferences": [
-    "material.world.prop.industrial"
+    "material.infrastructure.directorate.conveyor"
   ],
   "collisionRequired": true,
   "collisionReference": "infrastructure.directorate.conveyor.ramp_up.collision",
@@ -43,29 +43,13 @@
     {
       "name": "frame",
       "firstIndex": 0,
-      "indexCount": 1716,
+      "indexCount": 1788,
       "parent": -1,
       "motion": "static",
       "socket": "origin"
     },
     {
       "name": "belt_0_0",
-      "firstIndex": 1716,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static",
-      "socket": "origin"
-    },
-    {
-      "name": "belt_0_1",
-      "firstIndex": 1752,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static",
-      "socket": "origin"
-    },
-    {
-      "name": "belt_0_2",
       "firstIndex": 1788,
       "indexCount": 36,
       "parent": -1,
@@ -73,7 +57,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_3",
+      "name": "belt_0_1",
       "firstIndex": 1824,
       "indexCount": 36,
       "parent": -1,
@@ -81,7 +65,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_4",
+      "name": "belt_0_2",
       "firstIndex": 1860,
       "indexCount": 36,
       "parent": -1,
@@ -89,7 +73,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_5",
+      "name": "belt_0_3",
       "firstIndex": 1896,
       "indexCount": 36,
       "parent": -1,
@@ -97,7 +81,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_6",
+      "name": "belt_0_4",
       "firstIndex": 1932,
       "indexCount": 36,
       "parent": -1,
@@ -105,7 +89,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_7",
+      "name": "belt_0_5",
       "firstIndex": 1968,
       "indexCount": 36,
       "parent": -1,
@@ -113,7 +97,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_8",
+      "name": "belt_0_6",
       "firstIndex": 2004,
       "indexCount": 36,
       "parent": -1,
@@ -121,8 +105,24 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_9",
+      "name": "belt_0_7",
       "firstIndex": 2040,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_8",
+      "firstIndex": 2076,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_9",
+      "firstIndex": 2112,
       "indexCount": 36,
       "parent": -1,
       "motion": "static",
