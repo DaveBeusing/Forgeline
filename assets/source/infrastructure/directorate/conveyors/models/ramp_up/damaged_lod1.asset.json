@@ -3,7 +3,7 @@
   "type": "mesh",
   "source": "damaged_lod1.glb",
   "materialReferences": [
-    "material.world.prop.industrial"
+    "material.infrastructure.directorate.conveyor"
   ],
   "collisionRequired": true,
   "collisionReference": "infrastructure.directorate.conveyor.ramp_up.collision",

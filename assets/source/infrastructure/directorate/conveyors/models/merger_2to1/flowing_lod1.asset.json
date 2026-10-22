@@ -3,7 +3,7 @@
   "type": "mesh",
   "source": "flowing_lod1.glb",
   "materialReferences": [
-    "material.world.prop.industrial"
+    "material.infrastructure.directorate.conveyor"
   ],
   "collisionRequired": true,
   "collisionReference": "infrastructure.directorate.conveyor.merger_2to1.collision",
@@ -37,29 +37,13 @@
     {
       "name": "frame",
       "firstIndex": 0,
-      "indexCount": 3096,
+      "indexCount": 3168,
       "parent": -1,
       "motion": "static",
       "socket": "origin"
     },
     {
       "name": "belt_0_0",
-      "firstIndex": 3096,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static",
-      "socket": "origin"
-    },
-    {
-      "name": "belt_0_1",
-      "firstIndex": 3132,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static",
-      "socket": "origin"
-    },
-    {
-      "name": "belt_0_2",
       "firstIndex": 3168,
       "indexCount": 36,
       "parent": -1,
@@ -67,7 +51,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_3",
+      "name": "belt_0_1",
       "firstIndex": 3204,
       "indexCount": 36,
       "parent": -1,
@@ -75,7 +59,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_4",
+      "name": "belt_0_2",
       "firstIndex": 3240,
       "indexCount": 36,
       "parent": -1,
@@ -83,7 +67,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_5",
+      "name": "belt_0_3",
       "firstIndex": 3276,
       "indexCount": 36,
       "parent": -1,
@@ -91,7 +75,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_6",
+      "name": "belt_0_4",
       "firstIndex": 3312,
       "indexCount": 36,
       "parent": -1,
@@ -99,7 +83,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_0_7",
+      "name": "belt_0_5",
       "firstIndex": 3348,
       "indexCount": 36,
       "parent": -1,
@@ -107,7 +91,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_1_0",
+      "name": "belt_0_6",
       "firstIndex": 3384,
       "indexCount": 36,
       "parent": -1,
@@ -115,7 +99,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_1_1",
+      "name": "belt_0_7",
       "firstIndex": 3420,
       "indexCount": 36,
       "parent": -1,
@@ -123,7 +107,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_1_2",
+      "name": "belt_1_0",
       "firstIndex": 3456,
       "indexCount": 36,
       "parent": -1,
@@ -131,7 +115,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_1_3",
+      "name": "belt_1_1",
       "firstIndex": 3492,
       "indexCount": 36,
       "parent": -1,
@@ -139,7 +123,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_1_4",
+      "name": "belt_1_2",
       "firstIndex": 3528,
       "indexCount": 36,
       "parent": -1,
@@ -147,7 +131,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_1_5",
+      "name": "belt_1_3",
       "firstIndex": 3564,
       "indexCount": 36,
       "parent": -1,
@@ -155,7 +139,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_1_6",
+      "name": "belt_1_4",
       "firstIndex": 3600,
       "indexCount": 36,
       "parent": -1,
@@ -163,7 +147,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_1_7",
+      "name": "belt_1_5",
       "firstIndex": 3636,
       "indexCount": 36,
       "parent": -1,
@@ -171,7 +155,7 @@
       "socket": "origin"
     },
     {
-      "name": "belt_2_0",
+      "name": "belt_1_6",
       "firstIndex": 3672,
       "indexCount": 36,
       "parent": -1,
@@ -179,8 +163,24 @@
       "socket": "origin"
     },
     {
-      "name": "belt_2_1",
+      "name": "belt_1_7",
       "firstIndex": 3708,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_2_0",
+      "firstIndex": 3744,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_2_1",
+      "firstIndex": 3780,
       "indexCount": 36,
       "parent": -1,
       "motion": "static",

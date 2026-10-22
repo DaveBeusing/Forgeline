@@ -1,0 +1,12 @@
+{
+  "id": "texture.infrastructure.directorate.conveyor.emissive",
+  "type": "texture",
+  "source": "conveyor_emissive.png",
+  "textureUsage": "emissive",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm",
+  "textureMaxMipLevels": 3,
+  "textureCompressionQuality": "balanced"
+}

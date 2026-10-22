@@ -1,0 +1,23 @@
+{
+  "baseColorFactor": [
+    1,
+    1,
+    1,
+    1
+  ],
+  "metallicFactor": 1,
+  "roughnessFactor": 1,
+  "baseColorTexture": "texture.infrastructure.directorate.conveyor.base",
+  "normalTexture": "texture.infrastructure.directorate.conveyor.normal",
+  "ormTexture": "texture.infrastructure.directorate.conveyor.orm",
+  "emissiveTexture": "texture.infrastructure.directorate.conveyor.emissive",
+  "emissiveMultiplier": 0.35,
+  "uvScale": [
+    1,
+    1
+  ],
+  "uvOffset": [
+    0,
+    0
+  ]
+}

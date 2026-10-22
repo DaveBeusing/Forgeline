@@ -8,6 +8,16 @@ for scale18, sockets, support constraints and manual review. No gameplay conveyo
 or manual-test approval is implied. The original design baseline below remains
 unchanged.
 
+## Production material package
+
+`materials/` contains the shared conveyor BaseColor, tangent Normal, ORM,
+bounded emission and source-only RGB dirt/wear/heat mask, their runtime asset
+definitions and deterministic recipe. All saved masters and render exports bind
+`material.infrastructure.directorate.conveyor`. `conveyor-materials.v1.json`
+records every module's valid state/material mapping and presentation precedence.
+See [Material specification and manual acceptance](../../../../../docs/ConveyorMaterialsAndTextures.md).
+No tests or gameplay/camera smokes were executed for this material delivery.
+
 ## Original design contract
 
 `conveyor-kit.v1.json` is the **editable preproduction design contract**. It is
@@ -42,12 +52,9 @@ curve, ramp and junction sockets mate with aligned, opposite cardinal normals,
 that resources remain fail-closed, and that the greybox board represents the
 complete catalog. It does **not** open Blender or compile runtime assets.
 
-## Next asset-production gate
+## Remaining acceptance gate
 
-Author corresponding Blender 5.2.2 source masters or glTF 2.0 GLBs for each
-`slug`, including both curve hands and LOD0/1/2, the small state variants and
-separate support/collision footprints. After visual review, create **real**
-`*.asset.json` declarations with the existing compiler, qualifying sockets,
-materials, boundaries, normal winding and content hashes. Do not rename this
-preproduction kit JSON to `*.asset.json` and do not add an empty runtime asset
-reference: the game currently has no conveyor simulation component.
+Production masters, state/LOD exports, clips and material definitions are present.
+Visual, vehicle/terrain clearance and runtime acceptance remain manual. Do not
+rename the preproduction kit JSON to `*.asset.json`; the separate production
+catalogs describe source assets without adding a conveyor simulation component.

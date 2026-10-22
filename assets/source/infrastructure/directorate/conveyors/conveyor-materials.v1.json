@@ -1,0 +1,322 @@
+{
+  "schema": "forgeline.conveyor_materials",
+  "schemaVersion": 1,
+  "materialAssetId": "material.infrastructure.directorate.conveyor",
+  "recipe": "materials/recipe.json",
+  "runtimeTextures": {
+    "base": "texture.infrastructure.directorate.conveyor.base",
+    "normal": "texture.infrastructure.directorate.conveyor.normal",
+    "orm": "texture.infrastructure.directorate.conveyor.orm",
+    "emissive": "texture.infrastructure.directorate.conveyor.emissive"
+  },
+  "authoringWearMask": "materials/conveyor_wear.png",
+  "maskChannels": {
+    "R": "dirt",
+    "G": "exposed substrate",
+    "B": "heat / soot"
+  },
+  "runtimeMaskSampling": false,
+  "uvInset": 0.018,
+  "uvGrid": [
+    4,
+    4
+  ],
+  "statusBinding": "presentation selection contract; no conveyor simulation enum or live binding exists yet",
+  "selectionPriority": [
+    "destroyed",
+    "critical",
+    "damaged",
+    "unpowered",
+    "disconnected",
+    "blocked",
+    "congested",
+    "flowing",
+    "idle_no_input"
+  ],
+  "selectionPolicy": "health/destruction takes precedence; unavailable power/connectivity precedes flow; flow requires authoritative visible operating observation; structural modules ignore operating observations",
+  "stateMapping": {
+    "flowing": {
+      "variantSuffix": ".flowing",
+      "statusCell": 4,
+      "cue": "two printed bars, dim green pilot; existing cleat motion at LOD0/1",
+      "motion": true
+    },
+    "idle_no_input": {
+      "variantSuffix": ".idle_no_input",
+      "statusCell": 12,
+      "cue": "printed hollow circle, dark pilot, static empty belt",
+      "motion": false
+    },
+    "disconnected": {
+      "variantSuffix": ".disconnected",
+      "statusCell": 15,
+      "cue": "printed separated link, open mechanical jaws, static belt",
+      "motion": false
+    },
+    "congested": {
+      "variantSuffix": ".congested",
+      "statusCell": 13,
+      "cue": "printed amber X with queued generic packs; static belt",
+      "motion": false
+    },
+    "blocked": {
+      "variantSuffix": ".blocked",
+      "statusCell": 13,
+      "cue": "printed amber X and physical striped stop gate; static belt",
+      "motion": false
+    },
+    "unpowered": {
+      "variantSuffix": ".unpowered",
+      "statusCell": 9,
+      "cue": "printed crossed power circle, dark pilot, engaged brake; static belt",
+      "motion": false
+    },
+    "damaged": {
+      "variantSuffix": ".damaged",
+      "statusCell": 8,
+      "cue": "exposed substrate/crack and bent guard; static until explicitly integrated",
+      "motion": false
+    },
+    "critical": {
+      "variantSuffix": ".critical",
+      "statusCell": 11,
+      "cue": "concentrated soot/heat/crack, deformed bearer; static",
+      "motion": false
+    },
+    "destroyed": {
+      "variantSuffix": ".destroyed",
+      "statusCell": null,
+      "cue": "interrupted/collapsed geometry, exposed wreck substrate, no light or motion",
+      "motion": false
+    },
+    "structural_intact": {
+      "variantSuffix": ".structural_intact",
+      "statusCell": 14,
+      "cue": "painted Directorate bars/service mark; no operating light or motion",
+      "motion": false
+    }
+  },
+  "modules": [
+    {
+      "assetId": "infrastructure.directorate.conveyor.straight_short",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.straight_standard",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.curve_90",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.curve_90.right",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.ramp_up",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.ramp_down",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.merger_2to1",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.splitter_1to2",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.io_in",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.io_out",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "idle_no_input",
+      "states": [
+        "blocked",
+        "congested",
+        "critical",
+        "damaged",
+        "destroyed",
+        "disconnected",
+        "flowing",
+        "idle_no_input",
+        "unpowered"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.support_light",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "structural_intact",
+      "states": [
+        "critical",
+        "damaged",
+        "destroyed",
+        "structural_intact"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.support_heavy",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "structural_intact",
+      "states": [
+        "critical",
+        "damaged",
+        "destroyed",
+        "structural_intact"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.endcap",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "structural_intact",
+      "states": [
+        "critical",
+        "damaged",
+        "destroyed",
+        "structural_intact"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.support_light.tier1",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "structural_intact",
+      "states": [
+        "critical",
+        "damaged",
+        "destroyed",
+        "structural_intact"
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1",
+      "materialAssetId": "material.infrastructure.directorate.conveyor",
+      "defaultState": "structural_intact",
+      "states": [
+        "critical",
+        "damaged",
+        "destroyed",
+        "structural_intact"
+      ]
+    }
+  ],
+  "visibility": "consume copied visible observations only; never infer hidden inventory/ownership from textures",
+  "acceptance": {
+    "automatedTestsExecuted": false,
+    "runtimeSmokesExecuted": false,
+    "manualReview": "pending"
+  }
+}

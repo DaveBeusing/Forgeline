@@ -12,14 +12,16 @@ def to_engine(p):return (p[0],p[2],-p[1])
 
 
 def materials():
-    material=bpy.data.materials.new('Directorate shared industrial PBR');material.use_nodes=True
+    material=bpy.data.materials.new('Directorate conveyor shared PBR');material.use_nodes=True
     nodes=material.node_tree.nodes;links=material.node_tree.links;bsdf=nodes.get('Principled BSDF')
-    folder=ROOT/'assets/source/materials/directorate/surfaces'
-    for filename,kind,space in [('production_surface_base.png','base','sRGB'),('production_surface_normal.png','normal','Non-Color'),('production_surface_orm.png','orm','Non-Color')]:
+    folder=ROOT/'assets/source/infrastructure/directorate/conveyors/materials'
+    for filename,kind,space in [('conveyor_base.png','base','sRGB'),('conveyor_normal.png','normal','Non-Color'),('conveyor_orm.png','orm','Non-Color'),('conveyor_emissive.png','emissive','sRGB')]:
         image=bpy.data.images.load(str(folder/filename),check_existing=True);image.colorspace_settings.name=space
-        image.filepath='//../../../../materials/directorate/surfaces/'+filename
+        image.filepath='//../materials/'+filename
         node=nodes.new('ShaderNodeTexImage');node.image=image;node.label=kind
         if kind=='base':links.new(node.outputs['Color'],bsdf.inputs['Base Color'])
+        if kind=='emissive':
+            links.new(node.outputs['Color'],bsdf.inputs['Emission Color']);bsdf.inputs['Emission Strength'].default_value=.35
         if kind=='normal':
             normal=nodes.new('ShaderNodeNormalMap');links.new(node.outputs['Color'],normal.inputs['Color']);links.new(normal.outputs['Normal'],bsdf.inputs['Normal'])
         if kind=='orm':
@@ -38,7 +40,7 @@ def author(m,output):
             collection['conveyor_state']=state;collection['conveyor_lod']=lod
             for name,part,samples in assemble(m,state,lod):
                 data=bpy.data.meshes.new(name);data.from_pydata([to_blender(p) for p in part.positions],[],[part.indices[i:i+3] for i in range(0,len(part.indices),3)]);data.update()
-                uv=data.uv_layers.new(name='Shared industrial atlas')
+                uv=data.uv_layers.new(name='Shared conveyor atlas')
                 for loop in data.loops:u,v=part.uvs[loop.vertex_index];uv.data[loop.index].uv=(u,1-v)
                 obj=bpy.data.objects.new(name,data);collection.objects.link(obj);data.materials.append(material)
                 obj['conveyor_part']=name;obj['conveyor_samples']=json.dumps(samples if state=='flowing' else None)
@@ -122,6 +124,8 @@ def run(request):
                 facing={'N':(0,0,1),'S':(0,0,-1),'E':(1,0,0),'W':(-1,0,0)}.get(port.get('facing'))
                 if facing and (Vector(to_engine(obj.rotation_quaternion @ Vector((0,0,1))))-Vector(facing)).length>1e-6:raise ValueError('Saved port direction differs from the canonical module contract')
             records.append(export_module(m,output/'source',saved_parts,saved_collision))
-    write_json(output/'conveyor-production.v1.json',{'schema':'forgeline.conveyor_models','schemaVersion':1,'designSource':'conveyor-kit.v1.json','delivery':'authored source kit; no conveyor gameplay integration; manual visual, clearance, motion and LOD review outstanding','modules':records})
+    for record in records:
+        record['materialReference']='material.infrastructure.directorate.conveyor'
+    write_json(output/'conveyor-production.v1.json',{'schema':'forgeline.conveyor_models','schemaVersion':1,'designSource':'conveyor-kit.v1.json','materialPackage':'conveyor-materials.v1.json','delivery':'authored source kit; no conveyor gameplay integration; manual visual, clearance, motion and LOD review outstanding','modules':records})
 
 if __name__=='__main__':run(json.loads(Path(sys.argv[sys.argv.index('--request')+1]).read_text(encoding='utf-8-sig')))

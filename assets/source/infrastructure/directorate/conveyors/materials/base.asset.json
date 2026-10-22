@@ -1,0 +1,12 @@
+{
+  "id": "texture.infrastructure.directorate.conveyor.base",
+  "type": "texture",
+  "source": "conveyor_base.png",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 2048,
+  "textureFormat": "bc7Unorm",
+  "textureMaxMipLevels": 5,
+  "textureCompressionQuality": "balanced"
+}

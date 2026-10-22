@@ -1,0 +1,12 @@
+{
+  "id": "texture.infrastructure.directorate.conveyor.orm",
+  "type": "texture",
+  "source": "conveyor_orm.png",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm",
+  "textureMaxMipLevels": 3,
+  "textureCompressionQuality": "balanced"
+}
