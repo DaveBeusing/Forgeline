@@ -122,7 +122,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
     private readonly InventoryStore _inventories;
     private readonly ProductionRecipeCatalog _recipes;
     private readonly List<Entry> _entries = [];
-    private readonly List<(SimulationTick Tick, EntityId Request)> _manualPauses = [];
+    private readonly Dictionary<ulong, List<EntityId>> _manualPauses = [];
+    private int _nextEvaluationIndex;
     private bool _disposed;
 
     public OperationsRuleSystem(
@@ -251,35 +252,41 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
     {
         if (command.Command is PlayerProductionActionCommand
             { Operation: PlayerProductionOperation.SetPaused } manual)
-            _manualPauses.Add((command.TargetTick, manual.RequestEntity));
+        {
+            if (!_manualPauses.TryGetValue(command.TargetTick.Value, out List<EntityId>? targets))
+            {
+                targets = [];
+                _manualPauses.Add(command.TargetTick.Value, targets);
+            }
+            targets.Add(manual.RequestEntity);
+        }
     }
 
     public void Execute(SimulationContext context)
     {
         // Manual requests are recognized at execution tick, including commands
         // pre-scheduled while reconstructing replay history.
-        for (int i = _manualPauses.Count - 1; i >= 0; i--)
-        {
-            var manual = _manualPauses[i];
-            if (manual.Tick > context.Tick) continue;
-            if (manual.Tick == context.Tick)
+        if (_manualPauses.Remove(context.Tick.Value, out List<EntityId>? manualRequests))
+            foreach (EntityId requestEntity in manualRequests)
                 foreach (Entry entry in _entries)
-                    if (entry.ManagedRequest == manual.Request ||
-                        (context.Entities.TryGetComponent(manual.Request, out ProductionRequest request) &&
+                    if (entry.ManagedRequest == requestEntity ||
+                        (context.Entities.TryGetComponent(requestEntity, out ProductionRequest request) &&
                          request.Facility == entry.Definition.Facility))
                     {
                         entry.Suspended = true;
                         entry.ManagedRequest = EntityId.Invalid;
                         entry.Result = OperationsRuleResult.ManualOverride;
                     }
-            _manualPauses.RemoveAt(i);
-        }
 
         if (!MatchRunning(context.Entities)) return;
-        int evaluated = 0;
-        foreach (Entry entry in _entries)
+        int count = _entries.Count;
+        if (count == 0) return;
+        int start = count > MaximumRulesPerTick ? _nextEvaluationIndex % count : 0;
+        int budget = Math.Min(count, MaximumRulesPerTick);
+        for (int i = 0; i < budget; i++)
         {
-            if (!entry.Enabled || evaluated++ >= MaximumRulesPerTick) continue;
+            Entry entry = _entries[(start + i) % count];
+            if (!entry.Enabled) continue;
             if (entry.LastEvaluated == context.Tick) continue;
             entry.LastEvaluated = context.Tick;
             if (entry.Suspended) continue;
@@ -295,6 +302,7 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
             else
                 EvaluateOutputPause(context, entry, facility);
         }
+        _nextEvaluationIndex = count > MaximumRulesPerTick ? (start + budget) % count : 0;
     }
 
     private void EvaluateInputPolicy(SimulationContext context, Entry entry, ProductionFacility facility)
