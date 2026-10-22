@@ -98,7 +98,7 @@ public sealed class CargoConvoySystem : ISimulationSystem
             }
 
             for (int i = _members.Count - 1; i >= 0; i--)
-                if (!CargoConvoyEligibility.TryGetTruck(context.Entities, _network,
+                if (!CargoConvoyEligibility.TryGetTruck(context.Entities,
                         group.Owner, _members[i], group.Origin, group.Destination,
                         group.RouteVersion, out _))
                 {
@@ -298,7 +298,7 @@ public sealed class CargoConvoySystem : ISimulationSystem
 internal static class CargoConvoyEligibility
 {
     public static bool TryGetTruck(
-        EntityRegistry entities, LogisticsNetwork network, PlayerId issuer,
+        EntityRegistry entities, PlayerId issuer,
         EntityId entity, LogisticsNodeId origin, LogisticsNodeId destination,
         LogisticsNetworkVersion networkVersion, out CargoTransportRouteState route)
     {
@@ -311,6 +311,7 @@ internal static class CargoConvoyEligibility
             order.Origin != origin || order.Destination != destination ||
             !entities.TryGetComponent(entity, out CargoTransportRuntimeState state) ||
             state.Lifecycle != CargoTransportLifecycleState.ToDestination ||
+            state.ObservedNetworkVersion != networkVersion ||
             !entities.TryGetComponent(entity, out CargoTransportRouteState candidate) ||
             candidate.Route is null || candidate.Route.Version != networkVersion ||
             candidate.NextSegmentIndex < 0 ||
@@ -323,10 +324,6 @@ internal static class CargoConvoyEligibility
             entities.HasComponent<CargoFuelServiceState>(entity) ||
             entities.HasComponent<ResupplyOrder>(entity) ||
             entities.HasComponent<SupplyRescueAssignment>(entity))
-            return false;
-        if (!network.TryGetNode(order.Destination, out LogisticsNode end) ||
-            !end.Enabled || !network.TryGetNode(order.Origin, out LogisticsNode start) ||
-            !start.Enabled)
             return false;
         route = candidate;
         return true;
