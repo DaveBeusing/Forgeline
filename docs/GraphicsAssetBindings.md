@@ -67,6 +67,20 @@ On 22 October 2026, dependency restore and the complete Release solution build
 succeeded with SDK 10.0.401, zero warnings and zero errors. The project-reference
 validator accepted all 44 projects without cycles or boundary violations.
 
+One complete asset compilation with compiler 1.12.1 also succeeded: all 1,825
+containers passed runtime qualification with zero issues, totaling 112,321,078
+container bytes. The extended inventory was written successfully. Local evidence:
+`artifacts/graphics-bindings/compile.log`, `compilation.jsonl`, `qualification.json`
+and `inventory.json`. The manifest content signature is
+`141ca4b6055c5f0307fb0ef1affcbcb9618a787fbd911e4acbf426b28b4fb73a`.
+
+The inventory's independent gameplay texture budget **fails**: 65,604,477 compiled
+container bytes exceed the unchanged 58,720,256-byte limit by 6,884,221 bytes.
+Binding qualification success does not close this gate. No texture sources,
+encoder settings, mip policies or budget limits were changed. A separate baseline
+rebuild and attribution were not performed. Keep package acceptance open until
+the excess has been attributed and resolved; this is not a GPU residency measurement.
+
 No automated tests were added or executed, as requested. Native D3D12/WARP and
 physical GPU rendering, quality/session transitions, shader execution and disposal
 stress, deterministic double compilation, source-less package execution and visual
