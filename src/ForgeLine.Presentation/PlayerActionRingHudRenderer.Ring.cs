@@ -61,7 +61,10 @@ internal sealed partial class PlayerActionRingHudRenderer
                 4 => "SOURCE", _ => "DESTINATION"
             } : orderItem ? "ORDER" : unavailableGlobal ? "No target" : slot.Navigation switch
             {
-                ActionRingNavigation.Group => "Group", ActionRingNavigation.GroupControl => GroupActionRingContext.Label(target.ItemIndex),
+                ActionRingNavigation.Group => "Group",
+                ActionRingNavigation.GroupControl =>
+                    target.ItemIndex == 11 && ring.Group?.CanCreateCargoConvoy == true
+                        ? "Create Convoy" : GroupActionRingContext.Label(target.ItemIndex),
                 ActionRingNavigation.Back => "Back", ActionRingNavigation.Close => "Close",
                 ActionRingNavigation.Next => "Next", ActionRingNavigation.Previous => "Prev",
                 ActionRingNavigation.Parameters => "Params", ActionRingNavigation.NextItem => "Next item",
