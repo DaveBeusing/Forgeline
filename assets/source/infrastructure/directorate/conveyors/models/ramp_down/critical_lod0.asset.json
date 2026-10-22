@@ -1,0 +1,42 @@
+{
+  "id": "infrastructure.directorate.conveyor.ramp_down.critical",
+  "type": "mesh",
+  "source": "critical_lod0.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.ramp_down.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "material_in",
+      "x": 0.0,
+      "y": 0.43333333333333335,
+      "z": -0.2222222222222222
+    },
+    {
+      "name": "material_out",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": 0.2222222222222222
+    }
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "infrastructure.directorate.conveyor.ramp_down.critical.lod1",
+      "maxDistance": 140
+    },
+    {
+      "level": 2,
+      "assetId": "infrastructure.directorate.conveyor.ramp_down.critical.lod2",
+      "maxDistance": 420
+    }
+  ]
+}

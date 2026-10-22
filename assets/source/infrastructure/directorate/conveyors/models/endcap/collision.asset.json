@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.endcap.collision",
+  "type": "mesh",
+  "source": "collision.glb"
+}

@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.straight_short.destroyed.selection",
+  "type": "mesh",
+  "source": "destroyed_collision.glb"
+}

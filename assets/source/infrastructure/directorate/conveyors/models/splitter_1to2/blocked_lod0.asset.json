@@ -1,0 +1,48 @@
+{
+  "id": "infrastructure.directorate.conveyor.splitter_1to2.blocked",
+  "type": "mesh",
+  "source": "blocked_lod0.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.splitter_1to2.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "input_main",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": -0.2222222222222222
+    },
+    {
+      "name": "output_a",
+      "x": -0.2222222222222222,
+      "y": 0.3222222222222222,
+      "z": 0.2222222222222222
+    },
+    {
+      "name": "output_b",
+      "x": 0.2222222222222222,
+      "y": 0.3222222222222222,
+      "z": 0.2222222222222222
+    }
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "infrastructure.directorate.conveyor.splitter_1to2.blocked.lod1",
+      "maxDistance": 140
+    },
+    {
+      "level": 2,
+      "assetId": "infrastructure.directorate.conveyor.splitter_1to2.blocked.lod2",
+      "maxDistance": 420
+    }
+  ]
+}

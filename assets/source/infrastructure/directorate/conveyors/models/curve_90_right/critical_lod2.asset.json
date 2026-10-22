@@ -1,0 +1,30 @@
+{
+  "id": "infrastructure.directorate.conveyor.curve_90.right.critical.lod2",
+  "type": "mesh",
+  "source": "critical_lod2.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.curve_90.right.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "material_in",
+      "x": 0.2222222222222222,
+      "y": 0.3222222222222222,
+      "z": 0.0
+    },
+    {
+      "name": "material_out",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": 0.2222222222222222
+    }
+  ]
+}

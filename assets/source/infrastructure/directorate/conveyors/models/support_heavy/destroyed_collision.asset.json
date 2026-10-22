@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.support_heavy.destroyed.collision",
+  "type": "mesh",
+  "source": "destroyed_collision.glb"
+}

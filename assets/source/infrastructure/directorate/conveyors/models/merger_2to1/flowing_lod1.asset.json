@@ -1,0 +1,193 @@
+{
+  "id": "infrastructure.directorate.conveyor.merger_2to1.flowing.lod1",
+  "type": "mesh",
+  "source": "flowing_lod1.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.merger_2to1.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "input_a",
+      "x": -0.2222222222222222,
+      "y": 0.3222222222222222,
+      "z": -0.2222222222222222
+    },
+    {
+      "name": "input_b",
+      "x": 0.2222222222222222,
+      "y": 0.3222222222222222,
+      "z": -0.2222222222222222
+    },
+    {
+      "name": "output_main",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": 0.2222222222222222
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "frame",
+      "firstIndex": 0,
+      "indexCount": 3096,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_0",
+      "firstIndex": 3096,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_1",
+      "firstIndex": 3132,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_2",
+      "firstIndex": 3168,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_3",
+      "firstIndex": 3204,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_4",
+      "firstIndex": 3240,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_5",
+      "firstIndex": 3276,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_6",
+      "firstIndex": 3312,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_7",
+      "firstIndex": 3348,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_1_0",
+      "firstIndex": 3384,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_1_1",
+      "firstIndex": 3420,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_1_2",
+      "firstIndex": 3456,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_1_3",
+      "firstIndex": 3492,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_1_4",
+      "firstIndex": 3528,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_1_5",
+      "firstIndex": 3564,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_1_6",
+      "firstIndex": 3600,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_1_7",
+      "firstIndex": 3636,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_2_0",
+      "firstIndex": 3672,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_2_1",
+      "firstIndex": 3708,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    }
+  ],
+  "animationReferences": [
+    "infrastructure.directorate.conveyor.merger_2to1.flowing.lod1.motion"
+  ]
+}

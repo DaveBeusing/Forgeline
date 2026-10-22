@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.io_out.flowing.motion",
+  "type": "animation",
+  "source": "flowing_lod0.flow.gltf"
+}

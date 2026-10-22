@@ -1,0 +1,30 @@
+{
+  "id": "infrastructure.directorate.conveyor.straight_short.damaged.lod2",
+  "type": "mesh",
+  "source": "damaged_lod2.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.straight_short.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "material_in",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": -0.1111111111111111
+    },
+    {
+      "name": "material_out",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": 0.1111111111111111
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.ramp_down.flowing.lod1.motion",
+  "type": "animation",
+  "source": "flowing_lod1.flow.gltf"
+}

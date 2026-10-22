@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.io_out.destroyed.collision",
+  "type": "mesh",
+  "source": "destroyed_collision.glb"
+}

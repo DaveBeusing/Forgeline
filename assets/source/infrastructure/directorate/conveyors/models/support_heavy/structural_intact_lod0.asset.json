@@ -1,0 +1,48 @@
+{
+  "id": "infrastructure.directorate.conveyor.support_heavy.structural_intact",
+  "type": "mesh",
+  "source": "structural_intact_lod0.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.support_heavy.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "foot_left",
+      "x": -0.08888888888888889,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "name": "foot_right",
+      "x": 0.08888888888888889,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "name": "carrier",
+      "x": 0.0,
+      "y": 0.2888888888888889,
+      "z": 0.0
+    }
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "infrastructure.directorate.conveyor.support_heavy.structural_intact.lod1",
+      "maxDistance": 140
+    },
+    {
+      "level": 2,
+      "assetId": "infrastructure.directorate.conveyor.support_heavy.structural_intact.lod2",
+      "maxDistance": 420
+    }
+  ]
+}
