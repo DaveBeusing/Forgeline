@@ -291,7 +291,14 @@ public sealed partial class PlayerActionPanelController
         {
             case ActionRingNavigation.Group: _ringLevel = ActionRingLevel.Group; _ringPage = 0; break;
             case ActionRingNavigation.GroupControl:
-                _groupResult = _ringCard.Activate(slot.Target.ItemIndex, snapshot, _currentSelection!);
+                if (slot.Target.ItemIndex == 11 && _ringGroup is { CanCreateCargoConvoy: true } group)
+                {
+                    _pendingRequest = PlayerActionRequest.CreateCargoConvoy(
+                        group.ConvoyTrucks, group.ConvoyEscorts);
+                    _contextualActivationTick = snapshot?.Tick;
+                }
+                else
+                    _groupResult = _ringCard.Activate(slot.Target.ItemIndex, snapshot, _currentSelection!);
                 break;
             case ActionRingNavigation.Close: Close(); return;
             case ActionRingNavigation.Back:
