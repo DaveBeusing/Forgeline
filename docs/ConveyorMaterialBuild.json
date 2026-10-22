@@ -1,8 +1,8 @@
 {
   "schema": "forgeline.conveyor_material_build",
   "schemaVersion": 1,
-  "version": "0.1.449",
-  "integrationBase": "32234ea62c320d2cb22803793d5d12ee56dbeb2e",
+  "version": "0.1.450",
+  "integrationBase": "a3d2893e40020aa8e03858d66daa665a26ab6267",
   "blender": "5.2.2 x64 d13f752e3b9c",
   "physicalModules": 15,
   "materialAssetId": "material.infrastructure.directorate.conveyor",
@@ -54,5 +54,6 @@
   "ciExecuted": false,
   "manualAcceptance": "pending; user performs tests and camera/LOD/clearance review",
   "scope": "complete conveyor module/material/texture/animation input set; no full-game build or runtime acceptance",
-  "historicalModelReceipt": "docs/ConveyorModelBuild.json (superseded source generation)"
+  "historicalModelReceipt": "docs/ConveyorModelBuild.json (superseded source generation)",
+  "integrationNote": "Operations guidance merged; conveyor sources and compiler code unchanged. Release compiler and scoped asset build repeated for 0.1.450; no tests executed."
 }

@@ -1,7 +1,7 @@
 # Conveyor materials and textures
 
 Implementation base: master `32234ea6` (0.1.448), including the model kit from
-PR #297. This package prepares 0.1.449. Automated tests, runtime/camera smokes,
+PR #297. Final integration includes master `a3d2893e` (0.1.449, Operations guidance). This package prepares 0.1.450. Automated tests, runtime/camera smokes,
 resolution comparisons and manual art acceptance were deliberately not run at
 the user's request. The scoped asset build is recorded separately in
 [ConveyorMaterialBuild.json](ConveyorMaterialBuild.json).
