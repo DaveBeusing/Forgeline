@@ -183,3 +183,7 @@ The remaining deferred logistics layers are:
 - production-polished logistics UI.
 
 Future logistics modes must consume and extend the same graph, capacity, inventory, and physical transport contracts rather than replacing them.
+
+## Planned conveyor integration boundary
+
+[Base Conveyor Logistics](BaseConveyorLogistics.md) specifies a separate future directed base-local belt graph and [building port matrix](BaseConveyorPortMatrix.md). GroundRoad cargo execution remains the current authoritative implementation. Future belt eligibility must be explicit, preserve physical inventory and outstanding reservations, and must not manufacture graph edges by proximity or silently duplicate road shipment demand.
