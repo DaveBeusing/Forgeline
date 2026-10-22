@@ -47,6 +47,9 @@ public sealed record GraphicsPipelineDescription(
         ArgumentNullException.ThrowIfNull(VertexShader);
         ArgumentNullException.ThrowIfNull(PixelShader);
         ArgumentNullException.ThrowIfNull(VertexElements);
+        if (!Enum.IsDefined(PrimitiveTopology)) throw new ArgumentOutOfRangeException(nameof(PrimitiveTopology));
+        if (VertexConstantsInBuffer && VertexRootConstantCount == 0)
+            throw new ArgumentException("Buffered vertex constants require a nonzero constant count.");
         if (DepthAlwaysPass && !DepthEnabled) throw new ArgumentException("Always-pass depth requires depth writes.");
         if (TargetFormat is not (GraphicsFrameTargetFormat.Rgba8Unorm or GraphicsFrameTargetFormat.Rgba16Float or GraphicsFrameTargetFormat.Depth32Float))
             throw new ArgumentOutOfRangeException(nameof(TargetFormat));
@@ -103,9 +106,12 @@ public sealed record GraphicsPipelineDescription(
                 "Unsupported graphics cull mode.");
         }
 
+        var semantics = new HashSet<(string Name, int Index)>();
         foreach (GraphicsVertexElement element in VertexElements)
         {
             element.Validate();
+            if (!semantics.Add((element.SemanticName.ToUpperInvariant(), element.SemanticIndex)))
+                throw new ArgumentException($"Duplicate vertex shader input '{element.SemanticName}{element.SemanticIndex}'.");
         }
     }
 }
