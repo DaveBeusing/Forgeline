@@ -78,6 +78,47 @@ public sealed class SelectedUnitOrderTests
         Assert.Empty(draw.Lines.ToArray());
     }
 
+    [Fact]
+    public void ThousandSelectedMembersRemainBoundedWithTenThousandWorldInstances()
+    {
+        EntityId[] selected = Enumerable.Range(1, 1000)
+            .Select(i => new EntityId((uint)i, 1)).ToArray();
+        SelectedUnitOrderView[] orders = selected.Select(id =>
+            new SelectedUnitOrderView(id, new(10, 0, 10),
+                SelectedUnitOrderKind.Move, "MOVE", Destination, true)).ToArray();
+        var model = new SelectedUnitOrderSnapshot(Session, new SimulationTick(20),
+            selected, orders, "MOVE 1000");
+        RenderInstance[] instances = Enumerable.Range(1, 10000).Select(i =>
+            new RenderInstance(new EntityId((uint)i, 1),
+                new RenderTransform(new Vector3(i, 0, 10),
+                    Quaternion.Identity, Vector3.One),
+                new RenderMeshHandle(1), RenderMaterialHandle.Default,
+                RenderVisibilityMask.World)).ToArray();
+        var buffer = new PresentationSnapshotBuffer();
+        buffer.Publish(new PresentationSnapshot(new SimulationTick(20),
+            TimeSpan.FromMilliseconds(50), instances.Length, instances, sessionId: Session)
+        { SelectedOrders = model });
+        var world = new RenderWorld();
+        Assert.True(world.Update(buffer));
+        var overlay = new SelectedUnitOrderOverlay();
+        var draw = new DebugDraw { Enabled = true };
+        var camera = new RtsCamera();
+
+        overlay.Draw(draw, world, selected, Session, camera, 1, 900, 1,
+            TimeSpan.FromSeconds(1), reducedMotion: true);
+        Assert.Equal(1000, overlay.LastConnectionCount);
+        Assert.Equal(1, overlay.LastUniqueTargetCount);
+        Assert.Equal(1007, draw.Lines.Length);
+        DebugLine[] still = draw.Lines.ToArray();
+        overlay.Draw(draw, world, selected, Session, camera, 1, 900, 1,
+            TimeSpan.FromSeconds(60), reducedMotion: true);
+        Assert.Equal(still, draw.Lines.ToArray());
+
+        overlay.Draw(draw, world, selected, Session, camera, 1, 900, 1,
+            TimeSpan.FromSeconds(0.3), reducedMotion: false);
+        Assert.NotEqual(still[1000].Color.W, draw.Lines[1000].Color.W);
+    }
+
     private static PresentationSnapshot Snapshot(
         EntityId[] selected, SelectedUnitOrderSnapshot orders)
     {
