@@ -20,7 +20,8 @@ public enum ReplayCommandKind : byte
     SetMatchPaused = 9,
     Technology = 10,
     Demolition = 11,
-    CancelConstruction = 12
+    CancelConstruction = 12,
+    OperationsRule = 13
 }
 
 public sealed record RecordedSimulationCommand
@@ -96,6 +97,12 @@ public sealed record RecordedSimulationCommand
     public int IntValue { get; init; }
 
     public ulong CorrelationId { get; init; }
+
+    public ulong OperationsRuleId { get; init; }
+    public uint OperationsRuleRevision { get; init; }
+    public uint OperationsCooldownTicks { get; init; }
+    public OperationsRuleOperation OperationsOperation { get; init; }
+    public OperationsRuleTemplate OperationsTemplate { get; init; }
 }
 
 public sealed class MatchReplayRecorder : IDisposable
@@ -434,6 +441,26 @@ public static class ReplayCommandCodec
                     };
                 return true;
 
+            case OperationsRuleCommand command:
+                recorded = Base(ReplayCommandKind.OperationsRule) with
+                {
+                    Issuer = command.Definition.Owner,
+                    SubmittedAtTick = command.SubmittedAtTick.Value,
+                    TargetEntity = command.Definition.Facility,
+                    ResourceId = command.Definition.Resource,
+                    OperationsRuleId = command.Definition.Id,
+                    OperationsRuleRevision = command.ExpectedRevision,
+                    OperationsCooldownTicks = command.Definition.CooldownTicks,
+                    OperationsOperation = command.Operation,
+                    OperationsTemplate = command.Definition.Template,
+                    LogisticsPriority = command.Definition.Priority,
+                    Enabled = command.Enabled,
+                    Value1 = command.Definition.Minimum,
+                    Value2 = command.Definition.Target,
+                    Value3 = command.Definition.Maximum
+                };
+                return true;
+
             case PlayerTacticalActionCommand command:
                 recorded =
                     Base(
@@ -563,6 +590,16 @@ public static class ReplayCommandCodec
                 DecodeLogistics(
                     command,
                     submittedAtTick),
+
+            ReplayCommandKind.OperationsRule =>
+                new OperationsRuleCommand(
+                    scenario.OperationsRules, command.OperationsOperation,
+                    new OperationsRuleDefinition(
+                        command.OperationsRuleId, command.Issuer, command.TargetEntity,
+                        command.OperationsTemplate, command.ResourceId,
+                        command.Value1, command.Value2, command.Value3,
+                        command.LogisticsPriority, command.OperationsCooldownTicks),
+                    command.OperationsRuleRevision, command.Enabled, submittedAtTick),
 
             ReplayCommandKind.Technology =>
                 DecodeTechnology(
