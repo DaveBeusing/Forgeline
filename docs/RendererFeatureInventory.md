@@ -2,8 +2,8 @@
 
 ## Scope and evidence
 
-Code baseline: `8e2935abaa8486b2b72125ac7354ac729381de3f` (`master`,
-0.1.453). This inventory describes consumers present in that revision. It is
+Code baseline: `b726ff9c00b7dc74cf285219fa58440acf663e16` (`master`,
+0.1.454), synchronized after the resource cluster integration. This inventory describes consumers present in that revision. It is
 not a visual acceptance report. Native evidence below is historical evidence
 linked from the owning documents; it does not establish a new native run on
 this revision. Builds, headless tests and null-device tests cannot establish
@@ -49,6 +49,20 @@ only to the two repeated columns below.
 | ExecuteIndirect, GPU occlusion and temporal reconstruction — specified/deferred | No production indirect/history resource path | Existing CPU submission and spatial reconstruction remain selected | No active pass for these techniques | No client enable switch | Existing spatial/submission tests do not qualify these methods | Prerequisites and evidence for deferral: [scalable rendering](ScalableRendering.md). |
 
 ## Capture coverage
+
+Resource clusters illustrate the difference between authored and wired features.
+`assets/source/world/authoring/resource_clusters/variants.json` declares four
+layouts and three sizes per resource family, with LOD0/1/2 and collision proxies.
+`src/ForgeLine.Presentation/WorldPresentationCatalog.cs` and
+`src/ForgeLine.Presentation/SimpleInstanceRenderer.cs` still select the existing
+High/Reduced pair through the canonical IDs. The default medium geometry is
+wired; extra layouts, sizes and LOD2 are **authored but not dispatched** in live
+gameplay. They are retained assets for a later presentation integration, not
+dead registrations to delete. `tests/ForgeLine.Presentation.Tests/ResourceDepositBlenderMasterTests.cs`
+and `tests/ForgeLine.Assets.Tests/WorldAssetAuthoringTests.cs` provide source and
+catalog contracts; they do not establish variant selection or native acceptance.
+See [resource cluster geometry](ResourceDepositClusterGeometry.md) for the
+unexecuted acceptance matrix and ownership of the remaining work.
 
 `src/ForgeLine.Presentation/VisualReferenceScene.cs` owns the scene enum and
 factory dispatch; `src/ForgeLine.Client/VisualReferenceCapture.cs` owns native
@@ -156,3 +170,25 @@ Validation commands and complete CI requirements remain in
 [Development](Development.md). The required `build-test` job includes assets,
 Windows smoke, headless execution, solution tests, packaging and the natural
 terminal match with seed 2026. This inventory does not weaken those gates.
+
+## Observed validation gaps
+
+The first local Release solution run used source baseline `8e2935ab`, before
+the resource-cluster synchronization. It was interrupted after multiple failures;
+it is not a successful full-suite result. The following findings belong to
+unchanged source/test contracts and must not be hidden by a documentation PR:
+
+| Finding / status | Evidence and next owner |
+| --- | --- |
+| Construction-action count contract — failing | `tests/ForgeLine.Presentation.Tests/PlayerActionReadModelTests.cs`: expected 13 building entries, actual 27 including expanded actions. Also fails on synchronized master in [CI run 39859499327](https://github.com/DaveBeusing/Forgeline/actions/runs/39859499327). Presentation/action-model integration must reconcile catalog coverage without dropping conveyor actions. |
+| Production asset count contracts — failing | `tests/ForgeLine.Assets.Tests/WorldAssetAuthoringTests.cs`, `tests/ForgeLine.Assets.Tests/DirectorateUnitAssetAuthoringTests.cs`, `tests/ForgeLine.Assets.Tests/DirectorateBuildingAssetAuthoringTests.cs`, `tests/ForgeLine.Assets.Tests/VfxAssetAuthoringTests.cs`, `tests/ForgeLine.Assets.Tests/RtsUiAssetAuthoringTests.cs`: expected 1,365, compiled 1,825 on the original baseline. Asset/tooling owners must reconcile the expanded catalog; these values do not describe the later resource-cluster catalog. |
+| Selection-proxy material classification — failing qualification contract | `tests/ForgeLine.Assets.Tests/ProductionAssetMaterialCompletenessTests.cs` treats conveyor `.selection` IDs as physical production meshes and reports missing materials. For example, `assets/source/infrastructure/directorate/conveyors/models/straight_standard/selection.asset.json` points to `collision.glb` without material references. Asset/tooling owners must distinguish proxy purpose from visible meshes; this failure alone does not prove a rendered surface is missing its material. |
+| Semantic artwork coverage — failing | `tests/ForgeLine.Client.Tests/UiArtworkCoverageTests.cs` reports an enum/catalog coverage mismatch. UI asset owners must reconcile explicit bindings or documented exceptions. A visible fallback does not close the semantic artwork contract. |
+| Convoy command interaction — failing | `tests/ForgeLine.Game.Tests/CargoTransportSystemTests.cs`, `ManualEscortMovementReplacesConvoyFollowWithoutCancelingCargo`, fails its boolean assertion. Game/logistics owners must investigate authoritative escort/order semantics; renderer documentation cannot close this regression. |
+
+The initial native cursor/menu failures also lacked the generated runtime cache
+in the fresh worktree. Those are setup failures, not established renderer defects;
+native tests require canonical runtime assets before execution. Graphics tests
+passed in that run with explicit native lifetime/debug-layer skips. Missing debug
+layer and opt-in lifetime coverage remain unqualified. Neither interrupted tests
+nor skipped checks establish a successful required `build-test` job.
