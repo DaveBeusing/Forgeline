@@ -637,6 +637,18 @@ internal sealed class ClientRenderHost : IDisposable
                     current.DebugOverlay.Enabled,
                     current.DebugLines,
                     current.DebugLabels);
+                selectedOrderOverlay.Draw(
+                    selectedOrderDraw,
+                    renderWorld,
+                    current.InformationLayer.SelectedEntities,
+                    snapshot.SessionId,
+                    renderCamera,
+                    renderAlpha,
+                    current.ViewportHeight,
+                    RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale,
+                    uiNow,
+                    current.FeedbackSettings.ReducedMotion ||
+                        qualityProfile.Active == RenderQuality.Low);
                 dockingZoneDraw.Clear();
                 if (current.MetricsActive && current.PreAlphaUx.Mode == PreAlphaUxMode.None)
                     LogisticsZoneOverlay.Draw(dockingZoneDraw, snapshot,
