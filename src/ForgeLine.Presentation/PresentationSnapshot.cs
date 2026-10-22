@@ -78,6 +78,7 @@ public sealed class PresentationSnapshot
         Guidance = guidance;
         Operations = operations;
         Alerts = alerts;
+        Diagnosis = OperationsDiagnosisSnapshot.Capture(this);
         _instances = ownedInstances;
     }
 
@@ -122,6 +123,8 @@ public sealed class PresentationSnapshot
     public PlayerGuidanceSummary? Guidance { get; }
     public OperationsSnapshot? Operations { get; }
     public ActionableAlertSnapshot? Alerts { get; }
+
+    public OperationsDiagnosisSnapshot? Diagnosis { get; }
 
     public int InstanceCount => _instances.Length;
 
