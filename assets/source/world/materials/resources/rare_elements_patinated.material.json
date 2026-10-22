@@ -1,0 +1,22 @@
+{
+  "baseColorFactor": [
+    0.6,
+    0.42,
+    0.76,
+    1
+  ],
+  "baseColorTexture": "texture.world.resource.rare_elements.base",
+  "emissiveMultiplier": 0,
+  "metallicFactor": 1,
+  "normalTexture": "texture.world.resource.rare_elements.normal",
+  "ormTexture": "texture.world.resource.rare_elements.orm",
+  "roughnessFactor": 1,
+  "uvOffset": [
+    -1.5,
+    -0.5
+  ],
+  "uvScale": [
+    2,
+    2
+  ]
+}

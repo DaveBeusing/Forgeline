@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.resource.silicates.orm",
+  "source": "silicates_orm.png",
+  "textureColorSpace": "linear",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 256,
+  "textureUsage": "orm",
+  "type": "texture"
+}

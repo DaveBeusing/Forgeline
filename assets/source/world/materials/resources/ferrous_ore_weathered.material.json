@@ -1,0 +1,22 @@
+{
+  "baseColorFactor": [
+    0.46,
+    0.28,
+    0.19,
+    1
+  ],
+  "baseColorTexture": "texture.world.resource.ferrous_ore.base",
+  "emissiveMultiplier": 0,
+  "metallicFactor": 1,
+  "normalTexture": "texture.world.resource.ferrous_ore.normal",
+  "ormTexture": "texture.world.resource.ferrous_ore.orm",
+  "roughnessFactor": 1,
+  "uvOffset": [
+    -1.5,
+    -1.0
+  ],
+  "uvScale": [
+    2,
+    2
+  ]
+}
