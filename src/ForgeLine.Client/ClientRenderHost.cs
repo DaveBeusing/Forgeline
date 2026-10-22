@@ -451,7 +451,8 @@ internal sealed class ClientRenderHost : IDisposable
                     depthEnabled: false,
                     lineWidthPixels: 3.0f);
             using var selectedOrderRenderer =
-                new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 1.0f);
+                new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 1.0f,
+                    maximumLines: 8192);
             var selectedOrderOverlay = new SelectedUnitOrderOverlay();
             using var debugDrawRenderer =
                 new DebugDrawRenderer(
