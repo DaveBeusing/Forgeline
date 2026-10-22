@@ -191,3 +191,7 @@ Combat/industrial validation adds bounded extraction, industrial production pari
 
 
 Scalable rendering adds RenderSnapshotIndexTests, reference/optimized upload parity and native DepthReconstructionTests to CI. Frame hot-path reports now measure snapshot-index rebuild separately. Full reproduction, capability probes and CPU/GPU qualification limits: [scalable rendering](ScalableRendering.md).
+
+## Building demolition
+
+[Building demolition](BuildingDemolition.md) describes Delete input ownership, historical material refunds, authoritative validation and replay compatibility.
