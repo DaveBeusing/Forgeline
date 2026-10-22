@@ -610,6 +610,29 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 enabled,
                 observedTick));
 
+    public PlayerCommandSubmissionReceipt SubmitCargoConvoy(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> trucks,
+        ReadOnlySpan<EntityId> escorts,
+        SimulationTick observedTick) =>
+        SubmitLogisticsAction(
+            PlayerCommandKind.Logistics,
+            issuer,
+            observedTick,
+            PlayerLogisticsActionCommand.CreateCargoConvoy(
+                issuer, trucks, escorts, observedTick));
+
+    public PlayerCommandSubmissionReceipt SubmitCargoConvoyDissolve(
+        PlayerId issuer,
+        EntityId group,
+        SimulationTick observedTick) =>
+        SubmitLogisticsAction(
+            PlayerCommandKind.Logistics,
+            issuer,
+            observedTick,
+            PlayerLogisticsActionCommand.DissolveCargoConvoy(
+                issuer, group, observedTick));
+
     public PlayerCommandSubmissionReceipt SubmitRemoveLogisticsStockPolicy(
         PlayerId issuer,
         EntityId policyEntity,
