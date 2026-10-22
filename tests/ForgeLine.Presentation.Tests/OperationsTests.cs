@@ -257,6 +257,101 @@ public sealed class OperationsTests
     }
 
     [Fact]
+    public void OperationsClickRequiresReleaseInThePressedControl()
+    {
+        var entity = new EntityId(3, 2);
+        var data = new OperationsSnapshot(new(1), new(4), new(1), [Facility(entity)], [], [], 1, 0);
+        var snapshot = Snapshot(data);
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var controller = new OperationsController();
+        controller.Update(input, snapshot, layout, interaction);
+        controller.OpenCategory(OperationsCategory.All, snapshot.SessionId, interaction);
+
+        var firstRow = OperationsLayout.Control(layout, 3);
+        var secondRow = OperationsLayout.Control(layout, 4);
+        Edge(input, PlatformInputEventKind.MouseButtonDown, firstRow);
+        Assert.False(controller.Update(input, snapshot, layout, interaction).Navigate.IsValid);
+        Assert.False(controller.View.Selected.IsValid);
+        Edge(input, PlatformInputEventKind.MouseButtonUp, secondRow);
+        Assert.False(controller.Update(input, snapshot, layout, interaction).Navigate.IsValid);
+        Assert.False(controller.View.Selected.IsValid);
+
+        Edge(input, PlatformInputEventKind.MouseButtonDown, firstRow);
+        controller.Update(input, snapshot, layout, interaction);
+        Edge(input, PlatformInputEventKind.MouseButtonUp, firstRow);
+        controller.Update(input, snapshot, layout, interaction);
+        Assert.Equal(entity, controller.View.Selected);
+
+        var open = OperationsLayout.Control(layout, 10);
+        Edge(input, PlatformInputEventKind.MouseButtonDown, open);
+        Assert.False(controller.Update(input, snapshot, layout, interaction).Navigate.IsValid);
+        Edge(input, PlatformInputEventKind.MouseButtonUp, open);
+        var result = controller.Update(input, snapshot, layout, interaction);
+        Assert.Equal(entity, result.Navigate);
+        Assert.Equal(PlayerActionPanelMode.Production, result.Controls);
+        Assert.False(controller.Update(input, snapshot, layout, interaction).Navigate.IsValid);
+    }
+
+    [Fact]
+    public void OperationsDisabledAndStaleGesturesDoNotNavigate()
+    {
+        var entity = new EntityId(3, 2);
+        var data = new OperationsSnapshot(new(1), new(4), new(1),
+            [Facility(entity) with { Controls = PlayerActionPanelMode.Closed }], [], [], 1, 0);
+        var snapshot = Snapshot(data);
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var controller = new OperationsController();
+        controller.Update(input, snapshot, layout, interaction);
+        controller.OpenCategory(OperationsCategory.All, snapshot.SessionId, interaction);
+        Click(input, OperationsLayout.Control(layout, 3));
+        controller.Update(input, snapshot, layout, interaction);
+        Assert.Equal(entity, controller.View.Selected);
+
+        Click(input, OperationsLayout.Control(layout, 10));
+        Assert.False(controller.Update(input, snapshot, layout, interaction).Navigate.IsValid);
+        Edge(input, PlatformInputEventKind.MouseButtonDown, OperationsLayout.Control(layout, 9));
+        controller.Update(input, snapshot, layout, interaction);
+        var resized = GameplayHudLayout.Create(1920, 1080, 144);
+        Edge(input, PlatformInputEventKind.MouseButtonUp, OperationsLayout.Control(resized, 9));
+        Assert.False(controller.Update(input, snapshot, resized, interaction).Navigate.IsValid);
+
+        Edge(input, PlatformInputEventKind.MouseButtonDown, OperationsLayout.Control(resized, 9));
+        controller.Update(input, snapshot, resized, interaction);
+        Edge(input, PlatformInputEventKind.MouseButtonUp, OperationsLayout.Control(resized, 9));
+        Assert.False(controller.Update(input, Snapshot(data, session: 2), resized, interaction).Navigate.IsValid);
+    }
+
+    [Fact]
+    public void ReplacedFacilityGenerationCannotAcquireHeldRowPress()
+    {
+        var oldEntity = new EntityId(3, 2);
+        var replacement = new EntityId(3, 3);
+        var oldData = new OperationsSnapshot(new(1), new(4), new(1), [Facility(oldEntity)], [], [], 1, 0);
+        var newData = new OperationsSnapshot(new(1), new(4), new(1), [Facility(replacement)], [], [], 1, 0);
+        var oldSnapshot = Snapshot(oldData);
+        var newSnapshot = Snapshot(newData);
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var controller = new OperationsController();
+        controller.Update(input, oldSnapshot, layout, interaction);
+        controller.OpenCategory(OperationsCategory.All, oldSnapshot.SessionId, interaction);
+        Edge(input, PlatformInputEventKind.MouseButtonDown, OperationsLayout.Control(layout, 3));
+        controller.Update(input, oldSnapshot, layout, interaction);
+        Edge(input, PlatformInputEventKind.MouseButtonUp, OperationsLayout.Control(layout, 3));
+        controller.Update(input, newSnapshot, layout, interaction);
+        Assert.False(controller.View.Selected.IsValid);
+
+        Click(input, OperationsLayout.Control(layout, 3));
+        controller.Update(input, newSnapshot, layout, interaction);
+        Assert.Equal(replacement, controller.View.Selected);
+    }
+
+    [Fact]
     public void ShortClicksSelectAndOpenExistingControlsWithoutSubmittingCommands()
     {
         var entity = new EntityId(3, 2);
@@ -460,6 +555,13 @@ public sealed class OperationsTests
         };
         return new(new(tick), TimeSpan.FromSeconds(.05), 0, [], sessionId: new(session), playerExperience: experience, operations: data);
     }
+    private static void Edge(InputState input, PlatformInputEventKind kind, HudRect rect)
+    {
+        input.BeginFrame();
+        int x = (int)(rect.X + rect.Width / 2), y = (int)(rect.Y + rect.Height / 2);
+        input.Apply(PlatformInputEvent.MouseButtonChanged(kind, PlatformMouseButton.Left, x, y));
+    }
+
     private static void Click(InputState input, HudRect rect)
     {
         input.BeginFrame(); int x = (int)(rect.X + rect.Width / 2), y = (int)(rect.Y + rect.Height / 2);

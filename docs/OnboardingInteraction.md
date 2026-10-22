@@ -26,7 +26,11 @@ suppressed. Confirmed goals retain their explanations and explicitly say that no
 repeat action is needed. Out-of-order commands remain available and are observed.
 An accepted policy, assigned transport, actual unloading, completed production
 and field transfer retain separate meanings. Starting Core supply is availability,
-not delivery or mobile resupply evidence.
+not delivery or mobile resupply evidence. When more specific selection help is not
+available, a current completed-tick Operations diagnosis contributes its observed
+block reason and an existing inspection action. This contextual advice never
+counts requested, confirmed incoming or loaded quantities as delivered stock,
+never invents an alert, and never sends a gameplay command.
 
 ## Layout and input
 

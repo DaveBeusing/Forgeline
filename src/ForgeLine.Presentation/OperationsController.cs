@@ -83,13 +83,19 @@ public static class OperationsLayout
 public sealed class OperationsController
 {
     private ulong _press;
+    private bool _armed;
+    private ulong _armedPress;
+    private System.Numerics.Vector2 _armedOrigin;
+    private OperationsView _armedView;
+    private int _armedRowIndex = -1;
+    private EntityId _armedRowEntity;
     private SimulationSessionId _session;
     private GameplayHudLayout _layout;
     private bool _initialized;
     private EntityId _lastRouteFocus;
     public OperationsView View { get; private set; }
     public void OpenCategory(OperationsCategory category, SimulationSessionId session, PresentationInteractionState interaction)
-    { View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
+    { _armed = false; View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
     public bool ContainsSurface(System.Numerics.Vector2 point, in GameplayHudLayout layout) =>
         View.Open && !View.Suppressed && OperationsLayout.Panel(layout).Contains(point);
     public void Close(InputState input, PresentationInteractionState interaction)
@@ -98,8 +104,8 @@ public sealed class OperationsController
         CancelInput(input); interaction.SetOperationsOpen(false);
     }
     public void OpenNotifications(SimulationSessionId session, PresentationInteractionState interaction)
-    { View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
-    public void CancelInput(InputState input) => _press = input.MousePressSequence(PlatformMouseButton.Left);
+    { _armed = false; View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
+    public void CancelInput(InputState input) { _press = input.MousePressSequence(PlatformMouseButton.Left); _armed = false; }
     public OperationsInteraction Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
         PresentationInteractionState interaction, bool blocked = false, bool inputCaptured = false)
     {
@@ -109,42 +115,93 @@ public sealed class OperationsController
         bool newSession = _session != snapshot?.SessionId;
         _initialized = true; _layout = layout; _session = snapshot?.SessionId ?? default;
         if (newSession || snapshot?.PlayerExperience?.IsMatchComplete == true)
-        { View = default; _lastRouteFocus = default; interaction.SetOperationsOpen(false); }
+        {
+            View = default; _lastRouteFocus = default; _armed = false;
+            interaction.SetOperationsOpen(false);
+        }
         View = View with { Suppressed = blocked || input.FocusLostThisFrame };
         if (View.Suppressed)
         {
+            _armed = false;
             interaction.SetOperationsOpen(false);
             return default;
         }
         interaction.SetOperationsOpen(View.Open);
         var panel = OperationsLayout.Panel(layout);
         bool captured = input.HasPointerPosition && View.Open && panel.Contains(input.PointerPosition);
-        bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
-        captured |= fresh && originValid && View.Open && panel.Contains(origin);
-        if (inputCaptured || transition || !fresh || !input.HasPointerPosition || !originValid || snapshot?.PlayerExperience is null ||
-            !snapshot.SessionId.IsSpecified || snapshot.PlayerExperience.Value.IsMatchComplete) return new(captured);
-        if (!View.Open && layout.TopStatusBar.Contains(origin))
-        { View = new(true, Session: _session); interaction.SetOperationsOpen(true); return new(true); }
-        if (!View.Open || !panel.Contains(origin)) return new(captured);
+        if (inputCaptured || transition || snapshot?.PlayerExperience is null ||
+            !snapshot.SessionId.IsSpecified || snapshot.PlayerExperience.Value.IsMatchComplete)
+        {
+            _armed = false;
+            return new(captured);
+        }
+
+        if (fresh && input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin))
+        {
+            _armed = View.Open ? panel.Contains(pressOrigin) : layout.TopStatusBar.Contains(pressOrigin);
+            _armedPress = press;
+            _armedOrigin = pressOrigin;
+            _armedView = View;
+            _armedRowIndex = -1;
+            _armedRowEntity = default;
+            if (_armed && View.Open && !View.Notifications &&
+                OperationsSnapshot.Resolve(snapshot) is { } pressedData)
+                for (int index = 3; index <= 8; index++)
+                    if (OperationsLayout.Control(layout, index).Contains(pressOrigin))
+                    {
+                        _armedRowIndex = index;
+                        _armedRowEntity = OperationsLayout.Row(pressedData, View, index - 3)?.Entity ?? default;
+                        break;
+                    }
+        }
+        captured |= _armed && View.Open && panel.Contains(_armedOrigin);
+        if (!input.WasMouseButtonReleased(PlatformMouseButton.Left)) return new(captured);
+
+        bool activate = _armed && _armedPress == press && _armedView == View && input.HasPointerPosition;
+        var origin = _armedOrigin;
+        _armed = false;
+        if (!activate) return new(captured);
+        var release = input.PointerPosition;
+
+        if (!View.Open)
+        {
+            if (layout.TopStatusBar.Contains(origin) && layout.TopStatusBar.Contains(release))
+            {
+                View = new(true, Session: _session);
+                interaction.SetOperationsOpen(true);
+                return new(true);
+            }
+            return new(captured);
+        }
+        if (!panel.Contains(origin) || !panel.Contains(release)) return new(captured);
         if (View.Notifications)
         {
-            if (OperationsLayout.NotificationControl(layout, 0).Contains(origin))
+            if (OperationsLayout.NotificationControl(layout, 0).Contains(origin) &&
+                OperationsLayout.NotificationControl(layout, 0).Contains(release))
             { View = default; interaction.SetOperationsOpen(false); }
-            else if (OperationsLayout.NotificationControl(layout, 1).Contains(origin)) View = View with { Notifications = false, Page = 0 };
-            else if (OperationsLayout.NotificationControl(layout, 2).Contains(origin)) View = View with { Page = View.Page == int.MaxValue ? 0 : View.Page + 1 };
+            else if (OperationsLayout.NotificationControl(layout, 1).Contains(origin) &&
+                     OperationsLayout.NotificationControl(layout, 1).Contains(release))
+                View = View with { Notifications = false, Page = 0 };
+            else if (OperationsLayout.NotificationControl(layout, 2).Contains(origin) &&
+                     OperationsLayout.NotificationControl(layout, 2).Contains(release))
+                View = View with { Page = View.Page == int.MaxValue ? 0 : View.Page + 1 };
             return new(true);
         }
-        if (OperationsLayout.Control(layout, 0).Contains(origin))
+        if (OperationsLayout.Control(layout, 0).Contains(origin) &&
+            OperationsLayout.Control(layout, 0).Contains(release))
         { View = default; interaction.SetOperationsOpen(false); return new(true); }
-        if (OperationsLayout.Control(layout, 12).Contains(origin))
+        if (OperationsLayout.Control(layout, 12).Contains(origin) &&
+            OperationsLayout.Control(layout, 12).Contains(release))
         { View = View with { Notifications = true, Page = 0 }; return new(true); }
         if (OperationsSnapshot.Resolve(snapshot) is not { } data) return new(true);
         for (int index = 1; index <= 11; index++)
         {
-            if (!OperationsLayout.Control(layout, index).Contains(origin)) continue;
+            var control = OperationsLayout.Control(layout, index);
+            if (!control.Contains(origin) || !control.Contains(release)) continue;
             if (index == 1) View = View with { Filter = (OperationsCategory)(((int)View.Filter + 1) % 6), Page = 0, Selected = default };
             else if (index == 2) View = View with { Page = OperationsLayout.Row(data, View with { Page = View.Page + 1 }, 0) is null ? 0 : View.Page + 1, Selected = default };
-            else if (index is >= 3 and <= 8 && OperationsLayout.Row(data, View, index - 3) is { } row)
+            else if (index is >= 3 and <= 8 && OperationsLayout.Row(data, View, index - 3) is { } row &&
+                     _armedRowIndex == index && _armedRowEntity == row.Entity)
                 View = View with { Selected = row.Entity };
             else if (index == 11)
             {
@@ -163,8 +220,11 @@ public sealed class OperationsController
             {
                 foreach (var facility in data.Facilities)
                     if (facility.Entity == View.Selected)
+                    {
+                        if (index == 10 && facility.Controls == PlayerActionPanelMode.Closed) return new(true);
                         return new(true, LogisticsStatusCatalog.IsBlocked(facility.Service) && facility.Service.VehicleQueue is { WaitReason: not VehicleQueueWaitReason.Unavailable } queue
                             ? queue.Building : facility.Entity, index == 10 ? facility.Controls : PlayerActionPanelMode.Closed);
+                    }
             }
             break;
         }

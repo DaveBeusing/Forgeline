@@ -82,6 +82,10 @@ public sealed class EarlyGameGuidanceController
             foreach (var policy in logistics.Policies)
                 if (policy.FailureReason != ForgeLine.Game.LogisticsTransportRequestFailureReason.None)
                 { help = LogisticsStatusCatalog.Advice(policy.FailureReason); break; }
+        if (help.Length == 0 && OperationsDiagnosisSnapshot.Resolve(snapshot) is { Rows.Count: > 0 } diagnosis &&
+            OperationsActionGuidance.ForEntity(diagnosis, diagnosis.Rows[0].Entity) is { } issue &&
+            OperationsActionGuidance.NextAction(issue.PrimaryReason) is { Length: > 0 } nextAction)
+            help = OperationsDiagnosisSnapshot.Label(issue.PrimaryReason) + " / " + nextAction;
         if (_cachedHelp != help || _cachedConfirmed != confirmed || _cachedKey != step.Key || !ReferenceEquals(_cachedBindings, bindings) || _cachedLayout != layout)
         {
             _cachedHelp = help;
