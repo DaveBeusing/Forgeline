@@ -210,3 +210,7 @@ Every operation crosses `PlayerCommandGateway`. The player-facing adapter valida
 ## Planned local conveyor integration
 
 The proposed [Base Conveyor Logistics](BaseConveyorLogistics.md) design enables explicit local material ports for compatible solid inputs and outputs. Its [Directorate port matrix](BaseConveyorPortMatrix.md) describes intended interfaces, not implemented transport. Current production, recipes, inventory reservations and power gating remain authoritative; conveyor delivery must not bypass them.
+
+## Production and logistics diagnosis
+
+When an owned processing facility is selected, the [Operations Diagnosis](OperationsDiagnosis.md) reports its current production status and proven block reason separately from stock-policy demand and transport progress. A `NoInput` state means the local input is not sufficient; an outstanding request or cargo en route does not count as delivered material. `NoPower`, `Paused` and `OutputFull` retain their authoritative production meanings. The diagnosis is informational and never resumes a request, changes a recipe or transfers inventory.
