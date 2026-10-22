@@ -600,9 +600,9 @@ internal static class PlayerActionDockHudModel
                    PlayerActionPanelMode.Logistics &&
                actions.Logistics is
                    PlayerLogisticsActionReadModel logistics &&
-               index <
-                   logistics.Policies.Count &&
-               logistics.Policies[index].HasPolicy;
+               (index == 0 && logistics.SelectedConvoy.HasValue ||
+                index < logistics.Policies.Count &&
+                logistics.Policies[index].HasPolicy);
     }
 
     public static bool CanCyclePrimary(
@@ -882,6 +882,8 @@ internal static class PlayerActionDockHudModel
                     "NO RESUPPLY",
                 PlayerLogisticsActionFailureReason.InvalidPriority =>
                     "INVALID PRIORITY",
+                PlayerLogisticsActionFailureReason.ConvoyIneligible =>
+                    "CONVOY INELIGIBLE",
                 _ =>
                     "ACTION REJECTED"
             };
@@ -1182,6 +1184,17 @@ internal static class PlayerActionDockHudModel
                 "LOW",
             _ =>
                 "NORMAL"
+        };
+
+    public static string ResolveCargoConvoyStatusLabel(
+        CargoConvoyStatus status) => status switch
+        {
+            CargoConvoyStatus.Rendezvous => "RENDEZVOUS",
+            CargoConvoyStatus.Holding => "HOLDING",
+            CargoConvoyStatus.Moving => "MOVING",
+            CargoConvoyStatus.Disrupted => "DISRUPTED",
+            CargoConvoyStatus.Dissolved => "DISSOLVED",
+            _ => "UNAVAILABLE"
         };
 
     public static string ResolveLogisticsPriorityLabel(
