@@ -64,6 +64,10 @@ public sealed record MatchAuthoritativeSnapshot(
                 scenario.Intelligence.Capture(participant.Faction)));
         }
 
+        IReadOnlyList<OperationsRuleReadModel> operations = scenario.OperationsRules.CaptureAll();
+        // Keep the legacy no-rules snapshot unchanged for existing save compatibility.
+        if (operations.Count > 0)
+            domains.Add(CaptureDomain("operations.rules", operations));
 
         return new MatchAuthoritativeSnapshot(
             CurrentSchemaVersion,
