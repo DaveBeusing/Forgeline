@@ -521,7 +521,8 @@ internal static class PlayerActionDockHudModel
                     mode,
                     index,
                     panel,
-                    actions),
+                    actions,
+                    control == PlayerActionDockControlKind.Increase ? 1 : -1),
             _ =>
                 false
         };
@@ -546,7 +547,8 @@ internal static class PlayerActionDockHudModel
     public static bool CanCancel(
         PlayerActionPanelMode mode,
         int index,
-        PlayerActionSnapshot? actions)
+        PlayerActionSnapshot? actions,
+        int direction = 0)
     {
         if (actions is null ||
             index < 0)
@@ -656,18 +658,44 @@ internal static class PlayerActionDockHudModel
                 0;
         }
 
-        if (mode ==
-                PlayerActionPanelMode.Logistics &&
-            actions.Logistics is
-                PlayerLogisticsActionReadModel logistics)
+        if (mode == PlayerActionPanelMode.Logistics &&
+            actions.Logistics is PlayerLogisticsActionReadModel logistics)
         {
-            return index < logistics.OrderStartIndex;
+            if (index >= logistics.Policies.Count && index < logistics.OrderStartIndex)
+                return direction == 0 || direction > 0 ? panel.LogisticsSteps < 100 : panel.LogisticsSteps > 1;
+            if (index < 0 || index >= logistics.Policies.Count) return false;
+            if (direction == 0) return true;
+            return DecideStockAdjustment(panel, logistics, direction).Allowed;
         }
 
         return mode ==
                    PlayerActionPanelMode.Supply &&
                actions.Supply is { IsStaticProvider: false } &&
                index <= 1;
+    }
+
+    internal static (double Next, bool Allowed, string Reason) DecideStockAdjustment(
+        in PlayerActionPanelView panel, PlayerLogisticsActionReadModel logistics, int direction)
+    {
+        double minimum = panel.StockMinimum;
+        double target = panel.StockTarget;
+        double maximum = panel.StockMaximum;
+        return panel.StockThresholdField switch
+        {
+            PlayerStockThresholdField.Minimum => LogisticsQuantityEditor.Decide(
+                minimum, direction, LogisticsQuantityEditor.Minimum, target,
+                "MINIMUM IS 50", "INCREASE TARGET FIRST"),
+            PlayerStockThresholdField.Target => LogisticsQuantityEditor.Decide(
+                target, direction, Math.Max(LogisticsQuantityEditor.Minimum, minimum), maximum,
+                "DECREASE MIN FIRST", "INCREASE MAX FIRST"),
+            PlayerStockThresholdField.Maximum => LogisticsQuantityEditor.Decide(
+                maximum, direction, Math.Max(LogisticsQuantityEditor.Minimum, target),
+                logistics.InventoryCapacity > 0
+                    ? direction > 0 ? logistics.InventoryCapacity : Math.Max(maximum, logistics.InventoryCapacity)
+                    : double.MaxValue,
+                "DECREASE TARGET FIRST", "INVENTORY CAPACITY REACHED"),
+            _ => (0, false, "UNAVAILABLE")
+        };
     }
 
     public static string ResolveFooterLabel(
