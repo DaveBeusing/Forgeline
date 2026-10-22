@@ -3,8 +3,10 @@
 Implementation: 0.1.453, branch `feature/conveyor-flow`. Started from master
 `eb23d5ca` (conveyor construction, PR #300), then integrated current master
 `d4e100e7dfdc28426d6191ab1a9cd123cc00ade4` (graphics asset bindings, PR #301).
-The PR and implementation commit are recorded in the branch history and PR;
-build evidence is recorded in `ConveyorSimulationBuild.json`.
+Implementation head: `2646f9d04406a44c0a0ec44e23d9fab19bd9fd66`.
+Draft PR: [#302](https://github.com/DaveBeusing/Forgeline/pull/302).
+Documentation-only follow-ups are visible in that PR history; build evidence is
+recorded in `ConveyorSimulationBuild.json`.
 
 The user explicitly requested implementation and a pushed PR without tests.
 No automated tests were added or executed. CI, native execution, smoke runs,

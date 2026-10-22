@@ -50,5 +50,7 @@
   "headlessExecuted": false,
   "saveReplayRoundTripExecuted": false,
   "manualAcceptance": "pending; user will execute manually",
-  "manualPlan": "ConveyorSimulationAndVehicleInterop.md#persistence-and-manual-acceptance"
+  "manualPlan": "ConveyorSimulationAndVehicleInterop.md#persistence-and-manual-acceptance",
+  "implementationCommit": "2646f9d04406a44c0a0ec44e23d9fab19bd9fd66",
+  "pullRequest": "https://github.com/DaveBeusing/Forgeline/pull/302"
 }
