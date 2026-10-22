@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.ferrous_ore.faulted_ridge.small.collision",
+  "id": "mesh.world.resource.ferrous_ore.faulted_ridge.small",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.ferrous_ore.faulted_ridge.small_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.ferrous_ore.faulted_ridge.small_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.ferrous_ore"
+  ],
+  "source": "../sources/clusters/ferrous_ore/faulted_ridge_small_lod0.glb",
+  "type": "mesh"
+}

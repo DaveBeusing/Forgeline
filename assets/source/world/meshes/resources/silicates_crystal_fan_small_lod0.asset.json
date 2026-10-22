@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.silicates.crystal_fan.small.collision",
+  "id": "mesh.world.resource.silicates.crystal_fan.small",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.silicates.crystal_fan.small_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.silicates.crystal_fan.small_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.silicates"
+  ],
+  "source": "../sources/clusters/silicates/crystal_fan_small_lod0.glb",
+  "type": "mesh"
+}

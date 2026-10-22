@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.rare_elements.faulted_pocket.medium.collision",
+  "id": "mesh.world.resource.rare_elements.faulted_pocket.medium",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.rare_elements.faulted_pocket.medium_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.rare_elements.faulted_pocket.medium_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.rare_elements"
+  ],
+  "source": "../sources/clusters/rare_elements/faulted_pocket_medium_lod0.glb",
+  "type": "mesh"
+}

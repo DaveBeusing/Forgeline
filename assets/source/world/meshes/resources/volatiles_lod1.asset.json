@@ -1,8 +1,9 @@
 {
+  "collisionReference": "mesh.world.resource.volatiles.sealed_nodule.medium.collision",
   "id": "mesh.world.resource.volatiles_lod1",
-  "type": "mesh",
-  "source": "../sources/blender/volatiles/mesh.world.resource.volatiles_lod1.glb",
   "materialReferences": [
     "material.world.resource.volatiles"
-  ]
+  ],
+  "source": "../sources/clusters/volatiles/sealed_nodule_medium_lod1.glb",
+  "type": "mesh"
 }

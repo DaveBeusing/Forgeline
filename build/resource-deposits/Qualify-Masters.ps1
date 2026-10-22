@@ -45,8 +45,10 @@ foreach ($family in @('ferrous_ore','silicates','volatiles','rare_elements')) {
     }
     foreach ($variant in @('first','second','reopened')) {
         $report = Get-Content -LiteralPath (Join-Path $familyRoot "$variant/roundtrip-report.json") -Raw | ConvertFrom-Json
-        if (-not $report.success -or -not $report.productionSourcesUnchanged -or $report.meshes.Count -ne 2 -or
-            (Compare-Object @("mesh.world.resource.$family", "mesh.world.resource.${family}_lod1") @($report.meshes.id | Sort-Object))) { throw "Incomplete authored output: $family/$variant" }
+        $expectedMeshes = @((Get-Content -LiteralPath $fixture -Raw | ConvertFrom-Json).families |
+            Where-Object root -eq "mesh.world.resource.$family" | ForEach-Object assets | Sort-Object)
+        if (-not $report.success -or -not $report.productionSourcesUnchanged -or $report.meshes.Count -ne $expectedMeshes.Count -or
+            (Compare-Object $expectedMeshes @($report.meshes.id | Sort-Object))) { throw "Incomplete authored output: $family/$variant" }
         foreach ($file in $report.sourceHashes.PSObject.Properties) {
             $sourcePath = [IO.Path]::GetFullPath($file.Name, $canonicalRoot)
             if (-not $sourcePath.StartsWith($canonicalRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or

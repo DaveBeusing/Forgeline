@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.ferrous_ore.layered_shelf.large.collision",
+  "id": "mesh.world.resource.ferrous_ore.layered_shelf.large",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.ferrous_ore.layered_shelf.large_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.ferrous_ore.layered_shelf.large_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.ferrous_ore"
+  ],
+  "source": "../sources/clusters/ferrous_ore/layered_shelf_large_lod0.glb",
+  "type": "mesh"
+}

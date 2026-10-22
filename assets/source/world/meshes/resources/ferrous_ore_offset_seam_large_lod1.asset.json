@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.ferrous_ore.offset_seam.large.collision",
+  "id": "mesh.world.resource.ferrous_ore.offset_seam.large_lod1",
+  "materialReferences": [
+    "material.world.resource.ferrous_ore"
+  ],
+  "source": "../sources/clusters/ferrous_ore/offset_seam_large_lod1.glb",
+  "type": "mesh"
+}

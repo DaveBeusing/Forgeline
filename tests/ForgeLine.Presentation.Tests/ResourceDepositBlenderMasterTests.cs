@@ -70,7 +70,7 @@ public sealed class ResourceDepositBlenderMasterTests
                 replacements.Add(record.Id, (record, source));
             }
         }
-        Assert.Equal(8, replacements.Count);
+        Assert.Equal(16, replacements.Count); // Four families, three LODs and one conservative proxy each.
         string target = Path.Combine(root, "overlay/runtime");
         Assert.False(Directory.Exists(target), "Use a fresh complete review overlay.");
         Directory.CreateDirectory(target);
@@ -150,7 +150,7 @@ public sealed class ResourceDepositBlenderMasterTests
     {
         string root = Path.Combine(Environment.GetEnvironmentVariable("FORGELINE_RESOURCE_MASTERS")!, family);
         var baseline = RuntimeAssetCatalog.Load(Path.Combine(root, "baseline/runtime"));
-        Assert.Equal(2, baseline.Manifest.Assets.Count(x => x.Type == RuntimeAssetType.Mesh));
+        Assert.Equal(4, baseline.Manifest.Assets.Count(x => x.Type == RuntimeAssetType.Mesh));
         foreach (string variant in new[] { "first", "second", "reopened" })
         {
             var candidate = RuntimeAssetCatalog.Load(Path.Combine(root, variant, "runtime"));

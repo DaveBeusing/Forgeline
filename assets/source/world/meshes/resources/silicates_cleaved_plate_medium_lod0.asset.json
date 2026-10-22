@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.silicates.cleaved_plate.medium.collision",
+  "id": "mesh.world.resource.silicates.cleaved_plate.medium",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.silicates.cleaved_plate.medium_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.silicates.cleaved_plate.medium_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.silicates"
+  ],
+  "source": "../sources/clusters/silicates/cleaved_plate_medium_lod0.glb",
+  "type": "mesh"
+}

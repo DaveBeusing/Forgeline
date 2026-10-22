@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.ferrous_ore.layered_shelf.large.collision",
+  "id": "mesh.world.resource.ferrous_ore.layered_shelf.large_lod2",
+  "materialReferences": [
+    "material.world.resource.ferrous_ore"
+  ],
+  "source": "../sources/clusters/ferrous_ore/layered_shelf_large_lod2.glb",
+  "type": "mesh"
+}

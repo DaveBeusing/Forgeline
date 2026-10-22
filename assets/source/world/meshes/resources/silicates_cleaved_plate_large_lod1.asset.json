@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.silicates.cleaved_plate.large.collision",
+  "id": "mesh.world.resource.silicates.cleaved_plate.large_lod1",
+  "materialReferences": [
+    "material.world.resource.silicates"
+  ],
+  "source": "../sources/clusters/silicates/cleaved_plate_large_lod1.glb",
+  "type": "mesh"
+}

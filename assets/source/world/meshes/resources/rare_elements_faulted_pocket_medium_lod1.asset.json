@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.rare_elements.faulted_pocket.medium.collision",
+  "id": "mesh.world.resource.rare_elements.faulted_pocket.medium_lod1",
+  "materialReferences": [
+    "material.world.resource.rare_elements"
+  ],
+  "source": "../sources/clusters/rare_elements/faulted_pocket_medium_lod1.glb",
+  "type": "mesh"
+}

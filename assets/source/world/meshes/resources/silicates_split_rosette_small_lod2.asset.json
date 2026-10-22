@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.silicates.split_rosette.small.collision",
+  "id": "mesh.world.resource.silicates.split_rosette.small_lod2",
+  "materialReferences": [
+    "material.world.resource.silicates"
+  ],
+  "source": "../sources/clusters/silicates/split_rosette_small_lod2.glb",
+  "type": "mesh"
+}

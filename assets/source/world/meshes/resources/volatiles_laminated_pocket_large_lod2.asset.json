@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.volatiles.laminated_pocket.large.collision",
+  "id": "mesh.world.resource.volatiles.laminated_pocket.large_lod2",
+  "materialReferences": [
+    "material.world.resource.volatiles"
+  ],
+  "source": "../sources/clusters/volatiles/laminated_pocket_large_lod2.glb",
+  "type": "mesh"
+}

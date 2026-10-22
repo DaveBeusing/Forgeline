@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.resource.silicates.crystal_fan.medium.collision",
+  "source": "../sources/clusters/silicates/crystal_fan_medium_proxy.glb",
+  "type": "mesh"
+}

@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.resource.volatiles.laminated_pocket.small.collision",
+  "source": "../sources/clusters/volatiles/laminated_pocket_small_proxy.glb",
+  "type": "mesh"
+}

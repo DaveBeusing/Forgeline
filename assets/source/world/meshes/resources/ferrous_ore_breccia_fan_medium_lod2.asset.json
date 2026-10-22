@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.ferrous_ore.breccia_fan.medium.collision",
+  "id": "mesh.world.resource.ferrous_ore.breccia_fan.medium_lod2",
+  "materialReferences": [
+    "material.world.resource.ferrous_ore"
+  ],
+  "source": "../sources/clusters/ferrous_ore/breccia_fan_medium_lod2.glb",
+  "type": "mesh"
+}

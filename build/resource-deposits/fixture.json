@@ -5,7 +5,9 @@
       "root": "mesh.world.resource.ferrous_ore",
       "assets": [
         "mesh.world.resource.ferrous_ore",
-        "mesh.world.resource.ferrous_ore_lod1"
+        "mesh.world.resource.ferrous_ore_lod1",
+        "mesh.world.resource.ferrous_ore_lod2",
+        "mesh.world.resource.ferrous_ore.layered_shelf.medium.collision"
       ],
       "instanceScale": [
         1,
@@ -23,7 +25,9 @@
       "root": "mesh.world.resource.silicates",
       "assets": [
         "mesh.world.resource.silicates",
-        "mesh.world.resource.silicates_lod1"
+        "mesh.world.resource.silicates_lod1",
+        "mesh.world.resource.silicates_lod2",
+        "mesh.world.resource.silicates.cleaved_plate.medium.collision"
       ],
       "instanceScale": [
         1,
@@ -41,7 +45,9 @@
       "root": "mesh.world.resource.volatiles",
       "assets": [
         "mesh.world.resource.volatiles",
-        "mesh.world.resource.volatiles_lod1"
+        "mesh.world.resource.volatiles_lod1",
+        "mesh.world.resource.volatiles_lod2",
+        "mesh.world.resource.volatiles.sealed_nodule.medium.collision"
       ],
       "instanceScale": [
         1,
@@ -59,7 +65,9 @@
       "root": "mesh.world.resource.rare_elements",
       "assets": [
         "mesh.world.resource.rare_elements",
-        "mesh.world.resource.rare_elements_lod1"
+        "mesh.world.resource.rare_elements_lod1",
+        "mesh.world.resource.rare_elements_lod2",
+        "mesh.world.resource.rare_elements.inclusion_reef.medium.collision"
       ],
       "instanceScale": [
         1,

@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.resource.silicates.cleaved_plate.medium.collision",
+  "source": "../sources/clusters/silicates/cleaved_plate_medium_proxy.glb",
+  "type": "mesh"
+}

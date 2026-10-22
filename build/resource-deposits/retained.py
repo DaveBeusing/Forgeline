@@ -93,6 +93,13 @@ def refresh_native(output):
 
 
 def validate():
+    if (ROOT / 'assets/source/world/authoring/resource_clusters/sources.json').is_file():
+        # New topology has its own saved-master/export contract. Historical masters
+        # remain hash-checked by that contract, without claiming their old signatures
+        # qualify the replacement geometry.
+        from cluster_contract import validate as validate_clusters
+        validate_clusters()
+        return
     catalog = Catalog(ROOT / 'assets/source')
     for name in NAMES:
         ids, families = fixture_selection(catalog, FIXTURE, ['mesh.world.resource.' + name])
