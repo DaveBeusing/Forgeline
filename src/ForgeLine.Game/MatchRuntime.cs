@@ -28,6 +28,7 @@ public sealed class MatchRuntime : IDisposable
         InventoryStore inventories,
         LogisticsNetwork logistics,
         CargoTransportSystem cargoTransport,
+        CargoConvoySystem cargoConvoys,
         AutomatedDistributionSystem automatedDistribution,
         PowerNetworkSystem power,
         ProductionSystem production,
@@ -56,6 +57,7 @@ public sealed class MatchRuntime : IDisposable
         Inventories = inventories;
         Logistics = logistics;
         CargoTransport = cargoTransport;
+        CargoConvoys = cargoConvoys;
         AutomatedDistribution = automatedDistribution;
         Power = power;
         Production = production;
@@ -97,6 +99,8 @@ public sealed class MatchRuntime : IDisposable
     public LogisticsNetwork Logistics { get; }
 
     public CargoTransportSystem CargoTransport { get; }
+
+    public CargoConvoySystem CargoConvoys { get; }
 
     public AutomatedDistributionSystem AutomatedDistribution { get; }
 
@@ -303,6 +307,7 @@ public sealed class MatchRuntime : IDisposable
                 logistics,
                 inventories,
                 navigation, docking) { Progress = progress };
+        var cargoConvoys = new CargoConvoySystem(logistics);
         var automatedDistribution =
             new AutomatedDistributionSystem(
                 logistics,
@@ -581,6 +586,7 @@ public sealed class MatchRuntime : IDisposable
             suppression,
             automaticResupply,
             formationMovement,
+            cargoConvoys,
             navigation,
             groundMovement,
             new SpatialIndexSystem(
@@ -675,6 +681,7 @@ public sealed class MatchRuntime : IDisposable
             inventories,
             logistics,
             cargoTransport,
+            cargoConvoys,
             automatedDistribution,
             power,
             production,
