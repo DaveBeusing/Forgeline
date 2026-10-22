@@ -106,6 +106,16 @@ internal sealed partial class PlayerActionRingHudRenderer
                 actions?.Logistics is { } requirements && panel.SelectedIndex >= requirements.Policies.Count &&
                 target.Kind is PlayerActionDockControlKind.Decrease or PlayerActionDockControlKind.Increase)
             { value.Append("STEPS "); value.Append(panel.LogisticsSteps); }
+            else if (!navigation && !mode && !item && !enabled &&
+                panel.Mode == PlayerActionPanelMode.Logistics &&
+                actions?.Logistics is { } stock &&
+                panel.SelectedIndex < stock.Policies.Count &&
+                target.Kind is PlayerActionDockControlKind.Decrease or PlayerActionDockControlKind.Increase)
+            {
+                var reason = PlayerActionDockHudModel.DecideStockAdjustment(panel, stock,
+                    target.Kind == PlayerActionDockControlKind.Increase ? 1 : -1);
+                value.Append(reason.Reason);
+            }
             else if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
             else if (mode && target.Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } logisticsSummary)
             { value.Append("ORDERS "); value.Append(logisticsSummary.TotalOrderCount); }

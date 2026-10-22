@@ -1410,24 +1410,12 @@ internal static class PlayerActionSnapshotFactory
                         inventory,
                         resource.Id)
                     : 0.0;
-            double target =
-                hasPolicy
-                    ? policy.DesiredTarget
-                    : Math.Max(
-                        10.0,
-                        Math.Ceiling(currentQuantity));
-            double minimum =
-                hasPolicy
-                    ? policy.DesiredMinimum
-                    : Math.Min(
-                        target,
-                        target * 0.5);
-            double maximum =
-                hasPolicy
-                    ? policy.DesiredMaximum
-                    : Math.Max(
-                        target,
-                        target * 2.0);
+            // A new manual policy is a draft; its defaults are not inventory demand.
+            var defaults = LogisticsQuantityEditor.NewManualDefaults(
+                scenario.Inventories.GetTotalCapacity(inventory));
+            double minimum = hasPolicy ? policy.DesiredMinimum : defaults.Minimum;
+            double target = hasPolicy ? policy.DesiredTarget : defaults.Target;
+            double maximum = hasPolicy ? policy.DesiredMaximum : defaults.Maximum;
 
             ResolveDistributionStatus(
                 scenario,

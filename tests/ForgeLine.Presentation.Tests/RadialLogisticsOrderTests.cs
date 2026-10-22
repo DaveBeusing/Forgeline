@@ -7,6 +7,41 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class RadialLogisticsOrderTests
 {
+    [Theory]
+    [InlineData(0, 50, 100, 150)]
+    [InlineData(500, 50, 100, 150)]
+    [InlineData(125, 50, 100, 100)]
+    [InlineData(100, 50, 100, 100)]
+    [InlineData(75, 50, 50, 50)]
+    [InlineData(49, 0, 0, 0)]
+    public void UnsavedManualPolicyUsesFullFiftyUnitCapacitySteps(
+        double capacity, double minimum, double target, double maximum)
+    {
+        var defaults = LogisticsQuantityEditor.NewManualDefaults(capacity);
+        Assert.Equal((minimum, target, maximum), defaults);
+    }
+
+    [Fact]
+    public void DirectionalStockDecisionsExplainBlockedNeighborAndCapacity()
+    {
+        var atTarget = LogisticsQuantityEditor.Decide(100, 1, 50, 100,
+            "DECREASE MIN FIRST", "INCREASE MAX FIRST");
+        Assert.False(atTarget.Allowed);
+        Assert.Equal("INCREASE MAX FIRST", atTarget.Reason);
+        Assert.Equal(100, atTarget.Next);
+
+        var increased = LogisticsQuantityEditor.Decide(100, 1, 50, 150,
+            "DECREASE MIN FIRST", "INCREASE MAX FIRST");
+        Assert.True(increased.Allowed);
+        Assert.Equal(150, increased.Next);
+
+        var atCapacity = LogisticsQuantityEditor.Decide(100, 1, 50, 125,
+            "DECREASE TARGET FIRST", "INVENTORY CAPACITY REACHED");
+        Assert.False(atCapacity.Allowed);
+        Assert.Equal("INVENTORY CAPACITY REACHED", atCapacity.Reason);
+        Assert.Equal(100, atCapacity.Next);
+    }
+
     [Fact]
     public void FiftyUnitEditorAdvancesWithoutTouchingLegacyValues()
     {

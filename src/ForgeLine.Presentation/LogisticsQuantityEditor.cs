@@ -6,6 +6,49 @@ internal static class LogisticsQuantityEditor
     internal const double Step = 50;
     internal const double Minimum = 50;
 
+    // Zero denotes an unspecified total capacity in legacy action snapshots.
+    internal static (double Minimum, double Target, double Maximum) NewManualDefaults(double capacity)
+    {
+        if (!double.IsFinite(capacity) || capacity < 0 || capacity > 0 && capacity < Minimum)
+            return (0, 0, 0);
+        if (capacity > 0 && capacity < 100) return (50, 50, 50);
+        if (capacity > 0 && capacity < 150) return (50, 100, 100);
+        return (50, 100, 150);
+    }
+
+    internal static (double Next, bool Allowed, string Reason) Decide(
+        double current, int direction, double lower, double upper,
+        string lowerReason, string upperReason)
+    {
+        double next = Adjust(current, direction, lower, upper);
+        if (next != current) return (next, true, string.Empty);
+        if (!double.IsFinite(current) || !double.IsFinite(lower) || !double.IsFinite(upper))
+            return (current, false, "INVALID QUANTITY LIMIT");
+        return (current, false, direction < 0 ? lowerReason : upperReason);
+    }
+
+    internal static (double Next, bool Allowed, string Reason) DecideField(
+        PlayerStockThresholdField field, double minimum, double target,
+        double maximum, double capacity, int direction)
+    {
+        return field switch
+        {
+            PlayerStockThresholdField.Minimum => Decide(
+                minimum, direction, Minimum, target,
+                "MINIMUM IS 50", "INCREASE TARGET FIRST"),
+            PlayerStockThresholdField.Target => Decide(
+                target, direction, Math.Max(Minimum, minimum), maximum,
+                "DECREASE MIN FIRST", "INCREASE MAX FIRST"),
+            PlayerStockThresholdField.Maximum => Decide(
+                maximum, direction, Math.Max(Minimum, target),
+                capacity > 0
+                    ? direction > 0 ? capacity : Math.Max(maximum, capacity)
+                    : double.MaxValue,
+                "DECREASE TARGET FIRST", "INVENTORY CAPACITY REACHED"),
+            _ => (0, false, "UNAVAILABLE")
+        };
+    }
+
     internal static double Adjust(double current, int direction, double lower = Minimum, double upper = double.MaxValue)
     {
         if (direction == 0 || !double.IsFinite(current) || current < 0 ||

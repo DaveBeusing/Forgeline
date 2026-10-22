@@ -434,7 +434,12 @@ internal static class PlayerActionDockHudModel
             case PlayerActionPanelMode.Logistics:
                 return actions.Logistics is PlayerLogisticsActionReadModel logistics &&
                        index < logistics.ItemCount
-                    ? index < logistics.OrderStartIndex ? PlayerActionDockItemState.Enabled :
+                    ? index < logistics.Policies.Count &&
+                        !logistics.Policies[index].HasPolicy &&
+                        logistics.InventoryCapacity > 0 &&
+                        logistics.InventoryCapacity < LogisticsQuantityEditor.Minimum
+                        ? PlayerActionDockItemState.Disabled("CAPACITY BELOW 50")
+                        : index < logistics.OrderStartIndex ? PlayerActionDockItemState.Enabled :
                         PlayerActionDockItemState.Disabled("READ ONLY")
                     : PlayerActionDockItemState.Disabled("SELECT LOGISTICS");
 
@@ -521,7 +526,8 @@ internal static class PlayerActionDockHudModel
                     mode,
                     index,
                     panel,
-                    actions),
+                    actions,
+                    control == PlayerActionDockControlKind.Increase ? 1 : -1),
             _ =>
                 false
         };
@@ -546,7 +552,8 @@ internal static class PlayerActionDockHudModel
     public static bool CanCancel(
         PlayerActionPanelMode mode,
         int index,
-        PlayerActionSnapshot? actions)
+        PlayerActionSnapshot? actions,
+        int direction = 0)
     {
         if (actions is null ||
             index < 0)
@@ -634,7 +641,8 @@ internal static class PlayerActionDockHudModel
         PlayerActionPanelMode mode,
         int index,
         in PlayerActionPanelView panel,
-        PlayerActionSnapshot? actions)
+        PlayerActionSnapshot? actions,
+        int direction = 0)
     {
         if (actions is null ||
             index < 0)
@@ -656,18 +664,28 @@ internal static class PlayerActionDockHudModel
                 0;
         }
 
-        if (mode ==
-                PlayerActionPanelMode.Logistics &&
-            actions.Logistics is
-                PlayerLogisticsActionReadModel logistics)
+        if (mode == PlayerActionPanelMode.Logistics &&
+            actions.Logistics is PlayerLogisticsActionReadModel logistics)
         {
-            return index < logistics.OrderStartIndex;
+            if (index >= logistics.Policies.Count && index < logistics.OrderStartIndex)
+                return direction == 0 || (direction > 0 ? panel.LogisticsSteps < 100 : panel.LogisticsSteps > 1);
+            if (index < 0 || index >= logistics.Policies.Count) return false;
+            if (direction == 0) return true;
+            return DecideStockAdjustment(panel, logistics, direction).Allowed;
         }
 
         return mode ==
                    PlayerActionPanelMode.Supply &&
                actions.Supply is { IsStaticProvider: false } &&
                index <= 1;
+    }
+
+    internal static (double Next, bool Allowed, string Reason) DecideStockAdjustment(
+        in PlayerActionPanelView panel, PlayerLogisticsActionReadModel logistics, int direction)
+    {
+        return LogisticsQuantityEditor.DecideField(
+            panel.StockThresholdField, panel.StockMinimum, panel.StockTarget,
+            panel.StockMaximum, logistics.InventoryCapacity, direction);
     }
 
     public static string ResolveFooterLabel(
