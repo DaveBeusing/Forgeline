@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
+using Feature = Vortice.Direct3D12.Feature;
 
 namespace ForgeLine.Graphics;
 
