@@ -64,6 +64,17 @@ public static class PlayerActionRequestDispatcher
                         observedTick);
                 return true;
 
+            case PlayerActionRequestKind.CreateCargoConvoy:
+                receipt = gateway.SubmitCargoConvoy(
+                    player, request.ConvoyTrucks ?? [],
+                    request.ConvoyEscorts ?? [], observedTick);
+                return true;
+
+            case PlayerActionRequestKind.DissolveCargoConvoy:
+                receipt = gateway.SubmitCargoConvoyDissolve(
+                    player, request.ConvoyGroup, observedTick);
+                return true;
+
             case PlayerActionRequestKind.SetStockPolicy:
                 receipt =
                     gateway.SubmitLogisticsStockPolicy(
