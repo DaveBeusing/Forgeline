@@ -123,13 +123,20 @@ internal static class SelectedUnitOrderSnapshotFactory
                 ? live : CargoTransportRuntimeState.Idle;
             bool goOrigin = state.Lifecycle is CargoTransportLifecycleState.ToOrigin or
                 CargoTransportLifecycleState.Loading;
+            bool queued = entities.HasComponent<VehicleQueueEntry>(id);
             string verb = state.Lifecycle switch
             {
-                CargoTransportLifecycleState.ToOrigin => "COLLECT",
+                CargoTransportLifecycleState.ToOrigin => queued ? "COLLECT — WAITING FOR BAY" : "COLLECT",
                 CargoTransportLifecycleState.Loading => "LOADING",
-                CargoTransportLifecycleState.ToDestination => "DELIVER",
+                CargoTransportLifecycleState.ToDestination => queued ? "DELIVER — WAITING FOR BAY" : "DELIVER",
                 CargoTransportLifecycleState.Unloading => "UNLOADING",
-                CargoTransportLifecycleState.Waiting => "DELIVERY — WAITING",
+                CargoTransportLifecycleState.Waiting => state.WaitReason switch
+                {
+                    CargoTransportWaitReason.OriginResourceUnavailable => "COLLECT — NO STOCK",
+                    CargoTransportWaitReason.DestinationCapacity => "DELIVER — DESTINATION FULL",
+                    CargoTransportWaitReason.RouteUnavailable or CargoTransportWaitReason.RouteInvalidated => "DELIVERY — ROUTE BLOCKED",
+                    _ => "DELIVERY — WAITING"
+                },
                 CargoTransportLifecycleState.Failed => "DELIVERY — BLOCKED",
                 _ => "CARGO"
             };
@@ -216,7 +223,9 @@ internal static class SelectedUnitOrderSnapshotFactory
         else if (entities.TryGetComponent(id, out NavigationRouteState route))
             movement = route.OriginalOrder;
         else if (entities.TryGetComponent(id, out NavigationFailureState failure))
-            movement = failure.OriginalOrder;
+            return View(SelectedUnitOrderKind.Move, "MOVE — ROUTE BLOCKED",
+                failure.OriginalOrder.WorldTarget,
+                failure.OriginalOrder.Kind == MovementOrderKind.Strategic);
         else if (!entities.TryGetComponent(id, out movement))
             return View(SelectedUnitOrderKind.Idle, "IDLE");
 
