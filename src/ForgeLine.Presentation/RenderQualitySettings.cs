@@ -39,7 +39,8 @@ public readonly record struct RenderQualitySettings
     }
 
     public RenderQualityProfile Resolve(bool supported, bool software, int width, int height, int buffers,
-        ulong? availableBytes = null, bool particlesSupported = true)
+        ulong? availableBytes = null, bool particlesSupported = true,
+        bool shadowsSupported = true, bool atmosphereSupported = true)
     {
         Validate();
         if (width <= 0 || height <= 0 || buffers is < 2 or > 4) throw new ArgumentOutOfRangeException(nameof(width));
@@ -90,6 +91,16 @@ public readonly record struct RenderQualitySettings
                 aa = (SpatialAntialiasing)Math.Min((int)aa, selected == RenderQuality.Low ? 0 : selected == RenderQuality.Medium ? 1 : 2);
                 if (software) atmosphere = AtmosphereQuality.Disabled;
             }
+            if (!shadowsSupported && shadow != DirectionalShadowQuality.Disabled)
+            {
+                shadow = DirectionalShadowQuality.Disabled;
+                fallback = AppendReason(fallback, "Directional shadows are unsupported.");
+            }
+            if (!atmosphereSupported && atmosphere != AtmosphereQuality.Disabled)
+            {
+                atmosphere = AtmosphereQuality.Disabled;
+                fallback = AppendReason(fallback, "Atmospheric depth composition is unsupported.");
+            }
             if (!particlesSupported && particles != ParticleQuality.Disabled)
                 fallback = string.IsNullOrEmpty(fallback) ? "Particle rendering is unsupported." : fallback + " Particle rendering is unsupported.";
             return new(input.Quality, selected, linear,
@@ -115,6 +126,9 @@ public readonly record struct RenderQualitySettings
     {
         if (!Enum.IsDefined(value)) throw new ArgumentOutOfRangeException(name);
     }
+
+    private static string AppendReason(string? reason, string addition) =>
+        string.IsNullOrEmpty(reason) ? addition : reason + " " + addition;
 }
 
 public readonly record struct RenderQualityProfile(RenderQuality Requested, RenderQuality Active, bool LinearScene,

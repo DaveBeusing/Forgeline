@@ -8,6 +8,9 @@ public interface IGraphicsDevice : IDisposable
     bool SupportsUiText => false;
     ulong? AvailableMemoryBudgetBytes => null;
     bool SupportsPostProcessing => false;
+    bool SupportsAtmosphere => false;
+    bool SupportsDirectionalShadows => false;
+    bool ParticleDepthEnabled => false;
     GraphicsPostProcessingSettings PostProcessing => GraphicsPostProcessingSettings.Neutral;
     void ConfigurePostProcessing(GraphicsPostProcessingSettings settings)
     {
