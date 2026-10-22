@@ -120,6 +120,33 @@ internal sealed partial class PlayerActionRingHudRenderer
             else if (mode && target.Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } logisticsSummary)
             { value.Append("ORDERS "); value.Append(logisticsSummary.TotalOrderCount); }
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
+            else if (item && panel.Mode == PlayerActionPanelMode.Logistics &&
+                actions?.Logistics is { } stockRows &&
+                target.ItemIndex >= 0 && target.ItemIndex < stockRows.Policies.Count)
+            {
+                // The entry describes accepted simulation state, not the
+                // separately editable PRIOR value on the parameter page.
+                var stockPolicy = stockRows.Policies[target.ItemIndex];
+                value.Append(PlayerActionDockHudModel.ResolveLogisticsPriorityLabel(stockPolicy.Priority));
+                if (stockPolicy.DispatchPriority != stockPolicy.Priority &&
+                    stockPolicy.Enabled)
+                {
+                    value.Append(">");
+                    value.Append(PlayerActionDockHudModel.ResolveLogisticsPriorityLabel(stockPolicy.DispatchPriority));
+                }
+                if (!stockPolicy.Enabled) value.Append(" / OFF");
+                else if (stockPolicy.FailureReason != ForgeLine.Game.LogisticsTransportRequestFailureReason.None)
+                {
+                    value.Append(" / ");
+                    value.Append(PlayerActionDockHudModel.ResolveTransportFailureLabel(stockPolicy.FailureReason));
+                }
+                else if (stockPolicy.DistributionState != PlayerDistributionActionState.None)
+                {
+                    value.Append(" / ");
+                    value.Append(PlayerActionDockHudModel.ResolveDistributionStateLabel(stockPolicy.DistributionState));
+                }
+                else value.Append(" / IDLE");
+            }
             else if (item)
             {
                 var state = PlayerActionDockHudModel.ResolveItemState(panel.Mode, target.ItemIndex, actions,

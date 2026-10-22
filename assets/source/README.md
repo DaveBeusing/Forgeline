@@ -9,6 +9,7 @@ The Vertical Slice source sets are organized by presentation domain:
 - `world/` — terrain materials, decals, props, vegetation, and resource presentation;
 - `units/directorate/` — Directorate unit meshes, materials, LODs, collision, sockets, and strategic symbols;
 - `buildings/directorate/` — Directorate building families and shared construction/state modules;
+- `infrastructure/directorate/conveyors/` — proposed raised-conveyor visual dimensions, ports, module catalog and blockout reference; no compiled conveyor gameplay yet.
 - `infrastructure/directorate/` — Directorate road/bridge presentation and strategic symbols;
 - `vfx/` — combat, destruction, persistent damage, projectile, and logistics VFX meshes/materials;
 - `ui/` — semantic RTS resource, role, command, cursor, supply, minimap, and status material assets.
