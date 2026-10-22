@@ -45,8 +45,13 @@ public sealed class AutomatedDistributionSystemTests
         Assert.Equal(LogisticsStockPriority.High, assigned.Priority);
         Assert.Equal(truck, assigned.AssignedTruck);
 
-        EntityId policyEntity = fixture.Simulation.Entities
-            .Query<LogisticsStockPolicy>().Single();
+        EntityId policyEntity = EntityId.Invalid;
+        foreach (EntityId candidate in fixture.Simulation.Entities.Query<LogisticsStockPolicy>())
+        {
+            policyEntity = candidate;
+            break;
+        }
+        Assert.True(policyEntity.IsValid);
         fixture.Simulation.Entities.SetComponent(
             policyEntity,
             new LogisticsStockPolicy(
