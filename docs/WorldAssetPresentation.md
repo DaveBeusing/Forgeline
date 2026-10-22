@@ -2,6 +2,9 @@
 
 ## Purpose
 
+Resource variant bindings, complete-pair fallbacks, instancing diagnostics and the
+pending manual review matrix are described in [Resource deposit rendering](ResourceDepositRendering.md).
+
 Current authored groups, road-aligned material transitions, rooted volumetric
 vegetation and qualification limits are described in [Environment composition](EnvironmentDressing.md).
 

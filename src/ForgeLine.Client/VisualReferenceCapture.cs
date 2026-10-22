@@ -381,10 +381,14 @@ internal static class VisualReferenceCapture
                     if (measured.Surface.Width != display.Width || measured.Surface.Height != display.Height)
                         throw new InvalidOperationException("Actual native surface dimensions differ from the capture request.");
                     if (measured.Resources.TextureBindingFailureCount != 0 || meshes.MaterialDiagnostics.BindingFailureCount != 0 ||
+                        meshes.LastDiagnostics.ResourceDeposits.MissingResources != 0 ||
+                        meshes.LastDiagnostics.ResourceDeposits.CanonicalFallbacks != 0 ||
+                        meshes.LastDiagnostics.ResourceDeposits.InvalidSelections != 0 ||
+                        meshes.LastDiagnostics.ResourceDeposits.InvalidTransforms != 0 ||
                         meshes.LastDiagnostics.FallbackMeshInstances != 0 || measured.Health.PendingRetirementCount != 0 ||
                         measured.Health.SubmissionFaultCount != 0 || measured.Health.FailureReasonCode is not null ||
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
-                        throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
+                        throw new InvalidOperationException("Capture contains failed bindings, missing resource visuals or fallback meshes.");
                     captureState = new { key, stage = "first-readback", surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
                     byte[] rgba = CaptureFrame();
                     bool repeatPixelsEqual = true;
@@ -470,6 +474,7 @@ internal static class VisualReferenceCapture
                             cameraPathVersion = request.CameraPath == ReferenceCameraPath.Traverse ? 2 : 1, cameraSamples = request.Samples,
                             coldScope = "Fresh per-case renderers; process/device/runtime catalog and OS caches can already be warm. No OS/driver cache flush." },
                         decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
+                        resourceBatches = meshes.GetResourceBatchDiagnostics(),
                         materialReference = materialReference is null ? null : MaterialReferenceRenderer.Materials,
                         hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual, request.RepeatCaptures, repeatFailures,
                         captureInputs = captureInputs.ToArray(),

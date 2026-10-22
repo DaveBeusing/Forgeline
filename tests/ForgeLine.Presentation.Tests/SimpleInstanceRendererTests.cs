@@ -12,6 +12,31 @@ public sealed class SimpleInstanceRendererTests : IDisposable
     private readonly FakeGraphicsDevice _graphics = new();
 
     [Fact]
+    public void MissingResourceAssetsAreDiagnosedWithoutDebugCubesOrHiddenUploads()
+    {
+        var camera = new RtsCamera();
+        var mineral = Instance(new(1, 1), camera.Target, new Vector3(4)) with
+        {
+            WorldFeature = new(WorldVisualId.ResourceFerrousOre, WorldPresentationKind.ResourceDeposit,
+                ResourceDepositPresentationState.Untouched, true)
+            { ResourceVariant = new("foreign-key", 12) }
+        };
+        var buffer = new PresentationSnapshotBuffer();
+        buffer.Publish(new(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 2,
+            [mineral, mineral with { Entity = new(2, 1), Visibility = RenderVisibilityMask.None }]));
+        var world = new RenderWorld();
+        Assert.True(world.Update(buffer));
+        using var renderer = new SimpleInstanceRenderer(_graphics);
+        renderer.Render(new FakeGraphicsCommandContext(), camera, world, 1);
+        Assert.Equal(1, renderer.ResourceDiagnostics.VisibleRequests);
+        Assert.Equal(1, renderer.ResourceDiagnostics.InvalidSelections);
+        Assert.Equal(1, renderer.ResourceDiagnostics.MissingResources);
+        Assert.Equal(0, renderer.LastDiagnostics.DrawCalls);
+        Assert.Equal(0, renderer.LastDiagnostics.FallbackMeshInstances);
+        Assert.Empty(renderer.GetResourceBatchDiagnostics());
+    }
+
+    [Fact]
     public void AnimatedVegetationKeepsOneBatchAndHiddenInstancesOutOfUploads()
     {
         _graphics.CaptureUploads = true;
