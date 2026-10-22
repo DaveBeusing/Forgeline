@@ -12,10 +12,12 @@ require(not target.exists(), 'Use fresh material source output')
 catalog = Catalog(ROOT / 'assets/source')
 names = ('ferrous_ore', 'silicates', 'volatiles', 'rare_elements')
 ids = catalog.closure(['material.world.resource.' + name for name in names])
-require(len(ids) == 7 and all(catalog.definitions[aid][1]['type'] in ('material', 'texture') for aid in ids),
-        'Expected four mineral materials and three shared textures')
+require(len(ids) == 16 and
+        sum(catalog.definitions[aid][1]['type'] == 'material' for aid in ids) == 4 and
+        sum(catalog.definitions[aid][1]['type'] == 'texture' for aid in ids) == 12,
+        'Expected four mineral materials and twelve family-specific textures')
 signature, hashes = catalog.signature(ids)
 catalog.copy_to(ids, target)
 require(catalog.signature(ids)[0] == signature, 'Canonical material source changed')
 write_json(target / 'material-source.json', {'schemaVersion': 1, 'assets': ids, 'sourceHashes': hashes})
-print('Prepared four mineral materials and three shared textures without mesh records')
+print('Prepared four mineral materials and twelve family-specific textures without mesh records')

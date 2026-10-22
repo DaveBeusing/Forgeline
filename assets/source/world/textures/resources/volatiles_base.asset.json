@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.resource.volatiles.base",
+  "source": "volatiles_base.png",
+  "textureColorSpace": "srgb",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureUsage": "baseColor",
+  "type": "texture"
+}

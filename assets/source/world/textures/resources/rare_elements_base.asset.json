@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.resource.rare_elements.base",
+  "source": "rare_elements_base.png",
+  "textureColorSpace": "srgb",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureUsage": "baseColor",
+  "type": "texture"
+}

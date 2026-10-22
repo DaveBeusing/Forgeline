@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "sourceSize": 1024,
+  "tileGutterPixels": 32,
+  "legacyUvRectangle": [[0.75, 0.5], [1.0, 0.75]],
+  "surfaceVariants": ["weathered", "fresh_fracture", "patinated", "inclusion_rich"],
+  "runtimeDimensions": {"base": 512, "normal": 512, "orm": 256},
+  "samplerContract": "Existing 8x anisotropic material sampler; full compiler mip chain; no new shader interface",
+  "uvContract": "One existing family material slot. UV * [2,2] + [-1.5+column/2,-1+row/2] selects one atlas quadrant without changing mesh UVs.",
+  "families": {
+    "ferrous_ore": {
+      "seed": 4711, "pattern": "stratified_veins", "baseColorFactor": [0.46, 0.28, 0.19, 1],
+      "reliefUv": 0.006, "inclusionMetallic": 0.48,
+      "paletteLinear": {"host": [0.13,0.08,0.04], "core": [0.21,0.12,0.065], "fracture": [0.32,0.18,0.10], "dirt": [0.07,0.055,0.035], "patina": [0.25,0.07,0.025], "inclusion": [0.39,0.23,0.15]},
+      "roughness": {"host": 0.84, "core": 0.74, "fracture": 0.61, "dirt": 0.95, "patina": 0.91, "inclusion": 0.46}
+    },
+    "silicates": {
+      "seed": 8923, "pattern": "cleaved_facets", "baseColorFactor": [0.70, 0.66, 0.54, 1],
+      "reliefUv": 0.004, "inclusionMetallic": 0,
+      "paletteLinear": {"host": [0.34,0.34,0.30], "core": [0.46,0.45,0.40], "fracture": [0.62,0.60,0.50], "dirt": [0.14,0.12,0.09], "patina": [0.40,0.35,0.25], "inclusion": [0.55,0.56,0.49]},
+      "roughness": {"host": 0.76, "core": 0.64, "fracture": 0.48, "dirt": 0.94, "patina": 0.86, "inclusion": 0.43}
+    },
+    "volatiles": {
+      "seed": 13007, "pattern": "sealed_nodules", "baseColorFactor": [0.33, 0.58, 0.64, 1],
+      "reliefUv": 0.005, "inclusionMetallic": 0,
+      "paletteLinear": {"host": [0.12,0.18,0.19], "core": [0.15,0.27,0.29], "fracture": [0.25,0.38,0.40], "dirt": [0.055,0.085,0.08], "patina": [0.12,0.20,0.15], "inclusion": [0.24,0.34,0.31]},
+      "roughness": {"host": 0.88, "core": 0.79, "fracture": 0.66, "dirt": 0.96, "patina": 0.91, "inclusion": 0.62}
+    },
+    "rare_elements": {
+      "seed": 19139, "pattern": "sparse_inclusions", "baseColorFactor": [0.60, 0.42, 0.76, 1],
+      "reliefUv": 0.005, "inclusionMetallic": 0.32,
+      "paletteLinear": {"host": [0.20,0.19,0.23], "core": [0.26,0.23,0.31], "fracture": [0.36,0.29,0.43], "dirt": [0.095,0.085,0.10], "patina": [0.21,0.20,0.16], "inclusion": [0.46,0.29,0.61]},
+      "roughness": {"host": 0.85, "core": 0.75, "fracture": 0.59, "dirt": 0.95, "patina": 0.90, "inclusion": 0.41}
+    }
+  },
+  "provenance": {"origin": "Original mathematical mineral surface recipes", "externalImages": [], "externalModels": [], "thirdPartyArt": false},
+  "validation": "NOT EXECUTED"
+}

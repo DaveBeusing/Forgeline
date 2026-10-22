@@ -5,13 +5,18 @@
     0.76,
     1
   ],
+  "baseColorTexture": "texture.world.resource.rare_elements.base",
+  "emissiveMultiplier": 0,
   "metallicFactor": 1,
+  "normalTexture": "texture.world.resource.rare_elements.normal",
+  "ormTexture": "texture.world.resource.rare_elements.orm",
   "roughnessFactor": 1,
-  "baseColorTexture": "texture.directorate.surface.atlas_base",
-  "normalTexture": "texture.directorate.surface.atlas_normal",
-  "ormTexture": "texture.directorate.surface.atlas_orm",
+  "uvOffset": [
+    -1.5,
+    -1.0
+  ],
   "uvScale": [
-    1,
-    1
+    2,
+    2
   ]
 }

@@ -1,0 +1,22 @@
+{
+  "baseColorFactor": [
+    0.33,
+    0.58,
+    0.64,
+    1
+  ],
+  "baseColorTexture": "texture.world.resource.volatiles.base",
+  "emissiveMultiplier": 0,
+  "metallicFactor": 1,
+  "normalTexture": "texture.world.resource.volatiles.normal",
+  "ormTexture": "texture.world.resource.volatiles.orm",
+  "roughnessFactor": 1,
+  "uvOffset": [
+    -1.0,
+    -1.0
+  ],
+  "uvScale": [
+    2,
+    2
+  ]
+}
