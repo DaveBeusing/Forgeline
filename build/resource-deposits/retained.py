@@ -99,6 +99,9 @@ def validate():
         # qualify the replacement geometry.
         from cluster_contract import validate as validate_clusters
         validate_clusters()
+        if (ROOT / 'assets/source/world/authoring/resource_surfaces/sources.json').is_file():
+            from surface_contract import validate as validate_surfaces
+            validate_surfaces(ROOT / 'assets/source', ROOT / 'assets/source')
         return
     catalog = Catalog(ROOT / 'assets/source')
     for name in NAMES:
