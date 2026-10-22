@@ -51,10 +51,15 @@ internal static class PlayerHoverSummaryFactory
             var detail=PlayerExperienceSnapshotFactory.CaptureSelection(entities,extraction.Player,new[]{entity},
                 scenario.Inventories,scenario.Production,scenario.UnitProduction,
                 scenario.Services.UnitDefinitions,scenario.Services.BuildingDefinitions);
+            var row=ConveyorConstructionService.Capture(entities,extraction.Player,scenario.Inventories).First(p=>p.Entity==entity);
+            string info=row.Flow is {} flow?FormattableString.Invariant(
+                $"IN {flow.InputPerSecond:0.##}/s; OUT {flow.OutputPerSecond:0.##}/s; BUFFER {conveyor.BufferedQuantity:0.##}/{flow.Capacity:0}; NETWORK {flow.Network}; IN [{flow.InputA}, {flow.InputB}] OUT [{flow.OutputA}, {flow.OutputB}]. {flow.Cause}."):
+                "STRUCTURAL PART; NO CARGO";
+            if(row.Cargo is {} cargo && cargo.Count>0)info+=" CARGO: "+string.Join(", ",cargo.Select(c=>FormattableString.Invariant($"{c.ResourceId}: {c.Quantity:0.##}")));
             return new(entity,scenario.Simulation.SessionId,context.Tick,PlayerHoverCategory.Conveyor,
                 "Conveyor / "+ConveyorGeometry.Slug(conveyor.Placement.Module),RtsUiIcon.CommandBuild,detail,
-                ExtractionState:ConveyorConstructionService.Capture(entities,extraction.Player).First(p=>p.Entity==entity).Status.ToString(),
-                Requirement:"BUILD MENU: CONVEYOR; V CYCLES BUILD / REMOVE / REPLACE / REPAIR. LOCAL TRANSPORT SIMULATION IS NOT ENABLED BY CONSTRUCTION.");
+                ExtractionState:row.Status.ToString(),
+                Requirement:info+" BUILD MENU / V TO REPAIR, REMOVE OR REPLACE. OCCUPIED PARTS MUST DRAIN; REPAIR WRECKS TO RECOVER CARGO.");
         }
         if (owned)
         {

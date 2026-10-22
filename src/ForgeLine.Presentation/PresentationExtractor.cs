@@ -283,7 +283,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
             service.Preview(context.Entities,_extraction.Player,r.Request,_extraction.Side.CommandCore):null;
         double available=context.Entities.TryGetComponent(_extraction.Side.CommandCore,out InventoryStorage storage)?
             _extraction.Scenario.Inventories.GetAvailableQuantity(storage.InventoryId,ResourceIds.Steel):0;
-        return new(request?.Id??0,context.Tick,plan,available,ConveyorConstructionService.Capture(context.Entities,_extraction.Player),ConveyorConstructionService.CapturePorts(context.Entities,_extraction.Player));
+        return new(request?.Id??0,context.Tick,plan,available,ConveyorConstructionService.Capture(context.Entities,_extraction.Player,_extraction.Scenario.Inventories),ConveyorConstructionService.CapturePorts(context.Entities,_extraction.Player));
     }
 
     private RenderInstance[] CaptureRenderInstances(
@@ -432,7 +432,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     buildingFeature,
                     infrastructureFeature,
                     ConveyorFeature: conveyor,
-                    MechanicalPose: unitFeature.IsSpecified || buildingFeature.IsSpecified
+                    MechanicalPose: conveyor.IsSpecified && conveyorStates.ContainsKey(entity) && entities.TryGetComponent(entity,out ConveyorFlowState flowPose)
+                        ? new MechanicalPose(true,0,flowPose.ActiveSeconds,context.Tick.Value*context.TickDuration.TotalSeconds,-1,0,0)
+                        : unitFeature.IsSpecified || buildingFeature.IsSpecified
                         ? _mechanicalHistory.Capture(entity, transform.Position, transform.Rotation,
                             unitFeature.IsSpecified && !unitFeature.IsWreck || buildingFeature.State == BuildingPresentationState.Operational,
                             _mechanicalShots.Contains(entity), ResolveAimElevation(entities, entity),

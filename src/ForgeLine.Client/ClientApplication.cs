@@ -2223,6 +2223,7 @@ internal sealed class ClientApplication
         }
 
         buildingPlacementController.Conveyor.Draw(gameplayDraw);
+        ConveyorNetworkOverlay.Draw(gameplayDraw,renderWorld.CurrentSnapshot,selectionController.Selection.Entities,selectionController.HoveredEntity);
 
         if (strategicOverlayMode !=
                 StrategicOverlayMode.None &&

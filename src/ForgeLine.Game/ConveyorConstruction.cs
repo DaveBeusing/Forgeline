@@ -62,12 +62,19 @@ public sealed record ConveyorPlan(ConveyorFailure Failure, IReadOnlyList<Conveyo
 {
     public bool IsValid => Failure == ConveyorFailure.None;
 }
-public enum ConveyorLinkStatus : byte { Structural, NoInput, Disconnected, Blocked, Congested, Damaged, Critical, Destroyed }
-public readonly record struct ConveyorOwnedPiece(EntityId Entity, ConveyorPiece Piece, ConveyorLinkStatus Status=ConveyorLinkStatus.NoInput);
+public enum ConveyorLinkStatus : byte { Structural, NoInput, Disconnected, Blocked, Congested, Damaged, Critical, Destroyed, Flowing, Offline }
+public readonly record struct ConveyorOwnedPiece(EntityId Entity, ConveyorPiece Piece, ConveyorLinkStatus Status=ConveyorLinkStatus.NoInput,
+    ConveyorFlowState? Flow=null, IReadOnlyList<InventoryResourceQuantity>? Cargo=null);
 
 public static class ConveyorGeometry
 {
     public const uint MenuBase = 2000;
+    public static Vector3 BuildingPortDimensions(BuildingId id) =>
+        id==BuildingIds.CommandCore?new(20,12,20):id==BuildingIds.Extractor?new(12,8,12):
+        id==BuildingIds.StorageDepot?new(14,8,14):id==BuildingIds.Smelter?new(18,10,16):
+        id==BuildingIds.ElectronicsPlant || id==BuildingIds.AmmunitionPlant?new(18,10,18):
+        id==BuildingIds.LogisticsHub?new(18,9,18):id==BuildingIds.SupplyDepot?new(16,8,16):
+        id==BuildingIds.Barracks?new(18,8,16):id==BuildingIds.VehicleFactory?new(26,12,24):default;
     public static string Slug(ConveyorModule module) => module switch
     {
         ConveyorModule.ShortSegment=>"straight_short", ConveyorModule.Standard=>"straight_standard",
@@ -153,7 +160,7 @@ public sealed class ConveyorConstructionService
         _battlefield=battlefield; _area=new BattlefieldBuildableAreaQuery(battlefield);
     }
     public bool Matches(SimulationCoordinator simulation)=>ReferenceEquals(_simulation,simulation);
-    public static IReadOnlyList<ConveyorOwnedPiece> Capture(EntityRegistry entities,PlayerId owner)
+    public static IReadOnlyList<ConveyorOwnedPiece> Capture(EntityRegistry entities,PlayerId owner,InventoryStore? inventories=null)
     {
         var rows=new List<ConveyorOwnedPiece>();
         var inputs=new Dictionary<(int X,int Y,int Z,int DX,int DZ),(Vector3 Position,bool Cap)>();
@@ -201,7 +208,11 @@ public sealed class ConveyorConstructionService
                 status=ConveyorLinkStatus.Congested;
             if(entities.TryGetComponent(row.Entity,out ForgeLine.Combat.HealthState health) && health.Fraction<.7)
                 status=health.IsDepleted?ConveyorLinkStatus.Destroyed:health.Fraction<.25?ConveyorLinkStatus.Critical:ConveyorLinkStatus.Damaged;
-            rows[i]=row with {Status=status};
+            if (entities.TryGetComponent(row.Entity, out ConveyorFlowState flow)) status=flow.Status;
+            rows[i]=row with {Status=status,
+                Flow=entities.TryGetComponent(row.Entity,out ConveyorFlowState state)?state:null,
+                Cargo=inventories is not null && entities.TryGetComponent(row.Entity,out ConveyorFlowState stock) && inventories.Contains(stock.Buffer)?
+                    Array.AsReadOnly(inventories.GetResourceQuantities(stock.Buffer)):null};
         }
         return rows.AsReadOnly();
 
@@ -217,16 +228,18 @@ public sealed class ConveyorConstructionService
             CompletedBuilding building=entities.GetComponent<CompletedBuilding>(e);
             if(building.Owner!=owner)continue;
             if(entities.TryGetComponent(e,out ForgeLine.Combat.HealthState health) && health.IsDepleted)continue;
-            // Explicit V1 exterior transfer sockets, on the side opposite truck bays.
-            // Only these two content identities opt in. No proximity-generated port.
-            (float halfWidth,float halfHeight)=building.BuildingId==BuildingIds.StorageDepot?(7f,4f):
-                building.BuildingId==BuildingIds.LogisticsHub?(9f,4.5f):(0f,0f);
-            if(halfWidth==0)continue;
+            // Authored side sockets avoid the +Z truck bay. Unknown identities/scales opt out.
+            Vector3 expected=ConveyorGeometry.BuildingPortDimensions(building.BuildingId);
+            if(expected==default)continue;
+            float halfWidth=expected.X/2, halfHeight=expected.Y/2;
             WorldTransform transform=entities.GetComponent<WorldTransform>(e);
-            if(Vector3.DistanceSquared(transform.Scale,new(halfWidth*2,halfHeight*2,halfWidth*2))>.001f)continue;
+            if(Vector3.DistanceSquared(transform.Scale,expected)>.001f)continue;
             Vector3 origin=transform.Position-Vector3.UnitY*halfHeight;
             foreach(bool input in new[]{true,false})
             {
+                if (building.BuildingId==BuildingIds.Extractor && (input ||
+                    !entities.TryGetComponent(e,out ResourceExtractor extractor) || !ConveyorSimulationSystem.Eligible(extractor.ResourceId)))continue;
+                if (!input && (building.BuildingId==BuildingIds.Barracks || building.BuildingId==BuildingIds.VehicleFactory))continue;
                 float sign=input?-1:1;
                 ports.Add(new(e,owner,origin+Vector3.Transform(new Vector3(sign*halfWidth,5.8f,0),transform.Rotation),
                     Vector3.Transform(sign*Vector3.UnitX,transform.Rotation),input));
@@ -253,17 +266,21 @@ public sealed class ConveyorConstructionService
             if (old.Owner!=owner) return Fail(ConveyorFailure.NotOwned);
             if(request.Edit==ConveyorEdit.Replace)
                 request=request with {Tier=old.Placement.Tier,Orientation=old.Placement.Orientation};
-            if (!double.IsFinite(old.BufferedQuantity) || old.BufferedQuantity!=0) return Fail(ConveyorFailure.Occupied);
+            if ((request.Edit is ConveyorEdit.Remove or ConveyorEdit.Replace) &&
+                (!double.IsFinite(old.BufferedQuantity) || old.BufferedQuantity!=0 ||
+                 entities.TryGetComponent(request.Target,out ConveyorFlowState held) &&
+                 _stock.Contains(held.Buffer) && _stock.GetResourceQuantities(held.Buffer).Any(r=>r.Quantity!=0 || r.ReservedQuantity!=0))) return Fail(ConveyorFailure.Occupied);
             if (request.Edit==ConveyorEdit.Repair &&
                 (!entities.TryGetComponent(request.Target,out ForgeLine.Combat.HealthState repairHealth) ||
-                 repairHealth.IsDepleted || repairHealth.Fraction>=1))return Fail(ConveyorFailure.InvalidRequest);
+                 repairHealth.Fraction>=1))return Fail(ConveyorFailure.InvalidRequest);
             if (old.Placement.IsSupport && request.Edit==ConveyorEdit.Remove &&
                 Capture(entities,owner).Any(p=>!p.Piece.Placement.IsSupport &&
                     p.Piece.Placement.Sockets.Any(s=>Vector2.Distance(new(s.Position.X,s.Position.Z),
                         new(old.Placement.Pivot.X,old.Placement.Pivot.Z))<.1f)))return Fail(ConveyorFailure.Obstructed);
             if (request.Edit is ConveyorEdit.Remove or ConveyorEdit.Repair)
             {
-                double cost=request.Edit==ConveyorEdit.Repair?4:0;
+                double cost=request.Edit==ConveyorEdit.Repair?
+                    entities.TryGetComponent(request.Target,out ForgeLine.Combat.HealthState repairState) && repairState.IsDepleted?old.PaidSteel:4:0;
                 return new(_stock.GetAvailableQuantity(storage.InventoryId,ResourceIds.Steel)<cost?
                     ConveyorFailure.InsufficientStock:ConveyorFailure.None,Array.AsReadOnly(new[]{old.Placement}),cost);
             }
@@ -491,6 +508,7 @@ public sealed class ConveyorConstructionService
         if (request.Edit==ConveyorEdit.Remove)
         {
             // No refund: no resurrection of construction stock or occupied cargo.
+            DestroyEmptyBuffer(request.Target);
             _spatial.Remove(request.Target);context.Entities.DestroyEntity(request.Target);
         }
         else if(request.Edit==ConveyorEdit.Repair)
@@ -498,11 +516,17 @@ public sealed class ConveyorConstructionService
             if (!_stock.Remove(inventory,ResourceIds.Steel,plan.Steel).Succeeded)return ConveyorFailure.InsufficientStock;
             if (context.Entities.TryGetComponent(request.Target,out ForgeLine.Combat.HealthState health))
                 context.Entities.SetComponent(request.Target,ForgeLine.Combat.HealthState.Full(health.Maximum));
+            if (context.Entities.TryGetComponent(request.Target,out PowerConsumer consumer))
+                context.Entities.SetComponent(request.Target,consumer.WithEnabled(true));
         }
         else
         {
             if (!_stock.Remove(inventory,ResourceIds.Steel,plan.Steel).Succeeded)return ConveyorFailure.InsufficientStock;
-            if(request.Edit==ConveyorEdit.Replace){_spatial.Remove(request.Target);context.Entities.DestroyEntity(request.Target);}
+            if(request.Edit==ConveyorEdit.Replace)
+            {
+                DestroyEmptyBuffer(request.Target);
+                _spatial.Remove(request.Target);context.Entities.DestroyEntity(request.Target);
+            }
             foreach(ConveyorPlacement part in plan.Pieces)
             {
                 EntityId e=context.Entities.CreateEntity();
@@ -513,6 +537,15 @@ public sealed class ConveyorConstructionService
                     part.Module==ConveyorModule.OutputAdapter?request.DestinationPortBuilding:EntityId.Invalid;
                 context.Entities.AddComponent(e,new ConveyorPiece(owner,part,ConveyorGeometry.Cost(part.Module),attachment,
                     AutomaticSupport:part.IsSupport && request.Module is not (ConveyorModule.Support or ConveyorModule.RaisedSupport)));
+                if (!part.IsSupport && part.Module!=ConveyorModule.Endcap)
+                {
+                    double capacity=ConveyorSimulationSystem.Capacity(part.Module);
+                    InventoryId buffer=_stock.CreateInventory(new InventorySpecification(capacity,ConveyorSimulationSystem.EligibleResources));
+                    context.Entities.AddComponent(e,new ConveyorFlowState(buffer,capacity));
+                    context.Entities.AddComponent(e,new PowerConsumer(part.Module is ConveyorModule.Merger or ConveyorModule.Splitter?4:2));
+                    if(context.Entities.TryGetComponent(payer,out PowerNetworkMembership membership))
+                        context.Entities.AddComponent(e,membership);
+                }
                 context.Entities.AddComponent(e,transform);context.Entities.AddComponent(e,presence);
                 context.Entities.AddComponent(e,new ControllableEntity(owner,ControllableEntityCategory.Logistics));
                 context.Entities.AddComponent(e,new VisualIdentity(1));
@@ -530,6 +563,11 @@ public sealed class ConveyorConstructionService
             if(survivors.Any(p=>!p.Piece.Placement.IsSupport && p.Piece.Placement.Sockets.Any(s=>
                 Vector2.Distance(new(s.Position.X,s.Position.Z),new(foot.X,foot.Z))<.1f)))continue;
             _spatial.Remove(support.Entity);context.Entities.DestroyEntity(support.Entity);
+        }
+        void DestroyEmptyBuffer(EntityId target)
+        {
+            if (context.Entities.TryGetComponent(target,out ConveyorFlowState flow) && _stock.Contains(flow.Buffer))
+                _stock.DestroyInventory(flow.Buffer);
         }
         NavigationChanged?.Invoke(context);
         return ConveyorFailure.None;

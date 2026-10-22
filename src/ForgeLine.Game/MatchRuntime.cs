@@ -616,6 +616,7 @@ public sealed class MatchRuntime : IDisposable
             technologyResearch,
             buildingConstruction,
             extraction,
+            new ConveyorSimulationSystem(inventories, automatedDistribution, recipes, unitDefinitions),
             logisticsRegistration,
             roadAccess,
             lifecycle,

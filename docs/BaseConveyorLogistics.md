@@ -2,17 +2,18 @@
 
 ## Status and ownership
 
-The [construction and placement implementation](ConveyorConstructionPlacementAndUX.md)
-now supplies paid physical modules, previews and edit commands. It does not
-activate the resource transport contract below. Regional trucks remain the
-authoritative transport until a separate conveyor-flow simulation is integrated.
-
-This document defines the proposed V1 contract for **local industrial conveyor supply**.
-It is a design specification and migration gate, not a claim that conveyor transport,
-placement, rendering or inventory transfer is implemented. The present authoritative
-transport is the road-based Cargo Truck system described in
-[Logistics Network and Routing](LogisticsNetworkAndRouting.md) and
+The [construction implementation](ConveyorConstructionPlacementAndUX.md) and
+[simulation implementation](ConveyorSimulationAndVehicleInterop.md) now supply paid
+physical modules, directed building ports, finite inventory buffers, deterministic
+junction flow and shared truck exchange. The detailed implementation document records
+current rules and manual acceptance still pending. Regional Cargo Trucks continue to
+use [Logistics Network and Routing](LogisticsNetworkAndRouting.md) and
 [Cargo Transport Operations](CargoTransportOperations.md).
+
+The remaining design sections below describe the wider V1 contract. Where they discuss
+future controls or qualification gates, the implemented scope and concrete power,
+damage, recovery, port and persistence rules in the implementation document take
+precedence. A passing compilation does not qualify runtime behavior.
 
 FORGELINE remains an RTS first. Build a production network once, then control strategic
 throughput, priorities and vulnerable links instead of individual cargo items.
@@ -72,14 +73,14 @@ support placement must be validated independently from its directed flow links.
 | --- | --- | --- | --- |
 | Short straight | 1 in, 1 out | 4 m routing increment | Required |
 | Standard straight | 1 in, 1 out | 8 m routing increment | Required |
-| 90° elbow | 1 in, 1 out | Uniform right-angle corner, left/right mirrored | Required |
+| 90Â° elbow | 1 in, 1 out | Uniform right-angle corner, left/right mirrored | Required |
 | Height transition | 1 in, 1 out | Authored rise/fall between compatible elevation tiers | Required |
 | Merger 2:1 | 2 in, 1 out | Deterministic fair arbitration | Required |
 | Splitter 1:2 | 1 in, 2 out | Configured priority or fair distribution | Required |
 | Building input adapter | 1 in, 1 building input | Explicit receiving connection | Required |
 | Building output adapter | 1 building output, 1 out | Explicit dispatch connection | Required |
 | Elevated support | Structural only | Intermittent column/beam, ground obstruction | Required |
-| Dedicated high-span bridge | — | Optional later only if ordinary elevated kit cannot clear an obstacle | Deferred |
+| Dedicated high-span bridge | â€” | Optional later only if ordinary elevated kit cannot clear an obstacle | Deferred |
 
 Choose **90-degree horizontal turns** for V1; no diagonal/45-degree free
 rotation. Straight and curve pieces use a shared grid and cardinal facing.

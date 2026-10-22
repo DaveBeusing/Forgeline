@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using ForgeLine.Core;
+using ForgeLine.Ecs;
 using ForgeLine.Game;
 using ForgeLine.Simulation;
 
@@ -32,7 +33,7 @@ internal sealed record MatchHeadlessReport(
         ArgumentNullException.ThrowIfNull(matches);
 
         return new MatchHeadlessReport(
-            2,
+            3,
             RuntimeInformation.FrameworkDescription,
             RuntimeInformation.OSDescription,
             RuntimeInformation.ProcessArchitecture.ToString(),
@@ -102,6 +103,7 @@ internal sealed record MatchExecutionReport(
     double TotalArtilleryAmmunitionConsumed,
     IReadOnlyList<MatchParticipantReport> Participants)
 {
+    public IReadOnlyList<ConveyorOwnedPiece> Conveyors { get; init; } = Array.Empty<ConveyorOwnedPiece>();
     public static MatchExecutionReport Capture(
         int matchIndex,
         ulong seed,
@@ -156,7 +158,11 @@ internal sealed record MatchExecutionReport(
             scenario.Artillery.Metrics.TotalImpacts,
             scenario.Artillery.Metrics.TotalAmmunitionConsumed,
             scenario.MatchConfiguration.Participants.Select(participant =>
-                CaptureSide(scenario, scenario.GetBase(participant.Player))).ToArray());
+                CaptureSide(scenario, scenario.GetBase(participant.Player))).ToArray())
+        {
+            Conveyors=scenario.MatchConfiguration.Participants.OrderBy(p=>p.Player.Value).SelectMany(p=>
+                ConveyorConstructionService.Capture(scenario.Simulation.Entities,p.Player,scenario.Inventories)).ToArray()
+        };
     }
 
     private static MatchParticipantReport CaptureSide(
