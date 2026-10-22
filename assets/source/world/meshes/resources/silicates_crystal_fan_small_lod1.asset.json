@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.silicates.crystal_fan.small.collision",
+  "id": "mesh.world.resource.silicates.crystal_fan.small_lod1",
+  "materialReferences": [
+    "material.world.resource.silicates"
+  ],
+  "source": "../sources/clusters/silicates/crystal_fan_small_lod1.glb",
+  "type": "mesh"
+}

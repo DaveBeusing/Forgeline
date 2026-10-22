@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.resource.silicates.stepped_bed.small.collision",
+  "source": "../sources/clusters/silicates/stepped_bed_small_proxy.glb",
+  "type": "mesh"
+}

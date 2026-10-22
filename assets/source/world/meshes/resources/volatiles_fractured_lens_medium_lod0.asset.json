@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.volatiles.fractured_lens.medium.collision",
+  "id": "mesh.world.resource.volatiles.fractured_lens.medium",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.volatiles.fractured_lens.medium_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.volatiles.fractured_lens.medium_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.volatiles"
+  ],
+  "source": "../sources/clusters/volatiles/fractured_lens_medium_lod0.glb",
+  "type": "mesh"
+}

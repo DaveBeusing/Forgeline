@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.resource.ferrous_ore.faulted_ridge.medium.collision",
+  "source": "../sources/clusters/ferrous_ore/faulted_ridge_medium_proxy.glb",
+  "type": "mesh"
+}

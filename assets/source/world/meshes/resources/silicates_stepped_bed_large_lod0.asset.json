@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.silicates.stepped_bed.large.collision",
+  "id": "mesh.world.resource.silicates.stepped_bed.large",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.silicates.stepped_bed.large_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.silicates.stepped_bed.large_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.silicates"
+  ],
+  "source": "../sources/clusters/silicates/stepped_bed_large_lod0.glb",
+  "type": "mesh"
+}

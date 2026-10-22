@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.rare_elements.split_matrix.large.collision",
+  "id": "mesh.world.resource.rare_elements.split_matrix.large_lod2",
+  "materialReferences": [
+    "material.world.resource.rare_elements"
+  ],
+  "source": "../sources/clusters/rare_elements/split_matrix_large_lod2.glb",
+  "type": "mesh"
+}

@@ -1,8 +1,9 @@
 {
+  "collisionReference": "mesh.world.resource.rare_elements.inclusion_reef.medium.collision",
   "id": "mesh.world.resource.rare_elements_lod1",
-  "type": "mesh",
-  "source": "../sources/blender/rare_elements/mesh.world.resource.rare_elements_lod1.glb",
   "materialReferences": [
     "material.world.resource.rare_elements"
-  ]
+  ],
+  "source": "../sources/clusters/rare_elements/inclusion_reef_medium_lod1.glb",
+  "type": "mesh"
 }

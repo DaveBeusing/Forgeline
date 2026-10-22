@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.rare_elements.split_matrix.medium.collision",
+  "id": "mesh.world.resource.rare_elements.split_matrix.medium",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.rare_elements.split_matrix.medium_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.rare_elements.split_matrix.medium_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.rare_elements"
+  ],
+  "source": "../sources/clusters/rare_elements/split_matrix_medium_lod0.glb",
+  "type": "mesh"
+}

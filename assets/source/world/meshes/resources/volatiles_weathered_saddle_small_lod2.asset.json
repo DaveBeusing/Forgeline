@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.volatiles.weathered_saddle.small.collision",
+  "id": "mesh.world.resource.volatiles.weathered_saddle.small_lod2",
+  "materialReferences": [
+    "material.world.resource.volatiles"
+  ],
+  "source": "../sources/clusters/volatiles/weathered_saddle_small_lod2.glb",
+  "type": "mesh"
+}

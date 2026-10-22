@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.silicates.split_rosette.medium.collision",
+  "id": "mesh.world.resource.silicates.split_rosette.medium",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.silicates.split_rosette.medium_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.silicates.split_rosette.medium_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.silicates"
+  ],
+  "source": "../sources/clusters/silicates/split_rosette_medium_lod0.glb",
+  "type": "mesh"
+}
