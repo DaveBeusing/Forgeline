@@ -1589,7 +1589,9 @@ internal sealed class ClientApplication
                 commandGateway,
                 ref lastCommandResult,
                 buildingPlacementController,
-                presentationInteraction);
+                presentationInteraction,
+                actionPanel,
+                scenario.Services.Resources);
 
             TacticalTargetingView tacticalTargetingView =
                 tacticalTargetingController.CreateView(
@@ -3648,15 +3650,66 @@ internal sealed class ClientApplication
         PlayerCommandGateway commandGateway,
         ref PlayerCommandResultReadModel? lastCommandResult,
         RtsBuildingPlacementController placement,
-        PresentationInteractionState interaction)
+        PresentationInteractionState interaction,
+        PlayerActionPanelController actionPanel,
+        ResourceCatalog resources)
     {
         while (commandGateway.Results.TryRead(
                    out PlayerCommandResultReadModel result))
         {
             placement.ObserveResult(result, interaction);
-            lastCommandResult =
-                result;
+            if (result.Kind == PlayerCommandKind.Demolition)
+                actionPanel.ShowDemolitionFeedback(DescribeDemolitionResult(result, resources));
+            lastCommandResult = result;
         }
+    }
+
+    private static string DescribeDemolitionResult(
+        in PlayerCommandResultReadModel result,
+        ResourceCatalog resources)
+    {
+        BuildingDemolitionTargetResult[] targets = result.DemolitionTargets ?? [];
+        if (result.AcceptedTargets == 0)
+        {
+            BuildingDemolitionFailure reason =
+                targets.Length > 0 ? targets[0].Failure : BuildingDemolitionFailure.InvalidTarget;
+            string explanation = reason switch
+            {
+                BuildingDemolitionFailure.ProtectedCommandCore => "COMMAND CORE PROTECTED",
+                BuildingDemolitionFailure.NotOwned => "TARGET NOT OWNED",
+                BuildingDemolitionFailure.MissingPaymentRecord => "MATERIAL RECEIPT UNAVAILABLE",
+                BuildingDemolitionFailure.CommandCoreUnavailable => "COMMAND CORE UNAVAILABLE",
+                BuildingDemolitionFailure.InventoryNotEmpty => "EMPTY STORAGE BEFORE DEMOLITION",
+                BuildingDemolitionFailure.InsufficientRefundCapacity => "COMMAND CORE NEEDS MORE STORAGE CAPACITY",
+                BuildingDemolitionFailure.ConstructionAlreadyCancelling => "CONSTRUCTION ALREADY CANCELLING",
+                BuildingDemolitionFailure.ProductionActive => "STOP PRODUCTION / RESEARCH FIRST",
+                _ => "NO VALID BUILDINGS SELECTED"
+            };
+            return "DEMOLITION REJECTED - " + explanation;
+        }
+
+        var totals = new Dictionary<ResourceId, double>();
+        bool anyRefund = false;
+        foreach (BuildingDemolitionTargetResult target in targets)
+            if (target.Accepted)
+                foreach (BuildingResourceCost refund in target.Refunded)
+                {
+                    anyRefund = true;
+                    totals[refund.ResourceId] = totals.GetValueOrDefault(refund.ResourceId) + refund.Quantity;
+                }
+
+        string prefix = anyRefund
+            ? $"DEMOLISHED {result.AcceptedTargets}"
+            : $"CANCELLED {result.AcceptedTargets} CONSTRUCTION SITE(S)";
+        if (totals.Count > 0)
+        {
+            string materials = string.Join(", ", totals.OrderBy(item => item.Key)
+                .Select(item => $"{item.Value:0.##} {resources[item.Key].DisplayName}"));
+            prefix += " - REFUNDED " + materials;
+        }
+        if (result.RejectedTargets > 0)
+            prefix += $" - {result.RejectedTargets} REJECTED";
+        return prefix;
     }
 
 }
