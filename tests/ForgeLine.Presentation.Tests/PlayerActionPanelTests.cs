@@ -53,6 +53,27 @@ public sealed class PlayerActionPanelTests
     }
 
     [Fact]
+    public void LogisticsRadialStepAvailabilityMatchesChosenFieldAndDirection()
+    {
+        var policy = new PlayerStockPolicyActionReadModel(default, ResourceIds.Steel, "Steel",
+            0, 50, 100, 100, LogisticsStockPriority.Normal, true, default, default, default, default);
+        var logistics = new PlayerLogisticsActionReadModel(new(73, 1), [policy], null, 125);
+        var snapshot = CreateSnapshot(logistics: logistics);
+        var controller = new PlayerActionPanelController();
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+        Press(input, PlatformKey.L);
+        controller.Update(input, snapshot, 1600, 900);
+        var panel = controller.CreateView(1600, 900, snapshot.PlayerActions);
+        Assert.False(PlayerActionDockHudModel.CanUseControl(PlayerActionDockControlKind.Increase,
+            PlayerActionPanelMode.Logistics, 0, panel, snapshot.PlayerActions));
+        Assert.True(PlayerActionDockHudModel.CanUseControl(PlayerActionDockControlKind.Decrease,
+            PlayerActionPanelMode.Logistics, 0, panel, snapshot.PlayerActions));
+        Assert.Equal("INCREASE MAX FIRST",
+            PlayerActionDockHudModel.DecideStockAdjustment(panel, logistics, 1).Reason);
+    }
+
+    [Fact]
     public void StaticProviderStockDoesNotOfferRecipientCommandsByMouseOrKeyboard()
     {
         var supply = new PlayerSupplyActionReadModel(new(50,1),default,1,1,true,.5,.5,default,default,0,0,default)
