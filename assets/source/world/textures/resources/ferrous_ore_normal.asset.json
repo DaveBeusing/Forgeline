@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.resource.ferrous_ore.normal",
+  "source": "ferrous_ore_normal.png",
+  "textureColorSpace": "linear",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureUsage": "normal",
+  "type": "texture"
+}

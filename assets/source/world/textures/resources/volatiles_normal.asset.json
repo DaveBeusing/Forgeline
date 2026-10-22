@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.resource.volatiles.normal",
+  "source": "volatiles_normal.png",
+  "textureColorSpace": "linear",
+  "textureCompressionQuality": "balanced",
+  "textureFormat": "bc7Unorm",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureUsage": "normal",
+  "type": "texture"
+}
