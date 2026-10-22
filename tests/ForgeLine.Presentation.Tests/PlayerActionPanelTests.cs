@@ -13,6 +13,46 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class PlayerActionPanelTests
 {
     [Fact]
+    public void ManualLogisticsKeyboardEditsUseDirectionalBoundsWithoutChangingSnapshot()
+    {
+        var policy = new PlayerStockPolicyActionReadModel(default, ResourceIds.Steel, "Steel",
+            0, 50, 100, 150, LogisticsStockPriority.Normal, true, default, default, default, default);
+        var logistics = new PlayerLogisticsActionReadModel(new(73, 1), [policy], null, 150);
+        var snapshot = CreateSnapshot(logistics: logistics);
+        var controller = new PlayerActionPanelController();
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+
+        Key(PlatformKey.L);
+        Assert.Equal(100, View().StockTarget);
+        Key(PlatformKey.Right);
+        Assert.Equal(150, View().StockTarget);
+        Key(PlatformKey.Right);
+        Assert.Equal(150, View().StockTarget);
+        Key(PlatformKey.Left);
+        Assert.Equal(100, View().StockTarget);
+        Key(PlatformKey.Left);
+        Assert.Equal(50, View().StockTarget);
+        Key(PlatformKey.Left);
+        Assert.Equal(50, View().StockTarget);
+        Assert.Equal(100, logistics.Policies[0].DesiredTarget);
+        Assert.False(controller.TryTakeRequest(out _));
+        Key(PlatformKey.Enter);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(PlayerActionRequestKind.SetStockPolicy, request.Kind);
+        Assert.Equal(50, request.StockMinimum);
+        Assert.Equal(50, request.StockTarget);
+        Assert.Equal(150, request.StockMaximum);
+
+        PlayerActionPanelView View() => controller.CreateView(1600, 900, snapshot.PlayerActions);
+        void Key(PlatformKey key)
+        {
+            Press(input, key); controller.Update(input, snapshot, 1600, 900);
+            Release(input, key); controller.Update(input, snapshot, 1600, 900);
+        }
+    }
+
+    [Fact]
     public void StaticProviderStockDoesNotOfferRecipientCommandsByMouseOrKeyboard()
     {
         var supply = new PlayerSupplyActionReadModel(new(50,1),default,1,1,true,.5,.5,default,default,0,0,default)
