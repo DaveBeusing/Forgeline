@@ -1,0 +1,122 @@
+[
+  {
+    "channel": "base",
+    "level": 0,
+    "psnr": 50.68569285163277,
+    "meanAlpha": 0.2943534851074219,
+    "maxAlpha": 8,
+    "meanAngle": 0,
+    "p99Angle": 0,
+    "maxAngle": 0
+  },
+  {
+    "channel": "base",
+    "level": 1,
+    "psnr": 48.582938123324766,
+    "meanAlpha": 0.4138336181640625,
+    "maxAlpha": 8,
+    "meanAngle": 0,
+    "p99Angle": 0,
+    "maxAngle": 0
+  },
+  {
+    "channel": "base",
+    "level": 2,
+    "psnr": 49.553975212784714,
+    "meanAlpha": 0.517333984375,
+    "maxAlpha": 5,
+    "meanAngle": 0,
+    "p99Angle": 0,
+    "maxAngle": 0
+  },
+  {
+    "channel": "base",
+    "level": 3,
+    "psnr": 51.97639272331945,
+    "meanAlpha": 0.73828125,
+    "maxAlpha": 6,
+    "meanAngle": 0,
+    "p99Angle": 0,
+    "maxAngle": 0
+  },
+  {
+    "channel": "normal",
+    "level": 0,
+    "psnr": 99,
+    "meanAlpha": 0,
+    "maxAlpha": 0,
+    "meanAngle": 0.002967048387253749,
+    "p99Angle": 0.027976455118293345,
+    "maxAngle": 0.03956468264845247
+  },
+  {
+    "channel": "normal",
+    "level": 1,
+    "psnr": 99,
+    "meanAlpha": 0,
+    "maxAlpha": 0,
+    "meanAngle": 0.0030994501209234654,
+    "p99Angle": 0.027976455118293345,
+    "maxAngle": 0.03956468264845247
+  },
+  {
+    "channel": "normal",
+    "level": 2,
+    "psnr": 99,
+    "meanAlpha": 0,
+    "maxAlpha": 0,
+    "meanAngle": 0.001889740170192947,
+    "p99Angle": 0.027976455118293345,
+    "maxAngle": 0.03426402009603798
+  },
+  {
+    "channel": "normal",
+    "level": 3,
+    "psnr": 99,
+    "meanAlpha": 0,
+    "maxAlpha": 0,
+    "meanAngle": 0.002425490650144913,
+    "p99Angle": 0.027976455118293345,
+    "maxAngle": 0.03426402009603798
+  },
+  {
+    "channel": "orm",
+    "level": 0,
+    "psnr": 50.49285534223266,
+    "meanAlpha": 0,
+    "maxAlpha": 0,
+    "meanAngle": 0,
+    "p99Angle": 0,
+    "maxAngle": 0
+  },
+  {
+    "channel": "orm",
+    "level": 1,
+    "psnr": 50.148880111009,
+    "meanAlpha": 0,
+    "maxAlpha": 0,
+    "meanAngle": 0,
+    "p99Angle": 0,
+    "maxAngle": 0
+  },
+  {
+    "channel": "orm",
+    "level": 2,
+    "psnr": 50.10021758896712,
+    "meanAlpha": 0,
+    "maxAlpha": 0,
+    "meanAngle": 0,
+    "p99Angle": 0,
+    "maxAngle": 0
+  },
+  {
+    "channel": "orm",
+    "level": 3,
+    "psnr": 49.578815296740366,
+    "meanAlpha": 0,
+    "maxAlpha": 0,
+    "meanAngle": 0,
+    "p99Angle": 0,
+    "maxAngle": 0
+  }
+]

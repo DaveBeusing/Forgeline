@@ -93,7 +93,7 @@ public sealed class RtsUiAssetAuthoringTests
                     result.Diagnostics.Select(
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
-            Assert.Equal(1363, result.CompiledCount);
+            Assert.Equal(1365, result.CompiledCount);
             Assert.Equal(61, RequiredIds.Length);
             Assert.Equal(
                 RequiredIds.Length,

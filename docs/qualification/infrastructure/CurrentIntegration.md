@@ -1,5 +1,29 @@
 # Current master and installed-player integration
 
+## Master synchronization at 0.1.440
+
+PR #285 integrates master `8647d39aafe642661589ea688ce1c11e95f53135`
+(version 0.1.439). The PR version is 0.1.440, exactly one PATCH above that base.
+The complete master scene-ID range is preserved: existing scenes remain 0–106,
+and the nine integrated decal scenes remain 107–115. The fifteen infrastructure
+scenes follow at 116–130 in their original relative order. Both scene factories
+and the decal-specific terrain profile are retained.
+
+Infrastructure scene fingerprints include the numeric scene ID. Their IDs move
+by nine positions to preserve the already integrated decal identities. This
+integration also inherits the current master's decal atlas and material changes.
+The native images, timing samples, package checksum, runtime catalog counts and
+source receipts below describe the earlier 0.1.439 source boundary; they are
+retained historical evidence, not a fresh qualification of the merged 0.1.440
+catalog or its infrastructure fingerprints. No native GPU, installed-player or
+Blender qualification has been repeated for this synchronization.
+
+Regression coverage preserves the integrated numeric scene identities and checks
+that the historical numeric decal selection and appended infrastructure scenes
+still dispatch to their correct factories and terrain-profile behavior.
+
+## Retained 0.1.439 qualification
+
 Source revision `8e85a329a9a8d86497f432ba904703f3f95c1dda` integrates master
 `34c69dd97db417d1982fd7bf75cb1baa197082f6` and version 0.1.439, exactly one
 PATCH above master 0.1.438. Subsequent evidence-only commits do not change the

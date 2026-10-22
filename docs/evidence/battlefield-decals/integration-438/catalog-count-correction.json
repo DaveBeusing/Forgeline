@@ -1,0 +1,33 @@
+{
+  "failedSource": "cb1d9461fa4159c7f3bd11085319365777e5d466",
+  "workflowRun": 39666667010,
+  "failedTests": [
+    "DirectorateUnitAssetAuthoringTests.cs",
+    "RtsUiAssetAuthoringTests.cs",
+    "VfxAssetAuthoringTests.cs",
+    "WorldAssetAuthoringTests.cs",
+    "DirectorateBuildingAssetAuthoringTests.cs"
+  ],
+  "previousExpected": 1363,
+  "currentExpected": 1365,
+  "newIds": [
+    "texture.world.decal.atlas_normal",
+    "texture.world.decal.atlas_orm"
+  ],
+  "originalLogSha256": "1589c3d9430475002914f860498f485c1e9f44be969f9b8dc9a8f705509dfd6a",
+  "productionSourceUnchanged": "c7cbb542c77f56ce5de0988e043ad65495b12b37",
+  "budgetsUnchanged": true,
+  "localVerification": {
+    "tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "durationSeconds": 461.096
+  },
+  "originalCiSummary": {
+    "total": 3340,
+    "passed": 3290,
+    "failed": 5,
+    "skipped": 45
+  }
+}

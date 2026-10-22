@@ -1,0 +1,30 @@
+{
+  "samples": 1141,
+  "pstates": [
+    "P8"
+  ],
+  "graphicsClockMhz": [
+    172.0,
+    180.0
+  ],
+  "memoryClockMhz": [
+    405.0,
+    405.0
+  ],
+  "powerWatts": [
+    11.0,
+    20.82
+  ],
+  "temperatureCelsius": [
+    42.0,
+    45.0
+  ],
+  "gpuUtilizationPercent": [
+    11.0,
+    100.0
+  ],
+  "deviceMemoryMiB": [
+    1002.0,
+    3647.0
+  ]
+}
