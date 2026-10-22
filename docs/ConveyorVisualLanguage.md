@@ -153,6 +153,18 @@ Enemy operations and exact carried quantities must respect the existing
 faction-visibility boundary. No fog-of-war information may leak from animated
 parts or hidden cargo state.
 
+### Variant identity and reuse
+
+The JSON lists a stable `assetId` for each module and a separate planned
+`assetId + "." + state` for every state presentation. The nine material-moving
+module families have explicit **Flowing, Idle, Disconnected, Congested, Blocked,
+Unpowered, Damaged, Critical and Destroyed** variants. The two supports and
+physical end cap have only the meaningful **Structural Intact, Damaged, Critical
+and Destroyed** variants. A shared mesh with bounded procedural changes may
+provide several of those states; the reserved variant IDs do not require a
+unique high-poly model per state, do not grant flow authority and do not imply
+a compiler-ready asset today.
+
 ## Materials, texture and LOD contract
 
 Follow the current Directorate baseline (metallic/roughness):
