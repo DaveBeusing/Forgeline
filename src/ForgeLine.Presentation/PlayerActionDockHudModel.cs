@@ -636,7 +636,8 @@ internal static class PlayerActionDockHudModel
         PlayerActionPanelMode mode,
         int index,
         in PlayerActionPanelView panel,
-        PlayerActionSnapshot? actions)
+        PlayerActionSnapshot? actions,
+        int direction = 0)
     {
         if (actions is null ||
             index < 0)
