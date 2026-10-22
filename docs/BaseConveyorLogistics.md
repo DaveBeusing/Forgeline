@@ -23,6 +23,10 @@ forward depots and any resource or operation outside the conveyor-compatible con
 Supply Trucks still reload through their existing loading bays and deliver to military
 recipients. Conveyors never directly feed a battlefield unit.
 
+The [Directorate conveyor visual kit](ConveyorVisualLanguage.md) fixes the
+raised presentation dimensions, modular silhouettes and matching socket frames.
+Its preproduction JSON and greybox artwork are **not** transport implementation.
+
 The intended hybrid sequence is:
 
 `regional Cargo Truck -> storage / logistics hub -> local conveyor ->

@@ -1,0 +1,1404 @@
+{
+  "schema": "forgeline.directorate.conveyor_visual_kit",
+  "schemaVersion": 1,
+  "status": "design_baseline_proposed_for_pr_review_not_compiled",
+  "engine": {
+    "units": "meters",
+    "upAxis": "+Y",
+    "forwardAxis": "+Z",
+    "rightAxis": "+X",
+    "pivot": "origin at module ground reference; tier transforms add whole 2m steps",
+    "cardinalRotationDegrees": [
+      0,
+      90,
+      180,
+      270
+    ]
+  },
+  "geometry": {
+    "gridMeters": 4,
+    "shortLengthMeters": 4,
+    "standardLengthMeters": 8,
+    "transportSurfaceWidthMeters": 2,
+    "outerAssemblyWidthMeters": 2.8,
+    "beltSurfaceYTierZeroMeters": 5.8,
+    "assemblyUndersideYTierZeroMeters": 5.2,
+    "railTopYTierZeroMeters": 6.3,
+    "roadPassageMinimumMeters": 5,
+    "roadPassageDesignMarginMeters": 0.2,
+    "elevationTierStepMeters": 2,
+    "curveCenterlineRadiusMeters": 4,
+    "portPositionToleranceMeters": 0.02,
+    "portAngleToleranceDegrees": 1,
+    "modulesWithoutGroundContact": true,
+    "supportsHaveGroundContact": true,
+    "defaultModuleYawDegrees": 0,
+    "normalizedSourceScale": 1
+  },
+  "flow": {
+    "beltResources": [
+      "ferrous_ore",
+      "silicates",
+      "steel",
+      "electronics",
+      "ammunition"
+    ],
+    "ineligibleFamilies": [
+      "fuel",
+      "volatiles",
+      "liquids",
+      "gases",
+      "units",
+      "vehicles"
+    ],
+    "sourceOfTruth": "docs/BaseConveyorLogistics.md; docs/BaseConveyorPortMatrix.md",
+    "topologySemantics": "future, no gameplay logic in this kit"
+  },
+  "materials": {
+    "palette": {
+      "paintedArmorSteel": {
+        "baseColorHex": "#404A43",
+        "metallic": 0,
+        "roughness": 0.72
+      },
+      "exposedStructuralSteel": {
+        "baseColorHex": "#5F6868",
+        "metallic": 0.88,
+        "roughness": 0.56
+      },
+      "darkGunmetal": {
+        "baseColorHex": "#282D30",
+        "metallic": 0.85,
+        "roughness": 0.65
+      },
+      "rubberBelt": {
+        "baseColorHex": "#202428",
+        "metallic": 0,
+        "roughness": 0.94
+      },
+      "reinforcedConcrete": {
+        "baseColorHex": "#666762",
+        "metallic": 0,
+        "roughness": 0.91
+      },
+      "warningPaint": {
+        "baseColorHex": "#B78432",
+        "metallic": 0,
+        "roughness": 0.78
+      }
+    },
+    "pbr": "BaseColor, Normal and ORM (AO/Roughness/Metallic), separate small emissive channel for powered controls",
+    "reusedAtlas": "assets/source/materials/directorate/surfaces",
+    "uniqueTexturesRequired": false,
+    "factionColorMaximumSurfaceFraction": 0.08,
+    "blueprints": {
+      "direction": "painted asymmetric chevrons and exposed roller intervals; never faction color alone",
+      "state": "physical shutters, rollers and status lamps; never hue alone"
+    }
+  },
+  "states": [
+    {
+      "id": "structural_intact",
+      "cue": "baseline sound load-bearing beams and guard brackets; no flowing-material claim",
+      "movement": false,
+      "overlayLabel": "STRUCTURAL"
+    },
+    {
+      "id": "flowing",
+      "cue": "rollers and belt UV advance; small transfer-gate lamps; moving aggregate cargo optional",
+      "movement": true,
+      "overlayLabel": "FLOWING"
+    },
+    {
+      "id": "idle_no_input",
+      "cue": "static rollers; open feed hopper visible and empty; sparse dormant white control light",
+      "movement": false,
+      "overlayLabel": "NO INPUT"
+    },
+    {
+      "id": "disconnected",
+      "cue": "open connector jaw and mechanical stop bar; no flowing particles",
+      "movement": false,
+      "overlayLabel": "DISCONNECTED"
+    },
+    {
+      "id": "congested",
+      "cue": "visible packed loads with transfer stop/stack; amber alternating load indicator",
+      "movement": false,
+      "overlayLabel": "CONGESTED"
+    },
+    {
+      "id": "blocked",
+      "cue": "closed physical shutter across output, striped hazard guard and blinking amber lamp",
+      "movement": false,
+      "overlayLabel": "BLOCKED"
+    },
+    {
+      "id": "unpowered",
+      "cue": "stationary rollers and extinguished drive, mechanical brake engagement",
+      "movement": false,
+      "overlayLabel": "UNPOWERED"
+    },
+    {
+      "id": "damaged",
+      "cue": "bent guard or separated outer plate, a few sparks; transport logic external",
+      "movement": "conditional",
+      "overlayLabel": "DAMAGED"
+    },
+    {
+      "id": "critical",
+      "cue": "one broken bearer and localized smoke/sparks while still recognizable",
+      "movement": "conditional",
+      "overlayLabel": "CRITICAL"
+    },
+    {
+      "id": "destroyed",
+      "cue": "collapsed localized span, separated belt path and solid silhouette blockage",
+      "movement": false,
+      "overlayLabel": "DESTROYED"
+    }
+  ],
+  "visualBudget": {
+    "normalCameraPriority": [
+      "direction",
+      "junction_role",
+      "clearance",
+      "operating_state",
+      "faction",
+      "fine_detail"
+    ],
+    "recommendedLODs": [
+      "lod0",
+      "lod1",
+      "lod2"
+    ],
+    "instanceReuse": "repeat straight beam/roller/support, share material families",
+    "vfxCost": "no per-item physics; animate aggregate belt material only"
+  },
+  "modules": [
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.straight_short",
+      "slug": "conveyor_straight_short",
+      "role": "transport",
+      "shape": "straight",
+      "lengthMeters": 4,
+      "footprintMeters": [
+        2.8,
+        4
+      ],
+      "supportPolicy": "shared_endpoint_supports",
+      "directionGlyph": "repeated_chevron",
+      "ports": [
+        {
+          "name": "material_in",
+          "kind": "input",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            -2
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        },
+        {
+          "name": "material_out",
+          "kind": "output",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            2
+          ],
+          "facing": "N",
+          "relativeTier": 0
+        }
+      ],
+      "resourceClasses": [
+        "bulk_solid",
+        "packaged_solid"
+      ],
+      "variants": [
+        {
+          "state": "flowing",
+          "assetId": "infrastructure.directorate.conveyor.straight_short.flowing",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "idle_no_input",
+          "assetId": "infrastructure.directorate.conveyor.straight_short.idle_no_input",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "disconnected",
+          "assetId": "infrastructure.directorate.conveyor.straight_short.disconnected",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "congested",
+          "assetId": "infrastructure.directorate.conveyor.straight_short.congested",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "blocked",
+          "assetId": "infrastructure.directorate.conveyor.straight_short.blocked",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "unpowered",
+          "assetId": "infrastructure.directorate.conveyor.straight_short.unpowered",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.straight_short.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.straight_short.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.straight_short.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.straight_standard",
+      "slug": "conveyor_straight_standard",
+      "role": "transport",
+      "shape": "straight",
+      "lengthMeters": 8,
+      "footprintMeters": [
+        2.8,
+        8
+      ],
+      "supportPolicy": "shared_endpoint_supports",
+      "directionGlyph": "repeated_chevron",
+      "ports": [
+        {
+          "name": "material_in",
+          "kind": "input",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            -4
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        },
+        {
+          "name": "material_out",
+          "kind": "output",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            4
+          ],
+          "facing": "N",
+          "relativeTier": 0
+        }
+      ],
+      "resourceClasses": [
+        "bulk_solid",
+        "packaged_solid"
+      ],
+      "variants": [
+        {
+          "state": "flowing",
+          "assetId": "infrastructure.directorate.conveyor.straight_standard.flowing",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "idle_no_input",
+          "assetId": "infrastructure.directorate.conveyor.straight_standard.idle_no_input",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "disconnected",
+          "assetId": "infrastructure.directorate.conveyor.straight_standard.disconnected",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "congested",
+          "assetId": "infrastructure.directorate.conveyor.straight_standard.congested",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "blocked",
+          "assetId": "infrastructure.directorate.conveyor.straight_standard.blocked",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "unpowered",
+          "assetId": "infrastructure.directorate.conveyor.straight_standard.unpowered",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.straight_standard.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.straight_standard.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.straight_standard.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.curve_90",
+      "slug": "conveyor_curve_90",
+      "role": "turn",
+      "shape": "quarter_circle",
+      "radiusMeters": 4,
+      "handednessVariants": [
+        "left",
+        "right"
+      ],
+      "footprintMeters": [
+        6.8,
+        6.8
+      ],
+      "supportPolicy": "outside_corner_only",
+      "directionGlyph": "radial_chevron",
+      "ports": [
+        {
+          "name": "material_in",
+          "kind": "input",
+          "role": "belt",
+          "positionMeters": [
+            -4,
+            5.8,
+            0
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        },
+        {
+          "name": "material_out",
+          "kind": "output",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            4
+          ],
+          "facing": "E",
+          "relativeTier": 0
+        }
+      ],
+      "resourceClasses": [
+        "bulk_solid",
+        "packaged_solid"
+      ],
+      "footprintCenterXZ": [
+        -2,
+        2
+      ],
+      "footprintNote": "Local left-hand source: arc bounds X -5.4..1.4 / Z -1.4..5.4 including 1.4m half-assembly width; mirrored variant reverses X.",
+      "variants": [
+        {
+          "state": "flowing",
+          "assetId": "infrastructure.directorate.conveyor.curve_90.flowing",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "idle_no_input",
+          "assetId": "infrastructure.directorate.conveyor.curve_90.idle_no_input",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "disconnected",
+          "assetId": "infrastructure.directorate.conveyor.curve_90.disconnected",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "congested",
+          "assetId": "infrastructure.directorate.conveyor.curve_90.congested",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "blocked",
+          "assetId": "infrastructure.directorate.conveyor.curve_90.blocked",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "unpowered",
+          "assetId": "infrastructure.directorate.conveyor.curve_90.unpowered",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.curve_90.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.curve_90.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.curve_90.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.ramp_up",
+      "slug": "conveyor_ramp_up",
+      "role": "elevation",
+      "shape": "ramp",
+      "lengthMeters": 8,
+      "riseMeters": 2,
+      "footprintMeters": [
+        2.8,
+        8
+      ],
+      "supportPolicy": "tier_specific_supports",
+      "directionGlyph": "slope_chevron",
+      "ports": [
+        {
+          "name": "material_in",
+          "kind": "input",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            -4
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        },
+        {
+          "name": "material_out",
+          "kind": "output",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            7.8,
+            4
+          ],
+          "facing": "N",
+          "relativeTier": 1
+        }
+      ],
+      "resourceClasses": [
+        "bulk_solid",
+        "packaged_solid"
+      ],
+      "variants": [
+        {
+          "state": "flowing",
+          "assetId": "infrastructure.directorate.conveyor.ramp_up.flowing",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "idle_no_input",
+          "assetId": "infrastructure.directorate.conveyor.ramp_up.idle_no_input",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "disconnected",
+          "assetId": "infrastructure.directorate.conveyor.ramp_up.disconnected",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "congested",
+          "assetId": "infrastructure.directorate.conveyor.ramp_up.congested",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "blocked",
+          "assetId": "infrastructure.directorate.conveyor.ramp_up.blocked",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "unpowered",
+          "assetId": "infrastructure.directorate.conveyor.ramp_up.unpowered",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.ramp_up.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.ramp_up.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.ramp_up.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.ramp_down",
+      "slug": "conveyor_ramp_down",
+      "role": "elevation",
+      "shape": "ramp",
+      "lengthMeters": 8,
+      "riseMeters": -2,
+      "footprintMeters": [
+        2.8,
+        8
+      ],
+      "supportPolicy": "tier_specific_supports",
+      "directionGlyph": "slope_chevron",
+      "ports": [
+        {
+          "name": "material_in",
+          "kind": "input",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            7.8,
+            -4
+          ],
+          "facing": "S",
+          "relativeTier": 1
+        },
+        {
+          "name": "material_out",
+          "kind": "output",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            4
+          ],
+          "facing": "N",
+          "relativeTier": 0
+        }
+      ],
+      "resourceClasses": [
+        "bulk_solid",
+        "packaged_solid"
+      ],
+      "variants": [
+        {
+          "state": "flowing",
+          "assetId": "infrastructure.directorate.conveyor.ramp_down.flowing",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "idle_no_input",
+          "assetId": "infrastructure.directorate.conveyor.ramp_down.idle_no_input",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "disconnected",
+          "assetId": "infrastructure.directorate.conveyor.ramp_down.disconnected",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "congested",
+          "assetId": "infrastructure.directorate.conveyor.ramp_down.congested",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "blocked",
+          "assetId": "infrastructure.directorate.conveyor.ramp_down.blocked",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "unpowered",
+          "assetId": "infrastructure.directorate.conveyor.ramp_down.unpowered",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.ramp_down.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.ramp_down.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.ramp_down.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.merger_2to1",
+      "slug": "conveyor_merger_2to1",
+      "role": "merge",
+      "shape": "triple_trapezoid",
+      "lengthMeters": 8,
+      "footprintMeters": [
+        10.8,
+        8
+      ],
+      "supportPolicy": "outside_branch_supports",
+      "directionGlyph": "two_arms_into_one",
+      "ports": [
+        {
+          "name": "input_a",
+          "kind": "input",
+          "role": "belt",
+          "positionMeters": [
+            -4,
+            5.8,
+            -4
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        },
+        {
+          "name": "input_b",
+          "kind": "input",
+          "role": "belt",
+          "positionMeters": [
+            4,
+            5.8,
+            -4
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        },
+        {
+          "name": "output_main",
+          "kind": "output",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            4
+          ],
+          "facing": "N",
+          "relativeTier": 0
+        }
+      ],
+      "resourceClasses": [
+        "bulk_solid",
+        "packaged_solid"
+      ],
+      "variants": [
+        {
+          "state": "flowing",
+          "assetId": "infrastructure.directorate.conveyor.merger_2to1.flowing",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "idle_no_input",
+          "assetId": "infrastructure.directorate.conveyor.merger_2to1.idle_no_input",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "disconnected",
+          "assetId": "infrastructure.directorate.conveyor.merger_2to1.disconnected",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "congested",
+          "assetId": "infrastructure.directorate.conveyor.merger_2to1.congested",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "blocked",
+          "assetId": "infrastructure.directorate.conveyor.merger_2to1.blocked",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "unpowered",
+          "assetId": "infrastructure.directorate.conveyor.merger_2to1.unpowered",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.merger_2to1.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.merger_2to1.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.merger_2to1.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.splitter_1to2",
+      "slug": "conveyor_splitter_1to2",
+      "role": "split",
+      "shape": "triple_fork",
+      "lengthMeters": 8,
+      "footprintMeters": [
+        10.8,
+        8
+      ],
+      "supportPolicy": "outside_branch_supports",
+      "directionGlyph": "one_into_two_arms",
+      "ports": [
+        {
+          "name": "input_main",
+          "kind": "input",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            -4
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        },
+        {
+          "name": "output_a",
+          "kind": "output",
+          "role": "belt",
+          "positionMeters": [
+            -4,
+            5.8,
+            4
+          ],
+          "facing": "N",
+          "relativeTier": 0
+        },
+        {
+          "name": "output_b",
+          "kind": "output",
+          "role": "belt",
+          "positionMeters": [
+            4,
+            5.8,
+            4
+          ],
+          "facing": "N",
+          "relativeTier": 0
+        }
+      ],
+      "resourceClasses": [
+        "bulk_solid",
+        "packaged_solid"
+      ],
+      "variants": [
+        {
+          "state": "flowing",
+          "assetId": "infrastructure.directorate.conveyor.splitter_1to2.flowing",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "idle_no_input",
+          "assetId": "infrastructure.directorate.conveyor.splitter_1to2.idle_no_input",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "disconnected",
+          "assetId": "infrastructure.directorate.conveyor.splitter_1to2.disconnected",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "congested",
+          "assetId": "infrastructure.directorate.conveyor.splitter_1to2.congested",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "blocked",
+          "assetId": "infrastructure.directorate.conveyor.splitter_1to2.blocked",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "unpowered",
+          "assetId": "infrastructure.directorate.conveyor.splitter_1to2.unpowered",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.splitter_1to2.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.splitter_1to2.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.splitter_1to2.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.io_in",
+      "slug": "conveyor_io_in",
+      "role": "building_to_belt",
+      "shape": "interface",
+      "lengthMeters": 4,
+      "footprintMeters": [
+        2.8,
+        4
+      ],
+      "supportPolicy": "building_edge_not_ground_span",
+      "directionGlyph": "building_arrow_out",
+      "ports": [
+        {
+          "name": "building_source",
+          "kind": "input",
+          "role": "building_socket",
+          "positionMeters": [
+            0,
+            5.8,
+            -2
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        },
+        {
+          "name": "belt_output",
+          "kind": "output",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            2
+          ],
+          "facing": "N",
+          "relativeTier": 0
+        }
+      ],
+      "resourceClasses": [
+        "bulk_solid",
+        "packaged_solid"
+      ],
+      "variants": [
+        {
+          "state": "flowing",
+          "assetId": "infrastructure.directorate.conveyor.io_in.flowing",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "idle_no_input",
+          "assetId": "infrastructure.directorate.conveyor.io_in.idle_no_input",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "disconnected",
+          "assetId": "infrastructure.directorate.conveyor.io_in.disconnected",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "congested",
+          "assetId": "infrastructure.directorate.conveyor.io_in.congested",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "blocked",
+          "assetId": "infrastructure.directorate.conveyor.io_in.blocked",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "unpowered",
+          "assetId": "infrastructure.directorate.conveyor.io_in.unpowered",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.io_in.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.io_in.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.io_in.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.io_out",
+      "slug": "conveyor_io_out",
+      "role": "belt_to_building",
+      "shape": "interface",
+      "lengthMeters": 4,
+      "footprintMeters": [
+        2.8,
+        4
+      ],
+      "supportPolicy": "building_edge_not_ground_span",
+      "directionGlyph": "building_arrow_in",
+      "ports": [
+        {
+          "name": "belt_input",
+          "kind": "input",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            -2
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        },
+        {
+          "name": "building_sink",
+          "kind": "output",
+          "role": "building_socket",
+          "positionMeters": [
+            0,
+            5.8,
+            2
+          ],
+          "facing": "N",
+          "relativeTier": 0
+        }
+      ],
+      "resourceClasses": [
+        "bulk_solid",
+        "packaged_solid"
+      ],
+      "variants": [
+        {
+          "state": "flowing",
+          "assetId": "infrastructure.directorate.conveyor.io_out.flowing",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "idle_no_input",
+          "assetId": "infrastructure.directorate.conveyor.io_out.idle_no_input",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "disconnected",
+          "assetId": "infrastructure.directorate.conveyor.io_out.disconnected",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "congested",
+          "assetId": "infrastructure.directorate.conveyor.io_out.congested",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "blocked",
+          "assetId": "infrastructure.directorate.conveyor.io_out.blocked",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "unpowered",
+          "assetId": "infrastructure.directorate.conveyor.io_out.unpowered",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.io_out.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.io_out.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.io_out.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.support_light",
+      "slug": "conveyor_support_light",
+      "role": "structure",
+      "shape": "single_column",
+      "footprintMeters": [
+        0.8,
+        0.8
+      ],
+      "supportPolicy": "vertical_load_only",
+      "directionGlyph": "none",
+      "structuralSockets": [
+        {
+          "name": "foundation",
+          "positionMeters": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "carrier",
+          "positionMeters": [
+            0,
+            5.2,
+            0
+          ]
+        }
+      ],
+      "ports": [],
+      "resourceClasses": [],
+      "variants": [
+        {
+          "state": "structural_intact",
+          "assetId": "infrastructure.directorate.conveyor.support_light.structural_intact",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.support_light.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.support_light.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.support_light.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.support_heavy",
+      "slug": "conveyor_support_heavy",
+      "role": "structure",
+      "shape": "braced_double_column",
+      "footprintMeters": [
+        4.1,
+        0.9
+      ],
+      "supportPolicy": "junction_and_long_span",
+      "directionGlyph": "none",
+      "structuralSockets": [
+        {
+          "name": "foot_left",
+          "positionMeters": [
+            -1.6,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "foot_right",
+          "positionMeters": [
+            1.6,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "carrier",
+          "positionMeters": [
+            0,
+            5.2,
+            0
+          ]
+        }
+      ],
+      "ports": [],
+      "resourceClasses": [],
+      "variants": [
+        {
+          "state": "structural_intact",
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.structural_intact",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    },
+    {
+      "family": "infrastructure.directorate.conveyor",
+      "baseTier": 0,
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFormat": "planned_glb",
+      "runtimeStatus": "not_implemented",
+      "assetId": "infrastructure.directorate.conveyor.endcap",
+      "slug": "conveyor_endcap",
+      "role": "closure",
+      "shape": "endcap",
+      "lengthMeters": 0.8,
+      "footprintMeters": [
+        2.8,
+        0.8
+      ],
+      "supportPolicy": "no_independent_support",
+      "directionGlyph": "stop_bar",
+      "ports": [
+        {
+          "name": "mechanical_cap",
+          "kind": "cap",
+          "role": "belt",
+          "positionMeters": [
+            0,
+            5.8,
+            -0.4
+          ],
+          "facing": "S",
+          "relativeTier": 0
+        }
+      ],
+      "resourceClasses": [],
+      "variants": [
+        {
+          "state": "structural_intact",
+          "assetId": "infrastructure.directorate.conveyor.endcap.structural_intact",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "damaged",
+          "assetId": "infrastructure.directorate.conveyor.endcap.damaged",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "critical",
+          "assetId": "infrastructure.directorate.conveyor.endcap.critical",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        },
+        {
+          "state": "destroyed",
+          "assetId": "infrastructure.directorate.conveyor.endcap.destroyed",
+          "sourceMode": "shared_mesh_with_state_override",
+          "runtimeStatus": "not_compiled"
+        }
+      ]
+    }
+  ]
+}
