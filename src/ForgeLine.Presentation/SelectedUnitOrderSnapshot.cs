@@ -138,7 +138,9 @@ internal static class SelectedUnitOrderSnapshotFactory
             if (state.Lifecycle is CargoTransportLifecycleState.Waiting or CargoTransportLifecycleState.Failed)
                 nodeId = state.AnchorNode.IsSpecified ? state.AnchorNode : cargo.Destination;
             if (network.TryGetNode(nodeId, out var node) &&
-                entities.IsAlive(node.Entity))
+                entities.IsAlive(node.Entity) &&
+                entities.TryGetComponent(node.Entity, out ControllableEntity owner) &&
+                owner.Owner == extraction.Player)
                 return View(SelectedUnitOrderKind.Cargo, verb, node.WorldPosition, true, node.Entity);
             return View(SelectedUnitOrderKind.Cargo, verb);
         }
