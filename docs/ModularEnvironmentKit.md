@@ -222,3 +222,7 @@ These unchanged Medium 1920x1080 pixels are review evidence, not approved golden
 ![Actual bridge approaches, 120m](images/environment-kit/bridge-close.png)
 
 ![1,000 copied kit objects, 420m](images/environment-kit/repeated-normal.png)
+
+For current road/bridge/ford masters and graph-derived display transforms, see
+[Road, bridge and crossing Blender sources](InfrastructureBlenderMasters.md).
+Earlier captures in this document remain historical.

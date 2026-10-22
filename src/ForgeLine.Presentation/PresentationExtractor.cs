@@ -27,6 +27,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     private readonly PresentationExtractionContext? _extraction;
     private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly RenderInstance[] _staticDressing = [];
+    private readonly CrossingVisualLayout? _crossingLayout;
+    private readonly EntityId[] _visualCrossingEntities = [];
     private RenderInstance[] _captureScratch = [];
     internal const int MaximumRetainedCaptureInstances = 16_384;
     internal long CaptureScratchRetainedBytes => (long)_captureScratch.Length * System.Runtime.CompilerServices.Unsafe.SizeOf<RenderInstance>() +
@@ -87,10 +89,12 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     {
         _extraction = extraction;
         _worldAudio = new();
-        _staticDressing = CaptureStaticDressing(extraction.Scenario);
+        _crossingLayout = CrossingVisualLayout.Create(extraction.Scenario.Battlefield, extraction.Scenario.Terrain);
+        _visualCrossingEntities = extraction.Scenario.BattlefieldRuntime.CrossingEntities.Values.ToArray();
+        _staticDressing = CaptureStaticDressing(extraction.Scenario, _crossingLayout);
     }
 
-    private static RenderInstance[] CaptureStaticDressing(MatchRuntime scenario)
+    private static RenderInstance[] CaptureStaticDressing(MatchRuntime scenario, CrossingVisualLayout layout)
     {
         var instances = new List<RenderInstance>();
         foreach (var item in scenario.Battlefield.WorldObjects)
@@ -102,13 +106,15 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 : item.Kind == WorldPresentationKind.Decal ? .04f : item.Scale.Y * .5f;
             // A separate presentation identity range cannot consume simulation allocator slots.
             uint identity = checked(0xE000_0000U + (uint)instances.Count);
-            instances.Add(new(new EntityId(identity, 1),
+            RenderTransform display = layout.Aprons.TryGetValue(item.Key, out var apron) ? apron :
                 new(new(item.Position.X, height + offset, item.Position.Z),
-                    Quaternion.CreateFromAxisAngle(Vector3.UnitY, item.RotationDegrees * MathF.PI / 180), item.Scale),
+                    Quaternion.CreateFromAxisAngle(Vector3.UnitY, item.RotationDegrees * MathF.PI / 180), item.Scale);
+            instances.Add(new(new EntityId(identity, 1), display,
                 new(checked(5_000u + (uint)item.Visual)), RenderMaterialHandle.Default,
                 RenderVisibilityMask.World, identity,
                 WorldFeature: new(item.Visual, item.Kind, default, Inspectable: false)));
         }
+        instances.AddRange(layout.Approaches);
         return instances.ToArray();
     }
 
@@ -286,6 +292,18 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
         int baseIndex =
             0;
 
+        bool bridgeOperational = false, fordOperational = false;
+        if (_extraction is not null && _crossingLayout is not null)
+        {
+            foreach (var crossing in _visualCrossingEntities)
+            {
+                if (!entities.TryGetComponent(crossing, out StrategicInfrastructureState state) ||
+                    state.State != StrategicInfrastructureOperationalState.Operational ||
+                    !entities.TryGetComponent(crossing, out InfrastructurePresentationIdentity identity)) continue;
+                bridgeOperational |= identity.Kind == InfrastructurePresentationKind.RoadBridge;
+                fordOperational |= identity.Kind == InfrastructurePresentationKind.Ford;
+            }
+        }
         foreach (EntityId entity in entities.Query<
                      WorldTransform,
                      VisualIdentity>(
@@ -355,12 +373,27 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
             bool ownedProductionMotion = _extraction is not null &&
                 MechanicalDoorPolicy.CanReadProduction(selectable.Owner, _extraction.Player);
 
+            // Keep simulation transforms and mechanical travel untouched; adjust only the drawn copy.
+            var renderTransform = ResourceDepositVisualTransform.Apply(
+                new RenderTransform(transform.Position, transform.Rotation, transform.Scale), worldFeature);
+            if (_crossingLayout is not null)
+            {
+                // Terrain wear lies under the opaque intact deck; do not project soil through concrete.
+                if (_crossingLayout.IsCoveredGroundWear(renderTransform,worldFeature.Visual,bridgeOperational)) continue;
+                if (worldFeature.Visual is WorldVisualId.DecalConcreteCrack or WorldVisualId.DecalRoadWear)
+                    renderTransform = _crossingLayout.AlignBridgeOverlay(renderTransform,worldFeature.Visual,bridgeOperational);
+                if (infrastructureFeature.Kind is InfrastructurePresentationKind.RoadBridge or InfrastructurePresentationKind.Ford &&
+                    entities.TryGetComponent(entity, out InfrastructurePresentationIdentity crossingIdentity) &&
+                    _crossingLayout.Crossings.TryGetValue(crossingIdentity.Key, out var crossingTransform))
+                    renderTransform = crossingTransform;
+                if (!unitFeature.IsWreck && (unitFeature.Unit == UnitIds.CargoTruck || unitFeature.Unit == UnitIds.SupplyTruck))
+                    renderTransform = _crossingLayout.GroundTruck(renderTransform, unitFeature.Unit == UnitIds.CargoTruck,
+                        bridgeOperational, fordOperational);
+            }
             baseInstances[baseIndex++] =
                 new RenderInstance(
                     entity,
-                    ResourceDepositVisualTransform.Apply(
-                        new RenderTransform(transform.Position, transform.Rotation, transform.Scale),
-                        worldFeature),
+                    renderTransform,
                     new RenderMeshHandle(
                         visual.VisualId),
                     RenderMaterialHandle.Default,

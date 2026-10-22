@@ -9,7 +9,8 @@ public enum InfrastructurePresentationKind : byte
     RoadCurveShort = 5,
     RoadCurveLong = 6,
     RoadJunctionT = 7,
-    RoadJunctionCross = 8
+    RoadJunctionCross = 8,
+    RoadYardTransition = 9
 }
 
 public readonly record struct InfrastructurePresentationIdentity

@@ -1,8 +1,8 @@
 {
   "id": "infrastructure.directorate.road.yard_transition",
-  "type": "mesh",
-  "source": "../sources/road_yard_transition.gltf",
   "materialReferences": [
     "material.directorate.infrastructure.road"
-  ]
+  ],
+  "source": "../sources/blender/road_yard_transition.glb",
+  "type": "mesh"
 }

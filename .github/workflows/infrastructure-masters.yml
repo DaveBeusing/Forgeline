@@ -1,0 +1,38 @@
+name: Infrastructure Blender masters
+
+on:
+  workflow_dispatch:
+    inputs:
+      blender_executable:
+        description: Optional pinned Blender executable
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  native-masters:
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 45
+    env:
+      FORGELINE_BLENDER_PATH: ${{ inputs.blender_executable }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release
+        shell: pwsh
+        run: dotnet build ForgeLine.sln --configuration Release
+      - name: Qualify saved infrastructure masters
+        shell: pwsh
+        run: ./tools/blender/Test-BlenderInfrastructure.ps1 -OutputRoot artifacts/infrastructure-native
+      - name: Retain native reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: infrastructure-native-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/infrastructure-native
+          retention-days: 14

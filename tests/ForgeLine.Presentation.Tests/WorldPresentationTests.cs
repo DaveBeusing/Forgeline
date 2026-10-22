@@ -36,7 +36,10 @@ public sealed class WorldPresentationTests
         Assert.Equal("F8851B42FBFD3EF68A46F0D8E26B2C31433C4EBF225F5B4FD6F6156C24CCD979", hash);
         Assert.True(buffer.TryReadLatest(out var snapshot));
         var dressing = snapshot.Instances.ToArray().Where(x => x.Entity.Index >= 0xE000_0000U && x.Entity.Index < 0xF000_0000U).ToArray();
-        Assert.Equal(scenario.Battlefield.WorldObjects.Count(x => x.PresentationOnly), dressing.Length);
+        int authoredDressing=scenario.Battlefield.WorldObjects.Count(x=>x.PresentationOnly);
+        Assert.Equal(authoredDressing,dressing.Count(x=>!x.InfrastructureFeature.IsSpecified));
+        Assert.Equal(234,dressing.Count(x=>x.InfrastructureFeature.IsSpecified));
+        Assert.Equal(authoredDressing+234,dressing.Length);
         Assert.All(dressing, item =>
         {
             Assert.False(scenario.Simulation.Entities.IsAlive(item.Entity));

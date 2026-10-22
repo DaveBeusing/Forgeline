@@ -1,0 +1,8 @@
+{
+  "families": 3,
+  "nativeInvalidEditsRejected": true,
+  "savedEditsReachOnlyIntendedMeshes": true,
+  "success": true,
+  "sourceLessIntegrity": true,
+  "repeatedSourceAndRuntimeBytes": true
+}

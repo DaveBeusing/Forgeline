@@ -1,0 +1,62 @@
+[
+  {
+    "retained": "before/roads.png",
+    "sha256": "fbfc38b2c507b48fa8b4488c9a84f716526e47185682f34b9eead141ce1a325b",
+    "side": "before",
+    "source": "main/InfrastructureRoadJunctions-1920x1080-High-NormalGameplay.png"
+  },
+  {
+    "retained": "before/bridge.png",
+    "sha256": "8f01c99079a7ae5c650945108de3ad064f4a6f01886e50d067b3ef8bd4dc5bd3",
+    "side": "before",
+    "source": "main/InfrastructureBridgeDeck-1920x1080-High-CloseTactical.png"
+  },
+  {
+    "retained": "before/ford.png",
+    "sha256": "87e92802f03a651007cbee2fd124eeba206326aff33d74b47ba548c0084d09b3",
+    "side": "before",
+    "source": "main/InfrastructureFordDeck-1920x1080-High-CloseTactical.png"
+  },
+  {
+    "retained": "before/curve-long.png",
+    "sha256": "34eba2a88bd6be1f3be829eee0512474fd0605f0098d01237324d3ede1b628f6",
+    "side": "before",
+    "source": "junctions/InfrastructureCurveLong-1920x1080-High-CloseTactical.png"
+  },
+  {
+    "retained": "before/strategic-4k.png",
+    "sha256": "e3b4701eb7d07573b7bd68dd5e69cda849f3578912dfa03dd85026d807342b68",
+    "side": "before",
+    "source": "main/InfrastructureBridgeDeck-3840x2160-High-Strategic.png"
+  },
+  {
+    "retained": "after/roads.png",
+    "sha256": "f0a36e8b3b771fcfa9018b3d21daf0be45ff64a9decc0bca9f30fcfedca2d890",
+    "side": "after",
+    "source": "main/InfrastructureRoadJunctions-1920x1080-High-NormalGameplay.png"
+  },
+  {
+    "retained": "after/bridge.png",
+    "sha256": "fb12d98da87c243cb5d03a09f3057c371055bbe0f62b963d8a93997e3e6dc229",
+    "side": "after",
+    "source": "main/InfrastructureBridgeDeck-1920x1080-High-CloseTactical.png"
+  },
+  {
+    "retained": "after/ford.png",
+    "sha256": "5649077209d3ee318331feb712ea1b1bbe3e384aef7eb1b6353309295c3afff9",
+    "side": "after",
+    "source": "main/InfrastructureFordDeck-1920x1080-High-CloseTactical.png"
+  },
+  {
+    "retained": "after/curve-long.png",
+    "sha256": "2d7c735772c5192eb494c08f00484e5e360830414d1b43440ac53db38bebf5f9",
+    "side": "after",
+    "source": "junctions/InfrastructureCurveLong-1920x1080-High-CloseTactical.png"
+  },
+  {
+    "retained": "after/strategic-4k.png",
+    "sha256": "6215dd2dc8baa8f0dce665b7ef0b1e1c080f8e284d6ca5c94e2c8601585a1707",
+    "side": "after",
+    "source": "main/InfrastructureBridgeDeck-3840x2160-High-Strategic.png"
+  }
+]

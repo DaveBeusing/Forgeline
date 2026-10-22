@@ -1,0 +1,80 @@
+{
+  "definitions": {
+    "infrastructure.directorate.bridge.road.damaged": "infrastructure/directorate/bridges/road_damaged.asset.json",
+    "infrastructure.directorate.bridge.road.destroyed": "infrastructure/directorate/bridges/road_destroyed.asset.json",
+    "infrastructure.directorate.bridge.road.intact": "infrastructure/directorate/bridges/road_intact.asset.json",
+    "infrastructure.directorate.road.curve_long": "infrastructure/directorate/roads/curve_long.asset.json",
+    "infrastructure.directorate.road.curve_short": "infrastructure/directorate/roads/curve_short.asset.json",
+    "infrastructure.directorate.road.damaged": "infrastructure/directorate/roads/damaged.asset.json",
+    "infrastructure.directorate.road.destroyed": "infrastructure/directorate/roads/destroyed.asset.json",
+    "infrastructure.directorate.road.junction_cross": "infrastructure/directorate/roads/junction_cross.asset.json",
+    "infrastructure.directorate.road.junction_t": "infrastructure/directorate/roads/junction_t.asset.json",
+    "infrastructure.directorate.road.shoulder": "infrastructure/directorate/roads/shoulder.asset.json",
+    "infrastructure.directorate.road.straight": "infrastructure/directorate/roads/straight.asset.json",
+    "infrastructure.directorate.road.yard_transition": "infrastructure/directorate/roads/yard_transition.asset.json",
+    "material.directorate.infrastructure.bridge": "infrastructure/directorate/materials/bridge.asset.json",
+    "material.directorate.infrastructure.road": "infrastructure/directorate/materials/road.asset.json",
+    "material.directorate.infrastructure.road_damaged": "infrastructure/directorate/materials/road_damaged.asset.json",
+    "material.directorate.infrastructure.road_shoulder": "infrastructure/directorate/materials/road_shoulder.asset.json",
+    "material.world.prop.industrial": "world/materials/common/industrial.asset.json",
+    "mesh.world.kit.collision_centered": "world/meshes/kit/collision_centered.asset.json",
+    "mesh.world.prop.bridge_apron": "world/meshes/kit/bridge_apron.asset.json",
+    "mesh.world.prop.bridge_apron_lod1": "world/meshes/kit/bridge_apron_lod1.asset.json",
+    "mesh.world.prop.loading_apron": "world/meshes/kit/loading_apron.asset.json",
+    "mesh.world.prop.loading_apron_lod1": "world/meshes/kit/loading_apron_lod1.asset.json",
+    "mesh.world.prop.road_edge": "world/meshes/kit/road_edge.asset.json",
+    "mesh.world.prop.road_edge_lod1": "world/meshes/kit/road_edge_lod1.asset.json",
+    "texture.directorate.surface.atlas_base": "materials/directorate/surfaces/surface_atlas.asset.json",
+    "texture.directorate.surface.atlas_normal": "materials/directorate/surfaces/surface_normal.asset.json",
+    "texture.directorate.surface.atlas_orm": "materials/directorate/surfaces/surface_orm.asset.json"
+  },
+  "families": [
+    {
+      "assets": [
+        "infrastructure.directorate.road.curve_long",
+        "infrastructure.directorate.road.curve_short",
+        "infrastructure.directorate.road.damaged",
+        "infrastructure.directorate.road.destroyed",
+        "infrastructure.directorate.road.junction_cross",
+        "infrastructure.directorate.road.junction_t",
+        "infrastructure.directorate.road.shoulder",
+        "infrastructure.directorate.road.straight",
+        "infrastructure.directorate.road.yard_transition"
+      ],
+      "instanceScale": [
+        12,
+        1,
+        8
+      ],
+      "instanceTranslation": [
+        0,
+        0,
+        0
+      ],
+      "instanceYawDegrees": 0,
+      "name": "roads",
+      "root": "infrastructure.directorate.road.straight"
+    },
+    {
+      "assets": [
+        "infrastructure.directorate.bridge.road.damaged",
+        "infrastructure.directorate.bridge.road.destroyed",
+        "infrastructure.directorate.bridge.road.intact"
+      ],
+      "instanceScale": [
+        18,
+        4,
+        42
+      ],
+      "instanceTranslation": [
+        0,
+        0,
+        0
+      ],
+      "instanceYawDegrees": 90,
+      "name": "bridge",
+      "root": "infrastructure.directorate.bridge.road.intact"
+    }
+  ],
+  "schemaVersion": 1
+}
