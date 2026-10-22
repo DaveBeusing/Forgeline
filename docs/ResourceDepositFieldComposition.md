@@ -108,6 +108,8 @@ The existing screen-space High/Reduced policy and per-entity/ordinal hysteresis
 select detail for each cluster. World and shadow passes consume the same copied
 field. Materials, mesh buffers and batch keys remain shared. Family-relative tint
 is applied before the existing state tint, preserving the common depleted gray.
+Visible/LOD diagnostics continue counting roots (using the first visible field
+part for its LOD summary); submission/upload metrics count actual emitted parts.
 
 `PresentationBounds` still resolves the original selection/inspection root.
 Separate render bounds union the complete field and legacy root envelope; sphere

@@ -373,7 +373,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     continue;
                 }
 
-                if (!rootVisible) { visible++; rootVisible = true; }
+                bool firstVisiblePart = !rootVisible;
+                if (firstVisiblePart) { visible++; rootVisible = true; }
                 if (instance.WorldFeature.Kind == ForgeLine.Game.WorldPresentationKind.Vegetation) visibleVegetation++;
 
                 RuntimeMeshBuffers runtimeMesh =
@@ -580,12 +581,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         usesRuntimeMesh = TryGetMesh(instance.WorldFeature, WorldAssetLod.High, out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
                     if (fieldCluster.HasValue && !usesRuntimeMesh) continue;
 
-                    if (worldLod == WorldAssetLod.Reduced)
+                    if (worldLod == WorldAssetLod.Reduced && firstVisiblePart)
                     {
                         lod1Instances++;
                         reducedLod++;
                     }
-                    else
+                    else if (firstVisiblePart)
                     {
                         highLod++;
                     }
