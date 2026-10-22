@@ -28,6 +28,7 @@ public sealed class GameplayHudRenderer : IDisposable
         var prepared = new List<IGameplayHudSurface>();
         try
         {
+            prepared.Add(new OperationsWorldOverlaySurface(graphics));
             _statusSurface = new ResourcePowerHudSurface(graphics, runtimeAssets);
             prepared.Add(_statusSurface);
             prepared.Add(new PlayerActionRingHudSurface(graphics, runtimeAssets));
