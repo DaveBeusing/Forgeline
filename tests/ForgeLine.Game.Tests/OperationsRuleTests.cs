@@ -215,7 +215,7 @@ public sealed class OperationsRuleTests
     {
         var gateway = new PlayerCommandGateway(scenario.Simulation,
             scenario.Services.BuildingCommands, scenario.BattlefieldRuntime.MatchStateEntity);
-        scenario.Simulation.RegisterTickObserver(gateway);
+        scenario.Simulation.AttachTickObserver(gateway);
         return gateway;
     }
 
