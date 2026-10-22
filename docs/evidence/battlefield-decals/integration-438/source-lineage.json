@@ -1,0 +1,668 @@
+{
+  "success": true,
+  "currentProductionSource": "c7cbb542c77f56ce5de0988e043ad65495b12b37",
+  "currentMaster": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "reusedNativeAuthoringSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+  "unchangedAuthoringInputs": [
+    {
+      "path": "world/authoring/decals/blast_mark.blend",
+      "sha256": "1ca64921c7c890cc6d677b074127e1d29389492c851819fccab026da667a6366"
+    },
+    {
+      "path": "world/authoring/decals/blast_mark.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/concrete_crack.blend",
+      "sha256": "b4dbf576447c31b5e522590e97d3e81565a1716005c53ac5887440a996ad4a75"
+    },
+    {
+      "path": "world/authoring/decals/concrete_crack.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/decal_quad.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/oil_stain.blend",
+      "sha256": "e003b1dc786200d6e759be27170439a027eee8d4e2d715d0892beb6bf461979d"
+    },
+    {
+      "path": "world/authoring/decals/oil_stain.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/road_wear.blend",
+      "sha256": "d52452c6466ef3fb558515d3ec810851a5a24ffbd0715ace94b68841477edd4c"
+    },
+    {
+      "path": "world/authoring/decals/road_wear.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/scorch_mark.blend",
+      "sha256": "f9cfb8af5640205ac19d207458ca37625046348cd0d5d0e88b341300c4aa5917"
+    },
+    {
+      "path": "world/authoring/decals/scorch_mark.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/shell_impact.blend",
+      "sha256": "5e70126ea2552514e78f873b346b9a4c014821f464a571daa406540f5ce8fc3c"
+    },
+    {
+      "path": "world/authoring/decals/shell_impact.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/tire_tracks.blend",
+      "sha256": "6988d95ee313285761bab15f815b2c60e553b1336b928474293c274876f98b9c"
+    },
+    {
+      "path": "world/authoring/decals/tire_tracks.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/tracked_vehicle_marks.blend",
+      "sha256": "566e47391403564926c17fd74fd75782c73f2259c70b62225861b42a515f88f4"
+    },
+    {
+      "path": "world/authoring/decals/tracked_vehicle_marks.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/materials/decals/blast_mark.asset.json",
+      "sha256": "107f67a19e2e1966637c07b1b33f3c53c7119b800e3e30d9221ad738739c2fa5"
+    },
+    {
+      "path": "world/materials/decals/blast_mark.material.json",
+      "sha256": "1b8742c17e82c2c704bb822155998f95da44631b12d0d81297b7ffe0b1b4fbe0"
+    },
+    {
+      "path": "world/materials/decals/concrete_crack.asset.json",
+      "sha256": "6dc1c1569ce177b35fb5ddcbd4a69966444435097339c92057a156b9d2fc0e83"
+    },
+    {
+      "path": "world/materials/decals/concrete_crack.material.json",
+      "sha256": "d47bb0f38817a3d7f44df0667205fbf64d67da24fca0ba019e97111aac3cf719"
+    },
+    {
+      "path": "world/materials/decals/oil_stain.asset.json",
+      "sha256": "9124d897027e49aafb0931f87ee384d7ff8d7860c0e2e55339d1656ecb6a1b66"
+    },
+    {
+      "path": "world/materials/decals/oil_stain.material.json",
+      "sha256": "cb8ca878a2e72ce3dd56ebf2bc444d81837e3f7ecfd221d47df095f47921f0fb"
+    },
+    {
+      "path": "world/materials/decals/road_wear.asset.json",
+      "sha256": "f60d67a2a86a03fa3f0fe94a3181d49ca8006cb8f6ed35695427e2da3b8a2c0d"
+    },
+    {
+      "path": "world/materials/decals/road_wear.material.json",
+      "sha256": "28ad43d214e551f587eee1b0f8eb7c32f0c9a2f9553c2686cd2c6cc956133685"
+    },
+    {
+      "path": "world/materials/decals/scorch_mark.asset.json",
+      "sha256": "42c0f3612ea67aac46fcaa64253d1fcd76a52e3f0a044f68071294d099917267"
+    },
+    {
+      "path": "world/materials/decals/scorch_mark.material.json",
+      "sha256": "e617f663eef3bd29e289337d826a3395730c6c03f3a3e2f5470c6855c1778b11"
+    },
+    {
+      "path": "world/materials/decals/shell_impact.asset.json",
+      "sha256": "3354fbc58da885e6705ea24a2db14381d2cdd51cdbb0ba6dffab191dce327f5b"
+    },
+    {
+      "path": "world/materials/decals/shell_impact.material.json",
+      "sha256": "9e1bb11f1d57d778f947f879c803bc1e527a4649ba3943a158233d75dbc04459"
+    },
+    {
+      "path": "world/materials/decals/tire_tracks.asset.json",
+      "sha256": "f976c8bbb2c879e752c27226e571217fad14f3ccf3435cfd0d8049792df180ab"
+    },
+    {
+      "path": "world/materials/decals/tire_tracks.material.json",
+      "sha256": "4a9a85ec55d89678c878f8355df07d06a26c1b46b0425bc75003d5d129437e6b"
+    },
+    {
+      "path": "world/materials/decals/tracked_vehicle_marks.asset.json",
+      "sha256": "cc6a2cd7d90a70385cdf0fc51ff6c64915f798fb13899d778704eb3a1d2acd30"
+    },
+    {
+      "path": "world/materials/decals/tracked_vehicle_marks.material.json",
+      "sha256": "7849926d13df4baa249e882bec4f9e0bf0830397b0dcd1fd49bf7e0f3d13b82c"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas_normal.asset.json",
+      "sha256": "ff144f827c0ba671820e1b5083d8878e1116b6598753cc62728cf46deb675afc"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas_normal.png",
+      "sha256": "54724989f276e7f4ee6431f779174109d95394b2628f2a5ab33954c664e14750"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas_orm.asset.json",
+      "sha256": "7d45aca45cf40263e2d1096689f56825be8ec3a87fc49432de5af7d9aa908cfa"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas_orm.png",
+      "sha256": "be08b0a23b344782c76703fdd912ea7a0e9659e477f234f7d99bb1a9d9c96a7b"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas.asset.json",
+      "sha256": "3d993b94ed8c157a26f970465b390775ee97aa24b36c3de61aff807f25ad56ed"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas.png",
+      "sha256": "d73f8a4883dfade35f568baa9da02434d1bc0687247a97574f069b6192131dfa"
+    }
+  ],
+  "originalDecalFilesMatchLatestMaster": [
+    {
+      "path": "world/textures/decals/decal_atlas.asset.json",
+      "gitBlob": "9b07026d12013d71a2e88230c16e06d3bb9fbe48"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas.png",
+      "gitBlob": "7fecb025e53f2491fa14902560ced40ba936cea9"
+    },
+    {
+      "path": "world/meshes/decals/quad.asset.json",
+      "gitBlob": "f77c0bc49028e960cd7f05bb2a348395f086a14f"
+    },
+    {
+      "path": "world/materials/decals/blast_mark.material.json",
+      "gitBlob": "033ede07627027cf5270362e1e18119038d466bf"
+    },
+    {
+      "path": "world/materials/decals/concrete_crack.material.json",
+      "gitBlob": "0658a992b5b481d876046886916334b55fae6b41"
+    },
+    {
+      "path": "world/materials/decals/oil_stain.material.json",
+      "gitBlob": "259f91405af2723629a5502ee33d6e4146e4bc07"
+    },
+    {
+      "path": "world/materials/decals/road_wear.material.json",
+      "gitBlob": "abc9b4ba967b74066187d8cbce92dc9f3548a8f0"
+    },
+    {
+      "path": "world/materials/decals/scorch_mark.material.json",
+      "gitBlob": "00f8566cfcb73450263079082827a4808a8883dc"
+    },
+    {
+      "path": "world/materials/decals/shell_impact.material.json",
+      "gitBlob": "73f64da2bf6443350211630a51a5724d953a8e54"
+    },
+    {
+      "path": "world/materials/decals/tire_tracks.material.json",
+      "gitBlob": "62d92b70afd934700f0156a8402ffffed04982cf"
+    },
+    {
+      "path": "world/materials/decals/tracked_vehicle_marks.material.json",
+      "gitBlob": "bcb7b63eff63ae79da247a3f1493583a63ac4f96"
+    }
+  ],
+  "preservedMasterSceneOrdinals": [
+    {
+      "name": "DaylightTerrain",
+      "value": 0
+    },
+    {
+      "name": "IndustrialBase",
+      "value": 1
+    },
+    {
+      "name": "FormationConvoy",
+      "value": 2
+    },
+    {
+      "name": "LogisticsCorridor",
+      "value": 3
+    },
+    {
+      "name": "DamageDestruction",
+      "value": 4
+    },
+    {
+      "name": "BattlefieldCombat",
+      "value": 5
+    },
+    {
+      "name": "MechanicalIdle",
+      "value": 6
+    },
+    {
+      "name": "MechanicalMoving",
+      "value": 7
+    },
+    {
+      "name": "MechanicalFiring",
+      "value": 8
+    },
+    {
+      "name": "MechanicalLoading",
+      "value": 9
+    },
+    {
+      "name": "MechanicalUnpowered",
+      "value": 10
+    },
+    {
+      "name": "MechanicalBroken",
+      "value": 11
+    },
+    {
+      "name": "DirectorateUnits",
+      "value": 12
+    },
+    {
+      "name": "DirectorateBuildingStates",
+      "value": 13
+    },
+    {
+      "name": "CommandCoreProduction",
+      "value": 14
+    },
+    {
+      "name": "MainBattleTankProduction",
+      "value": 15
+    },
+    {
+      "name": "MainBattleTankFormation",
+      "value": 16
+    },
+    {
+      "name": "EnvironmentKitYard",
+      "value": 17
+    },
+    {
+      "name": "EnvironmentKitBridge",
+      "value": 18
+    },
+    {
+      "name": "EnvironmentKitRepeated",
+      "value": 19
+    },
+    {
+      "name": "ExtractorProduction",
+      "value": 20
+    },
+    {
+      "name": "SmelterProduction",
+      "value": 21
+    },
+    {
+      "name": "ElectronicsPlantProduction",
+      "value": 22
+    },
+    {
+      "name": "FuelRefineryProduction",
+      "value": 23
+    },
+    {
+      "name": "AmmunitionPlantProduction",
+      "value": 24
+    },
+    {
+      "name": "StorageDepotProduction",
+      "value": 25
+    },
+    {
+      "name": "SupplyDepotProduction",
+      "value": 26
+    },
+    {
+      "name": "LogisticsHubProduction",
+      "value": 27
+    },
+    {
+      "name": "LogisticsLoadingProduction",
+      "value": 28
+    },
+    {
+      "name": "LogisticsTransitProduction",
+      "value": 29
+    },
+    {
+      "name": "LogisticsUnloadingProduction",
+      "value": 30
+    },
+    {
+      "name": "LogisticsSustainedProduction",
+      "value": 31
+    },
+    {
+      "name": "VehicleFactoryProduction",
+      "value": 32
+    },
+    {
+      "name": "PowerPlantProduction",
+      "value": 33
+    },
+    {
+      "name": "BarracksProduction",
+      "value": 34
+    },
+    {
+      "name": "RadarProduction",
+      "value": 35
+    },
+    {
+      "name": "OperationalBuildingsRepeated",
+      "value": 36
+    },
+    {
+      "name": "InfantryRifleProduction",
+      "value": 37
+    },
+    {
+      "name": "InfantryEngineerProduction",
+      "value": 38
+    },
+    {
+      "name": "InfantryRepeated",
+      "value": 39
+    },
+    {
+      "name": "InfantryBattleProduction",
+      "value": 40
+    },
+    {
+      "name": "BattlefieldVariantProduction",
+      "value": 41
+    },
+    {
+      "name": "ScoutVehicleProduction",
+      "value": 42
+    },
+    {
+      "name": "ArtilleryProduction",
+      "value": 43
+    },
+    {
+      "name": "CargoTruckProduction",
+      "value": 44
+    },
+    {
+      "name": "SupplyTruckProduction",
+      "value": 45
+    },
+    {
+      "name": "CombatSupportRepeated",
+      "value": 46
+    },
+    {
+      "name": "MaterialFoundation",
+      "value": 47
+    },
+    {
+      "name": "EffectsBarrage",
+      "value": 48
+    },
+    {
+      "name": "IndustrialEffects",
+      "value": 49
+    },
+    {
+      "name": "InfantrySkinning",
+      "value": 50
+    },
+    {
+      "name": "InfantrySkinningRepeated",
+      "value": 51
+    },
+    {
+      "name": "InfantrySkinningEngineer",
+      "value": 52
+    },
+    {
+      "name": "CommandCoreSingle",
+      "value": 53
+    },
+    {
+      "name": "CommandCoreRepeated",
+      "value": 54
+    },
+    {
+      "name": "VehicleFactorySingle",
+      "value": 55
+    },
+    {
+      "name": "VehicleFactoryRepeated",
+      "value": 56
+    },
+    {
+      "name": "PowerPlantSingle",
+      "value": 57
+    },
+    {
+      "name": "PowerPlantRepeated",
+      "value": 58
+    },
+    {
+      "name": "BarracksSingle",
+      "value": 59
+    },
+    {
+      "name": "BarracksRepeated",
+      "value": 60
+    },
+    {
+      "name": "RadarSingle",
+      "value": 61
+    },
+    {
+      "name": "RadarRepeated",
+      "value": 62
+    },
+    {
+      "name": "CargoTruckSingle",
+      "value": 63
+    },
+    {
+      "name": "CargoTruckHundred",
+      "value": 64
+    },
+    {
+      "name": "CargoTruckRepeated",
+      "value": 65
+    },
+    {
+      "name": "SupplyTruckSingle",
+      "value": 66
+    },
+    {
+      "name": "SupplyTruckHundred",
+      "value": 67
+    },
+    {
+      "name": "SupplyTruckRepeated",
+      "value": 68
+    },
+    {
+      "name": "ArtillerySingle",
+      "value": 69
+    },
+    {
+      "name": "ArtilleryRepeated100",
+      "value": 70
+    },
+    {
+      "name": "ArtilleryRepeated1000",
+      "value": 71
+    },
+    {
+      "name": "StorageDepotRepeated",
+      "value": 72
+    },
+    {
+      "name": "StorageDepotStress",
+      "value": 73
+    },
+    {
+      "name": "SupplyDepotRepeated",
+      "value": 74
+    },
+    {
+      "name": "SupplyDepotStress",
+      "value": 75
+    },
+    {
+      "name": "LogisticsHubRepeated",
+      "value": 76
+    },
+    {
+      "name": "LogisticsHubStress",
+      "value": 77
+    },
+    {
+      "name": "StorageDepotSingle",
+      "value": 78
+    },
+    {
+      "name": "SupplyDepotSingle",
+      "value": 79
+    },
+    {
+      "name": "LogisticsHubSingle",
+      "value": 80
+    },
+    {
+      "name": "MainBattleTankSingle",
+      "value": 81
+    },
+    {
+      "name": "MainBattleTankHundred",
+      "value": 82
+    },
+    {
+      "name": "MainBattleTankThousand",
+      "value": 83
+    },
+    {
+      "name": "InfantryRifleSingle",
+      "value": 84
+    },
+    {
+      "name": "InfantryRifleHundred",
+      "value": 85
+    },
+    {
+      "name": "InfantryRifleThousand",
+      "value": 86
+    },
+    {
+      "name": "InfantryEngineerSingle",
+      "value": 87
+    },
+    {
+      "name": "InfantryEngineerHundred",
+      "value": 88
+    },
+    {
+      "name": "InfantryEngineerThousand",
+      "value": 89
+    },
+    {
+      "name": "ResourceDepositsGallery",
+      "value": 90
+    },
+    {
+      "name": "ResourceDepositSingle",
+      "value": 91
+    },
+    {
+      "name": "ResourceDeposits100",
+      "value": 92
+    },
+    {
+      "name": "ResourceDeposits1000",
+      "value": 93
+    },
+    {
+      "name": "ScoutSingle",
+      "value": 94
+    },
+    {
+      "name": "ScoutActive",
+      "value": 95
+    },
+    {
+      "name": "ScoutSelected",
+      "value": 96
+    },
+    {
+      "name": "ScoutRepeated100",
+      "value": 97
+    },
+    {
+      "name": "ScoutRepeated1000",
+      "value": 98
+    },
+    {
+      "name": "VegetationSingle",
+      "value": 99
+    },
+    {
+      "name": "VegetationGrove",
+      "value": 100
+    },
+    {
+      "name": "VegetationRepeated100",
+      "value": 101
+    },
+    {
+      "name": "VegetationRepeated1000",
+      "value": 102
+    }
+  ],
+  "appendedDecalScenes": [
+    {
+      "name": "DecalAsphaltGallery",
+      "value": 103
+    },
+    {
+      "name": "DecalConcreteGallery",
+      "value": 104
+    },
+    {
+      "name": "DecalDirtGallery",
+      "value": 105
+    },
+    {
+      "name": "DecalGravelGallery",
+      "value": 106
+    },
+    {
+      "name": "DecalSingle",
+      "value": 107
+    },
+    {
+      "name": "Decals100",
+      "value": 108
+    },
+    {
+      "name": "Decals1000",
+      "value": 109
+    },
+    {
+      "name": "DecalsOverlap",
+      "value": 110
+    },
+    {
+      "name": "DecalSlopeGallery",
+      "value": 111
+    }
+  ],
+  "productionCodeChanges": [
+    "src/ForgeLine.Presentation/TerrainPresentationProfile.cs",
+    "src/ForgeLine.Presentation/VegetationReferenceScene.cs",
+    "src/ForgeLine.Presentation/VisualReferenceScene.cs"
+  ],
+  "fixtureIsolation": "Decal fixtures replace standard terrain regions and contain no vegetation instances. New vegetation masters remain staged outside assets/source. Old native records retain their original commit; new controls use the synchronized executable."
+}

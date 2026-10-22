@@ -1,0 +1,216 @@
+{
+  "families": [
+    {
+      "carrierSha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "family": "tire_tracks",
+      "rebake": true,
+      "reopens": 2
+    },
+    {
+      "carrierSha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "family": "tracked_vehicle_marks",
+      "rebake": true,
+      "reopens": 2
+    },
+    {
+      "carrierSha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "family": "road_wear",
+      "rebake": true,
+      "reopens": 2
+    },
+    {
+      "carrierSha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "family": "oil_stain",
+      "rebake": true,
+      "reopens": 2
+    },
+    {
+      "carrierSha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "family": "blast_mark",
+      "rebake": true,
+      "reopens": 2
+    },
+    {
+      "carrierSha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "family": "shell_impact",
+      "rebake": true,
+      "reopens": 2
+    },
+    {
+      "carrierSha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "family": "scorch_mark",
+      "rebake": true,
+      "reopens": 2
+    },
+    {
+      "carrierSha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "family": "concrete_crack",
+      "rebake": true,
+      "reopens": 2
+    }
+  ],
+  "success": true,
+  "editedReliefChangesNormalAndPreservesCarrier": true,
+  "sourceRevision": "f7d63b7dc1531277a54851f4938cb276ecc9a6ba",
+  "inputs": [
+    {
+      "sha256": "FD9A13A7766C65005163E80103B59D831160AC0ADDECFCCE1F056A1E6877D130",
+      "path": "world/authoring/decals/blast_mark.blend"
+    },
+    {
+      "sha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "path": "world/authoring/decals/blast_mark.glb"
+    },
+    {
+      "sha256": "253CE539D75F3A2676043F5FFD9BCCF6D7D5582C4F01554D3F08BBF2FE7CE2DA",
+      "path": "world/authoring/decals/concrete_crack.blend"
+    },
+    {
+      "sha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "path": "world/authoring/decals/concrete_crack.glb"
+    },
+    {
+      "sha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "path": "world/authoring/decals/decal_quad.glb"
+    },
+    {
+      "sha256": "D13CF754B8904149C0DE89D284CAE5D5BDD87FF5C879714A3392579AA922586D",
+      "path": "world/authoring/decals/oil_stain.blend"
+    },
+    {
+      "sha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "path": "world/authoring/decals/oil_stain.glb"
+    },
+    {
+      "sha256": "68403D4F50318CCE4BDD71590AB7457DB67F532E86AD4E98573D49F98B6F84FC",
+      "path": "world/authoring/decals/road_wear.blend"
+    },
+    {
+      "sha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "path": "world/authoring/decals/road_wear.glb"
+    },
+    {
+      "sha256": "C873EAE033A04DD4C36C1EC1FE783418E5421AB217A46A534C134DFB70895675",
+      "path": "world/authoring/decals/scorch_mark.blend"
+    },
+    {
+      "sha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "path": "world/authoring/decals/scorch_mark.glb"
+    },
+    {
+      "sha256": "CE42398F7B7FB4C39D3501830463BC7E7D16396CE692565EEBFE07E39B7A4DF6",
+      "path": "world/authoring/decals/shell_impact.blend"
+    },
+    {
+      "sha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "path": "world/authoring/decals/shell_impact.glb"
+    },
+    {
+      "sha256": "378CE07D28EF5267710689F6687BCED5624FA861F7771FACAC1BDB6E3F84D38F",
+      "path": "world/authoring/decals/tire_tracks.blend"
+    },
+    {
+      "sha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "path": "world/authoring/decals/tire_tracks.glb"
+    },
+    {
+      "sha256": "794202E0FDEB8BD782F9A5F083E3C664F32776E6995BE4AFEC82F9EB8085108B",
+      "path": "world/authoring/decals/tracked_vehicle_marks.blend"
+    },
+    {
+      "sha256": "FCD87871A70B85F1B71486314C2F0DCE91E32E067E545F6D2C925E6968865E9D",
+      "path": "world/authoring/decals/tracked_vehicle_marks.glb"
+    },
+    {
+      "sha256": "107F67A19E2E1966637C07B1B33F3C53C7119B800E3E30D9221AD738739C2FA5",
+      "path": "world/materials/decals/blast_mark.asset.json"
+    },
+    {
+      "sha256": "1B8742C17E82C2C704BB822155998F95DA44631B12D0D81297B7FFE0B1B4FBE0",
+      "path": "world/materials/decals/blast_mark.material.json"
+    },
+    {
+      "sha256": "6DC1C1569CE177B35FB5DDCBD4A69966444435097339C92057A156B9D2FC0E83",
+      "path": "world/materials/decals/concrete_crack.asset.json"
+    },
+    {
+      "sha256": "D47BB0F38817A3D7F44DF0667205FBF64D67DA24FCA0BA019E97111AAC3CF719",
+      "path": "world/materials/decals/concrete_crack.material.json"
+    },
+    {
+      "sha256": "9124D897027E49AAFB0931F87EE384D7FF8D7860C0E2E55339D1656ECB6A1B66",
+      "path": "world/materials/decals/oil_stain.asset.json"
+    },
+    {
+      "sha256": "CB8CA878A2E72CE3DD56EBF2BC444D81837E3F7ECFD221D47DF095F47921F0FB",
+      "path": "world/materials/decals/oil_stain.material.json"
+    },
+    {
+      "sha256": "F60D67A2A86A03FA3F0FE94A3181D49CA8006CB8F6ED35695427E2DA3B8A2C0D",
+      "path": "world/materials/decals/road_wear.asset.json"
+    },
+    {
+      "sha256": "28AD43D214E551F587EEE1B0F8EB7C32F0C9A2F9553C2686CD2C6CC956133685",
+      "path": "world/materials/decals/road_wear.material.json"
+    },
+    {
+      "sha256": "42C0F3612EA67AAC46FCAA64253D1FCD76A52E3F0A044F68071294D099917267",
+      "path": "world/materials/decals/scorch_mark.asset.json"
+    },
+    {
+      "sha256": "E617F663EEF3BD29E289337D826A3395730C6C03F3A3E2F5470C6855C1778B11",
+      "path": "world/materials/decals/scorch_mark.material.json"
+    },
+    {
+      "sha256": "3354FBC58DA885E6705EA24A2DB14381D2CDD51CDBB0BA6DFFAB191DCE327F5B",
+      "path": "world/materials/decals/shell_impact.asset.json"
+    },
+    {
+      "sha256": "9E1BB11F1D57D778F947F879C803BC1E527A4649BA3943A158233D75DBC04459",
+      "path": "world/materials/decals/shell_impact.material.json"
+    },
+    {
+      "sha256": "F976C8BBB2C879E752C27226E571217FAD14F3CCF3435CFD0D8049792DF180AB",
+      "path": "world/materials/decals/tire_tracks.asset.json"
+    },
+    {
+      "sha256": "4A9A85EC55D89678C878F8355DF07D06A26C1B46B0425BC75003D5D129437E6B",
+      "path": "world/materials/decals/tire_tracks.material.json"
+    },
+    {
+      "sha256": "CC6A2CD7D90A70385CDF0FC51FF6C64915F798FB13899D778704EB3A1D2ACD30",
+      "path": "world/materials/decals/tracked_vehicle_marks.asset.json"
+    },
+    {
+      "sha256": "7849926D13DF4BAA249E882BEC4F9E0BF0830397B0DCD1FD49BF7E0F3D13B82C",
+      "path": "world/materials/decals/tracked_vehicle_marks.material.json"
+    },
+    {
+      "sha256": "FF144F827C0BA671820E1B5083D8878E1116B6598753CC62728CF46DEB675AFC",
+      "path": "world/textures/decals/decal_atlas_normal.asset.json"
+    },
+    {
+      "sha256": "54724989F276E7F4EE6431F779174109D95394B2628F2A5AB33954C664E14750",
+      "path": "world/textures/decals/decal_atlas_normal.png"
+    },
+    {
+      "sha256": "7D45ACA45CF40263E2D1096689F56825BE8EC3A87FC49432DE5AF7D9AA908CFA",
+      "path": "world/textures/decals/decal_atlas_orm.asset.json"
+    },
+    {
+      "sha256": "BE08B0A23B344782C76703FDD912EA7A0E9659E477F234F7D99BB1A9D9C96A7B",
+      "path": "world/textures/decals/decal_atlas_orm.png"
+    },
+    {
+      "sha256": "3D993B94ED8C157A26F970465B390775EE97AA24B36C3DE61AFF807F25AD56ED",
+      "path": "world/textures/decals/decal_atlas.asset.json"
+    },
+    {
+      "sha256": "D73F8A4883DFADE35F568BAA9DA02434D1BC0687247A97574F069B6192131DFA",
+      "path": "world/textures/decals/decal_atlas.png"
+    }
+  ],
+  "exactRebakedChannels": 24,
+  "sourceTreeClean": true,
+  "sourceLessCatalog": true
+}

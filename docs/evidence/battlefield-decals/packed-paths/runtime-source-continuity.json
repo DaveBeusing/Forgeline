@@ -1,0 +1,18 @@
+{
+  "runtimeSource": "c7cbb542c77f56ce5de0988e043ad65495b12b37",
+  "authoringSource": "f7d63b7dc1531277a54851f4938cb276ecc9a6ba",
+  "unchangedRuntimeCode": true,
+  "unchangedCompilerCode": true,
+  "unchangedCompilerReadyDecalInputs": 31,
+  "activeSourceChanges": [
+    "assets/source/world/authoring/decals/README.md",
+    "assets/source/world/authoring/decals/blast_mark.blend",
+    "assets/source/world/authoring/decals/concrete_crack.blend",
+    "assets/source/world/authoring/decals/oil_stain.blend",
+    "assets/source/world/authoring/decals/road_wear.blend",
+    "assets/source/world/authoring/decals/scorch_mark.blend",
+    "assets/source/world/authoring/decals/shell_impact.blend",
+    "assets/source/world/authoring/decals/tire_tracks.blend",
+    "assets/source/world/authoring/decals/tracked_vehicle_marks.blend"
+  ]
+}

@@ -1,0 +1,3899 @@
+{
+  "summary": {
+    "success": true,
+    "source": "c7cbb542c77f56ce5de0988e043ad65495b12b37",
+    "pairedCases": 10,
+    "originalImages": 20,
+    "originalImageBytes": 88092359,
+    "changedPairs": 10,
+    "zeroFallbacksAndBindingFailures": true,
+    "allRepeatReadbacksAgree": true,
+    "allPairsGeometryCameraAndFixtureIdentical": true,
+    "fixedCameraSamplePhaseResourceChurn": false,
+    "movingTerrainResourceRanges": [],
+    "maximumResidentTextureBytes": 45070076,
+    "maximumDescriptors": 94,
+    "performanceFailedCohorts": [
+      "gallery",
+      "loads"
+    ],
+    "physicalAcceptance": "pending",
+    "humanArtApproval": "pending"
+  },
+  "pairs": [
+    {
+      "cohort": "gallery",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 247,
+        "MeanAbsoluteChannelDelta": 1.7557360387731482,
+        "ChangedPixels": 143298,
+        "ChangedPixelFraction": 0.06910590277777778,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 8,
+        "visibleInstances": 8,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 8,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 8,
+        "texturedRuntimeMeshInstances": 8,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 8,
+        "uploadBytes": 896,
+        "pipelineBindings": 1,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 394,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0434,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0257
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.119,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0813
+      },
+      "beforeResources": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 77,
+        "textureReleaseCount": 0
+      },
+      "afterResources": {
+        "loadedTextureCount": 79,
+        "residentTextureBytes": 45024316,
+        "shaderResourceDescriptorsUsed": 86,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 45024316,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "textureUploadCount": 79,
+        "textureReleaseCount": 0
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 11.030887499999999,
+        "p50": 10.4043,
+        "p95": 23.5037,
+        "p99": 25.371
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 17.447978125,
+        "p50": 10.5642,
+        "p95": 45.9027,
+        "p99": 47.8151
+      },
+      "beforeGpu": {
+        "samples": 30,
+        "mean": 6.342272000000002,
+        "p50": 7.103488,
+        "p95": 9.387616,
+        "p99": 9.516672
+      },
+      "afterGpu": {
+        "samples": 29,
+        "mean": 7.095554206896554,
+        "p50": 7.727744,
+        "p95": 9.364032,
+        "p99": 10.841216
+      },
+      "beforeFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.342272000000002,
+        "p50": 7.103488,
+        "p95": 9.387616,
+        "p99": 9.516672
+      },
+      "afterFullFrameGpu": {
+        "samples": 29,
+        "mean": 7.095554206896554,
+        "p50": 7.727744,
+        "p95": 9.364032,
+        "p99": 10.841216
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.46200937500000006,
+          "p50": 0.4599,
+          "p95": 0.7253,
+          "p99": 0.7401
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.3788031250000001,
+          "p50": 0.3408,
+          "p95": 0.6064,
+          "p99": 0.6305
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.02295,
+          "p50": 0.0161,
+          "p95": 0.066,
+          "p99": 0.0814
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.19299062499999997,
+          "p50": 0.1915,
+          "p95": 0.2795,
+          "p99": 0.3008
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 1.8152593749999995,
+          "p50": 1.7241999999999997,
+          "p95": 2.4981999999999998,
+          "p99": 3.4112000000000005
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 1.33471875,
+          "p50": 1.2187,
+          "p95": 2.0043,
+          "p99": 2.1709
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.062909375,
+          "p50": 0.05,
+          "p95": 0.1361,
+          "p99": 0.2447
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.7329749999999999,
+          "p50": 0.6914,
+          "p95": 1.0217,
+          "p99": 1.0856
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.702689066666666,
+          "p50": 3.3415679999999996,
+          "p95": 5.965408,
+          "p99": 6.109152
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.21880853333333333,
+          "p50": 0.034752,
+          "p95": 2.647168,
+          "p99": 2.659584
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.3922762666666666,
+          "p50": 1.192384,
+          "p95": 2.977952,
+          "p99": 3.64768
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.0284981333333334,
+          "p50": 0.87152,
+          "p95": 3.420096,
+          "p99": 3.459808
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.3922762666666666,
+          "p50": 1.192384,
+          "p95": 2.977952,
+          "p99": 3.64768
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 29,
+          "mean": 4.2601555862068965,
+          "p50": 4.56592,
+          "p95": 6.820672,
+          "p99": 7.010208
+        },
+        "overlay": {
+          "samples": 29,
+          "mean": 0.23941186206896553,
+          "p50": 0.034016,
+          "p95": 2.15552,
+          "p99": 2.177024
+        },
+        "composite": {
+          "samples": 29,
+          "mean": 1.6585456551724138,
+          "p50": 1.192928,
+          "p95": 3.981312,
+          "p99": 4.017152
+        },
+        "shadows": {
+          "samples": 29,
+          "mean": 0.9374411034482761,
+          "p50": 0.815424,
+          "p95": 0.885024,
+          "p99": 3.964608
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 29,
+          "mean": 1.6585456551724138,
+          "p50": 1.192928,
+          "p95": 3.981312,
+          "p99": 4.017152
+        }
+      }
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 247,
+        "MeanAbsoluteChannelDelta": 2.8773783516589506,
+        "ChangedPixels": 150375,
+        "ChangedPixelFraction": 0.07251880787037036,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 8,
+        "visibleInstances": 8,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 8,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 8,
+        "texturedRuntimeMeshInstances": 8,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 8,
+        "uploadBytes": 896,
+        "pipelineBindings": 1,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 394,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0279,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0107
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0422,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0188
+      },
+      "beforeResources": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 154,
+        "textureReleaseCount": 77
+      },
+      "afterResources": {
+        "loadedTextureCount": 79,
+        "residentTextureBytes": 45024316,
+        "shaderResourceDescriptorsUsed": 86,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 45024316,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "textureUploadCount": 158,
+        "textureReleaseCount": 79
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 10.85859375,
+        "p50": 10.7202,
+        "p95": 23.5267,
+        "p99": 32.3364
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 9.522871875000002,
+        "p50": 9.1654,
+        "p95": 22.8229,
+        "p99": 23.4628
+      },
+      "beforeGpu": {
+        "samples": 30,
+        "mean": 6.337978666666667,
+        "p50": 6.562432,
+        "p95": 9.471392,
+        "p99": 9.5576
+      },
+      "afterGpu": {
+        "samples": 30,
+        "mean": 6.333205333333333,
+        "p50": 6.809248,
+        "p95": 8.189632,
+        "p99": 8.405408
+      },
+      "beforeFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.337978666666667,
+        "p50": 6.562432,
+        "p95": 9.471392,
+        "p99": 9.5576
+      },
+      "afterFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.333205333333333,
+        "p50": 6.809248,
+        "p95": 8.189632,
+        "p99": 8.405408
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.19591250000000002,
+          "p50": 0.175,
+          "p95": 0.3801,
+          "p99": 0.3962
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.31937187499999997,
+          "p50": 0.3044,
+          "p95": 0.4613,
+          "p99": 0.4637
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.0150375,
+          "p50": 0.0132,
+          "p95": 0.0287,
+          "p99": 0.0301
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.11304375000000004,
+          "p50": 0.1108,
+          "p95": 0.1499,
+          "p99": 0.1707
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.19608125,
+          "p50": 0.18789999999999996,
+          "p95": 0.2682,
+          "p99": 0.3907999999999999
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.31178437499999995,
+          "p50": 0.2995,
+          "p95": 0.4315,
+          "p99": 0.4454
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.015300000000000001,
+          "p50": 0.0148,
+          "p95": 0.0218,
+          "p99": 0.029
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.12119062500000001,
+          "p50": 0.1136,
+          "p95": 0.1802,
+          "p99": 0.2361
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.349188266666666,
+          "p50": 2.1414400000000002,
+          "p95": 5.967616,
+          "p99": 6.00464
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.21709440000000002,
+          "p50": 0.033824,
+          "p95": 2.57152,
+          "p99": 2.646752
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.6238762666666666,
+          "p50": 1.214208,
+          "p95": 3.886944,
+          "p99": 4.002176
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.1478197333333333,
+          "p50": 0.87232,
+          "p95": 2.979584,
+          "p99": 3.224096
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.6238762666666666,
+          "p50": 1.214208,
+          "p95": 3.886944,
+          "p99": 4.002176
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.730049066666667,
+          "p50": 4.023391999999999,
+          "p95": 5.987328,
+          "p99": 6.016064
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.048045866666666666,
+          "p50": 0.034176,
+          "p95": 0.0832,
+          "p99": 0.086144
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.5338304,
+          "p50": 1.213856,
+          "p95": 3.846144,
+          "p99": 4.084704
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.0212799999999997,
+          "p50": 0.85648,
+          "p95": 2.4472,
+          "p99": 2.916864
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.5338304,
+          "p50": 1.213856,
+          "p95": 3.846144,
+          "p99": 4.084704
+        }
+      }
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 247,
+        "MeanAbsoluteChannelDelta": 2.1446152826003084,
+        "ChangedPixels": 149838,
+        "ChangedPixelFraction": 0.07225983796296297,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 8,
+        "visibleInstances": 8,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 8,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 8,
+        "texturedRuntimeMeshInstances": 8,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 8,
+        "uploadBytes": 896,
+        "pipelineBindings": 1,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 394,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0179,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0102
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0457,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0107
+      },
+      "beforeResources": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 231,
+        "textureReleaseCount": 154
+      },
+      "afterResources": {
+        "loadedTextureCount": 79,
+        "residentTextureBytes": 45024316,
+        "shaderResourceDescriptorsUsed": 86,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 45024316,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "textureUploadCount": 237,
+        "textureReleaseCount": 158
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 10.223875,
+        "p50": 9.9471,
+        "p95": 24.5851,
+        "p99": 27.0049
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 10.709656249999998,
+        "p50": 9.9237,
+        "p95": 24.1614,
+        "p99": 33.5265
+      },
+      "beforeGpu": {
+        "samples": 30,
+        "mean": 5.945819733333334,
+        "p50": 4.212288,
+        "p95": 8.433696,
+        "p99": 8.46144
+      },
+      "afterGpu": {
+        "samples": 30,
+        "mean": 6.1089557333333335,
+        "p50": 6.641824,
+        "p95": 9.207552,
+        "p99": 9.998304
+      },
+      "beforeFullFrameGpu": {
+        "samples": 30,
+        "mean": 5.945819733333334,
+        "p50": 4.212288,
+        "p95": 8.433696,
+        "p99": 8.46144
+      },
+      "afterFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.1089557333333335,
+        "p50": 6.641824,
+        "p95": 9.207552,
+        "p99": 9.998304
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.11146249999999998,
+          "p50": 0.0997,
+          "p95": 0.17089999999999997,
+          "p99": 0.2777
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.10415312500000003,
+          "p50": 0.0937,
+          "p95": 0.229,
+          "p99": 0.2774
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.010384375000000001,
+          "p50": 0.0097,
+          "p95": 0.017,
+          "p99": 0.0196
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.070615625,
+          "p50": 0.0658,
+          "p95": 0.0939,
+          "p99": 0.1135
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.12033749999999999,
+          "p50": 0.10300000000000001,
+          "p95": 0.21039999999999998,
+          "p99": 0.2663
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.145896875,
+          "p50": 0.1205,
+          "p95": 0.2903,
+          "p99": 0.3075
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.014,
+          "p50": 0.0133,
+          "p95": 0.0217,
+          "p99": 0.0275
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.071346875,
+          "p50": 0.0678,
+          "p95": 0.0948,
+          "p99": 0.1228
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.2143285333333327,
+          "p50": 2.129472,
+          "p95": 6.45936,
+          "p99": 6.514848000000001
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.24658346666666667,
+          "p50": 0.035104,
+          "p95": 2.02336,
+          "p99": 2.034784
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.7071605333333333,
+          "p50": 1.201408,
+          "p95": 3.33296,
+          "p99": 3.945344
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 0.7777472000000001,
+          "p50": 0.731744,
+          "p95": 0.806592,
+          "p99": 2.90048
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.7071605333333333,
+          "p50": 1.201408,
+          "p95": 3.33296,
+          "p99": 3.945344
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.304328533333334,
+          "p50": 3.334368,
+          "p95": 5.954848,
+          "p99": 6.255808
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.3018037333333333,
+          "p50": 0.031136,
+          "p95": 2.032928,
+          "p99": 2.592096
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.77064,
+          "p50": 1.196384,
+          "p95": 3.32304,
+          "p99": 3.905376
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 0.7321834666666668,
+          "p50": 0.697088,
+          "p95": 0.78768,
+          "p99": 2.870176
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.77064,
+          "p50": 1.196384,
+          "p95": 3.32304,
+          "p99": 3.905376
+        }
+      }
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 247,
+        "MeanAbsoluteChannelDelta": 2.2422709297839507,
+        "ChangedPixels": 156944,
+        "ChangedPixelFraction": 0.07568672839506173,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 8,
+        "visibleInstances": 8,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 8,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 8,
+        "texturedRuntimeMeshInstances": 8,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 8,
+        "uploadBytes": 896,
+        "pipelineBindings": 1,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 394,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0155,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0073
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0217,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0132
+      },
+      "beforeResources": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 308,
+        "textureReleaseCount": 231
+      },
+      "afterResources": {
+        "loadedTextureCount": 79,
+        "residentTextureBytes": 45024316,
+        "shaderResourceDescriptorsUsed": 86,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 45024316,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "textureUploadCount": 316,
+        "textureReleaseCount": 237
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 9.997300000000001,
+        "p50": 9.7832,
+        "p95": 22.7183,
+        "p99": 27.8569
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 9.47535,
+        "p50": 8.9045,
+        "p95": 24.5544,
+        "p99": 24.865
+      },
+      "beforeGpu": {
+        "samples": 30,
+        "mean": 6.212843733333333,
+        "p50": 6.718592,
+        "p95": 9.222176,
+        "p99": 11.51424
+      },
+      "afterGpu": {
+        "samples": 30,
+        "mean": 6.301450666666668,
+        "p50": 6.575808,
+        "p95": 8.795328,
+        "p99": 9.099616
+      },
+      "beforeFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.212843733333333,
+        "p50": 6.718592,
+        "p95": 9.222176,
+        "p99": 11.51424
+      },
+      "afterFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.301450666666668,
+        "p50": 6.575808,
+        "p95": 8.795328,
+        "p99": 9.099616
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.10189374999999999,
+          "p50": 0.09290000000000001,
+          "p95": 0.15150000000000002,
+          "p99": 0.1963
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.11713124999999999,
+          "p50": 0.0856,
+          "p95": 0.2477,
+          "p99": 0.7084
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.009425000000000001,
+          "p50": 0.0091,
+          "p95": 0.0133,
+          "p99": 0.0135
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.06350312500000001,
+          "p50": 0.0602,
+          "p95": 0.076,
+          "p99": 0.1202
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.09435312500000001,
+          "p50": 0.09000000000000001,
+          "p95": 0.1266,
+          "p99": 0.1749
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.09396562500000002,
+          "p50": 0.0824,
+          "p95": 0.2204,
+          "p99": 0.2484
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.009259375000000002,
+          "p50": 0.0085,
+          "p95": 0.0119,
+          "p99": 0.012
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.05886875,
+          "p50": 0.0586,
+          "p95": 0.07,
+          "p99": 0.0771
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.479039999999999,
+          "p50": 2.668672,
+          "p95": 5.95888,
+          "p99": 6.00304
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.11565013333333332,
+          "p50": 0.0344,
+          "p95": 0.08496,
+          "p99": 2.036256
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.5403680000000002,
+          "p50": 1.251648,
+          "p95": 3.536128,
+          "p99": 3.727584
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.0777856,
+          "p50": 0.855488,
+          "p95": 2.989216,
+          "p99": 3.676672
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.5403680000000002,
+          "p50": 1.251648,
+          "p95": 3.536128,
+          "p99": 3.727584
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.6709440000000004,
+          "p50": 2.2615679999999996,
+          "p95": 5.918304,
+          "p99": 5.929632000000001
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.39769493333333333,
+          "p50": 0.03296,
+          "p95": 2.692672,
+          "p99": 2.816512
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.3884117333333337,
+          "p50": 1.25216,
+          "p95": 3.112352,
+          "p99": 3.481664
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 0.8444,
+          "p50": 0.878656,
+          "p95": 0.917248,
+          "p99": 0.917824
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.3884117333333337,
+          "p50": 1.25216,
+          "p95": 3.112352,
+          "p99": 3.481664
+        }
+      }
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 247,
+        "MeanAbsoluteChannelDelta": 1.5302027874228394,
+        "ChangedPixels": 124070,
+        "ChangedPixelFraction": 0.059833140432098766,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 8,
+        "visibleInstances": 8,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 8,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 8,
+        "texturedRuntimeMeshInstances": 8,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 8,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 8,
+        "uploadBytes": 896,
+        "pipelineBindings": 1,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 394,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 48,
+        "controlTextureCount": 47,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0198,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 47,
+        "requiredChunks": 47,
+        "residentGeometryBytes": 2503920,
+        "residentControlBytes": 268840,
+        "chunkUploads": 47,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.013
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 48,
+        "controlTextureCount": 47,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0226,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 47,
+        "requiredChunks": 47,
+        "residentGeometryBytes": 2503920,
+        "residentControlBytes": 268840,
+        "chunkUploads": 47,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0125
+      },
+      "beforeResources": {
+        "loadedTextureCount": 85,
+        "residentTextureBytes": 44806356,
+        "shaderResourceDescriptorsUsed": 92,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 85,
+        "peakResidentTextureBytes": 44806356,
+        "peakShaderResourceDescriptorsUsed": 92,
+        "textureUploadCount": 393,
+        "textureReleaseCount": 308
+      },
+      "afterResources": {
+        "loadedTextureCount": 87,
+        "residentTextureBytes": 45070076,
+        "shaderResourceDescriptorsUsed": 94,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 87,
+        "peakResidentTextureBytes": 45070076,
+        "peakShaderResourceDescriptorsUsed": 94,
+        "textureUploadCount": 403,
+        "textureReleaseCount": 316
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 10.9443375,
+        "p50": 11.445,
+        "p95": 24.8124,
+        "p99": 29.6792
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 9.206171874999999,
+        "p50": 10.2071,
+        "p95": 18.5926,
+        "p99": 23.936
+      },
+      "beforeGpu": {
+        "samples": 30,
+        "mean": 6.784723200000001,
+        "p50": 7.040992,
+        "p95": 9.466848,
+        "p99": 9.487456
+      },
+      "afterGpu": {
+        "samples": 30,
+        "mean": 6.503277866666665,
+        "p50": 6.71104,
+        "p95": 11.833376,
+        "p99": 11.869888
+      },
+      "beforeFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.784723200000001,
+        "p50": 7.040992,
+        "p95": 9.466848,
+        "p99": 9.487456
+      },
+      "afterFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.503277866666665,
+        "p50": 6.71104,
+        "p95": 11.833376,
+        "p99": 11.869888
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.10601249999999997,
+          "p50": 0.0924,
+          "p95": 0.18320000000000003,
+          "p99": 0.1973
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.10242500000000002,
+          "p50": 0.087,
+          "p95": 0.2005,
+          "p99": 0.3199
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.009506249999999999,
+          "p50": 0.0087,
+          "p95": 0.0164,
+          "p99": 0.0177
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.06965937500000001,
+          "p50": 0.065,
+          "p95": 0.0964,
+          "p99": 0.0968
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.09207499999999998,
+          "p50": 0.0844,
+          "p95": 0.1594,
+          "p99": 0.20370000000000002
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.08784687499999999,
+          "p50": 0.0792,
+          "p95": 0.1988,
+          "p99": 0.2383
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.008734374999999999,
+          "p50": 0.0085,
+          "p95": 0.012,
+          "p99": 0.0127
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.061309375,
+          "p50": 0.0612,
+          "p95": 0.0723,
+          "p99": 0.0832
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.6568234666666664,
+          "p50": 3.956704,
+          "p95": 6.1007039999999995,
+          "p99": 7.22992
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.0405248,
+          "p50": 0.031712,
+          "p95": 0.082944,
+          "p99": 0.082976
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.6099242666666667,
+          "p50": 1.194272,
+          "p95": 3.899392,
+          "p99": 3.92032
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.4774506666666665,
+          "p50": 1.01376,
+          "p95": 3.112416,
+          "p99": 4.250528
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.6099242666666667,
+          "p50": 1.194272,
+          "p95": 3.899392,
+          "p99": 3.92032
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.593531733333333,
+          "p50": 2.1339520000000003,
+          "p95": 6.131744,
+          "p99": 7.007808
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.04699946666666667,
+          "p50": 0.03328,
+          "p95": 0.083488,
+          "p99": 0.083968
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.422241066666667,
+          "p50": 1.190048,
+          "p95": 3.308736,
+          "p99": 3.922176
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.4405055999999996,
+          "p50": 0.990944,
+          "p95": 3.736832,
+          "p99": 3.761472
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.422241066666667,
+          "p50": 1.190048,
+          "p95": 3.308736,
+          "p99": 3.922176
+        }
+      }
+    },
+    {
+      "cohort": "gallery",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 247,
+        "MeanAbsoluteChannelDelta": 3.4106702112268517,
+        "ChangedPixels": 300798,
+        "ChangedPixelFraction": 0.1450607638888889,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 128,
+        "visibleInstances": 120,
+        "culledInstances": 8,
+        "drawCalls": 8,
+        "highLodInstances": 120,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 120,
+        "texturedRuntimeMeshInstances": 120,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 4,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 128,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 128,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 120,
+        "uploadBytes": 13440,
+        "pipelineBindings": 1,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 5468,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0208,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0142
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 2,
+        "culledChunks": 142,
+        "submittedTriangles": 4096,
+        "drawCalls": 2,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0201,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0113
+      },
+      "beforeResources": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 85,
+        "peakResidentTextureBytes": 44806356,
+        "peakShaderResourceDescriptorsUsed": 92,
+        "textureUploadCount": 470,
+        "textureReleaseCount": 393
+      },
+      "afterResources": {
+        "loadedTextureCount": 79,
+        "residentTextureBytes": 45024316,
+        "shaderResourceDescriptorsUsed": 86,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 87,
+        "peakResidentTextureBytes": 45070076,
+        "peakShaderResourceDescriptorsUsed": 94,
+        "textureUploadCount": 482,
+        "textureReleaseCount": 403
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 10.103287499999999,
+        "p50": 11.0843,
+        "p95": 19.5439,
+        "p99": 23.8237
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 10.949624999999997,
+        "p50": 10.74,
+        "p95": 26.7858,
+        "p99": 33.1087
+      },
+      "beforeGpu": {
+        "samples": 30,
+        "mean": 8.3049312,
+        "p50": 8.939168,
+        "p95": 11.743904,
+        "p99": 11.771232
+      },
+      "afterGpu": {
+        "samples": 30,
+        "mean": 8.2558528,
+        "p50": 8.69952,
+        "p95": 12.096352,
+        "p99": 12.242208
+      },
+      "beforeFullFrameGpu": {
+        "samples": 30,
+        "mean": 8.3049312,
+        "p50": 8.939168,
+        "p95": 11.743904,
+        "p99": 11.771232
+      },
+      "afterFullFrameGpu": {
+        "samples": 30,
+        "mean": 8.2558528,
+        "p50": 8.69952,
+        "p95": 12.096352,
+        "p99": 12.242208
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.1952,
+          "p50": 0.1981,
+          "p95": 0.2508,
+          "p99": 0.268
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.09912499999999999,
+          "p50": 0.0901,
+          "p95": 0.1783,
+          "p99": 0.2174
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.009912500000000001,
+          "p50": 0.0089,
+          "p95": 0.014,
+          "p99": 0.0298
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.06938125,
+          "p50": 0.0661,
+          "p95": 0.099,
+          "p99": 0.1101
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.20483750000000003,
+          "p50": 0.1875,
+          "p95": 0.3242,
+          "p99": 0.329
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.09912812500000001,
+          "p50": 0.0906,
+          "p95": 0.2207,
+          "p99": 0.2394
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.009578125,
+          "p50": 0.0096,
+          "p95": 0.0135,
+          "p99": 0.0146
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.073721875,
+          "p50": 0.0694,
+          "p95": 0.103,
+          "p99": 0.105
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 4.655997866666667,
+          "p50": 4.949216,
+          "p95": 7.572704000000001,
+          "p99": 7.780992
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.07712533333333332,
+          "p50": 0.028064,
+          "p95": 0.038048,
+          "p99": 1.472736
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 2.2593845333333333,
+          "p50": 1.208928,
+          "p95": 3.87728,
+          "p99": 3.998272
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.3124234666666665,
+          "p50": 0.888736,
+          "p95": 2.990592,
+          "p99": 4.167008
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 2.2593845333333333,
+          "p50": 1.208928,
+          "p95": 3.87728,
+          "p99": 3.998272
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 4.536437333333334,
+          "p50": 4.808415999999999,
+          "p95": 7.931456000000001,
+          "p99": 7.972544000000001
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.11786133333333335,
+          "p50": 0.030816,
+          "p95": 0.048192,
+          "p99": 2.575424
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 2.2656586666666665,
+          "p50": 1.207776,
+          "p95": 3.403936,
+          "p99": 4.20592
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.3358954666666667,
+          "p50": 0.896544,
+          "p95": 2.961824,
+          "p99": 2.964256
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 2.2656586666666665,
+          "p50": 1.207776,
+          "p95": 3.403936,
+          "p99": 4.20592
+        }
+      }
+    },
+    {
+      "cohort": "loads",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 230,
+        "MeanAbsoluteChannelDelta": 0.001394434799382716,
+        "ChangedPixels": 150,
+        "ChangedPixelFraction": 7.233796296296296e-05,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 1,
+        "visibleInstances": 1,
+        "culledInstances": 0,
+        "drawCalls": 1,
+        "highLodInstances": 0,
+        "reducedLodInstances": 1,
+        "runtimeMeshInstances": 1,
+        "texturedRuntimeMeshInstances": 1,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 1,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 1,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 64,
+        "batchInstanceCapacity": 64,
+        "batchCapacity": 1,
+        "submittedInstances": 1,
+        "uploadBytes": 112,
+        "pipelineBindings": 1,
+        "textureBindings": 4,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 135,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 14,
+        "culledChunks": 130,
+        "submittedTriangles": 28672,
+        "drawCalls": 14,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0821,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0304
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 14,
+        "culledChunks": 130,
+        "submittedTriangles": 28672,
+        "drawCalls": 14,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.1038,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0397
+      },
+      "beforeResources": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 77,
+        "textureReleaseCount": 0
+      },
+      "afterResources": {
+        "loadedTextureCount": 79,
+        "residentTextureBytes": 45024316,
+        "shaderResourceDescriptorsUsed": 86,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 45024316,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "textureUploadCount": 79,
+        "textureReleaseCount": 0
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 11.902121875,
+        "p50": 8.9339,
+        "p95": 30.7701,
+        "p99": 31.2302
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 11.248356249999999,
+        "p50": 11.7853,
+        "p95": 24.3803,
+        "p99": 25.5798
+      },
+      "beforeGpu": {
+        "samples": 30,
+        "mean": 6.454833066666667,
+        "p50": 4.48912,
+        "p95": 10.34112,
+        "p99": 12.14384
+      },
+      "afterGpu": {
+        "samples": 30,
+        "mean": 7.312005333333335,
+        "p50": 6.642176,
+        "p95": 10.452704,
+        "p99": 13.216224
+      },
+      "beforeFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.454833066666667,
+        "p50": 4.48912,
+        "p95": 10.34112,
+        "p99": 12.14384
+      },
+      "afterFullFrameGpu": {
+        "samples": 30,
+        "mean": 7.312005333333335,
+        "p50": 6.642176,
+        "p95": 10.452704,
+        "p99": 13.216224
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.40365000000000006,
+          "p50": 0.38380000000000003,
+          "p95": 0.6488,
+          "p99": 0.7915999999999999
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.5509843750000001,
+          "p50": 0.5247,
+          "p95": 0.9391,
+          "p99": 1.0542
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.033121874999999995,
+          "p50": 0.0271,
+          "p95": 0.085,
+          "p99": 0.0975
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.23819374999999995,
+          "p50": 0.2289,
+          "p95": 0.3685,
+          "p99": 0.4571
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.32095625,
+          "p50": 0.3185,
+          "p95": 0.504,
+          "p99": 0.6272
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.3691968750000001,
+          "p50": 0.3518,
+          "p95": 0.5082,
+          "p99": 0.5869
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.022621875000000003,
+          "p50": 0.0159,
+          "p95": 0.0693,
+          "p99": 0.0865
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.196703125,
+          "p50": 0.1994,
+          "p95": 0.2861,
+          "p99": 0.5579
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.2941343999999995,
+          "p50": 2.147552,
+          "p95": 6.049792,
+          "p99": 6.216352
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.6233599999999999,
+          "p50": 0.080992,
+          "p95": 2.616416,
+          "p99": 2.678368
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.582465066666667,
+          "p50": 1.189856,
+          "p95": 3.773344,
+          "p99": 4.170848
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 0.9548736000000002,
+          "p50": 0.867008,
+          "p95": 0.949568,
+          "p99": 3.74736
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.582465066666667,
+          "p50": 1.189856,
+          "p95": 3.773344,
+          "p99": 4.170848
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 4.260995199999999,
+          "p50": 4.615424,
+          "p95": 6.436032,
+          "p99": 9.371808
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.9119626666666665,
+          "p50": 0.082656,
+          "p95": 2.05504,
+          "p99": 2.055392
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.288391466666667,
+          "p50": 1.189312,
+          "p95": 1.194848,
+          "p99": 4.170976
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 0.8506560000000001,
+          "p50": 0.861184,
+          "p95": 0.916768,
+          "p99": 0.920448
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.288391466666667,
+          "p50": 1.189312,
+          "p95": 1.194848,
+          "p99": 4.170976
+        }
+      }
+    },
+    {
+      "cohort": "loads",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 247,
+        "MeanAbsoluteChannelDelta": 0.14075424382716048,
+        "ChangedPixels": 14734,
+        "ChangedPixelFraction": 0.007105516975308642,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 100,
+        "visibleInstances": 100,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 0,
+        "reducedLodInstances": 100,
+        "runtimeMeshInstances": 100,
+        "texturedRuntimeMeshInstances": 100,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 100,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 4,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 100,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 128,
+        "batchInstanceCapacity": 512,
+        "batchCapacity": 8,
+        "submittedInstances": 100,
+        "uploadBytes": 11200,
+        "pipelineBindings": 1,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 5468,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 14,
+        "culledChunks": 130,
+        "submittedTriangles": 28672,
+        "drawCalls": 14,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.073,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.025
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 14,
+        "culledChunks": 130,
+        "submittedTriangles": 28672,
+        "drawCalls": 14,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0957,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0258
+      },
+      "beforeResources": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 154,
+        "textureReleaseCount": 77
+      },
+      "afterResources": {
+        "loadedTextureCount": 79,
+        "residentTextureBytes": 45024316,
+        "shaderResourceDescriptorsUsed": 86,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 45024316,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "textureUploadCount": 158,
+        "textureReleaseCount": 79
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 12.058940625,
+        "p50": 9.0795,
+        "p95": 30.7345,
+        "p99": 32.8375
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 11.48539375,
+        "p50": 10.9707,
+        "p95": 26.5135,
+        "p99": 32.4555
+      },
+      "beforeGpu": {
+        "samples": 30,
+        "mean": 6.543811199999999,
+        "p50": 4.596896,
+        "p95": 11.368416,
+        "p99": 11.778112
+      },
+      "afterGpu": {
+        "samples": 30,
+        "mean": 7.6527584,
+        "p50": 7.201088,
+        "p95": 11.022144,
+        "p99": 11.027584
+      },
+      "beforeFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.543811199999999,
+        "p50": 4.596896,
+        "p95": 11.368416,
+        "p99": 11.778112
+      },
+      "afterFullFrameGpu": {
+        "samples": 30,
+        "mean": 7.6527584,
+        "p50": 7.201088,
+        "p95": 11.022144,
+        "p99": 11.027584
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.8729593749999999,
+          "p50": 0.8238,
+          "p95": 1.2429000000000001,
+          "p99": 1.7168999999999999
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.5692062500000001,
+          "p50": 0.5342,
+          "p95": 0.7625,
+          "p99": 0.8074
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.034253125,
+          "p50": 0.0298,
+          "p95": 0.0656,
+          "p99": 0.0704
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.19234374999999998,
+          "p50": 0.1816,
+          "p95": 0.2469,
+          "p99": 0.2509
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 0.4595000000000001,
+          "p50": 0.44689999999999996,
+          "p95": 0.631,
+          "p99": 0.7507
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.33109062499999997,
+          "p50": 0.3116,
+          "p95": 0.5144,
+          "p99": 0.5171
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.015537500000000003,
+          "p50": 0.0143,
+          "p95": 0.022,
+          "p99": 0.0221
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.126525,
+          "p50": 0.1225,
+          "p95": 0.1591,
+          "p99": 0.1833
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.3900704,
+          "p50": 2.37504,
+          "p95": 6.126271999999999,
+          "p99": 7.246847999999999
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.5117376,
+          "p50": 0.081408,
+          "p95": 2.046592,
+          "p99": 2.505664
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.619136,
+          "p50": 1.189312,
+          "p95": 3.85648,
+          "p99": 3.8728
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.0228672,
+          "p50": 0.87664,
+          "p95": 2.897984,
+          "p99": 3.691936
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.619136,
+          "p50": 1.189312,
+          "p95": 3.85648,
+          "p99": 3.8728
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.987922133333334,
+          "p50": 3.6029120000000003,
+          "p95": 6.924064,
+          "p99": 7.007231999999999
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.7931232,
+          "p50": 0.080992,
+          "p95": 2.095744,
+          "p99": 2.632192
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.7886538666666665,
+          "p50": 1.190976,
+          "p95": 3.894144,
+          "p99": 4.086752
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.0830592,
+          "p50": 0.871104,
+          "p95": 2.963296,
+          "p99": 3.53152
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.7886538666666665,
+          "p50": 1.190976,
+          "p95": 3.894144,
+          "p99": 4.086752
+        }
+      }
+    },
+    {
+      "cohort": "loads",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 247,
+        "MeanAbsoluteChannelDelta": 1.4023845003858024,
+        "ChangedPixels": 146904,
+        "ChangedPixelFraction": 0.07084490740740741,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 1000,
+        "culledInstances": 0,
+        "drawCalls": 8,
+        "highLodInstances": 0,
+        "reducedLodInstances": 1000,
+        "runtimeMeshInstances": 1000,
+        "texturedRuntimeMeshInstances": 1000,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 1000,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 0,
+        "clusterCulledInstances": 0,
+        "instanceBoundsTests": 1000,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 1024,
+        "batchInstanceCapacity": 1024,
+        "batchCapacity": 8,
+        "submittedInstances": 1000,
+        "uploadBytes": 112000,
+        "pipelineBindings": 1,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 43744,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 14,
+        "culledChunks": 130,
+        "submittedTriangles": 28672,
+        "drawCalls": 14,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0386,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0153
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 14,
+        "culledChunks": 130,
+        "submittedTriangles": 28672,
+        "drawCalls": 14,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0314,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0196
+      },
+      "beforeResources": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 231,
+        "textureReleaseCount": 154
+      },
+      "afterResources": {
+        "loadedTextureCount": 79,
+        "residentTextureBytes": 45024316,
+        "shaderResourceDescriptorsUsed": 86,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 45024316,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "textureUploadCount": 237,
+        "textureReleaseCount": 158
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 14.37174375,
+        "p50": 8.1111,
+        "p95": 39.0708,
+        "p99": 51.0581
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 12.360375,
+        "p50": 10.5298,
+        "p95": 28.0138,
+        "p99": 33.424
+      },
+      "beforeGpu": {
+        "samples": 28,
+        "mean": 6.681177142857143,
+        "p50": 4.556064,
+        "p95": 11.912032,
+        "p99": 12.103296
+      },
+      "afterGpu": {
+        "samples": 30,
+        "mean": 6.981812266666666,
+        "p50": 4.787616,
+        "p95": 10.669856,
+        "p99": 10.789856
+      },
+      "beforeFullFrameGpu": {
+        "samples": 28,
+        "mean": 6.681177142857143,
+        "p50": 4.556064,
+        "p95": 11.912032,
+        "p99": 12.103296
+      },
+      "afterFullFrameGpu": {
+        "samples": 30,
+        "mean": 6.981812266666666,
+        "p50": 4.787616,
+        "p95": 10.669856,
+        "p99": 10.789856
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 2.8673812499999998,
+          "p50": 2.1529,
+          "p95": 4.8842,
+          "p99": 14.7899
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.673253125,
+          "p50": 0.3833,
+          "p95": 0.7804,
+          "p99": 8.6657
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.045884375000000005,
+          "p50": 0.0459,
+          "p95": 0.0713,
+          "p99": 0.0897
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.18713125000000003,
+          "p50": 0.1661,
+          "p95": 0.3255,
+          "p99": 0.3444
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 1.9838062500000002,
+          "p50": 1.3834,
+          "p95": 3.2186000000000003,
+          "p99": 3.3398
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.5130062500000001,
+          "p50": 0.2744,
+          "p95": 0.5631,
+          "p99": 7.5217
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.026896875,
+          "p50": 0.0241,
+          "p95": 0.0517,
+          "p99": 0.0593
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.128234375,
+          "p50": 0.1258,
+          "p95": 0.153,
+          "p99": 0.1765
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 28,
+          "mean": 3.761307428571428,
+          "p50": 2.380256,
+          "p95": 8.273568,
+          "p99": 10.266464
+        },
+        "overlay": {
+          "samples": 28,
+          "mean": 0.22979885714285714,
+          "p50": 0.034496,
+          "p95": 2.56096,
+          "p99": 2.564416
+        },
+        "composite": {
+          "samples": 28,
+          "mean": 1.6625554285714284,
+          "p50": 1.194624,
+          "p95": 3.330912,
+          "p99": 3.750496
+        },
+        "shadows": {
+          "samples": 28,
+          "mean": 1.0275154285714285,
+          "p50": 0.886624,
+          "p95": 2.918944,
+          "p99": 3.52864
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 28,
+          "mean": 1.6625554285714284,
+          "p50": 1.194624,
+          "p95": 3.330912,
+          "p99": 3.750496
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 30,
+          "mean": 3.8840682666666657,
+          "p50": 2.65728,
+          "p95": 6.4035839999999995,
+          "p99": 6.456576
+        },
+        "overlay": {
+          "samples": 30,
+          "mean": 0.1253184,
+          "p50": 0.034496,
+          "p95": 0.083872,
+          "p99": 2.379264
+        },
+        "composite": {
+          "samples": 30,
+          "mean": 1.9711296,
+          "p50": 1.19792,
+          "p95": 3.994048,
+          "p99": 4.176992
+        },
+        "shadows": {
+          "samples": 30,
+          "mean": 1.001296,
+          "p50": 0.865184,
+          "p95": 2.916672,
+          "p99": 2.94672
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 30,
+          "mean": 1.9711296,
+          "p50": 1.19792,
+          "p95": 3.994048,
+          "p99": 4.176992
+        }
+      }
+    },
+    {
+      "cohort": "dense-close",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "identicalPng": false,
+      "pixels": {
+        "MaximumChannelDelta": 247,
+        "MeanAbsoluteChannelDelta": 15.866521990740742,
+        "ChangedPixels": 1411268,
+        "ChangedPixelFraction": 0.6805883487654321,
+        "WithinTolerance": false
+      },
+      "instances": {
+        "totalInstances": 1000,
+        "visibleInstances": 495,
+        "culledInstances": 505,
+        "drawCalls": 8,
+        "highLodInstances": 495,
+        "reducedLodInstances": 0,
+        "runtimeMeshInstances": 495,
+        "texturedRuntimeMeshInstances": 495,
+        "fallbackMeshInstances": 0,
+        "lod1Instances": 0,
+        "lod2Instances": 0,
+        "animatedVegetationInstances": 0,
+        "visibleVegetationInstances": 0,
+        "clusterTests": 32,
+        "rejectedClusters": 5,
+        "clusterCulledInstances": 136,
+        "instanceBoundsTests": 864,
+        "skippedDecalResources": 0
+      },
+      "submission": {
+        "stagingCapacity": 512,
+        "batchInstanceCapacity": 576,
+        "batchCapacity": 8,
+        "submittedInstances": 495,
+        "uploadBytes": 55440,
+        "pipelineBindings": 1,
+        "textureBindings": 32,
+        "skinEvaluatedPoses": 0,
+        "skinStaticFallbacks": 0,
+        "skinUploadBytes": 0,
+        "snapshotIndexBytes": 43744,
+        "mechanicalPartInstances": 0,
+        "mechanicalTransformScratchBytes": 2048
+      },
+      "beforeTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 3,
+        "culledChunks": 141,
+        "submittedTriangles": 6144,
+        "drawCalls": 3,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0642,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.0362
+      },
+      "afterTerrain": {
+        "totalChunks": 144,
+        "visibleChunks": 3,
+        "culledChunks": 141,
+        "submittedTriangles": 6144,
+        "drawCalls": 3,
+        "uploadedBufferCount": 40,
+        "controlTextureCount": 39,
+        "textureBindingsPerDraw": 13,
+        "maximumTextureSamplesPerPixel": 13,
+        "cpuSubmissionMilliseconds": 0.0778,
+        "surfaceDetailEnabled": true,
+        "rootSignatureDwords": 18,
+        "residentChunks": 39,
+        "requiredChunks": 39,
+        "residentGeometryBytes": 2085744,
+        "residentControlBytes": 223080,
+        "chunkUploads": 39,
+        "chunkEvictions": 0,
+        "residencyCpuMilliseconds": 0.051
+      },
+      "beforeResources": {
+        "loadedTextureCount": 77,
+        "residentTextureBytes": 44760596,
+        "shaderResourceDescriptorsUsed": 84,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 77,
+        "peakResidentTextureBytes": 44760596,
+        "peakShaderResourceDescriptorsUsed": 84,
+        "textureUploadCount": 77,
+        "textureReleaseCount": 0
+      },
+      "afterResources": {
+        "loadedTextureCount": 79,
+        "residentTextureBytes": 45024316,
+        "shaderResourceDescriptorsUsed": 86,
+        "shaderResourceDescriptorCapacity": 4096,
+        "textureBindingFailureCount": 0,
+        "peakLoadedTextureCount": 79,
+        "peakResidentTextureBytes": 45024316,
+        "peakShaderResourceDescriptorsUsed": 86,
+        "textureUploadCount": 79,
+        "textureReleaseCount": 0
+      },
+      "beforeCpu": {
+        "samples": 32,
+        "mean": 23.639315625000002,
+        "p50": 23.1599,
+        "p95": 29.1561,
+        "p99": 39.6252
+      },
+      "afterCpu": {
+        "samples": 32,
+        "mean": 22.178603125000006,
+        "p50": 22.0805,
+        "p95": 24.1031,
+        "p99": 33.4012
+      },
+      "beforeGpu": {
+        "samples": 32,
+        "mean": 8.254369,
+        "p50": 8.035008,
+        "p95": 12.064192,
+        "p99": 12.108448
+      },
+      "afterGpu": {
+        "samples": 32,
+        "mean": 7.950158,
+        "p50": 7.94464,
+        "p95": 11.536864,
+        "p99": 11.908608
+      },
+      "beforeFullFrameGpu": {
+        "samples": 32,
+        "mean": 8.254369,
+        "p50": 8.035008,
+        "p95": 12.064192,
+        "p99": 12.108448
+      },
+      "afterFullFrameGpu": {
+        "samples": 32,
+        "mean": 7.950158,
+        "p50": 7.94464,
+        "p95": 11.536864,
+        "p99": 11.908608
+      },
+      "beforeCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 19.936368749999996,
+          "p50": 19.903299999999998,
+          "p95": 25.2004,
+          "p99": 25.2128
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 1.1223218750000001,
+          "p50": 0.6916,
+          "p95": 0.9314,
+          "p99": 14.487
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.035015625,
+          "p50": 0.0348,
+          "p95": 0.0569,
+          "p99": 0.0603
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.35114062499999993,
+          "p50": 0.3438,
+          "p95": 0.4598,
+          "p99": 0.479
+        }
+      },
+      "afterCpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 18.840209375000004,
+          "p50": 18.994799999999998,
+          "p95": 20.336399999999998,
+          "p99": 20.3721
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.96950625,
+          "p50": 0.6275,
+          "p95": 0.7358,
+          "p99": 11.5361
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 0.027990624999999998,
+          "p50": 0.0243,
+          "p95": 0.0461,
+          "p99": 0.0479
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 0.32251874999999997,
+          "p50": 0.3209,
+          "p95": 0.3714,
+          "p99": 0.3722
+        }
+      },
+      "beforeGpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 4.394475,
+          "p50": 4.720832,
+          "p95": 7.395936,
+          "p99": 7.405952000000001
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.225373,
+          "p50": 0.035936,
+          "p95": 2.055744,
+          "p99": 2.069664
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 1.9753529999999997,
+          "p50": 1.246816,
+          "p95": 3.388928,
+          "p99": 4.332384
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 1.659168,
+          "p50": 0.816416,
+          "p95": 2.958176,
+          "p99": 3.34384
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 32,
+          "mean": 1.9753529999999997,
+          "p50": 1.246816,
+          "p95": 3.388928,
+          "p99": 4.332384
+        }
+      },
+      "afterGpuPasses": {
+        "world": {
+          "samples": 32,
+          "mean": 3.8753230000000007,
+          "p50": 4.182336,
+          "p95": 5.8673280000000005,
+          "p99": 7.301663999999999
+        },
+        "overlay": {
+          "samples": 32,
+          "mean": 0.23713300000000004,
+          "p50": 0.0336,
+          "p95": 2.072096,
+          "p99": 2.621344
+        },
+        "composite": {
+          "samples": 32,
+          "mean": 2.1504549999999996,
+          "p50": 1.242432,
+          "p95": 3.954048,
+          "p99": 4.380096
+        },
+        "shadows": {
+          "samples": 32,
+          "mean": 1.687247,
+          "p50": 0.949792,
+          "p95": 2.872768,
+          "p99": 2.932896
+        },
+        "particles": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null
+        },
+        "atmosphere": {
+          "samples": 32,
+          "mean": 2.1504549999999996,
+          "p50": 1.242432,
+          "p95": 3.954048,
+          "p99": 4.380096
+        }
+      }
+    }
+  ],
+  "images": [
+    {
+      "path": "dcn438r2/gallery/before/DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4265200,
+      "sha256": "9d34f88952c27574738fd5aae891bd9b57973592302cae96cde88d4aa8c5a524",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4370052,
+      "sha256": "ef0a865349fe99d84d11af2707b69297738c4b8153dcf84724e5aa03db56c94b",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4342385,
+      "sha256": "b857518b805717408db943b9d46ec2c413ad198ea19fa820bd0bb0c3a6296a20",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 5210229,
+      "sha256": "d320abe643da22f44d68fda27f449126c4bfa45b9c531bd9e146a9271ec76234",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4074355,
+      "sha256": "f87423a3e254fb846c6a06b4f368bfe0d11afd4f97117280e44018e1ecae34f0",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/before/DecalsOverlap-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4493154,
+      "sha256": "dd318dc345ba64b8f26b11ca65ff55616e37ae187089b9a54171bb9a96c75863",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4119553,
+      "sha256": "f0d43cdfceb6dde1e9cfcd5bb5aa4d4ed273afd3cae607c3933adb0cd07c4cbf",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4256088,
+      "sha256": "b8eb3bf0c66b2bb5d20b122ee36c0d75c147e8e97ff0dfd60a48ae6d2432f48c",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4215121,
+      "sha256": "03ca549c3abe9efd4c8a3de3dd4fec7312c022bfbe6747ebfc768d1d08a2380b",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 5116907,
+      "sha256": "7913745cf1d4d695d53eaf5fe29a3b066534de95d61ed142f3a8867f7156513c",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 3935961,
+      "sha256": "5e7a2a7a23f4575602ccd03f477cabc19adef9b7b01a659f50440a80848796bf",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/gallery/after/DecalsOverlap-1920x1080-High-CloseTactical-Inspection40.png",
+      "bytes": 4189649,
+      "sha256": "508f5f8b9a6655c07c8dd51f29e972087e60862cd194be4bcaab0ba5eb1da0b2",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/loads/before/DecalSingle-1920x1080-High-NormalGameplay.png",
+      "bytes": 4017410,
+      "sha256": "a43bb28f4c9500fcfd9a080ba944998f2148b4eab5321e00dac46c1c769d513a",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/loads/before/Decals100-1920x1080-High-NormalGameplay.png",
+      "bytes": 4039931,
+      "sha256": "e443e29fe0d94008da009faace5a27eb053ff9eeee3c7a08544055cd5078e110",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/loads/before/Decals1000-1920x1080-High-NormalGameplay.png",
+      "bytes": 4224166,
+      "sha256": "c4046f8bd55ecdf41311bdb5ee27bf7e23cb6affc41ced07ed4f59f6ffe141cf",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/loads/after/DecalSingle-1920x1080-High-NormalGameplay.png",
+      "bytes": 4017662,
+      "sha256": "c3d30c3b1e2a180d2f91c65267cf1a96a8b01a622af69337c5fe8adad975961b",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/loads/after/Decals100-1920x1080-High-NormalGameplay.png",
+      "bytes": 4026490,
+      "sha256": "3605b502ee010def7b14bbd2e6c514ec43e9dedf927faf67a37c6f095488f5d6",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/loads/after/Decals1000-1920x1080-High-NormalGameplay.png",
+      "bytes": 4103672,
+      "sha256": "ee732006fa7904516a65fb9b19ffbf5610cc89778dc8f44e269faab8bbf9bea7",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/dense-close/before/Decals1000-1920x1080-High-CloseTactical-Inspection80.png",
+      "bytes": 6083763,
+      "sha256": "6a9f5c0414577e281937d015aacc7fa29639a5caa59624712ca4bc38cbf6a59a",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "dcn438r2/dense-close/after/Decals1000-1920x1080-High-CloseTactical-Inspection80.png",
+      "bytes": 4990611,
+      "sha256": "406a3ce7ce2d19146f94bfcf58b848f4b12e0d74bfd1aa2290e817f9fee29de0",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "churn": [
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 44760596,
+      "maximum": 44760596
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 84,
+      "maximum": 84
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 0,
+      "maximum": 0
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 44760596,
+      "maximum": 44760596
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 84,
+      "maximum": 84
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 154,
+      "maximum": 154
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 44760596,
+      "maximum": 44760596
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 84,
+      "maximum": 84
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 231,
+      "maximum": 231
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 154,
+      "maximum": 154
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 44760596,
+      "maximum": 44760596
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 84,
+      "maximum": 84
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 308,
+      "maximum": 308
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 231,
+      "maximum": 231
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 85,
+      "maximum": 85
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 44806356,
+      "maximum": 44806356
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 92,
+      "maximum": 92
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 393,
+      "maximum": 393
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 308,
+      "maximum": 308
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 44760596,
+      "maximum": 44760596
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 84,
+      "maximum": 84
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 470,
+      "maximum": 470
+    },
+    {
+      "folder": "dcn438r2/gallery/before",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 393,
+      "maximum": 393
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 45024316,
+      "maximum": 45024316
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 86,
+      "maximum": 86
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalAsphaltGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 0,
+      "maximum": 0
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 45024316,
+      "maximum": 45024316
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 86,
+      "maximum": 86
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 158,
+      "maximum": 158
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalConcreteGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 45024316,
+      "maximum": 45024316
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 86,
+      "maximum": 86
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 237,
+      "maximum": 237
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalDirtGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 158,
+      "maximum": 158
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 45024316,
+      "maximum": 45024316
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 86,
+      "maximum": 86
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 316,
+      "maximum": 316
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalGravelGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 237,
+      "maximum": 237
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 87,
+      "maximum": 87
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 45070076,
+      "maximum": 45070076
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 94,
+      "maximum": 94
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 403,
+      "maximum": 403
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalSlopeGallery-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 316,
+      "maximum": 316
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "loadedTextureCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "residentTextureBytes",
+      "minimum": 45024316,
+      "maximum": 45024316
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 86,
+      "maximum": 86
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureUploadCount",
+      "minimum": 482,
+      "maximum": 482
+    },
+    {
+      "folder": "dcn438r2/gallery/after",
+      "key": "DecalsOverlap-1920x1080-High-CloseTactical-Inspection40",
+      "field": "textureReleaseCount",
+      "minimum": 403,
+      "maximum": 403
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "loadedTextureCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "residentTextureBytes",
+      "minimum": 44760596,
+      "maximum": 44760596
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 84,
+      "maximum": 84
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "textureUploadCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "textureReleaseCount",
+      "minimum": 0,
+      "maximum": 0
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "loadedTextureCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "residentTextureBytes",
+      "minimum": 44760596,
+      "maximum": 44760596
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 84,
+      "maximum": 84
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "textureUploadCount",
+      "minimum": 154,
+      "maximum": 154
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "textureReleaseCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "loadedTextureCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "residentTextureBytes",
+      "minimum": 44760596,
+      "maximum": 44760596
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 84,
+      "maximum": 84
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "textureUploadCount",
+      "minimum": 231,
+      "maximum": 231
+    },
+    {
+      "folder": "dcn438r2/loads/before",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "textureReleaseCount",
+      "minimum": 154,
+      "maximum": 154
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "loadedTextureCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "residentTextureBytes",
+      "minimum": 45024316,
+      "maximum": 45024316
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 86,
+      "maximum": 86
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "textureUploadCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "DecalSingle-1920x1080-High-NormalGameplay",
+      "field": "textureReleaseCount",
+      "minimum": 0,
+      "maximum": 0
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "loadedTextureCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "residentTextureBytes",
+      "minimum": 45024316,
+      "maximum": 45024316
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 86,
+      "maximum": 86
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "textureUploadCount",
+      "minimum": 158,
+      "maximum": 158
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals100-1920x1080-High-NormalGameplay",
+      "field": "textureReleaseCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "loadedTextureCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "residentTextureBytes",
+      "minimum": 45024316,
+      "maximum": 45024316
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 86,
+      "maximum": 86
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "textureUploadCount",
+      "minimum": 237,
+      "maximum": 237
+    },
+    {
+      "folder": "dcn438r2/loads/after",
+      "key": "Decals1000-1920x1080-High-NormalGameplay",
+      "field": "textureReleaseCount",
+      "minimum": 158,
+      "maximum": 158
+    },
+    {
+      "folder": "dcn438r2/dense-close/before",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "loadedTextureCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/dense-close/before",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "residentTextureBytes",
+      "minimum": 44760596,
+      "maximum": 44760596
+    },
+    {
+      "folder": "dcn438r2/dense-close/before",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 84,
+      "maximum": 84
+    },
+    {
+      "folder": "dcn438r2/dense-close/before",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "textureUploadCount",
+      "minimum": 77,
+      "maximum": 77
+    },
+    {
+      "folder": "dcn438r2/dense-close/before",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "textureReleaseCount",
+      "minimum": 0,
+      "maximum": 0
+    },
+    {
+      "folder": "dcn438r2/dense-close/after",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "loadedTextureCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/dense-close/after",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "residentTextureBytes",
+      "minimum": 45024316,
+      "maximum": 45024316
+    },
+    {
+      "folder": "dcn438r2/dense-close/after",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "shaderResourceDescriptorsUsed",
+      "minimum": 86,
+      "maximum": 86
+    },
+    {
+      "folder": "dcn438r2/dense-close/after",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "textureUploadCount",
+      "minimum": 79,
+      "maximum": 79
+    },
+    {
+      "folder": "dcn438r2/dense-close/after",
+      "key": "Decals1000-1920x1080-High-CloseTactical-Inspection80",
+      "field": "textureReleaseCount",
+      "minimum": 0,
+      "maximum": 0
+    }
+  ]
+}

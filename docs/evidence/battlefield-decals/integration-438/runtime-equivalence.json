@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "currentProductionSource": "c7cbb542c77f56ce5de0988e043ad65495b12b37",
+  "previousMeasuredSource": "cdfa458581cbc70be7563f111f75b9b6618d6fa1",
+  "currentMaster": "a2a88f06f24b6a4351b7f1f3c7a56819f0527d5d",
+  "comparisons": [
+    {
+      "before": "dchb",
+      "after": "dcvb",
+      "assets": 1363,
+      "changedPayloads": [],
+      "stableRuntimeMetadata": true,
+      "beforeManifestSha256": "d50b0ef2758545a3620db07eb17e639aafab2ded18a7152b3d95e54da6db8faa",
+      "afterManifestSha256": "d9975cdcf5da0b0e03f30087457a11ccd6c6e7866eb267b866d57e33c1a0449d"
+    },
+    {
+      "before": "dcha",
+      "after": "dcva",
+      "assets": 1365,
+      "changedPayloads": [],
+      "stableRuntimeMetadata": true,
+      "beforeManifestSha256": "df871a28acdba07051b55128ed72a15a91794eaccdc2af2c67a2a3ae09b449a3",
+      "afterManifestSha256": "f7d0d6adb9d6fa4da19afcdd0c521911b457837c168dcb538c845d38f6a66cd7"
+    }
+  ],
+  "interpretation": "All encoded runtime payloads remain identical on both sides; source-path metadata and default terrain region authoring changed. Original native records retain their original source identity. Fresh current-source captures and package are separate."
+}

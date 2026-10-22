@@ -156,7 +156,7 @@ internal static class VisualReferenceCapture
                     long setupStart = Stopwatch.GetTimestamp();
                     long setupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
                     var beforeSetup = graphics.Diagnostics;
-                    var terrainProfile = TerrainPresentationProfile.CreateCentralDivide(catalog);
+                    var terrainProfile = fixture.ResolveTerrainProfile(TerrainPresentationProfile.CreateCentralDivide(catalog));
                     if (request.SurfaceMarks.Length > 0) terrainProfile = terrainProfile.WithSurfaceMarks(new TerrainSurfaceMarks(request.SurfaceMarks));
                     using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, lighting: lighting,
                         surfaceDetail: profile.TerrainDetail, textureDetail: profile.Textures, residency: profile.TerrainResidency,

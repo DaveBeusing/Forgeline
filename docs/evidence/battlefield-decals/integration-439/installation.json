@@ -1,0 +1,14 @@
+{
+  "success": true,
+  "source": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+  "sourceTreeClean": true,
+  "archive": "<repository>\\artifacts\\dcp439\\FORGELINE-0.1.439-dev-win-x64.zip",
+  "archiveBytes": 55174759,
+  "archiveSha256": "3dbd77276b7c88e88f290ca863f27526725c2f0c90deddef44f522722858e760",
+  "archiveEntries": 1541,
+  "installation": "<workspace>\\decal-player439",
+  "verifiedFileHashes": 1489,
+  "authoringFiles": 0,
+  "commonByteIdenticalCompiledFiles": 1366,
+  "publisherOnlyMediaFiles": 63
+}

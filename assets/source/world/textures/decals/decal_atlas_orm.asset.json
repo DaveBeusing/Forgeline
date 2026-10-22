@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.decal.atlas_orm",
+  "type": "texture",
+  "source": "decal_atlas_orm.png",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureMaxDimension": 256,
+  "textureMaxMipLevels": 4,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
+}

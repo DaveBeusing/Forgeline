@@ -1,0 +1,1717 @@
+{
+  "success": true,
+  "authoringSource": "f7d63b7dc1531277a54851f4938cb276ecc9a6ba",
+  "runtimeMeasurementSource": "c7cbb542c77f56ce5de0988e043ad65495b12b37",
+  "changedAuthoringMasters": [
+    "world/authoring/decals/blast_mark.blend",
+    "world/authoring/decals/concrete_crack.blend",
+    "world/authoring/decals/oil_stain.blend",
+    "world/authoring/decals/road_wear.blend",
+    "world/authoring/decals/scorch_mark.blend",
+    "world/authoring/decals/shell_impact.blend",
+    "world/authoring/decals/tire_tracks.blend",
+    "world/authoring/decals/tracked_vehicle_marks.blend"
+  ],
+  "unchangedCompilerReadyInputs": 31,
+  "canonicalPackedEntriesPerImage": 1,
+  "masterReopens": 16,
+  "exactRebakedChannels": 24,
+  "geometryNormalProbes": 200,
+  "maximumNormalComponentError": 0.09921842440962791,
+  "originalFiles": [
+    {
+      "path": "decal-native-relative/assets.json",
+      "bytes": 2040,
+      "sha256": "61ab37d9b432eddaebcbaa3c4f64eb9385b87bf09f5990960d6825aa8838a956"
+    },
+    {
+      "path": "decal-native-relative/atlas-contract.json",
+      "bytes": 5950,
+      "sha256": "80cdec724f32a839b0b496d2e6795f07a00d0c1b90710503d5990f737330a671"
+    },
+    {
+      "path": "decal-native-relative/compile.log",
+      "bytes": 84746,
+      "sha256": "10769301f2bc6545bbf18b880bd92bdc8a45623c1c7eaa8bafd6149d8bc5aa75"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/rebake.json",
+      "bytes": 5416,
+      "sha256": "05002aff1298bab2f7fca0171a642d3053cc6a14b44b0b9ae2595c773120d6f3"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/report.json",
+      "bytes": 829,
+      "sha256": "3199eaf8da99fbdc93b1c3a764ff57b3d0071d21ca255e9f7e8e146dcf6e11ba"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/runs/44b2540dbaf947cfbd427c9d85b320f6/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/runs/44b2540dbaf947cfbd427c9d85b320f6/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/runs/44b2540dbaf947cfbd427c9d85b320f6/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/runs/44b2540dbaf947cfbd427c9d85b320f6/report.json",
+      "bytes": 829,
+      "sha256": "3199eaf8da99fbdc93b1c3a764ff57b3d0071d21ca255e9f7e8e146dcf6e11ba"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/runs/44b2540dbaf947cfbd427c9d85b320f6/request.json",
+      "bytes": 846,
+      "sha256": "4d1271c8910fa3a3192bb5422b6c1aeeb9f47112840cdd37788c1e801f600a04"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/runs/44b2540dbaf947cfbd427c9d85b320f6/script.stderr.log",
+      "bytes": 339,
+      "sha256": "75c9cd2937df16bbabc86e0c957b363a0d7f1ba73b99315727214ea1bb91cd4b"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/runs/44b2540dbaf947cfbd427c9d85b320f6/script.stdout.log",
+      "bytes": 614,
+      "sha256": "3ca670a2d508a5ee2cf6a9e9859c28a38a57b887e005ab029fea61a4796ebd24"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/runs/44b2540dbaf947cfbd427c9d85b320f6/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/runs/44b2540dbaf947cfbd427c9d85b320f6/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/tire_tracks-base.png",
+      "bytes": 195323,
+      "sha256": "ab4b6b6cbcad3a1ad7bfae3d5d2623f55e6d7f8bb97248e2cbd2145b24b92ce3"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/tire_tracks-normal.png",
+      "bytes": 177291,
+      "sha256": "ae22a1c6c93e0e852bf93a92040872e9def40ec69afb2bb4ea082b16ba8adc3a"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/tire_tracks-orm.png",
+      "bytes": 82455,
+      "sha256": "cb02350fa34762a8af6f60cdfc03934a3c73a731d027a7c52238300120c6252e"
+    },
+    {
+      "path": "decal-native-relative/edited-relief/tire_tracks.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/blast_mark-base.png",
+      "bytes": 175657,
+      "sha256": "8c2b25d904ba5b2894d1899c7d8068b159ac0874494efb971c2e8a2eac8963be"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/blast_mark-normal.png",
+      "bytes": 92059,
+      "sha256": "954fd4c9b70f35ff8e2c7d12d8a3b59952c20631e8f391ebf8e4f55874b1787b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/blast_mark-orm.png",
+      "bytes": 74298,
+      "sha256": "82acde922ac4c32acc413ecf0b60e35eb00c7e63c5c5bded59eeb1919a087a1e"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/blast_mark.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/rebake.json",
+      "bytes": 5431,
+      "sha256": "de1d23c56ed4ba0fc28d0cf088b5db6bd0ebdb16761fed92f44a4dcfaba0d531"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/report.json",
+      "bytes": 835,
+      "sha256": "acd8f7661ef632d715a3dcb1951e273e38bb3900007094a90daa111a29d85198"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/runs/7840b03ed0f34688a921e00855940efc/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/runs/7840b03ed0f34688a921e00855940efc/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/runs/7840b03ed0f34688a921e00855940efc/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/runs/7840b03ed0f34688a921e00855940efc/report.json",
+      "bytes": 835,
+      "sha256": "acd8f7661ef632d715a3dcb1951e273e38bb3900007094a90daa111a29d85198"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/runs/7840b03ed0f34688a921e00855940efc/request.json",
+      "bytes": 835,
+      "sha256": "6bdf48184a7b12eb69ed9fcd522b5c4d5a830b553689f0c443f54b9546275e8f"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/runs/7840b03ed0f34688a921e00855940efc/script.stderr.log",
+      "bytes": 339,
+      "sha256": "75c9cd2937df16bbabc86e0c957b363a0d7f1ba73b99315727214ea1bb91cd4b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/runs/7840b03ed0f34688a921e00855940efc/script.stdout.log",
+      "bytes": 612,
+      "sha256": "5d7e1c582e4f80121b61ed97e703ef30deceba1272ffb19c8e6e5a1f872a61f2"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/runs/7840b03ed0f34688a921e00855940efc/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/blast_mark/runs/7840b03ed0f34688a921e00855940efc/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/concrete_crack-base.png",
+      "bytes": 179531,
+      "sha256": "91d88b7bc8ae91cadacaa582ccc8e36fd649dfc9044d08b7f8bde2011eebd0f1"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/concrete_crack-normal.png",
+      "bytes": 137291,
+      "sha256": "7d1628d0619d68744a632f9a9b80cf182ed34bd6e29fb347b29493739ef32d4a"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/concrete_crack-orm.png",
+      "bytes": 61849,
+      "sha256": "f1d7201255b84cf7ff65f1a35bc0f58b15fdf5282e769b3c3e4f2b788f7993d9"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/concrete_crack.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/rebake.json",
+      "bytes": 5462,
+      "sha256": "f5b46292f03b69c778464afa2ee52fe5ab4dab6d175c1050e290f529892dca65"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/report.json",
+      "bytes": 839,
+      "sha256": "8794beaca5257cd8d1238a00254f69acd13ecb80c9e65f93587d6edfd7aa806b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/runs/4f44a7e5554e4ded8e9a950d6418ec7d/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/runs/4f44a7e5554e4ded8e9a950d6418ec7d/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/runs/4f44a7e5554e4ded8e9a950d6418ec7d/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/runs/4f44a7e5554e4ded8e9a950d6418ec7d/report.json",
+      "bytes": 839,
+      "sha256": "8794beaca5257cd8d1238a00254f69acd13ecb80c9e65f93587d6edfd7aa806b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/runs/4f44a7e5554e4ded8e9a950d6418ec7d/request.json",
+      "bytes": 847,
+      "sha256": "84cf377723a1b79257aa234f97b6cb0687357b08af56d5c3cb6eadda3676d590"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/runs/4f44a7e5554e4ded8e9a950d6418ec7d/script.stderr.log",
+      "bytes": 339,
+      "sha256": "75c9cd2937df16bbabc86e0c957b363a0d7f1ba73b99315727214ea1bb91cd4b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/runs/4f44a7e5554e4ded8e9a950d6418ec7d/script.stdout.log",
+      "bytes": 620,
+      "sha256": "1efd3a9e6bc1ee451cdfbb4d9b062fdca46adfa38a36bf7434f96f534a4b63d9"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/runs/4f44a7e5554e4ded8e9a950d6418ec7d/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/concrete_crack/runs/4f44a7e5554e4ded8e9a950d6418ec7d/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/oil_stain-base.png",
+      "bytes": 143940,
+      "sha256": "a8d3d18b210214c2b15d9e629dcb60e677372bfafe2dc637969781722fba9cfe"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/oil_stain-normal.png",
+      "bytes": 63266,
+      "sha256": "efece0d3489a4be1287f68ee277de0d3fb6efe774b13776012a74045a91585f3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/oil_stain-orm.png",
+      "bytes": 129668,
+      "sha256": "d30d2b09ff035a17ff7a20465cf40618a866a12231175cc5540e6e15ffa75b37"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/oil_stain.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/rebake.json",
+      "bytes": 5426,
+      "sha256": "c10a9d6ed07b2ee18fe158fd2f36dff3ccf0eed8f4f9dc7039b504e3f5350fcd"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/report.json",
+      "bytes": 834,
+      "sha256": "5d6da61b3f8646bb9b42fdaeb0c8238ba4ca58fc5479f11a751e12a0af22ecc9"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/runs/779d9dde435c42b087594d6c4c180815/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/runs/779d9dde435c42b087594d6c4c180815/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/runs/779d9dde435c42b087594d6c4c180815/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/runs/779d9dde435c42b087594d6c4c180815/report.json",
+      "bytes": 834,
+      "sha256": "5d6da61b3f8646bb9b42fdaeb0c8238ba4ca58fc5479f11a751e12a0af22ecc9"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/runs/779d9dde435c42b087594d6c4c180815/request.json",
+      "bytes": 832,
+      "sha256": "16e62fe4c80a540d83ed3da2dc5db7afe5e7e8254fd1971b4760410cb8a58ce9"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/runs/779d9dde435c42b087594d6c4c180815/script.stderr.log",
+      "bytes": 339,
+      "sha256": "75c9cd2937df16bbabc86e0c957b363a0d7f1ba73b99315727214ea1bb91cd4b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/runs/779d9dde435c42b087594d6c4c180815/script.stdout.log",
+      "bytes": 610,
+      "sha256": "9d3661823c33dbc23bfe280d557320ffd538eb1822c71958a6c8dc07651e7332"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/runs/779d9dde435c42b087594d6c4c180815/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/oil_stain/runs/779d9dde435c42b087594d6c4c180815/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/rebake.json",
+      "bytes": 5422,
+      "sha256": "a5225de982e9d3a9f4c22782725c000442c1a75ed42bca25f8ef53b797b26672"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/report.json",
+      "bytes": 834,
+      "sha256": "2a5119a0982485bf7fb939c2f9c54c3d62b5e0eb4fbf5f91ea3d2b02ad03ab41"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/road_wear-base.png",
+      "bytes": 219195,
+      "sha256": "9519ba0be532599d2cb4b934953a8d8d29d82d2ea9d9a75bd5df980a3c547523"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/road_wear-normal.png",
+      "bytes": 167559,
+      "sha256": "5e785a09ba0bb383644b316b4b3bfe49101baec1e2ac9cf23153c315b0df5795"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/road_wear-orm.png",
+      "bytes": 98750,
+      "sha256": "c16fa583f8985c6e42908219fbb878d4c753e8a79c3094c9ececc4e210431674"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/road_wear.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/runs/ed09849337164e2a87c4bbb96267aafd/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/runs/ed09849337164e2a87c4bbb96267aafd/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/runs/ed09849337164e2a87c4bbb96267aafd/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/runs/ed09849337164e2a87c4bbb96267aafd/report.json",
+      "bytes": 834,
+      "sha256": "2a5119a0982485bf7fb939c2f9c54c3d62b5e0eb4fbf5f91ea3d2b02ad03ab41"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/runs/ed09849337164e2a87c4bbb96267aafd/request.json",
+      "bytes": 832,
+      "sha256": "409f6cec9be9f849e40cc1dbede9bc616bcb0919fc9418fbbbe9bbfc53176f36"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/runs/ed09849337164e2a87c4bbb96267aafd/script.stderr.log",
+      "bytes": 339,
+      "sha256": "75c9cd2937df16bbabc86e0c957b363a0d7f1ba73b99315727214ea1bb91cd4b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/runs/ed09849337164e2a87c4bbb96267aafd/script.stdout.log",
+      "bytes": 610,
+      "sha256": "5d422b450631e2117b1df5ed33372f0d5eb0a3c742e109e36b396c35d2412d88"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/runs/ed09849337164e2a87c4bbb96267aafd/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/road_wear/runs/ed09849337164e2a87c4bbb96267aafd/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/rebake.json",
+      "bytes": 5440,
+      "sha256": "b652be9cf0332acb061b4921ee516b242f1130cd5587856e5ad9033dff421b7b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/report.json",
+      "bytes": 836,
+      "sha256": "dc4a0bb54572ad220d35d764a0f2a4d1fade665ba894cfd985a65c97c147c42d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/runs/d9f7d800789b4850a4f0b0cdf2d23ce7/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/runs/d9f7d800789b4850a4f0b0cdf2d23ce7/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/runs/d9f7d800789b4850a4f0b0cdf2d23ce7/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/runs/d9f7d800789b4850a4f0b0cdf2d23ce7/report.json",
+      "bytes": 836,
+      "sha256": "dc4a0bb54572ad220d35d764a0f2a4d1fade665ba894cfd985a65c97c147c42d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/runs/d9f7d800789b4850a4f0b0cdf2d23ce7/request.json",
+      "bytes": 838,
+      "sha256": "0508dafce823770ef299d400b50a07254d4a4299d783ed5023c884f5b8222a09"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/runs/d9f7d800789b4850a4f0b0cdf2d23ce7/script.stderr.log",
+      "bytes": 339,
+      "sha256": "75c9cd2937df16bbabc86e0c957b363a0d7f1ba73b99315727214ea1bb91cd4b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/runs/d9f7d800789b4850a4f0b0cdf2d23ce7/script.stdout.log",
+      "bytes": 614,
+      "sha256": "0ba8a7169f525f3c8f2ba3cadc9616b1e3cb0750aeed42e4bd49da179a8554fc"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/runs/d9f7d800789b4850a4f0b0cdf2d23ce7/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/runs/d9f7d800789b4850a4f0b0cdf2d23ce7/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/scorch_mark-base.png",
+      "bytes": 149098,
+      "sha256": "ba0e018bd8658136974e80c75ac21d715ef2d909d177bc60bb39f5198c95a81e"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/scorch_mark-normal.png",
+      "bytes": 119755,
+      "sha256": "d5e67669aed39aab749a5855ff6a70cccc439109be709c4aefbad4add27de3ea"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/scorch_mark-orm.png",
+      "bytes": 61704,
+      "sha256": "312ffb76e05faf6066be03c13d9e8e05d96992544fcd0c986e5a0a667f400fda"
+    },
+    {
+      "path": "decal-native-relative/rebakes/scorch_mark/scorch_mark.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/rebake.json",
+      "bytes": 5447,
+      "sha256": "c9277028ba3ab75d200ab79de39d223a74cd7c5fc9a72647dae126f08999fc0e"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/report.json",
+      "bytes": 837,
+      "sha256": "c94371c845ff8b808b56f4036bb20004023865081b4cc9e41a1b48710a92f561"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/runs/deb432659b424aa0b34cbdb2d682a08c/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/runs/deb432659b424aa0b34cbdb2d682a08c/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/runs/deb432659b424aa0b34cbdb2d682a08c/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/runs/deb432659b424aa0b34cbdb2d682a08c/report.json",
+      "bytes": 837,
+      "sha256": "c94371c845ff8b808b56f4036bb20004023865081b4cc9e41a1b48710a92f561"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/runs/deb432659b424aa0b34cbdb2d682a08c/request.json",
+      "bytes": 841,
+      "sha256": "6dbb78c3df60eb79d5d46cd74dfc0f16b532a5406b5c1d0864e3f3943aa9f9a1"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/runs/deb432659b424aa0b34cbdb2d682a08c/script.stderr.log",
+      "bytes": 339,
+      "sha256": "75c9cd2937df16bbabc86e0c957b363a0d7f1ba73b99315727214ea1bb91cd4b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/runs/deb432659b424aa0b34cbdb2d682a08c/script.stdout.log",
+      "bytes": 616,
+      "sha256": "0b9e3025bdd570eae22c98c08d00d30bd9d1fadf88acfe94560d5437453b0302"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/runs/deb432659b424aa0b34cbdb2d682a08c/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/runs/deb432659b424aa0b34cbdb2d682a08c/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/shell_impact-base.png",
+      "bytes": 186982,
+      "sha256": "84badcece1b8109bb5d0001eb0b18cf6f5f2bcbe02ec36d6e6852a8dc46c5d69"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/shell_impact-normal.png",
+      "bytes": 94293,
+      "sha256": "52a17f621a7ff04c0392ece476aefa48e7d628dfcfa77b9c8eea448197808dd7"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/shell_impact-orm.png",
+      "bytes": 71640,
+      "sha256": "faeb720baf987818587fcdfb74889fee8438639976241af0d6171e38ae2dc3ff"
+    },
+    {
+      "path": "decal-native-relative/rebakes/shell_impact/shell_impact.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/rebake.json",
+      "bytes": 5439,
+      "sha256": "102e322bd24acaec074b49f70bba429796fd02afa4ee7181323250fd675da0b8"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/report.json",
+      "bytes": 836,
+      "sha256": "bfaff33042d04976d64a5da8777bbb1b0a77c8c289dc230343a2439c62634da5"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/runs/6248f6a2b3bb42139d633a8deb1560d5/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/runs/6248f6a2b3bb42139d633a8deb1560d5/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/runs/6248f6a2b3bb42139d633a8deb1560d5/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/runs/6248f6a2b3bb42139d633a8deb1560d5/report.json",
+      "bytes": 836,
+      "sha256": "bfaff33042d04976d64a5da8777bbb1b0a77c8c289dc230343a2439c62634da5"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/runs/6248f6a2b3bb42139d633a8deb1560d5/request.json",
+      "bytes": 838,
+      "sha256": "799eedb787a92cc9177aae3b845ee49b6d87fcb46e7f630176a7b3299253bebe"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/runs/6248f6a2b3bb42139d633a8deb1560d5/script.stderr.log",
+      "bytes": 339,
+      "sha256": "75c9cd2937df16bbabc86e0c957b363a0d7f1ba73b99315727214ea1bb91cd4b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/runs/6248f6a2b3bb42139d633a8deb1560d5/script.stdout.log",
+      "bytes": 614,
+      "sha256": "328ade012a789ce717708865fbb9f805699560267f69733e4e4c06cd2526f7e3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/runs/6248f6a2b3bb42139d633a8deb1560d5/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/runs/6248f6a2b3bb42139d633a8deb1560d5/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/tire_tracks-base.png",
+      "bytes": 195328,
+      "sha256": "bebb13374867db21f48dc30e4d0540f8544e2e717ea1ada1cd9d32760ad3844b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/tire_tracks-normal.png",
+      "bytes": 177345,
+      "sha256": "d9ae23a9ffd7b17ec73d7492c8a55b8d04e955ccb9784405a9c79c529b990f87"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/tire_tracks-orm.png",
+      "bytes": 82341,
+      "sha256": "4a92ab87bcca83d3753c2ea30c6754e2e83333a83937d09aaede4829bb523739"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tire_tracks/tire_tracks.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/rebake.json",
+      "bytes": 5519,
+      "sha256": "579a1e30557b27e98c221c742eed4c4afa97e260d650bccf655f3d794d515600"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/report.json",
+      "bytes": 846,
+      "sha256": "efd324d035555c6502942c51045b831c1b1738d197457f52d69f7fa7a2d88bde"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/runs/f4a04d6d0d5b498cb43f5f3be91aa558/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/runs/f4a04d6d0d5b498cb43f5f3be91aa558/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/runs/f4a04d6d0d5b498cb43f5f3be91aa558/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/runs/f4a04d6d0d5b498cb43f5f3be91aa558/report.json",
+      "bytes": 846,
+      "sha256": "efd324d035555c6502942c51045b831c1b1738d197457f52d69f7fa7a2d88bde"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/runs/f4a04d6d0d5b498cb43f5f3be91aa558/request.json",
+      "bytes": 868,
+      "sha256": "30b6c0d769a6341499abd66b241ebf45cfedd146194bf0e2dffebe6ecd0f4e63"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/runs/f4a04d6d0d5b498cb43f5f3be91aa558/script.stderr.log",
+      "bytes": 339,
+      "sha256": "75c9cd2937df16bbabc86e0c957b363a0d7f1ba73b99315727214ea1bb91cd4b"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/runs/f4a04d6d0d5b498cb43f5f3be91aa558/script.stdout.log",
+      "bytes": 634,
+      "sha256": "bd21a20f02ddc828e3af65cd1f736c95658b48115ea7ef842e5d742d4dd3210c"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/runs/f4a04d6d0d5b498cb43f5f3be91aa558/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/runs/f4a04d6d0d5b498cb43f5f3be91aa558/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/tracked_vehicle_marks-base.png",
+      "bytes": 199277,
+      "sha256": "21bf5671cf24a92ed5ccdd4fd8b4f3e3c8f91a2df54819bcfe982bf2d3b0ca22"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/tracked_vehicle_marks-normal.png",
+      "bytes": 176394,
+      "sha256": "78d72abee39af27a476f75265ed58a9b741c85549c8887b201a426e58b1b0aa3"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/tracked_vehicle_marks-orm.png",
+      "bytes": 83061,
+      "sha256": "91b3a56a4f7a05b7aa32023393cd440a5d94c168d9c3ae465444853b20993887"
+    },
+    {
+      "path": "decal-native-relative/rebakes/tracked_vehicle_marks/tracked_vehicle_marks.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/blast_mark.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/reopen.json",
+      "bytes": 1107,
+      "sha256": "7ddfd755ee14677a78b1073934c1606e24378721a188a2915f73ac224be740ff"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/report.json",
+      "bytes": 836,
+      "sha256": "4eb643fae0b78cdf051efef3787389aecf9148745790f024f81096b84bed24e4"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/runs/d0cf20f08a2e4f818ce58f6b16293566/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/runs/d0cf20f08a2e4f818ce58f6b16293566/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/runs/d0cf20f08a2e4f818ce58f6b16293566/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/runs/d0cf20f08a2e4f818ce58f6b16293566/report.json",
+      "bytes": 836,
+      "sha256": "4eb643fae0b78cdf051efef3787389aecf9148745790f024f81096b84bed24e4"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/runs/d0cf20f08a2e4f818ce58f6b16293566/request.json",
+      "bytes": 820,
+      "sha256": "47e40e37e212775c90abf56ba6cb96683c49637d942814f8d35f02b2c55aa99d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/runs/d0cf20f08a2e4f818ce58f6b16293566/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/runs/d0cf20f08a2e4f818ce58f6b16293566/script.stdout.log",
+      "bytes": 285,
+      "sha256": "f604f3bc00121183a4c102630a206875f82169112770597855f366da6491f778"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/runs/d0cf20f08a2e4f818ce58f6b16293566/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/blast_mark/runs/d0cf20f08a2e4f818ce58f6b16293566/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/concrete_crack.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/reopen.json",
+      "bytes": 1111,
+      "sha256": "b7ea6a989d1ead9103eb72b3523cd732a0dc070ecf9d7ed6ef458b1288222919"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/report.json",
+      "bytes": 840,
+      "sha256": "0b14cc0109bda2f44e907479fc4da68d79287edfc90872d93df9022c8446003c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/runs/76f7ada53ab34630bc2352d1b2263c44/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/runs/76f7ada53ab34630bc2352d1b2263c44/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/runs/76f7ada53ab34630bc2352d1b2263c44/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/runs/76f7ada53ab34630bc2352d1b2263c44/report.json",
+      "bytes": 840,
+      "sha256": "0b14cc0109bda2f44e907479fc4da68d79287edfc90872d93df9022c8446003c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/runs/76f7ada53ab34630bc2352d1b2263c44/request.json",
+      "bytes": 832,
+      "sha256": "3b52e181295cb87b725bcc83e561fcbee96a491f05ea8b9d9de904d7b6b47ade"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/runs/76f7ada53ab34630bc2352d1b2263c44/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/runs/76f7ada53ab34630bc2352d1b2263c44/script.stdout.log",
+      "bytes": 289,
+      "sha256": "5c93bbd2b9d40dcff605d24808e56e8f99e58b0e95343acdd39897ffdcf8cd14"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/runs/76f7ada53ab34630bc2352d1b2263c44/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/concrete_crack/runs/76f7ada53ab34630bc2352d1b2263c44/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/oil_stain.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/reopen.json",
+      "bytes": 1106,
+      "sha256": "7ad087f24556eb41b7fb252a6a8941cc9b6e86e27d02b5c13651aab988f58716"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/report.json",
+      "bytes": 835,
+      "sha256": "a685f8271f86fa827d3fe973891f7043bddc7efc57dddab1d1ae666dedb72779"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/runs/0aff5d96e35649d9a5867916dea50f5f/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/runs/0aff5d96e35649d9a5867916dea50f5f/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/runs/0aff5d96e35649d9a5867916dea50f5f/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/runs/0aff5d96e35649d9a5867916dea50f5f/report.json",
+      "bytes": 835,
+      "sha256": "a685f8271f86fa827d3fe973891f7043bddc7efc57dddab1d1ae666dedb72779"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/runs/0aff5d96e35649d9a5867916dea50f5f/request.json",
+      "bytes": 817,
+      "sha256": "df55f61aba281953b22caf890120de127c3088a0ae852dda9600c2e553895b4d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/runs/0aff5d96e35649d9a5867916dea50f5f/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/runs/0aff5d96e35649d9a5867916dea50f5f/script.stdout.log",
+      "bytes": 284,
+      "sha256": "975cfa14ecb7328f17d7994421c6fa5fd051d150dc7ffac2b50d9488ef2b5148"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/runs/0aff5d96e35649d9a5867916dea50f5f/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/oil_stain/runs/0aff5d96e35649d9a5867916dea50f5f/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/reopen.json",
+      "bytes": 1106,
+      "sha256": "689cc1abed4e543ce9a2999425500deba232569ec99ffecf6f00e6f67a04f13a"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/report.json",
+      "bytes": 835,
+      "sha256": "8dc94fa0f7575e6fd1874df79ec81efd22f0e599149e4d0751027bb88e7f22f6"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/road_wear.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/runs/9e2b8425eb494c23962666124efd1a2e/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/runs/9e2b8425eb494c23962666124efd1a2e/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/runs/9e2b8425eb494c23962666124efd1a2e/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/runs/9e2b8425eb494c23962666124efd1a2e/report.json",
+      "bytes": 835,
+      "sha256": "8dc94fa0f7575e6fd1874df79ec81efd22f0e599149e4d0751027bb88e7f22f6"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/runs/9e2b8425eb494c23962666124efd1a2e/request.json",
+      "bytes": 817,
+      "sha256": "e22cc3c353db5fe74468866a1cdf8d96616233f96824187988c0cb3179108608"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/runs/9e2b8425eb494c23962666124efd1a2e/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/runs/9e2b8425eb494c23962666124efd1a2e/script.stdout.log",
+      "bytes": 284,
+      "sha256": "ab078b79c656a4cfcc925931c076366993ba784d137b091b2079bf3c2f9c8156"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/runs/9e2b8425eb494c23962666124efd1a2e/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/road_wear/runs/9e2b8425eb494c23962666124efd1a2e/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/reopen.json",
+      "bytes": 1108,
+      "sha256": "6b2322fcfbc640ae809f0159bad907499a92a9d6dc4a61a8f775bb2fb95549b8"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/report.json",
+      "bytes": 837,
+      "sha256": "635722b1360a2c3ea7c5103dfbb87ec6fb63034951a79e0dae0cd568f03bd41a"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/runs/654bc8010da44e04bf74158399d810c1/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/runs/654bc8010da44e04bf74158399d810c1/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/runs/654bc8010da44e04bf74158399d810c1/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/runs/654bc8010da44e04bf74158399d810c1/report.json",
+      "bytes": 837,
+      "sha256": "635722b1360a2c3ea7c5103dfbb87ec6fb63034951a79e0dae0cd568f03bd41a"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/runs/654bc8010da44e04bf74158399d810c1/request.json",
+      "bytes": 823,
+      "sha256": "e29a697c3752607366341d292caabb7985ea4d705a85ea5d96a95a21f8d415f1"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/runs/654bc8010da44e04bf74158399d810c1/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/runs/654bc8010da44e04bf74158399d810c1/script.stdout.log",
+      "bytes": 286,
+      "sha256": "ca82248073ed26351f036e27e89b703a3fcdccf3c9748f94bf38df9ba9cae779"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/runs/654bc8010da44e04bf74158399d810c1/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/runs/654bc8010da44e04bf74158399d810c1/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/scorch_mark/scorch_mark.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/reopen.json",
+      "bytes": 1109,
+      "sha256": "7a5345938b6405d0ca5e587af495928b9fe9b6c6d2ad06f95d5cb9773de39235"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/report.json",
+      "bytes": 838,
+      "sha256": "400fe425a77aed1a86007e446eb72d7302be70af3818efb4cf80316c79cd89fa"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/runs/7c2aad4ec1d7420ebe4c4713cfcd7220/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/runs/7c2aad4ec1d7420ebe4c4713cfcd7220/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/runs/7c2aad4ec1d7420ebe4c4713cfcd7220/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/runs/7c2aad4ec1d7420ebe4c4713cfcd7220/report.json",
+      "bytes": 838,
+      "sha256": "400fe425a77aed1a86007e446eb72d7302be70af3818efb4cf80316c79cd89fa"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/runs/7c2aad4ec1d7420ebe4c4713cfcd7220/request.json",
+      "bytes": 826,
+      "sha256": "a982df2d9e13565ee10b95229d5ec03f354eefd04f17a597e6817ff873eb7f4c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/runs/7c2aad4ec1d7420ebe4c4713cfcd7220/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/runs/7c2aad4ec1d7420ebe4c4713cfcd7220/script.stdout.log",
+      "bytes": 287,
+      "sha256": "7ded04de84f31619168d2d9d64f14b01e22cc87a8d4bebc1b788cf1cc85af910"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/runs/7c2aad4ec1d7420ebe4c4713cfcd7220/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/runs/7c2aad4ec1d7420ebe4c4713cfcd7220/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/shell_impact/shell_impact.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/reopen.json",
+      "bytes": 1108,
+      "sha256": "87118d1464b41a1cb479d7c6654ccd0144281dc2a96711ab06dfc3ff347d98cd"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/report.json",
+      "bytes": 837,
+      "sha256": "c1ecf5a8028fed5227496d4906578d2d5db9f3c4f706962a3125fd879493e7dc"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/runs/3cd0b283f9ca4112a19331e4bf604f3c/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/runs/3cd0b283f9ca4112a19331e4bf604f3c/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/runs/3cd0b283f9ca4112a19331e4bf604f3c/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/runs/3cd0b283f9ca4112a19331e4bf604f3c/report.json",
+      "bytes": 837,
+      "sha256": "c1ecf5a8028fed5227496d4906578d2d5db9f3c4f706962a3125fd879493e7dc"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/runs/3cd0b283f9ca4112a19331e4bf604f3c/request.json",
+      "bytes": 823,
+      "sha256": "9eeb9b89ddd4de0669139bb841e4f681da9a0c3c0d3a6584f62766d467c40b81"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/runs/3cd0b283f9ca4112a19331e4bf604f3c/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/runs/3cd0b283f9ca4112a19331e4bf604f3c/script.stdout.log",
+      "bytes": 286,
+      "sha256": "6f23fd7f414d37b845ea08688a49d7df538be031b4309a633650a88b4273026e"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/runs/3cd0b283f9ca4112a19331e4bf604f3c/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/runs/3cd0b283f9ca4112a19331e4bf604f3c/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tire_tracks/tire_tracks.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/reopen.json",
+      "bytes": 1118,
+      "sha256": "1b88f502ae082ca39ec31faab2921568e919acff70a7af3785dbe7e6cfbf9256"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/report.json",
+      "bytes": 847,
+      "sha256": "03063ec0a2138d0eb8a6528ae7704065a719a076a5819d2e0b63d121c1421ed8"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/runs/53fbcf645a484306a43ac6a408cd2d1b/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/runs/53fbcf645a484306a43ac6a408cd2d1b/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/runs/53fbcf645a484306a43ac6a408cd2d1b/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/runs/53fbcf645a484306a43ac6a408cd2d1b/report.json",
+      "bytes": 847,
+      "sha256": "03063ec0a2138d0eb8a6528ae7704065a719a076a5819d2e0b63d121c1421ed8"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/runs/53fbcf645a484306a43ac6a408cd2d1b/request.json",
+      "bytes": 853,
+      "sha256": "aa8c4d0f4df36a04a7cae6ff031c1d6017fe1fa71e3201e103bc6b3baca554d5"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/runs/53fbcf645a484306a43ac6a408cd2d1b/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/runs/53fbcf645a484306a43ac6a408cd2d1b/script.stdout.log",
+      "bytes": 296,
+      "sha256": "4d0561ed2e7f3470a57c941f4838d4f9251632e62f2d3b9de2573754f56da8dd"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/runs/53fbcf645a484306a43ac6a408cd2d1b/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/runs/53fbcf645a484306a43ac6a408cd2d1b/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-a/tracked_vehicle_marks/tracked_vehicle_marks.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/blast_mark.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/reopen.json",
+      "bytes": 1107,
+      "sha256": "7ddfd755ee14677a78b1073934c1606e24378721a188a2915f73ac224be740ff"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/report.json",
+      "bytes": 836,
+      "sha256": "af52c6e20b1e3039589f80c143023901edc8e78719820ccd0580eadeae0e1ca2"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/runs/98336b04d2e4457382c3f4cf517f869c/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/runs/98336b04d2e4457382c3f4cf517f869c/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/runs/98336b04d2e4457382c3f4cf517f869c/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/runs/98336b04d2e4457382c3f4cf517f869c/report.json",
+      "bytes": 836,
+      "sha256": "af52c6e20b1e3039589f80c143023901edc8e78719820ccd0580eadeae0e1ca2"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/runs/98336b04d2e4457382c3f4cf517f869c/request.json",
+      "bytes": 866,
+      "sha256": "d55d6acc30d4a47c5e97edcdf8c47f49d81072ccacd718610640b14ab13000c8"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/runs/98336b04d2e4457382c3f4cf517f869c/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/runs/98336b04d2e4457382c3f4cf517f869c/script.stdout.log",
+      "bytes": 297,
+      "sha256": "0609633514cbe49ff6e7b08b773bd26a2954c5c6e3107ee44df13384004d8881"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/runs/98336b04d2e4457382c3f4cf517f869c/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/blast_mark/runs/98336b04d2e4457382c3f4cf517f869c/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/concrete_crack.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/reopen.json",
+      "bytes": 1111,
+      "sha256": "b7ea6a989d1ead9103eb72b3523cd732a0dc070ecf9d7ed6ef458b1288222919"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/report.json",
+      "bytes": 840,
+      "sha256": "3fcb6105b00113374360143a50f5924f2cc109e0b5f7e0d81b6c3c6cb3a4afd0"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/runs/77fd7ba803e04115aa8936873553c4c9/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/runs/77fd7ba803e04115aa8936873553c4c9/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/runs/77fd7ba803e04115aa8936873553c4c9/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/runs/77fd7ba803e04115aa8936873553c4c9/report.json",
+      "bytes": 840,
+      "sha256": "3fcb6105b00113374360143a50f5924f2cc109e0b5f7e0d81b6c3c6cb3a4afd0"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/runs/77fd7ba803e04115aa8936873553c4c9/request.json",
+      "bytes": 878,
+      "sha256": "cde9208e14b415e4572069060208e8e9900ed5ed0e64a03887bc6a6c8c56b05d"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/runs/77fd7ba803e04115aa8936873553c4c9/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/runs/77fd7ba803e04115aa8936873553c4c9/script.stdout.log",
+      "bytes": 301,
+      "sha256": "1b969960744765c2ef5ad43f14d80d9d5b93b8cf0bd0f49dd03a3dec050f439e"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/runs/77fd7ba803e04115aa8936873553c4c9/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/concrete_crack/runs/77fd7ba803e04115aa8936873553c4c9/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/oil_stain.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/reopen.json",
+      "bytes": 1106,
+      "sha256": "7ad087f24556eb41b7fb252a6a8941cc9b6e86e27d02b5c13651aab988f58716"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/report.json",
+      "bytes": 835,
+      "sha256": "aa0b92ab79af3b99423f7302fa2eb6b2c091735d4aed9da06e28c09ccbbe4ff0"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/runs/47c9294de4c44a88a1e95c44e2b892e3/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/runs/47c9294de4c44a88a1e95c44e2b892e3/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/runs/47c9294de4c44a88a1e95c44e2b892e3/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/runs/47c9294de4c44a88a1e95c44e2b892e3/report.json",
+      "bytes": 835,
+      "sha256": "aa0b92ab79af3b99423f7302fa2eb6b2c091735d4aed9da06e28c09ccbbe4ff0"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/runs/47c9294de4c44a88a1e95c44e2b892e3/request.json",
+      "bytes": 863,
+      "sha256": "f467cdb5491301223628ef7e9ec1f93f49011c355c6754a30447441c66091634"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/runs/47c9294de4c44a88a1e95c44e2b892e3/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/runs/47c9294de4c44a88a1e95c44e2b892e3/script.stdout.log",
+      "bytes": 296,
+      "sha256": "5efcc736c3eb71a66d4feca7fabd98ec77494eceab359dd3fea26fcd37621d08"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/runs/47c9294de4c44a88a1e95c44e2b892e3/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/oil_stain/runs/47c9294de4c44a88a1e95c44e2b892e3/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/reopen.json",
+      "bytes": 1106,
+      "sha256": "689cc1abed4e543ce9a2999425500deba232569ec99ffecf6f00e6f67a04f13a"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/report.json",
+      "bytes": 835,
+      "sha256": "e2ab751434ffdfdba14a4986efe69a61eb28036cf5df24707d7429e21318bf23"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/road_wear.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/runs/1f1c906c5924488d9a17254965bf79f8/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/runs/1f1c906c5924488d9a17254965bf79f8/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/runs/1f1c906c5924488d9a17254965bf79f8/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/runs/1f1c906c5924488d9a17254965bf79f8/report.json",
+      "bytes": 835,
+      "sha256": "e2ab751434ffdfdba14a4986efe69a61eb28036cf5df24707d7429e21318bf23"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/runs/1f1c906c5924488d9a17254965bf79f8/request.json",
+      "bytes": 863,
+      "sha256": "a28cee3d73a34b77593697930963fc647c82a84907c49b6b4d5824c589039831"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/runs/1f1c906c5924488d9a17254965bf79f8/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/runs/1f1c906c5924488d9a17254965bf79f8/script.stdout.log",
+      "bytes": 296,
+      "sha256": "740da89311effe47fc2f710a3ff77b50d4dbb819541978ed6cf50e5d3f9e2f40"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/runs/1f1c906c5924488d9a17254965bf79f8/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/road_wear/runs/1f1c906c5924488d9a17254965bf79f8/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/reopen.json",
+      "bytes": 1108,
+      "sha256": "6b2322fcfbc640ae809f0159bad907499a92a9d6dc4a61a8f775bb2fb95549b8"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/report.json",
+      "bytes": 837,
+      "sha256": "bf78ea0d5d50c58ff3e46e429d4a0c48383cac876dde60a380c512506a751daa"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/runs/39fc422e235d4167942261292d35255b/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/runs/39fc422e235d4167942261292d35255b/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/runs/39fc422e235d4167942261292d35255b/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/runs/39fc422e235d4167942261292d35255b/report.json",
+      "bytes": 837,
+      "sha256": "bf78ea0d5d50c58ff3e46e429d4a0c48383cac876dde60a380c512506a751daa"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/runs/39fc422e235d4167942261292d35255b/request.json",
+      "bytes": 869,
+      "sha256": "450686bcc17fd1222ea17fa004d14129463c148da2f40f773960c7e05ff00a4c"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/runs/39fc422e235d4167942261292d35255b/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/runs/39fc422e235d4167942261292d35255b/script.stdout.log",
+      "bytes": 298,
+      "sha256": "a41e65a11c7b2a1d803701cf5ed34b8934392e8954e9a2ecfa57b2cb2713194b"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/runs/39fc422e235d4167942261292d35255b/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/runs/39fc422e235d4167942261292d35255b/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/scorch_mark/scorch_mark.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/reopen.json",
+      "bytes": 1109,
+      "sha256": "7a5345938b6405d0ca5e587af495928b9fe9b6c6d2ad06f95d5cb9773de39235"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/report.json",
+      "bytes": 838,
+      "sha256": "a59cdfc3fa9841547325e5710454f1d5f4a8f0cb58f51c5272f628465b47a610"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/runs/0f2cf8c86bb34cf7820da1ef8bba0bb9/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/runs/0f2cf8c86bb34cf7820da1ef8bba0bb9/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/runs/0f2cf8c86bb34cf7820da1ef8bba0bb9/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/runs/0f2cf8c86bb34cf7820da1ef8bba0bb9/report.json",
+      "bytes": 838,
+      "sha256": "a59cdfc3fa9841547325e5710454f1d5f4a8f0cb58f51c5272f628465b47a610"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/runs/0f2cf8c86bb34cf7820da1ef8bba0bb9/request.json",
+      "bytes": 872,
+      "sha256": "9a453085a5e0dab2f521e1ba7c7912550e29f79b925087959f7dcfd3eaf00272"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/runs/0f2cf8c86bb34cf7820da1ef8bba0bb9/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/runs/0f2cf8c86bb34cf7820da1ef8bba0bb9/script.stdout.log",
+      "bytes": 299,
+      "sha256": "5126bd13b1d398d721da30d861877a2402bdbdedcba518750fdf4dd09ee91463"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/runs/0f2cf8c86bb34cf7820da1ef8bba0bb9/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/runs/0f2cf8c86bb34cf7820da1ef8bba0bb9/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/shell_impact/shell_impact.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/reopen.json",
+      "bytes": 1108,
+      "sha256": "87118d1464b41a1cb479d7c6654ccd0144281dc2a96711ab06dfc3ff347d98cd"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/report.json",
+      "bytes": 837,
+      "sha256": "73ba56d265b6c0defd45567cd742435480d1bf2b3c4d18fbf9c1ed0e1a3b745b"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/runs/0a4975a5829e4d95a898dc15641cbb91/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/runs/0a4975a5829e4d95a898dc15641cbb91/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/runs/0a4975a5829e4d95a898dc15641cbb91/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/runs/0a4975a5829e4d95a898dc15641cbb91/report.json",
+      "bytes": 837,
+      "sha256": "73ba56d265b6c0defd45567cd742435480d1bf2b3c4d18fbf9c1ed0e1a3b745b"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/runs/0a4975a5829e4d95a898dc15641cbb91/request.json",
+      "bytes": 869,
+      "sha256": "34baa07a019cd504bb60bb54cc93bf080110efc0f7b100a0603412bc1d4d6f5a"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/runs/0a4975a5829e4d95a898dc15641cbb91/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/runs/0a4975a5829e4d95a898dc15641cbb91/script.stdout.log",
+      "bytes": 298,
+      "sha256": "fd1f8b80179edd2c3ca514ceb3939add32e2a2c99d4eb59da07160f6d2dab940"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/runs/0a4975a5829e4d95a898dc15641cbb91/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/runs/0a4975a5829e4d95a898dc15641cbb91/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tire_tracks/tire_tracks.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/reopen.json",
+      "bytes": 1118,
+      "sha256": "1b88f502ae082ca39ec31faab2921568e919acff70a7af3785dbe7e6cfbf9256"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/report.json",
+      "bytes": 847,
+      "sha256": "b229e31548c6175ca292d9be0f42cc8fc764f7efa1f65c1ca0a055b376fb0a33"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/runs/4528ab5e4f5c4202ac32a6ae7d72f981/probe.json",
+      "bytes": 252,
+      "sha256": "c3ce4625616606b901fcfb2b977818d41d82d63f59591286e794780d2b5e6e2f"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/runs/4528ab5e4f5c4202ac32a6ae7d72f981/probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/runs/4528ab5e4f5c4202ac32a6ae7d72f981/probe.stdout.log",
+      "bytes": 78,
+      "sha256": "97d86596ebb4b251766e918c0d9bf06a43700c9dd1a14119b4f72d7659133d0c"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/runs/4528ab5e4f5c4202ac32a6ae7d72f981/report.json",
+      "bytes": 847,
+      "sha256": "b229e31548c6175ca292d9be0f42cc8fc764f7efa1f65c1ca0a055b376fb0a33"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/runs/4528ab5e4f5c4202ac32a6ae7d72f981/request.json",
+      "bytes": 899,
+      "sha256": "20959dbfcb13ae4c462834e5d765cc12ba8c00d9fc40a821f19299327b11b9d0"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/runs/4528ab5e4f5c4202ac32a6ae7d72f981/script.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/runs/4528ab5e4f5c4202ac32a6ae7d72f981/script.stdout.log",
+      "bytes": 308,
+      "sha256": "67787f44c64f9cb6b0d273cb2615504e9ca201864a207296a5131d46ee4743d1"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/runs/4528ab5e4f5c4202ac32a6ae7d72f981/version.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/runs/4528ab5e4f5c4202ac32a6ae7d72f981/version.stdout.log",
+      "bytes": 1365,
+      "sha256": "a4fd0c844130585e6015428dee33ba3613addd63b756c84445157a5e50d898e3"
+    },
+    {
+      "path": "decal-native-relative/reopen-b/tracked_vehicle_marks/tracked_vehicle_marks.glb",
+      "bytes": 1072,
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "decal-native-relative/result.json",
+      "bytes": 8051,
+      "sha256": "323f7e9809a8414aaa958d88bfdfb422ee5bb10b179762172ca84266e4ceb7f8"
+    },
+    {
+      "path": "decal-native-relative/source-less.log",
+      "bytes": 1835,
+      "sha256": "e82286c1346e931e81c4822d0d5ff5594a4e3a58c578280f8a2ea7be089fe2b4"
+    },
+    {
+      "path": "decal-relative-adoption.json",
+      "bytes": 2094,
+      "sha256": "05cdf17fedacec5f775b364b3800df33dbd21f7e6e28897bf82af80c657b28cb"
+    },
+    {
+      "path": "decal-relative-portable.log",
+      "bytes": 969,
+      "sha256": "d443b98a19f40924ec56e45ba3eb3130b90d093a3a02976574f64128d4ee7d03"
+    },
+    {
+      "path": "decal-native-relative.log",
+      "bytes": 5437,
+      "sha256": "ff9eed67f152a3100386792d73033a2aa64b96ae1ece5a3a8e2ecb23ece010a8"
+    },
+    {
+      "path": "decal438-count-tests.log",
+      "bytes": 602,
+      "sha256": "705e3a70bccbb34c574fdcf2876089cd3aedc1ff098b24e9cbf16a3d8ec4b457"
+    },
+    {
+      "path": "decal438-count-build.log",
+      "bytes": 966,
+      "sha256": "93102e1c80fe85fdcde5e3b84774206530eae35af8f20a9a05d21ec71ac65819"
+    }
+  ],
+  "rawArchive": {
+    "path": "artifacts/battlefield-decal-packed-paths438.zip",
+    "bytes": 3325026,
+    "sha256": "cfe6f26450c238232a23e9a57c0dac6dc891974b2948a49dee26ed8c83feb3a4",
+    "entries": 337,
+    "allEntryHashesVerified": true
+  },
+  "physicalAcceptance": "pending",
+  "humanArtApproval": "pending"
+}

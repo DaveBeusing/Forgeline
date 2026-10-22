@@ -6,7 +6,7 @@
     1
   ],
   "metallicFactor": 0,
-  "roughnessFactor": 0.94,
+  "roughnessFactor": 1,
   "baseColorTexture": "texture.world.decal.atlas_base",
   "uvScale": [
     0.214,
@@ -15,5 +15,7 @@
   "uvOffset": [
     0.768,
     0.018
-  ]
+  ],
+  "normalTexture": "texture.world.decal.atlas_normal",
+  "ormTexture": "texture.world.decal.atlas_orm"
 }

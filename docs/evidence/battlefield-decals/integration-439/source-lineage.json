@@ -1,0 +1,179 @@
+{
+  "success": true,
+  "currentProductionSource": "7c6c3e93af6ceddba897b08a4db514de6e14668d",
+  "currentMaster": "34c69dd97db417d1982fd7bf75cb1baa197082f6",
+  "version": "0.1.439",
+  "reusedNativeAuthoringSource": "f7d63b7dc1531277a54851f4938cb276ecc9a6ba",
+  "unchangedNativeInputs": [
+    {
+      "path": "world/authoring/decals/blast_mark.blend",
+      "sha256": "fd9a13a7766c65005163e80103b59d831160ac0addecfcce1f056a1e6877d130"
+    },
+    {
+      "path": "world/authoring/decals/blast_mark.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/concrete_crack.blend",
+      "sha256": "253ce539d75f3a2676043f5ffd9bccf6d7d5582c4f01554d3f08bbf2fe7ce2da"
+    },
+    {
+      "path": "world/authoring/decals/concrete_crack.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/decal_quad.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/oil_stain.blend",
+      "sha256": "d13cf754b8904149c0de89d284cae5d5bdd87ff5c879714a3392579aa922586d"
+    },
+    {
+      "path": "world/authoring/decals/oil_stain.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/road_wear.blend",
+      "sha256": "68403d4f50318cce4bdd71590ab7457db67f532e86ad4e98573d49f98b6f84fc"
+    },
+    {
+      "path": "world/authoring/decals/road_wear.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/scorch_mark.blend",
+      "sha256": "c873eae033a04dd4c36c1ec1fe783418e5421ab217a46a534c134dfb70895675"
+    },
+    {
+      "path": "world/authoring/decals/scorch_mark.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/shell_impact.blend",
+      "sha256": "ce42398f7b7fb4c39d3501830463bc7e7d16396ce692565eebfe07e39b7a4df6"
+    },
+    {
+      "path": "world/authoring/decals/shell_impact.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/tire_tracks.blend",
+      "sha256": "378ce07d28ef5267710689f6687bced5624fa861f7771facac1bdb6e3f84d38f"
+    },
+    {
+      "path": "world/authoring/decals/tire_tracks.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/authoring/decals/tracked_vehicle_marks.blend",
+      "sha256": "794202e0fdeb8bd782f9a5f083e3c664f32776e6995be4afec82f9eb8085108b"
+    },
+    {
+      "path": "world/authoring/decals/tracked_vehicle_marks.glb",
+      "sha256": "fcd87871a70b85f1b71486314c2f0dce91e32e067e545f6d2c925e6968865e9d"
+    },
+    {
+      "path": "world/materials/decals/blast_mark.asset.json",
+      "sha256": "107f67a19e2e1966637c07b1b33f3c53c7119b800e3e30d9221ad738739c2fa5"
+    },
+    {
+      "path": "world/materials/decals/blast_mark.material.json",
+      "sha256": "1b8742c17e82c2c704bb822155998f95da44631b12d0d81297b7ffe0b1b4fbe0"
+    },
+    {
+      "path": "world/materials/decals/concrete_crack.asset.json",
+      "sha256": "6dc1c1569ce177b35fb5ddcbd4a69966444435097339c92057a156b9d2fc0e83"
+    },
+    {
+      "path": "world/materials/decals/concrete_crack.material.json",
+      "sha256": "d47bb0f38817a3d7f44df0667205fbf64d67da24fca0ba019e97111aac3cf719"
+    },
+    {
+      "path": "world/materials/decals/oil_stain.asset.json",
+      "sha256": "9124d897027e49aafb0931f87ee384d7ff8d7860c0e2e55339d1656ecb6a1b66"
+    },
+    {
+      "path": "world/materials/decals/oil_stain.material.json",
+      "sha256": "cb8ca878a2e72ce3dd56ebf2bc444d81837e3f7ecfd221d47df095f47921f0fb"
+    },
+    {
+      "path": "world/materials/decals/road_wear.asset.json",
+      "sha256": "f60d67a2a86a03fa3f0fe94a3181d49ca8006cb8f6ed35695427e2da3b8a2c0d"
+    },
+    {
+      "path": "world/materials/decals/road_wear.material.json",
+      "sha256": "28ad43d214e551f587eee1b0f8eb7c32f0c9a2f9553c2686cd2c6cc956133685"
+    },
+    {
+      "path": "world/materials/decals/scorch_mark.asset.json",
+      "sha256": "42c0f3612ea67aac46fcaa64253d1fcd76a52e3f0a044f68071294d099917267"
+    },
+    {
+      "path": "world/materials/decals/scorch_mark.material.json",
+      "sha256": "e617f663eef3bd29e289337d826a3395730c6c03f3a3e2f5470c6855c1778b11"
+    },
+    {
+      "path": "world/materials/decals/shell_impact.asset.json",
+      "sha256": "3354fbc58da885e6705ea24a2db14381d2cdd51cdbb0ba6dffab191dce327f5b"
+    },
+    {
+      "path": "world/materials/decals/shell_impact.material.json",
+      "sha256": "9e1bb11f1d57d778f947f879c803bc1e527a4649ba3943a158233d75dbc04459"
+    },
+    {
+      "path": "world/materials/decals/tire_tracks.asset.json",
+      "sha256": "f976c8bbb2c879e752c27226e571217fad14f3ccf3435cfd0d8049792df180ab"
+    },
+    {
+      "path": "world/materials/decals/tire_tracks.material.json",
+      "sha256": "4a9a85ec55d89678c878f8355df07d06a26c1b46b0425bc75003d5d129437e6b"
+    },
+    {
+      "path": "world/materials/decals/tracked_vehicle_marks.asset.json",
+      "sha256": "cc6a2cd7d90a70385cdf0fc51ff6c64915f798fb13899d778704eb3a1d2acd30"
+    },
+    {
+      "path": "world/materials/decals/tracked_vehicle_marks.material.json",
+      "sha256": "7849926d13df4baa249e882bec4f9e0bf0830397b0dcd1fd49bf7e0f3d13b82c"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas_normal.asset.json",
+      "sha256": "ff144f827c0ba671820e1b5083d8878e1116b6598753cc62728cf46deb675afc"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas_normal.png",
+      "sha256": "54724989f276e7f4ee6431f779174109d95394b2628f2a5ab33954c664e14750"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas_orm.asset.json",
+      "sha256": "7d45aca45cf40263e2d1096689f56825be8ec3a87fc49432de5af7d9aa908cfa"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas_orm.png",
+      "sha256": "be08b0a23b344782c76703fdd912ea7a0e9659e477f234f7d99bb1a9d9c96a7b"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas.asset.json",
+      "sha256": "3d993b94ed8c157a26f970465b390775ee97aa24b36c3de61aff807f25ad56ed"
+    },
+    {
+      "path": "world/textures/decals/decal_atlas.png",
+      "sha256": "d73f8a4883dfade35f568baa9da02434d1bc0687247a97574f069b6192131dfa"
+    }
+  ],
+  "preservedMasterSceneOrdinals": 107,
+  "appendedDecalScenes": [
+    "DecalAsphaltGallery",
+    "DecalConcreteGallery",
+    "DecalDirtGallery",
+    "DecalGravelGallery",
+    "DecalSingle",
+    "Decals100",
+    "Decals1000",
+    "DecalsOverlap",
+    "DecalSlopeGallery"
+  ],
+  "compilerReadyDecalInputsUnchanged": true,
+  "interpretation": "All 39 sanitized authoring/GLB/material/texture inputs match the re-executed native gate. World-prop payload changes are tested separately on both comparison sides."
+}

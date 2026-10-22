@@ -1,0 +1,82 @@
+name: Battlefield decal bakes
+
+on:
+  pull_request:
+    paths:
+      - 'assets/source/world/authoring/decals/**'
+      - 'assets/source/world/materials/decals/**'
+      - 'assets/source/world/textures/decals/**'
+      - 'assets/source/world/meshes/decals/**'
+      - 'tools/blender/*decal*'
+      - 'tools/blender/Test-BlenderDecals.ps1'
+      - 'tools/blender/tests/test_decal_atlas_contract.py'
+      - 'tests/ForgeLine.Assets.Tests/DecalBakeAssetTests.cs'
+      - 'tests/ForgeLine.Presentation.Tests/DecalReferenceSceneTests.cs'
+      - '.github/workflows/decal-bakes.yml'
+  workflow_dispatch:
+    inputs:
+      run_native:
+        description: 'Run saved Blender masters on a provisioned Windows Blender runner'
+        type: boolean
+        default: false
+      blender_executable:
+        description: 'Optional pinned Blender executable path'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: decal-bakes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  decal-contracts:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Original alpha and carrier contracts
+        run: python -m unittest discover -s tools/blender/tests -p test_decal_atlas_contract.py -v
+      - name: Compile actual scoped materials and exercise visibility and load references
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj --configuration Release -- --filter-class ForgeLine.Assets.Tests.DecalBakeAssetTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release -- --filter-class ForgeLine.Presentation.Tests.DecalReferenceSceneTests ForgeLine.Presentation.Tests.RuntimeDecalMaterialTests ForgeLine.Presentation.Tests.DecalPoolTests ForgeLine.Presentation.Tests.CombatDecalExtractionTests
+          exit $LASTEXITCODE
+
+  native-decals:
+    if: github.event_name == 'workflow_dispatch' && inputs.run_native
+    runs-on: [self-hosted, Windows, X64, blender]
+    timeout-minutes: 45
+    env:
+      FORGELINE_BLENDER_PATH: ${{ inputs.blender_executable }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build Release compiler
+        run: dotnet build ForgeLine.sln --configuration Release --artifacts-path artifacts/decal-build
+      - name: Real pinned Blender reopen, rebake, edit and source-less gate
+        shell: pwsh
+        run: ./tools/blender/Test-BlenderDecals.ps1 -OutputRoot artifacts/decal-native-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Retain original native qualification records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: decal-native-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/decal-native-*
+          retention-days: 14
