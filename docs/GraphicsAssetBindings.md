@@ -14,6 +14,12 @@ already declare sRGB. Existing mesh definitions have no unsorted or repeated
 material slots; preserving slot order corrects the compiler contract without
 changing those authored bindings.
 
+Before final delivery the branch integrated master
+`eb23d5caa98ad9eb8b437e6117b6ace9814c3f14` (conveyor construction, version
+`0.1.451`) and refreshed its single net PATCH increment to `0.1.452`. That master
+adds construction/presentation wiring and source documentation, without changing
+the compiled asset definitions or payload sources used by the recorded asset build.
+
 | Binding | Producer | Runtime consumer |
 | --- | --- | --- |
 | Mesh sections and ordered material IDs | `GltfImporter`, `SkinImporter` | `ResidentAssetStore`, `SimpleInstanceRenderer` |
@@ -66,6 +72,8 @@ Successful resources continue to use the existing fence-based retirement path.
 On 22 October 2026, dependency restore and the complete Release solution build
 succeeded with SDK 10.0.401, zero warnings and zero errors. The project-reference
 validator accepted all 44 projects without cycles or boundary violations.
+The full solution was rebuilt successfully after the final master integration,
+again with zero warnings and zero errors.
 
 One complete asset compilation with compiler 1.12.1 also succeeded: all 1,825
 containers passed runtime qualification with zero issues, totaling 112,321,078
