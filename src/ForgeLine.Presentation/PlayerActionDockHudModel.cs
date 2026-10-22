@@ -434,7 +434,12 @@ internal static class PlayerActionDockHudModel
             case PlayerActionPanelMode.Logistics:
                 return actions.Logistics is PlayerLogisticsActionReadModel logistics &&
                        index < logistics.ItemCount
-                    ? index < logistics.OrderStartIndex ? PlayerActionDockItemState.Enabled :
+                    ? index < logistics.Policies.Count &&
+                        !logistics.Policies[index].HasPolicy &&
+                        logistics.InventoryCapacity > 0 &&
+                        logistics.InventoryCapacity < LogisticsQuantityEditor.Minimum
+                        ? PlayerActionDockItemState.Disabled("CAPACITY BELOW 50")
+                        : index < logistics.OrderStartIndex ? PlayerActionDockItemState.Enabled :
                         PlayerActionDockItemState.Disabled("READ ONLY")
                     : PlayerActionDockItemState.Disabled("SELECT LOGISTICS");
 
@@ -678,25 +683,9 @@ internal static class PlayerActionDockHudModel
     internal static (double Next, bool Allowed, string Reason) DecideStockAdjustment(
         in PlayerActionPanelView panel, PlayerLogisticsActionReadModel logistics, int direction)
     {
-        double minimum = panel.StockMinimum;
-        double target = panel.StockTarget;
-        double maximum = panel.StockMaximum;
-        return panel.StockThresholdField switch
-        {
-            PlayerStockThresholdField.Minimum => LogisticsQuantityEditor.Decide(
-                minimum, direction, LogisticsQuantityEditor.Minimum, target,
-                "MINIMUM IS 50", "INCREASE TARGET FIRST"),
-            PlayerStockThresholdField.Target => LogisticsQuantityEditor.Decide(
-                target, direction, Math.Max(LogisticsQuantityEditor.Minimum, minimum), maximum,
-                "DECREASE MIN FIRST", "INCREASE MAX FIRST"),
-            PlayerStockThresholdField.Maximum => LogisticsQuantityEditor.Decide(
-                maximum, direction, Math.Max(LogisticsQuantityEditor.Minimum, target),
-                logistics.InventoryCapacity > 0
-                    ? direction > 0 ? logistics.InventoryCapacity : Math.Max(maximum, logistics.InventoryCapacity)
-                    : double.MaxValue,
-                "DECREASE TARGET FIRST", "INVENTORY CAPACITY REACHED"),
-            _ => (0, false, "UNAVAILABLE")
-        };
+        return LogisticsQuantityEditor.DecideField(
+            panel.StockThresholdField, panel.StockMinimum, panel.StockTarget,
+            panel.StockMaximum, logistics.InventoryCapacity, direction);
     }
 
     public static string ResolveFooterLabel(
