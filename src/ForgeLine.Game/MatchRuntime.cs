@@ -29,6 +29,7 @@ public sealed class MatchRuntime : IDisposable
         LogisticsNetwork logistics,
         CargoTransportSystem cargoTransport,
         AutomatedDistributionSystem automatedDistribution,
+        OperationsRuleSystem operationsRules,
         PowerNetworkSystem power,
         ProductionSystem production,
         UnitProductionSystem unitProduction,
@@ -57,6 +58,7 @@ public sealed class MatchRuntime : IDisposable
         Logistics = logistics;
         CargoTransport = cargoTransport;
         AutomatedDistribution = automatedDistribution;
+        OperationsRules = operationsRules;
         Power = power;
         Production = production;
         UnitProduction = unitProduction;
@@ -121,6 +123,8 @@ public sealed class MatchRuntime : IDisposable
     public UnitFactory UnitFactory { get; }
 
     public MatchReplayRecorder Replay { get; }
+
+    public OperationsRuleSystem OperationsRules { get; }
 
     public SkirmishMatchInitialization Initialization { get; }
 
@@ -303,6 +307,7 @@ public sealed class MatchRuntime : IDisposable
                 logistics,
                 inventories,
                 navigation, docking) { Progress = progress };
+        var operationsRules = new OperationsRuleSystem(simulation, inventories, recipes, battlefieldRuntime.MatchStateEntity);
         var automatedDistribution =
             new AutomatedDistributionSystem(
                 logistics,
@@ -575,6 +580,7 @@ public sealed class MatchRuntime : IDisposable
             demolition,
             logisticsDisruption,
             strategicInfrastructure,
+            operationsRules,
             opponents,
             tacticalOpponent,
             tacticalPreparation,
@@ -676,6 +682,7 @@ public sealed class MatchRuntime : IDisposable
             logistics,
             cargoTransport,
             automatedDistribution,
+            operationsRules,
             power,
             production,
             unitProduction,
@@ -810,6 +817,7 @@ public sealed class MatchRuntime : IDisposable
 
         _disposed = true;
         Replay.Dispose();
+        OperationsRules.Dispose();
         _ownedScheduler?.Dispose();
     }
 

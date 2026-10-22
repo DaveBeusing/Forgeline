@@ -27,7 +27,8 @@ public enum PlayerCommandKind : byte
     Artillery = 9,
     Surrender = 10,
     Technology = 11,
-    Demolition = 12
+    Demolition = 12,
+    OperationsRule = 13
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -61,7 +62,8 @@ public readonly record struct PlayerCommandResultReadModel(
         PlayerLogisticsActionFailureReason.None,
     PlayerTacticalActionFailureReason TacticalFailure =
         PlayerTacticalActionFailureReason.None,
-    BuildingDemolitionTargetResult[]? DemolitionTargets = null);
+    BuildingDemolitionTargetResult[]? DemolitionTargets = null,
+    OperationsRuleResult OperationsResult = OperationsRuleResult.None);
 
 public sealed class PlayerCommandResultBuffer
 {
@@ -709,6 +711,31 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+    public PlayerCommandSubmissionReceipt SubmitOperationsRule(
+        OperationsRuleSystem rules,
+        OperationsRuleOperation operation,
+        OperationsRuleDefinition definition,
+        uint expectedRevision,
+        bool enabled,
+        SimulationTick observedTick)
+    {
+        ArgumentNullException.ThrowIfNull(rules);
+        if (!rules.Matches(_simulation))
+            throw new ArgumentException("Rule system belongs to a different match.", nameof(rules));
+        if (!TryBeginSubmission(PlayerCommandKind.OperationsRule, definition.Owner,
+                observedTick, out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick, out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+            return rejected;
+
+        var command = new OperationsRuleCommand(rules, operation,
+            definition, expectedRevision, enabled, observedTick);
+        SimulationCommandEnvelope envelope = _simulation.SubmitCommand(command, targetTick, source);
+        _pending.Add(PendingCommand.ForOperationsRule(correlation, envelope, command));
+        return AcceptedReceipt(correlation, PlayerCommandKind.OperationsRule,
+            source, observedTick, envelope);
+    }
+
     public PlayerCommandSubmissionReceipt SubmitAttack(
         PlayerId issuer,
         ReadOnlySpan<EntityId> units,
@@ -1269,6 +1296,18 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     DemolitionTargets: demolition.Targets);
             }
 
+            case PlayerCommandKind.OperationsRule:
+            {
+                OperationsRuleCommand command = pending.OperationsCommand!;
+                if (command.ExecutedAtTick == SimulationTick.Zero) return null;
+                return new PlayerCommandResultReadModel(
+                    SessionId, pending.CorrelationId, pending.Kind,
+                    command.Accepted ? PlayerCommandFeedbackState.Accepted : PlayerCommandFeedbackState.Rejected,
+                    command.Accepted ? 1 : 0, command.Accepted ? 0 : 1,
+                    BuildCommandRejectionReason.None, BuildingPlacementFailureReason.None,
+                    command.ExecutedAtTick, OperationsResult: command.Result);
+            }
+
             case PlayerCommandKind.Production:
             {
                 PlayerProductionActionCommand command =
@@ -1543,7 +1582,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     PlayerCommandFeedbackKind.Production,
                 PlayerCommandKind.UnitProduction =>
                     PlayerCommandFeedbackKind.UnitProduction,
-                PlayerCommandKind.Logistics =>
+                PlayerCommandKind.Logistics or PlayerCommandKind.OperationsRule =>
                     PlayerCommandFeedbackKind.Logistics,
                 PlayerCommandKind.Supply =>
                     PlayerCommandFeedbackKind.Supply,
@@ -1580,8 +1619,15 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         PlayerCommandResultReadModel? Result,
         SurrenderCommand? SurrenderCommand = null,
         PlayerTechnologyActionCommand? TechnologyCommand = null,
-        DemolishBuildingsCommand? DemolitionCommand = null)
+        DemolishBuildingsCommand? DemolitionCommand = null,
+        OperationsRuleCommand? OperationsCommand = null)
     {
+        public static PendingCommand ForOperationsRule(
+            PlayerCommandCorrelationId correlation, in SimulationCommandEnvelope envelope,
+            OperationsRuleCommand command) =>
+            new(correlation, PlayerCommandKind.OperationsRule, envelope, null,
+                null, null, null, null, null, null, OperationsCommand: command);
+
         public static PendingCommand ForDemolition(
             PlayerCommandCorrelationId correlation,
             in SimulationCommandEnvelope envelope,

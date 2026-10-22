@@ -86,3 +86,7 @@ A `NO TRUCK` retry does not by itself prove an undersized fleet: distinguish tru
 ## Reading local demand and transport progress
 
 For an owned selected facility or Cargo Truck, the focused [Operations Diagnosis](OperationsDiagnosis.md) copies the current completed-tick state without changing any orders. **Local stock** is the physically present quantity; **free stock** excludes reservations. **Demand** is the configured enabled target minus local stock. **Outstanding requests** already include assigned work; **confirmed incoming** is part of that outstanding quantity and must not be added again. **Loaded cargo is not delivery**—only an actual unload increases the destination inventory. When the source inventory, route, truck, or loading bay cannot be verified from the current copied state, the diagnosis reports it as unobserved rather than guessing.
+
+## Optional operations rules
+
+The opt-in [Operations Rules and Recovery](OperationsAutomation.md) automation can install one missing explicitly configured input stock policy or temporarily pause and resume an output-blocked production request. It uses the existing validated commands, does not bypass physical transport, and yields to manual overrides. Normal production and distribution systems already stop and retry their own work; enabling a rule is not required for normal operation.
