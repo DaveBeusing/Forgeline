@@ -142,8 +142,9 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                         if (data.Facilities[rowIndex].Entity == view.Selected) { selected = data.Facilities[rowIndex]; break; }
                     if (selected is { } detail)
                     {
-                        var diagnosis = OperationsActionGuidance.ForEntity(
-                            OperationsDiagnosisSnapshot.Resolve(context.Snapshot), detail.Entity);
+                        var currentDiagnosis = OperationsDiagnosisSnapshot.Resolve(context.Snapshot);
+                        var diagnosis = OperationsActionGuidance.ForEntity(currentDiagnosis, detail.Entity);
+                        var transport = OperationsActionGuidance.TransportForEntity(currentDiagnosis, detail.Entity);
                         string nextAction = diagnosis is { } current
                             ? OperationsActionGuidance.NextAction(current.PrimaryReason) : string.Empty;
                         if (diagnosis is { } issue && nextAction.Length > 0)
@@ -154,6 +155,10 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                         else Line(detail.Explanation);
                         b = new(text); b.Append("STOCK "); Number(ref b, detail.InventoryQuantity); b.Append(" / "); Number(ref b, detail.InventoryCapacity);
                         b.Append(" POWER "); Number(ref b, detail.AllocatedPower); b.Append(" / "); Number(ref b, detail.PowerDemand);
+                        if (detail.GenerationCapacity.HasValue)
+                        { b.Append(" GEN "); Number(ref b, detail.GenerationCapacity); }
+                        if (detail.Utilization.HasValue)
+                        { b.Append(" USE "); Number(ref b, detail.Utilization, "P0"); }
                         Line(b.Written);
                         int routes = 0, unavailable = 0;
                         for (int routeIndex = 0; routeIndex < data.Routes.Count; routeIndex++)
@@ -163,8 +168,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                             { routes++; if (!route.Enabled) unavailable++; }
                         }
                         b = new(text);
-                        if (diagnosis is { } reported && reported.Subject is
-                            (OperationsDiagnosisSubject.StockPolicy or OperationsDiagnosisSubject.TransportRequest or OperationsDiagnosisSubject.CargoTransport))
+                        if (transport is { } reported)
                         {
                             b.Append("STATE "); b.Append(reported.Status);
                             if (reported.OutstandingRequestQuantity.HasValue)
