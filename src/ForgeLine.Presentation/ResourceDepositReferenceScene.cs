@@ -32,7 +32,7 @@ internal static class ResourceDepositReferenceScene
         ResourceId[] resources = [ResourceIds.FerrousOre, ResourceIds.Silicates, ResourceIds.Volatiles, ResourceIds.RareElements];
         var simulation = new SimulationCoordinator(seed: VisualReferenceScene.Seed);
         var snapshots = new PresentationSnapshotBuffer();
-        simulation.RegisterTickObserver(new PresentationExtractor(snapshots));
+        simulation.RegisterTickObserver(new PresentationExtractor(snapshots, runtimeAssets: assets, resourceTerrain: terrain));
         var footprint = DirectorateContent.CreateBuildingCatalog()[BuildingIds.Extractor].Footprint;
         for (int i = 0; i < count; i++)
         {
@@ -75,7 +75,7 @@ internal static class ResourceDepositReferenceScene
         var snapshot = new PresentationSnapshot(extracted.Tick, extracted.TickDuration, extracted.SimulationEntityCount, instances,
             sessionId: extracted.SessionId, playerExperience: experience);
         string fingerprint = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
-            { kind, version = 1, target, instances }, FingerprintOptions)));
+            { kind, version = 2, target, instances }, FingerprintOptions)));
         return new(kind, target, snapshot, default, fingerprint);
     }
 }

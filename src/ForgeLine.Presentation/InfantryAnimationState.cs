@@ -57,10 +57,23 @@ internal static class SkinPresentationBounds
     }
     internal static AxisAlignedBounds Resolve(in RenderInstance instance)
     {
+        if (instance.ResourceField is { } field)
+        {
+            var original = PresentationBounds.ResolveAxisAlignedBounds(instance);
+            return new(Vector3.Min(original.Minimum, field.Bounds.Minimum), Vector3.Max(original.Maximum, field.Bounds.Maximum));
+        }
         if (!instance.MechanicalPose.Infantry.IsSpecified) return PresentationBounds.ResolveAxisAlignedBounds(instance);
         float radius = Vector3.Abs(instance.Transform.Scale).Length() * RuntimeSkinData.CullingRadius;
         return new(instance.Transform.Position - new Vector3(radius), instance.Transform.Position + new Vector3(radius));
     }
-    internal static float Radius(in RenderInstance instance) => instance.MechanicalPose.Infantry.IsSpecified
-        ? Vector3.Abs(instance.Transform.Scale).Length() * RuntimeSkinData.CullingRadius : PresentationBounds.ResolveLocalHalfExtents(instance).Length();
+    internal static float Radius(in RenderInstance instance)
+    {
+        if (instance.ResourceField is { } field)
+            return MathF.Max(PresentationBounds.ResolveLocalHalfExtents(instance).Length(),
+                Vector3.Max(Vector3.Abs(field.Bounds.Minimum - instance.Transform.Position),
+                    Vector3.Abs(field.Bounds.Maximum - instance.Transform.Position)).Length());
+        return instance.MechanicalPose.Infantry.IsSpecified
+            ? Vector3.Abs(instance.Transform.Scale).Length() * RuntimeSkinData.CullingRadius
+            : PresentationBounds.ResolveLocalHalfExtents(instance).Length();
+    }
 }

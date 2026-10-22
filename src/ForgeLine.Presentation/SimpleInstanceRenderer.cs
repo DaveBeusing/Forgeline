@@ -338,382 +338,400 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
             candidates++;
             ref readonly PreparedRoot preparedRoot = ref _preparedRoots.Get(world, index);
-            RenderInstance instance = preparedRoot.Instance;
-            if (shadowProjection.HasValue && (instance.VfxFeature.IsSpecified || instance.DecalFeature.IsSpecified)) continue;
-
-
-            if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
-                !_vegetation.Includes(instance, camera.Position) ||
-                !instance.Mesh.IsValid ||
-                !instance.Material.IsValid)
+            RenderInstance rootInstance = preparedRoot.Instance;
+            ResourceDepositField? resourceField = _runtimeAssets is null ? null : rootInstance.ResourceField;
+            bool rootVisible = false, rootBatched = false;
+            for (int fieldPart = 0; fieldPart < (resourceField?.Clusters.Count ?? 1); fieldPart++)
             {
-                continue;
-            }
-
-            if (instance.VfxFeature.IsSpecified && ++effectRequests > PresentationExtractor.MaximumSnapshotEffects) continue;
-            if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
-            if (instance.VfxFeature.IsSpecified && ++meshFallbackEffects > (particles?.MaximumMeshFallbackEffects ?? 128)) continue;
-            AxisAlignedBounds bounds = preparedRoot.Bounds;
-
-            instanceTests++;
-            if (Finite(bounds.Minimum) && Finite(bounds.Maximum) && !frustum.Intersects(bounds))
-            {
-                continue;
-            }
-
-            visible++;
-            if (instance.WorldFeature.Kind == ForgeLine.Game.WorldPresentationKind.Vegetation) visibleVegetation++;
-
-            RuntimeMeshBuffers runtimeMesh =
-                default;
-            AssetId runtimeMeshId =
-                default;
-            bool usesRuntimeMesh =
-                false;
-            string? materialAssetId =
-                null;
-            float distance =
-                Vector3.Distance(
-                    camera.Position,
-                    instance.Transform.Position);
-            float projectedDiameter = ScreenSpaceLod.ProjectedDiameter(
-                instance.Transform.Position,
-                PresentationBounds.ResolveLocalHalfExtents(instance).Length(),
-                matrices, viewportHeight);
-            var lodKey = (instance.Entity, instance.DebugIdentity);
-            bool hasLodIdentity = instance.Entity.IsValid || instance.DebugIdentity != 0;
-            var lodHistory = preparing || shadowProjection.HasValue ? _currentLods : _previousLods;
-            int previousLod = hasLodIdentity && lodHistory.TryGetValue(lodKey, out int retainedLod) ? retainedLod : 0;
-            UnitAssetLod unitLod =
-                UnitAssetLod.Lod0;
-            UnitPresentationDefinition unitDefinition =
-                default;
-            bool hasUnitDefinition =
-                false;
-            BuildingAssetLod buildingLod =
-                BuildingAssetLod.Lod0;
-            bool hasBuildingDefinition =
-                false;
-
-            if (instance.UnitFeature.IsSpecified)
-            {
-                unitLod =
-                    (UnitAssetLod)SkinPresentationBounds.SelectLod(instance, projectedDiameter, previousLod, _lodDiameterScale);
-                if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)unitLod;
-                unitDefinition =
-                    UnitPresentationCatalog.Get(
-                        instance.UnitFeature.Unit);
-                materialAssetId =
-                    unitDefinition.MaterialAssetId;
-                hasUnitDefinition =
-                    true;
-                string meshAssetId =
-                    instance.UnitFeature.IsWreck && !(unitLod == UnitAssetLod.Lod0 && instance.MechanicalPose.Infantry is { IsSpecified: true, Action: InfantryAction.Death })
-                        ? UnitPresentationCatalog.ResolveWreckAssetId(instance.UnitFeature)
-                        : unitDefinition.GetMeshAssetId(
-                            unitLod);
-
-                usesRuntimeMesh =
-                    _runtimeAssets is not null &&
-                    TryGetMesh(
-                        meshAssetId,
-                        out runtimeMesh,
-                        out runtimeMeshId) &&
-                    runtimeMesh.IsValid;
-
-                if (!usesRuntimeMesh && _runtimeAssets is not null && unitLod != UnitAssetLod.Lod0 && !instance.UnitFeature.IsWreck)
+                ResourceDepositFieldCluster? fieldCluster = resourceField?.Clusters[fieldPart];
+                RenderInstance instance = fieldCluster is { } mineral ? rootInstance with
                 {
-                    unitLod = UnitAssetLod.Lod0;
-                    usesRuntimeMesh = TryGetMesh(unitDefinition.MeshAssetId,
-                        out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
-                    if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)unitLod;
-                }
-                if (unitLod == UnitAssetLod.Lod1) lod1Instances++;
-                if (unitLod == UnitAssetLod.Lod2) lod2Instances++;
+                    Transform = mineral.Transform,
+                    ResourceField = null,
+                    DebugIdentity = 0xD000_0000U + (uint)mineral.Ordinal
+                } : rootInstance;
+                if (shadowProjection.HasValue && (instance.VfxFeature.IsSpecified || instance.DecalFeature.IsSpecified)) continue;
 
-                if (unitLod == UnitAssetLod.Lod0)
+
+                if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
+                    !_vegetation.Includes(instance, camera.Position) ||
+                    !instance.Mesh.IsValid ||
+                    !instance.Material.IsValid)
                 {
-                    highLod++;
-                }
-                else
-                {
-                    reducedLod++;
-                }
-            }
-            else if (instance.BuildingFeature.IsSpecified)
-            {
-                buildingLod =
-                    instance.BuildingFeature.IsConstruction || instance.BuildingFeature.IsDestroyed
-                        ? BuildingAssetLod.Lod0
-                        : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, 150.0f, 45.0f, _lodDiameterScale);
-                if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)buildingLod;
-                hasBuildingDefinition =
-                    BuildingPresentationCatalog.TryGet(
-                        instance.BuildingFeature.Building,
-                        out _);
-                materialAssetId =
-                    BuildingPresentationCatalog.ResolveMaterialAssetId(
-                        instance.BuildingFeature);
-
-                string meshAssetId =
-                    BuildingPresentationCatalog.ResolveMeshAssetId(
-                        instance.BuildingFeature,
-                        buildingLod);
-
-                usesRuntimeMesh =
-                    _runtimeAssets is not null &&
-                    TryGetMesh(
-                        meshAssetId,
-                        out runtimeMesh,
-                        out runtimeMeshId) &&
-                    runtimeMesh.IsValid;
-
-                if (!usesRuntimeMesh && _runtimeAssets is not null && buildingLod != BuildingAssetLod.Lod0)
-                {
-                    buildingLod = BuildingAssetLod.Lod0;
-                    usesRuntimeMesh = TryGetMesh(
-                        BuildingPresentationCatalog.ResolveMeshAssetId(instance.BuildingFeature, buildingLod),
-                        out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
-                    if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)buildingLod;
-                }
-
-                if (buildingLod == BuildingAssetLod.Lod1) lod1Instances++;
-                if (buildingLod == BuildingAssetLod.Lod2) lod2Instances++;
-
-                if (buildingLod ==
-                    BuildingAssetLod.Lod0)
-                {
-                    highLod++;
-                }
-                else
-                {
-                    reducedLod++;
-                }
-            }
-            else if (instance.VfxFeature.IsSpecified)
-            {
-                VfxPresentationDefinition definition =
-                    VfxPresentationCatalog.Get(
-                        instance.VfxFeature.Kind);
-                materialAssetId =
-                    definition.MaterialAssetId;
-
-                if (!VfxPresentationCatalog.ShouldRender(
-                        instance.VfxFeature.Kind,
-                        distance))
-                {
-                    visible--;
                     continue;
                 }
 
-                usesRuntimeMesh =
-                    _runtimeAssets is not null &&
-                    TryGetMesh(
-                        definition.MeshAssetId,
-                        out runtimeMesh,
-                        out runtimeMeshId) &&
-                    runtimeMesh.IsValid;
+                if (instance.VfxFeature.IsSpecified && ++effectRequests > PresentationExtractor.MaximumSnapshotEffects) continue;
+                if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
+                if (instance.VfxFeature.IsSpecified && ++meshFallbackEffects > (particles?.MaximumMeshFallbackEffects ?? 128)) continue;
+                AxisAlignedBounds bounds = fieldCluster.HasValue
+                    ? ResourceDepositFieldComposition.Bounds(instance.Transform) : preparedRoot.Bounds;
 
-                highLod++;
-            }
-            else if (instance.ConveyorFeature.IsSpecified)
-            {
-                materialAssetId="material.infrastructure.directorate.conveyor";
-                float conveyorDistance=Vector3.Distance(camera.Position,instance.Transform.Position);
-                int conveyorLod=conveyorDistance>420?2:conveyorDistance>140?1:0;
-                usesRuntimeMesh=_runtimeAssets is not null &&
-                    TryGetMesh(instance.ConveyorFeature.Mesh(conveyorLod),out runtimeMesh,out runtimeMeshId) && runtimeMesh.IsValid;
-                highLod++;
-            }
-            else if (instance.InfrastructureFeature.IsSpecified)
-            {
-                materialAssetId =
-                    InfrastructurePresentationCatalog.ResolveMaterialAssetId(
-                        instance.InfrastructureFeature);
-                string meshAssetId =
-                    InfrastructurePresentationCatalog.ResolveMeshAssetId(
-                        instance.InfrastructureFeature);
-
-                usesRuntimeMesh =
-                    _runtimeAssets is not null &&
-                    TryGetMesh(
-                        meshAssetId,
-                        out runtimeMesh,
-                        out runtimeMeshId) &&
-                    runtimeMesh.IsValid;
-
-                highLod++;
-            }
-            else if (instance.WorldFeature.IsSpecified)
-            {
-                materialAssetId =
-                    WorldPresentationCatalog.Get(
-                        instance.WorldFeature.Visual)
-                    .MaterialAssetId;
-                WorldAssetLod worldLod =
-                    ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f, _lodDiameterScale) > 0
-                        ? WorldAssetLod.Reduced : WorldAssetLod.High;
-                if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
-
-                usesRuntimeMesh =
-                    _runtimeAssets is not null &&
-                    TryGetMesh(
-                        instance.WorldFeature,
-                        worldLod,
-                        out runtimeMesh,
-                        out runtimeMeshId) &&
-                    runtimeMesh.IsValid;
-
-                if (worldLod == WorldAssetLod.Reduced)
+                instanceTests++;
+                if (Finite(bounds.Minimum) && Finite(bounds.Maximum) && !frustum.Intersects(bounds))
                 {
-                    lod1Instances++;
-                    reducedLod++;
+                    continue;
+                }
+
+                bool firstVisiblePart = !rootVisible;
+                if (firstVisiblePart) { visible++; rootVisible = true; }
+                if (instance.WorldFeature.Kind == ForgeLine.Game.WorldPresentationKind.Vegetation) visibleVegetation++;
+
+                RuntimeMeshBuffers runtimeMesh =
+                    default;
+                AssetId runtimeMeshId =
+                    default;
+                bool usesRuntimeMesh =
+                    false;
+                string? materialAssetId =
+                    null;
+                float distance =
+                    Vector3.Distance(
+                        camera.Position,
+                        instance.Transform.Position);
+                float projectedDiameter = ScreenSpaceLod.ProjectedDiameter(
+                    instance.Transform.Position,
+                    PresentationBounds.ResolveLocalHalfExtents(instance).Length(),
+                    matrices, viewportHeight);
+                var lodKey = (instance.Entity, instance.DebugIdentity);
+                bool hasLodIdentity = instance.Entity.IsValid || instance.DebugIdentity != 0;
+                var lodHistory = preparing || shadowProjection.HasValue ? _currentLods : _previousLods;
+                int previousLod = hasLodIdentity && lodHistory.TryGetValue(lodKey, out int retainedLod) ? retainedLod : 0;
+                UnitAssetLod unitLod =
+                    UnitAssetLod.Lod0;
+                UnitPresentationDefinition unitDefinition =
+                    default;
+                bool hasUnitDefinition =
+                    false;
+                BuildingAssetLod buildingLod =
+                    BuildingAssetLod.Lod0;
+                bool hasBuildingDefinition =
+                    false;
+
+                if (instance.UnitFeature.IsSpecified)
+                {
+                    unitLod =
+                        (UnitAssetLod)SkinPresentationBounds.SelectLod(instance, projectedDiameter, previousLod, _lodDiameterScale);
+                    if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)unitLod;
+                    unitDefinition =
+                        UnitPresentationCatalog.Get(
+                            instance.UnitFeature.Unit);
+                    materialAssetId =
+                        unitDefinition.MaterialAssetId;
+                    hasUnitDefinition =
+                        true;
+                    string meshAssetId =
+                        instance.UnitFeature.IsWreck && !(unitLod == UnitAssetLod.Lod0 && instance.MechanicalPose.Infantry is { IsSpecified: true, Action: InfantryAction.Death })
+                            ? UnitPresentationCatalog.ResolveWreckAssetId(instance.UnitFeature)
+                            : unitDefinition.GetMeshAssetId(
+                                unitLod);
+
+                    usesRuntimeMesh =
+                        _runtimeAssets is not null &&
+                        TryGetMesh(
+                            meshAssetId,
+                            out runtimeMesh,
+                            out runtimeMeshId) &&
+                        runtimeMesh.IsValid;
+
+                    if (!usesRuntimeMesh && _runtimeAssets is not null && unitLod != UnitAssetLod.Lod0 && !instance.UnitFeature.IsWreck)
+                    {
+                        unitLod = UnitAssetLod.Lod0;
+                        usesRuntimeMesh = TryGetMesh(unitDefinition.MeshAssetId,
+                            out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
+                        if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)unitLod;
+                    }
+                    if (unitLod == UnitAssetLod.Lod1) lod1Instances++;
+                    if (unitLod == UnitAssetLod.Lod2) lod2Instances++;
+
+                    if (unitLod == UnitAssetLod.Lod0)
+                    {
+                        highLod++;
+                    }
+                    else
+                    {
+                        reducedLod++;
+                    }
+                }
+                else if (instance.BuildingFeature.IsSpecified)
+                {
+                    buildingLod =
+                        instance.BuildingFeature.IsConstruction || instance.BuildingFeature.IsDestroyed
+                            ? BuildingAssetLod.Lod0
+                            : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, 150.0f, 45.0f, _lodDiameterScale);
+                    if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)buildingLod;
+                    hasBuildingDefinition =
+                        BuildingPresentationCatalog.TryGet(
+                            instance.BuildingFeature.Building,
+                            out _);
+                    materialAssetId =
+                        BuildingPresentationCatalog.ResolveMaterialAssetId(
+                            instance.BuildingFeature);
+
+                    string meshAssetId =
+                        BuildingPresentationCatalog.ResolveMeshAssetId(
+                            instance.BuildingFeature,
+                            buildingLod);
+
+                    usesRuntimeMesh =
+                        _runtimeAssets is not null &&
+                        TryGetMesh(
+                            meshAssetId,
+                            out runtimeMesh,
+                            out runtimeMeshId) &&
+                        runtimeMesh.IsValid;
+
+                    if (!usesRuntimeMesh && _runtimeAssets is not null && buildingLod != BuildingAssetLod.Lod0)
+                    {
+                        buildingLod = BuildingAssetLod.Lod0;
+                        usesRuntimeMesh = TryGetMesh(
+                            BuildingPresentationCatalog.ResolveMeshAssetId(instance.BuildingFeature, buildingLod),
+                            out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
+                        if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = (int)buildingLod;
+                    }
+
+                    if (buildingLod == BuildingAssetLod.Lod1) lod1Instances++;
+                    if (buildingLod == BuildingAssetLod.Lod2) lod2Instances++;
+
+                    if (buildingLod ==
+                        BuildingAssetLod.Lod0)
+                    {
+                        highLod++;
+                    }
+                    else
+                    {
+                        reducedLod++;
+                    }
+                }
+                else if (instance.VfxFeature.IsSpecified)
+                {
+                    VfxPresentationDefinition definition =
+                        VfxPresentationCatalog.Get(
+                            instance.VfxFeature.Kind);
+                    materialAssetId =
+                        definition.MaterialAssetId;
+
+                    if (!VfxPresentationCatalog.ShouldRender(
+                            instance.VfxFeature.Kind,
+                            distance))
+                    {
+                        visible--;
+                        continue;
+                    }
+
+                    usesRuntimeMesh =
+                        _runtimeAssets is not null &&
+                        TryGetMesh(
+                            definition.MeshAssetId,
+                            out runtimeMesh,
+                            out runtimeMeshId) &&
+                        runtimeMesh.IsValid;
+
+                    highLod++;
+                }
+                else if (instance.ConveyorFeature.IsSpecified)
+                {
+                    materialAssetId="material.infrastructure.directorate.conveyor";
+                    float conveyorDistance=Vector3.Distance(camera.Position,instance.Transform.Position);
+                    int conveyorLod=conveyorDistance>420?2:conveyorDistance>140?1:0;
+                    usesRuntimeMesh=_runtimeAssets is not null &&
+                        TryGetMesh(instance.ConveyorFeature.Mesh(conveyorLod),out runtimeMesh,out runtimeMeshId) && runtimeMesh.IsValid;
+                    highLod++;
+                }
+                else if (instance.InfrastructureFeature.IsSpecified)
+                {
+                    materialAssetId =
+                        InfrastructurePresentationCatalog.ResolveMaterialAssetId(
+                            instance.InfrastructureFeature);
+                    string meshAssetId =
+                        InfrastructurePresentationCatalog.ResolveMeshAssetId(
+                            instance.InfrastructureFeature);
+
+                    usesRuntimeMesh =
+                        _runtimeAssets is not null &&
+                        TryGetMesh(
+                            meshAssetId,
+                            out runtimeMesh,
+                            out runtimeMeshId) &&
+                        runtimeMesh.IsValid;
+
+                    highLod++;
+                }
+                else if (instance.WorldFeature.IsSpecified)
+                {
+                    materialAssetId =
+                        WorldPresentationCatalog.Get(
+                            instance.WorldFeature.Visual)
+                        .MaterialAssetId;
+                    WorldAssetLod worldLod =
+                        ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f, _lodDiameterScale) > 0
+                            ? WorldAssetLod.Reduced : WorldAssetLod.High;
+                    if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
+
+                    usesRuntimeMesh =
+                        _runtimeAssets is not null &&
+                        (fieldCluster is { } cluster
+                            ? TryGetMesh(worldLod == WorldAssetLod.Reduced ? cluster.ReducedMeshAssetId : cluster.MeshAssetId,
+                                out runtimeMesh, out runtimeMeshId)
+                            : TryGetMesh(instance.WorldFeature, worldLod, out runtimeMesh, out runtimeMeshId)) &&
+                        runtimeMesh.IsValid;
+
+                    // Incomplete optional catalogs retain the family's canonical mesh.
+                    if (!usesRuntimeMesh && fieldCluster.HasValue && _runtimeAssets is not null)
+                        usesRuntimeMesh = TryGetMesh(instance.WorldFeature, WorldAssetLod.High, out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
+                    if (fieldCluster.HasValue && !usesRuntimeMesh) continue;
+
+                    if (worldLod == WorldAssetLod.Reduced && firstVisiblePart)
+                    {
+                        lod1Instances++;
+                        reducedLod++;
+                    }
+                    else if (firstVisiblePart)
+                    {
+                        highLod++;
+                    }
                 }
                 else
                 {
                     highLod++;
                 }
-            }
-            else
-            {
-                highLod++;
-            }
 
-            if (usesRuntimeMesh &&
-                runtimeMesh.HasMaterial &&
-                !hasBuildingDefinition)
-            {
-                materialAssetId =
-                    runtimeMesh.MaterialId.Value;
-            }
-
-            bool hasRuntimeMaterial =
-                _runtimeAssets is not null &&
-                materialAssetId is not null;
-            RuntimeMaterialResources runtimeMaterial =
-                hasRuntimeMaterial
-                    ? ResolveMaterial(
-                        materialAssetId!)
-                    : default;
-            bool usesRuntimeMaterial =
-                hasRuntimeMaterial &&
-                (!usesRuntimeMesh ||
-                 runtimeMesh.SupportsTexturedMaterial);
-            if (instance.DecalFeature.IsSpecified && (!usesRuntimeMesh || !usesRuntimeMaterial || runtimeMaterial.UsesDevelopmentFallback || !float.IsFinite(instance.DecalFeature.Opacity)))
-            { skippedDecalResources++; continue; }
-            if (preparing)
-            {
-                // Resource demand needs no colors, animated transforms or mechanical
-                // weights. Resolve attachments in the same order, then leave that
-                // presentation work to the recording pass that consumes it.
-                if (_runtimeAssets is not null)
+                if (usesRuntimeMesh &&
+                    runtimeMesh.HasMaterial &&
+                    !hasBuildingDefinition)
                 {
-                    if (hasUnitDefinition && unitLod == UnitAssetLod.Lod0 &&
-                        !instance.UnitFeature.IsWreck && unitDefinition.HasArticulatedTurret)
-                        TryGetMesh(unitDefinition.TurretMeshAssetId!, out _);
-                    string? preparedUnitState = hasUnitDefinition
-                        ? UnitPresentationCatalog.ResolveStateAttachmentAssetId(instance.UnitFeature, unitLod) : null;
-                    if (preparedUnitState is not null) TryGetMesh(preparedUnitState, out _);
-                    string? preparedBuildingState = hasBuildingDefinition
-                        ? BuildingPresentationCatalog.ResolveStateAttachmentAssetId(instance.BuildingFeature) : null;
-                    if (preparedBuildingState is not null) TryGetMesh(preparedBuildingState, out _);
+                    materialAssetId =
+                        runtimeMesh.MaterialId.Value;
                 }
-                continue;
-            }
-            Vector4 color =
-                ResolveColor(
-                    instance,
+
+                bool hasRuntimeMaterial =
+                    _runtimeAssets is not null &&
+                    materialAssetId is not null;
+                RuntimeMaterialResources runtimeMaterial =
                     hasRuntimeMaterial
-                        ? runtimeMaterial.BaseColorFactor
-                        : null);
-            if (instance.DecalFeature.IsSpecified) color.W *= Math.Clamp(instance.DecalFeature.Opacity, 0, .65f);
-            Matrix4x4 worldMatrix =
-                presentationSeconds.HasValue ? VegetationVisualMotion.Transform(instance, projectedDiameter, presentationSeconds.Value) :
-                    preparedRoot.Transform;
-            if (presentationSeconds.HasValue && projectedDiameter > 18 && VegetationVisualMotion.Applies(instance)) animatedVegetation++;
-
-            if (instance.InfrastructureFeature.IsSpecified)
-            {
-                worldMatrix =
-                    InfrastructurePresentationCatalog.AdjustWorldTransform(
-                        instance.InfrastructureFeature,
-                        worldMatrix);
-            }
-
-            _skinDetail = MechanicalDetailWeight(projectedDiameter, 90, _lodDiameterScale);
-            float motionWeight = MechanicalDetailWeight(projectedDiameter, hasBuildingDefinition ? 150 : 90, _lodDiameterScale);
-            if (!preparing) AddMechanicalBatches(instance, worldMatrix, color, usesRuntimeMesh, runtimeMesh,
-                runtimeMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
-            if (hasUnitDefinition &&
-                unitLod == UnitAssetLod.Lod0 &&
-                !instance.UnitFeature.IsWreck &&
-                unitDefinition.HasArticulatedTurret &&
-                _runtimeAssets is not null &&
-                TryGetMesh(
-                    unitDefinition.TurretMeshAssetId!,
-                    out RuntimeMeshBuffers turretMesh,
-                    out AssetId turretMeshId) &&
-                turretMesh.IsValid)
-            {
-                if (!preparing) AddMechanicalBatches(instance,
-                    CreateArticulatedTransform(worldMatrix, unitDefinition.TurretPivot, instance.UnitFeature.AimYawRadians * motionWeight),
-                    color, true, turretMesh, turretMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
-            }
-            string? unitStateAssetId = hasUnitDefinition
-                ? UnitPresentationCatalog.ResolveStateAttachmentAssetId(instance.UnitFeature, unitLod) : null;
-            if (unitStateAssetId is not null && _runtimeAssets is not null &&
-                TryGetMesh(unitStateAssetId, out RuntimeMeshBuffers unitStateMesh, out AssetId unitStateMeshId) &&
-                unitStateMesh.IsValid)
-            {
-                if (!preparing) AddMechanicalBatches(instance, worldMatrix, color, true, unitStateMesh,
-                    unitStateMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
-            }
-            string? buildingStateAssetId =
-                hasBuildingDefinition
-                    ? BuildingPresentationCatalog.ResolveStateAttachmentAssetId(
-                        instance.BuildingFeature)
-                    : null;
-
-            if (buildingStateAssetId is not null &&
-                _runtimeAssets is not null &&
-                TryGetMesh(
-                    buildingStateAssetId,
-                    out RuntimeMeshBuffers stateMesh,
-                    out AssetId stateMeshId) &&
-                stateMesh.IsValid)
-            {
-                if (preparing) continue;
-                var stateKey =
-                    new InstanceBatchKey(
-                        true,
-                        stateMeshId,
-                        usesRuntimeMaterial,
-                        runtimeMaterial.MaterialId);
-
-                if (!batchLookup.TryGetValue(
-                        stateKey,
-                        out InstanceBatch? stateBatch))
+                        ? ResolveMaterial(
+                            materialAssetId!)
+                        : default;
+                bool usesRuntimeMaterial =
+                    hasRuntimeMaterial &&
+                    (!usesRuntimeMesh ||
+                     runtimeMesh.SupportsTexturedMaterial);
+                if (instance.DecalFeature.IsSpecified && (!usesRuntimeMesh || !usesRuntimeMaterial || runtimeMaterial.UsesDevelopmentFallback || !float.IsFinite(instance.DecalFeature.Opacity)))
+                { skippedDecalResources++; continue; }
+                if (preparing)
                 {
-                    stateBatch =
-                        RentBatch(
-                            true,
-                            stateMesh,
-                            usesRuntimeMaterial,
-                            runtimeMaterial);
-                    batchLookup.Add(
-                        stateKey,
-                        stateBatch);
+                    // Resource demand needs no colors, animated transforms or mechanical
+                    // weights. Resolve attachments in the same order, then leave that
+                    // presentation work to the recording pass that consumes it.
+                    if (_runtimeAssets is not null)
+                    {
+                        if (hasUnitDefinition && unitLod == UnitAssetLod.Lod0 &&
+                            !instance.UnitFeature.IsWreck && unitDefinition.HasArticulatedTurret)
+                            TryGetMesh(unitDefinition.TurretMeshAssetId!, out _);
+                        string? preparedUnitState = hasUnitDefinition
+                            ? UnitPresentationCatalog.ResolveStateAttachmentAssetId(instance.UnitFeature, unitLod) : null;
+                        if (preparedUnitState is not null) TryGetMesh(preparedUnitState, out _);
+                        string? preparedBuildingState = hasBuildingDefinition
+                            ? BuildingPresentationCatalog.ResolveStateAttachmentAssetId(instance.BuildingFeature) : null;
+                        if (preparedBuildingState is not null) TryGetMesh(preparedBuildingState, out _);
+                    }
+                    continue;
+                }
+                Vector4 color =
+                    ResolveColor(
+                        instance,
+                        hasRuntimeMaterial
+                            ? runtimeMaterial.BaseColorFactor * (fieldCluster?.Tint ?? Vector4.One)
+                            : null);
+                if (instance.DecalFeature.IsSpecified) color.W *= Math.Clamp(instance.DecalFeature.Opacity, 0, .65f);
+                Matrix4x4 worldMatrix =
+                    presentationSeconds.HasValue ? VegetationVisualMotion.Transform(instance, projectedDiameter, presentationSeconds.Value) :
+                        fieldCluster.HasValue ? instance.Transform.ToMatrix() : preparedRoot.Transform;
+                if (presentationSeconds.HasValue && projectedDiameter > 18 && VegetationVisualMotion.Applies(instance)) animatedVegetation++;
+
+                if (instance.InfrastructureFeature.IsSpecified)
+                {
+                    worldMatrix =
+                        InfrastructurePresentationCatalog.AdjustWorldTransform(
+                            instance.InfrastructureFeature,
+                            worldMatrix);
                 }
 
-                if (_collectRootIndices) stateBatch.RootIndices.Add(_renderRootIndex);
-                stateBatch.Instances.Add(
-                    CreateInstanceRenderData(
-                        worldMatrix,
-                        color,
-                        usesRuntimeMaterial,
-                        runtimeMaterial));
+                _skinDetail = MechanicalDetailWeight(projectedDiameter, 90, _lodDiameterScale);
+                float motionWeight = MechanicalDetailWeight(projectedDiameter, hasBuildingDefinition ? 150 : 90, _lodDiameterScale);
+                if (!preparing) AddMechanicalBatches(instance, worldMatrix, color, usesRuntimeMesh, runtimeMesh,
+                    runtimeMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
+                if (hasUnitDefinition &&
+                    unitLod == UnitAssetLod.Lod0 &&
+                    !instance.UnitFeature.IsWreck &&
+                    unitDefinition.HasArticulatedTurret &&
+                    _runtimeAssets is not null &&
+                    TryGetMesh(
+                        unitDefinition.TurretMeshAssetId!,
+                        out RuntimeMeshBuffers turretMesh,
+                        out AssetId turretMeshId) &&
+                    turretMesh.IsValid)
+                {
+                    if (!preparing) AddMechanicalBatches(instance,
+                        CreateArticulatedTransform(worldMatrix, unitDefinition.TurretPivot, instance.UnitFeature.AimYawRadians * motionWeight),
+                        color, true, turretMesh, turretMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
+                }
+                string? unitStateAssetId = hasUnitDefinition
+                    ? UnitPresentationCatalog.ResolveStateAttachmentAssetId(instance.UnitFeature, unitLod) : null;
+                if (unitStateAssetId is not null && _runtimeAssets is not null &&
+                    TryGetMesh(unitStateAssetId, out RuntimeMeshBuffers unitStateMesh, out AssetId unitStateMeshId) &&
+                    unitStateMesh.IsValid)
+                {
+                    if (!preparing) AddMechanicalBatches(instance, worldMatrix, color, true, unitStateMesh,
+                        unitStateMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
+                }
+                string? buildingStateAssetId =
+                    hasBuildingDefinition
+                        ? BuildingPresentationCatalog.ResolveStateAttachmentAssetId(
+                            instance.BuildingFeature)
+                        : null;
+
+                if (buildingStateAssetId is not null &&
+                    _runtimeAssets is not null &&
+                    TryGetMesh(
+                        buildingStateAssetId,
+                        out RuntimeMeshBuffers stateMesh,
+                        out AssetId stateMeshId) &&
+                    stateMesh.IsValid)
+                {
+                    if (preparing) continue;
+                    var stateKey =
+                        new InstanceBatchKey(
+                            true,
+                            stateMeshId,
+                            usesRuntimeMaterial,
+                            runtimeMaterial.MaterialId);
+
+                    if (!batchLookup.TryGetValue(
+                            stateKey,
+                            out InstanceBatch? stateBatch))
+                    {
+                        stateBatch =
+                            RentBatch(
+                                true,
+                                stateMesh,
+                                usesRuntimeMaterial,
+                                runtimeMaterial);
+                        batchLookup.Add(
+                            stateKey,
+                            stateBatch);
+                    }
+
+                    if (_collectRootIndices) stateBatch.RootIndices.Add(_renderRootIndex);
+                    stateBatch.Instances.Add(
+                        CreateInstanceRenderData(
+                            worldMatrix,
+                            color,
+                            usesRuntimeMaterial,
+                            runtimeMaterial));
+                }
+                if (!preparing && !rootBatched) { batchedRoots++; rootBatched = true; }
             }
-            if (!preparing) batchedRoots++;
         }
 
         WorkMetrics = new(world.InstanceCount, candidates, _preparedRoots.Interpolations, _preparedRoots.Hits,
