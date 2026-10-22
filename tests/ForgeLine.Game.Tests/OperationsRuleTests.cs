@@ -75,7 +75,7 @@ public sealed class OperationsRuleTests
         using MatchRuntime scenario = CreateScenario();
         EntityId facility = AddProcessingFacility(scenario, out InventoryId input, out _);
         QueueSteel(scenario, facility);
-        scenario.Simulation.RunTicks(2);
+        scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
         Assert.Equal(ProductionBlockReason.NoInput,
             scenario.Simulation.Entities.GetComponent<ProductionFacility>(facility).BlockReason);
         double initialStock = scenario.Inventories.GetTotalQuantity(input);
@@ -83,7 +83,7 @@ public sealed class OperationsRuleTests
         gateway.SubmitOperationsRule(scenario.OperationsRules,
             OperationsRuleOperation.Upsert, InputRule(facility), 0, true,
             scenario.Simulation.CurrentTick);
-        scenario.Simulation.RunTicks(20);
+        scenario.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
         var row = Assert.Single(scenario.OperationsRules.Capture(Owner));
         Assert.Equal(OperationsRuleResult.Applied, row.Result);
         Assert.Equal(1, row.ActionCount);
@@ -91,10 +91,10 @@ public sealed class OperationsRuleTests
         var policies = new List<EntityId>();
         foreach (EntityId policyEntity in scenario.Simulation.Entities.Query<LogisticsStockPolicy>(
                      QueryIterationOrder.StableByEntityIndex)) policies.Add(policyEntity);
-        Assert.Single(policies.Where(p =>
+        Assert.Single(policies, p =>
             scenario.Simulation.Entities.GetComponent<LogisticsStockPolicy>(p).TargetEntity == facility &&
-            scenario.Simulation.Entities.GetComponent<LogisticsStockPolicy>(p).ResourceId == ResourceIds.FerrousOre));
-        scenario.Simulation.RunTicks(40);
+            scenario.Simulation.Entities.GetComponent<LogisticsStockPolicy>(p).ResourceId == ResourceIds.FerrousOre);
+        scenario.Simulation.RunTicks(40, TestContext.Current.CancellationToken);
         Assert.Equal(1, Assert.Single(scenario.OperationsRules.Capture(Owner)).ActionCount);
     }
 
@@ -114,7 +114,7 @@ public sealed class OperationsRuleTests
         gateway.SubmitOperationsRule(scenario.OperationsRules,
             OperationsRuleOperation.Upsert, InputRule(facility), 0, true,
             scenario.Simulation.CurrentTick);
-        scenario.Simulation.RunTicks(10);
+        scenario.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
         Assert.Equal(OperationsRuleResult.ManualOverride,
             Assert.Single(scenario.OperationsRules.Capture(Owner)).Result);
         foreach (EntityId policyEntity in scenario.Simulation.Entities.Query<LogisticsStockPolicy>())
@@ -134,7 +134,7 @@ public sealed class OperationsRuleTests
         gateway.SubmitOperationsRule(scenario.OperationsRules,
             OperationsRuleOperation.Upsert, OutputRule(facility), 0, true,
             scenario.Simulation.CurrentTick);
-        scenario.Simulation.RunTicks(55);
+        scenario.Simulation.RunTicks(55, TestContext.Current.CancellationToken);
         var paused = Assert.Single(scenario.OperationsRules.Capture(Owner));
         Assert.True(paused.ManagedProductionRequest.IsValid);
         Assert.True(scenario.Simulation.Entities.GetComponent<ProductionRequest>(
@@ -162,7 +162,7 @@ public sealed class OperationsRuleTests
         gateway.SubmitOperationsRule(scenario.OperationsRules,
             OperationsRuleOperation.Upsert, OutputRule(facility), 0, true,
             scenario.Simulation.CurrentTick);
-        scenario.Simulation.RunTicks(55);
+        scenario.Simulation.RunTicks(55, TestContext.Current.CancellationToken);
         EntityId request = Assert.Single(scenario.OperationsRules.Capture(Owner)).ManagedProductionRequest;
         Assert.True(request.IsValid);
         gateway.SubmitProductionPaused(Owner, request, true, scenario.Simulation.CurrentTick);
@@ -170,7 +170,7 @@ public sealed class OperationsRuleTests
         Assert.Equal(OperationsRuleResult.ManualOverride,
             Assert.Single(scenario.OperationsRules.Capture(Owner)).Result);
         Assert.True(scenario.Inventories.Remove(output, ResourceIds.Steel, 10).Succeeded);
-        scenario.Simulation.RunTicks(40);
+        scenario.Simulation.RunTicks(40, TestContext.Current.CancellationToken);
         Assert.True(scenario.Simulation.Entities.GetComponent<ProductionRequest>(request).Paused);
         Assert.Equal(1, Assert.Single(scenario.OperationsRules.Capture(Owner)).ActionCount);
     }
