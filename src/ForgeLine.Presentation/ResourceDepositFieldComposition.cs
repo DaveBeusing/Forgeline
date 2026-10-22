@@ -32,9 +32,10 @@ internal static class ResourceDepositFieldComposition
         ITerrainQuery terrain, int budget, RuntimeAssetCatalog? assets)
     {
         int family = Family(resource);
-        if (family < 0 || budget <= 0 || !Finite(bounds.Minimum) || !Finite(bounds.Maximum)) return [];
+        if (family < 0 || budget <= 0 || !ValidKey(identity.MapKey) || !ValidKey(identity.DepositKey) ||
+            !Finite(bounds.Minimum) || !Finite(bounds.Maximum) || !Finite(bounds.Center)) return [];
         Vector3 extent = bounds.Maximum - bounds.Minimum;
-        if (extent.X < .5f || extent.Z < .5f) return [];
+        if (!Finite(extent) || extent.X < .5f || extent.Z < .5f) return [];
         int desired = Math.Clamp((int)Math.Min(24, (double)extent.X * extent.Z / 140), 6, MaximumClustersPerDeposit);
         int count = Math.Min(desired, budget);
         var result = new List<ResourceDepositFieldCluster>(count);
@@ -145,7 +146,10 @@ internal static class ResourceDepositFieldComposition
         ITerrainQuery terrain, out RenderTransform transform)
     {
         transform = default;
-        float radius = MathF.Max(scale.X, scale.Z) * .5f;
+        float margin = MathF.Min(MathF.Min(anchor.X - field.Minimum.X, field.Maximum.X - anchor.X),
+            MathF.Min(anchor.Z - field.Minimum.Z, field.Maximum.Z - anchor.Z));
+        float radius = MathF.Min(MathF.Max(scale.X, scale.Z) * .5f, margin * .8f);
+        if (radius < .01f) return false;
         // Initial probes fit the horizon. Invalid/missing terrain never fabricates height zero.
         if (!Height(anchor.X, anchor.Z, out float center) ||
             !Height(anchor.X - radius, anchor.Z, out float left) || !Height(anchor.X + radius, anchor.Z, out float right) ||
@@ -195,13 +199,15 @@ internal static class ResourceDepositFieldComposition
     }
 
     private static bool HasPair(RuntimeAssetCatalog? assets, string mesh, string material) =>
-        assets is not null && MeshRecord(assets, mesh, material) && MeshRecord(assets, mesh + "_lod1", material);
+        assets is not null && assets.TryGet(AssetId.Parse(material), out var surface) && surface is { Type: RuntimeAssetType.Material } &&
+        MeshRecord(assets, mesh, material) && MeshRecord(assets, mesh + "_lod1", material);
 
-    // Local function needs the catalog/material pair, kept separate for nullable-flow clarity.
     private static bool MeshRecord(RuntimeAssetCatalog assets, string mesh, string material) =>
         assets.TryGet(AssetId.Parse(mesh), out var record) && record is { Type: RuntimeAssetType.Mesh } &&
-        record.MaterialReferences.Contains(material, StringComparer.Ordinal);
+        record.MaterialReferences.Count == 1 && string.Equals(record.MaterialReferences[0], material, StringComparison.Ordinal);
 
     private static int Family(ResourceId resource) => resource.Value switch { 1 => 0, 3 => 1, 2 => 2, 8 => 3, _ => -1 };
+    private static bool ValidKey(string value) => !string.IsNullOrEmpty(value) && value.Length <= 128 &&
+        value.All(static c => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z' or >= '0' and <= '9' or '.' or '_' or '-');
     private static bool Finite(Vector3 value) => float.IsFinite(value.X) && float.IsFinite(value.Y) && float.IsFinite(value.Z);
 }

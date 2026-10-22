@@ -40,9 +40,11 @@ internal sealed class ResourceDepositFieldComposer(ITerrainQuery terrain, Runtim
             ResourceDepositFieldComposition.MaximumSnapshotClusters / deposits);
         foreach (ref var instance in instances)
         {
+            instance = instance with { ResourceField = null };
             if (quota == 0 || !Eligible(instance, entities, out var deposit)) continue;
             _seen.Add(instance.Entity);
-            if (!_cache.TryGetValue(instance.Entity, out var entry) || entry.Bounds != deposit.Bounds ||
+            if (!_cache.TryGetValue(instance.Entity, out var entry) || entry.Bounds.Minimum != deposit.Bounds.Minimum ||
+                entry.Bounds.Maximum != deposit.Bounds.Maximum ||
                 entry.Resource != deposit.ResourceId || entry.Quota != quota)
             {
                 var identity = _authored.TryGetValue(instance.Entity, out var known) ? known :

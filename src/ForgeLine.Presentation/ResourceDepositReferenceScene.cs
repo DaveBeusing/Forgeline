@@ -32,7 +32,7 @@ internal static class ResourceDepositReferenceScene
         ResourceId[] resources = [ResourceIds.FerrousOre, ResourceIds.Silicates, ResourceIds.Volatiles, ResourceIds.RareElements];
         var simulation = new SimulationCoordinator(seed: VisualReferenceScene.Seed);
         var snapshots = new PresentationSnapshotBuffer();
-        simulation.RegisterTickObserver(new PresentationExtractor(snapshots));
+        simulation.RegisterTickObserver(new PresentationExtractor(snapshots, runtimeAssets: assets, resourceTerrain: terrain));
         var footprint = DirectorateContent.CreateBuildingCatalog()[BuildingIds.Extractor].Footprint;
         for (int i = 0; i < count; i++)
         {

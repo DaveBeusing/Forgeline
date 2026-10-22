@@ -338,7 +338,18 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
             candidates++;
             ref readonly PreparedRoot preparedRoot = ref _preparedRoots.Get(world, index);
-            RenderInstance instance = preparedRoot.Instance;
+            RenderInstance rootInstance = preparedRoot.Instance;
+            ResourceDepositField? resourceField = _runtimeAssets is null ? null : rootInstance.ResourceField;
+            bool rootVisible = false, rootBatched = false;
+            for (int fieldPart = 0; fieldPart < (resourceField?.Clusters.Count ?? 1); fieldPart++)
+            {
+            ResourceDepositFieldCluster? fieldCluster = resourceField?.Clusters[fieldPart];
+            RenderInstance instance = fieldCluster is { } mineral ? rootInstance with
+            {
+                Transform = mineral.Transform,
+                ResourceField = null,
+                DebugIdentity = 0xD000_0000U + (uint)mineral.Ordinal
+            } : rootInstance;
             if (shadowProjection.HasValue && (instance.VfxFeature.IsSpecified || instance.DecalFeature.IsSpecified)) continue;
 
 
@@ -353,7 +364,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
             if (instance.VfxFeature.IsSpecified && ++effectRequests > PresentationExtractor.MaximumSnapshotEffects) continue;
             if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
             if (instance.VfxFeature.IsSpecified && ++meshFallbackEffects > (particles?.MaximumMeshFallbackEffects ?? 128)) continue;
-            AxisAlignedBounds bounds = preparedRoot.Bounds;
+            AxisAlignedBounds bounds = fieldCluster.HasValue
+                ? ResourceDepositFieldComposition.Bounds(instance.Transform) : preparedRoot.Bounds;
 
             instanceTests++;
             if (Finite(bounds.Minimum) && Finite(bounds.Maximum) && !frustum.Intersects(bounds))
@@ -361,7 +373,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 continue;
             }
 
-            visible++;
+            if (!rootVisible) { visible++; rootVisible = true; }
             if (instance.WorldFeature.Kind == ForgeLine.Game.WorldPresentationKind.Vegetation) visibleVegetation++;
 
             RuntimeMeshBuffers runtimeMesh =
@@ -557,12 +569,16 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&
-                    TryGetMesh(
-                        instance.WorldFeature,
-                        worldLod,
-                        out runtimeMesh,
-                        out runtimeMeshId) &&
+                    (fieldCluster is { } cluster
+                        ? TryGetMesh(worldLod == WorldAssetLod.Reduced ? cluster.ReducedMeshAssetId : cluster.MeshAssetId,
+                            out runtimeMesh, out runtimeMeshId)
+                        : TryGetMesh(instance.WorldFeature, worldLod, out runtimeMesh, out runtimeMeshId)) &&
                     runtimeMesh.IsValid;
+
+                // Incomplete optional catalogs retain the family's canonical mesh.
+                if (!usesRuntimeMesh && fieldCluster.HasValue && _runtimeAssets is not null)
+                    usesRuntimeMesh = TryGetMesh(instance.WorldFeature, WorldAssetLod.High, out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
+                if (fieldCluster.HasValue && !usesRuntimeMesh) continue;
 
                 if (worldLod == WorldAssetLod.Reduced)
                 {
@@ -624,12 +640,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 ResolveColor(
                     instance,
                     hasRuntimeMaterial
-                        ? runtimeMaterial.BaseColorFactor
+                        ? runtimeMaterial.BaseColorFactor * (fieldCluster?.Tint ?? Vector4.One)
                         : null);
             if (instance.DecalFeature.IsSpecified) color.W *= Math.Clamp(instance.DecalFeature.Opacity, 0, .65f);
             Matrix4x4 worldMatrix =
                 presentationSeconds.HasValue ? VegetationVisualMotion.Transform(instance, projectedDiameter, presentationSeconds.Value) :
-                    preparedRoot.Transform;
+                    fieldCluster.HasValue ? instance.Transform.ToMatrix() : preparedRoot.Transform;
             if (presentationSeconds.HasValue && projectedDiameter > 18 && VegetationVisualMotion.Applies(instance)) animatedVegetation++;
 
             if (instance.InfrastructureFeature.IsSpecified)
@@ -713,7 +729,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         usesRuntimeMaterial,
                         runtimeMaterial));
             }
-            if (!preparing) batchedRoots++;
+            if (!preparing && !rootBatched) { batchedRoots++; rootBatched = true; }
+            }
         }
 
         WorkMetrics = new(world.InstanceCount, candidates, _preparedRoots.Interpolations, _preparedRoots.Hits,
