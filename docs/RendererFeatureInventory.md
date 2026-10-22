@@ -2,8 +2,8 @@
 
 ## Scope and evidence
 
-Code baseline: `b726ff9c00b7dc74cf285219fa58440acf663e16` (`master`,
-0.1.454), synchronized after the resource cluster integration. This inventory describes consumers present in that revision. It is
+Code baseline: `421d5a21416b6bf3fc1675311d49d161d87f57da` (`master`,
+0.1.456), synchronized after resource geometry, visual-language and PBR-surface integration. This inventory describes consumers present in that revision. It is
 not a visual acceptance report. Native evidence below is historical evidence
 linked from the owning documents; it does not establish a new native run on
 this revision. Builds, headless tests and null-device tests cannot establish
@@ -63,6 +63,15 @@ and `tests/ForgeLine.Assets.Tests/WorldAssetAuthoringTests.cs` provide source an
 catalog contracts; they do not establish variant selection or native acceptance.
 See [resource cluster geometry](ResourceDepositClusterGeometry.md) for the
 unexecuted acceptance matrix and ownership of the remaining work.
+
+The later [resource PBR surfaces](ResourceDepositPbrSurfaces.md) integration
+binds family BaseColor/Normal/ORM maps through the stable material IDs and
+existing shader slots. The canonical material selects the weathered patch;
+additional surface material IDs are authored inputs without live per-instance
+dispatch. [Resource visual language](ResourceDepositVisualLanguage.md) defines
+the variation contract, not an implementation of seeded field composition.
+These distinctions survive the PBR integration; new source images do not prove
+new shader interfaces, runtime variant selection or native art acceptance.
 
 `src/ForgeLine.Presentation/VisualReferenceScene.cs` owns the scene enum and
 factory dispatch; `src/ForgeLine.Client/VisualReferenceCapture.cs` owns native
