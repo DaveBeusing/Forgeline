@@ -3,6 +3,7 @@ using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Ecs;
 using ForgeLine.Logistics;
+using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
