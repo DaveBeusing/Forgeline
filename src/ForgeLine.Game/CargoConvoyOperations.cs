@@ -269,7 +269,7 @@ public sealed class CargoConvoySystem : ISimulationSystem
                      QueryIterationOrder.StableByEntityIndex))
         {
             CargoConvoyGroup group = entities.GetComponent<CargoConvoyGroup>(id);
-            if (group.Owner != owner) continue;
+            if (group.Owner != owner || group.RouteVersion != _network.Version) continue;
             int trucks = 0, escorts = 0;
             foreach (EntityId entity in entities.Query<CargoConvoyMember>())
                 if (entities.GetComponent<CargoConvoyMember>(entity).Group == id)
@@ -288,14 +288,18 @@ public sealed class CargoConvoySystem : ISimulationSystem
     public static void Dissolve(SimulationContext context, EntityId groupId)
     {
         // Enumerate a fixed identity copy: detaching removes the queried component.
-        EntityId[] trucks = context.Entities.Query<CargoConvoyMember>(
-            QueryIterationOrder.StableByEntityIndex).ToArray();
+        var trucks = new List<EntityId>();
+        foreach (EntityId candidate in context.Entities.Query<CargoConvoyMember>(
+                     QueryIterationOrder.StableByEntityIndex))
+            trucks.Add(candidate);
         foreach (EntityId truck in trucks)
             if (context.Entities.TryGetComponent(truck, out CargoConvoyMember member) &&
                 member.Group == groupId)
                 DetachTruck(context.Entities, truck);
-        EntityId[] escorts = context.Entities.Query<CargoConvoyEscort>(
-            QueryIterationOrder.StableByEntityIndex).ToArray();
+        var escorts = new List<EntityId>();
+        foreach (EntityId candidate in context.Entities.Query<CargoConvoyEscort>(
+                     QueryIterationOrder.StableByEntityIndex))
+            escorts.Add(candidate);
         foreach (EntityId escort in escorts)
             if (context.Entities.TryGetComponent(escort, out CargoConvoyEscort member) &&
                 member.Group == groupId)
