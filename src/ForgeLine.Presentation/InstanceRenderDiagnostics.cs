@@ -20,4 +20,5 @@ public readonly record struct InstanceRenderDiagnostics(
     public int ClusterCulledInstances { get; init; }
     public int InstanceBoundsTests { get; init; }
     public int SkippedDecalResources { get; init; }
+    public ResourceDepositRenderDiagnostics ResourceDeposits { get; init; }
 }

@@ -12,7 +12,7 @@ using ForgeLine.Core;
 
 namespace ForgeLine.Presentation;
 
-public sealed class SimpleInstanceRenderer : IDisposable
+public sealed partial class SimpleInstanceRenderer : IDisposable
 {
     private const int MatrixRootConstantCount = 16;
     private const int RootConstantCount =
@@ -250,11 +250,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegative(maximumCasters);
         ArgumentOutOfRangeException.ThrowIfNegative(maximumDraws);
         InstanceRenderDiagnostics prior = LastDiagnostics;
+        ResourceDepositRenderDiagnostics priorResources = ResourceDiagnostics;
         ArgumentNullException.ThrowIfNull(context);
         _runtimeAssets?.BeginRecord();
         try { RenderCore(context, camera, world, alpha, frame.ViewProjection, maximumCasters, maximumDraws, presentationSeconds); }
         finally { _runtimeAssets?.EndRecord(); }
         LastDiagnostics = prior;
+        ResourceDiagnostics = priorResources;
     }
 
     private void RenderCore(IGraphicsCommandContext? context, RtsCamera camera, RenderWorld world, float alpha,
@@ -308,6 +310,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
         int clusterCulled = spatialCulling ? _spatialVisibility.RejectedRoots : 0, instanceTests = 0;
         _preparedRoots.Begin(world, alpha, presentationSeconds);
         _passMeshes.Clear(); _passMaterials.Clear();
+        _resourceBindings.Clear();
+        ResourceDiagnostics = default;
         _meshResolutions = _materialResolutions = 0;
         _collectRootIndices = shadowProjection.HasValue && (maximumCasters != int.MaxValue || maximumDraws != int.MaxValue);
         int candidates = 0, batchedRoots = 0;
@@ -351,6 +355,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
 
             if (instance.VfxFeature.IsSpecified && ++effectRequests > PresentationExtractor.MaximumSnapshotEffects) continue;
+            if (instance.WorldFeature.Kind == ForgeLine.Game.WorldPresentationKind.ResourceDeposit &&
+                !ValidResourceTransform(instance.Transform))
+            {
+                ResourceDiagnostics = ResourceDiagnostics with { InvalidTransforms = ResourceDiagnostics.InvalidTransforms + 1 };
+                continue;
+            }
             if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
             if (instance.VfxFeature.IsSpecified && ++meshFallbackEffects > (particles?.MaximumMeshFallbackEffects ?? 128)) continue;
             AxisAlignedBounds bounds = preparedRoot.Bounds;
@@ -544,6 +554,19 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
                 highLod++;
             }
+            else if (instance.WorldFeature.Kind == ForgeLine.Game.WorldPresentationKind.ResourceDeposit &&
+                     ResourceDepositVariantCatalog.IsResource(instance.WorldFeature.Visual))
+            {
+                WorldAssetLod requestedLod = ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f, _lodDiameterScale) > 0
+                    ? WorldAssetLod.Reduced : WorldAssetLod.High;
+                if (!TryResolveResource(instance.WorldFeature, requestedLod, out runtimeMesh, out runtimeMeshId,
+                    out materialAssetId, out WorldAssetLod actualLod)) continue;
+                usesRuntimeMesh = true;
+                if (hasLodIdentity && !shadowProjection.HasValue && !preparing)
+                    _currentLods[lodKey] = requestedLod == WorldAssetLod.Reduced ? 1 : 0;
+                if (actualLod == WorldAssetLod.Reduced) { lod1Instances++; reducedLod++; }
+                else highLod++;
+            }
             else if (instance.WorldFeature.IsSpecified)
             {
                 materialAssetId =
@@ -581,7 +604,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
             if (usesRuntimeMesh &&
                 runtimeMesh.HasMaterial &&
-                !hasBuildingDefinition)
+                !hasBuildingDefinition &&
+                instance.WorldFeature.Kind != ForgeLine.Game.WorldPresentationKind.ResourceDeposit)
             {
                 materialAssetId =
                     runtimeMesh.MaterialId.Value;
@@ -749,11 +773,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
             LastDiagnostics =
                 new InstanceRenderDiagnostics(
                     world.InstanceCount,
-                    0,
-                    world.InstanceCount,
+                    visible,
+                    world.InstanceCount - visible,
                     0,
                     highLod,
-                    reducedLod) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances, SkippedDecalResources = skippedDecalResources, ClusterTests = clusterTests, RejectedClusters = rejectedClusters, ClusterCulledInstances = clusterCulled, InstanceBoundsTests = instanceTests };
+                    reducedLod) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances, ResourceDeposits = ResourceDiagnostics, SkippedDecalResources = skippedDecalResources, ClusterTests = clusterTests, RejectedClusters = rejectedClusters, ClusterCulledInstances = clusterCulled, InstanceBoundsTests = instanceTests };
             return;
         }
 
@@ -950,7 +974,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 runtimeMeshInstances,
                 texturedRuntimeMeshInstances,
                 fallbackMeshInstances) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances,
-                    AnimatedVegetationInstances = animatedVegetation, VisibleVegetationInstances = visibleVegetation, SkippedDecalResources = skippedDecalResources, ClusterTests = clusterTests, RejectedClusters = rejectedClusters, ClusterCulledInstances = clusterCulled, InstanceBoundsTests = instanceTests };
+                    AnimatedVegetationInstances = animatedVegetation, VisibleVegetationInstances = visibleVegetation, ResourceDeposits = ResourceDiagnostics, SkippedDecalResources = skippedDecalResources, ClusterTests = clusterTests, RejectedClusters = rejectedClusters, ClusterCulledInstances = clusterCulled, InstanceBoundsTests = instanceTests };
     }
 
     public void Dispose()
@@ -1269,12 +1293,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
         if (instance.WorldFeature.IsSpecified)
         {
-            return runtimeTint.HasValue
-                ? WorldPresentationCatalog.ApplyStateTint(
-                    instance.WorldFeature,
-                    runtimeTint.Value)
-                : WorldPresentationCatalog.ResolveTint(
-                    instance.WorldFeature);
+            Vector4 family = runtimeTint ?? WorldPresentationCatalog.Get(instance.WorldFeature.Visual).Tint;
+            return WorldPresentationCatalog.ApplyStateTint(instance.WorldFeature,
+                family * ResourceDepositVariantCatalog.InstanceTint(instance.WorldFeature));
         }
 
         uint hash =
