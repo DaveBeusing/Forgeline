@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "contract": "resource-visual/1",
+  "status": "specification-only; NOT EXECUTED; not loaded by runtime or CI",
+  "keyFormat": "resource-visual/1/{family}/{layout}/{size}",
+  "families": [
+    {
+      "resourceId": 1,
+      "economyKey": "resource.ferrous_ore",
+      "visual": "ResourceFerrousOre",
+      "family": "ferrous_ore",
+      "mesh": "mesh.world.resource.ferrous_ore",
+      "reducedMesh": "mesh.world.resource.ferrous_ore_lod1",
+      "material": "material.world.resource.ferrous_ore",
+      "symbol": "material.world.symbol.resource.ferrous_ore",
+      "layouts": [
+        { "key": "layered_shelf", "weight": 40 },
+        { "key": "faulted_ridge", "weight": 25 },
+        { "key": "breccia_fan", "weight": 20 },
+        { "key": "offset_seam", "weight": 15 }
+      ],
+      "tintMin": [0.94, 0.92, 0.90],
+      "tintMax": [1.04, 1.02, 1.00],
+      "landmarks": ["stepped beds", "blunt fractured rim"]
+    },
+    {
+      "resourceId": 3,
+      "economyKey": "resource.silicates",
+      "visual": "ResourceSilicates",
+      "family": "silicates",
+      "mesh": "mesh.world.resource.silicates",
+      "reducedMesh": "mesh.world.resource.silicates_lod1",
+      "material": "material.world.resource.silicates",
+      "symbol": "material.world.symbol.resource.silicates",
+      "layouts": [
+        { "key": "cleaved_plate", "weight": 35 },
+        { "key": "crystal_fan", "weight": 30 },
+        { "key": "stepped_bed", "weight": 20 },
+        { "key": "split_rosette", "weight": 15 }
+      ],
+      "tintMin": [0.94, 0.95, 0.94],
+      "tintMax": [1.03, 1.04, 1.02],
+      "landmarks": ["broad basal plate", "inclined cleavage"]
+    },
+    {
+      "resourceId": 2,
+      "economyKey": "resource.volatiles",
+      "visual": "ResourceVolatiles",
+      "family": "volatiles",
+      "mesh": "mesh.world.resource.volatiles",
+      "reducedMesh": "mesh.world.resource.volatiles_lod1",
+      "material": "material.world.resource.volatiles",
+      "symbol": "material.world.symbol.resource.volatiles",
+      "layouts": [
+        { "key": "sealed_nodule", "weight": 40 },
+        { "key": "fractured_lens", "weight": 25 },
+        { "key": "laminated_pocket", "weight": 20 },
+        { "key": "weathered_saddle", "weight": 15 }
+      ],
+      "tintMin": [0.93, 0.96, 0.96],
+      "tintMax": [1.01, 1.03, 1.04],
+      "landmarks": ["closed low caps", "dry sealed rind"]
+    },
+    {
+      "resourceId": 8,
+      "economyKey": "resource.rare_elements",
+      "visual": "ResourceRareElements",
+      "family": "rare_elements",
+      "mesh": "mesh.world.resource.rare_elements",
+      "reducedMesh": "mesh.world.resource.rare_elements_lod1",
+      "material": "material.world.resource.rare_elements",
+      "symbol": "material.world.symbol.resource.rare_elements",
+      "layouts": [
+        { "key": "inclusion_reef", "weight": 35 },
+        { "key": "split_matrix", "weight": 30 },
+        { "key": "radial_inclusions", "weight": 20 },
+        { "key": "faulted_pocket", "weight": 15 }
+      ],
+      "tintMin": [0.95, 0.93, 0.96],
+      "tintMax": [1.03, 1.01, 1.04],
+      "landmarks": ["asymmetric host matrix", "two unequal inclusion directions"]
+    }
+  ],
+  "sizes": [
+    { "key": "small", "weight": 25, "maximumNormalizedSpan": 0.68 },
+    { "key": "medium", "weight": 50, "maximumNormalizedSpan": 0.86 },
+    { "key": "large", "weight": 25, "maximumNormalizedSpan": 1.00 }
+  ],
+  "states": ["Untouched", "Active", "Depleted"],
+  "runtimeLods": ["High", "Reduced"],
+  "reservedAssetOnlyLod": "_lod2",
+  "uvMode": "authored",
+  "uniformScale": { "minInclusive": 0.90, "maxExclusive": 1.00 },
+  "seedProtocol": {
+    "digest": "SHA-256",
+    "prefixAscii": "FORGELINE.resource-visual/1",
+    "prefixTerminatorByte": 0,
+    "encoding": "ASCII keys with UInt32 byte-length prefixes; UInt64 visualSeed and UInt32 resourceId/anchorOrdinal; all integers little-endian",
+    "channels": ["form", "size", "rotation", "scale", "tint"],
+    "excluded": ["state", "lod", "remainingQuantity", "tick", "viewer", "quality", "resolution", "transientEntityIndex", "simulationRng"]
+  },
+  "bucketBoundaryExamples": {
+    "weights40_25_20_15": [
+      { "min": 0, "max": 39, "row": 0 },
+      { "min": 40, "max": 64, "row": 1 },
+      { "min": 65, "max": 84, "row": 2 },
+      { "min": 85, "max": 99, "row": 3 }
+    ],
+    "weights35_30_20_15": [
+      { "min": 0, "max": 34, "row": 0 },
+      { "min": 35, "max": 64, "row": 1 },
+      { "min": 65, "max": 84, "row": 2 },
+      { "min": 85, "max": 99, "row": 3 }
+    ]
+  },
+  "negativeCases": [
+    { "input": "schemaVersion=2", "expected": "canonical-family-fallback" },
+    { "input": "layout=Layered_Shelf", "expected": "canonical-family-fallback" },
+    { "input": "size=huge", "expected": "canonical-family-fallback" },
+    { "input": "depositKey missing", "expected": "canonical-family-fallback" },
+    { "input": "variant Reduced missing", "expected": "reject-variant-pair; canonical-family-fallback" },
+    { "input": "canonical mesh missing", "expected": "controlled-missing-3d; retain-authorized-inspection-and-symbol-policy" },
+    { "input": "unknown ResourceId", "expected": "existing-unsupported-resource-policy; no-family-coercion" },
+    { "input": "nonfinite anchor transform", "expected": "reject-invalid-transform-before-allocation; no-invalid-draw" },
+    { "input": "state=None", "expected": "metadata-absence; never-a-fourth-deposit-state" },
+    { "input": "hidden deposit", "expected": "no-new-parts-shadows-or-symbols" }
+  ],
+  "requiredAssertions": [
+    "persistent-ids-and-bindings",
+    "ordered-layouts-and-size-weights",
+    "byte-exact-seed-and-channel-independence",
+    "same-authoritative-state-and-simulation-with-visuals-disabled",
+    "distinct-grayscale-family-silhouettes-at-both-runtime-lods",
+    "conservative-render-and-shadow-bounds-without-gameplay-bound-changes",
+    "bounded-shared-resources-in-100-and-1000-instance-scenes"
+  ]
+}
