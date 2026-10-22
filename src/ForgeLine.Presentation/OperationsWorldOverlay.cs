@@ -124,14 +124,10 @@ internal sealed class OperationsWorldOverlay
                 foreach (var row in diagnosis.Rows)
                     if (row.RequestId == link.RequestId && row.Subject == OperationsDiagnosisSubject.TransportRequest)
                     {
-                        // Request loaded counters can survive a completed/failed journey. Only a
-                        // matching current physical cargo observation establishes cargo on board.
-                        foreach (var physical in diagnosis.Rows)
-                            if (row.AssignedTruck.IsValid && physical.Subject == OperationsDiagnosisSubject.CargoTransport &&
-                                physical.Entity == row.AssignedTruck && physical.Source == link.Source &&
-                                physical.Destination == link.Destination && physical.Resource == link.Resource &&
-                                physical.LoadedCargoQuantity is > 0)
-                            { loaded = true; break; }
+                        // The player extractor has already checked the live truck/order generation,
+                        // endpoints and resource and subtracts delivered progress from loaded progress.
+                        loaded = row.AssignedTruck.IsValid && row.LoadedCargoQuantity is > 0 &&
+                            row.Status is (nameof(LogisticsTransportRequestState.Assigned) or nameof(LogisticsTransportRequestState.InTransit));
                         break;
                     }
                 AddLink(link.Source, link.Destination, true, true, loaded);

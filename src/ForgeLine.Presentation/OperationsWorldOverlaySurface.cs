@@ -147,7 +147,7 @@ internal sealed class OperationsWorldOverlaySurface : IGameplayHudSurface
                     { caption.Append(resource.Name); caption.Append(": "); break; }
             caption.Append(row.PrimaryReason != OperationsDiagnosisReason.None
                 ? OperationsDiagnosisSnapshot.Label(row.PrimaryReason) : row.Status);
-            caption.Number(row.Subject == OperationsDiagnosisSubject.CargoTransport ? " / ON BOARD " : " / LOADED SO FAR ",
+            caption.Number(row.Subject == OperationsDiagnosisSubject.CargoTransport ? " / ON BOARD " : " / LOAD ",
                 row.LoadedCargoQuantity);
             caption.Number(" / STOCK ", row.LocalQuantity);
             caption.Number(" / REQUEST ", row.OutstandingRequestQuantity);

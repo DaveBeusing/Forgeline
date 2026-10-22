@@ -33,6 +33,10 @@ An `OperationsDiagnosisLink` requires a nonzero real request ID and two already 
 
 ## Workflow and limitations
 
+The [gameplay and Operations world overlays](GameplayOperationsWorldOverlays.md)
+project these authorized observations through the existing HUD compositor, with
+bounded markers, explicit topology/request/load labels and the existing focus controls.
+
 Select an owned building or Cargo Truck. Inspect its existing production/logistics commands for stock thresholds, requests, vehicle state and docking service. The existing Operations panel continues to use its bounded player-owned aggregate overview. When the panel's selected row matches the exact generation-aware entity covered by the current selected-object diagnosis, its detail reuses the highest-priority observed blocker and suggests an existing inspection path. It also identifies reported transport/policy state with independently labeled REQUEST, CONFIRMED and LOADED amounts. These are **not additive** and none means physically delivered. If no current matching focused diagnosis is available, the aggregate facility explanation remains visible; there is no guessed cross-facility trace.
 
 The optional onboarding card uses this same current, owned diagnosis when no more specific production or logistics feedback is already available. Opening a facility or existing controls only changes presentation focus; no command is issued, shipment confirmed, automatic retry started or alert fabricated. No new panel, chart, notification or control is introduced here.
