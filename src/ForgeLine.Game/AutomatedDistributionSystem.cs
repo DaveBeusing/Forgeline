@@ -1423,7 +1423,15 @@ public sealed class AutomatedDistributionSystem
                     request.WaitingSinceTick,
                     request.NextAttemptTick,
                     request.LastEvaluatedAtTick,
-                    dockReason);
+                    dockReason)
+                {
+                    EffectivePriority =
+                        request.State is LogisticsTransportRequestState.Pending or
+                            LogisticsTransportRequestState.RetryPending
+                            ? (LogisticsStockPriority)GetEffectivePriority(
+                                request, context.Tick, context.Entities)
+                            : request.Priority
+                };
         }
 
         int idleTrucks = 0;
