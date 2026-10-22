@@ -30,6 +30,8 @@ class ConveyorContractTests(unittest.TestCase):
         self.assertEqual(12, len(self.kit["modules"]))
         self.assertEqual(5.2, self.kit["geometry"]["assemblyUndersideYTierZeroMeters"])
         self.assertEqual(5, self.kit["geometry"]["roadPassageMinimumMeters"])
+        self.assertEqual(9, len(module_by_slug(self.kit, "conveyor_merger_2to1")["variants"]))
+        self.assertEqual(4, len(module_by_slug(self.kit, "conveyor_support_heavy")["variants"]))
 
     def test_straights_mate_without_a_gap_or_a_direction_mismatch(self):
         short_out = self.ports("conveyor_straight_short")[1]
