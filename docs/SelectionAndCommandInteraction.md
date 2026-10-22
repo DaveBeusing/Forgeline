@@ -304,3 +304,42 @@ qualification are recorded in [HUD consolidation](HudSurfaceConsolidation.md).
 ## Shared green drag-selection treatment
 
 The drag rectangle and selected entity corners share `RtsSelectionVisualStyle.Selected` (`0.25, 1.0, 0.35` RGB). The fill is 0.12 alpha and the single border is 0.92 alpha at 1.25 physical client pixels, without a secondary dark glow. The box is normalized/clipped in screen space but never changes the six-logical-pixel drag threshold, shift-toggle, picking eligibility, input capture, selection order or command authority. This is a visual-only change; tactical F2 debug circles and order/placement footprints remain intact. Geometry and allocation regressions verify 1,000 selected objects within a bounded line budget. Native screenshots across DPI/UI scales and terrain contrast still require physical review.
+
+## Persistent selected-unit orders
+
+Selected owned units expose their **current authoritative operation** independently of
+the radial action ring and pointer hover. The copied selection snapshot contains its
+session, simulation tick, full generation-aware selected entity identities, per-unit
+operation/status and only authorized target coordinates. An immediate input selection
+change hides the previous annotation until a matching snapshot arrives.
+
+Supported operations include strategic movement, group end destinations (not local
+formation slots or navigation waypoints), Attack, AttackMove, Retreat, Hold, cargo
+collection/delivery/loading/unloading/waiting and active resupply. Invalid or completed
+orders do not create a destination line. A fuel shortage is a status of the current
+operation rather than an invented new order. Unknown targets remain unmarked.
+
+The one-line caption is drawn near the selected formation or unit independently of
+any hover/ring. Multiple selected units have a bounded summary of actual operation
+categories (e.g. `MOVE 4 / ATTACK 2 / IDLE 1`); selecting one unit reveals its
+individual phase. Text and target markers never own pointer hit regions.
+
+A dedicated depth-disabled player presentation overlay draws a one-logical-pixel
+line at approximately 22 percent alpha and one subtle grouped target pulse
+(about 1.2 seconds) per unique destination. This overlay does not alter existing
+three-pixel selection or 0.8-second intent feedback geometry. Reduced Motion and
+low rendering quality use a static target dot; pulsing reads presentation time,
+never simulation time. Endpoint and session validation prevent invalid world-origin
+lines or stale target information, and target grouping avoids repeated alpha buildup
+for formations.
+
+Enemy Attack target coordinates are taken from **currently detected or identified
+faction intelligence contacts**, never from an enemy's unrestricted live
+WorldTransform. Visibility loss hides the coordinate while the text can continue to
+report the actual accepted order. Only local owned unit state is copied. The world
+annotation draws from current immutable snapshots and interpolated friendly render
+transforms without reading ECS state on the render thread.
+
+This is a presentation-only feature. It does not modify pathfinding, movement,
+production, logistics, combat execution, saving or replay state. Native animation,
+terrain/zoom contrast and DPI/UI-scale checks remain required for visual acceptance.

@@ -17,11 +17,13 @@ public sealed class DebugDrawRenderer : IDisposable
     private bool _disposed;
     private readonly ScreenLineVertex[]? _screenVertices;
     private readonly float _lineWidthPixels;
+    private readonly int _maximumLines;
 
     public DebugDrawRenderer(
         IGraphicsDevice graphics,
         bool depthEnabled = true,
-        float lineWidthPixels = 0.0f)
+        float lineWidthPixels = 0.0f,
+        int maximumLines = MaxLines)
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
@@ -30,11 +32,14 @@ public sealed class DebugDrawRenderer : IDisposable
         {
             throw new ArgumentOutOfRangeException(nameof(lineWidthPixels));
         }
+        ArgumentOutOfRangeException.ThrowIfLessThan(maximumLines, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(maximumLines, MaxLines);
+        _maximumLines = maximumLines;
         _lineWidthPixels = lineWidthPixels;
-        _vertices = lineWidthPixels > 0.0f ? [] : new DebugVertex[MaxLines * 2];
+        _vertices = lineWidthPixels > 0.0f ? [] : new DebugVertex[maximumLines * 2];
         if (lineWidthPixels > 0.0f)
         {
-            _screenVertices = new ScreenLineVertex[MaxLines * 6];
+            _screenVertices = new ScreenLineVertex[maximumLines * 6];
         }
         _pipeline =
             _screenVertices is not null ? CreateScreenLinePipeline(graphics, depthEnabled) : CreatePipeline(
@@ -62,7 +67,7 @@ public sealed class DebugDrawRenderer : IDisposable
             return;
         }
 
-        int renderedLines = Math.Min(lines.Length, MaxLines);
+        int renderedLines = Math.Min(lines.Length, _maximumLines);
         if (_screenVertices is not null)
         {
             RenderScreenLines(context, camera, lines, renderedLines, uiScale);

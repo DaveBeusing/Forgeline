@@ -450,6 +450,10 @@ internal sealed class ClientRenderHost : IDisposable
                     graphics,
                     depthEnabled: false,
                     lineWidthPixels: 3.0f);
+            using var selectedOrderRenderer =
+                new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 1.0f,
+                    maximumLines: 8192);
+            var selectedOrderOverlay = new SelectedUnitOrderOverlay();
             using var debugDrawRenderer =
                 new DebugDrawRenderer(
                     graphics,
@@ -479,6 +483,7 @@ internal sealed class ClientRenderHost : IDisposable
             var debugDraw =
                 new DebugDraw();
             var dockingZoneDraw = new DebugDraw { Enabled = true };
+            var selectedOrderDraw = new DebugDraw { Enabled = true };
             var frameTimingTracker =
                 new FrameTimingTracker();
             var runtimeMetricsSampler = new RuntimeMetricsSampler();
@@ -633,6 +638,26 @@ internal sealed class ClientRenderHost : IDisposable
                     current.DebugOverlay.Enabled,
                     current.DebugLines,
                     current.DebugLabels);
+                if (current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
+                    current.Frontend is null && !current.SurfaceSuspended)
+                {
+                    selectedOrderOverlay.Draw(
+                        selectedOrderDraw,
+                        renderWorld,
+                        current.InformationLayer.SelectedEntities,
+                        snapshot.SessionId,
+                        renderCamera,
+                        renderAlpha,
+                        current.ViewportHeight,
+                        RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale,
+                        uiNow,
+                        current.FeedbackSettings.ReducedMotion ||
+                            qualityProfile.Active == RenderQuality.Low);
+                }
+                else
+                {
+                    selectedOrderDraw.Clear();
+                }
                 dockingZoneDraw.Clear();
                 if (current.MetricsActive && current.PreAlphaUx.Mode == PreAlphaUxMode.None)
                     LogisticsZoneOverlay.Draw(dockingZoneDraw, snapshot,
@@ -727,6 +752,9 @@ internal sealed class ClientRenderHost : IDisposable
                             .TotalMilliseconds;
 
                         dockingZoneRenderer.Render(context, renderCamera, dockingZoneDraw);
+                        selectedOrderRenderer.Render(
+                            context, renderCamera, selectedOrderDraw,
+                            RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
                         gameplayOverlayRenderer.Render(
                             context,
                             renderCamera,

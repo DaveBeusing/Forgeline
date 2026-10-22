@@ -55,6 +55,23 @@ public sealed class DebugDrawRendererTests : IDisposable
         Assert.Same(buffer, _graphics.LastBuffer);
     }
 
+    [Fact]
+    public void BoundedOnePixelOverlayUsesOnlyItsConfiguredCapacity()
+    {
+        using var renderer = new DebugDrawRenderer(
+            _graphics, depthEnabled: false, lineWidthPixels: 1.0f, maximumLines: 8);
+        var draw = new DebugDraw { Enabled = true };
+        for (int i = 0; i < 12; i++)
+            draw.Line(new(-4, 0, 0), new(4, 0, 0), new(0.25f, 1, 0.35f, 0.22f));
+        var context = new FakeGraphicsCommandContext();
+        renderer.Render(context, new RtsCamera(), draw);
+        Assert.Equal(1, context.DrawCalls);
+        Assert.Equal(8, renderer.LastDiagnostics.RenderedLines);
+        Assert.Equal(4, renderer.LastDiagnostics.DroppedLines);
+        Assert.Equal(8 * 6 * 40, _graphics.LastBuffer!.Data.Length);
+        Assert.Equal(8UL * 6UL * 40UL, _graphics.LastBuffer.Description.SizeInBytes);
+    }
+
     [Theory]
     [InlineData(1.0f)]
     [InlineData(2.0f)]
