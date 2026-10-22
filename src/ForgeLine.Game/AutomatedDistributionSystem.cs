@@ -299,7 +299,14 @@ public sealed class AutomatedDistributionSystem
             }
 
             RequestState? existing = FindActiveRequest(policyState.PolicyEntity);
-            if (existing is not null) existing.Priority = policy.Priority;
+            // A new policy class changes only unassigned demand. A committed
+            // truck and its physical cargo keep the priority accepted at dispatch.
+            if (existing is not null &&
+                existing.State is LogisticsTransportRequestState.Pending or
+                    LogisticsTransportRequestState.RetryPending)
+            {
+                existing.Priority = policy.Priority;
+            }
             double currentQuantity =
                 _inventories.GetQuantity(destinationInventory, policy.ResourceId);
 
