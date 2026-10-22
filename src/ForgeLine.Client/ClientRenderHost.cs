@@ -482,6 +482,7 @@ internal sealed class ClientRenderHost : IDisposable
             var debugDraw =
                 new DebugDraw();
             var dockingZoneDraw = new DebugDraw { Enabled = true };
+            var selectedOrderDraw = new DebugDraw { Enabled = true };
             var frameTimingTracker =
                 new FrameTimingTracker();
             var runtimeMetricsSampler = new RuntimeMetricsSampler();
