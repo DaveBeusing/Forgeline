@@ -1352,8 +1352,9 @@ public sealed partial class PlayerActionPanelController
             return;
         }
 
-        var decision = PlayerActionDockHudModel.DecideStockAdjustment(
-            CreateView(1920, 1080, actions), actions.Logistics, direction);
+        var decision = LogisticsQuantityEditor.DecideField(
+            StockThresholdField, _stockMinimum, _stockTarget, _stockMaximum,
+            actions.Logistics.InventoryCapacity, direction);
         if (!decision.Allowed)
         {
             Feedback = decision.Reason;
