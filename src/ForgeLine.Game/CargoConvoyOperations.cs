@@ -140,6 +140,8 @@ public sealed class CargoConvoySystem : ISimulationSystem
                 maximumDistanceSquared = Math.Max(maximumDistanceSquared, separation);
                 slowestSpeed = Math.Min(slowestSpeed, movement.MaximumSpeed);
                 if (context.Entities.HasComponent<VehicleDockVisit>(truck) ||
+                    context.Entities.TryGetComponent(truck, out SupplyMovementConstraint movementSupply) &&
+                    !movementSupply.CanMove ||
                     context.Entities.HasComponent<CargoFuelServiceState>(truck) ||
                     context.Entities.HasComponent<ResupplyOrder>(truck) ||
                     context.Entities.HasComponent<SupplyRescueAssignment>(truck))
@@ -167,7 +169,8 @@ public sealed class CargoConvoySystem : ISimulationSystem
 
             bool holding = maximumDistanceSquared >
                 MaximumSeparationMeters * MaximumSeparationMeters;
-            var status = holding ? CargoConvoyStatus.Holding :
+            var status = group.Leader != leader ? CargoConvoyStatus.Disrupted :
+                holding ? CargoConvoyStatus.Holding :
                 maximumDistanceSquared > RendezvousMeters * RendezvousMeters
                     ? CargoConvoyStatus.Rendezvous : CargoConvoyStatus.Moving;
             foreach (EntityId truck in _members)
@@ -263,13 +266,18 @@ public sealed class CargoConvoySystem : ISimulationSystem
 
     public static void Dissolve(SimulationContext context, EntityId groupId)
     {
-        foreach (EntityId truck in context.Entities.Query<CargoConvoyMember>(
-                     QueryIterationOrder.StableByEntityIndex))
-            if (context.Entities.GetComponent<CargoConvoyMember>(truck).Group == groupId)
+        // Enumerate a fixed identity copy: detaching removes the queried component.
+        EntityId[] trucks = context.Entities.Query<CargoConvoyMember>(
+            QueryIterationOrder.StableByEntityIndex).ToArray();
+        foreach (EntityId truck in trucks)
+            if (context.Entities.TryGetComponent(truck, out CargoConvoyMember member) &&
+                member.Group == groupId)
                 DetachTruck(context.Entities, truck);
-        foreach (EntityId escort in context.Entities.Query<CargoConvoyEscort>(
-                     QueryIterationOrder.StableByEntityIndex))
-            if (context.Entities.GetComponent<CargoConvoyEscort>(escort).Group == groupId)
+        EntityId[] escorts = context.Entities.Query<CargoConvoyEscort>(
+            QueryIterationOrder.StableByEntityIndex).ToArray();
+        foreach (EntityId escort in escorts)
+            if (context.Entities.TryGetComponent(escort, out CargoConvoyEscort member) &&
+                member.Group == groupId)
                 DetachEscort(context, escort);
         if (context.Entities.IsAlive(groupId))
             context.Entities.DestroyEntity(groupId);
