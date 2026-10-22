@@ -5,7 +5,7 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.12.0";
+    public const string CompilerVersion = "1.12.1";
     public const int RuntimeVersion = RuntimeAssetIntegrity.SupportedRuntimeVersion;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
@@ -366,13 +366,13 @@ public static class AssetPipelineCompiler
                     ToRelativePath(sourceRoot, sourcePath)));
             }
 
-            if (definition.TextureUsage == RuntimeTextureUsage.BaseColor &&
+            if (definition.TextureUsage is RuntimeTextureUsage.BaseColor or RuntimeTextureUsage.Emissive &&
                 definition.TextureColorSpace != RuntimeTextureColorSpace.Srgb)
             {
                 diagnostics.Add(new AssetCompilerDiagnostic(
                     "ASSET028",
                     AssetCompilerDiagnosticSeverity.Error,
-                    "Base Color textures require sRGB color space.",
+                    "Base Color and Emissive textures require sRGB color space.",
                     id.Value,
                     ToRelativePath(sourceRoot, sourcePath)));
             }
@@ -1044,10 +1044,8 @@ public static class AssetPipelineCompiler
             RuntimeVersion = RuntimeVersion,
             CompilerVersion = CompilerVersion,
             Dependencies = node.Dependencies.Select(static id => id.Value).ToArray(),
-            MaterialReferences = node.Definition.MaterialReferences
-                .Distinct(StringComparer.Ordinal)
-                .Order(StringComparer.Ordinal)
-                .ToArray(),
+            // Material slots are indexed by mesh sections; order and repeated IDs are semantic.
+            MaterialReferences = node.Definition.MaterialReferences.ToArray(),
             TextureReferences = textureReferences
                 .Distinct(StringComparer.Ordinal)
                 .Order(StringComparer.Ordinal)

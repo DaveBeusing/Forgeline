@@ -49,6 +49,8 @@ internal static class MaterialImporter
 
     private static void Validate(MaterialSourceDefinition definition)
     {
+        if (definition.BaseColorFactor is null || definition.UvScale is null || definition.UvOffset is null)
+            throw new InvalidDataException("Material baseColorFactor, uvScale and uvOffset must be arrays, not null.");
         if (definition.BaseColorFactor.Length != 4 ||
             definition.BaseColorFactor.Any(static value => !float.IsFinite(value) || value < 0f))
         {

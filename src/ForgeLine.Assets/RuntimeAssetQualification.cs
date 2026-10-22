@@ -124,6 +124,7 @@ public static class RuntimeAssetQualification
                 catalog.Manifest.Assets.Count);
         var readWatch =
             Stopwatch.StartNew();
+        var bindings = new RuntimeAssetBindingValidator(catalog);
 
         foreach (RuntimeAssetRecord record in
                  catalog.Manifest.Assets)
@@ -160,6 +161,7 @@ public static class RuntimeAssetQualification
                 {
                     case RuntimeAssetType.Mesh:
                         var mesh = RuntimeMeshData.FromPayload(content.Payload);
+                        bindings.ValidateMesh(record, mesh);
                         if (record.SkinReference is { } skinReference)
                         {
                             var skinDataMesh = RuntimeSkinData.FromPayload(catalog.Read(AssetId.Parse(skinReference)).Payload);
@@ -179,6 +181,7 @@ public static class RuntimeAssetQualification
                         break;
                     case RuntimeAssetType.Skin:
                         var skinData = RuntimeSkinData.FromPayload(content.Payload);
+                        bindings.ValidateMesh(record, skinData.Mesh);
                         foreach (string clipId in record.AnimationReferences)
                             _ = skinData.Bind(RuntimeAnimationData.FromPayload(catalog.Read(AssetId.Parse(clipId)).Payload));
                         break;
@@ -204,9 +207,7 @@ public static class RuntimeAssetQualification
                         break;
 
                     case RuntimeAssetType.Material:
-                        _ =
-                            RuntimeMaterialData.FromPayload(
-                                content.Payload);
+                        bindings.ValidateMaterial(record, RuntimeMaterialData.FromPayload(content.Payload));
                         break;
                 }
             }
@@ -214,6 +215,8 @@ public static class RuntimeAssetQualification
                 exception is IOException or
                 UnauthorizedAccessException or
                 InvalidDataException or
+                ArgumentException or
+                KeyNotFoundException or
                 JsonException)
             {
                 issues.Add(
