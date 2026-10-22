@@ -107,6 +107,8 @@ public sealed class PresentationSnapshot
 
     public LogisticsZoneSnapshot? DockingZones { get; init; }
 
+    public SelectedUnitOrderSnapshot? SelectedOrders { get; init; }
+
     public VfxPresentationMetrics VfxMetrics { get; }
 
     public DecalPresentationMetrics DecalMetrics { get; init; }
