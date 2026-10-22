@@ -73,7 +73,7 @@ internal static class CargoConvoyCommands
         context.Entities.AddComponent(created, new CargoConvoyGroup(
             issuer, trucks[0], primary.Origin, primary.Destination,
             leaderRoute.Route!.Version, CargoConvoyStatus.Rendezvous,
-            context.Tick, context.Tick));
+            context.Tick, context.Tick, context.Tick));
         foreach (EntityId truck in trucks)
             context.Entities.AddComponent(truck, new CargoConvoyMember(created));
         foreach (EntityId escort in escorts)
