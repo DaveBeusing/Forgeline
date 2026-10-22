@@ -87,6 +87,8 @@ public sealed class OperationsController
     private ulong _armedPress;
     private System.Numerics.Vector2 _armedOrigin;
     private OperationsView _armedView;
+    private int _armedRowIndex = -1;
+    private EntityId _armedRowEntity;
     private SimulationSessionId _session;
     private GameplayHudLayout _layout;
     private bool _initialized;
@@ -140,6 +142,17 @@ public sealed class OperationsController
             _armedPress = press;
             _armedOrigin = pressOrigin;
             _armedView = View;
+            _armedRowIndex = -1;
+            _armedRowEntity = default;
+            if (_armed && View.Open && !View.Notifications &&
+                OperationsSnapshot.Resolve(snapshot) is { } pressedData)
+                for (int index = 3; index <= 8; index++)
+                    if (OperationsLayout.Control(layout, index).Contains(pressOrigin))
+                    {
+                        _armedRowIndex = index;
+                        _armedRowEntity = OperationsLayout.Row(pressedData, View, index - 3)?.Entity ?? default;
+                        break;
+                    }
         }
         captured |= _armed && View.Open && panel.Contains(_armedOrigin);
         if (!input.WasMouseButtonReleased(PlatformMouseButton.Left)) return new(captured);
@@ -187,7 +200,8 @@ public sealed class OperationsController
             if (!control.Contains(origin) || !control.Contains(release)) continue;
             if (index == 1) View = View with { Filter = (OperationsCategory)(((int)View.Filter + 1) % 6), Page = 0, Selected = default };
             else if (index == 2) View = View with { Page = OperationsLayout.Row(data, View with { Page = View.Page + 1 }, 0) is null ? 0 : View.Page + 1, Selected = default };
-            else if (index is >= 3 and <= 8 && OperationsLayout.Row(data, View, index - 3) is { } row)
+            else if (index is >= 3 and <= 8 && OperationsLayout.Row(data, View, index - 3) is { } row &&
+                     _armedRowIndex == index && _armedRowEntity == row.Entity)
                 View = View with { Selected = row.Entity };
             else if (index == 11)
             {
