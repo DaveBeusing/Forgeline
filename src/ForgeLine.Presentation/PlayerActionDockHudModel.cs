@@ -668,7 +668,7 @@ internal static class PlayerActionDockHudModel
             actions.Logistics is PlayerLogisticsActionReadModel logistics)
         {
             if (index >= logistics.Policies.Count && index < logistics.OrderStartIndex)
-                return direction == 0 || direction > 0 ? panel.LogisticsSteps < 100 : panel.LogisticsSteps > 1;
+                return direction == 0 || (direction > 0 ? panel.LogisticsSteps < 100 : panel.LogisticsSteps > 1);
             if (index < 0 || index >= logistics.Policies.Count) return false;
             if (direction == 0) return true;
             return DecideStockAdjustment(panel, logistics, direction).Allowed;
