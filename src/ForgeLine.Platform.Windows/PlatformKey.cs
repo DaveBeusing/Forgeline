@@ -56,5 +56,6 @@ public enum PlatformKey
     LeftControl,
     RightControl,
     Home,
-    G, I, J, N, O, V, X, Z
+    G, I, J, N, O, V, X, Z,
+    Delete
 }

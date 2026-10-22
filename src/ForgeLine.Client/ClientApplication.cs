@@ -338,7 +338,9 @@ internal sealed class ClientApplication
                 artilleryWeapons:
                     scenario.Services.ArtilleryWeapons,
                 technologies:
-                    scenario.Services.TechnologyDefinitions);
+                    scenario.Services.TechnologyDefinitions,
+                demolition:
+                    scenario.Services.Demolition);
         var presentationExtraction =
             new PresentationExtractionContext(
                 scenario,
@@ -1534,6 +1536,26 @@ internal sealed class ClientApplication
                 presentationInteraction.SetSelection(
                     selectionController.Selection.Entities);
 
+                // Building rings do not own Delete. Dialogs, key rebinding,
+                // placement, targeting and inactive game states do.
+                if (inputState.WasKeyPressed(_gameplayBindings.Key(GameplayAction.Demolish)) &&
+                    !simulationPaused && !modalFrame &&
+                    window.IsFocused && !window.IsMinimized &&
+                    !buildingPlacementController.IsActive &&
+                    !tacticalTargetingController.IsActive)
+                {
+                    EntityId[] demolitionTargets = selectionController.Selection.Entities.ToArray();
+                    if (demolitionTargets.Length > 0)
+                    {
+                        SimulationTick observedTick =
+                            currentSnapshot?.Tick ?? SimulationTick.Zero;
+                        RequireSubmission(
+                            simulationHost,
+                            gateway => gateway.SubmitDemolition(
+                                LocalPlayer, demolitionTargets, observedTick));
+                    }
+                }
+
                 if (buildingPlacementController.TryTakePlacementRequest(
                         out BuildingPlacementRequest placementRequest))
                 {
@@ -1567,7 +1589,9 @@ internal sealed class ClientApplication
                 commandGateway,
                 ref lastCommandResult,
                 buildingPlacementController,
-                presentationInteraction);
+                presentationInteraction,
+                actionPanel,
+                scenario.Services.Resources);
 
             TacticalTargetingView tacticalTargetingView =
                 tacticalTargetingController.CreateView(
@@ -3626,15 +3650,66 @@ internal sealed class ClientApplication
         PlayerCommandGateway commandGateway,
         ref PlayerCommandResultReadModel? lastCommandResult,
         RtsBuildingPlacementController placement,
-        PresentationInteractionState interaction)
+        PresentationInteractionState interaction,
+        PlayerActionPanelController actionPanel,
+        ResourceCatalog resources)
     {
         while (commandGateway.Results.TryRead(
                    out PlayerCommandResultReadModel result))
         {
             placement.ObserveResult(result, interaction);
-            lastCommandResult =
-                result;
+            if (result.Kind == PlayerCommandKind.Demolition)
+                actionPanel.ShowDemolitionFeedback(DescribeDemolitionResult(result, resources));
+            lastCommandResult = result;
         }
+    }
+
+    private static string DescribeDemolitionResult(
+        in PlayerCommandResultReadModel result,
+        ResourceCatalog resources)
+    {
+        BuildingDemolitionTargetResult[] targets = result.DemolitionTargets ?? [];
+        if (result.AcceptedTargets == 0)
+        {
+            BuildingDemolitionFailure reason =
+                targets.Length > 0 ? targets[0].Failure : BuildingDemolitionFailure.InvalidTarget;
+            string explanation = reason switch
+            {
+                BuildingDemolitionFailure.ProtectedCommandCore => "COMMAND CORE PROTECTED",
+                BuildingDemolitionFailure.NotOwned => "TARGET NOT OWNED",
+                BuildingDemolitionFailure.MissingPaymentRecord => "MATERIAL RECEIPT UNAVAILABLE",
+                BuildingDemolitionFailure.CommandCoreUnavailable => "COMMAND CORE UNAVAILABLE",
+                BuildingDemolitionFailure.InventoryNotEmpty => "EMPTY STORAGE BEFORE DEMOLITION",
+                BuildingDemolitionFailure.InsufficientRefundCapacity => "COMMAND CORE NEEDS MORE STORAGE CAPACITY",
+                BuildingDemolitionFailure.ConstructionAlreadyCancelling => "CONSTRUCTION ALREADY CANCELLING",
+                BuildingDemolitionFailure.ProductionActive => "STOP PRODUCTION / RESEARCH FIRST",
+                _ => "NO VALID BUILDINGS SELECTED"
+            };
+            return "DEMOLITION REJECTED - " + explanation;
+        }
+
+        var totals = new Dictionary<ResourceId, double>();
+        bool anyRefund = false;
+        foreach (BuildingDemolitionTargetResult target in targets)
+            if (target.Accepted)
+                foreach (BuildingResourceCost refund in target.Refunded)
+                {
+                    anyRefund = true;
+                    totals[refund.ResourceId] = totals.GetValueOrDefault(refund.ResourceId) + refund.Quantity;
+                }
+
+        string prefix = anyRefund
+            ? $"DEMOLISHED {result.AcceptedTargets}"
+            : $"CANCELLED {result.AcceptedTargets} CONSTRUCTION SITE(S)";
+        if (totals.Count > 0)
+        {
+            string materials = string.Join(", ", totals.OrderBy(item => item.Key)
+                .Select(item => $"{item.Value:0.##} {resources[item.Key].DisplayName}"));
+            prefix += " - REFUNDED " + materials;
+        }
+        if (result.RejectedTargets > 0)
+            prefix += $" - {result.RejectedTargets} REJECTED";
+        return prefix;
     }
 
 }

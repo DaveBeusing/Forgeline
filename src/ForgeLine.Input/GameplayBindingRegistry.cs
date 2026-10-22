@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace ForgeLine.Input;
 
-public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement }
+public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement, Demolish }
 public enum GameplayBindingScope : byte { Global, Dock }
 public readonly record struct GameplayBindingDefinition(GameplayAction Action, PlatformKey DefaultKey, string Label, GameplayBindingScope Scope);
 public readonly record struct GameplayBindingOverride(GameplayAction Action, PlatformKey Key);
@@ -27,7 +27,8 @@ public sealed class GameplayBindingRegistry
         "ESC PAUSE / CONTROLS", "ESC CANCEL / PAUSE", "LEFT SELECT / DOUBLE LEFT VISIBLE SAME TYPE",
         "SHIFT + LEFT EXTEND SELECTION", "RIGHT MOVE / TARGET", "CTRL + DIGIT ASSIGN / DIGIT RECALL / DOUBLE DIGIT FOCUS",
         "CTRL + SHIFT + DIGIT CLEAR", "SHIFT + CLICK REPEAT ACCEPTED BUILD", "SHIFT + F1 METRICS",
-        "SHIFT + F12 GUIDE", "F2 WORLD DEBUG / SHIFT + F4-F9 DEBUG CATEGORIES", "R RESTART TERMINAL MATCH"
+        "SHIFT + F12 GUIDE", "F2 WORLD DEBUG / SHIFT + F4-F9 DEBUG CATEGORIES", "R RESTART TERMINAL MATCH",
+        "DELETE DEMOLISH SELECTED BUILDINGS (40% MATERIAL REFUND)"
     });
     private static readonly GameplayBindingDefinition[] DefinitionsArray =
     [
@@ -55,7 +56,8 @@ public sealed class GameplayBindingRegistry
         new(GameplayAction.ExtractorPlacement, PlatformKey.F6, "PLACE EXTRACTOR", GameplayBindingScope.Global),
         new(GameplayAction.StoragePlacement, PlatformKey.F7, "PLACE STORAGE", GameplayBindingScope.Global),
         new(GameplayAction.SmelterPlacement, PlatformKey.F8, "PLACE SMELTER", GameplayBindingScope.Global),
-        new(GameplayAction.RotatePlacement, PlatformKey.F9, "ROTATE BUILDING", GameplayBindingScope.Global)
+        new(GameplayAction.RotatePlacement, PlatformKey.F9, "ROTATE BUILDING", GameplayBindingScope.Global),
+        new(GameplayAction.Demolish, PlatformKey.Delete, "DEMOLISH BUILDING", GameplayBindingScope.Global)
     ];
     public static IReadOnlyList<GameplayBindingDefinition> Definitions { get; } = Array.AsReadOnly(DefinitionsArray);
     public static GameplayBindingRegistry Default { get; } = new(new());

@@ -517,6 +517,9 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
 
         context.Entities.AddComponent(
             entity,
+            new PaidBuildingMaterials(definition.Costs.ToArray()));
+        context.Entities.AddComponent(
+            entity,
             new CompletedBuilding(
                 site.BuildingId,
                 site.Owner,

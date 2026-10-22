@@ -292,6 +292,12 @@ public readonly record struct CompletedBuilding(
     PlayerId Owner,
     SimulationTick CompletedAtTick);
 
+// Captured when reservations are consumed, not recalculated from the current recipe.
+public readonly record struct PaidBuildingMaterials(BuildingResourceCost[] Costs)
+{
+    public IReadOnlyList<BuildingResourceCost> Items => Costs ?? [];
+}
+
 public readonly record struct CommandFacility;
 
 public readonly record struct ProcessingFacility;
