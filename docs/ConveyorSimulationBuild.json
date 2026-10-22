@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-22T21:29:32.850011+00:00",
+  "package": "6_ConveyorSimulationAndVehicleInterop",
+  "branch": "feature/conveyor-flow",
+  "initialMaster": "eb23d5ca",
+  "integratedMaster": "d4e100e7dfdc28426d6191ab1a9cd123cc00ade4",
+  "version": "0.1.453",
+  "authoritativeSchema": 5,
+  "persistenceSchema": 6,
+  "headlessReportSchema": 3,
+  "builds": {
+    "client-build.log": {
+      "path": "artifacts/conveyor-flow/client-build.log",
+      "sha256": "34dc8e6090ef56b2d8150bbc5b397f20cc0d83f730def3159c7362e91faaa1ca",
+      "result": "passed",
+      "warnings": 0,
+      "errors": 0
+    },
+    "headless-build.log": {
+      "path": "artifacts/conveyor-flow/headless-build.log",
+      "sha256": "56be2976da679841e60ab193e1819976cbb27433fe45e434649b88436ba2f763",
+      "result": "passed",
+      "warnings": 0,
+      "errors": 0
+    }
+  },
+  "sourceSha256": {
+    "Directory.Build.props": "f764335465dc42b2b459908604ded8a141b9d71514fa7b5f04065c52e478bf1d",
+    "src/ForgeLine.Client/ClientApplication.cs": "747c8483b4475aa8c7312de56f243815ed2413f79584a40a014cc14b2412a4ca",
+    "src/ForgeLine.Game/AutomatedDistributionSystem.cs": "9f9e83a73c5f5089cd3aa2c4452c349ce32c68bd6c385c50a99898e24ec8a795",
+    "src/ForgeLine.Game/CombatEntityLifecycleSystem.cs": "0c2feb46998c8d168635fd47a08d9de24dafa07ad978ea4474cc13f2c8ac361c",
+    "src/ForgeLine.Game/ConveyorConstruction.cs": "6da54592fdd5c6770610c48331f94f85f0d3efdd4fd0f6c93c9082e5cae010ca",
+    "src/ForgeLine.Game/MatchAuthoritativeSnapshot.cs": "a82f62018cacf8f3be0bbc32792d63f8cd1d22ca5eef8b63cacdb7b5ca6e72fa",
+    "src/ForgeLine.Game/MatchPersistenceSerializer.cs": "0d061d10be322c3f558423dbe9198584d99185e979d5ff486a06b74295493400",
+    "src/ForgeLine.Game/MatchPersistenceService.cs": "5ba6868417d6694d51e4e79e99c5a47b92896f6727b746663ca686c12cdf575f",
+    "src/ForgeLine.Game/MatchRuntime.cs": "f50cd67bdc47830b87deae670ba3d79f1913d9d2c58240731c26c1beac9dc7a3",
+    "src/ForgeLine.Headless/MatchHeadlessReport.cs": "1dfb013231cdbffd72d419e0eeb134971e15b003acfdba6038140cc5b6c139c8",
+    "src/ForgeLine.Presentation/OperationsSnapshot.cs": "d9657a745cf6fde9eb3376c911b3ef5c4d00befea14c80ae01ee3f5a6c3a6c7b",
+    "src/ForgeLine.Presentation/PlayerHoverSummary.cs": "7fee6c03e61cc5dbb20cbd2d4fcfec19e6c1ab11c42c86368350138ae17e8fbe",
+    "src/ForgeLine.Presentation/PresentationExtractor.cs": "f6f9aed6d403092092078e783729c835f1f097e624bb2f86db4b10a9539af131",
+    "src/ForgeLine.Presentation/RtsConveyorConstructionController.cs": "e6058625e9a7fee661ac42133b699aebd720c2c0ea50a89d7323b25c3fdc4f02",
+    "src/ForgeLine.Game/ConveyorSimulationSystem.cs": "0f90fd266923ee0902518e46361912bff6a263f6d3342a26d0ef55d328136dbc",
+    "src/ForgeLine.Presentation/ConveyorNetworkOverlay.cs": "6ed8660f66e4658ef255e2ecdaf8518f839a8cb40c9a81741842c9641844ecd6"
+  },
+  "automatedTestsAdded": false,
+  "automatedTestsExecuted": false,
+  "ciRequested": false,
+  "nativeExecuted": false,
+  "headlessExecuted": false,
+  "saveReplayRoundTripExecuted": false,
+  "manualAcceptance": "pending; user will execute manually",
+  "manualPlan": "ConveyorSimulationAndVehicleInterop.md#persistence-and-manual-acceptance",
+  "implementationCommit": "2646f9d04406a44c0a0ec44e23d9fab19bd9fd66",
+  "pullRequest": "https://github.com/DaveBeusing/Forgeline/pull/302"
+}

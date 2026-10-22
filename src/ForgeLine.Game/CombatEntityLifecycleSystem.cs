@@ -57,6 +57,14 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
                     destruction.Entity);
             }
 
+            // Conveyor wrecks retain their original entity, inventory and real support obstruction.
+            // Repair is the explicit recovery path; occupied demolition/replacement is refused.
+            if (context.Entities.HasComponent<ConveyorPiece>(destruction.Entity))
+            {
+                if(context.Entities.TryGetComponent(destruction.Entity,out ForgeLine.Economy.PowerConsumer power))
+                    context.Entities.SetComponent(destruction.Entity,power.WithEnabled(false));
+                continue;
+            }
             _spatialIndex?.Remove(
                 destruction.Entity);
             context.Entities.DestroyEntity(

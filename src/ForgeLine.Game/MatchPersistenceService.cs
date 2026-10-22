@@ -597,7 +597,7 @@ public static class MatchPersistenceService
             replay.SchemaVersion);
         if (replay.AuthoritativeSchemaVersion != MatchAuthoritativeSnapshot.CurrentSchemaVersion)
             throw Failure(MatchPersistenceFailureReason.IncompatibleVersion,
-                "Replay uses a different authoritative simulation contract. Checkpoints without vehicle queues cannot be replayed by this simulation.");
+                "Replay uses a different authoritative simulation contract. Checkpoints from before the finite conveyor cargo contract cannot be replayed by this simulation.");
         ArgumentNullException.ThrowIfNull(
             replay.Configuration);
         ArgumentNullException.ThrowIfNull(

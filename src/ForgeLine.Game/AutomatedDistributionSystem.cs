@@ -961,6 +961,17 @@ public sealed class AutomatedDistributionSystem
         return retainedTarget;
     }
 
+    /// <summary>Only physically committed trucks reserve destination demand against local conveyor delivery.</summary>
+    public double GetCommittedInbound(EntityRegistry entities, EntityId destination, ResourceId resource)
+    {
+        double quantity=0;
+        foreach(var request in _requests)
+            if(request.ResourceId==resource && (request.State is LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
+                entities.TryGetComponent(request.PolicyEntity,out LogisticsStockPolicy policy) && policy.TargetEntity==destination)
+                quantity+=request.RequestedQuantity;
+        return quantity;
+    }
+
     private double GetOutstandingQuantity(EntityId policyEntity)
     {
         double quantity = 0.0;
