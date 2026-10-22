@@ -20,6 +20,7 @@ public readonly record struct ConveyorFeaturePresentationMetadata(ConveyorPlacem
         ConveyorGeometry.Slug(Placement.Module)+"."+State+(lod==0?"":".lod"+lod);
     public static string Surface(ConveyorLinkStatus status)=>status switch
     {
+        ConveyorLinkStatus.Flowing=>"flowing",ConveyorLinkStatus.Offline=>"unpowered",
         ConveyorLinkStatus.Structural=>"structural_intact",ConveyorLinkStatus.Disconnected=>"disconnected",
         ConveyorLinkStatus.Blocked=>"blocked",ConveyorLinkStatus.Congested=>"congested",
         ConveyorLinkStatus.Damaged=>"damaged",ConveyorLinkStatus.Critical=>"critical",

@@ -80,19 +80,27 @@ internal static class OperationsSnapshotFactory
                     distribution[policy.TargetEntity] = request.FailureReason.ToString();
         var rows = new List<OperationsFacility>(OperationsSnapshot.MaximumFacilities);
         int count = 0;
-        var conveyorStatus=ConveyorConstructionService.Capture(entities,extraction.Player).ToDictionary(p=>p.Entity,p=>p.Status);
+        var conveyorStatus=ConveyorConstructionService.Capture(entities,extraction.Player,scenario.Inventories).ToDictionary(p=>p.Entity);
         foreach (var entity in entities.Query<ControllableEntity>(QueryIterationOrder.StableByEntityIndex))
         {
             if (!Owned(entity)) continue;
             if(entities.TryGetComponent(entity,out ConveyorPiece conveyor))
             {
                 count++;
+                var belt=conveyorStatus[entity];
+                var flow=belt.Flow;
+                if(flow is {} stock && scenario.Inventories.Contains(stock.Buffer))inventories.Add(stock.Buffer);
+                bool hasPower=entities.TryGetComponent(entity,out PowerConsumer drive);
                 if(rows.Count<OperationsSnapshot.MaximumFacilities)
                     rows.Add(new(entity,"Conveyor / "+ConveyorGeometry.Slug(conveyor.Placement.Module),
-                        OperationsCategory.Logistics,conveyorStatus[entity].ToString(),
-                        conveyorStatus[entity]==ConveyorLinkStatus.Structural?"":"Conveyor"+conveyorStatus[entity],
-                        "CONSTRUCTION READY; CONNECT MATCHING PORTS. LOCAL CONVEYOR TRANSFER IS A SEPARATE SIMULATION FEATURE.",
-                        0,null,null,null,null,null,null,PlayerActionPanelMode.Construction));
+                        OperationsCategory.Logistics,belt.Status.ToString(),
+                        belt.Status is ConveyorLinkStatus.Structural or ConveyorLinkStatus.Flowing?"":"Conveyor"+belt.Status,
+                        flow is {} f?FormattableString.Invariant($"{f.Cause}; IN {f.InputPerSecond:0.##}/s OUT {f.OutputPerSecond:0.##}/s; NETWORK {f.Network}; IN [{f.InputA}, {f.InputB}] OUT [{f.OutputA}, {f.OutputB}]"):"STRUCTURAL PART / NO CARGO",
+                        0,flow is not null?conveyor.BufferedQuantity:null,flow?.Capacity,
+                        hasPower?drive.Demand:null,hasPower?drive.AllocatedPower:null,
+                        flow is not null?ConveyorSimulationSystem.NominalThroughput:null,
+                        flow is {} rate?Math.Max(rate.InputPerSecond,rate.OutputPerSecond)/ConveyorSimulationSystem.NominalThroughput:null,
+                        PlayerActionPanelMode.Construction));
                 continue;
             }
             bool processing = entities.TryGetComponent(entity, out ProductionFacility production);
@@ -168,6 +176,16 @@ internal static class OperationsSnapshotFactory
                 routes.Add(new(source, destination, edge.CapacityPerSecond, edge.Enabled,
                     edgeCapacity.TryGetValue(edge.Id, out var load) ? load.Utilization : null));
         }
+        foreach(var belt in conveyorStatus.Values)
+            if(belt.Flow is {} flow)
+                foreach(var (destination,rate) in new[]{(flow.OutputA,flow.OutputAPerSecond),(flow.OutputB,flow.OutputBPerSecond)})
+                {
+                    if(!destination.IsValid || !Owned(destination))continue;
+                    routeCount++;
+                    if(routes.Count<OperationsSnapshot.MaximumRoutes)routes.Add(new(belt.Entity,destination,
+                        ConveyorSimulationSystem.NominalThroughput,belt.Status!=ConveyorLinkStatus.Offline && belt.Status!=ConveyorLinkStatus.Destroyed,
+                        rate/ConveyorSimulationSystem.NominalThroughput));
+                }
         var resources = new List<OperationsResource>();
         foreach (var resource in scenario.Services.Resources.Definitions)
         {
@@ -181,13 +199,15 @@ internal static class OperationsSnapshotFactory
         void Count(EntityId entity) { if (Owned(entity)) queues[entity] = queues.GetValueOrDefault(entity) + 1; }
         bool Owned(EntityId entity) => entities.TryGetComponent(entity, out ControllableEntity owner) &&
             owner.Owner == extraction.Player && owner.IsControllable &&
-            (!entities.TryGetComponent(entity, out HealthState health) || !health.IsDepleted);
+            (!entities.TryGetComponent(entity, out HealthState health) || !health.IsDepleted || entities.HasComponent<ConveyorPiece>(entity));
     }
     internal static string Explain(string cause) => cause switch
     {
-        "ConveyorNoInput" => "BUILT WITH MATCHED PORTS; LOCAL TRANSPORT IS A SEPARATE SIMULATION FEATURE",
+        "ConveyorNoInput" => "NO UNRESERVED ELIGIBLE INPUT / CHECK SOURCE STOCK AND ACCEPTING DOWNSTREAM PORT",
+        "ConveyorOffline" => "POWER OR SUPPORTING FOOT UNAVAILABLE",
+        "ConveyorDestroyed" => "CARGO RETAINED / REPAIR WRECK TO RESUME AND DRAIN",
         "ConveyorDisconnected" => "UNMATED PORT / CONNECT A MATCHING BELT OR BUILDING ADAPTER",
-        "ConveyorBlocked" => "CLOSED END CAP / REMOVE THE CAP TO EXTEND THE ROUTE",
+        "ConveyorBlocked" => "NO ACCEPTING DOWNSTREAM BUILDING PORT / CHECK ROUTE AND RESOURCE FILTER",
         "ConveyorCongested" => "BUFFERED CARGO WITH NO OPEN OUTPUT / DRAIN BEFORE DEMOLITION",
         "ConveyorDamaged" or "ConveyorCritical" => "CONVEYOR BUILD MENU / V TO REPAIR OR REPLACE",
         "NoInput" => "INPUT STOCK INSUFFICIENT - CHECK LOGISTICS",

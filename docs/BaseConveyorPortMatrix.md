@@ -1,12 +1,13 @@
 # Base Conveyor Port Matrix
 
-**Status: proposed V1 transport content contract.** The
-[construction implementation](ConveyorConstructionPlacementAndUX.md) explicitly
-defines physical input/output sockets for Storage Depot and Logistics Hub.
-Other entries below remain future port content; conveyor resource transfer is
-not activated by those construction sockets. Building names and roles follow
-[Central Divide](CentralDivideScenario.md). Per-building placement and port
-coordinates must be authored and physically qualified before activation.
+**Status: implemented finite-flow port subset, manual qualification pending.**
+[Conveyor simulation and vehicle interop](ConveyorSimulationAndVehicleInterop.md)
+lists exact activated sockets, dimensions, resource filters and real inventory bindings.
+Command Core, eligible Extractors, Storage Depot, Smelter, Electronics Fabricator,
+Ammunition Plant, Logistics Hub, Supply Depot, Barracks and Vehicle Factory are active.
+The current Refinery processes only Volatiles/Fuel and has no conveyor port; Power Plant
+and Radar also remain excluded. Rows below describe roles including future eligible
+content, not permission to invent sockets for an unsupported definition or scale.
 
 | Directorate structure | Belt INPUT | Belt OUTPUT | Transfer role and restrictions |
 | --- | --- | --- | --- |

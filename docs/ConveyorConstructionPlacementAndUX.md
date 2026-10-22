@@ -4,7 +4,10 @@ Implementation baseline: master `d7c45792` (0.1.450), including the conveyor mod
 and material packages. This work prepares 0.1.451. The Release client and its
 dependencies were built; automated tests, CI, native interaction/camera smokes
 and save/replay round trips were deliberately not run at the user's request.
-All manual acceptance below remains pending.
+All manual acceptance below remains pending. The subsequent
+[simulation package](ConveyorSimulationAndVehicleInterop.md) activates inventory flow,
+additional authored building ports, drive power and occupied-wreck repair; its current
+behavior supersedes the construction-only baseline statements in this document.
 
 ## V1 interaction and layout
 
@@ -92,9 +95,9 @@ V1 explicitly authors four exterior sockets, in unrotated building ground space:
 `ConveyorConstructionService.CapturePorts` is the runtime source of this typed
 content. It accepts only owned, completed, living buildings with the expected
 physical scale and transforms these fixed sockets by the actual building pose.
-Other building types remain without ports; the earlier port matrix is still a
-future content plan for them. These sockets are a construction connection, not
-an inventory source/sink implementation or automatic across-wall transfer.
+The simulation package adds the exact further sockets and inventory bindings listed
+in [its activated port table](ConveyorSimulationAndVehicleInterop.md). These two rows
+remain the original construction baseline, not the complete current port catalog.
 
 Route starts snap within 2m to an output socket and ends to an input socket.
 Existing belt sockets snap within 1.5m. A building route automatically includes
@@ -107,16 +110,16 @@ The 4m lattice is relative to the selected start port; a destination port must
 share its phase. Ports at different phases or more than 0.02m apart in carrier
 height are rejected with Port mismatch. Position buildings with compatible port
 coordinates; V1 does not fill a 2m gap or an arbitrary grade with a scaled mesh.
-No resource transfer, throughput, power, arbitration or inventory flow system is
-added here. The existing regional truck economy remains authoritative.
+The subsequent simulation package adds resource transfer, throughput, drive power and
+arbitration to this paid geometry. Regional trucks retain their existing road system.
 
 Physical connectivity is derived from stable socket positions/facings, with
 owner filtering. Capped output is Blocked; an unmatched end is Disconnected;
 intact matched geometry is NoInput. A nonempty guarded buffer with a closed or
 missing output is Congested. Damage/critical/destruction overrides those cues.
 These copied statuses select the existing material/model state, appear in
-hover/selection and in owned Operations logistics rows, and never claim actual
-flow animation in the absence of a transport simulation. Health and private
+hover/selection and in owned Operations logistics rows. Actual measured flow and
+snapshot-driven animation now come from the conveyor simulation. Health and private
 buffer data are not published for foreign entities; their visible models follow
 the existing identification boundary via IntelligenceSignature.
 
@@ -145,7 +148,9 @@ requires exactly the same world socket positions, directions and roles. It pays
 the full new module cost and preserves shared feet; occupied targets cannot be
 replaced. An upgrade requiring different sockets is a new route/ramp construction,
 not a silent topology rewrite. Repair costs 4 Steel and restores a damaged living
-piece's HealthState; healthy and destroyed targets are rejected. None of these
+piece's HealthState; healthy targets are rejected. Occupied damaged parts may be
+repaired. Destroyed parts retain cargo and can be repaired for their original paid
+module Steel cost; nonfatal repairs remain 4 Steel. None of these
 edits consumes, returns or invents cargo stock.
 
 ReplayCommandKind/PlayerCommandKind 14 encode the complete command, including
