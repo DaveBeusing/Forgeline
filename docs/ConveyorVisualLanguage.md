@@ -1,7 +1,7 @@
 # Directorate raised conveyor visual kit
 
 **Scope:** visual design, blockout geometry, authored sockets and module identities.  
-**Status:** proposed V1 art contract, ready for review; **not** live gameplay or compiled runtime assets.  
+**Status:** versioned art/source contract. The JSON and greybox references on this page are preproduction inputs; current compiled assets and live behavior are described by [conveyor construction](ConveyorConstructionPlacementAndUX.md) and [conveyor simulation](ConveyorSimulationAndVehicleInterop.md). Native visual acceptance remains pending.
 **Canonical source:** [`conveyor-kit.v1.json`](../assets/source/infrastructure/directorate/conveyors/conveyor-kit.v1.json).  
 **Reference:** [Base conveyor logistics](BaseConveyorLogistics.md), [building port matrix](BaseConveyorPortMatrix.md), [Directorate material review](DirectorateMaterialQualification.md), [asset pipeline](AssetPipeline.md).
 

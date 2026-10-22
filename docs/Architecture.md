@@ -151,7 +151,7 @@ Simulation code is written in a deterministic-friendly style:
 - no rendering-dependent game state
 - controlled parallel reductions across job execution
 
-Perfect cross-machine bit-level determinism is not a first-prototype requirement.
+Cross-machine bit-level determinism is not a supported runtime guarantee.
 
 ## Shared Match Runtime Composition
 
@@ -185,6 +185,11 @@ Headless execution supports a configurable tick count, deterministic seed, and l
 CI includes short headless smoke executions after the Release build. The Windows runner also performs a bounded native client smoke launch that creates and closes the primary Win32 window.
 
 ## Rendering and Interaction Boundary
+
+The [renderer feature inventory](RendererFeatureInventory.md) maps assets,
+presentation, shader/pass consumers, client composition and tests. It separates
+implemented paths from optional diagnostics, deferred techniques and native
+qualification gaps; engineering budgets and compatibility contracts remain in force.
 
 The first graphics backend is Direct3D 12. `ForgeLine.Graphics` owns the D3D12/DXGI objects and exposes a narrow engine-facing device contract. The Windows client passes only the platform-native window target across the platform/graphics boundary.
 
@@ -304,7 +309,7 @@ Phase-5 tactical behavior preserves the command/simulation split. Combat command
 See `docs/CombatOrdersAndReadiness.md`. Directorate faction data, stable unit definitions, cross-catalog content validation, deterministic unit-production queues, and generic unit entity composition live here because they coordinate existing economy, logistics, movement, combat, intelligence, and supply domains without moving ownership out of those domains.
 
 
-## Prototype Battlefield and Strategic Infrastructure Boundary
+## Battlefield and Strategic Infrastructure Boundary
 
 The canonical `Central Divide` battlefield is game content, not a presentation script. `BattlefieldDefinition` owns stable map metadata, starts, finite resource locations, build/expansion sites, road topology, crossings, and Command Core objective positions. `CentralDivideTerrainFactory` produces the deterministic chunked `TerrainWorld`, and `BattlefieldRuntime` materializes finite deposits and the road corridor through the existing economy and logistics types.
 
