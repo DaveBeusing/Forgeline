@@ -94,7 +94,7 @@ and an active mechanical link. Physical adjacency is not a transfer rule.
 | --- | --- | --- | --- |
 | Short straight | (0, 5.8, -2) / S | (0, 5.8, +2) / N | 2.8 × 4 m |
 | Standard straight | (0, 5.8, -4) / S | (0, 5.8, +4) / N | 2.8 × 8 m |
-| 90° curve, left source | (-4, 5.8, 0) / S | (0, 5.8, +4) / E | radius 4 m; opposite hand is authored |
+| 90° curve, left source | (-4, 5.8, 0) / S | (0, 5.8, +4) / E | radius 4 m; swept frame 6.8 × 6.8 m, center (-2, +2); opposite hand authored |
 | Ramp up | (0, 5.8, -4) / S | (0, 7.8, +4) / N | +2 m tier |
 | Ramp down | (0, 7.8, -4) / S | (0, 5.8, +4) / N | -2 m tier |
 | Merger 2:1 | (-4, 5.8, -4), (+4, 5.8, -4) / S | (0, 5.8, +4) / N | 10.8 × 8 m; two → one |
