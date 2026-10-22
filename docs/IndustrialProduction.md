@@ -206,3 +206,7 @@ Industrial production is exposed through the same reusable player action palette
 The palette displays facility-local input quantities, output-derived desired-stock targets, fixed-tick progress, queue entries, authoritative status/block reasons, pending command count, and accepted/rejected feedback. Global player resource totals are never used as permission to spend from a processing facility.
 
 Every operation crosses `PlayerCommandGateway`. The player-facing adapter validates ownership before delegating to the existing production commands. The presentation layer never creates production output, reserves inventory, advances progress, or mutates `ProductionFacility` state.
+
+## Planned local conveyor integration
+
+The proposed [Base Conveyor Logistics](BaseConveyorLogistics.md) design enables explicit local material ports for compatible solid inputs and outputs. Its [Directorate port matrix](BaseConveyorPortMatrix.md) describes intended interfaces, not implemented transport. Current production, recipes, inventory reservations and power gating remain authoritative; conveyor delivery must not bypass them.

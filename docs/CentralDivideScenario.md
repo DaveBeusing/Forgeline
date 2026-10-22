@@ -174,3 +174,7 @@ The Windows client exposes the current Directorate content through one shared ac
 - `T` changes production priority; `M` changes industrial request mode.
 
 Availability and costs are copied from the same building, recipe, unit, and inventory contracts used by simulation. A human slot does not receive a hidden strategic controller: construction and production originate as explicit player commands and remain subject to authoritative ownership, material, power, placement, output-capacity, and fixed-tick rules.
+
+## Planned local base conveyors
+
+[Base Conveyor Logistics](BaseConveyorLogistics.md) and its [building port matrix](BaseConveyorPortMatrix.md) define a future optional base-internal transport layer. Central Divide currently continues to use the real road/Cargo Truck and battlefield Supply Truck lifecycles. No conveyor link, production shortcut, building socket or automatic scenario migration is active. A future hybrid qualification must retain terminal-match, vehicle-navigation and finite-resource invariants.
