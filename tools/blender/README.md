@@ -12,6 +12,14 @@ Python, pip, virtual environment, addon download or runtime/client/headless
 reference is introduced. Existing production exporters and assets remain unchanged.
 See [asset ownership](../../docs/AssetPipeline.md).
 
+## Preproduction conveyor kit
+
+The editable 12-module raised conveyor dimensions and matching socket frames are
+specified by [the visual kit](../../docs/ConveyorVisualLanguage.md). The
+portable contract validator is `python tools/blender/conveyor_contract.py`;
+its tests are discovered by ordinary CI. It does not run Blender or export
+meshes, and the source JSON must not be treated as a compiler asset declaration.
+
 ## Installation and discovery
 
 Install/extract exactly **5.2.2 Windows x64** from the
