@@ -34,7 +34,9 @@ public enum PlayerActionRequestKind : byte
     SetSupplyPriority = 24,
     SubmitRetreatToRecovery = 25,
     StartTechnologyResearch = 26,
-    CancelTechnologyResearch = 27
+    CancelTechnologyResearch = 27,
+    CreateCargoConvoy = 28,
+    DissolveCargoConvoy = 29
 }
 
 public readonly record struct PlayerActionRequest(
@@ -65,7 +67,10 @@ public readonly record struct PlayerActionRequest(
     FormationTemplate TacticalFormation = FormationTemplate.Compact,
     BattlefieldSupplyPriority SupplyPriority = BattlefieldSupplyPriority.Normal,
     TechnologyId TechnologyId = default,
-    EntityId TechnologySourceInventory = default)
+    EntityId TechnologySourceInventory = default,
+    EntityId[]? ConvoyTrucks = null,
+    EntityId[]? ConvoyEscorts = null,
+    EntityId ConvoyGroup = default)
 {
     public static PlayerActionRequest BeginBuildingPlacement(
         BuildingId buildingId) =>
@@ -164,6 +169,20 @@ public readonly record struct PlayerActionRequest(
             ProductionRequestMode.OneShot,
             ResourceId.None,
             0.0);
+
+    public static PlayerActionRequest CreateCargoConvoy(
+        ReadOnlySpan<EntityId> trucks, ReadOnlySpan<EntityId> escorts) =>
+        new(PlayerActionRequestKind.CreateCargoConvoy, BuildingId.None,
+            EntityId.Invalid, RecipeId.None, UnitId.None, EntityId.Invalid,
+            false, ProductionPriority.Normal, ProductionRequestMode.OneShot,
+            ResourceId.None, 0,
+            ConvoyTrucks: trucks.ToArray(), ConvoyEscorts: escorts.ToArray());
+
+    public static PlayerActionRequest DissolveCargoConvoy(EntityId group) =>
+        new(PlayerActionRequestKind.DissolveCargoConvoy, BuildingId.None,
+            EntityId.Invalid, RecipeId.None, UnitId.None, EntityId.Invalid,
+            false, ProductionPriority.Normal, ProductionRequestMode.OneShot,
+            ResourceId.None, 0, ConvoyGroup: group);
 
     public static PlayerActionRequest SetStockPolicy(
         EntityId target,
