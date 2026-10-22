@@ -342,7 +342,9 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
             foreach (ProductionIngredient output in recipe.Outputs)
                 if (!_inventories.CanAdd(facility.OutputInventory, output.ResourceId, output.Quantity))
                     return;
-            if (!Ready(entry, context.Tick)) return;
+            // Never strand a request paused by this rule when its action budget is exhausted.
+            if (entry.LastFired != SimulationTick.Zero &&
+                context.Tick.Value - entry.LastFired.Value < entry.Definition.CooldownTicks) return;
             var resume = PlayerProductionActionCommand.SetPaused(
                 entry.Definition.Owner, entry.ManagedRequest, false, context.Tick);
             resume.Execute(context);
