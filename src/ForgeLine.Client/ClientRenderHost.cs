@@ -743,6 +743,9 @@ internal sealed class ClientRenderHost : IDisposable
                             .TotalMilliseconds;
 
                         dockingZoneRenderer.Render(context, renderCamera, dockingZoneDraw);
+                        selectedOrderRenderer.Render(
+                            context, renderCamera, selectedOrderDraw,
+                            RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
                         gameplayOverlayRenderer.Render(
                             context,
                             renderCamera,
