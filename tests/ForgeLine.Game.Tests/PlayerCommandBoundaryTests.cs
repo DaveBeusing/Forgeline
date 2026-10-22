@@ -604,15 +604,14 @@ public sealed class PlayerCommandBoundaryTests
         Assert.True(gateway.Results.TryRead(out PlayerCommandResultReadModel priorityResult));
         Assert.Equal(PlayerCommandFeedbackState.Rejected, priorityResult.State);
         Assert.Equal(PlayerLogisticsActionFailureReason.InvalidPriority, priorityResult.ActionFailure);
-        Assert.DoesNotContain(
-            scenario.Simulation.Entities.Query<LogisticsStockPolicy>(),
-            entity =>
-            {
-                LogisticsStockPolicy candidate = scenario.Simulation.Entities
-                    .GetComponent<LogisticsStockPolicy>(entity);
-                return candidate.TargetEntity == scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore &&
-                    candidate.ResourceId == ResourceIds.FerrousOre;
-            });
+        foreach (EntityId entity in scenario.Simulation.Entities.Query<LogisticsStockPolicy>())
+        {
+            LogisticsStockPolicy candidate = scenario.Simulation.Entities
+                .GetComponent<LogisticsStockPolicy>(entity);
+            Assert.False(candidate.TargetEntity ==
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore &&
+                candidate.ResourceId == ResourceIds.FerrousOre);
+        }
     }
 
     [Fact]
