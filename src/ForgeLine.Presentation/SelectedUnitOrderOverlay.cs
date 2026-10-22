@@ -35,8 +35,10 @@ public sealed class SelectedUnitOrderOverlay
         _orderedTargets.Clear();
         draw.Clear();
 
-        SelectedUnitOrderSnapshot? orders = world.CurrentSnapshot?.SelectedOrders;
-        if (orders is null || world.CurrentSnapshot?.SessionId != session ||
+        var snapshot = world.CurrentSnapshot;
+        SelectedUnitOrderSnapshot? orders = snapshot?.SelectedOrders;
+        if (orders is null || snapshot?.SessionId != session || !session.IsSpecified || orders.Tick != snapshot.Tick ||
+            snapshot.PlayerExperience is not { IsMatchComplete: false } experience || experience.Tick != snapshot.Tick ||
             !orders.MatchesSelection(session, currentSelection) ||
             viewportHeight <= 0)
             return;
@@ -53,10 +55,13 @@ public sealed class SelectedUnitOrderOverlay
         Vector4 stroke = RtsSelectionVisualStyle.Selected with { W = LineAlpha };
         foreach (ref readonly SelectedUnitOrderView order in orders.Orders)
         {
+            // 1,024 connections plus seven strokes per target fit the existing 8,192-line renderer.
+            if (LastConnectionCount == MaximumTargets) break;
             if (!order.HasTarget || !Finite(order.Target))
                 continue;
             if (!world.TryGetInterpolatedInstance(order.Entity, interpolation, out RenderInstance instance))
                 continue;
+            if (!OperationsWorldOverlay.IsOwnedVisible(instance, experience.Player)) continue;
             Vector3 start = instance.Transform.Position;
             if (!Finite(start))
                 continue;

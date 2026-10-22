@@ -26,7 +26,11 @@ internal sealed class SelectedUnitOrderStatusSurface : IGameplayHudSurface
         _text.Begin();
         if (context.PreAlphaUx.Mode != PreAlphaUxMode.None ||
             context.Graphics.Width <= 0 || context.Graphics.Height <= 0 ||
+            !context.Snapshot.SessionId.IsSpecified ||
+            context.Snapshot.PlayerExperience is not { IsMatchComplete: false } experience ||
+            experience.Tick != context.Snapshot.Tick ||
             context.Snapshot.SelectedOrders is not { } orders ||
+            orders.Tick != context.Snapshot.Tick ||
             !orders.MatchesSelection(context.Snapshot.SessionId, context.InformationLayer.SelectedEntities) ||
             orders.Orders.Length == 0 || string.IsNullOrWhiteSpace(orders.Summary))
             return;
