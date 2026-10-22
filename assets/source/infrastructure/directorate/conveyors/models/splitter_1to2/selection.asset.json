@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.splitter_1to2.selection",
+  "type": "mesh",
+  "source": "collision.glb"
+}

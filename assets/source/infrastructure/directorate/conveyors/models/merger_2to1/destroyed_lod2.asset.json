@@ -1,0 +1,36 @@
+{
+  "id": "infrastructure.directorate.conveyor.merger_2to1.destroyed.lod2",
+  "type": "mesh",
+  "source": "destroyed_lod2.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.merger_2to1.destroyed.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "input_a",
+      "x": -0.2222222222222222,
+      "y": 0.3222222222222222,
+      "z": -0.2222222222222222
+    },
+    {
+      "name": "input_b",
+      "x": 0.2222222222222222,
+      "y": 0.3222222222222222,
+      "z": -0.2222222222222222
+    },
+    {
+      "name": "output_main",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": 0.2222222222222222
+    }
+  ]
+}

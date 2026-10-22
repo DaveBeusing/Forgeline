@@ -1,0 +1,123 @@
+{
+  "id": "infrastructure.directorate.conveyor.ramp_up.flowing.lod1",
+  "type": "mesh",
+  "source": "flowing_lod1.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.ramp_up.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "material_in",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": -0.2222222222222222
+    },
+    {
+      "name": "material_out",
+      "x": 0.0,
+      "y": 0.43333333333333335,
+      "z": 0.2222222222222222
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "frame",
+      "firstIndex": 0,
+      "indexCount": 1236,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_0",
+      "firstIndex": 1236,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_1",
+      "firstIndex": 1272,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_2",
+      "firstIndex": 1308,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_3",
+      "firstIndex": 1344,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_4",
+      "firstIndex": 1380,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_5",
+      "firstIndex": 1416,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_6",
+      "firstIndex": 1452,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_7",
+      "firstIndex": 1488,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_8",
+      "firstIndex": 1524,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    },
+    {
+      "name": "belt_0_9",
+      "firstIndex": 1560,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static",
+      "socket": "origin"
+    }
+  ],
+  "animationReferences": [
+    "infrastructure.directorate.conveyor.ramp_up.flowing.lod1.motion"
+  ]
+}

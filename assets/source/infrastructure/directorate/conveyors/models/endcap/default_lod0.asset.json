@@ -1,0 +1,36 @@
+{
+  "id": "infrastructure.directorate.conveyor.endcap",
+  "type": "mesh",
+  "source": "structural_intact_lod0.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.endcap.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "mechanical_cap",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": -0.022222222222222223
+    }
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "infrastructure.directorate.conveyor.endcap.lod1",
+      "maxDistance": 140
+    },
+    {
+      "level": 2,
+      "assetId": "infrastructure.directorate.conveyor.endcap.lod2",
+      "maxDistance": 420
+    }
+  ]
+}

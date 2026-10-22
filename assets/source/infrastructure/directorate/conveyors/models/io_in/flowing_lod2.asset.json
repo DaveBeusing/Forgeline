@@ -1,0 +1,30 @@
+{
+  "id": "infrastructure.directorate.conveyor.io_in.flowing.lod2",
+  "type": "mesh",
+  "source": "flowing_lod2.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.io_in.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "building_source",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": -0.1111111111111111
+    },
+    {
+      "name": "belt_output",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": 0.1111111111111111
+    }
+  ]
+}

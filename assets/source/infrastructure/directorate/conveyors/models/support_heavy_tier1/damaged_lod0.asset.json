@@ -1,0 +1,48 @@
+{
+  "id": "infrastructure.directorate.conveyor.support_heavy.tier1.damaged",
+  "type": "mesh",
+  "source": "damaged_lod0.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.support_heavy.tier1.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "foot_left",
+      "x": -0.08888888888888889,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "name": "foot_right",
+      "x": 0.08888888888888889,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "name": "carrier",
+      "x": 0.0,
+      "y": 0.4,
+      "z": 0.0
+    }
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.damaged.lod1",
+      "maxDistance": 140
+    },
+    {
+      "level": 2,
+      "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.damaged.lod2",
+      "maxDistance": 420
+    }
+  ]
+}

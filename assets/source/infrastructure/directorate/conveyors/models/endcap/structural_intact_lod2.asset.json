@@ -1,0 +1,24 @@
+{
+  "id": "infrastructure.directorate.conveyor.endcap.structural_intact.lod2",
+  "type": "mesh",
+  "source": "structural_intact_lod2.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.endcap.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "mechanical_cap",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": -0.022222222222222223
+    }
+  ]
+}

@@ -1,7 +1,18 @@
-# Raised Directorate Conveyor V1 (design sources)
+# Raised Directorate Conveyor V1
 
-This folder is an **editable preproduction kit contract**, not a playable
-conveyor feature and not a compiled asset family.
+The production model package is now in `authoring/`, `models/` and
+`conveyor-production.v1.json`: fifteen editable Blender masters (including ground-mounted tier-1 supports), actual GLB
+LODs/states, collision/selection meshes and existing-format rigid belt clips.
+See [Models and animation handoff](../../../../../docs/ConveyorModelsAndAnimations.md)
+for scale18, sockets, support constraints and manual review. No gameplay conveyor
+or manual-test approval is implied. The original design baseline below remains
+unchanged.
+
+## Original design contract
+
+`conveyor-kit.v1.json` is the **editable preproduction design contract**. It is
+separate from the real model/asset definitions beside it and is not a playable
+conveyor feature.
 
 - `conveyor-kit.v1.json`: canonical engine-space dimensions, 12 module stable
   identities, typed input/output/closure ports, resource eligibility, shared

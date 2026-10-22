@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.straight_short.collision",
+  "type": "mesh",
+  "source": "collision.glb"
+}

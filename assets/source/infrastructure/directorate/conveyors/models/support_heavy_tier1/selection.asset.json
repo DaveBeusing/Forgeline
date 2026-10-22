@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.support_heavy.tier1.selection",
+  "type": "mesh",
+  "source": "collision.glb"
+}

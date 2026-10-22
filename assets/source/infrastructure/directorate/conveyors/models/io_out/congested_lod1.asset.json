@@ -1,0 +1,30 @@
+{
+  "id": "infrastructure.directorate.conveyor.io_out.congested.lod1",
+  "type": "mesh",
+  "source": "congested_lod1.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.io_out.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "belt_input",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": -0.1111111111111111
+    },
+    {
+      "name": "building_sink",
+      "x": 0.0,
+      "y": 0.3222222222222222,
+      "z": 0.1111111111111111
+    }
+  ]
+}

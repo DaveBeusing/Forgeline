@@ -1,0 +1,5 @@
+{
+  "id": "infrastructure.directorate.conveyor.merger_2to1.collision",
+  "type": "mesh",
+  "source": "collision.glb"
+}
