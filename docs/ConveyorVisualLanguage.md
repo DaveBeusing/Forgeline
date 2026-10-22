@@ -207,3 +207,10 @@ The design gate enables independent mesh/texture authoring. **It does not
 approve** physical asset delivery, real-world vehicle passage or shipment of
 a gameplay conveyor system. No current gameplay economy, logistics, transport,
 savegame schema or scenario is modified by this package.
+
+## Model production handoff
+
+[Conveyor models and belt motion](ConveyorModelsAndAnimations.md) supplies the
+Blender/GLB state/LOD implementation and compiler declarations for this design.
+The design baseline and original review checklist above remain historical; manual
+visual, clearance and gameplay acceptance are still outstanding.
