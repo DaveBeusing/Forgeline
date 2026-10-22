@@ -371,6 +371,12 @@ public sealed class MatchRuntime : IDisposable
                 battlefieldRuntime,
                 matchConfiguration,
                 settings.StartingStock);
+        var demolition = new BuildingDemolitionSystem(
+            inventories,
+            spatialIndex,
+            matchConfiguration.Participants.ToDictionary(
+                participant => participant.Player,
+                participant => initialization.GetBase(participant.Player).CommandCore));
         AxisAlignedBounds[] entityObstacles =
             CollectStaticNavigationObstacles(
                 simulation);
@@ -566,6 +572,7 @@ public sealed class MatchRuntime : IDisposable
         ISimulationSystem[] systems =
         [
             buildingCommands,
+            demolition,
             logisticsDisruption,
             strategicInfrastructure,
             opponents,
@@ -640,6 +647,7 @@ public sealed class MatchRuntime : IDisposable
                 buildingPlacement,
                 buildingCommands,
                 buildingConstruction,
+                demolition,
                 unitProduction,
                 technologyResearch,
                 groundMovement,
