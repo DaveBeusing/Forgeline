@@ -49,9 +49,11 @@ public sealed class RtsBuildingPlacementController
     private int _height;
     private float _displayScale;
 
+    public RtsConveyorConstructionController Conveyor { get; } = new();
+
     public GameplayBindingRegistry Bindings => _bindings;
     public bool AwaitingResult => _awaitingResult;
-    public string InteractionHint => _awaitingResult ? "BUILD REQUEST PENDING" :
+    public string InteractionHint => Conveyor.IsActive ? Conveyor.Hint : _awaitingResult ? "BUILD REQUEST PENDING" :
         IsActive ? _placementHint : string.Empty;
 
     public RtsBuildingPlacementController(PlayerId issuer, GameplayBindingRegistry? bindings = null)
@@ -79,7 +81,7 @@ public sealed class RtsBuildingPlacementController
     public PlacementPreviewFreshness PreviewFreshness { get; private set; } =
         PlacementPreviewFreshness.Unavailable;
 
-    public bool IsActive => ActiveBuilding.IsSpecified;
+    public bool IsActive => ActiveBuilding.IsSpecified || Conveyor.IsActive;
 
     public void Update(
         InputState input,
@@ -96,6 +98,11 @@ public sealed class RtsBuildingPlacementController
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(terrain);
         ArgumentNullException.ThrowIfNull(interaction);
+        if (Conveyor.IsActive)
+        {
+            Conveyor.Update(input,camera,terrain,snapshot,interaction,_issuer,viewportWidth,viewportHeight,pointerCaptured,displayScale);
+            return;
+        }
         bool sessionChanged = snapshot?.SessionId is { IsSpecified: true } session && _session.IsSpecified && session != _session;
         if (snapshot?.SessionId is { IsSpecified: true } currentSession) _session = currentSession;
         bool displayChanged = _width != 0 && (_width != viewportWidth || _height != viewportHeight || _displayScale != displayScale);
@@ -248,6 +255,7 @@ public sealed class RtsBuildingPlacementController
     {
         ArgumentNullException.ThrowIfNull(interaction);
 
+        Conveyor.Cancel(interaction);
         ActiveBuilding = BuildingId.None;
         Preview = null;
         PreviewFreshness =
@@ -268,6 +276,12 @@ public sealed class RtsBuildingPlacementController
             throw new ArgumentOutOfRangeException(nameof(buildingId));
         }
 
+        if (buildingId.Value>=ConveyorGeometry.MenuBase && buildingId.Value<ConveyorGeometry.MenuBase+14)
+        {
+            ActiveBuilding=BuildingId.None;Preview=null;
+            Conveyor.Begin((ConveyorModule)(buildingId.Value-ConveyorGeometry.MenuBase));
+            return;
+        }
         ActiveBuilding = buildingId;
         Orientation = _rememberedBuilding == buildingId ? _rememberedOrientation : BuildingOrientation.North;
         _rememberedBuilding = buildingId;
@@ -285,6 +299,7 @@ public sealed class RtsBuildingPlacementController
 
     public void ObserveSubmission(PlayerCommandSubmissionReceipt? receipt, PresentationInteractionState interaction)
     {
+        Conveyor.ObserveSubmission(receipt,interaction);
         if (!_awaitingResult || _correlation.IsSpecified) return;
         if (receipt is not { Accepted: true, Kind: PlayerCommandKind.Construction } accepted || accepted.SessionId != _session)
         { _awaitingResult = false; ResetPreviewRequest(interaction); return; }
@@ -293,6 +308,7 @@ public sealed class RtsBuildingPlacementController
 
     public void ObserveResult(in PlayerCommandResultReadModel result, PresentationInteractionState interaction)
     {
+        Conveyor.ObserveResult(result,interaction);
         if (!_awaitingResult || !_correlation.IsSpecified || result.SessionId != _session ||
             result.Kind != PlayerCommandKind.Construction || result.CorrelationId != _correlation) return;
         _awaitingResult = false;

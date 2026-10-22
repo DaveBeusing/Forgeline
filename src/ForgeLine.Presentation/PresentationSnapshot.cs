@@ -82,6 +82,8 @@ public sealed class PresentationSnapshot
         _instances = ownedInstances;
     }
 
+    public ConveyorConstructionReadModel? Conveyors { get; init; }
+
     public SimulationSessionId SessionId { get; }
 
     public SimulationTick Tick { get; }

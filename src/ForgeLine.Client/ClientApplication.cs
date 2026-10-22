@@ -1556,6 +1556,16 @@ internal sealed class ClientApplication
                     }
                 }
 
+                if (buildingPlacementController.Conveyor.TryTakeRequest(out ConveyorBuildRequest conveyorRequest))
+                {
+                    SimulationSessionId conveyorSession=currentSnapshot?.SessionId??default;
+                    if (!conveyorSession.IsSpecified || !simulationHost.TrySubmit(conveyorSession,
+                        gateway=>gateway.SubmitConveyor(scenario.Services.Conveyors, LocalPlayer,
+                            conveyorRequest, constructionInventory, currentSnapshot?.Tick??SimulationTick.Zero),
+                        out pendingPlacementHostSequence))
+                        buildingPlacementController.Conveyor.ObserveSubmission(null,presentationInteraction);
+                }
+
                 if (buildingPlacementController.TryTakePlacementRequest(
                         out BuildingPlacementRequest placementRequest))
                 {
@@ -2211,6 +2221,8 @@ internal sealed class ClientApplication
                 placementValidColor,
                 placementInvalidColor);
         }
+
+        buildingPlacementController.Conveyor.Draw(gameplayDraw);
 
         if (strategicOverlayMode !=
                 StrategicOverlayMode.None &&
@@ -3658,6 +3670,9 @@ internal sealed class ClientApplication
                    out PlayerCommandResultReadModel result))
         {
             placement.ObserveResult(result, interaction);
+            if(result.Kind==PlayerCommandKind.ConveyorConstruction)
+                actionPanel.ShowDemolitionFeedback(result.State==PlayerCommandFeedbackState.Accepted?
+                    "CONVEYOR CHANGE ACCEPTED":RtsConveyorConstructionController.Explain(result.ConveyorResult));
             if (result.Kind == PlayerCommandKind.Demolition)
                 actionPanel.ShowDemolitionFeedback(DescribeDemolitionResult(result, resources));
             lastCommandResult = result;
