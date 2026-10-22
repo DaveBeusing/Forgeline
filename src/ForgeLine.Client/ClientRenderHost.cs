@@ -412,21 +412,13 @@ internal sealed class ClientRenderHost : IDisposable
                 Atmosphere = _renderQuality.Atmosphere ?? (_sceneAtmosphere.Quality != AtmosphereQuality.Disabled ? _sceneAtmosphere.Quality : null),
                 Particles = _renderQuality.Particles ?? (_particleSettings != ParticleSettings.Default ? _particleSettings.Quality : null)
             });
-            RenderQualityProfile qualityProfile = qualitySettings.Resolve(graphics.SupportsPostProcessing,
-                graphics.Diagnostics.Device.IsSoftwareAdapter, Math.Max(1, initialTarget.Width), Math.Max(1, initialTarget.Height),
-                graphics.Diagnostics.Surface.BufferCount, graphics.AvailableMemoryBudgetBytes, graphics.SupportsParticleRendering);
-            SceneLightingSettings lighting = qualityProfile.Environment.ResolveLighting(_sceneLighting);
-            GraphicsAtmosphereSettings atmosphere = _sceneAtmosphere.Graphics with { Quality = qualityProfile.Atmosphere };
-            atmosphere.Validate();
-            graphics.ConfigurePostProcessing(GraphicsPostProcessingSettings.Neutral);
-            if (!qualityProfile.LinearScene && graphics.Atmosphere.Enabled)
-                graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default);
-            graphics.ConfigureSceneOutput(new GraphicsSceneOutputSettings(qualityProfile.LinearScene,
-                lighting.Exposure, lighting.ToneMapping == SceneToneMappingMode.AcesFitted, qualityProfile.ResolutionScale));
-            graphics.ConfigureAtmosphere(atmosphere);
-            graphics.ConfigurePostProcessing(qualityProfile.PostProcessing);
+            var composition = ClientRenderConfiguration.Resolve(graphics, qualitySettings,
+                initialTarget.Width, initialTarget.Height, _sceneLighting, _sceneAtmosphere.Graphics);
+            composition.Apply(graphics);
+            RenderQualityProfile qualityProfile = composition.Profile;
+            SceneLightingSettings lighting = composition.Lighting;
+            GraphicsAtmosphereSettings atmosphere = composition.Atmosphere;
             var shadowSettings = qualityProfile.Shadows;
-            graphics.ConfigureDirectionalShadows(shadowSettings);
             if (existingDevice is not null)
             {
                 graphics.WaitForIdle();
@@ -500,14 +492,7 @@ internal sealed class ClientRenderHost : IDisposable
                 default;
             double debugOverlayCpuMilliseconds =
                 0.0;
-            int width =
-                initialTarget.Width;
-            int height =
-                initialTarget.Height;
-            bool surfaceSuspended =
-                initialTarget.Suspended ||
-                width <= 0 ||
-                height <= 0;
+            var surface = new ClientRenderSurface(initialTarget.Width, initialTarget.Height, initialTarget.Suspended);
 
             if (_asynchronousStartup)
                 _startup.End(StartupPhase.GameplayRenderer, sessionId: _startup.CurrentSessionId);
@@ -533,45 +518,23 @@ internal sealed class ClientRenderHost : IDisposable
                 ClientRenderFrame current =
                     frame.Value;
 
-                if (current.SurfaceSuspended)
+                if (!surface.Update(graphics, current.ViewportWidth, current.ViewportHeight, current.SurfaceSuspended, out bool surfaceChanged))
                 {
                     dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); worldAudio.StopPlayback();
                     runtimeMetricsSampler.Reset();
-                    if (!surfaceSuspended)
-                    {
-                        graphics.Resize(
-                            0,
-                            0);
-                        surfaceSuspended =
-                            true;
-                    }
-
                     continue;
                 }
 
                 if (!current.MetricsActive) { dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); worldAudio.StopPlayback(); }
-                if (current.ViewportWidth <= 0 ||
-                    current.ViewportHeight <= 0)
-                {
-                    runtimeMetricsSampler.Reset();
-                    continue;
-                }
-
-                if (surfaceSuspended ||
-                    current.ViewportWidth != width ||
-                    current.ViewportHeight != height)
+                if (surfaceChanged)
                 {
                     dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); worldAudio.StopPlayback();
-                    graphics.Resize(
-                        current.ViewportWidth,
-                        current.ViewportHeight);
-                    width =
-                        current.ViewportWidth;
-                    height =
-                        current.ViewportHeight;
-                    surfaceSuspended =
-                        false;
+                    runtimeMetricsSampler.Reset();
+                    previousFrameAt = lastParticleFrame = Stopwatch.GetTimestamp();
+                    frameTimingTracker = new FrameTimingTracker();
+                    frameTiming = default;
                 }
+                int width = surface.Width, height = surface.Height;
 
                 renderCamera.ApplyState(
                     current.Camera);
@@ -712,33 +675,14 @@ internal sealed class ClientRenderHost : IDisposable
                     GraphicsColor.ForgeLineClear,
                     context =>
                     {
-                        context.BeginPass(GraphicsFramePass.World);
-                        if (atmosphere.Enabled)
-                            context.SetAtmosphereView(SceneAtmosphereSettings.CreateView(renderCamera, context.Width, context.Height));
-                        if (shadowSettings.Enabled)
-                        {
-                            GraphicsDirectionalShadowFrame shadowFrame = DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings);
-                            context.BeginDirectionalShadowPass(shadowFrame);
-                            int terrainShadows = terrainRenderer.RenderShadow(context, shadowFrame, Math.Min(128, shadowSettings.MaximumDraws));
-                            instanceRenderer.RenderShadow(context, renderCamera, renderWorld, renderAlpha, shadowFrame,
-                                shadowSettings.MaximumCasters - terrainShadows, shadowSettings.MaximumDraws - terrainShadows,
-                                (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency);
-                            context.EndDirectionalShadowPass();
-                        }
-                        terrainRenderer.Render(
-                            context,
-                            renderCamera);
-                        particleRenderer.Prepare(renderWorld,renderCamera,context.Width,context.Height,particleDelta,
+                        var worldPasses = new ClientWorldPassRecorder(terrainRenderer, instanceRenderer, particleRenderer,
+                            renderWorld, renderCamera, renderAlpha,
+                            (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency, particleDelta,
                             current.PreAlphaUx.Mode is PreAlphaUxMode.Paused or PreAlphaUxMode.Help || !current.MetricsActive);
-                        instanceRenderer.Render(
-                            context,
-                            renderCamera,
-                            renderWorld,
-                            renderAlpha,
-                            (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency,
-                            particleRenderer);
-                        particleRenderer.Render(context,renderCamera);
-                        context.BeginPass(GraphicsFramePass.Overlay);
+                        ClientWorldPassSequence.Record(context,
+                            atmosphere.Enabled ? SceneAtmosphereSettings.CreateView(renderCamera, context.Width, context.Height) : null,
+                            shadowSettings.Enabled ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null,
+                            shadowSettings, ref worldPasses);
                         long debugStartedAt =
                             Stopwatch.GetTimestamp();
                         debugDrawRenderer.Render(

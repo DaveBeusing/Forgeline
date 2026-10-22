@@ -133,20 +133,16 @@ internal static class VisualReferenceCapture
             foreach (var display in request.Displays)
             foreach (var quality in request.Profiles)
             {
-                graphics.ConfigurePostProcessing(GraphicsPostProcessingSettings.Neutral);
-                graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default with { Quality = AtmosphereQuality.Disabled });
-                graphics.ConfigureDirectionalShadows(default);
+                ClientRenderConfiguration.Reset(graphics);
                 graphics.ConfigureSceneOutput(new(false, lighting.Exposure, true));
                 graphics.Resize(display.Width, display.Height);
                 graphics.RenderFrame(GraphicsColor.ForgeLineClear);
                 var settings = (request.GraphicsSettings ?? new RenderQualitySettings()) with { Quality = quality };
-                var profile = settings.Resolve(graphics.SupportsPostProcessing,
-                    graphics.Diagnostics.Device.IsSoftwareAdapter, display.Width, display.Height, 3, graphics.AvailableMemoryBudgetBytes, graphics.SupportsParticleRendering);
-                lighting = profile.Environment.ResolveLighting(SceneLightingSettings.Default);
-                graphics.ConfigureSceneOutput(new(profile.LinearScene, lighting.Exposure, true, profile.ResolutionScale));
-                graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default with { Quality = profile.Atmosphere, LocalHaze = request.LocalHaze });
-                graphics.ConfigureDirectionalShadows(profile.Shadows);
-                graphics.ConfigurePostProcessing(profile.PostProcessing);
+                var composition = ClientRenderConfiguration.Resolve(graphics, settings, display.Width, display.Height,
+                    SceneLightingSettings.Default, GraphicsAtmosphereSettings.Default with { LocalHaze = request.LocalHaze });
+                composition.Apply(graphics);
+                var profile = composition.Profile;
+                lighting = composition.Lighting;
                 foreach (var fixture in fixtures)
                 foreach (var zoom in request.Zooms)
                 foreach (var uiScenario in request.UiScenarios)
@@ -267,23 +263,16 @@ internal static class VisualReferenceCapture
                         }
                         if (materialReference is not null)
                         {
+                            context.BeginPass(GraphicsFramePass.World);
                             materialReference.Render(context, camera);
                             return;
                         }
-                        if (graphics.Atmosphere.Enabled) context.SetAtmosphereView(SceneAtmosphereSettings.CreateView(camera, context.Width, context.Height));
-                        if (profile.Shadows.Enabled)
-                        {
-                            var shadow = DirectionalShadowProjection.Create(camera.CaptureState(), lighting, profile.Shadows);
-                            context.BeginDirectionalShadowPass(shadow);
-                            int draws = ground.RenderShadow(context, shadow, 128);
-                            meshes.RenderShadow(context, camera, world, 1, shadow, profile.Shadows.MaximumCasters - draws, profile.Shadows.MaximumDraws - draws, captureVisualSeconds);
-                            context.EndDirectionalShadowPass();
-                        }
-                        ground.Render(context, camera);
-                        particles.Prepare(world, camera, context.Width, context.Height, 0, true);
-                        meshes.Render(context, camera, world, 1, captureVisualSeconds, particles);
-                        particles.Render(context, camera);
-                        context.BeginPass(GraphicsFramePass.Overlay);
+                        var worldPasses = new ClientWorldPassRecorder(ground, meshes, particles, world, camera, 1,
+                            captureVisualSeconds, 0, true);
+                        ClientWorldPassSequence.Record(context,
+                            composition.Atmosphere.Enabled ? SceneAtmosphereSettings.CreateView(camera, context.Width, context.Height) : null,
+                            profile.Shadows.Enabled ? DirectionalShadowProjection.Create(camera.CaptureState(), lighting, profile.Shadows) : null,
+                            profile.Shadows, ref worldPasses);
                         selection.Render(context, camera, indicators);
                         if (panel.Ring.UsesRing)
                         {
