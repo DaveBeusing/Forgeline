@@ -227,3 +227,7 @@ The [opening logistics guide](OnboardingInteraction.md) explains these same cont
 ## Cargo Truck operational Fuel versus battlefield supply
 
 Cargo propulsion Fuel is stored in a dedicated `UnitFuelState` inventory, independently from its freight inventory and Supply Truck battlefield cargo. A static depot's proximity is not an automatic transfer into a Cargo Truck drive tank. Autonomous Cargo Truck refueling uses the real docking/FIFO/inventory service described in [Cargo Transport Operations](CargoTransportOperations.md). Existing explicit mobile Supply Truck rescue remains available for a cargo vehicle unable to reach any fueled dock, while idle or traveling Cargo Trucks do not accept passive static-range top-ups. Battlefield resupply of combat units and Supply Truck ammunition is unchanged.
+
+## Planned base-local conveyor handoff
+
+The [conveyor logistics design](BaseConveyorLogistics.md) permits future local Ammunition transfer into a Supply Depot through validated inventory ports. Fuel remains on the present vehicle logistics path. Supply Truck bay loading, provider selection and battlefield recipient supply remain unchanged; belts do not directly service mobile units. This is a design boundary, not an implemented supply mode.
