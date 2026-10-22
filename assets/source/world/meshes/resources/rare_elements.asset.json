@@ -1,15 +1,21 @@
 {
+  "collisionReference": "mesh.world.resource.rare_elements.inclusion_reef.medium.collision",
   "id": "mesh.world.resource.rare_elements",
-  "type": "mesh",
-  "source": "../sources/blender/rare_elements/mesh.world.resource.rare_elements.glb",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.rare_elements_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.rare_elements_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
   "materialReferences": [
     "material.world.resource.rare_elements"
   ],
-  "lods": [
-    {
-      "level": 1,
-      "assetId": "mesh.world.resource.rare_elements_lod1",
-      "maxDistance": 260
-    }
-  ]
+  "source": "../sources/clusters/rare_elements/inclusion_reef_medium_lod0.glb",
+  "type": "mesh"
 }

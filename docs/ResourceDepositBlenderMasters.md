@@ -1,5 +1,9 @@
 # Resource deposit Blender masters
 
+The canonical geometry now uses [modular cluster sources](ResourceDepositClusterGeometry.md).
+The preserved sources, screenshots and results below remain historical evidence
+of their original geometry and revisions; they do not qualify the replacement clusters.
+
 ## Current review status
 
 Integration base: master **6445ed102bfbec4a5033917196f9464578086be4**, version

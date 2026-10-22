@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.ferrous_ore.faulted_ridge.medium.collision",
+  "id": "mesh.world.resource.ferrous_ore.faulted_ridge.medium_lod2",
+  "materialReferences": [
+    "material.world.resource.ferrous_ore"
+  ],
+  "source": "../sources/clusters/ferrous_ore/faulted_ridge_medium_lod2.glb",
+  "type": "mesh"
+}

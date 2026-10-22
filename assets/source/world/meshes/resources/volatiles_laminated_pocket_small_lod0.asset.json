@@ -1,0 +1,21 @@
+{
+  "collisionReference": "mesh.world.resource.volatiles.laminated_pocket.small.collision",
+  "id": "mesh.world.resource.volatiles.laminated_pocket.small",
+  "lods": [
+    {
+      "assetId": "mesh.world.resource.volatiles.laminated_pocket.small_lod1",
+      "level": 1,
+      "maxDistance": 260
+    },
+    {
+      "assetId": "mesh.world.resource.volatiles.laminated_pocket.small_lod2",
+      "level": 2,
+      "maxDistance": 520
+    }
+  ],
+  "materialReferences": [
+    "material.world.resource.volatiles"
+  ],
+  "source": "../sources/clusters/volatiles/laminated_pocket_small_lod0.glb",
+  "type": "mesh"
+}

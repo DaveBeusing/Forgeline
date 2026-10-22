@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.volatiles.fractured_lens.medium.collision",
+  "id": "mesh.world.resource.volatiles.fractured_lens.medium_lod2",
+  "materialReferences": [
+    "material.world.resource.volatiles"
+  ],
+  "source": "../sources/clusters/volatiles/fractured_lens_medium_lod2.glb",
+  "type": "mesh"
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "status": "authored-pending-manual-acceptance",
+  "idPattern": "mesh.world.resource.<family>.<layout>.<size>[_lod1|_lod2]",
+  "proxyIdPattern": "mesh.world.resource.<family>.<layout>.<size>.collision",
+  "sizes": ["small", "medium", "large"],
+  "localFrame": {"minimum": [-0.5, -0.5, -0.5], "maximum": [0.5, 0.5, 0.5], "groundY": -0.5, "unit": "metre", "up": "+Y"},
+  "sourceTriangleCeilings": [400, 100, 48],
+  "families": {
+    "ferrous_ore": {"defaultLayout": "layered_shelf", "layouts": ["layered_shelf", "faulted_ridge", "breccia_fan", "offset_seam"]},
+    "silicates": {"defaultLayout": "cleaved_plate", "layouts": ["cleaved_plate", "crystal_fan", "stepped_bed", "split_rosette"]},
+    "volatiles": {"defaultLayout": "sealed_nodule", "layouts": ["sealed_nodule", "fractured_lens", "laminated_pocket", "weathered_saddle"]},
+    "rare_elements": {"defaultLayout": "inclusion_reef", "layouts": ["inclusion_reef", "split_matrix", "radial_inclusions", "faulted_pocket"]}
+  },
+  "defaultBinding": "Existing High/Reduced IDs alias defaultLayout.medium; LOD2 is additive. Extra layouts require presentation-only dispatch by their stable IDs.",
+  "states": ["Untouched", "Active", "Depleted"],
+  "statePolicy": "Reuse existing authoritative presentation tint; no new simulation or emissive state."
+}

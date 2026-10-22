@@ -1,0 +1,4261 @@
+{
+  "blenderVersion": "5.2.2",
+  "exports": [
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.small.collision",
+      "layout": "layered_shelf",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3351357579231262,
+          0.18000000715255737,
+          0.3389977216720581
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.small",
+      "layout": "layered_shelf",
+      "lod": 0,
+      "sha256": "4d14a214ecf1b9eedb11baeb88fd8ebb79aa94484c3c52dbf9d1ff20d6312548",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_small_lod0.glb",
+      "triangles": 180
+    },
+    {
+      "bounds": [
+        [
+          -0.3251362144947052,
+          -0.5,
+          -0.33077260851860046
+        ],
+        [
+          0.3400000035762787,
+          0.17117983102798462,
+          0.3400000035762787
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.small_lod1",
+      "layout": "layered_shelf",
+      "lod": 1,
+      "sha256": "0bb36648b296b5f20f40aa158253f55d5cdc1fe5ded11e2f9777476337418867",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.25536027550697327,
+          -0.5,
+          -0.28779786825180054
+        ],
+        [
+          0.3400000035762787,
+          0.17117983102798462,
+          0.2178782969713211
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.small_lod2",
+      "layout": "layered_shelf",
+      "lod": 2,
+      "sha256": "668ba0c88dcba69c101e2637be61e0c42e91e43e49273fd8ec6646dcb0353a8c",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.medium.collision",
+      "layout": "layered_shelf",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.42384815216064453,
+          0.36000001430511475,
+          0.42873242497444153
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.medium",
+      "layout": "layered_shelf",
+      "lod": 0,
+      "sha256": "8124e3445fcfc7b559209c1ed0968e7f3d1717fa9bf128f27d2f9146beddfa9f",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_medium_lod0.glb",
+      "triangles": 252
+    },
+    {
+      "bounds": [
+        [
+          -0.41120168566703796,
+          -0.5,
+          -0.41833004355430603
+        ],
+        [
+          0.4300000071525574,
+          0.34884509444236755,
+          0.4300000071525574
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.medium_lod1",
+      "layout": "layered_shelf",
+      "lod": 1,
+      "sha256": "c99f72c877ced03d710392ea31acc7ab844747caaca011f4e90914d6b975df15",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.3229556381702423,
+          -0.5,
+          -0.36397966742515564
+        ],
+        [
+          0.4300000071525574,
+          0.34884509444236755,
+          0.2755519449710846
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.medium_lod2",
+      "layout": "layered_shelf",
+      "lod": 2,
+      "sha256": "7fcf738591395fade9185323376cd935f18a15374b01ef7764816c23683c2325",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.large.collision",
+      "layout": "layered_shelf",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.49284669756889343,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.large",
+      "layout": "layered_shelf",
+      "lod": 0,
+      "sha256": "9db61d364207ad0f43171a806a5984f6b8e6187da436fbbe55fbd93346579ae9",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_large_lod0.glb",
+      "triangles": 324
+    },
+    {
+      "bounds": [
+        [
+          -0.47814151644706726,
+          -0.5,
+          -0.4720664620399475
+        ],
+        [
+          0.5,
+          0.48702916502952576,
+          0.49927860498428345
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.large_lod1",
+      "layout": "layered_shelf",
+      "lod": 1,
+      "sha256": "8e138b1099d175ed7c840e14cc45b25344d7dc4d74f04e1766cd21843dfc21e8",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.37552982568740845,
+          -0.5,
+          -0.4098348021507263
+        ],
+        [
+          0.5,
+          0.48702916502952576,
+          0.32243430614471436
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.layered_shelf.large_lod2",
+      "layout": "layered_shelf",
+      "lod": 2,
+      "sha256": "76f328ee56b9a51ec5c27a24928465bd1b82e20c2ce83a0a9e11cff1f4459e1d",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/layered_shelf_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.small.collision",
+      "layout": "faulted_ridge",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.33501240611076355,
+          0.18000000715255737,
+          0.3351551592350006
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.small",
+      "layout": "faulted_ridge",
+      "lod": 0,
+      "sha256": "519bdd533356c3a45ff2650238faf04a97542e7a7a5e3bb54357b5212e84fa8f",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_small_lod0.glb",
+      "triangles": 180
+    },
+    {
+      "bounds": [
+        [
+          -0.3391166031360626,
+          -0.5,
+          -0.33676648139953613
+        ],
+        [
+          0.3400000035762787,
+          0.17117983102798462,
+          0.3400000035762787
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.small_lod1",
+      "layout": "faulted_ridge",
+      "lod": 1,
+      "sha256": "3f1c6c12459deb342aa4918654d1ff4f9213d033ee0076491b833de8d8005efc",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.30865076184272766,
+          -0.5,
+          -0.339120477437973
+        ],
+        [
+          0.1729409098625183,
+          0.17117983102798462,
+          0.20710106194019318
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.small_lod2",
+      "layout": "faulted_ridge",
+      "lod": 2,
+      "sha256": "4d899048c847adb7b4af371bba7aa36d8aaabab090d18d928fa6f6db2537a1e1",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.medium.collision",
+      "layout": "faulted_ridge",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.42369213700294495,
+          0.36000001430511475,
+          0.423872709274292
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.medium",
+      "layout": "faulted_ridge",
+      "lod": 0,
+      "sha256": "7333426a9defaa3965a4dd6a7b0b28ad96b0dcc808b10e15eccb686ce0e14daa",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_medium_lod0.glb",
+      "triangles": 252
+    },
+    {
+      "bounds": [
+        [
+          -0.42888274788856506,
+          -0.5,
+          -0.4259105622768402
+        ],
+        [
+          0.4300000071525574,
+          0.34884509444236755,
+          0.4300000071525574
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.medium_lod1",
+      "layout": "faulted_ridge",
+      "lod": 1,
+      "sha256": "df7444af75630e4a767a01ffc2c446e4938bbef30c14ca4e02382f3bc5a4dd46",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.39035242795944214,
+          -0.5,
+          -0.42888763546943665
+        ],
+        [
+          0.21871939301490784,
+          0.34884509444236755,
+          0.2619219422340393
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.medium_lod2",
+      "layout": "faulted_ridge",
+      "lod": 2,
+      "sha256": "b82e03d86dcf2601193f024eb9ba28bb3c295a3230f6570a6659417f4548ddc1",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.large.collision",
+      "layout": "faulted_ridge",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.49266529083251953,
+          0.5,
+          0.49325594305992126
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.large",
+      "layout": "faulted_ridge",
+      "lod": 0,
+      "sha256": "44699dc7c184738d0ff4c5a41fe946d9f6da4150c9d7632a6b19d859f310459a",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_large_lod0.glb",
+      "triangles": 288
+    },
+    {
+      "bounds": [
+        [
+          -0.498700886964798,
+          -0.5,
+          -0.4420626163482666
+        ],
+        [
+          0.5,
+          0.48702916502952576,
+          0.5
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.large_lod1",
+      "layout": "faulted_ridge",
+      "lod": 1,
+      "sha256": "45da8c67bec825e520ee64302ac48b0997ead1a4f0559e82ec6a047bcae712be",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.453898161649704,
+          -0.5,
+          -0.4453393518924713
+        ],
+        [
+          0.25432485342025757,
+          0.48702916502952576,
+          0.3150039613246918
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.faulted_ridge.large_lod2",
+      "layout": "faulted_ridge",
+      "lod": 2,
+      "sha256": "52c2549ea52611e71e202cb2295ac4e9b57e675918bdadb3ec4a5157a8b4d957",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/faulted_ridge_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.small.collision",
+      "layout": "breccia_fan",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.small",
+      "layout": "breccia_fan",
+      "lod": 0,
+      "sha256": "c82028f35b557ae68e7241d2e1ac7f540740b3b31440d1415a9f27c14a4c74ad",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_small_lod0.glb",
+      "triangles": 180
+    },
+    {
+      "bounds": [
+        [
+          -0.30381742119789124,
+          -0.5,
+          -0.32449543476104736
+        ],
+        [
+          0.3344585597515106,
+          0.17117983102798462,
+          0.32714027166366577
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.small_lod1",
+      "layout": "breccia_fan",
+      "lod": 1,
+      "sha256": "7fc30fc3df0eed8914327edc5d31dde4f45a1783dd1f39c253174d0dc9262e09",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.2163739651441574,
+          -0.5,
+          -0.27909040451049805
+        ],
+        [
+          0.2982564866542816,
+          0.17117983102798462,
+          0.2775925099849701
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.small_lod2",
+      "layout": "breccia_fan",
+      "lod": 2,
+      "sha256": "a98521f876ff086b9b0e36dd2c59e357d580fcce54e0afd6bf7bb75f88f9c19c",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.medium.collision",
+      "layout": "breccia_fan",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.42800819873809814
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.medium",
+      "layout": "breccia_fan",
+      "lod": 0,
+      "sha256": "a7a733ccbe0fd14a2f24b3005ab7c045e5886e871f91846f1d0b0ea9cfa1b71c",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_medium_lod0.glb",
+      "triangles": 252
+    },
+    {
+      "bounds": [
+        [
+          -0.38423970341682434,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.42299172282218933,
+          0.34884509444236755,
+          0.4262952208518982
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.medium_lod1",
+      "layout": "breccia_fan",
+      "lod": 1,
+      "sha256": "3eb8ab5d581154761aafdd7710cec5c05f67b77a532f033591ee4ac9caa352c1",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.2736494243144989,
+          -0.5,
+          -0.32149365544319153
+        ],
+        [
+          0.3772067427635193,
+          0.34884509444236755,
+          0.329738974571228
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.medium_lod2",
+      "layout": "breccia_fan",
+      "lod": 2,
+      "sha256": "cb159611d89a3c17ed4b65bc6a8b33df3c29fd18e9d4ba51912f4152020196dc",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.large.collision",
+      "layout": "breccia_fan",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.4977820813655853
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.large",
+      "layout": "breccia_fan",
+      "lod": 0,
+      "sha256": "a215a803cb3ac86282f9536181ae3cfb39866bfc17b276c4d2fa66d29b1b0ed8",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_large_lod0.glb",
+      "triangles": 324
+    },
+    {
+      "bounds": [
+        [
+          -0.44818586111068726,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.4658375382423401,
+          0.48702916502952576,
+          0.4535040855407715
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.large_lod1",
+      "layout": "breccia_fan",
+      "lod": 1,
+      "sha256": "b7969a9da5ef8422bb5695cf1887285a527178964d450a6cbcd499aef9d152bf",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.32296517491340637,
+          -0.5,
+          -0.37917572259902954
+        ],
+        [
+          0.4139954745769501,
+          0.48702916502952576,
+          0.345986545085907
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.breccia_fan.large_lod2",
+      "layout": "breccia_fan",
+      "lod": 2,
+      "sha256": "bee2ee16b6930c2e65195e6c1f672410a2348f4f1049e5bd156ae665d23596ba",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/breccia_fan_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.small.collision",
+      "layout": "offset_seam",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.33708229660987854
+        ],
+        [
+          0.33323803544044495,
+          0.18000000715255737,
+          0.3340405523777008
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.small",
+      "layout": "offset_seam",
+      "lod": 0,
+      "sha256": "a79cb532864b42241845fdc3dd62a8f2a8ef2e89f368a2b5ec2edc913cb126d3",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_small_lod0.glb",
+      "triangles": 180
+    },
+    {
+      "bounds": [
+        [
+          -0.30333009362220764,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.small_lod1",
+      "layout": "offset_seam",
+      "lod": 1,
+      "sha256": "6a7b185b1e67e58a06657142f7aa3e4f5df9fc2e822f1755e51b144c086afc8d",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.29989343881607056,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3342197835445404,
+          0.18000000715255737,
+          0.3254627287387848
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.small_lod2",
+      "layout": "offset_seam",
+      "lod": 2,
+      "sha256": "5e9bc72d19d3609c810a071aa9f36e0f3f20a5fbb2f7822f57bb56f562723ac0",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.medium.collision",
+      "layout": "offset_seam",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4184594750404358
+        ],
+        [
+          0.42144811153411865,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.medium",
+      "layout": "offset_seam",
+      "lod": 0,
+      "sha256": "67b19498d02e5651c890e59254cbfa5b8dc7f180a3a2bdbe0d118a268dab47e9",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_medium_lod0.glb",
+      "triangles": 252
+    },
+    {
+      "bounds": [
+        [
+          -0.3836233615875244,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4131089150905609
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.medium_lod1",
+      "layout": "offset_seam",
+      "lod": 1,
+      "sha256": "822fbe954071d422825c069f4adfd39229dd7d33f8fa0502ad17394b79147264",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.37927699089050293,
+          -0.5,
+          -0.4029525816440582
+        ],
+        [
+          0.4226897060871124,
+          0.36000001430511475,
+          0.3723698854446411
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.medium_lod2",
+      "layout": "offset_seam",
+      "lod": 2,
+      "sha256": "dfd70c77fabadd3409554fe538dd8582b0da324295c1fff4b6627705eb910b63",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.large.collision",
+      "layout": "offset_seam",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.4865807890892029
+        ],
+        [
+          0.49005594849586487,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.large",
+      "layout": "offset_seam",
+      "lod": 0,
+      "sha256": "0ea559def61443fe4191a5e4a21f22fad6197fdf58edcfa3d7a280c871e3ca62",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_large_lod0.glb",
+      "triangles": 288
+    },
+    {
+      "bounds": [
+        [
+          -0.4460736811161041,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.4803592264652252
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.large_lod1",
+      "layout": "offset_seam",
+      "lod": 1,
+      "sha256": "95f504a3df4192d360948af2c15261f4c7a04accb5316804f5cdc41305a3f72f",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.44101977348327637,
+          -0.5,
+          -0.4685494899749756
+        ],
+        [
+          0.491499662399292,
+          0.5,
+          0.4329882264137268
+        ]
+      ],
+      "family": "ferrous_ore",
+      "id": "mesh.world.resource.ferrous_ore.offset_seam.large_lod2",
+      "layout": "offset_seam",
+      "lod": 2,
+      "sha256": "eaec63ef83b5aa14cb748c33fb853faa0b216e4f65bd55f7da92222165032776",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/ferrous_ore/offset_seam_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.small.collision",
+      "layout": "cleaved_plate",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.33061155676841736,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.small",
+      "layout": "cleaved_plate",
+      "lod": 0,
+      "sha256": "774d69aa4d33f2b80dc78229dc8ecd7fb3a409cacf9c235629f45a9106a1a32f",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_small_lod0.glb",
+      "triangles": 130
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3220607042312622
+        ],
+        [
+          0.33281210064888,
+          0.17117983102798462,
+          0.3285660147666931
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.small_lod1",
+      "layout": "cleaved_plate",
+      "lod": 1,
+      "sha256": "0a90c3103ba64962b9bee2f20399bf3d378c9e7b539bb00f6745f54366d4bc1a",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.2537803053855896,
+          -0.5,
+          -0.2797556519508362
+        ],
+        [
+          0.33281210064888,
+          0.17117983102798462,
+          0.1637618988752365
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.small_lod2",
+      "layout": "cleaved_plate",
+      "lod": 2,
+      "sha256": "11601ec98aaea986ab700497f8a36c48ddbb1ebea4baadcaa4951069328cd53a",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.medium.collision",
+      "layout": "cleaved_plate",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4181263744831085,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.medium",
+      "layout": "cleaved_plate",
+      "lod": 0,
+      "sha256": "7317295d3839e68f15887b6a771ee93f0d85e00b4c0fadd412a26649c58beb95",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_medium_lod0.glb",
+      "triangles": 182
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4228222370147705
+        ],
+        [
+          0.42090943455696106,
+          0.34884509444236755,
+          0.4162864685058594
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.medium_lod1",
+      "layout": "cleaved_plate",
+      "lod": 1,
+      "sha256": "644a99bee1d954af5c4feb82329ea6f798a153e7a1f7064372b7c3735918382c",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.3209574222564697,
+          -0.5,
+          -0.3133125901222229
+        ],
+        [
+          0.42090943455696106,
+          0.34884509444236755,
+          0.21862637996673584
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.medium_lod2",
+      "layout": "cleaved_plate",
+      "lod": 2,
+      "sha256": "232774c335ed9c821c3095dd6a03915adad99b34d288fe7110c75acabc51b6a0",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.large.collision",
+      "layout": "cleaved_plate",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4861934781074524,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.large",
+      "layout": "cleaved_plate",
+      "lod": 0,
+      "sha256": "6bb991e3784ecb7132971b478884416c8073fe85744537eba15b70ed47c0083d",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_large_lod0.glb",
+      "triangles": 234
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.4906112551689148
+        ],
+        [
+          0.4894295632839203,
+          0.48702916502952576,
+          0.4840708076953888
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.large_lod1",
+      "layout": "cleaved_plate",
+      "lod": 1,
+      "sha256": "43ca854b92bc3fe5b53bfb3b8dc31f1e135cd45269b0ae7e429232dae0f12390",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.37320631742477417,
+          -0.5,
+          -0.36340832710266113
+        ],
+        [
+          0.4894295632839203,
+          0.48702916502952576,
+          0.25447511672973633
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.cleaved_plate.large_lod2",
+      "layout": "cleaved_plate",
+      "lod": 2,
+      "sha256": "5b4acf8880789b41828ea4a0b3f1f9742fc9451310dd1669c759ab4dacd48cb9",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/cleaved_plate_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.small.collision",
+      "layout": "crystal_fan",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3220609426498413,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.small",
+      "layout": "crystal_fan",
+      "lod": 0,
+      "sha256": "b2babd365ac19ec2b6176038786e7a2a4899644a13a7552087537a7e89501d22",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_small_lod0.glb",
+      "triangles": 130
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.31506508588790894
+        ],
+        [
+          0.3277476727962494,
+          0.17117983102798462,
+          0.3327414393424988
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.small_lod1",
+      "layout": "crystal_fan",
+      "lod": 1,
+      "sha256": "860a634052ab31f8b3b33f048076e32c88fd805efa66c808c44adabc232fb58a",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.29661500453948975,
+          -0.5,
+          -0.2966195344924927
+        ],
+        [
+          0.20368839800357819,
+          0.17117983102798462,
+          0.1986973136663437
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.small_lod2",
+      "layout": "crystal_fan",
+      "lod": 2,
+      "sha256": "5433edf6e67023ad0974cfedd0536cd1ce9a6426ef72f88697e1c8825c682b18",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.medium.collision",
+      "layout": "crystal_fan",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4073123633861542,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.medium",
+      "layout": "crystal_fan",
+      "lod": 0,
+      "sha256": "4530cf6aae5fee8927af6a6c530d454a8b475d4aec0f20752f43b46094ed46f9",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_medium_lod0.glb",
+      "triangles": 182
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.3984646499156952
+        ],
+        [
+          0.41450440883636475,
+          0.34884509444236755,
+          0.42082005739212036
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.medium_lod1",
+      "layout": "crystal_fan",
+      "lod": 1,
+      "sha256": "b2a51a37f50e4aa15d78ac8912b0fa3dc892c87017322d15d33b4861b2e38e75",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.3751307427883148,
+          -0.5,
+          -0.37513646483421326
+        ],
+        [
+          0.2576059103012085,
+          0.34884509444236755,
+          0.2512936592102051
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.medium_lod2",
+      "layout": "crystal_fan",
+      "lod": 2,
+      "sha256": "616f8c72e136e7e1fc3c7658d605b4ffc46ce2c46f394ebe71b2c93086695472",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.large.collision",
+      "layout": "crystal_fan",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4736190140247345,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.large",
+      "layout": "crystal_fan",
+      "lod": 0,
+      "sha256": "e958c59e87f3d4caf6b973f0e170887d030e9277561b851616a91e024d9e4adb",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_large_lod0.glb",
+      "triangles": 208
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.41754692792892456
+        ],
+        [
+          0.48198187351226807,
+          0.48702916502952576,
+          0.48983296751976013
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.large_lod1",
+      "layout": "crystal_fan",
+      "lod": 1,
+      "sha256": "35dad4c8900311e53e32a35bfafd7eb8c1e58705eec386080c572eec2f7a3fb3",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.43619853258132935,
+          -0.5,
+          -0.3917103409767151
+        ],
+        [
+          0.29954177141189575,
+          0.48702916502952576,
+          0.30207791924476624
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.crystal_fan.large_lod2",
+      "layout": "crystal_fan",
+      "lod": 2,
+      "sha256": "091ec0e05d0bf9bb114da6530615d4a345c9d5550d73fc08f472fa2c4c8551bb",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/crystal_fan_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.small.collision",
+      "layout": "stepped_bed",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3306768238544464
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.small",
+      "layout": "stepped_bed",
+      "lod": 0,
+      "sha256": "fe4b4a52adb0bc0de8cb31e1acccde18595b2491ee13f3034b4d06163c8d5314",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_small_lod0.glb",
+      "triangles": 130
+    },
+    {
+      "bounds": [
+        [
+          -0.32881343364715576,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.32004445791244507,
+          0.17117983102798462,
+          0.32717642188072205
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.small_lod1",
+      "layout": "stepped_bed",
+      "lod": 1,
+      "sha256": "a38772036d12dee3958f0d0b6d6e6db20268bf5494195b735a6bfd407ece0b2f",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.23395861685276031,
+          -0.5,
+          -0.26764607429504395
+        ],
+        [
+          0.318808913230896,
+          0.17117983102798462,
+          0.269571989774704
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.small_lod2",
+      "layout": "stepped_bed",
+      "lod": 2,
+      "sha256": "61510d54442687f6bc935920867bbda18437922e6d4f1c7b6dae2e01379f3128",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.medium.collision",
+      "layout": "stepped_bed",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.40577566623687744
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.medium",
+      "layout": "stepped_bed",
+      "lod": 0,
+      "sha256": "dcc7daf860a22b6f0be587cb00228bc18bdd952e7a2cf770447a8ba833314512",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_medium_lod0.glb",
+      "triangles": 182
+    },
+    {
+      "bounds": [
+        [
+          -0.41585227847099304,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4047621190547943,
+          0.34884509444236755,
+          0.41705840826034546
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.medium_lod1",
+      "layout": "stepped_bed",
+      "lod": 1,
+      "sha256": "13f21f010a806528c9b526f28801cf008faecd6975e38d4db61a5d75194ec190",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.29588884115219116,
+          -0.5,
+          -0.31503912806510925
+        ],
+        [
+          0.4031994938850403,
+          0.34884509444236755,
+          0.2836615741252899
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.medium_lod2",
+      "layout": "stepped_bed",
+      "lod": 2,
+      "sha256": "9c97506c6b2aa115e1e692dcc041ebd231036edce17b47deb69e5f7e3ae34f72",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.large.collision",
+      "layout": "stepped_bed",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.4723280668258667
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.large",
+      "layout": "stepped_bed",
+      "lod": 0,
+      "sha256": "7c02c743d714d51a6c26628df18ed232ee41d4f68ece891b47ccf221f155fac6",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_large_lod0.glb",
+      "triangles": 234
+    },
+    {
+      "bounds": [
+        [
+          -0.4842633008956909,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.42851781845092773,
+          0.48702916502952576,
+          0.4676114618778229
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.large_lod1",
+      "layout": "stepped_bed",
+      "lod": 1,
+      "sha256": "0c223d4ee4ea54aa9f7c99539c5cce3050d63b3f87d18e19c9b321868430809a",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.3508262634277344,
+          -0.5,
+          -0.36867794394493103
+        ],
+        [
+          0.42677968740463257,
+          0.48702916502952576,
+          0.3152296543121338
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.stepped_bed.large_lod2",
+      "layout": "stepped_bed",
+      "lod": 2,
+      "sha256": "8fabc2398cae089bfbee6f213fada6705d3083743375d26b5c88dc52f8d25d4e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/stepped_bed_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.small.collision",
+      "layout": "split_rosette",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.32850557565689087
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.small",
+      "layout": "split_rosette",
+      "lod": 0,
+      "sha256": "c19a7d5c06090d1613a3ef5e8e5ce13feb6fc6f1e21a8bbd54ab9cd340b3845e",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_small_lod0.glb",
+      "triangles": 130
+    },
+    {
+      "bounds": [
+        [
+          -0.32762864232063293,
+          -0.5,
+          -0.32678669691085815
+        ],
+        [
+          0.3281676769256592,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.small_lod1",
+      "layout": "split_rosette",
+      "lod": 1,
+      "sha256": "ca62e0d7d83017851c727f9c841c3de3602a6b09e29474e54b2c32577e7d5fdd",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.2999311089515686,
+          -0.5,
+          -0.32678669691085815
+        ],
+        [
+          0.3281676769256592,
+          0.18000000715255737,
+          0.33706387877464294
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.small_lod2",
+      "layout": "split_rosette",
+      "lod": 2,
+      "sha256": "3a0c81862b565a06b41f634bee00e2c6bf09cb1b4bad6053c2eba2a583c5d697",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.medium.collision",
+      "layout": "split_rosette",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.medium",
+      "layout": "split_rosette",
+      "lod": 0,
+      "sha256": "13fb2ba50d2caef493c90dc24d8d40ad99bec1eed489eb15043858f779682562",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_medium_lod0.glb",
+      "triangles": 182
+    },
+    {
+      "bounds": [
+        [
+          -0.4143538773059845,
+          -0.5,
+          -0.4144285023212433
+        ],
+        [
+          0.415035605430603,
+          0.36000001430511475,
+          0.4249059557914734
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.medium_lod1",
+      "layout": "split_rosette",
+      "lod": 1,
+      "sha256": "63c4d205ec562549822feb37c5cb45558731f68bceee7332a7c08bdff4ad217f",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.37932464480400085,
+          -0.5,
+          -0.4144285023212433
+        ],
+        [
+          0.415035605430603,
+          0.36000001430511475,
+          0.36789900064468384
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.medium_lod2",
+      "layout": "split_rosette",
+      "lod": 2,
+      "sha256": "d660a336792ff20db14c5290db817dec638954484adc87350bdc4577ce3f60a8",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.large.collision",
+      "layout": "split_rosette",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.large",
+      "layout": "split_rosette",
+      "lod": 0,
+      "sha256": "6d4300b87e597a9e7c6316ee7d959b8903761a4720580e200f019d8941b09546",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_large_lod0.glb",
+      "triangles": 208
+    },
+    {
+      "bounds": [
+        [
+          -0.48180684447288513,
+          -0.5,
+          -0.4820072054862976
+        ],
+        [
+          0.48259952664375305,
+          0.5,
+          0.48784005641937256
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.large_lod1",
+      "layout": "split_rosette",
+      "lod": 1,
+      "sha256": "5d37c4d6e0982caa233983ddb40c05828724b81fef355a14dc42dfc22c33306f",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.4410751760005951,
+          -0.5,
+          -0.4820072054862976
+        ],
+        [
+          0.48259952664375305,
+          0.5,
+          0.4219687581062317
+        ]
+      ],
+      "family": "silicates",
+      "id": "mesh.world.resource.silicates.split_rosette.large_lod2",
+      "layout": "split_rosette",
+      "lod": 2,
+      "sha256": "b9f867dc0681c53587eea47e549cffa77bffd20d17bb4c75bfc146d0e8a0e0ff",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/silicates/split_rosette_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.small.collision",
+      "layout": "sealed_nodule",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.small",
+      "layout": "sealed_nodule",
+      "lod": 0,
+      "sha256": "251645549a00f79887ab18cda077bfe044b84ae108e2d962d4ee2e593b502656",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_small_lod0.glb",
+      "triangles": 220
+    },
+    {
+      "bounds": [
+        [
+          -0.31447237730026245,
+          -0.5,
+          -0.31270065903663635
+        ],
+        [
+          0.3298954665660858,
+          0.17117983102798462,
+          0.3257802724838257
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.small_lod1",
+      "layout": "sealed_nodule",
+      "lod": 1,
+      "sha256": "1cbd39839b62915ec38d876195245d395235b5d7437a7c73e6fa563e433baf29",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.24391530454158783,
+          -0.5,
+          -0.27161210775375366
+        ],
+        [
+          0.3298954665660858,
+          0.17117983102798462,
+          0.20197021961212158
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.small_lod2",
+      "layout": "sealed_nodule",
+      "lod": 2,
+      "sha256": "c5139fc6c536c45ed4bbe843c8b85a844c882c5100afa9d5652195d53d3858c3",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.medium.collision",
+      "layout": "sealed_nodule",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.medium",
+      "layout": "sealed_nodule",
+      "lod": 0,
+      "sha256": "69036abbff94ad2c9e651969a59a8766b440c1ed621aa2e0c8ee08184050ebca",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_medium_lod0.glb",
+      "triangles": 308
+    },
+    {
+      "bounds": [
+        [
+          -0.3977150619029999,
+          -0.5,
+          -0.3954743444919586
+        ],
+        [
+          0.41722074151039124,
+          0.34884509444236755,
+          0.41201621294021606
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.medium_lod1",
+      "layout": "sealed_nodule",
+      "lod": 1,
+      "sha256": "55a7c6373e79ade8cdac51797011299ca441c2a84aaf712c27ce7128bd6309a5",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.3084811270236969,
+          -0.5,
+          -0.34350940585136414
+        ],
+        [
+          0.41722074151039124,
+          0.34884509444236755,
+          0.25543293356895447
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.medium_lod2",
+      "layout": "sealed_nodule",
+      "lod": 2,
+      "sha256": "7717b9334c1779278521b8e383d511a4716f276276c85123f82ac80d6c61ebd7",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.large.collision",
+      "layout": "sealed_nodule",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.large",
+      "layout": "sealed_nodule",
+      "lod": 0,
+      "sha256": "5e622d5ab14e8459cf6c3d7972ab99ad37f95c62cf31ce4e7d36e94f3191b5fd",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_large_lod0.glb",
+      "triangles": 396
+    },
+    {
+      "bounds": [
+        [
+          -0.46245935559272766,
+          -0.5,
+          -0.4407530725002289
+        ],
+        [
+          0.4851404130458832,
+          0.48702916502952576,
+          0.4795047640800476
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.large_lod1",
+      "layout": "sealed_nodule",
+      "lod": 1,
+      "sha256": "bbde7fc5adadce63c1f3df19b0030773d0d66b4e769f985484dc10f2cf0c1fa3",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.3586989939212799,
+          -0.5,
+          -0.3815311789512634
+        ],
+        [
+          0.4851404130458832,
+          0.48702916502952576,
+          0.30105435848236084
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.sealed_nodule.large_lod2",
+      "layout": "sealed_nodule",
+      "lod": 2,
+      "sha256": "86ee24ab766805cc415554dc946476e46b8b8c1096376c7e919ca2893565b0c9",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/sealed_nodule_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.small.collision",
+      "layout": "fractured_lens",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.small",
+      "layout": "fractured_lens",
+      "lod": 0,
+      "sha256": "ec209f7ecea0af0fdcbbe8d487fefb7f795861ded9c3ef7d5bbed75d948e43b2",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_small_lod0.glb",
+      "triangles": 220
+    },
+    {
+      "bounds": [
+        [
+          -0.32264822721481323,
+          -0.5,
+          -0.2987412214279175
+        ],
+        [
+          0.3259842097759247,
+          0.17117983102798462,
+          0.3303992748260498
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.small_lod1",
+      "layout": "fractured_lens",
+      "lod": 1,
+      "sha256": "5a67f182ab37bd981a1dc209ecbd4f85b6aded5e42c06cd68de6e9d65ffdfb9c",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.2911316752433777,
+          -0.5,
+          -0.3018937408924103
+        ],
+        [
+          0.17367133498191833,
+          0.17117983102798462,
+          0.20487596094608307
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.small_lod2",
+      "layout": "fractured_lens",
+      "lod": 2,
+      "sha256": "295a4ab01be765f5f24a034bfc3a72c7dd7b700cafb3f6567051f7450fa39bdf",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.medium.collision",
+      "layout": "fractured_lens",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.medium",
+      "layout": "fractured_lens",
+      "lod": 0,
+      "sha256": "f141ab81cd164d0062de28e2ac8c54f5d3aeae5a844a2b52e9cbddfcfe4e2884",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_medium_lod0.glb",
+      "triangles": 308
+    },
+    {
+      "bounds": [
+        [
+          -0.4080551266670227,
+          -0.5,
+          -0.37781980633735657
+        ],
+        [
+          0.41227415204048157,
+          0.34884509444236755,
+          0.41785791516304016
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.medium_lod1",
+      "layout": "fractured_lens",
+      "lod": 1,
+      "sha256": "46961b0ddacbb8075d3816ccbde34adacc4d65d4f4a822940b6f0a68fd5592eb",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.36819595098495483,
+          -0.5,
+          -0.3818068206310272
+        ],
+        [
+          0.21964316070079803,
+          0.34884509444236755,
+          0.2591078281402588
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.medium_lod2",
+      "layout": "fractured_lens",
+      "lod": 2,
+      "sha256": "d00b5f176451556837e1e314bbe9f2745f9200b76bc77099be26f9769d00958a",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.large.collision",
+      "layout": "fractured_lens",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.large",
+      "layout": "fractured_lens",
+      "lod": 0,
+      "sha256": "ed3711366e1deaa64cf347699b3a49f1b0c1349562ffd6e8416f4a3f6e6977ab",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_large_lod0.glb",
+      "triangles": 352
+    },
+    {
+      "bounds": [
+        [
+          -0.4744826853275299,
+          -0.5,
+          -0.43787309527397156
+        ],
+        [
+          0.479388564825058,
+          0.48702916502952576,
+          0.4859031140804291
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.large_lod1",
+      "layout": "fractured_lens",
+      "lod": 1,
+      "sha256": "1fa5fd42346c5fd1541c574fbbf7bc368f3bf8e43d2cd1430e40de511da51876",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.42813482880592346,
+          -0.5,
+          -0.4425019919872284
+        ],
+        [
+          0.25539901852607727,
+          0.48702916502952576,
+          0.30159538984298706
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.fractured_lens.large_lod2",
+      "layout": "fractured_lens",
+      "lod": 2,
+      "sha256": "09ba276b1da08551de77be933a5c68d695ef0f8e20885ad1498dd118f4dcb247",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/fractured_lens_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.small.collision",
+      "layout": "laminated_pocket",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.small",
+      "layout": "laminated_pocket",
+      "lod": 0,
+      "sha256": "ac47668b965bffcb85c7b25174e6c618d0babfc3c4d6878b0a8947ed55c13616",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_small_lod0.glb",
+      "triangles": 220
+    },
+    {
+      "bounds": [
+        [
+          -0.3228823244571686,
+          -0.5,
+          -0.31759753823280334
+        ],
+        [
+          0.3163444697856903,
+          0.17117983102798462,
+          0.31653931736946106
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.small_lod1",
+      "layout": "laminated_pocket",
+      "lod": 1,
+      "sha256": "b392f735b76f11015badaefeed3dff6124407e828abe26fbd40b8929b1ce452a",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.23441611230373383,
+          -0.5,
+          -0.268947571516037
+        ],
+        [
+          0.28649261593818665,
+          0.17117983102798462,
+          0.26760274171829224
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.small_lod2",
+      "layout": "laminated_pocket",
+      "lod": 2,
+      "sha256": "678056c3485fead144f273738b57e2ed7bbff0cc643faebf52d4e7e9e720dace",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.medium.collision",
+      "layout": "laminated_pocket",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.41863468289375305
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.medium",
+      "layout": "laminated_pocket",
+      "lod": 0,
+      "sha256": "a36fe9210d727dca7a82f13b812b94de0ded397c7ad0c733e1e02aaab29112e4",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_medium_lod0.glb",
+      "triangles": 308
+    },
+    {
+      "bounds": [
+        [
+          -0.40835118293762207,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.40008270740509033,
+          0.34884509444236755,
+          0.4176314175128937
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.medium_lod1",
+      "layout": "laminated_pocket",
+      "lod": 1,
+      "sha256": "9e0885176bcd9ef6d2a595a150597b67cf51095a5d750db5e15f28c033a744e4",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.29646745324134827,
+          -0.5,
+          -0.32129332423210144
+        ],
+        [
+          0.3623288869857788,
+          0.34884509444236755,
+          0.31577861309051514
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.medium_lod2",
+      "layout": "laminated_pocket",
+      "lod": 2,
+      "sha256": "55a4caea02d0c64ea957216894201269d011e1fe39a7d0e35bafa47a254b87ad",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.large.collision",
+      "layout": "laminated_pocket",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.487228661775589
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.large",
+      "layout": "laminated_pocket",
+      "lod": 0,
+      "sha256": "491e169bb651b5b4272530c57939f721762fa91f8838fae80b584b6fa694923b",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_large_lod0.glb",
+      "triangles": 396
+    },
+    {
+      "bounds": [
+        [
+          -0.4749647080898285,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.45992985367774963,
+          0.48702916502952576,
+          0.45249176025390625
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.large_lod1",
+      "layout": "laminated_pocket",
+      "lod": 1,
+      "sha256": "8fffa862be0d5007e49b2abc9dd00164fea14f15085c8548a61727df4b7c689f",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.3455793857574463,
+          -0.5,
+          -0.37784525752067566
+        ],
+        [
+          0.41627031564712524,
+          0.48702916502952576,
+          0.3380388021469116
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.laminated_pocket.large_lod2",
+      "layout": "laminated_pocket",
+      "lod": 2,
+      "sha256": "70a07d697fbe53710c84ee6e27701157dc92e0d0903efd7ba77a1d9549aba83d",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/laminated_pocket_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.small.collision",
+      "layout": "weathered_saddle",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.33577761054039
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.small",
+      "layout": "weathered_saddle",
+      "lod": 0,
+      "sha256": "270fc9098659a42a596883dd136ea70e4ff390693ab76a58b26c1dd21b516001",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_small_lod0.glb",
+      "triangles": 220
+    },
+    {
+      "bounds": [
+        [
+          -0.32271265983581543,
+          -0.5,
+          -0.321173757314682
+        ],
+        [
+          0.32550543546676636,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.small_lod1",
+      "layout": "weathered_saddle",
+      "lod": 1,
+      "sha256": "2c43b3c79673ad28063e299bf42f68e8aa103a1eabfa70a73fa10b8d11d745cb",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_small_lod1.glb",
+      "triangles": 60
+    },
+    {
+      "bounds": [
+        [
+          -0.31466349959373474,
+          -0.5,
+          -0.321173757314682
+        ],
+        [
+          0.32550543546676636,
+          0.18000000715255737,
+          0.3278069794178009
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.small_lod2",
+      "layout": "weathered_saddle",
+      "lod": 2,
+      "sha256": "0d7f57479c7347b0f56b83b278b51d76bb934e739c0d8f8e6b896fa944ea3d9a",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_small_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.medium.collision",
+      "layout": "weathered_saddle",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.medium",
+      "layout": "weathered_saddle",
+      "lod": 0,
+      "sha256": "bf1b9665b3bad1ea9da9c85a509c5e7abcaaf766bd0325bd4170f2aa7fe3fc5e",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_medium_lod0.glb",
+      "triangles": 308
+    },
+    {
+      "bounds": [
+        [
+          -0.40813660621643066,
+          -0.5,
+          -0.421139657497406
+        ],
+        [
+          0.4116686284542084,
+          0.36000001430511475,
+          0.3987496793270111
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.medium_lod1",
+      "layout": "weathered_saddle",
+      "lod": 1,
+      "sha256": "585721e471e461cb4ab949c00823e34ee75f272a39c8067c2474086f922f47e1",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_medium_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.3979567885398865,
+          -0.5,
+          -0.4020126163959503
+        ],
+        [
+          0.4116686284542084,
+          0.36000001430511475,
+          0.35838818550109863
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.medium_lod2",
+      "layout": "weathered_saddle",
+      "lod": 2,
+      "sha256": "ce161b7741ea7810e678960f67f4b5da38513df68154c50951360799bc054fa9",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_medium_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.large.collision",
+      "layout": "weathered_saddle",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.large",
+      "layout": "weathered_saddle",
+      "lod": 0,
+      "sha256": "670bf6612d827553563a327de0d54998924671fdbc6e6aa7a458c99626c7772e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_large_lod0.glb",
+      "triangles": 352
+    },
+    {
+      "bounds": [
+        [
+          -0.4745774269104004,
+          -0.5,
+          -0.48969727754592896
+        ],
+        [
+          0.4786844551563263,
+          0.5,
+          0.46366241574287415
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.large_lod1",
+      "layout": "weathered_saddle",
+      "lod": 1,
+      "sha256": "50d15e737700c26d8cb9a8fa7dd2af88c25504811ed7594ed52779beb27b89a1",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_large_lod1.glb",
+      "triangles": 84
+    },
+    {
+      "bounds": [
+        [
+          -0.4627404510974884,
+          -0.5,
+          -0.46745651960372925
+        ],
+        [
+          0.4786844551563263,
+          0.5,
+          0.41673043370246887
+        ]
+      ],
+      "family": "volatiles",
+      "id": "mesh.world.resource.volatiles.weathered_saddle.large_lod2",
+      "layout": "weathered_saddle",
+      "lod": 2,
+      "sha256": "3a3f84255633169d7aff8347365f14f9c271b9f9a980cdcb73ed866ffeeee280",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/volatiles/weathered_saddle_large_lod2.glb",
+      "triangles": 24
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.small.collision",
+      "layout": "inclusion_reef",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.small",
+      "layout": "inclusion_reef",
+      "lod": 0,
+      "sha256": "86f600a1b5734c6fa16e418d6d23e834051c18f24c939cab7f09beb399a5d127",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_small_lod0.glb",
+      "triangles": 208
+    },
+    {
+      "bounds": [
+        [
+          -0.3390427827835083,
+          -0.5,
+          -0.3246787488460541
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.small_lod1",
+      "layout": "inclusion_reef",
+      "lod": 1,
+      "sha256": "1ad003578527d678bc910a558941148732b7254cf10dc215166c17f30328fae4",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_small_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.26114875078201294,
+          -0.5,
+          -0.28158867359161377
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.20247161388397217
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.small_lod2",
+      "layout": "inclusion_reef",
+      "lod": 2,
+      "sha256": "84a4a985004940f29908f6e40500ac303b426ac725f19bbfe6fb3e1bc6b3df71",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_small_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.medium.collision",
+      "layout": "inclusion_reef",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.medium",
+      "layout": "inclusion_reef",
+      "lod": 0,
+      "sha256": "33d5f6592a0fa35aae85fe3cfef8c04df5f3064331821c070759b7ecc12b3bd2",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_medium_lod0.glb",
+      "triangles": 260
+    },
+    {
+      "bounds": [
+        [
+          -0.4287893772125244,
+          -0.5,
+          -0.41062310338020325
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.medium_lod1",
+      "layout": "inclusion_reef",
+      "lod": 1,
+      "sha256": "c53de3dc800ce8b10bad24f2ae92f02255f0dbc460d93bdeb3127b318a5661fb",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_medium_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.33027637004852295,
+          -0.5,
+          -0.3561268448829651
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.25606703758239746
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.medium_lod2",
+      "layout": "inclusion_reef",
+      "lod": 2,
+      "sha256": "69d52b83b144ed235a325a714335f73484a28ef90d89dfc8c7d2887ba3166d52",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_medium_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.large.collision",
+      "layout": "inclusion_reef",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.large",
+      "layout": "inclusion_reef",
+      "lod": 0,
+      "sha256": "6859d065ef9daee3a11d95dbe2681557b35b0b3d81fe153fd15b3f48319f52d8",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_large_lod0.glb",
+      "triangles": 312
+    },
+    {
+      "bounds": [
+        [
+          -0.4985923171043396,
+          -0.5,
+          -0.4541826844215393
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.large_lod1",
+      "layout": "inclusion_reef",
+      "lod": 1,
+      "sha256": "30d95efcff042212d232425dd09bfe9bd747ee4eefd0711106bae21bc1af932d",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_large_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.38404229283332825,
+          -0.5,
+          -0.3923245370388031
+        ],
+        [
+          0.5,
+          0.5,
+          0.3025704622268677
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.inclusion_reef.large_lod2",
+      "layout": "inclusion_reef",
+      "lod": 2,
+      "sha256": "d7b484aebd7797887b6f83d739d2ba5984a79b5cd4ea899ed83d7e08bf0788c0",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/inclusion_reef_large_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.small.collision",
+      "layout": "split_matrix",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3310994803905487,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.small",
+      "layout": "split_matrix",
+      "lod": 0,
+      "sha256": "869bf79e7a5269663f9c9d50de44eb7bd850ffa6bfa16ecd184f64c8ea0f6220",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_small_lod0.glb",
+      "triangles": 208
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3249702453613281
+        ],
+        [
+          0.33682554960250854,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.small_lod1",
+      "layout": "split_matrix",
+      "lod": 1,
+      "sha256": "a3d917ec32b23f5af20a27cb742c1aa698db485fa8114e37bd67e77c261781d8",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_small_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.30423060059547424,
+          -0.5,
+          -0.32576441764831543
+        ],
+        [
+          0.18654188513755798,
+          0.18000000715255737,
+          0.2058914750814438
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.small_lod2",
+      "layout": "split_matrix",
+      "lod": 2,
+      "sha256": "e19d28bf901b8a1ab7b3b64f88608fdabee86244474e987c512d4ab67f8df433",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_small_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.medium.collision",
+      "layout": "split_matrix",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4187434911727905,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.medium",
+      "layout": "split_matrix",
+      "lod": 0,
+      "sha256": "731947ec0f59a6330572a77cbccdc90313d892fdf33a34592d82f78ddef477f8",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_medium_lod0.glb",
+      "triangles": 260
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4109917879104614
+        ],
+        [
+          0.4259852468967438,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.medium_lod1",
+      "layout": "split_matrix",
+      "lod": 1,
+      "sha256": "cad7777aa361900e113208ae0345ef6a9e99ed1c998d342da626776f34222678",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_medium_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.3847622275352478,
+          -0.5,
+          -0.41199615597724915
+        ],
+        [
+          0.23592060804367065,
+          0.36000001430511475,
+          0.2603921592235565
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.medium_lod2",
+      "layout": "split_matrix",
+      "lod": 2,
+      "sha256": "3df2da333d745446cbaebf3c7e57a7e54ed63fc31ffa3f53b52899d5b86ee38d",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_medium_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.large.collision",
+      "layout": "split_matrix",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.48691102862358093,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.large",
+      "layout": "split_matrix",
+      "lod": 0,
+      "sha256": "128e7050622d84708849a5aaf66e45a279540a1895df745dfe1eb0efb24d74c4",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_large_lod0.glb",
+      "triangles": 286
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.4234961271286011
+        ],
+        [
+          0.49533167481422424,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.large_lod1",
+      "layout": "split_matrix",
+      "lod": 1,
+      "sha256": "520b59df58eceeef1422597c4bee8f906b4d1e47f58a0d02b6e552b4e3e832e8",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_large_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.44739794731140137,
+          -0.5,
+          -0.4245990514755249
+        ],
+        [
+          0.27432629466056824,
+          0.5,
+          0.31375300884246826
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.split_matrix.large_lod2",
+      "layout": "split_matrix",
+      "lod": 2,
+      "sha256": "80b830bfa6ebaeffb8dfbb119ecc4d6f93da071b0b03c626d50236683a839c95",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/split_matrix_large_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.small.collision",
+      "layout": "radial_inclusions",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.small",
+      "layout": "radial_inclusions",
+      "lod": 0,
+      "sha256": "e0f493f40810110ddc5f9a86031a87d55490d47f7b796fbbd45221ef723d64e3",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_small_lod0.glb",
+      "triangles": 208
+    },
+    {
+      "bounds": [
+        [
+          -0.3160596489906311,
+          -0.5,
+          -0.3376196622848511
+        ],
+        [
+          0.32676538825035095,
+          0.18000000715255737,
+          0.3259560167789459
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.small_lod1",
+      "layout": "radial_inclusions",
+      "lod": 1,
+      "sha256": "cc1f421fa4deb26f02ad66f4afc28f53f22d03b7895a92de3b668014b1d86f64",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_small_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.22633156180381775,
+          -0.5,
+          -0.2813684046268463
+        ],
+        [
+          0.30379319190979004,
+          0.18000000715255737,
+          0.2744716703891754
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.small_lod2",
+      "layout": "radial_inclusions",
+      "lod": 2,
+      "sha256": "f5a621cdf2cb74c5f79c412f5fcb679961b15d80c5b4b7e80626a4eaf989e7c5",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_small_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.medium.collision",
+      "layout": "radial_inclusions",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.medium",
+      "layout": "radial_inclusions",
+      "lod": 0,
+      "sha256": "589cd53891677f519067f32612ab07f7908e1ce71f01a6f8b008a83ba3438f82",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_medium_lod0.glb",
+      "triangles": 260
+    },
+    {
+      "bounds": [
+        [
+          -0.39972248673439026,
+          -0.5,
+          -0.39696580171585083
+        ],
+        [
+          0.41326209902763367,
+          0.36000001430511475,
+          0.3746787905693054
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.medium_lod1",
+      "layout": "radial_inclusions",
+      "lod": 1,
+      "sha256": "3aef46ba30e629a27016e2f1fe25e2ee4d6ac7c408ad71237ff7b79e1a0ce96e",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_medium_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.28624284267425537,
+          -0.5,
+          -0.33155357837677
+        ],
+        [
+          0.3842090368270874,
+          0.36000001430511475,
+          0.31480976939201355
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.medium_lod2",
+      "layout": "radial_inclusions",
+      "lod": 2,
+      "sha256": "e125ef44d84cd3c7d0744271f0d5af34c53845755430cc7426a6b9c4c6f7b146",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_medium_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.large.collision",
+      "layout": "radial_inclusions",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.large",
+      "layout": "radial_inclusions",
+      "lod": 0,
+      "sha256": "5183b354bc3ba92623b75ede6ed09840316da37b1dd92a16c3320d6aa52253e0",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_large_lod0.glb",
+      "triangles": 312
+    },
+    {
+      "bounds": [
+        [
+          -0.465914785861969,
+          -0.5,
+          -0.4629453122615814
+        ],
+        [
+          0.4493105411529541,
+          0.5,
+          0.40261372923851013
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.large_lod1",
+      "layout": "radial_inclusions",
+      "lod": 1,
+      "sha256": "2cb03ad109ec8e5f6bf17960ab50a6fda545b024207f3d62bd500c8628e16989",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_large_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.33816397190093994,
+          -0.5,
+          -0.3895719647407532
+        ],
+        [
+          0.41660377383232117,
+          0.5,
+          0.33545824885368347
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.radial_inclusions.large_lod2",
+      "layout": "radial_inclusions",
+      "lod": 2,
+      "sha256": "50ea497235e54e6bbd9165d4dc257847abe6159945c585abf03d7303dcf8bffa",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/radial_inclusions_large_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.small.collision",
+      "layout": "faulted_pocket",
+      "lod": -1,
+      "sha256": "473a90761b2fc26e7382aee1f859f1d12b6877202a4c05bbf7c1795f815f3e80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_small_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.3400000035762787,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3298030495643616
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.small",
+      "layout": "faulted_pocket",
+      "lod": 0,
+      "sha256": "12a8bb50013eae9b9a4cc3b1af0e92e16855ce207a0bc7483803e40d7463da80",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_small_lod0.glb",
+      "triangles": 208
+    },
+    {
+      "bounds": [
+        [
+          -0.31641167402267456,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.18000000715255737,
+          0.3400000035762787
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.small_lod1",
+      "layout": "faulted_pocket",
+      "lod": 1,
+      "sha256": "16af982740fa54e237bde4cafecd53a6ec834eaddec89d23991eb780c20941de",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_small_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.3032973110675812,
+          -0.5,
+          -0.3400000035762787
+        ],
+        [
+          0.3400000035762787,
+          0.13316169381141663,
+          0.32962995767593384
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.small_lod2",
+      "layout": "faulted_pocket",
+      "lod": 2,
+      "sha256": "4e7710d9cda9727ed04c847c65e9c79891737ab24c0766b2ad26e97e1c80040a",
+      "size": "small",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_small_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.medium.collision",
+      "layout": "faulted_pocket",
+      "lod": -1,
+      "sha256": "70edd02a0f1b3d18f6f06312ce609c97eb2298d76502c6b4517ec88ed1fe803b",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_medium_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.4300000071525574,
+          -0.5,
+          -0.4300000071525574
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.4300000071525574
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.medium",
+      "layout": "faulted_pocket",
+      "lod": 0,
+      "sha256": "30e01ed180784e6a39e7408e65144a21f7b7406a82d1c196af2d806f57f3239e",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_medium_lod0.glb",
+      "triangles": 260
+    },
+    {
+      "bounds": [
+        [
+          -0.40016770362854004,
+          -0.5,
+          -0.4249745011329651
+        ],
+        [
+          0.4300000071525574,
+          0.36000001430511475,
+          0.3816418945789337
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.medium_lod1",
+      "layout": "faulted_pocket",
+      "lod": 1,
+      "sha256": "da925338498f296872e88c5f40cf674dfd736df07a539e6a490e3aceea707461",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_medium_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.38358190655708313,
+          -0.5,
+          -0.4249745011329651
+        ],
+        [
+          0.4300000071525574,
+          0.300763338804245,
+          0.3693409264087677
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.medium_lod2",
+      "layout": "faulted_pocket",
+      "lod": 2,
+      "sha256": "fe3c96cd5ed5ab08720606e07752224986636d8f5fca8e46ee9ee8c1f65cc509",
+      "size": "medium",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_medium_lod2.glb",
+      "triangles": 40
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.large.collision",
+      "layout": "faulted_pocket",
+      "lod": -1,
+      "sha256": "85afffb4fa9d21427e8aac6175be3916cae4828f18488b25b83039178b98e42e",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_large_proxy.glb",
+      "triangles": 12
+    },
+    {
+      "bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.large",
+      "layout": "faulted_pocket",
+      "lod": 0,
+      "sha256": "a143593205b751c56ef3fae9a598c1a6b2c1be03ac32a9e0977dad8d1c99fb6f",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_large_lod0.glb",
+      "triangles": 286
+    },
+    {
+      "bounds": [
+        [
+          -0.46531128883361816,
+          -0.5,
+          -0.4941563904285431
+        ],
+        [
+          0.5,
+          0.5,
+          0.443769633769989
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.large_lod1",
+      "layout": "faulted_pocket",
+      "lod": 1,
+      "sha256": "58eadb2883371a1f53b47c04880532d50c37eaa7df74ac482d86fd921618f9b2",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_large_lod1.glb",
+      "triangles": 96
+    },
+    {
+      "bounds": [
+        [
+          -0.44602546095848083,
+          -0.5,
+          -0.4941563904285431
+        ],
+        [
+          0.5,
+          0.4311201572418213,
+          0.429466187953949
+        ]
+      ],
+      "family": "rare_elements",
+      "id": "mesh.world.resource.rare_elements.faulted_pocket.large_lod2",
+      "layout": "faulted_pocket",
+      "lod": 2,
+      "sha256": "41c1eeaec3d468c23b9df18965492fa2b1824b9ccf5158b45f2e956697d6f38d",
+      "size": "large",
+      "source": "world/meshes/sources/clusters/rare_elements/faulted_pocket_large_lod2.glb",
+      "triangles": 40
+    }
+  ],
+  "families": [
+    "ferrous_ore",
+    "silicates",
+    "volatiles",
+    "rare_elements"
+  ],
+  "humanArtApproval": "pending",
+  "masterSources": [
+    {
+      "family": "ferrous_ore",
+      "path": "world/authoring/resource_clusters/ferrous_ore.blend",
+      "sha256": "4297b4cad9be35b8bb57409ce1e98ce566f6b707e67926cccb0343455189a0a2"
+    },
+    {
+      "family": "silicates",
+      "path": "world/authoring/resource_clusters/silicates.blend",
+      "sha256": "c2daafe8f6c7d01bd682a8515492237a499bb871fe461d87dc6c660e7e177a44"
+    },
+    {
+      "family": "volatiles",
+      "path": "world/authoring/resource_clusters/volatiles.blend",
+      "sha256": "7a80b7c0ce165891025df640a57c56c8273f254da74483e79f3e6884ecdf4ab3"
+    },
+    {
+      "family": "rare_elements",
+      "path": "world/authoring/resource_clusters/rare_elements.blend",
+      "sha256": "d60c69b3603740bb34dc7c23bcd1956f0137e3f37c2461e235e730fba76dbd41"
+    }
+  ],
+  "schemaVersion": 1,
+  "status": "authored-not-validated",
+  "validation": "NOT EXECUTED"
+}

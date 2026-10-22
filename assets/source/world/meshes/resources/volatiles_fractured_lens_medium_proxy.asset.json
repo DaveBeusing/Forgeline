@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.resource.volatiles.fractured_lens.medium.collision",
+  "source": "../sources/clusters/volatiles/fractured_lens_medium_proxy.glb",
+  "type": "mesh"
+}

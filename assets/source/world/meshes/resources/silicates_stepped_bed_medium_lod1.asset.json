@@ -1,0 +1,9 @@
+{
+  "collisionReference": "mesh.world.resource.silicates.stepped_bed.medium.collision",
+  "id": "mesh.world.resource.silicates.stepped_bed.medium_lod1",
+  "materialReferences": [
+    "material.world.resource.silicates"
+  ],
+  "source": "../sources/clusters/silicates/stepped_bed_medium_lod1.glb",
+  "type": "mesh"
+}

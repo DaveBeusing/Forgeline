@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.resource.volatiles.weathered_saddle.small.collision",
+  "source": "../sources/clusters/volatiles/weathered_saddle_small_proxy.glb",
+  "type": "mesh"
+}

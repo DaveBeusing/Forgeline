@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.resource.ferrous_ore.breccia_fan.small.collision",
+  "source": "../sources/clusters/ferrous_ore/breccia_fan_small_proxy.glb",
+  "type": "mesh"
+}
