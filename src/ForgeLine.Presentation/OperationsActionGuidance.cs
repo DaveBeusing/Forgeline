@@ -25,6 +25,34 @@ internal static class OperationsActionGuidance
         return selected;
     }
 
+    /// <summary>
+    /// A separate observed transport lifecycle may accompany a production blocker.
+    /// Prefer request status, then policy status, then physical truck status; never
+    /// combine their non-additive quantity fields.
+    /// </summary>
+    public static OperationsDiagnosisRow? TransportForEntity(OperationsDiagnosisSnapshot? diagnosis, EntityId entity)
+    {
+        if (diagnosis is null || !entity.IsValid) return null;
+
+        OperationsDiagnosisRow? selected = null;
+        int bestPriority = int.MaxValue;
+        foreach (var row in diagnosis.Rows)
+        {
+            if (row.Entity != entity) continue;
+            int priority = row.Subject switch
+            {
+                OperationsDiagnosisSubject.TransportRequest => 0,
+                OperationsDiagnosisSubject.StockPolicy => 1,
+                OperationsDiagnosisSubject.CargoTransport => 2,
+                _ => int.MaxValue
+            };
+            if (priority >= bestPriority) continue;
+            selected = row;
+            bestPriority = priority;
+        }
+        return selected;
+    }
+
     /// <summary>The advice names an existing inspection path, never an implicit gameplay action.</summary>
     public static string NextAction(OperationsDiagnosisReason reason) => reason switch
     {
