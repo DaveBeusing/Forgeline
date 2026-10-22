@@ -38,7 +38,9 @@ public sealed class PlayerConstructionActionReadModel
                 costs?.ToArray() ??
                 throw new ArgumentNullException(nameof(costs)));
         RequiresResourceDeposit = requiresResourceDeposit;
-        HasRequiredResources = _costs.All(static cost => cost.IsAvailable);
+        // Placement tools must stay available for demolition and repair even
+        // when a player cannot currently afford a new route.
+        HasRequiredResources = buildingId.Value>=ConveyorGeometry.MenuBase || _costs.All(static cost => cost.IsAvailable);
     }
 
     public BuildingId BuildingId { get; }
@@ -724,6 +726,12 @@ internal static class PlayerActionSnapshotFactory
                     definition.RequiresResourceDeposit));
         }
 
+        foreach (ConveyorModule module in Enum.GetValues<ConveyorModule>())
+        {
+            double minimum=module==ConveyorModule.Route?8:ConveyorGeometry.Cost(module);
+            actions.Add(new(new BuildingId(ConveyorGeometry.MenuBase+(uint)module),
+                "Conveyor / "+ConveyorGeometry.Name(module), new[]{CreateAmount(scenario,constructionInventory,ResourceIds.Steel,minimum)},false));
+        }
         return actions.ToArray();
     }
 

@@ -2,6 +2,11 @@
 
 ## Status and ownership
 
+The [construction and placement implementation](ConveyorConstructionPlacementAndUX.md)
+now supplies paid physical modules, previews and edit commands. It does not
+activate the resource transport contract below. Regional trucks remain the
+authoritative transport until a separate conveyor-flow simulation is integrated.
+
 This document defines the proposed V1 contract for **local industrial conveyor supply**.
 It is a design specification and migration gate, not a claim that conveyor transport,
 placement, rendering or inventory transfer is implemented. The present authoritative

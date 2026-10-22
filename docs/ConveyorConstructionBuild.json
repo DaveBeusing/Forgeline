@@ -1,0 +1,27 @@
+{
+  "schema": "forgeline.conveyor_construction_build",
+  "schemaVersion": 1,
+  "version": "0.1.451",
+  "integrationBase": "d7c45792cffc5259f65be0cd2e2894fd11431fe8",
+  "build": "Release ForgeLine.Client and dependencies",
+  "success": true,
+  "warnings": 0,
+  "errors": 0,
+  "sourceSHA256": {
+    "Directory.Build.props": "5dc3e4b98ca2979aac2ac580272b5fc7617065815ced6398bb01fc199bc875f0",
+    "src/ForgeLine.Game/ConveyorConstruction.cs": "743c7297d646aab45f2fac022695900c5f95c18600a142b8faf76884c5187420",
+    "src/ForgeLine.Game/PlayerCommandBoundary.cs": "d7b421336963d6755590806b56bfb841cb693e7a0d6504d4e2228043cbf763ae",
+    "src/ForgeLine.Game/MatchReplay.cs": "f509d601154554cdb2f17fd19e41a94cea64e5c72bf91bef03cd1035e7f7f850",
+    "src/ForgeLine.Presentation/RtsConveyorConstructionController.cs": "03edc638dea9ac2031dd5830b026815522102baddb3de7487c51868aef45474c",
+    "src/ForgeLine.Presentation/PresentationExtractor.cs": "20a75a53164ad8723b8961725b6621fcd674d401ed096a091f0d0e31635e43bf",
+    "src/ForgeLine.Presentation/SimpleInstanceRenderer.cs": "22e305ff20ed3d4bfbb10d6fd686d4b5e9c563e45187dd3899a4b8204cbcb651",
+    "src/ForgeLine.Client/ClientApplication.cs": "a214bc67316b1b66b467d10ea48903257ffedf19509027d33ba6ab9fe297253c"
+  },
+  "automatedTestsExecuted": false,
+  "testsAdded": false,
+  "runtimeSmokesExecuted": false,
+  "ciExecuted": false,
+  "saveReplayRoundTripExecuted": false,
+  "manualAcceptance": "pending: docs/ConveyorConstructionPlacementAndUX.md",
+  "scope": "paid construction, physical ports and presentation; resource transfer remains a separate simulation feature"
+}

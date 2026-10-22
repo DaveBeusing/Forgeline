@@ -28,7 +28,8 @@ public enum PlayerCommandKind : byte
     Surrender = 10,
     Technology = 11,
     Demolition = 12,
-    OperationsRule = 13
+    OperationsRule = 13,
+    ConveyorConstruction = 14
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -63,7 +64,8 @@ public readonly record struct PlayerCommandResultReadModel(
     PlayerTacticalActionFailureReason TacticalFailure =
         PlayerTacticalActionFailureReason.None,
     BuildingDemolitionTargetResult[]? DemolitionTargets = null,
-    OperationsRuleResult OperationsResult = OperationsRuleResult.None);
+    OperationsRuleResult OperationsResult = OperationsRuleResult.None,
+    ConveyorFailure ConveyorResult = ConveyorFailure.None);
 
 public sealed class PlayerCommandResultBuffer
 {
@@ -734,6 +736,21 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+    public PlayerCommandSubmissionReceipt SubmitConveyor(
+        ConveyorConstructionService service, PlayerId issuer, ConveyorBuildRequest request,
+        EntityId payer, SimulationTick observedTick)
+    {
+        if (!service.Matches(_simulation)) throw new ArgumentException("Conveyor service belongs to another match.", nameof(service));
+        if (!TryBeginSubmission(PlayerCommandKind.ConveyorConstruction, issuer, observedTick,
+            out PlayerCommandCorrelationId correlation, out SimulationTick targetTick,
+            out SimulationCommandSource source, out PlayerCommandSubmissionReceipt rejected)) return rejected;
+        var command = new ConveyorConstructionCommand(service, issuer, request, payer, observedTick);
+        SimulationCommandEnvelope envelope = _simulation.SubmitCommand(command, targetTick, source);
+        _pending.Add(new(correlation, PlayerCommandKind.ConveyorConstruction, envelope,
+            null, null, null, null, null, null, null, ConveyorCommand: command));
+        return AcceptedReceipt(correlation, PlayerCommandKind.ConveyorConstruction, source, observedTick, envelope);
+    }
+
     public PlayerCommandSubmissionReceipt SubmitOperationsRule(
         OperationsRuleSystem rules,
         OperationsRuleOperation operation,
@@ -1319,6 +1336,16 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     DemolitionTargets: demolition.Targets);
             }
 
+            case PlayerCommandKind.ConveyorConstruction:
+            {
+                ConveyorConstructionCommand command = pending.ConveyorCommand!;
+                if (command.ExecutedAtTick == SimulationTick.Zero) return null;
+                return new(SessionId, pending.CorrelationId, pending.Kind,
+                    command.Accepted ? PlayerCommandFeedbackState.Accepted : PlayerCommandFeedbackState.Rejected,
+                    command.Accepted ? 1 : 0, command.Accepted ? 0 : 1,
+                    BuildCommandRejectionReason.None, BuildingPlacementFailureReason.None,
+                    command.ExecutedAtTick, ConveyorResult: command.Result);
+            }
             case PlayerCommandKind.OperationsRule:
             {
                 OperationsRuleCommand command = pending.OperationsCommand!;
@@ -1599,7 +1626,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             {
                 PlayerCommandKind.Movement =>
                     PlayerCommandFeedbackKind.Movement,
-                PlayerCommandKind.Construction or PlayerCommandKind.Demolition =>
+                PlayerCommandKind.Construction or PlayerCommandKind.Demolition or PlayerCommandKind.ConveyorConstruction =>
                     PlayerCommandFeedbackKind.Construction,
                 PlayerCommandKind.Production =>
                     PlayerCommandFeedbackKind.Production,
@@ -1643,7 +1670,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         SurrenderCommand? SurrenderCommand = null,
         PlayerTechnologyActionCommand? TechnologyCommand = null,
         DemolishBuildingsCommand? DemolitionCommand = null,
-        OperationsRuleCommand? OperationsCommand = null)
+        OperationsRuleCommand? OperationsCommand = null,
+        ConveyorConstructionCommand? ConveyorCommand = null)
     {
         public static PendingCommand ForOperationsRule(
             PlayerCommandCorrelationId correlation, in SimulationCommandEnvelope envelope,

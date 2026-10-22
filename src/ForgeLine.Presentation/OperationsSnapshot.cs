@@ -80,9 +80,21 @@ internal static class OperationsSnapshotFactory
                     distribution[policy.TargetEntity] = request.FailureReason.ToString();
         var rows = new List<OperationsFacility>(OperationsSnapshot.MaximumFacilities);
         int count = 0;
+        var conveyorStatus=ConveyorConstructionService.Capture(entities,extraction.Player).ToDictionary(p=>p.Entity,p=>p.Status);
         foreach (var entity in entities.Query<ControllableEntity>(QueryIterationOrder.StableByEntityIndex))
         {
             if (!Owned(entity)) continue;
+            if(entities.TryGetComponent(entity,out ConveyorPiece conveyor))
+            {
+                count++;
+                if(rows.Count<OperationsSnapshot.MaximumFacilities)
+                    rows.Add(new(entity,"Conveyor / "+ConveyorGeometry.Slug(conveyor.Placement.Module),
+                        OperationsCategory.Logistics,conveyorStatus[entity].ToString(),
+                        conveyorStatus[entity]==ConveyorLinkStatus.Structural?"":"Conveyor"+conveyorStatus[entity],
+                        "CONSTRUCTION READY; CONNECT MATCHING PORTS. LOCAL CONVEYOR TRANSFER IS A SEPARATE SIMULATION FEATURE.",
+                        0,null,null,null,null,null,null,PlayerActionPanelMode.Construction));
+                continue;
+            }
             bool processing = entities.TryGetComponent(entity, out ProductionFacility production);
             bool units = entities.TryGetComponent(entity, out UnitProductionFacility factory) && factory.Owner == extraction.Player;
             bool depot = entities.TryGetComponent(entity, out SupplyDepot supplyDepot);
@@ -173,6 +185,11 @@ internal static class OperationsSnapshotFactory
     }
     internal static string Explain(string cause) => cause switch
     {
+        "ConveyorNoInput" => "BUILT WITH MATCHED PORTS; LOCAL TRANSPORT IS A SEPARATE SIMULATION FEATURE",
+        "ConveyorDisconnected" => "UNMATED PORT / CONNECT A MATCHING BELT OR BUILDING ADAPTER",
+        "ConveyorBlocked" => "CLOSED END CAP / REMOVE THE CAP TO EXTEND THE ROUTE",
+        "ConveyorCongested" => "BUFFERED CARGO WITH NO OPEN OUTPUT / DRAIN BEFORE DEMOLITION",
+        "ConveyorDamaged" or "ConveyorCritical" => "CONVEYOR BUILD MENU / V TO REPAIR OR REPLACE",
         "NoInput" => "INPUT STOCK INSUFFICIENT - CHECK LOGISTICS",
         "LoadingAccessBlocked" => "CONFIRMED LOADING ACCESS BLOCKED - FOCUS THE BUILDING",
         "LoadingExitBlocked" => "CONFIRMED LOADING EXIT BLOCKED - FOCUS THE BUILDING",

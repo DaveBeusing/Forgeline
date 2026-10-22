@@ -28,6 +28,7 @@ internal static class SelectionInspectorHudModel
 
         return selection.Kind switch
         {
+            PlayerSelectionKind.Infrastructure => RtsUiIcon.CommandBuild,
             PlayerSelectionKind.Unit =>
                 RtsUiIcon.MinimapSelectedGroup,
             PlayerSelectionKind.Building =>
@@ -45,6 +46,7 @@ internal static class SelectionInspectorHudModel
         PlayerSelectionKind kind) =>
         kind switch
         {
+            PlayerSelectionKind.Infrastructure => "INFRASTRUCTURE",
             PlayerSelectionKind.Unit =>
                 "UNIT",
             PlayerSelectionKind.Building =>

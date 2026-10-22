@@ -21,7 +21,8 @@ public enum ReplayCommandKind : byte
     Technology = 10,
     Demolition = 11,
     CancelConstruction = 12,
-    OperationsRule = 13
+    OperationsRule = 13,
+    ConveyorConstruction = 14
 }
 
 public sealed record RecordedSimulationCommand
@@ -97,6 +98,9 @@ public sealed record RecordedSimulationCommand
     public int IntValue { get; init; }
 
     public ulong CorrelationId { get; init; }
+
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public ConveyorBuildRequest ConveyorRequest { get; init; }
 
     public ulong OperationsRuleId { get; init; }
     public uint OperationsRuleRevision { get; init; }
@@ -446,6 +450,12 @@ public static class ReplayCommandCodec
                     };
                 return true;
 
+            case ConveyorConstructionCommand command:
+                recorded = Base(ReplayCommandKind.ConveyorConstruction) with
+                { Issuer = command.Issuer, SubmittedAtTick = command.SubmittedAtTick.Value,
+                  TargetEntity = command.Payer, ConveyorRequest = command.Request };
+                return true;
+
             case OperationsRuleCommand command:
                 recorded = Base(ReplayCommandKind.OperationsRule) with
                 {
@@ -595,6 +605,10 @@ public static class ReplayCommandCodec
                 DecodeLogistics(
                     command,
                     submittedAtTick),
+
+            ReplayCommandKind.ConveyorConstruction =>
+                new ConveyorConstructionCommand(scenario.Services.Conveyors, command.Issuer,
+                    command.ConveyorRequest, command.TargetEntity, submittedAtTick),
 
             ReplayCommandKind.OperationsRule =>
                 new OperationsRuleCommand(

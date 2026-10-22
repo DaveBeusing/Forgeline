@@ -71,6 +71,7 @@ internal static class HoverTooltipResolver
         if (!visible) return null;
         string role = world.Category switch
         {
+            PlayerHoverCategory.Conveyor => "CONVEYOR INFRASTRUCTURE",
             PlayerHoverCategory.Deposit => "RESOURCE DEPOSIT",
             PlayerHoverCategory.Construction => "CONSTRUCTION",
             PlayerHoverCategory.IdentifiedContact => "IDENTIFIED HOSTILE",
@@ -85,6 +86,7 @@ internal static class HoverTooltipResolver
             else if (selected.Supply is { } supply && supply.Entity == world.Entity)
                 explanation = $"{LogisticsStatusCatalog.DriveTank(supply)}; {(supply.IsSupplyTruck ? "FIELD CARGO" : "PROVIDER STOCK")} FUEL {(supply.IsSupplyTruck ? supply.CargoFuel : supply.ProviderFuel):0.##} / AMMUNITION {(supply.IsSupplyTruck ? supply.CargoAmmunition : supply.ProviderAmmunition):0.##}. " + LogisticsStatusCatalog.ServiceDetails(supply.Service);
         }
+        if(world.Category==PlayerHoverCategory.Conveyor) explanation=world.Requirement;
         return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation,
             WrapDetails: world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } owned &&
                 (owned.Logistics?.Entity == world.Entity || owned.Supply?.Entity == world.Entity));

@@ -408,6 +408,8 @@ public sealed class StrategicInfrastructureSystem
                      QueryIterationOrder.StableByEntityIndex))
         {
             SpatialPresence presence = entities.GetComponent<SpatialPresence>(entity);
+            if (entities.TryGetComponent(entity, out ConveyorPiece conveyor) && !conveyor.Placement.IsSupport)
+                continue;
             if (presence.Metadata.Mobility != SpatialMobility.Static)
             {
                 continue;
@@ -424,6 +426,12 @@ public sealed class StrategicInfrastructureSystem
 
         (_liveObstacles, _observedObstacles) = (_observedObstacles, _liveObstacles);
         return true;
+    }
+
+    public void RefreshConveyorNavigation(SimulationContext context)
+    {
+        RefreshStaticObstacles(context.Entities);
+        SynchronizeAuthoritativeTopology(context);
     }
 
     private void SynchronizeAuthoritativeTopology(

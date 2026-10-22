@@ -432,6 +432,9 @@ public sealed class MatchRuntime : IDisposable
                 gridSettings,
                 sectorSettings);
 
+        var conveyors = new ConveyorConstructionService(simulation, terrain, spatialIndex, inventories, battlefield)
+        { NavigationChanged = strategicInfrastructure.RefreshConveyorNavigation };
+
         var combatRuntime =
             new CombatRuntime();
         var terrainLineOfFire =
@@ -673,6 +676,8 @@ public sealed class MatchRuntime : IDisposable
                 repairRecovery,
                 combatDebugSnapshots,
                 registeredSystemTypes);
+
+        services.Conveyors = conveyors;
 
         return new MatchRuntime(
             runtimeSettings,

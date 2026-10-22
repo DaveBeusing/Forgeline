@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.World;
+using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
 
@@ -12,6 +13,11 @@ public static class PresentationBounds
     public static Vector3 ResolveLocalHalfExtents(
         in RenderInstance instance)
     {
+        if (instance.ConveyorFeature.IsSpecified)
+        {
+            var (lo,hi)=ConveyorGeometry.LocalBounds(instance.ConveyorFeature.Placement.Module);
+            return (hi-lo)/2;
+        }
         Vector3 halfExtents =
             Vector3.Max(
                 Vector3.Abs(
@@ -72,6 +78,7 @@ public static class PresentationBounds
     public static AxisAlignedBounds ResolveAxisAlignedBounds(
         in RenderInstance instance)
     {
+        if (instance.ConveyorFeature.IsSpecified) return instance.ConveyorFeature.Placement.Bounds;
         Vector3 extents =
             ResolveWorldAxisAlignedHalfExtents(
                 instance);
@@ -85,6 +92,8 @@ public static class PresentationBounds
 
     public static float ResolveGroundPlaneY(
         in RenderInstance instance) =>
+        instance.ConveyorFeature.IsSpecified?
+        instance.ConveyorFeature.Placement.Pivot.Y-(instance.ConveyorFeature.Placement.IsSupport?0:instance.ConveyorFeature.Placement.Tier*2):
         instance.Transform.Position.Y -
         MathF.Max(
             MathF.Abs(

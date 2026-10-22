@@ -1,7 +1,10 @@
 # Base Conveyor Port Matrix
 
-**Status: proposed V1 content contract; no ports or conveyor transfer are
-currently implemented.** Building names and roles follow
+**Status: proposed V1 transport content contract.** The
+[construction implementation](ConveyorConstructionPlacementAndUX.md) explicitly
+defines physical input/output sockets for Storage Depot and Logistics Hub.
+Other entries below remain future port content; conveyor resource transfer is
+not activated by those construction sockets. Building names and roles follow
 [Central Divide](CentralDivideScenario.md). Per-building placement and port
 coordinates must be authored and physically qualified before activation.
 
