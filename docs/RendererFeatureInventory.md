@@ -33,7 +33,7 @@ only to the two repeated columns below.
 | Instancing, culling, object LOD and snapshot interpolation — wired | `src/ForgeLine.Presentation/RenderInstance.cs`, compiled LOD mesh IDs | `src/ForgeLine.Presentation/RenderWorld.cs`, `src/ForgeLine.Presentation/RenderSnapshotIndex.cs`, `src/ForgeLine.Presentation/RenderSubmission/SpatialSubmissionIndex.cs` | `src/ForgeLine.Presentation/SimpleInstanceRenderer.cs` | C | `tests/ForgeLine.Presentation.Tests/RenderSnapshotIndexTests.cs`, `tests/ForgeLine.Presentation.Tests/RenderSubmission/SubmissionReferenceTests.cs` | [Scalable rendering](ScalableRendering.md) distinguishes isolated CPU savings from unqualified full-frame performance. |
 | Rigid mechanical clips — wired when authored | `src/ForgeLine.Assets/RuntimeAnimationData.cs`, `src/ForgeLine.Assets/RigidAnimationBinding.cs` | `src/ForgeLine.Presentation/MechanicalPose.cs`, `src/ForgeLine.Presentation/MechanicalPoseHistory.cs` | `src/ForgeLine.Presentation/SimpleInstanceRenderer.cs` | C | `tests/ForgeLine.Assets.Tests/RigidClipPipelineTests.cs`, `tests/ForgeLine.Presentation.Tests/RigidClipPlaybackTests.cs`, `tests/ForgeLine.Presentation.Tests/RigidClipRendererTests.cs` | Per-asset clip and socket validity is separate from continuous-motion acceptance. |
 | Infantry skinning — wired when authored | `src/ForgeLine.Assets/RuntimeSkinData.cs`, `src/ForgeLine.Assets/RuntimeAnimationData.cs` | `src/ForgeLine.Presentation/SkinFrameCache.cs`, `src/ForgeLine.Presentation/InfantryAnimationState.cs` | `src/ForgeLine.Presentation/InstanceMaterialPipeline.cs`, `src/ForgeLine.Presentation/SimpleInstanceRenderer.cs` | C | `tests/ForgeLine.Assets.Tests/InfantrySkinPipelineTests.cs`, `tests/ForgeLine.Presentation.Tests/InfantrySkinRendererTests.cs` | Static fallback is explicit; fixture success does not establish all live poses or socket motion. |
-| Conveyor modules, state surfaces and belt pose — wired | `src/ForgeLine.Assets/RuntimeMeshData.cs`, compiled conveyor IDs selected by E | E; `src/ForgeLine.Presentation/RenderInstance.cs` (`ConveyorFeature`), `src/ForgeLine.Presentation/ConveyorNetworkOverlay.cs` | `src/ForgeLine.Presentation/SimpleInstanceRenderer.cs` (conveyor LOD/material branch) | C; `src/ForgeLine.Presentation/RtsConveyorConstructionController.cs` | Simulation/construction acceptance and test commands: [implementation](ConveyorSimulationAndVehicleInterop.md), [placement](ConveyorConstructionPlacementAndUX.md) | Newer than the original art proposal. Live native build/flow/blocked-state acceptance remains separate from simulation correctness. |
+| Conveyor modules, state surfaces and belt pose — wired | `src/ForgeLine.Assets/RuntimeMeshData.cs`, compiled conveyor IDs selected by E | E; `src/ForgeLine.Presentation/RenderInstance.cs` (`ConveyorFeature`), `src/ForgeLine.Presentation/ConveyorNetworkOverlay.cs` | `src/ForgeLine.Presentation/SimpleInstanceRenderer.cs` (conveyor LOD/material branch) | C; `src/ForgeLine.Presentation/RtsConveyorConstructionController.cs` | No conveyor-specific automated test at baseline; manual acceptance: [implementation](ConveyorSimulationAndVehicleInterop.md), [placement](ConveyorConstructionPlacementAndUX.md) | Newer than the original art proposal. Live native build/flow/blocked-state acceptance remains separate from simulation correctness. |
 | Directional shadows — optional, wired | Copied terrain and instance caster roots | `src/ForgeLine.Presentation/DirectionalShadowProjection.cs` | `src/ForgeLine.Presentation/DirectionalShadowCasterPipeline.cs`, `src/ForgeLine.Presentation/DirectionalShadowShader.cs`, `src/ForgeLine.Presentation/MaterialQuality/ShadowReceiverShader.cs`, `src/ForgeLine.Graphics/D3D12DirectionalShadows.cs` | C, before world color | `tests/ForgeLine.Graphics.Tests/D3D12DirectionalShadowTests.cs`, `tests/ForgeLine.Presentation.Tests/DirectionalShadowIntegrationTests.cs` | Preset/capability/budget controlled; [graphics settings](GraphicsQualitySettings.md). |
 | Combat and industrial particles — optional, wired | `src/ForgeLine.Presentation/IndustrialEffectPresets.cs`, runtime VFX assets | E; `src/ForgeLine.Presentation/ParticleVfxRenderer.cs`, `src/ForgeLine.Presentation/EffectSubmission/ParticleEffectSubmission.cs` | `src/ForgeLine.Graphics/GpuParticleRenderer.cs` (embedded vertex/pixel shaders), `src/ForgeLine.Graphics/D3D12Particles.cs` | C, after instances | `tests/ForgeLine.Graphics.Tests/D3D12ParticleTests.cs`, `tests/ForgeLine.Presentation.Tests/ParticleVfxRendererTests.cs` | [Combat/industrial rendering](CombatIndustrialRendering.md); bounded emission, sorting and fill costs remain. |
 | Impact/track/world decals — wired | Runtime decal mesh/material bindings | E; `src/ForgeLine.Presentation/DecalPresentation.cs` | `src/ForgeLine.Presentation/SimpleInstanceRenderer.cs` (decal admission, opacity, missing-resource skip) | C via ordinary instances | `tests/ForgeLine.Presentation.Tests/DecalPoolTests.cs`, `tests/ForgeLine.Presentation.Tests/CombatDecalExtractionTests.cs`, `tests/ForgeLine.Presentation.Tests/RuntimeDecalMaterialTests.cs` | [Combat/industrial rendering](CombatIndustrialRendering.md). No independent settings row or separate deferred decal pass. |
@@ -66,6 +66,29 @@ test under `tests/`. The conveyor implementation document records compile-only
 evidence and pending manual scenarios. Existing generic renderer tests must not
 be presented as conveyor flow, conservation, replay or native acceptance tests.
 
+`src/ForgeLine.Presentation/MaterialReferenceRenderer.cs` is deliberately used
+by the MaterialFoundation capture path in
+`src/ForgeLine.Client/VisualReferenceCapture.cs`; it is fixture infrastructure,
+not an unused gameplay registration.
+
+## Fallback semantics
+
+`src/ForgeLine.Assets/RuntimeAssetBindingValidator.cs` permits an unauthored
+material texture slot to use a neutral texture; an authored reference with the
+wrong type, usage or color space fails qualification. These are different cases.
+`src/ForgeLine.Presentation/RuntimeWorldAssetResources.cs` and
+`src/ForgeLine.Presentation/SimpleInstanceRenderer.cs` retain mesh/material
+fallback diagnostics; a production no-fallback capture must check those counters
+rather than infer success from a presented frame. Cosmetic decals skip missing
+resources. Skinning exposes static fallback counts. Software/capability/memory
+fallbacks are resolved separately by `RenderQualitySettings.Resolve`, retaining
+requested versus effective settings and a reason.
+
+The implicit legacy rendering lifecycle in
+`src/ForgeLine.Presentation/RenderAssetSession.cs` is an explicit compatibility
+path alongside prepared frames. Its existence does not demonstrate a dead
+registration or justify removing ownership/fence checks.
+
 ## Pass and shader registration
 
 `src/ForgeLine.Graphics/GraphicsFramePlan.cs` exposes World and Overlay passes.
@@ -94,6 +117,7 @@ diagnostic filename nor an adapter capability is a dead registration.
 | Performance budget | `src/ForgeLine.Presentation/RenderQualitySettings.cs`: High/Ultra share bounded shadow/particle resources; software and insufficient-budget caps | Retain. Ultra's extra object detail is not evidence that resource caps are obsolete. |
 | Performance budget | `src/ForgeLine.Graphics/GraphicsDirectionalShadowSettings.cs`: one cascade, 1,024/2,048/4,096 resolution, 1,024/4,096/8,192 casters, 256 draws and four PCF samples | Retain; changing these requires native cost and regression evidence. |
 | Safety/correctness and budget | `src/ForgeLine.Assets/RuntimeSkinData.cs`: 48 joints, 32,768 vertices and 98,304 indices | Retain; bounded payload and shader contracts are not phase labels. |
+| Safety/correctness and budget | `src/ForgeLine.Assets/RuntimeAnimationData.cs`: 64 nodes, 128 channels, 1,024 keys/channel, 8,192 total keys, 1 MiB payload and 120-second duration | Retain; animation format versions 1/2 remain compatibility identities. |
 | Configuration range | `src/ForgeLine.Presentation/RenderQualitySettings.cs`: finite world scale 0.5–1; `src/ForgeLine.Presentation/TerrainResidencySettings.cs`: 1–4,096 chunks | Retain; validated ranges are supported contracts. |
 | Product/compatibility | `docs/BaseConveyorLogistics.md`, `docs/BaseConveyorPortMatrix.md`, `assets/source/infrastructure/directorate/conveyors/conveyor-kit.v1.json`: solid-resource eligibility, 90° turns, authored sockets and versioned art contract | Retain. These describe scope/format decisions, not a renderer-wide feature lock. |
 | Unnecessary feature lock | No reproducible renderer-wide V1 gate identified in the audited production consumers | No runtime limit removed; no blanket increase. |
@@ -112,6 +136,11 @@ visually correct. The conveyor art proposal remains the source contract for its
 versioned preproduction JSON; the linked implementation documents govern current
 live behavior. Its initial proposal label must not be read as the status of all
 conveyor rendering.
+
+The source terminology scan across Graphics, Presentation and Client finds
+historical `prototypeBattlefield` identifiers, schema/fixture version 1 values
+and UV-coordinate variables named `v1`. These are not general feature gates;
+renaming them would not unlock rendering and is outside this documentation edit.
 
 Follow-up ownership: asset/tooling work owns missing authored channels, clips and
 binding qualification; Presentation owns feature metadata, faction filtering,
