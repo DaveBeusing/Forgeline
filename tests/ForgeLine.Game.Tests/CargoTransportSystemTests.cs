@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Logistics;
@@ -159,6 +160,66 @@ public sealed class CargoTransportSystemTests
         Assert.False(fixture.Simulation.Entities.IsAlive(group));
         Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMember>(second));
         Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMotionConstraint>(second));
+        Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(second));
+    }
+
+    [Fact]
+    public void OutOfFuelConvoyMemberReleasesAllTrucksWithoutChangingCargo()
+    {
+        var (fixture, first, second, group) = CreateActiveConvoy();
+        double before = fixture.TotalConservedQuantity(first, second);
+        fixture.Simulation.Entities.AddComponent(first,
+            new SupplyMovementConstraint(0.0f, canMove: false));
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.False(fixture.Simulation.Entities.IsAlive(group));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMember>(second));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyMotionConstraint>(second));
+        Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(first));
+        Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(second));
+        Assert.Equal(before, fixture.TotalConservedQuantity(first, second));
+    }
+
+    [Fact]
+    public void ManualEscortMovementReplacesConvoyFollowWithoutCancelingCargo()
+    {
+        var (fixture, first, second, group) = CreateActiveConvoy();
+        EntityId escort = fixture.Simulation.Entities.CreateEntity();
+        fixture.Simulation.Entities.AddComponent(escort,
+            new ControllableEntity(LocalPlayer, ControllableEntityCategory.Unit));
+        fixture.Simulation.Entities.AddComponent(escort,
+            new Combatant(new FactionId(1)));
+        fixture.Simulation.Entities.AddComponent(escort,
+            new WorldTransform(fixture.SourcePosition + new Vector3(8, 0, 8),
+                Quaternion.Identity, Vector3.One));
+        fixture.Simulation.Entities.AddComponent(escort, GroundMovement.CreateDefault());
+        fixture.Simulation.Entities.AddComponent(escort, GroundMovementState.Stationary());
+        fixture.Simulation.Entities.AddComponent(escort,
+            new NavigationAgent(NavigationMovementClass.Wheeled));
+        fixture.Simulation.Entities.AddComponent(escort,
+            new CargoConvoyEscort(group, SimulationTick.Zero, default));
+
+        fixture.Simulation.AdvanceOneTick();
+        Assert.True(fixture.Simulation.Entities.IsAlive(group));
+        CargoConvoyEscort following =
+            fixture.Simulation.Entities.GetComponent<CargoConvoyEscort>(escort);
+        Assert.NotEqual(SimulationTick.Zero, following.LastIssuedAtTick);
+
+        var manual = new MoveEntitiesCommand(
+            LocalPlayer, [escort], new Vector3(40, 0, 24),
+            fixture.Simulation.CurrentTick);
+        fixture.Simulation.SubmitCommand(manual,
+            fixture.Simulation.CurrentTick.Next(),
+            new SimulationCommandSource(LocalPlayer.Value));
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.Equal(1, manual.AcceptedTargetCount);
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyEscort>(escort));
+        Assert.True(
+            fixture.Simulation.Entities.HasComponent<MovementOrder>(escort) ||
+            fixture.Simulation.Entities.HasComponent<NavigationPendingPath>(escort) ||
+            fixture.Simulation.Entities.HasComponent<NavigationRouteState>(escort));
+        Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(first));
         Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(second));
     }
 
