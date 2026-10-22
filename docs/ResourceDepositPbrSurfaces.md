@@ -7,6 +7,15 @@ stable. Each now references original family-specific BaseColor, Normal and ORM
 sources. No mesh, placement, resource identity, simulation, renderer or shader
 source is changed.
 
+Before PR publication, synchronized with `master` at
+`8c2609b3afaaf8899f81e66b997dd139f7a84b52`, version 0.1.455, including
+[the visual-language specification](ResourceDepositVisualLanguage.md). Its
+schema-1 authored UV mode and canonical family dispatch stay unchanged. The
+additional surface IDs are an additive authoring inventory; selecting them needs
+a separately approved presentation contract, including batching/budget review.
+The visual-language roughness ranges and inclusion coverage are art-review targets,
+not measurements or acceptance claims for these unqualified maps.
+
 ## Surface design and editable sources
 
 `assets/source/world/authoring/resource_surfaces/recipes.json` contains the original
