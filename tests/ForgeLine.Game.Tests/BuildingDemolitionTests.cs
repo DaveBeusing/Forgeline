@@ -119,6 +119,61 @@ public sealed class BuildingDemolitionTests
         Assert.Equal(command.CorrelationId, decoded.CorrelationId);
     }
 
+    [Fact]
+    public void ConstructionSiteCancellationReleasesReservationsWithoutRefund()
+    {
+        using MatchRuntime scenario = CreateScenario(6205);
+        BuildingDefinition definition =
+            scenario.Services.BuildingDefinitions[BuildingIds.PowerPlant];
+        InventoryId source = scenario.Inventories.CreateInventory(
+            new InventorySpecification(100_000));
+        foreach (BuildingResourceCost cost in definition.Costs)
+        {
+            Assert.True(scenario.Inventories.Add(source, cost.ResourceId, cost.Quantity).Succeeded);
+            Assert.True(scenario.Inventories.Reserve(source, cost.ResourceId, cost.Quantity).Succeeded);
+        }
+
+        EntityId site = scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(
+            site, new ControllableEntity(Player, ControllableEntityCategory.Building));
+        scenario.Simulation.Entities.AddComponent(
+            site, new ConstructionSite(
+                BuildingIds.PowerPlant, Player, source,
+                scenario.Simulation.CurrentTick, 100, 0));
+
+        PlayerCommandGateway gateway = CreateGateway(scenario);
+        gateway.SubmitDemolition(Player, [site], scenario.Simulation.CurrentTick);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.False(scenario.Simulation.Entities.IsAlive(site));
+        Assert.True(gateway.Results.TryRead(out PlayerCommandResultReadModel result));
+        Assert.Equal(1, result.AcceptedTargets);
+        Assert.Empty(Assert.Single(result.DemolitionTargets!).Refunded);
+        foreach (BuildingResourceCost cost in definition.Costs)
+        {
+            Assert.Equal(0, scenario.Inventories.GetReservedQuantity(source, cost.ResourceId));
+            Assert.Equal(cost.Quantity,
+                scenario.Inventories.GetQuantity(source, cost.ResourceId));
+        }
+    }
+
+    [Fact]
+    public void ConstructionCancellationCommandIsReplayable()
+    {
+        var cancel = new CancelConstructionCommand(
+            Player, new EntityId(41, 2), new SimulationTick(9));
+        var envelope = new SimulationCommandEnvelope(
+            new SimulationTick(10), 21, new SimulationCommandSource(Player.Value), cancel);
+        Assert.True(ReplayCommandCodec.TryEncode(envelope, out RecordedSimulationCommand? recorded));
+        Assert.NotNull(recorded);
+        Assert.Equal(ReplayCommandKind.CancelConstruction, recorded.Kind);
+        using MatchRuntime scenario = CreateScenario(6206);
+        var decoded = Assert.IsType<CancelConstructionCommand>(
+            ReplayCommandCodec.Decode(recorded, scenario));
+        Assert.Equal(cancel.ConstructionSite, decoded.ConstructionSite);
+        Assert.Equal(cancel.SubmittedAtTick, decoded.SubmittedAtTick);
+    }
+
     private static EntityId CreatePaidBuilding(
         MatchRuntime scenario, PlayerId owner, BuildingResourceCost[] costs)
     {
