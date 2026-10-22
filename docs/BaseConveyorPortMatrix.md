@@ -21,6 +21,11 @@ coordinates must be authored and physically qualified before activation.
 | Power Plant | Explicitly eligible solid recipe inputs if content requires | None | Power is not inventory cargo; no power-by-belt shortcut |
 | Radar | None by default | None | Powered consumer, not a routine material transit node |
 
+The [raised conveyor visual kit](ConveyorVisualLanguage.md) defines the
+standard belt end frames, tier increments and explicit input/output adapters.
+This matrix retains ownership of future *building-specific* physical sockets;
+none are generated automatically by the standalone kit.
+
 ### Port metadata
 
 Each future authored port must declare: building stable ID and role, port stable
