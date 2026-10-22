@@ -123,6 +123,36 @@ public sealed class OperationsDiagnosisTests
     }
 
     [Fact]
+    public void LiveSelectionCannotExposeForeignWorkOrRetainOldEntityDiagnosis()
+    {
+        using var scenario = WorldHoverExtractionTests.CreateScenario();
+        var interaction = new PresentationInteractionState();
+        var buffer = WorldHoverExtractionTests.Observe(scenario, interaction);
+        var entities = scenario.Simulation.Entities;
+        var foreign = entities.CreateEntity();
+        entities.AddComponent(foreign, new ControllableEntity(new PlayerId(2), ControllableEntityCategory.Building));
+        var local = entities.CreateEntity();
+        var input = scenario.Inventories.CreateInventory(new InventorySpecification(500));
+        var output = scenario.Inventories.CreateInventory(new InventorySpecification(500));
+        entities.AddComponent(local, new ControllableEntity(new PlayerId(1), ControllableEntityCategory.Building));
+        entities.AddComponent(local, new ProductionFacility(input, output, ProductionCapability.SteelProcessing, SimulationTick.Zero));
+
+        interaction.SetSelection([local]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var owned));
+        var diagnosis = Assert.IsType<OperationsDiagnosisSnapshot>(owned.Diagnosis);
+        Assert.Contains(diagnosis.Rows, row => row.Entity == local);
+
+        interaction.SetSelection([foreign]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var denied));
+        Assert.Null(denied.Diagnosis);
+        Assert.All(diagnosis.Rows, row => Assert.NotEqual(foreign, row.Entity));
+        Assert.NotEqual(owned.Tick, denied.Tick);
+        Assert.Same(diagnosis, OperationsDiagnosisSnapshot.Resolve(owned));
+    }
+
+    [Fact]
     public void CopiesAreImmutableAndTraversalsBoundedEvenWithCycles()
     {
         var input = Enumerable.Range(1, 1000)
