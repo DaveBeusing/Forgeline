@@ -1,0 +1,30 @@
+{
+  "id": "infrastructure.directorate.conveyor.support_light.tier1.lod1",
+  "type": "mesh",
+  "source": "structural_intact_lod1.glb",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "collisionRequired": true,
+  "collisionReference": "infrastructure.directorate.conveyor.support_light.tier1.collision",
+  "sockets": [
+    {
+      "name": "origin",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "foundation",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "name": "carrier",
+      "x": 0.0,
+      "y": 0.4,
+      "z": 0.0
+    }
+  ]
+}

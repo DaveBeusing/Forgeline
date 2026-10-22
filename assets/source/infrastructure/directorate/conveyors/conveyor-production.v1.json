@@ -8,6 +8,8 @@
       "assetId": "infrastructure.directorate.conveyor.straight_short",
       "slug": "conveyor_straight_short",
       "role": "transport",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "straight",
       "footprintMeters": [
         2.8,
@@ -585,6 +587,8 @@
       "assetId": "infrastructure.directorate.conveyor.straight_standard",
       "slug": "conveyor_straight_standard",
       "role": "transport",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "straight",
       "footprintMeters": [
         2.8,
@@ -1162,6 +1166,8 @@
       "assetId": "infrastructure.directorate.conveyor.curve_90",
       "slug": "conveyor_curve_90",
       "role": "turn",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "quarter_circle",
       "footprintMeters": [
         6.8,
@@ -1739,6 +1745,8 @@
       "assetId": "infrastructure.directorate.conveyor.curve_90.right",
       "slug": "conveyor_curve_90_right",
       "role": "turn",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "quarter_circle",
       "footprintMeters": [
         6.8,
@@ -2316,6 +2324,8 @@
       "assetId": "infrastructure.directorate.conveyor.ramp_up",
       "slug": "conveyor_ramp_up",
       "role": "elevation",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "ramp",
       "footprintMeters": [
         2.8,
@@ -2893,6 +2903,8 @@
       "assetId": "infrastructure.directorate.conveyor.ramp_down",
       "slug": "conveyor_ramp_down",
       "role": "elevation",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "ramp",
       "footprintMeters": [
         2.8,
@@ -3470,6 +3482,8 @@
       "assetId": "infrastructure.directorate.conveyor.merger_2to1",
       "slug": "conveyor_merger_2to1",
       "role": "merge",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "triple_trapezoid",
       "footprintMeters": [
         10.8,
@@ -4059,6 +4073,8 @@
       "assetId": "infrastructure.directorate.conveyor.splitter_1to2",
       "slug": "conveyor_splitter_1to2",
       "role": "split",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "triple_fork",
       "footprintMeters": [
         10.8,
@@ -4648,6 +4664,8 @@
       "assetId": "infrastructure.directorate.conveyor.io_in",
       "slug": "conveyor_io_in",
       "role": "building_to_belt",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "interface",
       "footprintMeters": [
         2.8,
@@ -5225,6 +5243,8 @@
       "assetId": "infrastructure.directorate.conveyor.io_out",
       "slug": "conveyor_io_out",
       "role": "belt_to_building",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "interface",
       "footprintMeters": [
         2.8,
@@ -5802,6 +5822,8 @@
       "assetId": "infrastructure.directorate.conveyor.support_light",
       "slug": "conveyor_support_light",
       "role": "structure",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "single_column",
       "footprintMeters": [
         0.8,
@@ -6110,6 +6132,8 @@
       "assetId": "infrastructure.directorate.conveyor.support_heavy",
       "slug": "conveyor_support_heavy",
       "role": "structure",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "braced_double_column",
       "footprintMeters": [
         4.1,
@@ -6437,6 +6461,8 @@
       "assetId": "infrastructure.directorate.conveyor.endcap",
       "slug": "conveyor_endcap",
       "role": "closure",
+      "baseTier": 0,
+      "carrierAttachmentHeightMeters": 5.2,
       "shape": "endcap",
       "footprintMeters": [
         2.8,
@@ -6720,6 +6746,645 @@
               2.2950000762939453,
               2.2049999237060547,
               0.864799976348877
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.support_light.tier1",
+      "slug": "conveyor_support_light_tier1",
+      "role": "structure",
+      "baseTier": 1,
+      "carrierAttachmentHeightMeters": 7.2,
+      "shape": "single_column",
+      "footprintMeters": [
+        0.8,
+        0.8
+      ],
+      "footprintCenterXZ": [
+        0,
+        0
+      ],
+      "resourceClasses": [],
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFrameMeters": 18.0,
+      "instanceScale": [
+        18.0,
+        18.0,
+        18.0
+      ],
+      "pivotMeters": [
+        0,
+        0,
+        0
+      ],
+      "ports": [],
+      "structuralSockets": [
+        {
+          "name": "foundation",
+          "positionMeters": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "carrier",
+          "positionMeters": [
+            0,
+            7.2,
+            0
+          ]
+        }
+      ],
+      "collisionAssetId": "infrastructure.directorate.conveyor.support_light.tier1.collision",
+      "groundBlockingPrimitives": [
+        {
+          "centerXZ": [
+            0,
+            0
+          ],
+          "sizeXZ": [
+            0.8,
+            0.8
+          ],
+          "heightMeters": 7.2
+        }
+      ],
+      "selectionAssetId": "infrastructure.directorate.conveyor.support_light.tier1.selection",
+      "destroyedSelectionAssetId": "infrastructure.directorate.conveyor.support_light.tier1.destroyed.selection",
+      "selectionPolicy": "actual suspended mesh; never use ground-projected elevated AABB as navigation obstacle",
+      "clearance": {
+        "minimumMeters": 5,
+        "undersideTierZeroMeters": 5.2,
+        "validStates": "intact carriers only; supports obstruct passage; damaged/critical/destroyed require actual state geometry checks",
+        "appliesToRaisedCarrierOnly": true,
+        "maximumFootingAdjustmentMeters": 0.2,
+        "heavySupportVehiclePolicy": "2.4m foundation gap is not a truck portal; keep support stations outside vehicle swept lanes",
+        "terrainPolicy": "sample maximum terrain under span; reject placement below minimum; supports have rigid local foundations and bounded footing adaptation by future placement system"
+      },
+      "lods": {
+        "distanceMeters": [
+          140,
+          420
+        ],
+        "farMotion": "static direction chevrons; no rigid part evaluation at LOD2"
+      },
+      "motion": {
+        "strategy": "existing rigid translation clips for repeated belt cleats",
+        "durationSeconds": 1,
+        "seam": "repeated pitch reset concealed under terminal covers",
+        "activation": "future copied authoritative operating state; only flowing resolves motion assets; idle,blocked,offline and wreck remain static"
+      },
+      "variants": [
+        {
+          "state": "structural_intact",
+          "lod": 0,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.structural_intact",
+          "triangles": 128,
+          "boundsMeters": [
+            [
+              -0.4000000059604645,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              0.4000000059604645,
+              7.199999809265137,
+              0.4000000059604645
+            ]
+          ]
+        },
+        {
+          "state": "structural_intact",
+          "lod": 1,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.structural_intact.lod1",
+          "triangles": 48,
+          "boundsMeters": [
+            [
+              -0.4000000059604645,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              0.4000000059604645,
+              7.199999809265137,
+              0.4000000059604645
+            ]
+          ]
+        },
+        {
+          "state": "structural_intact",
+          "lod": 2,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.structural_intact.lod2",
+          "triangles": 48,
+          "boundsMeters": [
+            [
+              -0.4000000059604645,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              0.4000000059604645,
+              7.199999809265137,
+              0.4000000059604645
+            ]
+          ]
+        },
+        {
+          "state": "damaged",
+          "lod": 0,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.damaged",
+          "triangles": 140,
+          "boundsMeters": [
+            [
+              -0.8179441690444946,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              0.8979442119598389,
+              7.199999809265137,
+              0.4000000059604645
+            ]
+          ]
+        },
+        {
+          "state": "damaged",
+          "lod": 1,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.damaged.lod1",
+          "triangles": 60,
+          "boundsMeters": [
+            [
+              -0.8179441690444946,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              0.8979442119598389,
+              7.199999809265137,
+              0.4000000059604645
+            ]
+          ]
+        },
+        {
+          "state": "damaged",
+          "lod": 2,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.damaged.lod2",
+          "triangles": 60,
+          "boundsMeters": [
+            [
+              -0.8179441690444946,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              0.8979442119598389,
+              7.199999809265137,
+              0.4000000059604645
+            ]
+          ]
+        },
+        {
+          "state": "critical",
+          "lod": 0,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.critical",
+          "triangles": 152,
+          "boundsMeters": [
+            [
+              -0.8179441690444946,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              0.8979442119598389,
+              7.475247383117676,
+              0.5431793332099915
+            ]
+          ]
+        },
+        {
+          "state": "critical",
+          "lod": 1,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.critical.lod1",
+          "triangles": 72,
+          "boundsMeters": [
+            [
+              -0.8179441690444946,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              0.8979442119598389,
+              7.475247383117676,
+              0.5431793332099915
+            ]
+          ]
+        },
+        {
+          "state": "critical",
+          "lod": 2,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.critical.lod2",
+          "triangles": 72,
+          "boundsMeters": [
+            [
+              -0.8179441690444946,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              0.8979442119598389,
+              7.475247383117676,
+              0.5431793332099915
+            ]
+          ]
+        },
+        {
+          "state": "destroyed",
+          "lod": 0,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.destroyed",
+          "triangles": 128,
+          "boundsMeters": [
+            [
+              -0.4000000059604645,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              1.4800000190734863,
+              2.5199999809265137,
+              0.9760000109672546
+            ]
+          ]
+        },
+        {
+          "state": "destroyed",
+          "lod": 1,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.destroyed.lod1",
+          "triangles": 48,
+          "boundsMeters": [
+            [
+              -0.4000000059604645,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              1.4800000190734863,
+              2.5199999809265137,
+              0.9760000109672546
+            ]
+          ]
+        },
+        {
+          "state": "destroyed",
+          "lod": 2,
+          "assetId": "infrastructure.directorate.conveyor.support_light.tier1.destroyed.lod2",
+          "triangles": 48,
+          "boundsMeters": [
+            [
+              -0.4000000059604645,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              1.4800000190734863,
+              2.5199999809265137,
+              0.9760000109672546
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1",
+      "slug": "conveyor_support_heavy_tier1",
+      "role": "structure",
+      "baseTier": 1,
+      "carrierAttachmentHeightMeters": 7.2,
+      "shape": "braced_double_column",
+      "footprintMeters": [
+        4.1,
+        0.9
+      ],
+      "footprintCenterXZ": [
+        0,
+        0
+      ],
+      "resourceClasses": [],
+      "allowedRotationsDegrees": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "sourceFrameMeters": 18.0,
+      "instanceScale": [
+        18.0,
+        18.0,
+        18.0
+      ],
+      "pivotMeters": [
+        0,
+        0,
+        0
+      ],
+      "ports": [],
+      "structuralSockets": [
+        {
+          "name": "foot_left",
+          "positionMeters": [
+            -1.6,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "foot_right",
+          "positionMeters": [
+            1.6,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "carrier",
+          "positionMeters": [
+            0,
+            7.2,
+            0
+          ]
+        }
+      ],
+      "collisionAssetId": "infrastructure.directorate.conveyor.support_heavy.tier1.collision",
+      "groundBlockingPrimitives": [
+        {
+          "centerXZ": [
+            -1.6,
+            0
+          ],
+          "sizeXZ": [
+            0.8,
+            0.8
+          ],
+          "heightMeters": 7.2
+        },
+        {
+          "centerXZ": [
+            1.6,
+            0
+          ],
+          "sizeXZ": [
+            0.8,
+            0.8
+          ],
+          "heightMeters": 7.2
+        }
+      ],
+      "selectionAssetId": "infrastructure.directorate.conveyor.support_heavy.tier1.selection",
+      "destroyedSelectionAssetId": "infrastructure.directorate.conveyor.support_heavy.tier1.destroyed.selection",
+      "selectionPolicy": "actual suspended mesh; never use ground-projected elevated AABB as navigation obstacle",
+      "clearance": {
+        "minimumMeters": 5,
+        "undersideTierZeroMeters": 5.2,
+        "validStates": "intact carriers only; supports obstruct passage; damaged/critical/destroyed require actual state geometry checks",
+        "appliesToRaisedCarrierOnly": true,
+        "maximumFootingAdjustmentMeters": 0.2,
+        "heavySupportVehiclePolicy": "2.4m foundation gap is not a truck portal; keep support stations outside vehicle swept lanes",
+        "terrainPolicy": "sample maximum terrain under span; reject placement below minimum; supports have rigid local foundations and bounded footing adaptation by future placement system"
+      },
+      "lods": {
+        "distanceMeters": [
+          140,
+          420
+        ],
+        "farMotion": "static direction chevrons; no rigid part evaluation at LOD2"
+      },
+      "motion": {
+        "strategy": "existing rigid translation clips for repeated belt cleats",
+        "durationSeconds": 1,
+        "seam": "repeated pitch reset concealed under terminal covers",
+        "activation": "future copied authoritative operating state; only flowing resolves motion assets; idle,blocked,offline and wreck remain static"
+      },
+      "variants": [
+        {
+          "state": "structural_intact",
+          "lod": 0,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.structural_intact",
+          "triangles": 268,
+          "boundsMeters": [
+            [
+              -2.049999952316284,
+              0.0,
+              -0.44999998807907104
+            ],
+            [
+              2.049999952316284,
+              7.199999809265137,
+              0.44999998807907104
+            ]
+          ]
+        },
+        {
+          "state": "structural_intact",
+          "lod": 1,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.structural_intact.lod1",
+          "triangles": 108,
+          "boundsMeters": [
+            [
+              -2.049999952316284,
+              0.0,
+              -0.44999998807907104
+            ],
+            [
+              2.049999952316284,
+              7.199999809265137,
+              0.44999998807907104
+            ]
+          ]
+        },
+        {
+          "state": "structural_intact",
+          "lod": 2,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.structural_intact.lod2",
+          "triangles": 108,
+          "boundsMeters": [
+            [
+              -2.049999952316284,
+              0.0,
+              -0.44999998807907104
+            ],
+            [
+              2.049999952316284,
+              7.199999809265137,
+              0.44999998807907104
+            ]
+          ]
+        },
+        {
+          "state": "damaged",
+          "lod": 0,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.damaged",
+          "triangles": 280,
+          "boundsMeters": [
+            [
+              -2.049999952316284,
+              0.0,
+              -0.44999998807907104
+            ],
+            [
+              2.130000114440918,
+              7.199999809265137,
+              0.44999998807907104
+            ]
+          ]
+        },
+        {
+          "state": "damaged",
+          "lod": 1,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.damaged.lod1",
+          "triangles": 120,
+          "boundsMeters": [
+            [
+              -2.049999952316284,
+              0.0,
+              -0.44999998807907104
+            ],
+            [
+              2.130000114440918,
+              7.199999809265137,
+              0.44999998807907104
+            ]
+          ]
+        },
+        {
+          "state": "damaged",
+          "lod": 2,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.damaged.lod2",
+          "triangles": 120,
+          "boundsMeters": [
+            [
+              -2.049999952316284,
+              0.0,
+              -0.44999998807907104
+            ],
+            [
+              2.130000114440918,
+              7.199999809265137,
+              0.44999998807907104
+            ]
+          ]
+        },
+        {
+          "state": "critical",
+          "lod": 0,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.critical",
+          "triangles": 292,
+          "boundsMeters": [
+            [
+              -2.049999952316284,
+              0.0,
+              -0.44999998807907104
+            ],
+            [
+              2.130000114440918,
+              7.475247383117676,
+              0.5431793332099915
+            ]
+          ]
+        },
+        {
+          "state": "critical",
+          "lod": 1,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.critical.lod1",
+          "triangles": 132,
+          "boundsMeters": [
+            [
+              -2.049999952316284,
+              0.0,
+              -0.44999998807907104
+            ],
+            [
+              2.130000114440918,
+              7.475247383117676,
+              0.5431793332099915
+            ]
+          ]
+        },
+        {
+          "state": "critical",
+          "lod": 2,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.critical.lod2",
+          "triangles": 132,
+          "boundsMeters": [
+            [
+              -2.049999952316284,
+              0.0,
+              -0.44999998807907104
+            ],
+            [
+              2.130000114440918,
+              7.475247383117676,
+              0.5431793332099915
+            ]
+          ]
+        },
+        {
+          "state": "destroyed",
+          "lod": 0,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.destroyed",
+          "triangles": 268,
+          "boundsMeters": [
+            [
+              -2.0,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              3.130000114440918,
+              2.5199999809265137,
+              1.0260000228881836
+            ]
+          ]
+        },
+        {
+          "state": "destroyed",
+          "lod": 1,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.destroyed.lod1",
+          "triangles": 108,
+          "boundsMeters": [
+            [
+              -2.0,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              3.130000114440918,
+              2.5199999809265137,
+              1.0260000228881836
+            ]
+          ]
+        },
+        {
+          "state": "destroyed",
+          "lod": 2,
+          "assetId": "infrastructure.directorate.conveyor.support_heavy.tier1.destroyed.lod2",
+          "triangles": 108,
+          "boundsMeters": [
+            [
+              -2.0,
+              0.0,
+              -0.4000000059604645
+            ],
+            [
+              3.130000114440918,
+              2.5199999809265137,
+              1.0260000228881836
             ]
           ]
         }

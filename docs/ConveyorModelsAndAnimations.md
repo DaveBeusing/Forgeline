@@ -2,7 +2,10 @@
 
 Implementation baseline: master `165b7d644e6660c34cb03fa725a0d6e0bf34f024`
 (0.1.446), including the existing conveyor visual-kit design from PR #291.
-This change prepares 0.1.447 and supplies authored models and compiler records.
+Final integration also includes master
+`dbe748d3c1502ad21f8c0d8c962e2de018392faf` (0.1.447, operations rules).
+This change prepares 0.1.448 and supplies authored models and compiler records.
+The conveyor source and asset compiler contracts are unchanged by that rebase.
 Tests, runtime/camera smokes, clearance qualification, LOD acceptance and CI test
 runs were deliberately not executed at the user's request. Manual review remains
 outstanding. No conveyor simulation, construction UX or building transfer rule
@@ -15,7 +18,7 @@ The immutable planning baseline remains
 Production data lives beside it in `conveyor-production.v1.json`; it does not
 rename the design contract to an asset definition or change its proposed status.
 
-- `authoring/`: 13 genuine editable Blender 5.2.2 masters, one per physical module.
+- `authoring/`: 15 genuine editable Blender 5.2.2 masters, one per physical module.
 - `models/`: compiler-ready GLBs, existing-format rigid animation glTFs and real
   `*.asset.json` records, including all three LODs and reserved visual states.
 - `tools/blender/conveyor_models.py`: dimensional geometry and export recipes.
@@ -24,7 +27,7 @@ rename the design contract to an asset definition or change its proposed status.
   the saved translation FCurves. Collision meshes are editable in each master.
 
 There are twelve planned families plus an independently modelled right-hand
-curve. No negative runtime scale is used. The left hand retains the planned
+curve and two ground-mounted tier-1 support variants. No negative runtime scale is used. The left hand retains the planned
 `infrastructure.directorate.conveyor.curve_90` identity; the other hand uses
 `infrastructure.directorate.conveyor.curve_90.right`.
 
@@ -39,6 +42,7 @@ curve. No negative runtime scale is used. The left hand retains the planned
 | `io_in`, `io_out` | Distinct source/sink hopper and socket jaws |
 | `support_light` | Single column, localized concrete footing |
 | `support_heavy` | Two columns, cross-brace, two individual footings |
+| `support_light.tier1`, `support_heavy.tier1` | Same ground footprints, actual 7.2m carrier attachment |
 | `endcap` | Mechanical stop bar; cap socket, no material-flow outlet |
 
 Junctions use one filled concave Y-shaped deck, rather than overlapping coplanar
@@ -58,7 +62,10 @@ Runtime exports uniformly divide all positions and socket coordinates by
 **18** to fit the existing canonical unit-box rendering/rigid-clip envelope.
 Use a uniform runtime instance scale `(18,18,18)` to recover actual world metres;
 do not rescale a source file twice. Keep the ground-reference origin, add whole
-2m tier translations in world space, and apply only cardinal yaw. Normals and UVs
+2m tier translations to carrier modules in world space, and apply only cardinal
+yaw. Support feet stay at ground: select the authored `.tier1` support with a
+7.2m attachment for the first raised tier; do not lift a tier-0 support by 2m.
+Higher support tiers require an explicitly authored height variant. Normals and UVs
 are unaffected by this uniform conversion. The right curve is source-authored,
 including reflected port normals and corrected triangle winding.
 
@@ -150,11 +157,11 @@ collision/selection identity, sockets and motion policy.
 ## Build result
 
 The Release asset compiler build completes with zero warnings/errors. The scoped
-asset build accepts **421 records**: 397 mesh records (including state/LOD,
+asset build accepts **459 records**: 435 mesh records (including state/LOD,
 default aliases and proxies), 20 rigid clips, and the existing material plus
 three shared textures. It reports no issues. This is a source/asset build, not
-an executed test suite or physical/render acceptance. The last preview-only
-master update leaves every compiled GLB/definition/clip byte unchanged.
+an executed test suite or physical/render acceptance. The final build includes the two real raised-tier support variants. No
+full-game source build or gameplay/renderer acceptance is claimed.
 [Build receipt](ConveyorModelBuild.json) records counts and source identities.
 Runtime cache and intermediate outputs remain under artifacts and are not
 committed as authored content.
@@ -177,7 +184,7 @@ UVs, collision and flow FCurves):
 Copy reviewed masters to `authoring/`, module subdirectories from the generated
 `source/` directory to `models/`, and the matching production catalog beside the
 design JSON. Exporting one module writes a one-module catalog; merge only that
-record into the complete catalog. Do not replace all thirteen records with a
+record into the complete catalog. Do not replace all fifteen records with a
 partial export. Rebuild assets after any geometry or action edit.
 
 Manual validation, deliberately not executed by this implementation:

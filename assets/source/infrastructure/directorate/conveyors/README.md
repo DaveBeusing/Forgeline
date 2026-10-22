@@ -1,7 +1,7 @@
 # Raised Directorate Conveyor V1
 
 The production model package is now in `authoring/`, `models/` and
-`conveyor-production.v1.json`: thirteen editable Blender masters, actual GLB
+`conveyor-production.v1.json`: fifteen editable Blender masters (including ground-mounted tier-1 supports), actual GLB
 LODs/states, collision/selection meshes and existing-format rigid belt clips.
 See [Models and animation handoff](../../../../../docs/ConveyorModelsAndAnimations.md)
 for scale18, sockets, support constraints and manual review. No gameplay conveyor

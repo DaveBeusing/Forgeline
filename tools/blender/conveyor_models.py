@@ -108,6 +108,12 @@ def module_records():
         p['positionMeters'][0]*=-1
         p['facing']={'E':'W','W':'E'}.get(p['facing'],p['facing'])
     result.insert(3,curve)
+    for original in list(result):
+        if original['role']=='structure':
+            raised=copy.deepcopy(original);raised['assetId']+='.tier1';raised['slug']+='_tier1';raised['baseTier']=1;raised['supportTier']=1
+            for socket in raised['structuralSockets']:
+                if socket['name']=='carrier':socket['positionMeters'][1]+=2
+            result.append(raised)
     return result
 
 
@@ -133,6 +139,16 @@ def path_point(path,distance):
 
 
 def bounds(mesh):return [[min(p[k] for p in mesh.positions) for k in range(3)],[max(p[k] for p in mesh.positions) for k in range(3)]]
+
+
+def extend_support(mesh,m):
+    rise=2*m.get('supportTier',0)
+    if not rise:return
+    for i,p in enumerate(mesh.positions):
+        if p[1]>.3:mesh.positions[i]=(p[0],.3+(p[1]-.3)*(4.9+rise)/4.9,p[2])
+    for i in range(0,len(mesh.indices),3):
+        ids=mesh.indices[i:i+3];a,b,c=[mesh.positions[k] for k in ids];n=unit(cross(sub(b,a),sub(c,a)))
+        for k in ids:mesh.normals[k]=n
 
 
 def assemble(m,state,lod):
@@ -210,6 +226,7 @@ def assemble(m,state,lod):
         if state=='congested':
             for i in range(3):
                 p,_=path_point(paths[-1],.4+i*.42);x,y,z=p;static.box((x-.65,y+.05,z-.15),(x+.65,y+.48,z+.15),10)
+    if m['role']=='structure':extend_support(static,m)
     if state in ('damaged','critical'):
         top=max(p[1] for p in static.positions);static.beam((-.8,top-.4,0),(.8,top-.15,.2),.13,.13,8)
         if state=='critical':static.beam((-.7,top-.3,-.3),(.6,top+.18,.45),.18,.2,8)
@@ -270,7 +287,7 @@ def collision_for(m):
     mesh=Mesh();feet=[]
     if m['role']=='structure':
         for x in ([0] if m['shape']=='single_column' else [-1.6,1.6]):
-            mesh.box((x-.4,0,-.4),(x+.4,.3,.4),6);mesh.box((x-.21,.3,-.2),(x+.21,5.2,.2),1);feet.append({'centerXZ':[x,0],'sizeXZ':[.8,.8],'heightMeters':5.2})
+            mesh.box((x-.4,0,-.4),(x+.4,.3,.4),6);mesh.box((x-.21,.3,-.2),(x+.21,5.2,.2),1);feet.append({'centerXZ':[x,0],'sizeXZ':[.8,.8],'heightMeters':5.2+2*m.get('supportTier',0)})
         if len(feet)>1:mesh.box((-2.05,5.05,-.45),(2.05,5.2,.45),1)
     else:
         paths=paths_for(m,2)
@@ -278,6 +295,7 @@ def collision_for(m):
         if m['role'] in ('merge','split'):polygon_prism(mesh,junction_outline(m['role'],1.4),5.2,6.3,1)
         else:
             for path in paths:mesh.ribbon(path,2.8,-.6,.5,1)
+    if m['role']=='structure':extend_support(mesh,m)
     return mesh,feet
 
 
@@ -306,4 +324,4 @@ def export_module(m,output,part_provider=assemble,collision_provider=collision_f
                 alias=copy.deepcopy(definition);alias['id']=base+('' if lod==0 else '.lod'+str(lod))
                 if lod==0:alias['lods']=[{'level':i,'assetId':base+'.lod'+str(i),'maxDistance':140 if i==1 else 420} for i in (1,2)]
                 write_json(folder/('default_lod'+str(lod)+'.asset.json'),alias)
-    return {'assetId':base,'slug':m['slug'],'role':m['role'],'shape':m['shape'],'footprintMeters':m['footprintMeters'],'footprintCenterXZ':m.get('footprintCenterXZ',[0,0]),'resourceClasses':m['resourceClasses'],'allowedRotationsDegrees':m['allowedRotationsDegrees'],'sourceFrameMeters':FRAME,'instanceScale':[FRAME]*3,'pivotMeters':[0,0,0],'ports':ports,'structuralSockets':m.get('structuralSockets',[]),'collisionAssetId':base+'.collision','groundBlockingPrimitives':feet,'selectionAssetId':base+'.selection','destroyedSelectionAssetId':base+'.destroyed.selection','selectionPolicy':'actual suspended mesh; never use ground-projected elevated AABB as navigation obstacle','clearance':{'minimumMeters':5,'undersideTierZeroMeters':5.2,'validStates':'intact carriers only; supports obstruct passage; damaged/critical/destroyed require actual state geometry checks','appliesToRaisedCarrierOnly':True,'maximumFootingAdjustmentMeters':.2,'heavySupportVehiclePolicy':'2.4m foundation gap is not a truck portal; keep support stations outside vehicle swept lanes','terrainPolicy':'sample maximum terrain under span; reject placement below minimum; supports have rigid local foundations and bounded footing adaptation by future placement system'},'lods':{'distanceMeters':[140,420],'farMotion':'static direction chevrons; no rigid part evaluation at LOD2'},'motion':{'strategy':'existing rigid translation clips for repeated belt cleats','durationSeconds':1,'seam':'repeated pitch reset concealed under terminal covers','activation':'future copied authoritative operating state; only flowing resolves motion assets; idle,blocked,offline and wreck remain static'},'variants':rows}
+    return {'assetId':base,'slug':m['slug'],'role':m['role'],'baseTier':m['baseTier'],'carrierAttachmentHeightMeters':5.2+2*m.get('supportTier',0),'shape':m['shape'],'footprintMeters':m['footprintMeters'],'footprintCenterXZ':m.get('footprintCenterXZ',[0,0]),'resourceClasses':m['resourceClasses'],'allowedRotationsDegrees':m['allowedRotationsDegrees'],'sourceFrameMeters':FRAME,'instanceScale':[FRAME]*3,'pivotMeters':[0,0,0],'ports':ports,'structuralSockets':m.get('structuralSockets',[]),'collisionAssetId':base+'.collision','groundBlockingPrimitives':feet,'selectionAssetId':base+'.selection','destroyedSelectionAssetId':base+'.destroyed.selection','selectionPolicy':'actual suspended mesh; never use ground-projected elevated AABB as navigation obstacle','clearance':{'minimumMeters':5,'undersideTierZeroMeters':5.2,'validStates':'intact carriers only; supports obstruct passage; damaged/critical/destroyed require actual state geometry checks','appliesToRaisedCarrierOnly':True,'maximumFootingAdjustmentMeters':.2,'heavySupportVehiclePolicy':'2.4m foundation gap is not a truck portal; keep support stations outside vehicle swept lanes','terrainPolicy':'sample maximum terrain under span; reject placement below minimum; supports have rigid local foundations and bounded footing adaptation by future placement system'},'lods':{'distanceMeters':[140,420],'farMotion':'static direction chevrons; no rigid part evaluation at LOD2'},'motion':{'strategy':'existing rigid translation clips for repeated belt cleats','durationSeconds':1,'seam':'repeated pitch reset concealed under terminal covers','activation':'future copied authoritative operating state; only flowing resolves motion assets; idle,blocked,offline and wreck remain static'},'variants':rows}
