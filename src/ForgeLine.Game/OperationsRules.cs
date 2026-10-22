@@ -47,7 +47,11 @@ public readonly record struct OperationsRuleReadModel(
     OperationsRuleDefinition Definition, uint Revision, bool Enabled,
     OperationsRuleResult Result, SimulationTick LastEvaluated,
     SimulationTick LastFired, int ActionCount, bool Pending,
-    EntityId ManagedProductionRequest);
+    EntityId ManagedProductionRequest)
+{
+    public int AttemptCount { get; init; }
+    public SimulationTick LastAttempt { get; init; }
+}
 
 public sealed class OperationsRuleCommand : ISimulationCommand
 {
@@ -104,7 +108,9 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
         public OperationsRuleResult Result = OperationsRuleResult.Pending;
         public SimulationTick LastEvaluated;
         public SimulationTick LastFired;
+        public SimulationTick LastAttempt;
         public int ActionCount;
+        public int AttemptCount;
         public int HeldTicks;
         public bool InputPolicyHandled;
         public bool Suspended;
@@ -142,7 +148,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
             if (e.Definition.Owner == owner)
                 rows.Add(new(e.Definition, e.Revision, e.Enabled, e.Result,
                     e.LastEvaluated, e.LastFired, e.ActionCount,
-                    e.Enabled && e.Result == OperationsRuleResult.Pending, e.ManagedRequest));
+                    e.Enabled && e.Result == OperationsRuleResult.Pending, e.ManagedRequest)
+                { AttemptCount = e.AttemptCount, LastAttempt = e.LastAttempt });
         return Array.AsReadOnly(rows.ToArray());
     }
 
@@ -176,6 +183,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
                 current.InputPolicyHandled = false;
                 current.HeldTicks = 0;
                 current.ActionCount = 0;
+                current.AttemptCount = 0;
+                current.LastAttempt = SimulationTick.Zero;
                 current.Revision++;
                 current.Result = enabled ? OperationsRuleResult.Pending : OperationsRuleResult.Disabled;
                 return OperationsRuleResult.Applied;
@@ -211,6 +220,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
         entry.Revision++;
         entry.HeldTicks = 0;
         entry.ActionCount = 0;
+        entry.AttemptCount = 0;
+        entry.LastAttempt = SimulationTick.Zero;
         entry.InputPolicyHandled = false;
         entry.Suspended = false;
         entry.LastFired = SimulationTick.Zero;
@@ -320,7 +331,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
             d.Owner, d.Facility, d.Resource, d.Minimum, d.Target, d.Maximum,
             d.Priority, true, context.Tick);
         action.Execute(context);
-        entry.InputPolicyHandled = true; // Never synthesize another demand on subsequent ticks.
+        Attempted(entry, context.Tick);
+        entry.InputPolicyHandled = action.Accepted; // Do not retry while a real policy exists.
         entry.Result = action.Accepted ? OperationsRuleResult.Applied : OperationsRuleResult.Rejected;
         if (action.Accepted) Fired(entry, context.Tick);
     }
@@ -343,11 +355,12 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
                 if (!_inventories.CanAdd(facility.OutputInventory, output.ResourceId, output.Quantity))
                     return;
             // Never strand a request paused by this rule when its action budget is exhausted.
-            if (entry.LastFired != SimulationTick.Zero &&
-                context.Tick.Value - entry.LastFired.Value < entry.Definition.CooldownTicks) return;
+            if (entry.LastAttempt != SimulationTick.Zero &&
+                context.Tick.Value - entry.LastAttempt.Value < entry.Definition.CooldownTicks) return;
             var resume = PlayerProductionActionCommand.SetPaused(
                 entry.Definition.Owner, entry.ManagedRequest, false, context.Tick);
             resume.Execute(context);
+            Attempted(entry, context.Tick);
             entry.Result = resume.Accepted ? OperationsRuleResult.Recovered : OperationsRuleResult.Rejected;
             if (resume.Accepted) { Fired(entry, context.Tick); entry.ManagedRequest = EntityId.Invalid; }
             return;
@@ -373,8 +386,15 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
         var pause = PlayerProductionActionCommand.SetPaused(
             entry.Definition.Owner, facility.ActiveRequest, true, context.Tick);
         pause.Execute(context);
+        Attempted(entry, context.Tick);
         entry.Result = pause.Accepted ? OperationsRuleResult.Applied : OperationsRuleResult.Rejected;
         if (pause.Accepted) { Fired(entry, context.Tick); entry.ManagedRequest = facility.ActiveRequest; }
+    }
+
+    private static void Attempted(Entry entry, SimulationTick tick)
+    {
+        entry.LastAttempt = tick;
+        entry.AttemptCount++;
     }
 
     private static void Fired(Entry entry, SimulationTick tick)
@@ -386,13 +406,13 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
 
     private static bool Ready(Entry entry, SimulationTick tick)
     {
-        if (entry.ActionCount >= MaximumActionsPerRule)
+        if (entry.AttemptCount >= MaximumActionsPerRule)
         {
             entry.Result = OperationsRuleResult.ActionLimit;
             return false;
         }
-        if (entry.LastFired != SimulationTick.Zero &&
-            tick.Value - entry.LastFired.Value < entry.Definition.CooldownTicks)
+        if (entry.LastAttempt != SimulationTick.Zero &&
+            tick.Value - entry.LastAttempt.Value < entry.Definition.CooldownTicks)
         {
             entry.Result = OperationsRuleResult.Cooldown;
             return false;
