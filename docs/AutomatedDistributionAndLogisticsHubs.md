@@ -91,6 +91,16 @@ To reduce starvation under sustained higher-priority demand, waiting requests ga
 
 This policy is deliberately simple and deterministic-friendly rather than a global mathematical optimizer.
 
+### Player operational priority and live effectiveness
+
+Operational scheduling reuses the four existing stock policy classes (`Critical`, `High`, `Normal`, `Low`) rather than introducing a second global dispatch policy. A facility may maintain separate resource stock policies. Production queue and battlefield supply priorities remain distinct existing controls. Source reserves, physical truck/dock FIFO, capacity reservations and conservation rules take precedence over preferred scheduling order.
+
+The player stages the class in the existing radial `PRIOR` control and applies it through the normal stock policy action. Until that command is accepted by simulation, the displayed stored policy is unchanged. Invalid classes are rejected with explicit `InvalidPriority` feedback; ownership, entity generation and session checks continue to use the existing player command boundary.
+
+The dispatcher updates priorities for Pending/RetryPending requests without resetting request identity or waiting age. Once a truck is assigned, its shipment retains the priority at admission; editing the policy does not silently reclassify loaded or reserved work. After a completed shipment, any remaining demand is evaluated using the latest configured class.
+
+Each diagnostic request reports its configured shipment class and an effective scheduling class. The effective value includes bounded waiting-time aging and the existing Critical recovery qualifier; only waiting demand is promoted. The copied player stock row reports both classes and its current observed request status. The existing radial stock entry displays the configured class, any effective promotion and observed route/stock/truck/fuel/capacity obstruction. A configured class without an outstanding deficit is idle, not a promised shipment. A reported blockage describes observed dispatch feasibility, not proof of another system's underlying cause.
+
 ## Retry and Failure Handling
 
 Temporary scheduling failures enter RetryPending and are retried after a fixed simulation-tick delay. Reasons include unavailable destination, no source surplus, no valid route, no truck, reservation failure, and assignment failure.
