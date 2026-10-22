@@ -340,6 +340,8 @@ public sealed class PlayerActionReadModelTests
         var live = observed.Requests.Where(r => r.PolicyEntity == policyEntity &&
             r.State != LogisticsTransportRequestState.Completed).ToArray();
         Assert.NotEmpty(live);
+        var policy = Assert.Single(logistics.Policies, p => p.ResourceId == ResourceIds.Fuel);
+        Assert.Equal(Assert.Single(live).EffectivePriority, policy.DispatchPriority);
         Assert.Equal(live.Length, logistics.TotalOrderCount);
         Assert.Equal(live.Length, logistics.Orders.Count);
         foreach (var order in logistics.Orders)
@@ -399,6 +401,8 @@ public sealed class PlayerActionReadModelTests
 
         Assert.True(fuel.HasPolicy);
         Assert.Equal(policyEntity, fuel.PolicyEntity);
+        Assert.Equal(LogisticsStockPriority.High, fuel.Priority);
+        Assert.Equal(LogisticsStockPriority.High, fuel.DispatchPriority);
         Assert.Equal(100.0, fuel.DesiredTarget);
         Assert.True(fuel.CurrentQuantity > 0.0);
 
