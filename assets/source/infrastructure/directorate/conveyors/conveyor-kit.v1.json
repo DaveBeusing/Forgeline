@@ -1,7 +1,7 @@
 {
   "schema": "forgeline.directorate.conveyor_visual_kit",
   "schemaVersion": 1,
-  "status": "approved_geometry_baseline_pending_native_art_review",
+  "status": "design_baseline_proposed_for_pr_review_not_compiled",
   "engine": {
     "units": "meters",
     "upAxis": "+Y",
@@ -297,8 +297,8 @@
         "right"
       ],
       "footprintMeters": [
-        5.4,
-        5.4
+        6.8,
+        6.8
       ],
       "supportPolicy": "outside_corner_only",
       "directionGlyph": "radial_chevron",
@@ -331,7 +331,12 @@
       "resourceClasses": [
         "bulk_solid",
         "packaged_solid"
-      ]
+      ],
+      "footprintCenterXZ": [
+        -2,
+        2
+      ],
+      "footprintNote": "Local left-hand source: arc bounds X -5.4..1.4 / Z -1.4..5.4 including 1.4m half-assembly width; mirrored variant reverses X."
     },
     {
       "family": "infrastructure.directorate.conveyor",
