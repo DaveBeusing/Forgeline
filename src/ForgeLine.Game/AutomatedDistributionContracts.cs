@@ -271,7 +271,11 @@ public readonly record struct LogisticsTransportRequestReadModel(
     SimulationTick WaitingSinceTick = default,
     SimulationTick NextAttemptTick = default,
     SimulationTick LastEvaluatedAtTick = default,
-    VehicleDockBlockReason PhysicalDockBlockReason = VehicleDockBlockReason.None);
+    VehicleDockBlockReason PhysicalDockBlockReason = VehicleDockBlockReason.None)
+{
+    // Only pending demand is aged; assigned cargo retains its admitted class.
+    public LogisticsStockPriority EffectivePriority { get; init; } = Priority;
+}
 
 public readonly record struct AutomatedDistributionMetrics(
     int PolicyCount,

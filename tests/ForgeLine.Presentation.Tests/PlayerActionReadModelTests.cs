@@ -315,7 +315,15 @@ public sealed class PlayerActionReadModelTests
         Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Electronics && t.Target == 24);
         Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Fuel && t.Target == 60);
         Assert.Contains(proposal.Thresholds, t => t.Resource == ResourceIds.Ammunition && t.Target == 40);
-        Assert.All(logistics.Policies, p => Assert.Equal(10, p.DesiredTarget));
+        // New manual drafts use the current 50-unit step policy,
+        // not the former 10-unit default. No inventory demand is created.
+        Assert.All(logistics.Policies, p =>
+        {
+            Assert.False(p.HasPolicy);
+            Assert.Equal(50.0, p.DesiredMinimum);
+            Assert.Equal(100.0, p.DesiredTarget);
+            Assert.Equal(150.0, p.DesiredMaximum);
+        });
     }
 
     [Fact]
@@ -340,6 +348,8 @@ public sealed class PlayerActionReadModelTests
         var live = observed.Requests.Where(r => r.PolicyEntity == policyEntity &&
             r.State != LogisticsTransportRequestState.Completed).ToArray();
         Assert.NotEmpty(live);
+        var policy = Assert.Single(logistics.Policies, p => p.ResourceId == ResourceIds.Fuel);
+        Assert.Equal(Assert.Single(live).EffectivePriority, policy.DispatchPriority);
         Assert.Equal(live.Length, logistics.TotalOrderCount);
         Assert.Equal(live.Length, logistics.Orders.Count);
         foreach (var order in logistics.Orders)
@@ -399,6 +409,8 @@ public sealed class PlayerActionReadModelTests
 
         Assert.True(fuel.HasPolicy);
         Assert.Equal(policyEntity, fuel.PolicyEntity);
+        Assert.Equal(LogisticsStockPriority.High, fuel.Priority);
+        Assert.Equal(LogisticsStockPriority.High, fuel.DispatchPriority);
         Assert.Equal(100.0, fuel.DesiredTarget);
         Assert.True(fuel.CurrentQuantity > 0.0);
 

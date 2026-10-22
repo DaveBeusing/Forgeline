@@ -280,6 +280,7 @@ public readonly record struct PlayerStockPolicyActionReadModel(
     EntityId AssignedTruck)
 {
     public bool HasPolicy => PolicyEntity.IsValid;
+    public LogisticsStockPriority DispatchPriority { get; init; } = Priority;
     public double ReservedQuantity { get; init; }
     public double AvailableQuantity => Math.Max(0, CurrentQuantity - ReservedQuantity);
     public double AnnouncedQuantity { get; init; }
@@ -1421,7 +1422,9 @@ internal static class PlayerActionSnapshotFactory
                 scenario,
                 entities,
                 policyEntity,
+                hasPolicy ? policy.Priority : LogisticsStockPriority.Normal,
                 out PlayerDistributionActionState distributionState,
+                out LogisticsStockPriority dispatchPriority,
                 out LogisticsTransportRequestFailureReason failure,
                 out LogisticsBottleneckReason bottleneck,
                 out EntityId assignedTruck);
@@ -1445,6 +1448,7 @@ internal static class PlayerActionSnapshotFactory
                     bottleneck,
                     Owned(assignedTruck) ? assignedTruck : EntityId.Invalid)
                 {
+                    DispatchPriority = dispatchPriority,
                     ReservedQuantity = scenario.Inventories.GetReservedQuantity(inventory, resource.Id),
                     RequestedQuantity = Outstanding(policyEntity, false),
                     AnnouncedQuantity = Outstanding(policyEntity, true),
@@ -1704,12 +1708,15 @@ internal static class PlayerActionSnapshotFactory
         MatchRuntime scenario,
         EntityRegistry entities,
         EntityId policyEntity,
+        LogisticsStockPriority configuredPriority,
         out PlayerDistributionActionState state,
+        out LogisticsStockPriority dispatchPriority,
         out LogisticsTransportRequestFailureReason failure,
         out LogisticsBottleneckReason bottleneck,
         out EntityId assignedTruck)
     {
         state = PlayerDistributionActionState.None;
+        dispatchPriority = configuredPriority;
         failure = LogisticsTransportRequestFailureReason.None;
         bottleneck = LogisticsBottleneckReason.None;
         assignedTruck = EntityId.Invalid;
@@ -1741,6 +1748,7 @@ internal static class PlayerActionSnapshotFactory
         LogisticsTransportRequestReadModel selected =
             best.Value;
         if (selected.State == LogisticsTransportRequestState.Completed) return;
+        dispatchPriority = selected.EffectivePriority;
         failure = selected.FailureReason;
         bottleneck = selected.BottleneckReason;
         assignedTruck = selected.State is LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit

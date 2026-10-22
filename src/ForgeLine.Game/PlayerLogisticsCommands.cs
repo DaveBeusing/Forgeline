@@ -22,7 +22,8 @@ public enum PlayerLogisticsActionFailureReason : byte
     UnsupportedTarget = 3,
     MissingPolicy = 4,
     InvalidThresholds = 5,
-    ResupplyUnavailable = 6
+    ResupplyUnavailable = 6,
+    InvalidPriority = 7
 }
 
 public sealed class PlayerLogisticsActionCommand : ISimulationCommand
@@ -265,6 +266,12 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
                     PlayerLogisticsActionFailureReason.UnsupportedTarget;
             }
 
+            return;
+        }
+
+        if (!Enum.IsDefined(Priority))
+        {
+            FailureReason = PlayerLogisticsActionFailureReason.InvalidPriority;
             return;
         }
 

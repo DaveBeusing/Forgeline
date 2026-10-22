@@ -31,6 +31,60 @@ public sealed class AutomatedDistributionSystemTests
         Assert.Equal(80, request.RequestedQuantity);
     }
 
+    [Fact]
+    public void ChangingStockPriorityDoesNotReprioritizeAnAssignedShipment()
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 100.0);
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        fixture.AddPolicy(fixture.DestinationEntity, 20, 80, 100, LogisticsStockPriority.High);
+        EntityId truck = fixture.CreateTruck(fixture.SourcePosition);
+
+        fixture.Simulation.AdvanceOneTick();
+        var assigned = Assert.Single(fixture.Distribution.LastDebugSnapshot.Requests);
+        Assert.Equal(LogisticsTransportRequestState.Assigned, assigned.State);
+        Assert.Equal(LogisticsStockPriority.High, assigned.Priority);
+        Assert.Equal(truck, assigned.AssignedTruck);
+
+        EntityId policyEntity = EntityId.Invalid;
+        foreach (EntityId candidate in fixture.Simulation.Entities.Query<LogisticsStockPolicy>())
+        {
+            policyEntity = candidate;
+            break;
+        }
+        Assert.True(policyEntity.IsValid);
+        fixture.Simulation.Entities.SetComponent(
+            policyEntity,
+            new LogisticsStockPolicy(
+                fixture.DestinationEntity, ResourceIds.FerrousOre,
+                20, 80, 100, LogisticsStockPriority.Low));
+        fixture.Simulation.AdvanceOneTick();
+
+        var shipment = fixture.Distribution.LastDebugSnapshot.Requests
+            .Single(request => request.RequestId == assigned.RequestId);
+        Assert.True(shipment.State is LogisticsTransportRequestState.Assigned or
+            LogisticsTransportRequestState.InTransit);
+        Assert.Equal(LogisticsStockPriority.High, shipment.Priority);
+        Assert.Equal(LogisticsStockPriority.High, shipment.EffectivePriority);
+        Assert.Equal(truck, shipment.AssignedTruck);
+        Assert.Equal(100, fixture.TotalConservedQuantity(truck));
+        Assert.Equal(LogisticsStockPriority.Low,
+            fixture.Simulation.Entities.GetComponent<LogisticsStockPolicy>(policyEntity).Priority);
+    }
+
+    [Fact]
+    public void WaitingLowPriorityDemandReportsItsAgedSchedulingClass()
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 0.0);
+        fixture.AddPolicy(fixture.DestinationEntity, 20, 80, 100, LogisticsStockPriority.Low);
+        fixture.Simulation.RunTicks(61, TestContext.Current.CancellationToken);
+
+        var request = Assert.Single(fixture.Distribution.LastDebugSnapshot.Requests);
+        Assert.Equal(LogisticsTransportRequestState.RetryPending, request.State);
+        Assert.Equal(LogisticsStockPriority.Low, request.Priority);
+        Assert.Equal(LogisticsStockPriority.High, request.EffectivePriority);
+        Assert.Equal(0, fixture.Distribution.Metrics.CommittedDispatchCountThisTick);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
