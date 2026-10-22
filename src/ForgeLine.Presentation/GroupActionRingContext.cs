@@ -10,14 +10,26 @@ public sealed class GroupActionRingContext
 {
     private readonly EntityId[] _members;
     private readonly int[] _counts;
-    private GroupActionRingContext(EntityId[] members, int selected, int[] counts, SimulationTick tick, bool hasFacts)
-    { _members = members; SelectedCount = selected; _counts = counts; Tick = tick; HasOperationalFacts = hasFacts; }
+    private readonly EntityId[] _convoyTrucks;
+    private readonly EntityId[] _convoyEscorts;
+    private GroupActionRingContext(EntityId[] members, int selected, int[] counts, SimulationTick tick,
+        bool hasFacts, EntityId[] trucks, EntityId[] escorts)
+    {
+        _members = members; SelectedCount = selected; _counts = counts;
+        Tick = tick; HasOperationalFacts = hasFacts;
+        _convoyTrucks = trucks; _convoyEscorts = escorts;
+    }
+    public bool CanCreateCargoConvoy => _convoyTrucks.Length >= 2;
+    public ReadOnlySpan<EntityId> ConvoyTrucks => _convoyTrucks;
+    public ReadOnlySpan<EntityId> ConvoyEscorts => _convoyEscorts;
     public bool HasOperationalFacts { get; }
     public int Count => _members.Length;
     public int SelectedCount { get; }
     public SimulationTick Tick { get; }
     public EntityId Representative => Count == 0 ? default : _members[0];
-    public int Participants(int control) => control is >= 0 and < 12 ? _counts[control] : 0;
+    public int Participants(int control) =>
+        control == 11 && CanCreateCargoConvoy ? _convoyTrucks.Length :
+        control is >= 0 and < 12 ? _counts[control] : 0;
     public static string Label(int control) => control < 8 ? SelectedCombatGroup.TypeLabel(control) : control switch
     { 8 => "Damaged", 9 => "Supply focus", 10 => "Formation", _ => "Focus group" };
 
@@ -39,7 +51,32 @@ public sealed class GroupActionRingContext
             if (member.HasSupply && member.SupplyStatus is BattlefieldSupplyStatus.Critical or BattlefieldSupplyStatus.Unsupplied) counts[9]++;
             if (member.CombatEligible) counts[10]++;
         }
-        return new(members.ToArray(), selection.Count, counts, snapshot.Tick, operational is not null);
+        var trucks = new List<EntityId>();
+        var escorts = new List<EntityId>();
+        bool eligibleSelection = snapshot.SelectedOrders is { } orders &&
+            orders.MatchesSelection(snapshot.SessionId, selection.Entities);
+        if (eligibleSelection)
+        {
+            foreach (SelectedUnitOrderView order in snapshot.SelectedOrders!.Orders)
+            {
+                if (order.Kind == SelectedUnitOrderKind.Cargo)
+                    trucks.Add(order.Entity);
+                else if (operational is not null &&
+                    operational.TryGet(order.Entity, out var candidate) &&
+                    candidate.CombatEligible)
+                    escorts.Add(order.Entity);
+                else
+                    eligibleSelection = false;
+            }
+        }
+        if (!eligibleSelection || trucks.Count < 2 ||
+            trucks.Count + escorts.Count != members.Count)
+        {
+            trucks.Clear();
+            escorts.Clear();
+        }
+        return new(members.ToArray(), selection.Count, counts, snapshot.Tick,
+            operational is not null, trucks.ToArray(), escorts.ToArray());
     }
 
     public bool MatchesSelection(IReadOnlyList<EntityId>? selected)

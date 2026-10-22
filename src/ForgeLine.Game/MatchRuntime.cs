@@ -28,6 +28,7 @@ public sealed class MatchRuntime : IDisposable
         InventoryStore inventories,
         LogisticsNetwork logistics,
         CargoTransportSystem cargoTransport,
+        CargoConvoySystem cargoConvoys,
         AutomatedDistributionSystem automatedDistribution,
         OperationsRuleSystem operationsRules,
         PowerNetworkSystem power,
@@ -57,6 +58,7 @@ public sealed class MatchRuntime : IDisposable
         Inventories = inventories;
         Logistics = logistics;
         CargoTransport = cargoTransport;
+        CargoConvoys = cargoConvoys;
         AutomatedDistribution = automatedDistribution;
         OperationsRules = operationsRules;
         Power = power;
@@ -99,6 +101,8 @@ public sealed class MatchRuntime : IDisposable
     public LogisticsNetwork Logistics { get; }
 
     public CargoTransportSystem CargoTransport { get; }
+
+    public CargoConvoySystem CargoConvoys { get; }
 
     public AutomatedDistributionSystem AutomatedDistribution { get; }
 
@@ -308,6 +312,7 @@ public sealed class MatchRuntime : IDisposable
                 inventories,
                 navigation, docking) { Progress = progress };
         var operationsRules = new OperationsRuleSystem(simulation, inventories, recipes, battlefieldRuntime.MatchStateEntity);
+        var cargoConvoys = new CargoConvoySystem(logistics);
         var automatedDistribution =
             new AutomatedDistributionSystem(
                 logistics,
@@ -587,6 +592,7 @@ public sealed class MatchRuntime : IDisposable
             suppression,
             automaticResupply,
             formationMovement,
+            cargoConvoys,
             navigation,
             groundMovement,
             new SpatialIndexSystem(
@@ -681,6 +687,7 @@ public sealed class MatchRuntime : IDisposable
             inventories,
             logistics,
             cargoTransport,
+            cargoConvoys,
             automatedDistribution,
             operationsRules,
             power,

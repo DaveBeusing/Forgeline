@@ -11,7 +11,9 @@ public enum PlayerLogisticsActionOperation : byte
     RemoveStockPolicy = 2,
     SetAutomaticResupplyPolicy = 3,
     RequestResupply = 4,
-    SetSupplyPriority = 5
+    SetSupplyPriority = 5,
+    CreateCargoConvoy = 6,
+    DissolveCargoConvoy = 7
 }
 
 public enum PlayerLogisticsActionFailureReason : byte
@@ -23,7 +25,8 @@ public enum PlayerLogisticsActionFailureReason : byte
     MissingPolicy = 4,
     InvalidThresholds = 5,
     ResupplyUnavailable = 6,
-    InvalidPriority = 7
+    InvalidPriority = 7,
+    ConvoyIneligible = 8
 }
 
 public sealed class PlayerLogisticsActionCommand : ISimulationCommand
@@ -42,7 +45,9 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
         double ammunitionThreshold,
         double fuelThreshold,
         BattlefieldSupplyPriority supplyPriority,
-        SimulationTick submittedAtTick)
+        SimulationTick submittedAtTick,
+        EntityId[]? convoyTrucks = null,
+        EntityId[]? convoyEscorts = null)
     {
         if (!issuer.IsSpecified)
         {
@@ -73,7 +78,12 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
         FuelThreshold = fuelThreshold;
         SupplyPriority = supplyPriority;
         SubmittedAtTick = submittedAtTick;
+        _convoyTrucks = convoyTrucks?.ToArray() ?? [];
+        _convoyEscorts = convoyEscorts?.ToArray() ?? [];
     }
+
+    private readonly EntityId[] _convoyTrucks;
+    private readonly EntityId[] _convoyEscorts;
 
     public PlayerLogisticsActionOperation Operation { get; }
 
@@ -108,6 +118,30 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
     public PlayerLogisticsActionFailureReason FailureReason { get; private set; }
 
     public SimulationTick ExecutedAtTick { get; private set; }
+
+    public EntityId CreatedConvoy { get; private set; }
+
+    public ReadOnlySpan<EntityId> ConvoyTrucks => _convoyTrucks;
+
+    public ReadOnlySpan<EntityId> ConvoyEscorts => _convoyEscorts;
+
+    public static PlayerLogisticsActionCommand CreateCargoConvoy(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> trucks,
+        ReadOnlySpan<EntityId> escorts,
+        SimulationTick submittedAtTick) =>
+        new(PlayerLogisticsActionOperation.CreateCargoConvoy, issuer,
+            EntityId.Invalid, EntityId.Invalid, ResourceId.None,
+            0, 0, 0, LogisticsStockPriority.Normal, true, 0, 0,
+            BattlefieldSupplyPriority.Normal, submittedAtTick,
+            trucks.ToArray(), escorts.ToArray());
+
+    public static PlayerLogisticsActionCommand DissolveCargoConvoy(
+        PlayerId issuer, EntityId group, SimulationTick submittedAtTick) =>
+        new(PlayerLogisticsActionOperation.DissolveCargoConvoy, issuer,
+            group, EntityId.Invalid, ResourceId.None,
+            0, 0, 0, LogisticsStockPriority.Normal, true, 0, 0,
+            BattlefieldSupplyPriority.Normal, submittedAtTick);
 
     public static PlayerLogisticsActionCommand SetStockPolicy(
         PlayerId issuer,
@@ -247,6 +281,20 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
 
             case PlayerLogisticsActionOperation.SetSupplyPriority:
                 ExecuteSetSupplyPriority(context);
+                break;
+
+            case PlayerLogisticsActionOperation.CreateCargoConvoy:
+                Accepted = CargoConvoyCommands.TryCreate(context, Issuer,
+                    _convoyTrucks, _convoyEscorts,
+                    out EntityId created, out PlayerLogisticsActionFailureReason createFailure);
+                CreatedConvoy = created;
+                FailureReason = createFailure;
+                break;
+
+            case PlayerLogisticsActionOperation.DissolveCargoConvoy:
+                Accepted = CargoConvoyCommands.TryDissolve(
+                    context, Issuer, Target, out PlayerLogisticsActionFailureReason dissolveFailure);
+                FailureReason = dissolveFailure;
                 break;
 
             default:

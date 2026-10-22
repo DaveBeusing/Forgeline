@@ -61,12 +61,18 @@ internal sealed partial class PlayerActionRingHudRenderer
                 4 => "SOURCE", _ => "DESTINATION"
             } : orderItem ? "ORDER" : unavailableGlobal ? "No target" : slot.Navigation switch
             {
-                ActionRingNavigation.Group => "Group", ActionRingNavigation.GroupControl => GroupActionRingContext.Label(target.ItemIndex),
+                ActionRingNavigation.Group => "Group",
+                ActionRingNavigation.GroupControl =>
+                    target.ItemIndex == 11 && ring.Group?.CanCreateCargoConvoy == true
+                        ? "Create Convoy" : GroupActionRingContext.Label(target.ItemIndex),
                 ActionRingNavigation.Back => "Back", ActionRingNavigation.Close => "Close",
                 ActionRingNavigation.Next => "Next", ActionRingNavigation.Previous => "Prev",
                 ActionRingNavigation.Parameters => "Params", ActionRingNavigation.NextItem => "Next item",
                 _ => mode ? PlayerActionDockHudModel.ResolveModeLabel(target.Mode) :
                     item ? PlayerActionDockHudModel.ResolveRingItemTitle(panel.Mode, target.ItemIndex, actions, geometry.LabelHalfWidth < 38 * scale) :
+                    target.Kind == PlayerActionDockControlKind.Cancel &&
+                    panel.Mode == PlayerActionPanelMode.Logistics &&
+                    actions?.Logistics?.SelectedConvoy is not null ? "DISBAND" :
                     target.Kind == PlayerActionDockControlKind.Activate ? PlayerActionDockHudModel.ResolvePrimaryActionLabel(panel.Mode, target.ItemIndex, actions) :
                     PlayerActionDockHudModel.ResolveFooterLabel(target.Kind, panel.Mode)
             };
@@ -117,6 +123,14 @@ internal sealed partial class PlayerActionRingHudRenderer
                 value.Append(reason.Reason);
             }
             else if (!navigation && !mode && !item) AppendRingParameter(ref value, target.Kind, panel);
+            else if (mode && target.Mode == PlayerActionPanelMode.Logistics &&
+                actions?.Logistics?.SelectedConvoy is { } convoy)
+            {
+                value.Append("CVY ");
+                value.Append(convoy.TruckCount);
+                value.Append(" ");
+                value.Append(PlayerActionDockHudModel.ResolveCargoConvoyStatusLabel(convoy.Status));
+            }
             else if (mode && target.Mode == PlayerActionPanelMode.Logistics && actions?.Logistics is { } logisticsSummary)
             { value.Append("ORDERS "); value.Append(logisticsSummary.TotalOrderCount); }
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));

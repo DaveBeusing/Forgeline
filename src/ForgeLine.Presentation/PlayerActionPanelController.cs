@@ -921,6 +921,15 @@ public sealed partial class PlayerActionPanelController
             return;
         }
 
+        if (Mode == PlayerActionPanelMode.Logistics &&
+            actions.Logistics is { SelectedConvoy: { } selectedConvoy } &&
+            SelectedIndex == 0)
+        {
+            _pendingRequest =
+                PlayerActionRequest.DissolveCargoConvoy(selectedConvoy.Group);
+            return;
+        }
+
         if (Mode ==
                 PlayerActionPanelMode.Logistics &&
             actions.Logistics is

@@ -371,6 +371,7 @@ public sealed class PlayerLogisticsActionReadModel
     public int TotalOrderCount { get; init; }
     public bool HasEnabledGraphNode { get; init; }
     public PlayerCargoFleet CargoFleet { get; init; }
+    public CargoConvoyReadModel? SelectedConvoy { get; init; }
 }
 
 public enum PlayerSupplyProviderState : byte
@@ -1362,6 +1363,22 @@ internal static class PlayerActionSnapshotFactory
                 };
         }
 
+        CargoConvoyReadModel? selectedConvoy = null;
+        if (cargo.HasValue &&
+            entities.TryGetComponent(entity, out CargoConvoyMember convoyMember) &&
+            entities.TryGetComponent(entity, out ControllableEntity convoyOwner))
+        {
+            foreach (CargoConvoyReadModel convoy in scenario.CargoConvoys.CaptureOwned(
+                         entities, convoyOwner.Owner, tick))
+            {
+                if (convoy.Group == convoyMember.Group)
+                {
+                    selectedConvoy = convoy;
+                    break;
+                }
+            }
+        }
+
         if (!hasInventory)
         {
             return cargo.HasValue
@@ -1369,7 +1386,8 @@ internal static class PlayerActionSnapshotFactory
                     entity,
                     [],
                     cargo, service: CaptureService(entity), orders: orderRows)
-                    { CargoFleet = CaptureFleet(), TotalOrderCount = orderTotal }
+                    { CargoFleet = CaptureFleet(), TotalOrderCount = orderTotal,
+                        SelectedConvoy = selectedConvoy }
                 : null;
         }
 
@@ -1474,7 +1492,8 @@ internal static class PlayerActionSnapshotFactory
             HasEnabledGraphNode = scenario.Logistics.TryGetNodeForEntity(entity, out var localNode) &&
                 scenario.Logistics.TryGetNode(localNode, out var graphNode) && graphNode.Enabled,
             CargoFleet = CaptureFleet(),
-            TotalOrderCount = orderTotal
+            TotalOrderCount = orderTotal,
+            SelectedConvoy = selectedConvoy
         };
 
         string Name(EntityId target)

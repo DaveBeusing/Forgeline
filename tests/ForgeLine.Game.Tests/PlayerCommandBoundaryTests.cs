@@ -615,6 +615,36 @@ public sealed class PlayerCommandBoundaryTests
     }
 
     [Fact]
+    public void ConvoyActionBoundaryReportsInvalidMembershipAndStaleGroups()
+    {
+        using MatchRuntime scenario = CreateHumanScenario(seed: 4125);
+        PlayerCommandGateway gateway = CreateGateway(scenario);
+        PlayerId player = scenario.GetBase(new PlayerId(1)).Player;
+
+        Assert.True(PlayerActionRequestDispatcher.TryDispatch(
+            PlayerActionRequest.CreateCargoConvoy([], []),
+            player, gateway, scenario.Simulation.CurrentTick,
+            out PlayerCommandSubmissionReceipt created));
+        Assert.True(created.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out PlayerCommandResultReadModel createResult));
+        Assert.Equal(PlayerCommandFeedbackState.Rejected, createResult.State);
+        Assert.Equal(PlayerLogisticsActionFailureReason.ConvoyIneligible,
+            createResult.ActionFailure);
+
+        Assert.True(PlayerActionRequestDispatcher.TryDispatch(
+            PlayerActionRequest.DissolveCargoConvoy(EntityId.Invalid),
+            player, gateway, scenario.Simulation.CurrentTick,
+            out PlayerCommandSubmissionReceipt dissolved));
+        Assert.True(dissolved.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out PlayerCommandResultReadModel dissolveResult));
+        Assert.Equal(PlayerCommandFeedbackState.Rejected, dissolveResult.State);
+        Assert.Equal(PlayerLogisticsActionFailureReason.InvalidTarget,
+            dissolveResult.ActionFailure);
+    }
+
+    [Fact]
     public void AutomaticResupplyPolicySubmissionUpdatesOwnedUnit()
     {
         using MatchRuntime scenario =
