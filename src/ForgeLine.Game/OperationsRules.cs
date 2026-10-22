@@ -145,14 +145,23 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
     public IReadOnlyList<OperationsRuleReadModel> Capture(PlayerId owner)
     {
         var rows = new List<OperationsRuleReadModel>();
-        foreach (Entry e in _entries)
-            if (e.Definition.Owner == owner)
-                rows.Add(new(e.Definition, e.Revision, e.Enabled, e.Result,
-                    e.LastEvaluated, e.LastFired, e.ActionCount,
-                    e.Enabled && e.Result == OperationsRuleResult.Pending, e.ManagedRequest)
-                { AttemptCount = e.AttemptCount, LastAttempt = e.LastAttempt });
+        foreach (Entry entry in _entries)
+            if (entry.Definition.Owner == owner) rows.Add(ToReadModel(entry));
         return Array.AsReadOnly(rows.ToArray());
     }
+
+    internal IReadOnlyList<OperationsRuleReadModel> CaptureAll()
+    {
+        var rows = new OperationsRuleReadModel[_entries.Count];
+        for (int i = 0; i < rows.Length; i++) rows[i] = ToReadModel(_entries[i]);
+        return Array.AsReadOnly(rows);
+    }
+
+    private static OperationsRuleReadModel ToReadModel(Entry entry) =>
+        new(entry.Definition, entry.Revision, entry.Enabled, entry.Result,
+            entry.LastEvaluated, entry.LastFired, entry.ActionCount,
+            entry.Enabled && entry.Result == OperationsRuleResult.Pending, entry.ManagedRequest)
+        { AttemptCount = entry.AttemptCount, LastAttempt = entry.LastAttempt };
 
     internal OperationsRuleResult Apply(
         SimulationContext context, OperationsRuleOperation operation,
