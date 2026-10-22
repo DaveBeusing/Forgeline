@@ -16,6 +16,7 @@ internal sealed class ResourceDepositFieldComposer(ITerrainQuery terrain, Runtim
     private readonly HashSet<EntityId> _seen = [];
     private readonly List<EntityId> _expired = [];
     private EntityRegistry? _registry;
+    internal int CachedDepositCount => _cache.Count;
 
     internal static ResourceDepositFieldComposer Create(MatchRuntime scenario, RuntimeAssetCatalog? assets)
     {
@@ -33,16 +34,24 @@ internal sealed class ResourceDepositFieldComposer(ITerrainQuery terrain, Runtim
         _seen.Clear();
         int deposits = 0;
         foreach (ref readonly var instance in instances)
-            if (Eligible(instance, entities, out _)) deposits++;
+        {
+            if (!Eligible(instance, entities, out _)) continue;
+            deposits++;
+            if (deposits <= ResourceDepositFieldComposition.MaximumCachedDeposits) _seen.Add(instance.Entity);
+        }
         // Every admitted field receives the same quota. No dictionary ordering,
         // first-family preference, camera distance or render-pass budget influences layout.
-        int quota = deposits == 0 ? 0 : Math.Min(ResourceDepositFieldComposition.MaximumClustersPerDeposit,
+        int quota = deposits == 0 || deposits > ResourceDepositFieldComposition.MaximumCachedDeposits ? 0 : Math.Min(ResourceDepositFieldComposition.MaximumClustersPerDeposit,
             ResourceDepositFieldComposition.MaximumSnapshotClusters / deposits);
+        // Retire before admitting new parents, including complete viewer/session changes.
+        _expired.Clear();
+        foreach (var entity in _cache.Keys)
+            if (quota == 0 || !_seen.Contains(entity)) _expired.Add(entity);
+        foreach (var entity in _expired) _cache.Remove(entity);
         foreach (ref var instance in instances)
         {
             instance = instance with { ResourceField = null };
             if (quota == 0 || !Eligible(instance, entities, out var deposit)) continue;
-            _seen.Add(instance.Entity);
             if (!_cache.TryGetValue(instance.Entity, out var entry) || entry.Bounds.Minimum != deposit.Bounds.Minimum ||
                 entry.Bounds.Maximum != deposit.Bounds.Maximum ||
                 entry.Resource != deposit.ResourceId || entry.Quota != quota)
@@ -62,11 +71,6 @@ internal sealed class ResourceDepositFieldComposer(ITerrainQuery terrain, Runtim
             }
             instance = instance with { ResourceField = entry.Field };
         }
-        // Hidden/recycled parents cannot retain visible metadata or consume cache slots.
-        _expired.Clear();
-        foreach (var entity in _cache.Keys)
-            if (!_seen.Contains(entity)) _expired.Add(entity);
-        foreach (var entity in _expired) _cache.Remove(entity);
     }
 
     private static bool Eligible(in RenderInstance instance, EntityRegistry entities, out ResourceDeposit deposit)

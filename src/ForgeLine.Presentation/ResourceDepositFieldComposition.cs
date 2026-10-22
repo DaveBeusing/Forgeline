@@ -24,6 +24,8 @@ internal static class ResourceDepositFieldComposition
         ["inclusion_reef", "split_matrix", "radial_inclusions", "faulted_pocket"]
     ];
     private static readonly string[] Families = ["ferrous_ore", "silicates", "volatiles", "rare_elements"];
+    private static readonly Vector3[] TintMinimum = [new(.94f, .92f, .90f), new(.94f, .95f, .94f), new(.93f, .96f, .96f), new(.95f, .93f, .96f)];
+    private static readonly Vector3[] TintMaximum = [new(1.04f, 1.02f, 1), new(1.03f, 1.04f, 1.02f), new(1.01f, 1.03f, 1.04f), new(1.03f, 1.01f, 1.04f)];
 
     internal static bool Supports(ResourceId resource) => Family(resource) >= 0;
 
@@ -37,6 +39,7 @@ internal static class ResourceDepositFieldComposition
         Vector3 extent = bounds.Maximum - bounds.Minimum;
         if (!Finite(extent) || extent.X < .5f || extent.Z < .5f) return [];
         int desired = Math.Clamp((int)Math.Min(24, (double)extent.X * extent.Z / 140), 6, MaximumClustersPerDeposit);
+        desired = Math.Max(6, desired - (int)(Sample(identity, resource, 0, "field-count") * 5));
         int count = Math.Min(desired, budget);
         var result = new List<ResourceDepositFieldCluster>(count);
         float vein = Sample(identity, resource, 0, "field-vein") * MathF.Tau;
@@ -71,8 +74,8 @@ internal static class ResourceDepositFieldComposition
             string material = $"material.world.resource.{Families[family]}";
             // Pair admission is metadata-only. GPU resources still belong to the render owner.
             string mesh = HasPair(assets, variant, material) ? variant : canonical;
-            float tint = .94f + Sample(identity, resource, ordinal, "tint") * .08f;
-            result.Add(new(ordinal, transform, mesh, mesh + "_lod1", new(tint, tint, tint, 1), ordinal % 4 == 0));
+            Vector3 tint = Vector3.Lerp(TintMinimum[family], TintMaximum[family], Sample(identity, resource, ordinal, "tint"));
+            result.Add(new(ordinal, transform, mesh, mesh + "_lod1", new(tint, 1), ordinal % 4 == 0));
         }
         return result.ToArray();
     }

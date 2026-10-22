@@ -75,7 +75,7 @@ internal static class ResourceDepositReferenceScene
         var snapshot = new PresentationSnapshot(extracted.Tick, extracted.TickDuration, extracted.SimulationEntityCount, instances,
             sessionId: extracted.SessionId, playerExperience: experience);
         string fingerprint = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
-            { kind, version = 1, target, instances }, FingerprintOptions)));
+            { kind, version = 2, target, instances }, FingerprintOptions)));
         return new(kind, target, snapshot, default, fingerprint);
     }
 }
