@@ -142,11 +142,24 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                         if (data.Facilities[rowIndex].Entity == view.Selected) { selected = data.Facilities[rowIndex]; break; }
                     if (selected is { } detail)
                     {
-                        Line(detail.Explanation);
+                        var currentDiagnosis = OperationsDiagnosisSnapshot.Resolve(context.Snapshot);
+                        var diagnosis = OperationsActionGuidance.ForEntity(currentDiagnosis, detail.Entity);
+                        var transport = OperationsActionGuidance.TransportForEntity(currentDiagnosis, detail.Entity);
+                        string nextAction = diagnosis is { } current
+                            ? OperationsActionGuidance.NextAction(current.PrimaryReason) : string.Empty;
+                        if (diagnosis is { } issue && nextAction.Length > 0)
+                        {
+                            b = new(text); b.Append("CAUSE "); b.Append(OperationsDiagnosisSnapshot.Label(issue.PrimaryReason));
+                            b.Append(" / NEXT "); b.Append(nextAction); Line(b.Written);
+                        }
+                        else Line(detail.Explanation);
                         b = new(text); b.Append("STOCK "); Number(ref b, detail.InventoryQuantity); b.Append(" / "); Number(ref b, detail.InventoryCapacity);
                         b.Append(" POWER "); Number(ref b, detail.AllocatedPower); b.Append(" / "); Number(ref b, detail.PowerDemand);
-                        b.Append(" GENMAX "); Number(ref b, detail.GenerationCapacity);
-                        b.Append(" LOAD "); Number(ref b, detail.Utilization, "P0"); Line(b.Written);
+                        if (detail.GenerationCapacity.HasValue)
+                        { b.Append(" GEN "); Number(ref b, detail.GenerationCapacity); }
+                        if (detail.Utilization.HasValue)
+                        { b.Append(" USE "); Number(ref b, detail.Utilization, "P0"); }
+                        Line(b.Written);
                         int routes = 0, unavailable = 0;
                         for (int routeIndex = 0; routeIndex < data.Routes.Count; routeIndex++)
                         {
@@ -155,7 +168,18 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                             { routes++; if (!route.Enabled) unavailable++; }
                         }
                         b = new(text);
-                        if (detail.Service.LoadingQueue is { } loading)
+                        if (transport is { } reported)
+                        {
+                            b.Append("STATE "); b.Append(reported.Status);
+                            if (reported.OutstandingRequestQuantity.HasValue)
+                            { b.Append(" REQUEST "); Number(ref b, reported.OutstandingRequestQuantity); }
+                            if (reported.ConfirmedIncomingQuantity.HasValue)
+                            { b.Append(" CONFIRMED "); Number(ref b, reported.ConfirmedIncomingQuantity); }
+                            if (reported.LoadedCargoQuantity.HasValue)
+                            { b.Append(" LOADED "); Number(ref b, reported.LoadedCargoQuantity); }
+                            Line(b.Written);
+                        }
+                        else if (detail.Service.LoadingQueue is { } loading)
                         { b.Append(LogisticsStatusCatalog.Service(detail.Service)); b.Append(" / WAITING "); b.Number(loading.WaitingCount, "0"); Line(b.Written); }
                         else if (detail.Service.VehicleQueue is { } vehicle)
                         { b.Append(LogisticsStatusCatalog.Service(detail.Service)); b.Append(" / POSITION "); b.Number(vehicle.Position, "0"); Line(b.Written); }
