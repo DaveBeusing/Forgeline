@@ -26,7 +26,8 @@ public readonly record struct CargoConvoyGroup(
     LogisticsNetworkVersion RouteVersion,
     CargoConvoyStatus Status,
     SimulationTick AcceptedAtTick,
-    SimulationTick UpdatedAtTick);
+    SimulationTick UpdatedAtTick,
+    SimulationTick StatusChangedAtTick);
 
 public readonly record struct CargoConvoyMember(EntityId Group);
 
@@ -56,6 +57,7 @@ public sealed class CargoConvoySystem : ISimulationSystem
     private const float DockReleaseMeters = 36.0f;
     private const float EscortFollowSpacingMeters = 12.0f;
     private const ulong EscortRefreshTicks = 12;
+    private const ulong MaximumHoldingTicks = 160;
 
     private readonly LogisticsNetwork _network;
     private readonly List<EntityId> _members = new();
@@ -170,6 +172,13 @@ public sealed class CargoConvoySystem : ISimulationSystem
 
             bool holding = maximumDistanceSquared >
                 MaximumSeparationMeters * MaximumSeparationMeters;
+            if (holding && group.Status == CargoConvoyStatus.Holding &&
+                context.Tick.Value >= group.StatusChangedAtTick.Value &&
+                context.Tick.Value - group.StatusChangedAtTick.Value > MaximumHoldingTicks)
+            {
+                Dissolve(context, groupId);
+                continue;
+            }
             var status = group.Leader != leader ? CargoConvoyStatus.Disrupted :
                 holding ? CargoConvoyStatus.Holding :
                 maximumDistanceSquared > RendezvousMeters * RendezvousMeters
@@ -200,13 +209,22 @@ public sealed class CargoConvoySystem : ISimulationSystem
                 }
 
                 var assignment = context.Entities.GetComponent<CargoConvoyEscort>(escort);
-                if (assignment.LastIssuedAtTick != SimulationTick.Zero &&
-                    TacticalCommandUtilities.TryGetMovementIntent(context, escort, out MovementOrder current) &&
-                    current.AcceptedAtTick != assignment.LastIssuedAtTick)
+                if (assignment.LastIssuedAtTick != SimulationTick.Zero)
                 {
-                    DetachEscort(context, escort);
-                    _escorts.RemoveAt(i);
-                    continue;
+                    bool hasIntent = TacticalCommandUtilities.TryGetMovementIntent(
+                        context, escort, out MovementOrder current);
+                    Vector3 currentPosition = context.Entities
+                        .GetComponent<WorldTransform>(escort).Position;
+                    // A completed arrival can legitimately have no movement order.
+                    // A distant canceled order means manual Stop took ownership.
+                    if (hasIntent && current.AcceptedAtTick != assignment.LastIssuedAtTick ||
+                        !hasIntent && Vector3.DistanceSquared(
+                            currentPosition, assignment.LastFollowTarget) > 25.0f)
+                    {
+                        DetachEscort(context, escort);
+                        _escorts.RemoveAt(i);
+                        continue;
+                    }
                 }
 
                 Vector3 approach = destination.WorldPosition - leaderTransform.Position;
@@ -236,7 +254,9 @@ public sealed class CargoConvoySystem : ISimulationSystem
 
             context.Entities.SetComponent(groupId,
                 group with { Leader = leader, Status = status,
-                    UpdatedAtTick = context.Tick });
+                    UpdatedAtTick = context.Tick,
+                    StatusChangedAtTick = status == group.Status
+                        ? group.StatusChangedAtTick : context.Tick });
         }
     }
 
