@@ -1,4 +1,5 @@
 using ForgeLine.AssetCompiler;
+using ForgeLine.Assets;
 using Xunit;
 
 [assembly: AssemblyFixture(typeof(ForgeLine.Assets.Tests.ProductionAssetFixture))]
@@ -8,7 +9,7 @@ namespace ForgeLine.Assets.Tests;
 /// <summary>Compile immutable repository art once, then isolate each test's runtime files.</summary>
 public sealed class ProductionAssetFixture : IDisposable
 {
-    private static readonly Lazy<(string Root, AssetCompilationResult Result)> Fixture = new(Build);
+    private static readonly Lazy<(string Root, AssetCompilationResult Result, IReadOnlyList<ProductionSourceAsset> Sources)> Fixture = new(Build);
 
     public void Dispose()
     {
@@ -30,14 +31,19 @@ public sealed class ProductionAssetFixture : IDisposable
         return fixture.Result;
     }
 
-    private static (string Root, AssetCompilationResult Result) Build()
+    public static void AssertCatalog(RuntimeAssetCatalog catalog, AssetCompilationResult result) =>
+        ProductionAssetCatalogContract.AssertMatches(Fixture.Value.Sources, catalog.Manifest, result);
+
+    private static (string Root, AssetCompilationResult Result, IReadOnlyList<ProductionSourceAsset> Sources) Build()
     {
         DirectoryInfo? repository = new(AppContext.BaseDirectory);
         while (repository is not null && !File.Exists(Path.Combine(repository.FullName, "ForgeLine.sln")))
             repository = repository.Parent;
         if (repository is null) throw new InvalidOperationException("Cannot locate production source assets.");
         string root = Path.Combine(Path.GetTempPath(), "forgeline-production-fixture-" + Guid.NewGuid().ToString("N"));
-        var result = AssetPipelineCompiler.Compile(Path.Combine(repository.FullName, "assets", "source"), root, clean: true);
-        return (root, result);
+        string sourceRoot = Path.Combine(repository.FullName, "assets", "source");
+        IReadOnlyList<ProductionSourceAsset> sources = ProductionAssetCatalogContract.ReadSources(sourceRoot);
+        var result = AssetPipelineCompiler.Compile(sourceRoot, root, clean: true);
+        return (root, result, sources);
     }
 }
