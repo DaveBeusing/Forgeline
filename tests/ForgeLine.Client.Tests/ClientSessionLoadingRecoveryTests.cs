@@ -6,6 +6,53 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class ClientSessionLoadingRecoveryTests
 {
+    [Theory]
+    [InlineData((int)ClientSessionLoadPhase.ScenarioAssembly)]
+    [InlineData((int)ClientSessionLoadPhase.Replay)]
+    [InlineData((int)ClientSessionLoadPhase.HashVerification)]
+    public void CancelledCandidatePreservesExistingSessionAndAllowsFreshRetry(int phaseValue)
+    {
+        var phase = (ClientSessionLoadPhase)phaseValue;
+        string directory = Path.Combine(Path.GetTempPath(), "ForgeLine.SessionLoading.Tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        try
+        {
+            using var active = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Validation, seed: 966), TestContext.Current.CancellationToken);
+            active.Simulation.RunTicks(128, TestContext.Current.CancellationToken);
+            var checkpoint = MatchPersistenceService.CaptureSave(active);
+            var identity = active.Simulation.SessionId;
+            string path = Path.Combine(directory, "candidate.save.json");
+            MatchPersistenceSerializer.WriteSave(path, checkpoint);
+            byte[] original = File.ReadAllBytes(path);
+            var request = ClientSessionRequest.Load(new LoadGameEntry("candidate", "CANDIDATE", path, 128, LoadGameEntryState.Available));
+            using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+            using (var coordinator = new ClientSessionLoadingCoordinator<ClientLoadedSession>((token, report) =>
+                ClientSessionFactory.CreateOwned(request, progress =>
+                {
+                    report(progress);
+                    if (progress.Phase == phase) cancellation.Cancel();
+                }, token), cancellation.Token))
+            {
+                Assert.True(SpinWait.SpinUntil(() => coordinator.Completed, TimeSpan.FromSeconds(10)));
+                Assert.False(coordinator.TryTake(out _));
+                Assert.Null(coordinator.Failure);
+                coordinator.Dispose();
+                Assert.False(coordinator.WorkerAlive);
+            }
+            Assert.Equal(identity, active.Simulation.SessionId);
+            Assert.Equal(checkpoint.StateSha256, MatchAuthoritativeSnapshot.Capture(active).ComputeSha256());
+            Assert.Equal(original, File.ReadAllBytes(path));
+            using var retry = ClientSessionFactory.CreateOwned(request, _ => { }, TestContext.Current.CancellationToken);
+            Assert.NotEqual(identity, retry.Runtime.Simulation.SessionId);
+            active.Simulation.RunTicks(8, TestContext.Current.CancellationToken);
+            retry.Runtime.Simulation.RunTicks(8, TestContext.Current.CancellationToken);
+            Assert.Equal(MatchAuthoritativeSnapshot.Capture(active).ComputeSha256(),
+                MatchAuthoritativeSnapshot.Capture(retry.Runtime).ComputeSha256());
+        }
+        finally { Directory.Delete(directory, recursive: true); }
+    }
+
     [Fact]
     public void LargeReplayDoesNotBlockTheEventOwner()
     {

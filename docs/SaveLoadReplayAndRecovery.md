@@ -35,7 +35,11 @@ Every save or replay document contains:
 - the serialized payload;
 - a SHA-256 checksum of the payload.
 
-Writes use a temporary file followed by atomic replacement. A partially written temporary file is never treated as the requested save path.
+Writes use a temporary file in the destination directory followed by atomic replacement. Save and replay share a **134,217,728-byte (128 MiB) UTF-8 document budget**, including the complete envelope, indentation, checksum and JSON escaping of the embedded payload. The bound measures the final bytes, not UTF-16 characters or unescaped payload size. In-memory serialization/deserialization share the bound; file reading also checks the opened length and rejects invalid UTF-8.
+
+Content and size are validated before target replacement. Oversize output raises `DocumentTooLarge` with actual/allowed byte counts. Validation, serialization, I/O and cancellation failure preserve the previous bytes; temporary files are cleaned in finally. `WriteSaveCancellable` / `WriteReplayCancellable` check cancellation before work, temporary output and replacement. Cancellation after the replacement commit point cannot undo a completed write. Command history is never truncated. Oversize input is corrupt.
+
+The serializer and direct restore share runtime-free content/schema preflight. Required configuration, collection entries, entity/inventory identities, command metadata, finite coordinates/quantities, embedded checkpoint JSON and state checksum are checked before enabling Load. Positive infinite inventory capacity retains its existing unlimited-capacity meaning; quantities and command values must be finite. Custom composition keys remain opaque until an explicit resolver supplies their content.
 
 The three version boundaries have separate responsibilities:
 
@@ -45,7 +49,7 @@ The three version boundaries have separate responsibilities:
 | Save/replay payload | 6 | Configuration, recorded command history, and checkpoint/replay metadata |
 | Authoritative simulation state | 6 | Deterministic reconstruction and checkpoint comparison |
 
-New captures use payload schema 6 and authoritative schema 6. The reader accepts supported payload schemas 1 through 6, but loading or replaying also requires authoritative schema 6. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
+New captures use payload schema 6 and authoritative schema 6. The reader accepts supported payload schemas 1 through 6, but discovery, loading and replaying also require authoritative schema 6. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
 
 Authoritative schema 6 includes the completed-building combat contract, power-gated radar observations, and building destruction's economic, logistics, and navigation cleanup. These rules change reconstructed entities and simulation outcomes. Saves carrying authoritative state schema 5 and replays declaring `AuthoritativeSchemaVersion = 5` therefore fail with `IncompatibleVersion` before runtime reconstruction, even when their document and checkpoint checksums are valid. Earlier incompatible state schemas remain rejected as well.
 
@@ -132,7 +136,10 @@ Persistence input validation is deliberately a dedicated headless mode. It is no
 - incomplete command history;
 - unsupported command;
 - authoritative state mismatch;
-- RNG state mismatch.
+- RNG state mismatch;
+- document too large (rejected output).
+
+Malformed roots, null payloads, wrong schema types, missing required objects/collections and invalid persisted identities become controlled corrupt-document failures. Unsupported envelope/payload/state schemas are incompatible-version failures; invalid scenario settings use invalid-configuration. Discovery isolates these per file: healthy entries remain Available, incompatible entries disable Load, and other rejected entries are Corrupt with diagnostics. Preview neither deletes files nor mutates a live session.
 
 Checksum/header/schema validation occurs before a runtime is exposed. Runtime reconstruction happens in a temporary scenario that is disposed on any failure.
 
@@ -169,3 +176,17 @@ The full repository build, tests, and existing natural terminal-match validation
 ## Match composition migration
 
 Composition identity and per-player opponent policies remain explicit payload inputs. The supported schema-1 layout migration supplies the preset composition identity and maps its opponent fields; it does not change authoritative simulation semantics. Historical checkpoints from before vehicle docking, physical queues, finite conveyor cargo, or the completed-building combat contract cannot be reconstructed under the current authoritative version. Their saved hashes and fixtures remain rejection coverage. Custom composition recovery requires an explicit key resolver and verifies the reconstructed state before returning it. See [Match Runtime and Scenario Composition](adr/MatchRuntimeAndScenarioComposition.md).
+
+## Intentional pause and host pacing
+
+An accepted paused-to-running transition rebases the monotonic deadline to **now + one full fixed-tick interval** (50 ms at 20 Hz), discarding the partial pre-pause interval. Repeated Resume while running does not postpone it. Paused time creates no catch-up debt; ordinary running lag retains the five-tick catch-up cap.
+
+The application aggregates minimized/empty-window and pause-menu reasons before sending host transitions. Help within the pause shell follows that path. Terminal freeze remains independent of Resume. Recorded controls retain completed-tick order with no wall-clock timestamps.
+
+Controlled-clock host tests cover long/repeated pauses, exact interval behavior, repeated Resume and ordinary lag. Synchronization timeouts retain the real system clock. Existing terminal, command-ownership and shutdown cases remain required. Physical Pause/Help/Minimize overlap, input capture and graphics acceptance remain manual.
+
+## Reliability evidence
+
+Base `master 4f1126dc` (0.1.462-dev) reproduces 10 failed / 4 passed initial boundary cases: malformed content escapes the persistence exception contract or missing members/schemas are accepted. With the original host deadline policy and only controlled clock injection, paused tick 1 becomes tick 3 before the post-resume assertion. The PR records fixed-suite results at their source revisions.
+
+Coverage uses actual active production and pending commands (`MatchPersistenceTests`), loaded adapters with complete generation identity and continued save/replay hashes (`ConveyorEndpointRecoveryTests`), all reconstruction cancellation phases (`CancellableMatchRestorationTests`) and actual client candidate cancellation preserving an existing runtime/file before independent retry (`ClientSessionLoadingRecoveryTests`). Coordinator cases retain exactly-once transfer/disposal and joined worker ownership. These are distinct from physical D3D12 and human UI acceptance.

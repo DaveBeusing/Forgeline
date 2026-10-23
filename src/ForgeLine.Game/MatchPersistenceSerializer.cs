@@ -141,8 +141,9 @@ public static class MatchPersistenceSerializer
         MatchPersistenceDocumentKind expectedKind,
         long maximumBytes = MaximumDocumentBytes)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(
-            document);
+        ArgumentNullException.ThrowIfNull(document);
+        if (string.IsNullOrWhiteSpace(document))
+            throw Failure(MatchPersistenceFailureReason.CorruptDocument, "The match document is empty.");
         CheckSize(document, maximumBytes, MatchPersistenceFailureReason.CorruptDocument);
 
         try

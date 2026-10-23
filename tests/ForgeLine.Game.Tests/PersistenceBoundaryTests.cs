@@ -10,6 +10,18 @@ namespace ForgeLine.Game.Tests;
 public sealed class PersistenceBoundaryTests
 {
     [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("\n\t")]
+    public void EmptyDocumentUsesPersistenceFailure(string document)
+    {
+        Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceSerializer.DeserializeSave(document)).Reason);
+        Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceSerializer.DeserializeReplay(document)).Reason);
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void CompleteEscapedUtf8DocumentUsesOneReadWriteBudget(bool replay)
@@ -113,16 +125,49 @@ public sealed class PersistenceBoundaryTests
 
     [Theory]
     [InlineData("Configuration")]
+    [InlineData("Configuration.Participants")]
+    [InlineData("Configuration.Scenario")]
+    [InlineData("Configuration.Scenario.OpponentConfigurations")]
     [InlineData("Commands")]
     [InlineData("State")]
+    [InlineData("State.Entities")]
+    [InlineData("State.Entities.AliveEntities")]
+    [InlineData("State.Entities.ComponentStores")]
+    [InlineData("State.Inventories")]
+    [InlineData("State.Inventories.Inventories")]
+    [InlineData("State.Domains")]
     [InlineData("StateSha256")]
     public void RequiredPayloadMembersCannotBeNull(string member)
     {
         using var runtime = CreateRuntime();
         string document = MatchPersistenceSerializer.SerializeSave(MatchPersistenceService.CaptureSave(runtime));
-        string invalid = Mutate(document, root => root[member] = null);
+        string invalid = Mutate(document, root =>
+        {
+            string[] path = member.Split('.');
+            JsonNode parent = root;
+            foreach (string segment in path[..^1]) parent = parent[segment]!;
+            parent[path[^1]] = null;
+        });
         Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
             Assert.Throws<MatchPersistenceException>(() => MatchPersistenceSerializer.DeserializeSave(invalid)).Reason);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void NullCollectionItemsAndNonFiniteCommandsFailBeforeRuntimeCreation(bool replay)
+    {
+        using var runtime = CreateRuntime();
+        string document = replay ? MatchPersistenceSerializer.SerializeReplay(MatchPersistenceService.CaptureReplay(runtime)) :
+            MatchPersistenceSerializer.SerializeSave(MatchPersistenceService.CaptureSave(runtime));
+        var kind = replay ? MatchPersistenceDocumentKind.Replay : MatchPersistenceDocumentKind.Save;
+        var root = JsonNode.Parse(JsonNode.Parse(document)!["Payload"]!.GetValue<string>())!.AsObject();
+        root["Commands"] = new JsonArray((JsonNode?)null);
+        Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
+            Assert.Throws<MatchPersistenceException>(() => Read(Envelope(root.ToJsonString(), kind), kind)).Reason);
+        root["Commands"] = JsonNode.Parse("[{\"Kind\":1,\"TargetTick\":1,\"Sequence\":1,\"Source\":1,\"RecordingOrder\":1,\"Position\":{\"X\":\"NaN\",\"Y\":0,\"Z\":0}}]");
+        Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
+            Assert.Throws<MatchPersistenceException>(() => Read(Envelope(root.ToJsonString(), kind), kind)).Reason);
     }
 
     [Theory]
