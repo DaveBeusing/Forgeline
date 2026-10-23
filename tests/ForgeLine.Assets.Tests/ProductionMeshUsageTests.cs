@@ -162,6 +162,12 @@ public sealed class ProductionMeshUsageTests
 
     private sealed class MeshWorkspace : IDisposable
     {
+        private static readonly string[] MeshSuffixes =
+        [
+            "", ".lod1", ".flowing", ".flowing.lod1", ".destroyed",
+            ".blocking_volume", ".pick_volume", ".wreck_pick_volume", ".unregistered.selection",
+            ".collision", ".unregistered.collision"
+        ];
         private readonly string _root = Path.Combine(Path.GetTempPath(), "mesh-usage-" + Guid.NewGuid().ToString("N"));
         private readonly List<RuntimeAssetRecord> _records = [];
 
@@ -173,9 +179,7 @@ public sealed class ProductionMeshUsageTests
                  new(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1),
                  new(0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1)],
                 [0, 1, 2], [], [new(0, 3, -1)]);
-            string[] ids = new[] { "", ".lod1", ".flowing", ".flowing.lod1", ".destroyed",
-                    ".blocking_volume", ".pick_volume", ".wreck_pick_volume", ".unregistered.selection",
-                    ".collision", ".unregistered.collision" }
+            string[] ids = MeshSuffixes
                 .Select(static suffix => Prefix + suffix).Append("mesh.contract.visible").ToArray();
             foreach (string id in ids)
             {
