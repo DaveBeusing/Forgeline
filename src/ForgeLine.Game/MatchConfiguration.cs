@@ -257,7 +257,10 @@ public static class SkirmishMatchInitializer
                 startingBase);
         }
 
+        var completedBuildings = new List<EntityId>();
         foreach (EntityId entity in entities.Query<CompletedBuilding>(QueryIterationOrder.StableByEntityIndex))
+            completedBuildings.Add(entity);
+        foreach (EntityId entity in completedBuildings)
         {
             CompletedBuilding building = entities.GetComponent<CompletedBuilding>(entity);
             BuildingCombatInitialization.Initialize(entities, entity, composition.Content.Buildings[building.BuildingId]);
