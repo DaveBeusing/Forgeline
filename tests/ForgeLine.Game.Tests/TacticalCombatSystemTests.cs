@@ -1410,6 +1410,8 @@ public sealed class TacticalCombatSystemTests
     {
         TacticalScenario scenario = CreateScenario(80.0f, registerAutomaticResupply: true,
             registerBattlefieldSupply: true);
+        scenario.Simulation.RegisterSystem(new CombatExecutionSystem(scenario.Weapons,
+            scenario.Inventories, new CombatRuntime()));
         EntityId recipient = CreateCombatUnit(scenario, BluePlayer, BlueFaction, Vector3.Zero,
             addVisualSensor: true, movable: true, attachSupply: true, initialFuel: 10.0);
         EntityId other = CreateCombatUnit(scenario, BluePlayer, BlueFaction, Vector3.Zero);
@@ -1436,6 +1438,8 @@ public sealed class TacticalCombatSystemTests
         Assert.Equal(CombatOrderStatus.Resupplying,
             scenario.Simulation.Entities.GetComponent<TacticalCombatState>(recipient).Status);
         Assert.False(scenario.Simulation.Entities.GetComponent<WeaponState>(recipient).Target.IsValid);
+        AmmunitionState ammunition = scenario.Simulation.Entities.GetComponent<AmmunitionState>(recipient);
+        Assert.Equal(100.0, scenario.Inventories.GetQuantity(ammunition.InventoryId, ResourceIds.Ammunition));
         Assert.True(scenario.Simulation.Entities.GetComponent<TacticalMovementConstraint>(recipient).CanMove);
         if (grouped)
         {
@@ -1448,6 +1452,62 @@ public sealed class TacticalCombatSystemTests
         Assert.Equal(hold ? CombatOrderKind.HoldPosition : CombatOrderKind.AttackMove,
             scenario.Simulation.Entities.GetComponent<CombatOrderState>(recipient).Kind);
         Assert.Equal(enemy, scenario.Simulation.Entities.GetComponent<WeaponState>(recipient).Target);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void ResupplyInterruptionKeepsCurrentIntentAndRejectsRecycledEntities(int interruption)
+    {
+        TacticalScenario scenario = CreateScenario(80, registerAutomaticResupply: true, registerBattlefieldSupply: true);
+        EntityId unit = CreateCombatUnit(scenario, BluePlayer, BlueFaction, Vector3.Zero,
+            addVisualSensor: true, movable: true, attachSupply: true, initialFuel: 10);
+        EntityId other = CreateCombatUnit(scenario, BluePlayer, BlueFaction, Vector3.Zero);
+        EntityId enemy = CreateCombatUnit(scenario, RedPlayer, RedFaction, new Vector3(30, 0, 0));
+        scenario.Simulation.Entities.AddComponent(unit, new AutomaticResupplyPolicy(.2, .2));
+        InventoryId stock = scenario.Inventories.CreateInventory(new InventorySpecification(200, [ResourceIds.Fuel]));
+        Assert.True(scenario.Inventories.Add(stock, ResourceIds.Fuel, 5).Succeeded);
+        EntityId provider = scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(provider, new WorldTransform(new Vector3(5, 0, 0), Quaternion.Identity, Vector3.One));
+        scenario.Simulation.Entities.AddComponent(provider, new SupplyProvider(stock, BluePlayer, 20));
+        var advance = new AttackMoveCommand(BluePlayer, [unit, other], new Vector3(60, 0, 0), SimulationTick.Zero);
+        scenario.Simulation.SubmitCommand(advance, SimulationTick.Zero.Next());
+        scenario.Simulation.AdvanceOneTick();
+        Assert.Equal(CombatOrderStatus.Resupplying, scenario.Simulation.Entities.GetComponent<TacticalCombatState>(unit).Status);
+        EntityId group = scenario.Simulation.Entities.GetComponent<CombatGroupMember>(unit).Group;
+        if (interruption == 0)
+        {
+            Assert.True(scenario.Simulation.Entities.DestroyEntity(provider));
+            EntityId replacement = scenario.Simulation.Entities.CreateEntity();
+            Assert.Equal(provider.Index, replacement.Index);
+            Assert.NotEqual(provider, replacement);
+        }
+        else
+        {
+            Assert.True(scenario.Inventories.Add(stock, ResourceIds.Fuel, 100).Succeeded);
+            if (interruption == 1)
+                scenario.Simulation.SubmitCommand(new HoldPositionCommand(BluePlayer, [unit], scenario.Simulation.CurrentTick),
+                    scenario.Simulation.CurrentTick.Next());
+            else
+            {
+                Assert.True(scenario.Simulation.Entities.DestroyEntity(enemy));
+                EntityId replacement = scenario.Simulation.Entities.CreateEntity();
+                Assert.Equal(enemy.Index, replacement.Index);
+                Assert.NotEqual(enemy, replacement);
+            }
+        }
+        scenario.Simulation.RunTicks(4, TestContext.Current.CancellationToken);
+        Assert.False(scenario.Simulation.Entities.HasComponent<ResupplyOrder>(unit));
+        Assert.Equal(interruption == 1 ? CombatOrderKind.HoldPosition : CombatOrderKind.AttackMove,
+            scenario.Simulation.Entities.GetComponent<CombatOrderState>(unit).Kind);
+        if (interruption != 1)
+            Assert.Equal(group, scenario.Simulation.Entities.GetComponent<CombatGroupMember>(unit).Group);
+        if (interruption == 2)
+        {
+            Assert.False(scenario.Simulation.Entities.GetComponent<WeaponState>(unit).Target.IsValid);
+            Assert.Equal(CombatOrderStatus.Advancing, scenario.Simulation.Entities.GetComponent<TacticalCombatState>(unit).Status);
+        }
     }
 
     private static TacticalScenario CreateScenario(
