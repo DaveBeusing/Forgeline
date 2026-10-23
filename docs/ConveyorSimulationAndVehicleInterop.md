@@ -209,7 +209,11 @@ a positive `1e-10` shipment with exact per-hop equality. No epsilon deletes carg
 Fuel consumption is accounted from real vehicle displacement in the field-supply
 chain; the Gameplay-start invariant covers the five belt-compatible resources.
 
-## Executed evidence
+## Historical implementation evidence
+
+The results in this section and the measurements below precede synchronization
+with master `4f1126dc`. They retain their original source identities and do not
+qualify the synchronized branch. See the integration checkpoint below.
 
 | Scenario | Implementation commit | Executed result | Remaining native acceptance |
 | --- | --- | --- | --- |
@@ -320,7 +324,7 @@ truck states also match the local after-correction report. This hosted run uses
 Ubuntu 24.04.5, .NET 10.0.13 and four visible processors; its timings are a separate
 host measurement and are not substituted into the paired comparison above.
 
-## Independent integration dependencies
+## Historical integration dependencies
 
 The unchanged baseline has a convoy command-precedence defect tracked by
 [#334](https://github.com/DaveBeusing/Forgeline/issues/334). In
@@ -357,12 +361,33 @@ source's [Frame run 39988636471](https://github.com/DaveBeusing/Forgeline/action
 independently reproduces the four #339 Operations failures. Subsequent PR checks are
 reported in the PR; a checkpoint failure or an unreached gate is never recorded as a pass.
 
-PR #340 also changes building lifecycle cleanup and explicit reattachment of occupied
-adapters after building replacement. The branches retain separate ownership of those
-changes. Integration must preserve both its lifecycle/reattachment behavior and this
-PR's full-generation attachment inheritance, reconcile shared workflow/distribution
-edits, and apply the one-PATCH rule against master in merge order. Neither feature
-branch is an alternative integration base.
+## Synchronized integration checkpoint
+
+PR #340 is integrated into master `4f1126dcbeef9f41d3ffae0be6c0fc6951f71d46`.
+Conveyor branch source `006dcd83300685ef51a7f663dc035cb65c160194` merges that exact
+master while preserving the seven existing conveyor commits. The existing Operations
+fixture and convoy command-precedence corrections are now present; the historical
+#334/#339 failures above are not assertions about the synchronized source.
+
+The shared construction path inherits a live adapter's full-generation attachment
+when no endpoint override is supplied. Explicit replacement of a dead endpoint with
+a matching live owned port preserves the occupied adapter entity, cargo, damage and
+supports. A missing override cannot silently bind a reused building index. Both the
+attachment-inheritance and occupied-reconnection regression groups remain in the
+focused conveyor workflow.
+
+Distribution retains accepted-load/destination accounting together with building
+destruction cleanup. Both industrial/radar and conveyor/inventory focused CI gates
+are retained. No required Windows/WARP, complete solution, package, recovery or natural
+terminal gate is removed. The synchronized branch uses master's authoritative schema
+6 and explicit schema-5 rejection; conveyor integration adds no new persisted fields
+or schema transition.
+
+The repository version-preparation script advances current master `0.1.462-dev` to
+`0.1.463-dev`, one PATCH for this PR after synchronization. Current-source CI must
+complete again. Earlier 117-test and 24-case successes above remain historical
+evidence and cannot substitute for those runs. Physical D3D12 driving, visual review
+and reference-hardware performance remain open under the acceptance boundary below.
 
 ## Reproduction and acceptance boundaries
 
