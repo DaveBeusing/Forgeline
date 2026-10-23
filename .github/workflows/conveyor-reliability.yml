@@ -1,0 +1,82 @@
+name: Conveyor reliability
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'src/ForgeLine.Core/**'
+      - 'src/ForgeLine.Ecs/**'
+      - 'src/ForgeLine.Economy/**'
+      - 'src/ForgeLine.Game/**'
+      - 'src/ForgeLine.Logistics/**'
+      - 'src/ForgeLine.Navigation/**'
+      - 'src/ForgeLine.Simulation/**'
+      - 'src/ForgeLine.World/**'
+      - 'tests/ForgeLine.Game.Tests/**'
+      - 'tests/ForgeLine.Simulation.Tests/**'
+      - 'benchmarks/ForgeLine.Simulation.Benchmarks/**'
+      - 'benchmarks/ScalabilityMeasurement.cs'
+      - 'Directory.Build.props'
+      - 'Directory.Packages.props'
+      - 'global.json'
+      - '.github/workflows/conveyor-reliability.yml'
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: conveyor-reliability-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: '1'
+  TESTINGPLATFORM_TELEMETRY_OPTOUT: '1'
+  FORGELINE_QUALIFICATION_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  conveyor-flow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          # This independent headless lane has no source-asset or native-client requirement.
+          sparse-checkout: |
+            src
+            tests
+            benchmarks
+            build
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Restore headless qualification projects
+        run: |
+          dotnet restore tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj
+          dotnet restore tests/ForgeLine.Simulation.Tests/ForgeLine.Simulation.Tests.csproj
+          dotnet restore benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj
+      - name: Build headless qualification projects
+        run: |
+          dotnet build tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore
+          dotnet build tests/ForgeLine.Simulation.Tests/ForgeLine.Simulation.Tests.csproj --configuration Release --no-restore
+          dotnet build benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release --no-restore
+      - name: Conveyor, distribution, physical supply and persistence contracts
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class '*Conveyor*' ForgeLine.Game.Tests.AutomatedDistributionSystemTests ForgeLine.Game.Tests.BattlefieldSupplySystemTests ForgeLine.Game.Tests.MatchPersistenceTests --parallel none
+      - name: Inventory quantity and reservation contracts
+        run: dotnet test --project tests/ForgeLine.Simulation.Tests/ForgeLine.Simulation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Simulation.Tests.InventoryStoreTests
+      - name: Warmed conveyor CPU, allocation and live-load qualification
+        # Liveness/conservation gate the report. Timing remains advisory on hosted hardware.
+        env:
+          DOTNET_TieredCompilation: '0'
+        run: dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release --no-build -- --conveyor-measurements artifacts/conveyor-measurements.json
+      - name: Preserve conveyor qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: conveyor-reliability
+          path: artifacts/conveyor-measurements.json
+          if-no-files-found: warn
