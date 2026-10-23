@@ -19,6 +19,10 @@ public sealed class ResourceDepositField
 
 public readonly record struct ResourceDepositFieldCluster(
     int Ordinal, RenderTransform Transform, string MeshAssetId, string ReducedMeshAssetId,
-    Vector4 Tint, bool Crust);
+    Vector4 Tint, bool Crust)
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public ResourceDepositVariantSelection Variant { get; init; }
+}
 
 internal readonly record struct ResourceDepositFieldIdentity(string MapKey, string DepositKey, ulong Salt = 2026);

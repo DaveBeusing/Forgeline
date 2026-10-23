@@ -89,12 +89,13 @@ UI and state-tint compatibility. Authored BaseColor is encoded from target linea
 zone reflectance divided by that factor, then converted to sRGB; this avoids
 accidentally applying the family hue twice.
 
-The additional material IDs are registered inputs for later presentation-only
-selection. This change does not select a new patch from entity IDs, add a seed
-authority or change field composition. A later renderer/composition change can
-map its approved variation index to these existing material IDs; no new shader
-interface is required. Until then the default patch is shared across instances,
-and full per-instance repeat suppression is not claimed.
+The additional material IDs are inputs to the presentation-only
+[resource selector](ResourceDepositRendering.md). It maps approved surface indices
+to these existing IDs through the current shader interface. Canonical IDs still
+select the weathered default. Authored map/deposit keys select fixed root-cluster
+variants. Integrated field composition now supplies the same copied binding contract
+per cluster, with its own stable surface channel. Native field/material qualification
+remains pending. Full repeat suppression is not claimed.
 
 Untouched/Active/Depleted keep their existing authoritative presentation tint.
 Material `emissiveMultiplier` is zero and no resource emissive texture is bound.

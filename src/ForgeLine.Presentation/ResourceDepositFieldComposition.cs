@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using ForgeLine.Assets;
 using ForgeLine.Core;
+using ForgeLine.Game;
 using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
@@ -74,7 +75,15 @@ internal static class ResourceDepositFieldComposition
             // Pair admission is metadata-only. GPU resources still belong to the render owner.
             string mesh = HasPair(assets, variant, material) ? variant : canonical;
             Vector3 tint = Vector3.Lerp(TintMinimum[family], TintMaximum[family], Sample(identity, resource, ordinal, "tint"));
-            result.Add(new(ordinal, transform, mesh, mesh + "_lod1", new(tint, 1), ordinal % 4 == 0));
+            // Add only a copied binding selection; preserve existing field topology,
+            // form/size/rotation/tint channels and depletion/grounding behavior.
+            int sizeIndex = size == "small" ? 0 : size == "medium" ? 1 : 2;
+            int surface = Math.Min(3, (int)(Sample(identity, resource, ordinal, "surface") * 4));
+            result.Add(new(ordinal, transform, mesh, mesh + "_lod1", new(tint, 1), ordinal % 4 == 0)
+            {
+                Variant = ResourceDepositVariantCatalog.SelectAuthored(WorldPresentationIdentity.ForResource(resource).Visual,
+                    layout * 3 + sizeIndex, surface)
+            });
         }
         return result.ToArray();
     }

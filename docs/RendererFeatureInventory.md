@@ -50,28 +50,23 @@ only to the two repeated columns below.
 
 ## Capture coverage
 
-Resource clusters illustrate the difference between authored and wired features.
-`assets/source/world/authoring/resource_clusters/variants.json` declares four
-layouts and three sizes per resource family, with LOD0/1/2 and collision proxies.
-`src/ForgeLine.Presentation/WorldPresentationCatalog.cs` and
-`src/ForgeLine.Presentation/SimpleInstanceRenderer.cs` still select the existing
-High/Reduced pair through the canonical IDs. The default medium geometry is
-wired; extra layouts, sizes and LOD2 are **authored but not dispatched** in live
-gameplay. They are retained assets for a later presentation integration, not
-dead registrations to delete. `tests/ForgeLine.Presentation.Tests/ResourceDepositBlenderMasterTests.cs`
-and `tests/ForgeLine.Assets.Tests/WorldAssetAuthoringTests.cs` provide source and
-catalog contracts; they do not establish variant selection or native acceptance.
-See [resource cluster geometry](ResourceDepositClusterGeometry.md) for the
-unexecuted acceptance matrix and ownership of the remaining work.
+Resource-specific update synchronized with `master` `c8da15fc` (0.1.457): the
+field producer is integrated, and [resource variant rendering](ResourceDepositRendering.md)
+now connects approved layout/size and PBR-surface selections to the ordinary
+instanced High/Reduced path. Twelve forms per family and four surfaces are
+allowlisted; canonical IDs remain fallbacks. Fields preserve their grounded
+transforms, prefix quotas, copied depletion and parent picking identity.
+`ResourceDepositVariantCatalog`, `ResourceDepositVariantSeed`, copied cluster
+metadata and `SimpleInstanceRenderer.Resources` own the runtime binding contract.
+The source `_lod2` and collision proxies remain **authored but not dispatched**.
 
-The later [resource PBR surfaces](ResourceDepositPbrSurfaces.md) integration
-binds family BaseColor/Normal/ORM maps through the stable material IDs and
-existing shader slots. The canonical material selects the weathered patch;
-additional surface material IDs are authored inputs without live per-instance
-dispatch. [Resource visual language](ResourceDepositVisualLanguage.md) defines
-the variation contract, not an implementation of seeded field composition.
-These distinctions survive the PBR integration; new source images do not prove
-new shader interfaces, runtime variant selection or native art acceptance.
+Family BaseColor/Normal/ORM maps use existing shader slots. Per-cluster surface
+selection shares those textures and does not introduce a shader interface.
+New Grass/Rock/Mud inventory and 1,000-input scenes append to the enum; old scene
+IDs and goldens remain intact. Source, variant, field and batching regressions are
+prepared, not executed during this integration. Neither runtime dispatch nor
+source artwork establishes native art, package, residency or performance acceptance;
+the manual matrix and remaining evidence gates are in the rendering document.
 
 `src/ForgeLine.Presentation/VisualReferenceScene.cs` owns the scene enum and
 factory dispatch; `src/ForgeLine.Client/VisualReferenceCapture.cs` owns native

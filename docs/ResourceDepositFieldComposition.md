@@ -98,9 +98,13 @@ family tint endpoints, material IDs and strategic symbols.
 Field binding chooses the fixed `mesh.world.resource.<family>.<layout>.<size>`
 High/Reduced pair only when both manifest mesh records reference exactly the
 correct family material and that material exists. Otherwise each part retains
-the canonical family mesh pair. The renderer also falls back to canonical High
-if a requested part cannot resolve. An unavailable canonical mesh follows the
-controlled missing-3D path, without substituting another resource family.
+the canonical family mesh pair. Copied selection metadata retains the requested
+form and an independent stable surface index through this metadata fallback.
+The [resource renderer](ResourceDepositRendering.md) validates complete runtime
+pairs/materials, falls back to the canonical family pair, and retains canonical
+High only when its Reduced is unavailable. Missing canonical assets are diagnosed
+and omitted without a generic cube or another resource family. Field tint is
+composed once through the same copied instance contract.
 Manifest reading is metadata-only; CPU/GPU asset preparation remains with its
 existing owners. No source file is loaded at runtime. Optional LOD2 stays unused.
 

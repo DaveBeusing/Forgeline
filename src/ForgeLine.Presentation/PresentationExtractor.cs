@@ -26,6 +26,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
     private readonly AxisAlignedBounds? _intelligenceWorldBounds;
     private readonly PresentationExtractionContext? _extraction;
     private readonly RuntimeAssetCatalog? _runtimeAssets;
+    private readonly Dictionary<EntityId, (WorldVisualId Visual, ResourceDepositVariantSelection Selection, Vector3 Tint)> _resourceVariants = [];
     private readonly ResourceDepositFieldComposer? _resourceFields;
     private readonly RenderInstance[] _staticDressing = [];
     private readonly CrossingVisualLayout? _crossingLayout;
@@ -91,6 +92,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
             runtimeAssets)
     {
         _extraction = extraction;
+        _resourceVariants = ResourceDepositVariantSeed.CreateMap(extraction.Scenario);
         _resourceFields = ResourceDepositFieldComposer.Create(extraction.Scenario, runtimeAssets);
         _worldAudio = new();
         _crossingLayout = CrossingVisualLayout.Create(extraction.Scenario.Battlefield, extraction.Scenario.Terrain);
@@ -373,6 +375,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                             worldPresentation.Kind),
                         worldPresentation.Inspectable)
                     : WorldFeaturePresentationMetadata.None;
+
+            if (worldFeature.Kind == WorldPresentationKind.ResourceDeposit &&
+                _resourceVariants.TryGetValue(entity, out var resourceVariant) && resourceVariant.Visual == worldFeature.Visual)
+                worldFeature = worldFeature with { ResourceVariant = resourceVariant.Selection, ResourceTint = resourceVariant.Tint };
 
             UnitFeaturePresentationMetadata unitFeature =
                 ResolveUnitPresentationState(
