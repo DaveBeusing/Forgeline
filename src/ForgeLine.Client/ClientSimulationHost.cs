@@ -49,6 +49,8 @@ internal sealed class ClientSimulationHost : IDisposable
     private readonly ManualResetEventSlim _faulted = new(false);
     private readonly Thread _thread;
     private readonly int _capacity;
+    private readonly TimeProvider _time;
+    private long _nextTickAt;
 
     private ExceptionDispatchInfo? _failure;
     private long _nextHostSequence;
@@ -65,7 +67,8 @@ internal sealed class ClientSimulationHost : IDisposable
         PlayerCommandGateway commands,
         PresentationSnapshotBuffer snapshots,
         int boundaryCapacity = DefaultBoundaryCapacity,
-        bool asynchronousStartup = false)
+        bool asynchronousStartup = false,
+        TimeProvider? timeProvider = null)
     {
         _scenario =
             scenario ??
@@ -93,6 +96,7 @@ internal sealed class ClientSimulationHost : IDisposable
 
         _capacity =
             boundaryCapacity;
+        _time = timeProvider ?? TimeProvider.System;
         _matchStateEntity =
             scenario.BattlefieldRuntime.MatchStateEntity;
 
@@ -485,9 +489,9 @@ internal sealed class ClientSimulationHost : IDisposable
             NotifyProgress();
             UpdateTerminalState();
 
-            long nextTickAt =
-                Stopwatch.GetTimestamp() +
-                ToStopwatchTicks(
+            _nextTickAt =
+                _time.GetTimestamp() +
+                ToHostTicks(
                     _simulation.Clock.TickDuration);
 
             _started.Set();
@@ -511,14 +515,14 @@ internal sealed class ClientSimulationHost : IDisposable
                 }
 
                 long now =
-                    Stopwatch.GetTimestamp();
+                    _time.GetTimestamp();
 
-                if (now < nextTickAt)
+                if (now < _nextTickAt)
                 {
                     TimeSpan wait =
-                        StopwatchElapsed(
+                        HostElapsed(
                             now,
-                            nextTickAt);
+                            _nextTickAt);
 
                     _signal.WaitOne(
                         wait > TimeSpan.FromMilliseconds(16)
@@ -529,7 +533,7 @@ internal sealed class ClientSimulationHost : IDisposable
 
                 int catchUpTicks = 0;
 
-                while (now >= nextTickAt &&
+                while (now >= _nextTickAt &&
                        catchUpTicks <
                        MaximumCatchUpTicks &&
                        !IsPaused &&
@@ -537,10 +541,12 @@ internal sealed class ClientSimulationHost : IDisposable
                        Volatile.Read(ref _stopping) == 0)
                 {
                     DrainMessages();
+                    now = _time.GetTimestamp();
 
                     if (IsPaused ||
                         IsTerminalFrozen ||
-                        Volatile.Read(ref _stopping) != 0)
+                        Volatile.Read(ref _stopping) != 0 ||
+                        now < _nextTickAt)
                     {
                         break;
                     }
@@ -550,20 +556,20 @@ internal sealed class ClientSimulationHost : IDisposable
                     UpdateTerminalState();
 
                     catchUpTicks++;
-                    nextTickAt +=
-                        ToStopwatchTicks(
+                    _nextTickAt +=
+                        ToHostTicks(
                             _simulation.Clock.TickDuration);
                     now =
-                        Stopwatch.GetTimestamp();
+                        _time.GetTimestamp();
                 }
 
                 if (catchUpTicks ==
                         MaximumCatchUpTicks &&
-                    now >= nextTickAt)
+                    now >= _nextTickAt)
                 {
-                    nextTickAt =
+                    _nextTickAt =
                         now +
-                        ToStopwatchTicks(
+                        ToHostTicks(
                             _simulation.Clock.TickDuration);
                 }
             }
@@ -691,6 +697,7 @@ internal sealed class ClientSimulationHost : IDisposable
             return;
         }
 
+        bool wasPaused = IsPaused;
         var command =
             new SetMatchPausedCommand(
                 _matchStateEntity,
@@ -702,6 +709,11 @@ internal sealed class ClientSimulationHost : IDisposable
         {
             return;
         }
+
+        // A real resume starts a full active tick interval. Discard any partial
+        // pre-pause interval without creating simulation debt or replay inputs.
+        if (wasPaused && !paused)
+            _nextTickAt = _time.GetTimestamp() + ToHostTicks(_simulation.Clock.TickDuration);
 
         Volatile.Write(
             ref _paused,
@@ -910,19 +922,25 @@ internal sealed class ClientSimulationHost : IDisposable
         return checked((ulong)value);
     }
 
-    private static long ToStopwatchTicks(
+    private static long ToStopwatchTicks(TimeSpan duration) =>
+        checked((long)Math.Ceiling(duration.TotalSeconds * Stopwatch.Frequency));
+
+    private static TimeSpan StopwatchElapsed(long start, long end) =>
+        TimeSpan.FromSeconds((end - start) / (double)Stopwatch.Frequency);
+
+    private long ToHostTicks(
         TimeSpan duration) =>
         checked(
             (long)Math.Ceiling(
                 duration.TotalSeconds *
-                Stopwatch.Frequency));
+                _time.TimestampFrequency));
 
-    private static TimeSpan StopwatchElapsed(
+    private TimeSpan HostElapsed(
         long start,
         long end) =>
         TimeSpan.FromSeconds(
             (end - start) /
-            (double)Stopwatch.Frequency);
+            (double)_time.TimestampFrequency);
 
     private void ThrowIfDisposed()
     {
