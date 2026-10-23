@@ -142,9 +142,12 @@ internal sealed class OperationsWorldOverlaySurface : IGameplayHudSurface
         if (marker.Diagnosis is { } row)
         {
             if (operations is not null)
-                foreach (var resource in operations.Resources)
+                for (int i = 0; i < operations.Resources.Count; i++)
+                {
+                    var resource = operations.Resources[i];
                     if (resource.Resource == row.Resource)
                     { caption.Append(resource.Name); caption.Append(": "); break; }
+                }
             caption.Append(row.PrimaryReason != OperationsDiagnosisReason.None
                 ? OperationsDiagnosisSnapshot.Label(row.PrimaryReason) : row.Status);
             caption.Number(row.Subject == OperationsDiagnosisSubject.CargoTransport ? " / ON BOARD " : " / LOAD ",

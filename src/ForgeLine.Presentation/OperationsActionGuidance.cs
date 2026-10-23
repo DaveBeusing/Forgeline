@@ -14,8 +14,9 @@ internal static class OperationsActionGuidance
 
         OperationsDiagnosisRow? selected = null;
         int bestPriority = int.MaxValue;
-        foreach (var row in diagnosis.Rows)
+        for (int i = 0; i < diagnosis.Rows.Count; i++)
         {
+            var row = diagnosis.Rows[i];
             if (row.Entity != entity) continue;
             int priority = Priority(row);
             if (priority >= bestPriority) continue;
@@ -36,8 +37,9 @@ internal static class OperationsActionGuidance
 
         OperationsDiagnosisRow? selected = null;
         int bestPriority = int.MaxValue;
-        foreach (var row in diagnosis.Rows)
+        for (int i = 0; i < diagnosis.Rows.Count; i++)
         {
+            var row = diagnosis.Rows[i];
             if (row.Entity != entity) continue;
             int priority = row.Subject switch
             {

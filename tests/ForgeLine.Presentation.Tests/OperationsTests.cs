@@ -444,6 +444,57 @@ public sealed class OperationsTests
     }
 
     [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void WorldOverlayProjectionHasZeroWarmAllocation(bool visible, bool selectedDiagnosis)
+    {
+        EntityId facility = new(12, 3), source = new(14, 2), truck = new(18, 7);
+        var data = new OperationsSnapshot(new(1), new(4), new(1),
+            [Facility(facility), Facility(source)], [new(ResourceIds.Steel, "STEEL", 100, null)],
+            [new(source, facility, 100, true, .7)], 2, 1);
+        var order = new PlayerLogisticsOrderReadModel(new(17), ResourceIds.Steel, "STEEL",
+            LogisticsTransportRequestState.InTransit, LogisticsTransportRequestFailureReason.None,
+            LogisticsBottleneckReason.None, 90, 10, truck, source, facility, "SOURCE", "FACILITY");
+        var actions = selectedDiagnosis ? new PlayerActionSnapshot(new(1), new(4), [], 0,
+            null, null, new PlayerLogisticsActionReadModel(facility, [], null, orders: [order])) : null;
+        EntityId[] selection = selectedDiagnosis ? [facility] : [];
+        RenderInstance[] instances = visible
+            ? [Visible(facility) with { Transform = RenderTransform.Identity with { Position = new(-10, 0, 0) } },
+               Visible(source) with { Transform = RenderTransform.Identity with { Position = new(10, 0, 0) } }]
+            : [];
+        var experience = default(PlayerExperienceSnapshot) with { Player = new(1), Tick = new(4) };
+        var snapshot = new PresentationSnapshot(new(4), TimeSpan.FromMilliseconds(50), instances.Length, instances,
+            sessionId: new(1), playerExperience: experience, operations: data, playerActions: actions)
+        {
+            SelectedOrders = selectedDiagnosis ? new(new(1), new(4), selection, [], string.Empty) : null
+        };
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var graphics = new SelectionOverlayRenderingTests.RecordingContext { Width = 1600, Height = 900 };
+        var information = RtsInformationLayerView.Empty with { SelectedEntities = selection };
+        var context = new GameplayHudRenderContext(graphics, new RtsCamera(), snapshot, default, information,
+            default, default, default, CombatGroupOverviewView.Empty, default, layout, 96, 1, null,
+            Operations: new(true, Selected: facility, Session: new(1)));
+        var overlay = new OperationsWorldOverlay();
+        overlay.Build(context);
+        Assert.Equal(visible ? 2 : 0, overlay.Markers.Length);
+        Assert.Equal(visible ? 1 : 0, overlay.Links.Length);
+        if (visible)
+        {
+            Assert.Equal(facility, overlay.Markers[0].Entity);
+            Assert.Equal(selectedDiagnosis, overlay.Markers[0].Diagnosis.HasValue);
+            Assert.Equal(selectedDiagnosis, overlay.Links[0].Request);
+            Assert.Equal(selectedDiagnosis, overlay.Links[0].Loaded);
+            Assert.Equal(source, overlay.Links[0].Source);
+            Assert.Equal(facility, overlay.Links[0].Destination);
+        }
+        for (int i = 0; i < 128; i++) overlay.Build(context);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 256; i++) overlay.Build(context);
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+    }
+
+    [Theory]
     [InlineData(0)]
     [InlineData(1)]
     [InlineData(10)]
