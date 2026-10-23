@@ -10,6 +10,10 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
+
+_geometry_spec = importlib.util.spec_from_file_location('forgeline_source_geometry', Path(__file__).with_name('source_geometry.py'))
+source_geometry = importlib.util.module_from_spec(_geometry_spec)
+_geometry_spec.loader.exec_module(source_geometry)
 SOURCE = ROOT / 'assets/source/units/directorate'
 spec = importlib.util.spec_from_file_location('directorate_geometry', Path(__file__).with_name('Author-CommandCore.py'))
 geometry = importlib.util.module_from_spec(spec)
@@ -56,7 +60,7 @@ class Mesh(geometry.Mesh):
 
     def belt(self, profile, x0, x1, inset):
         outer=np.asarray(profile,float); centre=outer.mean(0)
-        inner=outer-np.sign(outer-centre)*np.asarray(inset)
+        inner=source_geometry.inset_profile(outer,inset)
         def point(x,q): return np.array([x,q[1],q[0]])
         for k in range(len(outer)):
             j=(k+1)%len(outer); radial=(outer[k]+outer[j])/2-centre

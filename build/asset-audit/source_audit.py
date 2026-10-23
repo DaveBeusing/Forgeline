@@ -20,6 +20,7 @@ import zipfile
 
 import numpy as np
 from PIL import Image
+from catalog_contracts import animation_stats
 
 DTYPES = {5120: '<i1', 5121: '<u1', 5122: '<i2', 5123: '<u2', 5125: '<u4', 5126: '<f4'}
 WIDTHS = {'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4, 'MAT2': 4, 'MAT3': 9, 'MAT4': 16}
@@ -258,7 +259,7 @@ def audit(root: Path) -> dict:
             if d['type'].lower() == 'texture':
                 usage = d.get('textureUsage', 'baseColor').lower()
                 usages[source].add(usage)
-                required = 'linear' if usage in ('normal', 'orm', 'genericdata', 'terraincontrol') else 'srgb'
+                required = 'linear' if usage in ('normal', 'orm', 'genericdata', 'terraincontrol', 'displayimage') else 'srgb'
                 require(d.get('textureColorSpace', 'srgb').lower() == required, f'{usage} texture must use {required} color space')
             require(d.get('scale', 1) == 1, 'non-unit import scale')
         except (ValueError, KeyError, TypeError, OSError) as error:
@@ -297,7 +298,14 @@ def audit(root: Path) -> dict:
                   'kind': 'mesh' if path.suffix.lower() in ('.gltf', '.glb') else 'master' if path.suffix.lower() == '.blend' else 'texture'}
         try:
             if record['kind'] == 'mesh':
-                stats, issues = mesh_stats(*load_mesh(path, root))
+                document, buffers = load_mesh(path, root)
+                if document.get('meshes'):
+                    stats, issues = mesh_stats(document, buffers)
+                    if document.get('animations'):
+                        animation_stats(document, buffers, accessor)
+                else:
+                    record['kind'] = 'animation'
+                    stats, issues = animation_stats(document, buffers, accessor)
             elif record['kind'] == 'texture':
                 stats, issues = texture_stats(path, usages[path])
             else:

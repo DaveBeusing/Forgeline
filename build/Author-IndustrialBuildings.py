@@ -10,6 +10,10 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
+
+_geometry_spec = importlib.util.spec_from_file_location('forgeline_source_geometry', Path(__file__).with_name('source_geometry.py'))
+source_geometry = importlib.util.module_from_spec(_geometry_spec)
+_geometry_spec.loader.exec_module(source_geometry)
 SOURCE = ROOT / 'assets/source/buildings/directorate'
 FAMILIES = ('extractor', 'smelter', 'electronics_plant', 'fuel_refinery', 'ammunition_plant')
 spec = importlib.util.spec_from_file_location('directorate_components', ROOT / 'build/Author-CommandCore.py')
@@ -43,14 +47,8 @@ def pipe(mesh, part, lod):
     sides = part['sides'][lod]
     rings = []
     reference = np.array(part.get('reference', [0,1,0]), float)
-    for i, point in enumerate(points):
-        tangent = points[min(i+1,len(points)-1)] - points[max(0,i-1)]
-        tangent /= np.linalg.norm(tangent)
-        u = np.cross(tangent, reference)
-        if np.linalg.norm(u) < 1e-6:
-            u = np.cross(tangent, [1,0,0])
-        u /= np.linalg.norm(u)
-        v = np.cross(tangent,u)
+    frames = source_geometry.pipe_frames(points, reference)
+    for point, (u, v) in zip(points, frames):
         rings.append([point + part['radius'] * (u*np.cos(k*2*np.pi/sides)+v*np.sin(k*2*np.pi/sides)) for k in range(sides)])
     for i in range(len(points)-1):
         for k in range(sides):
