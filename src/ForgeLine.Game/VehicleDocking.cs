@@ -697,6 +697,10 @@ public sealed partial class VehicleDockingService
         Vector3 maximum = bounds.Maximum;
         if (_terrain is not null && !pose.HasDrivableTerrain(_terrain)) return false;
         if (_spatial is null) return true;
+        float laneHeight = MathF.Max(pose.Entry.Y, MathF.Max(pose.Service.Y, pose.Exit.Y));
+        if (pose.ApproachStart is Vector3 approach) laneHeight = MathF.Max(laneHeight, approach.Y);
+        float vehicleTop = entities.TryGetComponent(truck, out WorldTransform vehicle)
+            ? laneHeight + MathF.Abs(vehicle.Scale.Y) * 0.5f : float.PositiveInfinity;
         _spatial.QueryAabb(new AxisAlignedBounds(minimum, maximum), _neighbors);
         foreach (EntityId neighbor in _neighbors.Results)
         {
@@ -705,6 +709,9 @@ public sealed partial class VehicleDockingService
                 entities.TryGetComponent(neighbor, out SpatialPresence presence))
             {
                 var obstacle = presence.CreateEntry(neighbor, transform).Bounds;
+                if (float.IsFinite(vehicleTop) && vehicleTop < obstacle.Minimum.Y &&
+                    entities.TryGetComponent(neighbor, out ConveyorPiece piece) && !piece.Placement.IsSupport)
+                    continue;
                 if (entities.HasComponent<CargoTransport>(neighbor) || entities.HasComponent<SupplyTruck>(neighbor))
                 {
                     Vector3 right = Vector3.Transform(Vector3.UnitX, transform.Rotation);
@@ -749,3 +756,4 @@ public sealed partial class VehicleDockingService
         else entities.AddComponent(entity, value);
     }
 }
+
