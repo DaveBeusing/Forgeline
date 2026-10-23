@@ -83,17 +83,25 @@ public sealed class OperationsActionGuidanceTests
         Assert.Equal(string.Empty, OperationsActionGuidance.NextAction(OperationsDiagnosisReason.None));
     }
 
-    [Fact]
-    public void RepeatedDiagnosisLookupDoesNotAllocateOnTheRenderPath()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void RepeatedDiagnosisLookupDoesNotAllocateOnTheRenderPath(bool transportOnly)
     {
         var selected = new EntityId(12, 3);
         var diagnosis = new OperationsDiagnosisSnapshot(new(1), new(7), new(1),
         [
-            Row(selected, OperationsDiagnosisReason.NoInput)
+            Row(selected, OperationsDiagnosisReason.NoInput),
+            Row(selected, OperationsDiagnosisReason.None, OperationsDiagnosisSubject.TransportRequest, "InTransit")
         ]);
-        for (int i = 0; i < 256; i++) _ = OperationsActionGuidance.ForEntity(diagnosis, selected);
+        OperationsDiagnosisRow? Lookup() => transportOnly
+            ? OperationsActionGuidance.TransportForEntity(diagnosis, selected)
+            : OperationsActionGuidance.ForEntity(diagnosis, selected);
+        Assert.Equal(transportOnly ? OperationsDiagnosisSubject.TransportRequest : OperationsDiagnosisSubject.Production,
+            Lookup()!.Value.Subject);
+        for (int i = 0; i < 256; i++) _ = Lookup();
         long before = GC.GetAllocatedBytesForCurrentThread();
-        for (int i = 0; i < 512; i++) _ = OperationsActionGuidance.ForEntity(diagnosis, selected);
+        for (int i = 0; i < 512; i++) _ = Lookup();
         Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
     }
 

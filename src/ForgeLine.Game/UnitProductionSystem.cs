@@ -44,6 +44,47 @@ public sealed class UnitProductionSystem : ISimulationSystem
 
     public UnitProductionMetrics Metrics { get; private set; }
 
+    internal void CancelForFacility(EntityRegistry entities, EntityId facilityEntity)
+    {
+        if (entities.TryGetComponent(facilityEntity, out UnitProductionFacility facility))
+        {
+            if (facility.InputsReserved &&
+                _units.TryGet(facility.ActiveUnit, out UnitDefinition? definition))
+                ReleaseReservations(facility.InputInventory, definition);
+            facility.ClearActive();
+            entities.SetComponent(facilityEntity, facility);
+        }
+
+        CollectRequests(entities);
+        foreach (EntityId requestEntity in _requestEntities)
+        {
+            if (entities.GetComponent<UnitProductionRequest>(requestEntity).Facility != facilityEntity)
+                continue;
+            entities.DestroyEntity(requestEntity);
+            _cancelledRequests++;
+        }
+
+        for (int index = _readModels.Count - 1; index >= 0; index--)
+            if (_readModels[index].Entity == facilityEntity)
+                _readModels.RemoveAt(index);
+        int running = 0;
+        int blocked = 0;
+        foreach (UnitProductionFacilityReadModel model in _readModels)
+        {
+            if (model.Status == UnitProductionStatus.Running) running++;
+            else if (model.Status is UnitProductionStatus.NoInput or UnitProductionStatus.NoPower or
+                     UnitProductionStatus.Paused) blocked++;
+        }
+
+        Metrics = Metrics with
+        {
+            FacilityCount = _readModels.Count,
+            RunningFacilityCount = running,
+            BlockedFacilityCount = blocked,
+            CancelledRequests = _cancelledRequests
+        };
+    }
+
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

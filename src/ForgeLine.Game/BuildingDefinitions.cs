@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 
@@ -184,6 +185,12 @@ public sealed record BuildingDefinition
 
     public uint VisualId { get; init; } = 1;
 
+    public double MaximumHealth { get; init; } = 600.0;
+
+    public int TargetPriority { get; init; }
+
+    public ArmorProfileId ArmorProfileId { get; init; }
+
     public double PowerGeneration { get; init; }
 
     public double PowerDemand { get; init; }
@@ -246,6 +253,12 @@ public sealed record BuildingDefinition
         {
             throw new InvalidOperationException(
                 $"Building '{Key}' requires a non-zero visual ID.");
+        }
+
+        if (!double.IsFinite(MaximumHealth) || MaximumHealth <= 0.0)
+        {
+            throw new InvalidOperationException(
+                $"Building '{Key}' requires positive finite durability.");
         }
 
         if (!double.IsFinite(PowerGeneration) || PowerGeneration < 0.0 ||
@@ -454,6 +467,8 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.CommandCore,
+                    MaximumHealth = 1200.0,
+                    TargetPriority = 100,
                     Key = "building.command_core",
                     DisplayName = "Command Core",
                     VisualId = 101,
@@ -477,6 +492,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.PowerPlant,
+                    MaximumHealth = 750.0,
                     Key = "building.power_plant",
                     DisplayName = "Power Plant",
                     VisualId = 102,
@@ -494,6 +510,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.Extractor,
+                    MaximumHealth = 600.0,
                     Key = "building.extractor",
                     DisplayName = "Mine / Extractor",
                     VisualId = 103,
@@ -517,6 +534,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.StorageDepot,
+                    MaximumHealth = 900.0,
                     Key = "building.storage_depot",
                     DisplayName = "Storage Depot",
                     VisualId = 104,
@@ -537,6 +555,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.LogisticsHub,
+                    MaximumHealth = 800.0,
                     Key = "building.logistics_hub",
                     DisplayName = "Logistics Hub",
                     VisualId = 108,
@@ -559,6 +578,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.SupplyDepot,
+                    MaximumHealth = 700.0,
                     Key = "building.supply_depot",
                     DisplayName = "Supply Depot",
                     VisualId = 110,
@@ -582,6 +602,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.Smelter,
+                    MaximumHealth = 900.0,
                     Key = "building.smelter",
                     DisplayName = "Smelter",
                     VisualId = 105,
@@ -605,6 +626,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.Refinery,
+                    MaximumHealth = 800.0,
                     Key = "building.refinery",
                     DisplayName = "Refinery",
                     VisualId = 106,
@@ -628,6 +650,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.ElectronicsPlant,
+                    MaximumHealth = 700.0,
                     Key = "building.electronics_plant",
                     DisplayName = "Electronics Fabricator",
                     VisualId = 107,
@@ -652,6 +675,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.AmmunitionPlant,
+                    MaximumHealth = 800.0,
                     Key = "building.ammunition_plant",
                     DisplayName = "Ammunition Plant",
                     VisualId = 109,
@@ -676,6 +700,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.Barracks,
+                    MaximumHealth = 800.0,
                     Key = "building.barracks",
                     DisplayName = "Barracks",
                     VisualId = 111,
@@ -700,6 +725,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.VehicleFactory,
+                    MaximumHealth = 1100.0,
                     Key = "building.vehicle_factory",
                     DisplayName = "Vehicle Factory",
                     VisualId = 112,
@@ -724,6 +750,7 @@ public static class InitialBuildingDefinitions
                 new BuildingDefinition
                 {
                     Id = BuildingIds.Radar,
+                    MaximumHealth = 500.0,
                     Key = "building.radar",
                     DisplayName = "Radar",
                     VisualId = 113,

@@ -266,6 +266,13 @@ public sealed class ConveyorConstructionService
             if (old.Owner!=owner) return Fail(ConveyorFailure.NotOwned);
             if(request.Edit==ConveyorEdit.Replace)
                 request=request with {Tier=old.Placement.Tier,Orientation=old.Placement.Orientation};
+            if (TryGetAdapterReattachment(entities, owner, request, old, out _))
+            {
+                double cost = ConveyorGeometry.Cost(old.Placement.Module);
+                return new(_stock.GetAvailableQuantity(storage.InventoryId, ResourceIds.Steel) < cost ?
+                    ConveyorFailure.InsufficientStock : ConveyorFailure.None,
+                    Array.AsReadOnly(new[] { old.Placement }), cost);
+            }
             if ((request.Edit is ConveyorEdit.Remove or ConveyorEdit.Replace) &&
                 (!double.IsFinite(old.BufferedQuantity) || old.BufferedQuantity!=0 ||
                  entities.TryGetComponent(request.Target,out ConveyorFlowState held) &&
@@ -483,6 +490,37 @@ public sealed class ConveyorConstructionService
                 Vector3.Dot(port.Facing,socket.Facing)<-.999f);
         }
     }
+
+    private static bool TryGetAdapterReattachment(
+        EntityRegistry entities, PlayerId owner, ConveyorBuildRequest request,
+        ConveyorPiece existing, out EntityId attachment)
+    {
+        attachment = EntityId.Invalid;
+        if (request.Edit != ConveyorEdit.Replace || request.Module != existing.Placement.Module ||
+            request.Module is not (ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter) ||
+            !existing.Attachment.IsValid || entities.IsAlive(existing.Attachment))
+            return false;
+
+        bool output = request.Module == ConveyorModule.OutputAdapter;
+        EntityId replacement = output ? request.DestinationPortBuilding : request.SourcePortBuilding;
+        EntityId opposite = output ? request.SourcePortBuilding : request.DestinationPortBuilding;
+        if (!replacement.IsValid || opposite.IsValid || replacement == existing.Attachment)
+            return false;
+
+        ConveyorSocket[] sockets = existing.Placement.Sockets;
+        ConveyorSocket terminal = output ? sockets[^1] : sockets[0];
+        foreach (ConveyorBuildingPort port in CapturePorts(entities, owner))
+        {
+            if (port.Building != replacement || port.Input != output ||
+                Vector3.DistanceSquared(port.Position, terminal.Position) >= .0004f ||
+                Vector3.Dot(port.Facing, terminal.Facing) >= -.999f)
+                continue;
+            attachment = replacement;
+            return true;
+        }
+        return false;
+    }
+
     private static bool Finite(Vector3 v)=>float.IsFinite(v.X)&&float.IsFinite(v.Y)&&float.IsFinite(v.Z);
     private bool OnRoad(Vector3 p)
     {
@@ -522,6 +560,14 @@ public sealed class ConveyorConstructionService
         else
         {
             if (!_stock.Remove(inventory,ResourceIds.Steel,plan.Steel).Succeeded)return ConveyorFailure.InsufficientStock;
+            if (context.Entities.TryGetComponent(request.Target, out ConveyorPiece adapter) &&
+                TryGetAdapterReattachment(context.Entities, owner, request, adapter, out EntityId replacementAttachment))
+            {
+                // Explicit replacement of a dead full-generation endpoint keeps the paid carrier,
+                // its buffer, damage and supports. Cargo is never discarded to reconnect a line.
+                context.Entities.SetComponent(request.Target, adapter with { Attachment = replacementAttachment });
+                return ConveyorFailure.None;
+            }
             if(request.Edit==ConveyorEdit.Replace)
             {
                 DestroyEmptyBuffer(request.Target);

@@ -93,10 +93,13 @@ public sealed class SelectedUnitOrderTests
                 new RenderTransform(new Vector3(i, 0, 10),
                     Quaternion.Identity, Vector3.One),
                 new RenderMeshHandle(1), RenderMaterialHandle.Default,
-                RenderVisibilityMask.World)).ToArray();
+                RenderVisibilityMask.World,
+                Selectable: new(new PlayerId(1), ControllableEntityCategory.Unit, CanMove: true))).ToArray();
         var buffer = new PresentationSnapshotBuffer();
         buffer.Publish(new PresentationSnapshot(new SimulationTick(20),
-            TimeSpan.FromMilliseconds(50), instances.Length, instances, sessionId: Session)
+            TimeSpan.FromMilliseconds(50), instances.Length, instances, sessionId: Session,
+            playerExperience: default(PlayerExperienceSnapshot) with
+            { Player = new(1), Tick = model.Tick, MatchStatus = PlayerMatchStatus.Active })
         { SelectedOrders = model });
         var world = new RenderWorld();
         Assert.True(world.Update(buffer));
@@ -127,9 +130,12 @@ public sealed class SelectedUnitOrderTests
                 new RenderTransform(new Vector3(10 + 10 * index, 0, 15),
                     Quaternion.Identity, Vector3.One),
                 new RenderMeshHandle(1), RenderMaterialHandle.Default,
-                RenderVisibilityMask.World)).ToArray();
+                RenderVisibilityMask.World,
+                Selectable: new(new PlayerId(1), ControllableEntityCategory.Unit, CanMove: true))).ToArray();
         return new PresentationSnapshot(new SimulationTick(orders.Tick.Value),
-            TimeSpan.FromMilliseconds(50), instances.Length, instances, sessionId: Session)
+            TimeSpan.FromMilliseconds(50), instances.Length, instances, sessionId: Session,
+            playerExperience: default(PlayerExperienceSnapshot) with
+            { Player = new(1), Tick = orders.Tick, MatchStatus = PlayerMatchStatus.Active })
         { SelectedOrders = orders };
     }
 }

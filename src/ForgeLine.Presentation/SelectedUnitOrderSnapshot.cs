@@ -54,6 +54,15 @@ public sealed class SelectedUnitOrderSnapshot
     {
         if (SessionId != session || selected is null || selected.Count != _selected.Length)
             return false;
+        // Render-owner selections are arrays or lists; preserve their order without
+        // creating an interface enumerator on every overlay pass.
+        if (selected is IReadOnlyList<EntityId> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+                if (_selected[i] != list[i])
+                    return false;
+            return true;
+        }
         int index = 0;
         foreach (EntityId entity in selected)
             if (_selected[index++] != entity)

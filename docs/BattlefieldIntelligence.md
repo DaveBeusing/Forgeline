@@ -124,6 +124,46 @@ They do not expose the target identity key.
 
 Radar does not mark terrain as visually visible.
 
+### Powered radar operation
+
+Completed radar structures and any radar entity that declares a `PowerConsumer`
+use the shared `RadarOperation.IsOperational` predicate. An enabled consumer,
+valid logical `PowerNetworkMembership`, and an `OperationalScale` of at least
+`1.0` are required. The current radar has no graded range or scan-rate contract,
+so a brownout pauses scanning until its full demand is allocated. The Directorate
+Radar requires 18 power at Critical priority. A missing consumer on a completed
+radar fails closed; an explicitly disabled consumer or missing membership cannot
+continue scanning from a stale allocation.
+
+The gate applies before cadence and candidate queries. Offline radars generate
+no new contacts, identification, active radar metrics, or debug coverage. Power
+restoration resumes the normal entity-staggered scan schedule, with no catch-up
+burst. Bare mobile radar sensors that do not declare power consumption and all
+passive visual sensors retain their existing power-independent behavior.
+
+Power allocation remains in the canonical Infrastructure phase, after Sensors.
+Sensors therefore consumes the preceding completed allocation. Disabling or
+removing generation before Infrastructure is reflected in that phase and prevents
+radar scans from the following tick. Combat removes a destroyed generator later,
+in EntityLifecycle; the next tick's Infrastructure computes the resulting shortage,
+which gates subsequent Sensors phases. Restoration similarly makes scanning
+eligible after allocation, at the next scheduled scan. Disabling the consumer
+or removing its membership is checked directly and takes effect at the next
+Sensors phase even if the previous allocation was powered. A newly completed
+radar waits for its first allocation before observing anything.
+
+Power loss never deletes learned intelligence. The existing `BeginTick` and
+`IsCurrent` contract makes unrefreshed contacts historical; their last-seen tick,
+last-known position and previously learned identity remain unchanged. A moved
+or newly arrived hidden enemy cannot update that history during the outage.
+
+The copied strategic sensor overlay uses the same operational predicate and
+omits unavailable radar coverage while retaining any passive visual coverage.
+Building presentation reports an unavailable radar as `Unpowered`, including
+missing economic bindings, while preserving existing damage-state precedence.
+Faction filtering remains unchanged: no foreign sensor range or hidden enemy
+transform is published by these status updates.
+
 ## Detection and Identification
 
 Detection and identification are distinct authority levels.
@@ -259,6 +299,14 @@ Automated tests cover:
 - targeting enabled once visual identification becomes current;
 - deterministic lower-frequency radar scan counts;
 - presentation removal of an enemy when identification is lost.
+
+`RadarPowerTests` covers the production `BuildCommand` completion path, no
+generation, sustained generation loss and recovery, disabled consumers, missing
+membership/consumer bindings, zero/partial/full allocations, scan cadence and
+unchanged mobile/passive sensing. Its outage scenario does not depend on combat
+destruction. `RadarPowerPresentationTests` checks matching offline states,
+last-known contact privacy and faction-scoped operational coverage. These
+regressions address [#323](https://github.com/DaveBeusing/Forgeline/issues/323).
 
 ## Performance Coverage
 

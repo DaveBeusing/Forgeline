@@ -98,6 +98,7 @@ public static class GameContentValidator
             buildings,
             resources,
             recipes,
+            armor,
             errors);
         ValidateRequiredUnits(
             faction,
@@ -129,6 +130,7 @@ public static class GameContentValidator
         BuildingDefinitionCatalog buildings,
         ResourceCatalog resources,
         ProductionRecipeCatalog recipes,
+        ArmorCatalog armor,
         List<string> errors)
     {
         var factionIds =
@@ -162,6 +164,12 @@ public static class GameContentValidator
                 definition,
                 recipes,
                 errors);
+            if (definition.ArmorProfileId.IsSpecified &&
+                !armor.TryGet(definition.ArmorProfileId, out _))
+            {
+                errors.Add(
+                    $"Building '{definition.Key}' references unknown armor profile '{definition.ArmorProfileId}'.");
+            }
         }
 
         foreach (BuildingAvailability entry in faction.Buildings)

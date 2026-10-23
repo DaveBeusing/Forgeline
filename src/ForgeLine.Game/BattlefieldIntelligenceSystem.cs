@@ -206,6 +206,11 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                      WorldTransform>(
                          QueryIterationOrder.StableByEntityIndex))
         {
+            if (!RadarOperation.IsOperational(context.Entities, sensorEntity))
+            {
+                continue;
+            }
+
             RadarSensorState sensor =
                 context.Entities.GetComponent<RadarSensorState>(
                     sensorEntity);

@@ -1,4 +1,3 @@
-using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Ecs;
 using ForgeLine.Simulation;
@@ -936,7 +935,8 @@ public sealed class MatchObjectiveSystem : ISimulationSystem
     public static EntityId AttachCommandCoreObjective(
         EntityRegistry entities,
         BattlefieldObjectiveDefinition definition,
-        EntityId commandCore)
+        EntityId commandCore,
+        BuildingDefinition? buildingDefinition = null)
     {
         ArgumentNullException.ThrowIfNull(entities);
 
@@ -952,48 +952,20 @@ public sealed class MatchObjectiveSystem : ISimulationSystem
                 $"Entity {commandCore} is not the completed Command Core for player {definition.Owner}.");
         }
 
-        if (definition.Owner.Value > uint.MaxValue)
-        {
-            throw new InvalidOperationException(
-                $"Player {definition.Owner} cannot be represented as a combat faction.");
-        }
+        BuildingCombatInitialization.Initialize(
+            entities, commandCore,
+            buildingDefinition ?? InitialBuildingDefinitions.CreateCatalog()[BuildingIds.CommandCore]);
 
-        FactionId faction =
-            new((uint)definition.Owner.Value);
-
-        if (!entities.HasComponent<Combatant>(commandCore))
+        foreach (EntityId candidate in entities.Query<CommandCoreObjective>(QueryIterationOrder.StableByEntityIndex))
         {
-            entities.AddComponent(
-                commandCore,
-                new Combatant(faction));
-        }
-
-        if (!entities.HasComponent<Targetable>(commandCore))
-        {
-            entities.AddComponent(
-                commandCore,
-                new Targetable(TargetClass.Structure));
-        }
-
-        if (!entities.HasComponent<HealthState>(commandCore))
-        {
-            entities.AddComponent(
-                commandCore,
-                HealthState.Full(1_500.0));
-        }
-
-        if (!entities.HasComponent<CombatHitbox>(commandCore))
-        {
-            entities.AddComponent(
-                commandCore,
-                CombatHitbox.Default);
-        }
-
-        if (!entities.HasComponent<TargetPriority>(commandCore))
-        {
-            entities.AddComponent(
-                commandCore,
-                new TargetPriority(100));
+            CommandCoreObjective existing = entities.GetComponent<CommandCoreObjective>(candidate);
+            if (existing.Key == definition.Key || existing.CommandCore == commandCore)
+            {
+                if (existing.Key != definition.Key || existing.Owner != definition.Owner ||
+                    existing.CommandCore != commandCore)
+                    throw new InvalidOperationException($"Command Core objective '{definition.Key}' has a conflicting identity.");
+                return candidate;
+            }
         }
 
         EntityId objective =

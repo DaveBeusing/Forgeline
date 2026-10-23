@@ -32,6 +32,47 @@ public sealed class ProductionSystem : ISimulationSystem
 
     public ProductionMetrics Metrics { get; private set; }
 
+    /// <summary>Ends facility-owned work before its inventories leave the simulation.</summary>
+    public void CancelForFacility(EntityRegistry entities, EntityId facilityEntity)
+    {
+        ArgumentNullException.ThrowIfNull(entities);
+        if (entities.TryGetComponent(facilityEntity, out ProductionFacility facility))
+        {
+            ReleaseActiveReservations(in facility);
+            facility.ClearActive();
+            entities.SetComponent(facilityEntity, facility);
+        }
+
+        CollectRequests(entities);
+        foreach (EntityId requestEntity in _requestEntities)
+        {
+            if (entities.GetComponent<ProductionRequest>(requestEntity).Facility != facilityEntity)
+                continue;
+            entities.DestroyEntity(requestEntity);
+            _cancelledRequests++;
+        }
+
+        for (int index = _readModels.Count - 1; index >= 0; index--)
+            if (_readModels[index].Entity == facilityEntity)
+                _readModels.RemoveAt(index);
+        int running = 0;
+        int blocked = 0;
+        foreach (ProductionFacilityReadModel model in _readModels)
+        {
+            if (model.Status == ProductionStatus.Running) running++;
+            else if (model.Status is ProductionStatus.NoInput or ProductionStatus.OutputFull or
+                     ProductionStatus.NoPower or ProductionStatus.Paused) blocked++;
+        }
+
+        Metrics = Metrics with
+        {
+            FacilityCount = _readModels.Count,
+            RunningFacilityCount = running,
+            BlockedFacilityCount = blocked,
+            CancelledRequests = _cancelledRequests
+        };
+    }
+
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

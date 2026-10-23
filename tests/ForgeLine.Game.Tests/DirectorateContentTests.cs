@@ -14,6 +14,36 @@ public sealed class DirectorateContentTests
 {
     private static readonly PlayerId DirectoratePlayer = new(1);
 
+    [Theory]
+    [InlineData(0u, true)]
+    [InlineData(20002u, true)]
+    [InlineData(99999u, false)]
+    public void BuildingArmorReferencesMustResolveWhenSpecified(uint armorProfile, bool valid)
+    {
+        MatchContent content = CentralDivideScenario.CreateComposition().Content;
+        var buildings = new BuildingDefinitionCatalog(
+            content.Buildings.Definitions.Select(definition =>
+                definition.Id == BuildingIds.PowerPlant
+                    ? definition with { ArmorProfileId = new ArmorProfileId(armorProfile) }
+                    : definition));
+
+        void Validate() => GameContentValidator.ValidateDirectorate(
+            DirectorateContent.CreateFactionDefinition(), content.Resources, buildings,
+            content.Units, content.Recipes, content.Weapons, content.Armor, content.Artillery);
+
+        if (valid)
+        {
+            Validate();
+        }
+        else
+        {
+            GameContentValidationException error = Assert.Throws<GameContentValidationException>(Validate);
+            Assert.Contains(error.Errors, message =>
+                message.Contains("building.power_plant", StringComparison.Ordinal) &&
+                message.Contains("unknown armor profile", StringComparison.Ordinal));
+        }
+    }
+
     [Fact]
     public void CompleteDirectorateCatalogPassesCrossCatalogValidation()
     {

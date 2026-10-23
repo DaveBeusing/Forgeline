@@ -258,13 +258,24 @@ def enum_members(path, name):
     return [part.strip().split("=")[0].strip() for part in body.split(",") if part.strip()]
 
 
-GAMEPLAY = dict(zip("Build Process Units Logistics Supply Combat Technology NextItem PrimarySetting SecondarySetting Decrease Increase Activate CancelJob FocusBase Formation Overlay Minimap Pause CorePlacement PowerPlacement ExtractorPlacement StoragePlacement SmelterPlacement RotatePlacement".split(),
-                    "command.build building_role.processing unit_role.infantry unit_role.logistics command.supply command.attack utility.research utility.next_item utility.primary_setting utility.secondary_setting utility.decrease utility.increase status.activate command.cancel building_role.command utility.formation utility.overlay utility.minimap utility.pause building_role.command building_role.power building_role.extraction building_role.storage building_role.processing utility.rotate".split()))
-REQUESTS = dict(zip("BeginBuildingPlacement QueueProduction SetProductionPaused CancelProduction QueueUnitProduction CancelUnitProduction SetStockPolicy RemoveStockPolicy SetAutomaticResupplyPolicy RequestResupply BeginAttackTargeting BeginAttackMoveTargeting SubmitStopCombat SubmitHoldPosition BeginRetreatTargeting BeginFireMissionTargeting CancelFireMission SubmitAttack SubmitAttackMove SubmitRetreat SubmitFireMissionCoordinate SubmitFireMissionContact Surrender SetSupplyPriority SubmitRetreatToRecovery StartTechnologyResearch CancelTechnologyResearch".split(),
-                    "command.build building_role.factory command.production_pause command.cancel_production command.unit_production command.cancel_unit_production command.stock command.remove_stock command.automatic_resupply command.supply command.attack command.attack_move command.stop command.hold command.retreat command.fire_mission command.cancel_fire_mission command.attack command.attack_move command.retreat command.fire_mission command.fire_mission command.surrender command.priority command.recovery utility.research command.cancel_research".split()))
+GAMEPLAY = dict(zip("Build Process Units Logistics Supply Combat Technology NextItem PrimarySetting SecondarySetting Decrease Increase Activate CancelJob FocusBase Formation Overlay Minimap Pause CorePlacement PowerPlacement ExtractorPlacement StoragePlacement SmelterPlacement RotatePlacement Demolish".split(),
+                    "command.build building_role.processing unit_role.infantry unit_role.logistics command.supply command.attack utility.research utility.next_item utility.primary_setting utility.secondary_setting utility.decrease utility.increase status.activate command.cancel building_role.command utility.formation utility.overlay utility.minimap utility.pause building_role.command building_role.power building_role.extraction building_role.storage building_role.processing utility.rotate status.destroyed".split()))
+REQUESTS = dict(zip("BeginBuildingPlacement QueueProduction SetProductionPaused CancelProduction QueueUnitProduction CancelUnitProduction SetStockPolicy RemoveStockPolicy SetAutomaticResupplyPolicy RequestResupply BeginAttackTargeting BeginAttackMoveTargeting SubmitStopCombat SubmitHoldPosition BeginRetreatTargeting BeginFireMissionTargeting CancelFireMission SubmitAttack SubmitAttackMove SubmitRetreat SubmitFireMissionCoordinate SubmitFireMissionContact Surrender SetSupplyPriority SubmitRetreatToRecovery StartTechnologyResearch CancelTechnologyResearch CreateCargoConvoy DissolveCargoConvoy".split(),
+                    "command.build building_role.factory command.production_pause command.cancel_production command.unit_production command.cancel_unit_production command.stock command.remove_stock command.automatic_resupply command.supply command.attack command.attack_move command.stop command.hold command.retreat command.fire_mission command.cancel_fire_mission command.attack command.attack_move command.retreat command.fire_mission command.fire_mission command.surrender command.priority command.recovery utility.research command.cancel_research utility.group command.cancel".split()))
 UTILITY = "settings controls audio muted pause play new_game load save save_return exit return_menu credits display general bindings group rotate research next_item primary_setting secondary_setting decrease increase expand collapse scroll_up scroll_down back forward info formation overlay minimap".split()
 STATUS = "health fuel ammunition power alert damaged maintenance warning critical pending accepted rejected invalid unavailable supplied low unsupplied activate operational construction idle unpowered destroyed partial".split()
 MARKERS = "friendly_unit visible_enemy detected_contact building command_structure resource depot objective selected_group attack_notification".split()
+
+
+def validate_command_bindings():
+    for domain,path,mapping in [
+        ('GameplayAction','src/ForgeLine.Input/GameplayBindingRegistry.cs',GAMEPLAY),
+        ('PlayerActionRequestKind','src/ForgeLine.Game/PlayerActionRequests.cs',REQUESTS)]:
+        expected=set(enum_members(path,domain))-{'None'}
+        missing=expected-set(mapping)
+        unexpected=set(mapping)-expected
+        if missing or unexpected:
+            raise ValueError(f'{domain} artwork bindings differ: missing {sorted(missing)}, unexpected {sorted(unexpected)}')
 
 
 def main():
@@ -272,6 +283,7 @@ def main():
     parser.add_argument("--portraits",type=Path,required=True)
     parser.add_argument("--preview",type=Path,required=True)
     args=parser.parse_args()
+    validate_command_bindings()
     OUT.mkdir(parents=True,exist_ok=True)
     source=(ROOT/'src/ForgeLine.Presentation/RtsInformationLayer.cs').read_text()
     legacy=re.findall(r'Add\(RtsUiIcon\.(\w+), "ui.icon.([^"]+)"',source)

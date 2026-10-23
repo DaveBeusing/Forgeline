@@ -30786,6 +30786,12 @@
       "availability": "runtime_required"
     },
     {
+      "domain": "GameplayAction",
+      "member": "Demolish",
+      "role": "status.destroyed",
+      "availability": "runtime_required"
+    },
+    {
       "domain": "PlayerActionRequestKind",
       "member": "BeginBuildingPlacement",
       "role": "command.build",
@@ -30945,6 +30951,18 @@
       "domain": "PlayerActionRequestKind",
       "member": "CancelTechnologyResearch",
       "role": "command.cancel_research",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "PlayerActionRequestKind",
+      "member": "CreateCargoConvoy",
+      "role": "utility.group",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "PlayerActionRequestKind",
+      "member": "DissolveCargoConvoy",
+      "role": "command.cancel",
       "availability": "runtime_required"
     },
     {

@@ -40,7 +40,7 @@ public static class CentralDivideScenario
             CompositionKey, CentralDivideBattlefield.Create(), content,
             static map => CentralDivideTerrainFactory.Create(map),
             static (entities, inventories, factory, terrain, start, catalogs, stock) =>
-                CentralDivideStartingBaseFactory.Create(entities, inventories, factory, terrain, start, stock, catalogs.Units),
+                CentralDivideStartingBaseFactory.Create(entities, inventories, factory, terrain, start, stock, catalogs.Units, catalogs.Buildings),
             static systems => systems);
     }
 

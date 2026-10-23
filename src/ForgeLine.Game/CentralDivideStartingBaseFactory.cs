@@ -1,5 +1,4 @@
 using System.Numerics;
-using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -39,9 +38,6 @@ public readonly record struct SkirmishStartingBase(
 
 public static class CentralDivideStartingBaseFactory
 {
-    private const double CommandCoreMaximumHealth = 1_200.0;
-    private const int CommandCoreTargetPriority = 100;
-
     public static SkirmishStartingBase Create(
         EntityRegistry entities,
         InventoryStore inventories,
@@ -49,7 +45,8 @@ public static class CentralDivideStartingBaseFactory
         TerrainWorld terrain,
         BattlefieldStartPosition start,
         SkirmishStartingStock? startingStock = null,
-        UnitDefinitionCatalog? unitDefinitions = null)
+        UnitDefinitionCatalog? unitDefinitions = null,
+        BuildingDefinitionCatalog? buildingDefinitions = null)
     {
         ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(inventories);
@@ -178,25 +175,9 @@ public static class CentralDivideStartingBaseFactory
                     0x7000_0000u +
                     (uint)start.Player.Value)));
 
-        entities.AddComponent(
-            commandCore,
-            new Combatant(faction));
-        entities.AddComponent(
-            commandCore,
-            new Targetable(
-                TargetClass.Structure));
-        entities.AddComponent(
-            commandCore,
-            new TargetPriority(
-                CommandCoreTargetPriority));
-        entities.AddComponent(
-            commandCore,
-            HealthState.Full(
-                CommandCoreMaximumHealth));
-        entities.AddComponent(
-            commandCore,
-            new CombatHitbox(
-                coreScale * 0.5f));
+        BuildingCombatInitialization.Initialize(
+            entities, commandCore,
+            (buildingDefinitions ?? InitialBuildingDefinitions.CreateCatalog())[BuildingIds.CommandCore]);
 
         UnitDefinitionCatalog units =
             unitDefinitions ?? DirectorateContent.CreateUnitCatalog();

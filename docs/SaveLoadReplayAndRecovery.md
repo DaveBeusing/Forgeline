@@ -37,12 +37,19 @@ Every save or replay document contains:
 
 Writes use a temporary file followed by atomic replacement. A partially written temporary file is never treated as the requested save path.
 
-The current reader accepts envelope format 1 and payload schema 4. Schema 4
-requires a composition identity and authoritative checkpoint schema 3, including
-vehicle docking and physical queue semantics. The existing schema-1 composition
-migration remains available only with a compatible authoritative checkpoint;
-pre-queue checkpoints are rejected before runtime reconstruction. Unlimited backward
-compatibility is not implied.
+The three version boundaries have separate responsibilities:
+
+| Boundary | Current version | Contract |
+| --- | ---: | --- |
+| Document envelope | 1 | Header, document kind, serialized payload, and payload checksum |
+| Save/replay payload | 6 | Configuration, recorded command history, and checkpoint/replay metadata |
+| Authoritative simulation state | 6 | Deterministic reconstruction and checkpoint comparison |
+
+New captures use payload schema 6 and authoritative schema 6. The reader accepts supported payload schemas 1 through 6, but loading or replaying also requires authoritative schema 6. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
+
+Authoritative schema 6 includes the completed-building combat contract, power-gated radar observations, and building destruction's economic, logistics, and navigation cleanup. These rules change reconstructed entities and simulation outcomes. Saves carrying authoritative state schema 5 and replays declaring `AuthoritativeSchemaVersion = 5` therefore fail with `IncompatibleVersion` before runtime reconstruction, even when their document and checkpoint checksums are valid. Earlier incompatible state schemas remain rejected as well.
+
+This simulation-contract change adds no payload fields or command kinds, so the payload remains at schema 6 and the envelope remains at format 1. No migration rewrites historical checkpoint hashes or treats former combat/radar behavior as current behavior.
 
 ## Save Payload
 
@@ -71,6 +78,7 @@ A replay records:
 - control commands at their original tick boundary;
 - final tick and RNG state;
 - final match lifecycle state;
+- the authoritative simulation schema version;
 - final authoritative-state checksum.
 
 Replay playback creates a fresh runtime, schedules the recorded commands, applies recorded control commands at the matching tick, advances to the recorded final tick, and verifies the final lifecycle, RNG state, and authoritative checksum.
@@ -148,6 +156,7 @@ Repository validation covers:
 - replay reconstruction with recorded player commands;
 - corrupted document rejection;
 - format-version rejection;
+- authoritative schema-5 save/replay rejection before reconstruction;
 - tampered checkpoint rejection;
 - RNG divergence rejection;
 - repeated save/load resource stability;
@@ -155,11 +164,8 @@ Repository validation covers:
 
 The full repository build, tests, and existing natural terminal-match validation remain required alongside the focused persistence checks.
 
+`MatchPersistenceTests.PreIndustrialCombatCheckpointsAreRejectedBeforeReconstruction` covers schema-5 rejection for both saves and replays. Existing `MatchPersistenceTests` and `MatchCompositionTests` retain reconstruction, checksum, composition-resolution, and historical-format coverage. The building combat and radar behavior that motivates the new authoritative version is covered separately by `BuildingCombatInitializationTests`, `BuildingCombatDestructionTests`, and `RadarPowerTests`; changing the version does not replace those behavioral checks.
+
 ## Match composition migration
 
-Composition identity and per-player opponent policies remain in schema 3.
-Vehicle docking changes deterministic movement and transfer timing, so historical
-schema-1/2 checkpoints cannot be reconstructed under the new rules. Their saved
-hashes and fixtures are preserved as rejection coverage. Custom composition
-recovery still requires an explicit key resolver and verifies the reconstructed
-state before returning it. See [Match Runtime and Scenario Composition](adr/MatchRuntimeAndScenarioComposition.md).
+Composition identity and per-player opponent policies remain explicit payload inputs. The supported schema-1 layout migration supplies the preset composition identity and maps its opponent fields; it does not change authoritative simulation semantics. Historical checkpoints from before vehicle docking, physical queues, finite conveyor cargo, or the completed-building combat contract cannot be reconstructed under the current authoritative version. Their saved hashes and fixtures remain rejection coverage. Custom composition recovery requires an explicit key resolver and verifies the reconstructed state before returning it. See [Match Runtime and Scenario Composition](adr/MatchRuntimeAndScenarioComposition.md).

@@ -288,6 +288,9 @@ public sealed class BuildingPlacementService
             EntityId entity = obstructingEntities[index];
             if (!ignoredEntity.IsValid || entity != ignoredEntity)
             {
+                if (IsDisconnectedAdapterAtPort(entities, entity, issuer, definition,
+                        groundPosition, orientation, bounds))
+                    continue;
                 return new BuildingPlacementResult(
                     false,
                     BuildingPlacementFailureReason.Obstructed,
@@ -369,6 +372,37 @@ public sealed class BuildingPlacementService
             orientation,
             bounds,
             deposit) { LoadingCorridor = loadingCorridor };
+    }
+
+    private static bool IsDisconnectedAdapterAtPort(
+        EntityRegistry entities, EntityId entity, PlayerId owner, BuildingDefinition definition,
+        Vector3 groundPosition, BuildingOrientation orientation, AxisAlignedBounds bounds)
+    {
+        if (!entities.TryGetComponent(entity, out ConveyorPiece piece) || piece.Owner != owner ||
+            piece.Placement.Module is not (ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter) ||
+            !piece.Attachment.IsValid || entities.IsAlive(piece.Attachment) ||
+            ConveyorGeometry.Overlap(bounds, piece.Placement.Bounds, inset: .0001f))
+            return false;
+
+        Vector3 dimensions = ConveyorGeometry.BuildingPortDimensions(definition.Id);
+        if (dimensions == default || Vector3.DistanceSquared(dimensions, new Vector3(
+                definition.Footprint.Width, definition.Footprint.Height, definition.Footprint.Depth)) > .001f)
+            return false;
+        bool input = piece.Placement.Module == ConveyorModule.OutputAdapter;
+        if (input && definition.Id == BuildingIds.Extractor ||
+            !input && (definition.Id == BuildingIds.Barracks || definition.Id == BuildingIds.VehicleFactory))
+            return false;
+
+        Quaternion rotation = BuildingFootprint.GetRotation(orientation);
+        float sign = input ? -1 : 1;
+        Vector3 port = groundPosition + Vector3.Transform(new Vector3(sign * dimensions.X / 2, 5.8f, 0), rotation);
+        Vector3 facing = Vector3.Transform(sign * Vector3.UnitX, rotation);
+        ConveyorSocket[] sockets = piece.Placement.Sockets;
+        ConveyorSocket terminal = input ? sockets[^1] : sockets[0];
+        // Only the exact old terminal may touch the replacement footprint. Its attachment remains
+        // stale until the player explicitly reconnects it; all support/interior collisions still apply.
+        return Vector3.DistanceSquared(port, terminal.Position) < .0004f &&
+            Vector3.Dot(facing, terminal.Facing) < -.999f;
     }
 
     private bool IsWithinWorldBounds(in AxisAlignedBounds bounds)

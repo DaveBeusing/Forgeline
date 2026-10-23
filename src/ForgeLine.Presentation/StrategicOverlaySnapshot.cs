@@ -527,7 +527,8 @@ internal static class StrategicOverlaySnapshotFactory
                     entity,
                     out RadarSensorState radar) &&
                 radar.Faction ==
-                    faction)
+                    faction &&
+                RadarOperation.IsOperational(entities, entity))
             {
                 radarRange =
                     radar.DetectionRangeMeters;

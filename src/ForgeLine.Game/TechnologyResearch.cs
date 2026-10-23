@@ -367,6 +367,32 @@ public sealed class TechnologyResearchSystem : ISimulationSystem
 
     public TechnologyResearchMetrics Metrics { get; private set; }
 
+    internal void CancelForDestroyedBuilding(
+        EntityRegistry entities,
+        EntityId facility,
+        IReadOnlyCollection<InventoryId> destroyedInventories)
+    {
+        CollectRequests(entities);
+        foreach (EntityId requestEntity in _requests)
+        {
+            TechnologyResearchRequest request =
+                entities.GetComponent<TechnologyResearchRequest>(requestEntity);
+            if (request.Facility != facility && !destroyedInventories.Contains(request.SourceInventory))
+                continue;
+
+            // Research materials are consumed on commencement; cancellation never refunds them.
+            entities.DestroyEntity(requestEntity);
+            _cancelledRequests++;
+        }
+
+        int blocked = 0;
+        foreach (EntityId requestEntity in entities.Query<TechnologyResearchRequest>())
+            if (entities.GetComponent<TechnologyResearchRequest>(requestEntity).Status ==
+                TechnologyResearchStatus.Blocked) blocked++;
+        Metrics = new TechnologyResearchMetrics(
+            CountActiveRequests(entities), blocked, _completedTechnologies, _cancelledRequests);
+    }
+
     public void Execute(
         SimulationContext context)
     {
