@@ -1,9 +1,11 @@
 using System.Numerics;
 using ForgeLine.Combat;
 using ForgeLine.Core;
+using ForgeLine.Ecs;
 using ForgeLine.Economy;
 using ForgeLine.Logistics;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Game.Tests;
@@ -208,6 +210,81 @@ public sealed class MatchPersistenceTests
                 Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
             }
         }
+    }
+
+    [Fact]
+    public void ActiveDetourRouteRoundTripsThroughSaveAndReplay()
+    {
+        MatchRuntimeSettings settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 7420);
+        MatchComposition basis = settings.Composition;
+        BattlefieldStartPosition[] starts = [CreateStart(1, new Vector3(8, 0, 8)), CreateStart(2, new Vector3(56, 0, 56))];
+        var wall = new AxisAlignedBounds(new Vector3(28.1f, -1, 16.1f), new Vector3(28.9f, 2, 39.9f));
+        var map = new BattlefieldDefinition(new BattlefieldMapMetadata("recovery.detour", "Detour Recovery", 64, 64, 2),
+            starts, [], [], [], [], [], [],
+            starts.Select(start => new BattlefieldObjectiveDefinition($"core.{start.Player.Value}", start.Player, start.CommandCorePosition)).ToArray(),
+            [wall], basis.Battlefield.TerrainVisual);
+        EntityId unit = EntityId.Invalid;
+        Vector3 destination = new(30.5f, 0, 26.5f);
+        MatchComposition composition = basis with
+        {
+            Key = "detour-route-recovery",
+            Battlefield = map,
+            CreateTerrain = _ =>
+            {
+                var grid = new WorldGridSettings { ChunkSizeMeters = 32, HeightSamplesPerSide = 9 };
+                return new TerrainWorld(grid, Enumerable.Range(0, 4).Select(index => new TerrainChunk(
+                    new ChunkCoordinate(index % 2, index / 2), new TerrainHeightfield(9, 32, new float[81]))));
+            },
+            CreateStartingBase = (entities, inventories, factory, terrain, start, content, stock) =>
+            {
+                EntityId core = entities.CreateEntity();
+                entities.AddComponent(core, new CompletedBuilding(BuildingIds.CommandCore, start.Player, SimulationTick.Zero));
+                entities.AddComponent(core, new CommandFacility());
+                EntityId[] units = [];
+                if (start.Player == new PlayerId(1))
+                {
+                    unit = factory.Create(content.Units[UnitIds.RifleSquad], new Vector3(26.5f, 0, 26.5f), start.Player);
+                    units = [unit];
+                }
+                return new SkirmishStartingBase(start.Player, new FactionId((uint)start.Player.Value), core,
+                    EntityId.Invalid, inventories.CreateInventory(new InventorySpecification(1)), units);
+            }
+        };
+        settings = settings with { Composition = composition,
+            Participants = CentralDivideScenario.CreateDefaultParticipants(false, false),
+            Scenario = settings.Scenario with { NavigationCellSizeMeters = 1, NavigationSectorSizeCells = 8 } };
+        using MatchRuntime original = MatchRuntime.Create(settings, TestContext.Current.CancellationToken);
+        original.Simulation.SubmitCommand(new MoveEntitiesCommand(new PlayerId(1), [unit], destination, SimulationTick.Zero), SimulationTick.Zero.Next());
+        original.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        NavigationRouteState route = original.Simulation.Entities.GetComponent<NavigationRouteState>(unit);
+        Assert.Contains(route.Path.RefinedCells, cell => cell.Z < 16 || cell.Z > 39);
+        MatchSaveData save = MatchPersistenceService.CaptureSave(original);
+        MatchReplayData replay = MatchPersistenceService.CaptureReplay(original);
+        MatchComposition Resolve(string key) => key == composition.Key ? composition : throw new InvalidOperationException(key);
+        using MatchRuntime restored = MatchPersistenceService.Restore(MatchPersistenceSerializer.DeserializeSave(
+            MatchPersistenceSerializer.SerializeSave(save)), Resolve);
+        using MatchRuntime playback = MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(
+            MatchPersistenceSerializer.SerializeReplay(replay)), Resolve);
+        VerifyHashes();
+        foreach (ulong ticks in new ulong[] { 1, 7, 12, 600 })
+        {
+            original.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            restored.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            playback.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            VerifyHashes();
+        }
+        Assert.False(original.Simulation.Entities.HasComponent<NavigationPendingPath>(unit));
+        Assert.False(original.Simulation.Entities.HasComponent<NavigationRouteState>(unit));
+        Assert.InRange(Vector3.Distance(destination, original.Simulation.Entities.GetComponent<WorldTransform>(unit).Position), 0, 2);
+
+        void VerifyHashes()
+        {
+            string expected = MatchAuthoritativeSnapshot.Capture(original).ComputeSha256();
+            Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+            Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        }
+        static BattlefieldStartPosition CreateStart(ulong player, Vector3 position) => new(new PlayerId(player), position, position,
+            new AxisAlignedBounds(position - new Vector3(4, 4, 4), position + new Vector3(4, 4, 4)));
     }
 
     [Fact]
