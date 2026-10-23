@@ -538,19 +538,16 @@ public static class MatchPersistenceService
         }
     }
 
-    private static void ValidateSave(
+    internal static void ValidateSave(
         MatchSaveData save)
     {
         ArgumentNullException.ThrowIfNull(save);
 
         ValidateSchema(
             save.SchemaVersion);
-        ArgumentNullException.ThrowIfNull(
-            save.Configuration);
-        ArgumentNullException.ThrowIfNull(
-            save.Commands);
-        ArgumentNullException.ThrowIfNull(
-            save.State);
+        MatchPersistenceValidation.Configuration(save.Configuration);
+        MatchPersistenceValidation.Commands(save.Commands);
+        MatchPersistenceValidation.Require(save.State is not null, "Missing authoritative checkpoint.");
 
         ValidateCommandHistory(
             save.Commands,
@@ -563,6 +560,9 @@ public static class MatchPersistenceService
                 MatchPersistenceFailureReason.IncompatibleVersion,
                 $"Save state schema {save.State.SchemaVersion} is incompatible with state schema {MatchAuthoritativeSnapshot.CurrentSchemaVersion}.");
         }
+
+        MatchPersistenceValidation.State(save.State);
+        MatchPersistenceValidation.Require(MatchPersistenceValidation.Hash(save.StateSha256), "Invalid checkpoint checksum.");
 
         if (save.SavedTick !=
                 save.State.Tick ||
@@ -588,7 +588,7 @@ public static class MatchPersistenceService
         }
     }
 
-    private static void ValidateReplay(
+    internal static void ValidateReplay(
         MatchReplayData replay)
     {
         ArgumentNullException.ThrowIfNull(replay);
@@ -598,17 +598,15 @@ public static class MatchPersistenceService
         if (replay.AuthoritativeSchemaVersion != MatchAuthoritativeSnapshot.CurrentSchemaVersion)
             throw Failure(MatchPersistenceFailureReason.IncompatibleVersion,
                 $"Replay state schema {replay.AuthoritativeSchemaVersion} is incompatible with state schema {MatchAuthoritativeSnapshot.CurrentSchemaVersion}.");
-        ArgumentNullException.ThrowIfNull(
-            replay.Configuration);
-        ArgumentNullException.ThrowIfNull(
-            replay.Commands);
+        MatchPersistenceValidation.Configuration(replay.Configuration);
+        MatchPersistenceValidation.Commands(replay.Commands);
+        MatchPersistenceValidation.Lifecycle(replay.FinalMatchState);
 
         ValidateCommandHistory(
             replay.Commands,
             replay.FinalTick);
 
-        if (string.IsNullOrWhiteSpace(
-                replay.FinalStateSha256))
+        if (!MatchPersistenceValidation.Hash(replay.FinalStateSha256))
         {
             throw Failure(
                 MatchPersistenceFailureReason.CorruptDocument,

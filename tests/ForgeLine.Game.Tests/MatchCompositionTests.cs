@@ -108,9 +108,8 @@ public sealed class MatchCompositionTests
     {
         string document = File.ReadAllText(Path.Combine(AppContext.BaseDirectory,
             "Fixtures", "schema-1-central-divide.replay.json"));
-        MatchReplayData replay = MatchPersistenceSerializer.DeserializeReplay(document);
-        Assert.Equal("848FABF78754FA4136EB56D03B5059B5FAA2EC91F2C145CA2FFA022C7251549B", replay.FinalStateSha256);
-        var error = Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.PlayReplay(replay));
+        Assert.Contains("848FABF78754FA4136EB56D03B5059B5FAA2EC91F2C145CA2FFA022C7251549B", document, StringComparison.Ordinal);
+        var error = Assert.Throws<MatchPersistenceException>(() => MatchPersistenceSerializer.DeserializeReplay(document));
         Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion, error.Reason);
     }
 
