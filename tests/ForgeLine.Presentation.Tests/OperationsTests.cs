@@ -245,7 +245,8 @@ public sealed class OperationsTests
         var expectedControls = focusBuilding ? PlayerActionPanelMode.Logistics : PlayerActionPanelMode.Supply;
         var row = Facility(truck) with { Cause = LogisticsStatusCatalog.BlockedCause(service), Service = service, Controls = expectedControls };
         var data = new OperationsSnapshot(new(1),new(4),new(1),[row],[],[],1,0);
-        var snapshot = Snapshot(data); var layout = GameplayHudLayout.Create(1600,900,96);
+        var snapshot = Snapshot(data, instances: [Visible(truck, ControllableEntityCategory.Logistics), Visible(building)]);
+        var layout = GameplayHudLayout.Create(1600,900,96);
         var input = new InputState(); var interaction = new PresentationInteractionState(); var controller = new OperationsController();
         controller.Update(input,snapshot,layout,interaction);
         controller.OpenCategory(OperationsCategory.Blocked,new(1),interaction);
@@ -261,7 +262,7 @@ public sealed class OperationsTests
     {
         var entity = new EntityId(3, 2);
         var data = new OperationsSnapshot(new(1), new(4), new(1), [Facility(entity)], [], [], 1, 0);
-        var snapshot = Snapshot(data);
+        var snapshot = Snapshot(data, instances: [Visible(entity)]);
         var layout = GameplayHudLayout.Create(1600, 900, 96);
         var input = new InputState();
         var interaction = new PresentationInteractionState();
@@ -356,7 +357,7 @@ public sealed class OperationsTests
     {
         var entity = new EntityId(3, 2);
         var data = new OperationsSnapshot(new(1), new(4), new(1), [Facility(entity)], [], [], 1, 0);
-        var snapshot = Snapshot(data); var controller = new OperationsController();
+        var snapshot = Snapshot(data, instances: [Visible(entity)]); var controller = new OperationsController();
         var input = new InputState(); var interaction = new PresentationInteractionState();
         var layout = GameplayHudLayout.Create(1600, 900, 96);
         controller.Update(input, snapshot, layout, interaction);
@@ -370,6 +371,43 @@ public sealed class OperationsTests
         Assert.False(controller.Update(input, snapshot, layout, interaction).Navigate.IsValid);
         var dock = new PlayerActionPanelController(); dock.OpenOperationsControls(result.Controls);
         Assert.Equal(PlayerActionPanelMode.Production, dock.Mode); Assert.False(dock.TryTakeRequest(out _));
+    }
+
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("foreign")]
+    [InlineData("hidden")]
+    [InlineData("generation")]
+    public void FocusAndControlsRequireCurrentOwnedVisibleEntity(string unavailable)
+    {
+        var entity = new EntityId(3, 2);
+        var data = new OperationsSnapshot(new(1), new(4), new(1), [Facility(entity)], [], [], 1, 0);
+        RenderInstance[] instances = unavailable switch
+        {
+            "missing" => [],
+            "foreign" => [Visible(entity) with { Selectable = new(new PlayerId(2), ControllableEntityCategory.Building) }],
+            "hidden" => [Visible(entity) with { Visibility = RenderVisibilityMask.Debug }],
+            "generation" => [Visible(new(entity.Index, entity.Generation + 1))],
+            _ => throw new ArgumentOutOfRangeException(nameof(unavailable))
+        };
+        var snapshot = Snapshot(data, instances: instances);
+        var controller = new OperationsController();
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        controller.Update(input, snapshot, layout, interaction);
+        controller.OpenCategory(OperationsCategory.All, snapshot.SessionId, interaction);
+        Click(input, OperationsLayout.Control(layout, 3));
+        controller.Update(input, snapshot, layout, interaction);
+        Assert.Equal(entity, controller.View.Selected);
+
+        for (int control = 9; control <= 10; control++)
+        {
+            Click(input, OperationsLayout.Control(layout, control));
+            var result = controller.Update(input, snapshot, layout, interaction);
+            Assert.False(result.Navigate.IsValid);
+            Assert.Equal(PlayerActionPanelMode.Closed, result.Controls);
+        }
     }
 
     [Fact]
@@ -403,6 +441,57 @@ public sealed class OperationsTests
         Click(input, OperationsLayout.Control(layout, 0)); controller.CancelInput(input);
         controller.Update(input, snapshot, layout, interaction);
         Assert.True(controller.View.Open); Assert.False(controller.View.Suppressed);
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void WorldOverlayProjectionHasZeroWarmAllocation(bool visible, bool selectedDiagnosis)
+    {
+        EntityId facility = new(12, 3), source = new(14, 2), truck = new(18, 7);
+        var data = new OperationsSnapshot(new(1), new(4), new(1),
+            [Facility(facility), Facility(source)], [new(ResourceIds.Steel, "STEEL", 100, null)],
+            [new(source, facility, 100, true, .7)], 2, 1);
+        var order = new PlayerLogisticsOrderReadModel(new(17), ResourceIds.Steel, "STEEL",
+            LogisticsTransportRequestState.InTransit, LogisticsTransportRequestFailureReason.None,
+            LogisticsBottleneckReason.None, 90, 10, truck, source, facility, "SOURCE", "FACILITY");
+        var actions = selectedDiagnosis ? new PlayerActionSnapshot(new(1), new(4), [], 0,
+            null, null, new PlayerLogisticsActionReadModel(facility, [], null, orders: [order])) : null;
+        EntityId[] selection = selectedDiagnosis ? [facility] : [];
+        RenderInstance[] instances = visible
+            ? [Visible(facility) with { Transform = RenderTransform.Identity with { Position = new(-10, 0, 0) } },
+               Visible(source) with { Transform = RenderTransform.Identity with { Position = new(10, 0, 0) } }]
+            : [];
+        var experience = default(PlayerExperienceSnapshot) with { Player = new(1), Tick = new(4) };
+        var snapshot = new PresentationSnapshot(new(4), TimeSpan.FromMilliseconds(50), instances.Length, instances,
+            sessionId: new(1), playerExperience: experience, operations: data, playerActions: actions)
+        {
+            SelectedOrders = selectedDiagnosis ? new(new(1), new(4), selection, [], string.Empty) : null
+        };
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var graphics = new SelectionOverlayRenderingTests.RecordingContext { Width = 1600, Height = 900 };
+        var information = RtsInformationLayerView.Empty with { SelectedEntities = selection };
+        var context = new GameplayHudRenderContext(graphics, new RtsCamera(), snapshot, default, information,
+            default, default, default, CombatGroupOverviewView.Empty, default, layout, 96, 1, null,
+            Operations: new(true, Selected: facility, Session: new(1)));
+        var overlay = new OperationsWorldOverlay();
+        overlay.Build(context);
+        Assert.Equal(visible ? 2 : 0, overlay.Markers.Length);
+        Assert.Equal(visible ? 1 : 0, overlay.Links.Length);
+        if (visible)
+        {
+            Assert.Equal(facility, overlay.Markers[0].Entity);
+            Assert.Equal(selectedDiagnosis, overlay.Markers[0].Diagnosis.HasValue);
+            Assert.Equal(selectedDiagnosis, overlay.Links[0].Request);
+            Assert.Equal(selectedDiagnosis, overlay.Links[0].Loaded);
+            Assert.Equal(source, overlay.Links[0].Source);
+            Assert.Equal(facility, overlay.Links[0].Destination);
+        }
+        for (int i = 0; i < 128; i++) overlay.Build(context);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 256; i++) overlay.Build(context);
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
     }
 
     [Theory]
@@ -545,7 +634,11 @@ public sealed class OperationsTests
 
     private static OperationsFacility Facility(EntityId entity) => new(entity, "FACILITY", OperationsCategory.Production,
         "NoInput", "NoInput", "INPUT STOCK INSUFFICIENT", 2, null, null, null, null, null, null, PlayerActionPanelMode.Production);
-    private static PresentationSnapshot Snapshot(OperationsSnapshot? data = null, ulong tick = 4, ulong session = 1, uint player = 1, bool terminal = false)
+    private static RenderInstance Visible(EntityId entity, ControllableEntityCategory category = ControllableEntityCategory.Building) =>
+        new(entity, RenderTransform.Identity, new(1), RenderMaterialHandle.Default, RenderVisibilityMask.World,
+            Selectable: new(new PlayerId(1), category));
+    private static PresentationSnapshot Snapshot(OperationsSnapshot? data = null, ulong tick = 4, ulong session = 1,
+        uint player = 1, bool terminal = false, RenderInstance[]? instances = null)
     {
         var experience = default(PlayerExperienceSnapshot) with
         {
@@ -553,7 +646,8 @@ public sealed class OperationsTests
             Tick = new(tick),
             MatchStatus = terminal ? PlayerMatchStatus.Victory : default
         };
-        return new(new(tick), TimeSpan.FromSeconds(.05), 0, [], sessionId: new(session), playerExperience: experience, operations: data);
+        return new(new(tick), TimeSpan.FromSeconds(.05), instances?.Length ?? 0, instances ?? [],
+            sessionId: new(session), playerExperience: experience, operations: data);
     }
     private static void Edge(InputState input, PlatformInputEventKind kind, HudRect rect)
     {

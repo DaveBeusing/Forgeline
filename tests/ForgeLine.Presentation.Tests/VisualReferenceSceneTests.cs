@@ -233,7 +233,22 @@ public sealed class VisualReferenceSceneTests
         var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
         var yard = VisualReferenceScene.Create(VisualReferenceSceneKind.EnvironmentKitYard, terrain);
         var bridge = VisualReferenceScene.Create(VisualReferenceSceneKind.EnvironmentKitBridge, terrain);
-        Assert.Equal(yard.Snapshot.Instances.ToArray(), bridge.Snapshot.Instances.ToArray());
+        Assert.Equal(yard.Snapshot.InstanceCount, bridge.Snapshot.InstanceCount);
+        for (int index = 0; index < yard.Snapshot.InstanceCount; index++)
+        {
+            RenderInstance expected = yard.Snapshot.Instances[index];
+            RenderInstance actual = bridge.Snapshot.Instances[index];
+            Assert.Equal(expected with { ResourceField = null }, actual with { ResourceField = null });
+            if (expected.ResourceField is not { } expectedField)
+            {
+                Assert.Null(actual.ResourceField);
+                continue;
+            }
+            var actualField = Assert.IsType<ResourceDepositField>(actual.ResourceField);
+            Assert.Equal(expectedField.Version, actualField.Version);
+            Assert.Equal(expectedField.Bounds, actualField.Bounds);
+            Assert.Equal(expectedField.Clusters.ToArray(), actualField.Clusters.ToArray());
+        }
         Assert.Contains(yard.Snapshot.Instances.ToArray(), x => x.WorldFeature.Visual == WorldVisualId.PropLoadingGantry);
         Assert.Contains(bridge.Snapshot.Instances.ToArray(), x => x.InfrastructureFeature.IsSpecified);
         Assert.All(yard.Snapshot.Instances.ToArray().Where(x => x.Entity.Index >= 0xE000_0000U && x.Entity.Index < 0xF000_0000U),

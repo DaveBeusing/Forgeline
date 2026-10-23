@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
@@ -11,6 +12,32 @@ namespace ForgeLine.Game.Tests;
 public sealed class BuildingConstructionTests
 {
     private static readonly PlayerId Player = new(1);
+
+    [Theory]
+    [InlineData(2u)]
+    [InlineData(4u)]
+    [InlineData(5u)]
+    public void NormalConstructionCompletesWithTheIndustrialCombatContract(uint buildingValue)
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId source = AddFundedInventory(test, includeAllCosts: true);
+        var buildingId = new BuildingId(buildingValue);
+        SubmitBuild(test, source, buildingId, new Vector3(64.0f, 0.0f, 64.0f));
+        test.Simulation.AdvanceOneTick();
+        EntityId site = test.Commands.Metrics.LastCreatedSite;
+        Assert.True(site.IsValid);
+        Assert.False(test.Simulation.Entities.HasComponent<HealthState>(site));
+        Assert.False(test.Simulation.Entities.HasComponent<Targetable>(site));
+        test.Simulation.RunTicks(test.Definitions[buildingId].ConstructionTicks,
+            TestContext.Current.CancellationToken);
+
+        Assert.True(test.Simulation.Entities.HasComponent<CompletedBuilding>(site));
+        Assert.True(test.Simulation.Entities.HasComponent<HealthState>(site));
+        Assert.Equal(new FactionId(1), test.Simulation.Entities.GetComponent<Combatant>(site).Faction);
+        Assert.Equal(TargetClass.Structure, test.Simulation.Entities.GetComponent<Targetable>(site).Class);
+        Assert.Equal(test.Simulation.Entities.GetComponent<SpatialPresence>(site).HalfExtents,
+            test.Simulation.Entities.GetComponent<CombatHitbox>(site).HalfExtents);
+    }
 
     [Fact]
     public void InitialBuildingCatalogExposesStableEconomicStructures()

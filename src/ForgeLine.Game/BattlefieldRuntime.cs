@@ -361,7 +361,8 @@ public sealed class BattlefieldRuntime
     public IReadOnlyList<EntityId> AttachCommandCoreObjectives(
         EntityRegistry entities,
         IReadOnlyDictionary<PlayerId, EntityId> commandCores,
-        bool allowUnassignedStarts = false)
+        bool allowUnassignedStarts = false,
+        BuildingDefinitionCatalog? buildingDefinitions = null)
     {
         ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(commandCores);
@@ -393,7 +394,8 @@ public sealed class BattlefieldRuntime
                 MatchObjectiveSystem.AttachCommandCoreObjective(
                     entities,
                     definition,
-                    commandCore));
+                    commandCore,
+                    buildingDefinitions?[BuildingIds.CommandCore]));
         }
 
         MatchObjectiveSystem.MarkMatchReady(

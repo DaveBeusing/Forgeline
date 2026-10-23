@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using ForgeLine.Assets;
 using Xunit;
 
@@ -111,10 +112,20 @@ public sealed class AssetResidencyTests
     {
         using var fixture = new ResidencyFixture(); using var graphics = new ResidencyDevice();
         var record = fixture.Records[0];
-        var texture = RuntimeTextureData.FromRgba8(1,1,[0,0,0,255], RuntimeTextureColorSpace.Linear,
+        var texture = RuntimeTextureData.FromRgba8(1,1,[0,0,0,255],
+            wrongUsage ? RuntimeTextureColorSpace.Linear : RuntimeTextureColorSpace.Srgb,
             wrongUsage ? RuntimeTextureUsage.Normal : RuntimeTextureUsage.Color);
+        byte[] payload = texture.ToPayload();
+        if (!wrongUsage)
+        {
+            // Version 3 stores color space after version, width, height and format.
+            // Corrupt serialized input: the typed constructor correctly rejects this combination.
+            Assert.Equal(3, RuntimeTextureData.CurrentPayloadVersion);
+            BinaryPrimitives.WriteInt32LittleEndian(payload.AsSpan(4 * sizeof(int), sizeof(int)),
+                (int)RuntimeTextureColorSpace.Linear);
+        }
         string path = Path.Combine(fixture.Root,record.RuntimePath);
-        RuntimeAssetFile.Write(path,RuntimeAssetType.Texture,[],texture.ToPayload());
+        RuntimeAssetFile.Write(path,RuntimeAssetType.Texture,[],payload);
         fixture.Records[0] = RuntimeAssetIntegrity.SealRecord(path,record);
         using var resources = new RuntimeWorldAssetResources(graphics,fixture.Catalog());
         Assert.Throws<InvalidDataException>(() => resources.PrepareRequiredAssets(CancellationToken.None));

@@ -211,7 +211,7 @@ public sealed class CargoConvoySystem : ISimulationSystem
                 var assignment = context.Entities.GetComponent<CargoConvoyEscort>(escort);
                 if (assignment.LastIssuedAtTick != SimulationTick.Zero)
                 {
-                    bool hasIntent = TacticalCommandUtilities.TryGetMovementIntent(
+                    bool hasIntent = TryGetEscortMovementIntent(
                         context, escort, out MovementOrder current);
                     Vector3 currentPosition = context.Entities
                         .GetComponent<WorldTransform>(escort).Position;
@@ -322,9 +322,29 @@ public sealed class CargoConvoySystem : ISimulationSystem
         context.Entities.RemoveComponent<CargoConvoyEscort>(escort);
         // Never cancel a newer manual/tactical order.
         if (assignment.LastIssuedAtTick != SimulationTick.Zero &&
-            TacticalCommandUtilities.TryGetMovementIntent(context, escort, out MovementOrder order) &&
+            TryGetEscortMovementIntent(context, escort, out MovementOrder order) &&
             order.AcceptedAtTick == assignment.LastIssuedAtTick)
             TacticalCommandUtilities.ClearMovementIntent(context, escort);
+    }
+
+    private static bool TryGetEscortMovementIntent(
+        SimulationContext context, EntityId escort, out MovementOrder order)
+    {
+        // Input commands run before navigation replaces the old pending path or route.
+        // Only the route's exact active waypoint represents its original intent;
+        // a different direct order already owns movement for this tick.
+        if (context.Entities.TryGetComponent(escort, out MovementOrder direct) &&
+            (!context.Entities.TryGetComponent(escort, out NavigationRouteState route) ||
+             !route.HasActiveWaypoint ||
+             direct.AcceptedAtTick != route.ActiveWaypointTick ||
+             Vector3.DistanceSquared(direct.WorldTarget,
+                 route.Path.Waypoints[route.NextWaypointIndex - 1]) > 0.0001f))
+        {
+            order = direct;
+            return true;
+        }
+
+        return TacticalCommandUtilities.TryGetMovementIntent(context, escort, out order);
     }
 }
 

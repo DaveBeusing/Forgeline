@@ -797,12 +797,14 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
             }
         }
 
-        if (entities.TryGetComponent(
+        if ((entities.HasComponent<RadarSensorState>(entity) &&
+             !RadarOperation.IsOperational(entities, entity)) ||
+            (entities.TryGetComponent(
                 entity,
                 out PowerConsumer consumer) &&
             (!consumer.Enabled ||
              consumer.State !=
-             PowerOperationalState.Powered))
+             PowerOperationalState.Powered)))
         {
             state =
                 BuildingPresentationState.Unpowered;

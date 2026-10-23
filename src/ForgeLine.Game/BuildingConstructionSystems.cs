@@ -433,6 +433,26 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
 
     public BuildingConstructionMetrics Metrics { get; private set; }
 
+    public void CancelForSourceInventories(
+        SimulationContext context,
+        IReadOnlyCollection<InventoryId> destroyedInventories)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(destroyedInventories);
+        _sites.Clear();
+        foreach (EntityId entity in context.Entities.Query<ConstructionSite>(QueryIterationOrder.StableByEntityIndex))
+        {
+            ConstructionSite site = context.Entities.GetComponent<ConstructionSite>(entity);
+            if (destroyedInventories.Contains(site.SourceInventory))
+                _sites.Add(entity);
+        }
+
+        foreach (EntityId entity in _sites)
+            Cancel(context, entity, context.Entities.GetComponent<ConstructionSite>(entity));
+        Metrics = new BuildingConstructionMetrics(
+            context.Entities.GetComponentCount<ConstructionSite>(), _cancelledSites, _completedBuildings);
+    }
+
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -525,6 +545,7 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                 site.Owner,
                 context.Tick));
         context.Entities.RemoveComponent<ConstructionSite>(entity);
+        BuildingCombatInitialization.Initialize(context.Entities, entity, definition);
 
         _completedBuildings++;
     }

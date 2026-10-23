@@ -77,17 +77,29 @@ internal sealed class OperationsWorldOverlay
             _hover = captured.Entity;
         var diagnosis = selectionMatches ? OperationsDiagnosisSnapshot.Resolve(snapshot) : null;
 
-        foreach (var facility in data.Facilities)
+        for (int i = 0; i < data.Facilities.Count; i++)
+        {
+            var facility = data.Facilities[i];
             if (Relevant(facility.Entity) || operations && MatchesFilter(facility, context.Operations.Filter))
                 _wanted.Add(facility.Entity);
+        }
         if (diagnosis is not null)
-            foreach (var row in diagnosis.Rows)
+            for (int i = 0; i < diagnosis.Rows.Count; i++)
+            {
+                var row = diagnosis.Rows[i];
                 if (Relevant(row.Entity)) _wanted.Add(row.Entity);
-        foreach (var route in data.Routes)
+            }
+        for (int i = 0; i < data.Routes.Count; i++)
+        {
+            var route = data.Routes[i];
             if (Relevant(route.Source) || Relevant(route.Destination)) WantEndpoints(route.Source, route.Destination);
+        }
         if (diagnosis is not null)
-            foreach (var link in diagnosis.Links)
+            for (int i = 0; i < diagnosis.Links.Count; i++)
+            {
+                var link = diagnosis.Links[i];
                 if (Relevant(link.Source) || Relevant(link.Destination)) WantEndpoints(link.Source, link.Destination);
+            }
         if (_wanted.Count == 0) return;
 
         Matrix4x4 projection = context.Camera.GetMatrices(context.Graphics.Width, context.Graphics.Height).ViewProjection;
@@ -104,24 +116,33 @@ internal sealed class OperationsWorldOverlay
             _positions[instance.Entity] = new((ndc.X + 1) * .5f * context.Graphics.Width,
                 (1 - ndc.Y) * .5f * context.Graphics.Height);
         }
-        foreach (var facility in data.Facilities)
+        for (int i = 0; i < data.Facilities.Count; i++)
+        {
+            var facility = data.Facilities[i];
             if ((Relevant(facility.Entity) || operations && MatchesFilter(facility, context.Operations.Filter)) &&
                 _positions.TryGetValue(facility.Entity, out var position))
                 AddMarker(new(facility.Entity, position, facility,
                     OperationsActionGuidance.ForEntity(diagnosis, facility.Entity), Priority(facility.Entity, facility.Cause.Length > 0)));
+        }
         if (diagnosis is not null)
-            foreach (var row in diagnosis.Rows)
+            for (int i = 0; i < diagnosis.Rows.Count; i++)
+            {
+                var row = diagnosis.Rows[i];
                 if (Relevant(row.Entity) && _positions.TryGetValue(row.Entity, out var position))
                     AddMarker(new(row.Entity, position, null, OperationsActionGuidance.ForEntity(diagnosis, row.Entity),
                         Priority(row.Entity, row.PrimaryReason != OperationsDiagnosisReason.None)));
+            }
 
         // A reported request is still not a completed delivery. Prefer it to an overlapping topology link.
         if (diagnosis is not null)
-            foreach (var link in diagnosis.Links)
+            for (int i = 0; i < diagnosis.Links.Count; i++)
             {
+                var link = diagnosis.Links[i];
                 if (!link.RequestId.IsSpecified || !(Relevant(link.Source) || Relevant(link.Destination))) continue;
                 bool loaded = false;
-                foreach (var row in diagnosis.Rows)
+                for (int rowIndex = 0; rowIndex < diagnosis.Rows.Count; rowIndex++)
+                {
+                    var row = diagnosis.Rows[rowIndex];
                     if (row.RequestId == link.RequestId && row.Subject == OperationsDiagnosisSubject.TransportRequest)
                     {
                         // The player extractor has already checked the live truck/order generation,
@@ -130,11 +151,15 @@ internal sealed class OperationsWorldOverlay
                             row.Status is (nameof(LogisticsTransportRequestState.Assigned) or nameof(LogisticsTransportRequestState.InTransit));
                         break;
                     }
+                }
                 AddLink(link.Source, link.Destination, true, true, loaded);
             }
-        foreach (var route in data.Routes)
+        for (int i = 0; i < data.Routes.Count; i++)
+        {
+            var route = data.Routes[i];
             if (Relevant(route.Source) || Relevant(route.Destination))
                 AddLink(route.Source, route.Destination, route.Enabled, false, false);
+        }
     }
 
     private void WantEndpoints(EntityId source, EntityId destination)

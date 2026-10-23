@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
@@ -385,6 +386,86 @@ public sealed class ClientSimulationHostTests
     }
 
     [Fact]
+    public void EnemyCoreAttackFreezesGameplayBeforeAndAfterTerminalAcknowledgement()
+    {
+        var defender = new PlayerId(1);
+        var attacker = new PlayerId(2);
+        EntityId tank = EntityId.Invalid;
+        EntityId core = EntityId.Invalid;
+        MatchComposition standard = CentralDivideScenario.CreateComposition();
+        MatchComposition composition = standard with
+        {
+            Key = "test.client-core-combat.v1",
+            CreateStartingBase = (entities, inventories, factory, terrain, start, content, stock) =>
+            {
+                SkirmishStartingBase starting = standard.CreateStartingBase(
+                    entities, inventories, factory, terrain, start, content, stock);
+                if (start.Player == defender)
+                {
+                    core = starting.CommandCore;
+                    return starting;
+                }
+
+                Assert.True(terrain.TrySampleHeight(350, 1440, out float height));
+                tank = factory.Create(content.Units[UnitIds.MainBattleTank],
+                    new Vector3(350, height + 1.5f, 1440), attacker);
+                entities.SetComponent(tank, new AutoTargetState(false));
+                return starting with { StartingUnits = [.. starting.StartingUnits, tank] };
+            }
+        };
+        MatchRuntimeSettings runtime = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay) with
+        {
+            Composition = composition,
+            Participants = CentralDivideScenario.CreateDefaultParticipants(false, false)
+        };
+        using ClientHostFixture fixture = ClientHostFixture.Create(runtimeSettings: runtime);
+        Assert.True(core.IsValid);
+        Assert.True(tank.IsValid);
+
+        Assert.True(fixture.Host.TrySubmit(fixture.Host.SessionId, gateway =>
+        {
+            // This callback runs on the simulation owner after a completed sensor tick.
+            Assert.True(fixture.Scenario.Intelligence.IsEntityCurrentlyIdentified(new FactionId(2), core));
+            Assert.Equal(HealthState.Full(runtime.Composition.Content.Buildings[BuildingIds.CommandCore].MaximumHealth),
+                fixture.Scenario.Simulation.Entities.GetComponent<HealthState>(core));
+            return gateway.SubmitAttack(attacker, [tank], core, fixture.Host.CurrentTick);
+        }));
+        Assert.True(fixture.Host.WaitForSubmissionCompletion(TestTimeout, out ClientSubmissionCompletion submission));
+        Assert.True(submission.Accepted);
+        Assert.True(submission.Receipt.HasValue);
+        PlayerCommandSubmissionReceipt receipt = submission.Receipt.Value;
+        Assert.True(fixture.Host.WaitForTickAtLeast(receipt.TargetTick, TestTimeout));
+        Assert.True(fixture.Host.CommandResults.TryRead(out PlayerCommandResultReadModel result));
+        Assert.Equal(receipt.CorrelationId, result.CorrelationId);
+        Assert.Equal(1, result.AcceptedTargets);
+        Assert.Equal(PlayerTacticalActionFailureReason.None, result.TacticalFailure);
+
+        Assert.True(fixture.Host.WaitForTerminalState(terminal: true, TimeSpan.FromSeconds(30)));
+        Assert.True(fixture.Host.WaitForPlayerMatchStatus(PlayerMatchStatus.Defeat, TestTimeout));
+        fixture.Host.ThrowIfFaulted();
+        SimulationTick terminalTick = fixture.Host.CurrentTick;
+        ClientSimulationTelemetry stopped = fixture.Host.CaptureTelemetry();
+        MatchState terminal = fixture.Scenario.GetMatchState();
+        Assert.Equal(MatchLifecyclePhase.Ending, terminal.Lifecycle);
+        Assert.Equal(MatchTerminationReason.CommandCoreDestroyed, terminal.TerminationReason);
+        Assert.Equal(attacker, terminal.Winner);
+        Assert.False(fixture.Scenario.Simulation.Entities.IsAlive(core));
+        Assert.Equal(RuntimeSimulationState.Stopped, stopped.State);
+        Assert.False(fixture.Host.WaitForTickAtLeast(terminalTick.Next(), TimeSpan.FromMilliseconds(200)));
+        Assert.Equal(terminalTick, fixture.Host.CurrentTick);
+
+        Assert.True(fixture.Host.TryAcknowledgeTerminal(fixture.Host.SessionId, defender, terminalTick));
+        Assert.True(fixture.Host.WaitForPlayerMatchStatus(PlayerMatchStatus.Ended, TestTimeout));
+        Assert.False(fixture.Host.WaitForTickAtLeast(terminalTick.Next(), TimeSpan.FromMilliseconds(200)));
+        Assert.Equal(terminalTick, fixture.Host.CurrentTick);
+        Assert.Equal(stopped.CompletedTicks, fixture.Host.CaptureTelemetry().CompletedTicks);
+        MatchState completed = fixture.Scenario.GetMatchState();
+        Assert.Equal(MatchLifecyclePhase.Completed, completed.Lifecycle);
+        Assert.Equal(terminal.Winner, completed.Winner);
+        Assert.Equal(terminal.TerminationReason, completed.TerminationReason);
+    }
+
+    [Fact]
     public void TerminalAcknowledgementDoesNotAdvanceGameplayTick()
     {
         using ClientHostFixture fixture =
@@ -739,13 +820,15 @@ public sealed class ClientSimulationHostTests
 
         public static ClientHostFixture Create(
             int boundaryCapacity = 32,
-            ISimulationSystem? additionalSystem = null)
+            ISimulationSystem? additionalSystem = null,
+            MatchRuntimeSettings? runtimeSettings = null)
         {
             MatchScenarioSettings settings =
                 CentralDivideScenario.CreateSettings(
                     MatchScenarioProfile.Gameplay);
             MatchRuntimeSettings runtime =
-                CentralDivideScenario.CreateHeadless(
+                runtimeSettings ??
+                (CentralDivideScenario.CreateHeadless(
                     settings.Profile,
                     seed: 9147,
                     enableDiagnostics: false,
@@ -757,7 +840,7 @@ public sealed class ClientSimulationHostTests
                             .CreateDefaultParticipants(
                                 westComputerControlled: false,
                                 eastComputerControlled: true)
-                };
+                });
 
             MatchRuntime scenario =
                 CentralDivideScenario.Create(

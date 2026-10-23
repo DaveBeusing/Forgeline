@@ -30,11 +30,31 @@ Building definitions are data-driven and use stable `BuildingId` values rather t
 
 ## Building definitions and footprints
 
-`BuildingDefinitionCatalog` contains stable identifiers, content keys, footprints, construction duration, resource costs, capability metadata, slope limits, and initial presentation identity.
+`BuildingDefinitionCatalog` contains stable identifiers, content keys, footprints, construction duration, resource costs, capability metadata, slope limits, initial presentation identity, and completed-building combat values. `MaximumHealth` must be finite and positive; `TargetPriority` and an optional `ArmorProfileId` complete the declared combat contract. A specified armor profile must resolve in the content's armor catalog.
 
 `BuildingFootprint` describes width, depth, and height. The four cardinal `BuildingOrientation` values rotate width and depth deterministically.
 
 The initial definitions are exposed by `InitialBuildingDefinitions.CreateCatalog()`. They provide construction contracts for the first economy structures, including processing capability and production-inventory metadata, while recipe definitions remain owned by the economy production system. The nine core Vertical Slice industrial families now have stable Directorate presentation assets; gameplay footprints remain independent from render geometry and LOD.
+
+The current durability values are shared by normal construction and starting buildings:
+
+| Building | Maximum Health | Target priority |
+| --- | ---: | ---: |
+| Command Core | 1,200 | 100 |
+| Power Plant | 750 | 0 |
+| Mine / Extractor | 600 | 0 |
+| Storage Depot | 900 | 0 |
+| Smelter | 900 | 0 |
+| Refinery | 800 | 0 |
+| Electronics Plant | 700 | 0 |
+| Logistics Hub | 800 | 0 |
+| Ammunition Plant | 800 | 0 |
+| Supply Depot | 700 | 0 |
+| Barracks | 800 | 0 |
+| Vehicle Factory | 1,100 | 0 |
+| Radar | 500 | 0 |
+
+All thirteen current definitions leave `ArmorProfileId` unspecified and retain the existing unarmored damage resolution. A content definition can declare an armor profile without changing the construction or damage pipeline.
 
 ## Placement preview
 
@@ -164,6 +184,8 @@ An accepted site is a normal simulation entity containing:
 
 Construction progress is simulation-owned and can run fully headless. Presentation reads that completed-tick state and maps it to shared foundation, structural-frame, and partial-shell runtime meshes; it never advances construction itself.
 
+Construction sites retain their existing combat boundary. Accepting a site does not attach completed-building Health, Structure targeting, or radar capability. The shared combat initializer rejects an entity that still has `ConstructionSite`; unfinished sites do not gain combat vulnerability from the completed-building contract.
+
 ## Cancellation
 
 `CancelConstructionCommand` is owner-authorized.
@@ -179,7 +201,7 @@ Cancellation never consumes the reserved material.
 
 ## Completion and capability activation
 
-Completion first verifies that all required reservations still exist, then consumes them and activates the definition's capabilities. Activation happens once, immediately before `ConstructionSite` is replaced with `CompletedBuilding`.
+Completion first verifies that all required reservations still exist, then consumes them and activates the definition's capabilities. Activation happens once, immediately before `ConstructionSite` is replaced with `CompletedBuilding`. `BuildingCombatInitialization.Initialize` then attaches the completed structure's combat contract using the same catalog definition.
 
 Initial capability activation includes:
 
@@ -191,9 +213,19 @@ Initial capability activation includes:
 - Refinery: processing marker, Fuel Processing production facility, dedicated input/output inventories, and power consumer;
 - Electronics Plant: processing marker, Electronics Processing production facility, dedicated input/output inventories, and power consumer.
 
-Power-capable buildings initially join the logical development network with ID `1`. Physical transmission topology remains a later power-system extension.
+Power-capable buildings join the owner's logical development network, whose ID is the owner's player ID. Physical transmission topology remains a later power-system extension. A completed radar waits for a valid power allocation before scanning; see [Battlefield Intelligence](BattlefieldIntelligence.md#powered-radar-operation).
 
 Construction activates processing capability and inventory bindings only. Recipe execution remains owned by `ProductionSystem`, preserving the construction/production responsibility boundary.
+
+### Shared completed-building combat initialization
+
+The initializer derives controllable ownership and combat faction from `CompletedBuilding.Owner`, requires `TargetClass.Structure`, and attaches catalog Health and target priority when absent. Its `CombatHitbox` uses the placed `SpatialPresence` half-extents, including the selected orientation; a completed entity without spatial presence uses the definition's North-facing footprint. Gameplay collision bounds remain independent of render assets.
+
+Initialization is idempotent. Existing Health, including damaged or depleted Health, is preserved; repeated initialization never repairs a building. Existing target priority, hitbox, and armor are retained. Declared armor is attached only when the entity has no armor component. Inconsistent controllable ownership, combat faction, target class, building definition, or a player ID that cannot represent a combat faction is rejected.
+
+The starting-base factory initializes its Command Core from the composition's building catalog. Match initialization applies the same contract to completed starting structures before objective attachment. Reattaching the same Command Core objective preserves its entity identity and Health; conflicting objective identities are rejected.
+
+Completed structures participate in ordinary target acquisition, direct fire, damage resolution, and lifecycle destruction. Destruction closes building-owned economic work and inventories at the lifecycle boundary; its stock-loss and wreck rules are documented in [Combat Execution](CombatExecution.md#completed-buildings-and-economic-ownership). Building again uses the normal placement and construction path and creates a fresh entity.
 
 ## Construction diagnostics
 
@@ -231,8 +263,14 @@ Regression coverage validates:
 - same-tick concurrent footprint conflicts;
 - cancellation refund and occupancy cleanup;
 - exact-once resource consumption and capability activation;
+- completed-building combat activation through normal construction, with no Health or Structure targeting on the unfinished site;
+- all thirteen definitions' shared combat contract, starting-catalog values, and repeat-initialization preservation;
+- invalid durability, ownership, combat identity, and armor-reference rejection;
+- Command Core objective identity preservation;
 - extractor deposit/output/power activation;
 - multi-tick headless construction completion.
+
+`BuildingConstructionTests` exercises the normal command/completion path. `BuildingCombatInitializationTests` covers the shared initializer, starting Core, and custom starting industry, while `DirectorateContentTests` covers optional armor references. `RadarPowerTests` constructs its radar through the same authoritative path and checks independent power outages and recovery. These checks use simulation state and do not require a rendered client.
 
 The critical invariants are:
 
@@ -252,7 +290,7 @@ This slice intentionally does not implement:
 - walls;
 - roads or rail construction;
 - defensive structures;
-- repair or rebuild;
+- building repair or automatic rebuilding;
 - blueprint copy/paste;
 - terrain deformation;
 - final high-detail building art replacement;

@@ -10,6 +10,20 @@ namespace ForgeLine.Game.Tests;
 public sealed class MatchPersistenceTests
 {
     [Fact]
+    public void PreIndustrialCombatCheckpointsAreRejectedBeforeReconstruction()
+    {
+        using MatchRuntime runtime = CreateScenario(seed: 831);
+        MatchSaveData save = MatchPersistenceService.CaptureSave(runtime);
+        MatchAuthoritativeSnapshot oldState = save.State with { SchemaVersion = 5 };
+        MatchSaveData oldSave = save with { State = oldState, StateSha256 = oldState.ComputeSha256() };
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(oldSave)).Reason);
+        MatchReplayData oldReplay = MatchPersistenceService.CaptureReplay(runtime) with { AuthoritativeSchemaVersion = 5 };
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.PlayReplay(oldReplay)).Reason);
+    }
+
+    [Fact]
     public void ConvoyCommandsRoundTripThroughSaveAndReplayWithoutLosingMembers()
     {
         using MatchRuntime original = CreateScenario(seed: 9221);

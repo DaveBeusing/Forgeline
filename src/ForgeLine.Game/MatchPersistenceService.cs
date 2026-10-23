@@ -597,7 +597,7 @@ public static class MatchPersistenceService
             replay.SchemaVersion);
         if (replay.AuthoritativeSchemaVersion != MatchAuthoritativeSnapshot.CurrentSchemaVersion)
             throw Failure(MatchPersistenceFailureReason.IncompatibleVersion,
-                "Replay uses a different authoritative simulation contract. Checkpoints from before the finite conveyor cargo contract cannot be replayed by this simulation.");
+                $"Replay state schema {replay.AuthoritativeSchemaVersion} is incompatible with state schema {MatchAuthoritativeSnapshot.CurrentSchemaVersion}.");
         ArgumentNullException.ThrowIfNull(
             replay.Configuration);
         ArgumentNullException.ThrowIfNull(
