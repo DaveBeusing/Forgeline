@@ -257,12 +257,19 @@ public static class SkirmishMatchInitializer
                 startingBase);
         }
 
+        foreach (EntityId entity in entities.Query<CompletedBuilding>(QueryIterationOrder.StableByEntityIndex))
+        {
+            CompletedBuilding building = entities.GetComponent<CompletedBuilding>(entity);
+            BuildingCombatInitialization.Initialize(entities, entity, composition.Content.Buildings[building.BuildingId]);
+        }
+
         _ = battlefieldRuntime.AttachCommandCoreObjectives(
             entities,
             bases.ToDictionary(
                 static pair => pair.Key,
                 static pair => pair.Value.CommandCore),
-            allowUnassignedStarts: true);
+            allowUnassignedStarts: true,
+            buildingDefinitions: composition.Content.Buildings);
 
         return new SkirmishMatchInitialization(
             configuration,
