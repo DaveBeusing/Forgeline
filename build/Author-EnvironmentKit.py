@@ -129,7 +129,7 @@ def export(m,path):
     report=m.export(path)
     g=json.loads(path.read_text(encoding='utf-8'))
     g['asset']['generator']='ForgeLine environment kit authoring'
-    path.write_text(json.dumps(g,indent=2)+'\n',encoding='utf-8')
+    path.write_text(json.dumps(g,indent=2)+'\n',encoding='utf-8', newline='\n')
     report['sha256']=hashlib.sha256(path.read_bytes()).hexdigest()
     return report
 
@@ -149,22 +149,22 @@ def main():
                 if not reduced:
                     d.update(lods=[dict(level=1,assetId=r['id']+'_lod1',maxDistance=r['distance'])],
                         collisionReference='mesh.world.kit.collision_rooted' if r['shape']=='broadleaf' else 'mesh.world.kit.collision_centered',collisionRequired=True)
-                meta.write_text(json.dumps(d,indent=2)+'\n',encoding='utf-8')
+                meta.write_text(json.dumps(d,indent=2)+'\n',encoding='utf-8', newline='\n')
     for rooted in (False,True):
         name='collision_rooted' if rooted else 'collision_centered';m=Mesh()
         m.box([-.5,0 if rooted else -.5,-.5],[.5,1 if rooted else .5,.5],6)
         reports[name+'.gltf']=export(m,output/(name+'.gltf'))
         if args.update_metadata:
             d=dict(id='mesh.world.kit.'+name,type='mesh',source='../sources/environment_kit/'+name+'.gltf')
-            (SOURCE/'meshes/kit'/f'{name}.asset.json').write_text(json.dumps(d,indent=2)+'\n',encoding='utf-8')
+            (SOURCE/'meshes/kit'/f'{name}.asset.json').write_text(json.dumps(d,indent=2)+'\n',encoding='utf-8', newline='\n')
     for reduced in (False,True):
         r=kit['ferrous'];name='ferrous_reduced' if reduced else 'ferrous_high'
         reports[name+'.gltf']=export(model(r,reduced),output/(name+'.gltf'))
         if args.update_metadata:
             p=SOURCE/'meshes/resources'/f'ferrous_ore{"_lod1" if reduced else ""}.asset.json'
             d=json.loads(p.read_text(encoding='utf-8'));d['source']='../sources/environment_kit/'+name+'.gltf'
-            p.write_text(json.dumps(d,indent=2)+'\n',encoding='utf-8')
-    (output/'exports.json').write_text(json.dumps(reports,indent=2)+'\n',encoding='utf-8')
+            p.write_text(json.dumps(d,indent=2)+'\n',encoding='utf-8', newline='\n')
+    (output/'exports.json').write_text(json.dumps(reports,indent=2)+'\n',encoding='utf-8', newline='\n')
     print(json.dumps({name:r['triangles'] for name,r in reports.items()}))
 
 

@@ -234,19 +234,19 @@ def author(output,update):
         report[state]=state_mesh(kit,state).export(output/f'{state}.gltf')
     for name,module in modules.items():
         report['kit.'+name]=module.export(output/'kit'/f'{name}.gltf')
-    (output/'exports.json').write_text(json.dumps(dict(meshes=report,bindings=bindings),indent=2)+'\n')
+    (output/'exports.json').write_text(json.dumps(dict(meshes=report,bindings=bindings),indent=2)+'\n', newline='\n')
     if update:
         for file,name in (('main_battle_tank','chassis_lod0'),('main_battle_tank_turret','turret_lod0'),
                           ('main_battle_tank_lod1','combined_lod1'),('main_battle_tank_lod2','combined_lod2')):
             path=SOURCE/'vehicles'/f'{file}.asset.json'; d=json.loads(path.read_text())
             d['source']=f'../sources/main_battle_tank/{name}.gltf'
             if name in bindings: d.update(bindings[name])
-            path.write_text(json.dumps(d,indent=2)+'\n')
+            path.write_text(json.dumps(d,indent=2)+'\n', newline='\n')
         for state in kit['states']:
             d=dict(id='unit.directorate.main_battle_tank.'+state,type='mesh',
                    source=f'../sources/main_battle_tank/{state}.gltf',
                    materialReferences=['material.directorate.unit.main_battle_tank'])
-            (SOURCE/'vehicles'/f'main_battle_tank_{state}.asset.json').write_text(json.dumps(d,indent=2)+'\n')
+            (SOURCE/'vehicles'/f'main_battle_tank_{state}.asset.json').write_text(json.dumps(d,indent=2)+'\n', newline='\n')
     print(json.dumps({k:v['triangles'] for k,v in report.items()}))
 
 

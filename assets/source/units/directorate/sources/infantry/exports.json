@@ -12,7 +12,7 @@
       0.5099999904632568,
       0.41999998688697815
     ],
-    "sha256": "c2615f3d966da734c6d05889d87d623d50fa4842656b4c6b3245f9e4dffdbf92",
+    "sha256": "bfb58dfc6b2b4bd62203d530da1cb457cbd3fdbe84a1dcb722f2f5a4711e98e6",
     "groups": [
       {
         "name": "member_0_body",
@@ -177,7 +177,7 @@
       0.5099999904632568,
       0.41999998688697815
     ],
-    "sha256": "0cf11ebdc74db44bb35a4f631df48c83c318bed9920ba28ded1b89ebc606bd7b",
+    "sha256": "eb59c38f9a00d2493a44a881513a3b882af6fd362c5b31e8298077402551c060",
     "groups": [
       {
         "name": "member_0_body",
@@ -306,7 +306,7 @@
       0.49000000953674316,
       0.41999998688697815
     ],
-    "sha256": "f36a95110edbd1f943bdebbd964d9acdfdacfca3176687700d325a115a73f911",
+    "sha256": "cfcab683c3d19966510537c9b6f3a14fee831daa4df3f29f5c5ad4b5355fd36d",
     "groups": [
       {
         "name": "member_0_body",
@@ -435,7 +435,7 @@
       0.5099999904632568,
       0.29600000381469727
     ],
-    "sha256": "40fb85fa985903c21e3232e2a5be2327a575da468893d41b68a7666c96e69d82",
+    "sha256": "571bd4d005a7150b5618c2ad34678c542e09e8134b251f606c4f7d5818419024",
     "groups": [
       {
         "name": "member_0_body",
@@ -459,7 +459,7 @@
       0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "ec73209ebed8f3f79d0ba86edae7ddce3defb5e270d3a6109192e3ae8c7da5cc",
+    "sha256": "5eb5380c04295e7a165c9110035bb4175cc6634d6f4b9728da438e9c3e953e43",
     "groups": [
       {
         "name": "member_0_hip_left",
@@ -486,7 +486,7 @@
       0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "4a9d0b365c28ba7aeb12108b7b3c3e712b6ad445eca517b97eeb5f04d754a913",
+    "sha256": "d6c56a34725f4772740fd132cfefdd12da220a07cfb5c76319244b2723e7061e",
     "groups": [
       {
         "name": "member_0_hip_right",
@@ -513,7 +513,7 @@
       0.2477739006280899,
       0.41999998688697815
     ],
-    "sha256": "244ba5a3bc1c326c36480022b6271416e4415df3fe9de415730f75e5a6ebb679",
+    "sha256": "bb42f4aba85754695d32e1438f04e2e3b98fb07a7aec3b16a273a19e0bc17c19",
     "groups": [
       {
         "name": "member_0_shoulder",
@@ -540,7 +540,7 @@
       0.4880000054836273,
       0.29600000381469727
     ],
-    "sha256": "075e73682ad5179a58ab902aca5c41c38aa71282a575f4803f5187ccdd029beb",
+    "sha256": "e23689da54230cc6bda587ef93a059da33026e22e7d4aacddd6d7258e7994e1a",
     "groups": [
       {
         "name": "member_1_body",
@@ -564,7 +564,7 @@
       0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "ae5e46d83e6d1e7172ad3e3a30ba75e9b3dc6403786adfd03d8ac1ffe6924061",
+    "sha256": "6fccdd8ae9fcd187d84591aee53a247b99f5d3c320a71f8462e4a41daac0b08b",
     "groups": [
       {
         "name": "member_1_hip_left",
@@ -591,7 +591,7 @@
       0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "1f01de45d83811b17e8b758b6210fa8fbd3e621d9c02558151dd5f95a4a1fa8b",
+    "sha256": "b8f33234b7f198466f8b1dd095ce187f85bacee3e0cd6957b98d4da48a631fc9",
     "groups": [
       {
         "name": "member_1_hip_right",
@@ -618,7 +618,7 @@
       0.2477739006280899,
       0.41999998688697815
     ],
-    "sha256": "10a379b9221329844571485465d0fe7e5d1bac5caf055a789898291aca594b92",
+    "sha256": "7accf902d824775bf7beaf3fb62c41827ebe3d0d2bff9cd4af941c616ff716bd",
     "groups": [
       {
         "name": "member_1_shoulder",
@@ -645,7 +645,7 @@
       0.4880000054836273,
       -0.14399999380111694
     ],
-    "sha256": "308fe2dcefe8e3148f6c5a294a2519e665575a23e5267fa9c4d6abc8e79f4960",
+    "sha256": "2183efb8926ce313f9221a3f55ef44b358affe1d0d8bd6c8641219a75a9f3c02",
     "groups": [
       {
         "name": "member_2_body",
@@ -669,7 +669,7 @@
       0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "ccc74742f944ca954b83b6f0876483e07e264418c14c667fbeef214ae7f85c08",
+    "sha256": "aedf763ff984993522937813d4c135b9a5d53f2f2fb11add9c835723841a965b",
     "groups": [
       {
         "name": "member_2_hip_left",
@@ -696,7 +696,7 @@
       0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "5114898c6b511f75503640442712309c3589e4be9fa53998c86591114d7fd710",
+    "sha256": "f6748fd3fe17e68e54d58f2832930a05d6a0f3a100443fdf2106828291f1e68f",
     "groups": [
       {
         "name": "member_2_hip_right",
@@ -723,7 +723,7 @@
       0.2477739006280899,
       -0.019999999552965164
     ],
-    "sha256": "f54590afe4726464856c029b76962be539391ba4149bc3d2f3b6a0e9d7df3f99",
+    "sha256": "ecc1d546b207d1067009988c22a9cc9f37ea883dd1bfb2c2b88a8d8e8b076b39",
     "groups": [
       {
         "name": "member_2_shoulder",
@@ -750,7 +750,7 @@
       0.4880000054836273,
       -0.14399999380111694
     ],
-    "sha256": "48fad8fdacdbdef2a4723627786e1a899dd888607e536f6c312a8fbfcfbdcb8b",
+    "sha256": "10215a918f306e7c126237d901a18ccfe3dc6bf685ef0a0ed8a9cf2b1c53e401",
     "groups": [
       {
         "name": "member_3_body",
@@ -774,7 +774,7 @@
       0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "7f089a5b1425927f89fa55a0e928a8a22cdadc904965873600cc7e74de5ca9e1",
+    "sha256": "877a59f4f595f1097ea158ff325c863212cc51e2a24a0a49cec8a2b1290275cc",
     "groups": [
       {
         "name": "member_3_hip_left",
@@ -801,7 +801,7 @@
       0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "9cae250b3da1de344504c7f334546c27cefcd6d3682bce2adf6f57ce96efd20b",
+    "sha256": "4811e4de55e54f506e1a3aa74a2af1377931e5953fd50a470ae3043e8fab08b2",
     "groups": [
       {
         "name": "member_3_hip_right",
@@ -828,7 +828,7 @@
       0.2477739006280899,
       -0.019999999552965164
     ],
-    "sha256": "0a2592d7f05979ff62b4a47109decbacafb9a9a3a22826c0495181d3b19b57ad",
+    "sha256": "cbdc5c160a978896345b7d5511638ff0d437d91e2e292acaad2a0f0d598ecf4c",
     "groups": [
       {
         "name": "member_3_shoulder",
@@ -855,7 +855,7 @@
       0.5099999904632568,
       0.41999998688697815
     ],
-    "sha256": "b4ab810d801ddbb6997849c52e839bd71b02db8b2de720fa3c941b05b43bb9c1",
+    "sha256": "110dfed2b1caf37ee9a662550604879fa708d443642f2190454bd37895cd537f",
     "groups": [
       {
         "name": "member_0_body",
@@ -1020,7 +1020,7 @@
       0.5099999904632568,
       0.41999998688697815
     ],
-    "sha256": "8c399dcbb012c17085f7fcb484e7d915c7223c5e92f7ad9340ee046841b2ecb4",
+    "sha256": "05faec24807331bd9d41c227cb6975711608619176e3e43c7db3e18c8587a1c0",
     "groups": [
       {
         "name": "member_0_body",
@@ -1149,7 +1149,7 @@
       0.49000000953674316,
       0.41999998688697815
     ],
-    "sha256": "57d09b4c862e9dba02e00a0b159c27cb36c8c45b7609c5293acb47bb51cda449",
+    "sha256": "26ef1c012f8df6d068f00c5b058b5d33d13ea218c0c66d27da5af6e9c840b56a",
     "groups": [
       {
         "name": "member_0_body",
@@ -1278,7 +1278,7 @@
       0.5099999904632568,
       0.296999990940094
     ],
-    "sha256": "38ab1a8aee96e885f7208ba199b027483ad7519a0c779ae749dced9f7d8a25ab",
+    "sha256": "565452b165584ff47e61fccec198f11aa42e3dcb3e31fba07f9242bcdf2ec19e",
     "groups": [
       {
         "name": "member_0_body",
@@ -1302,7 +1302,7 @@
       0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "950a8e88cca03f907dac80fc45dbc90f7a195935513855befcc755f20ed6f5d3",
+    "sha256": "6dd4bd056606aece80a7920b1a44573b7e21238bacfc7f30a7d6f9bf98a1e0bf",
     "groups": [
       {
         "name": "member_0_hip_left",
@@ -1329,7 +1329,7 @@
       0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "0785070e4f8801d52e0d5c01bf5fa7cdbf0fc1b175d1b8ed3d9df62040c5989f",
+    "sha256": "b5589bbae831beb08253a6d3144d750d914100e7433bba3db309cfbf7ecaa977",
     "groups": [
       {
         "name": "member_0_hip_right",
@@ -1356,7 +1356,7 @@
       0.2477739006280899,
       0.41999998688697815
     ],
-    "sha256": "df82f601310df911a09577f35c74cdf85cbdc92b348f8d7bcc2a9c1ebf9ddc6a",
+    "sha256": "e9d7d9092212631a711e9b859073bbf7eac10781cc64b5c288acfd05443a3746",
     "groups": [
       {
         "name": "member_0_shoulder",
@@ -1383,7 +1383,7 @@
       0.4880000054836273,
       0.296999990940094
     ],
-    "sha256": "efbca0a268a204bfac0926ec08a386e13f892d71376284828d2d3e55934d0c73",
+    "sha256": "6c125a7a73ff07770d79bc21b91b331c05135e5949217435fe92bce797169ed9",
     "groups": [
       {
         "name": "member_1_body",
@@ -1407,7 +1407,7 @@
       0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "297f46efb3368178caf54639c5eb4f13babc07d7bb5d8e483939bdfe795cb89a",
+    "sha256": "4e329c06d92e74b3e53feca06e5427f79ccc27611a6f2e7d2724676afe8f62a4",
     "groups": [
       {
         "name": "member_1_hip_left",
@@ -1434,7 +1434,7 @@
       0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "a148614ad7aa1dd054bb91319daf9a599f09476375cbdc291ab367fd3adfa859",
+    "sha256": "e4d398b2209477e0f5253a388ad1700975636ad1ddff570d7dc8f746fda0fb3d",
     "groups": [
       {
         "name": "member_1_hip_right",
@@ -1461,7 +1461,7 @@
       0.2477739006280899,
       0.41999998688697815
     ],
-    "sha256": "c9d62d347428e337735392beff6e49f34d90cbdeb76d0c9624bdc813581adf2b",
+    "sha256": "b4eb75d5ac8073cbb1f24f3b5269a93980abca49cdaf9b9f95aedcbccecc1001",
     "groups": [
       {
         "name": "member_1_shoulder",
@@ -1488,7 +1488,7 @@
       0.4880000054836273,
       -0.14300000667572021
     ],
-    "sha256": "365b15368fe846d3fd921448dfc294cb132c940c4c1688bf2613ed2b3d283641",
+    "sha256": "2abdaf8e825417b6ff5163fc23e11ac7fb21bd7329a357bb8bd6f293ac897f04",
     "groups": [
       {
         "name": "member_2_body",
@@ -1512,7 +1512,7 @@
       0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "ae973eec20444494316c7d4f222ef43b33dd789ceea4f18392104f66215e05b0",
+    "sha256": "3179d32a950d93994c754f663922939f9ede869d2cf8a7e1620c1d85481060ae",
     "groups": [
       {
         "name": "member_2_hip_left",
@@ -1539,7 +1539,7 @@
       0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "53d8dc5117e36865e0b17c9f1a9800568d1a4c6e3917706f0775249a4a4713e2",
+    "sha256": "2dea76ca0e13444f1ef2d2f28f38fc5f3a0565b19bc6d1ff485865b126f80f5d",
     "groups": [
       {
         "name": "member_2_hip_right",
@@ -1566,7 +1566,7 @@
       0.2477739006280899,
       -0.019999999552965164
     ],
-    "sha256": "b577d009eb928c2cbb891286ec570dc663b7dbfa22b11479c473ab0d59e53285",
+    "sha256": "d6ab5e5281cf9bded6718f2c65c6f798a849d3d5bf13a79a7c35825268062321",
     "groups": [
       {
         "name": "member_2_shoulder",
@@ -1593,7 +1593,7 @@
       0.4880000054836273,
       -0.14300000667572021
     ],
-    "sha256": "89cba43f346b9c7ca2fc324bcf0cb519c8d1e87eb05cee71ec54698708f6aeaa",
+    "sha256": "e928951af49d0405b154c9536c7cbc4e869454c3f5d33e847b70b4242b039695",
     "groups": [
       {
         "name": "member_3_body",
@@ -1617,7 +1617,7 @@
       0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "70c6b0d2817a1b9778e93eec4bca41855a1af09eff30c869b3074f4ab7148862",
+    "sha256": "a2abf8d3c8e8b7ff879065ab0650a1451080dcdd2e79f119fc45260621a0f52b",
     "groups": [
       {
         "name": "member_3_hip_left",
@@ -1644,7 +1644,7 @@
       0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "df01772f6edeb1f8ea07efefd3fe11d9ae74040b0b8faa2eea8b53e8618f0cf0",
+    "sha256": "c558468609d8944bb143ce69bd8ec0566da927106c93530e58e032e5c8e1d7af",
     "groups": [
       {
         "name": "member_3_hip_right",
@@ -1671,7 +1671,7 @@
       0.2477739006280899,
       -0.019999999552965164
     ],
-    "sha256": "34ee9fcea5102468b14b3fe92f0d09a5edbceec2a900c845e8e5b7fbf6579b4b",
+    "sha256": "b70599028ee6567304050263aac3e5c9aebdf31a761e360e20061d9d0eeeb580",
     "groups": [
       {
         "name": "member_3_shoulder",
@@ -1698,7 +1698,7 @@
       0.25,
       0.3009999990463257
     ],
-    "sha256": "5b95c2eee22aae064c4d4657a3b01828740fc4e535231c81737f97a328758611",
+    "sha256": "356e625d2b339460e7093245abad16064d55655236bf7fee4b76584124f4060e",
     "groups": [
       {
         "name": "rifle_squad_damaged",
@@ -1722,7 +1722,7 @@
       0.2845294177532196,
       0.3009999990463257
     ],
-    "sha256": "0e9b3596250edfeffd5429944dad1b0c2001f86bf1b57a0b2b1a41299ec5f077",
+    "sha256": "2c4a5c39c168a7bb416f96542b77d32fee67f2171ca5a7b88f5a7d0e7525c3ad",
     "groups": [
       {
         "name": "rifle_squad_critical",
@@ -1746,7 +1746,7 @@
       -0.4000000059604645,
       0.41999998688697815
     ],
-    "sha256": "8908f54002341c5984bd92ce93d446658628ad45cd0da4fedfb9874b8212dc4d",
+    "sha256": "75a110a00756c9399935ed82dca3ebc9991d75d458e316196010c2e0b59adbad",
     "groups": [
       {
         "name": "rifle_squad_wreck",
@@ -1770,7 +1770,7 @@
       0.25,
       0.3009999990463257
     ],
-    "sha256": "d8ec06798438eb7dff5fb55b05b1fb886900aa1616201fdd684cfc0ea8b7b417",
+    "sha256": "34ea39f21671dc4bd8fe553d8059b680815cafb0d1f2beaa5a4b69d1a50a74b2",
     "groups": [
       {
         "name": "combat_engineer_damaged",
@@ -1794,7 +1794,7 @@
       0.2845294177532196,
       0.3009999990463257
     ],
-    "sha256": "65d691d56e0524094434b4b250fd8986e819c98cd6caa63709944fda6c2a9cd8",
+    "sha256": "54d6d69590c1ab147ee6e9e415a63b51834779957a7bc074a689d4054923c904",
     "groups": [
       {
         "name": "combat_engineer_critical",
@@ -1818,7 +1818,7 @@
       -0.4000000059604645,
       0.41999998688697815
     ],
-    "sha256": "42d9cb97b201e9cb89cf8896c100ecfe810eb694edc4a522d1442d27d53cf276",
+    "sha256": "43e869d7dfc4550174eebcacb4a2cad4c27f48246edbe4617e54d9a8fa46f3c5",
     "groups": [
       {
         "name": "combat_engineer_wreck",
@@ -1842,7 +1842,7 @@
       -0.10000000149011612,
       0.41999998688697815
     ],
-    "sha256": "9e451da881fc68608c8c219dd546e3c46dd794c6ea026cd2ed0db9ec20c4cec5",
+    "sha256": "e49db02f632cabce01be5aa0c26a578317658efb90f570109b220c520b0daa07",
     "groups": [
       {
         "name": "scout_vehicle_wreck",
@@ -1866,7 +1866,7 @@
       -0.057500001043081284,
       0.47687649726867676
     ],
-    "sha256": "0beb2cd85a64ea172a5f77732804b51f6759d1c8aba0268ca791a45015f36771",
+    "sha256": "77942867a046ebb3ae6b1b12546176c971ba8c0bceabaf663b151c47698f1717",
     "groups": [
       {
         "name": "self_propelled_artillery_wreck",
@@ -1890,7 +1890,7 @@
       -0.07833333313465118,
       0.41999998688697815
     ],
-    "sha256": "f3ef647a9d0e812b9fbbeb8cd52c240a4e7a59e8e269242ca48ecc2bad51694a",
+    "sha256": "c4b966f715e6d02b893cb4e07a11dd26ee6db56294c75139041b4e6047c4a225",
     "groups": [
       {
         "name": "cargo_truck_wreck",
@@ -1914,7 +1914,7 @@
       -0.05999999865889549,
       0.41999998688697815
     ],
-    "sha256": "bf965939574713bba8ca72dcaca0647b05f6f713b2df24cecd46bfab888de26b",
+    "sha256": "97e4531692dbfda36f3a648d3f4e55c18c745ac2b2b5e50e9b9a24c022e95869",
     "groups": [
       {
         "name": "supply_truck_wreck",
@@ -1938,7 +1938,7 @@
       -0.13600000739097595,
       0.4099999964237213
     ],
-    "sha256": "711fca44761e4712fbc4faef1ecc56ef7bbc3ac117991c9b1cca37dc56b56032",
+    "sha256": "cb4ae24e5345a7b7fa12933bf68ebfd68d668e6663d411450ad0a66d7b6d9e5b",
     "groups": [
       {
         "name": "rubble",
@@ -1962,7 +1962,7 @@
       -0.13600000739097595,
       0.4099999964237213
     ],
-    "sha256": "9ce48e3c5a53e8e6c7dc10eeeeb953e95a7d58e702b4a71514dc067343f086ef",
+    "sha256": "362d051ed10792f832a87e38e4721107cfd54c4036474e836a556f63895117ac",
     "groups": [
       {
         "name": "rubble",
@@ -1986,7 +1986,7 @@
       0.4475787281990051,
       0.3499999940395355
     ],
-    "sha256": "aa05846b11faebc28b9cbbce788b0ba90856b0e09ffdf21cd21f7730b8260121",
+    "sha256": "cc26b54d949e5bb193944d559b49aec2ead1b4633fe512d34fde9d74dbd4411d",
     "groups": [
       {
         "name": "scorched_barrier",
@@ -2010,7 +2010,7 @@
       0.4469011127948761,
       0.3499999940395355
     ],
-    "sha256": "60522924b5757f2f51a90e06354fa8ff22fc0041df47c76cb2f98b3fbac01bc8",
+    "sha256": "74e2735f131dea41ca1f1eec4059beb37881f5b5e11e5b698ba9836d5434342d",
     "groups": [
       {
         "name": "scorched_barrier",
@@ -2034,7 +2034,7 @@
       -0.004390448331832886,
       0.31705132126808167
     ],
-    "sha256": "a9bb71581889ead77e978c706b6db21bc70ef7b16752b261bb76138a5840a427",
+    "sha256": "42ea02680ff0ea560be9e2341ef0ac5a419ebd0bf808af486e09957a434e2bbd",
     "groups": [
       {
         "name": "burst_pipe",
@@ -2058,7 +2058,7 @@
       -0.02009117230772972,
       0.31705132126808167
     ],
-    "sha256": "412299c851d19c912dbfdbb5b8f22e9a649bd13e49ae1b63cf4572a0dbad47de",
+    "sha256": "a0f2d82c8aed76ae2b16d5604cb158e7de2911b37e28fe7b6d4a5e17bf50c55d",
     "groups": [
       {
         "name": "burst_pipe",
@@ -2082,7 +2082,7 @@
       0.3499999940395355,
       0.5
     ],
-    "sha256": "edae47611b1d1ab9041bf1fa6b4f05e0a78f2f9170669270fe6e75485978803f",
+    "sha256": "b02ca2f943d8486252cef74f23c408f74a4301f9e478cbfdd5d329b5fc729a0a",
     "groups": [
       {
         "name": "road_damaged",
@@ -2106,7 +2106,7 @@
       0.3499999940395355,
       0.5
     ],
-    "sha256": "a36b9958b9ce434c166a33cb6a5ec0a803bcaadbe694413e1b5180b08e4f3bd7",
+    "sha256": "d1fef3d889920b69b0da8a7966267251d1cee64a7090a6947d99acd494ce997a",
     "groups": [
       {
         "name": "road_destroyed",
@@ -2130,7 +2130,7 @@
       -0.009999999776482582,
       0.5
     ],
-    "sha256": "db4ba96444b6baeef27a451fe5b996233c73d9727db85532a8134799aa60bb92",
+    "sha256": "4ae3d57c57040dc084c20bc0d4a349ffd24235762dc36ee9a45a31aaa5317baf",
     "groups": [
       {
         "name": "bridge_damaged",
@@ -2154,7 +2154,7 @@
       -0.009999999776482582,
       0.5
     ],
-    "sha256": "0212ca705975694af10f915155aa511f4e87d0b3bb7c4ef062958c6f6af4a849",
+    "sha256": "e3627c22a3a1577e92ef341bee0b9e1c66f31f6851d1fca119da72b4d2358971",
     "groups": [
       {
         "name": "bridge_destroyed",

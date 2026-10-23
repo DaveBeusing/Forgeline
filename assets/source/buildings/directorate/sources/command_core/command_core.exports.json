@@ -12,7 +12,7 @@
       0.5600000023841858,
       0.47999998927116394
     ],
-    "sha256": "4429cc4175f3db18615e247603de9fd198a59acd85f451dbb17978731bc98fa4"
+    "sha256": "05673e11efca86f98ad7873335959319d4d69dc0802935fae4d319bd74ac178a"
   },
   "lod1": {
     "vertices": 1880,
@@ -27,7 +27,7 @@
       0.5600000023841858,
       0.47999998927116394
     ],
-    "sha256": "01fa6e3de469240ac9825001ed47085c1556aa33360068df57bce81d1d0ed82f"
+    "sha256": "6341177412cb2d0db4379eb641dff4d4b0b48940d94dcaeb1289ee31d1ae0fbc"
   },
   "lod2": {
     "vertices": 708,
@@ -42,7 +42,7 @@
       0.5600000023841858,
       0.47999998927116394
     ],
-    "sha256": "6347d46a54a37084fe5895cef622fcdf13b5624a99142ff383fe8673371c4af9"
+    "sha256": "a977a858e17346e5ffdc42ae7eaae6695da6b33cfc48182faa0bf67415c01a2d"
   },
   "foundation": {
     "vertices": 216,
@@ -57,7 +57,7 @@
       -0.25999999046325684,
       0.47999998927116394
     ],
-    "sha256": "699d7e5bfa50f9209e766d171e4c5e89cbeea5bcf4ef8148410c5eef4f7a1bdf"
+    "sha256": "dea435593f875b7cf7c381dca9a4f95056dafbd0c5cffa9857d2f526f9428631"
   },
   "command_blocks": {
     "vertices": 2592,
@@ -72,7 +72,7 @@
       0.36500000953674316,
       0.32899999618530273
     ],
-    "sha256": "53cb09141fbc542b474a3ba8e74caf9a00c6b313cc87500b3acd1d41ecd97194"
+    "sha256": "1ee2aba112f84a9e7c7331f7ace2647398653689323429b841c711b6f42ff4ee"
   },
   "access_portal": {
     "vertices": 864,
@@ -87,7 +87,7 @@
       -0.017999999225139618,
       0.39500001072883606
     ],
-    "sha256": "e3ac11947c6fefa770f52d0ae3082de0b7390b293050ed7dd26ac76daa0cbd20"
+    "sha256": "0da2c23b26d27c9702ec1feadf8f1f3cb3740618778b3906f61ef1706c49cb6f"
   },
   "roof_systems": {
     "vertices": 2624,
@@ -102,7 +102,7 @@
       0.2840000092983246,
       0.17000000178813934
     ],
-    "sha256": "7eaf5cbd9b0f6d4861ac098700fc5f435a954ed0da26512a07be50144a967823"
+    "sha256": "2c2be5c34d46af818216c9c1a7977ddee9d8c20c7c021151478842ca87edc8c7"
   },
   "communications": {
     "vertices": 1488,
@@ -117,7 +117,7 @@
       0.5600000023841858,
       0.12449999898672104
     ],
-    "sha256": "09ba6cfc9b05ad0ef1088166bc33d719c5373499c38f96f9c5aed4d9b3b00382"
+    "sha256": "ce7feb27d39ebc53661e63fbbe1baa2a98083198ba86344f4842f8c82d22fc31"
   },
   "construction_frame": {
     "vertices": 1056,
@@ -132,7 +132,7 @@
       0.24500000476837158,
       0.2849999964237213
     ],
-    "sha256": "4b5ff2ba451b253b721c0978f96f72e4cecd2f47d18860d6b8cd90f50f6778e3"
+    "sha256": "e551ff1a55ea541721b9cad99803877fd0013976c41dbd25a45665cd37f43fab"
   },
   "partial_shell": {
     "vertices": 576,
@@ -147,7 +147,7 @@
       0.24500000476837158,
       0.47999998927116394
     ],
-    "sha256": "bfcf222c652c6a6fcfbff12b573c9665c7c5142e3abd761da49a313ca540a6d3"
+    "sha256": "19e16ed023e7b97a3ba3efdb24f197b7c6060c2f2d7b4dd063f0d73cb1795aeb"
   },
   "unpowered": {
     "vertices": 72,
@@ -162,7 +162,7 @@
       0.5320000052452087,
       0.2919999957084656
     ],
-    "sha256": "5f39038775b4435a93214bf486447c2e8f4ed883073bb2f04c08789ebdd4e468"
+    "sha256": "62b6886e4095029f23bad5daedc527d115801d29f4e644ff4dfd5f808761c5c6"
   },
   "damaged": {
     "vertices": 96,
@@ -177,7 +177,7 @@
       0.2329999953508377,
       0.3449999988079071
     ],
-    "sha256": "aa0fe4fbd3830dd1e3cbbcff4b3f179ec8696b730a22db62cd3110af89205f90"
+    "sha256": "9369c643a6e7bbc5b77e2db8f416e8d03b58ecc6c667b0360c35fce0010488b9"
   },
   "critical": {
     "vertices": 324,
@@ -192,7 +192,7 @@
       0.3037242293357849,
       0.41499999165534973
     ],
-    "sha256": "53a7d4eaa98585722d9b3c7bd243b07c85863c021fa4226478adaea62cc2d1b8"
+    "sha256": "25a9c01795f2d1988ebbc7cacae9f2da0dc8f5485192c0e7b6ba3e76dae0e302"
   },
   "wreck": {
     "vertices": 576,
@@ -207,7 +207,7 @@
       -0.08500000089406967,
       0.2800000011920929
     ],
-    "sha256": "07881d26dbf62449c1127fa529e0e13e4b2c308633327bb291f23de6b745b5ce"
+    "sha256": "bc48dfc394383a9ebae43cbdceb6f9e83234bdde5d44fd3e95a9b2079e68e160"
   },
   "structural_frame": {
     "vertices": 480,
@@ -222,7 +222,7 @@
       0.24500000476837158,
       0.47999998927116394
     ],
-    "sha256": "3a8c398c995262c8a547d5237bee8b3731ecf62479b9c91b9f2a0ab3e1597eec"
+    "sha256": "73817785c0d260b7a4ffe2c216f923c2c012168df5fb681b609df504c9e98347"
   },
   "destroyed": {
     "vertices": 396,
@@ -237,6 +237,6 @@
       -0.08500000089406967,
       0.47999998927116394
     ],
-    "sha256": "5b018354f6fc4d35da7dc86c7b07a4cd2e6abdebf2aa6e4516f142c8571bb0b9"
+    "sha256": "e7c49772db87aa9c514025c9304f36cce062390e00c3cd27faa22114dae9168c"
   }
 }

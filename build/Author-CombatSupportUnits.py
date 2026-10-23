@@ -96,7 +96,7 @@ def export(kit, shared, names, lod, path, articulated=False):
     data = json.loads(path.read_text(encoding='utf-8'))
     data['asset']['generator'] = 'ForgeLine combat and support unit component exporter'
     data['extras'] = dict(coordinates=kit['coordinates'], componentHierarchy=hierarchy, gameScaleMeters=kit['gameScaleMeters'], heightOffsetMeters=kit['heightOffsetMeters'])
-    path.write_text(json.dumps(data, indent=2)+'\n', encoding='utf-8')
+    path.write_text(json.dumps(data, indent=2)+'\n', encoding='utf-8', newline='\n')
     report['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
     return report, dict(mechanicalParts=bindings if articulated else [], sockets=sockets)
 
@@ -115,7 +115,7 @@ def author(family, output, update):
         reports[state], _ = export(kit, shared, names, 1, output/f'{state}.gltf')
     for module in kit['modules']:
         reports['kit/'+module['name']], _ = export(kit, shared, [module['name']], 0, output/'kit'/f"{module['name']}.gltf")
-    (output/'exports.json').write_text(json.dumps(dict(meshes=reports, bindings=metadata), indent=2)+'\n', encoding='utf-8')
+    (output/'exports.json').write_text(json.dumps(dict(meshes=reports, bindings=metadata), indent=2)+'\n', encoding='utf-8', newline='\n')
     if update:
         folder = SOURCE/FOLDERS[family]
         for lod in range(3):
@@ -124,12 +124,12 @@ def author(family, output, update):
             record['source'] = f'../sources/combat_support/{family}/lod{lod}.gltf'
             if lod == 0:
                 record.update(metadata['lod0'])
-            path.write_text(json.dumps(record, indent=2)+'\n', encoding='utf-8')
+            path.write_text(json.dumps(record, indent=2)+'\n', encoding='utf-8', newline='\n')
         for name in list(kit['states']) + (['turret'] if kit.get('turretModules') else []):
             record = dict(id=f'unit.directorate.{family}.{name}', type='mesh', source=f'../sources/combat_support/{family}/{name}.gltf', materialReferences=[f'material.directorate.unit.{family}'])
             if name == 'turret':
                 record.update(metadata[name])
-            (folder/f'{family}_{name}.asset.json').write_text(json.dumps(record, indent=2)+'\n', encoding='utf-8')
+            (folder/f'{family}_{name}.asset.json').write_text(json.dumps(record, indent=2)+'\n', encoding='utf-8', newline='\n')
     print(family, json.dumps({n:r['triangles'] for n,r in reports.items() if not n.startswith('kit/')}))
 
 

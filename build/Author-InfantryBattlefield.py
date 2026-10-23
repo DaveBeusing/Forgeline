@@ -51,7 +51,7 @@ def export(modules, lod, path, axes):
     report = mesh.export(path)
     gltf = json.loads(path.read_text()); gltf['asset']['generator'] = 'ForgeLine infantry and battlefield component exporter'
     gltf['extras'] = dict(componentHierarchy=hierarchy,axes=axes,lod=lod)
-    path.write_text(json.dumps(gltf,indent=2)+'\n',encoding='utf-8')
+    path.write_text(json.dumps(gltf,indent=2)+'\n',encoding='utf-8', newline='\n')
     report.update(sha256=hashlib.sha256(path.read_bytes()).hexdigest(),groups=groups)
     return report
 
@@ -60,7 +60,7 @@ def write_metadata(path, definition, output):
     path.parent.mkdir(parents=True, exist_ok=True)
     import os
     definition['source'] = Path(os.path.relpath(output,path.parent)).as_posix()
-    path.write_text(json.dumps(definition,indent=2)+'\n',encoding='utf-8')
+    path.write_text(json.dumps(definition,indent=2)+'\n',encoding='utf-8', newline='\n')
 
 
 def author(output, update):
@@ -114,7 +114,7 @@ def author(output, update):
         counts=[report[family+f'.lod{i}']['triangles'] for i in range(3)]
         if not counts[0]>counts[1]>counts[2]:raise ValueError('Infantry LODs must strictly decrease: '+str(counts))
     report_path=(output if output else unit_output)/'exports.json'; report_path.parent.mkdir(parents=True,exist_ok=True)
-    report_path.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    report_path.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8', newline='\n')
     print(json.dumps({key:value['triangles'] for key,value in report.items()},indent=2))
 
 
