@@ -39,6 +39,12 @@ Win32 display changes run on the window owner. The frontend render owner queues 
 
 ## Capabilities and effective policy
 
+Gameplay and native references now share [render pass composition](RenderPassComposition.md),
+including actual swapchain buffer-count admission, independent atmosphere/shadow
+capability gates, sampled-depth particle support and configuration restoration.
+Frontend/gameplay surface suspension shares one render-owner policy. The linked
+document records the create-to-dispose trace and the native checks still OPEN.
+
 Adapter selection remains D3D12 feature level 11_0 or newer, with maximum supported feature level in diagnostics. Composition additionally probes FP16 texture/render-target/blend/shader-load and R32 depth shader-load support. Software adapters cap optional features to Low, including Quarter textures, no fog/AA/wind and Low shadow/particle budgets. The requested settings remain visible in diagnostics.
 
 Software-cap diagnostics also report the reason when Low was already requested: explicit Full/High overrides may still be capped even though the profile name does not change.

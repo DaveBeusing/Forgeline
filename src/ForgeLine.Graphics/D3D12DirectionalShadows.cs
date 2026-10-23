@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
+using Feature = Vortice.Direct3D12.Feature;
 
 namespace ForgeLine.Graphics;
 
@@ -29,6 +30,20 @@ internal sealed partial class D3D12GraphicsDevice
     private double? _shadowCpu;
     private double? _shadowGpu;
     private ulong _shadowGpuFence;
+    private bool? _supportsDirectionalShadows;
+    public bool SupportsDirectionalShadows
+    {
+        get
+        {
+            ThrowIfDisposed();
+            if (_supportsDirectionalShadows is { } supported) return supported;
+            var depth = new FeatureDataFormatSupport { Format = Format.D32_Float };
+            bool available = _device.CheckFeatureSupport(Feature.FormatSupport, ref depth) &&
+                (depth.Support1 & FormatSupport1.DepthStencil) != 0 && SupportsSampledDepth;
+            _supportsDirectionalShadows = available;
+            return available;
+        }
+    }
 
     public GraphicsDirectionalShadowSettings DirectionalShadows
     {
@@ -40,6 +55,8 @@ internal sealed partial class D3D12GraphicsDevice
         ThrowIfDisposed();
         ThrowIfRecording();
         settings.Validate();
+        if (settings.Enabled && !SupportsDirectionalShadows)
+            throw new NotSupportedException("Directional shadows require depth-stencil and shader-readable R32 formats.");
         if (settings == _directionalShadows) return;
         WaitForIdle();
         ReleaseDirectionalShadows();

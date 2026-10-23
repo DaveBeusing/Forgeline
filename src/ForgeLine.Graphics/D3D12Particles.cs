@@ -11,11 +11,14 @@ internal sealed partial class D3D12GraphicsDevice
     private ulong _particleGpuFence;
     private double? _particleGpu;
 
-    public bool SupportsParticleRendering => true;
+    public bool SupportsParticleRendering => SupportsSampledDepth;
+    public bool ParticleDepthEnabled { get { ThrowIfDisposed(); return _particleDepth; } }
 
     public void ConfigureParticleDepth(bool enabled)
     {
         ThrowIfDisposed(); ThrowIfRecording();
+        if (enabled && !SupportsParticleRendering)
+            throw new NotSupportedException("Particle rendering requires R32 shader-readable depth.");
         if (enabled == _particleDepth) return;
         WaitForIdle();
         ReleaseRenderTargets(); ReleaseParticleQueries();

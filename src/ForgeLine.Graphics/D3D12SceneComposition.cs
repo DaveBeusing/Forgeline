@@ -19,6 +19,22 @@ internal sealed partial class D3D12GraphicsDevice
         }
     }
     private bool? _supportsPostProcessing;
+    private bool? _supportsSampledDepth;
+    internal bool SupportsSampledDepth
+    {
+        get
+        {
+            ThrowIfDisposed();
+            if (_supportsSampledDepth is { } supported) return supported;
+            var depth = new FeatureDataFormatSupport { Format = Format.R32_Float };
+            const FormatSupport1 required = FormatSupport1.Texture2D | FormatSupport1.ShaderLoad;
+            bool available = _device.CheckFeatureSupport(Feature.FormatSupport, ref depth) &&
+                (depth.Support1 & required) == required;
+            _supportsSampledDepth = available;
+            return available;
+        }
+    }
+    public bool SupportsAtmosphere => SupportsPostProcessing;
     public bool SupportsPostProcessing
     {
         get
@@ -26,12 +42,9 @@ internal sealed partial class D3D12GraphicsDevice
             ThrowIfDisposed();
             if (_supportsPostProcessing is { } supported) return supported;
             var color = new FeatureDataFormatSupport { Format = Format.R16G16B16A16_Float };
-            var depth = new FeatureDataFormatSupport { Format = Format.R32_Float };
             const FormatSupport1 colorFlags = FormatSupport1.Texture2D | FormatSupport1.RenderTarget | FormatSupport1.ShaderLoad | FormatSupport1.Blendable;
-            const FormatSupport1 depthFlags = FormatSupport1.Texture2D | FormatSupport1.ShaderLoad;
             bool available = _device.CheckFeatureSupport(Feature.FormatSupport, ref color) &&
-                _device.CheckFeatureSupport(Feature.FormatSupport, ref depth) &&
-                (color.Support1 & colorFlags) == colorFlags && (depth.Support1 & depthFlags) == depthFlags;
+                (color.Support1 & colorFlags) == colorFlags && SupportsSampledDepth;
             _supportsPostProcessing = available;
             return available;
         }

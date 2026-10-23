@@ -18,6 +18,8 @@ internal sealed partial class D3D12GraphicsDevice
     public void ConfigureAtmosphere(GraphicsAtmosphereSettings settings)
     {
         ThrowIfDisposed(); ThrowIfRecording(); settings.Validate();
+        if (settings.Enabled && !SupportsAtmosphere)
+            throw new NotSupportedException("Atmosphere requires supported linear scene and sampled-depth formats.");
         if (settings == _atmosphere) return;
         if (settings.Enabled && !_sceneOutput.Enabled)
             throw new InvalidOperationException("Atmosphere requires linear scene composition.");

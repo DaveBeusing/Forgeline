@@ -229,8 +229,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
             _startup.Mark(StartupPhase.GraphicsReady);
         }
         _started.Set();
-        int width = _target.Width, height = _target.Height;
-        bool suspended = _target.Suspended;
+        var surface = new ClientRenderSurface(_target.Width, _target.Height, _target.Suspended);
         StudioSplashVideoRenderer? videoRenderer = null;
         bool videoAttempted = false;
         bool menuPresented = false;
@@ -262,20 +261,14 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     continue;
                 }
 
-                if (requestedSuspended)
+                if (!surface.Update(graphics, requestedWidth, requestedHeight, requestedSuspended, out bool surfaceChanged))
                 {
                     feedback.Cancel(); uiAudio.StopPlayback();
-                    if (!suspended) graphics.Resize(0, 0);
-                    suspended = true;
                     continue;
                 }
-                if (suspended || width != requestedWidth || height != requestedHeight)
+                if (surfaceChanged)
                 {
                     feedback.Cancel(); uiAudio.StopPlayback();
-                    graphics.Resize(requestedWidth, requestedHeight);
-                    width = requestedWidth;
-                    height = requestedHeight;
-                    suspended = false;
                 }
 
                 if (view.Value.Kind == FrontendSurfaceKind.StudioSplash && _presentedFrames > 0 && !videoAttempted)
@@ -344,7 +337,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                         Volatile.Write(ref _splashPresented, 1);
                     if (view.Value.Kind == FrontendSurfaceKind.MainMenu) menuPresented = true;
                     _presentedFrames = graphics.PresentedFrameCount;
-                    Volatile.Write(ref _presentedDimensions, (long)(uint)width << 32 | (uint)height);
+                    Volatile.Write(ref _presentedDimensions, (long)(uint)surface.Width << 32 | (uint)surface.Height);
                     Volatile.Write(ref _presentedSequence, sequence);
                     _frameRendered.Set();
                 }
