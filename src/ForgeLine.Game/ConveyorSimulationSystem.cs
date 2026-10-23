@@ -59,10 +59,13 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             if (piece.Placement.IsSupport || piece.Placement.Module == ConveyorModule.Endcap) continue;
             if (!entities.TryGetComponent(e, out ConveyorFlowState flow) || !_stock.Contains(flow.Buffer)) continue;
             double scale = OperationalScale(entities, e);
+            ConveyorSocket[] sockets = piece.Placement.Sockets;
             // A broken supporting foot stops its attached spans, without projecting the span onto the road.
-            if (piece.Placement.Sockets.Any(s => brokenFeet.Contains((piece.Owner,
-                (int)MathF.Round(s.Position.X*10), (int)MathF.Round(s.Position.Z*10))))) scale = 0;
-            nodes.Add(new(e, piece.Owner, flow.Buffer, piece.Placement.Sockets, flow,
+            if (brokenFeet.Count != 0)
+                foreach (ConveyorSocket socket in sockets)
+                    if (brokenFeet.Contains((piece.Owner, (int)MathF.Round(socket.Position.X * 10),
+                        (int)MathF.Round(socket.Position.Z * 10)))) { scale = 0; break; }
+            nodes.Add(new(e, piece.Owner, flow.Buffer, sockets, flow,
                 NominalThroughput * seconds * scale, piece.Attachment));
         }
         if (nodes.Count == 0) return;
@@ -74,9 +77,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 int cursor = entities.TryGetComponent(port.Building, out ConveyorPortArbitration arbitration) ? arbitration.ResourceCursor : 0;
                 var node=new Node(port.Building, owner, inventory, [new(port.Position, port.Facing, port.Input)],
                     new(default, 0, ResourceCursor: cursor), NominalThroughput * seconds * OperationalScale(entities, port.Building),
-                    default, port) { AllowedResources=0 };
-                for(int r=0;r<EligibleResources.Count;r++)
-                    if(Accepts(entities,node,EligibleResources[r]))node.AllowedResources|=1<<r;
+                    default, port);
+                node.AllowedResources = AcceptedResources(entities, node);
                 nodes.Add(node);
             }
         Connect(nodes);
@@ -96,28 +98,43 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         var available = new Dictionary<InventoryId, double[]>();
         foreach (var node in nodes)
             if (!available.ContainsKey(node.Inventory))
-                available[node.Inventory] = EligibleResources.Select(r => _stock.GetAvailableQuantity(node.Inventory, r)).ToArray();
-        var policies = new List<LogisticsStockPolicy>();
+            {
+                var quantities = new double[EligibleResources.Count];
+                for (int r = 0; r < quantities.Length; r++)
+                    quantities[r] = _stock.GetAvailableQuantity(node.Inventory, EligibleResources[r]);
+                available[node.Inventory] = quantities;
+            }
+        // This index is rebuilt from authoritative policies every tick, including full entity generations.
+        // Duplicate policies retain the former minimum input target and maximum retained output stock.
+        var targets = new Dictionary<(EntityId, ResourceId), (double Minimum, double Maximum)>();
         foreach (EntityId e in entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
         {
-            var policy=entities.GetComponent<LogisticsStockPolicy>(e);
-            if(policy.Enabled)policies.Add(policy);
+            var policy = entities.GetComponent<LogisticsStockPolicy>(e);
+            if (!policy.Enabled) continue;
+            var key = (policy.TargetEntity, policy.ResourceId);
+            targets[key] = targets.TryGetValue(key, out var target)
+                ? (Math.Min(target.Minimum, policy.DesiredTarget), Math.Max(target.Maximum, policy.DesiredTarget))
+                : (policy.DesiredTarget, policy.DesiredTarget);
         }
-        foreach (var node in nodes.Where(n => n.Port is { Input: false }))
+        foreach (var node in nodes)
+        {
+            if (node.Port is not { Input: false } || ResolveInventory(entities, node.Entity, true) != node.Inventory) continue;
             for (int r = 0; r < EligibleResources.Count; r++)
             {
-                double retain = policies.Where(p => p.TargetEntity == node.Entity && p.ResourceId == EligibleResources[r] &&
-                    ResolveInventory(entities, node.Entity, true) == node.Inventory).Select(p => p.DesiredTarget).DefaultIfEmpty(0).Max();
+                double retain = targets.TryGetValue((node.Entity, EligibleResources[r]), out var target) ? target.Maximum : 0;
                 available[node.Inventory][r] = Math.Max(0, available[node.Inventory][r] - retain);
             }
+        }
         var limits=new Dictionary<(EntityId,ResourceId),double>();
-        foreach(var node in nodes.Where(n=>n.Port is {Input:true}))
+        foreach(var node in nodes)
+        {
+            if (node.Port is not { Input: true }) continue;
             foreach(var resource in EligibleResources)
             {
-                double target=policies.Where(p=>p.TargetEntity==node.Entity && p.ResourceId==resource)
-                    .Select(p=>p.DesiredTarget).DefaultIfEmpty(double.PositiveInfinity).Min();
+                double target = targets.TryGetValue((node.Entity, resource), out var policy) ? policy.Minimum : double.PositiveInfinity;
                 limits[(node.Entity,resource)]=target-_distribution.GetCommittedInbound(entities,node.Entity,resource);
             }
+        }
         // Match one incoming offer per receiver and one output per sender each round.
         // Successful transfers alone advance cursors. Blocked branches are skipped; spare capacity is reused.
         // Two-port contention and each input resource's fractional tail need bounded extra rounds.
@@ -248,23 +265,45 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         if (entities.TryGetComponent(entity, out LogisticsHub hub)) return hub.InventoryId;
         return default;
     }
-    private bool Accepts(EntityRegistry entities, Node node, ResourceId resource)
+    private int AcceptedResources(EntityRegistry entities, Node node)
     {
-        if (node.Port is not { } port) return true;
+        if (node.Port is not { } port) return (1 << EligibleResources.Count) - 1;
         BuildingId id = entities.GetComponent<CompletedBuilding>(port.Building).BuildingId;
-        if (id == BuildingIds.Extractor) return !port.Input && entities.TryGetComponent(port.Building, out ResourceExtractor extractor) && extractor.ResourceId == resource && extractor.Enabled && extractor.Owner==new FactionId(checked((uint)node.Owner.Value));
+        if (id == BuildingIds.Extractor)
+            return !port.Input && entities.TryGetComponent(port.Building, out ResourceExtractor extractor) && extractor.Enabled &&
+                extractor.Owner == new FactionId(checked((uint)node.Owner.Value)) ? ResourceMask(extractor.ResourceId) : 0;
         if (id == BuildingIds.Smelter || id == BuildingIds.ElectronicsPlant || id == BuildingIds.AmmunitionPlant)
-            return entities.TryGetComponent(port.Building,out ProductionFacility facility) &&
-                _recipes.Definitions.Any(recipe=>facility.Supports(recipe.RequiredCapability) &&
-                    (port.Input?recipe.Inputs:recipe.Outputs).Any(i=>i.ResourceId==resource));
-        if (id == BuildingIds.SupplyDepot) return resource == ResourceIds.Ammunition;
+        {
+            int mask = 0;
+            if (entities.TryGetComponent(port.Building, out ProductionFacility facility))
+                foreach (var recipe in _recipes.Definitions)
+                    if (facility.Supports(recipe.RequiredCapability))
+                        foreach (var ingredient in port.Input ? recipe.Inputs : recipe.Outputs)
+                            mask |= ResourceMask(ingredient.ResourceId);
+            return mask;
+        }
+        if (id == BuildingIds.SupplyDepot) return ResourceMask(ResourceIds.Ammunition);
         if (id == BuildingIds.Barracks || id == BuildingIds.VehicleFactory)
-            return port.Input && entities.TryGetComponent(port.Building,out UnitProductionFacility factory) &&
-                _units.Definitions.Any(unit=>factory.Supports(unit.RequiredProductionCapability) && unit.Costs.Any(c=>c.ResourceId==resource));
-        return id == BuildingIds.StorageDepot || id == BuildingIds.LogisticsHub || id == BuildingIds.CommandCore;
+        {
+            int mask = 0;
+            if (port.Input && entities.TryGetComponent(port.Building, out UnitProductionFacility factory))
+                foreach (var unit in _units.Definitions)
+                    if (factory.Supports(unit.RequiredProductionCapability))
+                        foreach (var cost in unit.Costs) mask |= ResourceMask(cost.ResourceId);
+            return mask;
+        }
+        return id == BuildingIds.StorageDepot || id == BuildingIds.LogisticsHub || id == BuildingIds.CommandCore
+            ? (1 << EligibleResources.Count) - 1 : 0;
+
+        static int ResourceMask(ResourceId resource)
+        {
+            for (int r = 0; r < EligibleResources.Count; r++)
+                if (EligibleResources[r] == resource) return 1 << r;
+            return 0;
+        }
     }
 
-    private static List<Link> Connect(List<Node> nodes)
+    private static void Connect(List<Node> nodes)
     {
         var inputs = new Dictionary<(PlayerId, int, int, int), List<(Node Node, ConveyorSocket Socket, int Slot)>>();
         foreach (var node in nodes) for(int slot=0;slot<node.Sockets.Length;slot++)
@@ -276,10 +315,13 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             bucket.Add((node, socket, slot));
         }
         var proposals = new List<Link>();
-        foreach (var source in nodes) foreach (var output in source.Sockets.Where(s => !s.Input))
+        var counts = new Dictionary<(Node, int), int>();
+        foreach (var source in nodes) foreach (var output in source.Sockets)
         {
+            if (output.Input) continue;
             var key = Key(source.Owner, output.Position);
-            var matches = new List<(Node Node,int Slot)>();
+            int matches = 0, inputSlot = 0;
+            Node? matched = null;
             for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) for (int z = -1; z <= 1; z++)
                 if (inputs.TryGetValue((key.Item1, key.Item2 + x, key.Item3 + y, key.Item4 + z), out var bucket))
                     foreach (var candidate in bucket)
@@ -289,20 +331,25 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                             Vector3.Dot(output.Facing, candidate.Socket.Facing) > -.999f) continue;
                         if (source.Port is not null && (destination.Port is not null || destination.Attachment != source.Entity)) continue;
                         if (destination.Port is not null && source.Attachment != destination.Entity) continue;
-                        matches.Add((destination,candidate.Slot));
+                        matches++;
+                        matched = destination;
+                        inputSlot = candidate.Slot;
                     }
             // Ambiguous overlapping sockets fail closed instead of cloning or choosing an arbitrary connection.
-            if (matches.Count == 1) proposals.Add(new(source, matches[0].Node, output.Position, matches[0].Slot));
+            if (matches == 1 && matched is not null)
+            {
+                proposals.Add(new(source, matched, output.Position, inputSlot));
+                var input = (matched, inputSlot);
+                counts[input] = counts.TryGetValue(input, out int count) ? count + 1 : 1;
+            }
         }
-        var counts=proposals.GroupBy(p=>(p.Destination,p.InputSlot)).ToDictionary(g=>g.Key,g=>g.Count());
-        var links = proposals.Where(p => counts[(p.Destination,p.InputSlot)]==1).ToList();
-        foreach (var link in links)
+        foreach (var link in proposals)
         {
+            if (counts[(link.Destination, link.InputSlot)] != 1) continue;
             link.Source.Outputs.Add(link); link.Destination.Inputs.Add(link);
             var a = link.Source.Root; var b = link.Destination.Root;
             if (a != b) { if (a.Entity < b.Entity) b.Parent = a; else a.Parent = b; }
         }
-        return links;
         static (PlayerId, int, int, int) Key(PlayerId owner, Vector3 p) =>
             (owner, (int)MathF.Round(p.X * 50), (int)MathF.Round(p.Y * 50), (int)MathF.Round(p.Z * 50));
     }
