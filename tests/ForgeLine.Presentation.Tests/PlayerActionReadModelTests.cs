@@ -148,14 +148,14 @@ public sealed class PlayerActionReadModelTests
                     action.Costs, item => item.ResourceId == expected.ResourceId);
                 Assert.Equal(expected.Quantity, cost.RequiredQuantity);
                 Assert.Equal(scenario.Services.Resources[expected.ResourceId].DisplayName, cost.DisplayName);
-                Assert.Equal(scenario.Inventories.GetQuantity(inventory, expected.ResourceId), cost.AvailableQuantity);
+                Assert.Equal(scenario.Inventories.GetAvailableQuantity(inventory, expected.ResourceId), cost.AvailableQuantity);
             }
 
             Assert.Equal(definition.Costs.All(cost =>
-                scenario.Inventories.GetQuantity(inventory, cost.ResourceId) >= cost.Quantity), action.HasRequiredResources);
+                scenario.Inventories.GetAvailableQuantity(inventory, cost.ResourceId) >= cost.Quantity), action.HasRequiredResources);
         }
 
-        double capturedSteel = scenario.Inventories.GetQuantity(inventory, ResourceIds.Steel);
+        double capturedSteel = scenario.Inventories.GetAvailableQuantity(inventory, ResourceIds.Steel);
         foreach (var expected in conveyors)
         {
             PlayerConstructionActionReadModel action = Assert.Single(
@@ -196,7 +196,7 @@ public sealed class PlayerActionReadModelTests
             ferrous.AvailableQuantity);
         Assert.NotEqual(
             captured,
-            scenario.Inventories.GetQuantity(
+            scenario.Inventories.GetAvailableQuantity(
                 inventory,
                 ResourceIds.FerrousOre));
 
@@ -204,7 +204,7 @@ public sealed class PlayerActionReadModelTests
         Assert.All(actions.Construction.SelectMany(static action => action.Costs)
             .Where(static cost => cost.ResourceId == ResourceIds.Steel),
             cost => Assert.Equal(capturedSteel, cost.AvailableQuantity));
-        Assert.NotEqual(capturedSteel, scenario.Inventories.GetQuantity(inventory, ResourceIds.Steel));
+        Assert.NotEqual(capturedSteel, scenario.Inventories.GetAvailableQuantity(inventory, ResourceIds.Steel));
     }
 
     [Fact]
