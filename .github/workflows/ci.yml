@@ -88,6 +88,14 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Conveyor material flow and recovery contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class '*Conveyor*' ForgeLine.Game.Tests.AutomatedDistributionSystemTests ForgeLine.Game.Tests.BattlefieldSupplySystemTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Simulation.Tests/ForgeLine.Simulation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Simulation.Tests.InventoryStoreTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Cargo fleet capacity diagnosis and alert lifecycle
         shell: pwsh
         run: |
@@ -400,3 +408,4 @@ jobs:
             artifacts/startup-qualification/**
             artifacts/windows-renderer-plan/**
           if-no-files-found: warn
+

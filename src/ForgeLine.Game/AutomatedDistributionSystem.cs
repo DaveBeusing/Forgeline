@@ -164,17 +164,10 @@ public sealed class AutomatedDistributionSystem
                     out CargoTransportReservation reservation) &&
                 reservation.RequestId == request.Id;
 
-            if (!hasReservation && request.ReservedQuantity > QuantityEpsilon)
+            if (!hasReservation)
             {
                 request.ReservedQuantity = 0.0;
                 request.ReservedSourceInventory = InventoryId.None;
-
-                if (context.Entities.HasComponent<CargoTransportOrder>(
-                        request.AssignedTruck))
-                {
-                    request.State = LogisticsTransportRequestState.InTransit;
-                    request.StateChangedAtTick = context.Tick;
-                }
             }
 
             if (!context.Entities.TryGetComponent(
@@ -182,6 +175,16 @@ public sealed class AutomatedDistributionSystem
                     out CargoTransportRuntimeState transportState))
             {
                 continue;
+            }
+
+            // Loading consumes the source reservation through the observer before reconciliation.
+            // The physical load, rather than the now-zero reservation counter, identifies departure.
+            if (request.State == LogisticsTransportRequestState.Assigned &&
+                !hasReservation && transportState.LoadedQuantity > QuantityEpsilon &&
+                context.Entities.HasComponent<CargoTransportOrder>(request.AssignedTruck))
+            {
+                request.State = LogisticsTransportRequestState.InTransit;
+                request.StateChangedAtTick = context.Tick;
             }
 
             if (transportState.Lifecycle == CargoTransportLifecycleState.Failed)
@@ -964,11 +967,23 @@ public sealed class AutomatedDistributionSystem
     /// <summary>Only physically committed trucks reserve destination demand against local conveyor delivery.</summary>
     public double GetCommittedInbound(EntityRegistry entities, EntityId destination, ResourceId resource)
     {
-        double quantity=0;
-        foreach(var request in _requests)
-            if(request.ResourceId==resource && (request.State is LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
-                entities.TryGetComponent(request.PolicyEntity,out LogisticsStockPolicy policy) && policy.TargetEntity==destination)
-                quantity+=request.RequestedQuantity;
+        if (!_network.TryGetNodeForEntity(destination, out LogisticsNodeId destinationNode)) return 0;
+
+        double quantity = 0;
+        foreach (RequestState request in _requests)
+        {
+            if (request.ResourceId != resource || request.Destination != destinationNode ||
+                request.State is not (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) ||
+                !entities.TryGetComponent(request.AssignedTruck, out CargoTransportOrder order) ||
+                order.Destination != destinationNode || order.ResourceId != resource)
+                continue;
+
+            // A request may span several truckloads. Only its accepted load is committed, and
+            // quantities already unloaded are present in destination stock, so must not count twice.
+            double delivered = entities.TryGetComponent(request.AssignedTruck, out CargoTransportRuntimeState state)
+                ? state.DeliveredQuantity : 0;
+            quantity += Math.Max(0, order.RequestedQuantity - delivered);
+        }
         return quantity;
     }
 
@@ -1790,3 +1805,4 @@ public sealed class AutomatedDistributionSystem
                 failureReason);
     }
 }
+

@@ -120,7 +120,9 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             }
         // Match one incoming offer per receiver and one output per sender each round.
         // Successful transfers alone advance cursors. Blocked branches are skipped; spare capacity is reused.
-        int rounds = checked((int)Math.Min(100000, Math.Ceiling(NominalThroughput * seconds) * 2 + 2));
+        // Two-port contention and each input resource's fractional tail need bounded extra rounds.
+        int rounds = checked((int)Math.Min(100000,
+            Math.Ceiling(NominalThroughput * seconds) * 2 + EligibleResources.Count * 2 + 2));
         for (int round = 0; round < rounds; round++)
         {
             var offers = new Dictionary<Node, List<Link>>();
@@ -148,7 +150,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                     if (resource < 0) continue;
                     var receiver = link.Destination;
                     ResourceId id = EligibleResources[resource];
-                    double quantity = Math.Min(1, Math.Min(sender.OutRemaining, receiver.InRemaining));
+                    double quantum = Math.Min(sender.Quantum, receiver.Quantum);
+                    double quantity = Math.Min(quantum, Math.Min(sender.OutRemaining, receiver.InRemaining));
                     quantity = Math.Min(quantity, Math.Min(available[sender.Inventory][resource], Room(receiver, id)));
                     quantity = Math.Min(quantity, _stock.GetAddableQuantity(receiver.Inventory, id, quantity));
                     if (quantity <= Epsilon || !_stock.Transfer(sender.Inventory, receiver.Inventory, id, quantity).Succeeded) continue;
@@ -310,6 +313,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         {
             Entity = entity; Owner = owner; Inventory = inventory; Sockets = sockets; Flow = flow;
             Budget = InRemaining = OutRemaining = budget; Attachment = attachment; Port = port;
+            // Equal quanta avoid assigning every fractional tick remainder to the same branch.
+            Quantum = budget > 0 ? budget / Math.Ceiling(budget) : 0;
             InputCursor = flow.InputCursor; OutputCursor = flow.OutputCursor; ResourceCursor = flow.ResourceCursor;
             Parent = this;
         }
@@ -321,6 +326,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         public EntityId Attachment { get; }
         public ConveyorBuildingPort? Port { get; }
         public double Budget { get; }
+        public double Quantum { get; }
         public double InRemaining, OutRemaining, Sent, Received;
         public int InputCursor, OutputCursor, ResourceCursor, AcceptedDownstream;
         public int AllowedResources=(1 << EligibleResources.Count)-1;
@@ -334,3 +340,4 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         public double Transferred { get; set; }
     }
 }
+
