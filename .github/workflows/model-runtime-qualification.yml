@@ -1,13 +1,8 @@
 name: Model runtime and master qualification
 
+# Diagnostic entry point independent of earlier unrelated required-CI blockers.
+# The existing required CI already owns canonical runtime/package acceptance.
 on:
-  pull_request:
-    branches: [master]
-    paths:
-      - 'build/asset-audit/**'
-      - 'build/source_geometry.py'
-      - 'assets/source/**'
-      - '.github/workflows/model-runtime-qualification.yml'
   workflow_dispatch:
 
 permissions:
