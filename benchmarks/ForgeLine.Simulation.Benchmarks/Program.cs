@@ -11,6 +11,13 @@ internal static class Program
             RecoveryMeasurements.Run(args[1]);
             return;
         }
+        if (args.Length is >= 2 and <= 4 && args[0] == "--conveyor-measurements")
+        {
+            ConveyorMeasurements.Run(args[1],
+                args.Length >= 3 ? int.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture) : 512,
+                args.Length == 4 ? int.Parse(args[3], System.Globalization.CultureInfo.InvariantCulture) : null);
+            return;
+        }
         if (args.Length == 2 && args[0] == "--vehicle-service")
         {
             VehicleServiceMeasurements.Run(args[1]);
@@ -25,3 +32,4 @@ internal static class Program
         BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
     }
 }
+

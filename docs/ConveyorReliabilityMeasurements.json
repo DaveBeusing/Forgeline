@@ -1,0 +1,187 @@
+{
+  "SchemaVersion": 1,
+  "Purpose": "Paired headless conveyor allocation and behavioral-equivalence evidence; wall-time values are advisory.",
+  "SourceProvenance": {
+    "MasterBase": "b397bd6f19384e4a8a20aea11f9291f918201943",
+    "MeasurementBuildVersion": "0.1.461-dev",
+    "FinalIntegrationBuildVersion": "0.1.462-dev",
+    "Qualification": "Measured working-tree snapshots contain the semantic conveyor/distribution fixes; the after snapshot adds only the measured conveyor allocation refactor. They are not identified as binaries of the final PR head.",
+    "SourceSha256Before": {
+      "src/ForgeLine.Game/ConveyorSimulationSystem.cs": "f2e03efbdb273d637e938f5b19fd09c2270701437835904d51fdb61864e669c1",
+      "src/ForgeLine.Game/AutomatedDistributionSystem.cs": "ec362d22c8c68a73839bb148fbc08af1692f5d70efebaab4277ab2b6f105567c",
+      "benchmarks/ForgeLine.Simulation.Benchmarks/Program.cs": "38327222a308fd01d51dda4579292875134d780948db1bdc6d269afc739d7db6",
+      "benchmarks/ForgeLine.Simulation.Benchmarks/ConveyorPerformanceScenario.cs": "892863cf2a39181f5b2bc5bfda2cf9752d826448cbb1520df8b89d8c04d55c78",
+      "benchmarks/ForgeLine.Simulation.Benchmarks/ConveyorMeasurements.cs": "9d4c7496e475cf919c820de4b2ed29cb19f9b67ed1a9b699f90a16e4f07d1e4c"
+    },
+    "SourceSha256After": {
+      "src/ForgeLine.Game/ConveyorSimulationSystem.cs": "c8d2c339a52fc2e54abffc97653dab0a2906072e4f6ab0c354b199803f065efb",
+      "src/ForgeLine.Game/AutomatedDistributionSystem.cs": "ec362d22c8c68a73839bb148fbc08af1692f5d70efebaab4277ab2b6f105567c",
+      "benchmarks/ForgeLine.Simulation.Benchmarks/Program.cs": "38327222a308fd01d51dda4579292875134d780948db1bdc6d269afc739d7db6",
+      "benchmarks/ForgeLine.Simulation.Benchmarks/ConveyorPerformanceScenario.cs": "892863cf2a39181f5b2bc5bfda2cf9752d826448cbb1520df8b89d8c04d55c78",
+      "benchmarks/ForgeLine.Simulation.Benchmarks/ConveyorMeasurements.cs": "9d4c7496e475cf919c820de4b2ed29cb19f9b67ed1a9b699f90a16e4f07d1e4c"
+    },
+    "RawReports": [
+      {
+        "Phase": "Before",
+        "CapturedUtc": "2026-10-23T16:22:39.0175936+00:00",
+        "Revision": "b397bd6-semantic-f2e03efb-ec362d22-before-allocation-refactor",
+        "Bytes": 1451636,
+        "Sha256": "be66798f7b5fd91127008bc055fdc33a3ebf07d5b5a89ed5c91f9f9962f21127",
+        "Assemblies": [
+          {
+            "Name": "ForgeLine.Simulation.Benchmarks.dll",
+            "Sha256": "2502DBC1A865EE31CF6319EF01E9994ED933DB109431B70E71978C93EABF428A"
+          },
+          {
+            "Name": "ForgeLine.Game.dll",
+            "Sha256": "E8F0FE32463B6E8F3389C9E07E5166A5485B3C2DC591EAC42B6FCB5F3DE02084"
+          }
+        ]
+      },
+      {
+        "Phase": "After",
+        "CapturedUtc": "2026-10-23T16:27:00.5550482+00:00",
+        "Revision": "b397bd6-semantic-f2e03efb-ec362d22-plus-allocation-c8d2c339",
+        "Bytes": 1444582,
+        "Sha256": "41977f4db248fedc92865db41566f815d0c14cd1f3acb27ab39ed0945fcefcaf",
+        "Assemblies": [
+          {
+            "Name": "ForgeLine.Simulation.Benchmarks.dll",
+            "Sha256": "B68ECF650A83F4FD58E046124249AD0972E729CE014742670E71B8F8D71ED86F"
+          },
+          {
+            "Name": "ForgeLine.Game.dll",
+            "Sha256": "B9B68B19955DE3F186CFFCF23E913B02EBD68D2077B4F10202780570F1D544B9"
+          }
+        ]
+      }
+    ]
+  },
+  "Environment": {
+    "Backend": "headless-conveyor",
+    "Runtime": ".NET 10.0.12",
+    "OS": "Ubuntu 24.04.3 LTS",
+    "Architecture": "X64",
+    "ProcessorCount": 8,
+    "Processor": null,
+    "CpuModel": null,
+    "HardwareReference": null,
+    "DriverMetadata": null,
+    "ClockAndPowerSettings": null
+  },
+  "Configuration": {
+    "Sdk": "10.0.401",
+    "TickRate": 20,
+    "Seed": 2026,
+    "WarmupTicksPerCase": 256,
+    "MeasuredTicksPerCase": 512,
+    "TieredCompilation": "0",
+    "MatrixCases": 24,
+    "ModuleCounts": [
+      100,
+      1000,
+      4096
+    ],
+    "Topology": [
+      "Linear",
+      "SplitMerge"
+    ],
+    "States": [
+      "Powered",
+      "Unpowered",
+      "Blocked",
+      "Congested"
+    ],
+    "Command": "dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release --no-build -- --conveyor-measurements artifacts/conveyor-measurements.json"
+  },
+  "Methodology": {
+    "Scope": "One complete fixed tick with real production, conveyor flow, stock policies and, for powered cases, navigation/docking/distribution/physical cargo. Conveyor probe separately measures the existing system Execute call. No rendering, combat or whole-match cost is claimed.",
+    "Setup": "Finite synthetic fixture; 10000 Ore per Smelter, unmodified Steel recipe. Powered cases begin with zero Steel, so all conveyor and truck Steel comes from production. Congested cases additionally seed each finite buffer and sink to capacity. No replenishment, draining, teleporting or state resets during warmup/measurement.",
+    "Geometry": "5/50/205 parallel lanes of at most 20 transport modules. SplitMerge inserts a splitter, two independent standard branches and a merger per lane. Module counts exclude buildings and structural supports; scale fixture is not a construction-cost acceptance test.",
+    "States": "Powered has 1/4/16 physical Cargo Trucks; unpowered disables conveyor generation; blocked reverses receiving-building sockets; congested fills sinks and buffers. Stopped states intentionally have no trucks and are not called active-flow measurements. Production remains active in every state.",
+    "Timing": "Full tick wall time includes conveyor probe overhead. Conveyor wall time excludes probe queries. Process CPU per observed tick includes observation/probe overhead and is reported separately from wall latency. Percentiles use nearest rank; raw tick samples are retained.",
+    "AllocationScope": "All process threads during the full tick or nested conveyor Execute call; setup, warmup, observation and JSON reporting excluded. GC counts include the entire observed sampling loop. No job scheduler is provisioned.",
+    "Equivalence": "Schema 1: SHA256 at warmup end, every 32 sampled ticks and final tick. Little-endian 64-bit words encode tick/counters, each tracked inventory's total and all five conveyor resources' quantity/reservation/availability, all module flow/cursor/network fields and buffered quantity, port resource cursors, truck position/cargo lifecycle and dock identity/state. Full entity generations and exact floating-point bits participate. Raw per-tick aggregate module output and truck distance are also retained. Digests are observed outside timing/allocation regions; process CPU includes observations."
+  },
+  "Comparison": {
+    "PerformancePairOrder": [
+      "Before",
+      "After"
+    ],
+    "CounterAndLivenessValues": "Exactly equal in both executions. CommonCounters are changes during the measured interval; CommonInventoryAtWarmupEndAndFinal uses [warmup end, final].",
+    "QualifiedCasesBeforeAfter": [
+      24,
+      24
+    ],
+    "IdenticalAuthoritySamples": 408,
+    "IdenticalPerTickFlowAndTruckDistancePairs": 12288,
+    "AllComparedCountersAndFinalTruckStatesEqual": true,
+    "ConveyorAllocationReductionPercentRange": [
+      43.559,
+      47.1418
+    ],
+    "ObservedTicksOver50MillisecondsBeforeAfter": [
+      792,
+      28
+    ],
+    "ObservedTickCountPerExecution": 12288,
+    "ObservationHashEncoding": "SHA256 of UTF-8 JSON, sorted object keys, compact comma/colon separators, ASCII escapes, finite numbers; arrays retain report order. Source/report/assembly hashes cover original bytes.",
+    "AllAuthoritySamplesSha256": "5ef786792aa8210d4e64f08637080ef887105dd6eaef6c995d5f784c4f61b883",
+    "AllFlowAndTruckSamplesSha256": "0f7dc7d0f56ba8a78388136eb9cd46b3dd712bdb7201c212df0a9277835e1c27",
+    "AllFinalTruckStatesSha256": "483525a036995300746c94e088445c5c8c6ad2582061fcd83c9ed43b925c1e7b",
+    "PerformanceColumns": [
+      "MeanTickMilliseconds",
+      "MeanConveyorMilliseconds",
+      "AllocatedBytesPerTick",
+      "ConveyorAllocatedBytesPerTick",
+      "ProcessCpuMillisecondsPerObservedTick",
+      "GenCollections",
+      "P50Milliseconds",
+      "P95Milliseconds",
+      "P99Milliseconds",
+      "MaximumMilliseconds",
+      "OverBudget",
+      "HitchesOver100Milliseconds",
+      "ConveyorAllocationReductionPercent"
+    ],
+    "PerformanceCellFormat": "Columns follow PerformanceColumns; every cell is [before, after], except ConveyorAllocationReductionPercent, which is one scalar. GenCollections contains [gen0, gen1, gen2] for each execution.",
+    "EqualSamplesPerCase": {
+      "AuthoritySamples": 17,
+      "PerTickFlowAndTruckDistancePairs": 512
+    }
+  },
+  "Limitations": [
+    "This finite scale fixture is not a paid-construction, whole-match, rendering, combat or native D3D12 qualification.",
+    "Clock and power settings, physical reference hardware and driver metadata were not recorded; unknown report metadata is retained as null.",
+    "Single paired runs on a shared host do not establish a machine-independent speedup or a hard 20 Hz deadline. The remaining 28 observed ticks over 50 ms prevent a universal deadline claim.",
+    "Production and physical truck liveness are required for powered cases. Stopped-state cases intentionally have no trucks and do not claim active material flow.",
+    "Allocation and wall measurements exclude observation work; process CPU and GC include the observed loop. Performance values here are rounded to six decimals; raw report byte hashes identify the full samples.",
+    "The independent integration build uses version 0.1.462-dev. The measured assembly hashes and source fingerprints, not the later build version, identify this before/after experiment."
+  ],
+  "Cases": [
+    {"Modules": 100,"Topology": "Linear","State": "Powered","ProductionFacilities": 5,"Trucks": 1,"PerformanceBeforeAfter": [[1.050729,0.69928],[0.678653,0.374254],[436066.484375,251343.203125],[412596.09375,227873.28125],[0.892168,0.711043],[[13,1,0],[7,1,0]],[0.6299,0.4292],[1.3767,0.6235],[11.2831,4.0933],[76.6253,81.3114],[1,1],[0,0],44.7709],"CommonCounters": {"ProductionCycles": 65,"ProducedSteel": 650,"CompletedDeliveries": 1,"DeliveredSteel": 5,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [49700,49050],"Steel": [300,950]},"CommonLiveness": {"ActiveFlowTicks": 265,"ActiveTruckTicks": 511,"FirstHalfModuleOutputQuantity": 6225,"SecondHalfModuleOutputQuantity": 6375,"FirstHalfTruckDistanceMeters": 61.124582,"SecondHalfTruckDistanceMeters": 73.924155},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 100,"Topology": "Linear","State": "Unpowered","ProductionFacilities": 5,"Trucks": 0,"PerformanceBeforeAfter": [[0.531606,0.337375],[0.483524,0.294785],[395187.796875,215600.984375],[380950.09375,201363.28125],[0.514865,0.347014],[[12,0,0],[6,0,0]],[0.5004,0.3272],[0.5638,0.3682],[1.0071,0.6072],[11.2333,0.904],[0,0],[0,0],47.1418],"CommonCounters": {"ProductionCycles": 65,"ProducedSteel": 650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [49700,49050],"Steel": [300,950]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 100,"Topology": "Linear","State": "Blocked","ProductionFacilities": 5,"Trucks": 0,"PerformanceBeforeAfter": [[0.441589,0.345905],[0.405505,0.302576],[393499.796875,214872.984375],[379150.09375,200523.28125],[0.406746,0.354936],[[12,0,0],[6,0,0]],[0.3421,0.3342],[0.5784,0.4203],[0.9589,0.8817],[11.3245,5.3493],[0,0],[0,0],47.1124],"CommonCounters": {"ProductionCycles": 65,"ProducedSteel": 650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [49700,49050],"Steel": [300,950]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 100,"Topology": "Linear","State": "Congested","ProductionFacilities": 5,"Trucks": 0,"PerformanceBeforeAfter": [[0.512991,0.376745],[0.472773,0.336224],[424099.796875,244513.453125],[409750.09375,230163.75],[0.466268,0.38651],[[12,0,0],[7,0,0]],[0.4567,0.3729],[0.6518,0.4351],[1.0183,0.8049],[15.242,4.4449],[0,0],[0,0],43.8283],"CommonCounters": {"ProductionCycles": 65,"ProducedSteel": 650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [49700,49050],"Steel": [10800,11450]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 100,"Topology": "SplitMerge","State": "Powered","ProductionFacilities": 5,"Trucks": 1,"PerformanceBeforeAfter": [[0.483607,0.442819],[0.415898,0.362938],[440210.828125,253728.125],[416726.4375,230243.625],[0.486424,0.451762],[[13,1,0],[7,1,0]],[0.4311,0.4137],[0.7862,0.5603],[1.4931,0.8739],[3.1987,4.2907],[0,0],[0,0],44.7495],"CommonCounters": {"ProductionCycles": 65,"ProducedSteel": 650,"CompletedDeliveries": 1,"DeliveredSteel": 10,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [49700,49050],"Steel": [300,950]},"CommonLiveness": {"ActiveFlowTicks": 252,"ActiveTruckTicks": 511,"FirstHalfModuleOutputQuantity": 5875,"SecondHalfModuleOutputQuantity": 6075,"FirstHalfTruckDistanceMeters": 61.64879,"SecondHalfTruckDistanceMeters": 90.009294},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 100,"Topology": "SplitMerge","State": "Unpowered","ProductionFacilities": 5,"Trucks": 0,"PerformanceBeforeAfter": [[0.415743,0.262334],[0.37633,0.233399],[399555.796875,218210.03125],[385318.09375,203971.28125],[0.370561,0.269887],[[12,0,0],[6,0,0]],[0.3289,0.2391],[0.5111,0.3649],[2.7957,0.5019],[11.0888,0.7405],[0,0],[0,0],47.0642],"CommonCounters": {"ProductionCycles": 65,"ProducedSteel": 650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [49700,49050],"Steel": [300,950]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 100,"Topology": "SplitMerge","State": "Blocked","ProductionFacilities": 5,"Trucks": 0,"PerformanceBeforeAfter": [[0.505437,0.331654],[0.462521,0.296937],[397259.796875,216874.03125],[382910.09375,202523.28125],[0.469156,0.338717],[[12,0,0],[6,0,0]],[0.4849,0.2703],[0.6086,0.4492],[1.0708,0.87],[11.2246,7.1437],[0,0],[0,0],47.1094],"CommonCounters": {"ProductionCycles": 65,"ProducedSteel": 650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [49700,49050],"Steel": [300,950]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 100,"Topology": "SplitMerge","State": "Congested","ProductionFacilities": 5,"Trucks": 0,"PerformanceBeforeAfter": [[0.478162,0.348097],[0.439232,0.309934],[428468.265625,247122.5],[414118.5625,232771.75],[0.464963,0.355463],[[13,0,0],[7,0,0]],[0.3763,0.3109],[0.6425,0.4777],[0.9738,0.6997],[12.5287,5.9392],[0,0],[0,0],43.791],"CommonCounters": {"ProductionCycles": 65,"ProducedSteel": 650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [49700,49050],"Steel": [11800,12450]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 1000,"Topology": "Linear","State": "Powered","ProductionFacilities": 50,"Trucks": 4,"PerformanceBeforeAfter": [[5.316649,4.166791],[4.882443,3.665119],[4243269.828125,2423589.015625],[4103405.5625,2283731.3125],[5.367016,4.228201],[[129,15,0],[74,15,0]],[5.1317,3.9794],[7.2671,5.6244],[8.5301,6.8065],[16.7966,14.5612],[0,0],[0,0],44.3455],"CommonCounters": {"ProductionCycles": 650,"ProducedSteel": 6500,"CompletedDeliveries": 4,"DeliveredSteel": 20,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [497000,490500],"Steel": [3000,9500]},"CommonLiveness": {"ActiveFlowTicks": 265,"ActiveTruckTicks": 511,"FirstHalfModuleOutputQuantity": 62250,"SecondHalfModuleOutputQuantity": 63750,"FirstHalfTruckDistanceMeters": 244.480458,"SecondHalfTruckDistanceMeters": 295.718873},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 1000,"Topology": "Linear","State": "Unpowered","ProductionFacilities": 50,"Trucks": 0,"PerformanceBeforeAfter": [[4.937204,3.541521],[4.650538,3.18713],[3950065.75,2150935.96875],[3824536.71875,2025406.9375],[4.995477,3.614498],[[120,55,0],[65,8,0]],[4.534,3.5109],[7.3406,4.3943],[10.3907,4.8281],[28.2325,7.5904],[0,0],[0,0],47.0418],"CommonCounters": {"ProductionCycles": 650,"ProducedSteel": 6500,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [497000,490500],"Steel": [3000,9500]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 1000,"Topology": "Linear","State": "Blocked","ProductionFacilities": 50,"Trucks": 0,"PerformanceBeforeAfter": [[4.671461,2.840209],[4.389522,2.565421],[3899369.28125,2126239.96875],[3773728.25,2000598.9375],[4.721654,2.89368],[[119,50,0],[65,31,0]],[4.2542,2.6198],[6.3961,3.5227],[8.0771,4.2716],[42.2074,8.801],[0,0],[0,0],46.9861],"CommonCounters": {"ProductionCycles": 650,"ProducedSteel": 6500,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [497000,490500],"Steel": [3000,9500]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 1000,"Topology": "Linear","State": "Congested","ProductionFacilities": 50,"Trucks": 0,"PerformanceBeforeAfter": [[6.859853,3.037746],[6.475593,2.774942],[4238181.96875,2439052.1875],[4112540.9375,2313411.15625],[5.697881,3.08423],[[129,0,0],[74,0,0]],[5.4146,2.8255],[15.8115,3.9047],[23.8444,5.3799],[39.506,7.7205],[0,0],[0,0],43.7474],"CommonCounters": {"ProductionCycles": 650,"ProducedSteel": 6500,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [497000,490500],"Steel": [108000,114500]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 1000,"Topology": "SplitMerge","State": "Powered","ProductionFacilities": 50,"Trucks": 4,"PerformanceBeforeAfter": [[5.35331,3.821623],[4.931616,3.382368],[4282709.140625,2445430.78125],[4142786.9375,2305512.6875],[5.405229,3.879135],[[130,9,0],[74,8,0]],[5.2319,3.6001],[7.3134,5.5477],[8.3261,6.4867],[10.0621,16.5495],[0,0],[0,0],44.3488],"CommonCounters": {"ProductionCycles": 650,"ProducedSteel": 6500,"CompletedDeliveries": 4,"DeliveredSteel": 40,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [497000,490500],"Steel": [3000,9500]},"CommonLiveness": {"ActiveFlowTicks": 252,"ActiveTruckTicks": 511,"FirstHalfModuleOutputQuantity": 58750,"SecondHalfModuleOutputQuantity": 60750,"FirstHalfTruckDistanceMeters": 246.579372,"SecondHalfTruckDistanceMeters": 360.055718},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 1000,"Topology": "SplitMerge","State": "Unpowered","ProductionFacilities": 50,"Trucks": 0,"PerformanceBeforeAfter": [[4.599336,3.15789],[4.331759,2.870172],[3991858.6875,2175129.484375],[3866329.65625,2049599.40625],[4.651998,3.215041],[[122,48,0],[66,24,0]],[4.2847,2.9308],[6.0682,4.1391],[8.7104,5.0724],[10.4147,7.663],[0,0],[0,0],46.9885],"CommonCounters": {"ProductionCycles": 650,"ProducedSteel": 6500,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [497000,490500],"Steel": [3000,9500]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 1000,"Topology": "SplitMerge","State": "Blocked","ProductionFacilities": 50,"Trucks": 0,"PerformanceBeforeAfter": [[4.58646,2.922884],[4.320416,2.65384],[3969778.21875,2162649.484375],[3844137.1875,2037007.40625],[4.642391,2.974406],[[121,50,0],[66,30,0]],[4.3617,2.6542],[5.8477,4.0141],[6.7817,5.1407],[10.3363,7.6006],[0,0],[0,0],47.01],"CommonCounters": {"ProductionCycles": 650,"ProducedSteel": 6500,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [497000,490500],"Steel": [3000,9500]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 1000,"Topology": "SplitMerge","State": "Congested","ProductionFacilities": 50,"Trucks": 0,"PerformanceBeforeAfter": [[5.720051,3.581718],[5.390636,3.285947],[4279974.4375,2463245.703125],[4154333.40625,2337603.625],[5.778826,3.644172],[[131,57,0],[75,29,0]],[5.2373,3.4267],[8.5224,4.9118],[12.3884,6.9679],[21.4026,12.7307],[0,0],[0,0],43.731],"CommonCounters": {"ProductionCycles": 650,"ProducedSteel": 6500,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [497000,490500],"Steel": [118000,124500]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 4096,"Topology": "Linear","State": "Powered","ProductionFacilities": 205,"Trucks": 16,"PerformanceBeforeAfter": [[50.89745,27.51761],[48.444205,25.077119],[17434213.265625,9955875.328125],[16892658.453125,9414321.8125],[51.937824,28.473184],[[617,392,124],[374,373,110]],[48.3857,25.4259],[74.0662,45.5681],[91.2246,53.8976],[136.0795,81.2493],[221,15],[4,0],44.2697],"CommonCounters": {"ProductionCycles": 2665,"ProducedSteel": 26650,"CompletedDeliveries": 16,"DeliveredSteel": 80,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [2037700,2011050],"Steel": [12300,38950]},"CommonLiveness": {"ActiveFlowTicks": 265,"ActiveTruckTicks": 512,"FirstHalfModuleOutputQuantity": 254945,"SecondHalfModuleOutputQuantity": 261135,"FirstHalfTruckDistanceMeters": 980.562953,"SecondHalfTruckDistanceMeters": 1179.344941},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 4096,"Topology": "Linear","State": "Unpowered","ProductionFacilities": 205,"Trucks": 0,"PerformanceBeforeAfter": [[42.896817,20.200363],[41.486688,18.442485],[16308437.453125,8912363.859375],[15800016.9375,8403882.5625],[42.817377,21.289033],[[631,442,172],[359,355,127]],[39.3609,17.6754],[66.4037,35.4802],[84.5729,41.0771],[172.888,43.2784],[99,0],[3,0],46.8109],"CommonCounters": {"ProductionCycles": 2665,"ProducedSteel": 26650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [2037700,2011050],"Steel": [12300,38950]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 4096,"Topology": "Linear","State": "Blocked","ProductionFacilities": 205,"Trucks": 0,"PerformanceBeforeAfter": [[38.030522,19.246877],[36.562084,17.472445],[16169104.859375,8812224.296875],[15660575.03125,8303668.46875],[39.358627,20.289623],[[626,437,171],[329,317,101]],[36.5964,16.7787],[52.7227,35.787],[61.8514,44.9044],[78.0994,56.6372],[43,2],[0,0],46.9772],"CommonCounters": {"ProductionCycles": 2665,"ProducedSteel": 26650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [2037700,2011050],"Steel": [12300,38950]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 4096,"Topology": "Linear","State": "Congested","ProductionFacilities": 205,"Trucks": 0,"PerformanceBeforeAfter": [[41.075629,21.928158],[39.682388,20.334541],[17488244.359375,10092042.453125],[16979714.53125,9583510.546875],[42.143521,23.123863],[[667,456,172],[395,394,127]],[38.2457,20.0649],[60.2656,37.9363],[73.0139,44.6057],[79.1918,55.1737],[85,2],[0,0],43.5591],"CommonCounters": {"ProductionCycles": 2665,"ProducedSteel": 26650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [2037700,2011050],"Steel": [442400,469050]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 4096,"Topology": "SplitMerge","State": "Powered","ProductionFacilities": 205,"Trucks": 16,"PerformanceBeforeAfter": [[47.674495,27.762612],[45.371751,25.317941],[17602194.5625,10047107.4375],[17060381.5,9505318.796875],[48.495764,28.885336],[[621,393,123],[372,371,106]],[46.6499,25.5113],[66.07,44.4829],[73.0115,50.7995],[90.2382,98.9721],[200,6],[0,0],44.2843],"CommonCounters": {"ProductionCycles": 2665,"ProducedSteel": 26650,"CompletedDeliveries": 16,"DeliveredSteel": 160,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [2037700,2011050],"Steel": [12300,38950]},"CommonLiveness": {"ActiveFlowTicks": 252,"ActiveTruckTicks": 512,"FirstHalfModuleOutputQuantity": 240600,"SecondHalfModuleOutputQuantity": 248835,"FirstHalfTruckDistanceMeters": 988.953484,"SecondHalfTruckDistanceMeters": 1435.899621},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 4096,"Topology": "SplitMerge","State": "Unpowered","ProductionFacilities": 205,"Trucks": 0,"PerformanceBeforeAfter": [[38.535146,19.160727],[37.243034,17.455335],[16479061.40625,9011077.40625],[15970640.796875,8502358.125],[39.954053,20.66266],[[633,455,168],[405,394,170]],[36.7636,17.7605],[52.7531,30.5025],[62.3448,36.0216],[76.6259,37.2172],[49,0],[0,0],46.7626],"CommonCounters": {"ProductionCycles": 2665,"ProducedSteel": 26650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [2037700,2011050],"Steel": [12300,38950]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 4096,"Topology": "SplitMerge","State": "Blocked","ProductionFacilities": 205,"Trucks": 0,"PerformanceBeforeAfter": [[39.363838,17.910347],[37.896315,16.419014],[16411084.421875,8960147.640625],[15902374.53125,8451570.640625],[40.7724,19.229213],[[636,447,177],[402,389,168]],[38.4948,16.1481],[52.8131,28.8985],[57.5214,33.9071],[74.7284,45.1667],[44,0],[0,0],46.8534],"CommonCounters": {"ProductionCycles": 2665,"ProducedSteel": 26650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [2037700,2011050],"Steel": [12300,38950]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true},
+    {"Modules": 4096,"Topology": "SplitMerge","State": "Congested","ProductionFacilities": 205,"Trucks": 0,"PerformanceBeforeAfter": [[41.290621,22.490886],[39.767728,20.809824],[17663600.6875,10191055.203125],[17155032.125,9682463.25],[42.739064,23.998877],[[678,471,177],[437,430,166]],[40.2346,20.7444],[56.1337,35.4341],[63.5239,43.4447],[75.3572,58.9417],[50,2],[0,0],43.559],"CommonCounters": {"ProductionCycles": 2665,"ProducedSteel": 26650,"CompletedDeliveries": 0,"DeliveredSteel": 0,"LostCargo": 0},"CommonInventoryAtWarmupEndAndFinal": {"FerrousOre": [2037700,2011050],"Steel": [483400,510050]},"CommonLiveness": {"ActiveFlowTicks": 0,"ActiveTruckTicks": 0,"FirstHalfModuleOutputQuantity": 0,"SecondHalfModuleOutputQuantity": 0,"FirstHalfTruckDistanceMeters": 0,"SecondHalfTruckDistanceMeters": 0},"Failures": [],"AllObservedStateAndCountersEqual": true}
+  ]
+}

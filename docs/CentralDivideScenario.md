@@ -175,6 +175,7 @@ The Windows client exposes the current Directorate content through one shared ac
 
 Availability and costs are copied from the same building, recipe, unit, and inventory contracts used by simulation. A human slot does not receive a hidden strategic controller: construction and production originate as explicit player commands and remain subject to authoritative ownership, material, power, placement, output-capacity, and fixed-tick rules.
 
-## Planned local base conveyors
+## Paid local base conveyors
 
-[Base Conveyor Logistics](BaseConveyorLogistics.md) and its [building port matrix](BaseConveyorPortMatrix.md) define a future optional base-internal transport layer. Central Divide currently continues to use the real road/Cargo Truck and battlefield Supply Truck lifecycles. No conveyor link, production shortcut, building socket or automatic scenario migration is active. A future hybrid qualification must retain terminal-match, vehicle-navigation and finite-resource invariants.
+[Base Conveyor Logistics](BaseConveyorLogistics.md) and its [building port matrix](BaseConveyorPortMatrix.md) describe the implemented optional local conveyor layer. Players build paid physical modules and explicitly attach eligible building ports; existing scenarios receive no automatic network. Finite buffers move actual inventory through original production recipes, while regional Cargo Trucks and battlefield Supply Trucks retain their physical loading and movement lifecycles. The [flow qualification](ConveyorSimulationAndVehicleInterop.md) covers a Standard-stock Gameplay start with paid buildings and bands, an actual Ore truck delivery, two Smelter cycles and Steel reaching storage. Headless conservation, recovery and navigation evidence does not replace the unchanged natural terminal-match gate or native visual acceptance.
+

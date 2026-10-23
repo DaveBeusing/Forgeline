@@ -1,6 +1,6 @@
 # Base Conveyor Port Matrix
 
-**Status: implemented finite-flow port subset, manual qualification pending.**
+**Status: implemented finite-flow port subset with headless qualification; native acceptance pending.**
 [Conveyor simulation and vehicle interop](ConveyorSimulationAndVehicleInterop.md)
 lists exact activated sockets, dimensions, resource filters and real inventory bindings.
 Command Core, eligible Extractors, Storage Depot, Smelter, Electronics Fabricator,
@@ -15,14 +15,14 @@ content, not permission to invent sockets for an unsupported definition or scale
 | Mine / Extractor | None | Ferrous Ore, Silicates and other explicitly eligible extracted solids | One-way bulk output; a fluid/gas deposit is never automatically belt-enabled |
 | Storage Depot | Eligible solids/packages | Eligible solids/packages | Buffer and truck-to-belt or belt-to-truck handoff; finite shared inventory |
 | Smelter | Eligible solid ore | Steel | Consume raw stock and emit produced Steel only after the authoritative recipe completes |
-| Refinery | Eligible solid recipe inputs only | None for Fuel | Fuel stays non-belt in V1; fluid output needs future pipeline or road |
+| Refinery | None for the current Volatiles recipe | None for Fuel | Current recipe is entirely non-belt; future content requires explicit eligible-port qualification |
 | Electronics Fabricator | Eligible solid recipe inputs | Electronics | Protected packaged output |
 | Ammunition Plant | Steel, Electronics and other eligible solids per catalog | Ammunition | Sealed-crate output, no individual caliber item simulation |
 | Logistics Hub | Eligible solids/packages | Eligible solids/packages | Regional truck exchange and local buffering; no free auto-link |
 | Supply Depot | Ammunition | Ammunition where permitted | Cargo Truck/Supply Truck bays remain authoritative; Fuel still delivered by road |
 | Barracks | Eligible unit-recipe solids/packages | None | Produced infantry are ECS units, not conveyor cargo; Fuel inputs still use road if required |
 | Vehicle Factory | Eligible unit-recipe solids/packages | None | Produced vehicles are not belt cargo; Fuel input continues to need road |
-| Power Plant | Explicitly eligible solid recipe inputs if content requires | None | Power is not inventory cargo; no power-by-belt shortcut |
+| Power Plant | None in the current catalog | None | Power is not inventory cargo; future eligible inputs require an explicit content change |
 | Radar | None by default | None | Powered consumer, not a routine material transit node |
 
 The [raised conveyor visual kit](ConveyorVisualLanguage.md) defines the
@@ -67,3 +67,4 @@ ownership, intake/output class, capacity, recipe eligibility, blocked/disabled
 status, and lifecycle when the building is damaged, destroyed or removed.
 A missing port definition means no conveyor connection, never a guessed
 automatic transfer.
+

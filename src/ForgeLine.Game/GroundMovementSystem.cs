@@ -320,6 +320,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
 
         Vector3 targetDirection = NormalizeHorizontal(targetDelta);
         Vector3 steering = targetDirection;
+        float vehicleTop = position.Y + MathF.Abs(transform.Scale.Y) * 0.5f;
 
         steering += CalculateSeparationSteering(
             entity,
@@ -329,10 +330,12 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             ref neighborAdjustments);
 
         steering += CalculateObstacleSteering(
+            entities,
             entity,
             position,
             targetDirection,
             movement,
+            vehicleTop,
             ref obstacleAdjustments);
 
         if (order.TargetHeadingRadians.HasValue) steering = targetDirection;
@@ -436,10 +439,12 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             ref candidate,
             movement);
         ResolveStaticPenetration(
+            entities,
             entity,
             ref candidate,
-            movement);
-        ConstrainStaticStep(entity, position, ref candidate, movement);
+            movement,
+            vehicleTop);
+        ConstrainStaticStep(entities, entity, position, ref candidate, movement, vehicleTop);
 
         bool terrainBlocked = !TryApplyTerrain(
             ref candidate,
@@ -638,10 +643,12 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
     }
 
     private Vector3 CalculateObstacleSteering(
+        EntityRegistry entities,
         EntityId entity,
         Vector3 position,
         Vector3 targetDirection,
         in GroundMovement movement,
+        float vehicleTop,
         ref int adjustmentCount)
     {
         if (_spatialIndex is null ||
@@ -662,7 +669,8 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             if (obstacle == entity ||
                 !_spatialIndex.TryGetEntry(
                     obstacle,
-                    out SpatialEntry entry))
+                    out SpatialEntry entry) ||
+                HasConveyorClearance(entities, obstacle, entry.Bounds, vehicleTop))
             {
                 continue;
             }
@@ -777,9 +785,11 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
     }
 
     private void ResolveStaticPenetration(
+        EntityRegistry entities,
         EntityId entity,
         ref Vector3 candidate,
-        in GroundMovement movement)
+        in GroundMovement movement,
+        float vehicleTop)
     {
         if (_spatialIndex is null)
         {
@@ -798,7 +808,8 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
                 !_spatialIndex.TryGetEntry(
                     obstacle,
                     out SpatialEntry entry) ||
-                entry.Metadata.Mobility != SpatialMobility.Static)
+                entry.Metadata.Mobility != SpatialMobility.Static ||
+                HasConveyorClearance(entities, obstacle, entry.Bounds, vehicleTop))
             {
                 continue;
             }
@@ -846,6 +857,13 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             candidate += away * (clearance - distance);
         }
     }
+
+    private static bool HasConveyorClearance(EntityRegistry entities, EntityId obstacle,
+        in AxisAlignedBounds bounds, float vehicleTop) =>
+        // Elevated carriers only clear vehicles that fit below their physical bounds.
+        // Their real supports remain ordinary ground obstacles.
+        float.IsFinite(vehicleTop) && vehicleTop < bounds.Minimum.Y &&
+        entities.TryGetComponent(obstacle, out ConveyorPiece piece) && !piece.Placement.IsSupport;
 
     private bool TryApplyTerrain(
         ref Vector3 candidate,
@@ -1048,3 +1066,5 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         return GroundMovementState.NormalizeAngle(next);
     }
 }
+
+

@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Ecs;
 using ForgeLine.World;
 
 namespace ForgeLine.Game;
@@ -32,8 +33,8 @@ public sealed partial class GroundMovementSystem
             SpatialQueryOrder.StableEntityId);
     }
 
-    private void ConstrainStaticStep(EntityId entity, Vector3 position,
-        ref Vector3 candidate, in GroundMovement movement)
+    private void ConstrainStaticStep(EntityRegistry entities, EntityId entity, Vector3 position,
+        ref Vector3 candidate, in GroundMovement movement, float vehicleTop)
     {
         if (_spatialIndex is null) return;
         Vector3 displacement = candidate - position;
@@ -54,7 +55,8 @@ public sealed partial class GroundMovementSystem
         bool blocked = false;
         foreach (EntityId obstacle in _obstacleBuffer.Results)
         {
-            if (obstacle == entity || !_spatialIndex.TryGetEntry(obstacle, out SpatialEntry entry)) continue;
+            if (obstacle == entity || !_spatialIndex.TryGetEntry(obstacle, out SpatialEntry entry) ||
+                HasConveyorClearance(entities, obstacle, entry.Bounds, vehicleTop)) continue;
             if (GroundMovementStep.TrySweepCircle(position, candidate, entry.Bounds, clearance, out float fraction))
             {
                 earliest = MathF.Min(earliest, fraction);
@@ -68,3 +70,5 @@ public sealed partial class GroundMovementSystem
         }
     }
 }
+
+
