@@ -265,7 +265,7 @@ public sealed class ConveyorConstructionService
             if (!entities.TryGetComponent(request.Target,out old)) return Fail(ConveyorFailure.TargetUnavailable);
             if (old.Owner!=owner) return Fail(ConveyorFailure.NotOwned);
             if(request.Edit==ConveyorEdit.Replace)
-                request=request with {Tier=old.Placement.Tier,Orientation=old.Placement.Orientation};
+                request=ResolveReplacementRequest(request,old);
             if ((request.Edit is ConveyorEdit.Remove or ConveyorEdit.Replace) &&
                 (!double.IsFinite(old.BufferedQuantity) || old.BufferedQuantity!=0 ||
                  entities.TryGetComponent(request.Target,out ConveyorFlowState held) &&
@@ -483,6 +483,16 @@ public sealed class ConveyorConstructionService
                 Vector3.Dot(port.Facing,socket.Facing)<-.999f);
         }
     }
+    private static ConveyorBuildRequest ResolveReplacementRequest(ConveyorBuildRequest request,ConveyorPiece old) =>
+        request with
+        {
+            Tier=old.Placement.Tier,
+            Orientation=old.Placement.Orientation,
+            SourcePortBuilding=request.Module==ConveyorModule.InputAdapter && old.Placement.Module==ConveyorModule.InputAdapter &&
+                !request.SourcePortBuilding.IsValid?old.Attachment:request.SourcePortBuilding,
+            DestinationPortBuilding=request.Module==ConveyorModule.OutputAdapter && old.Placement.Module==ConveyorModule.OutputAdapter &&
+                !request.DestinationPortBuilding.IsValid?old.Attachment:request.DestinationPortBuilding
+        };
     private static bool Finite(Vector3 v)=>float.IsFinite(v.X)&&float.IsFinite(v.Y)&&float.IsFinite(v.Z);
     private bool OnRoad(Vector3 p)
     {
@@ -524,6 +534,7 @@ public sealed class ConveyorConstructionService
             if (!_stock.Remove(inventory,ResourceIds.Steel,plan.Steel).Succeeded)return ConveyorFailure.InsufficientStock;
             if(request.Edit==ConveyorEdit.Replace)
             {
+                request=ResolveReplacementRequest(request,context.Entities.GetComponent<ConveyorPiece>(request.Target));
                 DestroyEmptyBuffer(request.Target);
                 _spatial.Remove(request.Target);context.Entities.DestroyEntity(request.Target);
             }
@@ -592,3 +603,4 @@ public sealed class ConveyorConstructionCommand : ISimulationCommand
     public void Execute(SimulationContext context)
     { ExecutedAtTick=context.Tick; Result=_service.Apply(context,Issuer,Request,Payer); }
 }
+
