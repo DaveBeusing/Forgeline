@@ -1,0 +1,55 @@
+{
+  "Seed": 2026,
+  "Profile": "Gameplay",
+  "TickRate": 20,
+  "Runtime": ".NET 10.0.13",
+  "OS": "Microsoft Windows 10.0.26300",
+  "Architecture": "X64",
+  "Processors": 24,
+  "Build": "0.1.463-dev\u002B1466e26bd0bcb96946fa59f846bb4232acd9ae94",
+  "Scope": "Single normal-stock two-opponent match; cold restore at each saved tick; no graphics; advisory timing.",
+  "Samples": [
+    {
+      "Tick": 6000,
+      "LogicalMinutes": 5,
+      "DocumentBytes": 735286,
+      "CommandCount": 0,
+      "Entities": 180,
+      "Inventories": 47,
+      "Lifecycle": "Running",
+      "ReadMilliseconds": 177.5301,
+      "RestoreMilliseconds": 6631.5387,
+      "ProcessAllocatedBytesDuringRestore": 428112744,
+      "Hash": "6C36A0E4D962434CDC171D7849AFAD890069A7E9602294356AA1C963EC1F1277",
+      "RandomState": 2026
+    },
+    {
+      "Tick": 12000,
+      "LogicalMinutes": 10,
+      "DocumentBytes": 838878,
+      "CommandCount": 0,
+      "Entities": 188,
+      "Inventories": 53,
+      "Lifecycle": "Running",
+      "ReadMilliseconds": 105.2004,
+      "RestoreMilliseconds": 22196.3132,
+      "ProcessAllocatedBytesDuringRestore": 1120526752,
+      "Hash": "1D19DBC14268CE152B7BD774DBFF98559AD75F34654CFAE5C2FAC16FBE06E72C",
+      "RandomState": 2026
+    },
+    {
+      "Tick": 24000,
+      "LogicalMinutes": 20,
+      "DocumentBytes": 1000827,
+      "CommandCount": 0,
+      "Entities": 196,
+      "Inventories": 57,
+      "Lifecycle": "Running",
+      "ReadMilliseconds": 121.0915,
+      "RestoreMilliseconds": 40594.9291,
+      "ProcessAllocatedBytesDuringRestore": 2965856152,
+      "Hash": "F38FFCA351A324C7A94D30C46FCDF48E010EC825D6F30685DFE14400A0D4F5EC",
+      "RandomState": 2026
+    }
+  ]
+}

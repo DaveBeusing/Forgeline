@@ -341,7 +341,7 @@ public static class MatchPersistenceSerializer
 
         try
         {
-            using var reader = new StreamReader(stream, new UTF8Encoding(false, true), detectEncodingFromByteOrderMarks: false);
+            using var reader = new StreamReader(stream, new UTF8Encoding(true, true), detectEncodingFromByteOrderMarks: false);
             return reader.ReadToEnd();
         }
         catch (DecoderFallbackException error)

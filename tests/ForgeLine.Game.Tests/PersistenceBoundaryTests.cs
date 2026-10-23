@@ -9,6 +9,39 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class PersistenceBoundaryTests
 {
+    [Fact]
+    public void NonFiniteStartingStockIsRejectedBeforeReconstruction()
+    {
+        using var runtime = CreateRuntime();
+        var save = MatchPersistenceService.CaptureSave(runtime);
+        var invalid = save with { Configuration = save.Configuration with
+        {
+            Scenario = save.Configuration.Scenario with
+            {
+                StartingStock = save.Configuration.Scenario.StartingStock with { Fuel = double.NaN }
+            }
+        } };
+        Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(invalid)).Reason);
+    }
+
+    [Fact]
+    public void Utf8BomRemainsReadableButInvalidUtf8IsCorrupt()
+    {
+        using var runtime = CreateRuntime();
+        var save = MatchPersistenceService.CaptureSave(runtime);
+        string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".save.json");
+        try
+        {
+            File.WriteAllText(path, MatchPersistenceSerializer.SerializeSave(save), new UTF8Encoding(true));
+            Assert.Equal(save.StateSha256, MatchPersistenceSerializer.ReadSave(path).StateSha256);
+            File.WriteAllBytes(path, [0xff, 0xfe, 0xff]);
+            Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
+                Assert.Throws<MatchPersistenceException>(() => MatchPersistenceSerializer.ReadSave(path)).Reason);
+        }
+        finally { File.Delete(path); }
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]

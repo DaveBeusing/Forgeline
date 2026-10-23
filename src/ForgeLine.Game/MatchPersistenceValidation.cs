@@ -20,6 +20,10 @@ internal static class MatchPersistenceValidation
             value.Participants.All(p => p.Player.Value != 0), "Invalid participant identity.");
         Require(value.Scenario!.OpponentConfigurations is not null &&
             value.Scenario.OpponentConfigurations.Values.All(p => p is not null), "Missing opponent policies.");
+        var stock = value.Scenario.StartingStock;
+        Require(new[] { stock.FerrousOre, stock.Volatiles, stock.Silicates, stock.Steel,
+            stock.Fuel, stock.Electronics, stock.Ammunition }.All(amount => double.IsFinite(amount) && amount >= 0),
+            "Invalid starting resource quantity.");
         try { value.Scenario.Validate(); }
         catch (Exception error) when (error is InvalidOperationException or ArgumentException)
         {
