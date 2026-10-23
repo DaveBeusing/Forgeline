@@ -27,6 +27,7 @@ try {
     Run-Git @('commit','--quiet','-m','Base')
     $base = (& git rev-parse HEAD).Trim()
     . ./build/Versioning.ps1
+    Run-Git @('checkout','--quiet','-b','version-first-pr',$base)
     $previous = Get-ProductVersion
     ./build/Increment-PrVersion.ps1 -BaseRef $base
     $first = Get-Content Directory.Build.props -Raw
@@ -44,6 +45,46 @@ try {
     $rejected = $false
     try { ./build/Validate-SemVer.ps1 -BaseRef $base -HeadRef $base } catch { $rejected = $true }
     if (-not $rejected) { throw 'HeadRef was ignored.' }
+    # Two PRs may prepare the same PATCH; only the first integration can use it.
+    $firstPr = (& git rev-parse HEAD).Trim()
+    Run-Git @('checkout','--quiet','-b','version-second-pr',$base)
+    ./build/Increment-PrVersion.ps1 -BaseRef $base
+    if ((Get-ProductVersion) -ne $next) { throw 'Concurrent PR did not prepare the same PATCH.' }
+    'Independent second PR change' | Set-Content second-pr.txt
+    Run-Git @('add','Directory.Build.props','second-pr.txt')
+    Run-Git @('commit','--quiet','-m','Concurrent PR')
+    $secondPr = (& git rev-parse HEAD).Trim()
+    ./build/Validate-SemVer.ps1 -BaseRef $base -HeadRef $secondPr
+
+    Run-Git @('checkout','--quiet','-b','version-integration',$base)
+    Run-Git @('merge','--quiet','--no-ff','--no-edit','version-first-pr')
+    $firstIntegration = (& git rev-parse HEAD).Trim()
+    ./build/Validate-SemVer.ps1 -BaseRef $base -HeadRef $firstIntegration
+    $rejected = $false
+    try { ./build/Validate-SemVer.ps1 -BaseRef $firstIntegration -HeadRef $secondPr } catch { $rejected = $true }
+    if (-not $rejected) { throw 'Concurrent PR reused the first integrated PATCH.' }
+
+    Run-Git @('checkout','--quiet','version-second-pr')
+    Run-Git @('merge','--quiet','--no-edit','version-integration')
+    $rejected = $false
+    try { ./build/Validate-SemVer.ps1 -BaseRef $firstIntegration } catch { $rejected = $true }
+    if (-not $rejected) { throw 'Synchronizing Git history silently accepted a reused PATCH.' }
+    ./build/Increment-PrVersion.ps1 -BaseRef version-integration
+    $following = Get-NextPrVersion $next
+    if ((Get-ProductVersion) -ne $following) { throw 'Synchronized PR did not prepare the next PATCH.' }
+    $prepared = Get-Content Directory.Build.props -Raw
+    ./build/Increment-PrVersion.ps1 -BaseRef version-integration
+    if ($prepared -cne (Get-Content Directory.Build.props -Raw)) { throw 'Repeated concurrent PR preparation consumed PATCH.' }
+    Run-Git @('add','Directory.Build.props')
+    Run-Git @('commit','--quiet','-m','Reconcile concurrent PR version')
+    ./build/Validate-SemVer.ps1 -BaseRef $firstIntegration
+    Run-Git @('checkout','--quiet','version-integration')
+    Run-Git @('merge','--quiet','--no-ff','--no-edit','version-second-pr')
+    ./build/Validate-SemVer.ps1 -BaseRef $firstIntegration
+    if ((Get-ProductVersion) -ne $following) { throw 'Sequential integrations lost the reconciled PATCH.' }
+    Write-Host 'Concurrent PR preparation, stale-version rejection and sequential integration passed.'
+    Run-Git @('checkout','--quiet','--detach',$firstPr)
+
     '{"number":42}' | Set-Content event.json
     $env:GITHUB_EVENT_NAME = 'pull_request'
     $env:GITHUB_EVENT_PATH = Join-Path $temporary 'event.json'
@@ -69,3 +110,4 @@ try {
         Remove-Item -LiteralPath $temporary -Recurse -Force
     }
 }
+

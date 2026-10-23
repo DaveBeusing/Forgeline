@@ -74,6 +74,53 @@ public sealed class PlayerActionPanelTests
     }
 
     [Fact]
+    public void UnconfiguredLogisticsBelowMinimumCapacityBlocksApplyAndEveryQuantityField()
+    {
+        var policy = new PlayerStockPolicyActionReadModel(EntityId.Invalid, ResourceIds.Steel, "Steel",
+            0, 0, 0, 0, LogisticsStockPriority.Normal, true, default, default, default, default);
+        var logistics = new PlayerLogisticsActionReadModel(new(73, 1), [policy], null, 49);
+        var snapshot = CreateSnapshot(logistics: logistics);
+        var controller = new PlayerActionPanelController();
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+
+        Key(PlatformKey.L);
+        Assert.False(policy.HasPolicy);
+        Assert.Equal("CAPACITY BELOW 50", PlayerActionDockHudModel.ResolveItemState(
+            PlayerActionPanelMode.Logistics, 0, snapshot.PlayerActions).DisabledReason);
+
+        foreach (var field in new[]
+                 { PlayerStockThresholdField.Target, PlayerStockThresholdField.Maximum, PlayerStockThresholdField.Minimum })
+        {
+            var panel = View();
+            Assert.Equal(field, panel.StockThresholdField);
+            foreach (var control in new[]
+                     { PlayerActionDockControlKind.Activate, PlayerActionDockControlKind.Increase, PlayerActionDockControlKind.Decrease })
+                Assert.False(PlayerActionDockHudModel.CanUseControl(
+                    control, panel.Mode, panel.SelectedIndex, panel, snapshot.PlayerActions));
+
+            Key(PlatformKey.Right);
+            Assert.Equal((0.0, 0.0, 0.0), (View().StockMinimum, View().StockTarget, View().StockMaximum));
+            Key(PlatformKey.Left);
+            Assert.Equal((0.0, 0.0, 0.0), (View().StockMinimum, View().StockTarget, View().StockMaximum));
+            Key(PlatformKey.Enter);
+            Assert.False(controller.TryTakeRequest(out _));
+            Key(PlatformKey.M);
+        }
+
+        Assert.Equal((0.0, 0.0, 0.0),
+            (logistics.Policies[0].DesiredMinimum, logistics.Policies[0].DesiredTarget, logistics.Policies[0].DesiredMaximum));
+        Assert.False(logistics.Policies[0].HasPolicy);
+
+        PlayerActionPanelView View() => controller.CreateView(1600, 900, snapshot.PlayerActions);
+        void Key(PlatformKey key)
+        {
+            Press(input, key); controller.Update(input, snapshot, 1600, 900);
+            Release(input, key); controller.Update(input, snapshot, 1600, 900);
+        }
+    }
+
+    [Fact]
     public void StaticProviderStockDoesNotOfferRecipientCommandsByMouseOrKeyboard()
     {
         var supply = new PlayerSupplyActionReadModel(new(50,1),default,1,1,true,.5,.5,default,default,0,0,default)
@@ -1505,4 +1552,5 @@ public sealed class PlayerActionPanelTests
                 PlatformInputEventKind.KeyUp,
                 key));
 }
+
 

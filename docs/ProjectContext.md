@@ -143,9 +143,32 @@ Any protection configuration must be verified by GitHub readback after it is app
 
 ### Enforcement Status
 
-Observed on 2026-09-29, repository metadata reports `master` as unprotected and the repository ruleset collection is empty. The current integration available for this change does not provide an administration write action for branch protection or rulesets, so the intended configuration cannot be applied through this repository session.
+Read back on **2026-10-23**, at `master` commit
+`814b6a82af5a6f63dbb32cca2944c82a33afc6ba`:
 
-Repository protection therefore remains **pending administrator action and readback verification**. This status must be updated after protection is successfully applied and confirmed.
+- [Branch metadata](https://api.github.com/repos/DaveBeusing/Forgeline/branches/master)
+  reports `protected: false`, `protection.enabled: false`,
+  `required_status_checks.enforcement_level: off`, and empty `contexts` / `checks`.
+- [Repository rulesets](https://api.github.com/repos/DaveBeusing/Forgeline/rulesets)
+  returns `[]`.
+- [Branch-protection details](https://api.github.com/repos/DaveBeusing/Forgeline/branches/master/protection)
+  returns HTTP 403, `Resource not accessible by integration`. The detailed
+  protection configuration therefore cannot be read through the current access.
+- The available GitHub interface exposes no administration write operation for
+  branch protection or rulesets. Repository content-write access does not supply
+  that capability.
+
+The required configuration remains PR-only integration, a successful
+`build-test` check supplied by GitHub Actions (App ID `15368`), and strict
+up-to-date validation against current `master`. Force pushes and branch deletion
+must be disabled. Preserve stronger controls and existing review requirements,
+and do not expand bypass access. No new reviewer minimum is established here.
+
+Repository protection remains **pending administrator action and readback
+verification**, tracked in [issue #307](https://github.com/DaveBeusing/Forgeline/issues/307).
+Read current branch and ruleset settings again before applying configuration,
+then verify the resulting enforcement through GitHub. A successful CI run or
+documentation update does not resolve this external requirement.
 
 ## Development and Validation Source
 
@@ -175,3 +198,4 @@ No value should be inferred for these items from repository history, tags, filen
 - **Approved Date:** Not set
 
 Git history records document revisions but does not by itself constitute Product Owner approval.
+

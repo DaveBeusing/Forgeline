@@ -47,13 +47,11 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                     result.Diagnostics.Select(
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
-            Assert.Equal(
-                1365,
-                result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
                 RuntimeAssetCatalog.Load(
                     runtimeRoot);
+            ProductionAssetFixture.AssertCatalog(catalog, result);
 
             RuntimeMeshData[] commandLods = [ReadCommandMesh(""), ReadCommandMesh(".lod1"), ReadCommandMesh(".lod2")];
             Assert.True(commandLods[0].Indices.Count > commandLods[1].Indices.Count);

@@ -68,6 +68,15 @@ After the Release build, `pwsh ./build/Run-MatchSoak.ps1 -NoBuild` runs the cano
 
 The CI workflow emits the required check context `build-test` from GitHub Actions. That check represents the complete job, including the natural vertical-slice terminal validation; a successful build or unit-test subset is not equivalent to the full required check.
 
+The early logistics contract step also runs `PlayerActionDockHudTests` so
+construction, manual quantities, controller behavior and displayed availability
+are qualified together. After the existing runtime-asset compilation, the
+production catalog and render-usage step runs the source/manifest membership,
+building/unit/world/UI/VFX authoring and material/proxy regression tests. These
+focused checks provide independent diagnostics before later interaction gates;
+they do not replace the complete solution test, WARP, package, recovery or
+natural terminal-match checks.
+
 Repository settings must require that check before merge once `master` protection is applied. Integration preserves small validated technical commits. Ordinary merge and rebase integration remain permitted; the existing no-squash policy remains in force. Documentation does not itself enforce branch protection, so the effective GitHub settings must be verified by readback. See [Project Context and Repository Governance](ProjectContext.md).
 
 ## Test Projects

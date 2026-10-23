@@ -65,6 +65,21 @@ Semantic icons are not a feature contract. Patrol and Repair icons may exist in 
 
 Construction cards use `PlayerConstructionActionReadModel` and show the authored building identity, semantic role icon, captured cost availability, and resource-deposit requirement. Activating an available card enters the existing building-placement flow. Placement validity and final rejection remain owned by the placement preview/build-command path.
 
+The construction snapshot contains two distinct categories: one action for each
+current building definition and one menu-only action for each `ConveyorModule`.
+Conveyor identities start at `ConveyorGeometry.MenuBase` (2000) and dispatch to
+the conveyor placement controller, not the building catalog. Qualification checks
+the complete identities of both categories, uniqueness, authored costs and copied
+Command Core stock values; the combined menu length is not the building count.
+Building costs follow the supplied match content, including changed catalog costs.
+
+Conveyor cards show the minimum module Steel cost; Draw route starts at the short
+belt's 8 Steel. The complete route, automatic supports and edits are priced by the
+authoritative placement plan. Conveyor tools remain selectable without sufficient
+Steel so Remove and Repair can be reached, while each copied cost still reports
+its actual availability and placement revalidates payment. See
+[conveyor construction](ConveyorConstructionPlacementAndUX.md).
+
 ## Processing
 
 Processing uses the selected owned production facility read model. Recipe cards expose captured inputs/outputs; queue cards expose active/waiting/paused state, priority, and production mode. The header exposes facility progress and existing block reasons.

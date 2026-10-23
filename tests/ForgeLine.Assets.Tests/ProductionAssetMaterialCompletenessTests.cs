@@ -65,6 +65,10 @@ public sealed class ProductionAssetMaterialCompletenessTests
             RuntimeAssetCatalog catalog =
                 RuntimeAssetCatalog.Load(
                     runtimeRoot);
+            ProductionAssetFixture.AssertCatalog(catalog, result);
+            using var conveyorProduction = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(
+                repositoryRoot, "assets", "source", "infrastructure", "directorate", "conveyors", "conveyor-production.v1.json")));
+            ProductionMeshUsage meshUsage = ProductionMeshUsage.Create(catalog.Manifest, conveyorProduction.RootElement);
 
             long productionResidentBytes = 0;
             int productionTextureCount = 0;
@@ -87,11 +91,11 @@ public sealed class ProductionAssetMaterialCompletenessTests
             RuntimeAssetRecord[] productionMeshes =
                 catalog.Manifest.Assets
                     .Where(
-                        static record =>
+                        record =>
                             record.Type ==
                             RuntimeAssetType.Mesh &&
                             IsPhysicalProductionMesh(
-                                record.Id))
+                                record, meshUsage))
                     .OrderBy(
                         static record =>
                             record.Id,
@@ -107,11 +111,15 @@ public sealed class ProductionAssetMaterialCompletenessTests
             foreach (RuntimeAssetRecord record in
                      productionMeshes)
             {
-                ValidateMesh(
+                QualifyMesh(
                     catalog,
                     record,
+                    meshUsage,
                     issues);
             }
+
+            foreach (string proxyId in meshUsage.NonRenderedMeshIds)
+                QualifyMesh(catalog, catalog.Get(AssetId.Parse(proxyId)), meshUsage, issues);
 
             foreach (RuntimeAssetRecord record in catalog.Manifest.Assets.Where(
                 static record => record.Type == RuntimeAssetType.Material &&
@@ -252,6 +260,31 @@ public sealed class ProductionAssetMaterialCompletenessTests
                     runtimeRoot,
                     recursive: true);
             }
+        }
+    }
+
+    internal static void QualifyMesh(RuntimeAssetCatalog catalog, RuntimeAssetRecord record,
+        ProductionMeshUsage usage, List<string> issues)
+    {
+        if (usage.IsProxyOnly(record.Id))
+        {
+            RuntimeMeshData proxy = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse(record.Id)).Payload);
+            if (proxy.Vertices.Count == 0 || proxy.Indices.Count == 0)
+                issues.Add($"{record.Id}: proxy geometry is empty.");
+            if (record.Bounds is not AssetBounds bounds || !bounds.IsValid)
+            {
+                issues.Add($"{record.Id}: proxy bounds are unavailable or invalid.");
+                return;
+            }
+            const float tolerance = 0.00001f;
+            if (proxy.Vertices.Any(vertex => vertex.X < bounds.MinX - tolerance || vertex.X > bounds.MaxX + tolerance ||
+                    vertex.Y < bounds.MinY - tolerance || vertex.Y > bounds.MaxY + tolerance ||
+                    vertex.Z < bounds.MinZ - tolerance || vertex.Z > bounds.MaxZ + tolerance))
+                issues.Add($"{record.Id}: proxy bounds do not enclose its geometry.");
+        }
+        else if (IsPhysicalProductionMesh(record, usage))
+        {
+            ValidateMesh(catalog, record, issues);
         }
     }
 
@@ -409,34 +442,10 @@ public sealed class ProductionAssetMaterialCompletenessTests
         }
     }
 
-    private static bool IsPhysicalProductionMesh(
-        string id)
+    internal static bool IsPhysicalProductionMesh(RuntimeAssetRecord record, ProductionMeshUsage usage)
     {
-        if (id.Contains(
-                ".collision",
-                StringComparison.Ordinal))
-        {
-            return false;
-        }
-
-        return id.StartsWith(
-                   "unit.directorate.",
-                   StringComparison.Ordinal) ||
-               id.StartsWith(
-                   "building.directorate.",
-                   StringComparison.Ordinal) ||
-               id.StartsWith(
-                   "infrastructure.directorate.",
-                   StringComparison.Ordinal) ||
-               id.StartsWith(
-                   "mesh.world.prop.",
-                   StringComparison.Ordinal) ||
-               id.StartsWith(
-                   "mesh.world.resource.",
-                   StringComparison.Ordinal) ||
-               id.StartsWith(
-                   "mesh.world.vegetation.",
-                   StringComparison.Ordinal);
+        if (record.Type != RuntimeAssetType.Mesh || usage.IsProxyOnly(record.Id)) return false;
+        return usage.IsRendered(record.Id) || ProductionMeshUsage.IsPhysicalFamily(record.Id);
     }
 
     private static string FindRepositoryRoot()

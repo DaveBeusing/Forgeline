@@ -99,7 +99,7 @@ jobs:
       - name: Logistics order identity and quantity contracts
         shell: pwsh
         run: |
-          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.RadialLogisticsOrderTests ForgeLine.Presentation.Tests.PlayerActionPanelTests ForgeLine.Presentation.Tests.PlayerActionReadModelTests
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.RadialLogisticsOrderTests ForgeLine.Presentation.Tests.PlayerActionPanelTests ForgeLine.Presentation.Tests.PlayerActionReadModelTests ForgeLine.Presentation.Tests.PlayerActionDockHudTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.AutomatedDistributionSystemTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -212,6 +212,9 @@ jobs:
 
       - name: Compile and qualify runtime assets
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --mode build --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json
+
+      - name: Production catalog and render usage contracts
+        run: dotnet test --project tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Assets.Tests.ProductionAssetCatalogContractTests ForgeLine.Assets.Tests.ProductionMeshUsageTests ForgeLine.Assets.Tests.ProductionAssetMaterialCompletenessTests ForgeLine.Assets.Tests.DirectorateBuildingAssetAuthoringTests ForgeLine.Assets.Tests.DirectorateUnitAssetAuthoringTests ForgeLine.Assets.Tests.WorldAssetAuthoringTests ForgeLine.Assets.Tests.RtsUiAssetAuthoringTests ForgeLine.Assets.Tests.VfxAssetAuthoringTests --parallel none
 
       - name: Runtime asset process contracts
         shell: pwsh

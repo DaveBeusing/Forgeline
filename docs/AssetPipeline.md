@@ -522,6 +522,15 @@ Every newly compiled texture emits an `ASSETI001` information diagnostic contain
 
 Tests cover successful compilation, invalid input, duplicate IDs, missing dependencies, LOD/collision/socket validation, dependency-triggered incremental rebuilds, stable runtime paths, PNG/TGA import, deterministic mip dimensions, sRGB filtering, normal renormalization, ORM preservation, Terrain Control normalization, byte-stable clean recompilation, texture-setting cache invalidation, runtime texture round trips, malformed subresource rejection, glTF/GLB import, bounds, and runtime catalog lookup.
 
+Production authoring suites compile the complete source root. Their shared catalog
+contract independently reads each declared source ID and type and requires exact
+membership in the compiled manifest, with no duplicate, missing or unexpected
+IDs. Compilation accounting must agree with that manifest. The suites retain
+their explicit required domain IDs and material/LOD/socket checks; a valid new
+source module therefore extends catalog membership without invalidating an
+unrelated suite through a historical global asset total. Historical totals below
+remain evidence for their recorded revisions, not current acceptance constants.
+
 ## Directorate shared production material library
 
 The physical Directorate/world production mesh baseline now uses a shared texture library under `assets/source/materials/directorate/`. Stable mesh and material IDs are preserved; existing unit, building, infrastructure, prop, vegetation, and resource material definitions reference shared texture assets rather than introducing per-mesh material duplication.
@@ -544,12 +553,25 @@ Existing generated/static meshes that need texture sampling but lack authored UV
 
 Production material completeness is derived dynamically from the compiled runtime manifest rather than maintained as a duplicate asset catalog. The validation covers Directorate units, buildings, infrastructure, world props, resources, and vegetation. Every included mesh must resolve a production material, Base Color/Normal/ORM dependencies, valid UV0/tangents, non-fallback material sections, and LOD-stable material identity.
 
+Conveyor proxy roles come from the production catalog's `collisionAssetId`,
+`selectionAssetId` and `destroyedSelectionAssetId` fields, including explicit
+collision references of its enumerated render states. Conveyor
+`assetId`/`variants.assetId` and runtime physical LOD chains establish render use,
+including identities outside historical family prefixes. Render use takes
+precedence when an ID is shared with a proxy role, so a visible mesh still fails
+for missing materials. Selection names never grant an exception. The pre-existing
+collision-ID convention is retained for other families and now additionally
+requires an actual `CollisionReference`; such a reference alone does not exempt
+an arbitrary render identity. Proxy targets must be meshes, and their payload
+geometry and enclosing bounds remain qualified even though decorative PBR
+channels are not required.
+
 Intentional non-physical categories remain outside this completeness rule:
 
 - VFX meshes, whose purpose-specific effect materials are validated by the VFX asset tests;
 - decal carrier geometry and decal materials;
 - strategic/minimap/UI symbol materials;
-- collision-only meshes;
+- explicitly referenced collision-only and selection-only meshes;
 - terrain surfaces, which use the dedicated four-layer GPU terrain material path.
 
 ## Current Boundary
