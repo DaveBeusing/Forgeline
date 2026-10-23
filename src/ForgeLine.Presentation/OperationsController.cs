@@ -93,6 +93,7 @@ public sealed class OperationsController
     private GameplayHudLayout _layout;
     private bool _initialized;
     private EntityId _lastRouteFocus;
+    private bool _consumeLeftGesture;
     public OperationsView View { get; private set; }
     public void OpenCategory(OperationsCategory category, SimulationSessionId session, PresentationInteractionState interaction)
     { _armed = false; View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
@@ -105,12 +106,26 @@ public sealed class OperationsController
     }
     public void OpenNotifications(SimulationSessionId session, PresentationInteractionState interaction)
     { _armed = false; View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
-    public void CancelInput(InputState input) { _press = input.MousePressSequence(PlatformMouseButton.Left); _armed = false; }
+    public void CancelInput(InputState input)
+    {
+        _consumeLeftGesture |= _armed && input.IsMouseButtonDown(PlatformMouseButton.Left);
+        _press = input.MousePressSequence(PlatformMouseButton.Left); _armed = false;
+    }
     public OperationsInteraction Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
         PresentationInteractionState interaction, bool blocked = false, bool inputCaptured = false)
     {
         ulong press = input.MousePressSequence(PlatformMouseButton.Left);
         bool fresh = press != _press; _press = press;
+        bool consumedGesture = _consumeLeftGesture;
+        if (fresh && input.TryGetMousePressPosition(PlatformMouseButton.Left, out var capturedOrigin))
+        {
+            _consumeLeftGesture = View.Open
+                ? OperationsLayout.Panel(layout).Contains(capturedOrigin) ||
+                    _initialized && OperationsLayout.Panel(_layout).Contains(capturedOrigin)
+                : layout.TopStatusBar.Contains(capturedOrigin);
+            consumedGesture |= _consumeLeftGesture;
+        }
+        if (!input.IsMouseButtonDown(PlatformMouseButton.Left)) _consumeLeftGesture = false;
         bool transition = _initialized && (_layout != layout || _session != snapshot?.SessionId);
         bool newSession = _session != snapshot?.SessionId;
         _initialized = true; _layout = layout; _session = snapshot?.SessionId ?? default;
@@ -124,11 +139,11 @@ public sealed class OperationsController
         {
             _armed = false;
             interaction.SetOperationsOpen(false);
-            return default;
+            return new(consumedGesture);
         }
         interaction.SetOperationsOpen(View.Open);
         var panel = OperationsLayout.Panel(layout);
-        bool captured = input.HasPointerPosition && View.Open && panel.Contains(input.PointerPosition);
+        bool captured = consumedGesture || input.HasPointerPosition && View.Open && panel.Contains(input.PointerPosition);
         if (inputCaptured || transition || snapshot?.PlayerExperience is null ||
             !snapshot.SessionId.IsSpecified || snapshot.PlayerExperience.Value.IsMatchComplete)
         {
@@ -205,11 +220,12 @@ public sealed class OperationsController
                 View = View with { Selected = row.Entity };
             else if (index == 11)
             {
+                if (!OperationsWorldOverlay.CanFocus(snapshot, View.Selected)) return new(true);
                 EntityId first = default, next = default;
                 foreach (var route in data.Routes)
                 {
                     EntityId target = route.Source == View.Selected ? route.Destination : route.Destination == View.Selected ? route.Source : default;
-                    if (!target.IsValid) continue;
+                    if (!OperationsWorldOverlay.CanFocus(snapshot, target)) continue;
                     if (!first.IsValid || target.CompareTo(first) < 0) first = target;
                     if (target.CompareTo(_lastRouteFocus) > 0 && (!next.IsValid || target.CompareTo(next) < 0)) next = target;
                 }
@@ -222,8 +238,11 @@ public sealed class OperationsController
                     if (facility.Entity == View.Selected)
                     {
                         if (index == 10 && facility.Controls == PlayerActionPanelMode.Closed) return new(true);
-                        return new(true, LogisticsStatusCatalog.IsBlocked(facility.Service) && facility.Service.VehicleQueue is { WaitReason: not VehicleQueueWaitReason.Unavailable } queue
-                            ? queue.Building : facility.Entity, index == 10 ? facility.Controls : PlayerActionPanelMode.Closed);
+                        EntityId target = LogisticsStatusCatalog.IsBlocked(facility.Service) &&
+                            facility.Service.VehicleQueue is { WaitReason: not VehicleQueueWaitReason.Unavailable } queue
+                            ? queue.Building : facility.Entity;
+                        if (!OperationsWorldOverlay.CanFocus(snapshot, target)) return new(true);
+                        return new(true, target, index == 10 ? facility.Controls : PlayerActionPanelMode.Closed);
                     }
             }
             break;
