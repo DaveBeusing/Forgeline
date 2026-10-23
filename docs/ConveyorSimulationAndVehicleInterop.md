@@ -1,17 +1,11 @@
 # Conveyor simulation and vehicle interoperability
 
-Implementation: 0.1.453, branch `feature/conveyor-flow`. Started from master
-`eb23d5ca` (conveyor construction, PR #300), then integrated current master
-`d4e100e7dfdc28426d6191ab1a9cd123cc00ade4` (graphics asset bindings, PR #301).
-Implementation head: `2646f9d04406a44c0a0ec44e23d9fab19bd9fd66`.
-Draft PR: [#302](https://github.com/DaveBeusing/Forgeline/pull/302).
-Documentation-only follow-ups are visible in that PR history; build evidence is
-recorded in `ConveyorSimulationBuild.json`.
-
-The user explicitly requested implementation and a pushed PR without tests.
-No automated tests were added or executed. CI, native execution, smoke runs,
-headless execution, stress runs and save/replay round trips were not performed.
-All runtime and visual acceptance below remains manual and pending.
+Reliability qualification: **0.1.462**, [PR #341](https://github.com/DaveBeusing/Forgeline/pull/341),
+based on `master` `b397bd6f19384e4a8a20aea11f9291f918201943`.
+The original finite-flow implementation arrived in [PR #302](https://github.com/DaveBeusing/Forgeline/pull/302).
+The executable contracts and measured workloads below supersede its compile-only
+qualification. Automated behavior, hosted CI and native visual/hardware acceptance
+are recorded separately; an unreached required gate is not a pass.
 
 ## Flow authority
 
@@ -45,10 +39,13 @@ discarding small cargo or accumulating offline throughput credit.
 Inputs, outputs and resources have persistent round-robin cursors. Each arbitration
 round selects one eligible sender per receiver and one requesting output per sender;
 a successful transfer advances both port cursors and the resource cursor. Quanta are
-at most one unit, with fractional quanta at tick/capacity boundaries. Competing merger
-inputs alternate; splitter outputs alternate; blocked/rejecting/offline branches are
+at most one unit. Each node divides its actual budget into `ceil(budget)` equal
+quanta; a transfer uses the smaller endpoint quantum. This avoids a recurring
+60/40 split from the fractional tail of a 30 Hz tick. Competing merger inputs
+alternate; splitter outputs alternate; blocked/rejecting/offline branches are
 skipped and the remaining branch can use the shared 100/s budget. A deterministic
-bounded number of rounds covers the tick budget and two-port contention. Cursors
+bounded number of rounds covers the tick budget, two-port contention and fractional
+tails of the five eligible resources. Cursors
 advance only for actual transfers, surviving idle periods and replay.
 
 Connections require the same owner, complementary direction, opposite facing and
@@ -104,15 +101,23 @@ current stock minus already committed Assigned/InTransit truck quantities. Pendi
 truck demand is reconciled against subsequent actual receipts by the existing
 scheduler. The belt creates no second logistics request. In-flight belt stock is a
 finite upstream buffer, not a promise of destination delivery; a truck may cover a
-shortage while the belt waits. A partly unloaded truck's whole committed request is
-conservatively retained until completion. Without a stock policy, actual capacity is
-the limit. Production's separate output inventory does not retain its input targets.
+shortage while the belt waits. A request for 80 may result in an accepted 40-unit
+truckload: only those 40 reserve destination demand. Once 20 have actually unloaded,
+only the remaining 20 are committed; the first 20 are already destination inventory.
+The accepted CargoTransportOrder destination remains authoritative if its stock policy
+is retargeted. Full physical loading transitions Assigned to InTransit even when the
+reservation observer has already reduced the source-reservation quantity to zero.
+Without a stock policy, actual capacity is the limit. Production's separate output
+inventory does not retain its input targets.
 
 A full/rejecting/downstream-offline sink stalls the immediate buffer, then bounded
 upstream buffers. Freeing stock or repairing/reconnecting the route resumes service
 without an offline catch-up burst. Remove and Replace recheck actual inventory stock
 and reservations and refuse occupied parts; empty buffer inventories are destroyed
-with their removed module. No cargo is refunded as construction Steel.
+with their removed module. No cargo is refunded as construction Steel. Replacing the
+same adapter without new endpoint arguments preserves its explicit full EntityId
+attachment in both preview and execution. An explicit new endpoint is validated
+normally; reusing an entity index does not make an old attachment valid.
 
 Combat retains a destroyed conveyor entity, health-zero wreck, buffer and footprint.
 A wreck stops transfer and its power consumer is disabled. Repair works with cargo
@@ -128,8 +133,12 @@ and includes actual support footprints. Current intact standard spans and ramps 
 a minimum 5.2m underside. Placement samples terrain and requires 5m clearance; an
 insufficiently high ramp/transition is rejected, rather than projected onto the ground
 or allowed to clip a vehicle. Feet remain excluded from road corridors and loading
-lanes. This package reuses those authored raised geometry rules; it adds no low ramp
-or fallen span that would require a new ground blocker shape.
+lanes. Ground movement also checks the actual vehicle upper bound against the raised
+carrier lower bound during obstacle steering, static penetration and swept movement.
+Dock reservation applies the same clearance condition to the planned vehicle poses.
+Only typed non-support conveyor pieces receive this clearance treatment; real feet,
+ordinary obstacles and vehicles too tall for the span remain blocking. No low ramp
+or fallen span is introduced.
 
 Owned completed-tick snapshots copy buffer resources, ingress/egress, capacity,
 connection entity IDs, network identity, active time, health/power status and causes.
@@ -144,33 +153,263 @@ Selecting or hovering an owned carrier adds a bounded box, output links and rate
 buffer label from the snapshot. Headless match report schema 3 includes the same
 conveyor facts for all match participants for offline diagnosis.
 
-## Persistence and manual acceptance
+## Persistence and reconstruction
 
-Authoritative state schema is 5, save/replay envelope schema 6. Buffer inventory IDs,
+Authoritative state schema is 5; save/replay payload schema is 6 inside envelope
+format 1. This qualification introduces no stored state or schema change. Buffer inventory IDs,
 stock/reservations, cursors, active time, measured state and attachments are included
 in the existing authoritative ECS/inventory snapshot and hash. Existing recorded
 ConveyorConstruction commands rebuild that state through deterministic replay;
 derived topology and UI caches carry no authority. Older authoritative checkpoints
 and replays are explicitly rejected as incompatible; there is no guessed migration
-of pre-flow cargo. Manual save/replay qualification remains pending.
+of pre-flow cargo.
 
-Compile-only evidence covers Release Client/dependencies and Headless. This does
-not establish conservation, fairness, replay identity, visual quality or navigation
-acceptance. Manually exercise:
+`ConveyorPersistenceTests` builds paid networks in a complete MatchRuntime with the
+original catalogs and Standard starting stock on a fixed 512 m terrain. Recorded
+commands create the network, apply actual artillery damage, repair the occupied wreck
+and supports, pause receipt through a stock policy, drain, replace an adapter and
+remove/rebuild a connection. Tests serialize, deserialize and reconstruct both save
+and replay at the cargo, wreck, repair and edit checkpoints. Complete authoritative
+SHA256 hashes agree immediately and after another 1, 7 and 24 ticks. The controlled
+composition is explicit and recreated by its resolver; the normal Gameplay-start
+qualification is a separate production-chain case.
 
-1. Extractor Ferrous Ore to Smelter to storage; Silicates to Electronics; Steel and
-   Electronics through a merger to Ammunition Plant, then depot and Supply Truck.
-2. Two saturated inputs and two outputs: observe round robin, total 100/s, one blocked
-   branch taking zero, and full use of the open branch without starvation.
-3. Fill every downstream inventory, observe finite backpressure, drain and resume.
-   Count source + all buffers + destination, including mixed/fractional resources.
-4. Reserve source stock for production/trucks; concurrently dispatch a committed truck
-   and belt delivery to a policy target. Check reservations and target accounting.
-5. Power loss, brownout, damage, foot destruction, occupied wreck repair, removal and
-   replacement. Check cargo conservation and no stock refund or entity-generation alias.
-6. Drive real Cargo/Supply Trucks and combat vehicles below standard/raised/ramp spans,
-   beside real feet and through dock lanes, before and after edits or foot destruction.
-7. Save/load and replay identical command histories, comparing full authoritative hashes,
-   inventory totals and cursors. Repeat with a disconnected cycle and a large base.
-8. Inspect owner/fog isolation, selected links, Operations bounds, flowing/stalled clips,
-   state materials, LODs, reduced motion and camera readability in the native client.
+## Material accounting and production chains
+
+The chain contracts use the existing ResourceExtractionSystem, ProductionSystem,
+InventoryStore, CargoTransportSystem and BattlefieldSupplySystem. Recipes and normal
+starting stock are unchanged. Every conveyor and support is built through a paid
+ConveyorConstructionCommand. Controlled fixtures author small terminal layouts and
+power allocations; one full Central Divide Gameplay case uses the original terrain,
+real BuildCommands and unmodified construction costs.
+
+For each resource independently, the ledger checks:
+
+`closing inventory = opening inventory + extracted quantity - committed recipe inputs
++ committed recipe outputs - construction costs - recorded unit consumption`.
+
+Inventory totals include source stock, production input and output inventories,
+every carrier buffer, truck cargo, depot stock and unit supply inventories. Remaining
+deposit stock is measured separately. Reservation quantities remain a subset of
+inventory, not an additional source of material. Completed recipe cycles identify
+actual input/output commits; an active input reservation is not consumption.
+
+| Chain | Transactions and delivery assertions |
+| --- | --- |
+| Ferrous Ore → Smelter → Steel storage | Finite deposit 40; two original 10 Ore → 10 Steel cycles; 20 Steel reaches storage and 20 Ore remains at the production input. |
+| Silicates → Electronics Fabricator → storage | Finite deposit 40; two original 10 Silicates → 10 Electronics cycles; 20 Electronics reaches storage and 20 Silicates remains at the production input. |
+| Steel/Electronics → Ammunition Plant → Supply Depot → Supply Truck → Rifle Squad | Four original 6 Steel + 2 Electronics → 10 Ammunition cycles. The depot and physical Supply Truck carry 40 manufactured ammunition to a field recipient; loaded and delivered quantities are checked separately. Fuel reaches the depot by a real Cargo Truck and remains absent from all conveyor buffers. |
+| Normal Gameplay startup | Standard starting resources pay for a Power Plant, two Storage Depots, a Smelter, bands and supports. An existing Cargo Truck supplies 20 Ore to the source depot; removing its retention policy releases stock to two original recipes and 20 Steel reaches the final storage. Catalog construction costs are subtracted per resource. |
+
+The extraction and ammunition fixtures use seeds 17/917 and 20/30 Hz. Recovery also
+covers 20/7 Hz, and persistence uses two independent seeds plus the artillery case.
+The aggregate chain tolerance is `1e-7`, including the fixture's 200,000 Steel payer
+stock and repeated binary arithmetic; focused transfer contracts use `1e-8` and test
+a positive `1e-10` shipment with exact per-hop equality. No epsilon deletes cargo.
+Fuel consumption is accounted from real vehicle displacement in the field-supply
+chain; the Gameplay-start invariant covers the five belt-compatible resources.
+
+## Historical implementation evidence
+
+The results in this section and the measurements below precede synchronization
+with master `4f1126dc`. They retain their original source identities and do not
+qualify the synchronized branch. See the integration checkpoint below.
+
+| Scenario | Implementation commit | Executed result | Remaining native acceptance |
+| --- | --- | --- | --- |
+| Mixed cargo, shared budgets, fractional quantities, one-hop progression, merger/splitter fairness, blocked branches, reservations and actual truck commitments | `92e13874c11a097f3992f2c6f86b3a0c046d9d19` | ConveyorFlowTests: 21 passed, 0 failed, 0 skipped. Fairness, tiny-tail capacity and committed-load regressions were first reproduced red. | Native flow indicators and animation readability. |
+| Outage/brownout, bounded backpressure, support damage, occupied wreck/repair, remove/replace, ownership, generations, ambiguous sockets and incompatible/sinkless networks | `e1c763082a8c4053ad61e5e6cb81bd635c6ba214` | ConveyorRecoveryTests: 23 passed, 0 failed, 0 skipped, including actual spatial movement/docking. | Physical D3D12 driving, visual clearance and support readability. |
+| Paid cargo checkpoints, actual artillery wreck, repair and live edits through Save/Restore/Replay, followed by more ticks | `e1c763082a8c4053ad61e5e6cb81bd635c6ba214` | ConveyorPersistenceTests: 3 passed, 0 failed, 0 skipped. Included in a 142/142 passing recovery/movement/docking run. | Native save/load presentation and damaged/repaired asset state. |
+| Original Ore/Steel and Silicates/Electronics recipes, manufactured Ammunition through physical field supply, and paid normal Gameplay startup | `9e177b0a364108eef332ca7d86cd2e1d868fd5e2` | ConveyorProductionChainTests: 7 passed, 0 failed, 0 skipped. Separate resource ledgers include reservations, recipe commits, construction and actual unit consumption. | Native construction and the complete industrial/supply interaction. |
+| Active and stopped network measurements at 100/1,000/4,096 modules, physical deliveries and finite recipe balances | `6408a4270726a2c1faeb0ffb916b9a5c7b4090e8` | The driver qualified 24/24 cases in each paired source configuration. Hosted CI produces its own current-head report. | Reference hardware and native full-match performance. |
+| Per-tick allocation reduction, duplicate enabled policy bounds and policy disabling | `4d8f1c38431d3e25d3407bc403e90df92d49770d` | Flow plus policy contracts: 23 passed, 0 failed, 0 skipped. Both new policy cases also passed before the refactor. Paired workload digests and observations match exactly; detailed source provenance and results are below. | Native/full-match and reference-hardware performance. |
+
+The individual test counts overlap with the combined suites; they must not be added
+to those totals. Commit identifiers identify the implementation under test, not a
+claim that later documentation changes affect execution.
+
+Local Release builds of the integrated Game tests and simulation benchmarks use SDK
+10.0.401 with zero warnings and zero errors. The complete unfiltered Game suite
+executes 707 tests: 706 pass, one fails and none are skipped. Its only failure is the
+independent baseline convoy defect #334 described below. The focused combined conveyor,
+distribution, battlefield-supply and MatchPersistence run passes 117 tests, with no
+failures or skips. The complete Simulation test project
+passes 86 tests with no failures or skips. Project-reference validation covers all
+44 projects and reports no cycles or architecture-boundary violations. The PR version
+script advances 0.1.461 to 0.1.462 once; running it again against the unchanged master
+leaves the prepared version unchanged.
+
+## Active-network measurements
+
+The dedicated `--conveyor-measurements` mode measures 100, 1,000 and 4,096 carrier
+modules at 20 Hz, with linear and splitter/two-branch/merger topologies. Each case
+warms for 256 ticks and measures 512. Powered cases include original Steel production
+and 1/4/16 physical Cargo Trucks; the 5/50/205 production lanes use finite starting
+Ore with no refill, teleport or in-window reset. Unpowered, incompatible-endpoint and
+full-buffer cases deliberately stop conveyor flow while production remains active.
+They are reported as stopped-state costs, not active logistics throughput.
+
+Each report retains raw tick samples, allocations, GC counts, process CPU, module and
+truck counts, recipe commits, delivered/lost cargo, real truck displacement and
+qualification failures. The full tick and ConveyorSimulationSystem.Execute call
+have separate timing/allocation regions. Observations and authority digests are
+outside those regions; process CPU per observed tick includes their overhead.
+Qualification rejects missing sustained powered flow, inactive production, absent
+completed physical deliveries, incorrect stopped states, lost cargo or a failed
+per-resource recipe balance. Hosted wall-time values are advisory.
+
+The original `b397bd6f` baseline qualified all 24 cases on Ubuntu 24.04.3 x64,
+SDK 10.0.401 / .NET 10.0.12, with 8 runtime-visible processors and
+`DOTNET_TieredCompilation=0`. The host reports AMD EPYC 9V74; frequency/power settings
+and reference-machine status are unknown. At 4,096 powered modules the original
+linear case averaged 45.24 ms per complete tick (p95 60.12 ms), including 43.08 ms
+inside conveyors and 16.85 MB conveyor allocation per tick. The split/merge case
+averaged 43.45 ms per tick (p95 56.72 ms) and 17.02 MB conveyor allocation. These
+measurements establish the allocation investigation in #308, not a hardware budget
+acceptance. Baseline report SHA256:
+`0a96576963dd6c68249baac9c955f597407d3f280c1aa0a879a17dcaa797d6ca`.
+
+### Allocation correction and equivalent workloads
+
+Diagnostic profiling attributed the largest per-tick allocations to node/port/socket
+construction, connection matching and policy/snapshot limits. The bounded correction
+computes sockets and compatible resource masks once per module/port in the tick,
+aggregates enabled policy minima/maxima once per full entity/resource identity, and
+uses unique-candidate counts instead of temporary matching lists and GroupBy arrays.
+The graph and policy data are still rebuilt every tick. There is no persistent cache
+to invalidate, and no transfer-order, quantum, budget, cursor or persistence change.
+Duplicate policy tests verify the minimum destination target and maximum source
+retention, including disabling either bound and observing the revised receipt or
+retained stock.
+
+The paired comparison isolates that allocation correction on top of the already
+corrected flow/distribution semantics. It does not compare the old unfair arbitration
+against the corrected behavior. Both builds used identical benchmark sources and
+the baseline's 0.1.461 build metadata; combined functional validation uses 0.1.462.
+These are controlled source measurements, not a binary measurement of the final PR
+commit. Source and binary hashes, report hashes, configuration, all 24 case metrics,
+GC counts and equality summaries are retained in
+[ConveyorReliabilityMeasurements.json](ConveyorReliabilityMeasurements.json).
+
+| Modules | Topology, powered | Complete tick mean before → after (ms) | Complete tick p95 before → after (ms) | Conveyor allocation before → after (bytes/tick) |
+| ---: | --- | ---: | ---: | ---: |
+| 100 | Linear | 1.0507 → 0.6993 | 1.3767 → 0.6235 | 412,596 → 227,873 |
+| 100 | Split/merge | 0.4836 → 0.4428 | 0.7862 → 0.5603 | 416,726 → 230,244 |
+| 1,000 | Linear | 5.3166 → 4.1668 | 7.2671 → 5.6244 | 4,103,406 → 2,283,731 |
+| 1,000 | Split/merge | 5.3533 → 3.8216 | 7.3134 → 5.5477 | 4,142,787 → 2,305,513 |
+| 4,096 | Linear | 50.8974 → 27.5176 | 74.0662 → 45.5681 | 16,892,658 → 9,414,322 |
+| 4,096 | Split/merge | 47.6745 → 27.7626 | 66.0700 → 44.4829 | 17,060,382 → 9,505,319 |
+
+All 24 cases qualify before and after. All 408 sampled authority digests and 12,288
+per-tick module-output/truck-distance pairs agree exactly, as do counters and final
+truck states. Powered measurement windows complete 65/650/2,665 original recipe
+cycles and 1/4/16 physical deliveries at the three scales. At 4,096 powered modules,
+Linear delivers 80 Steel and SplitMerge delivers 160 Steel; both retain belt flow
+and truck movement in both halves.
+No cargo is lost. Conveyor allocation falls 43.56–47.14% across all 24 cases.
+
+The worst observed after-correction p95 complete tick is 45.5681 ms, but 28 of 12,288
+ticks still exceed 50 ms (792 before). Shared-host wall timings remain advisory.
+These results do not establish a universal 20 Hz budget, a graphical frame budget,
+Windows/WARP performance or physical reference-hardware acceptance.
+
+The [hosted Conveyor reliability run 39988636659](https://github.com/DaveBeusing/Forgeline/actions/runs/39988636659)
+also qualified all 24 cases at exact source revision
+`e972ccba181dbf31ef28bda15ea5a37f76de82cb`, after passing 117 focused Game and 11
+Inventory tests. Its uploaded `conveyor-reliability` artifact records
+`CompleteMatrix=true`, `Qualified=true` and no case failures. Raw JSON SHA256:
+`a53c53ea99f09f1f3a13bfd16035dc4e81e121228e9a376af36f264d3051cedd`.
+All compared authority samples, per-tick output/distance samples, counters and final
+truck states also match the local after-correction report. This hosted run uses
+Ubuntu 24.04.5, .NET 10.0.13 and four visible processors; its timings are a separate
+host measurement and are not substituted into the paired comparison above.
+
+## Historical integration dependencies
+
+The unchanged baseline has a convoy command-precedence defect tracked by
+[#334](https://github.com/DaveBeusing/Forgeline/issues/334). In
+`ManualEscortMovementReplacesConvoyFollowWithoutCancelingCargo`, the prior pending
+navigation intent wins over a newly accepted manual Move in the convoy phase. The
+escort detaches one tick later than required; cargo orders remain intact. Reproduction
+against the unmodified `b397bd6f` Game binary establishes that this is independent of
+conveyor/distribution changes. The repair belongs to the existing parallel
+[PR #340](https://github.com/DaveBeusing/Forgeline/pull/340).
+
+At the `e1c76308` implementation checkpoint, the
+[Frame hot paths run 39985936299](https://github.com/DaveBeusing/Forgeline/actions/runs/39985936299)
+builds successfully and then reports 97 passing / 4 failing Operations tests in
+Integrated interaction/display. The positive fixtures supply no render instances,
+so the owned/visible full-identity focus guard correctly returns Invalid. The exact
+failures are `ShortClicksSelectAndOpen`, both `ConfirmedServiceBlock` cases and
+`OperationsClickRequiresRelease`. This existing fixture dependency is tracked by
+[#339](https://github.com/DaveBeusing/Forgeline/issues/339); weakening the production
+privacy guard is not part of conveyor qualification. The same checkpoint's
+[Movement run 39985932736](https://github.com/DaveBeusing/Forgeline/actions/runs/39985932736)
+passes. These checkpoint results do not substitute for checks on the final PR head.
+
+At `e972ccba`, the [main CI run 39988636450](https://github.com/DaveBeusing/Forgeline/actions/runs/39988636450)
+passes the complete Release solution build and early conveyor/inventory contracts,
+then stops at step 27, UI audio reliability and industrial source contracts.
+`UiInteractionFeedbackTests.WarmCopiedFeedbackRetainsZeroAllocation` expects zero
+current-thread allocation bytes and observes 1,240; that invocation has 59 passing,
+one failing and two explicitly native-skipped tests. The tested source and test
+files are byte-identical to master, and the fixture invokes no conveyor, distribution
+or vehicle simulation. The reason for that allocation is unresolved; this is not
+attributed to a particular runtime mechanism. Later asset, WARP, full-solution-test,
+package, recovery and natural-terminal steps in that job are unreached. The same
+source's [Frame run 39988636471](https://github.com/DaveBeusing/Forgeline/actions/runs/39988636471)
+independently reproduces the four #339 Operations failures. Subsequent PR checks are
+reported in the PR; a checkpoint failure or an unreached gate is never recorded as a pass.
+
+## Synchronized integration checkpoint
+
+PR #340 is integrated into master `4f1126dcbeef9f41d3ffae0be6c0fc6951f71d46`.
+Conveyor branch source `006dcd83300685ef51a7f663dc035cb65c160194` merges that exact
+master while preserving the seven existing conveyor commits. The existing Operations
+fixture and convoy command-precedence corrections are now present; the historical
+#334/#339 failures above are not assertions about the synchronized source.
+
+The shared construction path inherits a live adapter's full-generation attachment
+when no endpoint override is supplied. Explicit replacement of a dead endpoint with
+a matching live owned port preserves the occupied adapter entity, cargo, damage and
+supports. A missing override cannot silently bind a reused building index. Both the
+attachment-inheritance and occupied-reconnection regression groups remain in the
+focused conveyor workflow.
+
+Distribution retains accepted-load/destination accounting together with building
+destruction cleanup. Both industrial/radar and conveyor/inventory focused CI gates
+are retained. No required Windows/WARP, complete solution, package, recovery or natural
+terminal gate is removed. The synchronized branch uses master's authoritative schema
+6 and explicit schema-5 rejection; conveyor integration adds no new persisted fields
+or schema transition.
+
+The repository version-preparation script advances current master `0.1.462-dev` to
+`0.1.463-dev`, one PATCH for this PR after synchronization. Current-source CI must
+complete again. Earlier 117-test and 24-case successes above remain historical
+evidence and cannot substitute for those runs. Physical D3D12 driving, visual review
+and reference-hardware performance remain open under the acceptance boundary below.
+
+## Reproduction and acceptance boundaries
+
+Use the SDK and Microsoft.Testing.Platform runner selected by `global.json`:
+
+```powershell
+dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class '*Conveyor*' ForgeLine.Game.Tests.AutomatedDistributionSystemTests ForgeLine.Game.Tests.BattlefieldSupplySystemTests ForgeLine.Game.Tests.MatchPersistenceTests --parallel none
+dotnet test --project tests/ForgeLine.Simulation.Tests/ForgeLine.Simulation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Simulation.Tests.InventoryStoreTests
+dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release --no-build -- --conveyor-measurements artifacts/conveyor-measurements.json
+```
+
+Restore and build the projects first. For paired allocation/timing measurements, set
+`DOTNET_TieredCompilation=0` for both hosts. The main `build-test` workflow retains all
+existing full-solution, WARP, asset, package, recovery and natural terminal-match gates.
+The independent headless Conveyor reliability workflow exposes the focused contracts
+and benchmark even when an unrelated earlier graphical gate stops main CI. It does
+not replace the required main workflow.
+
+Native acceptance still requires physical D3D12 execution and human inspection of
+Cargo/Supply Trucks and combat vehicles beneath spans/ramps, beside real supports and
+through docks before and after edits. Inspect owner/fog isolation, selected links,
+Operations bounds, flowing/stalled clips, state materials, LODs, reduced motion,
+terrain contact and camera readability. Headless movement, save/replay identity and
+hosted WARP are separate evidence; none establishes native visual quality or reference
+hardware performance.
