@@ -131,7 +131,7 @@ def main():
                 if old[key]!=new[key]: raise ValueError('Geometry contract changed: '+relative+' '+key)
             if newissues: raise ValueError('Repaired geometry still has findings: '+relative+repr(newissues))
             after_hash=hashlib.sha256(original.read_bytes()).hexdigest()
-            name=path.relative_to(dest).with_suffix('').as_posix().replace('/','.')
+            name=path.relative_to(dest).with_suffix('').as_posix()
             records[name]['sha256']=after_hash
             changes.append({'path':'assets/source/'+relative,'beforeSha256':before_hash,'afterSha256':after_hash,
                             'changed32BitComponents':edited,'before':old,'after':new})

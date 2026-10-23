@@ -10,7 +10,7 @@ def _unit(value):
 
 
 def pipe_frames(points, reference):
-    """Parallel-transport one frame instead of flipping at a reference singularity."""
+    """Preserve regular authored frames; transport through reference singularities."""
     points = np.asarray(points, dtype=float)
     reference = np.asarray(reference, dtype=float)
     if points.ndim != 2 or points.shape[1] != 3 or len(points) < 2 or not np.isfinite(points).all():
@@ -20,6 +20,10 @@ def pipe_frames(points, reference):
     if np.any(np.linalg.norm(np.diff(points, axis=0), axis=1) <= 1e-12):
         raise ValueError('Pipe contains a repeated adjacent point')
     tangents = [_unit(points[min(i + 1, len(points) - 1)] - points[max(0, i - 1)]) for i in range(len(points))]
+    legacy = [np.cross(tangent, reference) for tangent in tangents]
+    if all(np.linalg.norm(u) >= 1e-6 for u in legacy):
+        # No reference singularity: retain valid production surface roll exactly.
+        return [(u / np.linalg.norm(u), np.cross(t, u / np.linalg.norm(u))) for t, u in zip(tangents, legacy)]
     first = tangents[0]
     u = np.cross(first, reference)
     if np.linalg.norm(u) <= 1e-8:
@@ -31,7 +35,6 @@ def pipe_frames(points, reference):
         axis = np.cross(previous, tangent)
         if cosine <= -1 + 1e-8:
             raise ValueError('Pipe reverses direction without a defined bend')
-        # Minimal rotation maps the tangent without introducing arbitrary roll.
         if np.linalg.norm(axis) > 1e-12:
             u = u + np.cross(axis, u) + np.cross(axis, np.cross(axis, u)) / (1 + cosine)
         u = _unit(u - tangent * np.dot(u, tangent))
@@ -78,7 +81,6 @@ def inset_profile(profile, inset):
     legacy = outer - np.sign(outer - outer.mean(axis=0)) * inset
     if valid(legacy):
         return legacy
-    # Offset supporting lines by the authored anisotropic rectangle support.
     shifted = offsets + np.abs(normals) @ inset
     result = np.array([np.linalg.solve(normals[[i - 1, i]], shifted[[i - 1, i]]) for i in range(len(outer))])
     if not valid(result):

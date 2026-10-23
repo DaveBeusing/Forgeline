@@ -6,12 +6,16 @@ on:
     paths:
       - 'assets/source/**'
       - 'build/asset-audit/**'
+      - 'build/source_geometry.py'
+      - 'build/Author-*.py'
       - '.github/workflows/asset-source-audit.yml'
   push:
     branches: [master]
     paths:
       - 'assets/source/**'
       - 'build/asset-audit/**'
+      - 'build/source_geometry.py'
+      - 'build/Author-*.py'
       - '.github/workflows/asset-source-audit.yml'
   workflow_dispatch:
 
@@ -30,9 +34,11 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
-            assets/source
-            build/asset-audit
+            /assets/source/
+            /build/*.py
+            /build/asset-audit/
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
