@@ -81,7 +81,7 @@ def export(kit, shared, lod, names, path):
     data = json.loads(path.read_text(encoding='utf-8'))
     data['asset']['generator'] = 'ForgeLine logistics building component exporter'
     data['extras'] = dict(coordinates=kit['coordinates'],componentHierarchy=ranges,anchors=kit['anchors'])
-    path.write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
+    path.write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8', newline='\n')
     report['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
     return report
 
@@ -96,7 +96,7 @@ def author(family, output):
         reports[name] = export(kit,shared,1,modules,output/f'{name}.gltf')
     for module in kit['modules']:
         reports['kit/'+module['name']] = export(kit,shared,0,[module['name']],output/'kit'/f"{module['name']}.gltf")
-    (output/'exports.json').write_text(json.dumps(reports,indent=2)+'\n',encoding='utf-8')
+    (output/'exports.json').write_text(json.dumps(reports,indent=2)+'\n',encoding='utf-8', newline='\n')
     print(family,json.dumps({name:value['triangles'] for name,value in reports.items() if not name.startswith('kit/')}))
 
 

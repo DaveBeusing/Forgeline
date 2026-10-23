@@ -142,7 +142,7 @@ class Mesh:
                bufferViews=views,accessors=accessors,meshes=[dict(name=path.stem,primitives=[dict(
                    attributes=dict(POSITION=0,NORMAL=1,TEXCOORD_0=2),indices=3,mode=4)])])
         path.parent.mkdir(parents=True,exist_ok=True)
-        path.write_text(json.dumps(g,indent=2)+'\n',encoding='utf-8')
+        path.write_text(json.dumps(g,indent=2)+'\n',encoding='utf-8', newline='\n')
         return dict(vertices=len(arrays[0]),triangles=len(arrays[3])//3,
                     minimum=arrays[0].min(0).tolist(),maximum=arrays[0].max(0).tolist(),
                     sha256=hashlib.sha256(path.read_bytes()).hexdigest())
@@ -180,7 +180,7 @@ def author(output):
         report[module['name']]=assemble(kit,0,[module['name']]).export(output/'kit'/f"{module['name']}.gltf")
     for name,recipe in kit['states'].items():
         report[name]=assemble(kit,1,recipe).export(output/f'command_core_{name}.gltf')
-    (output/'command_core.exports.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    (output/'command_core.exports.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8', newline='\n')
     print(json.dumps({name:entry['triangles'] for name,entry in report.items()}))
 
 

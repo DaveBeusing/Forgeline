@@ -1,0 +1,83 @@
+name: Model runtime and master qualification
+
+# Diagnostic entry point independent of earlier unrelated required-CI blockers.
+# The existing required CI already owns canonical runtime/package acceptance.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: model-runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  runtime-assets:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build asset compiler and asset tests
+        shell: pwsh
+        run: |
+          dotnet build tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj -c Release
+          if ($LASTEXITCODE -ne 0) { throw 'Asset build failed.' }
+      - name: Compile and qualify the complete current source catalog
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts/asset-runtime | Out-Null
+          dotnet tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll --mode build --source assets/source --runtime artifacts/asset-runtime/runtime --qualification-output artifacts/asset-runtime/compile.json
+          if ($LASTEXITCODE -ne 0) { throw 'Production asset compilation failed.' }
+          dotnet tools/ForgeLine.AssetCompiler/bin/Release/net10.0/ForgeLine.AssetCompiler.dll --mode validate --source artifacts/absent-source --runtime artifacts/asset-runtime/runtime --qualification-output artifacts/asset-runtime/source-less.json
+          if ($LASTEXITCODE -ne 0) { throw 'Source-less runtime qualification failed.' }
+      - name: Run the complete asset test project
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj -c Release --no-build
+          if ($LASTEXITCODE -ne 0) { throw 'Asset tests failed; preserve all failures.' }
+      - name: Preserve qualification reports without runtime payloads
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: asset-runtime-${{ github.sha }}
+          path: artifacts/asset-runtime/*.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  native-master-census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Obtain the exact pinned Blender from its official release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(python -c "import json; print(json.load(open('tools/blender/toolchain.json'))['version'])")
+          series=${version%.*}
+          archive="blender-${version}-linux-x64.tar.xz"
+          cd "$RUNNER_TEMP"
+          curl --fail --location --retry 2 --max-time 180 "https://download.blender.org/release/Blender${series}/blender-${version}.sha256" -o blender.sha256
+          curl --fail --location --retry 2 --max-time 300 "https://download.blender.org/release/Blender${series}/${archive}" -o "$archive"
+          grep " ${archive}$" blender.sha256 | sha256sum --check --strict -
+          tar -xf "$archive"
+          echo "$RUNNER_TEMP/blender-${version}-linux-x64" >> "$GITHUB_PATH"
+      - name: Open every tracked master with embedded script execution disabled
+        shell: bash
+        run: blender --background --factory-startup --disable-autoexec --offline-mode --threads 1 --python-exit-code 23 --python build/asset-audit/blend_audit.py -- "$GITHUB_WORKSPACE"
+      - name: Preserve master inspection evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blender-master-census-${{ github.sha }}
+          path: artifacts/asset-audit/blender-masters.json
+          if-no-files-found: warn
+          retention-days: 14

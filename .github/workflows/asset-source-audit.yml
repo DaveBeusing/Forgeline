@@ -1,0 +1,58 @@
+name: Model and texture source audit
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'assets/source/**'
+      - 'build/asset-audit/**'
+      - 'build/source_geometry.py'
+      - 'build/Author-*.py'
+      - '.github/workflows/asset-source-audit.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'assets/source/**'
+      - 'build/asset-audit/**'
+      - 'build/source_geometry.py'
+      - 'build/Author-*.py'
+      - '.github/workflows/asset-source-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: asset-source-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /assets/source/
+            /build/*.py
+            /build/asset-audit/
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install source inspection dependencies
+        run: python -m pip install numpy==2.3.3 Pillow==12.3.0
+      - name: Audit regression fixtures
+        run: python -m unittest discover -s build/asset-audit -p 'test_*.py' -v
+      - name: Inspect every exported mesh and texture
+        run: python build/asset-audit/source_audit.py --review-bundle artifacts/asset-audit/mesh-review.zip
+      - name: Retain complete findings even when validation fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: asset-source-audit-${{ github.sha }}
+          path: artifacts/asset-audit/
+          if-no-files-found: warn
+          retention-days: 14

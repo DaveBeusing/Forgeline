@@ -13,7 +13,7 @@
         0.4791666567325592,
         0.4749999940395355
       ],
-      "sha256": "ce8f3abca5249064bdfb8ad58e885e57544a573345e5984bcd929b283b4e8ec5"
+      "sha256": "de97f930b0f8dcb09af5862bc03471f8338b48ead940471913f1749ccc09f0b3"
     },
     "lod1": {
       "vertices": 1812,
@@ -28,7 +28,7 @@
         0.4791666567325592,
         0.4749999940395355
       ],
-      "sha256": "cc90a1ea5c1bedcbbb402592f251a5f5f49ffdb14897d00356f693b80a15c6dc"
+      "sha256": "7e784ef76a9dd16724cfc0326aaf9001eeddb4cdb8ddc40e8f0036009b64c80f"
     },
     "lod2": {
       "vertices": 704,
@@ -43,7 +43,7 @@
         0.46666666865348816,
         0.4749999940395355
       ],
-      "sha256": "65df39c09795b08cffd2d08a45d719c9fcc9c78bfa715a53eb265da05c4b7866"
+      "sha256": "46dee88f95e9d0a2c66aa907c6fc9f78f5bb124b43595d649286cb540d2be906"
     },
     "damaged": {
       "vertices": 48,
@@ -58,7 +58,7 @@
         -0.1666666716337204,
         -0.18281249701976776
       ],
-      "sha256": "305b213248c434eac68bbf3d279ab03eba26a730b04885707824a60337a3872b"
+      "sha256": "c80edb4858d5d72bc50531eacde59ef71b793fcbdd02dd6d612efb6ab2309c3d"
     },
     "critical": {
       "vertices": 164,
@@ -73,7 +73,7 @@
         -0.04583333432674408,
         -0.1015625
       ],
-      "sha256": "d6bd3002a4a870d2ace76ea39fc69a59aaaf9578bbea8d3cdab3e16975fc7e49"
+      "sha256": "b59832a9e66f307532e0e9aabed5d4249a831ce68cf784c101ffd2baf76c10e2"
     },
     "wreck": {
       "vertices": 188,
@@ -88,7 +88,7 @@
         -0.02500000037252903,
         0.23593750596046448
       ],
-      "sha256": "a4e2453ad8a0c5a3dcd1baa7cb331a2193fc01963c0c4e6b6b14c412ef188b79"
+      "sha256": "a21c9c457b51cc20ef94b9587184034c0dc8655de4f86e7920fee25f41259f11"
     },
     "kit/ladder_chassis": {
       "vertices": 480,
@@ -103,7 +103,7 @@
         -0.01666666753590107,
         0.4749999940395355
       ],
-      "sha256": "7562d58831219bc1519c758149ca4e9f72ee3b9b64011d8274f4ebb304c5afc7"
+      "sha256": "3898be124913c824107634013d028628ce1c4bbf7cb8e2fd88ac4543561e441a"
     },
     "kit/armored_cab": {
       "vertices": 956,
@@ -118,7 +118,7 @@
         0.4791666567325592,
         0.4659374952316284
       ],
-      "sha256": "11ea50a911eb5673bf3c526a4578856594031b7326a5defee126a9ba840d1a5a"
+      "sha256": "87991c9d128e25d2166428ae5cdc8dfc0d666aae0a6b386f18a7aba6d0be7278"
     },
     "kit/wheel_n1_n2_4": {
       "vertices": 528,
@@ -133,7 +133,7 @@
         -0.10000000149011612,
         -0.30781251192092896
       ],
-      "sha256": "9743b83ad85223819a98510c677970157d4c3274adad02e41cb1553af63c9a13"
+      "sha256": "cb947d26cee6f4953fa7fd0082c23bac6dfdb3c7225c1879d3510b3d95bedbc9"
     },
     "kit/guard_wheel_n1_n2_4": {
       "vertices": 96,
@@ -148,7 +148,7 @@
         -0.0416666679084301,
         -0.29218751192092896
       ],
-      "sha256": "59e565673c857d848c14a74da675a9c7f2bbb0e74e26d0b3eb531e4f77c31be5"
+      "sha256": "0b34237488712135e9fc5329472d39464ba077804d9b789ad2c95d9727534366"
     },
     "kit/suspension_wheel_n1_n2_4": {
       "vertices": 72,
@@ -163,7 +163,7 @@
         -0.15316958725452423,
         -0.36796873807907104
       ],
-      "sha256": "5146b55aae6179dd21cb740c824399ef23148bc17885410a2e18684de01dc0b4"
+      "sha256": "efbb93760b5e152f091d66b216b11de9edbcc69996921b9093b1add2143d0e0f"
     },
     "kit/wheel_1_n2_4": {
       "vertices": 528,
@@ -178,7 +178,7 @@
         -0.10000000149011612,
         -0.30781251192092896
       ],
-      "sha256": "7eed3564a402e3e516b6bb51270ce00c8ac17da73024791db14a7f7a34fe889c"
+      "sha256": "0cadf61154ce037001079e9ac3e07b9084055a7eb0dc5ba7140a0b971af53125"
     },
     "kit/guard_wheel_1_n2_4": {
       "vertices": 96,
@@ -193,7 +193,7 @@
         -0.0416666679084301,
         -0.29218751192092896
       ],
-      "sha256": "ee2ce82295d85fa380b5111501302509e125bedb7a206e4dcd253dea40181ed2"
+      "sha256": "3ded889b229c457552841286d1c7db478489b8918ade3440500a245b0d7c0540"
     },
     "kit/suspension_wheel_1_n2_4": {
       "vertices": 72,
@@ -208,7 +208,7 @@
         -0.15316958725452423,
         -0.36796873807907104
       ],
-      "sha256": "5d21f6b8644458eb6712219557e480b881eab704d6884b8e7d8d05beaf0331da"
+      "sha256": "ab69d76594809053581b14c41e0d4a38c0bf254fe6ba7ea8c37ec7250137a323"
     },
     "kit/wheel_n1_n1_25": {
       "vertices": 528,
@@ -223,7 +223,7 @@
         -0.10000000149011612,
         -0.12812499701976776
       ],
-      "sha256": "393305811ecbb0f03798239bff43ad7894d88a4376a4415c97281fc67a1d1b7e"
+      "sha256": "7b85e75077525e761c035a905f49c06f3bc66c0fc0d3ff7ba3d2d119e0194073"
     },
     "kit/guard_wheel_n1_n1_25": {
       "vertices": 96,
@@ -238,7 +238,7 @@
         -0.0416666679084301,
         -0.11249999701976776
       ],
-      "sha256": "3af049651ee47b78ff42f6159e6c2baf1fee7a8e5c45f576a50043480ec3e6f0"
+      "sha256": "933b726fdce065b5605bb763724d55b1010384476b1f914f0ef270461ba1de81"
     },
     "kit/suspension_wheel_n1_n1_25": {
       "vertices": 72,
@@ -253,7 +253,7 @@
         -0.15316958725452423,
         -0.18828125298023224
       ],
-      "sha256": "e0a09c3d241e65c3019375966662edfedee02bc73f7f06a274df7d553b1be4a7"
+      "sha256": "a57d7a65638f1669651a0abe326cdeca6dc02ff11cad2b17aa0d498978acd503"
     },
     "kit/wheel_1_n1_25": {
       "vertices": 528,
@@ -268,7 +268,7 @@
         -0.10000000149011612,
         -0.12812499701976776
       ],
-      "sha256": "06f58e3bcd193d932ef665f2f9fe7c45f4304dface51bc64067b23be817f37ed"
+      "sha256": "efbfb344c2638ba3a6c5f958ebbd6af4f98faff957f0df771488a959116ea5c1"
     },
     "kit/guard_wheel_1_n1_25": {
       "vertices": 96,
@@ -283,7 +283,7 @@
         -0.0416666679084301,
         -0.11249999701976776
       ],
-      "sha256": "be90e33f6b0f4874f58598e396fd703d028b808c6498e88d13e8dcffe5229138"
+      "sha256": "4a05097f7ad7edcc12949e52bca7cc5f275a3e002ada8d28457a9e4f98a3bcda"
     },
     "kit/suspension_wheel_1_n1_25": {
       "vertices": 72,
@@ -298,7 +298,7 @@
         -0.15316958725452423,
         -0.18828125298023224
       ],
-      "sha256": "63f9ffb500d6a7f8e4d42cd7cb20fd43aa3ba191deb53e5734acb9e36bbe68fb"
+      "sha256": "5d4e45d3f23b480c0dc4821ed1ab4421a5db7095b4ea9b6f0c3374afc4f42287"
     },
     "kit/wheel_n1_1_35": {
       "vertices": 528,
@@ -313,7 +313,7 @@
         -0.10000000149011612,
         0.27812498807907104
       ],
-      "sha256": "3b22b22aea3db5884c05af504db2fa7072d264033f510f46275eb74bdaac8471"
+      "sha256": "07bd64b67232dd7fdee8dcd6329979d880df471ed5cc503e382da161b66550aa"
     },
     "kit/guard_wheel_n1_1_35": {
       "vertices": 96,
@@ -328,7 +328,7 @@
         -0.0416666679084301,
         0.29374998807907104
       ],
-      "sha256": "9262db339be18e6318d8a13c706aa8e8860f00af92480992985d3d44ef9d8d75"
+      "sha256": "2c79572ec9c4e989dfc1ce83b33112d16685742425cc66739f933e805c8dac7e"
     },
     "kit/suspension_wheel_n1_1_35": {
       "vertices": 72,
@@ -343,7 +343,7 @@
         -0.15316958725452423,
         0.21796874701976776
       ],
-      "sha256": "6e00875f96205f9c74af3f6a61547e8e0a963908a42dc572bd9bd61b2bf8464c"
+      "sha256": "92abf7df9b2eff414e963e0d6459c1a14256bcb45cffb2713614dd445727e5fc"
     },
     "kit/wheel_1_1_35": {
       "vertices": 528,
@@ -358,7 +358,7 @@
         -0.10000000149011612,
         0.27812498807907104
       ],
-      "sha256": "add11d48b7b1d9ec821547a8524e15d0f41dfd0bc0d7feed85d9de3bbb84e557"
+      "sha256": "03320eccefb792eef2b196c50c5f05d5c8c58fb14bd9477aea14ce5985a781c2"
     },
     "kit/guard_wheel_1_1_35": {
       "vertices": 96,
@@ -373,7 +373,7 @@
         -0.0416666679084301,
         0.29374998807907104
       ],
-      "sha256": "6163437221f7da2f24db2723a4607c7e55582edf709e335caecf5c582832df0b"
+      "sha256": "328d4fbdcb5fe10796bc8fd2eefe1a5f781be9961e28c789b1e136d70e00300c"
     },
     "kit/suspension_wheel_1_1_35": {
       "vertices": 72,
@@ -388,7 +388,7 @@
         -0.15316958725452423,
         0.21796874701976776
       ],
-      "sha256": "0bfdd17cd719751a3dd3b8c82d619b6077f735d49e935bdaa2ccbaa18f253de7"
+      "sha256": "4a4e004b9c819d27d9148df9f5dcc7f4a1201dfdd20d62c3d21b5b3b4dd250e0"
     },
     "kit/wheel_n1_2_38": {
       "vertices": 528,
@@ -403,7 +403,7 @@
         -0.10000000149011612,
         0.4390625059604645
       ],
-      "sha256": "eae647f4c97fd7866442ea6c03a4e324477d77ffc2d661dd5487d37ac2b6e4be"
+      "sha256": "e624a605e61e4826518d9779169c5400535b3d628ce06baf94ae47ca7c5c0800"
     },
     "kit/guard_wheel_n1_2_38": {
       "vertices": 96,
@@ -418,7 +418,7 @@
         -0.0416666679084301,
         0.4546875059604645
       ],
-      "sha256": "10a4404ed79c81a80cd8d523d18c781560a798b8d5174cf28bb7f4a96f1b9c68"
+      "sha256": "d1b3016f489c0f016218f2d42c2887ec07d0cd96b454971585f45a697c9d5725"
     },
     "kit/suspension_wheel_n1_2_38": {
       "vertices": 72,
@@ -433,7 +433,7 @@
         -0.15316958725452423,
         0.37890625
       ],
-      "sha256": "6086e4b1ec243b20d132cd9d62cf646d177c9e09639fdf88dee40084664f1480"
+      "sha256": "d907f31e82894a5fcb10ca534dc8e5b42d42fb506e87c839ee6e4ba4037b6c3e"
     },
     "kit/wheel_1_2_38": {
       "vertices": 528,
@@ -448,7 +448,7 @@
         -0.10000000149011612,
         0.4390625059604645
       ],
-      "sha256": "a7aa25f984b89a4206872a8e840dc00141b0267b5a57be06279926fd31cd5c76"
+      "sha256": "9595db545dba520163acad8be29e8e46b0977f64c0da712198d2f4e9e23c9bfc"
     },
     "kit/guard_wheel_1_2_38": {
       "vertices": 96,
@@ -463,7 +463,7 @@
         -0.0416666679084301,
         0.4546875059604645
       ],
-      "sha256": "6da5ccc5b06c6b0aed6099c055ab212983bf4d413685b687fe9364fcdd40275d"
+      "sha256": "9182f70fe38acc123b41e0ad481dde7b0a2ceab7177e1091793ee61756020f25"
     },
     "kit/suspension_wheel_1_2_38": {
       "vertices": 72,
@@ -478,7 +478,7 @@
         -0.15316958725452423,
         0.37890625
       ],
-      "sha256": "2328e6e85e1f2743c494bcde6e2213bc7e59cb7d1c8b692edf6d3d05ff04b4b4"
+      "sha256": "aa9ba99d319356d215f2852d1ffbf2d826cdc193ae56f956b0fe19ac82541a38"
     },
     "kit/rear_loading_platform": {
       "vertices": 96,
@@ -493,7 +493,7 @@
         0.11999999731779099,
         0.14531250298023224
       ],
-      "sha256": "e73c3941eccd9b05a63a0ecefc777616231959c8c79d9e7b33837660f3cec549"
+      "sha256": "d5c1a0b6a8352f3e143be3d38965d31c4b928c5baabd2f417be53c7554ae2069"
     },
     "kit/cargo_pallet_0": {
       "vertices": 288,
@@ -508,7 +508,7 @@
         0.4541666805744171,
         -0.25312501192092896
       ],
-      "sha256": "a51b1fd928a62353a424f2f66ca72f20327c78072c624bfeeb786dde30d799d2"
+      "sha256": "e5dee23775dd911d1c1a8a96c4ebe4498c79844461a6822d90d20f6507ae4f83"
     },
     "kit/cargo_strap_0_-0.62": {
       "vertices": 24,
@@ -523,7 +523,7 @@
         0.4583333432674408,
         -0.2554687559604645
       ],
-      "sha256": "a918d78c1826d44eca1f3d3e6af46e24c148953768d1483f87528e4c4ff8ef11"
+      "sha256": "710e5cfdb94b04f8621ec940cbc7d95578db607826049a7f48b83b24c169bc54"
     },
     "kit/cargo_strap_0_0.62": {
       "vertices": 24,
@@ -538,7 +538,7 @@
         0.4583333432674408,
         -0.2554687559604645
       ],
-      "sha256": "0752c99d88f5e81db7979a1f224083e74a852ed27ed4fee8a1257318970d8721"
+      "sha256": "6171ae8462e078b394c6b07dfbaa10ab83a4217eb0d4b558f0dc218fbbb07f24"
     },
     "kit/cargo_pallet_1": {
       "vertices": 288,
@@ -553,7 +553,7 @@
         0.4541666805744171,
         -0.01406249962747097
       ],
-      "sha256": "ebf1ac3753a1aa179660aa69e492ec3026430d649f4690f98325238c7d8ae789"
+      "sha256": "ee899ca0ef6b156d42c7280d6e3af9d81d9138fb69846ead98b67313fbfbb7cd"
     },
     "kit/cargo_strap_1_-0.62": {
       "vertices": 24,
@@ -568,7 +568,7 @@
         0.4583333432674408,
         -0.01640624925494194
       ],
-      "sha256": "a8e22cc085a635f7723cd693c6e2125c94d97813d4f82ad8a9d0afe4d8c5d76a"
+      "sha256": "0dbf4a4e4af361d58f477ed9bac74e3ae52873f835baf782687b7bdaed898d9b"
     },
     "kit/cargo_strap_1_0.62": {
       "vertices": 24,
@@ -583,7 +583,7 @@
         0.4583333432674408,
         -0.01640624925494194
       ],
-      "sha256": "6e43f273c96b9cb6ed0c0431aae28958d03efd3f91320adf83955f120ff84248"
+      "sha256": "0aa28a22279adb8ba639df925d749df3cd7dd39b501f21b569d99f4dd0c3519e"
     },
     "kit/cargo_rear_gate": {
       "vertices": 120,
@@ -598,7 +598,7 @@
         0.2541666626930237,
         -0.4546875059604645
       ],
-      "sha256": "592d82eb72ff8c220dc24013d844a71c5179a3037f0bc58ea10be835f513493c"
+      "sha256": "162cfe2f8b8d28d9ba0add9c06c53fa3ce2438103ff64e82270ae336f5d95846"
     },
     "kit/damaged_panels": {
       "vertices": 192,
@@ -613,7 +613,7 @@
         -0.1666666716337204,
         -0.18281249701976776
       ],
-      "sha256": "d8866447a90c36ac3b181ca6096f342a3f8337f951fe329544034a11536fb849"
+      "sha256": "09eea6010642eca0ce4fb7240663180c7792b60d843f5696b20929a6a7a9c1fb"
     },
     "kit/critical_structure": {
       "vertices": 232,
@@ -628,7 +628,7 @@
         -0.04583333432674408,
         -0.1015625
       ],
-      "sha256": "bd51b26f58bd6342e0fd76ffccaf38d050bac8c2a1b81c9ca8808b7ac41c3962"
+      "sha256": "2f2f498f0b6f865b54a39c65d667133f9679d59206b42e15c577461cdcccb793"
     },
     "kit/collapsed_chassis": {
       "vertices": 520,
@@ -643,7 +643,7 @@
         -0.02500000037252903,
         0.23593750596046448
       ],
-      "sha256": "a939856b73fb70249013584d9de4cfe3517dc0ae771ec6b205e50dddcfd9e6f6"
+      "sha256": "f33f9924d956cd47709fa0ce54a73789544e716b0cf6179bbdb7c9e4491f3f7e"
     }
   },
   "bindings": {

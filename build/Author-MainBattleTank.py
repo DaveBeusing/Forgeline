@@ -10,6 +10,10 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
+
+_geometry_spec = importlib.util.spec_from_file_location('forgeline_source_geometry', Path(__file__).with_name('source_geometry.py'))
+source_geometry = importlib.util.module_from_spec(_geometry_spec)
+_geometry_spec.loader.exec_module(source_geometry)
 SOURCE = ROOT / 'assets/source/units/directorate'
 spec = importlib.util.spec_from_file_location('directorate_geometry', Path(__file__).with_name('Author-CommandCore.py'))
 geometry = importlib.util.module_from_spec(spec)
@@ -56,7 +60,7 @@ class Mesh(geometry.Mesh):
 
     def belt(self, profile, x0, x1, inset):
         outer=np.asarray(profile,float); centre=outer.mean(0)
-        inner=outer-np.sign(outer-centre)*np.asarray(inset)
+        inner=source_geometry.inset_profile(outer,inset)
         def point(x,q): return np.array([x,q[1],q[0]])
         for k in range(len(outer)):
             j=(k+1)%len(outer); radial=(outer[k]+outer[j])/2-centre
@@ -230,19 +234,19 @@ def author(output,update):
         report[state]=state_mesh(kit,state).export(output/f'{state}.gltf')
     for name,module in modules.items():
         report['kit.'+name]=module.export(output/'kit'/f'{name}.gltf')
-    (output/'exports.json').write_text(json.dumps(dict(meshes=report,bindings=bindings),indent=2)+'\n')
+    (output/'exports.json').write_text(json.dumps(dict(meshes=report,bindings=bindings),indent=2)+'\n', newline='\n')
     if update:
         for file,name in (('main_battle_tank','chassis_lod0'),('main_battle_tank_turret','turret_lod0'),
                           ('main_battle_tank_lod1','combined_lod1'),('main_battle_tank_lod2','combined_lod2')):
             path=SOURCE/'vehicles'/f'{file}.asset.json'; d=json.loads(path.read_text())
             d['source']=f'../sources/main_battle_tank/{name}.gltf'
             if name in bindings: d.update(bindings[name])
-            path.write_text(json.dumps(d,indent=2)+'\n')
+            path.write_text(json.dumps(d,indent=2)+'\n', newline='\n')
         for state in kit['states']:
             d=dict(id='unit.directorate.main_battle_tank.'+state,type='mesh',
                    source=f'../sources/main_battle_tank/{state}.gltf',
                    materialReferences=['material.directorate.unit.main_battle_tank'])
-            (SOURCE/'vehicles'/f'main_battle_tank_{state}.asset.json').write_text(json.dumps(d,indent=2)+'\n')
+            (SOURCE/'vehicles'/f'main_battle_tank_{state}.asset.json').write_text(json.dumps(d,indent=2)+'\n', newline='\n')
     print(json.dumps({k:v['triangles'] for k,v in report.items()}))
 
 

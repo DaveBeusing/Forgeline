@@ -12,7 +12,7 @@
       0.20874999463558197,
       0.4699999988079071
     ],
-    "sha256": "df35a4eba9e4c0f8408e37d91efdc89e1ad51df1a4d7600216b6e8ef2d09abfc"
+    "sha256": "a8df697bff6f2aaa313ca0d8aae7407a931fb55651e0c7ba2f22299dd91870cb"
   },
   "lod1": {
     "vertices": 912,
@@ -27,7 +27,7 @@
       0.20874999463558197,
       0.4699999988079071
     ],
-    "sha256": "d6cc5c5eb17c9d905c85d985fd6b4d62baef2f89059db58ee4bdce5e74c3a638"
+    "sha256": "f6d1fdfd16727db9b7a2017eb13532f65549ebd84bdce446aa2e9d0868b64cb1"
   },
   "lod2": {
     "vertices": 576,
@@ -42,7 +42,7 @@
       0.20874999463558197,
       0.4699999988079071
     ],
-    "sha256": "135d95990a973a941b5035062d0dd4192520fab471b286a84bdca4c73d0b745f"
+    "sha256": "5af8be1f47e8f8c0eddaea61fdb054528c8fe9ee1a12aa7868df1887089acfe5"
   },
   "foundation": {
     "vertices": 24,
@@ -57,7 +57,7 @@
       -0.4650000035762787,
       0.4699999988079071
     ],
-    "sha256": "332fe980e6f872b3583263c7d5056bf5ce98b2896137496a8e006bd520712077"
+    "sha256": "dbcb97f671b175cb821829b7366eac9f2d35b357efb3c6f5b83e7f0e0336c25d"
   },
   "structural_frame": {
     "vertices": 144,
@@ -72,7 +72,7 @@
       0.20999999344348907,
       0.4699999988079071
     ],
-    "sha256": "db62ea4d0c1eaf673f5367e54add49c7332f836673ca80b4019a216a5443c845"
+    "sha256": "a53d1aa862cf0ab7cee420827af1dae301379b2eab06baff90f1a4b15b44e547"
   },
   "partial_shell": {
     "vertices": 264,
@@ -87,7 +87,7 @@
       0.20999999344348907,
       0.4699999988079071
     ],
-    "sha256": "b992d06c2e77971721f0bd4414e913b57a417b687e698fac6bde729c1f7458f4"
+    "sha256": "f810106a2666e591a652de4c26b9d3b1d2abebef867347a91d001a11f3bf5681"
   },
   "idle": {
     "vertices": 24,
@@ -102,7 +102,7 @@
       -0.2800000011920929,
       0.4300000071525574
     ],
-    "sha256": "7b4ee348ce29697db27fb86262033a5d88720520e2e0cdeed0bc92deae0ecd15"
+    "sha256": "42fc124b6952a78cfdf2d2a3c36880ce63e06dc36291e0e793b1a0f7138c54a2"
   },
   "unpowered": {
     "vertices": 48,
@@ -117,7 +117,7 @@
       -0.24500000476837158,
       0.4350000023841858
     ],
-    "sha256": "dac7fd2cb29255010622683ced5013b391389d2425701869f5faf0a62b6a1bd4"
+    "sha256": "02fd7a75ac8a2c2b4d9e759d112e37ce03b08e695a554fba047722f59216d5c2"
   },
   "damaged": {
     "vertices": 84,
@@ -132,7 +132,7 @@
       -0.3189089894294739,
       0.4449999928474426
     ],
-    "sha256": "61d17f2bd95cece0fa0b084a2e2a6342a955116701cded6675309c08dc0a7b95"
+    "sha256": "41064fedf949406b632bc1693721e11288b725cfc99f58b0c8bc169ef655442f"
   },
   "critical": {
     "vertices": 132,
@@ -147,7 +147,7 @@
       -0.024383503943681717,
       0.4350000023841858
     ],
-    "sha256": "f1f385267b5503f221fb86af18200b6997f3ee4a55ce0b3d62fc88507d6ccb39"
+    "sha256": "9175aa39b2dd771e9b06a3c5c9a307a49c988bddcd174430b62b04f3e7f6e054"
   },
   "destroyed": {
     "vertices": 192,
@@ -162,7 +162,7 @@
       -0.27000001072883606,
       0.4699999988079071
     ],
-    "sha256": "ec40ba4b9fe3a3364fee48794eac1134c8522ffa519a51aba7f62872e34be40d"
+    "sha256": "c8c40ac25d2d22ae6c777ad68c492676fe72a543cb657de665d20fa24a2b05a9"
   },
   "kit/foundation": {
     "vertices": 96,
@@ -177,7 +177,7 @@
       -0.4650000035762787,
       0.4699999988079071
     ],
-    "sha256": "8d504f4547682c89886530b62ecef34e1e915ef6757fef9648654775e59db5d4"
+    "sha256": "06b56d3a90ca4043e729824a2e01d568277a0c8904820086cb75ee35dc57825d"
   },
   "kit/fuel_reservoir_0": {
     "vertices": 288,
@@ -192,7 +192,7 @@
       0.20874999463558197,
       -0.04600000008940697
     ],
-    "sha256": "2a418febbc9462f960d597ef15e93994b603d6bce7b219b3982f07e85027a06a"
+    "sha256": "ba5e70322b8851ab8ababdfb87dfa85c9302808ba07f7292c8b85b942af4fdc7"
   },
   "kit/fuel_reservoir_1": {
     "vertices": 288,
@@ -207,7 +207,7 @@
       0.20874999463558197,
       -0.04600000008940697
     ],
-    "sha256": "2fba5ea738aca2b394e68e36a3af023f2fe922047387a1d2e8fd9de687b2b5ae"
+    "sha256": "ac365e7c132f567dad89514a85a7f79acccbc6314e012607881eb07b0dea3e84"
   },
   "kit/fuel_manifold": {
     "vertices": 240,
@@ -222,7 +222,7 @@
       -0.3009999990463257,
       0.0689999982714653
     ],
-    "sha256": "610d5e91ea3bf99bf36261e8b17328968a59210ab15c0663e8358a784d4c77b2"
+    "sha256": "cd35a13e390c4618dbe302df28ebccabeb8d94fd06fb0780b67c60b59fbf8146"
   },
   "kit/protected_ammunition": {
     "vertices": 288,
@@ -237,7 +237,7 @@
       0.009999999776482582,
       0.05999999865889549
     ],
-    "sha256": "3daab2f8b71216302a32b97f61fad47267a868c8fa0d647afd0f0e292620eab2"
+    "sha256": "65c9f5f69f029427d23227eb34a5166282d6b338e00cd2e61f061e494cab278b"
   },
   "kit/service_station_0": {
     "vertices": 192,
@@ -252,7 +252,7 @@
       -0.2849999964237213,
       0.3009999990463257
     ],
-    "sha256": "18693cc741557c1ded54a8942c61872ea5b74836c71ac0e1409b28784d25c62f"
+    "sha256": "0e3a7a3e9eae82934022da04ce561e998b666f4bf2ecfc24d29b709d5a8bc82a"
   },
   "kit/service_station_1": {
     "vertices": 192,
@@ -267,7 +267,7 @@
       -0.2849999964237213,
       0.3009999990463257
     ],
-    "sha256": "b555b6fe3759861f39cf733caa199f4f47f6497ce1146a553ae53de3ffa8502d"
+    "sha256": "88128f56a6d0b988ac7eecfd8def2b2a89d60bfa90e3dc6f59b022ab28cc01bb"
   },
   "kit/service_station_2": {
     "vertices": 192,
@@ -282,7 +282,7 @@
       -0.2849999964237213,
       0.3009999990463257
     ],
-    "sha256": "ea9547c7bb9d380f8abfbed1a4af35601f4b3ed295b1fa04a2975a73484cfe72"
+    "sha256": "9629d58bfde53edcb60713140e45027a825e10901d434ae263d95cf3c260a9d3"
   },
   "kit/ammunition_container": {
     "vertices": 1152,
@@ -297,7 +297,7 @@
       -0.32499998807907104,
       0.37279999256134033
     ],
-    "sha256": "330e297a5feb81a22e4403b0b91f8b7380962100e815bec21f8a2ff0f40fe150"
+    "sha256": "470aaaf75ab419f02046afe940d14cf869d21d249935c5f047c10ee5bb348f13"
   },
   "kit/service_awning": {
     "vertices": 288,
@@ -312,7 +312,7 @@
       0.014999999664723873,
       0.44999998807907104
     ],
-    "sha256": "0ab69d11bf52766c8bf3813c5d1cf5b76eed819aeb76404381bfbfc45e1a0f71"
+    "sha256": "45ba8d390f9d4ce55b6e5e3e5881cb56f40e4409d324e8c75a1d1304bb1b8925"
   },
   "kit/loading_portal": {
     "vertices": 384,
@@ -327,7 +327,7 @@
       -0.03500000014901161,
       0.33500000834465027
     ],
-    "sha256": "0370613a381613da2e8e41d05ef4a45e4c078d3086b3623f2010bac542eea9fa"
+    "sha256": "581953f5f72453d2b7838b99f134f6abfea86388c36f4c2c3bada0390fd04d32"
   },
   "kit/dock_bollard_0": {
     "vertices": 96,
@@ -342,7 +342,7 @@
       -0.38999998569488525,
       0.4320000112056732
     ],
-    "sha256": "75a44e7c447f987b8ec3546eca030366b3910ebb2619beb363c622918ca6a299"
+    "sha256": "9c8b8826d05fd1513523d59d4846ab413d04eaf647d5f9f46124c16c90e9a43b"
   },
   "kit/dock_bollard_1": {
     "vertices": 96,
@@ -357,7 +357,7 @@
       -0.38999998569488525,
       0.4320000112056732
     ],
-    "sha256": "c03cf19395320aae01c6c40c6cf4757cad4679ae63692cf7244b7dc586f26e01"
+    "sha256": "8438967f25f8db25d90b5bdbc88c4e1546b2eddbdba1719b67a269f8209d9db1"
   },
   "kit/construction_frame": {
     "vertices": 480,
@@ -372,7 +372,7 @@
       0.20999999344348907,
       0.453000009059906
     ],
-    "sha256": "67d357f2d2af12159da08d3e53483efd73f37e5f9313a2d472e3fd3e34dcaabf"
+    "sha256": "663344841790cef4e19949ba00556cf72c74a2220582a6e5de152563e22a493d"
   },
   "kit/closed_loading_gate": {
     "vertices": 96,
@@ -387,7 +387,7 @@
       -0.2800000011920929,
       0.4300000071525574
     ],
-    "sha256": "767b73db4ebff206bc04ca73848d01b263f2852aabe8822d288267c1d39ae313"
+    "sha256": "02633fcd48d373aaf8de1061f1cdf8672937bec62c912c65b45171689e2e0510"
   },
   "kit/isolated_service": {
     "vertices": 192,
@@ -402,7 +402,7 @@
       -0.24500000476837158,
       0.4350000023841858
     ],
-    "sha256": "f064141b6a4552c9d2b31a4ba73abe3e9f3e8e9f67c97dc47c17475183171754"
+    "sha256": "fabd3e332b057a4b4e43ffb5fc16bde8023602010694fd376868dbd7dc97f9e7"
   },
   "kit/damaged_dock": {
     "vertices": 264,
@@ -417,7 +417,7 @@
       -0.3179667294025421,
       0.4449999928474426
     ],
-    "sha256": "8ed6b59d3c0ac16a90f40fcb6b5b0033512a5e00b643033450873773d3fe5a29"
+    "sha256": "1b5bcdd66078755cea4e5a4cb4546eafbbc0ded90d6438e03f0c5b944486bb3d"
   },
   "kit/critical_dock": {
     "vertices": 408,
@@ -432,7 +432,7 @@
       -0.023514630272984505,
       0.4350000023841858
     ],
-    "sha256": "1f4d2036496a5f38205e1e789fb015cd3e07872ea39134a98e79f29548f6c905"
+    "sha256": "79bb017b02e6ca00f0c1296d03341e854f86f5ebd25fdd478895decd39ec1db0"
   },
   "kit/collapsed_cargo": {
     "vertices": 456,
@@ -447,6 +447,6 @@
       -0.27000001072883606,
       0.2676384150981903
     ],
-    "sha256": "ac0125114a4ab20f2ebf813f987a3487f1e91a226c6cee5a348975671a9ad4c9"
+    "sha256": "2d07a9a8fe862a714cbf200a1b1c06f8eefe77131a057b8f10cc474e996a8b31"
   }
 }

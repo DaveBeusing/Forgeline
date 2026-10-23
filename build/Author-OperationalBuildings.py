@@ -83,7 +83,7 @@ def author(recipe,output,update):
             path=output/f'{name}_{suffix}.gltf';entry=mesh.export(path)
             gltf=json.loads(path.read_text(encoding='utf-8'));gltf['asset']['generator']='ForgeLine operational building component exporter'
             gltf['extras']=dict(componentHierarchy=hierarchy,axes=kit['axes'],state=state,lod=lod)
-            path.write_text(json.dumps(gltf,indent=2)+'\n',encoding='utf-8')
+            path.write_text(json.dumps(gltf,indent=2)+'\n',encoding='utf-8', newline='\n')
             entry['sha256']=hashlib.sha256(path.read_bytes()).hexdigest()
             for group in groups:
                 motion=family['motion'].get(group['name']) if state=='intact' and lod==0 else None
@@ -102,8 +102,8 @@ def author(recipe,output,update):
                         motion=family['motion'].get(group['name'])
                         group.update({k:motion[k] for k in ('motion','socket','rate','travel')} if motion else dict(motion='static'))
                     d['mechanicalParts']=groups
-                meta.write_text(json.dumps(d,indent=2)+'\n',encoding='utf-8')
-    (output/'operational.exports.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+                meta.write_text(json.dumps(d,indent=2)+'\n',encoding='utf-8', newline='\n')
+    (output/'operational.exports.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8', newline='\n')
     print(json.dumps({name:entry['triangles'] for name,entry in report.items()},indent=2))
 
 if __name__=='__main__':
