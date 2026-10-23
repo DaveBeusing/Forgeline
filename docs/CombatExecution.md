@@ -144,6 +144,54 @@ It:
 
 Existing spatial cleanup remains a secondary safety boundary for entities removed by other systems.
 
+### Completed Buildings and Economic Ownership
+
+Completed buildings enter combat through the shared building initializer. Catalog Health, owner/faction,
+Structure target class, and hitbox are present for ordinary construction and starting buildings; their
+existing construction/start paths supply intelligence identity. An explicitly declared armor profile
+is attached, while the current unarmored definitions keep the existing unarmored resolution.
+Initialization is idempotent and preserves an existing damaged Health value.
+
+At the lifecycle boundary, `BuildingCombatDestruction` closes ownership while the original entity and
+its inventories still exist. Production and unit-production queues are canceled and their active
+reservations released. Research tied to the facility or its source inventory is canceled. Construction
+sites using a destroyed source inventory are canceled through the construction owner. Logistics stock
+policies targeting the building are removed; affected cargo orders, dock visits, source reservations,
+and throughput reservations are closed before the logistics node is unregistered.
+
+The established phase order remains unchanged: `Production` and `Economy` precede `EntityLifecycle`.
+Work already completed in that lethal-damage tick remains completed; unfinished work is closed at
+lifecycle, and no surviving request may continue against the removed facility or inventory afterward.
+
+The resource contract is explicit:
+
+- Stock physically held in a destroyed building is lost, including stock reserved for unfinished work.
+  A reservation is a claim against that stock, not a second quantity to salvage.
+- Input/output inventories and aliases such as a barracks' shared storage/input inventory are removed
+  once. Already consumed construction or research materials remain spent.
+- Combat destruction never invokes the voluntary demolition refund. The existing building wreck is
+  presentation-only; it owns no inventory, production, logistics node, or navigation obstacle.
+- Independent truck and conveyor inventories retain their cargo. A failed delivery releases its
+  outstanding claims and cannot deliver into a replacement building through an obsolete node ID.
+
+Entity removal, logistics registration, and the navigation refresh complete in the same lifecycle
+phase before snapshots. Static map obstacles remain persistent; live building footprints are derived
+from live entities. Removing a building therefore releases its footprint without erasing another
+building or a surviving conveyor support. Conveyor wrecks retain their original entity, buffer, and
+real support obstruction under the existing repair contract.
+
+Conveyor attachments retain the full destroyed `EntityId`, including its generation, so a building
+rebuilt at the same location never receives cargo implicitly. An explicit `Replace` of the same input
+or output adapter may reconnect that unchanged adapter to a live, owned, geometrically matching port.
+This operation pays the normal adapter Steel cost and preserves the adapter entity, buffer, damage,
+and supports, including buffered cargo. Other occupied replacement/removal remains rejected. The
+existing serialized conveyor command carries the explicit replacement building; no new replay
+command kind or separate recovery state is introduced.
+
+Reconstruction permits an owned adapter's exact terminal to touch the new authored port when its
+former attachment is dead. Interior overlap, support collisions, foreign hardware, and mismatched
+ports still obstruct placement. Completing the replacement building does not itself reconnect cargo.
+
 ## Combat Events
 
 The first event types are:
@@ -240,6 +288,10 @@ Game tests verify:
 - stale projectile sources
 - stale weapon targets
 - zero-Health lifecycle destruction
+- completed-building stock loss without a demolition refund or wreck inventory
+- reserved production, unit, research, construction, and transport ownership cleanup
+- navigation release, surviving static footprints, and fresh rebuild identities
+- explicit conveyor endpoint recovery with cargo and full-generation identity preserved
 - combat destruction events
 - repeatable headless outcomes
 

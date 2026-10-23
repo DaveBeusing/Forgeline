@@ -151,6 +151,38 @@ public sealed class CargoTransportSystem : ISimulationSystem
         return true;
     }
 
+    internal void InvalidateBuilding(SimulationContext context, EntityId building)
+    {
+        EntityRegistry entities = context.Entities;
+        bool hasNode = _network.TryGetNodeForEntity(building, out LogisticsNodeId node);
+        _transportEntities.Clear();
+        foreach (EntityId entity in entities.Query<CargoTransport>(QueryIterationOrder.StableByEntityIndex))
+            _transportEntities.Add(entity);
+
+        foreach (EntityId entity in _transportEntities)
+        {
+            bool invalidOrder = hasNode && entities.TryGetComponent(entity, out CargoTransportOrder order) &&
+                (order.Origin == node || order.Destination == node);
+            bool invalidVisit = entities.TryGetComponent(entity, out VehicleDockVisit visit) && visit.Building == building;
+            bool invalidLoading = entities.TryGetComponent(entity, out SupplyLoadingOrder loading) && loading.Source == building;
+            bool invalidQueue = entities.TryGetComponent(entity, out VehicleQueueEntry queued) && queued.Building == building;
+            if (!invalidOrder && !invalidVisit && !invalidLoading && !invalidQueue)
+                continue;
+
+            CargoTransportRuntimeState state = entities.TryGetComponent(entity, out CargoTransportRuntimeState current)
+                ? current : CargoTransportRuntimeState.Idle;
+            CargoTransportFailureReason reason = hasNode &&
+                entities.TryGetComponent(entity, out CargoTransportOrder assigned) && assigned.Destination == node
+                    ? CargoTransportFailureReason.InvalidDestination : CargoTransportFailureReason.InvalidOrigin;
+
+            // The destroyed bay no longer owns a physical exit. Cargo remains in its truck inventory.
+            VehicleDockingService.Cancel(entities, entity);
+            Fail(entities, entity, state with { AnchorNode = LogisticsNodeId.None }, reason, context.Tick);
+        }
+
+        UpdateMetricsAndDebugSnapshot(entities);
+    }
+
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

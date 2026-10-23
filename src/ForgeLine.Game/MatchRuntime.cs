@@ -428,7 +428,7 @@ public sealed class MatchRuntime : IDisposable
                 logistics,
                 terrain,
                 navigation,
-                navigationObstacles,
+                battlefield.StaticNavigationObstacles,
                 gridSettings,
                 sectorSettings);
 
@@ -476,10 +476,15 @@ public sealed class MatchRuntime : IDisposable
                 weapons,
                 armor,
                 artilleryWeapons);
+        var buildingDestruction = new BuildingCombatDestruction(
+            inventories, buildingConstruction, production, unitProduction,
+            technologyResearch, cargoTransport, automatedDistribution);
         var lifecycle =
             new CombatEntityLifecycleSystem(
                 combatRuntime,
-                spatialIndex);
+                spatialIndex,
+                buildingDestruction,
+                strategicInfrastructure.RefreshRemovedStaticEntities);
         var suppression =
             new SuppressionSystem
             {
@@ -617,9 +622,9 @@ public sealed class MatchRuntime : IDisposable
             buildingConstruction,
             extraction,
             new ConveyorSimulationSystem(inventories, automatedDistribution, recipes, unitDefinitions),
+            lifecycle,
             logisticsRegistration,
             roadAccess,
-            lifecycle,
             new SpatialIndexCleanupSystem(
                 spatialSynchronizer),
             readiness,

@@ -87,6 +87,31 @@ public sealed class AutomatedDistributionSystem
         private set;
     } = AutomatedDistributionDebugSnapshot.Empty;
 
+    internal void InvalidateBuilding(SimulationContext context, EntityId building)
+    {
+        bool hasNode = _network.TryGetNodeForEntity(building, out LogisticsNodeId node);
+        foreach (RequestState request in _requests)
+        {
+            if (IsTerminal(request.State)) continue;
+            bool destinationDestroyed = hasNode && request.Destination == node ||
+                context.Entities.TryGetComponent(request.PolicyEntity, out LogisticsStockPolicy policy) &&
+                policy.TargetEntity == building;
+            if (!destinationDestroyed && (!hasNode || request.Origin != node)) continue;
+
+            ReleaseReservationIfPresent(request);
+            ReleaseCapacityReservationIfPresent(request);
+            if (context.Entities.TryGetComponent(request.AssignedTruck, out CargoTransportReservation reservation) &&
+                reservation.RequestId == request.Id)
+                context.Entities.RemoveComponent<CargoTransportReservation>(request.AssignedTruck);
+            MarkFailed(request,
+                destinationDestroyed ? LogisticsTransportRequestFailureReason.DestinationUnavailable :
+                    LogisticsTransportRequestFailureReason.TransportFailed,
+                context.Tick);
+        }
+
+        UpdateMetricsAndDebugSnapshot(context);
+    }
+
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

@@ -434,6 +434,17 @@ public sealed class StrategicInfrastructureSystem
         SynchronizeAuthoritativeTopology(context);
     }
 
+    public void RefreshRemovedStaticEntities(SimulationContext context)
+    {
+        bool changed = RefreshStaticObstacles(context.Entities);
+        if (!_initialized || changed)
+        {
+            SynchronizeAuthoritativeTopology(context);
+            _initialized = true;
+        }
+        UpdateMetrics(context);
+    }
+
     private void SynchronizeAuthoritativeTopology(
         SimulationContext context)
     {

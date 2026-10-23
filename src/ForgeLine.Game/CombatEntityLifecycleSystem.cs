@@ -10,14 +10,20 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
 {
     private readonly CombatRuntime _runtime;
     private readonly SpatialGridIndex? _spatialIndex;
+    private readonly BuildingCombatDestruction? _buildings;
+    private readonly Action<SimulationContext>? _staticTopologyChanged;
 
     public CombatEntityLifecycleSystem(
         CombatRuntime runtime,
-        SpatialGridIndex? spatialIndex = null)
+        SpatialGridIndex? spatialIndex = null,
+        BuildingCombatDestruction? buildings = null,
+        Action<SimulationContext>? staticTopologyChanged = null)
     {
         _runtime = runtime ??
             throw new ArgumentNullException(nameof(runtime));
         _spatialIndex = spatialIndex;
+        _buildings = buildings;
+        _staticTopologyChanged = staticTopologyChanged;
     }
 
     public SimulationPhase Phase =>
@@ -31,6 +37,7 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
 
         ReadOnlySpan<PendingCombatDestruction> pending =
             _runtime.PendingDestructions;
+        bool staticTopologyChanged = false;
 
         for (int index = 0;
              index < pending.Length;
@@ -65,6 +72,9 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
                     context.Entities.SetComponent(destruction.Entity,power.WithEnabled(false));
                 continue;
             }
+            _buildings?.RemoveBeforeEntityDestruction(context, destruction.Entity);
+            staticTopologyChanged |= context.Entities.TryGetComponent(
+                destruction.Entity, out SpatialPresence presence) && presence.Metadata.Mobility == SpatialMobility.Static;
             _spatialIndex?.Remove(
                 destruction.Entity);
             context.Entities.DestroyEntity(
@@ -72,6 +82,8 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
         }
 
         _runtime.ClearPendingDestructions();
+        if (staticTopologyChanged)
+            _staticTopologyChanged?.Invoke(context);
         _runtime.SetActiveProjectiles(
             context.Entities.GetComponentCount<ProjectileState>());
     }
