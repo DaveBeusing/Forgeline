@@ -8,6 +8,7 @@ namespace ForgeLine.Navigation.Benchmarks;
 public class HierarchicalPathfindingBenchmarks
 {
     private HierarchicalPathfinder _pathfinder = null!;
+    private HierarchicalPathfinder _detourPathfinder = null!;
     private NavigationCapabilities _capabilities;
     private Vector3 _start;
     private Vector3 _destination;
@@ -15,6 +16,13 @@ public class HierarchicalPathfindingBenchmarks
     [GlobalSetup]
     public void Setup()
     {
+        var smallSettings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 9 };
+        var smallTerrain = new TerrainWorld(smallSettings,
+            [new TerrainChunk(new ChunkCoordinate(0, 0), new TerrainHeightfield(9, 64, new float[81]))]);
+        _detourPathfinder = new HierarchicalPathfinder(NavigationWorld.Build(smallTerrain,
+            [new AxisAlignedBounds(new Vector3(28.1f, -1, 16.1f), new Vector3(28.9f, 2, 39.9f))],
+            new NavigationGridSettings { CellSizeMeters = 1, StaticObstacleClearanceMeters = 0 },
+            new NavigationSectorSettings { SectorSizeCells = 8 }));
         const int chunksPerSide = 16;
         const float chunkSize = 128.0f;
 
@@ -76,4 +84,7 @@ public class HierarchicalPathfindingBenchmarks
             _destination,
             _capabilities);
     }
+    [Benchmark]
+    public NavigationSearchResult FindDetourOutsideRefinementCorridor() =>
+        _detourPathfinder.FindPath(new Vector3(26.5f, 0, 26.5f), new Vector3(29.5f, 0, 26.5f), _capabilities);
 }
