@@ -299,14 +299,26 @@ GC counts and equality summaries are retained in
 All 24 cases qualify before and after. All 408 sampled authority digests and 12,288
 per-tick module-output/truck-distance pairs agree exactly, as do counters and final
 truck states. Powered measurement windows complete 65/650/2,665 original recipe
-cycles and 1/4/16 physical deliveries at the three scales. Each powered 4,096-module
-case delivers 80 Steel and retains belt flow and truck movement in both halves.
+cycles and 1/4/16 physical deliveries at the three scales. At 4,096 powered modules,
+Linear delivers 80 Steel and SplitMerge delivers 160 Steel; both retain belt flow
+and truck movement in both halves.
 No cargo is lost. Conveyor allocation falls 43.56–47.14% across all 24 cases.
 
 The worst observed after-correction p95 complete tick is 45.5681 ms, but 28 of 12,288
 ticks still exceed 50 ms (792 before). Shared-host wall timings remain advisory.
 These results do not establish a universal 20 Hz budget, a graphical frame budget,
 Windows/WARP performance or physical reference-hardware acceptance.
+
+The [hosted Conveyor reliability run 39988636659](https://github.com/DaveBeusing/Forgeline/actions/runs/39988636659)
+also qualified all 24 cases at exact source revision
+`e972ccba181dbf31ef28bda15ea5a37f76de82cb`, after passing 117 focused Game and 11
+Inventory tests. Its uploaded `conveyor-reliability` artifact records
+`CompleteMatrix=true`, `Qualified=true` and no case failures. Raw JSON SHA256:
+`a53c53ea99f09f1f3a13bfd16035dc4e81e121228e9a376af36f264d3051cedd`.
+All compared authority samples, per-tick output/distance samples, counters and final
+truck states also match the local after-correction report. This hosted run uses
+Ubuntu 24.04.5, .NET 10.0.13 and four visible processors; its timings are a separate
+host measurement and are not substituted into the paired comparison above.
 
 ## Independent integration dependencies
 
@@ -330,6 +342,20 @@ failures are `ShortClicksSelectAndOpen`, both `ConfirmedServiceBlock` cases and
 privacy guard is not part of conveyor qualification. The same checkpoint's
 [Movement run 39985932736](https://github.com/DaveBeusing/Forgeline/actions/runs/39985932736)
 passes. These checkpoint results do not substitute for checks on the final PR head.
+
+At `e972ccba`, the [main CI run 39988636450](https://github.com/DaveBeusing/Forgeline/actions/runs/39988636450)
+passes the complete Release solution build and early conveyor/inventory contracts,
+then stops at step 27, UI audio reliability and industrial source contracts.
+`UiInteractionFeedbackTests.WarmCopiedFeedbackRetainsZeroAllocation` expects zero
+current-thread allocation bytes and observes 1,240; that invocation has 59 passing,
+one failing and two explicitly native-skipped tests. The tested source and test
+files are byte-identical to master, and the fixture invokes no conveyor, distribution
+or vehicle simulation. The reason for that allocation is unresolved; this is not
+attributed to a particular runtime mechanism. Later asset, WARP, full-solution-test,
+package, recovery and natural-terminal steps in that job are unreached. The same
+source's [Frame run 39988636471](https://github.com/DaveBeusing/Forgeline/actions/runs/39988636471)
+independently reproduces the four #339 Operations failures. Subsequent PR checks are
+reported in the PR; a checkpoint failure or an unreached gate is never recorded as a pass.
 
 PR #340 also changes building lifecycle cleanup and explicit reattachment of occupied
 adapters after building replacement. The branches retain separate ownership of those
