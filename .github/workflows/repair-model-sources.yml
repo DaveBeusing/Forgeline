@@ -1,10 +1,9 @@
-name: Scoped model source repair
+name: Scoped source metadata repair
 
 on:
   push:
     branches: [fix/model-texture-integrity]
     paths:
-      - 'build/source_geometry.py'
       - 'build/asset-audit/repair_catalog.py'
       - '.github/workflows/repair-model-sources.yml'
 
@@ -33,16 +32,16 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install numpy==2.3.3 Pillow==12.3.0
-      - name: Reproduce baseline, repair exact sources and validate all production assets
+      - name: Repair only proven line-ending checksum mismatches
         run: python build/asset-audit/repair_catalog.py
       - name: Preserve bounded repair evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: model-repair-${{ github.sha }}
+          name: source-checksum-repair-${{ github.sha }}
           path: artifacts/asset-repair/
           retention-days: 14
-      - name: Commit only verified repairs to the existing fix branch
+      - name: Commit verified metadata to the existing fix branch
         env:
           EXPECTED_HEAD: ${{ github.sha }}
         run: |
@@ -54,5 +53,5 @@ jobs:
           mapfile -t paths < artifacts/asset-repair/allowed-paths.txt
           git add -- "${paths[@]}"
           git diff --cached --check
-          git commit -m "Repair smelter pipe frames and artillery track sidewalls"
+          git commit -m "Normalize source export bytes and refresh retained checksums"
           git push origin HEAD:refs/heads/fix/model-texture-integrity
