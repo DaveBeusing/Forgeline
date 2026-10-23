@@ -7,6 +7,9 @@ namespace ForgeLine.Client.Tests;
 // Source contracts awaiting manual execution; fake devices do not qualify native rendering.
 public sealed class ClientRenderCompositionTests
 {
+    private static readonly string[] ReconfigurationCalls =
+        ["post", "atmosphere", "shadows", "particles", "scene", "atmosphere", "shadows", "post"];
+
     [Fact]
     public void UnsupportedEffectsAreDisabledIndividuallyWithoutChangingRequestedSettings()
     {
@@ -64,7 +67,7 @@ public sealed class ClientRenderCompositionTests
         device.ConfigureParticleDepth(true);
         device.Calls.Clear();
         Resolve(device, new() { Quality = RenderQuality.Low }).Apply(device);
-        Assert.Equal(new[] { "post", "atmosphere", "shadows", "particles", "scene", "atmosphere", "shadows", "post" }, device.Calls);
+        Assert.Equal(ReconfigurationCalls, device.Calls);
         Assert.False(device.ParticleDepthEnabled);
         Assert.Equal(1, device.SceneOutput.ResolutionScale);
     }

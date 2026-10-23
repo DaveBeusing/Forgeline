@@ -56,6 +56,10 @@ jobs:
       - name: Restore
         run: dotnet restore ForgeLine.sln
 
+      - name: Preserve manual Windows renderer qualification plan
+        shell: pwsh
+        run: ./build/Invoke-WindowsRendererQualification.ps1 -Stage Plan -OutputRoot artifacts/windows-renderer-plan
+
       - name: Validate project references
         shell: pwsh
         run: ./build/Validate-ProjectReferences.ps1
@@ -391,4 +395,5 @@ jobs:
             artifacts/ui-reference-warp/**
             artifacts/rendering-benchmarks/**
             artifacts/startup-qualification/**
+            artifacts/windows-renderer-plan/**
           if-no-files-found: warn

@@ -107,6 +107,10 @@ Correctness tests remain separate from benchmark timing. Benchmark timing thresh
 
 ## Windows Client Host
 
+For source-pinned manual build, native/WARP capture matrices, live overlay checks
+and an external Windows package install, follow [Windows renderer qualification](WindowsRendererQualification.md).
+Its default Plan stage executes no tests or captures and grants no hardware acceptance.
+
 The frontend exposes four graphics presets and supported independent feature overrides. Schema 3 persists them per user and migrates earlier settings. Graphics apply at the next session boundary; display changes require a successfully presented 15-second trial before saving. Fixture requests resolve the same policy, including optional reduced world resolution and supplied texture mips. See [graphics settings and benchmark reproduction](GraphicsQualitySettings.md) for resource costs, effective fallback diagnostics and native qualification commands.
 
 Compile runtime assets explicitly with `pwsh ./build/Build-RuntimeAssets.ps1 -Mode development` before launching a source checkout. Publishing without `-RuntimeAssetRoot` builds its own runtime cache; the CI path validates and packages its already built/tested root. See [Asset Pipeline](AssetPipeline.md#build-modes-and-deployment-integrity) for force-rebuild, validation and migration. The interactive client never starts source compilation. A native bootstrap window appears before settings and graphics initialization; changed startup events are checkpointed under the local user diagnostics directory. See [Startup timing](StartupDiagnostics.md) and [Early Native Bootstrap](adr/EarlyNativeBootstrap.md).

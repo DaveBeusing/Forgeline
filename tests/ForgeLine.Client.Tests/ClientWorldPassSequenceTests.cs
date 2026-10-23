@@ -8,6 +8,10 @@ public sealed class ClientWorldPassSequenceTests
 {
     private static readonly GraphicsAtmosphereView Atmosphere = new(Matrix4x4.Identity, Vector3.Zero, 100);
     private static readonly GraphicsDirectionalShadowFrame Shadow = new(Matrix4x4.Identity, Vector3.Zero, 10, 20);
+    private static readonly string[] ShadedWorldCalls = ["World", "atmosphere", "shadow.begin", "shadow.terrain:128",
+        "shadow.instances:1022:254", "shadow.end", "terrain:480", "prepare:480", "instances:480", "particles:480", "Overlay"];
+    private static readonly string[] UnshadedWorldCalls = ["World", "terrain:480", "prepare:480", "instances:480", "particles:480", "Overlay"];
+    private static readonly string[] InvalidCasterCalls = ["World", "shadow.begin", "shadow.terrain:128", "shadow.end"];
 
     [Fact]
     public void FixedWorldSequenceUsesScaledWorldAndNativeOverlayWithBoundedShadows()
@@ -16,8 +20,7 @@ public sealed class ClientWorldPassSequenceTests
         var context = new PassContext(trace);
         var recorder = new Recorder(trace);
         ClientWorldPassSequence.Record(context, Atmosphere, Shadow, new(DirectionalShadowQuality.Low), ref recorder);
-        Assert.Equal(new[] { "World", "atmosphere", "shadow.begin", "shadow.terrain:128", "shadow.instances:1022:254",
-            "shadow.end", "terrain:480", "prepare:480", "instances:480", "particles:480", "Overlay" }, trace);
+        Assert.Equal(ShadedWorldCalls, trace);
         Assert.Equal(640, context.Width);
     }
 
@@ -27,7 +30,7 @@ public sealed class ClientWorldPassSequenceTests
         var trace = new List<string>();
         var recorder = new Recorder(trace);
         ClientWorldPassSequence.Record(new PassContext(trace), null, null, default, ref recorder);
-        Assert.Equal(new[] { "World", "terrain:480", "prepare:480", "instances:480", "particles:480", "Overlay" }, trace);
+        Assert.Equal(UnshadedWorldCalls, trace);
     }
 
     [Fact]
@@ -61,7 +64,7 @@ public sealed class ClientWorldPassSequenceTests
         var recorder = new Recorder(trace) { TerrainDraws = 129 };
         Assert.Throws<InvalidOperationException>(() => ClientWorldPassSequence.Record(new PassContext(trace), null, Shadow,
             new(DirectionalShadowQuality.Low), ref recorder));
-        Assert.Equal(new[] { "World", "shadow.begin", "shadow.terrain:128", "shadow.end" }, trace);
+        Assert.Equal(InvalidCasterCalls, trace);
     }
 
     private struct Recorder(List<string> trace) : IClientWorldPassRecorder
