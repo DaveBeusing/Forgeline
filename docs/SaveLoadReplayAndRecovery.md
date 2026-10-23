@@ -169,3 +169,9 @@ The full repository build, tests, and existing natural terminal-match validation
 ## Match composition migration
 
 Composition identity and per-player opponent policies remain explicit payload inputs. The supported schema-1 layout migration supplies the preset composition identity and maps its opponent fields; it does not change authoritative simulation semantics. Historical checkpoints from before vehicle docking, physical queues, finite conveyor cargo, or the completed-building combat contract cannot be reconstructed under the current authoritative version. Their saved hashes and fixtures remain rejection coverage. Custom composition recovery requires an explicit key resolver and verifies the reconstructed state before returning it. See [Match Runtime and Scenario Composition](adr/MatchRuntimeAndScenarioComposition.md).
+
+## Tactical supply and accepted convoy checkpoints
+
+MatchPersistenceTests now exercises active grouped partial resupply, a replacing Hold order and subsequent navigation through supported recorded player adapters. A second explicit finite-stock composition issues two real stock policies, accepts a loaded convoy with an escort, records manual detachment, and completes both 200 Fuel and 200 Ammunition deliveries. Both cargo orders finish, source reservations return to zero and normal dock proximity releases the temporary group. Remote Reserved/Busy visits retain their normal queue/slot owner until physical approach.
+
+Each active checkpoint serializes saves and replay documents, reconstructs with the matching composition resolver and compares complete authoritative hashes immediately and after 1, 8 and 20 cumulative continuation ticks. These cases add no persistence exception, command type or serialized component. Authoritative schema 6 and the existing envelope/payload versions remain unchanged; the appended navigation budget failure uses the existing failure-reason enum field.

@@ -208,3 +208,9 @@ Scalable rendering adds RenderSnapshotIndexTests, reference/optimized upload par
 ## Building demolition
 
 [Building demolition](BuildingDemolition.md) describes Delete input ownership, historical material refunds, authoritative validation and replay compatibility.
+
+## Tactical supply and convoy reliability
+
+The early Tactical supply, convoy and bounded navigation contracts step runs TacticalCombatSystemTests, CargoTransportSystemTests, MoveEntitiesCommandTests, HierarchicalNavigationSystemTests, MatchPersistenceTests and the full Navigation test module after the Release build. It preserves the independent conveyor gate and every later full-solution, Windows/WARP, asset/map/package/recovery and natural-terminal check.
+
+The paired refinement workload is reproduced with `dotnet run --project benchmarks/ForgeLine.Navigation.Benchmarks/ForgeLine.Navigation.Benchmarks.csproj --configuration Release -- --filter *HierarchicalPathfindingBenchmarks* --job Short --inProcess --artifacts artifacts/navigation-fallback --exporters BriefJSON`. Qualify reachability separately from timing: the old counterexample returns an incorrect NoLocalRoute and therefore performs less work. See HierarchicalNavigation.md and NavigationRefinementMeasurements.json for recorded sources, allocation, raw measurements and limits.

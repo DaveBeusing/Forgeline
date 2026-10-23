@@ -282,7 +282,7 @@ Corridor-bounded local refinement
 Ground movement waypoint
 ```
 
-The high-resolution grid is never searched across the complete world as the primary long-range strategy. Sector connectivity is derived from traversable boundary runs, high-level A* selects the regional route, and local A* is constrained to that sector corridor with one-sector expansion only as a bounded fallback.
+The high-resolution grid is never searched across the complete world as the primary long-range strategy. Sector connectivity is derived from traversable boundary runs, high-level A* selects the regional route, and local A* first uses that sector corridor and one-sector expansion. Only when both fail, a deterministic general search is permitted up to 16,384 additional expanded nodes; budget exhaustion remains distinct from proven disconnection. Refined cells and waypoints retain the real movement topology and movement groups still share their route.
 
 Navigation data is immutable for a specific `NavigationVersion`. Replacing the derived navigation world is the invalidation boundary: high-level cache entries are cleared and stale asynchronous results are rejected before they can enter simulation state. Path jobs read navigation snapshots only; they never mutate ECS transforms or live world state.
 
