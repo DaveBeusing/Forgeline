@@ -81,6 +81,9 @@ SDK, adapter inventory and before/after runtime manifest hashes are recorded.
 Asset qualification/progress reports retain compiler version/content signature;
 package `build-provenance.json` retains source, SDK and runtime provenance. An
 observed old runtime manifest in a Plan is explicitly an unqualified cache.
+Publish intentionally rebuilds with deterministic CI properties; the Package
+summary records resulting binary hashes separately. If those outputs differ,
+repeat Build before running another capture/contract stage against that checkout.
 
 Each child process has `commands/<id>.json`, original stdout/stderr byte logs,
 exit code and timeout/competition observations. Default timeout is four hours
@@ -144,7 +147,9 @@ publish tree. Verify the archive hash and source SHA, then extract into a **new
 directory outside every checkout**, for example a uniquely named directory below
 `$env:TEMP`. Do not copy `assets/source` into it. Check that no `assets/source`
 directory exists and that `assets/runtime/manifest.json` matches package
-provenance. Change to that install directory before launch:
+provenance. The package is framework-dependent (`--self-contained false`): its
+target machine needs the .NET 10 x64 runtime (also supplied by the pinned SDK).
+Change to that install directory before launch:
 
 ```powershell
 Get-FileHash -Algorithm SHA256 '<archive path>'

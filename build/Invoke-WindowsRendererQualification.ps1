@@ -118,7 +118,7 @@ try {
         createdAtUtc=[DateTimeOffset]::UtcNow.ToString('o'); pinnedSdk=$sdk; observedSdk=$null
         os=[Runtime.InteropServices.RuntimeInformation]::OSDescription
         architecture=[Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString()
-        adapters=@(); runtimeBefore=$runtime; runtimeAfter=$null; operations=$operations; binaries=@()
+        adapters=@(); runtimeBefore=$runtime; runtimeAfter=$null; operations=$operations; binaries=@(); binariesAfter=@()
         buildEvidence=$BuildEvidenceRoot; assetEvidence=$AssetEvidenceRoot
         captureCoverage=@{ worldScenes=$worldScenes; uiScenarios=$uiScenes; worldCaseCount=($worldScenes.Count*4*3*4); uiCaseCount=($uiScenes.Count*4*4*3) }
         executionStatus='not-executed'; acceptance='open'; nativeHardwareAccepted=$false
@@ -168,7 +168,11 @@ try {
             })
         } else {
             foreach ($binary in $report.binaries) {
-                if ((Get-QualificationTreeIdentity (Join-Path $repository $binary.root)).sha256 -cne $binary.sha256) {
+                $identity = Get-QualificationTreeIdentity (Join-Path $repository $binary.root)
+                $report.binariesAfter += @{ root=$binary.root; sha256=$identity.sha256 }
+                # Publish intentionally rebuilds with CI/deterministic properties. Its package
+                # provenance and reproducibility checks own that output, not the earlier build.
+                if ($Stage -ne 'Package' -and $identity.sha256 -cne $binary.sha256) {
                     throw 'Release binaries changed during execution.'
                 }
             }
