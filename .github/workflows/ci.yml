@@ -77,7 +77,7 @@ jobs:
         run: ./build/Validate-WorldAudio.ps1
 
       - name: Cargo transport recovery regression
-        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.CargoDockFailureRecoveryTests
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.CargoDockFailureRecoveryTests ForgeLine.Game.Tests.CargoTransportSystemTests
 
       - name: Cargo propulsion Fuel and docking contracts
         run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.CargoAutonomousFuelServiceTests ForgeLine.Game.Tests.CargoDeliveryFuelTests ForgeLine.Game.Tests.CargoDeliveryRouteFuelTests
