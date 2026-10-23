@@ -77,15 +77,17 @@ public sealed class PlayerActionReadModelTests
         Assert.Equal(scenario.Inventories.GetQuantity(side.StartingInventory,ResourceIds.Ammunition),coreSupply.LocalProviderAmmunition);
     }
 
-    [Fact]
-    public void ConstructionActionsMirrorCatalogAndOwnCapturedInventoryValues()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ConstructionActionsMirrorCatalogAndOwnCapturedInventoryValues(bool changedConstructionCosts)
     {
         using MatchRuntime scenario =
-            CreateScenario(4301);
+            CreateScenario(4301, changedConstructionCosts: changedConstructionCosts);
         var buffer =
             RegisterExtraction(
                 scenario,
-                out PresentationInteractionState interaction,
+                out _,
                 out _);
 
         scenario.Simulation.AdvanceOneTick();
@@ -97,15 +99,76 @@ public sealed class PlayerActionReadModelTests
             Assert.IsType<PlayerActionSnapshot>(
                 snapshot.PlayerActions);
 
-        Assert.Equal(
-            scenario.Services.BuildingDefinitions.Count,
-            actions.Construction.Count);
+        // Menu-only identities are a public placement contract, separate from buildings.
+        (ConveyorModule Module, uint ActionId, string Name, double Steel)[] conveyors =
+        [
+            (ConveyorModule.Route, 2000, "Draw route", 8),
+            (ConveyorModule.ShortSegment, 2001, "Short belt", 8),
+            (ConveyorModule.Standard, 2002, "Standard belt", 14),
+            (ConveyorModule.CurveLeft, 2003, "Curve, left", 16),
+            (ConveyorModule.CurveRight, 2004, "Curve, right", 16),
+            (ConveyorModule.RampUp, 2005, "Ramp up", 16),
+            (ConveyorModule.RampDown, 2006, "Ramp down", 16),
+            (ConveyorModule.Merger, 2007, "Merger", 24),
+            (ConveyorModule.Splitter, 2008, "Splitter", 24),
+            (ConveyorModule.InputAdapter, 2009, "Building output adapter", 16),
+            (ConveyorModule.OutputAdapter, 2010, "Building input adapter", 16),
+            (ConveyorModule.Endcap, 2011, "End cap", 4),
+            (ConveyorModule.Support, 2012, "Support", 4),
+            (ConveyorModule.RaisedSupport, 2013, "Raised support", 6)
+        ];
+        Assert.Equal(Enum.GetValues<ConveyorModule>(), conveyors.Select(static item => item.Module));
+        BuildingId[] expectedIds = scenario.Services.BuildingDefinitions.Definitions
+            .Select(static definition => definition.Id)
+            .Concat(conveyors.Select(static item => new BuildingId(item.ActionId)))
+            .Order()
+            .ToArray();
+        Assert.Equal(expectedIds.Length, expectedIds.Distinct().Count());
+        Assert.Equal(expectedIds, actions.Construction.Select(static action => action.BuildingId).Order());
         Assert.Equal(
             snapshot.SessionId,
             actions.SessionId);
         Assert.Equal(
             snapshot.Tick,
             actions.Tick);
+
+        InventoryId inventory = scenario.GetBase(LocalPlayer).StartingInventory;
+        foreach (BuildingDefinition definition in scenario.Services.BuildingDefinitions.Definitions)
+        {
+            PlayerConstructionActionReadModel action = Assert.Single(
+                actions.Construction, item => item.BuildingId == definition.Id);
+            Assert.Equal(definition.DisplayName, action.DisplayName);
+            Assert.Equal(definition.RequiresResourceDeposit, action.RequiresResourceDeposit);
+            Assert.Equal(
+                definition.Costs.Select(static cost => cost.ResourceId).Order(),
+                action.Costs.Select(static cost => cost.ResourceId).Order());
+            foreach (BuildingResourceCost expected in definition.Costs)
+            {
+                PlayerActionResourceAmount cost = Assert.Single(
+                    action.Costs, item => item.ResourceId == expected.ResourceId);
+                Assert.Equal(expected.Quantity, cost.RequiredQuantity);
+                Assert.Equal(scenario.Services.Resources[expected.ResourceId].DisplayName, cost.DisplayName);
+                Assert.Equal(scenario.Inventories.GetQuantity(inventory, expected.ResourceId), cost.AvailableQuantity);
+            }
+
+            Assert.Equal(definition.Costs.All(cost =>
+                scenario.Inventories.GetQuantity(inventory, cost.ResourceId) >= cost.Quantity), action.HasRequiredResources);
+        }
+
+        double capturedSteel = scenario.Inventories.GetQuantity(inventory, ResourceIds.Steel);
+        foreach (var expected in conveyors)
+        {
+            PlayerConstructionActionReadModel action = Assert.Single(
+                actions.Construction, item => item.BuildingId == new BuildingId(expected.ActionId));
+            Assert.Equal("Conveyor / " + expected.Name, action.DisplayName);
+            Assert.False(action.RequiresResourceDeposit);
+            PlayerActionResourceAmount cost = Assert.Single(action.Costs);
+            Assert.Equal(ResourceIds.Steel, cost.ResourceId);
+            Assert.Equal(scenario.Services.Resources[ResourceIds.Steel].DisplayName, cost.DisplayName);
+            Assert.Equal(expected.Steel, cost.RequiredQuantity);
+            Assert.Equal(capturedSteel, cost.AvailableQuantity);
+            Assert.True(action.HasRequiredResources);
+        }
 
         PlayerConstructionActionReadModel powerPlant =
             Assert.Single(
@@ -124,7 +187,7 @@ public sealed class PlayerActionReadModelTests
 
         Assert.True(
             scenario.Inventories.Remove(
-                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
+                inventory,
                 ResourceIds.FerrousOre,
                 1.0).Succeeded);
 
@@ -134,11 +197,43 @@ public sealed class PlayerActionReadModelTests
         Assert.NotEqual(
             captured,
             scenario.Inventories.GetQuantity(
-                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
+                inventory,
                 ResourceIds.FerrousOre));
 
-        interaction.SetSelection(
-            [scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore]);
+        Assert.True(scenario.Inventories.Remove(inventory, ResourceIds.Steel, 1.0).Succeeded);
+        Assert.All(actions.Construction.SelectMany(static action => action.Costs)
+            .Where(static cost => cost.ResourceId == ResourceIds.Steel),
+            cost => Assert.Equal(capturedSteel, cost.AvailableQuantity));
+        Assert.NotEqual(capturedSteel, scenario.Inventories.GetQuantity(inventory, ResourceIds.Steel));
+    }
+
+    [Fact]
+    public void ConveyorPlacementToolsKeepCopiedCostsWhenSteelIsUnavailable()
+    {
+        using MatchRuntime scenario = CreateScenario(4320);
+        InventoryId inventory = scenario.GetBase(LocalPlayer).StartingInventory;
+        Assert.True(scenario.Inventories.Remove(inventory, ResourceIds.Steel,
+            scenario.Inventories.GetQuantity(inventory, ResourceIds.Steel)).Succeeded);
+        var buffer = RegisterExtraction(scenario, out _, out _);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out PresentationSnapshot snapshot));
+        PlayerActionSnapshot actions = Assert.IsType<PlayerActionSnapshot>(snapshot.PlayerActions);
+        foreach (ConveyorModule module in Enum.GetValues<ConveyorModule>())
+        {
+            PlayerConstructionActionReadModel action = Assert.Single(actions.Construction,
+                item => item.BuildingId == new BuildingId(ConveyorGeometry.MenuBase + (uint)module));
+            PlayerActionResourceAmount cost = Assert.Single(action.Costs);
+            Assert.Equal(0.0, cost.AvailableQuantity);
+            Assert.False(cost.IsAvailable);
+            Assert.True(action.HasRequiredResources);
+        }
+
+        Assert.False(Assert.Single(actions.Construction,
+            action => action.BuildingId == BuildingIds.Radar).HasRequiredResources);
+        var costs = new[] { new PlayerActionResourceAmount(ResourceIds.Steel, "Steel", 8, 0) };
+        var copied = new PlayerConstructionActionReadModel(new BuildingId(2001), "Short belt", costs, false);
+        costs[0] = new PlayerActionResourceAmount(ResourceIds.Steel, "Changed", 1, 100);
+        Assert.Equal(new PlayerActionResourceAmount(ResourceIds.Steel, "Steel", 8, 0), Assert.Single(copied.Costs));
     }
 
     [Fact]
@@ -778,7 +873,7 @@ public sealed class PlayerActionReadModelTests
     }
 
     private static MatchRuntime CreateScenario(
-        ulong seed, bool changedCatalog = false)
+        ulong seed, bool changedCatalog = false, bool changedConstructionCosts = false)
     {
         MatchRuntimeSettings runtime =
             CentralDivideScenario.CreateHeadless(
@@ -798,6 +893,16 @@ public sealed class PlayerActionReadModelTests
                 ? unit with { Costs = unit.Costs.Select(cost => cost.ResourceId == ResourceIds.Steel ? new UnitResourceCost(cost.ResourceId,91) : cost).ToArray() }
                 : unit));
             runtime = runtime with { Composition = runtime.Composition with { Content = content with { Units = units } } };
+        }
+        if (changedConstructionCosts)
+        {
+            MatchContent content = runtime.Composition.Content;
+            var buildings = new BuildingDefinitionCatalog(content.Buildings.Definitions.Select(definition =>
+                definition.Id == BuildingIds.PowerPlant
+                    ? definition with { Costs = [new BuildingResourceCost(ResourceIds.FerrousOre, 37.0),
+                        new BuildingResourceCost(ResourceIds.Steel, 19.0)] }
+                    : definition));
+            runtime = runtime with { Composition = runtime.Composition with { Content = content with { Buildings = buildings } } };
         }
         return CentralDivideScenario.Create(
             runtime,
