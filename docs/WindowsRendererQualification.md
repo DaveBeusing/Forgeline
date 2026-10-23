@@ -132,6 +132,19 @@ LIVE-OPS, LIVE-CONVEYOR and LIVE-ORDERS cases in `manual-review.json` and
 accepted by an Operations screenshot. Motion, Windows DPI, world resolution
 scaling, idle/stress and lifecycle cases also remain manual.
 
+`LIVE-INDUSTRIAL-COMBAT` and `LIVE-RADAR-POWER` remain **not executed** until reviewed
+on this exact source with physical D3D12 hardware. The first case follows normal
+construction, enemy identification and attack, visible damage/destruction, lost
+stock/production, regular rebuild, explicit loaded-adapter reconnection, and resumed
+production. Inspect selection, hover and Operations identities through removal and
+entity-slot reuse, and verify traversal through the released footprint. In a separate
+match, destroy the objective Core and acknowledge the result without an additional
+gameplay tick. The radar case changes generator and consumer power without combat;
+inspect coverage, normal contact aging, hidden newcomers, cadence and recovery.
+Record screenshots or video before damage/outage, during loss, and after recovery,
+with source/session/tick and actual adapter information. Headless, replay and WARP
+results are supporting evidence and do not complete either live case.
+
 For physical performance comparisons, retain the existing
 `build/rendering/qualification/Invoke-RenderQualification.ps1` collector with
 immutable baseline/candidate/analysis SHAs, packages and reviewed hardware

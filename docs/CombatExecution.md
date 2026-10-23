@@ -192,6 +192,30 @@ Reconstruction permits an owned adapter's exact terminal to touch the new author
 former attachment is dead. Interior overlap, support collisions, foreign hardware, and mismatched
 ports still obstruct placement. Completing the replacement building does not itself reconnect cargo.
 
+## Industrial Regression Evidence
+
+[Industrial combat initialization (#322)](https://github.com/DaveBeusing/Forgeline/issues/322)
+is reproduced through ordinary `BuildCommand` completion: the Power Plant, Storage Depot, and
+Smelter cases fail on master `b397bd6f` because the completed entity lacks Health. The corresponding
+construction tests pass with the shared initializer. `IndustrialCombatIntegrationTests` then use a
+normal catalog tank, real visual identification, a player attack command, and normal projectile and
+damage resolution to destroy all three structures. No combat components are added to the targets.
+The production and power recovery scenarios use actual starting stock and truck deliveries, ordinary
+construction, and resumed steel output; damage and recovery checkpoints preserve save/replay hashes.
+
+[Initial-footprint cleanup (#312)](https://github.com/DaveBeusing/Forgeline/issues/312) is covered by
+the destroyed-starting-Core regression: a route that previously detoured becomes a direct route
+through the cleared footprint, while the surviving Core remains blocked. The real-combat client-host
+regression verifies one terminal outcome and no additional completed gameplay ticks before or after
+terminal acknowledgment. Raw coordinator stepping is a separate test boundary, not the host gate.
+
+[Powered radar (#323)](https://github.com/DaveBeusing/Forgeline/issues/323) has an independent
+construction/outage/recovery scenario and privacy checks; see [Battlefield Intelligence](BattlefieldIntelligence.md).
+These executed automated regressions establish simulation and copied-read-model behavior. Physical
+Direct3D 12 measurements and human visual acceptance still require the native Windows acceptance
+environment; headless execution does not establish those results. See
+[Windows Renderer Qualification](WindowsRendererQualification.md) for the native evidence boundary.
+
 ## Combat Events
 
 The first event types are:

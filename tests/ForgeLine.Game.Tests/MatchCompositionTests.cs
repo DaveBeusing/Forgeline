@@ -28,6 +28,8 @@ public sealed class MatchCompositionTests
         Assert.Equal(3, runtime.Simulation.Entities.GetComponentCount<CommandCoreObjective>());
         Assert.All(settings.Participants, participant =>
             Assert.Equal(participant.Player, runtime.GetBase(participant.Player).Player));
+        Assert.All(runtime.Initialization.Bases.Values, starting =>
+            Assert.Equal(HealthState.Full(321), runtime.Simulation.Entities.GetComponent<HealthState>(starting.CommandCore)));
         Assert.Equal(["intelligence.player_7", "intelligence.player_11", "intelligence.player_19"],
             MatchAuthoritativeSnapshot.Capture(runtime).Domains
                 .Where(domain => domain.Name.StartsWith("intelligence.", StringComparison.Ordinal))
@@ -185,10 +187,26 @@ public sealed class MatchCompositionTests
             starts, [], [], [], [], [], [],
             starts.Select(start => new BattlefieldObjectiveDefinition($"core.{start.Player.Value}", start.Player, start.CommandCorePosition)).ToArray(),
             [], CentralDivideBattlefield.Create().TerrainVisual);
-        var content = new MatchContent(new ResourceCatalog([]), new BuildingDefinitionCatalog([]),
+        var constructionMaterial = new ResourceDefinition
+        {
+            Id = new ResourceId(50_001),
+            Key = "test.construction_material",
+            DisplayName = "Construction Material"
+        };
+        var coreDefinition = new BuildingDefinition
+        {
+            Id = BuildingIds.CommandCore,
+            Key = "test.command_core",
+            DisplayName = "Independent Command Core",
+            Footprint = new BuildingFootprint(6, 6, 4),
+            ConstructionTicks = 1,
+            Costs = [new BuildingResourceCost(constructionMaterial.Id, 1)],
+            MaximumHealth = 321
+        };
+        var content = new MatchContent(new ResourceCatalog([constructionMaterial]), new BuildingDefinitionCatalog([coreDefinition]),
             new UnitDefinitionCatalog([]), new TechnologyDefinitionCatalog([]), new ProductionRecipeCatalog([]),
             new WeaponCatalog(), new ArmorCatalog(), new ArtilleryWeaponCatalog());
-        var composition = new MatchComposition("test.three-starts.empty-content.v1", map, content,
+        var composition = new MatchComposition("test.three-starts.minimal-core.v2", map, content,
             static _ =>
             {
                 var grid = new WorldGridSettings();

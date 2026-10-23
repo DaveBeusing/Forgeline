@@ -270,7 +270,7 @@ Regression coverage validates:
 - extractor deposit/output/power activation;
 - multi-tick headless construction completion.
 
-`BuildingConstructionTests` exercises the normal command/completion path. `BuildingCombatInitializationTests` covers the shared initializer and starting Core, while `DirectorateContentTests` covers optional armor references. `RadarPowerTests` constructs its radar through the same authoritative path and checks independent power outages and recovery. These checks use simulation state and do not require a rendered client.
+`BuildingConstructionTests` exercises the normal command/completion path. `BuildingCombatInitializationTests` covers the shared initializer, starting Core, and custom starting industry, while `DirectorateContentTests` covers optional armor references. `RadarPowerTests` constructs its radar through the same authoritative path and checks independent power outages and recovery. These checks use simulation state and do not require a rendered client.
 
 The critical invariants are:
 

@@ -143,8 +143,10 @@ passive visual sensors retain their existing power-independent behavior.
 
 Power allocation remains in the canonical Infrastructure phase, after Sensors.
 Sensors therefore consumes the preceding completed allocation. Disabling or
-removing generation is reflected in Infrastructure of that tick and prevents
-radar scans from the following tick. Restoration similarly makes scanning
+removing generation before Infrastructure is reflected in that phase and prevents
+radar scans from the following tick. Combat removes a destroyed generator later,
+in EntityLifecycle; the next tick's Infrastructure computes the resulting shortage,
+which gates subsequent Sensors phases. Restoration similarly makes scanning
 eligible after allocation, at the next scheduled scan. Disabling the consumer
 or removing its membership is checked directly and takes effect at the next
 Sensors phase even if the previous allocation was powered. A newly completed

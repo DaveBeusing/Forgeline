@@ -88,6 +88,16 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Industrial combat, recovery and powered radar contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.BuildingCombatInitializationTests ForgeLine.Game.Tests.BuildingConstructionTests ForgeLine.Game.Tests.BuildingCombatDestructionTests ForgeLine.Game.Tests.IndustrialCombatIntegrationTests ForgeLine.Game.Tests.ConveyorEndpointRecoveryTests ForgeLine.Game.Tests.RadarPowerTests ForgeLine.Game.Tests.BattlefieldIntelligenceSystemTests ForgeLine.Game.Tests.MatchPersistenceTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.IndustrialCombatPresentationTests ForgeLine.Presentation.Tests.RadarPowerPresentationTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSimulationHostTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Cargo fleet capacity diagnosis and alert lifecycle
         shell: pwsh
         run: |
