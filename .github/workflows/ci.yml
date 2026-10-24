@@ -88,6 +88,14 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Technology effects, paid research and opponent investment
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class 'ForgeLine.Game.Tests.Technology*' ForgeLine.Game.Tests.SkirmishResearchPlannerTests ForgeLine.Game.Tests.CargoAutonomousFuelServiceTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.PlayerActionPanelTests ForgeLine.Presentation.Tests.WorldPresentationTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Operations rule controls and production recovery
         shell: pwsh
         run: |
