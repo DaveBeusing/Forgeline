@@ -68,13 +68,13 @@ internal sealed class OperationsRuleDetailText
         string content = text.ToString();
         int count = 0, offset = 0;
         while (offset < content.Length)
-        { _ = NotificationText.Line(content.AsSpan(offset), MathF.Max(1, width), size, out int used); offset += used; count++; }
+        { _ = NotificationText.Line(content.AsSpan(offset), MathF.Max(1, width), size, out int used, bold: true); offset += used; count++; }
         PageCount = Math.Max(1, (count + _lines.Length - 1) / _lines.Length);
         Page = Math.Max(0, view.DetailPage) % PageCount;
         Array.Fill(_lines, string.Empty); offset = 0;
         for (int i = 0; i < (Page + 1) * _lines.Length && offset < content.Length; i++)
         {
-            var line = NotificationText.Line(content.AsSpan(offset), MathF.Max(1, width), size, out int used);
+            var line = NotificationText.Line(content.AsSpan(offset), MathF.Max(1, width), size, out int used, bold: true);
             if (i >= Page * _lines.Length) _lines[i - Page * _lines.Length] = line.ToString();
             offset += used;
         }

@@ -255,7 +255,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
             { _bounds = bounds; _line = 0; Line(label, enabled); _bounds = panel; }
         }
         var detail = OperationsRulePanelLayout.Details(context.Layout);
-        _ruleDetails.Update(view, MathF.Max(1, detail.Width - 12 * _scale), LastPanelTextSize);
+        _ruleDetails.Update(view, MathF.Max(1, detail.Width - 16 * _scale), LastPanelTextSize);
         _bounds = detail; _line = 0;
         foreach (string line in _ruleDetails.Lines) Line(line, true);
         _bounds = panel;

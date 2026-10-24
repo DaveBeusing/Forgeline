@@ -223,12 +223,16 @@ public sealed class OperationsRuleControlsTests
         var details = new OperationsRuleDetailText();
         float size = MathF.Max(14 * MathF.Min(1, layout.Scale), 14 * OperationsLayout.Scale(layout));
         var region = OperationsRulePanelLayout.Details(layout);
-        details.Update(f.View, region.Width - 12 * OperationsLayout.Scale(layout), size);
+        details.Update(f.View, region.Width - 16 * OperationsLayout.Scale(layout), size);
         var all = new System.Text.StringBuilder();
         for (int page = 0, count = details.PageCount; page < count; page++)
         {
-            details.Update(f.View with { DetailPage = page }, region.Width - 12 * OperationsLayout.Scale(layout), size);
-            foreach (var line in details.Lines) all.Append(line).Append(' ');
+            details.Update(f.View with { DetailPage = page }, region.Width - 16 * OperationsLayout.Scale(layout), size);
+            foreach (var line in details.Lines)
+            {
+                Assert.True(UiFontMetrics.Default.Measure(line, size, bold: true) <= region.Width - 16 * OperationsLayout.Scale(layout), line);
+                all.Append(line).Append(' ');
+            }
         }
         Assert.Contains("reservation, loading or delivery", all.ToString(), StringComparison.Ordinal);
         Assert.Contains("manually disabled", all.ToString(), StringComparison.Ordinal);
