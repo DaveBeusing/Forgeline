@@ -24,3 +24,4 @@ $missingRoot = Join-Path $output ([Guid]::NewGuid().ToString('N'))
 $failure = & dotnet run --project $project --configuration $Configuration --no-build -- --scenario central-divide --scenario-root $missingRoot --ticks 1 2>&1
 if ($LASTEXITCODE -ne 1 -or ($failure -join ' ') -notmatch 'Scenario loading failed:') { throw 'Missing registered maps must fail explicitly without a fallback.' }
 Write-Output 'Compiled headless startup, save, replay, and missing-content rejection qualified.'
+exit 0
