@@ -19,13 +19,15 @@ public sealed class ScenarioRegistry
         CentralDivideScenario.CompositionKey, "Central Divide", CentralDivideMapPath,
         new("prototype.vertical_slice", 1, CentralDivideMapSha256, BattlefieldTerrainRecipe.CurrentVersion,
             ScenarioContentIdentity.DirectorateKey, CentralDivideContentSha256,
-            ScenarioContentIdentity.StartRule, ScenarioContentIdentity.ObjectiveRule));
+            ScenarioContentIdentity.StartRule, ScenarioContentIdentity.ObjectiveRule))
+        { Description = "3.072 KM - RIDGE / TWO CROSSINGS" };
 
     public static ScenarioDescriptor SplitBasinDescriptor => new(
         SplitBasinBattlefield.CompositionKey, "Split Basin", "split-basin.flmap.json",
         new(SplitBasinBattlefield.MapKey, 1, SplitBasinMapSha256, BattlefieldTerrainRecipe.CurrentVersion,
             ScenarioContentIdentity.DirectorateKey, CentralDivideContentSha256,
-            ScenarioContentIdentity.StartRule, ScenarioContentIdentity.ObjectiveRule));
+            ScenarioContentIdentity.StartRule, ScenarioContentIdentity.ObjectiveRule))
+        { Description = "2.048 KM - OPEN BASIN / OUTER ROUTE" };
 
     public ScenarioRegistry(string contentRoot, IReadOnlyList<ScenarioDescriptor> descriptors)
     {

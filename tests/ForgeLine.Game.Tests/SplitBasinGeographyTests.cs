@@ -1,5 +1,8 @@
 using System.Numerics;
 using ForgeLine.Navigation;
+using ForgeLine.Core;
+using ForgeLine.Intelligence;
+using ForgeLine.Simulation;
 using ForgeLine.World;
 using Xunit;
 
@@ -40,6 +43,31 @@ public sealed class SplitBasinGeographyTests
             Assert.True(terrain.TrySampleHeight(2048 - x, z, out float b));
             Assert.Equal(a, b, .0001f);
         }
+    }
+
+    [Fact]
+    public void ExistingScoutSightDistinguishesCentralAndOuterCrossingExposure()
+    {
+        var composition = ScenarioRegistry.Default.Resolve(SplitBasinBattlefield.CompositionKey);
+        var map = composition.Battlefield;
+        var terrain = composition.CreateTerrain(map);
+        Vector3 Ground(Vector3 p) { Assert.True(terrain.TrySampleHeight(p.X, p.Z, out float h)); return p with { Y = h + 1.2f }; }
+        var bridge = map.GetCrossing("crossing.basin_bridge");
+        var ford = map.GetCrossing("crossing.outer_ford");
+        var simulation = new SimulationCoordinator();
+        var intelligence = new FactionIntelligenceStore();
+        simulation.RegisterSystem(new BattlefieldIntelligenceSystem(intelligence));
+        var observer = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(observer, new WorldTransform(Ground(bridge.Position + new Vector3(-124, 0, -144)), Quaternion.Identity, Vector3.One));
+        simulation.Entities.AddComponent(observer, new VisualSensorState(new FactionId(1), composition.Content.Units[UnitIds.ScoutVehicle].VisualSensorRangeMeters));
+        var target = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(target, new WorldTransform(Ground(bridge.Position), Quaternion.Identity, Vector3.One));
+        simulation.Entities.AddComponent(target, new IntelligenceSignature(new FactionId(2), 77));
+        simulation.AdvanceOneTick();
+        Assert.True(intelligence.IsEntityCurrentlyIdentified(new FactionId(1), target));
+        simulation.Entities.SetComponent(target, new WorldTransform(Ground(ford.Position), Quaternion.Identity, Vector3.One));
+        simulation.AdvanceOneTick();
+        Assert.False(intelligence.IsEntityCurrentlyIdentified(new FactionId(1), target));
     }
 
     [Theory]

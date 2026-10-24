@@ -89,6 +89,16 @@ internal static class Program
         {
             string argument = args[index];
 
+            if (string.Equals(argument, "--scenario", StringComparison.OrdinalIgnoreCase))
+            {
+                if (index + 1 >= args.Length || args[++index] is not ("central-divide" or "split-basin" or ForgeLine.Game.CentralDivideScenario.CompositionKey or ForgeLine.Game.SplitBasinBattlefield.CompositionKey))
+                {
+                    Console.Error.WriteLine("--scenario requires central-divide, split-basin or its registered composition key.");
+                    return false;
+                }
+                continue;
+            }
+
             if (string.Equals(argument, "--reference-zoom", StringComparison.OrdinalIgnoreCase))
             {
                 if (index + 1 >= args.Length ||
@@ -199,7 +209,7 @@ internal static class Program
         writer.WriteLine(
             "ForgeLine.Client [--smoke-test] [--render-stress <instances>] " +
             "[--visual-qualification-output <report.json>] " +
-            "[--settings-root <directory>] [--skip-splash] " +
+            "[--settings-root <directory>] [--scenario <central-divide|split-basin>] [--skip-splash] " +
             "[--startup-diagnostics-output <report.json>] [--startup-menu-smoke-test] " +
             "[--reference-zoom <CloseTactical|NormalGameplay|Strategic>]");
         writer.WriteLine("Standalone native evidence: ForgeLine.Client --reference-capture-request <request.json>");

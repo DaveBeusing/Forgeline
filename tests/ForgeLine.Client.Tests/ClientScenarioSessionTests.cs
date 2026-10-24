@@ -37,6 +37,28 @@ public sealed class ClientScenarioSessionTests
     }
 
     [Fact]
+    public void RegisteredSplitBasinStartsLoadsAndRestartsWithoutCustomResolver()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "forgeline-split-session-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            using var first = ClientSessionFactory.CreateOwned(ClientSessionRequest.NewGame(731, SplitBasinBattlefield.CompositionKey), _ => { }, TestContext.Current.CancellationToken);
+            Assert.Equal(ScenarioRegistry.SplitBasinDescriptor.Identity, first.Runtime.RuntimeSettings.Composition.Identity);
+            first.Runtime.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+            string path = Path.Combine(root, "split.save.json");
+            var save = MatchPersistenceService.CaptureSave(first.Runtime);
+            MatchPersistenceSerializer.WriteSaveCancellable(path, save, TestContext.Current.CancellationToken);
+            using var loaded = ClientSessionFactory.CreateOwned(ClientSessionRequest.Load(new("split", "SPLIT BASIN", path, 2, LoadGameEntryState.Available)), _ => { }, TestContext.Current.CancellationToken);
+            Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(loaded.Runtime).ComputeSha256());
+            using var restarted = ClientSessionFactory.CreateOwned(ClientSessionRequest.Restart(loaded.Runtime.RuntimeSettings), _ => { }, TestContext.Current.CancellationToken);
+            Assert.Equal(ScenarioRegistry.SplitBasinDescriptor.Identity, restarted.Runtime.RuntimeSettings.Composition.Identity);
+            Assert.Equal(0UL, restarted.Runtime.Simulation.CurrentTick.Value);
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
+    [Fact]
     public void OwnedNewAndRestartRejectTheWrongResolvedIdentity()
     {
         var settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, 9);

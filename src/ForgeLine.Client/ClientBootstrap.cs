@@ -112,7 +112,7 @@ internal static class ClientBootstrap
             var application = new ClientApplication(platform, loaded.Settings with { ReferenceZoom = zoom },
                 loaded.Path, diagnostics);
             return application.Run(smokeTest, instances, qualification,
-                args.Contains("--skip-splash", StringComparer.OrdinalIgnoreCase), restart, window, menuSmoke);
+                args.Contains("--skip-splash", StringComparer.OrdinalIgnoreCase), restart, window, menuSmoke, ArgumentValue(args, "--scenario"));
         }
         finally
         {
