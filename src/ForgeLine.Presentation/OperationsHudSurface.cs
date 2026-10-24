@@ -218,11 +218,13 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     }
     private void RenderRules(in GameplayHudRenderContext context, in OperationsRulePanelView view)
     {
-        Line("OPERATIONS RULES", true);
+        Line("RULES", true);
         var panel = _bounds;
         _bounds = panel with { Y = panel.Y + 28 * _scale, Height = 24 * _scale };
         _line = 0;
-        Line(view.Data is null ? "SELECT ONE OWNED PROCESSOR" : "SELECTED PROCESSOR / LOCAL DRAFT");
+        bool compact = panel.Width < 320 * MathF.Min(1, context.Layout.Scale);
+        Line(view.Data is null ? compact ? "SELECT PROCESSOR" : "SELECT ONE OWNED PROCESSOR" :
+            compact ? "OWN PROCESSOR" : "SELECTED PROCESSOR / LOCAL DRAFT");
         _bounds = panel;
         for (int i = 0; i < OperationsRulePanelLayout.ControlCount; i++)
         {
@@ -236,17 +238,17 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
             string label = i switch
             {
                 0 => "BACK",
-                1 => view.NewDraft ? "NEW DRAFT / SELECT RULE" : "RULE / REV " + view.ExpectedRevision + " / NEXT",
-                2 => view.Draft.Template == ForgeLine.Game.OperationsRuleTemplate.PauseUntilOutputAvailable ? "OUTPUT RECOVERY" : "INPUT STOCK POLICY",
+                1 => view.NewDraft && compact ? "NEW / NEXT RULE" : OperationsRulePanelController.SelectorLabel(view),
+                2 => view.Draft.Template == ForgeLine.Game.OperationsRuleTemplate.PauseUntilOutputAvailable ? compact ? "OUTPUT FULL" : "OUTPUT RECOVERY" : compact ? "INPUT STOCK" : "INPUT STOCK POLICY",
                 3 => ResourceLabel(view),
                 4 => OperationsRulePanelController.FieldLabel(view),
-                5 => "DECREASE",
-                6 => "INCREASE",
+                5 => compact ? "-" : "DECREASE",
+                6 => compact ? "+" : "INCREASE",
                 7 => view.Pending ? "PENDING" : "APPLY",
-                8 => view.NewDraft ? view.DraftEnabled ? "DRAFT ENABLED" : "DRAFT DISABLED" : view.Observed is { Enabled: true } ? "DISABLE" : "ENABLE",
+                8 => view.NewDraft ? view.DraftEnabled ? compact ? "ON" : "DRAFT ENABLED" : compact ? "OFF" : "DRAFT DISABLED" : view.Observed is { Enabled: true } ? "DISABLE" : "ENABLE",
                 9 => "REMOVE",
-                10 => "RELOAD / RESET",
-                _ => "DETAILS / NEXT PAGE"
+                10 => view.NewDraft ? "RESET" : "RELOAD",
+                _ => compact ? "DETAILS / NEXT" : "DETAILS / NEXT PAGE"
             };
             if (!_text.AddCentered(label, bounds, LastPanelTextSize,
                 enabled ? GameplayHudVisualStyle.TextPrimary : GameplayHudVisualStyle.TextSecondary, _width, _height))

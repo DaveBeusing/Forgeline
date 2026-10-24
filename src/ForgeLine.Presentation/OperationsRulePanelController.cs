@@ -12,7 +12,10 @@ namespace ForgeLine.Presentation;
 public readonly record struct OperationsRulePanelView(
     bool Open, OperationsRuleSelectionSnapshot? Data, OperationsRuleDefinition Draft,
     uint ExpectedRevision, bool NewDraft, bool DraftEnabled, bool Dirty, bool Pending,
-    int Field, int Focus, int DetailPage, string Feedback, OperationsRuleReadModel? Observed);
+    int Field, int Focus, int DetailPage, string Feedback, OperationsRuleReadModel? Observed, bool InputGuarded = false)
+{
+    public GameplayBindingRegistry? Bindings { get; init; }
+}
 
 public static class OperationsRulePanelLayout
 {
@@ -22,7 +25,11 @@ public static class OperationsRulePanelLayout
         HudRect panel = OperationsLayout.Panel(layout);
         float s = OperationsLayout.Scale(layout), x = MathF.Min(layout.Scale, panel.Width / 450);
         if (s <= 0 || panel.IsEmpty) return default;
-        if (index == 0) return new(panel.X + 366 * x, panel.Y + 6 * s, 78 * x, 22 * s);
+        if (index == 0)
+        {
+            float width = MathF.Min(90 * MathF.Min(layout.Scale, 1.25f), panel.Width * .4f);
+            return new(panel.Right - 6 * x - width, panel.Y + 6 * s, width, 22 * s);
+        }
         if (index is >= 1 and <= 4) return new(panel.X + 6 * x, panel.Y + (56 + (index - 1) * 26) * s, 438 * x, 22 * s);
         if (index is >= 5 and <= 10)
         {
@@ -47,6 +54,9 @@ internal sealed class OperationsRulePanelController
     private readonly GameplayBindingRegistry _bindings;
     private readonly ulong[] _keys = new ulong[Enum.GetValues<PlatformKey>().Length];
     private readonly Func<ulong> _allocateId;
+    private readonly TimeProvider _clock;
+    private long _lastSubmissionTimestamp;
+    private bool _hasSubmitted, _reviewRejectedDraft;
     private SimulationSessionId _session;
     private EntityId _facility;
     private OperationsRuleSelectionSnapshot? _data;
@@ -63,6 +73,7 @@ internal sealed class OperationsRulePanelController
     private EntityId _armedFacility;
     private ulong _armedRule;
     private OperationsRuleDefinition _armedDraft;
+    private bool _armedEnabled;
     private GameplayHudLayout _layout;
     private PlayerActionRequest? _request;
     private OperationsRuleOperation _pendingOperation;
@@ -70,15 +81,18 @@ internal sealed class OperationsRulePanelController
     private EntityId _pendingFacility;
     private SimulationTick? _reloadAfter;
 
-    internal OperationsRulePanelController(GameplayBindingRegistry bindings, Func<ulong>? allocateId = null)
+    internal OperationsRulePanelController(GameplayBindingRegistry bindings, Func<ulong>? allocateId = null, TimeProvider? timeProvider = null)
     {
         _bindings = bindings;
+        _clock = timeProvider ?? TimeProvider.System;
         // This is an external player-request identity. The submitted numeric value is recorded in replay.
         _allocateId = allocateId ?? (() => BitConverter.ToUInt64(Guid.NewGuid().ToByteArray()));
     }
 
     internal OperationsRulePanelView View => new(_open, _data, _draft, _revision, _selectedId == 0,
-        _enabled, _dirty, _pending || _boundaryPending, _field, _focus, _detailPage, _feedback, Observed());
+        _enabled, _dirty, _pending || _boundaryPending, _field, _focus, _detailPage, _feedback, Observed(),
+        _hasSubmitted && _clock.GetElapsedTime(_lastSubmissionTimestamp) < TimeSpan.FromMilliseconds(500))
+        { Bindings = _bindings };
 
     internal void Open() { _open = true; _facility = default; _selectedId = 0; _draft = default;
         _feedback = "SELECT ONE OWNED PROCESSOR"; _focus = 1; _armed = -1; }
@@ -92,13 +106,17 @@ internal sealed class OperationsRulePanelController
         {
             _session = snapshot?.SessionId ?? default;
             _facility = default; _pending = false; _hostSequence = 0; _correlation = default;
-            _earlyResult = null; _reloadAfter = null; _request = null; _armed = -1;
+            _earlyResult = null; _reloadAfter = null; _request = null; _armed = -1; _hasSubmitted = false; _reviewRejectedDraft = false;
         }
         PlayerActionSnapshot? actions = PlayerActionDockHudModel.ResolveActions(snapshot);
-        _data = PlayerActionDockHudModel.MatchesSelection(actions, selection) ? actions?.OperationsRules : null;
+        _data = PlayerActionDockHudModel.MatchesSelection(actions, selection) &&
+            actions?.OperationsRules is { } permitted && permitted.Facility == actions.Production?.Entity &&
+            permitted.Player == snapshot?.PlayerExperience?.Player ? permitted : null;
         _boundaryPending = actions?.PendingCommandCount > 0;
         EntityId selected = _data?.Facility ?? default;
-        if (_facility != selected)
+        bool waitingForRequestedData = _data is null && _facility.IsValid &&
+            actions?.Production?.Entity == _facility && PlayerActionDockHudModel.MatchesSelection(actions, selection);
+        if (!waitingForRequestedData && _facility != selected)
         {
             _facility = selected;
             _armed = -1;
@@ -110,7 +128,10 @@ internal sealed class OperationsRulePanelController
             if (_pendingFacility == _facility)
             {
                 _selectedId = _pendingOperation == OperationsRuleOperation.Remove ? 0 : _pendingRule;
-                Reload();
+                if (_reviewRejectedDraft && Observed() is { } current)
+                { _revision = current.Revision; _dirty = true; }
+                else Reload();
+                _reviewRejectedDraft = false;
             }
         }
         bool transition = _layout != layout;
@@ -138,13 +159,14 @@ internal sealed class OperationsRulePanelController
             _armedFacility = _facility;
             _armedRule = _selectedId;
             _armedDraft = _draft;
+            _armedEnabled = _enabled;
         }
         if (input.WasMouseButtonReleased(PlatformMouseButton.Left))
         {
             int control = _armed;
             _armed = -1;
             if (control >= 0 && _armedFacility == _facility && _armedRule == _selectedId &&
-                _armedDraft == _draft && input.HasPointerPosition &&
+                _armedDraft == _draft && _armedEnabled == _enabled && input.HasPointerPosition &&
                 OperationsRulePanelLayout.Control(layout, control).Contains(input.PointerPosition))
             { _focus = control; Activate(control); }
         }
@@ -209,9 +231,14 @@ internal sealed class OperationsRulePanelController
     internal static string ApplyReason(in OperationsRulePanelView view)
     {
         if (view.Pending) return "COMMAND PENDING";
+        if (view.InputGuarded) return "WAIT BEFORE NEXT CHANGE";
+        if (!view.NewDraft && !view.Dirty) return "NO UNAPPLIED CHANGES";
         if (view.Data is null) return "SELECT ONE OWNED PROCESSOR";
+        if (!view.NewDraft && !view.Observed.HasValue) return "RULE REMOVED / RELOAD";
         if (view.NewDraft && (view.Data.UsedRuleIds.Count >= OperationsRuleSystem.MaximumRulesPerPlayer ||
             view.Data.Rules.Count >= OperationsRuleSystem.MaximumRulesPerFacility)) return "RULE LIMIT REACHED";
+        if (view.NewDraft && view.Draft.Template == OperationsRuleTemplate.EnsureInputStockPolicy &&
+            !LogisticsQuantityEditor.FitsCapacity(LogisticsQuantityEditor.Minimum, view.Data.InputCapacity)) return "INPUT CAPACITY BELOW EDITOR STEP";
         if (!view.Draft.Owner.IsSpecified || view.Draft.Id == 0 || !OperationsRuleSystem.ValidDefinition(view.Draft)) return "INVALID RULE SETTINGS";
         if (view.Draft.Template == OperationsRuleTemplate.EnsureInputStockPolicy)
         {
@@ -226,8 +253,8 @@ internal sealed class OperationsRulePanelController
     {
         0 or 11 => true,
         7 => ApplyReason(view).Length == 0,
-        8 => !view.Pending && view.Data is not null && (view.NewDraft || !view.Dirty && view.Observed.HasValue),
-        9 => !view.Pending && !view.NewDraft && view.Observed.HasValue,
+        8 => !view.Pending && !view.InputGuarded && view.Data is not null && (view.NewDraft || !view.Dirty && view.Observed.HasValue),
+        9 => !view.Pending && !view.InputGuarded && !view.NewDraft && view.Observed.HasValue,
         3 => !view.Pending && view.Data is { Inputs.Count: > 0 } && view.Draft.Template == OperationsRuleTemplate.EnsureInputStockPolicy,
         _ => !view.Pending && view.Data is not null
     };
@@ -304,6 +331,7 @@ internal sealed class OperationsRulePanelController
     {
         if (_pending || _request.HasValue) return;
         _request = PlayerActionRequest.OperationsRule(operation, definition, revision, enabled);
+        _hasSubmitted = true; _lastSubmissionTimestamp = _clock.GetTimestamp();
         _pending = true; _pendingOperation = operation; _pendingRule = definition.Id; _pendingFacility = definition.Facility;
         _correlation = default; _earlyResult = null; _feedback = "PENDING / WAIT FOR AUTHORITATIVE RESULT"; _armed = -1;
     }
@@ -327,11 +355,23 @@ internal sealed class OperationsRulePanelController
         if (!_correlation.IsSpecified) { _earlyResult = result; return; }
         if (result.CorrelationId != _correlation) return;
         _pending = false; _correlation = default;
+        _reviewRejectedDraft = result.OperationsResult == OperationsRuleResult.RevisionMismatch &&
+            _pendingOperation == OperationsRuleOperation.Upsert;
         _feedback = result.OperationsResult == OperationsRuleResult.RevisionMismatch
             ? "REVISION CHANGED / REVIEW CURRENT / APPLY AGAIN"
             : result.State == PlayerCommandFeedbackState.Accepted ? "RULE CHANGE CONFIRMED" : "REJECTED / " + result.OperationsResult;
         if (result.State == PlayerCommandFeedbackState.Accepted || result.OperationsResult == OperationsRuleResult.RevisionMismatch)
             _reloadAfter = result.ResolvedAtTick;
+    }
+
+    internal static string SelectorLabel(in OperationsRulePanelView view)
+    {
+        if (view.NewDraft) return "NEW DRAFT / SELECT RULE";
+        if (view.Data is not null)
+            for (int i = 0; i < view.Data.Rules.Count; i++)
+                if (view.Data.Rules[i].Definition.Id == view.Draft.Id)
+                    return FormattableString.Invariant($"RULE {i + 1}/{view.Data.Rules.Count} / R{view.ExpectedRevision}");
+        return "RULE UNAVAILABLE / RELOAD";
     }
 
     internal static string FieldLabel(in OperationsRulePanelView view)

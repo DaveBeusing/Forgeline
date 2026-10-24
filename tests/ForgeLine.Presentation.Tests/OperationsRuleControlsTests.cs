@@ -62,11 +62,15 @@ public sealed class OperationsRuleControlsTests
         f.Runtime.Simulation.SubmitCommand(new OperationsRuleCommand(f.Runtime.OperationsRules,
             OperationsRuleOperation.SetEnabled, current.Definition, current.Revision, false,
             f.Runtime.Simulation.CurrentTick), f.Runtime.Simulation.CurrentTick.Next());
+        f.Click(6); f.AllowNextChange();
         f.Click(7); f.DispatchPending(); f.Tick();
         Assert.Equal(OperationsRuleResult.RevisionMismatch, f.LastResult!.Value.OperationsResult);
         Assert.False(f.Controller.TryTakeRuleRequest(out _));
         Assert.Equal(2u, f.View.ExpectedRevision);
-        Assert.False(f.View.DraftEnabled);
+        Assert.False(f.View.Observed!.Value.Enabled);
+        Assert.True(f.View.DraftEnabled);
+        Assert.True(f.View.Dirty);
+        f.AllowNextChange();
         f.Click(7); f.DispatchPending(); f.Tick();
         Assert.Equal(OperationsRuleResult.Applied, f.LastResult!.Value.OperationsResult);
         Assert.Equal(3u, Assert.Single(f.Runtime.OperationsRules.Capture(new PlayerId(1))).Revision);
@@ -145,6 +149,7 @@ public sealed class OperationsRuleControlsTests
         f.Key(GameplayBindingRegistry.Default.Key(GameplayAction.Increase));
         Assert.Equal(150, f.View.Draft.Target);
         Assert.Equal(100, Assert.Single(f.Runtime.OperationsRules.Capture(new PlayerId(1))).Definition.Target);
+        f.AllowNextChange();
         f.Key(PlatformKey.Enter);
         Assert.True(f.Controller.TryTakeRuleRequest(out var update));
         Assert.Equal(1u, update.ExpectedRuleRevision);
@@ -167,6 +172,7 @@ public sealed class OperationsRuleControlsTests
         Assert.Contains("LIMIT", f.View.Feedback, StringComparison.Ordinal);
         f.Click(1);
         Assert.False(f.View.NewDraft);
+        f.Click(6);
         f.Click(7); f.DispatchPending(); f.Tick();
         Assert.Equal(OperationsRuleSystem.MaximumRulesPerFacility, f.Runtime.OperationsRules.Capture(new PlayerId(1)).Count);
         Assert.Equal(2u, f.View.ExpectedRevision);
@@ -215,7 +221,7 @@ public sealed class OperationsRuleControlsTests
             }
         }
         var details = new OperationsRuleDetailText();
-        float size = 14 * MathF.Min(1, layout.Scale);
+        float size = MathF.Max(14 * MathF.Min(1, layout.Scale), 14 * OperationsLayout.Scale(layout));
         var region = OperationsRulePanelLayout.Details(layout);
         details.Update(f.View, region.Width - 12 * OperationsLayout.Scale(layout), size);
         var all = new System.Text.StringBuilder();
@@ -265,10 +271,133 @@ public sealed class OperationsRuleControlsTests
             f.Runtime.Simulation.CurrentTick.Next());
         f.Tick();
         Assert.Equal(original.Definition.Id, f.View.Draft.Id);
+        f.Click(6); f.AllowNextChange();
         f.Click(7);
         Assert.True(f.Controller.TryTakeRuleRequest(out var request));
         Assert.Equal(original.Definition.Id, request.RuleDefinition.Id);
         Assert.Equal(original.Revision, request.ExpectedRuleRevision);
+    }
+
+    [Fact]
+    public void FastConfirmationStillRejectsASecondClickWithoutSubmittingAgain()
+    {
+        using var f = new RuleUiFixture(); f.Open(); f.Apply(); f.Tick();
+        Assert.False(f.View.Pending);
+        Assert.True(f.View.InputGuarded);
+        f.Click(8);
+        Assert.False(f.Controller.TryTakeRuleRequest(out _));
+        Assert.True(Assert.Single(f.Runtime.OperationsRules.Capture(new PlayerId(1))).Enabled);
+        f.AllowNextChange();
+        f.Click(7);
+        Assert.False(f.Controller.TryTakeRuleRequest(out _));
+        f.Click(8); f.DispatchPending(); f.Tick();
+        Assert.False(Assert.Single(f.Runtime.OperationsRules.Capture(new PlayerId(1))).Enabled);
+    }
+
+    [Fact]
+    public void ModalInterruptionCancelsGestureButPreservesUnappliedDraftAcrossMissingRequestedData()
+    {
+        using var f = new RuleUiFixture(); f.Open(); f.Click(6);
+        Assert.Equal(50, f.View.Draft.Minimum);
+        f.Edge(7, PlatformInputEventKind.MouseButtonDown);
+        f.Update(blocked: true);
+        f.Tick(blocked: true);
+        Assert.Null(f.Snapshot.PlayerActions!.OperationsRules);
+        f.Update(); f.Tick();
+        f.Edge(7, PlatformInputEventKind.MouseButtonUp);
+        Assert.Equal(50, f.View.Draft.Minimum);
+        Assert.True(f.View.Dirty);
+        Assert.False(f.Controller.TryTakeRuleRequest(out _));
+        Assert.Empty(f.Runtime.OperationsRules.Capture(new PlayerId(1)));
+    }
+
+    [Fact]
+    public void EssentialResultMayArriveBeforeTheSubmissionReceiptWithoutLosingConfirmation()
+    {
+        using var f = new RuleUiFixture(); f.Open(); f.Click(7);
+        Assert.True(f.Controller.TryTakeRuleRequest(out var request));
+        Assert.True(PlayerActionRequestDispatcher.TryDispatch(request, new PlayerId(1), f.Gateway,
+            f.Runtime.Simulation.CurrentTick, out var receipt));
+        f.Controller.ExpectRuleSubmission(77);
+        f.Runtime.Simulation.AdvanceOneTick();
+        Assert.True(f.Gateway.Results.TryRead(out var result));
+        f.Controller.ObserveRuleResult(result);
+        Assert.True(f.View.Pending);
+        f.Controller.ObserveRuleSubmission(77, receipt);
+        f.Tick();
+        Assert.False(f.View.Pending);
+        Assert.False(f.View.NewDraft);
+        Assert.Equal(1u, f.View.ExpectedRevision);
+    }
+
+    [Fact]
+    public void InputPolicyFromUiSurvivesSaveAndReplayWithoutClaimingDelivery()
+    {
+        using var f = new RuleUiFixture(); f.Open(); f.Apply(); f.Tick(8);
+        Assert.Equal(1, Assert.Single(f.Runtime.OperationsRules.Capture(new PlayerId(1))).ActionCount);
+        var save = MatchPersistenceSerializer.DeserializeSave(MatchPersistenceSerializer.SerializeSave(MatchPersistenceService.CaptureSave(f.Runtime)));
+        var replay = MatchPersistenceSerializer.DeserializeReplay(MatchPersistenceSerializer.SerializeReplay(MatchPersistenceService.CaptureReplay(f.Runtime)));
+        using var restored = MatchPersistenceService.Restore(save, f.Resolve);
+        using var playback = MatchPersistenceService.PlayReplay(replay, f.Resolve);
+        foreach (ulong ticks in new ulong[] { 0, 1, 7, 20 })
+        {
+            f.Runtime.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            restored.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            playback.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            string expected = MatchAuthoritativeSnapshot.Capture(f.Runtime).ComputeSha256();
+            Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+            Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        }
+        Assert.Equal(0, f.Runtime.Inventories.GetTotalQuantity(f.InputInventory));
+    }
+
+    [Fact]
+    public void ManualOverrideRemainsPausedAcrossUiDisableAndRemove()
+    {
+        using var f = new RuleUiFixture(outputFull: true); f.Open(); f.Click(2); f.Apply(); f.Tick(55);
+        EntityId request = Assert.Single(f.Runtime.OperationsRules.Capture(new PlayerId(1))).ManagedProductionRequest;
+        f.Gateway.SubmitProductionPaused(new PlayerId(1), request, true, f.Runtime.Simulation.CurrentTick);
+        f.Tick();
+        Assert.Equal(OperationsRuleResult.ManualOverride, f.View.Observed!.Value.Result);
+        Assert.False(f.View.Observed.Value.ManagedProductionRequest.IsValid);
+        f.Click(8); f.DispatchPending(); f.Tick();
+        Assert.True(f.Runtime.Simulation.Entities.GetComponent<ProductionRequest>(request).Paused);
+        f.AllowNextChange(); f.Click(9); f.DispatchPending(); f.Tick();
+        Assert.Empty(f.Runtime.OperationsRules.Capture(new PlayerId(1)));
+        Assert.True(f.Runtime.Simulation.Entities.GetComponent<ProductionRequest>(request).Paused);
+    }
+
+    [Fact]
+    public void ReboundActivationUsesTheExistingGameplayRegistry()
+    {
+        var bindings = new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Activate, PlatformKey.G));
+        using var f = new RuleUiFixture(bindings: bindings); f.Open();
+        for (int i = 0; i < 6; i++) f.Key(bindings.Key(GameplayAction.NextItem));
+        f.Key(PlatformKey.Enter);
+        Assert.False(f.Controller.TryTakeRuleRequest(out _));
+        f.Key(PlatformKey.G);
+        Assert.True(f.Controller.TryTakeRuleRequest(out _));
+        Assert.Same(bindings, f.View.Bindings);
+    }
+
+    [Fact]
+    public void SessionReplacementDiscardsUnsubmittedLocalRequestAndDraft()
+    {
+        using var old = new RuleUiFixture(); old.Open(); old.Click(7);
+        using var replacement = new RuleUiFixture();
+        old.Controller.Update(old.Input, replacement.Snapshot, old.Layout, old.Interaction, selection: replacement.Selection);
+        Assert.False(old.Controller.View.Open);
+        Assert.False(old.Controller.TryTakeRuleRequest(out _));
+        Assert.Empty(old.Runtime.OperationsRules.Capture(new PlayerId(1)));
+        Assert.Empty(replacement.Runtime.OperationsRules.Capture(new PlayerId(1)));
+    }
+
+    private sealed class UiTestClock : TimeProvider
+    {
+        private long _ticks;
+        public override long TimestampFrequency => TimeSpan.TicksPerSecond;
+        public override long GetTimestamp() => _ticks;
+        internal void Advance(TimeSpan elapsed) => _ticks += elapsed.Ticks;
     }
 
     private sealed class RuleUiFixture : IDisposable
@@ -278,7 +407,8 @@ public sealed class OperationsRuleControlsTests
         private ulong _sequence;
         internal MatchRuntime Runtime { get; }
         internal PlayerCommandGateway Gateway { get; }
-        internal OperationsController Controller { get; } = new();
+        private readonly UiTestClock _clock = new();
+        internal OperationsController Controller { get; }
         internal InputState Input { get; } = new();
         internal PresentationInteractionState Interaction { get; } = new();
         internal SelectionSet Selection { get; } = new();
@@ -291,8 +421,9 @@ public sealed class OperationsRuleControlsTests
         internal PlayerCommandResultReadModel? LastResult { get; private set; }
         internal OperationsRulePanelView View => Controller.View.RuleControls!.Value;
 
-        internal RuleUiFixture(bool outputFull = false)
+        internal RuleUiFixture(bool outputFull = false, GameplayBindingRegistry? bindings = null)
         {
+            Controller = new(bindings, timeProvider: _clock);
             var settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, 9204);
             var basis = settings.Composition;
             _composition = basis with
@@ -350,12 +481,13 @@ public sealed class OperationsRuleControlsTests
             if (View.Data is null) Tick();
         }
         internal void Update(bool blocked = false) => Controller.Update(Input, Snapshot, Layout, Interaction, blocked, selection: Selection);
-        internal void Tick(ulong count = 1)
+        internal void Tick(ulong count = 1, bool blocked = false)
         {
+            _clock.Advance(TimeSpan.FromMilliseconds(count * 50));
             Runtime.Simulation.RunTicks(count, TestContext.Current.CancellationToken);
             while (Gateway.Results.TryRead(out var result)) { LastResult = result; Controller.ObserveRuleResult(result); }
             Assert.True(_buffer.TryReadLatest(out var snapshot)); Snapshot = snapshot;
-            Input.BeginFrame(); Update();
+            Input.BeginFrame(); Update(blocked);
         }
         internal void Edge(int index, PlatformInputEventKind kind)
         {
@@ -372,6 +504,7 @@ public sealed class OperationsRuleControlsTests
             Input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, x, y));
             Update();
         }
+        internal void AllowNextChange() => _clock.Advance(TimeSpan.FromMilliseconds(600));
         internal void KeyDown(PlatformKey key)
         { Input.BeginFrame(); Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, key)); Update(); }
         internal void KeyUp(PlatformKey key)

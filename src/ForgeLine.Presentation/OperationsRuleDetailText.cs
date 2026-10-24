@@ -1,6 +1,7 @@
 using System.Text;
 using System.Globalization;
 using ForgeLine.Game;
+using ForgeLine.Input;
 
 namespace ForgeLine.Presentation;
 
@@ -28,7 +29,8 @@ internal sealed class OperationsRuleDetailText
             {
                 text.Append(row.Enabled ? row.Result == OperationsRuleResult.ManualOverride ? "SUSPENDED / MANUAL" : "ENABLED" : "DISABLED")
                     .Append(" / ").AppendLine(row.Result.ToString());
-                text.Append("EVALUATED TICK ").Append(row.LastEvaluated.Value).Append(" / LAST SUCCESS ").AppendLine(row.LastFired.Value.ToString(CultureInfo.InvariantCulture));
+                text.Append("REVISION ").Append(row.Revision).Append(" / DRAFT EXPECTED ").AppendLine(view.ExpectedRevision.ToString(CultureInfo.InvariantCulture));
+                text.Append("EVALUATED TICK ").Append(row.LastEvaluated.Value).Append(" / LAST SUCCESS ").AppendLine(row.LastFired == ForgeLine.Simulation.SimulationTick.Zero ? "NONE YET" : row.LastFired.Value.ToString(CultureInfo.InvariantCulture));
                 text.Append("ATTEMPTS ").Append(row.AttemptCount).Append(" / REMAINING ")
                     .Append(Math.Max(0, OperationsRuleSystem.MaximumActionsPerRule - row.AttemptCount))
                     .Append(" / ACTIONS ").Append(row.ActionCount).Append(" / LAST ATTEMPT ").AppendLine(row.LastAttempt.Value.ToString(CultureInfo.InvariantCulture));
@@ -43,6 +45,7 @@ internal sealed class OperationsRuleDetailText
             }
             else text.AppendLine("NEW LOCAL DRAFT / EXPECTED REVISION 0");
             var d = view.Draft;
+            text.Append("RULE REFERENCE ").AppendLine(d.Id.ToString("X16", CultureInfo.InvariantCulture));
             if (d.Template == OperationsRuleTemplate.EnsureInputStockPolicy)
             {
                 string resource = "NOT IN CURRENT RECIPE";
@@ -54,6 +57,12 @@ internal sealed class OperationsRuleDetailText
             text.AppendLine(d.Template == OperationsRuleTemplate.EnsureInputStockPolicy
                 ? "INPUT STOCK: after missing recipe input, create one absent stock policy. Existing enabled or manually disabled policies win. This confirms no reservation, loading or delivery. A removed policy is not automatically recreated."
                 : "OUTPUT RECOVERY: pause the exact active request only while output is full; resume it when real output capacity returns. Manual pause or resume suspends automation. Disable/remove releases only a rule-owned pause.");
+            var bindings = view.Bindings ?? GameplayBindingRegistry.Default;
+            text.Append("KEYS ").Append(bindings.Prompt(GameplayAction.NextItem)).Append(": NEXT CONTROL / ")
+                .Append(bindings.Prompt(GameplayAction.Activate)).Append(": ACTIVATE / ")
+                .Append(bindings.Prompt(GameplayAction.PrimarySetting)).Append(": FIELD / ")
+                .Append(bindings.Prompt(GameplayAction.Decrease)).Append(" / ").Append(bindings.Prompt(GameplayAction.Increase))
+                .Append(": ADJUST / ").Append(bindings.Prompt(GameplayAction.CancelJob)).AppendLine(": REMOVE");
             text.AppendLine("Edits are local until APPLY. ENABLE explicitly rearms the rule. Limits: 32/player, 8/facility, 16 attempts/revision. Managed recovery can complete at the attempt limit.");
         }
         string content = text.ToString();

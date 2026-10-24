@@ -91,8 +91,8 @@ public sealed class OperationsController
     private readonly OperationsRulePanelController _rules;
     private readonly ulong[] _keys = new ulong[Enum.GetValues<PlatformKey>().Length];
     private int _overviewFocus = 13;
-    public OperationsController(GameplayBindingRegistry? bindings = null)
-    { _bindings = bindings ?? GameplayBindingRegistry.Default; _rules = new(_bindings); }
+    public OperationsController(GameplayBindingRegistry? bindings = null, TimeProvider? timeProvider = null)
+    { _bindings = bindings ?? GameplayBindingRegistry.Default; _rules = new(_bindings, timeProvider: timeProvider); }
     public bool HasKeyboardFocus => View.Open && !View.Suppressed && !View.Notifications;
     public bool TryTakeRuleRequest(out PlayerActionRequest request) => _rules.TryTakeRequest(out request);
     public void ExpectRuleSubmission(ulong sequence) => _rules.ExpectSubmission(sequence);
