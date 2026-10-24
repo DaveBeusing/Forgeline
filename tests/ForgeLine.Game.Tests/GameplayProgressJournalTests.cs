@@ -39,6 +39,12 @@ public sealed class GameplayProgressJournalTests
         journal.Record(simulation.CurrentTick, owner, proof.Kind, actor, actor, replacement, 2, ResourceIds.Fuel, 10);
         Assert.Equal(proof, Assert.Single(journal.Capture(owner, simulation.CurrentTick)));
         Assert.Empty(journal.Capture(owner, new(simulation.CurrentTick.Value + 1)));
+        Assert.Equal(proof, Assert.Single(journal.CaptureFirst(owner, simulation.CurrentTick)));
+        journal.Record(simulation.CurrentTick.Next(), owner, GameplayProgressKind.ConveyorDelivered,
+            replacement, replacement, replacement, 3, ResourceIds.Steel, 2);
+        Assert.Empty(journal.CaptureFirst(owner, simulation.CurrentTick));
+        simulation.AdvanceOneTick();
+        Assert.Equal(proof, Assert.Single(journal.CaptureFirst(owner, simulation.CurrentTick), item => item.Kind == proof.Kind));
     }
 
     [Fact]

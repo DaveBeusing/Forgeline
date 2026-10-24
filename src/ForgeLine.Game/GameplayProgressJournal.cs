@@ -84,6 +84,8 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
     public IReadOnlyList<GameplayProgressEvent> CaptureFirst(PlayerId player, SimulationTick completedTick)
     {
         if (!_observed || completedTick != _completed || !_first.TryGetValue(player, out var ledger)) return Array.Empty<GameplayProgressEvent>();
+        foreach (var item in ledger.Values)
+            if (item.Tick.Value > completedTick.Value) return Array.Empty<GameplayProgressEvent>();
         if (!_firstCopies.TryGetValue(player, out var copy))
         {
             copy = Array.AsReadOnly(ledger.Values.OrderBy(x => x.Identity).ToArray());

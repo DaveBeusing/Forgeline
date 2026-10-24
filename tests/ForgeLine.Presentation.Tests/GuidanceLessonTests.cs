@@ -70,6 +70,25 @@ public sealed class GuidanceLessonTests
         Assert.Equal(GuidanceExplanationState.Offered, replacement.ExplanationState);
         Assert.Equal(0, replacement.Page);
     }
+    [Theory]
+    [InlineData("belt-production", PlayerGuidanceMilestone.ConveyorDelivery | PlayerGuidanceMilestone.ProductionOutput)]
+    [InlineData("research", PlayerGuidanceMilestone.ResearchCompleted)]
+    public void NewGoalsRemainOptionalAndConfirmWhenReadAfterHiddenCompletion(string key, PlayerGuidanceMilestone milestone)
+    {
+        var guide = new EarlyGameGuidanceController();
+        var completed = EarlyGameGuidanceTests.Snapshot(milestone);
+        Assert.False(guide.Update(completed, false, blocked: true).Visible);
+        for (int i = 0; i < EarlyGameGuidanceCatalog.Steps.Length && guide.Update(completed, true).ContentKey != key; i++)
+            guide.Navigate(GuidanceNavigation.Later);
+        var view = guide.Update(completed, true);
+        Assert.Equal(key, view.ContentKey);
+        Assert.True(view.GoalConfirmed);
+        Assert.Contains("Already confirmed", view.Context);
+        var replaced = guide.Update(EarlyGameGuidanceTests.Snapshot(0, session: 2), true);
+        Assert.Equal("starting-base", replaced.ContentKey);
+        Assert.Equal(PlayerGuidanceMilestone.None, guide.Observed);
+    }
+
     [Fact]
     public void StaleOrForeignEvidenceCannotAdvanceCopiedMilestones()
     {

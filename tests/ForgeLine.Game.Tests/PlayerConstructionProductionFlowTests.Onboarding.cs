@@ -123,6 +123,14 @@ public sealed partial class PlayerConstructionProductionFlowTests
         BuildPlayerBuilding(scenario, gateway, BuildingIds.PowerPlant, FindOpenPlacement(scenario, BuildingIds.PowerPlant));
         BuildPlayerBuilding(scenario, gateway, BuildingIds.Extractor, FindOpeningOreSite(scenario));
         scenario.Simulation.RunTicks(150, TestContext.Current.CancellationToken);
+        var coreEntity = scenario.GetBase(player).CommandCore;
+        var research = PlayerTechnologyActionCommand.Start(player, TechnologyIds.IndustrialStandardization,
+            coreEntity, coreEntity, scenario.Simulation.CurrentTick, scenario.Services.TechnologyDefinitions);
+        scenario.Simulation.SubmitCommand(research, scenario.Simulation.CurrentTick.Next());
+        scenario.Simulation.AdvanceOneTick();
+        Assert.DoesNotContain(scenario.Progress.Capture(player, scenario.Simulation.CurrentTick), item => item.Kind == GameplayProgressKind.ResearchCompleted);
+        scenario.Simulation.RunTicks(120, TestContext.Current.CancellationToken);
+        var researchProof = Assert.Single(scenario.Progress.CaptureFirst(player, scenario.Simulation.CurrentTick), item => item.Kind == GameplayProgressKind.ResearchCompleted);
         var before = scenario.Progress.Capture(player, scenario.Simulation.CurrentTick);
         var extracted = Assert.Single(before, x => x.Kind == GameplayProgressKind.Extraction);
         scenario.Simulation.RunTicks(50, TestContext.Current.CancellationToken);
@@ -136,6 +144,13 @@ public sealed partial class PlayerConstructionProductionFlowTests
         Assert.Equal(extracted.Actor, recovered.Actor);
         Assert.True(recovered.Quantity > 0);
         Assert.Empty(restored.Progress.Capture(new PlayerId(2), restored.Simulation.CurrentTick));
+        Assert.Equal(researchProof with { SessionId = restored.Simulation.SessionId },
+            Assert.Single(restored.Progress.CaptureFirst(player, restored.Simulation.CurrentTick), item => item.Kind == GameplayProgressKind.ResearchCompleted));
+        using var playback = MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(
+            MatchPersistenceSerializer.SerializeReplay(MatchPersistenceService.CaptureReplay(scenario))));
+        Assert.Equal(MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256(), MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        Assert.Equal(researchProof with { SessionId = playback.Simulation.SessionId },
+            Assert.Single(playback.Progress.CaptureFirst(player, playback.Simulation.CurrentTick), item => item.Kind == GameplayProgressKind.ResearchCompleted));
     }
 
     private sealed class JourneyTelemetryObserver(GameplayTelemetryCollector meter) : ForgeLine.Simulation.ISimulationTickObserver
