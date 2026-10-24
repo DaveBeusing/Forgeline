@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Security.Cryptography;
 using ForgeLine.Game;
 using ForgeLine.Navigation;
 using ForgeLine.World;
@@ -20,11 +21,14 @@ internal static class Program
             CompilerOptions options =
                 CompilerOptions.Parse(args);
 
-            BattlefieldDefinition definition =
-                CentralDivideBattlefield.Create();
-            TerrainWorld terrain =
-                CentralDivideTerrainFactory.Create(
-                    definition);
+            BattlefieldMapArtifact artifact = BattlefieldMapArtifact.Capture(CentralDivideBattlefield.Create());
+            byte[] payload = artifact.Serialize();
+            BattlefieldMapArtifact loaded = BattlefieldMapArtifact.Deserialize(payload);
+            BattlefieldDefinition definition = loaded.ToDefinition();
+            loaded.ValidateMatches(CentralDivideBattlefield.Create());
+            if (Convert.ToHexStringLower(SHA256.HashData(payload)) != ScenarioRegistry.CentralDivideMapSha256)
+                throw new InvalidOperationException("Compiled map differs from the qualified runtime revision; qualify and register the updated artifact explicitly.");
+            TerrainWorld terrain = BattlefieldTerrainFactory.Create(definition, loaded.Terrain);
 
             var gridSettings =
                 new NavigationGridSettings
@@ -45,21 +49,10 @@ internal static class Program
                     gridSettings,
                     sectorSettings);
 
-            BattlefieldMapArtifact artifact =
-                BattlefieldMapArtifact.Capture(
-                    definition);
-            byte[] payload =
-                artifact.Serialize();
-
-            BattlefieldMapArtifact loaded =
-                BattlefieldMapArtifact.Deserialize(
-                    payload);
-            loaded.ValidateMatches(
-                definition);
-
             WriteBytes(
                 options.OutputPath,
                 payload);
+            File.WriteAllText(options.OutputPath + ".sha256", Convert.ToHexStringLower(SHA256.HashData(payload)) + "\n");
             WriteQualification(
                 options.QualificationOutputPath,
                 qualification);

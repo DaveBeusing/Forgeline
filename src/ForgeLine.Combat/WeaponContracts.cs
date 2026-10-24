@@ -144,6 +144,9 @@ public sealed class WeaponCatalog
 
     public int Count => _definitions.Count;
 
+    public IEnumerable<WeaponDefinition> Definitions =>
+        _definitions.OrderBy(static pair => pair.Key.Value).Select(static pair => pair.Value);
+
     public void Add(WeaponDefinition definition)
     {
         ArgumentNullException.ThrowIfNull(definition);

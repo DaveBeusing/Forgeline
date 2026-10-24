@@ -231,6 +231,13 @@ public sealed class ConveyorPersistenceTests
         using MatchRuntime playback = MatchPersistenceService.PlayReplay(replay, ResolveComposition);
         Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
         Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        foreach (var recovered in new[] { restored, playback })
+        {
+            Assert.NotEqual(original.Simulation.SessionId, recovered.Simulation.SessionId);
+            var expectedEvents = original.Progress.CaptureFirst(Player, original.Simulation.CurrentTick);
+            Assert.Equal(expectedEvents.Select(item => item with { SessionId = recovered.Simulation.SessionId }),
+                recovered.Progress.CaptureFirst(Player, recovered.Simulation.CurrentTick));
+        }
         foreach (ulong ticks in ContinuationTicks)
         {
             original.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);

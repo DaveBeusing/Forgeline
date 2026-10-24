@@ -98,6 +98,9 @@ public sealed class ArmorCatalog
 
     public int Count => _definitions.Count;
 
+    public IEnumerable<ArmorProfileDefinition> Definitions =>
+        _definitions.OrderBy(static pair => pair.Key.Value).Select(static pair => pair.Value);
+
     public void Add(ArmorProfileDefinition definition)
     {
         ArgumentNullException.ThrowIfNull(definition);

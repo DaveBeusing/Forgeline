@@ -142,6 +142,9 @@ public sealed class ArtilleryWeaponCatalog
 
     public int Count => _definitions.Count;
 
+    public IEnumerable<ArtilleryWeaponDefinition> Definitions =>
+        _definitions.OrderBy(static pair => pair.Key.Value).Select(static pair => pair.Value);
+
     public void Add(ArtilleryWeaponDefinition definition)
     {
         ArgumentNullException.ThrowIfNull(definition);

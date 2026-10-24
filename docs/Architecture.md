@@ -115,7 +115,7 @@ Simulation domains remain independently layered and are implemented progressivel
 - `ForgeLine.AssetCompiler`: production source-to-runtime asset compiler for static glTF/GLB meshes, PNG/TGA textures, material definitions, stable IDs, dependency validation, incremental rebuilds, and runtime manifest generation. See `docs/AssetPipeline.md`.
 - `ForgeLine.MapCompiler`: map compilation host.
 
-The Editor and Map Compiler remain foundation hosts. The Asset Compiler is an implemented tooling boundary and must not leak source-format parsing into runtime or simulation projects.
+The Editor remains a foundation host. The Map Compiler qualifies the same loaded map/terrain contract used by client and headless sessions. The Asset Compiler is an implemented tooling boundary and must not leak source-format parsing into runtime or simulation projects.
 
 ## Simulation Baseline
 
@@ -311,7 +311,7 @@ See `docs/CombatOrdersAndReadiness.md`. Directorate faction data, stable unit de
 
 ## Battlefield and Strategic Infrastructure Boundary
 
-The canonical `Central Divide` battlefield is game content, not a presentation script. `BattlefieldDefinition` owns stable map metadata, starts, finite resource locations, build/expansion sites, road topology, crossings, and Command Core objective positions. `CentralDivideTerrainFactory` produces the deterministic chunked `TerrainWorld`, and `BattlefieldRuntime` materializes finite deposits and the road corridor through the existing economy and logistics types.
+The canonical `Central Divide` battlefield is game content, not a presentation script. `BattlefieldDefinition` owns stable map metadata, starts, finite resource locations, build/expansion sites, road topology, crossings, and Command Core objective positions. `ScenarioRegistry` loads the qualified format-3 map and its versioned numeric terrain recipe; `BattlefieldTerrainFactory` produces the deterministic chunked `TerrainWorld`, and `BattlefieldRuntime` materializes finite deposits and the road corridor through the existing economy and logistics types.
 
 Strategic crossings use the generic `StrategicInfrastructure` / `StrategicInfrastructureState` lifecycle. `StrategicInfrastructureSystem` is simulation-authoritative: disabling a crossing disables its real logistics edge and publishes a new `NavigationWorld` with that crossing blocked. The new navigation version invalidates cached/stale paths through the existing navigation boundary. Restoration remains unavailable while its fixed-tick progress advances and only re-enables logistics and navigation on completion.
 
@@ -352,7 +352,7 @@ Minimize/pause, terminal freeze/acknowledgement, restart, shutdown, and owner fa
 
 ## World presentation asset boundary
 
-`ForgeLine.Game` owns stable world-presentation identities and canonical Central Divide placement data without reading asset files. `ForgeLine.Presentation` maps those identities to stable runtime asset IDs, derives resource presentation state, selects LODs, and caches compiled mesh buffers. `ForgeLine.Client` loads the generated `RuntimeAssetCatalog` and passes it to the render host.
+`ForgeLine.Game` loads qualified gameplay map/terrain data and owns stable world-presentation identities. Rendering asset lookup and binary loading belong to the presentation/client boundary. `ForgeLine.Presentation` maps those identities to stable runtime asset IDs, derives resource presentation state, selects LODs, and caches compiled mesh buffers. `ForgeLine.Client` loads the generated `RuntimeAssetCatalog` and passes it to the render host.
 
 This preserves the intended direction: source assets -> Asset Compiler -> runtime assets -> Presentation/Graphics. Simulation never loads source or runtime rendering assets.
 

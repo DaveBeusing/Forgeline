@@ -132,6 +132,18 @@ jobs:
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSaveCatalogReliabilityTests ForgeLine.Client.Tests.ClientSimulationHostTests ForgeLine.Client.Tests.ClientSessionLoadingRecoveryTests ForgeLine.Client.Tests.ClientSessionLoadingCoordinatorTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Gameplay progress and optional guidance contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.GameplayPacingProgressTests ForgeLine.Game.Tests.GameplayProgressJournalTests ForgeLine.Game.Tests.GameplayTelemetryTests ForgeLine.Game.Tests.PlayerConstructionProductionFlowTests ForgeLine.Game.Tests.ConveyorPersistenceTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.EarlyGameGuidanceTests ForgeLine.Presentation.Tests.GuidanceLessonTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GameplayGuidanceInteractionTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile gameplay --ticks 64 --seed 17 --telemetry-output artifacts/gameplay-observation-smoke.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Operations chain diagnosis and safe focus contracts
         shell: pwsh
         run: |
@@ -232,6 +244,15 @@ jobs:
 
       - name: Compile and qualify canonical map
         run: dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
+
+      - name: Compiled scenario loading and recovery contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.CompiledTerrainTests ForgeLine.Game.Tests.CompiledNavigationParityTests ForgeLine.Game.Tests.CompiledScenarioTests ForgeLine.Game.Tests.ScenarioPersistenceTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientScenarioSessionTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Test-CompiledScenarioLoading.ps1
 
       - name: Adaptive frontend geometry and interaction contracts
         shell: pwsh

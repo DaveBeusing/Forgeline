@@ -151,11 +151,12 @@ public sealed record GameplayTelemetrySnapshot(
     GameplayMatchResult MatchResult,
     IReadOnlyList<GameplayMetric> Metrics,
     IReadOnlyList<GameplayMilestone> Milestones,
-    GameplayTelemetryDebugSummary Debug);
+    GameplayTelemetryDebugSummary Debug,
+    IReadOnlyList<GameplayPacingMilestone>? Pacing = null);
 
-public sealed class GameplayTelemetryCollector
+public sealed partial class GameplayTelemetryCollector
 {
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
 
     private const string MatchOwner = "match";
     private readonly MatchRuntime _scenario;
@@ -244,6 +245,7 @@ public sealed class GameplayTelemetryCollector
         ObserveBuildings();
         ObserveSupplyShortage();
         ObserveObjectives();
+        ObservePacing();
     }
 
     public GameplayTelemetrySnapshot Capture()
@@ -309,7 +311,8 @@ public sealed class GameplayTelemetryCollector
             CaptureMatchResult(),
             metrics,
             milestones,
-            CaptureDebugSummary());
+            CaptureDebugSummary(),
+            CapturePacing());
     }
 
     private void CaptureInitialDeposits()
@@ -1013,7 +1016,8 @@ public sealed class GameplayTelemetryCollector
     private void RecordMilestone(
         string name,
         string owner,
-        string dimension)
+        string dimension,
+        ulong? observedAtTick = null)
     {
         var key =
             new MilestoneKey(
@@ -1032,7 +1036,7 @@ public sealed class GameplayTelemetryCollector
                 name,
                 owner,
                 dimension,
-                _scenario.Simulation.CurrentTick.Value));
+                observedAtTick ?? _scenario.Simulation.CurrentTick.Value));
     }
 
     private void AddResourceIncomeMetrics(

@@ -368,7 +368,7 @@ public sealed class MatchRuntime : IDisposable
         var technologyResearch =
             new TechnologyResearchSystem(
                 technologyDefinitions,
-                inventories);
+                inventories) { Progress = progress };
 
         SkirmishMatchInitialization initialization =
             SkirmishMatchInitializer.Initialize(
@@ -587,7 +587,7 @@ public sealed class MatchRuntime : IDisposable
             new MatchObjectiveSystem(
                 battlefieldRuntime.MatchStateEntity);
 
-        var conveyorFlow = new ConveyorSimulationSystem(inventories, automatedDistribution, recipes, unitDefinitions);
+        var conveyorFlow = new ConveyorSimulationSystem(inventories, automatedDistribution, recipes, unitDefinitions) { Progress = progress };
 
         ISimulationSystem[] systems =
         [

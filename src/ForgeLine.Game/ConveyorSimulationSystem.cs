@@ -29,6 +29,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
     public const double NominalThroughput = 100;
     // Transfer every positive remainder; never discard fractional cargo to an epsilon.
     private const double Epsilon = 0;
+    internal GameplayProgressJournal? Progress { get; set; }
     private readonly InventoryStore _stock;
     private readonly AutomatedDistributionSystem _distribution;
     private readonly ProductionRecipeCatalog _recipes;
@@ -180,6 +181,10 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                     quantity = Math.Min(quantity, Math.Min(available[sender.Inventory][resource], Room(receiver, id)));
                     quantity = Math.Min(quantity, _stock.GetAddableQuantity(receiver.Inventory, id, quantity));
                     if (quantity <= Epsilon || !_stock.Transfer(sender.Inventory, receiver.Inventory, id, quantity).Succeeded) continue;
+                    if (receiver.Port is { Input: true } &&
+                        entities.TryGetComponent(receiver.Entity, out CompletedBuilding deliveredBuilding))
+                        Progress?.Record(context.Tick, receiver.Owner, GameplayProgressKind.ConveyorDelivered,
+                            sender.Entity, sender.Entity, receiver.Entity, context.Tick.Value, id, quantity, deliveredBuilding.BuildingId.Value);
                     link.Transferred += quantity;
                     available[sender.Inventory][resource] -= quantity;
                     sender.OutRemaining -= quantity; sender.Sent += quantity;

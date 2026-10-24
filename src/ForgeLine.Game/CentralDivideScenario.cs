@@ -21,7 +21,9 @@ public static class CentralDivideScenario
 
     public const string CompositionKey = "central-divide.directorate.v1";
 
-    public static MatchComposition CreateComposition()
+    public static MatchComposition CreateComposition() => ScenarioRegistry.Default.Resolve(CompositionKey);
+
+    public static MatchContent CreateContent()
     {
         var content = new MatchContent(
             InitialResourceDefinitions.CreateCatalog(),
@@ -36,12 +38,7 @@ public static class CentralDivideScenario
             DirectorateContent.CreateFactionDefinition(), content.Resources,
             content.Buildings, content.Units, content.Recipes,
             content.Weapons, content.Armor, content.Artillery);
-        return new MatchComposition(
-            CompositionKey, CentralDivideBattlefield.Create(), content,
-            static map => CentralDivideTerrainFactory.Create(map),
-            static (entities, inventories, factory, terrain, start, catalogs, stock) =>
-                CentralDivideStartingBaseFactory.Create(entities, inventories, factory, terrain, start, stock, catalogs.Units, catalogs.Buildings),
-            static systems => systems);
+        return content;
     }
 
     public static MatchRuntime Create(
@@ -107,10 +104,11 @@ public static class CentralDivideScenario
         MatchScenarioProfile profile,
         ulong seed = 17,
         bool enableDiagnostics = false,
-        bool enableDebugCapture = false) =>
+        bool enableDebugCapture = false,
+        MatchComposition? composition = null) =>
         new()
         {
-            Composition = CreateComposition(),
+            Composition = composition ?? CreateComposition(),
             Scenario =
                 CreateSettings(profile),
             Seed = seed,
@@ -128,10 +126,11 @@ public static class CentralDivideScenario
     public static MatchRuntimeSettings CreateClient(
         JobScheduler scheduler,
         ulong seed = 17,
-        bool enableDiagnostics = true) =>
+        bool enableDiagnostics = true,
+        MatchComposition? composition = null) =>
         new()
         {
-            Composition = CreateComposition(),
+            Composition = composition ?? CreateComposition(),
             Scenario =
                 CreateSettings(
                     MatchScenarioProfile.Gameplay),

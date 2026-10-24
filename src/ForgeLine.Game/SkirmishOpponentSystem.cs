@@ -3223,6 +3223,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SkirmishOpponentConfiguration configuration)
     {
         bool powerRecoveryRequired = RequiresPowerConstruction(owned);
+        bool electronicsRecoveryReady = !powerRecoveryRequired;
+        foreach (BuildingId building in IndustrialPlan)
+            if (GetBuildingCount(owned, building) == 0)
+            {
+                electronicsRecoveryReady = false;
+                break;
+            }
         bool fuelProductionRecoveryRequired =
             !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage coreStorage) ||
             _inventories.GetAvailableQuantity(coreStorage.InventoryId, ResourceIds.Fuel) < 360;
@@ -3386,7 +3393,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     80.0,
                     220.0,
                     450.0,
-                    facility.Status == ProductionStatus.NoInput
+                    electronicsRecoveryReady && facility.Status == ProductionStatus.NoInput
                         ? LogisticsStockPriority.Critical
                         : LogisticsStockPriority.High);
             }

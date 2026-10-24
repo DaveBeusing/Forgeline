@@ -546,6 +546,7 @@ public static class MatchPersistenceService
         ValidateSchema(
             save.SchemaVersion);
         MatchPersistenceValidation.Configuration(save.Configuration);
+        ValidateScenarioIdentity(save.SchemaVersion, save.Configuration);
         MatchPersistenceValidation.Commands(save.Commands);
         MatchPersistenceValidation.Require(save.State is not null, "Missing authoritative checkpoint.");
 
@@ -599,6 +600,7 @@ public static class MatchPersistenceService
             throw Failure(MatchPersistenceFailureReason.IncompatibleVersion,
                 $"Replay state schema {replay.AuthoritativeSchemaVersion} is incompatible with state schema {MatchAuthoritativeSnapshot.CurrentSchemaVersion}.");
         MatchPersistenceValidation.Configuration(replay.Configuration);
+        ValidateScenarioIdentity(replay.SchemaVersion, replay.Configuration);
         MatchPersistenceValidation.Commands(replay.Commands);
         MatchPersistenceValidation.Lifecycle(replay.FinalMatchState);
 
@@ -612,6 +614,12 @@ public static class MatchPersistenceService
                 MatchPersistenceFailureReason.CorruptDocument,
                 "Replay final-state checksum is missing.");
         }
+    }
+
+    private static void ValidateScenarioIdentity(int schema, PersistedMatchConfiguration configuration)
+    {
+        if (schema >= 7 && configuration.CompositionKey == CentralDivideScenario.CompositionKey && configuration.Identity is null)
+            throw Failure(MatchPersistenceFailureReason.IncompatibleVersion, "This payload requires a complete scenario identity.");
     }
 
     private static void ValidateSchema(

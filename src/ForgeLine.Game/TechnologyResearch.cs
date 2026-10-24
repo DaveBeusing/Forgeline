@@ -344,6 +344,7 @@ public static class TechnologyResearchPolicy
 
 public sealed class TechnologyResearchSystem : ISimulationSystem
 {
+    internal GameplayProgressJournal? Progress { get; set; }
     private readonly TechnologyDefinitionCatalog _catalog;
     private readonly InventoryStore _inventories;
     private readonly List<EntityId> _requests = [];
@@ -495,6 +496,9 @@ public sealed class TechnologyResearchSystem : ISimulationSystem
                     requestEntity,
                     request.Player,
                     definition);
+                Progress?.Record(context.Tick, request.Player, GameplayProgressKind.ResearchCompleted,
+                    request.Facility, request.Facility, request.Facility, requestEntity.Index,
+                    default, 1, definition.Id.Value);
                 continue;
             }
 
