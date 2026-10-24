@@ -157,46 +157,43 @@ A successful report includes:
 
 Qualification fails with actionable diagnostics when a critical location is unreachable, a crossing becomes a single point of failure, expansion pressure disappears, explicit buildability is inconsistent, or terrain loses meaningful elevation.
 
-## Compiled Map Artifact
+## Compiled Map Artifact and Registration
 
-`BattlefieldMapArtifact` defines version 1 of the compiled Vertical Slice map artifact.
+BattlefieldMapArtifact format **3** carries map revision, copied placement/topology data, TerrainVisual, authoritative terrain recipe version **1**, Directorate catalog digest and explicit starting-base/objective rule IDs. Formats 1 and 2 omit authoritative geometry and are rejected. ToDefinition copies every collection and material array; edits to the source artifact cannot mutate the reconstructed definition.
 
-The artifact contains copied, immutable map data for:
+ScenarioRegistry explicitly registers only Central Divide. The composition key remains `central-divide.directorate.v1`, the map key remains `prototype.vertical_slice`, and the default remains Central Divide. The descriptor binds the map key/revision, SHA-256 of the complete deterministic JSON, terrain version, Directorate content key/digest and rule IDs. The content digest serializes the eight actual catalogs in stable ID order, including technology definitions, costs, weapons and armor. Changing content requires a newly qualified map revision and explicit compatibility handling.
 
-- metadata;
-- starts;
-- resources;
-- world presentation objects;
-- strategic sites;
-- road nodes and edges;
-- crossings;
-- objectives;
-- static navigation obstacles.
+The reviewed runtime input is `assets/maps/runtime/central-divide.flmap.json` with its `.sha256` sidecar. Game project content items copy exactly these files to `maps/` beside client/headless executables, test assemblies and published binaries. The runtime resolves from AppContext.BaseDirectory, independently of the working directory. Both the sidecar and bytes must match the registered digest. Missing or changed content fails explicitly; productive composition never falls back to CentralDivideBattlefield.Create or CentralDivideTerrainFactory. Those remain authoring/test conveniences.
 
-The artifact is serialized as deterministic JSON-compatible data and is immediately loaded and validated again by the compiler. This provides a real compile/load contract without moving gameplay authority into tooling.
+External input is capped at 4 MiB, depth 24, 500,000 tokens, 2,048 UTF-8 bytes per string and 16,384 elements per array before materialization. Typed limits further restrict starts/objectives to 16, resources to 4,096, sites to 256, road nodes to 2,048, road edges to 8,192, crossings to 128 and obstacles to 4,096. Validation checks finite coordinates, areas, resource extents, unique keys/owners, references, one objective per start and supported content/rules. Map dimensions are at most 8,192 m per axis. Registered relative paths must remain beneath the content root; symbolic links and reparse points within that path are rejected.
 
-The current gameplay runtime continues to use the canonical in-code definition as its source while the compiled artifact establishes the stable handoff needed for later editor-authored map data.
+## Authoritative Terrain Recipe
+
+Version 1 fixes the floating-point evaluation order for three broad waves (X sine, Z cosine, diagonal sine), a Gaussian ridge attenuated by the maximum of two pass profiles, and three Gaussian surface features. All frequencies, amplitudes, centres, widths and grid settings are serialized. This is a bounded numeric data contract; it cannot name code, types or scripts. Unknown recipe versions fail before terrain allocation. Sample density is at most 129 per chunk side and total height samples are capped at 4,000,000; dimensions must exactly cover whole chunks.
+
+Central Divide retains 256 m chunks and 65 samples per side. CompiledTerrainTests compares all **608,400** height samples with a fingerprint captured from master cb58c3ad before replacing the evaluator:
+
+`d9ff8d68132b7c8a48936cf751552044ca6befe8b4359b1dd0b736de2bc67a33`
+
+CompiledNavigationParityTests freezes every navigation cell at 16 m and 32 m resolution, both with normal crossings and with either crossing individually disabled. Each fingerprint includes height, slope, terrain/blocker flags, traversability and traversal cost for Infantry, Wheeled and Tracked. Those six fingerprints were captured from the unchanged pre-transfer master.
+
+CompiledScenarioTests also freezes the validation-profile seed-2026 authoritative hashes at ticks 0 and 20, compares all authored placement/topology data, and runs the full loaded-map operational geography qualification (71 reachability checks, two alternate-navigation and two alternate-road checks). A separately registered test fixture changes a finite resource quantity and observes that exact value on the real ResourceDeposit entity. It is not a second productive map.
 
 ## Map Compiler
-
-Run:
 
 ```powershell
 dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
 ```
 
-The compiler:
+The compiler captures authoring data, serializes and reloads it, reconstructs the definition and generates terrain through the shared BattlefieldTerrainFactory. It qualifies the loaded definition/recipe, verifies authoring equality and the registered runtime digest, then writes JSON, its SHA-256 sidecar and the qualification report. A differing authored map fails until its qualified runtime data and registration are deliberately updated together. Compiler and runtime therefore qualify the same reconstructed data.
 
-1. loads the canonical Central Divide definition;
-2. creates the authoritative terrain;
-3. runs operational-geography qualification;
-4. captures a versioned map artifact;
-5. serializes the artifact;
-6. reloads it;
-7. verifies it still matches the canonical definition;
-8. writes the compiled map and qualification report.
+## Setup, CLI and Packaging
 
-A failure returns a non-zero process exit code.
+The existing New Game setup displays registered scenario names. Up/Down selects a scenario; clicking the battlefield row advances selection. Left/Right continues to adjust the seed. Unavailable/invalid content disables Start with an error, and choices are refreshed when entering setup. Selecting a choice never mutates a live session.
+
+Headless accepts `--scenario central-divide`, its existing `vertical-slice` alias, and the stable `central-divide.directorate.v1` key. `--scenario-root <path>` overrides the compiled-map root for registered data; integrity and content checks remain mandatory. The same resolver is passed through new match creation, save restoration and replay. Client new/owned/load/restart paths preserve selected identity; a match restart retains seed and participants and reloads/verifies the registered revision with fresh scheduler ownership.
+
+Publish-PreAlpha qualifies the map through MapCompiler before export. Validate-ScenarioPackage requires exactly the two registered map files and runs `dotnet ForgeLine.Client.dll --validate-scenarios` from the exported folder. That installed-client entry point constructs the real runtime and validates save/replay reconstruction using deployed files only, without source files or the compiler. The package provenance includes its map digest. See [save compatibility](SaveLoadReplayAndRecovery.md) for payload identity rules.
 
 ## CI
 

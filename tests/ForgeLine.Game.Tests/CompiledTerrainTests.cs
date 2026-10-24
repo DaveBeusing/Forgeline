@@ -29,6 +29,38 @@ public sealed class CompiledTerrainTests
     }
 
     [Fact]
+    public void LoadedRecipeParametersControlAuthoritativeHeights()
+    {
+        var artifact = BattlefieldMapArtifact.Deserialize(BattlefieldMapArtifact.Capture(CentralDivideBattlefield.Create()).Serialize());
+        var definition = artifact.ToDefinition();
+        var original = BattlefieldTerrainFactory.Create(definition, artifact.Terrain);
+        var changed = BattlefieldTerrainFactory.Create(definition, artifact.Terrain with { RidgeAmplitude = 0 });
+        Assert.True(original.TrySampleHeight(1536, 1536, out float before));
+        Assert.True(changed.TrySampleHeight(1536, 1536, out float after));
+        Assert.True(before - after > 50);
+    }
+
+    [Fact]
+    public void InputBudgetsAndInvalidOwnersAreRejected()
+    {
+        string oversized = "{\"starts\":[" + string.Join(",", Enumerable.Repeat("{}", 16_385)) + "]}";
+        var error = Assert.Throws<InvalidOperationException>(() => BattlefieldMapArtifact.Deserialize(System.Text.Encoding.UTF8.GetBytes(oversized)));
+        Assert.Contains("collection budget", error.Message);
+        string longKey = "{\"metadata\":{\"key\":\"" + new string('x', 2049) + "\"}}";
+        Assert.Throws<InvalidOperationException>(() => BattlefieldMapArtifact.Deserialize(System.Text.Encoding.UTF8.GetBytes(longKey)));
+        var map = BattlefieldMapArtifact.Capture(CentralDivideBattlefield.Create());
+        var objectives = map.Objectives.ToArray();
+        objectives[1] = objectives[1] with { Owner = objectives[0].Owner };
+        Assert.Throws<InvalidOperationException>(() => (map with { Objectives = objectives }).ToDefinition());
+        var starts = map.Starts.ToArray();
+        starts[0] = starts[0] with { BuildArea = new AxisAlignedBounds(new Vector3(-1, 0, 0), new Vector3(500, 0, 500)) };
+        Assert.Throws<InvalidOperationException>(() => (map with { Starts = starts }).ToDefinition());
+        var resources = map.Resources.ToArray();
+        resources[0] = resources[0] with { HalfExtents = new Vector3(float.PositiveInfinity) };
+        Assert.Throws<InvalidOperationException>(() => (map with { Resources = resources }).ToDefinition());
+    }
+
+    [Fact]
     public void DefinitionCopiesArtifactCollections()
     {
         var artifact = BattlefieldMapArtifact.Capture(CentralDivideBattlefield.Create());

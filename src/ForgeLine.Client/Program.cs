@@ -12,6 +12,8 @@ internal static class Program
     public static int Main(string[] args)
     {
         long processEntryTimestamp = Stopwatch.GetTimestamp();
+        if (args.Length == 1 && args[0] == "--validate-scenarios")
+            return ValidateScenarios();
         if (args.Length == 3 && args[0] == "--action-ring-capture")
             return ObjectActionRingRuntimeCapture.Run(args[1],args[2]);
         if (args.Length == 3 && args[0] == "--onboarding-lessons-capture")
@@ -40,6 +42,9 @@ internal static class Program
             return RunReferenceCapture(args[1]);
         return ClientBootstrap.Run(args, processEntryTimestamp);
     }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int ValidateScenarios() => ScenarioPackageValidation.Run();
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunDockCapture(string output, string runtimeRoot, bool referenceOnly) => CommandDockCapture.Run(output, runtimeRoot, referenceOnly);
@@ -198,5 +203,6 @@ internal static class Program
             "[--startup-diagnostics-output <report.json>] [--startup-menu-smoke-test] " +
             "[--reference-zoom <CloseTactical|NormalGameplay|Strategic>]");
         writer.WriteLine("Standalone native evidence: ForgeLine.Client --reference-capture-request <request.json>");
+        writer.WriteLine("Scenario integrity and recovery: ForgeLine.Client --validate-scenarios");
     }
 }

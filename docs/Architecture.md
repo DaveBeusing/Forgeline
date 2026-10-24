@@ -115,7 +115,7 @@ Simulation domains remain independently layered and are implemented progressivel
 - `ForgeLine.AssetCompiler`: production source-to-runtime asset compiler for static glTF/GLB meshes, PNG/TGA textures, material definitions, stable IDs, dependency validation, incremental rebuilds, and runtime manifest generation. See `docs/AssetPipeline.md`.
 - `ForgeLine.MapCompiler`: map compilation host.
 
-The Editor and Map Compiler remain foundation hosts. The Asset Compiler is an implemented tooling boundary and must not leak source-format parsing into runtime or simulation projects.
+The Editor remains a foundation host. The Map Compiler qualifies the same loaded map/terrain contract used by client and headless sessions. The Asset Compiler is an implemented tooling boundary and must not leak source-format parsing into runtime or simulation projects.
 
 ## Simulation Baseline
 
@@ -311,7 +311,7 @@ See `docs/CombatOrdersAndReadiness.md`. Directorate faction data, stable unit de
 
 ## Battlefield and Strategic Infrastructure Boundary
 
-The canonical `Central Divide` battlefield is game content, not a presentation script. `BattlefieldDefinition` owns stable map metadata, starts, finite resource locations, build/expansion sites, road topology, crossings, and Command Core objective positions. `CentralDivideTerrainFactory` produces the deterministic chunked `TerrainWorld`, and `BattlefieldRuntime` materializes finite deposits and the road corridor through the existing economy and logistics types.
+The canonical `Central Divide` battlefield is game content, not a presentation script. `BattlefieldDefinition` owns stable map metadata, starts, finite resource locations, build/expansion sites, road topology, crossings, and Command Core objective positions. `ScenarioRegistry` loads the qualified format-3 map and its versioned numeric terrain recipe; `BattlefieldTerrainFactory` produces the deterministic chunked `TerrainWorld`, and `BattlefieldRuntime` materializes finite deposits and the road corridor through the existing economy and logistics types.
 
 Strategic crossings use the generic `StrategicInfrastructure` / `StrategicInfrastructureState` lifecycle. `StrategicInfrastructureSystem` is simulation-authoritative: disabling a crossing disables its real logistics edge and publishes a new `NavigationWorld` with that crossing blocked. The new navigation version invalidates cached/stale paths through the existing navigation boundary. Restoration remains unavailable while its fixed-tick progress advances and only re-enables logistics and navigation on completion.
 

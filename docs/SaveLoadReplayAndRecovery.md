@@ -23,6 +23,14 @@ The Windows client runs construction/restoration on a dedicated session-loading 
 
 This model preserves stable entity identifiers and internal subsystem state through deterministic reconstruction while retaining a serialized authoritative checkpoint for corruption and compatibility diagnostics.
 
+## Compiled Scenario Compatibility
+
+Payload 7 captures map key, revision and complete artifact SHA-256, terrain recipe version, Directorate content key/catalog digest and starting-base/objective rule IDs. Restoration compares these with the resolved composition before allocating its terrain or runtime. Changed map/content/rules are IncompatibleVersion failures; no hash is rewritten to accept different geography. New canonical payloads without that identity are rejected.
+
+Payloads 1–6 with current authoritative schema 7 may resolve the existing central-divide.directorate.v1 key only to the explicit frozen historical Central Divide identity. Full terrain/placement and tick-0/tick-20 parity against master cb58c3ad establish that compatibility. The historical target is separate from the current registration: a future map/catalog change cannot silently redefine legacy recovery. Earlier authoritative schemas remain incompatible. Existing custom in-process compositions retain their explicit host resolver; keys and any supplied identity must match, then full checkpoint/replay verification remains mandatory.
+
+ClientSessionFactory passes the resolver through owned asynchronous loading and NewGame as well as Load. Restart requests carry the current identity, seed and participants and re-resolve before constructing a fresh session. Headless uses the selected registry for new/load/replay, including --scenario-root. See [compiled maps](StrategicMapAndOperationalGeography.md).
+
 ## File Format
 
 `MatchPersistenceSerializer` owns format version 1.
@@ -49,11 +57,11 @@ The three version boundaries have separate responsibilities:
 | Save/replay payload | 6 | Configuration, recorded command history, and checkpoint/replay metadata |
 | Authoritative simulation state | 7 | Deterministic reconstruction and checkpoint comparison |
 
-New captures use payload schema 6 and authoritative schema 7. The reader accepts supported payload schemas 1 through 6, but discovery, loading and replaying also require authoritative schema 7. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
+New captures use payload schema 7 and authoritative schema 7. The reader accepts supported payload schemas 1 through 7, but discovery, loading and replaying also require authoritative schema 7. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
 
 Authoritative schema 7 retains the completed-building combat contract, power-gated radar observations, and building destruction's economic, logistics, and navigation cleanup. It adds bounded raid intent, stable member/contact identities, the contact cursor and tactical delegation policy. These rules change reconstructed entities and simulation outcomes. Saves carrying authoritative state schema 6 and replays declaring `AuthoritativeSchemaVersion = 6` therefore fail with `IncompatibleVersion` before runtime reconstruction, even when their document and checkpoint checksums are valid. Earlier incompatible state schemas remain rejected as well.
 
-This simulation-contract change adds no payload fields or command kinds, so the payload remains at schema 6 and the envelope remains at format 1. No migration rewrites historical checkpoint hashes or treats former combat/radar behavior as current behavior.
+The raid simulation-contract change introduced no payload fields. Compiled scenario loading subsequently adds ScenarioIdentity to configuration and raises the payload to 7; the envelope remains format 1 and authoritative state remains schema 7. No migration rewrites historical checkpoint hashes or treats former combat/radar behavior as current behavior.
 
 ## Save Payload
 
