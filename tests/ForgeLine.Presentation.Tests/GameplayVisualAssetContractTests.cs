@@ -18,7 +18,7 @@ public sealed class GameplayVisualAssetContractTests
         Assert.Equal(type, requirements[missing]);
         WithCatalog(requirements.Where(x => x.Key != missing).Select(Record), catalog =>
         {
-            var error = Assert.Throws<InvalidDataException>(() => GameplayVisualAssetContract.Validate(catalog));
+            var error = Assert.Throws<InvalidDataException>(() => GameplayVisualAssetContract.Validate(catalog, TestContext.Current.CancellationToken));
             Assert.Contains(missing, error.Message);
             Assert.Contains("Start-DevelopmentClient.ps1", error.Message);
         });
@@ -31,7 +31,7 @@ public sealed class GameplayVisualAssetContractTests
         WithCatalog(GameplayVisualAssetContract.RequiredAssets().Select(pair =>
             Record(pair.Key == id ? new(pair.Key, RuntimeAssetType.Mesh) : pair)), catalog =>
             Assert.Contains("expected Material, found Mesh",
-                Assert.Throws<InvalidDataException>(() => GameplayVisualAssetContract.Validate(catalog)).Message));
+                Assert.Throws<InvalidDataException>(() => GameplayVisualAssetContract.Validate(catalog, TestContext.Current.CancellationToken)).Message));
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public sealed class GameplayVisualAssetContractTests
     {
         WithCatalog(GameplayVisualAssetContract.RequiredAssets().Select(Record), catalog =>
         {
-            GameplayVisualAssetContract.Validate(catalog);
+            GameplayVisualAssetContract.Validate(catalog, TestContext.Current.CancellationToken);
             Assert.Throws<OperationCanceledException>(() =>
                 GameplayVisualAssetContract.Validate(catalog, new CancellationToken(true)));
         });
