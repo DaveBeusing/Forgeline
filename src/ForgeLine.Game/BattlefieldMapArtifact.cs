@@ -181,7 +181,9 @@ public sealed record BattlefieldMapArtifact(
                 IncludeFields = true,
                 PropertyNamingPolicy =
                     JsonNamingPolicy.CamelCase,
-                WriteIndented = true
+                WriteIndented = true,
+                // Preserve the existing qualified byte format across compiler platforms.
+                NewLine = "\r\n"
             };
         options.Converters.Add(
             new AxisAlignedBoundsConverter());
