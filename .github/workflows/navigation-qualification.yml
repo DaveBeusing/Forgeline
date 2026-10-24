@@ -1,0 +1,56 @@
+name: Logistics navigation qualification
+
+on:
+  push:
+    branches: [fix/logistics-navigation-resilience]
+    paths: ['.github/workflows/navigation-qualification.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-checkpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*.props
+            /*.json
+            /*.sln
+            /.editorconfig
+            /.github/workflows/*.yml
+            /src/**/*.cs
+            /src/**/*.csproj
+            /src/**/*.json
+            /tests/**/*.cs
+            /tests/**/*.csproj
+            /tests/**/*.json
+            /build/*.ps1
+            /build/*.py
+            /tools/ForgeLine.MapCompiler/
+            /tools/ForgeLine.AssetCompiler/
+            /docs/**/*.md
+      - name: Preserve tracked code and navigation context
+        shell: python
+        run: |
+          import pathlib, subprocess, zipfile
+          root = pathlib.Path.cwd()
+          output = root / 'artifacts/navigation'
+          output.mkdir(parents=True, exist_ok=True)
+          paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
+          with zipfile.ZipFile(output / 'source.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+              for name in paths:
+                  path = root / name
+                  if name and path.is_file() and path.suffix in {'.cs', '.csproj', '.props', '.json', '.sln', '.md', '.ps1', '.psm1', '.py', '.yml'} and path.stat().st_size < 1000000:
+                      archive.write(path, name)
+              archive.writestr('SOURCE_COMMIT.txt', subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode())
+      - uses: actions/upload-artifact@v4
+        with:
+          name: navigation-source-${{ github.sha }}
+          path: artifacts/navigation/
+          retention-days: 7
