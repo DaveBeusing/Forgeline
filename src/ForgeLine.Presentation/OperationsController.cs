@@ -7,7 +7,11 @@ using ForgeLine.Simulation;
 namespace ForgeLine.Presentation;
 
 public readonly record struct OperationsView(bool Open, OperationsCategory Filter = OperationsCategory.All,
-    int Page = 0, EntityId Selected = default, SimulationSessionId Session = default, bool Suppressed = false, bool Notifications = false);
+    int Page = 0, EntityId Selected = default, SimulationSessionId Session = default, bool Suppressed = false, bool Notifications = false)
+{
+    public OperationsRulePanelView? RuleControls { get; init; }
+    public bool RuleEntryFocused { get; init; }
+}
 public readonly record struct OperationsInteraction(bool Captured, EntityId Navigate = default,
     PlayerActionPanelMode Controls = PlayerActionPanelMode.Closed);
 
@@ -38,7 +42,8 @@ public static class OperationsLayout
             2 => new(p.X + 222 * x, p.Y + 120 * s, 222 * x, 22 * s),
             >= 3 and <= 8 => new(p.X + 6 * x, p.Y + (146 + (index - 3) * 22) * s, 438 * x, 22 * s),
             9 => new(p.X + 6 * x, p.Y + 346 * s, 210 * x, 22 * s),
-            11 => new(p.X + 6 * x, p.Y + 316 * s, 438 * x, 22 * s),
+            11 => new(p.X + 6 * x, p.Y + 316 * s, 210 * x, 22 * s),
+            13 => new(p.X + 222 * x, p.Y + 316 * s, 222 * x, 22 * s),
             _ => new(p.X + 222 * x, p.Y + 346 * s, 222 * x, 22 * s)
         };
     }
@@ -79,9 +84,21 @@ public static class OperationsLayout
     }
 }
 
-/// <summary>Nonmodal navigation and existing action-dock entry; never submits economic commands.</summary>
+/// <summary>Nonmodal navigation, existing action entry and local rule requests; no live simulation mutation.</summary>
 public sealed class OperationsController
 {
+    private readonly GameplayBindingRegistry _bindings;
+    private readonly OperationsRulePanelController _rules;
+    private readonly ulong[] _keys = new ulong[Enum.GetValues<PlatformKey>().Length];
+    private int _overviewFocus = 13;
+    public OperationsController(GameplayBindingRegistry? bindings = null, TimeProvider? timeProvider = null)
+    { _bindings = bindings ?? GameplayBindingRegistry.Default; _rules = new(_bindings, timeProvider: timeProvider); }
+    public bool HasKeyboardFocus => View.Open && !View.Suppressed && !View.Notifications;
+    public bool TryTakeRuleRequest(out PlayerActionRequest request) => _rules.TryTakeRequest(out request);
+    public void ExpectRuleSubmission(ulong sequence) => _rules.ExpectSubmission(sequence);
+    public void RuleSubmissionFailed() => _rules.SubmissionFailed();
+    public void ObserveRuleSubmission(ulong sequence, PlayerCommandSubmissionReceipt? receipt) => _rules.ObserveSubmission(sequence, receipt);
+    public void ObserveRuleResult(in PlayerCommandResultReadModel result) => _rules.ObserveResult(result);
     private ulong _press;
     private bool _armed;
     private ulong _armedPress;
@@ -97,23 +114,25 @@ public sealed class OperationsController
     private bool _consumeLeftGesture;
     public OperationsView View { get; private set; }
     public void OpenCategory(OperationsCategory category, SimulationSessionId session, PresentationInteractionState interaction)
-    { _armed = false; View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
+    { _armed = false; _rules.Close(); View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
     public bool ContainsSurface(System.Numerics.Vector2 point, in GameplayHudLayout layout) =>
         View.Open && !View.Suppressed && OperationsLayout.Panel(layout).Contains(point);
     public void Close(InputState input, PresentationInteractionState interaction)
     {
-        View = default; _lastRouteFocus = default;
+        _rules.Close(); View = default; _lastRouteFocus = default;
         CancelInput(input); interaction.SetOperationsOpen(false);
     }
     public void OpenNotifications(SimulationSessionId session, PresentationInteractionState interaction)
-    { _armed = false; View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
+    { _armed = false; _rules.Close(); View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
     public void CancelInput(InputState input)
     {
+        _rules.CancelInput(input);
+        SynchronizeKeys(input);
         _consumeLeftGesture |= _armed && input.IsMouseButtonDown(PlatformMouseButton.Left);
         _press = input.MousePressSequence(PlatformMouseButton.Left); _armed = false;
     }
     public OperationsInteraction Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
-        PresentationInteractionState interaction, bool blocked = false, bool inputCaptured = false)
+        PresentationInteractionState interaction, bool blocked = false, bool inputCaptured = false, SelectionSet? selection = null)
     {
         ulong press = input.MousePressSequence(PlatformMouseButton.Left);
         bool fresh = press != _press; _press = press;
@@ -132,25 +151,48 @@ public sealed class OperationsController
         _initialized = true; _layout = layout; _session = snapshot?.SessionId ?? default;
         if (newSession || snapshot?.PlayerExperience?.IsMatchComplete == true)
         {
-            View = default; _lastRouteFocus = default; _armed = false;
+            _rules.Close(); View = default; _lastRouteFocus = default; _armed = false;
             interaction.SetOperationsOpen(false);
         }
         View = View with { Suppressed = blocked || input.FocusLostThisFrame };
         if (View.Suppressed)
         {
             _armed = false;
+            if (View.RuleControls.HasValue)
+            { _rules.Update(input, snapshot, layout, true, selection); View = View with { RuleControls = _rules.View }; }
+            SynchronizeKeys(input);
             interaction.SetOperationsOpen(false);
             return new(consumedGesture);
         }
         interaction.SetOperationsOpen(View.Open);
         var panel = OperationsLayout.Panel(layout);
         bool captured = consumedGesture || input.HasPointerPosition && View.Open && panel.Contains(input.PointerPosition);
+        if (View.Open && View.RuleControls.HasValue)
+        {
+            _armed = false;
+            _rules.Update(input, snapshot, layout, inputCaptured || transition || snapshot?.PlayerExperience is null, selection);
+            View = View with { RuleControls = _rules.View.Open ? _rules.View : null };
+            return new(captured || input.HasPointerPosition && panel.Contains(input.PointerPosition));
+        }
         if (inputCaptured || transition || snapshot?.PlayerExperience is null ||
             !snapshot.SessionId.IsSpecified || snapshot.PlayerExperience.Value.IsMatchComplete)
         {
             _armed = false;
+            SynchronizeKeys(input);
             return new(captured);
         }
+        if (View.Open && !View.Notifications && !panel.IsEmpty)
+        {
+            if (Pressed(input, GameplayAction.NextItem)) _overviewFocus = _overviewFocus == 13 ? 0 : 13;
+            View = View with { RuleEntryFocused = _overviewFocus == 13 };
+            if (Pressed(input, GameplayAction.Activate))
+            {
+                if (_overviewFocus == 0) Close(input, interaction);
+                else OpenRules(input, snapshot, layout, selection);
+                return new(true);
+            }
+        }
+        else SynchronizeKeys(input);
 
         if (fresh && input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin))
         {
@@ -214,6 +256,8 @@ public sealed class OperationsController
         if (OperationsLayout.Control(layout, 12).Contains(origin) &&
             OperationsLayout.Control(layout, 12).Contains(release))
         { View = View with { Notifications = true, Page = 0 }; return new(true); }
+        if (OperationsLayout.Control(layout, 13).Contains(origin) && OperationsLayout.Control(layout, 13).Contains(release))
+        { OpenRules(input, snapshot, layout, selection); return new(true); }
         if (OperationsSnapshot.Resolve(snapshot) is not { } data) return new(true);
         for (int index = 1; index <= 11; index++)
         {
@@ -276,4 +320,22 @@ public sealed class OperationsController
                     ? queue.Building : facility.Entity;
         return default;
     }
+    private void OpenRules(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, SelectionSet? selection)
+    {
+        _armed = false;
+        _rules.Open();
+        _rules.Update(input, snapshot, layout, true, selection);
+        View = View with { RuleControls = _rules.View, Selected = _rules.View.Data?.Facility ?? default };
+    }
+    private bool Pressed(InputState input, GameplayAction action)
+    {
+        PlatformKey key = _bindings.Key(action);
+        ulong sequence = input.KeyPressSequence(key);
+        bool pressed = sequence != _keys[(int)key] && input.IsKeyDown(key);
+        _keys[(int)key] = sequence;
+        return pressed;
+    }
+    private void SynchronizeKeys(InputState input)
+    { for (int i = 0; i < _keys.Length; i++) _keys[i] = input.KeyPressSequence((PlatformKey)i); }
+
 }

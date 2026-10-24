@@ -193,6 +193,68 @@ public sealed class OperationsRuleTests
         Assert.Equal(command.ExpectedRevision, decoded.ExpectedRevision);
     }
 
+    [Fact]
+    public void RuleActionRequestsUseConfiguredGatewayOwnerAndConcreteRevision()
+    {
+        using MatchRuntime scenario = CreateScenario();
+        var gateway = Gateway(scenario);
+        EntityId facility = AddProcessingFacility(scenario, out _, out _);
+        var definition = InputRule(facility) with { Minimum = 0, Owner = new PlayerId(2) };
+        var request = PlayerActionRequest.OperationsRule(OperationsRuleOperation.Upsert, definition, 0, true);
+        Assert.True(PlayerActionRequestDispatcher.TryDispatch(request, Owner, gateway,
+            scenario.Simulation.CurrentTick, out var receipt));
+        Assert.True(receipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out var result));
+        Assert.Equal(OperationsRuleResult.Applied, result.OperationsResult);
+        var rule = Assert.Single(scenario.OperationsRules.Capture(Owner));
+        Assert.Equal(Owner, rule.Definition.Owner);
+        Assert.Equal(0, rule.Definition.Minimum);
+        Assert.Equal(1u, rule.Revision);
+        Assert.True(PlayerActionRequestDispatcher.TryDispatch(request, Owner, gateway,
+            scenario.Simulation.CurrentTick, out _));
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out result));
+        Assert.Equal(OperationsRuleResult.RevisionMismatch, result.OperationsResult);
+        EntityId foreign = AddProcessingFacility(scenario, out _, out _, new PlayerId(2));
+        request = PlayerActionRequest.OperationsRule(OperationsRuleOperation.Upsert,
+            definition with { Id = 2, Facility = foreign }, 0, true);
+        Assert.True(PlayerActionRequestDispatcher.TryDispatch(request, Owner, gateway,
+            scenario.Simulation.CurrentTick, out _));
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out result));
+        Assert.Equal(OperationsRuleResult.InvalidDefinition, result.OperationsResult);
+        Assert.Single(scenario.OperationsRules.Capture(Owner));
+    }
+
+    [Theory]
+    [InlineData(OperationsRuleOperation.SetEnabled, true)]
+    [InlineData(OperationsRuleOperation.SetEnabled, false)]
+    [InlineData(OperationsRuleOperation.Remove, true)]
+    [InlineData(OperationsRuleOperation.Remove, false)]
+    public void RemovingOrDisablingRulePreservesSameTickManualPause(OperationsRuleOperation operation, bool manualFirst)
+    {
+        using MatchRuntime scenario = CreateScenario();
+        EntityId facility = AddProcessingFacility(scenario, out InventoryId input, out InventoryId output, outputCapacity: 10);
+        Assert.True(scenario.Inventories.Add(input, ResourceIds.FerrousOre, 200).Succeeded);
+        Assert.True(scenario.Inventories.Add(output, ResourceIds.Steel, 10).Succeeded);
+        QueueSteel(scenario, facility);
+        var gateway = Gateway(scenario);
+        var definition = OutputRule(facility);
+        gateway.SubmitOperationsRule(scenario.OperationsRules, OperationsRuleOperation.Upsert,
+            definition, 0, true, scenario.Simulation.CurrentTick);
+        scenario.Simulation.RunTicks(55, TestContext.Current.CancellationToken);
+        EntityId request = Assert.Single(scenario.OperationsRules.Capture(Owner)).ManagedProductionRequest;
+        Assert.True(request.IsValid);
+        if (manualFirst) gateway.SubmitProductionPaused(Owner, request, true, scenario.Simulation.CurrentTick);
+        gateway.SubmitOperationsRule(scenario.OperationsRules, operation, definition, 1, false, scenario.Simulation.CurrentTick);
+        if (!manualFirst) gateway.SubmitProductionPaused(Owner, request, true, scenario.Simulation.CurrentTick);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(scenario.Simulation.Entities.GetComponent<ProductionRequest>(request).Paused);
+        if (operation == OperationsRuleOperation.Remove) Assert.Empty(scenario.OperationsRules.Capture(Owner));
+        else Assert.False(Assert.Single(scenario.OperationsRules.Capture(Owner)).Enabled);
+    }
+
     private static OperationsRuleDefinition InputRule(EntityId facility) =>
         new(1, Owner, facility, OperationsRuleTemplate.EnsureInputStockPolicy,
             ResourceIds.FerrousOre, 20, 50, 100, LogisticsStockPriority.Normal, 5);
@@ -214,7 +276,8 @@ public sealed class OperationsRuleTests
     private static PlayerCommandGateway Gateway(MatchRuntime scenario)
     {
         var gateway = new PlayerCommandGateway(scenario.Simulation,
-            scenario.Services.BuildingCommands, scenario.BattlefieldRuntime.MatchStateEntity);
+            scenario.Services.BuildingCommands, scenario.BattlefieldRuntime.MatchStateEntity,
+            operationsRules: scenario.OperationsRules);
         scenario.Simulation.AttachTickObserver(gateway);
         return gateway;
     }

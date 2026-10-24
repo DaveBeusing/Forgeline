@@ -175,3 +175,110 @@ The normal gameplay profile keeps the product-facing starting stock, default str
 The first opponent deliberately does not include build-order search or economic optimization, opponent modeling, personalities, diplomacy, doctrine variants, learned behavior, dynamic difficulty, deception planning, advanced multi-front force allocation, persistent named task forces across strategic replans, predictive artillery against stale contacts, or campaign scripting.
 
 These are future strategy-layer capabilities and must preserve the same knowledge and authority boundaries if added.
+
+
+## Bounded logistics raids
+
+A separate raid intent runs on the existing strategic reaction cadence after
+necessary economy, bootstrap, base-defense and force-recovery decisions, before
+free units are assigned to reconnaissance or the main offensive. Each controller
+can own one raid of two or three units. Ready idle home defenders are retained
+inside a configurable 260 m home radius (two by default). When an idle force can
+already meet the existing main-offensive size and structure-pressure floor, that
+force is reserved before lending surplus units. The five-unit offensive minimum,
+structure-capable minimum and forward-supply admission remain unchanged. Scouts,
+Cargo Trucks and Supply Trucks are excluded from raid membership.
+
+Selection consumes the faction's copied knowledge rather than searching hostile
+world state. A persisted cursor rotates through at most 32 candidate contacts per
+decision. Only current identified contacts can resolve an entity: full entity
+index and generation must still match. Exposed Cargo/Supply Trucks rank first,
+then Storage/Supply Depots, Power Plants and processing, ammunition and unit-production plants.
+Equal scores use distance from home, then full stable identity. Enemy inventories,
+queued recipes and economic contents are never inspected. Known nearby defense
+is assessed from all current identified contacts already in that same knowledge
+snapshot, so a guard outside the candidate window is not silently ignored.
+A known tank/artillery weighs three, another armed unit one; the initial admitted
+threat ceiling is one within 160 m.
+
+Admission checks real navigation outward and back for each unit's movement
+capabilities, available unreserved fuel, weapon effectiveness against the target
+class, ammunition and readiness. The initial fuel requirement is route length
+times normal consumption times 1.25, plus 15% of fuel capacity; six shots and
+0.65 readiness are required. A missing route or reserve postpones the raid.
+Rifles may raid light vehicles but cannot qualify as structure attackers.
+No inventory, fuel, ammunition, readiness or damage is created by this planner.
+
+Approach uses ordinary AttackMove, an identified in-range target uses Attack,
+and loss of identification permits only an AttackMove to the stored last known
+point for up to 80 ticks. Hidden transforms cannot update that point. A 120 m
+target-anchor leash bounds pursuit. Stronger known defense, lost routes, too few
+survivors, ammunition/readiness loss or inadequate return fuel cause normal
+Retreat or HoldPosition plus the existing nearest-provider resupply path.
+A raid never clears a replacement command whose combat-group identity has
+changed. Base defense can stop the orders still owned by the raid and take over.
+
+The initial intent budget is 1,200 ticks, including search/return/resupply.
+An expiry-only tick check enforces the deadline between strategic decisions
+without capturing faction knowledge or selecting targets. Expansion decisions
+also advance raids.
+Expiry releases the strategic intent with a normal retreat/hold order still
+valid; the existing tactical lifecycle owns completion of that return.
+Completion starts a stable-tick cooldown of 600 ticks. These values are
+configurable gameplay starting points, not guarantees about when a raid wins or
+when a natural match first exposes a target. Repeated decisions retain a valid
+group and only replace its command for a meaningful phase/destination change.
+
+Local tactical behavior on computer-controlled units defers identified logistics
+targets and unidentified contacts outside the configured home-defense perimeter
+to strategic planning. Ordinary combat with known armed contacts and immediate
+weapon acquisition remain available. Active raid members temporarily leave the
+local decision behavior so it cannot replace their group each tick; automatic
+supply policies and ordinary combat execution remain active. Disabling raids or
+using the legacy constructor without navigation/weapons preserves the previous
+local policy.
+
+The existing strategic debug read model includes the raid phase, target/contact,
+members/group, admission reason, stored/ordered positions, stable timestamps and
+candidate count. Authoritative state schema **7** includes raid intent/cursor and
+the tactical delegation fields. Envelope 1 and payload 6 remain unchanged.
+Older authoritative checkpoints (including schema 6) are explicitly rejected;
+there is no silent reinterpretation. Candidate lists and debug caches are derived.
+Save/replay reconstructs ordinary commands and the original opponent configuration.
+
+### Executed scenario and acceptance limits
+
+The headless raid scene uses Gameplay/Standard stock, seed 2026, normal catalogs,
+construction, production, logistics, sensors, movement, ammunition, damage and
+destruction. It waits for three Rifle Squads to be produced through the normal
+opponent/economy pipeline. The authored scene places the player's two existing
+Cargo Trucks 600 m east of the opposing core and loads 20 Fuel each by transfer
+from that player's finite starting inventory. It adds no vehicles or resources.
+Recorded tactical commands move the existing observer, stop it, and expose the
+trucks. Its defense radius is explicitly set to 180 m to separate a short-range
+raid from base defense; the gameplay default remains 520 m. Main-offensive
+requirements, costs, weapons, supply rates and raid defaults are unchanged.
+
+In the unprotected run the selected loaded truck is destroyed through normal
+combat and its cargo inventory is removed. In the same-seed counterplay run,
+a recorded player movement reroutes that target; vehicle and all 20 Fuel survive.
+Both runs advance 1,200 ticks after admission and leave the match running.
+This demonstrates bounded logistics loss and counterplay, not a claimed
+production-throughput measurement or guaranteed timing in the default deployment.
+
+An active raid also reconstructs through serialized Save and Replay with equal
+complete authoritative hashes and continued states at increments 0, 1, 7 and 24
+ticks. Focused cases cover missing/detected-only intelligence, incompatible
+weapons, return fuel, empty ammunition, known guards, pursuit, target-generation
+loss, route changes, command replacement, cooldown and stable same-seed intent.
+The required CI job runs the raid group independently before the complete suite.
+A separate timer regression uses a 40-tick reaction cadence and a three-tick
+intent budget to prove expiry before the next strategy decision; these validation
+parameters do not replace the normal gameplay defaults.
+
+Full final-head CI and natural terminal-match results are recorded in the PR.
+Native raid visibility, group readability, pursuit/return feel and player
+counterplay still require human Windows/D3D12 acceptance. Physical conveyor
+qualification remains tracked in #310; the unchanged gameplay texture-budget
+blocker is #344. WARP, physical GPU performance and human inspection are separate
+evidence classes; the headless scene does not replace them.

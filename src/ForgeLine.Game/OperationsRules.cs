@@ -98,6 +98,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
     public const int MaximumRulesPerFacility = 8;
     public const int MaximumRulesPerTick = 64;
     public const int MaximumActionsPerRule = 16;
+    public const uint MinimumCooldownTicks = 5;
+    public const uint MaximumCooldownTicks = 10_000;
     private const int HysteresisTicks = 3;
 
     private sealed class Entry
@@ -243,8 +245,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
         entities.TryGetComponent(_matchStateEntity, out MatchState state) &&
         state.Lifecycle == MatchLifecyclePhase.Running;
 
-    private static bool ValidDefinition(in OperationsRuleDefinition d) =>
-        d.Facility.IsValid && d.CooldownTicks is >= 5 and <= 10_000 &&
+    public static bool ValidDefinition(in OperationsRuleDefinition d) =>
+        d.Facility.IsValid && d.CooldownTicks is >= MinimumCooldownTicks and <= MaximumCooldownTicks &&
         Enum.IsDefined(d.Template) && Enum.IsDefined(d.Priority) &&
         (d.Template == OperationsRuleTemplate.PauseUntilOutputAvailable ||
          (d.Resource.IsSpecified && double.IsFinite(d.Minimum) &&
@@ -437,8 +439,18 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
         return true;
     }
 
-    private static void ReleaseManagedPause(SimulationContext context, Entry entry)
+    private void ReleaseManagedPause(SimulationContext context, Entry entry)
     {
+        // Same-tick manual intent owns its pause even before the AI phase observes it.
+        if (_manualPauses.TryGetValue(context.Tick.Value, out var manualRequests))
+            foreach (EntityId manual in manualRequests)
+                if (manual == entry.ManagedRequest ||
+                    context.Entities.TryGetComponent(manual, out ProductionRequest manualRequest) &&
+                    manualRequest.Facility == entry.Definition.Facility)
+                {
+                    entry.ManagedRequest = EntityId.Invalid;
+                    return;
+                }
         if (!entry.ManagedRequest.IsValid ||
             !context.Entities.TryGetComponent(entry.ManagedRequest, out ProductionRequest request) ||
             request.Facility != entry.Definition.Facility || !request.Paused) return;

@@ -16,6 +16,12 @@ public static class PlayerActionRequestDispatcher
 
         switch (request.Kind)
         {
+            case PlayerActionRequestKind.SubmitOperationsRule:
+                receipt = gateway.SubmitOperationsRule(request.RuleOperation,
+                    request.RuleDefinition with { Owner = player }, request.ExpectedRuleRevision,
+                    request.Enabled, observedTick);
+                return true;
+
             case PlayerActionRequestKind.QueueProduction:
                 receipt =
                     gateway.SubmitProduction(

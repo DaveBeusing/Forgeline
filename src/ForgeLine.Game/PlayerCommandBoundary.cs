@@ -137,6 +137,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
     private readonly WeaponCatalog? _weapons;
     private readonly ArtilleryWeaponCatalog? _artilleryWeapons;
     private readonly TechnologyDefinitionCatalog? _technologies;
+    private readonly OperationsRuleSystem? _operationsRules;
     private ulong _nextCorrelationId = 1;
 
     public PlayerCommandGateway(
@@ -148,7 +149,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         WeaponCatalog? weapons = null,
         ArtilleryWeaponCatalog? artilleryWeapons = null,
         TechnologyDefinitionCatalog? technologies = null,
-        BuildingDemolitionSystem? demolition = null)
+        BuildingDemolitionSystem? demolition = null,
+        OperationsRuleSystem? operationsRules = null)
     {
         _simulation =
             simulation ??
@@ -157,6 +159,9 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             buildingCommands ??
             throw new ArgumentNullException(nameof(buildingCommands));
         _demolition = demolition;
+        if (operationsRules is not null && !operationsRules.Matches(simulation))
+            throw new ArgumentException("Rule system belongs to a different match.", nameof(operationsRules));
+        _operationsRules = operationsRules;
 
         if (!matchStateEntity.IsValid)
         {
@@ -750,6 +755,12 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             null, null, null, null, null, null, null, ConveyorCommand: command));
         return AcceptedReceipt(correlation, PlayerCommandKind.ConveyorConstruction, source, observedTick, envelope);
     }
+
+    public PlayerCommandSubmissionReceipt SubmitOperationsRule(
+        OperationsRuleOperation operation, OperationsRuleDefinition definition,
+        uint expectedRevision, bool enabled, SimulationTick observedTick) =>
+        SubmitOperationsRule(_operationsRules ?? throw new InvalidOperationException("Operations rules are unavailable in this session."),
+            operation, definition, expectedRevision, enabled, observedTick);
 
     public PlayerCommandSubmissionReceipt SubmitOperationsRule(
         OperationsRuleSystem rules,

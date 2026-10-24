@@ -214,11 +214,11 @@ internal static class NotificationText
     public static ulong Revision(ReadOnlySpan<char> text)
     { ulong hash = 14695981039346656037; foreach (char c in text) hash = unchecked((hash ^ c) * 1099511628211); return hash; }
 
-    public static ReadOnlySpan<char> Line(ReadOnlySpan<char> text, float width, float size, out int consumed)
+    public static ReadOnlySpan<char> Line(ReadOnlySpan<char> text, float width, float size, out int consumed, bool bold = false)
     {
         int newline = text.IndexOf('\n');
         var paragraph = newline < 0 ? text : text[..newline];
-        int length = UiFontMetrics.Default.FitPrefix(paragraph, width, size, false);
+        int length = UiFontMetrics.Default.FitPrefix(paragraph, width, size, bold);
         if (length < paragraph.Length) { int space = paragraph[..length].LastIndexOf(' '); if (space > 0) length = space; }
         consumed = length;
         if (consumed == 0 && paragraph.Length > 0) { int next = 0; _ = UiFontMetrics.Default.Next(paragraph, ref next); consumed = next; }

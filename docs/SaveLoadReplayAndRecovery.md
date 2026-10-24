@@ -47,11 +47,11 @@ The three version boundaries have separate responsibilities:
 | --- | ---: | --- |
 | Document envelope | 1 | Header, document kind, serialized payload, and payload checksum |
 | Save/replay payload | 6 | Configuration, recorded command history, and checkpoint/replay metadata |
-| Authoritative simulation state | 6 | Deterministic reconstruction and checkpoint comparison |
+| Authoritative simulation state | 7 | Deterministic reconstruction and checkpoint comparison |
 
-New captures use payload schema 6 and authoritative schema 6. The reader accepts supported payload schemas 1 through 6, but discovery, loading and replaying also require authoritative schema 6. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
+New captures use payload schema 6 and authoritative schema 7. The reader accepts supported payload schemas 1 through 6, but discovery, loading and replaying also require authoritative schema 7. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
 
-Authoritative schema 6 includes the completed-building combat contract, power-gated radar observations, and building destruction's economic, logistics, and navigation cleanup. These rules change reconstructed entities and simulation outcomes. Saves carrying authoritative state schema 5 and replays declaring `AuthoritativeSchemaVersion = 5` therefore fail with `IncompatibleVersion` before runtime reconstruction, even when their document and checkpoint checksums are valid. Earlier incompatible state schemas remain rejected as well.
+Authoritative schema 7 retains the completed-building combat contract, power-gated radar observations, and building destruction's economic, logistics, and navigation cleanup. It adds bounded raid intent, stable member/contact identities, the contact cursor and tactical delegation policy. These rules change reconstructed entities and simulation outcomes. Saves carrying authoritative state schema 6 and replays declaring `AuthoritativeSchemaVersion = 6` therefore fail with `IncompatibleVersion` before runtime reconstruction, even when their document and checkpoint checksums are valid. Earlier incompatible state schemas remain rejected as well.
 
 This simulation-contract change adds no payload fields or command kinds, so the payload remains at schema 6 and the envelope remains at format 1. No migration rewrites historical checkpoint hashes or treats former combat/radar behavior as current behavior.
 
@@ -195,10 +195,23 @@ The original serializer, copied unchanged except for a class-name alias and an i
 
 The recovery integration also includes the conveyor flow/vehicle-supply contracts merged in master 92e6a65a. Both focused CI groups and both measurement entry points are retained. Shared persistence validation does not replace conveyor ownership, accepted-load accounting or adapter replacement behavior. The added conveyor persistence cases exercise their production command payloads and deterministic continuation under the same schema-6 preflight. Historical measurements retain their original source revision.
 
+## Operations control checkpoints
+
+OperationsRuleControlsTests submits both existing rule templates through the production Operations UI request path, serializes saves/replays, reconstructs through the explicit composition resolver and compares full authoritative hashes and continued effects. The output case saves a real rule-owned pause plus a future downstream production command; normal Ammunition production consumes finite shared Steel/Electronics after loading, allowing the same paused Steel request to resume. Input policy creation remains distinct from physical supply. Local unapplied drafts, input timing and focus are presentation state and are discarded on session replacement.
+
+Operations controls retain the existing OperationsRule command codec and envelope versions. Their original schema-6 checkpoints now run under authoritative schema 7, which includes the raid intent described above. Corrected same-tick manual pause precedence is exercised by both command orderings; reconstruction retains normal state/hash verification rather than accepting an unverified history.
+
 ## Tactical supply and accepted convoy checkpoints
 
 MatchPersistenceTests now exercises active grouped partial resupply, a replacing Hold order and subsequent navigation through supported recorded player adapters. A second explicit finite-stock composition issues two real stock policies, accepts a loaded convoy with an escort, records manual detachment, and completes both 200 Fuel and 200 Ammunition deliveries. Both cargo orders finish, source reservations return to zero and normal dock proximity releases the temporary group. Remote Reserved/Busy visits retain their normal queue/slot owner until physical approach.
 
-Each active checkpoint serializes saves and replay documents, reconstructs with the matching composition resolver and compares complete authoritative hashes immediately and after 1, 8 and 20 cumulative continuation ticks. These cases add no persistence exception, command type or serialized component. Authoritative schema 6 and the existing envelope/payload versions remain unchanged; the appended navigation budget failure uses the existing failure-reason enum field.
+Each active checkpoint serializes saves and replay documents, reconstructs with the matching composition resolver and compares complete authoritative hashes immediately and after 1, 8 and 20 cumulative continuation ticks. These cases add no persistence exception, command type or serialized component. Those tactical cases retained the then-current authoritative schema 6 and existing envelope/payload versions; the appended navigation budget failure uses the existing failure-reason enum field. Current authoritative compatibility is schema 7 as specified above.
 
 The active-detour recovery fixture uses a reproducible 64 m flat battlefield with a wall across the direct path, normal player movement and the production navigation/movement systems. It verifies an active refined route outside the blocked span, save/replay hash equality immediately and after 1, 8, 20 and 620 cumulative ticks, then normal arrival with no pending or active route.
+
+
+### Active logistics raid reconstruction
+
+The bounded raid intent is an ordinary authoritative component. Member and target generations, contact cursor, last known/ordered coordinates and stable tick deadlines participate in the complete hash. Candidate rankings and debug caches are derived. Existing tactical player commands and internal opponent scheduling regenerate the intent without a new external command codec.
+
+`SkirmishRaidMatchTests` serializes an active normal-stock raid through both Save and Replay, resolves the authored composition, and compares complete authoritative hashes and the intent after increments of 0, 1, 7 and 24 ticks. This also detects duplicate group creation during reconstruction. `PreRaidCheckpointsAreRejectedBeforeReconstruction` verifies explicit rejection of authoritative schema 6; readable payload schema 6 is not permission to reinterpret old simulation state. See [bounded raid behavior and its scene parameters](SkirmishOpponent.md#bounded-logistics-raids).
