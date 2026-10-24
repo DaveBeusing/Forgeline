@@ -245,6 +245,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             owned,
             configuration,
             _raids is not null && configuration.Raids.Enabled);
+        ClearIdleDockObstruction(context, controller, owned);
         EnsureEconomyPolicies(
             context,
             controller,
@@ -416,7 +417,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
         _research?.Evaluate(context, controllerEntity, controller, owned.Buildings,
             strategicState is SkirmishStrategicState.Defending or SkirmishStrategicState.Recovering or SkirmishStrategicState.Bootstrap ||
-            GetUnitCount(owned, UnitIds.CargoTruck) < ResolveCargoFleetTarget(owned, configuration) ||
+            GetUnitCount(owned, UnitIds.CargoTruck) < configuration.MinimumCargoTrucks ||
             (supplyEstablished && GetUnitCount(owned, UnitIds.SupplyTruck) < configuration.MinimumSupplyTrucks),
             GetUnitCount(owned, UnitIds.MobileArtillery) + GetPendingUnitCount(owned, UnitIds.MobileArtillery) < 2);
 
@@ -2799,6 +2800,43 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
+    private void ClearIdleDockObstruction(SimulationContext context,
+        SkirmishOpponentController controller, OwnedState owned)
+    {
+        // A guard can obstruct admission before the bay obtains a reservation.
+        // Inspect at most 32 owned visits and 32 idle guards; issue one ordinary order.
+        for (int visitIndex = 0; visitIndex < Math.Min(32, owned.Units.Count); visitIndex++)
+        {
+            if (!context.Entities.TryGetComponent(owned.Units[visitIndex], out VehicleDockVisit visit) ||
+                visit.Reason != VehicleDockBlockReason.Obstructed ||
+                !context.Entities.TryGetComponent(visit.Building, out CompletedBuilding building) ||
+                building.Owner != controller.Player) continue;
+            for (int index = 0; index < Math.Min(32, owned.CombatUnits.Count); index++)
+            {
+                EntityId unit = owned.CombatUnits[index];
+                if (!context.Entities.TryGetComponent(unit, out CombatOrderState order) || order.Kind != CombatOrderKind.HoldPosition ||
+                    !context.Entities.TryGetComponent(unit, out WorldTransform transform) ||
+                    !context.Entities.TryGetComponent(unit, out SpatialPresence presence) ||
+                    !context.Entities.TryGetComponent(unit, out GroundMovement movement) ||
+                    !visit.Pose.IntersectsLane(presence.CreateEntry(unit, transform).Bounds)) continue;
+                Vector3 forward = new(MathF.Sin(visit.Pose.Heading), 0, MathF.Cos(visit.Pose.Heading));
+                Vector3 outward = new(forward.Z, 0, -forward.X);
+                if (Vector3.Dot(outward, transform.Position - visit.Pose.Service) < 0) outward = -outward;
+                float distance = visit.Pose.HalfWidth + movement.Radius + 8;
+                if (context.Entities.TryGetComponent(unit, out UnitFuelState fuel) &&
+                    (!_inventories.Contains(fuel.InventoryId) || _inventories.GetAvailableQuantity(fuel.InventoryId, ResourceIds.Fuel) <
+                        distance * fuel.ConsumptionPerMeter + fuel.Capacity * 0.15)) continue;
+                Vector3 destination = transform.Position + outward * distance;
+                if (context.Entities.TryGetComponent(unit, out ResupplyOrder resupply) &&
+                    (!context.Entities.TryGetComponent(resupply.Provider, out SupplyProvider provider) ||
+                     !context.Entities.TryGetComponent(resupply.Provider, out WorldTransform source) ||
+                     Vector3.DistanceSquared(destination, source.Position) > provider.ResupplyRangeMeters * provider.ResupplyRangeMeters)) continue;
+                new AttackMoveCommand(controller.Player, [unit], destination, context.Tick).Execute(context);
+                return;
+            }
+        }
+    }
+
     private static void EnsureTacticalBehavior(
         SimulationContext context,
         SkirmishOpponentController controller,
@@ -3348,7 +3386,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     80.0,
                     220.0,
                     450.0,
-                    LogisticsStockPriority.High);
+                    facility.Status == ProductionStatus.NoInput
+                        ? LogisticsStockPriority.Critical
+                        : LogisticsStockPriority.High);
             }
 
             if (facility.Supports(
@@ -5680,8 +5720,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 .ThenBy(
                     static depot =>
                         depot.Entity)
-                .First()
-                .Position;
+                .Select(depot => ResolveDepotRecoveryPosition(context, depot.Entity, depot.Position))
+                .First();
         }
 
         Vector3 centroid = Vector3.Zero;
@@ -5718,8 +5758,21 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             .ThenBy(
                 static depot =>
                     depot.Entity)
-            .First()
-            .Position;
+            .Select(depot => ResolveDepotRecoveryPosition(context, depot.Entity, depot.Position))
+            .First();
+    }
+
+    private static Vector3 ResolveDepotRecoveryPosition(SimulationContext context, EntityId depot, Vector3 position)
+    {
+        if (!context.Entities.TryGetComponent(depot, out BuildingLoadingDock dock) ||
+            !context.Entities.TryGetComponent(depot, out WorldTransform transform) ||
+            !context.Entities.TryGetComponent(depot, out SupplyProvider provider)) return position;
+        Vector3 away = -Vector3.Transform(dock.ServicePosition, transform.Rotation);
+        away.Y = 0;
+        if (away.LengthSquared() < 0.001f) return position;
+        // Recovery uses the provider's real range on the side opposite cargo service.
+        // Routing and formation clearance remain responsible for physical movement.
+        return position + Vector3.Normalize(away) * (provider.ResupplyRangeMeters * 0.65f);
     }
 
     private void CaptureDebug(

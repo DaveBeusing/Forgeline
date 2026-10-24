@@ -67,7 +67,7 @@ public sealed class SkirmishResearchPlanner(TechnologyDefinitionCatalog technolo
                         foreach (UnitId unit in new[] { UnitIds.SupplyTruck, UnitIds.CargoTruck })
                             foreach (var productionCost in units[unit].Costs)
                                 if (productionCost.ResourceId == cost.ResourceId) reserve += productionCost.Quantity;
-                        if (inventories.GetAvailableQuantity(storage.InventoryId, cost.ResourceId) + 1e-9 < cost.Quantity + reserve)
+                        if (AvailableBudget(cost.ResourceId) + 1e-9 < cost.Quantity + reserve)
                         { reserved = true; break; }
                     }
                     if (reserved) { Record(id, SkirmishResearchReason.ProductionReserve); continue; }
@@ -86,5 +86,27 @@ public sealed class SkirmishResearchPlanner(TechnologyDefinitionCatalog technolo
         void Record(TechnologyId id, SkirmishResearchReason reason,
             TechnologyResearchBlockReason block = TechnologyResearchBlockReason.None) =>
             _diagnostics[controllerEntity] = new(id, reason, block, context.Tick);
+
+        double AvailableBudget(ResourceId resource)
+        {
+            double available = 0;
+            var counted = new HashSet<InventoryId>();
+            for (int index = 0; index < Math.Min(32, buildings.Count); index++)
+            {
+                EntityId entity = buildings[index];
+                if (!context.Entities.TryGetComponent(entity, out CompletedBuilding building) ||
+                    building.Owner != controller.Player) continue;
+                if (context.Entities.TryGetComponent(entity, out InventoryStorage storage)) Add(storage.InventoryId);
+                if (context.Entities.TryGetComponent(entity, out UnitProductionFacility factory)) Add(factory.InputInventory);
+                if (context.Entities.TryGetComponent(entity, out ProductionFacility processing)) Add(processing.OutputInventory);
+            }
+            return available;
+
+            void Add(InventoryId inventory)
+            {
+                if (counted.Add(inventory) && inventories.Contains(inventory))
+                    available += inventories.GetAvailableQuantity(inventory, resource);
+            }
+        }
     }
 }

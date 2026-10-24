@@ -61,6 +61,21 @@ public sealed class SkirmishResearchPlannerTests
         Assert.False(TechnologyStateQueries.TryGetActiveResearch(fixture.Simulation.Entities, new PlayerId(1), out _, out _));
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ResearchUsesOnlyPaidSourceWhileReplacementBudgetMayBeHeldInOtherOwnedStorage(bool foreignReserve)
+    {
+        var fixture = new Fixture();
+        fixture.Stock.Remove(fixture.Inventory, ResourceIds.Steel, 900);
+        InventoryId reserve = fixture.AddReserveStorage(foreignReserve ? new PlayerId(2) : new PlayerId(1));
+        fixture.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        Assert.Equal(!foreignReserve, TechnologyStateQueries.TryGetActiveResearch(fixture.Simulation.Entities,
+            new PlayerId(1), out _, out _));
+        Assert.Equal(foreignReserve ? 100 : 20, fixture.Stock.GetQuantity(fixture.Inventory, ResourceIds.Steel));
+        Assert.Equal(200, fixture.Stock.GetAvailableQuantity(reserve, ResourceIds.Steel));
+    }
+
     private sealed class Fixture
     {
         public SimulationCoordinator Simulation { get; } = new();
@@ -92,6 +107,17 @@ public sealed class SkirmishResearchPlannerTests
             Simulation.RegisterSystem(new TechnologyResearchSystem(definitions, Stock));
             Simulation.RegisterSystem(new Decision(this));
         }
+        public InventoryId AddReserveStorage(PlayerId owner)
+        {
+            InventoryId reserve = Stock.CreateInventory(new InventorySpecification(1000));
+            Stock.Add(reserve, ResourceIds.Steel, 200);
+            EntityId storage = Simulation.Entities.CreateEntity();
+            _buildings.Add(storage);
+            Simulation.Entities.AddComponent(storage, new CompletedBuilding(BuildingIds.StorageDepot, owner, SimulationTick.Zero));
+            Simulation.Entities.AddComponent(storage, new InventoryStorage(reserve));
+            return reserve;
+        }
+
         private sealed class Decision(Fixture fixture) : ISimulationSystem
         {
             public SimulationPhase Phase => SimulationPhase.AiDecisions;
