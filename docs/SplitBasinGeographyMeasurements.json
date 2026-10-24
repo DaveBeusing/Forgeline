@@ -1,0 +1,125 @@
+{
+  "MapKey": "battlefield.split_basin",
+  "ReachabilityChecks": 49,
+  "AlternateNavigationChecks": 2,
+  "AlternateRoadChecks": 2,
+  "ShortestRouteMeters": 203.96078,
+  "LongestRouteMeters": 2115.677,
+  "MinimumTerrainHeightMeters": -5.951033,
+  "MaximumTerrainHeightMeters": 33.82306,
+  "BuildableZoneCount": 20,
+  "ContestedResourceCount": 6,
+  "TerrainElevationRangeMeters": 39.774094,
+  "MapSha256": "d2e47e1ec4da0fe8e2b498d10d73f8b7a2fee6e0a5f76ab86514510ed6c6e861",
+  "TerrainSha256": "ee7f0c7e872c2e32528729eca98171ebbcbd9d0d4d846a007fb4d5eb0d9562cd",
+  "Routes": [
+    {
+      "Movement": "Infantry",
+      "DisabledCrossing": null,
+      "Reverse": false,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Infantry",
+      "DisabledCrossing": null,
+      "Reverse": true,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Wheeled",
+      "DisabledCrossing": null,
+      "Reverse": false,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Wheeled",
+      "DisabledCrossing": null,
+      "Reverse": true,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Tracked",
+      "DisabledCrossing": null,
+      "Reverse": false,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Tracked",
+      "DisabledCrossing": null,
+      "Reverse": true,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Infantry",
+      "DisabledCrossing": "crossing.basin_bridge",
+      "Reverse": false,
+      "RouteLengthMeters": 2115.677
+    },
+    {
+      "Movement": "Infantry",
+      "DisabledCrossing": "crossing.basin_bridge",
+      "Reverse": true,
+      "RouteLengthMeters": 2115.8376
+    },
+    {
+      "Movement": "Wheeled",
+      "DisabledCrossing": "crossing.basin_bridge",
+      "Reverse": false,
+      "RouteLengthMeters": 2115.677
+    },
+    {
+      "Movement": "Wheeled",
+      "DisabledCrossing": "crossing.basin_bridge",
+      "Reverse": true,
+      "RouteLengthMeters": 2115.8376
+    },
+    {
+      "Movement": "Tracked",
+      "DisabledCrossing": "crossing.basin_bridge",
+      "Reverse": false,
+      "RouteLengthMeters": 2115.677
+    },
+    {
+      "Movement": "Tracked",
+      "DisabledCrossing": "crossing.basin_bridge",
+      "Reverse": true,
+      "RouteLengthMeters": 2115.8376
+    },
+    {
+      "Movement": "Infantry",
+      "DisabledCrossing": "crossing.outer_ford",
+      "Reverse": false,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Infantry",
+      "DisabledCrossing": "crossing.outer_ford",
+      "Reverse": true,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Wheeled",
+      "DisabledCrossing": "crossing.outer_ford",
+      "Reverse": false,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Wheeled",
+      "DisabledCrossing": "crossing.outer_ford",
+      "Reverse": true,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Tracked",
+      "DisabledCrossing": "crossing.outer_ford",
+      "Reverse": false,
+      "RouteLengthMeters": 1408
+    },
+    {
+      "Movement": "Tracked",
+      "DisabledCrossing": "crossing.outer_ford",
+      "Reverse": true,
+      "RouteLengthMeters": 1408
+    }
+  ]
+}

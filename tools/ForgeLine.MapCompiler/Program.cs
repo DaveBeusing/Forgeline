@@ -58,10 +58,21 @@ internal static class Program
                 options.OutputPath,
                 payload);
             File.WriteAllText(options.OutputPath + ".sha256", Convert.ToHexStringLower(SHA256.HashData(payload)) + "\n");
-            WriteQualification(
-                options.QualificationOutputPath,
-                qualification);
 
+
+            if (options.PreviewOutputPath is not null) BattlefieldMapPreview.Write(options.PreviewOutputPath, definition, terrain);
+            using var terrainHash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            var sample = new byte[4];
+            foreach (var chunk in terrain.Chunks)
+                for (int z = 0; z < chunk.Heightfield.SamplesPerSide; z++)
+                    for (int x = 0; x < chunk.Heightfield.SamplesPerSide; x++)
+                    {
+                        System.Buffers.Binary.BinaryPrimitives.WriteSingleLittleEndian(sample, chunk.Heightfield.GetHeight(x, z));
+                        terrainHash.AppendData(sample);
+                    }
+            string terrainDigest = Convert.ToHexStringLower(terrainHash.GetHashAndReset());
+            WriteQualification(options.QualificationOutputPath, qualification, definition, terrain, digest, terrainDigest);
+            Console.WriteLine($"Map SHA-256: {digest}; terrain SHA-256: {terrainDigest}.");
             Console.WriteLine(
                 $"Compiled map '{definition.Metadata.DisplayName}' ({definition.Metadata.Key}) to '{options.OutputPath}'.");
             Console.WriteLine(
@@ -101,7 +112,7 @@ internal static class Program
 
     private static void WriteQualification(
         string path,
-        BattlefieldOperationalGeographyReport report)
+        BattlefieldOperationalGeographyReport report, BattlefieldDefinition map, TerrainWorld terrain, string mapDigest, string terrainDigest)
     {
         string? directory =
             Path.GetDirectoryName(
@@ -113,21 +124,38 @@ internal static class Program
                 directory);
         }
 
-        File.WriteAllText(
-            path,
-            JsonSerializer.Serialize(
-                report,
-                QualificationSerializerOptions));
+        var document = JsonSerializer.SerializeToNode(report, QualificationSerializerOptions)!;
+        document["MapSha256"] = mapDigest;
+        document["TerrainSha256"] = terrainDigest;
+        var routes = new List<object>();
+        foreach (string? disabled in new string?[] { null }.Concat(map.Crossings.Select(x => (string?)x.Key)))
+        {
+            var world = NavigationWorld.Build(terrain, map.CreateNavigationObstacles(disabled is null ? null :
+                new Dictionary<string, bool> { [disabled] = false }),
+                new NavigationGridSettings { CellSizeMeters = 16, StaticObstacleClearanceMeters = .5f },
+                new NavigationSectorSettings { SectorSizeCells = 8 });
+            var finder = new HierarchicalPathfinder(world);
+            foreach (var movement in new[] { NavigationMovementClass.Infantry, NavigationMovementClass.Wheeled, NavigationMovementClass.Tracked })
+            foreach (bool reverse in new[] { false, true })
+            {
+                var route = finder.FindPath(map.Starts[reverse ? 1 : 0].Position, map.Starts[reverse ? 0 : 1].Position, NavigationCapabilities.For(movement));
+                if (!route.Succeeded || route.Path is null) throw new InvalidOperationException("Measured route is unreachable.");
+                routes.Add(new { Movement = movement.ToString(), DisabledCrossing = disabled, Reverse = reverse, route.Path.Diagnostics.RouteLengthMeters });
+            }
+        }
+        document["Routes"] = JsonSerializer.SerializeToNode(routes);
+        File.WriteAllText(path, document.ToJsonString(QualificationSerializerOptions));
     }
 
     private sealed record CompilerOptions(
         string OutputPath,
-        string QualificationOutputPath, string Scenario)
+        string QualificationOutputPath, string Scenario, string? PreviewOutputPath)
     {
         public static CompilerOptions Parse(
             string[] args)
         {
             string scenario = CentralDivideScenario.CompositionKey;
+            string? preview = null;
             string output =
                 Path.Combine(
                     "artifacts",
@@ -147,6 +175,9 @@ internal static class Program
 
                 switch (argument)
                 {
+                    case "--preview-output":
+                        preview = ReadValue(args, ref index, argument);
+                        break;
                     case "--scenario":
                         scenario = ReadValue(args, ref index, argument) switch
                         {
@@ -179,7 +210,7 @@ internal static class Program
 
             return new CompilerOptions(
                 output,
-                qualification, scenario);
+                qualification, scenario, preview);
         }
 
         private static string ReadValue(

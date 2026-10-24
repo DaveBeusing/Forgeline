@@ -236,3 +236,7 @@ docs/         Technical documentation and qualification evidence
 
 </div>
 
+
+### Battlefields
+
+New Game offers Central Divide (3,072 m ridge map) and [Split Basin](docs/SplitBasinBattlefield.md) (2,048 m open basin with a longer outer route). Up/Down selects the battlefield. Client and headless accept `--scenario split-basin`; Central Divide remains the default. Both use normal Directorate content, exact save/replay identities and compiled data included in the package.
