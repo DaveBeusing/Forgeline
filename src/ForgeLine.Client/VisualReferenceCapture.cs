@@ -242,6 +242,7 @@ internal static class VisualReferenceCapture
                     var operations = uiScenario == UiReferenceScenario.NotificationDetails
                         ? new OperationsView(true, Session: snapshot.SessionId, Notifications: true) : uiScenario is UiReferenceScenario.Operations or UiReferenceScenario.OperationsEmpty or UiReferenceScenario.OperationsMissing
                         ? new OperationsView(true,Session:snapshot.SessionId,Selected:snapshot.Operations is { Facilities.Count: > 0 } ops ? ops.Facilities[0].Entity : default) : default;
+                    if (UiReferenceStates.IsRules(uiScenario)) operations = UiReferenceStates.RuleView(snapshot, uiScenario);
                     var groups = uiScenario == UiReferenceScenario.GroupSummary ? new CombatGroupOverviewView(
                         [default(CombatGroupSummaryReadModel) with { Slot = 1, Label = "Armoured support", MemberCount = 3,
                             IsActive = true, IsSelected = true, HasHealth = true, Health = .4, HasSupply = true,

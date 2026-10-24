@@ -7,6 +7,38 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class UiReferenceScenarioTests
 {
+    [Theory]
+    [InlineData(nameof(UiReferenceScenario.OperationsRuleDraft))]
+    [InlineData(nameof(UiReferenceScenario.OperationsRulePending))]
+    [InlineData(nameof(UiReferenceScenario.OperationsRuleRejected))]
+    [InlineData(nameof(UiReferenceScenario.OperationsRuleManagedPause))]
+    [InlineData(nameof(UiReferenceScenario.OperationsRuleManualOverride))]
+    public void RuleReferenceStatesExposeExactOwnedDraftAndStatus(string stateName)
+    {
+        UiReferenceScenario state = Enum.Parse<UiReferenceScenario>(stateName);
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var original = VisualReferenceScene.Create(VisualReferenceSceneKind.BattlefieldCombat, terrain).Snapshot;
+        var (snapshot, panel) = UiReferenceStates.Hud(original, state, 1280, 720, 192, 2);
+        Assert.False(panel.IsOpen);
+        Assert.True(original.Instances.SequenceEqual(snapshot.Instances));
+        var view = UiReferenceStates.RuleView(snapshot, state).RuleControls!.Value;
+        Assert.Equal(snapshot.PlayerExperience!.Value.Player, view.Data!.Player);
+        Assert.Equal(view.Data.Facility, view.Draft.Facility);
+        Assert.Equal(state == UiReferenceScenario.OperationsRuleDraft, view.NewDraft);
+        Assert.Equal(state == UiReferenceScenario.OperationsRulePending, view.Pending);
+        if (state == UiReferenceScenario.OperationsRuleManagedPause)
+        {
+            Assert.True(view.Observed!.Value.ManagedProductionRequest.IsValid);
+            Assert.Single(view.Data.ManagedRequests);
+        }
+        if (state == UiReferenceScenario.OperationsRuleManualOverride)
+        {
+            Assert.Equal(OperationsRuleResult.ManualOverride, view.Observed!.Value.Result);
+            Assert.False(view.Observed.Value.ManagedProductionRequest.IsValid);
+        }
+        if (state == UiReferenceScenario.OperationsRuleRejected) Assert.True(view.Dirty);
+    }
+
     [Fact]
     public void GroupReferenceStatesRetainWorldAndFitTheSharedHudAcrossAcceptanceDisplays()
     {

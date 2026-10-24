@@ -30966,6 +30966,12 @@
       "availability": "runtime_required"
     },
     {
+      "domain": "PlayerActionRequestKind",
+      "member": "SubmitOperationsRule",
+      "role": "utility.settings",
+      "availability": "runtime_required"
+    },
+    {
       "domain": "MainMenuCommand",
       "member": "Continue",
       "role": "utility.play",
