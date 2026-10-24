@@ -98,6 +98,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
     public const int MaximumRulesPerFacility = 8;
     public const int MaximumRulesPerTick = 64;
     public const int MaximumActionsPerRule = 16;
+    public const uint MinimumCooldownTicks = 5;
+    public const uint MaximumCooldownTicks = 10_000;
     private const int HysteresisTicks = 3;
 
     private sealed class Entry
@@ -243,8 +245,8 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
         entities.TryGetComponent(_matchStateEntity, out MatchState state) &&
         state.Lifecycle == MatchLifecyclePhase.Running;
 
-    private static bool ValidDefinition(in OperationsRuleDefinition d) =>
-        d.Facility.IsValid && d.CooldownTicks is >= 5 and <= 10_000 &&
+    public static bool ValidDefinition(in OperationsRuleDefinition d) =>
+        d.Facility.IsValid && d.CooldownTicks is >= MinimumCooldownTicks and <= MaximumCooldownTicks &&
         Enum.IsDefined(d.Template) && Enum.IsDefined(d.Priority) &&
         (d.Template == OperationsRuleTemplate.PauseUntilOutputAvailable ||
          (d.Resource.IsSpecified && double.IsFinite(d.Minimum) &&

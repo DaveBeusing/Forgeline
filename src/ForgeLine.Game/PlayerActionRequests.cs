@@ -36,7 +36,8 @@ public enum PlayerActionRequestKind : byte
     StartTechnologyResearch = 26,
     CancelTechnologyResearch = 27,
     CreateCargoConvoy = 28,
-    DissolveCargoConvoy = 29
+    DissolveCargoConvoy = 29,
+    SubmitOperationsRule = 30
 }
 
 public readonly record struct PlayerActionRequest(
@@ -72,6 +73,17 @@ public readonly record struct PlayerActionRequest(
     EntityId[]? ConvoyEscorts = null,
     EntityId ConvoyGroup = default)
 {
+    public OperationsRuleDefinition RuleDefinition { get; init; }
+    public OperationsRuleOperation RuleOperation { get; init; }
+    public uint ExpectedRuleRevision { get; init; }
+
+    public static PlayerActionRequest OperationsRule(OperationsRuleOperation operation,
+        OperationsRuleDefinition definition, uint expectedRevision, bool enabled) =>
+        new(PlayerActionRequestKind.SubmitOperationsRule, BuildingId.None, definition.Facility,
+            RecipeId.None, UnitId.None, EntityId.Invalid, false, ProductionPriority.Normal,
+            ProductionRequestMode.OneShot, ResourceId.None, 0, Enabled: enabled)
+        { RuleDefinition = definition, RuleOperation = operation, ExpectedRuleRevision = expectedRevision };
+
     public static PlayerActionRequest BeginBuildingPlacement(
         BuildingId buildingId) =>
         new(

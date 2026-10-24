@@ -562,7 +562,8 @@ public sealed class PlayerActionSnapshot
         PlayerLogisticsActionReadModel? logistics = null,
         PlayerSupplyActionReadModel? supply = null,
         PlayerTacticalActionReadModel? tactical = null,
-        IReadOnlyList<PlayerTechnologyActionReadModel>? technology = null)
+        IReadOnlyList<PlayerTechnologyActionReadModel>? technology = null,
+        OperationsRuleSelectionSnapshot? operationsRules = null)
     {
         SessionId = sessionId;
         Tick = tick;
@@ -574,6 +575,7 @@ public sealed class PlayerActionSnapshot
             pendingCommandCount);
         PendingCommandCount = pendingCommandCount;
         Production = production;
+        OperationsRules = operationsRules;
         UnitProduction = unitProduction;
         Logistics = logistics;
         Supply = supply;
@@ -594,6 +596,8 @@ public sealed class PlayerActionSnapshot
     public int PendingCommandCount { get; }
 
     public PlayerProductionFacilityActionReadModel? Production { get; }
+
+    public OperationsRuleSelectionSnapshot? OperationsRules { get; }
 
     public PlayerUnitProductionFacilityActionReadModel? UnitProduction { get; }
 
@@ -693,7 +697,21 @@ internal static class PlayerActionSnapshotFactory
             logistics,
             supply,
             tactical,
-            technology);
+            technology,
+            CaptureRules(context, extraction, production));
+    }
+
+    private static OperationsRuleSelectionSnapshot? CaptureRules(SimulationContext context,
+        PresentationExtractionContext extraction, PlayerProductionFacilityActionReadModel? production)
+    {
+        if (production is null || !context.Entities.TryGetComponent(production.Entity, out ProductionFacility facility) ||
+            !extraction.Scenario.Inventories.Contains(facility.InputInventory)) return null;
+        RecipeId recipeId = production.ActiveRecipe.IsSpecified ? production.ActiveRecipe :
+            production.Requests.Count > 0 ? production.Requests[0].RecipeId : RecipeId.None;
+        var inputs = production.Recipes.FirstOrDefault(recipe => recipe.RecipeId == recipeId)?.Inputs ?? [];
+        return new(extraction.Player, production.Entity,
+            extraction.Scenario.Inventories.GetTotalCapacity(facility.InputInventory), context.TickDuration,
+            recipeId, inputs, extraction.Scenario.OperationsRules.Capture(extraction.Player));
     }
 
     private static PlayerConstructionActionReadModel[]
