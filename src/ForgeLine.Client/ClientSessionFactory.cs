@@ -16,19 +16,25 @@ internal readonly record struct ClientSessionRequest(
     LoadGameEntry? Save)
 {
     internal MatchRuntimeSettings? RuntimeSettings { get; init; }
+    internal string ScenarioKey { get; init; } = CentralDivideScenario.CompositionKey;
+    internal ScenarioIdentity? Identity { get; init; }
+    internal bool ReloadScenario { get; init; }
+
+    internal static ClientSessionRequest Restart(MatchRuntimeSettings settings) =>
+        NewGame(settings with { Scheduler = null, SchedulerOwnership = MatchSchedulerOwnership.None }) with { ReloadScenario = true };
 
     internal static ClientSessionRequest NewGame(MatchRuntimeSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        return NewGame(settings.Seed) with { RuntimeSettings = settings };
+        return NewGame(settings.Seed, settings.Composition.Key) with { RuntimeSettings = settings, Identity = settings.Composition.Identity };
     }
 
     internal static ClientSessionRequest NewGame(
-        ulong seed) =>
+        ulong seed, string scenarioKey = CentralDivideScenario.CompositionKey) =>
         new(
             ClientSessionRequestKind.NewGame,
             seed,
-            null);
+            null) { ScenarioKey = scenarioKey };
 
     internal static ClientSessionRequest Load(
         LoadGameEntry save) =>
@@ -65,9 +71,9 @@ internal static class ClientSessionFactory
         {
             ClientSessionRequestKind.NewGame =>
                 MatchRuntime.Create(
-                    (request.RuntimeSettings ?? CentralDivideScenario.CreateClient(
+                    ResolveNewGame(request,
                         jobScheduler ?? throw new InvalidOperationException("New sessions require an owned scheduler."),
-                        seed: request.Seed)) with
+                        resolveComposition) with
                     {
                         Scheduler = jobScheduler,
                         SchedulerOwnership = MatchSchedulerOwnership.Host
@@ -84,14 +90,15 @@ internal static class ClientSessionFactory
 
     internal static ClientLoadedSession CreateOwned(
         ClientSessionRequest request, Action<ClientSessionLoadProgress> reportProgress,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Func<string, MatchComposition>? resolveComposition = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
         JobScheduler? scheduler = request.Kind == ClientSessionRequestKind.NewGame ? new JobScheduler() : null;
         MatchRuntime? runtime = null;
         try
         {
-            runtime = CreateCancellable(request, scheduler, cancellationToken, reportProgress);
+            runtime = CreateCancellable(request, scheduler, cancellationToken, reportProgress, resolveComposition);
             cancellationToken.ThrowIfCancellationRequested();
             return new ClientLoadedSession(runtime, scheduler);
         }
@@ -101,6 +108,17 @@ internal static class ClientSessionFactory
             finally { scheduler?.Dispose(); }
             throw;
         }
+    }
+
+    private static MatchRuntimeSettings ResolveNewGame(ClientSessionRequest request, JobScheduler scheduler, Func<string, MatchComposition>? resolver)
+    {
+        MatchComposition composition = resolver is not null ? resolver(request.ScenarioKey) :
+            request.ReloadScenario ? ScenarioRegistry.Default.Resolve(request.ScenarioKey) :
+            request.RuntimeSettings?.Composition ?? ScenarioRegistry.Default.Resolve(request.ScenarioKey);
+        if (composition.Key != request.ScenarioKey || (request.Identity is not null && composition.Identity != request.Identity))
+            throw new InvalidOperationException("Resolved scenario differs from the requested session identity.");
+        return (request.RuntimeSettings ?? CentralDivideScenario.CreateClient(scheduler, request.Seed, composition: composition))
+            with { Composition = composition };
     }
 
     private static MatchRuntime RestoreForGameplay(

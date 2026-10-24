@@ -9,6 +9,16 @@ internal static class Program
 {
     public static int Main(string[] args)
     {
+        try { return Run(args); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or System.Text.Json.JsonException)
+        {
+            Console.Error.WriteLine($"Scenario loading failed: {error.Message}");
+            return 1;
+        }
+    }
+
+    private static int Run(string[] args)
+    {
         HeadlessOptions options;
 
         try
@@ -30,16 +40,19 @@ internal static class Program
             return 0;
         }
 
+        var registry = options.ScenarioRoot is null ? ScenarioRegistry.Default :
+            new ScenarioRegistry(options.ScenarioRoot, [ScenarioRegistry.CentralDivideDescriptor]);
+
         if (options.LoadInput is not null)
         {
             return ValidateSaveRecovery(
-                options.LoadInput);
+                options.LoadInput, registry.Resolve);
         }
 
         if (options.ReplayInput is not null)
         {
             return ValidateReplayPlayback(
-                options.ReplayInput);
+                options.ReplayInput, registry.Resolve);
         }
 
         using var shutdown =
@@ -64,7 +77,7 @@ internal static class Program
                         shutdown.Token),
                 HeadlessScenarioKind.Match =>
                     RunMatch(
-                        options,
+                        options, registry,
                         shutdown.Token),
                 _ =>
                     throw new InvalidOperationException(
@@ -139,7 +152,7 @@ internal static class Program
     }
 
     private static int RunMatch(
-        HeadlessOptions options,
+        HeadlessOptions options, ScenarioRegistry registry,
         CancellationToken cancellationToken)
     {
         MatchScenarioSettings settings =
@@ -172,7 +185,8 @@ internal static class Program
                     enableDebugCapture:
                         options.DiagnosticsOutput is not null ||
                         options.SaveOutput is not null ||
-                        options.ReplayOutput is not null) with
+                        options.ReplayOutput is not null,
+                    composition: registry.Resolve(options.ScenarioKey)) with
                 {
                     Scenario = settings
                 };
@@ -351,7 +365,7 @@ internal static class Program
     }
 
     private static int ValidateSaveRecovery(
-        string path)
+        string path, Func<string, MatchComposition> resolver)
     {
         try
         {
@@ -360,7 +374,7 @@ internal static class Program
                     path);
             using MatchRuntime restored =
                 MatchPersistenceService.Restore(
-                    save);
+                    save, resolver);
             MatchAuthoritativeSnapshot state =
                 MatchAuthoritativeSnapshot.Capture(
                     restored);
@@ -384,7 +398,7 @@ internal static class Program
     }
 
     private static int ValidateReplayPlayback(
-        string path)
+        string path, Func<string, MatchComposition> resolver)
     {
         try
         {
@@ -393,7 +407,7 @@ internal static class Program
                     path);
             using MatchRuntime playback =
                 MatchPersistenceService.PlayReplay(
-                    replay);
+                    replay, resolver);
             MatchAuthoritativeSnapshot state =
                 MatchAuthoritativeSnapshot.Capture(
                     playback);
@@ -537,8 +551,9 @@ internal static class Program
     private static void WriteUsage(TextWriter writer)
     {
         writer.WriteLine("ForgeLine.Headless");
-        writer.WriteLine("  --scenario <lightweight|central-divide>");
+        writer.WriteLine("  --scenario <lightweight|central-divide|central-divide.directorate.v1>");
         writer.WriteLine("                               Scenario to execute (default: lightweight).");
+        writer.WriteLine("  --scenario-root <path>         Registered compiled-map root (default: executable/maps).");
         writer.WriteLine("  --profile <gameplay|validation>");
         writer.WriteLine("                               Match balance profile (default: gameplay).");
         writer.WriteLine("  --ticks <count>              Ticks to execute, or maximum ticks per match (default: 1000).");

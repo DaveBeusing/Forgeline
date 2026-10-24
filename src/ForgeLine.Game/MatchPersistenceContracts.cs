@@ -45,6 +45,8 @@ public sealed record PersistedMatchConfiguration(
     int InitialEntityCapacity,
     string CompositionKey)
 {
+    public ScenarioIdentity? Identity { get; init; }
+
     public static PersistedMatchConfiguration Capture(
         MatchRuntimeSettings settings)
     {
@@ -58,7 +60,7 @@ public sealed record PersistedMatchConfiguration(
             settings.EnableDebugCapture,
             settings.EnableSpatialQueryTiming,
             settings.InitialEntityCapacity,
-            settings.Composition.Key);
+            settings.Composition.Key) { Identity = settings.Composition.Identity };
     }
 
     public MatchRuntimeSettings CreateHeadlessRuntimeSettings(
@@ -89,9 +91,22 @@ public sealed record PersistedMatchConfiguration(
 
         if (!string.Equals(settings.Composition.Key, CompositionKey, StringComparison.Ordinal))
             throw new InvalidOperationException("Resolved composition does not match saved identity.");
+        if (Identity is not null && settings.Composition.Identity != Identity)
+            throw new MatchPersistenceException(MatchPersistenceFailureReason.IncompatibleVersion,
+                "Resolved map, terrain, content or rules differ from the saved scenario identity.");
+        if (Identity is null && CompositionKey == CentralDivideScenario.CompositionKey &&
+            settings.Composition.Identity != LegacyCentralDivideIdentity)
+            throw new MatchPersistenceException(MatchPersistenceFailureReason.IncompatibleVersion,
+                "Legacy Central Divide requires its historical qualified map and content revision.");
         settings.Validate();
         return settings;
     }
+    // Frozen compatibility target for payloads 1–6 with the current authoritative state schema.
+    private static ScenarioIdentity LegacyCentralDivideIdentity => new(
+        "prototype.vertical_slice", 1, "d60f7ae9d4d6b6771269bd53ccfada847615c1d3f261b87e6ba0223e55f276ef", 1,
+        "directorate.v1", "192624b7d2011b4ae6d0858d74d2fdfa9dc0d361c029444bf663f785556ffbd9",
+        "directorate.starting-base.v1", "command-core-elimination.v1");
+
     private static MatchComposition ResolveBuiltin(string key) =>
         key == CentralDivideScenario.CompositionKey
             ? CentralDivideScenario.CreateComposition()

@@ -27,6 +27,9 @@ internal readonly record struct HeadlessOptions(
     string? ReplayInput,
     bool ShowHelp)
 {
+    public string ScenarioKey { get; init; } = CentralDivideScenario.CompositionKey;
+    public string? ScenarioRoot { get; init; }
+
     public static HeadlessOptions Parse(string[] args)
     {
         ArgumentNullException.ThrowIfNull(args);
@@ -50,6 +53,7 @@ internal readonly record struct HeadlessOptions(
         string? loadInput = null;
         string? replayInput = null;
         bool showHelp = false;
+        string? scenarioRoot = null;
 
         for (int index = 0; index < args.Length; index++)
         {
@@ -61,6 +65,10 @@ internal readonly record struct HeadlessOptions(
                     scenario =
                         ParseScenario(
                             GetValue(args, ref index, argument));
+                    break;
+
+                case "--scenario-root":
+                    scenarioRoot = GetValue(args, ref index, argument);
                     break;
 
                 case "--profile":
@@ -185,6 +193,8 @@ internal readonly record struct HeadlessOptions(
 
         if (!showHelp)
         {
+            if (scenarioRoot is not null && scenario != HeadlessScenarioKind.Match)
+                throw new ArgumentException("--scenario-root requires a registered match scenario.");
             ValidateCombination(
                 scenario,
                 profile,
@@ -217,7 +227,7 @@ internal readonly record struct HeadlessOptions(
             replayOutput,
             loadInput,
             replayInput,
-            showHelp);
+            showHelp) { ScenarioRoot = scenarioRoot };
     }
 
     private static void ValidateCombination(
@@ -334,7 +344,7 @@ internal readonly record struct HeadlessOptions(
         {
             "lightweight" =>
                 HeadlessScenarioKind.Lightweight,
-            "central-divide" or "vertical-slice" =>
+            "central-divide" or "vertical-slice" or CentralDivideScenario.CompositionKey =>
                 HeadlessScenarioKind.Match,
             _ =>
                 throw new ArgumentException(

@@ -47,6 +47,7 @@ dotnet restore ForgeLine.sln
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet build ForgeLine.sln --configuration Release --no-restore
 dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
+pwsh ./build/Test-CompiledScenarioLoading.ps1
 pwsh ./build/Build-RuntimeAssets.ps1 -Mode build -ForceRebuild -NoBuild
 pwsh ./build/Test-RuntimeAssetPipeline.ps1
 
@@ -80,6 +81,8 @@ they do not replace the complete solution test, WARP, package, recovery or
 natural terminal-match checks.
 
 Repository settings must require that check before merge once `master` protection is applied. Integration preserves small validated technical commits. Ordinary merge and rebase integration remain permitted; the existing no-squash policy remains in force. Documentation does not itself enforce branch protection, so the effective GitHub settings must be verified by readback. See [Project Context and Repository Governance](ProjectContext.md).
+
+The compiled scenario loading and recovery CI gate verifies complete terrain parity, loaded map state, identity rejection, owned new/load/restart and disabled setup entries. Test-CompiledScenarioLoading exercises the actual CLI and missing-content failure. Publish-PreAlpha additionally qualifies the map and runs Validate-ScenarioPackage from each exported client folder. These checks preserve all existing full-solution, renderer, asset, package and natural terminal gates. See [compiled scenario contracts](StrategicMapAndOperationalGeography.md).
 
 ## Test Projects
 

@@ -75,3 +75,7 @@ docs/qualification/infrastructure/*.json text eol=lf
 docs/qualification/infrastructure/*.json.gz binary
 docs/qualification/infrastructure/*.png binary
 docs/qualification/infrastructure/**/*.png binary
+
+# Registered compiled maps retain their exact integrity bytes on every checkout.
+assets/maps/runtime/*.flmap.json -text -whitespace
+assets/maps/runtime/*.sha256 text eol=lf

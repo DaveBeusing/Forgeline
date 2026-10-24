@@ -14,6 +14,12 @@ internal static class MatchPersistenceValidation
         var value = configuration!;
         Require(value.Scenario is not null && value.Participants is not null &&
             !string.IsNullOrWhiteSpace(value.CompositionKey), "Missing scenario, participants or composition identity.");
+        if (value.Identity is ScenarioIdentity identity)
+            Require(!string.IsNullOrWhiteSpace(identity.MapKey) && identity.MapRevision > 0 &&
+                Hash(identity.MapSha256) && identity.TerrainVersion > 0 &&
+                !string.IsNullOrWhiteSpace(identity.ContentKey) && Hash(identity.ContentSha256) &&
+                !string.IsNullOrWhiteSpace(identity.StartRule) && !string.IsNullOrWhiteSpace(identity.ObjectiveRule),
+                "Invalid saved scenario identity.");
         Require(value.InitialEntityCapacity > 0, "Invalid initial entity capacity.");
         Require(value.Participants!.Count >= 2 && value.Participants.All(p => p is not null), "Invalid participants.");
         Require(value.Participants.Select(p => p.Player.Value).Distinct().Count() == value.Participants.Count &&

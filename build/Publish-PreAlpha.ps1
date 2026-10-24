@@ -57,6 +57,7 @@ function Publish-Client {
         throw "dotnet publish failed with exit code $LASTEXITCODE."
     }
 
+    & "$PSScriptRoot/Validate-ScenarioPackage.ps1" -PublishRoot $Destination
     & "$PSScriptRoot/Validate-UiFonts.ps1" -PublishRoot $Destination
     & "$PSScriptRoot/Test-WindowsApplicationIcon.ps1" -ClientPath (Join-Path $Destination 'ForgeLine.Client.exe')
 
@@ -105,6 +106,7 @@ function Publish-Client {
         targetFramework = "net10.0-windows"; runtimeIdentifier = "win-x64"
         configuration = $Configuration; sdk = $sdk; sourceTreeClean = ($dirty.Count -eq 0)
         runtimeAssetSignature = $runtimeManifest.contentSignature; runtimeAssetCompiler = $runtimeManifest.compilerVersion
+        scenarioMapSha256 = (Get-FileHash -LiteralPath (Join-Path $Destination "maps/central-divide.flmap.json") -Algorithm SHA256).Hash.ToLowerInvariant()
     } | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $Destination "build-provenance.json") -Encoding utf8NoBOM
 
     $manifestPath = Join-Path $Destination "manifest.sha256"
@@ -148,6 +150,10 @@ $archivePath = Join-Path $outputRootAbsolute "FORGELINE-$buildVersion-win-x64.zi
 foreach ($path in @($archivePath, "$archivePath.sha256", "$archivePath.provenance.json")) {
     if (Test-Path -LiteralPath $path) { throw "Artifact already exists: $path. Refusing replacement." }
 }
+# Rebuild and qualify the same registered map contract before exporting client content.
+& dotnet run --project (Join-Path $repoRoot 'tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj') --configuration $Configuration -- --output (Join-Path $repoRoot 'artifacts/maps/package-central-divide.flmap.json') --qualification-output (Join-Path $repoRoot 'artifacts/maps/package-qualification.json')
+if ($LASTEXITCODE -ne 0) { throw 'Registered scenario qualification failed before packaging.' }
+
 # Default publishing builds an owned cache, including on a clean checkout. CI may supply
 # the exact previously built/tested root; validate mode never touches sources or recompiles it.
 $assetMode = if ($RuntimeAssetRoot) { "validate" } else { "build" }
