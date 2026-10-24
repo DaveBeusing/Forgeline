@@ -352,7 +352,7 @@ Minimize/pause, terminal freeze/acknowledgement, restart, shutdown, and owner fa
 
 ## World presentation asset boundary
 
-`ForgeLine.Game` owns stable world-presentation identities and canonical Central Divide placement data without reading asset files. `ForgeLine.Presentation` maps those identities to stable runtime asset IDs, derives resource presentation state, selects LODs, and caches compiled mesh buffers. `ForgeLine.Client` loads the generated `RuntimeAssetCatalog` and passes it to the render host.
+`ForgeLine.Game` loads qualified gameplay map/terrain data and owns stable world-presentation identities. Rendering asset lookup and binary loading belong to the presentation/client boundary. `ForgeLine.Presentation` maps those identities to stable runtime asset IDs, derives resource presentation state, selects LODs, and caches compiled mesh buffers. `ForgeLine.Client` loads the generated `RuntimeAssetCatalog` and passes it to the render host.
 
 This preserves the intended direction: source assets -> Asset Compiler -> runtime assets -> Presentation/Graphics. Simulation never loads source or runtime rendering assets.
 
