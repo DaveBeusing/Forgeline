@@ -104,10 +104,11 @@ public static class CentralDivideScenario
         MatchScenarioProfile profile,
         ulong seed = 17,
         bool enableDiagnostics = false,
-        bool enableDebugCapture = false) =>
+        bool enableDebugCapture = false,
+        MatchComposition? composition = null) =>
         new()
         {
-            Composition = CreateComposition(),
+            Composition = composition ?? CreateComposition(),
             Scenario =
                 CreateSettings(profile),
             Seed = seed,
@@ -125,10 +126,11 @@ public static class CentralDivideScenario
     public static MatchRuntimeSettings CreateClient(
         JobScheduler scheduler,
         ulong seed = 17,
-        bool enableDiagnostics = true) =>
+        bool enableDiagnostics = true,
+        MatchComposition? composition = null) =>
         new()
         {
-            Composition = CreateComposition(),
+            Composition = composition ?? CreateComposition(),
             Scenario =
                 CreateSettings(
                     MatchScenarioProfile.Gameplay),

@@ -44,6 +44,8 @@ internal sealed class ClientApplication
     private const int MaximumDebugInstanceBoxes = 24;
     private const int MaximumDebugLabels = 4;
     internal const int RestartRequestedExitCode = 10;
+    private const int SessionRestartExitCode = 12;
+    private ClientSessionRequest? _pendingRestart;
 
     private static readonly PlayerId LocalPlayer = new(1);
     private static readonly PlayerId OpposingPlayer = new(2);
@@ -122,7 +124,7 @@ internal sealed class ClientApplication
                 window.ClientSize.IsEmpty);
 
         var newGame =
-            new NewGameModel();
+            new NewGameModel(InspectScenarios());
         RuntimeAssetCatalog runtimeAssets;
         IReadOnlyList<LoadGameEntry> startupSaves;
         string? splashBypassReason = ClientStartupLoop.SplashBypassReason(
@@ -186,8 +188,13 @@ internal sealed class ClientApplication
         while (window.IsOpen)
         {
             ClientSessionRequest sessionRequest;
-            if (smokeTest)
-                sessionRequest = ClientSessionRequest.NewGame(newGame.Configuration.Seed);
+            if (_pendingRestart is ClientSessionRequest restart)
+            {
+                sessionRequest = restart;
+                _pendingRestart = null;
+            }
+            else if (smokeTest)
+                sessionRequest = ClientSessionRequest.NewGame(newGame.Configuration.Seed, newGame.SelectedScenario.Key);
             else
             {
                 FrontendSessionSelectionResult selection = RunFrontendSessionSelection(window,
@@ -202,6 +209,7 @@ internal sealed class ClientApplication
             {
                 int result = RunMatchSession(window, runtimeAssets, sessionRequest, smokeTest,
                     renderInstanceCount, visualQualificationOutput, qualificationWindow);
+                if (result == SessionRestartExitCode) continue;
                 if (result != SessionReturnToMenuExitCode || smokeTest) return result;
                 sessionFeedback = "SESSION LOAD CANCELLED";
             }
@@ -969,7 +977,8 @@ internal sealed class ClientApplication
             if (inputMatchTerminal &&
                 restartPressed)
             {
-                return RestartRequestedExitCode;
+                _pendingRestart = ClientSessionRequest.Restart(scenario.RuntimeSettings);
+                return SessionRestartExitCode;
             }
 
             if (inputMatchTerminal &&
@@ -3256,6 +3265,7 @@ internal sealed class ClientApplication
             if (shell.Screen != transitionScreen)
             {
                 transitionScreen = shell.Screen;
+                if (shell.Screen == GameFrontendScreen.NewGame) newGame.RefreshScenarios(InspectScenarios());
                 frontendFeedback = string.Empty;
                 detailScroll = 0;
             }
@@ -3330,6 +3340,11 @@ internal sealed class ClientApplication
             }
             else if (shell.Screen == GameFrontendScreen.NewGame)
             {
+                if (ConsumeKeyPress(input, PlatformKey.Up, ref upHeld)) newGame.MoveScenario(-1);
+                if (ConsumeKeyPress(input, PlatformKey.Down, ref downHeld)) newGame.MoveScenario(1);
+                if (primaryPointerPressed && input.HasPointerPosition &&
+                    FrontendHitTesting.DetailRow(input.PointerPosition.X, input.PointerPosition.Y, frontendLayout, 3) == 0)
+                    newGame.MoveScenario(1);
                 if (ConsumeKeyPress(
                         input,
                         PlatformKey.Left,
@@ -3370,17 +3385,17 @@ internal sealed class ClientApplication
                                 : newGame.Configuration.Seed + 1);
                 }
 
-                if (enter ||
+                if (newGame.CanStartSelectedScenario && (enter ||
                     (primaryPointerPressed &&
                      input.HasPointerPosition &&
                      FrontendHitTesting.PrimaryAction(
                          input.PointerPosition.X,
                          input.PointerPosition.Y,
-                        frontendLayout)))
+                        frontendLayout))))
                 {
                     return FrontendSessionSelectionResult.Start(
                         ClientSessionRequest.NewGame(
-                            newGame.Configuration.Seed));
+                            newGame.Configuration.Seed, newGame.SelectedScenario.Key));
                 }
             }
             else if (shell.Screen == GameFrontendScreen.LoadGame)
@@ -3607,6 +3622,10 @@ internal sealed class ClientApplication
 
         return FrontendSessionSelectionResult.Exit();
     }
+
+    private static NewGameScenarioOption[] InspectScenarios() => ScenarioRegistry.Default.Inspect()
+        .Select(entry => new NewGameScenarioOption(entry.Descriptor.Key, entry.Descriptor.DisplayName, entry.Available, entry.Error))
+        .ToArray();
 
     private readonly record struct FrontendSessionSelectionResult(
         ClientSessionRequest? Session,

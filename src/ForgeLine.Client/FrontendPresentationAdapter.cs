@@ -81,8 +81,11 @@ internal static class FrontendPresentationAdapter
                     CanDecrease: model.Configuration.Seed > 0,
                     CanIncrease: model.Configuration.Seed < ulong.MaxValue)
             ],
-            "LEFT/RIGHT  CHANGE SEED     ENTER  START MATCH     ESC  BACK",
-            "START");
+            model.CanStartSelectedScenario
+                ? "UP/DOWN  SCENARIO     LEFT/RIGHT  SEED     ENTER  START     ESC  BACK"
+                : model.SelectedScenario.Error ?? "SCENARIO UNAVAILABLE",
+            model.CanStartSelectedScenario ? "START" : string.Empty)
+        with { DisabledPrimaryAction = model.CanStartSelectedScenario ? string.Empty : "START" };
 
     internal static FrontendSurfaceView LoadGame(
         LoadGameModel model, int visibleRows = FrontendDesign.MaximumVisibleDetailRows)
