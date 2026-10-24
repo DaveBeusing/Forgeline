@@ -555,6 +555,7 @@ public sealed class SkirmishProductionPolicyTests
                 validation);
         EntityRegistry entities =
             scenario.Simulation.Entities;
+        SkirmishScenarioHarness.CompleteResearchForPolicyFixture(scenario, new PlayerId(1));
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
         WorldTransform coreTransform =
@@ -960,6 +961,7 @@ public sealed class SkirmishProductionPolicyTests
                 });
         EntityRegistry entities =
             scenario.Simulation.Entities;
+        SkirmishScenarioHarness.CompleteResearchForPolicyFixture(scenario, new PlayerId(1));
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
         Vector3 stagingPosition =
@@ -1218,6 +1220,7 @@ public sealed class SkirmishProductionPolicyTests
                 validation);
         EntityRegistry entities =
             scenario.Simulation.Entities;
+        SkirmishScenarioHarness.CompleteResearchForPolicyFixture(scenario, new PlayerId(1));
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
         Vector3 stagingPosition =
