@@ -39,6 +39,7 @@ internal static class BattlefieldArtifactValidation
             map.StartRule == ScenarioContentIdentity.StartRule && map.ObjectiveRule == ScenarioContentIdentity.ObjectiveRule,
             "Compiled map has an unsupported content or rule identity.");
         Require(map.Terrain is not null, "Compiled map requires an authoritative terrain recipe.");
+        Require(map.Metadata.WidthMeters <= 8192 && map.Metadata.HeightMeters <= 8192, "Compiled map dimensions exceed the runtime budget.");
         Require(map.Starts.Length is >= 2 and <= 16 && map.Objectives.Length <= 16 &&
             map.Resources.Length <= 4096 && map.WorldObjects.Length <= 16384 && map.Sites.Length <= 256 &&
             map.RoadNodes.Length <= 2048 && map.RoadEdges.Length <= 8192 && map.Crossings.Length <= 128 &&

@@ -21,15 +21,7 @@ public static class CentralDivideScenario
 
     public const string CompositionKey = "central-divide.directorate.v1";
 
-    public static MatchComposition CreateComposition()
-    {
-        var content = CreateContent();
-        return new MatchComposition(CompositionKey, CentralDivideBattlefield.Create(), content,
-            static map => CentralDivideTerrainFactory.Create(map),
-            static (entities, inventories, factory, terrain, start, catalogs, stock) =>
-                CentralDivideStartingBaseFactory.Create(entities, inventories, factory, terrain, start, stock, catalogs.Units, catalogs.Buildings),
-            static systems => systems);
-    }
+    public static MatchComposition CreateComposition() => ScenarioRegistry.Default.Resolve(CompositionKey);
 
     public static MatchContent CreateContent()
     {
