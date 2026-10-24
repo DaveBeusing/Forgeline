@@ -17,6 +17,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);
     private readonly OperationsVertex[] _vertices = new OperationsVertex[MaxVertices];
     private readonly NotificationDetailText _notificationDetails = new();
+    private readonly OperationsRuleDetailText _ruleDetails = new();
     private readonly OperationsPanelMotion _motion = new();
     private int _count, _line, _width, _height;
     private HudRect _bounds;
@@ -76,7 +77,8 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     !_skin.Panel(_bounds, "panel.primary", OperationsPanelVisuals.BackgroundOpacity * _panelOpacity))
                     Quad(_bounds, GameplayHudVisualStyle.PanelBackground with
                         { W = OperationsPanelVisuals.BackgroundOpacity * _panelOpacity });
-                if (view.Notifications) RenderNotificationDetails(context);
+                if (view.RuleControls is { } rules) RenderRules(context, rules);
+                else if (view.Notifications) RenderNotificationDetails(context);
                 else
                 {
                 var header = new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 24 * _scale);
@@ -191,6 +193,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     }
                     else Line("SELECT A FACILITY FOR CAUSE AND CONTROLS");
                     _bounds = panel;
+                    Control(context.Layout, 13, "RULES", selected: view.RuleEntryFocused);
                     Control(context.Layout, 9, selected.HasValue ? "FOCUS FACILITY" : "SELECT FACILITY TO FOCUS", enabled: selected.HasValue);
                     bool controls = selected.HasValue && selected.Value.Controls != PlayerActionPanelMode.Closed;
                     Control(context.Layout, 10, controls ? "OPEN EXISTING CONTROLS" : "NO FACILITY CONTROLS", enabled: controls);
@@ -213,6 +216,56 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         _text.Render(context.Graphics);
         LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
     }
+    private void RenderRules(in GameplayHudRenderContext context, in OperationsRulePanelView view)
+    {
+        Line("OPERATIONS RULES", true);
+        var panel = _bounds;
+        _bounds = panel with { Y = panel.Y + 28 * _scale, Height = 24 * _scale };
+        _line = 0;
+        Line(view.Data is null ? "SELECT ONE OWNED PROCESSOR" : "SELECTED PROCESSOR / LOCAL DRAFT");
+        _bounds = panel;
+        for (int i = 0; i < OperationsRulePanelLayout.ControlCount; i++)
+        {
+            var bounds = OperationsRulePanelLayout.Control(context.Layout, i);
+            bool enabled = OperationsRulePanelController.CanUse(i, view);
+            bool focused = view.Focus == i;
+            if (!_skin.Panel(bounds, "control.button_compact", OperationsPanelVisuals.BackgroundOpacity * _panelOpacity))
+                Quad(bounds, (focused ? GameplayHudVisualStyle.PanelSelected : GameplayHudVisualStyle.PanelRaised)
+                    with { W = OperationsPanelVisuals.BackgroundOpacity * _panelOpacity });
+            if (focused) Quad(bounds with { Width = 2 * _scale }, GameplayHudVisualStyle.Focus);
+            string label = i switch
+            {
+                0 => "BACK",
+                1 => view.NewDraft ? "NEW DRAFT / SELECT RULE" : "RULE / REV " + view.ExpectedRevision + " / NEXT",
+                2 => view.Draft.Template == ForgeLine.Game.OperationsRuleTemplate.PauseUntilOutputAvailable ? "OUTPUT RECOVERY" : "INPUT STOCK POLICY",
+                3 => ResourceLabel(view),
+                4 => OperationsRulePanelController.FieldLabel(view),
+                5 => "DECREASE",
+                6 => "INCREASE",
+                7 => view.Pending ? "PENDING" : "APPLY",
+                8 => view.NewDraft ? view.DraftEnabled ? "DRAFT ENABLED" : "DRAFT DISABLED" : view.Observed is { Enabled: true } ? "DISABLE" : "ENABLE",
+                9 => "REMOVE",
+                10 => "RELOAD / RESET",
+                _ => "DETAILS / NEXT PAGE"
+            };
+            if (!_text.AddCentered(label, bounds, LastPanelTextSize,
+                enabled ? GameplayHudVisualStyle.TextPrimary : GameplayHudVisualStyle.TextSecondary, _width, _height))
+            { _bounds = bounds; _line = 0; Line(label, enabled); _bounds = panel; }
+        }
+        var detail = OperationsRulePanelLayout.Details(context.Layout);
+        _ruleDetails.Update(view, MathF.Max(1, detail.Width - 12 * _scale), LastPanelTextSize);
+        _bounds = detail; _line = 0;
+        foreach (string line in _ruleDetails.Lines) Line(line, true);
+        _bounds = panel;
+    }
+    private static string ResourceLabel(in OperationsRulePanelView view)
+    {
+        if (view.Draft.Template == ForgeLine.Game.OperationsRuleTemplate.PauseUntilOutputAvailable) return "REAL OUTPUT CAPACITY";
+        if (view.Data is not null)
+            foreach (var input in view.Data.Inputs) if (input.ResourceId == view.Draft.Resource) return input.DisplayName;
+        return "QUEUE AN INPUT RECIPE";
+    }
+
     private void RenderNotificationDetails(in GameplayHudRenderContext context)
     {
         LastPanelTextSize = OperationsLayout.NotificationTextSize(context.Layout);

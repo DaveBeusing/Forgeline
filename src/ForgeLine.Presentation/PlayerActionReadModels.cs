@@ -698,20 +698,22 @@ internal static class PlayerActionSnapshotFactory
             supply,
             tactical,
             technology,
-            CaptureRules(context, extraction, production));
+            interaction.OperationsOpen ? CaptureRules(context, extraction, production) : null);
     }
 
     private static OperationsRuleSelectionSnapshot? CaptureRules(SimulationContext context,
         PresentationExtractionContext extraction, PlayerProductionFacilityActionReadModel? production)
     {
-        if (production is null || !context.Entities.TryGetComponent(production.Entity, out ProductionFacility facility) ||
+        if (production is null || !context.Entities.TryGetComponent(production.Entity, out ControllableEntity owner) ||
+            !owner.IsControllable || context.Entities.TryGetComponent(production.Entity, out HealthState health) && health.IsDepleted ||
+            !context.Entities.TryGetComponent(production.Entity, out ProductionFacility facility) ||
             !extraction.Scenario.Inventories.Contains(facility.InputInventory)) return null;
         RecipeId recipeId = production.ActiveRecipe.IsSpecified ? production.ActiveRecipe :
             production.Requests.Count > 0 ? production.Requests[0].RecipeId : RecipeId.None;
         var inputs = production.Recipes.FirstOrDefault(recipe => recipe.RecipeId == recipeId)?.Inputs ?? [];
         return new(extraction.Player, production.Entity,
             extraction.Scenario.Inventories.GetTotalCapacity(facility.InputInventory), context.TickDuration,
-            recipeId, inputs, extraction.Scenario.OperationsRules.Capture(extraction.Player));
+            recipeId, inputs, extraction.Scenario.OperationsRules.Capture(extraction.Player), production.Requests);
     }
 
     private static PlayerConstructionActionReadModel[]
