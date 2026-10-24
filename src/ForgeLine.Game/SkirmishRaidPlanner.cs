@@ -145,7 +145,12 @@ public sealed class SkirmishRaidPlanner
         SkirmishRaidState state, FactionIntelligenceSnapshot knowledge, SkirmishRaidConfiguration policy, bool priority)
     {
         EntityId[] members = Members(context.Entities, controller.Player, state);
-        if (members.Length == 0) return Finish(context, state, policy, SkirmishRaidReason.OrdersReplaced);
+        if (members.Length == 0)
+        {
+            bool lost = new[] { state.First, state.Second, state.Third }
+                .Where(e => e.IsValid).All(e => !context.Entities.IsAlive(e));
+            return Finish(context, state, policy, lost ? SkirmishRaidReason.UnitsLost : SkirmishRaidReason.OrdersReplaced);
+        }
         if (priority)
         {
             // Release only the orders that still belong to this raid. The next normal decision may defend.
@@ -278,7 +283,7 @@ public sealed class SkirmishRaidPlanner
     private static bool IsReady(EntityRegistry entities, EntityId entity, PlayerId owner,
         SkirmishRaidConfiguration policy, bool continuing = false) =>
         entities.IsAlive(entity) && entities.TryGetComponent(entity, out ControllableEntity controllable) &&
-        controllable.Owner == owner && entities.TryGetComponent(entity, out UnitIdentity identity) &&
+        controllable.IsControllable && controllable.Owner == owner && entities.TryGetComponent(entity, out UnitIdentity identity) &&
         identity.UnitId != UnitIds.ScoutVehicle && identity.UnitId != UnitIds.CargoTruck && identity.UnitId != UnitIds.SupplyTruck &&
         entities.TryGetComponent(entity, out HealthState health) && !health.IsDepleted &&
         entities.HasComponent<WorldTransform>(entity) && entities.HasComponent<WeaponState>(entity) &&

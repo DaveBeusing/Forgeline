@@ -244,6 +244,17 @@ public sealed class SkirmishRaidPlannerTests
         Assert.False(guarded.State.IsActive);
     }
 
+    [Fact]
+    public void LosingEveryRaiderCompletesWithLossRatherThanOrderReplacement()
+    {
+        var fixture = new Fixture(); fixture.Step();
+        foreach (EntityId unit in fixture.Raiders().ToArray()) Assert.True(fixture.Entities.DestroyEntity(unit));
+        fixture.Step();
+        Assert.Equal(SkirmishRaidPhase.Complete, fixture.State.Phase);
+        Assert.Equal(SkirmishRaidReason.UnitsLost, fixture.State.Reason);
+        Assert.True(fixture.State.NextAllowedTick > fixture.Simulation.CurrentTick);
+    }
+
     public static IEnumerable<object[]> IndustrialTargets =>
         new[] { BuildingIds.PowerPlant, BuildingIds.Smelter, BuildingIds.Refinery,
             BuildingIds.ElectronicsPlant, BuildingIds.AmmunitionPlant, BuildingIds.Barracks,
