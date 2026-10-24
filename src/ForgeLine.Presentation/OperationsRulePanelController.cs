@@ -44,7 +44,7 @@ public static class OperationsRulePanelLayout
     {
         var panel = OperationsLayout.Panel(layout);
         float s = OperationsLayout.Scale(layout);
-        return new(panel.X + 6 * s, panel.Y + 240 * s, MathF.Max(0, panel.Width - 12 * s), 100 * s);
+        return new(panel.X + 6 * s, panel.Y + 240 * s, MathF.Max(0, panel.Width - 12 * s), 102 * s);
     }
 }
 

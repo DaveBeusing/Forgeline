@@ -223,6 +223,12 @@ public sealed class OperationsRuleControlsTests
         var details = new OperationsRuleDetailText();
         float size = MathF.Max(14 * MathF.Min(1, layout.Scale), 14 * OperationsLayout.Scale(layout));
         var region = OperationsRulePanelLayout.Details(layout);
+        float panelScale = OperationsLayout.Scale(layout);
+        float leading = MathF.Max(15 * MathF.Min(1, layout.Scale), 16 * panelScale);
+        float lastLineBottom = region.Y + 4 * panelScale + 5 * leading + size;
+        Assert.True(lastLineBottom <= region.Bottom - 2 * panelScale,
+            $"All six detail lines must fit: {lastLineBottom} / {region.Bottom - 2 * panelScale}");
+        Assert.True(region.Bottom < OperationsRulePanelLayout.Control(layout, 11).Y);
         details.Update(f.View, region.Width - 16 * OperationsLayout.Scale(layout), size);
         var all = new System.Text.StringBuilder();
         for (int page = 0, count = details.PageCount; page < count; page++)
