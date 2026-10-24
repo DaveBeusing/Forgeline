@@ -9,9 +9,12 @@ public sealed class HierarchicalPathfinder
         HighLevelRouteCacheKey,
         Lazy<HighLevelRouteCacheEntry>> _highLevelCache = new();
     private NavigationWorld _world;
+    private readonly int _maximumFallbackExpandedNodes;
 
-    public HierarchicalPathfinder(NavigationWorld world)
+    public HierarchicalPathfinder(NavigationWorld world, int maximumFallbackExpandedNodes = 16_384)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumFallbackExpandedNodes);
+        _maximumFallbackExpandedNodes = maximumFallbackExpandedNodes;
         _world = world ??
             throw new ArgumentNullException(nameof(world));
     }
@@ -136,9 +139,21 @@ public sealed class HierarchicalPathfinder
 
         if (!refined)
         {
-            return Failure(
-                world.Version,
-                NavigationFailureReason.NoLocalRoute);
+            // Only failed corridors enter the bounded general search. Use the
+            // same topology, diagonal clearance and deterministic frontier.
+            refined = LocalPathSearch.TryFindPath(
+                grid, graph, highLevel.Route, startCell, destinationCell,
+                capabilities, corridorExpansion: 0, out local,
+                maximumExpandedNodes: _maximumFallbackExpandedNodes,
+                restrictToCorridor: false);
+            localExpanded += local.ExpandedNodeCount;
+        }
+
+        if (!refined)
+        {
+            return Failure(world.Version, local.BudgetExhausted
+                ? NavigationFailureReason.SearchBudgetExhausted
+                : NavigationFailureReason.NoLocalRoute);
         }
 
         Vector3[] waypoints =

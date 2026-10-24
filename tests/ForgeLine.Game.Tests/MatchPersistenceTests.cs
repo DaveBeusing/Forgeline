@@ -1,14 +1,292 @@
 using System.Numerics;
 using ForgeLine.Combat;
 using ForgeLine.Core;
+using ForgeLine.Ecs;
 using ForgeLine.Economy;
+using ForgeLine.Logistics;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Game.Tests;
 
 public sealed class MatchPersistenceTests
 {
+    [Fact]
+    public void AcceptedLoadedConvoyAndManualEscortReplacementRoundTrip()
+    {
+        MatchRuntimeSettings settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 2026);
+        MatchComposition basis = settings.Composition;
+        EntityId destination = EntityId.Invalid;
+        MatchComposition composition = basis with
+        {
+            Key = "loaded-convoy-recovery",
+            CreateStartingBase = (entities, inventories, factory, terrain, start, content, stock) =>
+            {
+                var result = basis.CreateStartingBase(entities, inventories, factory, terrain, start, content, stock);
+                if (start.Player != new PlayerId(1)) return result;
+                Vector3 corePosition = entities.GetComponent<WorldTransform>(result.CommandCore).Position;
+                destination = entities.CreateEntity();
+                InventoryId inventory = inventories.CreateInventory(new InventorySpecification(1000));
+                entities.AddComponent(destination, new WorldTransform(corePosition + new Vector3(300, 0, 0), Quaternion.Identity, Vector3.One));
+                entities.AddComponent(destination, new ControllableEntity(start.Player, ControllableEntityCategory.Building));
+                entities.AddComponent(destination, new CompletedBuilding(BuildingIds.StorageDepot, start.Player, SimulationTick.Zero));
+                entities.AddComponent(destination, new InventoryStorage(inventory));
+                entities.AddComponent(destination, new StorageDepot(inventory, result.Faction));
+                entities.AddComponent(destination, new BuildingLoadingDock(Vector3.Zero, Vector3.UnitX, 12));
+                BuildingCombatInitialization.Initialize(entities, destination, content.Buildings[BuildingIds.StorageDepot]);
+                return result;
+            }
+        };
+        settings = settings with { Composition = composition,
+            Participants = CentralDivideScenario.CreateDefaultParticipants(false, false) };
+        using MatchRuntime original = MatchRuntime.Create(settings, TestContext.Current.CancellationToken);
+        var issuer = new PlayerId(1);
+        foreach (var resource in new[] { ResourceIds.Fuel, ResourceIds.Ammunition })
+            original.Simulation.SubmitCommand(PlayerLogisticsActionCommand.SetStockPolicy(issuer, destination, resource,
+                150, 200, 400, LogisticsStockPriority.High, true, SimulationTick.Zero), SimulationTick.Zero.Next());
+        EntityId escort = original.GetBase(issuer).StartingUnits[0];
+        Vector3 escortPosition = original.Simulation.Entities.GetComponent<WorldTransform>(escort).Position;
+        original.Simulation.SubmitCommand(new MoveEntitiesCommand(issuer, [escort], escortPosition, SimulationTick.Zero), SimulationTick.Zero.Next());
+        EntityId[] trucks = [];
+        string trace = string.Empty;
+        bool found = original.RunUntil(runtime =>
+        {
+            var activeTrucks = new List<EntityId>();
+            foreach (EntityId entity in runtime.Simulation.Entities.Query<CargoTransportOrder, CargoTransportRouteState>()) activeTrucks.Add(entity);
+            trucks = activeTrucks
+                .Where(entity => runtime.Simulation.Entities.TryGetComponent(entity, out ControllableEntity control) && control.Owner == issuer &&
+                    runtime.Simulation.Entities.TryGetComponent(entity, out CargoTransportRuntimeState state) &&
+                    state.Lifecycle == CargoTransportLifecycleState.ToDestination && state.ObservedNetworkVersion == runtime.Logistics.Version &&
+                    (!runtime.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit visit) ||
+                     !visit.LaneEntered && visit.Status is VehicleDockStatus.Reserved or VehicleDockStatus.Busy) &&
+                    !runtime.Simulation.Entities.HasComponent<CargoFuelServiceState>(entity) &&
+                    !runtime.Simulation.Entities.HasComponent<ResupplyOrder>(entity) &&
+                    !runtime.Simulation.Entities.HasComponent<SupplyRescueAssignment>(entity) &&
+                    !runtime.Simulation.Entities.HasComponent<CargoConvoyMember>(entity))
+                .Where(entity => runtime.Simulation.Entities.GetComponent<CargoTransportRouteState>(entity).Route is not null)
+                .GroupBy(entity =>
+                {
+                    var order = runtime.Simulation.Entities.GetComponent<CargoTransportOrder>(entity);
+                    var route = runtime.Simulation.Entities.GetComponent<CargoTransportRouteState>(entity);
+                    return (order.Origin, order.Destination, route.NextSegmentIndex,
+                        Edges: string.Join(',', route.Route!.Segments.Select(segment => segment.EdgeId)));
+                })
+                .Where(group => group.Count() >= 2).Select(group => group.Take(2).ToArray()).FirstOrDefault() ?? [];
+            if (runtime.Simulation.CurrentTick.Value % 500 == 0)
+                foreach (EntityId unit in runtime.GetBase(issuer).StartingUnits.Skip(1))
+                {
+                    var state = runtime.Simulation.Entities.GetComponent<CargoTransportRuntimeState>(unit);
+                    trace += $"tick={runtime.Simulation.CurrentTick.Value} truck={unit} state={state} fuelService={runtime.Simulation.Entities.HasComponent<CargoFuelServiceState>(unit)} dock={runtime.Simulation.Entities.HasComponent<VehicleDockVisit>(unit)}; ";
+                }
+            return trucks.Length == 2;
+        }, 5000, TestContext.Current.CancellationToken);
+        Assert.True(found, trace);
+        var create = PlayerLogisticsActionCommand.CreateCargoConvoy(issuer, trucks, [escort], original.Simulation.CurrentTick);
+        original.Simulation.SubmitCommand(new MoveEntitiesCommand(issuer, [escort], escortPosition, original.Simulation.CurrentTick), original.Simulation.CurrentTick.Next());
+        original.Simulation.SubmitCommand(create, original.Simulation.CurrentTick.Next());
+        original.Simulation.AdvanceOneTick();
+        Assert.True(create.Accepted, create.FailureReason.ToString());
+        Assert.True(original.Simulation.Entities.HasComponent<CargoConvoyEscort>(escort));
+        VerifyCheckpoint(continueTicks: false);
+        var manual = new MoveEntitiesCommand(issuer, [escort], escortPosition + new Vector3(40, 0, 0), original.Simulation.CurrentTick);
+        original.Simulation.SubmitCommand(manual, original.Simulation.CurrentTick.Next());
+        original.Simulation.AdvanceOneTick();
+        Assert.Equal(1, manual.AcceptedTargetCount);
+        Assert.False(original.Simulation.Entities.HasComponent<CargoConvoyEscort>(escort));
+        VerifyCheckpoint(continueTicks: true);
+        InventoryId received = original.Simulation.Entities.GetComponent<InventoryStorage>(destination).InventoryId;
+        Assert.True(original.RunUntil(runtime =>
+            runtime.Inventories.GetQuantity(received, ResourceIds.Fuel) == 200 &&
+            runtime.Inventories.GetQuantity(received, ResourceIds.Ammunition) == 200 &&
+            trucks.All(truck => !runtime.Simulation.Entities.HasComponent<CargoTransportOrder>(truck)),
+            5000, TestContext.Current.CancellationToken));
+        Assert.False(original.Simulation.Entities.IsAlive(create.CreatedConvoy));
+        InventoryId source = original.GetBase(issuer).StartingInventory;
+        Assert.Equal(0, original.Inventories.GetReservedQuantity(source, ResourceIds.Fuel));
+        Assert.Equal(0, original.Inventories.GetReservedQuantity(source, ResourceIds.Ammunition));
+        Assert.All(trucks, truck => Assert.False(original.Simulation.Entities.HasComponent<CargoConvoyMember>(truck)));
+        VerifyCheckpoint(continueTicks: true);
+
+
+        void VerifyCheckpoint(bool continueTicks)
+        {
+            var save = MatchPersistenceService.CaptureSave(original);
+            var replay = MatchPersistenceService.CaptureReplay(original);
+            MatchComposition Resolve(string key) => key == composition.Key ? composition : throw new InvalidOperationException(key);
+            using MatchRuntime restored = MatchPersistenceService.Restore(MatchPersistenceSerializer.DeserializeSave(
+                MatchPersistenceSerializer.SerializeSave(save)), Resolve);
+            using MatchRuntime playback = MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(
+                MatchPersistenceSerializer.SerializeReplay(replay)), Resolve);
+            Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+            Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+            if (!continueTicks) return;
+            foreach (ulong ticks in new ulong[] { 1, 7, 12 })
+            {
+                original.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+                restored.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+                playback.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+                string expected = MatchAuthoritativeSnapshot.Capture(original).ComputeSha256();
+                Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+                Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+            }
+        }
+    }
+
+    [Fact]
+    public void GroupedResupplyAndReplacementRoundTripThroughSaveAndReplay()
+    {
+        MatchRuntimeSettings settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 7419);
+        MatchComposition basis = settings.Composition;
+        EntityId recipient = EntityId.Invalid, partner = EntityId.Invalid;
+        Vector3 position = default;
+        MatchComposition composition = basis with
+        {
+            Key = "grouped-supply-recovery",
+            CreateStartingBase = (entities, inventories, factory, terrain, start, content, stock) =>
+            {
+                SkirmishStartingBase result = basis.CreateStartingBase(entities, inventories, factory, terrain, start, content, stock);
+                if (start.Player != new PlayerId(1)) return result;
+                position = entities.GetComponent<WorldTransform>(result.StartingUnits[0]).Position;
+                recipient = factory.Create(content.Units[UnitIds.RifleSquad], position, start.Player);
+                partner = factory.Create(content.Units[UnitIds.RifleSquad], position + new Vector3(4, 0, 0), start.Player);
+                EntityId enemy = factory.Create(content.Units[UnitIds.RifleSquad], position + new Vector3(20, 0, 0), new PlayerId(2));
+                entities.SetComponent(enemy, new FirePolicyState(FirePolicy.HoldFire));
+                entities.SetComponent(enemy, new HealthState(1000, 1000));
+                if (entities.HasComponent<AutomaticResupplyPolicy>(recipient)) entities.RemoveComponent<AutomaticResupplyPolicy>(recipient);
+                AmmunitionState ammunition = entities.GetComponent<AmmunitionState>(recipient);
+                double available = inventories.GetQuantity(ammunition.InventoryId, ResourceIds.Ammunition);
+                Assert.True(inventories.Remove(ammunition.InventoryId, ResourceIds.Ammunition, available - 1).Succeeded);
+                InventoryId supply = inventories.CreateInventory(new InventorySpecification(100, [ResourceIds.Ammunition]));
+                Assert.True(inventories.Add(supply, ResourceIds.Ammunition, 1).Succeeded);
+                EntityId provider = entities.CreateEntity();
+                entities.AddComponent(provider, new WorldTransform(position + new Vector3(1, 0, 0), Quaternion.Identity, Vector3.One));
+                entities.AddComponent(provider, new SupplyProvider(supply, start.Player, 10));
+                return result;
+            }
+        };
+        settings = settings with { Composition = composition,
+            Participants = CentralDivideScenario.CreateDefaultParticipants(false, false) };
+        using MatchRuntime original = MatchRuntime.Create(settings, TestContext.Current.CancellationToken);
+        var issuer = new PlayerId(1);
+        original.Simulation.SubmitCommand(PlayerTacticalActionCommand.HoldPosition(issuer, [recipient, partner], SimulationTick.Zero,
+            original.Intelligence, composition.Content.Weapons, composition.Content.Artillery), SimulationTick.Zero.Next());
+        original.Simulation.SubmitCommand(PlayerLogisticsActionCommand.RequestResupply(issuer, recipient, SimulationTick.Zero), SimulationTick.Zero.Next());
+        original.Simulation.AdvanceOneTick();
+        Assert.True(original.Simulation.Entities.HasComponent<ResupplyOrder>(recipient));
+        Assert.True(original.Simulation.Entities.HasComponent<CombatGroupMember>(recipient));
+        Assert.Equal(CombatOrderStatus.Resupplying, original.Simulation.Entities.GetComponent<TacticalCombatState>(recipient).Status);
+        VerifyCheckpoint();
+        original.Simulation.SubmitCommand(PlayerTacticalActionCommand.HoldPosition(issuer, [recipient], original.Simulation.CurrentTick,
+            original.Intelligence, composition.Content.Weapons, composition.Content.Artillery), original.Simulation.CurrentTick.Next());
+        original.Simulation.AdvanceOneTick();
+        Assert.False(original.Simulation.Entities.HasComponent<ResupplyOrder>(recipient));
+        VerifyCheckpoint();
+        original.Simulation.SubmitCommand(new MoveEntitiesCommand(issuer, [partner], position + new Vector3(160, 0, 0),
+            original.Simulation.CurrentTick), original.Simulation.CurrentTick.Next());
+        original.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        Assert.True(original.Simulation.Entities.HasComponent<NavigationPendingPath>(partner) ||
+            original.Simulation.Entities.HasComponent<NavigationRouteState>(partner));
+        VerifyCheckpoint();
+
+        void VerifyCheckpoint()
+        {
+            MatchSaveData save = MatchPersistenceService.CaptureSave(original);
+            MatchReplayData replay = MatchPersistenceService.CaptureReplay(original);
+            MatchComposition Resolve(string key) => key == composition.Key ? composition : throw new InvalidOperationException(key);
+            using MatchRuntime restored = MatchPersistenceService.Restore(MatchPersistenceSerializer.DeserializeSave(
+                MatchPersistenceSerializer.SerializeSave(save)), Resolve);
+            using MatchRuntime playback = MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(
+                MatchPersistenceSerializer.SerializeReplay(replay)), Resolve);
+            Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+            Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+            foreach (ulong ticks in new ulong[] { 1, 7, 12 })
+            {
+                original.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+                restored.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+                playback.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+                string expected = MatchAuthoritativeSnapshot.Capture(original).ComputeSha256();
+                Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+                Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+            }
+        }
+    }
+
+    [Fact]
+    public void ActiveDetourRouteRoundTripsThroughSaveAndReplay()
+    {
+        MatchRuntimeSettings settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 7420);
+        MatchComposition basis = settings.Composition;
+        BattlefieldStartPosition[] starts = [CreateStart(1, new Vector3(8, 0, 8)), CreateStart(2, new Vector3(56, 0, 56))];
+        var wall = new AxisAlignedBounds(new Vector3(28.1f, -1, 16.1f), new Vector3(28.9f, 2, 39.9f));
+        var map = new BattlefieldDefinition(new BattlefieldMapMetadata("recovery.detour", "Detour Recovery", 64, 64, 2),
+            starts, [], [], [], [], [], [],
+            starts.Select(start => new BattlefieldObjectiveDefinition($"core.{start.Player.Value}", start.Player, start.CommandCorePosition)).ToArray(),
+            [wall], basis.Battlefield.TerrainVisual);
+        EntityId unit = EntityId.Invalid;
+        Vector3 destination = new(30.5f, 0, 26.5f);
+        MatchComposition composition = basis with
+        {
+            Key = "detour-route-recovery",
+            Battlefield = map,
+            CreateTerrain = _ =>
+            {
+                var grid = new WorldGridSettings { ChunkSizeMeters = 32, HeightSamplesPerSide = 9 };
+                return new TerrainWorld(grid, Enumerable.Range(0, 4).Select(index => new TerrainChunk(
+                    new ChunkCoordinate(index % 2, index / 2), new TerrainHeightfield(9, 32, new float[81]))));
+            },
+            CreateStartingBase = (entities, inventories, factory, terrain, start, content, stock) =>
+            {
+                EntityId core = entities.CreateEntity();
+                entities.AddComponent(core, new CompletedBuilding(BuildingIds.CommandCore, start.Player, SimulationTick.Zero));
+                entities.AddComponent(core, new CommandFacility());
+                EntityId[] units = [];
+                if (start.Player == new PlayerId(1))
+                {
+                    unit = factory.Create(content.Units[UnitIds.RifleSquad], new Vector3(26.5f, 0, 26.5f), start.Player);
+                    units = [unit];
+                }
+                return new SkirmishStartingBase(start.Player, new FactionId((uint)start.Player.Value), core,
+                    EntityId.Invalid, inventories.CreateInventory(new InventorySpecification(1)), units);
+            }
+        };
+        settings = settings with { Composition = composition,
+            Participants = CentralDivideScenario.CreateDefaultParticipants(false, false),
+            Scenario = settings.Scenario with { NavigationCellSizeMeters = 1, NavigationSectorSizeCells = 8 } };
+        using MatchRuntime original = MatchRuntime.Create(settings, TestContext.Current.CancellationToken);
+        original.Simulation.SubmitCommand(new MoveEntitiesCommand(new PlayerId(1), [unit], destination, SimulationTick.Zero), SimulationTick.Zero.Next());
+        original.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        NavigationRouteState route = original.Simulation.Entities.GetComponent<NavigationRouteState>(unit);
+        Assert.Contains(route.Path.RefinedCells, cell => cell.Z < 16 || cell.Z > 39);
+        MatchSaveData save = MatchPersistenceService.CaptureSave(original);
+        MatchReplayData replay = MatchPersistenceService.CaptureReplay(original);
+        MatchComposition Resolve(string key) => key == composition.Key ? composition : throw new InvalidOperationException(key);
+        using MatchRuntime restored = MatchPersistenceService.Restore(MatchPersistenceSerializer.DeserializeSave(
+            MatchPersistenceSerializer.SerializeSave(save)), Resolve);
+        using MatchRuntime playback = MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(
+            MatchPersistenceSerializer.SerializeReplay(replay)), Resolve);
+        VerifyHashes();
+        foreach (ulong ticks in new ulong[] { 1, 7, 12, 600 })
+        {
+            original.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            restored.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            playback.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            VerifyHashes();
+        }
+        Assert.False(original.Simulation.Entities.HasComponent<NavigationPendingPath>(unit));
+        Assert.False(original.Simulation.Entities.HasComponent<NavigationRouteState>(unit));
+        Assert.InRange(Vector3.Distance(destination, original.Simulation.Entities.GetComponent<WorldTransform>(unit).Position), 0, 2);
+
+        void VerifyHashes()
+        {
+            string expected = MatchAuthoritativeSnapshot.Capture(original).ComputeSha256();
+            Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+            Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        }
+        static BattlefieldStartPosition CreateStart(ulong player, Vector3 position) => new(new PlayerId(player), position, position,
+            new AxisAlignedBounds(position - new Vector3(4, 4, 4), position + new Vector3(4, 4, 4)));
+    }
+
     [Fact]
     public void PreIndustrialCombatCheckpointsAreRejectedBeforeReconstruction()
     {

@@ -200,6 +200,127 @@ public sealed class HierarchicalPathfinderTests
             result.FailureReason);
     }
 
+    [Theory]
+    [InlineData(NavigationMovementClass.Infantry)]
+    [InlineData(NavigationMovementClass.Wheeled)]
+    [InlineData(NavigationMovementClass.Tracked)]
+    public void FindsDetourBeyondBothRefinementCorridors(NavigationMovementClass movementClass)
+    {
+        var wall = new AxisAlignedBounds(new Vector3(28.1f, -1, 16.1f), new Vector3(28.9f, 2, 39.9f));
+        NavigationWorld world = NavigationWorld.Build(CreateFlatWorld(), [wall],
+            new NavigationGridSettings { CellSizeMeters = 1, StaticObstacleClearanceMeters = 0 },
+            new NavigationSectorSettings { SectorSizeCells = 8 });
+        var pathfinder = new HierarchicalPathfinder(world);
+        var capabilities = NavigationCapabilities.For(movementClass);
+        var first = pathfinder.FindPath(new Vector3(26.5f, 0, 26.5f), new Vector3(29.5f, 0, 26.5f), capabilities);
+        var second = pathfinder.FindPath(new Vector3(26.5f, 0, 26.5f), new Vector3(29.5f, 0, 26.5f), capabilities);
+        Assert.True(first.Succeeded, first.FailureReason.ToString());
+        Assert.Equal(first.Path!.RefinedCells, second.Path!.RefinedCells);
+        Assert.Contains(first.Path.RefinedCells, cell => cell.Z < 16 || cell.Z > 39);
+        Assert.All(first.Path.RefinedCells, cell => Assert.True(world.Grid.IsTraversable(cell, capabilities)));
+    }
+
+    [Fact]
+    public void ExhaustedFallbackIsDistinctFromProvenUnreachableAndDoesNotAffectFastPath()
+    {
+        var wall = new AxisAlignedBounds(new Vector3(28.1f, -1, 16.1f), new Vector3(28.9f, 2, 39.9f));
+        NavigationWorld world = NavigationWorld.Build(CreateFlatWorld(), [wall],
+            new NavigationGridSettings { CellSizeMeters = 1, StaticObstacleClearanceMeters = 0 },
+            new NavigationSectorSettings { SectorSizeCells = 8 });
+        var pathfinder = new HierarchicalPathfinder(world, maximumFallbackExpandedNodes: 1);
+        var capabilities = NavigationCapabilities.For(NavigationMovementClass.Tracked);
+        var exhausted = pathfinder.FindPath(new Vector3(26.5f, 0, 26.5f), new Vector3(29.5f, 0, 26.5f), capabilities);
+        Assert.Equal(NavigationFailureReason.SearchBudgetExhausted, exhausted.FailureReason);
+        Assert.Null(exhausted.Path);
+        Assert.True(pathfinder.FindPath(new Vector3(2.5f, 0, 2.5f), new Vector3(60.5f, 0, 2.5f), capabilities).Succeeded);
+    }
+
+    [Fact]
+    public void FullBarrierWithinOneCoarseSectorIsProvenUnreachableAfterFallback()
+    {
+        var wall = new AxisAlignedBounds(new Vector3(28.1f, -1, 0), new Vector3(28.9f, 2, 64));
+        NavigationWorld world = NavigationWorld.Build(CreateFlatWorld(), [wall],
+            new NavigationGridSettings { CellSizeMeters = 1, StaticObstacleClearanceMeters = 0 },
+            new NavigationSectorSettings { SectorSizeCells = 8 });
+        var result = new HierarchicalPathfinder(world).FindPath(new Vector3(26.5f, 0, 26.5f),
+            new Vector3(29.5f, 0, 26.5f), NavigationCapabilities.For(NavigationMovementClass.Tracked));
+        Assert.Equal(NavigationFailureReason.NoLocalRoute, result.FailureReason);
+    }
+
+    [Fact]
+    public void DifferentSectorDetourEscapesTheFalseCoarseCorridor()
+    {
+        var wall = new AxisAlignedBounds(new Vector3(28.1f, -1, 0), new Vector3(28.9f, 2, 47.9f));
+        NavigationWorld world = NavigationWorld.Build(CreateFlatWorld(), [wall],
+            new NavigationGridSettings { CellSizeMeters = 1, StaticObstacleClearanceMeters = 0 },
+            new NavigationSectorSettings { SectorSizeCells = 8 });
+        var result = new HierarchicalPathfinder(world).FindPath(new Vector3(26.5f, 0, 26.5f),
+            new Vector3(37.5f, 0, 26.5f), NavigationCapabilities.For(NavigationMovementClass.Tracked));
+        Assert.True(result.Succeeded, result.FailureReason.ToString());
+        Assert.Contains(result.Path!.RefinedCells, cell => cell.Z >= 48);
+    }
+
+    [Theory]
+    [InlineData(NavigationMovementClass.Infantry)]
+    [InlineData(NavigationMovementClass.Wheeled)]
+    [InlineData(NavigationMovementClass.Tracked)]
+    public void SmallSeededMapsAgreeWithReferenceReachability(NavigationMovementClass movementClass)
+    {
+        var capabilities = NavigationCapabilities.For(movementClass);
+        for (int seed = 0; seed < 24; seed++)
+        {
+            var random = new Random(seed);
+            var obstacles = new List<AxisAlignedBounds>();
+            for (int z = 0; z < 16; z++)
+                for (int x = 0; x < 16; x++)
+                    if ((x != 0 || z != 0) && (x != 15 || z != 15) && random.NextDouble() < 0.3)
+                        obstacles.Add(new AxisAlignedBounds(new Vector3(x * 4 + .1f, -1, z * 4 + .1f),
+                            new Vector3(x * 4 + 3.9f, 2, z * 4 + 3.9f)));
+            NavigationWorld world = NavigationWorld.Build(CreateFlatWorld(), obstacles,
+                new NavigationGridSettings { CellSizeMeters = 4, StaticObstacleClearanceMeters = 0 },
+                new NavigationSectorSettings { SectorSizeCells = 4 });
+            var start = new NavigationCellCoordinate(0, 0);
+            var destination = new NavigationCellCoordinate(15, 15);
+            var queue = new Queue<NavigationCellCoordinate>();
+            var visited = new HashSet<NavigationCellCoordinate> { start };
+            queue.Enqueue(start);
+            while (queue.TryDequeue(out var cell))
+                for (int dz = -1; dz <= 1; dz++)
+                    for (int dx = -1; dx <= 1; dx++)
+                    {
+                        var next = new NavigationCellCoordinate(cell.X + dx, cell.Z + dz);
+                        if (!world.Grid.IsTraversable(next, capabilities) ||
+                            (dx != 0 && dz != 0 &&
+                             (!world.Grid.IsTraversable(new(cell.X + dx, cell.Z), capabilities) ||
+                              !world.Grid.IsTraversable(new(cell.X, cell.Z + dz), capabilities)))) continue;
+                        if (visited.Add(next)) queue.Enqueue(next);
+                    }
+            var result = new HierarchicalPathfinder(world).FindPath(world.Grid.GetCellCenter(start),
+                world.Grid.GetCellCenter(destination), capabilities);
+            Assert.Equal(visited.Contains(destination), result.Succeeded);
+            if (result.Path is not null)
+            {
+                for (int i = 1; i < result.Path.RefinedCells.Count; i++)
+                {
+                    var current = result.Path.RefinedCells[i - 1];
+                    var target = result.Path.RefinedCells[i];
+                    int dx = Math.Sign(target.X - current.X), dz = Math.Sign(target.Z - current.Z);
+                    while (current != target)
+                    {
+                        var next = new NavigationCellCoordinate(current.X + dx, current.Z + dz);
+                        Assert.True(world.Grid.IsTraversable(next, capabilities));
+                        if (dx != 0 && dz != 0)
+                        {
+                            Assert.True(world.Grid.IsTraversable(new(current.X + dx, current.Z), capabilities));
+                            Assert.True(world.Grid.IsTraversable(new(current.X, current.Z + dz), capabilities));
+                        }
+                        current = next;
+                    }
+                }
+            }
+        }
+    }
+
     private static TerrainWorld CreateFlatWorld()
     {
         var settings = new WorldGridSettings

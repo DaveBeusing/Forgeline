@@ -407,25 +407,7 @@ public sealed class TacticalCombatSystem : ISimulationSystem
                 continue;
             }
 
-            if (context.Entities.HasComponent<ResupplyOrder>(entity))
-            {
-                ClearWeaponTarget(
-                    context,
-                    entity);
-                SetMovementAllowed(
-                    context,
-                    entity,
-                    allowed: true);
-                SetTacticalState(
-                    context,
-                    entity,
-                    CombatOrderStatus.Resupplying,
-                    EntityId.Invalid,
-                    default,
-                    hasTargetPosition: false,
-                    movementPaused: false);
-                continue;
-            }
+            if (ApplyResupplyPriority(context, entity)) continue;
 
             switch (order.Kind)
             {
@@ -930,6 +912,16 @@ public sealed class TacticalCombatSystem : ISimulationSystem
             movementPaused: false);
     }
 
+    private static bool ApplyResupplyPriority(SimulationContext context, EntityId entity)
+    {
+        if (!context.Entities.HasComponent<ResupplyOrder>(entity)) return false;
+        ClearWeaponTarget(context, entity);
+        SetMovementAllowed(context, entity, allowed: true);
+        SetTacticalState(context, entity, CombatOrderStatus.Resupplying,
+            EntityId.Invalid, default, hasTargetPosition: false, movementPaused: false);
+        return true;
+    }
+
     private void CoordinateGroupTargets(
         SimulationContext context)
     {
@@ -977,6 +969,7 @@ public sealed class TacticalCombatSystem : ISimulationSystem
                     members[memberIndex];
 
                 if (!context.Entities.IsAlive(member) ||
+                    ApplyResupplyPriority(context, member) ||
                     !context.Entities.TryGetComponent(
                         member,
                         out WeaponState weaponState) ||

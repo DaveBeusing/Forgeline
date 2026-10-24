@@ -2,7 +2,8 @@ namespace ForgeLine.Navigation;
 
 internal readonly record struct LocalPathSearchResult(
     NavigationCellCoordinate[] Cells,
-    int ExpandedNodeCount);
+    int ExpandedNodeCount,
+    bool BudgetExhausted = false);
 
 internal static class LocalPathSearch
 {
@@ -26,12 +27,15 @@ internal static class LocalPathSearch
         NavigationCellCoordinate destination,
         in NavigationCapabilities capabilities,
         int corridorExpansion,
-        out LocalPathSearchResult result)
+        out LocalPathSearchResult result,
+        int maximumExpandedNodes = int.MaxValue,
+        bool restrictToCorridor = true)
     {
         ArgumentNullException.ThrowIfNull(grid);
         ArgumentNullException.ThrowIfNull(graph);
         ArgumentNullException.ThrowIfNull(highLevelRoute);
         ArgumentOutOfRangeException.ThrowIfNegative(corridorExpansion);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumExpandedNodes);
 
         if (start == destination)
         {
@@ -39,8 +43,8 @@ internal static class LocalPathSearch
             return true;
         }
 
-        HashSet<NavigationSectorCoordinate> corridor =
-            BuildCorridor(graph, highLevelRoute, corridorExpansion);
+        HashSet<NavigationSectorCoordinate>? corridor = restrictToCorridor
+            ? BuildCorridor(graph, highLevelRoute, corridorExpansion) : null;
         int startIndex = grid.GetIndex(start);
         int destinationIndex = grid.GetIndex(destination);
 
@@ -60,6 +64,12 @@ internal static class LocalPathSearch
                 float currentCost = bestCost[currentIndex];
                 if (entry.Cost != currentCost) continue;
 
+                if (expanded == maximumExpandedNodes)
+                {
+                    result = new LocalPathSearchResult([], expanded, BudgetExhausted: true);
+                    return false;
+                }
+
                 NavigationCellCoordinate current = grid.GetCoordinate(currentIndex);
                 expanded++;
                 if (currentIndex == destinationIndex)
@@ -76,7 +86,7 @@ internal static class LocalPathSearch
                     NavigationCellCoordinate next = new(current.X + offsetX, current.Z + offsetZ);
                     if (!grid.Contains(next) ||
                         !grid.IsTraversable(next, capabilities) ||
-                        !corridor.Contains(graph.GetSector(next)))
+                        (corridor is not null && !corridor.Contains(graph.GetSector(next))))
                     {
                         continue;
                     }

@@ -146,7 +146,11 @@ Actual Fuel and Ammunition are transferred only by `BattlefieldSupplySystem` in 
 
 The manual `ResupplyCommand` reuses the same planner so manual and automatic provider-selection semantics cannot diverge.
 
-While resupplying, tactical engagement yields to the supply order. AttackMove or Retreat can continue afterward.
+An active `ResupplyOrder` has priority in order preparation, individual tactical processing and combat-group coordination. The shared `ApplyResupplyPriority` rule clears the weapon target, allows tactical movement and retains `Resupplying`; other eligible group members continue fighting. Target acquisition cannot restore a fire target across the completed Sensors phase. Combat-group identity and the stored combat order remain intact.
+
+Supply transfers remain in the later Supply phase. Partial transfer keeps the active supply order; completion can therefore be observed after the tactical state was last resolved, and normal tactical intent resumes on the next Sensors phase. AttackMove resumes its stored destination through normal navigation; Hold retains stationary intent. A replacement combat command owns the new intent and cancels the old supply order. Provider and enemy references retain full entity generations; recycled entities do not revive obsolete targets.
+
+Regression coverage includes grouped/ungrouped low Fuel with full Ammunition, partial physical transfer, actual Combat-phase ammunition conservation, successful completion, provider destruction, replacement Hold and recycled target identities.
 
 ## Unit Readiness
 
@@ -267,3 +271,7 @@ The human player uses the same authoritative tactical commands as the simulation
 Direct Attack requires a current identified hostile target. The command adapter revalidates liveness, faction, health, targetability, current identification, ownership of the selected units, and weapon effectiveness before creating the existing `AttackCommand`. A copied target row is therefore not authority to attack later after intelligence becomes stale.
 
 Stop and Hold remain distinct existing commands. Stop clears tactical intent through the existing stop semantics; Hold creates a stationary combat order that can engage in range without pursuing. Retreat continues to use real movement and can still interact with the existing supply/resupply systems rather than teleporting or restoring resources. Retreat to Recovery resolves an owned support destination from current damage/supply needs and then submits the same existing Retreat/formation/navigation path.
+
+## Active-state recovery qualification
+
+GroupedResupplyAndReplacementRoundTripThroughSaveAndReplay uses the normal MatchRuntime systems with an explicit reproducible initial composition, finite Ammo stock and supported recorded PlayerTacticalActionCommand / PlayerLogisticsActionCommand adapters. It captures active grouped partial resupply, a replacing Hold order and subsequent normal navigation. Each checkpoint is serialized, restored and replayed, with complete authoritative hashes checked immediately and during continued ticks. The same-generation combat group and current command remain authoritative; no private command type or test-only persistence exception is accepted.

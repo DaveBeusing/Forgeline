@@ -73,9 +73,9 @@ Sector-route results are cached by navigation version, complete movement capabil
 
 ## Local Refinement
 
-After high-level routing, local A* refines the route only inside the selected sector corridor.
+After high-level routing, local A* first refines the route inside the selected sector corridor.
 
-The first pass permits only sectors in the high-level route. If that exact corridor cannot refine successfully, a bounded one-sector expansion is attempted. The local search never silently falls back to unrestricted full-map A*.
+The first pass permits only sectors in the high-level route. If that exact corridor cannot refine successfully, a one-sector expansion is attempted. Only after both fail does the explicit node-budgeted general search below run; budget exhaustion is reported separately.
 
 Eight-directional movement is supported with diagonal corner-cut prevention. The final cell path is simplified at direction changes and converted into world-space waypoints for ground locomotion.
 
@@ -180,3 +180,28 @@ Benchmark timing is evidence for optimization work and is not a CI pass/fail gat
 The current implementation intentionally excludes formation slot placement, formation-specific local avoidance, road and rail movement bonuses, air/naval navigation, tactical combat routing, advanced dynamic replanning, flow fields, and localized incremental navigation-grid rebuilds.
 
 These should be added only when gameplay requirements and measurements justify the permanent complexity.
+
+## Bounded refinement recovery
+
+The existing cached high-level route and local expansion-0/expansion-1 searches remain the normal path. If both corridors fail, a general local search uses the same immutable grid, movement capabilities, slope costs, deterministic frontier and diagonal clearance. Its additional expansion budget defaults to 16,384 nodes per request (`maximumFallbackExpandedNodes` on HierarchicalPathfinder). It does not become the primary long-range strategy or an unbounded per-unit/tick search. The constructor rejects non-positive budgets.
+
+Successful paths include all local expansions in ExpandedLocalNodes. The cached coarse sectors/portals describe the initial plan; refined cells and waypoints describe the actual detour. Existing movement groups continue sharing one route.
+
+- `NoHighLevelRoute`: no connection in the coarse graph.
+- `NoLocalRoute`: both corridors failed and the bounded general frontier was completely exhausted, proving local disconnection in the current topology.
+- `SearchBudgetExhausted` (appended value 9): the general frontier still had unexplored work at the budget boundary. This is an incomplete request, not proof of unreachable terrain; the existing command owner retains its explicit failure reason and controls retry/replacement. No automatic unbounded continuation is scheduled.
+
+The 64×64-cell regression from issue #327 succeeds for Infantry, Wheeled and Tracked. Additional cases cover a false different-sector coarse corridor, true disconnection, budget exhaustion, unaffected fast-path success with a one-node fallback budget, repeatable paths and 72 small seeded maps compared against a test-only reference reachability search, including every simplified segment's diagonal clearance. Endpoint projection and existing movement-quality gates remain unchanged.
+
+NavigationPath and serialized component layouts remain unchanged. The new failure value uses the existing enum field; no new authoritative command/component or save envelope is introduced. Existing schema 6 is retained.
+
+## Executed refinement measurements
+
+[Portable raw reports and source hashes](NavigationRefinementMeasurements.json) retain the sequential candidate-then-master BenchmarkDotNet ShortRun pair: identical normal long-distance and issue-#327 workloads, three warmups and three measured iterations, in-process, Windows 11 / Core Ultra 9 285HX / SDK 10.0.402 / runtime 10.0.13. Current-master navigation files are the baseline; the candidate navigation is from d2f1365b. Both working-tree builds carry 0.1.464-dev metadata; source SHA256s identify the actual methods rather than pretending these are clean final-head binaries.
+
+| Workload | Master mean / bytes per operation | Candidate mean / bytes per operation |
+| --- | --- | --- |
+| Normal long-distance success | 1747.210 us / 327848 | 1106.776 us / 327848 |
+| Out-of-corridor detour | 115.777 us / 36440, false NoLocalRoute | 135.916 us / 69721, valid route |
+
+The added successful search costs 33281 measured managed bytes in this small counterexample. The normal workload allocates exactly the same number of bytes. With three measurements, wide confidence intervals and an unisolated host, the timing difference is descriptive and establishes no normal-path speedup, whole-world performance guarantee or frame/tick-rate acceptance. The old detour result performs less work because it incorrectly rejects the route.
