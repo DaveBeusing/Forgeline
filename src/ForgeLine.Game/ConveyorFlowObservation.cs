@@ -7,7 +7,7 @@ namespace ForgeLine.Game;
 public enum ConveyorBlockReason : byte
 {
     None, DestroyedRoute, DestroyedSupport, NoPower, DisconnectedPort,
-    IncompatibleResource, ReservedStock, DestinationFull, RetainedStock, NoInput, Unknown
+    IncompatibleResource, ReservedStock, DestinationFull, RetainedStock, NoInput, DamagedRoute, Unknown
 }
 
 public readonly record struct ConveyorBlockObservation(ConveyorBlockReason Reason,

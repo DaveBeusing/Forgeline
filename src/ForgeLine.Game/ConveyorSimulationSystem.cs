@@ -53,7 +53,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         var nodes = new List<Node>();
         var owners = new HashSet<PlayerId>();
         var brokenFeet = new Dictionary<(PlayerId, int, int), EntityId>();
-        foreach (EntityId foot in entities.Query<ConveyorPiece, HealthState>())
+        foreach (EntityId foot in entities.Query<ConveyorPiece, HealthState>(QueryIterationOrder.StableByEntityIndex))
         {
             var support = entities.GetComponent<ConveyorPiece>(foot);
             if (support.Placement.IsSupport && entities.GetComponent<HealthState>(foot).IsDepleted)
@@ -238,6 +238,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         {
             ConveyorBlockObservation first = default, second = default, third = default;
             if (dead) Add(new(ConveyorBlockReason.DestroyedRoute, node.Entity));
+            else if (entities.TryGetComponent(node.Entity, out HealthState damage) && damage.Fraction < .7)
+                Add(new(ConveyorBlockReason.DamagedRoute, node.Entity));
             if (node.BrokenSupport.IsValid) Add(new(ConveyorBlockReason.DestroyedSupport, node.BrokenSupport));
             if (!entities.TryGetComponent(node.Entity, out PowerConsumer drive) || drive.OperationalScale <= 0)
                 Add(new(ConveyorBlockReason.NoPower, node.Entity));
