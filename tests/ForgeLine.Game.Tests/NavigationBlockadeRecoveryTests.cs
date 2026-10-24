@@ -52,7 +52,7 @@ public sealed class NavigationBlockadeRecoveryTests
             NavigationRouteState route = simulation.Entities.GetComponent<NavigationRouteState>(truck);
             Assert.Equal(changed.Version, route.Path.Version);
             Assert.Equal(order.WorldTarget, route.Path.Waypoints[^1]);
-            Assert.True(route.Path.Waypoints.Any(point => point.Z > wall.Maximum.Z));
+            Assert.Contains(route.Path.Waypoints, point => point.Z > wall.Maximum.Z);
             AssertTraversable(route.Path, changed.Grid);
         }
         Assert.Equal(40, inventories.GetQuantity(cargo, ResourceIds.Steel));
