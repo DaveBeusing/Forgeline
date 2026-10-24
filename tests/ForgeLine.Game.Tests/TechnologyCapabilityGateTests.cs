@@ -8,9 +8,14 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class TechnologyCapabilityGateTests
 {
-    [Fact]
-    public void CombatEngineerProductionRequiresFieldEngineeringUnlock()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void AuthoredUnitProductionRequiresItsCapabilityUnlock(bool artillery)
     {
+        UnitId unit = artillery ? UnitIds.MobileArtillery : UnitIds.CombatEngineer;
+        TechnologyCapabilityId capability = artillery ? TechnologyCapabilityIds.MechanizedSystems : TechnologyCapabilityIds.FieldEngineering;
+        TechnologyId technology = artillery ? TechnologyIds.MechanizedSystems : TechnologyIds.IndustrialStandardization;
         using MatchRuntime scenario =
             CreateScenario(
                 seed: 4411);
@@ -24,7 +29,7 @@ public sealed class TechnologyCapabilityGateTests
             facility,
             new UnitProductionFacility(
                 input,
-                UnitProductionCapability.Infantry,
+                artillery ? UnitProductionCapability.Vehicle : UnitProductionCapability.Infantry,
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 scenario.Simulation.CurrentTick));
@@ -33,7 +38,7 @@ public sealed class TechnologyCapabilityGateTests
             TechnologyStateQueries.IsCapabilityUnlocked(
                 scenario.Simulation.Entities,
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
-                TechnologyCapabilityIds.FieldEngineering));
+                capability));
 
         EntityId blockedRequest =
             scenario.Simulation.Entities.CreateEntity();
@@ -41,7 +46,7 @@ public sealed class TechnologyCapabilityGateTests
             blockedRequest,
             new UnitProductionRequest(
                 facility,
-                UnitIds.CombatEngineer,
+                unit,
                 ProductionPriority.Normal,
                 scenario.Simulation.CurrentTick));
 
@@ -57,8 +62,8 @@ public sealed class TechnologyCapabilityGateTests
             unlockEntity,
             new TechnologyCapabilityUnlock(
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
-                TechnologyCapabilityIds.FieldEngineering,
-                TechnologyIds.IndustrialStandardization,
+                capability,
+                technology,
                 scenario.Simulation.CurrentTick));
 
         EntityId allowedRequest =
@@ -67,7 +72,7 @@ public sealed class TechnologyCapabilityGateTests
             allowedRequest,
             new UnitProductionRequest(
                 facility,
-                UnitIds.CombatEngineer,
+                unit,
                 ProductionPriority.Normal,
                 scenario.Simulation.CurrentTick));
 
@@ -84,7 +89,7 @@ public sealed class TechnologyCapabilityGateTests
             allowedRequest,
             state.ActiveRequest);
         Assert.Equal(
-            UnitIds.CombatEngineer,
+            unit,
             state.ActiveUnit);
     }
 

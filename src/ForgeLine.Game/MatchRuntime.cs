@@ -577,7 +577,7 @@ public sealed class MatchRuntime : IDisposable
                 buildingPlacement,
                 intelligence,
                 battlefield,
-                configurations, navigation, weapons)
+                configurations, navigation, weapons, technologyDefinitions)
             {
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture

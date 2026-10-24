@@ -54,6 +54,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private readonly List<SkirmishOpponentDebugReadModel> _debug = new();
 
     private readonly SkirmishRaidPlanner? _raids;
+    private readonly SkirmishResearchPlanner? _research;
 
     private long _executions;
     private long _ownedStateCaptures;
@@ -74,7 +75,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         BattlefieldDefinition battlefield,
         IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration>? configurations = null,
         HierarchicalNavigationSystem? navigation = null,
-        WeaponCatalog? weapons = null)
+        WeaponCatalog? weapons = null,
+        TechnologyDefinitionCatalog? technologies = null)
     {
         _buildings = buildings ??
             throw new ArgumentNullException(nameof(buildings));
@@ -94,6 +96,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (navigation is not null && weapons is not null)
             _raids = new SkirmishRaidPlanner(inventories, weapons, intelligence, navigation);
+        if (technologies is not null)
+            _research = new SkirmishResearchPlanner(technologies, units, inventories);
 
         foreach (SkirmishOpponentConfiguration configuration in
                  _configurations.Values)
@@ -402,6 +406,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 if (activeRaid.Contains(unit) && context.Entities.TryGetComponent(unit, out CombatGroupMember membership) &&
                     membership.Group == activeRaid.Group)
                     context.Entities.RemoveComponent<TacticalTestOpponent>(unit);
+
+        bool supplyEstablished = context.Entities.TryGetComponent(controllerEntity,
+            out SkirmishResearchInfrastructure researchInfrastructure) && researchInfrastructure.SupplyEstablished;
+        if (_research is not null && !supplyEstablished && GetUnitCount(owned, UnitIds.SupplyTruck) > 0)
+        {
+            context.Entities.AddComponent(controllerEntity, new SkirmishResearchInfrastructure(true));
+            supplyEstablished = true;
+        }
+        _research?.Evaluate(context, controllerEntity, controller, owned.Buildings,
+            strategicState is SkirmishStrategicState.Defending or SkirmishStrategicState.Recovering or SkirmishStrategicState.Bootstrap ||
+            GetUnitCount(owned, UnitIds.CargoTruck) < ResolveCargoFleetTarget(owned, configuration) ||
+            (supplyEstablished && GetUnitCount(owned, UnitIds.SupplyTruck) < configuration.MinimumSupplyTrucks),
+            GetUnitCount(owned, UnitIds.MobileArtillery) + GetPendingUnitCount(owned, UnitIds.MobileArtillery) < 2);
 
         TryIssueArtilleryMission(
             context,
@@ -732,6 +749,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 _scratchStatesReleased++;
                 _raids?.Forget(_staleControllerScratch[index]);
+                _research?.Forget(_staleControllerScratch[index]);
             }
         }
     }
@@ -3368,6 +3386,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     entity);
             UnitId plannedUnit =
                 ResolveUnitProductionPlanningUnit(
+                    context,
                     owned,
                     facility,
                     configuration);
@@ -3564,6 +3583,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return selected.IsValid ? best.UnitId : UnitId.None;
     }
     private UnitId ResolveUnitProductionPlanningUnit(
+        SimulationContext context,
         OwnedState owned,
         in UnitProductionFacility facility,
         SkirmishOpponentConfiguration configuration)
@@ -3585,6 +3605,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         return SelectUnitProductionGoal(
+            context,
             owned,
             facility,
             configuration);
@@ -4003,6 +4024,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             UnitId candidate =
                 SelectUnitProductionGoal(
+                    context,
                     owned,
                     facility,
                     configuration);
@@ -4530,6 +4552,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     }
 
     private UnitId SelectUnitProductionGoal(
+        SimulationContext context,
         OwnedState owned,
         in UnitProductionFacility facility,
         SkirmishOpponentConfiguration configuration)
@@ -4559,7 +4582,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 return UnitIds.MainBattleTank;
             }
 
-            if (GetUnitCount(
+            if (TechnologyStateQueries.IsCapabilityUnlocked(context.Entities, facility.Owner, TechnologyCapabilityIds.MechanizedSystems) && GetUnitCount(
                     owned,
                     UnitIds.MobileArtillery) +
                 GetPendingUnitCount(
@@ -4626,7 +4649,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             UnitDefinition definition =
                 _units[unitId];
 
-            if (!facility.Supports(
+            if (!TechnologyStateQueries.IsCapabilityUnlocked(context.Entities, facility.Owner, definition.RequiredTechnologyCapability) || !facility.Supports(
                     definition.RequiredProductionCapability))
             {
                 continue;
@@ -5747,7 +5770,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     owned,
                     force,
                     configuration),
-                _raids?.Capture(controllerEntity) ?? default));
+                _raids?.Capture(controllerEntity) ?? default,
+                _research?.Capture(controllerEntity) ?? default));
     }
 
     private static SkirmishOperationalObjective
