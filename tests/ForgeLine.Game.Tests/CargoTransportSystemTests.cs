@@ -3,6 +3,7 @@ using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Logistics;
+using ForgeLine.Intelligence;
 using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 using ForgeLine.World;
@@ -288,6 +289,110 @@ public sealed class CargoTransportSystemTests
         Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(first));
         Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(second));
         Assert.Equal(conserved, fixture.TotalConservedQuantity(first, second));
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void ManualEscortReplacementPreservesLoadedCargoAndReservations(int escortCount)
+    {
+        var (fixture, first, second, group) = CreateActiveConvoy();
+        EntityId[] escorts = Enumerable.Range(0, escortCount).Select(_ => CreateConvoyEscort(fixture, group)).ToArray();
+        fixture.Simulation.AdvanceOneTick();
+        double cargo = fixture.GetTruckCargo(first) + fixture.GetTruckCargo(second);
+        double reserved = fixture.Inventories.GetReservedQuantity(fixture.SourceInventory, ResourceIds.FerrousOre);
+        var firstOrder = fixture.Simulation.Entities.GetComponent<CargoTransportOrder>(first);
+        var secondOrder = fixture.Simulation.Entities.GetComponent<CargoTransportOrder>(second);
+        var manual = new MoveEntitiesCommand(LocalPlayer, [escorts[0], escorts[0]], new Vector3(40, 0, 24), fixture.Simulation.CurrentTick);
+        fixture.Simulation.SubmitCommand(manual, fixture.Simulation.CurrentTick.Next());
+        fixture.Simulation.AdvanceOneTick();
+        Assert.Equal(2, manual.AcceptedTargetCount);
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyEscort>(escorts[0]));
+        AssertManualMovementIntent(fixture, escorts[0], manual);
+        if (escortCount > 1) Assert.True(fixture.Simulation.Entities.HasComponent<CargoConvoyEscort>(escorts[1]));
+        Assert.Equal(firstOrder, fixture.Simulation.Entities.GetComponent<CargoTransportOrder>(first));
+        Assert.Equal(secondOrder, fixture.Simulation.Entities.GetComponent<CargoTransportOrder>(second));
+        Assert.Equal(cargo, fixture.GetTruckCargo(first) + fixture.GetTruckCargo(second));
+        Assert.Equal(reserved, fixture.Inventories.GetReservedQuantity(fixture.SourceInventory, ResourceIds.FerrousOre));
+        RunUntilOrderCompletes(fixture, first);
+        RunUntilOrderCompletes(fixture, second);
+        Assert.Equal(50, fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.FerrousOre));
+        Assert.Equal(100, fixture.TotalConservedQuantity(first, second));
+    }
+
+    [Fact]
+    public void LoadedConvoyDetourAndResupplyRemainValidAfterManualEscortReplacement()
+    {
+        var wall = new AxisAlignedBounds(new Vector3(28.1f, -1, 8.1f), new Vector3(28.9f, 2, 31.9f));
+        TransportFixture fixture = CreateFixture(100,
+            sourcePosition: new Vector3(22, 0, 26), destinationPosition: new Vector3(42, 0, 26),
+            navigationObstacles: [wall]);
+        var intelligence = new FactionIntelligenceStore(new IntelligenceGridSettings { CellSizeMeters = 8 });
+        var weapons = new WeaponCatalog();
+        weapons.Add(new WeaponDefinition(new WeaponId(1), 80, 4, 1, new DamagePayload(10), WeaponDeliveryModel.Hitscan));
+        fixture.Simulation.RegisterSystem(new TacticalOrderPreparationSystem());
+        fixture.Simulation.RegisterSystem(new AutomaticResupplyDecisionSystem(fixture.Inventories));
+        fixture.Simulation.RegisterSystem(new BattlefieldIntelligenceSystem(intelligence));
+        fixture.Simulation.RegisterSystem(new TargetAcquisitionSystem(weapons));
+        fixture.Simulation.RegisterSystem(new TacticalCombatSystem(weapons, intelligence));
+        fixture.Simulation.RegisterSystem(new BattlefieldSupplySystem(fixture.Inventories));
+        var (_, first, second, group) = CreateActiveConvoy(fixture);
+        EntityId escort = CreateConvoyEscort(fixture, group);
+        fixture.Simulation.Entities.SetComponent(escort, new WorldTransform(new Vector3(18, 0, 26), Quaternion.Identity, Vector3.One));
+        fixture.Simulation.AdvanceOneTick();
+        EntityId recipient = CreateIntegrationCombatant(fixture, new Vector3(8, 0, 20), new FactionId(1), 10);
+        EntityId other = CreateIntegrationCombatant(fixture, new Vector3(8, 0, 22), new FactionId(1), 100);
+        _ = CreateIntegrationCombatant(fixture, new Vector3(14, 0, 20), new FactionId(2), 100);
+        fixture.Simulation.Entities.AddComponent(recipient, new VisualSensorState(new FactionId(1), 100, 1));
+        fixture.Simulation.Entities.AddComponent(recipient, new AutomaticResupplyPolicy(.2, .2));
+        InventoryId stock = fixture.Inventories.CreateInventory(new InventorySpecification(200, [ResourceIds.Fuel]));
+        Assert.True(fixture.Inventories.Add(stock, ResourceIds.Fuel, 5).Succeeded);
+        EntityId provider = fixture.Simulation.Entities.CreateEntity();
+        fixture.Simulation.Entities.AddComponent(provider, new WorldTransform(new Vector3(5, 0, 20), Quaternion.Identity, Vector3.One));
+        fixture.Simulation.Entities.AddComponent(provider, new SupplyProvider(stock, LocalPlayer, 20));
+        var manual = new MoveEntitiesCommand(LocalPlayer, [escort], new Vector3(10, 0, 26), fixture.Simulation.CurrentTick);
+        fixture.Simulation.SubmitCommand(new HoldPositionCommand(LocalPlayer, [recipient, other], fixture.Simulation.CurrentTick), fixture.Simulation.CurrentTick.Next());
+        fixture.Simulation.SubmitCommand(manual, fixture.Simulation.CurrentTick.Next());
+        fixture.Simulation.AdvanceOneTick();
+        Assert.Equal(CombatOrderStatus.Resupplying, fixture.Simulation.Entities.GetComponent<TacticalCombatState>(recipient).Status);
+        Assert.Equal(CombatOrderStatus.Engaging, fixture.Simulation.Entities.GetComponent<TacticalCombatState>(other).Status);
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoConvoyEscort>(escort));
+        AssertManualMovementIntent(fixture, escort, manual);
+        Assert.True(fixture.Inventories.Add(stock, ResourceIds.Fuel, 100).Succeeded);
+        bool sawDetour = false;
+        for (int tick = 0; tick < 1600 && (fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(first) ||
+            fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(second)); tick++)
+        {
+            foreach (EntityId truck in new[] { first, second })
+                if (fixture.Simulation.Entities.TryGetComponent(truck, out NavigationRouteState route))
+                    sawDetour |= route.Path.RefinedCells.Any(cell => cell.Z < 8);
+            fixture.Simulation.AdvanceOneTick();
+        }
+        Assert.True(sawDetour);
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(first));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(second));
+        Assert.Equal(50, fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.FerrousOre));
+        Assert.Equal(100, fixture.TotalConservedQuantity(first, second));
+        Assert.Equal(0, fixture.Inventories.GetReservedQuantity(fixture.SourceInventory, ResourceIds.FerrousOre));
+        Assert.False(fixture.Simulation.Entities.HasComponent<ResupplyOrder>(recipient));
+        Assert.Equal(CombatOrderKind.HoldPosition, fixture.Simulation.Entities.GetComponent<CombatOrderState>(recipient).Kind);
+    }
+
+    private static EntityId CreateIntegrationCombatant(TransportFixture fixture, Vector3 position, FactionId faction, double fuel)
+    {
+        EntityId unit = fixture.Simulation.Entities.CreateEntity();
+        fixture.Simulation.Entities.AddComponent(unit, new WorldTransform(position, Quaternion.Identity, Vector3.One));
+        fixture.Simulation.Entities.AddComponent(unit, new ControllableEntity(new PlayerId(faction.Value), ControllableEntityCategory.Unit));
+        fixture.Simulation.Entities.AddComponent(unit, new Combatant(faction));
+        fixture.Simulation.Entities.AddComponent(unit, new IntelligenceSignature(faction, unit.Index + 1));
+        fixture.Simulation.Entities.AddComponent(unit, new HealthState(100, 100));
+        fixture.Simulation.Entities.AddComponent(unit, new Targetable(TargetClass.LightVehicle));
+        fixture.Simulation.Entities.AddComponent(unit, new WeaponState(new WeaponId(1), EntityId.Invalid));
+        fixture.Simulation.Entities.AddComponent(unit, FirePolicyState.FireAtWill);
+        fixture.Simulation.Entities.AddComponent(unit, GroundMovement.CreateDefault());
+        fixture.Simulation.Entities.AddComponent(unit, GroundMovementState.Stationary());
+        BattlefieldSupplyFactory.AttachUnitSupply(fixture.Simulation.Entities, fixture.Inventories, unit, 100, 100, .01, fuel, 100);
+        return unit;
     }
 
     private static EntityId CreateConvoyEscort(TransportFixture fixture, EntityId group)
@@ -850,7 +955,8 @@ public sealed class CargoTransportSystemTests
         double destinationCapacity = 500.0,
         Vector3? sourcePosition = null,
         Vector3? destinationPosition = null,
-        int worldChunkCountX = 2)
+        int worldChunkCountX = 2,
+        AxisAlignedBounds[]? navigationObstacles = null)
     {
         TerrainWorld terrain =
             CreateFlatWorld(
@@ -859,15 +965,17 @@ public sealed class CargoTransportSystemTests
         NavigationWorld navigationWorld =
             NavigationWorld.Build(
                 terrain,
+                navigationObstacles,
                 gridSettings:
                     new NavigationGridSettings
                     {
-                        CellSizeMeters = 4.0f
+                        CellSizeMeters = navigationObstacles is null ? 4.0f : 1.0f,
+                        StaticObstacleClearanceMeters = navigationObstacles is null ? 0.5f : 3.0f
                     },
                 sectorSettings:
                     new NavigationSectorSettings
                     {
-                        SectorSizeCells = 4
+                        SectorSizeCells = navigationObstacles is null ? 4 : 8
                     });
 
         var simulation =
@@ -882,6 +990,22 @@ public sealed class CargoTransportSystemTests
                 network,
                 inventories);
 
+        SpatialGridIndex? spatialIndex = null;
+        if (navigationObstacles is not null)
+        {
+            spatialIndex = new SpatialGridIndex(new SpatialGridSettings { World = terrain.Settings, CellSizeMeters = 8 });
+            var synchronizer = new SpatialIndexSynchronizer(spatialIndex);
+            simulation.RegisterSystem(new SpatialIndexSystem(synchronizer));
+            simulation.RegisterSystem(new SpatialIndexCleanupSystem(synchronizer));
+            foreach (var bounds in navigationObstacles)
+            {
+                EntityId obstacle = simulation.Entities.CreateEntity();
+                simulation.Entities.AddComponent(obstacle, new WorldTransform((bounds.Minimum + bounds.Maximum) * .5f,
+                    Quaternion.Identity, Vector3.One));
+                simulation.Entities.AddComponent(obstacle, new SpatialPresence((bounds.Maximum - bounds.Minimum) * .5f,
+                    new SpatialEntryMetadata(1, 0, SpatialMobility.Static)));
+            }
+        }
         simulation.RegisterSystem(new CargoConvoySystem(network));
         simulation.RegisterSystem(
             new HierarchicalNavigationSystem(
@@ -889,7 +1013,7 @@ public sealed class CargoTransportSystemTests
                     navigationWorld)));
         simulation.RegisterSystem(
             new GroundMovementSystem(
-                terrain));
+                terrain, spatialIndex));
         simulation.RegisterSystem(
             transportSystem);
 

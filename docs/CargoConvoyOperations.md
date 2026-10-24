@@ -10,7 +10,7 @@ The current functionality uses the existing regional GroundRoad route selected f
 
 With at least two owned cargo vehicles selected, open the existing **Group** radial page and choose **Create Convoy** (the final group action normally used to focus the selection). Other selected owned combat-capable units become optional escorts. The offer comes from current owner-filtered order and combat read models; simulation revalidates every entity, its full identity, route and control rights at dispatch.
 
-All cargo members must have current `ToDestination` orders with exactly matching source, destination, graph version, route edges and active segment. No truck may already belong to a convoy or be in a dock, fuel service or rescue. Duplicate selections, foreign/stale IDs, an insufficient number of trucks, occupied escort combat orders and incompatible routes reject the entire request without partial membership or inventory mutation. The existing logistics command feedback reports whether the authoritative command succeeded.
+All cargo members must have current `ToDestination` orders with exactly matching source, destination, graph version, route edges and active segment. No truck may already belong to a convoy or have active physical dock access, fuel service or rescue. A remote Reserved/Busy visit with no lane entry can retain regional convoy membership; the destination reservation remains owned by its normal dock/queue system. Duplicate selections, foreign/stale IDs, an insufficient number of trucks, occupied escort combat orders and incompatible routes reject the entire request without partial membership or inventory mutation. The existing logistics command feedback reports whether the authoritative command succeeded.
 
 Select a member truck and open Logistics to see the copied **CVY** count and Rendezvous/Holding/Moving/Disrupted status. **DISBAND** is the existing Cargo Logistics Cancel control while a convoy is selected; disbanding removes only convoy membership and convoy-owned locomotion constraints, never cargo orders or physical bookings.
 
@@ -48,3 +48,17 @@ dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simula
 ```
 
 Record wall time, allocated bytes, hardware, scenario parameters and comparative cargo/movement baselines before proposing a performance threshold. No measured throughput, frame-time target or shared-path speedup is claimed solely because the benchmark source compiles.
+
+## Manual replacement and supply integration
+
+The convoy-local movement resolver compares accepted player intent with pending navigation, active-route original intent and managed waypoints. A newer manual order releases only that escort through the existing convoy owner. Navigation-managed waypoints do not count as player replacement. Same-tick convoy dissolution preserves the replacement movement. The last escort and one escort among several use this same path; duplicate entries in a Move retain the existing accepted-input count and one effective movement intent.
+
+The transport trucks keep their independent CargoTransportOrder, loaded inventory, destination and reservations. Executable conservation cases cover one/two escorts and delivery after detachment. The integrated case uses a static SpatialGridIndex wall and the same wall in navigation, two loaded trucks, a reachable detour outside both narrow corridors, grouped partial Fuel resupply and a manual escort move. The result is 50 FerrousOre delivered, 100 total FerrousOre conserved and zero remaining source reservation. No route, collision, Fuel or resource rule is bypassed.
+
+The original manual-escort defect was already fixed in integrated PR #340. Its regression and the additional conservation cases are retained; no replacement convoy implementation is introduced.
+
+### Remote reservations and persisted accepted convoys
+
+A real dock may create a Reserved/Busy visit while its truck is still on a regional leg. Treating every VehicleDockVisit as active physical bay access made normally docked shipments ineligible even far from the dock. The shared convoy-local HasActiveDockAccess guard now distinguishes those remote visits from lane entry, local approach, alignment, service and exit. Existing destination proximity still dissolves the group before physical docking; no slot, queue or reservation is cancelled to permit grouping.
+
+The accepted-convoy persistence fixture declares a normal initial finite-stock base plus an empty owned storage destination. Recorded Fuel/Ammunition stock-policy commands produce real loaded shipments through normal distribution, loading docks and navigation; recorded create-convoy and manual movement commands exercise both accepted states. Save and replay reconstruct full authoritative hashes before and after escort detachment and continue deterministically. Delivery and normal near-dock group dissolution remain part of the case. This is distinct from the older persistence case that intentionally records rejected convoy requests.

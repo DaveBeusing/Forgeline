@@ -12,7 +12,8 @@ public enum NavigationFailureReason : byte
     NoHighLevelRoute = 5,
     NoLocalRoute = 6,
     StaleNavigationVersion = 7,
-    Canceled = 8
+    Canceled = 8,
+    SearchBudgetExhausted = 9
 }
 
 public readonly record struct NavigationPathDiagnostics(

@@ -1,0 +1,322 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "92e6a65a1d0541b3b7510adb130950713c0450a0",
+  "candidateNavigationCommit": "d2f1365b53d0b767b601e8b5c44ed30aa5fc4235",
+  "version": "0.1.464-dev",
+  "sourceHashes": {
+    "src/ForgeLine.Navigation/HierarchicalPathfinder.cs": {
+      "baseGitBlob": "501a2c310f02029f6becdc49f7a4f62cebbd0637",
+      "baseSha256": "cb3d409e5654f91fc90255d74642604ed76f10e29a5f369869a3afbfabed9dea",
+      "candidateSha256": "8ddcdd8d4099970e3d74a785e5444f2555c79ed010e21614b6e224d18d94f4e3"
+    },
+    "src/ForgeLine.Navigation/LocalPathSearch.cs": {
+      "baseGitBlob": "99734c1e14b98a4755494dc2bfceb89aa7388562",
+      "baseSha256": "c09fb5b2a7b9c9211b06e99dbb1affa99e3657b56b2493f2521138108ea85c37",
+      "candidateSha256": "c90ffda3720ed42584d2c3cf81fe07bdb3ea467040b99f249c49a999050c04a4"
+    },
+    "src/ForgeLine.Navigation/NavigationPath.cs": {
+      "baseGitBlob": "c82f485b4a5b69c5f18e525cba782d85501c6afd",
+      "baseSha256": "132e86b71849bf8ca449c35e428f679e469047d55811ee019ef4f42159dc0828",
+      "candidateSha256": "0cdeaccc2a17f6067ae74143d03e4f04ad45f7b0d98cd8bc16c33379a5f968a2"
+    }
+  },
+  "workloadSha256": "95ea5d41efd8ac0522cb2207940dc2257fd4e7392b11d4d1a9795701768588cd",
+  "method": "Sequential head then base; identical ShortRun in-process workloads, three warmups and three measured iterations. Base uses exact master navigation files; head uses PR navigation files. Normal route succeeds in both; the detour is a previously false NoLocalRoute and succeeds only with the bounded fallback.",
+  "limitations": "Descriptive CPU/allocation evidence only. N=3 gives wide confidence intervals; no general speedup, stable-hardware, tick-rate or graphical performance claim. Physical hardware and other process activity were not isolated.",
+  "base": {
+    "Title": "ForgeLine.Navigation.Benchmarks.HierarchicalPathfindingBenchmarks-20261024-000808",
+    "HostEnvironmentInfo": {
+      "BenchmarkDotNetCaption": "BenchmarkDotNet",
+      "BenchmarkDotNetVersion": "0.15.8",
+      "OsVersion": "Windows 11 (10.0.26300.9457)",
+      "ProcessorName": "Intel Core Ultra 9 285HX",
+      "PhysicalProcessorCount": 1,
+      "PhysicalCoreCount": 24,
+      "LogicalCoreCount": 24,
+      "RuntimeVersion": ".NET 10.0.13 (10.0.13, 10.0.1326.50504)",
+      "Architecture": "X64",
+      "HasAttachedDebugger": false,
+      "HasRyuJit": true,
+      "Configuration": "RELEASE",
+      "DotNetCliVersion": "10.0.402",
+      "ChronometerFrequency": {
+        "Hertz": 10000000
+      },
+      "HardwareTimerKind": "Unknown"
+    },
+    "Benchmarks": [
+      {
+        "DisplayInfo": "HierarchicalPathfindingBenchmarks.FindLongDistanceRoute: ShortRun(Toolchain=InProcessEmitToolchain, IterationCount=3, LaunchCount=1, WarmupCount=3)",
+        "Namespace": "ForgeLine.Navigation.Benchmarks",
+        "Type": "HierarchicalPathfindingBenchmarks",
+        "Method": "FindLongDistanceRoute",
+        "MethodTitle": "FindLongDistanceRoute",
+        "Parameters": "",
+        "FullName": "ForgeLine.Navigation.Benchmarks.HierarchicalPathfindingBenchmarks.FindLongDistanceRoute",
+        "HardwareIntrinsics": "",
+        "Statistics": {
+          "OriginalValues": [
+            1671746.6796875,
+            1823216.015625,
+            1746667.96875
+          ],
+          "N": 3,
+          "Min": 1671746.6796875,
+          "LowerFence": 1595605.322265625,
+          "Q1": 1709207.32421875,
+          "Median": 1746667.96875,
+          "Mean": 1747210.2213541667,
+          "Q3": 1784941.9921875,
+          "UpperFence": 1898543.994140625,
+          "Max": 1823216.015625,
+          "InterquartileRange": 75734.66796875,
+          "LowerOutliers": [],
+          "UpperOutliers": [],
+          "AllOutliers": [],
+          "StandardError": 43726.27151096486,
+          "Variance": 5735960460.751852,
+          "StandardDeviation": 75736.12388254268,
+          "Skewness": 0.0071593947420941885,
+          "Kurtosis": 0.6666666666666664,
+          "ConfidenceInterval": {
+            "N": 3,
+            "Mean": 1747210.2213541667,
+            "StandardError": 43726.27151096486,
+            "Level": 12,
+            "Margin": 1381708.8343080087,
+            "Lower": 365501.3870461581,
+            "Upper": 3128919.0556621756
+          },
+          "Percentiles": {
+            "P0": 1671746.6796875,
+            "P25": 1709207.32421875,
+            "P50": 1746667.96875,
+            "P67": 1772694.3046875,
+            "P80": 1792596.796875,
+            "P85": 1800251.6015625,
+            "P90": 1807906.40625,
+            "P95": 1815561.2109375,
+            "P100": 1823216.015625
+          }
+        },
+        "Memory": {
+          "Gen0Collections": 8,
+          "Gen1Collections": 3,
+          "Gen2Collections": 0,
+          "TotalOperations": 512,
+          "BytesAllocatedPerOperation": 327848
+        }
+      },
+      {
+        "DisplayInfo": "HierarchicalPathfindingBenchmarks.FindDetourOutsideRefinementCorridor: ShortRun(Toolchain=InProcessEmitToolchain, IterationCount=3, LaunchCount=1, WarmupCount=3)",
+        "Namespace": "ForgeLine.Navigation.Benchmarks",
+        "Type": "HierarchicalPathfindingBenchmarks",
+        "Method": "FindDetourOutsideRefinementCorridor",
+        "MethodTitle": "FindDetourOutsideRefinementCorridor",
+        "Parameters": "",
+        "FullName": "ForgeLine.Navigation.Benchmarks.HierarchicalPathfindingBenchmarks.FindDetourOutsideRefinementCorridor",
+        "HardwareIntrinsics": "",
+        "Statistics": {
+          "OriginalValues": [
+            125372.83935546876,
+            116435.9619140625,
+            105523.52294921875
+          ],
+          "N": 3,
+          "Min": 105523.52294921875,
+          "LowerFence": 96092.75512695312,
+          "Q1": 110979.74243164062,
+          "Median": 116435.9619140625,
+          "Mean": 115777.44140625,
+          "Q3": 120904.40063476562,
+          "UpperFence": 135791.38793945312,
+          "Max": 125372.83935546876,
+          "InterquartileRange": 9924.658203125,
+          "LowerOutliers": [],
+          "UpperOutliers": [],
+          "AllOutliers": [],
+          "StandardError": 5739.4563445580725,
+          "Variance": 98824077.39326373,
+          "StandardDeviation": 9941.029996598125,
+          "Skewness": -0.06595200484186091,
+          "Kurtosis": 0.6666666666666665,
+          "ConfidenceInterval": {
+            "N": 3,
+            "Mean": 115777.44140625,
+            "StandardError": 5739.4563445580725,
+            "Level": 12,
+            "Margin": 181361.3935368909,
+            "Lower": -65583.95213064089,
+            "Upper": 297138.83494314086
+          },
+          "Percentiles": {
+            "P0": 105523.52294921875,
+            "P25": 110979.74243164062,
+            "P50": 116435.9619140625,
+            "P67": 119474.50024414062,
+            "P80": 121798.08837890625,
+            "P85": 122691.77612304688,
+            "P90": 123585.4638671875,
+            "P95": 124479.15161132814,
+            "P100": 125372.83935546876
+          }
+        },
+        "Memory": {
+          "Gen0Collections": 15,
+          "Gen1Collections": 1,
+          "Gen2Collections": 0,
+          "TotalOperations": 8192,
+          "BytesAllocatedPerOperation": 36440
+        }
+      }
+    ]
+  },
+  "head": {
+    "Title": "ForgeLine.Navigation.Benchmarks.HierarchicalPathfindingBenchmarks-20261024-000644",
+    "HostEnvironmentInfo": {
+      "BenchmarkDotNetCaption": "BenchmarkDotNet",
+      "BenchmarkDotNetVersion": "0.15.8",
+      "OsVersion": "Windows 11 (10.0.26300.9457)",
+      "ProcessorName": "Intel Core Ultra 9 285HX",
+      "PhysicalProcessorCount": 1,
+      "PhysicalCoreCount": 24,
+      "LogicalCoreCount": 24,
+      "RuntimeVersion": ".NET 10.0.13 (10.0.13, 10.0.1326.50504)",
+      "Architecture": "X64",
+      "HasAttachedDebugger": false,
+      "HasRyuJit": true,
+      "Configuration": "RELEASE",
+      "DotNetCliVersion": "10.0.402",
+      "ChronometerFrequency": {
+        "Hertz": 10000000
+      },
+      "HardwareTimerKind": "Unknown"
+    },
+    "Benchmarks": [
+      {
+        "DisplayInfo": "HierarchicalPathfindingBenchmarks.FindLongDistanceRoute: ShortRun(Toolchain=InProcessEmitToolchain, IterationCount=3, LaunchCount=1, WarmupCount=3)",
+        "Namespace": "ForgeLine.Navigation.Benchmarks",
+        "Type": "HierarchicalPathfindingBenchmarks",
+        "Method": "FindLongDistanceRoute",
+        "MethodTitle": "FindLongDistanceRoute",
+        "Parameters": "",
+        "FullName": "ForgeLine.Navigation.Benchmarks.HierarchicalPathfindingBenchmarks.FindLongDistanceRoute",
+        "HardwareIntrinsics": "",
+        "Statistics": {
+          "OriginalValues": [
+            1038325.3906249999,
+            1024455.2734374999,
+            1257546.875
+          ],
+          "N": 3,
+          "Min": 1024455.2734374999,
+          "LowerFence": 856571.6308593748,
+          "Q1": 1031390.3320312499,
+          "Median": 1038325.3906249999,
+          "Mean": 1106775.8463541667,
+          "Q3": 1147936.1328125,
+          "UpperFence": 1322754.8339843752,
+          "Max": 1257546.875,
+          "InterquartileRange": 116545.80078125012,
+          "LowerOutliers": [],
+          "UpperOutliers": [],
+          "AllOutliers": [],
+          "StandardError": 75491.77073670743,
+          "Variance": 17097022346.890785,
+          "StandardDeviation": 130755.58246931863,
+          "Skewness": 0.3800335224100557,
+          "Kurtosis": 0.6666666666666649,
+          "ConfidenceInterval": {
+            "N": 3,
+            "Mean": 1106775.8463541667,
+            "StandardError": 75491.77073670743,
+            "Level": 12,
+            "Margin": 2385468.5739283105,
+            "Lower": -1278692.7275741438,
+            "Upper": 3492244.4202824775
+          },
+          "Percentiles": {
+            "P0": 1024455.2734374999,
+            "P25": 1031390.3320312499,
+            "P50": 1038325.3906249999,
+            "P67": 1112860.6953125,
+            "P80": 1169858.28125,
+            "P85": 1191780.4296875,
+            "P90": 1213702.578125,
+            "P95": 1235624.7265625,
+            "P100": 1257546.875
+          }
+        },
+        "Memory": {
+          "Gen0Collections": 8,
+          "Gen1Collections": 3,
+          "Gen2Collections": 0,
+          "TotalOperations": 512,
+          "BytesAllocatedPerOperation": 327848
+        }
+      },
+      {
+        "DisplayInfo": "HierarchicalPathfindingBenchmarks.FindDetourOutsideRefinementCorridor: ShortRun(Toolchain=InProcessEmitToolchain, IterationCount=3, LaunchCount=1, WarmupCount=3)",
+        "Namespace": "ForgeLine.Navigation.Benchmarks",
+        "Type": "HierarchicalPathfindingBenchmarks",
+        "Method": "FindDetourOutsideRefinementCorridor",
+        "MethodTitle": "FindDetourOutsideRefinementCorridor",
+        "Parameters": "",
+        "FullName": "ForgeLine.Navigation.Benchmarks.HierarchicalPathfindingBenchmarks.FindDetourOutsideRefinementCorridor",
+        "HardwareIntrinsics": "",
+        "Statistics": {
+          "OriginalValues": [
+            146638.39111328125,
+            133277.60009765625,
+            127831.26220703125
+          ],
+          "N": 3,
+          "Min": 127831.26220703125,
+          "LowerFence": 116449.08447265625,
+          "Q1": 130554.43115234375,
+          "Median": 133277.60009765625,
+          "Mean": 135915.7511393229,
+          "Q3": 139957.99560546875,
+          "UpperFence": 154063.34228515625,
+          "Max": 146638.39111328125,
+          "InterquartileRange": 9403.564453125,
+          "LowerOutliers": [],
+          "UpperOutliers": [],
+          "AllOutliers": [],
+          "StandardError": 5587.095402594008,
+          "Variance": 93646905.11306128,
+          "StandardDeviation": 9677.133104027313,
+          "Skewness": 0.252356100452289,
+          "Kurtosis": 0.6666666666666675,
+          "ConfidenceInterval": {
+            "N": 3,
+            "Mean": 135915.7511393229,
+            "StandardError": 5587.095402594008,
+            "Level": 12,
+            "Margin": 176546.93183593274,
+            "Lower": -40631.18069660984,
+            "Upper": 312462.68297525565
+          },
+          "Percentiles": {
+            "P0": 127831.26220703125,
+            "P25": 130554.43115234375,
+            "P50": 133277.60009765625,
+            "P67": 137820.26904296875,
+            "P80": 141294.07470703125,
+            "P85": 142630.15380859375,
+            "P90": 143966.23291015625,
+            "P95": 145302.31201171875,
+            "P100": 146638.39111328125
+          }
+        },
+        "Memory": {
+          "Gen0Collections": 15,
+          "Gen1Collections": 0,
+          "Gen2Collections": 0,
+          "TotalOperations": 4096,
+          "BytesAllocatedPerOperation": 69721
+        }
+      }
+    ]
+  }
+}

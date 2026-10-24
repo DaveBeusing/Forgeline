@@ -142,7 +142,7 @@ public sealed class CargoConvoySystem : ISimulationSystem
                     leaderTransform.Position, transform.Position);
                 maximumDistanceSquared = Math.Max(maximumDistanceSquared, separation);
                 slowestSpeed = Math.Min(slowestSpeed, movement.MaximumSpeed);
-                if (context.Entities.HasComponent<VehicleDockVisit>(truck) ||
+                if (CargoConvoyEligibility.HasActiveDockAccess(context.Entities, truck) ||
                     context.Entities.TryGetComponent(truck, out SupplyMovementConstraint movementSupply) &&
                     !movementSupply.CanMove ||
                     context.Entities.HasComponent<CargoFuelServiceState>(truck) ||
@@ -373,7 +373,7 @@ internal static class CargoConvoyEligibility
             !entities.HasComponent<GroundMovementState>(entity) ||
             !entities.HasComponent<WorldTransform>(entity) ||
             !entities.HasComponent<NavigationAgent>(entity) ||
-            entities.HasComponent<VehicleDockVisit>(entity) ||
+            HasActiveDockAccess(entities, entity) ||
             entities.HasComponent<CargoFuelServiceState>(entity) ||
             entities.HasComponent<ResupplyOrder>(entity) ||
             entities.HasComponent<SupplyRescueAssignment>(entity))
@@ -381,6 +381,10 @@ internal static class CargoConvoyEligibility
         route = candidate;
         return true;
     }
+
+    internal static bool HasActiveDockAccess(EntityRegistry entities, EntityId entity) =>
+        entities.TryGetComponent(entity, out VehicleDockVisit visit) &&
+        (visit.LaneEntered || visit.Status is not VehicleDockStatus.Reserved and not VehicleDockStatus.Busy);
 
     public static bool IsEscort(EntityRegistry entities, PlayerId issuer, EntityId entity) =>
         entities.TryGetComponent(entity, out ControllableEntity control) &&

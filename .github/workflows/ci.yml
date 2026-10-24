@@ -88,6 +88,14 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Tactical supply, convoy and bounded navigation contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.TacticalCombatSystemTests ForgeLine.Game.Tests.CargoTransportSystemTests ForgeLine.Game.Tests.MoveEntitiesCommandTests ForgeLine.Game.Tests.HierarchicalNavigationSystemTests ForgeLine.Game.Tests.MatchPersistenceTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Navigation.Tests/ForgeLine.Navigation.Tests.csproj --configuration Release --no-build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Industrial combat, recovery and powered radar contracts
         shell: pwsh
         run: |
