@@ -268,8 +268,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                     ? null : PlayerHoverSummaryFactory.Capture(
                     context, _extraction, interaction.HoveredEntity),
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
-                _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction) : null,
-                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience, cargoFleet) : null) { Conveyors = CaptureConveyors(context), DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
+                _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction, instances,
+                    interaction.SelectedEntities.Count == 1 ? interaction.SelectedEntities[0] : default) : null,
+                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience, cargoFleet) : null) { Diagnosis = _extraction is null ? null : OperationsChainCapture.Capture(context, _extraction, playerActions, playerExperience, instances, interaction.SelectedEntities),
+                    Conveyors = CaptureConveyors(context), DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
                     SelectedOrders = _extraction is null || interaction.SelectedEntities.Count == 0
                         ? null
                         : SelectedUnitOrderSnapshotFactory.Capture(context, _extraction, interaction.SelectedEntities),

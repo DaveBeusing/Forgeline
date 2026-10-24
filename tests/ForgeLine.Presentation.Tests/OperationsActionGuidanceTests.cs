@@ -5,6 +5,32 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class OperationsActionGuidanceTests
 {
+    [Theory]
+    [InlineData(null)]
+    [InlineData(0.0)]
+    [InlineData(17.0)]
+    public void SourceFreeObservationPreservesUnknownZeroAndMeasuredStock(double? free)
+    {
+        EntityId selected = new(12, 3), source = new(14, 2);
+        var observed = Row(selected, OperationsDiagnosisReason.NoInput) with
+        { Source = source, Resource = ResourceIds.Electronics, Inventory = new(9), SourceFreeQuantity = free };
+        var diagnosis = new OperationsDiagnosisSnapshot(new(1), new(7), new(1), [observed]);
+        Assert.Equal(free, OperationsActionGuidance.SourceForEntity(diagnosis, selected)!.Value.SourceFreeQuantity);
+        var ambiguous = new OperationsDiagnosisSnapshot(new(1), new(7), new(1),
+            [observed, observed with { Source = new(15, 3), Inventory = new(10), SourceFreeQuantity = 0 }]);
+        Assert.Null(OperationsActionGuidance.SourceForEntity(ambiguous, selected));
+    }
+
+    [Fact]
+    public void ActualMissingIngredientNamesOutrankTheSameGenericProductionBlock()
+    {
+        EntityId entity = new(12, 3);
+        var generic = Row(entity, OperationsDiagnosisReason.NoInput);
+        var input = generic with { Subject = OperationsDiagnosisSubject.ProductionInput, Resource = ResourceIds.Silicates };
+        var diagnosis = new OperationsDiagnosisSnapshot(new(1), new(7), new(1), [generic, input]);
+        Assert.Equal(ResourceIds.Silicates, OperationsActionGuidance.ForEntity(diagnosis, entity)!.Value.Resource);
+    }
+
     [Fact]
     public void OnlyExactOwnedDiagnosisIdentityCanSupplyAdvice()
     {
@@ -70,6 +96,7 @@ public sealed class OperationsActionGuidanceTests
     [InlineData(OperationsDiagnosisReason.OutputFull, "CHECK OUTPUT COLLECTION")]
     [InlineData(OperationsDiagnosisReason.NoDriveFuel, "OPEN SUPPLY")]
     [InlineData(OperationsDiagnosisReason.DestinationFull, "CHECK DESTINATION STOCK")]
+    [InlineData(OperationsDiagnosisReason.DestinationTargetCovered, "CHECK STOCK POLICY")]
     public void KnownReasonsUseInspectionAdviceNotDispatch(OperationsDiagnosisReason reason, string text)
     {
         Assert.Equal(text, OperationsActionGuidance.NextAction(reason));

@@ -13,7 +13,10 @@ public enum OperationsDiagnosisSubject : byte
     UnitProduction,
     StockPolicy,
     TransportRequest,
-    CargoTransport
+    CargoTransport,
+    Conveyor,
+    ProductionInput,
+    SourceInventory
 }
 
 /// <summary>Ordered by diagnostic priority. Unknown is not evidence of a particular failure.</summary>
@@ -31,6 +34,13 @@ public enum OperationsDiagnosisReason : byte
     OutputFull = 9,
     NoDriveFuel = 10,
     DestinationFull = 11,
+    DestroyedRoute = 12,
+    DestroyedSupport = 13,
+    DisconnectedPort = 14,
+    IncompatibleResource = 15,
+    ReservedStock = 16,
+    RetainedStock = 17,
+    DestinationTargetCovered = 18,
     Unknown = byte.MaxValue
 }
 
@@ -56,11 +66,16 @@ public readonly record struct OperationsDiagnosisRow(
     int? DockWaitingCount,
     OperationsDiagnosisReason PrimaryReason,
     OperationsDiagnosisReason SecondaryReason = OperationsDiagnosisReason.None,
-    OperationsDiagnosisReason TertiaryReason = OperationsDiagnosisReason.None);
+    OperationsDiagnosisReason TertiaryReason = OperationsDiagnosisReason.None,
+    EntityId CauseEntity = default, InventoryId Inventory = default);
 
-/// <summary>Only a reported transport request establishes a directed, owned supply-chain link.</summary>
+public enum OperationsDiagnosisLinkKind : byte { TransportRequest, ConveyorConnection }
+
+/// <summary>Typed observed connection; a conveyor never borrows a transport request identity.</summary>
 public readonly record struct OperationsDiagnosisLink(
-    LogisticsTransportRequestId RequestId, EntityId Source, EntityId Destination, ResourceId Resource);
+    LogisticsTransportRequestId RequestId, EntityId Source, EntityId Destination, ResourceId Resource,
+    OperationsDiagnosisLinkKind Kind = OperationsDiagnosisLinkKind.TransportRequest,
+    InventoryId SourceInventory = default, InventoryId DestinationInventory = default);
 
 /// <summary>
 /// Copied, read-only, UI-independent diagnostic projection. Never owns economic state,
@@ -74,7 +89,8 @@ public sealed class OperationsDiagnosisSnapshot
 
     public OperationsDiagnosisSnapshot(SimulationSessionId session, SimulationTick tick, PlayerId player,
         IReadOnlyList<OperationsDiagnosisRow> rows, IReadOnlyList<OperationsDiagnosisLink>? links = null,
-        int totalRows = -1)
+        int totalRows = -1, EntityId root = default, int omittedSteps = 0, bool cycle = false,
+        bool missingObservation = false, int branches = 0, int totalLinks = -1)
     {
         ArgumentNullException.ThrowIfNull(rows);
         Session = session;
@@ -83,6 +99,9 @@ public sealed class OperationsDiagnosisSnapshot
         Rows = Array.AsReadOnly(rows.Take(MaximumRows).ToArray());
         Links = Array.AsReadOnly((links ?? []).Take(MaximumLinks).ToArray());
         TotalRows = totalRows < 0 ? rows.Count : totalRows;
+        TotalLinks = totalLinks < 0 ? links?.Count ?? 0 : totalLinks;
+        Root = root; OmittedSteps = omittedSteps; HasCycle = cycle;
+        MissingObservation = missingObservation; Branches = branches;
     }
 
     public SimulationSessionId Session { get; }
@@ -91,6 +110,12 @@ public sealed class OperationsDiagnosisSnapshot
     public IReadOnlyList<OperationsDiagnosisRow> Rows { get; }
     public IReadOnlyList<OperationsDiagnosisLink> Links { get; }
     public int TotalRows { get; }
+    public int TotalLinks { get; }
+    public EntityId Root { get; }
+    public int OmittedSteps { get; }
+    public bool HasCycle { get; }
+    public bool MissingObservation { get; }
+    public int Branches { get; }
 
     public static OperationsDiagnosisSnapshot? Resolve(PresentationSnapshot? snapshot) =>
         snapshot is { PlayerExperience: { } experience, PlayerActions: { } actions, Diagnosis: { } diagnosis } &&
@@ -104,20 +129,17 @@ public sealed class OperationsDiagnosisSnapshot
     {
         if (!destination.IsValid) return Array.Empty<OperationsDiagnosisLink>();
         var visited = new HashSet<EntityId> { destination };
+        var pending = new Queue<EntityId>(); pending.Enqueue(destination);
         var chain = new List<OperationsDiagnosisLink>(MaximumTraceDepth);
-        for (int depth = 0; depth < MaximumTraceDepth; depth++)
-        {
-            OperationsDiagnosisLink? next = null;
+        while (pending.TryDequeue(out var current) && chain.Count < MaximumTraceDepth)
             foreach (var link in Links)
-                if (link.Destination == destination && link.Source.IsValid && link.RequestId.IsSpecified)
+                if (link.Destination == current && link.Source.IsValid &&
+                    (link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection || link.RequestId.IsSpecified) &&
+                    visited.Add(link.Source))
                 {
-                    next = link;
-                    break;
+                    chain.Add(link); pending.Enqueue(link.Source);
+                    if (chain.Count == MaximumTraceDepth) break;
                 }
-            if (!next.HasValue || !visited.Add(next.Value.Source)) break;
-            chain.Add(next.Value);
-            destination = next.Value.Source;
-        }
         return Array.AsReadOnly(chain.ToArray());
     }
 
@@ -129,7 +151,10 @@ public sealed class OperationsDiagnosisSnapshot
             "OPERATIONS SESSION " + Session.Value.ToString(CultureInfo.InvariantCulture) +
             " TICK " + Tick.Value.ToString(CultureInfo.InvariantCulture) +
             " ROWS " + Rows.Count.ToString(CultureInfo.InvariantCulture) +
-            "/" + TotalRows.ToString(CultureInfo.InvariantCulture)
+            "/" + TotalRows.ToString(CultureInfo.InvariantCulture) +
+            " OMITTED STEPS " + OmittedSteps.ToString(CultureInfo.InvariantCulture) +
+            " EXTRA BRANCHES " + Branches.ToString(CultureInfo.InvariantCulture) +
+            (HasCycle ? " CYCLE" : "") + (MissingObservation ? " NOT OBSERVED" : "")
         };
         foreach (var row in Rows)
             lines.Add(row.Subject + " " + row.Entity + " " + row.Resource +
@@ -138,7 +163,9 @@ public sealed class OperationsDiagnosisSnapshot
                 " FREE " + Number(row.FreeQuantity) + " RESERVED " + Number(row.ReservedQuantity) +
                 " REQUESTED " + Number(row.OutstandingRequestQuantity) +
                 " CONFIRMED " + Number(row.ConfirmedIncomingQuantity) +
-                " LOADED " + Number(row.LoadedCargoQuantity));
+                " LOADED " + Number(row.LoadedCargoQuantity) +
+                " SOURCE FREE " + Number(row.SourceFreeQuantity) +
+                " INVENTORY " + row.Inventory + " CAUSE " + row.CauseEntity);
         return Array.AsReadOnly(lines.ToArray());
     }
 
@@ -158,16 +185,27 @@ public sealed class OperationsDiagnosisSnapshot
         OperationsDiagnosisReason.OutputFull => "OUTPUT FULL",
         OperationsDiagnosisReason.NoDriveFuel => "NO DRIVE FUEL",
         OperationsDiagnosisReason.DestinationFull => "DESTINATION FULL",
+        OperationsDiagnosisReason.DestinationTargetCovered => "DESTINATION TARGET COVERED",
+        OperationsDiagnosisReason.DestroyedRoute => "DAMAGED TRANSPORT ROUTE",
+        OperationsDiagnosisReason.DestroyedSupport => "DESTROYED SUPPORT",
+        OperationsDiagnosisReason.DisconnectedPort => "DISCONNECTED PORT",
+        OperationsDiagnosisReason.IncompatibleResource => "INCOMPATIBLE RESOURCE",
+        OperationsDiagnosisReason.ReservedStock => "SOURCE STOCK RESERVED",
+        OperationsDiagnosisReason.RetainedStock => "SOURCE STOCK RETAINED",
         _ => "UNKNOWN/NOT OBSERVED"
     };
 
-    internal static OperationsDiagnosisSnapshot? Capture(PresentationSnapshot snapshot)
+    internal static OperationsDiagnosisSnapshot? Capture(PresentationSnapshot snapshot) =>
+        Capture(snapshot.SessionId, snapshot.Tick, snapshot.PlayerActions, snapshot.PlayerExperience);
+
+    internal static OperationsDiagnosisSnapshot? Capture(SimulationSessionId session, SimulationTick tick,
+        PlayerActionSnapshot? actions, PlayerExperienceSnapshot? playerExperience)
     {
-        if (!snapshot.SessionId.IsSpecified || snapshot.PlayerActions is not { } actions ||
-            snapshot.PlayerExperience is not { } experience ||
+        if (!session.IsSpecified || actions is null ||
+            playerExperience is not { } experience ||
             experience.IsMatchComplete || experience.Player == PlayerId.None ||
-            experience.Tick != snapshot.Tick || actions.Tick != snapshot.Tick ||
-            actions.SessionId != snapshot.SessionId) return null;
+            experience.Tick != tick || actions.Tick != tick ||
+            actions.SessionId != session) return null;
 
         var logistics = actions.Logistics;
         var production = actions.Production;
@@ -267,10 +305,10 @@ public sealed class OperationsDiagnosisSnapshot
         }
 
         return rows.Count == 0 ? null :
-            new OperationsDiagnosisSnapshot(snapshot.SessionId, snapshot.Tick, experience.Player, rows, links, rows.Count);
+            new OperationsDiagnosisSnapshot(session, tick, experience.Player, rows, links, rows.Count);
     }
 
-    private static OperationsDiagnosisReason FromFailure(LogisticsTransportRequestFailureReason reason) => reason switch
+    internal static OperationsDiagnosisReason FromFailure(LogisticsTransportRequestFailureReason reason) => reason switch
     {
         LogisticsTransportRequestFailureReason.NoSourceSurplus => OperationsDiagnosisReason.NoSourceStock,
         LogisticsTransportRequestFailureReason.NoRoute => OperationsDiagnosisReason.NoRoute,
@@ -282,7 +320,7 @@ public sealed class OperationsDiagnosisSnapshot
         _ => OperationsDiagnosisReason.Unknown
     };
 
-    private static OperationsDiagnosisReason FromBottleneck(LogisticsBottleneckReason reason) => reason switch
+    internal static OperationsDiagnosisReason FromBottleneck(LogisticsBottleneckReason reason) => reason switch
     {
         LogisticsBottleneckReason.InsufficientSourceStock => OperationsDiagnosisReason.NoSourceStock,
         LogisticsBottleneckReason.InsufficientTruckCapacity or LogisticsBottleneckReason.SaturatedLinkOrHub =>
@@ -308,7 +346,7 @@ public sealed class OperationsDiagnosisSnapshot
         return OperationsDiagnosisReason.None;
     }
 
-    private struct ReasonAccumulator
+    internal struct ReasonAccumulator
     {
         public OperationsDiagnosisReason First;
         public OperationsDiagnosisReason Second;
