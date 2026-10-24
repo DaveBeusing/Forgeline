@@ -1,0 +1,245 @@
+{
+  "SchemaVersion": 1,
+  "BaseCommit": "cb58c3ad12c241cf6ef838ce55f2598a8e6894e2",
+  "BaseVersion": "0.1.468-dev",
+  "ProductVersion": "0.1.469-dev",
+  "BalanceChanges": [],
+  "Baseline": {
+    "Profile": "Gameplay",
+    "TickBudget": 12000,
+    "Result": "Telemetry-only execution aborted in MatchHeadlessReport.CaptureSide: DebugSnapshot.Single found no diagnostic entry. No completed batch evidence.",
+    "RequestedSeeds": [
+      17,
+      18,
+      19
+    ],
+    "CompletedReports": 0,
+    "ReferenceCommit": "cb58c3ad12c241cf6ef838ce55f2598a8e6894e2",
+    "BinaryIdentity": null,
+    "SourceTreeClean": null
+  },
+  "ShortBatch": {
+    "Profile": "Gameplay",
+    "StartingStock": "Standard",
+    "Participants": "two computer-controlled slots",
+    "Seeds": [
+      17,
+      18,
+      19
+    ],
+    "TicksPerMatch": 12000,
+    "TerminalMatches": 0,
+    "FirstContactReachedMatches": 0,
+    "DamageAppliedPerMatch": 0,
+    "Observation": "All three results matched; this small sample does not establish balance or win rate.",
+    "SourceIdentity": "0.1.469-dev+13a9bd28c4806feae1995734f7fd56479b2b4fe5",
+    "SourceCommit": "13a9bd28c4806feae1995734f7fd56479b2b4fe5"
+  },
+  "ExtendedBatch": {
+    "SourceIdentity": "0.1.469-dev+3e78795325279578372b52c17558acd4bace56fd",
+    "Seed": 17,
+    "Profile": "Gameplay",
+    "StartingStock": "Standard",
+    "Participants": "two computer-controlled slots",
+    "Ticks": 80000,
+    "Result": "Active; no damage and no terminal outcome",
+    "Pacing": [
+      {
+        "Name": "progression.first_conveyor_delivery",
+        "Owner": "player:1",
+        "Tick": null
+      },
+      {
+        "Name": "progression.first_processing_output",
+        "Owner": "player:1",
+        "Tick": 2149
+      },
+      {
+        "Name": "progression.first_mobile_supply",
+        "Owner": "player:1",
+        "Tick": null
+      },
+      {
+        "Name": "progression.first_research_completed",
+        "Owner": "player:1",
+        "Tick": null
+      },
+      {
+        "Name": "progression.first_authorized_contact",
+        "Owner": "player:1",
+        "Tick": null
+      },
+      {
+        "Name": "progression.first_chain_disruption",
+        "Owner": "player:1",
+        "Tick": 641
+      },
+      {
+        "Name": "progression.first_chain_recovery",
+        "Owner": "player:1",
+        "Tick": 2110
+      },
+      {
+        "Name": "progression.first_strategic_expansion",
+        "Owner": "player:1",
+        "Tick": 401
+      },
+      {
+        "Name": "progression.first_conveyor_delivery",
+        "Owner": "player:2",
+        "Tick": null
+      },
+      {
+        "Name": "progression.first_processing_output",
+        "Owner": "player:2",
+        "Tick": 1613
+      },
+      {
+        "Name": "progression.first_mobile_supply",
+        "Owner": "player:2",
+        "Tick": 15753
+      },
+      {
+        "Name": "progression.first_research_completed",
+        "Owner": "player:2",
+        "Tick": null
+      },
+      {
+        "Name": "progression.first_authorized_contact",
+        "Owner": "player:2",
+        "Tick": 40589
+      },
+      {
+        "Name": "progression.first_chain_disruption",
+        "Owner": "player:2",
+        "Tick": 641
+      },
+      {
+        "Name": "progression.first_chain_recovery",
+        "Owner": "player:2",
+        "Tick": 1574
+      },
+      {
+        "Name": "progression.first_strategic_expansion",
+        "Owner": "player:2",
+        "Tick": 401
+      },
+      {
+        "Name": "progression.first_combat_damage",
+        "Owner": "match",
+        "Tick": null
+      }
+    ],
+    "Observation": "Long transport and supply waits are observed. A numeric balance cause is not isolated; research extension is not integrated."
+  },
+  "SoloScoutProbe": {
+    "ImplementationBase": "0349a64ec815c0d6852fc40726a8a6ba55005bd0",
+    "Profile": "Gameplay",
+    "Seed": 4133,
+    "Participants": "two human slots; isolated command-driven fixture",
+    "Commands": "Opening, produced Scout, actual depot loading/mobile field supply, then Scout-only movement toward the public opposing start",
+    "MovementTickBudget": 8000,
+    "ContactReached": false,
+    "Observation": "Unreached goal, retained as a failed probe; cause not isolated. No resources or costs changed."
+  },
+  "SupportedScoutProbe": {
+    "CommandSequenceCommit": "13a9bd28c4806feae1995734f7fd56479b2b4fe5",
+    "Profile": "Gameplay",
+    "Seed": 4133,
+    "Participants": "two human slots; isolated command-driven fixture",
+    "Commands": "Same opening; produced Scout and genuinely loaded Supply Truck share an ordinary movement group toward the public opposing start",
+    "FinalTick": 14013,
+    "AuthoritativeHash": "44D270EE2D6C4364CB144598206884DC05DEB56D0A8C19499C6259CD598FC8A5",
+    "Milestones": {
+      "Extraction": 101,
+      "OrePolicy": 208,
+      "BlockedWork": 209,
+      "RunningWorkRecovered": 3036,
+      "ProcessingOutput": 3075,
+      "ScoutProduced": 7319,
+      "SupplyTruckProduced": 7438,
+      "DepotLoadCompleted": 8047,
+      "MobileFieldSupply": 8661,
+      "AuthorizedContact": 14013
+    },
+    "Unreached": [
+      "Conveyor delivery in this truck-based opening",
+      "Research in this opening (paid research is a separate save/replay test)",
+      "Strategic expansion",
+      "Combat damage",
+      "Regular match completion"
+    ],
+    "Observation": "Confirms existing supported scouting through real player commands. It does not establish enemy pressure, a full human match, or a global pacing improvement.",
+    "SourceIdentity": "0.1.469-dev+13a9bd28c4806feae1995734f7fd56479b2b4fe5",
+    "RepeatedHashVerified": true
+  },
+  "Validation": {
+    "SourceCommit": "3e78795325279578372b52c17558acd4bace56fd",
+    "Profile": "Validation",
+    "Seed": 2026,
+    "MaximumTicks": 80000,
+    "CompletedTick": 50862,
+    "Winner": 1,
+    "Reason": "CommandCoreDestroyed",
+    "RouteFailures": 0,
+    "Observation": "Unchanged natural terminal gate. Separate from normal Gameplay stock and acceptance."
+  },
+  "Package": {
+    "sdk": "10.0.402",
+    "informationalVersion": "0.1.469-dev+0349a64ec815c0d6852fc40726a8a6ba55005bd0",
+    "buildTimeUtc": "2026-10-24T15:43:02.5853784+00:00",
+    "sourceRevision": "0349a64ec815c0d6852fc40726a8a6ba55005bd0",
+    "productVersion": "0.1.469",
+    "product": "FORGELINE",
+    "configuration": "Release",
+    "runUrl": null,
+    "runId": null,
+    "version": "0.1.469-dev",
+    "targetFramework": "net10.0-windows",
+    "runtimeIdentifier": "win-x64",
+    "sourceTreeClean": true,
+    "repository": "https://github.com/DaveBeusing/Forgeline",
+    "runtimeAssetCompiler": "1.12.1",
+    "runAttempt": null,
+    "runtimeAssetSignature": "756b1ecc3a93d438a3c7d0c347931a7f82bfa2eb9cdb1b01e341a30025036f0e",
+    "channel": "dev",
+    "Checksum": "a5e957e5233526353199b3d68d4df9c66f61b358b550efc25c317ae06616d871  FORGELINE-0.1.469-dev-win-x64.zip",
+    "Reproducibility": "passed",
+    "FreshSettingsSmoke": "passed; real client session on physical D3D12; functional observation only",
+    "Startup": "two menu launches after warmup and application icon checks passed"
+  },
+  "NativeLessons": {
+    "Source": "0.1.469-dev+0349a64ec815c0d6852fc40726a8a6ba55005bd0",
+    "Cases": 29,
+    "Displays": [
+      "1280x720 at raster DPI 192 / UI scale 2",
+      "1920x1080 at raster DPI 96 / UI scale 1"
+    ],
+    "Lessons": [
+      "smelter-policy",
+      "truck-roles",
+      "mobile-loading",
+      "belt-production",
+      "research"
+    ],
+    "ExactRepeatsPerCase": 2,
+    "Adapter": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+    "SubmissionFaults": 0,
+    "Observation": "Authored fixture, all pages, structural/native image inspection. Not a live human player journey or reference-hardware performance acceptance."
+  },
+  "WindowsBudgetGate": {
+    "Script": "build/Invoke-WindowModeQualification.ps1",
+    "Line": 242,
+    "GameplayTextureBytes": 68761923,
+    "MaximumBytes": 58720256,
+    "Issue": 344,
+    "Result": "failed; unchanged guard preserved"
+  },
+  "OpenAcceptance": [
+    "Research extension PR #350 integration and combined functional assessment",
+    "Normal Gameplay regular match completion and investigation of observed long waits",
+    "Complete manual Windows package player journey with disabled/deferred/reordered guidance",
+    "Human readability/input/accessibility acceptance",
+    "Required final-head CI and independent existing failures as reported in PR #352"
+  ]
+}
