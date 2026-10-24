@@ -587,6 +587,8 @@ public sealed class MatchRuntime : IDisposable
             new MatchObjectiveSystem(
                 battlefieldRuntime.MatchStateEntity);
 
+        var conveyorFlow = new ConveyorSimulationSystem(inventories, automatedDistribution, recipes, unitDefinitions);
+
         ISimulationSystem[] systems =
         [
             buildingCommands,
@@ -621,7 +623,7 @@ public sealed class MatchRuntime : IDisposable
             technologyResearch,
             buildingConstruction,
             extraction,
-            new ConveyorSimulationSystem(inventories, automatedDistribution, recipes, unitDefinitions),
+            conveyorFlow,
             lifecycle,
             logisticsRegistration,
             roadAccess,
@@ -684,6 +686,7 @@ public sealed class MatchRuntime : IDisposable
                 registeredSystemTypes);
 
         services.Conveyors = conveyors;
+        services.ConveyorFlow = conveyorFlow;
 
         return new MatchRuntime(
             runtimeSettings,
