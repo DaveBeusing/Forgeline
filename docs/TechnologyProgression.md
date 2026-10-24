@@ -72,6 +72,8 @@ Normal-profile material recovery raises an Electronics Plant without input to Cr
 
 Production planning skips locked artillery and continues with available units. It does not add a research prerequisite to MBT/Supply admission or the core-capable main attack. Diagnostics copy the candidate, decision tick, requirement failure, production reserve, active request or priority reason. Candidate lists and diagnostics are derived; research requests, capability unlocks and the supply-established fact reconstruct through the normal authoritative command/tick path.
 
+An accepted mobile rescue without any remaining movement no longer counts as continuing service. The normal planner revalidates and reissues the paid trip; routing costs, reserved propulsion fuel and later player-order ownership remain enforced.
+
 ## Presentation and HUD
 
 Technology read models are captured from the completed simulation snapshot and own copied collections for costs, prerequisites, and unlocks. The read model exposes available, locked, blocked, researching, and completed states together with progress and a concrete block reason.

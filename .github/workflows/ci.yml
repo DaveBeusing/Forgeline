@@ -80,7 +80,7 @@ jobs:
         run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.CargoDockFailureRecoveryTests ForgeLine.Game.Tests.CargoTransportSystemTests
 
       - name: Cargo propulsion Fuel and docking contracts
-        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.CargoAutonomousFuelServiceTests ForgeLine.Game.Tests.CargoDeliveryFuelTests ForgeLine.Game.Tests.CargoDeliveryRouteFuelTests
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.CargoAutonomousFuelServiceTests ForgeLine.Game.Tests.CargoDeliveryFuelTests ForgeLine.Game.Tests.CargoDeliveryRouteFuelTests ForgeLine.Game.Tests.AutomaticResupplyDecisionSystemTests ForgeLine.Game.Tests.SupplyRescueRoutingTests ForgeLine.Game.Tests.SupplyRescueFeasibilityTests
 
       - name: Distribution FIFO and dispatch fairness contracts
         run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-restore -- --filter-class ForgeLine.Game.Tests.AutomatedDistributionSystemTests
