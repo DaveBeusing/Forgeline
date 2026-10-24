@@ -106,6 +106,14 @@ jobs:
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSimulationHostTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Session recovery boundaries and active-time pacing
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.PersistenceBoundaryTests ForgeLine.Game.Tests.MatchPersistenceTests ForgeLine.Game.Tests.MatchCompositionTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSaveCatalogReliabilityTests ForgeLine.Client.Tests.ClientSimulationHostTests ForgeLine.Client.Tests.ClientSessionLoadingRecoveryTests ForgeLine.Client.Tests.ClientSessionLoadingCoordinatorTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Conveyor material flow and recovery contracts
         shell: pwsh
         run: |

@@ -12,6 +12,65 @@ namespace ForgeLine.Client.Tests;
 public sealed class ClientSimulationHostTests
 {
     [Fact]
+    public void ResumeStartsAFullActiveIntervalAndRepeatedResumeDoesNotPostponeIt()
+    {
+        var clock = new ControlledHostTime();
+        using var fixture = ClientHostFixture.Create(timeProvider: clock);
+        for (int cycle = 0; cycle < 3; cycle++)
+        {
+            Assert.True(fixture.Host.TrySetPaused(true));
+            Assert.True(fixture.Host.WaitForPauseState(true, TestTimeout));
+            SimulationTick pausedAt = fixture.Host.CurrentTick;
+            clock.Advance(100_000);
+            Synchronize(fixture.Host);
+            Assert.Equal(pausedAt, fixture.Host.CurrentTick);
+            Assert.True(fixture.Host.TrySetPaused(false));
+            Assert.True(fixture.Host.WaitForPauseState(false, TestTimeout));
+            Synchronize(fixture.Host);
+            Assert.Equal(pausedAt, fixture.Host.CurrentTick);
+            clock.Advance(49);
+            Assert.True(fixture.Host.TrySetPaused(false));
+            Synchronize(fixture.Host);
+            Assert.Equal(pausedAt, fixture.Host.CurrentTick);
+            clock.Advance(1);
+            Synchronize(fixture.Host);
+            Assert.True(fixture.Host.WaitForTickAtLeast(new SimulationTick(pausedAt.Value + 1), TestTimeout));
+            Synchronize(fixture.Host);
+            Assert.Equal(pausedAt.Value + 1, fixture.Host.CurrentTick.Value);
+        }
+    }
+
+    [Fact]
+    public void OrdinaryRunningLagStillUsesTheBoundedCatchUpWindow()
+    {
+        var clock = new ControlledHostTime();
+        using var fixture = ClientHostFixture.Create(timeProvider: clock);
+        clock.Advance(10_000);
+        Synchronize(fixture.Host);
+        Assert.True(fixture.Host.WaitForTickAtLeast(new SimulationTick(6), TestTimeout));
+        Synchronize(fixture.Host);
+        Assert.Equal(6UL, fixture.Host.CurrentTick.Value);
+        clock.Advance(50);
+        Synchronize(fixture.Host);
+        Assert.True(fixture.Host.WaitForTickAtLeast(new SimulationTick(7), TestTimeout));
+    }
+
+    private static void Synchronize(ClientSimulationHost host)
+    {
+        Assert.True(host.TrySubmit(host.SessionId, static _ => default));
+        Assert.True(host.WaitForSubmissionCompletion(TestTimeout, out _));
+        host.ThrowIfFaulted();
+    }
+
+    private sealed class ControlledHostTime : TimeProvider
+    {
+        private long _timestamp;
+        public override long TimestampFrequency => 1000;
+        public override long GetTimestamp() => Interlocked.Read(ref _timestamp);
+        internal void Advance(long milliseconds) => Interlocked.Add(ref _timestamp, milliseconds);
+    }
+
+    [Fact]
     public void CompletedGpuQualificationPreservesMeasuredSceneAndCpuCounters()
     {
         ClientVisualQualificationSnapshot snapshot = default(ClientVisualQualificationSnapshot) with
@@ -821,7 +880,8 @@ public sealed class ClientSimulationHostTests
         public static ClientHostFixture Create(
             int boundaryCapacity = 32,
             ISimulationSystem? additionalSystem = null,
-            MatchRuntimeSettings? runtimeSettings = null)
+            MatchRuntimeSettings? runtimeSettings = null,
+            TimeProvider? timeProvider = null)
         {
             MatchScenarioSettings settings =
                 CentralDivideScenario.CreateSettings(
@@ -884,7 +944,8 @@ public sealed class ClientSimulationHostTests
                     scenario,
                     commands,
                     snapshots,
-                    boundaryCapacity);
+                    boundaryCapacity,
+                    timeProvider: timeProvider);
 
             return new ClientHostFixture(
                 scenario,

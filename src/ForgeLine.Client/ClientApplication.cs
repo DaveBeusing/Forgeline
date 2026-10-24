@@ -2924,8 +2924,10 @@ internal sealed class ClientApplication
                       IOException or
                       UnauthorizedAccessException)
         {
-            feedback =
-                "SAVE FAILED";
+            feedback = exception is MatchPersistenceException
+                { Reason: MatchPersistenceFailureReason.DocumentTooLarge }
+                    ? "SAVE FAILED - FILE TOO LARGE"
+                    : "SAVE FAILED";
             Console.Error.WriteLine(
                 $"[save:error] type={exception.GetType().Name} message={exception.Message}");
             return false;

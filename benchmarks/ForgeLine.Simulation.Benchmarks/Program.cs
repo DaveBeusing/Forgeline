@@ -6,6 +6,11 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
+        if (args.Length == 2 && args[0] == "--recovery-costs")
+        {
+            RecoveryMeasurements.Run(args[1]);
+            return;
+        }
         if (args.Length is >= 2 and <= 4 && args[0] == "--conveyor-measurements")
         {
             ConveyorMeasurements.Run(args[1],

@@ -12,7 +12,7 @@ public static class MatchPersistenceSerializer
     public const int CurrentSchemaVersion = 6;
     public const string Magic = "FORGELINE_MATCH";
 
-    private const long MaximumDocumentBytes =
+    public const long MaximumDocumentBytes =
         128L * 1024L * 1024L;
 
     private static readonly JsonSerializerOptions s_jsonOptions =
@@ -37,6 +37,18 @@ public static class MatchPersistenceSerializer
             MatchPersistenceDocumentKind.Replay,
             replay);
 
+    internal static string SerializeSave(MatchSaveData save, long maximumBytes) =>
+        Serialize(MatchPersistenceDocumentKind.Save, save, maximumBytes);
+
+    internal static string SerializeReplay(MatchReplayData replay, long maximumBytes) =>
+        Serialize(MatchPersistenceDocumentKind.Replay, replay, maximumBytes);
+
+    internal static MatchSaveData DeserializeSave(string document, long maximumBytes) =>
+        Deserialize<MatchSaveData>(document, MatchPersistenceDocumentKind.Save, maximumBytes);
+
+    internal static MatchReplayData DeserializeReplay(string document, long maximumBytes) =>
+        Deserialize<MatchReplayData>(document, MatchPersistenceDocumentKind.Replay, maximumBytes);
+
     public static MatchSaveData DeserializeSave(
         string document) =>
         Deserialize<MatchSaveData>(
@@ -49,21 +61,39 @@ public static class MatchPersistenceSerializer
             document,
             MatchPersistenceDocumentKind.Replay);
 
-    public static void WriteSave(
-        string path,
-        MatchSaveData save) =>
-        WriteDocument(
-            path,
-            SerializeSave(
-                save));
+    public static void WriteSave(string path, MatchSaveData save) =>
+        WriteSaveCancellable(path, save, CancellationToken.None);
 
-    public static void WriteReplay(
+    public static void WriteSaveCancellable(
         string path,
-        MatchReplayData replay) =>
-        WriteDocument(
-            path,
-            SerializeReplay(
-                replay));
+        MatchSaveData save,
+        CancellationToken cancellationToken) =>
+        WriteSaveWithBudget(path, save, MaximumDocumentBytes, cancellationToken);
+
+    internal static void WriteSaveWithBudget(string path, MatchSaveData save, long maximumBytes,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        MatchPersistenceService.ValidateSave(save);
+        WriteDocument(path, SerializeSave(save, maximumBytes), cancellationToken);
+    }
+
+    public static void WriteReplay(string path, MatchReplayData replay) =>
+        WriteReplayCancellable(path, replay, CancellationToken.None);
+
+    public static void WriteReplayCancellable(
+        string path,
+        MatchReplayData replay,
+        CancellationToken cancellationToken) =>
+        WriteReplayWithBudget(path, replay, MaximumDocumentBytes, cancellationToken);
+
+    internal static void WriteReplayWithBudget(string path, MatchReplayData replay, long maximumBytes,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        MatchPersistenceService.ValidateReplay(replay);
+        WriteDocument(path, SerializeReplay(replay, maximumBytes), cancellationToken);
+    }
 
     public static MatchSaveData ReadSave(
         string path) =>
@@ -79,7 +109,8 @@ public static class MatchPersistenceSerializer
 
     private static string Serialize<T>(
         MatchPersistenceDocumentKind kind,
-        T payload)
+        T payload,
+        long maximumBytes = MaximumDocumentBytes)
     {
         ArgumentNullException.ThrowIfNull(payload);
 
@@ -98,17 +129,22 @@ public static class MatchPersistenceSerializer
                 payloadJson,
                 payloadHash);
 
-        return JsonSerializer.Serialize(
+        string document = JsonSerializer.Serialize(
             envelope,
             s_jsonOptions);
+        CheckSize(document, maximumBytes, MatchPersistenceFailureReason.DocumentTooLarge);
+        return document;
     }
 
     private static T Deserialize<T>(
         string document,
-        MatchPersistenceDocumentKind expectedKind)
+        MatchPersistenceDocumentKind expectedKind,
+        long maximumBytes = MaximumDocumentBytes)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(
-            document);
+        ArgumentNullException.ThrowIfNull(document);
+        if (string.IsNullOrWhiteSpace(document))
+            throw Failure(MatchPersistenceFailureReason.CorruptDocument, "The match document is empty.");
+        CheckSize(document, maximumBytes, MatchPersistenceFailureReason.CorruptDocument);
 
         try
         {
@@ -145,6 +181,11 @@ public static class MatchPersistenceSerializer
                     $"Expected a {expectedKind} document but found {envelope.Kind}.");
             }
 
+            if (string.IsNullOrWhiteSpace(envelope.Payload) ||
+                !MatchPersistenceValidation.Hash(envelope.PayloadSha256))
+                throw Failure(MatchPersistenceFailureReason.CorruptDocument,
+                    "The match document payload or checksum is missing or invalid.");
+
             if (!MatchesSha256(
                     envelope.Payload,
                     envelope.PayloadSha256))
@@ -154,15 +195,22 @@ public static class MatchPersistenceSerializer
                     "The match document payload checksum is invalid.");
             }
 
-            T? payload =
-                JsonSerializer.Deserialize<T>(
-                    MigratePayload(envelope.Payload),
-                    s_jsonOptions);
-
-            return payload ??
-                throw Failure(
-                    MatchPersistenceFailureReason.CorruptDocument,
-                    "The match document payload is missing.");
+            T? payload;
+            // Constructors validate persisted identities. Translate only errors from
+            // materializing untrusted content, not arbitrary restoration failures.
+            try
+            {
+                payload = JsonSerializer.Deserialize<T>(MigratePayload(envelope.Payload), s_jsonOptions);
+            }
+            catch (ArgumentException exception)
+            {
+                throw Failure(MatchPersistenceFailureReason.CorruptDocument,
+                    "The match payload contains an invalid identity or value.", exception);
+            }
+            if (payload is MatchSaveData save) MatchPersistenceService.ValidateSave(save);
+            else if (payload is MatchReplayData replay) MatchPersistenceService.ValidateReplay(replay);
+            return payload ?? throw Failure(MatchPersistenceFailureReason.CorruptDocument,
+                "The match document payload is missing.");
         }
         catch (MatchPersistenceException)
         {
@@ -188,18 +236,24 @@ public static class MatchPersistenceSerializer
     // discriminators: only its preset opponent fields and absent composition key differ.
     private static string MigratePayload(string payload)
     {
-        JsonNode root = JsonNode.Parse(payload) ?? throw new JsonException("Empty match payload.");
-        if (root["SchemaVersion"]?.GetValue<int>() != 1)
+        if (JsonNode.Parse(payload) is not JsonObject root ||
+            root["SchemaVersion"] is not JsonValue schema || !schema.TryGetValue<int>(out int version))
+            throw new JsonException("The match payload must be an object with an integer schema.");
+        if (version is < 1 or > CurrentSchemaVersion)
+            throw Failure(MatchPersistenceFailureReason.IncompatibleVersion,
+                $"Match schema {version} is incompatible with schema {CurrentSchemaVersion}.");
+        if (root["Configuration"] is not JsonObject configuration ||
+            configuration["Scenario"] is not JsonObject scenario)
+            throw new JsonException("Missing match configuration or scenario object.");
+        if (version != 1)
         {
-            if (root["SchemaVersion"]?.GetValue<int>() >= 2 &&
-                string.IsNullOrWhiteSpace(root["Configuration"]?["CompositionKey"]?.GetValue<string>()))
+            if (configuration["CompositionKey"] is not JsonValue key ||
+                !key.TryGetValue<string>(out string? identity) || string.IsNullOrWhiteSpace(identity))
             {
                 throw new JsonException("Missing match composition identity.");
             }
             return payload;
         }
-        JsonNode configuration = root["Configuration"] ?? throw new JsonException("Missing configuration.");
-        JsonNode scenario = configuration["Scenario"] ?? throw new JsonException("Missing scenario.");
         if (scenario["OpponentConfigurations"] is null)
         {
             scenario["OpponentConfigurations"] = new JsonObject
@@ -216,7 +270,8 @@ public static class MatchPersistenceSerializer
 
     private static void WriteDocument(
         string path,
-        string document)
+        string document,
+        CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(
             path);
@@ -241,11 +296,13 @@ public static class MatchPersistenceSerializer
 
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             File.WriteAllText(
                 temporaryPath,
                 document,
                 new UTF8Encoding(
                     encoderShouldEmitUTF8Identifier: false));
+            cancellationToken.ThrowIfCancellationRequested();
             File.Move(
                 temporaryPath,
                 fullPath,
@@ -271,29 +328,35 @@ public static class MatchPersistenceSerializer
         string fullPath =
             Path.GetFullPath(
                 path);
-        var info =
-            new FileInfo(
-                fullPath);
+        using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-        if (!info.Exists)
-        {
-            throw new FileNotFoundException(
-                "The match document does not exist.",
-                fullPath);
-        }
-
-        if (info.Length <= 0 ||
-            info.Length >
+        if (stream.Length <= 0 ||
+            stream.Length >
                 MaximumDocumentBytes)
         {
             throw Failure(
                 MatchPersistenceFailureReason.CorruptDocument,
-                $"The match document size {info.Length} is invalid.");
+                $"The match document size {stream.Length} is invalid; the limit is {MaximumDocumentBytes} UTF-8 bytes.");
         }
 
-        return File.ReadAllText(
-            fullPath,
-            Encoding.UTF8);
+        try
+        {
+            using var reader = new StreamReader(stream, new UTF8Encoding(true, true), detectEncodingFromByteOrderMarks: false);
+            return reader.ReadToEnd();
+        }
+        catch (DecoderFallbackException error)
+        {
+            throw Failure(MatchPersistenceFailureReason.CorruptDocument, "The match document is not valid UTF-8.", error);
+        }
+    }
+
+    private static void CheckSize(string document, long maximumBytes, MatchPersistenceFailureReason reason)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(maximumBytes, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(maximumBytes, MaximumDocumentBytes);
+        long bytes = Encoding.UTF8.GetByteCount(document);
+        if (bytes > maximumBytes)
+            throw Failure(reason, $"The match document requires {bytes} UTF-8 bytes; the limit is {maximumBytes}. The previous file was preserved.");
     }
 
     private static bool MatchesSha256(

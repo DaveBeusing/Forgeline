@@ -17,7 +17,8 @@ public enum MatchPersistenceFailureReason : byte
     IncompleteCommandHistory = 4,
     UnsupportedCommand = 5,
     StateMismatch = 6,
-    RandomStateMismatch = 7
+    RandomStateMismatch = 7,
+    DocumentTooLarge = 8
 }
 
 public sealed class MatchPersistenceException : Exception
