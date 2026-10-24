@@ -88,6 +88,16 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Operations rule controls and production recovery
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.OperationsRuleTests ForgeLine.Game.Tests.PlayerCommandBoundaryTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.OperationsRuleControlsTests ForgeLine.Presentation.Tests.OperationsTests ForgeLine.Presentation.Tests.PlayerActionPanelTests ForgeLine.Presentation.Tests.PlayerActionDockHudTests ForgeLine.Presentation.Tests.PlayerActionReadModelTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.UiReferenceScenarioTests ForgeLine.Client.Tests.ClientSimulationHostTests ForgeLine.Client.Tests.UiArtworkCoverageTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Tactical supply, convoy and bounded navigation contracts
         shell: pwsh
         run: |
