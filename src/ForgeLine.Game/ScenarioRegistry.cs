@@ -5,7 +5,7 @@ namespace ForgeLine.Game;
 // Registrations are application-owned data. Files cannot name types or introduce executable rules.
 public sealed class ScenarioRegistry
 {
-    public const string SplitBasinMapSha256 = "d2e47e1ec4da0fe8e2b498d10d73f8b7a2fee6e0a5f76ab86514510ed6c6e861";
+    public const string SplitBasinMapSha256 = "2340ae49d9fd58b5c4e08347a8a14cbe4ca88f34b66dcbeca73af2e5bd5bd608";
     public const string CentralDivideMapSha256 = "d60f7ae9d4d6b6771269bd53ccfada847615c1d3f261b87e6ba0223e55f276ef";
     public const string CentralDivideContentSha256 = "192624b7d2011b4ae6d0858d74d2fdfa9dc0d361c029444bf663f785556ffbd9";
     public const string CentralDivideMapPath = "central-divide.flmap.json";

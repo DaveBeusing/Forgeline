@@ -23,8 +23,8 @@ public static class SplitBasinBattlefield
     {
         BattlefieldStartPosition[] starts =
         [
-            new(new PlayerId(1), new(320, 0, 1024), new(370, 0, 1024), Bounds(96, 784, 704, 1264)),
-            new(new PlayerId(2), new(1728, 0, 1024), new(1678, 0, 1024), Bounds(1344, 784, 1952, 1264))
+            new(new PlayerId(1), new(320, 0, 1024), new(370, 0, 1024), Bounds(96, 784, 400, 1264)),
+            new(new PlayerId(2), new(1728, 0, 1024), new(1678, 0, 1024), Bounds(1648, 784, 1952, 1264))
         ];
         var resources = new List<BattlefieldResourceDepositDefinition>();
         foreach (bool east in new[] { false, true })
@@ -33,10 +33,10 @@ public static class SplitBasinBattlefield
             float X(float x) => east ? SizeMeters - x : x;
             resources.Add(Deposit(side + ".ferrous", ResourceIds.FerrousOre, X(520), 870, 5500, 7.5, false));
             resources.Add(Deposit(side + ".volatiles", ResourceIds.Volatiles, X(460), 1180, 3500, 5, false));
-            resources.Add(Deposit(side + ".silicates", ResourceIds.Silicates, X(650), 1050, 4000, 5.5, false));
+            resources.Add(Deposit(side + ".silicates", ResourceIds.Silicates, X(650), 880, 4000, 5.5, false));
             resources.Add(Deposit(side + ".contested.ferrous", ResourceIds.FerrousOre, X(740), 760, 12000, 10, true));
-            resources.Add(Deposit(side + ".contested.volatiles", ResourceIds.Volatiles, X(740), 1390, 8000, 7, true));
-            resources.Add(Deposit(side + ".outpost.silicates", ResourceIds.Silicates, X(740), 1780, 10000, 8, true));
+            resources.Add(Deposit(side + ".contested.volatiles", ResourceIds.Volatiles, X(680), 1390, 8000, 7, true));
+            resources.Add(Deposit(side + ".outpost.silicates", ResourceIds.Silicates, X(740), 1800, 10000, 8, true));
         }
         BattlefieldSiteDefinition[] sites =
         [

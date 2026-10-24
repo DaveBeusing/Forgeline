@@ -38,8 +38,8 @@ public sealed class SplitBasinRuntimeTests
         foreach (var id in new[] { BuildingIds.Smelter, BuildingIds.ElectronicsPlant, BuildingIds.AmmunitionPlant, BuildingIds.SupplyDepot })
             buildings[id] = id == BuildingIds.AmmunitionPlant ? Build(id, new(owner == 1 ? 240 : 1808, 0, 983.5f), BuildingOrientation.West)
                 : id == BuildingIds.SupplyDepot ? Build(id, new(owner == 1 ? 240 : 1808, 0, 1064.5f), BuildingOrientation.West)
-                : id == BuildingIds.Smelter ? Build(id, new(X(520), 0, 970))
-                : Build(id, new(X(560), 0, 1140));
+                : id == BuildingIds.Smelter ? Build(id, new(X(520), 0, 950))
+                : Build(id, new(X(540), 0, 1140));
         EntityId smelter = buildings[BuildingIds.Smelter];
         EntityId electronics = buildings[BuildingIds.ElectronicsPlant];
         EntityId ammo = buildings[BuildingIds.AmmunitionPlant];
@@ -90,11 +90,18 @@ public sealed class SplitBasinRuntimeTests
         runtime.Simulation.SubmitCommand(disable, runtime.Simulation.CurrentTick.Next());
         runtime.Simulation.AdvanceOneTick(); Assert.True(disable.Accepted);
         Assert.True(runtime.Logistics.TryGetEdge(edge, out var disabled)); Assert.False(disabled.Enabled);
+        var alternate = runtime.Logistics.FindRoute(runtime.BattlefieldRuntime.RoadNodes["west.start"], runtime.BattlefieldRuntime.RoadNodes["east.start"]);
+        Assert.True(alternate.Succeeded);
+        Assert.Contains(alternate.Route!.Segments, x => x.EdgeId == runtime.BattlefieldRuntime.RoadEdges["outer.ford"]);
+        Assert.DoesNotContain(alternate.Route.Segments, x => x.EdgeId == edge);
         var restore = new RestoreStrategicInfrastructureCommand(bridge, runtime.Simulation.CurrentTick);
         runtime.Simulation.SubmitCommand(restore, runtime.Simulation.CurrentTick.Next());
         runtime.Simulation.AdvanceOneTick(); Assert.True(restore.Accepted);
         Until(() => runtime.Simulation.Entities.GetComponent<StrategicInfrastructureState>(bridge).State == StrategicInfrastructureOperationalState.Operational, 100);
         Assert.True(runtime.Logistics.TryGetEdge(edge, out var recovered)); Assert.True(recovered.Enabled);
+        var originalRoute = runtime.Logistics.FindRoute(runtime.BattlefieldRuntime.RoadNodes["west.start"], runtime.BattlefieldRuntime.RoadNodes["east.start"]);
+        Assert.True(originalRoute.Succeeded);
+        Assert.Contains(originalRoute.Route!.Segments, x => x.EdgeId == edge);
         // Existing host infrastructure commands deliberately remain outside the player replay codec.
         Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.CaptureSave(runtime));
 

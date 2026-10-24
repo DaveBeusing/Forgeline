@@ -46,6 +46,29 @@ public sealed class SplitBasinGeographyTests
     }
 
     [Fact]
+    public void ActualBuildPolicyKeepsRoadsAndShouldersClearWhileEachCoreFitsItsOwnYard()
+    {
+        var map = ScenarioRegistry.Default.Resolve(SplitBasinBattlefield.CompositionKey).Battlefield;
+        var query = new BattlefieldBuildableAreaQuery(map);
+        static AxisAlignedBounds Box(Vector3 p, float half) => new(new(p.X - half, -64, p.Z - half), new(p.X + half, 128, p.Z + half));
+        foreach (var start in map.Starts) Assert.True(query.IsBuildable(start.Player, Box(start.CommandCorePosition, 10)));
+        foreach (var edge in map.RoadEdges)
+        {
+            var a = map.RoadNodes.Single(x => x.Key == edge.SourceNodeKey).Position;
+            var b = map.RoadNodes.Single(x => x.Key == edge.DestinationNodeKey).Position;
+            var lateral = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, b - a));
+            int samples = (int)MathF.Ceiling(Vector3.Distance(a, b) / 16);
+            for (int i = 0; i <= samples; i++)
+            foreach (float offset in new float[] { -16, 0, 16 })
+            foreach (var start in map.Starts)
+            {
+                var p = Vector3.Lerp(a, b, i / (float)samples) + lateral * offset;
+                Assert.False(query.IsBuildable(start.Player, Box(p, 1)), $"Road {edge.Key} at {p} is inside a build/mining zone for {start.Player}.");
+            }
+        }
+    }
+
+    [Fact]
     public void ExistingScoutSightDistinguishesCentralAndOuterCrossingExposure()
     {
         var composition = ScenarioRegistry.Default.Resolve(SplitBasinBattlefield.CompositionKey);
