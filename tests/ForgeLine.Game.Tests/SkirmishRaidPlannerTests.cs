@@ -167,9 +167,12 @@ public sealed class SkirmishRaidPlannerTests
     public void ActiveTimeAndNavigationLossBoundTheMission()
     {
         var fixture = new Fixture(configuration: new() { Raids = new() { ActiveTicks = 3 } });
-        fixture.Step(4);
-        Assert.Equal(SkirmishRaidPhase.Returning, fixture.State.Phase);
+        fixture.Step();
+        EntityId member = fixture.State.First;
+        fixture.Step(3);
+        Assert.Equal(SkirmishRaidPhase.Complete, fixture.State.Phase);
         Assert.Equal(SkirmishRaidReason.DurationExpired, fixture.State.Reason);
+        Assert.Equal(CombatOrderKind.Retreat, fixture.Entities.GetComponent<CombatOrderState>(member).Kind);
         var blocked = new Fixture(); blocked.Step(); blocked.BlockRoute(); blocked.Step();
         Assert.Equal(SkirmishRaidPhase.Returning, blocked.State.Phase);
         Assert.Equal(SkirmishRaidReason.UnknownRoute, blocked.State.Reason);
@@ -239,6 +242,37 @@ public sealed class SkirmishRaidPlannerTests
         guarded.Guard = guarded.CreateUnit(UnitIds.MainBattleTank, new(610, 0, 128), new PlayerId(2));
         guarded.Step(3);
         Assert.False(guarded.State.IsActive);
+    }
+
+    public static IEnumerable<object[]> IndustrialTargets =>
+        new[] { BuildingIds.PowerPlant, BuildingIds.Smelter, BuildingIds.Refinery,
+            BuildingIds.ElectronicsPlant, BuildingIds.AmmunitionPlant, BuildingIds.Barracks,
+            BuildingIds.VehicleFactory, BuildingIds.StorageDepot, BuildingIds.SupplyDepot }
+            .Select(id => new object[] { id });
+
+    [Theory]
+    [MemberData(nameof(IndustrialTargets))]
+    public void StructureCapableSurplusCanRaidIndustryWithoutTakingTheFiveUnitMainForce(BuildingId building)
+    {
+        var fixture = new Fixture(UnitIds.MainBattleTank, ownCount: 7);
+        fixture.Entities.AddComponent(fixture.Truck, new CompletedBuilding(building, new PlayerId(2), SimulationTick.Zero));
+        fixture.Entities.RemoveComponent<UnitIdentity>(fixture.Truck);
+        fixture.Entities.SetComponent(fixture.Truck, new Targetable(TargetClass.Structure));
+        fixture.Entities.SetComponent(fixture.Truck, new WorldTransform(new(450, 0, 128), Quaternion.Identity, Vector3.One));
+        fixture.Step();
+        Assert.True(fixture.State.IsActive, fixture.Diagnostic.ToString());
+        Assert.Equal(5, fixture.Units.Count(unit => !fixture.State.Contains(unit)));
+    }
+
+    [Fact]
+    public void AForceAwayFromHomeCannotInventItsDefensiveReserve()
+    {
+        var fixture = new Fixture();
+        foreach (EntityId unit in fixture.Units)
+            fixture.Entities.SetComponent(unit, new WorldTransform(new(700, 0, 128), Quaternion.Identity, Vector3.One));
+        fixture.Step();
+        Assert.False(fixture.State.IsActive);
+        Assert.Equal(SkirmishRaidReason.NoEligibleForce, fixture.Diagnostic.AdmissionReason);
     }
 
     private sealed class Fixture

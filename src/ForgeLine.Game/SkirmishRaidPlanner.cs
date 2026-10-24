@@ -152,6 +152,13 @@ public sealed class SkirmishRaidPlanner
             new StopCombatCommand(controller.Player, members, context.Tick).Execute(context);
             return Finish(context, state, policy, SkirmishRaidReason.Priority);
         }
+        if (context.Tick.Value - state.StartedAtTick.Value >= policy.ActiveTicks)
+        {
+            // The tactical return remains valid after the bounded strategic intent expires.
+            if (state.Phase is not (SkirmishRaidPhase.Returning or SkirmishRaidPhase.Resupplying))
+                state = Retreat(context, controller, state, members, policy, SkirmishRaidReason.DurationExpired);
+            return Finish(context, state, policy, SkirmishRaidReason.DurationExpired);
+        }
         if (state.Phase is SkirmishRaidPhase.Returning or SkirmishRaidPhase.Resupplying)
         {
             if (members.All(e => Distance(Position(context.Entities, e), state.ReturnPoint) <= 16))
@@ -159,8 +166,6 @@ public sealed class SkirmishRaidPlanner
                 new StopCombatCommand(controller.Player, members, context.Tick).Execute(context);
                 return Finish(context, state, policy, SkirmishRaidReason.Returned);
             }
-            if (context.Tick.Value - state.StartedAtTick.Value >= policy.ActiveTicks + (ulong)policy.SearchTicks)
-                return Finish(context, state, policy, state.Reason);
             if (state.Phase == SkirmishRaidPhase.Resupplying)
             {
                 foreach (EntityId unit in members)
@@ -173,8 +178,6 @@ public sealed class SkirmishRaidPlanner
         }
         if (members.Length < policy.MinimumUnits)
             return Retreat(context, controller, state, members, policy, SkirmishRaidReason.UnitsLost);
-        if (context.Tick.Value - state.StartedAtTick.Value >= policy.ActiveTicks)
-            return Retreat(context, controller, state, members, policy, SkirmishRaidReason.DurationExpired);
         foreach (EntityId unit in members)
         {
             if (!IsReady(context.Entities, unit, controller.Player, policy, continuing: true) ||
@@ -313,7 +316,8 @@ public sealed class SkirmishRaidPlanner
         return building.BuildingId == BuildingIds.StorageDepot || building.BuildingId == BuildingIds.SupplyDepot ? 5 :
             building.BuildingId == BuildingIds.PowerPlant ? 4 :
             building.BuildingId == BuildingIds.Smelter || building.BuildingId == BuildingIds.Refinery ||
-            building.BuildingId == BuildingIds.ElectronicsPlant || building.BuildingId == BuildingIds.AmmunitionPlant ? 3 : 0;
+            building.BuildingId == BuildingIds.ElectronicsPlant || building.BuildingId == BuildingIds.AmmunitionPlant ||
+            building.BuildingId == BuildingIds.Barracks || building.BuildingId == BuildingIds.VehicleFactory ? 3 : 0;
     }
 
     private int KnownThreat(EntityRegistry entities, FactionId faction, FactionIntelligenceSnapshot knowledge,
