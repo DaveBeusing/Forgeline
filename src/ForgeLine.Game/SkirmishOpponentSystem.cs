@@ -163,6 +163,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controllerEntity);
         SkirmishOpponentConfiguration configuration =
             ResolveConfiguration(controller.Player);
+        _raids?.ExpireDue(context, controllerEntity, controller, configuration.Raids);
         bool decisionDue =
             IsDecisionDue(
                 context.Tick,
@@ -392,8 +393,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         if (strategicState is SkirmishStrategicState.Defending or SkirmishStrategicState.Recovering or
-            SkirmishStrategicState.Bootstrap or SkirmishStrategicState.Resupplying)
-            _raids?.Evaluate(context, controllerEntity, controller, owned.Units, intelligence, configuration, true);
+            SkirmishStrategicState.Bootstrap or SkirmishStrategicState.Resupplying or SkirmishStrategicState.Expanding)
+            _raids?.Evaluate(context, controllerEntity, controller, owned.Units, intelligence, configuration,
+                strategicState != SkirmishStrategicState.Expanding);
 
         if (context.Entities.TryGetComponent(controllerEntity, out SkirmishRaidState activeRaid) && activeRaid.IsActive)
             foreach (EntityId unit in owned.Units)

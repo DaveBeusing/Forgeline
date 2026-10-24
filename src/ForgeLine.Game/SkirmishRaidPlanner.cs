@@ -34,6 +34,22 @@ public sealed class SkirmishRaidPlanner
 
     public void Forget(EntityId controller) => _diagnostics.Remove(controller);
 
+    /// <summary>Expires an existing intent without running contact selection between decisions.</summary>
+    public void ExpireDue(SimulationContext context, EntityId controllerEntity,
+        SkirmishOpponentController controller, SkirmishRaidConfiguration policy)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(policy);
+        if (!context.Entities.TryGetComponent(controllerEntity, out SkirmishRaidState state) || !state.IsActive ||
+            context.Tick.Value - state.StartedAtTick.Value < policy.ActiveTicks) return;
+        if (_routes.World.Version != _navigation.World.Version) _routes.UpdateWorld(_navigation.World);
+        EntityId[] members = Members(context.Entities, controller.Player, state);
+        state = members.Length == 0 ? FinishMissing(context, state, policy) :
+            FinishExpired(context, controller, state, members, policy);
+        Store(context.Entities, controllerEntity, state);
+        _diagnostics[controllerEntity] = new(state, state.Reason, Capture(controllerEntity).ContactsConsidered);
+    }
+
     public void Evaluate(SimulationContext context, EntityId controllerEntity,
         SkirmishOpponentController controller, IReadOnlyList<EntityId> ownedCombatUnits,
         FactionIntelligenceSnapshot knowledge, SkirmishOpponentConfiguration configuration,
@@ -145,12 +161,7 @@ public sealed class SkirmishRaidPlanner
         SkirmishRaidState state, FactionIntelligenceSnapshot knowledge, SkirmishRaidConfiguration policy, bool priority)
     {
         EntityId[] members = Members(context.Entities, controller.Player, state);
-        if (members.Length == 0)
-        {
-            bool lost = new[] { state.First, state.Second, state.Third }
-                .Where(e => e.IsValid).All(e => !context.Entities.IsAlive(e));
-            return Finish(context, state, policy, lost ? SkirmishRaidReason.UnitsLost : SkirmishRaidReason.OrdersReplaced);
-        }
+        if (members.Length == 0) return FinishMissing(context, state, policy);
         if (priority)
         {
             // Release only the orders that still belong to this raid. The next normal decision may defend.
@@ -158,12 +169,7 @@ public sealed class SkirmishRaidPlanner
             return Finish(context, state, policy, SkirmishRaidReason.Priority);
         }
         if (context.Tick.Value - state.StartedAtTick.Value >= policy.ActiveTicks)
-        {
-            // The tactical return remains valid after the bounded strategic intent expires.
-            if (state.Phase is not (SkirmishRaidPhase.Returning or SkirmishRaidPhase.Resupplying))
-                state = Retreat(context, controller, state, members, policy, SkirmishRaidReason.DurationExpired);
-            return Finish(context, state, policy, SkirmishRaidReason.DurationExpired);
-        }
+            return FinishExpired(context, controller, state, members, policy);
         if (state.Phase is SkirmishRaidPhase.Returning or SkirmishRaidPhase.Resupplying)
         {
             if (members.All(e => Distance(Position(context.Entities, e), state.ReturnPoint) <= 16))
@@ -232,6 +238,23 @@ public sealed class SkirmishRaidPlanner
             state = state with { Phase = SkirmishRaidPhase.Approaching, Group = move.CreatedCombatGroup, OrderedPosition = position };
         }
         return state with { LastKnownPosition = position, LastSeenTick = current.Value.LastSeenTick, Reason = SkirmishRaidReason.None };
+    }
+
+    private SkirmishRaidState FinishExpired(SimulationContext context, SkirmishOpponentController controller,
+        SkirmishRaidState state, EntityId[] members, SkirmishRaidConfiguration policy)
+    {
+        // The tactical return remains valid after the bounded strategic intent expires.
+        if (state.Phase is not (SkirmishRaidPhase.Returning or SkirmishRaidPhase.Resupplying))
+            state = Retreat(context, controller, state, members, policy, SkirmishRaidReason.DurationExpired);
+        return Finish(context, state, policy, SkirmishRaidReason.DurationExpired);
+    }
+
+    private static SkirmishRaidState FinishMissing(SimulationContext context, SkirmishRaidState state,
+        SkirmishRaidConfiguration policy)
+    {
+        bool lost = new[] { state.First, state.Second, state.Third }
+            .Where(e => e.IsValid).All(e => !context.Entities.IsAlive(e));
+        return Finish(context, state, policy, lost ? SkirmishRaidReason.UnitsLost : SkirmishRaidReason.OrdersReplaced);
     }
 
     private SkirmishRaidState Retreat(SimulationContext context, SkirmishOpponentController controller,

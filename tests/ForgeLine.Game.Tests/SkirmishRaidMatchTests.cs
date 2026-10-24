@@ -34,6 +34,20 @@ public sealed class SkirmishRaidMatchTests
         }
     }
     [Fact]
+    public void OpponentExpiresTheRaidBeforeItsNextStrategicDecision()
+    {
+        using var scene = Scene.Create(reactionCadenceTicks: 40, activeTicks: 3);
+        var entities = scene.Runtime.Simulation.Entities;
+        var started = entities.GetComponent<SkirmishRaidState>(scene.Controller);
+        scene.Runtime.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+        var finished = entities.GetComponent<SkirmishRaidState>(scene.Controller);
+        Assert.Equal(SkirmishRaidPhase.Complete, finished.Phase);
+        Assert.Equal(SkirmishRaidReason.DurationExpired, finished.Reason);
+        Assert.Equal(started.StartedAtTick, entities.GetComponent<SkirmishOpponentState>(scene.Controller).LastDecisionTick);
+        Assert.Equal(CombatOrderKind.Retreat, entities.GetComponent<CombatOrderState>(started.First).Kind);
+    }
+
+    [Fact]
     public void ExposedLoadedTruckLosesCargoWhilePlayerReroutingPreservesIt()
     {
         using var exposed = Scene.Create();
@@ -63,7 +77,7 @@ public sealed class SkirmishRaidMatchTests
     private sealed record Scene(MatchRuntime Runtime, MatchComposition Composition, EntityId Controller, Vector3 Home) : IDisposable
     {
         public void Dispose() => Runtime.Dispose();
-        public static Scene Create()
+        public static Scene Create(uint reactionCadenceTicks = 20, uint activeTicks = 1_200)
         {
             var settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, 2026, enableDebugCapture: true);
             MatchComposition basis = settings.Composition;
@@ -91,7 +105,10 @@ public sealed class SkirmishRaidMatchTests
             };
             settings = settings with { Composition = composition,
                 Scenario = settings.Scenario with { OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>
-                    { [1] = settings.Scenario.OpponentConfigurations[1] with { DefensiveRadiusMeters = 180 }, [2] = settings.Scenario.OpponentConfigurations[2] } },
+                    { [1] = settings.Scenario.OpponentConfigurations[1] with
+                        { DefensiveRadiusMeters = 180, ReactionCadenceTicks = reactionCadenceTicks,
+                            Raids = settings.Scenario.OpponentConfigurations[1].Raids with { ActiveTicks = activeTicks } },
+                        [2] = settings.Scenario.OpponentConfigurations[2] } },
                 Participants = CentralDivideScenario.CreateDefaultParticipants(true, false) };
             var original = MatchRuntime.Create(settings, TestContext.Current.CancellationToken);
             Assert.True(original.RunUntil(runtime => runtime.CountUnits(new PlayerId(1), UnitIds.RifleSquad) >= 3,

@@ -255,6 +255,18 @@ public sealed class SkirmishRaidPlannerTests
         Assert.True(fixture.State.NextAllowedTick > fixture.Simulation.CurrentTick);
     }
 
+    [Fact]
+    public void LifetimeExpiresBetweenDecisionsWithoutRunningAnotherTargetSelection()
+    {
+        var fixture = new Fixture(configuration: new() { Raids = new() { ActiveTicks = 3 } }) { DecisionCadence = 40 };
+        fixture.Step();
+        EntityId member = fixture.State.First;
+        fixture.Step(3);
+        Assert.Equal(SkirmishRaidPhase.Complete, fixture.State.Phase);
+        Assert.Equal(SkirmishRaidReason.DurationExpired, fixture.State.Reason);
+        Assert.Equal(CombatOrderKind.Retreat, fixture.Entities.GetComponent<CombatOrderState>(member).Kind);
+    }
+
     public static IEnumerable<object[]> IndustrialTargets =>
         new[] { BuildingIds.PowerPlant, BuildingIds.Smelter, BuildingIds.Refinery,
             BuildingIds.ElectronicsPlant, BuildingIds.AmmunitionPlant, BuildingIds.Barracks,
@@ -301,6 +313,7 @@ public sealed class SkirmishRaidPlannerTests
         public bool Observe { get; set; } = true;
         public IntelligenceState Observation { get; set; } = IntelligenceState.Identified;
         public bool Priority { get; set; }
+        public ulong DecisionCadence { get; init; } = 1;
         public Action<SimulationContext>? BeforeDecision { get; set; }
         private readonly UnitFactory _factory;
         private readonly MatchContent _content;
@@ -354,6 +367,9 @@ public sealed class SkirmishRaidPlannerTests
                 }
                 fixture.BeforeDecision?.Invoke(context);
                 fixture.BeforeDecision = null;
+                fixture.Planner.ExpireDue(context, fixture.Controller,
+                    context.Entities.GetComponent<SkirmishOpponentController>(fixture.Controller), fixture._configuration.Raids);
+                if ((context.Tick.Value - 1) % fixture.DecisionCadence != 0) return;
                 fixture.Planner.Evaluate(context, fixture.Controller,
                     context.Entities.GetComponent<SkirmishOpponentController>(fixture.Controller), fixture.Units,
                     fixture.Intelligence.Capture(new FactionId(1)), fixture._configuration, fixture.Priority);

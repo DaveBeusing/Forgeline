@@ -204,7 +204,7 @@ threat ceiling is one within 160 m.
 Admission checks real navigation outward and back for each unit's movement
 capabilities, available unreserved fuel, weapon effectiveness against the target
 class, ammunition and readiness. The initial fuel requirement is route length
-times normal consumption times 1.25, plus 15% of tank capacity; six shots and
+times normal consumption times 1.25, plus 15% of fuel capacity; six shots and
 0.65 readiness are required. A missing route or reserve postpones the raid.
 Rifles may raid light vehicles but cannot qualify as structure attackers.
 No inventory, fuel, ammunition, readiness or damage is created by this planner.
@@ -219,6 +219,9 @@ A raid never clears a replacement command whose combat-group identity has
 changed. Base defense can stop the orders still owned by the raid and take over.
 
 The initial intent budget is 1,200 ticks, including search/return/resupply.
+An expiry-only tick check enforces the deadline between strategic decisions
+without capturing faction knowledge or selecting targets. Expansion decisions
+also advance raids.
 Expiry releases the strategic intent with a normal retreat/hold order still
 valid; the existing tactical lifecycle owns completion of that return.
 Completion starts a stable-tick cooldown of 600 ticks. These values are
@@ -269,6 +272,9 @@ ticks. Focused cases cover missing/detected-only intelligence, incompatible
 weapons, return fuel, empty ammunition, known guards, pursuit, target-generation
 loss, route changes, command replacement, cooldown and stable same-seed intent.
 The required CI job runs the raid group independently before the complete suite.
+A separate timer regression uses a 40-tick reaction cadence and a three-tick
+intent budget to prove expiry before the next strategy decision; these validation
+parameters do not replace the normal gameplay defaults.
 
 Full final-head CI and natural terminal-match results are recorded in the PR.
 Native raid visibility, group readability, pursuit/return feel and player
