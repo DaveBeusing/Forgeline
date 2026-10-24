@@ -195,6 +195,12 @@ The original serializer, copied unchanged except for a class-name alias and an i
 
 The recovery integration also includes the conveyor flow/vehicle-supply contracts merged in master 92e6a65a. Both focused CI groups and both measurement entry points are retained. Shared persistence validation does not replace conveyor ownership, accepted-load accounting or adapter replacement behavior. The added conveyor persistence cases exercise their production command payloads and deterministic continuation under the same schema-6 preflight. Historical measurements retain their original source revision.
 
+## Operations control checkpoints
+
+OperationsRuleControlsTests submits both existing rule templates through the production Operations UI request path, serializes saves/replays, reconstructs through the explicit composition resolver and compares full authoritative hashes and continued effects. The output case saves a real rule-owned pause plus a future downstream production command; normal Ammunition production consumes finite shared Steel/Electronics after loading, allowing the same paused Steel request to resume. Input policy creation remains distinct from physical supply. Local unapplied drafts, input timing and focus are presentation state and are discarded on session replacement.
+
+Operations controls retain the existing OperationsRule command codec and envelope versions. Their original schema-6 checkpoints now run under authoritative schema 7, which includes the raid intent described above. Corrected same-tick manual pause precedence is exercised by both command orderings; reconstruction retains normal state/hash verification rather than accepting an unverified history.
+
 ## Tactical supply and accepted convoy checkpoints
 
 MatchPersistenceTests now exercises active grouped partial resupply, a replacing Hold order and subsequent navigation through supported recorded player adapters. A second explicit finite-stock composition issues two real stock policies, accepts a loaded convoy with an escort, records manual detachment, and completes both 200 Fuel and 200 Ammunition deliveries. Both cargo orders finish, source reservations return to zero and normal dock proximity releases the temporary group. Remote Reserved/Busy visits retain their normal queue/slot owner until physical approach.

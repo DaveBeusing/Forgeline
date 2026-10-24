@@ -9,6 +9,7 @@ internal static class LogisticsQuantityEditor
     // Zero denotes an unspecified total capacity in legacy action snapshots.
     internal static (double Minimum, double Target, double Maximum) NewManualDefaults(double capacity)
     {
+        if (double.IsPositiveInfinity(capacity)) capacity = 0;
         if (!double.IsFinite(capacity) || capacity < 0 || capacity > 0 && capacity < Minimum)
             return (0, 0, 0);
         if (capacity > 0 && capacity < 100) return (50, 50, 50);
@@ -18,9 +19,9 @@ internal static class LogisticsQuantityEditor
 
     internal static (double Next, bool Allowed, string Reason) Decide(
         double current, int direction, double lower, double upper,
-        string lowerReason, string upperReason)
+        string lowerReason, string upperReason, bool allowZeroMinimum = false)
     {
-        double next = Adjust(current, direction, lower, upper);
+        double next = Adjust(current, direction, lower, upper, allowZeroMinimum);
         if (next != current) return (next, true, string.Empty);
         if (!double.IsFinite(current) || !double.IsFinite(lower) || !double.IsFinite(upper))
             return (current, false, "INVALID QUANTITY LIMIT");
@@ -29,13 +30,14 @@ internal static class LogisticsQuantityEditor
 
     internal static (double Next, bool Allowed, string Reason) DecideField(
         PlayerStockThresholdField field, double minimum, double target,
-        double maximum, double capacity, int direction)
+        double maximum, double capacity, int direction, bool allowZeroMinimum = false)
     {
+        if (double.IsPositiveInfinity(capacity)) capacity = 0;
         return field switch
         {
             PlayerStockThresholdField.Minimum => Decide(
-                minimum, direction, Minimum, target,
-                "MINIMUM IS 50", "INCREASE TARGET FIRST"),
+                minimum, direction, allowZeroMinimum ? 0 : Minimum, target,
+                allowZeroMinimum ? "MINIMUM IS ZERO" : "MINIMUM IS 50", "INCREASE TARGET FIRST", allowZeroMinimum),
             PlayerStockThresholdField.Target => Decide(
                 target, direction, Math.Max(Minimum, minimum), maximum,
                 "DECREASE MIN FIRST", "INCREASE MAX FIRST"),
@@ -49,7 +51,12 @@ internal static class LogisticsQuantityEditor
         };
     }
 
-    internal static double Adjust(double current, int direction, double lower = Minimum, double upper = double.MaxValue)
+    internal static bool FitsCapacity(double maximum, double capacity) =>
+        double.IsFinite(maximum) && maximum >= 0 && capacity >= 0 &&
+        (capacity == 0 || maximum <= capacity);
+
+    internal static double Adjust(double current, int direction, double lower = Minimum, double upper = double.MaxValue,
+        bool allowZeroMinimum = false)
     {
         if (direction == 0 || !double.IsFinite(current) || current < 0 ||
             !double.IsFinite(lower) || !double.IsFinite(upper) || lower > upper)
@@ -59,7 +66,7 @@ internal static class LogisticsQuantityEditor
         double candidate = direction > 0
             ? (Math.Floor(current / Step) + 1) * Step
             : (Math.Ceiling(current / Step) - 1) * Step;
-        candidate = Math.Max(Minimum, candidate);
+        candidate = Math.Max(allowZeroMinimum ? 0 : Minimum, candidate);
         if (!double.IsFinite(candidate) || candidate < lower || candidate > upper ||
             direction > 0 && candidate <= current || direction < 0 && candidate >= current)
             return current;

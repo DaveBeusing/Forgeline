@@ -1,6 +1,9 @@
 using System.Numerics;
 using System.Security.Cryptography;
 using ForgeLine.Game;
+using ForgeLine.Core;
+using ForgeLine.Economy;
+using ForgeLine.Simulation;
 using ForgeLine.Input;
 using ForgeLine.Presentation;
 using ForgeLine.UI;
@@ -21,6 +24,7 @@ internal enum UiReferenceScenario
     NotificationsCollapsed, NotificationsExpanded, NotificationDetails,
     OnboardingClosing25, OnboardingClosing50, OnboardingClosing75, OnboardingCollapsed,
     OnboardingOpening25, OnboardingOpening50, OnboardingOpening75,
+    OperationsRuleDraft, OperationsRulePending, OperationsRuleRejected, OperationsRuleManagedPause, OperationsRuleManualOverride,
     RingConstruction, RingProduction, RingUnits, RingLogistics, RingSupply, RingTactical, RingTechnology, RingParameters,
     RingPending, RingEdge, RingTooltip, RingOpening50, RingClosing50, RingOffscreen, RingSelectionStatus, GroupRing, GroupRingTools, GroupRingPartial, GroupRingEdge, GroupRingStatus
 }
@@ -38,7 +42,10 @@ internal static class UiReferenceStates
         (UiReferenceScenario.Contacts, UiReferenceScenario.DockHover),
         (UiReferenceScenario.DockHover, UiReferenceScenario.DockPressed),
         (UiReferenceScenario.DockPending, UiReferenceScenario.DockAccepted),
-        (UiReferenceScenario.DockAccepted, UiReferenceScenario.DockRejected)
+        (UiReferenceScenario.DockAccepted, UiReferenceScenario.DockRejected),
+        (UiReferenceScenario.OperationsRuleDraft, UiReferenceScenario.OperationsRulePending),
+        (UiReferenceScenario.OperationsRulePending, UiReferenceScenario.OperationsRuleRejected),
+        (UiReferenceScenario.OperationsRuleManagedPause, UiReferenceScenario.OperationsRuleManualOverride)
     ];
 
     internal static void ConfirmDistinct(Dictionary<string, string> hashes, string scope, UiReferenceScenario state, byte[] rgba)
@@ -130,6 +137,7 @@ internal static class UiReferenceStates
     {
         if (ObjectActionRingCapture.IsRing(state)) return ObjectActionRingCapture.Fixture(source,state,width,height,dpi,scale);
         if (state == UiReferenceScenario.World) return (source, default);
+        if (IsRules(state)) return (BattlefieldHudCapture.State(source, "Production"), default);
         if (IsFrontend(state)) return (source, default);
         string dockState = state switch
         {
@@ -210,6 +218,40 @@ internal static class UiReferenceStates
             if (state != UiReferenceScenario.NotificationsExpanded) panel = default;
         }
         return (snapshot, panel);
+    }
+
+    internal static bool IsRules(UiReferenceScenario state) => state is >= UiReferenceScenario.OperationsRuleDraft and <= UiReferenceScenario.OperationsRuleManualOverride;
+
+    internal static OperationsView RuleView(PresentationSnapshot snapshot, UiReferenceScenario state)
+    {
+        PlayerId owner = snapshot.PlayerExperience!.Value.Player;
+        EntityId facility = snapshot.Operations!.Facilities[0].Entity;
+        bool output = state is UiReferenceScenario.OperationsRuleManagedPause or UiReferenceScenario.OperationsRuleManualOverride;
+        var definition = new OperationsRuleDefinition(7, owner, facility,
+            output ? OperationsRuleTemplate.PauseUntilOutputAvailable : OperationsRuleTemplate.EnsureInputStockPolicy,
+            output ? ResourceId.None : ResourceIds.FerrousOre, 0, 100, 150, LogisticsStockPriority.Normal, 20);
+        EntityId managed = new(50001, 1);
+        var observed = new OperationsRuleReadModel(definition, 4, true,
+            state == UiReferenceScenario.OperationsRuleManualOverride ? OperationsRuleResult.ManualOverride :
+            output ? OperationsRuleResult.Applied : OperationsRuleResult.WaitingForTrigger,
+            snapshot.Tick, new SimulationTick(12), 1, false, output && state != UiReferenceScenario.OperationsRuleManualOverride ? managed : default)
+        { AttemptCount = 1, LastAttempt = new SimulationTick(12) };
+        bool draft = state == UiReferenceScenario.OperationsRuleDraft;
+        var data = new OperationsRuleSelectionSnapshot(owner, facility, 1000, snapshot.TickDuration, RecipeIds.Steel,
+            [new(ResourceIds.FerrousOre, "Ferrous Ore", 10, 0)], draft ? [] : [observed],
+            [new(managed, RecipeIds.Steel, "Steel", ProductionPriority.Normal, ProductionRequestMode.Repeat, true, true)]);
+        string feedback = state switch
+        {
+            UiReferenceScenario.OperationsRulePending => "PENDING / WAIT FOR AUTHORITATIVE RESULT",
+            UiReferenceScenario.OperationsRuleRejected => "REVISION CHANGED / REVIEW CURRENT / APPLY AGAIN",
+            UiReferenceScenario.OperationsRuleDraft => "LOCAL DRAFT / APPLY TO CREATE",
+            _ => "RULE CHANGE CONFIRMED"
+        };
+        return new OperationsView(true, Session: snapshot.SessionId, Selected: facility)
+        {
+            RuleControls = new(true, data, definition, draft ? 0u : 4u, draft, true, state == UiReferenceScenario.OperationsRuleRejected,
+                state == UiReferenceScenario.OperationsRulePending, output ? 4 : 0, 7, 0, feedback, draft ? null : observed)
+        };
     }
 
     private static PresentationSnapshot CopyExperience(PresentationSnapshot s, PlayerExperienceSnapshot experience) =>

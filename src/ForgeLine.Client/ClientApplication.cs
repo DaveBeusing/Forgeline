@@ -340,7 +340,8 @@ internal sealed class ClientApplication
                 technologies:
                     scenario.Services.TechnologyDefinitions,
                 demolition:
-                    scenario.Services.Demolition);
+                    scenario.Services.Demolition,
+                operationsRules: scenario.OperationsRules);
         var presentationExtraction =
             new PresentationExtractionContext(
                 scenario,
@@ -396,7 +397,7 @@ internal sealed class ClientApplication
             new CombatGroupRegistry();
         var combatGroupInput =
             new CombatGroupInputController();
-        var operationsController = new OperationsController();
+        var operationsController = new OperationsController(_gameplayBindings);
         var transientMenus = new TransientHudMenuController();
         var alertController = new ActionableAlertController();
         var memberFocusSelection = new SelectionSet();
@@ -613,7 +614,8 @@ internal sealed class ClientApplication
                 ref lastCommandReceipt,
                 buildingPlacementController,
                 presentationInteraction,
-                ref pendingPlacementHostSequence);
+                ref pendingPlacementHostSequence,
+                operationsController);
 
             long now = _platform.Clock.GetTimestamp();
             TimeSpan frameElapsed = _platform.Clock.GetElapsedTime(previousFrameAt, now);
@@ -1207,7 +1209,8 @@ internal sealed class ClientApplication
             }
             else
             {
-                actionPanel.Update(
+                if (operationsController.View.Open && !operationsController.View.Notifications) actionPanel.Close();
+                else actionPanel.Update(
                     inputState,
                     inputSnapshot,
                     window.ClientSize.Width,
@@ -1272,8 +1275,22 @@ internal sealed class ClientApplication
             }
             var operationsResult = operationsController.Update(inputState, inputSnapshot, interactionLayout, presentationInteraction,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
-                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, inputCaptured: alertResult.Captured);
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, inputCaptured: alertResult.Captured,
+                selection: selectionController.Selection);
             hudInteraction.CapturePointer(operationsResult.Captured);
+            hudInteraction.CaptureKeyboard(operationsController.HasKeyboardFocus);
+            if (operationsController.TryTakeRuleRequest(out PlayerActionRequest ruleRequest))
+            {
+                SimulationTick observedTick = inputSnapshot?.Tick ?? SimulationTick.Zero;
+                bool submitted = simulationHost.TrySubmit(simulationHost.SessionId, gateway =>
+                {
+                    if (!PlayerActionRequestDispatcher.TryDispatch(ruleRequest, LocalPlayer, gateway, observedTick, out var receipt))
+                        throw new InvalidOperationException("Operations rule request was not dispatched.");
+                    return receipt;
+                }, out ulong sequence);
+                if (submitted) operationsController.ExpectRuleSubmission(sequence);
+                else operationsController.RuleSubmissionFailed();
+            }
             if (operationsResult.Navigate.IsValid && inputSnapshot is not null)
             {
                 memberFocusSelection.SetSingle(operationsResult.Navigate);
@@ -1287,6 +1304,7 @@ internal sealed class ClientApplication
                         selectionController.Selection.SetSingle(operationsResult.Navigate);
                         presentationInteraction.SetSelection(selectionController.Selection.Entities);
                         inputState.SuppressHeldInput();
+                        operationsController.Close(inputState, presentationInteraction);
                         actionPanel.OpenOperationsControls(operationsResult.Controls);
                         hudInteraction.CaptureKeyboard(actionPanel.HasKeyboardFocus);
                     }
@@ -1601,7 +1619,8 @@ internal sealed class ClientApplication
                 buildingPlacementController,
                 presentationInteraction,
                 actionPanel,
-                scenario.Services.Resources);
+                scenario.Services.Resources,
+                operationsController);
 
             TacticalTargetingView tacticalTargetingView =
                 tacticalTargetingController.CreateView(
@@ -2000,11 +2019,13 @@ internal sealed class ClientApplication
         ref PlayerCommandSubmissionReceipt? lastCommandReceipt,
         RtsBuildingPlacementController placement,
         PresentationInteractionState interaction,
-        ref ulong placementHostSequence)
+        ref ulong placementHostSequence,
+        OperationsController operations)
     {
         while (simulationHost.TryReadSubmissionCompletion(
                    out ClientSubmissionCompletion completion))
         {
+            operations.ObserveRuleSubmission(completion.HostSequence, completion.Receipt);
             if (completion.HostSequence == placementHostSequence)
             {
                 placement.ObserveSubmission(completion.Receipt, interaction);
@@ -3667,11 +3688,13 @@ internal sealed class ClientApplication
         RtsBuildingPlacementController placement,
         PresentationInteractionState interaction,
         PlayerActionPanelController actionPanel,
-        ResourceCatalog resources)
+        ResourceCatalog resources,
+        OperationsController operations)
     {
         while (commandGateway.Results.TryRead(
                    out PlayerCommandResultReadModel result))
         {
+            operations.ObserveRuleResult(result);
             placement.ObserveResult(result, interaction);
             if(result.Kind==PlayerCommandKind.ConveyorConstruction)
                 actionPanel.ShowDemolitionFeedback(result.State==PlayerCommandFeedbackState.Accepted?

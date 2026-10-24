@@ -6,6 +6,13 @@ Constructing a building spends Command Core construction stock. It does not fill
 
 When an owned logistics building or assigned vehicle is selected or hovered, the game can show its currently validated loading area (yellow diagonal hatch) and assigned queue/holding positions (cyan reverse hatch). A blocked or unavailable copied assignment uses a warning tint; the hatch itself is visual guidance, not a new route or placement command. The active Logistics context may reveal a bounded subset of these current, authoritative zones without permanently painting all yards. No hatch is created for an empty/unvalidated loading bay or an unassigned vehicle, and the printed shape is never used to determine occupancy. Existing `WAITING FOR LOADING BAY`, `ALIGNING`, `LOADING` and `LEAVING BAY` statuses remain authoritative.
 
+## Optional selected-facility recovery rules
+
+- Missing recipe input: select the owned processor, queue the intended recipe, open Operations → RULES → NEW DRAFT → INPUT STOCK POLICY. Select the actual recipe input, choose MIN/TARGET/MAX, priority and cooldown, then APPLY. Minimum zero is supported. A confirmed policy is not loaded or delivered cargo; existing disabled policies and manually removed policies remain under manual control.
+- Full output: select the processor, open RULES, choose OUTPUT RECOVERY and APPLY. Observe the exact managed request and last successful action in DETAILS. Clear the actual output through normal consumption/collection; the rule resumes only its own request. A manual pause/resume suspends automation. DISABLE or REMOVE cannot undo that manual pause.
+
+These controls reuse the normal command gateway and finite production/distribution systems. No rule is active merely because its local draft is visible. See [Operations rules and recovery](OperationsAutomation.md).
+
 ## First production chain
 
 1. Use BUILD to construct power, a Smelter and a Vehicle Factory at valid sites. Suitable buildings connect automatically to nearby road nodes. There is no manual CONNECT ROUTE step.

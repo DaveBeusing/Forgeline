@@ -68,6 +68,8 @@ After the Release build, `pwsh ./build/Run-MatchSoak.ps1 -NoBuild` runs the cano
 
 The CI workflow emits the required check context `build-test` from GitHub Actions. That check represents the complete job, including the natural vertical-slice terminal validation; a successful build or unit-test subset is not equivalent to the full required check.
 
+The early Operations rule-controls gate runs the existing rule and command-boundary tests, real selected-facility UI/production/save-replay cases and client submission/native-state contracts. It preserves all later complete-solution, asset, Windows/WARP, package and terminal-match gates. See [Operations rules](OperationsAutomation.md) for scope and player controls.
+
 The early logistics contract step also runs `PlayerActionDockHudTests` so
 construction, manual quantities, controller behavior and displayed availability
 are qualified together. After the existing runtime-asset compilation, the
