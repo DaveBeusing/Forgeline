@@ -77,6 +77,10 @@ public readonly record struct SkirmishRaidState(
     EntityId Second,
     EntityId Third)
 {
+    public Vector3 OrderedPosition { get; init; }
+
+    public int ContactCursor { get; init; }
+
     public bool IsActive => Phase is not (SkirmishRaidPhase.None or SkirmishRaidPhase.Complete);
     public bool Contains(EntityId entity) => IsActive &&
         (entity == First || entity == Second || entity == Third);
