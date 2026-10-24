@@ -23,6 +23,16 @@ public static class CentralDivideScenario
 
     public static MatchComposition CreateComposition()
     {
+        var content = CreateContent();
+        return new MatchComposition(CompositionKey, CentralDivideBattlefield.Create(), content,
+            static map => CentralDivideTerrainFactory.Create(map),
+            static (entities, inventories, factory, terrain, start, catalogs, stock) =>
+                CentralDivideStartingBaseFactory.Create(entities, inventories, factory, terrain, start, stock, catalogs.Units, catalogs.Buildings),
+            static systems => systems);
+    }
+
+    public static MatchContent CreateContent()
+    {
         var content = new MatchContent(
             InitialResourceDefinitions.CreateCatalog(),
             DirectorateContent.CreateBuildingCatalog(),
@@ -36,12 +46,7 @@ public static class CentralDivideScenario
             DirectorateContent.CreateFactionDefinition(), content.Resources,
             content.Buildings, content.Units, content.Recipes,
             content.Weapons, content.Armor, content.Artillery);
-        return new MatchComposition(
-            CompositionKey, CentralDivideBattlefield.Create(), content,
-            static map => CentralDivideTerrainFactory.Create(map),
-            static (entities, inventories, factory, terrain, start, catalogs, stock) =>
-                CentralDivideStartingBaseFactory.Create(entities, inventories, factory, terrain, start, stock, catalogs.Units, catalogs.Buildings),
-            static systems => systems);
+        return content;
     }
 
     public static MatchRuntime Create(

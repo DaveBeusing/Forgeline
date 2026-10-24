@@ -35,6 +35,8 @@ public sealed record MatchComposition(
     MatchStartingBaseFactory CreateStartingBase,
     Func<IReadOnlyList<ISimulationSystem>, IReadOnlyList<ISimulationSystem>> ConfigureSystems)
 {
+    public ScenarioIdentity? Identity { get; init; }
+
     public void Validate()
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(Key);
