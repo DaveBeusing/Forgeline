@@ -48,6 +48,14 @@ Materials are removed once, when research first becomes runnable. Research then 
 
 Completion creates an authoritative `CompletedTechnology` component plus one `TechnologyCapabilityUnlock` component per authored unlock. Cancellation removes the active research request.
 
+## Gameplay effects and compatibility
+
+Industrial Standardization retains Combat Engineer production. Mechanized Systems gates Mobile Artillery through the existing production capability contract; MBT, Cargo/Supply Trucks and the basic economy remain unrestricted. Sensor Fusion multiplies owned completed radar identification by 1.25, capped at detection, using the unmodified sensor state on every scan. Detection, contact eligibility, scan cadence and operating power are unchanged. New and existing radars use the same calculation. Costs, duration and the multiplier are current tunable values, not balance measurements.
+
+Authoritative schema 8 explicitly rejects earlier saves/replays because production, sensing and opponent decisions change. Envelope 1 and payload 6 are unchanged. No completion or priority rule is invented when loading an older document.
+
+Logistics Coordination's capability currently has no routing consumer: master 805f0b4 has fair conveyor distribution but no priority-routing state, command or control. The priority-routing unlock, matching player availability/rejection and opponent use remain blocked by that concrete integration dependency. This is not a completed four-effect progression tree.
+
 ## Capability gates
 
 Gameplay systems query capability state through `TechnologyStateQueries.IsCapabilityUnlocked`. A non-specified capability remains unrestricted, allowing existing definitions to stay compatible while authored gates are introduced deliberately.
