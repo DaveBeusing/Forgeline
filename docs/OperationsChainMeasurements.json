@@ -1,0 +1,40 @@
+{
+  "SourceRevision": "773bda81899c09f6e615ae308390db852a6fb480",
+  "SourceTree": "2adbf34481c7c5a7d84a67dce3ed14323e60b5f3",
+  "MeasuredAtUtc": "2026-10-24T10:07:34.483Z",
+  "SourceSha256Lf": {
+    "src/ForgeLine.Game/ConveyorSimulationSystem.cs": "94a14c7dbb502350fbc191c1baa0434933b5011aaac43840af805d291ab49479",
+    "src/ForgeLine.Presentation/OperationsChainCapture.cs": "a62afcbf010796af9338a441924af80e0b60182b19239f3b7481501ed8aa1248",
+    "src/ForgeLine.Presentation/OperationsDiagnosisSnapshot.cs": "5fd96b2bb96fc5ffe07563b6b0544684c1393a0a2c2e30b51a57f3e4a23e59fb",
+    "src/ForgeLine.Presentation/OperationsWorldOverlay.cs": "dc9be5a4d74090d61c189441bc3933a33fca4e3a181cf3e4670d93eb23208342",
+    "tests/ForgeLine.Presentation.Tests/OperationsChainMeasurementTests.cs": "91be2292a59b9a5dc2edbe0e898281abb7f132473ae994e0c2d921fc10951e6c"
+  },
+  "Build": "Release, .NET SDK 10.0.402 (global.json 10.0.401/latestPatch), no shared compilation, zero warnings/errors",
+  "Concurrency": "Single test module, xUnit parallel none. Unisolated host; no affinity or exclusive-machine guarantee.",
+  "EvidenceClass": "Advisory in-process CPU and per-thread managed allocation; no GPU, frame-rate, physical reference-hardware or human readability acceptance.",
+  "Observation": {
+    "Runtime": ".NET 10.0.13",
+    "OS": "Microsoft Windows 10.0.26300",
+    "LogicalProcessors": 24,
+    "DenseOwnedFacilities": 1000,
+    "Instances": 1783,
+    "Tick": 1,
+    "Rows": 2,
+    "Links": 0,
+    "Warmups": 32,
+    "Samples": 128,
+    "BaselineSelectedDiagnosis": {
+      "MillisecondsPerOperation": 0.00105546875,
+      "BytesPerOperation": 1696
+    },
+    "BoundedChainProjection": {
+      "MillisecondsPerOperation": 0.08591171875,
+      "BytesPerOperation": 77304
+    },
+    "CopiedWorldOverlayComposition": {
+      "MillisecondsPerOperation": 1.05085703125,
+      "BytesPerOperation": 0
+    },
+    "Notes": "Single in-process observations; fixture adds no conveyor network. CPU composition is not GPU, frame-rate or human readability acceptance."
+  }
+}

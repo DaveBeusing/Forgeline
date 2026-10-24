@@ -33,6 +33,7 @@ Directional links have explicit meanings:
 | --- | --- | --- |
 | Quiet dashed / NETWORK LINK | `OperationsRoute` | Existing enabled topology, not proof of transport |
 | Red dashed / DISABLED LINK | Disabled `OperationsRoute` | Reported unavailable topology |
+| Quiet dashed / CONVEYOR CONNECTION | Typed ConveyorConnection diagnosis link with current owned port identities | Actual port continuity, with no invented truck request or delivery promise |
 | Amber dashed / TRANSPORT REQUEST | `OperationsDiagnosisLink` with a real request ID | An observed request, not guaranteed delivery |
 | Green solid / LOADED CARGO | Active request, assigned truck and positive copied loaded-minus-delivered progress, already matched to its live order by the player extractor | Observed remaining transport load, not completed delivery |
 
@@ -42,7 +43,9 @@ endpoints, resource and active request state before publishing loaded progress.
 Inactive, missing-truck and pending requests cannot produce a green loaded link.
 
 Markers are passive. Existing Operations rows, Focus Facility, Focus Next and
-Open Existing Controls provide the interactive drill-down. Focus resolves only
+Open Existing Controls provide the interactive drill-down. The existing TRACE NEXT
+control follows current copied causes/connections and retains visible branch,
+cycle, missing-observation and omission information. Focus resolves only
 an owned World-visible full-generation entity in the current snapshot. A press
 that began in Operations stays captured through release, including pointer exit,
 layout/session transitions and cancellation; release cannot activate a new row
@@ -79,11 +82,19 @@ current conveyor data, matching selection/hover and owned visible endpoints;
 they retain at most 32 focused pieces and eight labels. Docking geometry continues
 to use the existing authoritative `LogisticsZoneSnapshot` path.
 
-## Manual acceptance — not executed
+## Automated contracts and separate manual acceptance
 
-Test execution, native captures and smoke/performance runs were intentionally
-left to manual validation. A successful Release build establishes compilation
-only. Required CI workflows and their gates remain unchanged.
+The bounded chain integration adds actual paid production/connection/cycle tests,
+held-focus authorization regressions, retained HUD/overlay zero-allocation checks
+and a dense CPU observation report. See [Operations diagnosis](OperationsDiagnosis.md)
+for exact evidence, source-specific cost observations and limits. Current marker
+priority includes the copied selected chain before unrelated blocked facilities.
+The new typed conveyor line remains distinct from request and loaded-cargo lines.
+No primitive, marker, link or caption budget is increased.
+
+These automated checks do not establish native human readability, physical input,
+reference-hardware performance or accessibility acceptance. Perform the following
+manual cases separately; the complete required CI gates remain in place.
 
 1. Select a powered/unpowered processor, pause production, exhaust an input and
    fill output stock. Open Operations filters and select/focus the facility.
