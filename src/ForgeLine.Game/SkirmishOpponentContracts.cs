@@ -35,6 +35,8 @@ public enum SkirmishStrategicGoal : byte
 
 public sealed record SkirmishOpponentConfiguration
 {
+    public SkirmishRaidConfiguration Raids { get; init; } = new();
+
     public uint ReactionCadenceTicks { get; init; } = 20;
 
     public double Aggression { get; init; } = 0.65;
@@ -82,6 +84,8 @@ public sealed record SkirmishOpponentConfiguration
 
     public void Validate()
     {
+        ArgumentNullException.ThrowIfNull(Raids);
+        Raids.Validate();
         ArgumentOutOfRangeException.ThrowIfZero(ReactionCadenceTicks);
         ValidateFraction(Aggression, nameof(Aggression));
         ValidateFraction(
@@ -382,4 +386,5 @@ public readonly record struct SkirmishOpponentDebugReadModel(
     SkirmishRetreatReason RetreatReason =
         SkirmishRetreatReason.None,
     SkirmishOffensiveAdmissionReadModel OffensiveAdmission =
-        default);
+        default,
+    SkirmishRaidReadModel Raid = default);

@@ -293,6 +293,9 @@ public readonly record struct CombatGroupReadiness(
 
 public readonly record struct TacticalTestOpponent
 {
+    public Vector3 LogisticsDefenseCenter { get; init; }
+    public float LogisticsDefenseRadiusMeters { get; init; }
+
     public TacticalTestOpponent()
         : this(0.2, 0.15, 160.0f)
     {
