@@ -104,6 +104,8 @@ public static class BuildingPresentationCatalog
         BuildingPresentationDefinition> Definitions =
         CreateDefinitions();
 
+    public static IReadOnlyCollection<BuildingPresentationDefinition> All => Definitions.Values;
+
     public static BuildingPresentationDefinition Get(
         BuildingId building) =>
         Definitions.TryGetValue(

@@ -54,7 +54,7 @@ Industrial Standardization retains Combat Engineer production. Mechanized System
 
 Authoritative schema 8 explicitly rejects earlier saves/replays because production, sensing and opponent decisions change. Envelope 1 is retained. Payload 7 preserves the integrated compiled-scenario identity contract. No completion or priority rule is invented when loading an older document. The compiled scenario artifact, content fingerprint and registration are qualified together for the new catalog; the frozen legacy identity is retained and rejected when it cannot represent these rules.
 
-Logistics Coordination's capability currently has no routing consumer: master 42ac542 has fair conveyor distribution but no priority-routing state, command or control. The priority-routing unlock, matching player availability/rejection and opponent use remain blocked by that concrete integration dependency. This is not a completed four-effect progression tree.
+Logistics Coordination's capability currently has no routing consumer: master 3c261dc has fair conveyor distribution but no priority-routing state, command or control. The priority-routing unlock, matching player availability/rejection and opponent use remain blocked by that concrete integration dependency. This is not a completed four-effect progression tree.
 
 ## Capability gates
 

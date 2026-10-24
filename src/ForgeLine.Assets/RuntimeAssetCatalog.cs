@@ -24,6 +24,8 @@ public sealed class RuntimeAssetCatalog
 
     public RuntimeAssetManifest Manifest { get; }
 
+    public string RuntimeRoot => runtimeRoot;
+
     public IReadOnlyCollection<AssetId> AssetIds => records.Keys;
 
     public static RuntimeAssetCatalog Load(string runtimeRoot) =>
