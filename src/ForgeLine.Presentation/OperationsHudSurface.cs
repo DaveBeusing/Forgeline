@@ -157,7 +157,14 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                             b.Append(" / NEXT "); b.Append(nextAction); Line(b.Written);
                         }
                         else Line(detail.Explanation);
-                        b = new(text); b.Append("STOCK "); Number(ref b, detail.InventoryQuantity); b.Append(" / "); Number(ref b, detail.InventoryCapacity);
+                        b = new(text);
+                        if (diagnosis is { Resource.IsSpecified: true, LocalQuantity: not null } local)
+                        {
+                            b.Append("LOCAL "); Number(ref b, local.LocalQuantity);
+                            b.Append(" FREE "); Number(ref b, local.FreeQuantity);
+                            b.Append(" RESERVED "); Number(ref b, local.ReservedQuantity);
+                        }
+                        else { b.Append("STOCK "); Number(ref b, detail.InventoryQuantity); b.Append(" / "); Number(ref b, detail.InventoryCapacity); }
                         b.Append(" POWER "); Number(ref b, detail.AllocatedPower); b.Append(" / "); Number(ref b, detail.PowerDemand);
                         if (detail.GenerationCapacity.HasValue)
                         { b.Append(" GEN "); Number(ref b, detail.GenerationCapacity); }
@@ -175,6 +182,8 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                         if (currentDiagnosis is { Root.IsValid: true } chain)
                         {
                             b.Append(OperationsActionGuidance.NextChainEntity(chain, detail.Entity).IsValid ? "TRACE NEXT / EXTRA BRANCHES " : "TRACE END / EXTRA BRANCHES "); b.Number(chain.Branches, "0");
+                            if (transport is { PrimaryReason: not (OperationsDiagnosisReason.None or OperationsDiagnosisReason.Unknown) } transportBlock)
+                            { b.Append(" / "); b.Append(OperationsDiagnosisSnapshot.Label(transportBlock.PrimaryReason)); }
                             b.Append(" OMITTED "); b.Number(chain.OmittedSteps + chain.TotalLinks - chain.Links.Count + chain.TotalRows - chain.Rows.Count, "0");
                             if (OperationsActionGuidance.SourceForEntity(chain, detail.Entity) is { } source)
                             { b.Append(" / SOURCE FREE "); Number(ref b, source.SourceFreeQuantity); }

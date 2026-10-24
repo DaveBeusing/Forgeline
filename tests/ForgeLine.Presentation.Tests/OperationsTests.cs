@@ -138,20 +138,36 @@ public sealed class OperationsTests
         var entities = scenario.Simulation.Entities;
         var owned = new HashSet<EntityId>();
         LogisticsNodeId previous = default;
+        EntityId focused = default;
         for (int i = 0; i < count + 1; i++)
         {
             var entity = entities.CreateEntity(); bool foreign = i == count;
             entities.AddComponent(entity, new ControllableEntity(new(foreign ? 2U : 1U), ControllableEntityCategory.Building));
             var inventory = scenario.Inventories.CreateInventory(new InventorySpecification(1000));
             entities.AddComponent(entity, new InventoryStorage(inventory));
-            if (!foreign) owned.Add(entity);
+            if (!foreign) { owned.Add(entity); focused = entity; }
             var node = scenario.Logistics.AddNode(entity, new Vector3(i, 0, 0), LogisticsNodeKind.StorageDepot,
                 LogisticsNodeCapabilities.Storage);
             if (previous.IsSpecified) scenario.Logistics.AddEdge(previous, node, LogisticsTransportMode.GroundRoad, 1, 1, 10, enabled: i % 2 == 0);
             previous = node;
         }
+        entities.AddComponent(focused, new WorldTransform(Vector3.Zero, Quaternion.Identity, Vector3.One));
+        entities.AddComponent(focused, new VisualIdentity(1));
+        interaction.SetSelection([focused]);
         scenario.Simulation.AdvanceOneTick(); Assert.True(buffer.TryReadLatest(out var snapshot));
         var data = snapshot.Operations!;
+        Assert.Contains(data.Facilities, row => row.Entity == focused);
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var controller = new OperationsController(); var input = new InputState();
+        var single = new OperationsSnapshot(snapshot.SessionId, snapshot.Tick, new(1), [Facility(focused)], [], [], 1, 0);
+        var initial = Snapshot(single, tick: snapshot.Tick.Value, session: snapshot.SessionId.Value, instances: [Visible(focused)]);
+        controller.Update(input, initial, layout, interaction);
+        controller.OpenCategory(OperationsCategory.All, snapshot.SessionId, interaction);
+        Click(input, OperationsLayout.Control(layout, 3)); controller.Update(input, initial, layout, interaction);
+        Click(input, OperationsLayout.Control(layout, 10));
+        var controls = controller.Update(input, snapshot, layout, interaction);
+        Assert.Equal(focused, controls.Navigate);
+        Assert.Equal(PlayerActionPanelMode.Logistics, controls.Controls);
         Assert.InRange(data.Facilities.Count, 1, OperationsSnapshot.MaximumFacilities);
         Assert.InRange(data.Routes.Count, 0, OperationsSnapshot.MaximumRoutes);
         Assert.True(data.FacilityCount >= count);

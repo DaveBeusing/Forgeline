@@ -1,4 +1,5 @@
 using ForgeLine.Core;
+using ForgeLine.Economy;
 
 namespace ForgeLine.Presentation;
 
@@ -73,6 +74,7 @@ internal static class OperationsActionGuidance
         OperationsDiagnosisReason.OutputFull => "CHECK OUTPUT COLLECTION",
         OperationsDiagnosisReason.NoDriveFuel => "OPEN SUPPLY",
         OperationsDiagnosisReason.DestinationFull => "CHECK DESTINATION STOCK",
+        OperationsDiagnosisReason.DestinationTargetCovered => "CHECK STOCK POLICY",
         _ => string.Empty
     };
 
@@ -80,10 +82,11 @@ internal static class OperationsActionGuidance
     {
         OperationsDiagnosisRow? observed = null;
         if (diagnosis is null) return null;
+        ResourceId wanted = ForEntity(diagnosis, entity)?.Resource ?? default;
         for (int index = 0; index < diagnosis.Rows.Count; index++)
         {
             var row = diagnosis.Rows[index];
-            if (row.Entity != entity || !row.Source.IsValid) continue;
+            if (row.Entity != entity || !row.Source.IsValid || wanted.IsSpecified && row.Resource != wanted) continue;
             if (observed is { } prior &&
                 (prior.Source != row.Source || prior.Resource != row.Resource || prior.Inventory != row.Inventory)) return null;
             if (row.Inventory.IsSpecified) observed = row;
@@ -95,12 +98,14 @@ internal static class OperationsActionGuidance
     {
         if (diagnosis is null || !diagnosis.Root.IsValid) return default;
         var issue = ForEntity(diagnosis, entity);
+        ResourceId wanted = issue?.Resource ?? default;
         if (issue is { } row && row.CauseEntity.IsValid && row.CauseEntity != entity && row.CauseEntity != after) return row.CauseEntity;
         EntityId first = default, next = default;
         for (int index = 0; index < diagnosis.Links.Count; index++)
         {
             var link = diagnosis.Links[index];
-            if (link.Destination != entity || link.Source == entity) continue;
+            if (link.Destination != entity || link.Source == entity ||
+                wanted.IsSpecified && link.Resource.IsSpecified && link.Resource != wanted) continue;
             if (!first.IsValid || link.Source.CompareTo(first) < 0) first = link.Source;
             if (link.Source.CompareTo(after) > 0 && (!next.IsValid || link.Source.CompareTo(next) < 0)) next = link.Source;
         }

@@ -1,6 +1,7 @@
 using System.Numerics;
 using ForgeLine.Combat;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using Xunit;
 
@@ -8,6 +9,41 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class ConveyorDiagnosisTests
 {
+
+
+    [Fact]
+    public void TypedInventoryObservationUsesTheActualTransportResolver()
+    {
+        var fixture = new ConveyorTestFixture();
+        EntityId source = fixture.AddStorage(new(41, 0, 80));
+        EntityId destination = fixture.AddStorage(new(103, 0, 80));
+        InventoryId vehicleInventory = fixture.Inventory(source);
+        InventoryId conveyorInventory = fixture.CreateInventory(100);
+        fixture.Entities.AddComponent(source, new SupplyDepot(conveyorInventory, fixture.Player));
+        fixture.AddRoad(source, destination);
+        Assert.Equal(conveyorInventory, ConveyorSimulationSystem.ResolveInventory(fixture.Entities, source, input: false));
+        Assert.True(fixture.Cargo.TryObserveInventory(fixture.Entities, source, input: false, out var observed));
+        Assert.Equal(vehicleInventory, observed);
+        Assert.False(fixture.Cargo.TryObserveInventory(fixture.Entities,
+            new EntityId(source.Index, source.Generation + 1), input: false, out _));
+    }
+    [Fact]
+    public void CoveredDestinationTargetIsNotReportedAsPhysicallyFullStorage()
+    {
+        var fixture = new ConveyorTestFixture();
+        EntityId source = fixture.AddStorage(new(41, 0, 80));
+        EntityId destination = fixture.AddStorage(new(103, 0, 80));
+        EntityId[] line = fixture.Connect(source, destination);
+        fixture.AddPolicy(destination, ResourceIds.Steel, 0, 10, 20);
+        fixture.Give(destination, ResourceIds.Steel, 10);
+        fixture.Give(source, ResourceIds.Steel, 20);
+        fixture.Step(80);
+        EntityId last = line.Single(entity => fixture.Flow(entity).OutputA == destination);
+        Assert.True(fixture.Conveyor.TryGetObservation(last, out var blocked));
+        Assert.Equal(new(ConveyorBlockReason.DestinationTargetCovered, destination, ResourceIds.Steel), blocked.First);
+        Assert.True(fixture.Inventories.GetAddableQuantity(fixture.Inventory(destination), ResourceIds.Steel, 1) > 0);
+        Assert.Equal(10, fixture.Stock(destination, ResourceIds.Steel));
+    }
     [Fact]
     public void ReservedSourceAndFullDestinationHaveDifferentCauseIdentities()
     {
@@ -99,5 +135,11 @@ public sealed class ConveyorDiagnosisTests
         fixture.Step();
         Assert.Contains(line, entity => fixture.Flow(entity).InputPerSecond > 0);
         Assert.Equal(ConveyorBlockReason.NoInput, observation.First.Reason);
+        fixture.SetPower(source, 0);
+        fixture.Step(20);
+        EntityId inlet = line.Single(entity => fixture.Flow(entity).InputA == source);
+        Assert.True(fixture.Conveyor.TryGetObservation(inlet, out var powerBlocked));
+        Assert.Equal(new(ConveyorBlockReason.NoPower, source), powerBlocked.First);
+        Assert.True(fixture.Stock(source, ResourceIds.Steel) > 0);
     }
 }

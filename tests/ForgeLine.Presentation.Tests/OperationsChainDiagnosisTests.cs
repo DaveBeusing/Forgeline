@@ -12,6 +12,67 @@ public sealed class OperationsChainDiagnosisTests
 {
     private static readonly PlayerId Player = new(1);
 
+
+
+    [Fact]
+    public void FuelShortageDoesNotBorrowAnExistingAmmunitionConveyorConnection()
+    {
+        using var runtime = CreateRuntime();
+        var interaction = new PresentationInteractionState();
+        var buffer = WorldHoverExtractionTests.Observe(runtime, interaction);
+        _ = Build(runtime, BuildingIds.PowerPlant, new(48, 0, 48));
+        EntityId depot = Build(runtime, BuildingIds.SupplyDepot, new(66, 0, 112));
+        Connect(runtime, runtime.GetBase(Player).CommandCore, depot);
+        Submit(runtime, PlayerLogisticsActionCommand.SetStockPolicy(Player, depot, ResourceIds.Fuel,
+            10, 20, 30, LogisticsStockPriority.Normal, true, runtime.Simulation.CurrentTick));
+        interaction.SetSelection([depot]);
+        runtime.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var diagnosis = Assert.IsType<OperationsDiagnosisSnapshot>(snapshot.Diagnosis);
+        Assert.Contains(ConveyorConstructionService.Capture(runtime.Simulation.Entities, Player),
+            row => row.Flow is { } flow && flow.OutputA == depot);
+        Assert.Contains(diagnosis.Rows, row => row.Entity == depot && row.Resource == ResourceIds.Fuel && row.Demand > 0);
+        Assert.DoesNotContain(diagnosis.Links, link => link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection && link.Resource == ResourceIds.Fuel);
+        Assert.All(diagnosis.Links.Where(link => link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection),
+            link => Assert.Equal(ResourceIds.Ammunition, link.Resource));
+        var buffers = ConveyorConstructionService.Capture(runtime.Simulation.Entities, Player).Where(row => row.Flow.HasValue)
+            .Select(row => row.Flow!.Value.Buffer).ToHashSet();
+        Assert.DoesNotContain(diagnosis.Rows, row => row.SourceFreeQuantity.HasValue && row.Resource == ResourceIds.Fuel && buffers.Contains(row.Inventory));
+    }
+    [Fact]
+    public void UpstreamRequestWithNoObservedSourceRetainsItsRealFailureWithoutInventingALink()
+    {
+        using var runtime = CreateRuntime();
+        var interaction = new PresentationInteractionState();
+        var buffer = WorldHoverExtractionTests.Observe(runtime, interaction);
+        _ = Build(runtime, BuildingIds.PowerPlant, new(48, 0, 48));
+        _ = Build(runtime, BuildingIds.PowerPlant, new(96, 0, 48));
+        EntityId electronics = Build(runtime, BuildingIds.ElectronicsPlant, new(63, 0, 112));
+        EntityId ammunition = Build(runtime, BuildingIds.AmmunitionPlant, new(97, 0, 112));
+        Connect(runtime, electronics, ammunition);
+        InventoryId core = runtime.GetBase(Player).StartingInventory;
+        Assert.True(runtime.Inventories.Transfer(core,
+            runtime.Simulation.Entities.GetComponent<ProductionFacility>(ammunition).InputInventory, ResourceIds.Steel, 30).Succeeded);
+        double silicates = runtime.Inventories.GetAvailableQuantity(core, ResourceIds.Silicates);
+        Assert.True(runtime.Inventories.Reserve(core, ResourceIds.Silicates, silicates).Succeeded);
+        Submit(runtime, PlayerProductionActionCommand.Queue(Player, electronics, RecipeIds.Electronics, runtime.Simulation.CurrentTick));
+        Submit(runtime, PlayerProductionActionCommand.Queue(Player, ammunition, RecipeIds.Ammunition, runtime.Simulation.CurrentTick));
+        Submit(runtime, PlayerLogisticsActionCommand.SetStockPolicy(Player, electronics, ResourceIds.Silicates,
+            10, 20, 30, LogisticsStockPriority.Normal, true, runtime.Simulation.CurrentTick));
+        interaction.SetSelection([ammunition]);
+        runtime.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var actual = Assert.Single(runtime.AutomatedDistribution.LastDebugSnapshot.Requests, request => request.ResourceId == ResourceIds.Silicates);
+        Assert.Equal(LogisticsTransportRequestFailureReason.NoSourceSurplus, actual.FailureReason);
+        var diagnosis = Assert.IsType<OperationsDiagnosisSnapshot>(snapshot.Diagnosis);
+        var row = Assert.Single(diagnosis.Rows, observed => observed.Entity == electronics &&
+            observed.Subject == OperationsDiagnosisSubject.TransportRequest && observed.RequestId == actual.RequestId);
+        Assert.Equal(OperationsDiagnosisReason.NoSourceStock, row.PrimaryReason);
+        Assert.Equal(actual.RequestedQuantity, row.OutstandingRequestQuantity);
+        Assert.False(row.Source.IsValid);
+        Assert.Null(row.SourceFreeQuantity);
+        Assert.DoesNotContain(diagnosis.Links, link => link.RequestId == actual.RequestId);
+    }
     [Fact]
     public void ActualClosedPaidCycleReportsCycleAndUnobservedResourceInsteadOfGuessedStock()
     {
@@ -61,19 +122,26 @@ public sealed class OperationsChainDiagnosisTests
         _ = Build(runtime, BuildingIds.PowerPlant, new(48, 0, 48));
         EntityId electronics = Build(runtime, BuildingIds.ElectronicsPlant, new(63, 0, 112));
         EntityId ammunition = Build(runtime, BuildingIds.AmmunitionPlant, new(ammunitionX, 0, 112));
+        if (truncated) _ = Build(runtime, BuildingIds.PowerPlant, new(96, 0, 48));
         EntityId core = runtime.GetBase(Player).CommandCore;
         var input = runtime.Simulation.Entities.GetComponent<ProductionFacility>(ammunition).InputInventory;
         // Fixture setup relocates real finite starting Steel; no stock is created.
         Assert.True(runtime.Inventories.Transfer(runtime.GetBase(Player).StartingInventory,
             input, ResourceIds.Steel, 30).Succeeded);
         Connect(runtime, electronics, ammunition);
-        Submit(runtime, PlayerProductionActionCommand.Queue(Player, electronics, RecipeIds.Electronics, runtime.Simulation.CurrentTick));
         Submit(runtime, PlayerProductionActionCommand.Queue(Player, ammunition, RecipeIds.Ammunition, runtime.Simulation.CurrentTick));
 
         interaction.SetSelection([ammunition]); interaction.SetOperationsOpen(true);
         runtime.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var idleSource));
+        Assert.DoesNotContain(idleSource.Diagnosis!.Rows, row => row.Entity == electronics && row.Subject == OperationsDiagnosisSubject.ProductionInput);
+        if (!truncated)
+            Assert.Contains(idleSource.Diagnosis.Rows, row => row.Entity == electronics && row.PrimaryReason == OperationsDiagnosisReason.Unknown);
+        Submit(runtime, PlayerProductionActionCommand.Queue(Player, electronics, RecipeIds.Electronics, runtime.Simulation.CurrentTick));
+        runtime.Simulation.AdvanceOneTick();
         Assert.True(buffer.TryReadLatest(out var stopped));
         var diagnosis = Assert.IsType<OperationsDiagnosisSnapshot>(stopped.Diagnosis);
+        Assert.Equal(ProductionBlockReason.NoInput, runtime.Simulation.Entities.GetComponent<ProductionFacility>(ammunition).BlockReason);
         Assert.Equal(ammunition, diagnosis.Root);
         if (truncated)
         {
@@ -110,8 +178,17 @@ public sealed class OperationsChainDiagnosisTests
             100, TestContext.Current.CancellationToken));
         Assert.True(buffer.TryReadLatest(out var connected));
         if (!truncated)
+        {
             Assert.Contains(connected.Diagnosis!.Rows, row => row.PrimaryReason == OperationsDiagnosisReason.NoPower);
-        _ = Build(runtime, BuildingIds.PowerPlant, new(96, 0, 48));
+            interaction.SetSelection([electronics]);
+            runtime.Simulation.AdvanceOneTick();
+            Assert.True(buffer.TryReadLatest(out var powerOnly));
+            Assert.False(powerOnly.Diagnosis!.Root.IsValid);
+            Assert.Equal(OperationsDiagnosisReason.NoPower, OperationsActionGuidance.ForEntity(powerOnly.Diagnosis, electronics)!.Value.PrimaryReason);
+            interaction.SetSelection([ammunition]);
+            runtime.Simulation.AdvanceOneTick();
+        }
+        if (!truncated) _ = Build(runtime, BuildingIds.PowerPlant, new(96, 0, 48));
         Assert.True(runtime.RunUntil(match => match.Simulation.Entities
             .GetComponent<ProductionFacility>(ammunition).CompletedCycles > 0, 1000, TestContext.Current.CancellationToken),
             string.Join("; ", new[] { electronics, ammunition }.Select(entity =>
@@ -125,6 +202,8 @@ public sealed class OperationsChainDiagnosisTests
         Assert.True(buffer.TryReadLatest(out var recovered));
         Assert.DoesNotContain(recovered.Diagnosis!.Rows, row => row.Entity == ammunition &&
             row.PrimaryReason == OperationsDiagnosisReason.NoInput);
+        Assert.False(recovered.Diagnosis.Root.IsValid);
+        Assert.Empty(recovered.Diagnosis.Links);
         if (!truncated)
             Assert.Contains(diagnosis.Rows, row => row.Entity == electronics && row.Resource == ResourceIds.Silicates && row.FreeQuantity == 0);
         interaction.SetSelection([new EntityId(ammunition.Index, ammunition.Generation + 1)]);

@@ -96,6 +96,7 @@ public sealed class OperationsActionGuidanceTests
     [InlineData(OperationsDiagnosisReason.OutputFull, "CHECK OUTPUT COLLECTION")]
     [InlineData(OperationsDiagnosisReason.NoDriveFuel, "OPEN SUPPLY")]
     [InlineData(OperationsDiagnosisReason.DestinationFull, "CHECK DESTINATION STOCK")]
+    [InlineData(OperationsDiagnosisReason.DestinationTargetCovered, "CHECK STOCK POLICY")]
     public void KnownReasonsUseInspectionAdviceNotDispatch(OperationsDiagnosisReason reason, string text)
     {
         Assert.Equal(text, OperationsActionGuidance.NextAction(reason));

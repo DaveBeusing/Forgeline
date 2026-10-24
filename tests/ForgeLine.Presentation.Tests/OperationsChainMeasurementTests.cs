@@ -24,6 +24,10 @@ public sealed class OperationsChainMeasurementTests
         var probe = new ContextProbe();
         scenario.Simulation.RegisterTickObserver(probe);
         var entities = scenario.Simulation.Entities;
+        var network = new PowerNetworkId(999);
+        EntityId generator = entities.CreateEntity();
+        entities.AddComponent(generator, new PowerNetworkMembership(network));
+        entities.AddComponent(generator, new PowerGenerator(1000));
         EntityId root = default;
         for (int index = 0; index < 1000; index++)
         {
@@ -36,6 +40,8 @@ public sealed class OperationsChainMeasurementTests
             entities.AddComponent(entity, new VisualIdentity(1));
             if (index != 0) continue;
             root = entity;
+            entities.AddComponent(entity, new PowerNetworkMembership(network));
+            entities.AddComponent(entity, new PowerConsumer(10));
             var output = scenario.Inventories.CreateInventory(new InventorySpecification(1000));
             entities.AddComponent(entity, new ProductionFacility(inventory, output, ProductionCapability.SteelProcessing, SimulationTick.Zero));
             scenario.Simulation.SubmitCommand(new QueueProductionCommand(entity, RecipeIds.Steel, SimulationTick.Zero), new(1));
@@ -43,6 +49,7 @@ public sealed class OperationsChainMeasurementTests
         interaction.SetSelection([root]);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(buffer.TryReadLatest(out var snapshot));
+        Assert.Equal(ProductionBlockReason.NoInput, entities.GetComponent<ProductionFacility>(root).BlockReason);
         var extraction = new PresentationExtractionContext(scenario, new(1), interaction,
             new PlayerCommandGateway(scenario.Simulation, scenario.Services.BuildingCommands, scenario.BattlefieldRuntime.MatchStateEntity));
         var instances = snapshot.Instances.ToArray();

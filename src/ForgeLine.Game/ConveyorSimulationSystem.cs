@@ -260,14 +260,22 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                         if (_stock.GetQuantity(node.Inventory, resource) <= 0) continue;
                         if ((target.AllowedResources & (1 << r)) == 0)
                             Add(new(ConveyorBlockReason.IncompatibleResource, target.Entity, resource));
-                        else if (Room(target, resource) <= 0 || _stock.GetAddableQuantity(target.Inventory, resource, 1) <= 0)
+                        else if (_stock.GetAddableQuantity(target.Inventory, resource, 1) <= 0)
                             Add(new(ConveyorBlockReason.DestinationFull, target.Entity, resource));
+                        else if (Room(target, resource) <= 0)
+                            Add(new(ConveyorBlockReason.DestinationTargetCovered, target.Entity, resource));
                     }
                 }
             if (!moving && buffered <= 0)
                 foreach (var link in node.Inputs)
                 {
                     var source = link.Source;
+                    if (entities.TryGetComponent(source.Entity, out HealthState sourceHealth) && sourceHealth.IsDepleted)
+                        Add(new(ConveyorBlockReason.DestroyedRoute, source.Entity));
+                    else if (source.BrokenSupport.IsValid)
+                        Add(new(ConveyorBlockReason.DestroyedSupport, source.BrokenSupport));
+                    else if (source.Budget <= 0)
+                        Add(new(ConveyorBlockReason.NoPower, source.Entity));
                     bool hasStock = false;
                     for (int r = 0; r < EligibleResources.Count; r++)
                     {
@@ -334,7 +342,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         double damage = health.Maximum > 0 && health.Fraction < .7 ? health.Fraction : 1;
         return power.OperationalScale * damage;
     }
-    internal static InventoryId ResolveInventory(EntityRegistry entities, EntityId entity, bool input)
+    public static InventoryId ResolveInventory(EntityRegistry entities, EntityId entity, bool input)
     {
         if (!entities.IsAlive(entity)) return default;
         if (entities.TryGetComponent(entity, out ProductionFacility production)) return input ? production.InputInventory : production.OutputInventory;

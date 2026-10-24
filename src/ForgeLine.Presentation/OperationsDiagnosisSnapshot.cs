@@ -15,7 +15,8 @@ public enum OperationsDiagnosisSubject : byte
     TransportRequest,
     CargoTransport,
     Conveyor,
-    ProductionInput
+    ProductionInput,
+    SourceInventory
 }
 
 /// <summary>Ordered by diagnostic priority. Unknown is not evidence of a particular failure.</summary>
@@ -39,6 +40,7 @@ public enum OperationsDiagnosisReason : byte
     IncompatibleResource = 15,
     ReservedStock = 16,
     RetainedStock = 17,
+    DestinationTargetCovered = 18,
     Unknown = byte.MaxValue
 }
 
@@ -183,6 +185,7 @@ public sealed class OperationsDiagnosisSnapshot
         OperationsDiagnosisReason.OutputFull => "OUTPUT FULL",
         OperationsDiagnosisReason.NoDriveFuel => "NO DRIVE FUEL",
         OperationsDiagnosisReason.DestinationFull => "DESTINATION FULL",
+        OperationsDiagnosisReason.DestinationTargetCovered => "DESTINATION TARGET COVERED",
         OperationsDiagnosisReason.DestroyedRoute => "DAMAGED TRANSPORT ROUTE",
         OperationsDiagnosisReason.DestroyedSupport => "DESTROYED SUPPORT",
         OperationsDiagnosisReason.DisconnectedPort => "DISCONNECTED PORT",
@@ -305,7 +308,7 @@ public sealed class OperationsDiagnosisSnapshot
             new OperationsDiagnosisSnapshot(session, tick, experience.Player, rows, links, rows.Count);
     }
 
-    private static OperationsDiagnosisReason FromFailure(LogisticsTransportRequestFailureReason reason) => reason switch
+    internal static OperationsDiagnosisReason FromFailure(LogisticsTransportRequestFailureReason reason) => reason switch
     {
         LogisticsTransportRequestFailureReason.NoSourceSurplus => OperationsDiagnosisReason.NoSourceStock,
         LogisticsTransportRequestFailureReason.NoRoute => OperationsDiagnosisReason.NoRoute,
@@ -317,7 +320,7 @@ public sealed class OperationsDiagnosisSnapshot
         _ => OperationsDiagnosisReason.Unknown
     };
 
-    private static OperationsDiagnosisReason FromBottleneck(LogisticsBottleneckReason reason) => reason switch
+    internal static OperationsDiagnosisReason FromBottleneck(LogisticsBottleneckReason reason) => reason switch
     {
         LogisticsBottleneckReason.InsufficientSourceStock => OperationsDiagnosisReason.NoSourceStock,
         LogisticsBottleneckReason.InsufficientTruckCapacity or LogisticsBottleneckReason.SaturatedLinkOrHub =>
@@ -343,7 +346,7 @@ public sealed class OperationsDiagnosisSnapshot
         return OperationsDiagnosisReason.None;
     }
 
-    private struct ReasonAccumulator
+    internal struct ReasonAccumulator
     {
         public OperationsDiagnosisReason First;
         public OperationsDiagnosisReason Second;

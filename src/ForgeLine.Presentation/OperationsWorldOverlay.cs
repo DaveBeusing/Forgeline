@@ -150,7 +150,7 @@ internal sealed class OperationsWorldOverlay
                 if ((link.Kind == OperationsDiagnosisLinkKind.TransportRequest && !link.RequestId.IsSpecified) ||
                     !(Relevant(link.Source) || Relevant(link.Destination))) continue;
                 bool loaded = false;
-                for (int rowIndex = 0; rowIndex < diagnosis.Rows.Count; rowIndex++)
+                for (int rowIndex = 0; link.Kind == OperationsDiagnosisLinkKind.TransportRequest && rowIndex < diagnosis.Rows.Count; rowIndex++)
                 {
                     var row = diagnosis.Rows[rowIndex];
                     if (row.RequestId == link.RequestId && row.Subject == OperationsDiagnosisSubject.TransportRequest)
