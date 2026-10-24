@@ -21,13 +21,18 @@ internal static class Program
             CompilerOptions options =
                 CompilerOptions.Parse(args);
 
-            BattlefieldMapArtifact artifact = BattlefieldMapArtifact.Capture(CentralDivideBattlefield.Create());
+            bool splitBasin = options.Scenario == SplitBasinBattlefield.CompositionKey;
+            BattlefieldDefinition authored = splitBasin ? SplitBasinBattlefield.Create() : CentralDivideBattlefield.Create();
+            BattlefieldMapArtifact artifact = BattlefieldMapArtifact.Capture(authored,
+                splitBasin ? SplitBasinBattlefield.CreateTerrainRecipe() : BattlefieldTerrainRecipe.CentralDivide());
             byte[] payload = artifact.Serialize();
             BattlefieldMapArtifact loaded = BattlefieldMapArtifact.Deserialize(payload);
             BattlefieldDefinition definition = loaded.ToDefinition();
-            loaded.ValidateMatches(CentralDivideBattlefield.Create());
-            if (Convert.ToHexStringLower(SHA256.HashData(payload)) != ScenarioRegistry.CentralDivideMapSha256)
-                throw new InvalidOperationException("Compiled map differs from the qualified runtime revision; qualify and register the updated artifact explicitly.");
+            loaded.ValidateMatches(authored);
+            string expected = splitBasin ? ScenarioRegistry.SplitBasinMapSha256 : ScenarioRegistry.CentralDivideMapSha256;
+            string digest = Convert.ToHexStringLower(SHA256.HashData(payload));
+            if (digest != expected)
+                throw new InvalidOperationException($"Compiled map digest {digest} differs from the registered runtime revision.");
             TerrainWorld terrain = BattlefieldTerrainFactory.Create(definition, loaded.Terrain);
 
             var gridSettings =
@@ -117,11 +122,12 @@ internal static class Program
 
     private sealed record CompilerOptions(
         string OutputPath,
-        string QualificationOutputPath)
+        string QualificationOutputPath, string Scenario)
     {
         public static CompilerOptions Parse(
             string[] args)
         {
+            string scenario = CentralDivideScenario.CompositionKey;
             string output =
                 Path.Combine(
                     "artifacts",
@@ -141,6 +147,14 @@ internal static class Program
 
                 switch (argument)
                 {
+                    case "--scenario":
+                        scenario = ReadValue(args, ref index, argument) switch
+                        {
+                            "central-divide" or CentralDivideScenario.CompositionKey => CentralDivideScenario.CompositionKey,
+                            "split-basin" or SplitBasinBattlefield.CompositionKey => SplitBasinBattlefield.CompositionKey,
+                            _ => throw new ArgumentException("Unknown registered authoring scenario.")
+                        };
+                        break;
                     case "--output":
                         output =
                             ReadValue(
@@ -165,7 +179,7 @@ internal static class Program
 
             return new CompilerOptions(
                 output,
-                qualification);
+                qualification, scenario);
         }
 
         private static string ReadValue(

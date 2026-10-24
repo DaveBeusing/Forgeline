@@ -5,6 +5,7 @@ namespace ForgeLine.Game;
 // Registrations are application-owned data. Files cannot name types or introduce executable rules.
 public sealed class ScenarioRegistry
 {
+    public const string SplitBasinMapSha256 = "d2e47e1ec4da0fe8e2b498d10d73f8b7a2fee6e0a5f76ab86514510ed6c6e861";
     public const string CentralDivideMapSha256 = "d60f7ae9d4d6b6771269bd53ccfada847615c1d3f261b87e6ba0223e55f276ef";
     public const string CentralDivideContentSha256 = "192624b7d2011b4ae6d0858d74d2fdfa9dc0d361c029444bf663f785556ffbd9";
     public const string CentralDivideMapPath = "central-divide.flmap.json";
@@ -12,11 +13,17 @@ public sealed class ScenarioRegistry
     private readonly ScenarioDescriptor[] _descriptors;
 
     public static ScenarioRegistry Default => new(Path.Combine(AppContext.BaseDirectory, "maps"),
-        [CentralDivideDescriptor]);
+        [CentralDivideDescriptor, SplitBasinDescriptor]);
 
     public static ScenarioDescriptor CentralDivideDescriptor => new(
         CentralDivideScenario.CompositionKey, "Central Divide", CentralDivideMapPath,
         new("prototype.vertical_slice", 1, CentralDivideMapSha256, BattlefieldTerrainRecipe.CurrentVersion,
+            ScenarioContentIdentity.DirectorateKey, CentralDivideContentSha256,
+            ScenarioContentIdentity.StartRule, ScenarioContentIdentity.ObjectiveRule));
+
+    public static ScenarioDescriptor SplitBasinDescriptor => new(
+        SplitBasinBattlefield.CompositionKey, "Split Basin", "split-basin.flmap.json",
+        new(SplitBasinBattlefield.MapKey, 1, SplitBasinMapSha256, BattlefieldTerrainRecipe.CurrentVersion,
             ScenarioContentIdentity.DirectorateKey, CentralDivideContentSha256,
             ScenarioContentIdentity.StartRule, ScenarioContentIdentity.ObjectiveRule));
 
