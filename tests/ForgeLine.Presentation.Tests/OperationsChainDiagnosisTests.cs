@@ -13,14 +13,54 @@ public sealed class OperationsChainDiagnosisTests
     private static readonly PlayerId Player = new(1);
 
     [Fact]
-    public void AmmunitionWaitsForElectronicsWhoseSilicateInputRecoversThroughAPaidConnection()
+    public void ActualClosedPaidCycleReportsCycleAndUnobservedResourceInsteadOfGuessedStock()
+    {
+        using var runtime = CreateRuntime();
+        var interaction = new PresentationInteractionState();
+        var buffer = WorldHoverExtractionTests.Observe(runtime, interaction);
+        _ = Build(runtime, BuildingIds.PowerPlant, new(48, 0, 48));
+        BuildPiece(ConveyorModule.CurveLeft, new(160, 0, 168), BuildingOrientation.North);
+        BuildPiece(ConveyorModule.CurveLeft, new(168, 0, 168), BuildingOrientation.East);
+        BuildPiece(ConveyorModule.CurveLeft, new(168, 0, 160), BuildingOrientation.South);
+        BuildPiece(ConveyorModule.CurveLeft, new(160, 0, 160), BuildingOrientation.West);
+        BuildPiece(ConveyorModule.Standard, new(164, 0, 172), BuildingOrientation.East);
+        BuildPiece(ConveyorModule.Standard, new(172, 0, 164), BuildingOrientation.South);
+        BuildPiece(ConveyorModule.Standard, new(164, 0, 156), BuildingOrientation.West);
+        BuildPiece(ConveyorModule.Standard, new(156, 0, 164), BuildingOrientation.North);
+        EntityId first = ConveyorConstructionService.Capture(runtime.Simulation.Entities, Player)
+            .Single(row => row.Piece.Placement.Module == ConveyorModule.CurveLeft &&
+                row.Piece.Placement.Pivot == new Vector3(160, 0, 168)).Entity;
+        interaction.SetSelection([first]);
+        runtime.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var diagnosis = Assert.IsType<OperationsDiagnosisSnapshot>(snapshot.Diagnosis);
+        Assert.True(diagnosis.HasCycle);
+        Assert.Equal(0, diagnosis.OmittedSteps);
+        Assert.Equal(8, diagnosis.Links.Count);
+        Assert.All(diagnosis.Rows, row => Assert.Null(row.SourceFreeQuantity));
+        Assert.All(diagnosis.Links, link => Assert.Equal(OperationsDiagnosisLinkKind.ConveyorConnection, link.Kind));
+
+        void BuildPiece(ConveyorModule module, Vector3 position, BuildingOrientation orientation)
+        {
+            var command = new ConveyorConstructionCommand(runtime.Services.Conveyors, Player,
+                new(ConveyorEdit.Build, module, position, position, orientation, 0, true),
+                runtime.GetBase(Player).CommandCore, runtime.Simulation.CurrentTick);
+            Submit(runtime, command);
+            Assert.True(command.Accepted, command.Result.ToString());
+        }
+    }
+
+    [Theory]
+    [InlineData(97, false)]
+    [InlineData(161, true)]
+    public void AmmunitionWaitsForElectronicsWhoseSilicateInputRecoversThroughAPaidConnection(int ammunitionX, bool truncated)
     {
         using var runtime = CreateRuntime();
         var interaction = new PresentationInteractionState();
         var buffer = WorldHoverExtractionTests.Observe(runtime, interaction);
         _ = Build(runtime, BuildingIds.PowerPlant, new(48, 0, 48));
         EntityId electronics = Build(runtime, BuildingIds.ElectronicsPlant, new(63, 0, 112));
-        EntityId ammunition = Build(runtime, BuildingIds.AmmunitionPlant, new(97, 0, 112));
+        EntityId ammunition = Build(runtime, BuildingIds.AmmunitionPlant, new(ammunitionX, 0, 112));
         EntityId core = runtime.GetBase(Player).CommandCore;
         var input = runtime.Simulation.Entities.GetComponent<ProductionFacility>(ammunition).InputInventory;
         // Fixture setup relocates real finite starting Steel; no stock is created.
@@ -35,6 +75,14 @@ public sealed class OperationsChainDiagnosisTests
         Assert.True(buffer.TryReadLatest(out var stopped));
         var diagnosis = Assert.IsType<OperationsDiagnosisSnapshot>(stopped.Diagnosis);
         Assert.Equal(ammunition, diagnosis.Root);
+        if (truncated)
+        {
+            Assert.True(diagnosis.OmittedSteps > 0);
+            Assert.DoesNotContain(diagnosis.Rows, row => row.Entity == electronics);
+            Assert.InRange(diagnosis.TraceUpstream(ammunition).Count, 0, 8);
+        }
+        else
+        {
         Assert.Contains(diagnosis.Rows, row => row.Entity == electronics &&
             row.Subject == OperationsDiagnosisSubject.ProductionInput && row.Resource == ResourceIds.Silicates &&
             row.FreeQuantity == 0 && row.PrimaryReason == OperationsDiagnosisReason.NoInput);
@@ -42,6 +90,15 @@ public sealed class OperationsChainDiagnosisTests
             link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection && !link.RequestId.IsSpecified);
         Assert.Contains(diagnosis.Rows, row => row.Source == electronics &&
             row.Resource == ResourceIds.Electronics && row.SourceFreeQuantity == 0);
+            var originalVisual = runtime.Simulation.Entities.GetComponent<VisualIdentity>(electronics);
+            runtime.Simulation.Entities.RemoveComponent<VisualIdentity>(electronics);
+            runtime.Simulation.AdvanceOneTick();
+            Assert.True(buffer.TryReadLatest(out var missing));
+            Assert.DoesNotContain(missing.Diagnosis!.Rows, row => row.Entity == electronics || row.Source == electronics);
+            Assert.DoesNotContain(missing.Diagnosis.Links, link => link.Source == electronics);
+            runtime.Simulation.Entities.AddComponent(electronics, originalVisual);
+            runtime.Simulation.AdvanceOneTick();
+        }
         string hash = MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256();
         _ = diagnosis.TraceUpstream(ammunition);
         _ = diagnosis.ToDiagnosticLines();
@@ -52,7 +109,8 @@ public sealed class OperationsChainDiagnosisTests
             .GetComponent<ProductionFacility>(electronics).InputInventory, ResourceIds.Silicates) >= 10,
             100, TestContext.Current.CancellationToken));
         Assert.True(buffer.TryReadLatest(out var connected));
-        Assert.Contains(connected.Diagnosis!.Rows, row => row.PrimaryReason == OperationsDiagnosisReason.NoPower);
+        if (!truncated)
+            Assert.Contains(connected.Diagnosis!.Rows, row => row.PrimaryReason == OperationsDiagnosisReason.NoPower);
         _ = Build(runtime, BuildingIds.PowerPlant, new(96, 0, 48));
         Assert.True(runtime.RunUntil(match => match.Simulation.Entities
             .GetComponent<ProductionFacility>(ammunition).CompletedCycles > 0, 1000, TestContext.Current.CancellationToken),
@@ -67,8 +125,12 @@ public sealed class OperationsChainDiagnosisTests
         Assert.True(buffer.TryReadLatest(out var recovered));
         Assert.DoesNotContain(recovered.Diagnosis!.Rows, row => row.Entity == ammunition &&
             row.PrimaryReason == OperationsDiagnosisReason.NoInput);
-        Assert.Contains(diagnosis.Rows, row => row.Entity == electronics && row.Resource == ResourceIds.Silicates &&
-            row.FreeQuantity == 0);
+        if (!truncated)
+            Assert.Contains(diagnosis.Rows, row => row.Entity == electronics && row.Resource == ResourceIds.Silicates && row.FreeQuantity == 0);
+        interaction.SetSelection([new EntityId(ammunition.Index, ammunition.Generation + 1)]);
+        runtime.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var recycled));
+        Assert.Null(recycled.Diagnosis);
     }
 
     private static MatchRuntime CreateRuntime()

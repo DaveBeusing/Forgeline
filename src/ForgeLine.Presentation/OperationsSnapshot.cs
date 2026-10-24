@@ -53,9 +53,13 @@ public readonly record struct OperationsRoute(EntityId Source, EntityId Destinat
 
 internal static class OperationsSnapshotFactory
 {
-    public static OperationsSnapshot Capture(SimulationContext context, PresentationExtractionContext extraction)
+    public static OperationsSnapshot Capture(SimulationContext context, PresentationExtractionContext extraction, RenderInstance[]? visibleInstances = null)
     {
         var entities = context.Entities;
+        var visible = new HashSet<EntityId>();
+        if (visibleInstances is not null)
+            foreach (ref readonly var instance in visibleInstances.AsSpan())
+                if (OperationsWorldOverlay.IsOwnedVisible(instance, extraction.Player)) visible.Add(instance.Entity);
         var scenario = extraction.Scenario;
         var inventories = new HashSet<InventoryId>();
         var queues = new Dictionary<EntityId, int>();
@@ -92,14 +96,16 @@ internal static class OperationsSnapshotFactory
                 string observedCause = "NOT OBSERVED";
                 if (scenario.Services.ConveyorFlow.ObservationTick == context.Tick &&
                     scenario.Services.ConveyorFlow.TryGetObservation(entity, out var observation))
-                    observedCause = OperationsDiagnosisSnapshot.Label(OperationsChainCapture.ConveyorReason(observation.First.Reason));
+                    observedCause = OperationsDiagnosisSnapshot.Label(observation.First.Cause.IsValid &&
+                        observation.First.Cause != entity && !visible.Contains(observation.First.Cause)
+                        ? OperationsDiagnosisReason.Unknown : OperationsChainCapture.ConveyorReason(observation.First.Reason));
                 if(flow is {} stock && scenario.Inventories.Contains(stock.Buffer))inventories.Add(stock.Buffer);
                 bool hasPower=entities.TryGetComponent(entity,out PowerConsumer drive);
                 if(rows.Count<OperationsSnapshot.MaximumFacilities)
                     rows.Add(new(entity,"Conveyor / "+ConveyorGeometry.Slug(conveyor.Placement.Module),
                         OperationsCategory.Logistics,belt.Status.ToString(),
                         belt.Status is ConveyorLinkStatus.Structural or ConveyorLinkStatus.Flowing?"":"Conveyor"+belt.Status,
-                        flow is {} f?FormattableString.Invariant($"{observedCause}; IN {f.InputPerSecond:0.##}/s OUT {f.OutputPerSecond:0.##}/s; NETWORK {f.Network}; IN [{f.InputA}, {f.InputB}] OUT [{f.OutputA}, {f.OutputB}]"):"STRUCTURAL PART / NO CARGO",
+                        flow is {} f?FormattableString.Invariant($"{observedCause}; IN {f.InputPerSecond:0.##}/s OUT {f.OutputPerSecond:0.##}/s"):"STRUCTURAL PART / NO CARGO",
                         0,flow is not null?conveyor.BufferedQuantity:null,flow?.Capacity,
                         hasPower?drive.Demand:null,hasPower?drive.AllocatedPower:null,
                         flow is not null?ConveyorSimulationSystem.NominalThroughput:null,

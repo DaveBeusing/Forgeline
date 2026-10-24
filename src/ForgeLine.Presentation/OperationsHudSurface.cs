@@ -150,6 +150,10 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                         if (diagnosis is { } issue && nextAction.Length > 0)
                         {
                             b = new(text); b.Append("CAUSE "); b.Append(OperationsDiagnosisSnapshot.Label(issue.PrimaryReason));
+                            if (issue.Resource.IsSpecified)
+                                for (int resourceIndex = 0; resourceIndex < data.Resources.Count; resourceIndex++)
+                                    if (data.Resources[resourceIndex].Resource == issue.Resource)
+                                    { b.Append(" / "); b.Append(data.Resources[resourceIndex].Name); break; }
                             b.Append(" / NEXT "); b.Append(nextAction); Line(b.Written);
                         }
                         else Line(detail.Explanation);
@@ -168,7 +172,18 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                             { routes++; if (!route.Enabled) unavailable++; }
                         }
                         b = new(text);
-                        if (transport is { } reported)
+                        if (currentDiagnosis is { Root.IsValid: true } chain)
+                        {
+                            b.Append(OperationsActionGuidance.NextChainEntity(chain, detail.Entity).IsValid ? "TRACE NEXT / EXTRA BRANCHES " : "TRACE END / EXTRA BRANCHES "); b.Number(chain.Branches, "0");
+                            b.Append(" OMITTED "); b.Number(chain.OmittedSteps + chain.TotalLinks - chain.Links.Count + chain.TotalRows - chain.Rows.Count, "0");
+                            if (OperationsActionGuidance.SourceForEntity(chain, detail.Entity) is { } source)
+                            { b.Append(" / SOURCE FREE "); Number(ref b, source.SourceFreeQuantity); }
+                            if (chain.HasCycle) b.Append(" / CYCLE");
+                            if (chain.MissingObservation) b.Append(" / NOT OBSERVED");
+                            Control(context.Layout, 11, b.Written,
+                                enabled: OperationsActionGuidance.NextChainEntity(chain, detail.Entity).IsValid);
+                        }
+                        else if (transport is { } reported)
                         {
                             b.Append("STATE "); b.Append(reported.Status);
                             if (reported.OutstandingRequestQuantity.HasValue)

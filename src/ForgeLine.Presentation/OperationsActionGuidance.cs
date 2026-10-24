@@ -19,7 +19,8 @@ internal static class OperationsActionGuidance
             var row = diagnosis.Rows[i];
             if (row.Entity != entity) continue;
             int priority = Priority(row);
-            if (priority >= bestPriority) continue;
+            if (priority > bestPriority || priority == bestPriority &&
+                (row.Subject != OperationsDiagnosisSubject.ProductionInput || selected?.Subject == OperationsDiagnosisSubject.ProductionInput)) continue;
             selected = row;
             bestPriority = priority;
         }
@@ -59,6 +60,9 @@ internal static class OperationsActionGuidance
     public static string NextAction(OperationsDiagnosisReason reason) => reason switch
     {
         OperationsDiagnosisReason.NoPower => "CHECK POWER",
+        OperationsDiagnosisReason.DestroyedRoute or OperationsDiagnosisReason.DestroyedSupport => "INSPECT REPAIR",
+        OperationsDiagnosisReason.DisconnectedPort or OperationsDiagnosisReason.IncompatibleResource => "CHECK CONNECTIONS",
+        OperationsDiagnosisReason.ReservedStock or OperationsDiagnosisReason.RetainedStock => "CHECK SOURCE STOCK",
         OperationsDiagnosisReason.NoInput => "OPEN LOGISTICS",
         OperationsDiagnosisReason.NoSourceStock => "CHECK SOURCE STOCK",
         OperationsDiagnosisReason.NoRoute => "CHECK CONNECTIONS",
@@ -71,6 +75,37 @@ internal static class OperationsActionGuidance
         OperationsDiagnosisReason.DestinationFull => "CHECK DESTINATION STOCK",
         _ => string.Empty
     };
+
+    internal static OperationsDiagnosisRow? SourceForEntity(OperationsDiagnosisSnapshot? diagnosis, EntityId entity)
+    {
+        OperationsDiagnosisRow? observed = null;
+        if (diagnosis is null) return null;
+        for (int index = 0; index < diagnosis.Rows.Count; index++)
+        {
+            var row = diagnosis.Rows[index];
+            if (row.Entity != entity || !row.Source.IsValid) continue;
+            if (observed is { } prior &&
+                (prior.Source != row.Source || prior.Resource != row.Resource || prior.Inventory != row.Inventory)) return null;
+            if (row.Inventory.IsSpecified) observed = row;
+        }
+        return observed;
+    }
+
+    internal static EntityId NextChainEntity(OperationsDiagnosisSnapshot? diagnosis, EntityId entity, EntityId after = default)
+    {
+        if (diagnosis is null || !diagnosis.Root.IsValid) return default;
+        var issue = ForEntity(diagnosis, entity);
+        if (issue is { } row && row.CauseEntity.IsValid && row.CauseEntity != entity && row.CauseEntity != after) return row.CauseEntity;
+        EntityId first = default, next = default;
+        for (int index = 0; index < diagnosis.Links.Count; index++)
+        {
+            var link = diagnosis.Links[index];
+            if (link.Destination != entity || link.Source == entity) continue;
+            if (!first.IsValid || link.Source.CompareTo(first) < 0) first = link.Source;
+            if (link.Source.CompareTo(after) > 0 && (!next.IsValid || link.Source.CompareTo(next) < 0)) next = link.Source;
+        }
+        return next.IsValid ? next : first;
+    }
 
     private static int Priority(in OperationsDiagnosisRow row)
     {

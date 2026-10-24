@@ -14,6 +14,102 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class OperationsTests
 {
+    [Fact]
+    public void DenseCopiedChainRendersWithinExistingBudgetsWithoutWarmAllocation()
+    {
+        var facilities = Enumerable.Range(1, 1000).Select(index => Facility(new((uint)index, 1))).ToArray();
+        var data = new OperationsSnapshot(new(1), new(4), new(1), facilities,
+            [new(ResourceIds.Electronics, "Electronics", 0, null)], [], 1000, 0);
+        var rows = Enumerable.Range(1, 128).Select(index => new OperationsDiagnosisRow(
+            OperationsDiagnosisSubject.ProductionInput, new((uint)index, 1), ResourceIds.Electronics,
+            default, "NoInput", 10, 0, 0, 0, null, null, null, null,
+            default, default, default, null, null, OperationsDiagnosisReason.NoInput)).ToArray();
+        var links = Enumerable.Range(1, 64).Select(index => new OperationsDiagnosisLink(default,
+            new((uint)index + 1, 1), new((uint)index, 1), ResourceIds.Electronics,
+            OperationsDiagnosisLinkKind.ConveyorConnection)).ToArray();
+        var instances = facilities.Select((facility, index) => Visible(facility.Entity) with
+        { Transform = RenderTransform.Identity with { Position = new(index % 16 - 8, 0, index / 16 % 16 - 8) } }).ToArray();
+        EntityId[] selection = [new(1, 1)];
+        var experience = default(PlayerExperienceSnapshot) with { Player = new(1), Tick = new(4) };
+        var snapshot = new PresentationSnapshot(new(4), TimeSpan.FromMilliseconds(50), 1000, instances,
+            sessionId: new(1), playerExperience: experience, operations: data,
+            playerActions: new(new(1), new(4), [], 0, null, null))
+        {
+            Diagnosis = new(new(1), new(4), new(1), rows, links, root: selection[0], omittedSteps: 4, branches: 2),
+            SelectedOrders = new(new(1), new(4), selection, [], string.Empty)
+        };
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var graphics = new SelectionOverlayRenderingTests.RecordingContext { Width = 1600, Height = 900 };
+        var information = RtsInformationLayerView.Empty with { SelectedEntities = selection };
+        var context = new GameplayHudRenderContext(graphics, new RtsCamera(), snapshot, default, information,
+            default, default, default, CombatGroupOverviewView.Empty, default, layout, 96, 1, null,
+            Operations: new(true, Selected: selection[0], Session: new(1)));
+        using var device = new RetainedDevice();
+        using var renderer = new OperationsHudSurface(device);
+        var overlay = new OperationsWorldOverlay();
+        for (int index = 0; index < 128; index++) { renderer.Render(context); overlay.Build(context); }
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int index = 0; index < 256; index++) { renderer.Render(context); overlay.Build(context); }
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+        Assert.InRange(renderer.LastRenderedVertexCount, 1, OperationsHudSurface.MaxVertices);
+        Assert.Equal(OperationsWorldOverlay.MaximumMarkers, overlay.Markers.Length);
+        Assert.Equal(OperationsWorldOverlay.MaximumLinks, overlay.Links.Length);
+        Assert.All(overlay.Links.ToArray(), link => { Assert.True(link.Conveyor); Assert.False(link.Request); Assert.False(link.Loaded); });
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void HeldChainFocusCannotActivateAChangedUpstreamTarget(int refusal)
+    {
+        EntityId root = new(500, 3), first = new(501, 4), replacement = new(502, 8);
+        var input = new InputState();
+        var interaction = new PresentationInteractionState();
+        var controller = new OperationsController();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        PresentationSnapshot Make(EntityId source, ulong tick, int rejected = 0)
+        {
+            var data = new OperationsSnapshot(new(1), new(tick), new(1),
+                [Facility(root), Facility(first), Facility(replacement)], [], [], 3, 0);
+            var experience = default(PlayerExperienceSnapshot) with { Player = new(1), Tick = new(tick) };
+            var seen = Visible(first);
+            if (rejected == 1) seen = seen with { Visibility = RenderVisibilityMask.None };
+            if (rejected == 2) seen = seen with { Selectable = new(new PlayerId(2), ControllableEntityCategory.Building) };
+            if (rejected == 3) seen = seen with { Entity = new(first.Index, first.Generation + 1) };
+            return new PresentationSnapshot(new(tick), TimeSpan.FromMilliseconds(50), 3,
+                [Visible(root), seen, Visible(replacement)], sessionId: new(1),
+                playerExperience: experience, operations: data,
+                playerActions: new(new(1), new(tick), [], 0, null, null))
+            {
+                Diagnosis = new(new(1), new(tick), new(1), [],
+                    [new(default, source, root, ResourceIds.Electronics, OperationsDiagnosisLinkKind.ConveyorConnection)],
+                    root: root)
+            };
+        }
+        var before = Make(first, 4);
+        controller.Update(input, before, layout, interaction);
+        controller.OpenCategory(OperationsCategory.All, before.SessionId, interaction);
+        Click(input, OperationsLayout.Control(layout, 3));
+        controller.Update(input, before, layout, interaction);
+        Assert.Equal(root, controller.View.Selected);
+        Edge(input, PlatformInputEventKind.MouseButtonDown, OperationsLayout.Control(layout, 11));
+        controller.Update(input, before, layout, interaction);
+        var after = Make(refusal == 0 ? replacement : first, 5, refusal);
+        Edge(input, PlatformInputEventKind.MouseButtonUp, OperationsLayout.Control(layout, 11));
+        Assert.False(controller.Update(input, after, layout, interaction).Navigate.IsValid);
+        Assert.Equal(root, controller.View.Selected);
+        after = Make(replacement, 5);
+        Click(input, OperationsLayout.Control(layout, 11));
+        Assert.Equal(replacement, controller.Update(input, after, layout, interaction).Navigate);
+        Assert.Equal(replacement, controller.View.Selected);
+        Click(input, OperationsLayout.Control(layout, 10));
+        var controls = controller.Update(input, after, layout, interaction);
+        Assert.Equal(replacement, controls.Navigate);
+        Assert.Equal(PlayerActionPanelMode.Production, controls.Controls);
+    }
+
     [Theory]
     [InlineData(0, 0)]
     [InlineData(10, 10)]
@@ -444,10 +540,11 @@ public sealed class OperationsTests
     }
 
     [Theory]
-    [InlineData(false, false)]
-    [InlineData(true, false)]
-    [InlineData(true, true)]
-    public void WorldOverlayProjectionHasZeroWarmAllocation(bool visible, bool selectedDiagnosis)
+    [InlineData(false, false, false)]
+    [InlineData(true, false, false)]
+    [InlineData(true, true, false)]
+    [InlineData(true, true, true)]
+    public void WorldOverlayProjectionHasZeroWarmAllocation(bool visible, bool selectedDiagnosis, bool chain)
     {
         EntityId facility = new(12, 3), source = new(14, 2), truck = new(18, 7);
         var data = new OperationsSnapshot(new(1), new(4), new(1),
@@ -467,6 +564,10 @@ public sealed class OperationsTests
         var snapshot = new PresentationSnapshot(new(4), TimeSpan.FromMilliseconds(50), instances.Length, instances,
             sessionId: new(1), playerExperience: experience, operations: data, playerActions: actions)
         {
+            Diagnosis = chain ? new OperationsDiagnosisSnapshot(new(1), new(4), new(1),
+                OperationsDiagnosisSnapshot.Capture(new(1), new(4), actions, experience)!.Rows,
+                [new(default, source, facility, ResourceIds.Steel, OperationsDiagnosisLinkKind.ConveyorConnection)], root: facility)
+                : OperationsDiagnosisSnapshot.Capture(new(1), new(4), actions, experience),
             SelectedOrders = selectedDiagnosis ? new(new(1), new(4), selection, [], string.Empty) : null
         };
         var layout = GameplayHudLayout.Create(1600, 900, 96);
@@ -483,8 +584,9 @@ public sealed class OperationsTests
         {
             Assert.Equal(facility, overlay.Markers[0].Entity);
             Assert.Equal(selectedDiagnosis, overlay.Markers[0].Diagnosis.HasValue);
-            Assert.Equal(selectedDiagnosis, overlay.Links[0].Request);
-            Assert.Equal(selectedDiagnosis, overlay.Links[0].Loaded);
+            Assert.Equal(selectedDiagnosis && !chain, overlay.Links[0].Request);
+            Assert.Equal(chain, overlay.Links[0].Conveyor);
+            Assert.Equal(selectedDiagnosis && !chain, overlay.Links[0].Loaded);
             Assert.Equal(source, overlay.Links[0].Source);
             Assert.Equal(facility, overlay.Links[0].Destination);
         }

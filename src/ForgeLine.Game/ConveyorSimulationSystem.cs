@@ -269,8 +269,9 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 {
                     var source = link.Source;
                     bool hasStock = false;
-                    foreach (ResourceId resource in EligibleResources)
+                    for (int r = 0; r < EligibleResources.Count; r++)
                     {
+                        ResourceId resource = EligibleResources[r];
                         if (_stock.GetQuantity(source.Inventory, resource) <= 0) continue;
                         hasStock = true;
                         if (_stock.GetAvailableQuantity(source.Inventory, resource) <= 0)

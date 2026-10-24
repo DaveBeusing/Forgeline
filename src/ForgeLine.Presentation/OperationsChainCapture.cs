@@ -73,10 +73,13 @@ internal static class OperationsChainCapture
             var resources = new List<ResourceId>();
             if (entities.TryGetComponent(entity, out ProductionFacility production))
             {
+                bool matchingOutput = !item.Resource.IsSpecified ||
+                    scenario.Services.ProductionRecipes.TryGet(production.ActiveRecipe, out var active) &&
+                    active.Outputs.Any(output => output.ResourceId == item.Resource);
                 if (entity != root)
                     Append(Row(OperationsDiagnosisSubject.Production, entity, default,
-                        production.Status.ToString(), ProductionReason(production.BlockReason)));
-                if (production.BlockReason == ProductionBlockReason.NoInput &&
+                        production.Status.ToString(), matchingOutput ? ProductionReason(production.BlockReason) : OperationsDiagnosisReason.Unknown));
+                if (matchingOutput && production.BlockReason == ProductionBlockReason.NoInput &&
                     scenario.Services.ProductionRecipes.TryGet(production.ActiveRecipe, out var recipe))
                     foreach (var ingredient in recipe.Inputs)
                     {
@@ -91,6 +94,21 @@ internal static class OperationsChainCapture
                                 FreeQuantity = free, ReservedQuantity = local - free, Inventory = production.InputInventory });
                     }
             }
+            if (entities.TryGetComponent(entity, out UnitProductionFacility unitProduction) &&
+                unitProduction.BlockReason == UnitProductionBlockReason.NoInput &&
+                scenario.Services.UnitDefinitions.TryGet(unitProduction.ActiveUnit, out var unit))
+                foreach (var cost in unit.Costs)
+                {
+                    if (!stock.Contains(unitProduction.InputInventory)) { missing = true; continue; }
+                    double local = stock.GetQuantity(unitProduction.InputInventory, cost.ResourceId);
+                    double free = stock.GetAvailableQuantity(unitProduction.InputInventory, cost.ResourceId);
+                    if (free >= cost.Quantity) continue;
+                    resources.Add(cost.ResourceId);
+                    Append(Row(OperationsDiagnosisSubject.ProductionInput, entity, cost.ResourceId,
+                        "UNIT INPUT", free < local ? OperationsDiagnosisReason.ReservedStock : OperationsDiagnosisReason.NoInput)
+                        with { Demand = cost.Quantity - free, LocalQuantity = local, FreeQuantity = free,
+                            ReservedQuantity = local - free, Inventory = unitProduction.InputInventory });
+                }
             if (entities.TryGetComponent(entity, out ConveyorFlowState conveyor))
             {
                 var primary = OperationsDiagnosisReason.Unknown;
@@ -99,9 +117,9 @@ internal static class OperationsChainCapture
                 var tertiary = OperationsDiagnosisReason.None;
                 if (currentFlow && scenario.Services.ConveyorFlow.TryGetObservation(entity, out var fact))
                 {
-                    primary = ConveyorReason(fact.First.Reason);
-                    secondary = ConveyorReason(fact.Second.Reason);
-                    tertiary = ConveyorReason(fact.Third.Reason);
+                    primary = ObservedReason(fact.First);
+                    secondary = ObservedReason(fact.Second);
+                    tertiary = ObservedReason(fact.Third);
                     if (Authorized(fact.First.Cause)) cause = fact.First.Cause;
                 }
                 Append(Row(OperationsDiagnosisSubject.Conveyor, entity, item.Resource, conveyor.Status.ToString(), primary)
@@ -155,7 +173,12 @@ internal static class OperationsChainCapture
 
         bool Authorized(EntityId entity) => entity.IsValid && visible.Contains(entity) &&
             entities.TryGetComponent(entity, out ControllableEntity owner) &&
-            owner.Owner == extraction.Player && owner.IsControllable;
+            owner.Owner == extraction.Player && owner.IsControllable &&
+            (!entities.TryGetComponent(entity, out CompletedBuilding building) || building.Owner == extraction.Player) &&
+            (!entities.TryGetComponent(entity, out ConveyorPiece piece) || piece.Owner == extraction.Player) &&
+            (!entities.TryGetComponent(entity, out UnitProductionFacility factory) || factory.Owner == extraction.Player);
+        OperationsDiagnosisReason ObservedReason(ConveyorBlockObservation fact) =>
+            fact.Cause.IsValid && !Authorized(fact.Cause) ? OperationsDiagnosisReason.Unknown : ConveyorReason(fact.Reason);
         InventoryId Inventory(EntityId entity, bool input)
         {
             if (!Authorized(entity)) return default;
