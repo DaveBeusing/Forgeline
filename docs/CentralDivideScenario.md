@@ -179,3 +179,13 @@ Availability and costs are copied from the same building, recipe, unit, and inve
 
 [Base Conveyor Logistics](BaseConveyorLogistics.md) and its [building port matrix](BaseConveyorPortMatrix.md) describe the implemented optional local conveyor layer. Players build paid physical modules and explicitly attach eligible building ports; existing scenarios receive no automatic network. Finite buffers move actual inventory through original production recipes, while regional Cargo Trucks and battlefield Supply Trucks retain their physical loading and movement lifecycles. The [flow qualification](ConveyorSimulationAndVehicleInterop.md) covers a Standard-stock Gameplay start with paid buildings and bands, an actual Ore truck delivery, two Smelter cycles and Steel reaching storage. Headless conservation, recovery and navigation evidence does not replace the unchanged natural terminal-match gate or native visual acceptance.
 
+
+## Pacing evidence boundaries
+
+Optional guidance observes real conveyor handoff, processing, field transfers and
+paid research completion. It never changes stock or unlocks. See
+[onboarding qualification](OnboardingQualification.md) and
+[telemetry](GameplayTelemetry.md) for nullable timing outcomes and reproduction.
+No Gameplay stock, production cost, opponent threshold or navigation value is
+changed by this observational work. Research extension integration is assessed
+separately; the guide promises only the implemented catalog/control contracts.

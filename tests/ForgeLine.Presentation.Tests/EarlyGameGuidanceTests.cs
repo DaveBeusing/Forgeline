@@ -28,6 +28,9 @@ public sealed class EarlyGameGuidanceTests
         Assert.True(view.GoalConfirmed);
         Assert.False(summary.Observed.HasFlag(PlayerGuidanceMilestone.OreDelivered));
         Assert.False(summary.Observed.HasFlag(PlayerGuidanceMilestone.FieldSupplied));
+        Assert.False(summary.Observed.HasFlag(PlayerGuidanceMilestone.ConveyorDelivery));
+        Assert.False(summary.Observed.HasFlag(PlayerGuidanceMilestone.ProductionOutput));
+        Assert.False(summary.Observed.HasFlag(PlayerGuidanceMilestone.ResearchCompleted));
     }
 
     [Fact]
@@ -108,6 +111,8 @@ public sealed class EarlyGameGuidanceTests
         scenario.Simulation.RunTicks(scenario.Services.ProductionRecipes[RecipeIds.Steel].DurationTicks + 2, TestContext.Current.CancellationToken);
         Assert.True(buffer.TryReadLatest(out var processed));
         Assert.True(processed.Guidance!.Value.Observed.HasFlag(PlayerGuidanceMilestone.SteelProcessing));
+        Assert.True(processed.Guidance.Value.Observed.HasFlag(PlayerGuidanceMilestone.ProductionOutput));
+        Assert.False(processed.Guidance.Value.Observed.HasFlag(PlayerGuidanceMilestone.ConveyorDelivery));
         Assert.False(built.Guidance.Value.Observed.HasFlag(PlayerGuidanceMilestone.SteelProcessing)); // Retained copy is immutable.
         var factoryEntity = FindBuilding(scenario, BuildingIds.VehicleFactory);
         var factory = scenario.Simulation.Entities.GetComponent<UnitProductionFacility>(factoryEntity);

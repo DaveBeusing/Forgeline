@@ -33,7 +33,9 @@ public sealed class GameplayPacingProgressTests
         Assert.True(delivery.Quantity > 0);
         Assert.Equal(10, Assert.Single(journal.Capture(fixture.Player, fixture.Simulation.CurrentTick),
             item => item.Kind == GameplayProgressKind.ProductionCompleted).Quantity);
+        var retained = journal.CaptureFirst(fixture.Player, fixture.Simulation.CurrentTick);
         fixture.Step(20);
+        Assert.Same(retained, journal.CaptureFirst(fixture.Player, fixture.Simulation.CurrentTick));
         Assert.Equal(delivery, Assert.Single(journal.CaptureFirst(fixture.Player, fixture.Simulation.CurrentTick),
             item => item.Kind == GameplayProgressKind.ConveyorDelivered));
         Assert.Empty(journal.CaptureFirst(fixture.OtherPlayer, fixture.Simulation.CurrentTick));

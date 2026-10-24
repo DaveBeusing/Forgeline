@@ -45,7 +45,7 @@ internal static class OnboardingCapture
                 {
                     graphics.WaitForIdle(); graphics.Resize(display.Item1, display.Item2);
                     var layout = GameplayHudLayout.Create(display.Item1, display.Item2, display.Item3, display.Item4);
-                    foreach (string key in new[] { "smelter-policy", "truck-roles", "mobile-loading" })
+                    foreach (string key in new[] { "smelter-policy", "truck-roles", "mobile-loading", "belt-production", "research" })
                     {
                         var guide = new EarlyGameGuidanceController();
                         var card = guide.Update(snapshot, true, layout: layout);
@@ -89,7 +89,7 @@ internal static class OnboardingCapture
                 {
                     Source = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                     Device = graphics.Diagnostics.Device, Fixture = scene.Fingerprint, Cases = records, Health = graphics.Diagnostics.Health,
-                    Contract = "All pages of three logistics lessons; two exact native repeats. Authored fixture only, no world commands. Human visual and live-interaction acceptance remains pending."
+                    Contract = "All pages of five logistics and research lessons; two exact native repeats. Authored fixture only, no world commands. Human visual and live-interaction acceptance remains pending."
                 }, JsonOptions));
                 return 0;
             }

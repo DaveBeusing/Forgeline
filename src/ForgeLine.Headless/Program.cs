@@ -463,6 +463,15 @@ internal static class Program
         string label,
         MatchParticipantReport side)
     {
+        if (!side.StrategyAssessmentAvailable)
+        {
+            Console.WriteLine($"{label}: state={side.StrategicState}; goal={side.ActiveGoal}; assessment=unavailable; " +
+                $"rifle={side.RifleSquads}; scout={side.Scouts}; tank={side.MainBattleTanks}; " +
+                $"artillery={side.MobileArtillery}; cargo={side.CargoTrucks}; supply={side.SupplyTrucks}; " +
+                $"depots={side.SupplyDepots}; radar={side.Radars}; resupplyOrders={side.ActiveResupplyOrders}; " +
+                $"production=({side.UnitProductionSummary}).");
+            return;
+        }
         Console.WriteLine(
             $"{label}: state={side.StrategicState}; goal={side.ActiveGoal}; " +
             $"units={side.TotalUnits}/combat={side.CombatUnits}; " +

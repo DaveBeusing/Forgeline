@@ -13,6 +13,8 @@ public sealed partial class PlayerConstructionProductionFlowTests
     {
         using var scenario = CreateScenario(4133);
         var player = new PlayerId(1);
+        var meter = new GameplayTelemetryCollector(scenario);
+        scenario.Simulation.RegisterTickObserver(new JourneyTelemetryObserver(meter));
         var core = scenario.GetBase(player);
         Assert.Equal(2, FindOwnedUnits(scenario, UnitIds.CargoTruck).Length);
         Assert.Empty(FindOwnedUnits(scenario, UnitIds.SupplyTruck));
@@ -91,6 +93,17 @@ public sealed partial class PlayerConstructionProductionFlowTests
         scenario.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
         Assert.Contains(scenario.Progress.Capture(player, scenario.Simulation.CurrentTick), x => x.Kind == GameplayProgressKind.SupplyLoadCompleted);
 
+        string? measurementPath = Environment.GetEnvironmentVariable("FORGELINE_GAMEPLAY_JOURNEY_REPORT");
+        if (!string.IsNullOrWhiteSpace(measurementPath))
+            File.WriteAllText(measurementPath, System.Text.Json.JsonSerializer.Serialize(new
+            {
+                Profile = "Gameplay", Seed = 4133, Participants = "player:1 human / player:2 human",
+                Scenario = scenario.Battlefield.Metadata.Key, Tick = scenario.Simulation.CurrentTick.Value,
+                AuthoritativeHash = MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256(),
+                Evidence = scenario.Progress.CaptureFirst(player, scenario.Simulation.CurrentTick),
+                Telemetry = meter.Capture()
+            }));
+
         void Move(EntityId unit, Vector3 target)
         {
             Assert.True(gateway.SubmitMovement(player, [unit], target, scenario.Simulation.CurrentTick, FormationTemplate.Compact).Accepted);
@@ -123,6 +136,11 @@ public sealed partial class PlayerConstructionProductionFlowTests
         Assert.Equal(extracted.Actor, recovered.Actor);
         Assert.True(recovered.Quantity > 0);
         Assert.Empty(restored.Progress.Capture(new PlayerId(2), restored.Simulation.CurrentTick));
+    }
+
+    private sealed class JourneyTelemetryObserver(GameplayTelemetryCollector meter) : ForgeLine.Simulation.ISimulationTickObserver
+    {
+        public void OnTickCompleted(ForgeLine.Simulation.SimulationContext context) => meter.Observe();
     }
 
     private static Vector3 FindOpeningOreSite(MatchRuntime scenario)

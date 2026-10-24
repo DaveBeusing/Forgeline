@@ -39,7 +39,7 @@ Runtime and machine metadata are retained in the batch report for context, but g
 
 ## Stable Metric Contract
 
-Telemetry schema version 1 uses stable metric names together with an explicit owner, dimension, numeric value, and unit.
+Telemetry schema version 2 uses stable metric names together with an explicit owner, dimension, numeric value, and unit.
 
 Owner values use:
 
@@ -110,7 +110,7 @@ In addition to numeric match metrics, every snapshot contains a structured match
 
 ## Progression Milestones
 
-Schema version 1 records the first observed tick for:
+The retained milestone list records the first observed tick for:
 
 - progression.first_extractor_expansion;
 - progression.first_supply_depot_expansion;
@@ -180,3 +180,32 @@ Gameplay telemetry coverage includes:
 - long-run finite/non-negative metric validation.
 
 The canonical CI terminal match emits both engine diagnostics and gameplay telemetry. The manually dispatched Match Soak workflow emits both reports for multi-match analysis.
+
+## Normal-profile pacing outcomes
+
+Schema 2 adds a bounded Pacing array with explicit nullable ticks for each
+configured participant: first conveyor delivery into a building, committed
+processing output, actual mobile field supply, completed paid research, current
+faction-authorized contact, observed chain blockage/recovery and a completed
+building outside that participant's authored start build area. First damage is a
+separate match-wide observation, not a scouting fact. Missing events serialize
+as null, never tick zero. Aggregate Pacing retains reached/unreached match counts
+and nullable minimum/maximum/mean ticks. Existing metric names remain unchanged;
+schema-1 baselines are rejected rather than compared as if they had this contract.
+
+The completed-action journal retains both latest and first observations. A late
+collector can recover the exact recorded event tick for these journal events;
+contact, combat and expansion record their first collector observation. Collect
+once after every completed tick for complete timing. No enemy inventory is read
+to confirm a local guidance achievement.
+
+Batch reports include the build's informational source identity. Headless match
+participants are computer-controlled; an isolated command-driven opening with two
+human slots is separate evidence. Opponent detail assessments are optional: the
+match report exposes StrategyAssessmentAvailable=false when detailed diagnostic
+capture is disabled. Default numeric detail fields then provide no economy or
+force assessment. This avoids a previous Single() crash in telemetry-only runs.
+
+Normal Gameplay measurements use Standard starting stock and the unchanged
+Gameplay opponent/configuration values. Validation retains its separate stock,
+parameters and terminal gate. Neither profile's success substitutes for the other.

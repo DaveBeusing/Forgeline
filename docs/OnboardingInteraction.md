@@ -8,12 +8,17 @@ lesson has been read.
 
 ## Reading and gameplay are separate
 
-Eighteen stable content keys cover the starting Core and two Cargo Trucks, power,
+Twenty stable content keys cover the starting Core and two Cargo Trucks, power,
 real Ore extraction, Smelter construction and policy, Ore delivery, Steel,
 Vehicle Factory construction and inputs, Scout production, truck roles, depot
 construction and deliveries, Supply Truck production/loading, field supply,
 recovery, scouting and continued play. The truck-roles and continued-play cards
-are explanations rather than achievable simulation goals.
+are explanations rather than achievable simulation goals. The existing eighteen keys
+remain stable. `belt-production` separately explains compatible base conveyors and
+committed processing output; `research` explains the existing paid research flow.
+Neither lesson adds a command, unlock or required reading order. The contact card
+explains escorts, rerouting and transport reserves against observed raids without
+revealing hidden enemy state.
 
 Every lesson independently records Offered, Viewed or Deferred within the
 current session. NEXT/PREV select lessons; PAGE </PAGE > traverse the complete

@@ -11,8 +11,10 @@ GameplayProgressJournal is owned by MatchRuntime. Actual Cargo load/unload and
 Battlefield Supply transfers record positive quantities after successful
 inventory operations. Actual unit production records Scout and Supply Truck
 completion. The existing extraction sink supplies committed extraction results.
-Completed-tick observation records real Steel output deltas, accepted installed
-Ore policies and blocked work returning to running work through the existing
+Conveyor evidence is recorded only after an actual positive transfer into an owned
+building input port, not during construction or between belt buffers. Completed-tick
+observation records committed processing output deltas (including Steel), accepted installed
+Ore policies, a first observed blockage and blocked work returning to running work through the existing
 work summary. The journal never reserves stock or changes world orders.
 
 Each copied event carries session, player, monotonic event identity, completed
@@ -25,8 +27,13 @@ same source/truck/visit; two separate visits cannot be combined. Propulsion
 refueling is not depot cargo loading. Field supply evidence requires an actual
 mobile Supply Truck transfer to an owned recipient.
 
+Research records the owned facility and technology only after paid research actually
+completes. Starting stock, a request or consumed materials alone are not completion.
+
 Retention is bounded: at most 16 player ledgers, 64 distinct kind/resource/
-definition observations per player and 64 partial loading visits. Completed
+definition observations per player and 64 partial loading visits. Each player also
+retains at most 64 first observations under the same keys for timing. This first
+ledger is independent of later publication reads and latest-event replacement. Completed
 observations are condensed independently of presentation reads. Current owned
 production/policy bookkeeping is cleaned up when entities disappear. Repeated
 snapshot consumption does not increment achievements. Immutable retained copies
@@ -36,7 +43,8 @@ entity's current stock. Session replacement rejects old event identities.
 
 ## Save/load boundary
 
-Save schema 4 and authoritative replay schema 3 are unchanged. The existing
+Envelope 1, payload schema 6 and authoritative schema 7 are unchanged at this
+source. The observational additions require no authoritative compatibility change. The existing
 transactional recovery reconstructs the runtime from its complete supported
 command/tick history. Real extraction/transfer/production observations are
 rebuilt by those same operations and rebound to the new session. Stock snapshots
@@ -76,7 +84,8 @@ DPI and UI-scale combinations, active rebindings and new sessions.
 
 `--onboarding-lessons-capture <empty-output> <runtime-root>` uses the production
 HUD and font metrics to capture every page of SUPPLY YOUR SMELTER, UNDERSTAND YOUR
-TWO TRUCK ROLES and LOAD AND DELIVER FIELD SUPPLY at 1080p and compact 720p with
+TWO TRUCK ROLES, LOAD AND DELIVER FIELD SUPPLY, CONNECT BASE PRODUCTION and
+CHOOSE A PAID RESEARCH INVESTMENT at 1080p and compact 720p with
 DPI 192/UI scale 2. Each page has two exact native readbacks, source identity,
 full body text, font size, geometry, glyph/skin diagnostics and image hashes.
 `--onboarding-capture` retains the production interaction sequence at

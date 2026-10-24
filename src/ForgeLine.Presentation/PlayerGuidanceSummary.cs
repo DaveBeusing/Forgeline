@@ -20,7 +20,7 @@ public enum PlayerGuidanceMilestone : uint
     OpponentContact = 128,
     Smelter = 256, OrePolicy = 512, OreDelivered = 1024, FactoryInputs = 2048,
     SupplyDepot = 4096, DepotFuelDelivered = 8192, DepotAmmunitionDelivered = 16384,
-    SupplyTruckProduced = 32768, SupplyTruckLoaded = 65536, FieldSupplied = 131072, DisruptionResolved = 262144
+    SupplyTruckProduced = 32768, SupplyTruckLoaded = 65536, FieldSupplied = 131072, DisruptionResolved = 262144, ConveyorDelivery = 524288, ProductionOutput = 1048576, ResearchCompleted = 2097152
 }
 
 public readonly record struct PlayerGuidanceSummary(
@@ -81,6 +81,11 @@ internal static class PlayerGuidanceSummaryFactory
             if (item.Player != extraction.Player || item.Tick.Value > context.Tick.Value || item.Quantity <= 0) continue;
             observed |= item.Kind switch
             {
+                GameplayProgressKind.ConveyorDelivered => PlayerGuidanceMilestone.ConveyorDelivery |
+                    (item.DefinitionId == BuildingIds.Smelter.Value && item.Resource == ResourceIds.FerrousOre ? PlayerGuidanceMilestone.OreDelivered : 0) |
+                    (item.DefinitionId == BuildingIds.SupplyDepot.Value && item.Resource == ResourceIds.Ammunition ? PlayerGuidanceMilestone.DepotAmmunitionDelivered : 0),
+                GameplayProgressKind.ProductionCompleted => PlayerGuidanceMilestone.ProductionOutput,
+                GameplayProgressKind.ResearchCompleted => PlayerGuidanceMilestone.ResearchCompleted,
                 GameplayProgressKind.Extraction when item.Resource == ResourceIds.FerrousOre => PlayerGuidanceMilestone.FerrousExtraction,
                 GameplayProgressKind.SteelCompleted => PlayerGuidanceMilestone.SteelProcessing,
                 GameplayProgressKind.ScoutProduced => PlayerGuidanceMilestone.Scout | PlayerGuidanceMilestone.FactoryInputs,
