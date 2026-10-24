@@ -143,7 +143,8 @@ internal sealed class ClientApplication
                     RuntimeAssetCatalog assets = _startup.Measure(StartupPhase.RuntimeAssets,
                         () => LoadRuntimeAssets(token));
                     token.ThrowIfCancellationRequested();
-                    _startup.Mark(StartupPhase.RuntimeAssetsReady);
+                    _startup.Mark(StartupPhase.RuntimeAssetsReady, detail:
+                        $"Root={assets.RuntimeRoot}; Assets={assets.AssetIds.Count}; Signature={assets.Manifest.ContentSignature}");
                     return assets;
                 },
                 token => _startup.Measure(StartupPhase.SaveCatalog,
@@ -2999,6 +3000,7 @@ internal sealed class ClientApplication
 
     private static void ValidateGameplayAssets(RuntimeAssetCatalog catalog, CancellationToken cancellationToken)
     {
+        GameplayVisualAssetContract.Validate(catalog, cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         ValidateProductionRuntimeAsset(
             catalog,

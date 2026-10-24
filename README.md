@@ -76,11 +76,10 @@ dotnet build ForgeLine.sln --configuration Release --no-restore
 ### Build runtime assets and launch
 
 ```powershell
-pwsh ./build/Build-RuntimeAssets.ps1 -Mode development -NoBuild
-dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build
+pwsh ./build/Start-DevelopmentClient.ps1
 ```
 
-Build authoring assets explicitly before launching a source checkout. The helper invokes the asset compiler, checks its result, and records qualification and progress under `artifacts/`. Development mode supports incremental rebuilds; build mode prepares a complete runtime cache, and validate mode checks an existing cache without rebuilding. See [asset build modes and deployment integrity](docs/AssetPipeline.md#build-modes-and-deployment-integrity).
+The development launcher builds the client, then compiles and qualifies runtime assets before starting it. Compilation failure prevents launch. Qualification and progress are recorded under `artifacts/`. See [runtime visual compatibility and recovery](docs/RuntimeVisualAssetCompatibility.md). Development mode supports incremental rebuilds; build mode prepares a complete runtime cache, and validate mode checks an existing cache without rebuilding. See [asset build modes and deployment integrity](docs/AssetPipeline.md#build-modes-and-deployment-integrity).
 
 The client opens the Central Divide / Directorate skirmish flow and consumes compiled runtime assets; it never starts the compiler. Packaged builds consume adjacent runtime assets and require neither authoring sources nor the compiler. `FORGELINE_RUNTIME_ASSETS` selects an authoritative asset root; an invalid override is reported rather than silently replaced.
 
