@@ -93,10 +93,18 @@ public sealed partial class PlayerConstructionProductionFlowTests
         scenario.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
         Assert.Contains(scenario.Progress.Capture(player, scenario.Simulation.CurrentTick), x => x.Kind == GameplayProgressKind.SupplyLoadCompleted);
 
+        // Scout a public authored start through ordinary movement; current faction contact is the success condition.
+        Vector3 approach = scenario.Battlefield.Starts[1].Position + new Vector3(-240, 0, 0);
+        Assert.True(gateway.SubmitMovement(player, [scout, truck], approach, scenario.Simulation.CurrentTick, FormationTemplate.Compact).Accepted);
+        scenario.Simulation.AdvanceOneTick(); while (gateway.Results.TryRead(out _)) { }
+        RunUntil(scenario, () => scenario.Intelligence.HasCurrentContact(new FactionId(1)), 8_000);
+
         string? measurementPath = Environment.GetEnvironmentVariable("FORGELINE_GAMEPLAY_JOURNEY_REPORT");
         if (!string.IsNullOrWhiteSpace(measurementPath))
             File.WriteAllText(measurementPath, System.Text.Json.JsonSerializer.Serialize(new
             {
+                SourceIdentity = typeof(PlayerConstructionProductionFlowTests).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                    .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion,
                 Profile = "Gameplay", Seed = 4133, Participants = "player:1 human / player:2 human",
                 Scenario = scenario.Battlefield.Metadata.Key, Tick = scenario.Simulation.CurrentTick.Value,
                 AuthoritativeHash = MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256(),
