@@ -288,6 +288,18 @@ public sealed class MatchPersistenceTests
     }
 
     [Fact]
+    public void PreRaidCheckpointsAreRejectedBeforeReconstruction()
+    {
+        using var runtime = CentralDivideScenario.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, 17), cancellationToken: TestContext.Current.CancellationToken);
+        var save = MatchPersistenceService.CaptureSave(runtime);
+        var state = save.State with { SchemaVersion = 6 };
+        var oldSave = save with { State = state, StateSha256 = state.ComputeSha256() };
+        Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(oldSave));
+        var replay = MatchPersistenceService.CaptureReplay(runtime) with { AuthoritativeSchemaVersion = 6 };
+        Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.PlayReplay(replay));
+    }
+
+    [Fact]
     public void PreIndustrialCombatCheckpointsAreRejectedBeforeReconstruction()
     {
         using MatchRuntime runtime = CreateScenario(seed: 831);

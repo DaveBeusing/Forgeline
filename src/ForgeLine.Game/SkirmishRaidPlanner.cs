@@ -99,7 +99,8 @@ public sealed class SkirmishRaidPlanner
 
             var selected = new List<EntityId>(3);
             int home = owned.Count(e => IsReady(context.Entities, e, controller.Player, policy) &&
-                IsIdle(context.Entities, e) && Distance(Position(context.Entities, e), controller.HomePosition) <= 120);
+                IsIdle(context.Entities, e) && Distance(Position(context.Entities, e), controller.HomePosition) <= policy.HomeRadiusMeters);
+            if (home < policy.HomeDefenders) { reason = SkirmishRaidReason.NoEligibleForce; continue; }
             int idleReady = owned.Count(e => IsReady(context.Entities, e, controller.Player, policy) && IsIdle(context.Entities, e));
             int pressure = owned.Count(e => context.Entities.TryGetComponent(e, out UnitIdentity identity) &&
                 identity.UnitId == UnitIds.MainBattleTank);
@@ -285,7 +286,8 @@ public sealed class SkirmishRaidPlanner
     private static bool IsIdle(EntityRegistry entities, EntityId unit) =>
         !entities.HasComponent<MovementOrder>(unit) && !entities.HasComponent<NavigationPendingPath>(unit) &&
         !entities.HasComponent<NavigationRouteState>(unit) &&
-        (!entities.TryGetComponent(unit, out CombatOrderState order) || order.Kind == CombatOrderKind.Stop ||
+        (!entities.TryGetComponent(unit, out CombatOrderState order) || (order.Kind == CombatOrderKind.Stop || order.Kind == CombatOrderKind.HoldPosition &&
+          entities.HasComponent<TacticalTestOpponent>(unit)) ||
          entities.TryGetComponent(unit, out TacticalCombatState tactical) &&
          tactical.Status is CombatOrderStatus.Complete or CombatOrderStatus.Cancelled);
 
@@ -300,6 +302,8 @@ public sealed class SkirmishRaidPlanner
     private bool HasAmmunition(EntityRegistry entities, EntityId unit, double quantity) =>
         entities.TryGetComponent(unit, out AmmunitionState ammunition) && _inventories.Contains(ammunition.InventoryId) &&
         _inventories.GetAvailableQuantity(ammunition.InventoryId, ResourceIds.Ammunition) >= quantity;
+
+    internal static bool IsLogisticsTarget(EntityRegistry entities, EntityId target) => TargetRank(entities, target) > 0;
 
     private static int TargetRank(EntityRegistry entities, EntityId target)
     {

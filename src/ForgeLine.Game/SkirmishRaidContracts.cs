@@ -11,6 +11,7 @@ public sealed record SkirmishRaidConfiguration
     public int MinimumUnits { get; init; } = 2;
     public int MaximumUnits { get; init; } = 3;
     public int HomeDefenders { get; init; } = 2;
+    public float HomeRadiusMeters { get; init; } = 260;
     public int MaximumContacts { get; init; } = 32;
     public uint ActiveTicks { get; init; } = 1_200;
     public uint CooldownTicks { get; init; } = 600;
@@ -38,7 +39,8 @@ public sealed record SkirmishRaidConfiguration
         ArgumentOutOfRangeException.ThrowIfZero(SearchTicks);
         ArgumentOutOfRangeException.ThrowIfNegative(MaximumKnownThreat);
         ArgumentOutOfRangeException.ThrowIfLessThan(MinimumShots, 3);
-        if (!float.IsFinite(MaximumDistanceMeters) || MaximumDistanceMeters <= 0 ||
+        if (!float.IsFinite(HomeRadiusMeters) || HomeRadiusMeters <= 0 ||
+            !float.IsFinite(MaximumDistanceMeters) || MaximumDistanceMeters <= 0 ||
             !float.IsFinite(PursuitLeashMeters) || PursuitLeashMeters <= 0 ||
             !float.IsFinite(ThreatRadiusMeters) || ThreatRadiusMeters <= 0 ||
             !double.IsFinite(ReadinessThreshold) || ReadinessThreshold is < 0 or > 1 ||
