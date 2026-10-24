@@ -12,6 +12,55 @@ public sealed class CargoAutonomousFuelServiceTests
     private static readonly PlayerId Owner = new(1);
 
     [Fact]
+    public void ADeferredFinalApproachClearsItsOccupiedBayBeforeWaitingForFuel()
+    {
+        var f = new Fixture(providerFuel: 0, initialFuel: 24.05);
+        var entities = f.Simulation.Entities;
+        entities.SetComponent(f.Truck, new UnitFuelState(f.DriveInventory, 120, 0.12));
+        EntityId destination = entities.CreateEntity();
+        entities.AddComponent(destination, new InventoryStorage(f.Inventories.CreateInventory(new InventorySpecification(500))));
+        entities.AddComponent(destination, new WorldTransform(new(120, 0, 0), Quaternion.Identity, Vector3.One));
+        var origin = f.Network.AddNode(f.Provider, Vector3.Zero, LogisticsNodeKind.StorageDepot,
+            LogisticsNodeCapabilities.CargoSource | LogisticsNodeCapabilities.CargoDestination);
+        var target = f.Network.AddNode(destination, new(120, 0, 0), LogisticsNodeKind.StorageDepot,
+            LogisticsNodeCapabilities.CargoDestination);
+        f.Network.AddEdge(origin, target, LogisticsTransportMode.GroundRoad, 120, 120, 100);
+        f.Inventories.Add(f.ProviderInventory, ResourceIds.Steel, 40);
+        f.Inventories.Reserve(f.ProviderInventory, ResourceIds.Steel, 40);
+        var order = new CargoTransportOrder(origin, target, ResourceIds.Steel, 40, SimulationTick.Zero);
+        Assert.True(f.Cargo.TryAssignOrder(entities, f.Truck, order, SimulationTick.Zero));
+        var reservation = new CargoTransportReservation(new LogisticsTransportRequestId(77), f.ProviderInventory, ResourceIds.Steel, 40);
+        entities.AddComponent(f.Truck, reservation);
+        bool initialized = false;
+        f.Simulation.RegisterSystem(new Callback(context =>
+        {
+            if (initialized) return;
+            initialized = true;
+            Assert.True(new VehicleDockingService().TryReserve(context, f.Truck, f.Provider, Owner, out var visit));
+            entities.SetComponent(f.Truck, entities.GetComponent<WorldTransform>(f.Truck) with
+            { Position = visit.Pose.Entry, Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, visit.Pose.Heading) });
+            entities.SetComponent(f.Truck, GroundMovementState.Stationary(visit.Pose.Heading));
+            entities.SetComponent(f.Truck, visit with { Status = VehicleDockStatus.Approaching, LaneEntered = true });
+            var movement = new MovementOrder(Owner, visit.Pose.Service, context.Tick, context.Tick,
+                MovementOrderKind.LocalApproach, visit.Pose.Heading);
+            entities.AddComponent(f.Truck, new CargoDeliveryFuelDeferral(movement, 26, 24.05, default, context.Tick));
+        }));
+        f.Simulation.RunTicks(1500, TestContext.Current.CancellationToken);
+        Assert.False(entities.HasComponent<VehicleDockSlot>(f.Provider));
+        Assert.Equal(order, entities.GetComponent<CargoTransportOrder>(f.Truck));
+        Assert.Equal(reservation, entities.GetComponent<CargoTransportReservation>(f.Truck));
+        Assert.Equal(40, f.Inventories.GetReservedQuantity(f.ProviderInventory, ResourceIds.Steel));
+        Assert.Equal(0, f.Inventories.GetQuantity(f.ProviderInventory, ResourceIds.Fuel));
+        Assert.InRange(f.Inventories.GetQuantity(f.DriveInventory, ResourceIds.Fuel), 0.01, 24.049);
+    }
+
+    private sealed class Callback(Action<SimulationContext> action) : ISimulationSystem
+    {
+        public SimulationPhase Phase => SimulationPhase.AiDecisions;
+        public void Execute(SimulationContext context) => action(context);
+    }
+
+    [Fact]
     public void EmptyTruckAtOwnedDepotPhysicallyRefuelsWithoutCreatingFuel()
     {
         var f = new Fixture(providerFuel: 300, initialFuel: 0);
