@@ -54,6 +54,39 @@ The actual CLI validates both scenarios through new/save/load/replay and indepen
 
 The refined map finishes the unchanged 80,000-tick/seed-2026 validation command naturally at tick **34,281**, player 2 Victory / CommandCoreDestroyed. It records 50 completed and two failed Cargo orders, zero route failures, 5,832 delivered cargo, 1,017.5014 transferred Fuel and 647 Ammunition. No artillery shot occurs in this outcome. Its terminal save pins the registered map above and authoritative state `31CF750FD8141DFDECD23D8D725EF0A4B8C53E0D3C7A56FF095281030859F09E`. The earlier layout's outcome is superseded. Validation retains the existing accelerated stock and asymmetric opponent configurations; one outcome is not normal-stock balance or win-rate evidence. The paid openings separately use Gameplay/Standard stock.
 
-The unchanged Central Divide control finishes naturally at tick 50,862, player 1 Victory / CommandCoreDestroyed. The 1,000/10,000-entity lightweight smokes and 44-project architecture check pass. Fresh forced asset compilation/qualification succeeds with 2,049 assets, 118,619,195 runtime bytes and no issues. Complete solution, native/WARP, reproducible package, installed validation and actual-head CI remain pending at this checkpoint. The branch integrates the runtime-binding fix from master 3c261dca. Master still carries 0.1.469-dev and this PR prepares 0.1.470-dev.
+The unchanged Central Divide control finishes naturally at tick 50,862, player 1 Victory / CommandCoreDestroyed. The 1,000/10,000-entity lightweight smokes and 44-project architecture check pass. Fresh forced asset compilation/qualification succeeds with 2,049 assets, 118,619,195 runtime bytes and no issues. The synchronized full Release build has zero warnings/errors. Master remains 3c261dca / 0.1.469-dev; this PR prepares 0.1.470-dev with one patch increment.
+
+The synchronized build, package, native/WARP, complete solution and benchmark runs use clean runtime source 9c170bd85935539cef65ced456a800f3435c4f46. Earlier focused and terminal evidence uses the same final Game/map sources; the intervening master merge changes runtime rendering, not the Game/Headless/map layer. The final evidence-only documentation commit changes no runtime or map source. Master recheck retains 3c261dca3182d9973cce07ea64f2b7826c11f6c4 / 0.1.469-dev.
+
+The canonical publisher's two complete SHA-256 manifests match. The 65,295,335-byte ZIP has SHA-256 99137072c7aed440c9712c11bfa1d1f420b3a8ee9312fa046cd82c4fb93daf28. Provenance records sourceTreeClean=true, the source commit and both map digests. A separate installation outside the checkout contains exactly four map/sidecar files and passes construction, save reconstruction and replay reconstruction for both descriptors.
+
+That installed client runs the actual Split Basin descriptor and confirms its final map hash, with 1,000 stress instances. D3D12 reports zero texture/material binding failures, 112 presented frames and SessionReady/ApplicationReady. The short 1600×900 Medium/CloseTactical sample on NVIDIA RTX PRO 5000 reports 35.775 fps, 27.952 ms/frame, CPU render 20.353 ms and GPU 4.066 ms; the sampled view has 20/1,279 visible/total instances. The report also records 25 textured runtime-mesh instances and 12 fallback-mesh instances; the zero binding-error counts are not a claim of zero fallback geometry. This functional smoke is not sustained reference-performance acceptance. Two measured menu/icon starts pass after one excluded warmup.
+
+WARP produces two 1280×720 UI captures and one 640×360 existing BattlefieldCombat reference capture, all structural-pass with no image failures. These existing fixture scenes are not Split Basin captures. No matched accepted pixel baseline is supplied; image/visual acceptance remains pending.
+
+The required window-mode guard fails before launch at 68,761,923 gameplay texture bytes against the unchanged 58,720,256-byte budget (#344). The complete solution's resource-field fixture fails at ResourceDepositFieldRenderingTests.cs:42 -> SimpleInstanceRenderer.cs:925 -> IGraphicsCommandContext.cs:43 with the same unsupported texture-binding default documented in #345. Both underlying test/renderer files are unchanged by this feature. The previously reported golden-state failure is not reproduced in the current Presentation module.
+
+The complete canonical Release solution run reports **3,883 total / 3,810 passed / 1 failed / 72 skipped**, 31m04.639s, exit 2. All Game and Client cases pass. The one failure is the resource-field fixture described above; the fixture, shared fake context, renderer and graphics interface are unchanged from current master. Skips include opt-in native lifetime, Blender round-trip and isolated hardware qualification cases. They are not passes.
+
+The initial canonical twelve-case Short benchmark command times out restoring the generated project at its fixed 120-second build limit and produces **zero measured cases**, despite host exit 0. Retrying the same twelve cases with the installed CLI option `--buildTimeout 600` succeeds: twelve measured cases, N=3 each, exit 0, 4m47s total. No measurement iteration setting, benchmark or performance threshold is changed. Mean CPU times below come from the BriefJSON reports; Short-run variability and the absence of an accepted comparison baseline preclude a performance-regression or sustained-FPS acceptance claim.
+
+| Benchmark | Mean (µs) |
+| --- | ---: |
+| Submit1000NearFieldInstances | 720.475 |
+| Submit5000InstancesWithCulling | 4.651 |
+| SubmitRepresentativeVerticalSliceTacticalView | 654.726 |
+| SubmitRepresentativeVerticalSliceNormalRtsView | 701.570 |
+| SubmitRepresentativeVerticalSliceStrategicView | 545.789 |
+| SubmitRoadReadabilityTacticalView | 148.991 |
+| SubmitRoadReadabilityNormalRtsView | 290.533 |
+| SubmitRoadReadabilityStrategicView | 259.797 |
+| GenerateTerrainChunkMesh | 85.926 |
+| SubmitCloseTacticalTerrain | 2.028 |
+| SubmitVisibleTerrainChunks | 3.571 |
+| SubmitStrategicHighCoverageTerrain | 14.874 |
+
+Local evidence is under `artifacts/`: `split-basin-final-build.log`, `split-basin-full-tests.log`, `split-basin-revised-checks.log`, `split-basin-package-native.log`, `split-basin-installed-visual.json`, `split-basin-startup/summary.json`, both `split-basin-*-regression-warp` folders and `split-basin-rendering-benchmarks-retry/results/*-brief.json`. The original failed benchmark attempt and window-budget log are retained. Actual final-PR-head CI links/status belong in the PR description; local evidence alone does not establish remote CI success.
+
+The change remains a draft candidate with existing [texture-budget #344](https://github.com/DaveBeusing/Forgeline/issues/344) and [resource-field fixture #345](https://github.com/DaveBeusing/Forgeline/issues/345) blockers. Required gates, assertions and budgets are retained. No merge, release or tag is part of this task.
 
 Current terrain/vegetation sensing has no occlusion or elevation sight bonus. Host-only crossing disruption/restoration and its unrecorded-history rejection remain the separate infrastructure limits described above. Automated native/WARP execution, sustained reference-performance qualification and human visual/gameplay acceptance are separate evidence classes. Existing required gates remain unchanged.
