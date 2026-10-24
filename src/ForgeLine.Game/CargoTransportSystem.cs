@@ -1852,6 +1852,17 @@ public sealed class CargoTransportSystem : ISimulationSystem
             LogicalTransitNodeApproachRadiusMeters;
     }
 
+    /// <summary>Read-only endpoint inventory observation; callers enforce player authorization.</summary>
+    public bool TryObserveInventory(EntityRegistry entities, EntityId endpoint, bool input, out InventoryId inventory)
+    {
+        ArgumentNullException.ThrowIfNull(entities);
+        inventory = InventoryId.None;
+        if (!_network.TryGetNodeForEntity(endpoint, out var id) || !_network.TryGetNode(id, out var node) || node.Entity != endpoint)
+            return false;
+        return input ? TryResolveDestinationInventory(entities, node, out inventory) :
+            TryResolveSourceInventory(entities, node, out inventory);
+    }
+
     private bool TryResolveSourceInventory(
         EntityRegistry entities,
         in LogisticsNode node,

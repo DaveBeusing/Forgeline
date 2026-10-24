@@ -13,6 +13,21 @@ public sealed class OperationsDiagnosisTests
     private static readonly EntityId Truck = new(18, 7);
 
     [Fact]
+    public void TypedConveyorBranchesDoNotNeedTruckRequestsAndTraceIsBounded()
+    {
+        var links = Enumerable.Range(1, 12).Select(i => new OperationsDiagnosisLink(default,
+            new((uint)i + 1, 4), new((uint)i, 4), ResourceIds.Electronics,
+            OperationsDiagnosisLinkKind.ConveyorConnection)).ToList();
+        links.Add(new(default, new(30, 7), new(1, 4), ResourceIds.Electronics,
+            OperationsDiagnosisLinkKind.ConveyorConnection));
+        var snapshot = new OperationsDiagnosisSnapshot(new(1), new(1), new(1), [], links);
+        var trace = snapshot.TraceUpstream(new(1, 4));
+        Assert.Equal(8, trace.Count);
+        Assert.Contains(trace, link => link.Source == new EntityId(30, 7));
+        Assert.All(trace, link => Assert.False(link.RequestId.IsSpecified));
+    }
+
+    [Fact]
     public void CopiesSelectedPolicyDemandWithoutCountingIncomingTwice()
     {
         var policy = new PlayerStockPolicyActionReadModel(
