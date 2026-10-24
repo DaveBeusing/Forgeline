@@ -43,8 +43,6 @@ internal static class LocalPathSearch
             return true;
         }
 
-        HashSet<NavigationSectorCoordinate>? corridor = restrictToCorridor
-            ? BuildCorridor(graph, highLevelRoute, corridorExpansion) : null;
         int startIndex = grid.GetIndex(start);
         int destinationIndex = grid.GetIndex(destination);
 
@@ -53,8 +51,15 @@ internal static class LocalPathSearch
         LocalPathFrontier frontier = LocalPathFrontier.Rent();
         try
         {
-            var bestCost = new Dictionary<int, float> { [startIndex] = 0.0f };
-            var previous = new Dictionary<int, int>();
+            HashSet<NavigationSectorCoordinate>? corridor = null;
+            if (restrictToCorridor)
+            {
+                corridor = frontier.Corridor;
+                BuildCorridor(graph, highLevelRoute, corridorExpansion, corridor);
+            }
+            Dictionary<int, float> bestCost = frontier.BestCost;
+            Dictionary<int, int> previous = frontier.Previous;
+            bestCost.Add(startIndex, 0.0f);
             frontier.Enqueue(startIndex, 0.0f, Heuristic(start, destination));
             int expanded = 0;
 
@@ -121,12 +126,12 @@ internal static class LocalPathSearch
         }
     }
 
-    private static HashSet<NavigationSectorCoordinate> BuildCorridor(
+    private static void BuildCorridor(
         NavigationSectorGraph graph,
         HighLevelRoute route,
-        int expansion)
+        int expansion,
+        HashSet<NavigationSectorCoordinate> corridor)
     {
-        var corridor = new HashSet<NavigationSectorCoordinate>();
         foreach (NavigationSectorCoordinate sector in route.Sectors)
         {
             corridor.Add(sector);
@@ -139,7 +144,6 @@ internal static class LocalPathSearch
                 }
             }
         }
-        return corridor;
     }
 
     private static bool CanTraverseDiagonal(

@@ -134,7 +134,9 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 out NavigationRouteState route);
 
         if (hasRoute &&
-            route.Path.Version != World.Version)
+            route.Path.Version != World.Version &&
+            (!context.Entities.TryGetComponent(entity, out MovementOrder currentOrder) ||
+             IsManagedWaypoint(currentOrder, route)))
         {
             CancelPending(context, entity);
             RemoveRoute(context, entity, removeManagedOrder: true);
@@ -199,6 +201,8 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                     var recoveryOrder = new MovementOrder(
                         route.OriginalOrder.Issuer, route.OriginalOrder.WorldTarget,
                         route.OriginalOrder.SubmittedAtTick, context.Tick);
+                    SupplyRescueTravel.RedirectOwnedOrder(
+                        context, entity, route.OriginalOrder, recoveryOrder);
                     ScheduleRequest(context, entity, transform, agent, recoveryOrder);
                 }
 
@@ -353,11 +357,9 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 continue;
             }
 
-            if (context.Entities.TryGetComponent(
-                    entity,
-                    out MovementOrder newerOrder) &&
-                newerOrder.AcceptedAtTick >
-                pending.OriginalOrder.AcceptedAtTick)
+            // Scheduling removes the previous MovementOrder. Any order now
+            // present supersedes it, including another command in the same tick.
+            if (context.Entities.HasComponent<MovementOrder>(entity))
             {
                 context.Entities.RemoveComponent<
                     NavigationPendingPath>(entity);
@@ -372,6 +374,13 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 result.Search.Version != World.Version)
             {
                 _staleResultCount++;
+                // The request was validly owned, but its immutable world expired.
+                // Restore intent for ProcessAgent below instead of orphaning the
+                // truck or recursively draining newly scheduled results here.
+                var replacement = pending.OriginalOrder with { AcceptedAtTick = context.Tick };
+                context.Entities.AddComponent(entity, replacement);
+                SupplyRescueTravel.RedirectOwnedOrder(
+                    context, entity, pending.OriginalOrder, replacement);
                 continue;
             }
 
@@ -545,7 +554,10 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
         in MovementOrder movementOrder,
         in NavigationRouteState route)
     {
-        if (!context.Entities.TryGetComponent(
+        // Skipping a nearby intermediate corner is recovery, not arrival.
+        // The requested final destination must still satisfy normal stop tolerance.
+        if (route.NextWaypointIndex >= route.Path.Waypoints.Count ||
+            !context.Entities.TryGetComponent(
                 entity,
                 out GroundMovementState movementState) ||
             movementState.Status != GroundMovementStatus.Stuck ||
@@ -587,6 +599,10 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
         in NavigationRouteState route)
     {
         if (!route.HasActiveWaypoint ||
+            movementOrder.Kind != MovementOrderKind.Strategic ||
+            movementOrder.TargetHeadingRadians.HasValue ||
+            movementOrder.Issuer != route.OriginalOrder.Issuer ||
+            movementOrder.SubmittedAtTick != route.OriginalOrder.SubmittedAtTick ||
             movementOrder.AcceptedAtTick != route.ActiveWaypointTick)
         {
             return false;
