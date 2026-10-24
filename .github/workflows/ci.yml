@@ -124,6 +124,14 @@ jobs:
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSaveCatalogReliabilityTests ForgeLine.Client.Tests.ClientSimulationHostTests ForgeLine.Client.Tests.ClientSessionLoadingRecoveryTests ForgeLine.Client.Tests.ClientSessionLoadingCoordinatorTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Operations chain diagnosis and safe focus contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.ConveyorDiagnosisTests ForgeLine.Game.Tests.ConveyorProductionChainTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.OperationsDiagnosisTests ForgeLine.Presentation.Tests.OperationsChainDiagnosisTests ForgeLine.Presentation.Tests.OperationsChainMeasurementTests ForgeLine.Presentation.Tests.OperationsActionGuidanceTests ForgeLine.Presentation.Tests.OperationsTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Logistics raid intent and active recovery
         shell: pwsh
         run: |

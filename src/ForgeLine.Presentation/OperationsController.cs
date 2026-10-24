@@ -106,6 +106,7 @@ public sealed class OperationsController
     private OperationsView _armedView;
     private int _armedRowIndex = -1;
     private EntityId _armedRowEntity;
+    private EntityId _armedNavigationTarget;
     private SimulationSessionId _session;
     private GameplayHudLayout _layout;
     private bool _initialized;
@@ -201,6 +202,7 @@ public sealed class OperationsController
             _armedView = View;
             _armedRowIndex = -1;
             _armedRowEntity = default;
+            _armedNavigationTarget = default;
             if (_armed && View.Open && !View.Notifications &&
                 OperationsSnapshot.Resolve(snapshot) is { } pressedData)
                 for (int index = 3; index <= 8; index++)
@@ -211,6 +213,10 @@ public sealed class OperationsController
                         break;
                     }
         }
+        if (fresh && _armed && View.Open && !View.Notifications && OperationsSnapshot.Resolve(snapshot) is { } navigationData)
+            for (int index = 9; index <= 11; index++)
+                if (OperationsLayout.Control(layout, index).Contains(_armedOrigin))
+                    _armedNavigationTarget = NavigationTarget(snapshot, navigationData, index);
         captured |= _armed && View.Open && panel.Contains(_armedOrigin);
         if (!input.WasMouseButtonReleased(PlatformMouseButton.Left)) return new(captured);
 
@@ -264,17 +270,12 @@ public sealed class OperationsController
                 View = View with { Selected = row.Entity };
             else if (index == 11)
             {
-                if (!OperationsWorldOverlay.CanFocus(snapshot, View.Selected)) return new(true);
-                EntityId first = default, next = default;
-                foreach (var route in data.Routes)
-                {
-                    EntityId target = route.Source == View.Selected ? route.Destination : route.Destination == View.Selected ? route.Source : default;
-                    if (!OperationsWorldOverlay.CanFocus(snapshot, target)) continue;
-                    if (!first.IsValid || target.CompareTo(first) < 0) first = target;
-                    if (target.CompareTo(_lastRouteFocus) > 0 && (!next.IsValid || target.CompareTo(next) < 0)) next = target;
-                }
-                _lastRouteFocus = next.IsValid ? next : first;
-                return new(true, _lastRouteFocus);
+                EntityId target = NavigationTarget(snapshot, data, index);
+                if (target != _armedNavigationTarget || !OperationsWorldOverlay.CanFocus(snapshot, target)) return new(true);
+                _lastRouteFocus = target;
+                if (OperationsDiagnosisSnapshot.Resolve(snapshot) is { Root.IsValid: true })
+                    View = View with { Selected = target };
+                return new(true, target);
             }
             else if (index is 9 or 10)
             {
@@ -285,13 +286,39 @@ public sealed class OperationsController
                         EntityId target = LogisticsStatusCatalog.IsBlocked(facility.Service) &&
                             facility.Service.VehicleQueue is { WaitReason: not VehicleQueueWaitReason.Unavailable } queue
                             ? queue.Building : facility.Entity;
-                        if (!OperationsWorldOverlay.CanFocus(snapshot, target)) return new(true);
+                        if (target != _armedNavigationTarget || !OperationsWorldOverlay.CanFocus(snapshot, target)) return new(true);
                         return new(true, target, index == 10 ? facility.Controls : PlayerActionPanelMode.Closed);
                     }
             }
             break;
         }
         return new(true);
+    }
+
+    private EntityId NavigationTarget(PresentationSnapshot? snapshot, OperationsSnapshot data, int index)
+    {
+        if (!OperationsWorldOverlay.CanFocus(snapshot, View.Selected)) return default;
+        if (index == 11)
+        {
+            EntityId chain = OperationsActionGuidance.NextChainEntity(OperationsDiagnosisSnapshot.Resolve(snapshot), View.Selected);
+            if (chain.IsValid) return OperationsWorldOverlay.CanFocus(snapshot, chain) ? chain : default;
+            EntityId first = default, next = default;
+            foreach (var route in data.Routes)
+            {
+                EntityId target = route.Source == View.Selected ? route.Destination :
+                    route.Destination == View.Selected ? route.Source : default;
+                if (!OperationsWorldOverlay.CanFocus(snapshot, target)) continue;
+                if (!first.IsValid || target.CompareTo(first) < 0) first = target;
+                if (target.CompareTo(_lastRouteFocus) > 0 && (!next.IsValid || target.CompareTo(next) < 0)) next = target;
+            }
+            return next.IsValid ? next : first;
+        }
+        foreach (var facility in data.Facilities)
+            if (facility.Entity == View.Selected)
+                return LogisticsStatusCatalog.IsBlocked(facility.Service) &&
+                    facility.Service.VehicleQueue is { WaitReason: not VehicleQueueWaitReason.Unavailable } queue
+                    ? queue.Building : facility.Entity;
+        return default;
     }
     private void OpenRules(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, SelectionSet? selection)
     {

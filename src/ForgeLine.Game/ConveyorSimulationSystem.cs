@@ -21,6 +21,11 @@ public readonly record struct ConveyorPortArbitration(int ResourceCursor);
 /// <summary>Only explicit, directed, height-compatible sockets participate. No road edges or vehicle entities.</summary>
 public sealed class ConveyorSimulationSystem : ISimulationSystem
 {
+    private readonly Dictionary<EntityId, ConveyorFlowObservation> _observations = [];
+    public SimulationTick ObservationTick { get; private set; }
+    public bool TryGetObservation(EntityId entity, out ConveyorFlowObservation observation) =>
+        _observations.TryGetValue(entity, out observation);
+
     public const double NominalThroughput = 100;
     // Transfer every positive remainder; never discard fractional cargo to an epsilon.
     private const double Epsilon = 0;
@@ -40,17 +45,19 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
 
     public void Execute(SimulationContext context)
     {
+        _observations.Clear();
+        ObservationTick = context.Tick;
         var entities = context.Entities;
         double seconds = context.TickDuration.TotalSeconds;
         if (seconds <= 0 || !double.IsFinite(seconds)) return;
         var nodes = new List<Node>();
         var owners = new HashSet<PlayerId>();
-        var brokenFeet = new HashSet<(PlayerId, int, int)>();
-        foreach (EntityId foot in entities.Query<ConveyorPiece, HealthState>())
+        var brokenFeet = new Dictionary<(PlayerId, int, int), EntityId>();
+        foreach (EntityId foot in entities.Query<ConveyorPiece, HealthState>(QueryIterationOrder.StableByEntityIndex))
         {
             var support = entities.GetComponent<ConveyorPiece>(foot);
             if (support.Placement.IsSupport && entities.GetComponent<HealthState>(foot).IsDepleted)
-                brokenFeet.Add((support.Owner, (int)MathF.Round(support.Placement.Pivot.X*10), (int)MathF.Round(support.Placement.Pivot.Z*10)));
+                brokenFeet.TryAdd((support.Owner, (int)MathF.Round(support.Placement.Pivot.X*10), (int)MathF.Round(support.Placement.Pivot.Z*10)), foot);
         }
         foreach (EntityId e in entities.Query<ConveyorPiece>(QueryIterationOrder.StableByEntityIndex))
         {
@@ -61,12 +68,13 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             double scale = OperationalScale(entities, e);
             ConveyorSocket[] sockets = piece.Placement.Sockets;
             // A broken supporting foot stops its attached spans, without projecting the span onto the road.
+            EntityId brokenSupport = default;
             if (brokenFeet.Count != 0)
                 foreach (ConveyorSocket socket in sockets)
-                    if (brokenFeet.Contains((piece.Owner, (int)MathF.Round(socket.Position.X * 10),
-                        (int)MathF.Round(socket.Position.Z * 10)))) { scale = 0; break; }
+                    if (brokenFeet.TryGetValue((piece.Owner, (int)MathF.Round(socket.Position.X * 10),
+                        (int)MathF.Round(socket.Position.Z * 10)), out brokenSupport)) { scale = 0; break; }
             nodes.Add(new(e, piece.Owner, flow.Buffer, sockets, flow,
-                NominalThroughput * seconds * scale, piece.Attachment));
+                NominalThroughput * seconds * scale, piece.Attachment) { BrokenSupport = brokenSupport });
         }
         if (nodes.Count == 0) return;
         foreach (PlayerId owner in owners.OrderBy(o => o.Value))
@@ -205,6 +213,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             var status = dead ? ConveyorLinkStatus.Destroyed : node.Budget <= Epsilon ? ConveyorLinkStatus.Offline :
                 moving ? ConveyorLinkStatus.Flowing : buffered > Epsilon ? ConveyorLinkStatus.Congested :
                 missing ? ConveyorLinkStatus.Disconnected : node.AcceptedDownstream==0?ConveyorLinkStatus.Blocked:ConveyorLinkStatus.NoInput;
+            _observations[node.Entity] = Observe(node, dead, buffered, moving);
             string cause = dead ? "Wreck cargo retained; repair to resume" : node.Budget <= Epsilon ? "Power or supporting foot unavailable" :
                 moving ? "Transporting" : missing ? "Unmated or closed port" : buffered > Epsilon ? "Downstream full, reserved, offline or rejecting resource" : node.AcceptedDownstream==0?"No resource-compatible downstream building port":"No unreserved eligible input";
             if (!dead && health.Maximum > 0 && health.Fraction < .7)
@@ -223,6 +232,86 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 OutputAPerSecond = node.Outputs.Count > 0 ? node.Outputs[0].Transferred / seconds : 0,
                 OutputBPerSecond = node.Outputs.Count > 1 ? node.Outputs[1].Transferred / seconds : 0
             });
+        }
+
+        ConveyorFlowObservation Observe(Node node, bool dead, double buffered, bool moving)
+        {
+            ConveyorBlockObservation first = default, second = default, third = default;
+            if (dead) Add(new(ConveyorBlockReason.DestroyedRoute, node.Entity));
+            else if (entities.TryGetComponent(node.Entity, out HealthState damage) && damage.Fraction < .7)
+                Add(new(ConveyorBlockReason.DamagedRoute, node.Entity));
+            if (node.BrokenSupport.IsValid) Add(new(ConveyorBlockReason.DestroyedSupport, node.BrokenSupport));
+            if (!entities.TryGetComponent(node.Entity, out PowerConsumer drive) || drive.OperationalScale <= 0)
+                Add(new(ConveyorBlockReason.NoPower, node.Entity));
+            if (node.Inputs.Count == 0 || node.Outputs.Count == 0)
+                Add(new(ConveyorBlockReason.DisconnectedPort, node.Entity));
+            if (!moving && buffered > 0)
+                foreach (var link in node.Outputs)
+                {
+                    var target = link.Destination;
+                    if (entities.TryGetComponent(target.Entity, out HealthState health) && health.IsDepleted)
+                        Add(new(ConveyorBlockReason.DestroyedRoute, target.Entity));
+                    else if (target.BrokenSupport.IsValid)
+                        Add(new(ConveyorBlockReason.DestroyedSupport, target.BrokenSupport));
+                    else if (target.Budget <= 0) Add(new(ConveyorBlockReason.NoPower, target.Entity));
+                    for (int r = 0; r < EligibleResources.Count; r++)
+                    {
+                        ResourceId resource = EligibleResources[r];
+                        if (_stock.GetQuantity(node.Inventory, resource) <= 0) continue;
+                        if ((target.AllowedResources & (1 << r)) == 0)
+                            Add(new(ConveyorBlockReason.IncompatibleResource, target.Entity, resource));
+                        else if (_stock.GetAddableQuantity(target.Inventory, resource, 1) <= 0)
+                            Add(new(ConveyorBlockReason.DestinationFull, target.Entity, resource));
+                        else if (Room(target, resource) <= 0)
+                            Add(new(ConveyorBlockReason.DestinationTargetCovered, target.Entity, resource));
+                    }
+                }
+            if (!moving && buffered <= 0)
+                foreach (var link in node.Inputs)
+                {
+                    var source = link.Source;
+                    if (entities.TryGetComponent(source.Entity, out HealthState sourceHealth) && sourceHealth.IsDepleted)
+                        Add(new(ConveyorBlockReason.DestroyedRoute, source.Entity));
+                    else if (source.BrokenSupport.IsValid)
+                        Add(new(ConveyorBlockReason.DestroyedSupport, source.BrokenSupport));
+                    else if (source.Budget <= 0)
+                        Add(new(ConveyorBlockReason.NoPower, source.Entity));
+                    bool hasStock = false;
+                    for (int r = 0; r < EligibleResources.Count; r++)
+                    {
+                        ResourceId resource = EligibleResources[r];
+                        if (_stock.GetQuantity(source.Inventory, resource) <= 0) continue;
+                        hasStock = true;
+                        if (_stock.GetAvailableQuantity(source.Inventory, resource) <= 0)
+                            Add(new(ConveyorBlockReason.ReservedStock, source.Entity, resource));
+                        else if (source.Port is { Input: false } &&
+                            targets.TryGetValue((source.Entity, resource), out var retained) &&
+                            _stock.GetAvailableQuantity(source.Inventory, resource) <= retained.Maximum)
+                            Add(new(ConveyorBlockReason.RetainedStock, source.Entity, resource));
+                    }
+                    if (!hasStock && source.Sent <= 0)
+                        Add(new(ConveyorBlockReason.NoInput, source.Entity));
+                }
+            if (!moving && first.Reason == ConveyorBlockReason.None)
+                Add(new(ConveyorBlockReason.Unknown, default));
+            return new(first, second, third);
+
+            void Add(ConveyorBlockObservation fact)
+            {
+                if (fact == first || fact == second || fact == third) return;
+                if (first.Reason == ConveyorBlockReason.None || Compare(fact, first) < 0)
+                { third = second; second = first; first = fact; }
+                else if (second.Reason == ConveyorBlockReason.None || Compare(fact, second) < 0)
+                { third = second; second = fact; }
+                else if (third.Reason == ConveyorBlockReason.None || Compare(fact, third) < 0) third = fact;
+            }
+            static int Compare(ConveyorBlockObservation a, ConveyorBlockObservation b)
+            {
+                int reason = a.Reason.CompareTo(b.Reason);
+                if (reason != 0) return reason;
+                int entity = a.Cause.CompareTo(b.Cause);
+                return entity != 0 ? entity : a.Resource.Value.CompareTo(b.Resource.Value);
+            }
         }
 
         int FindResource(Link link)
@@ -253,7 +342,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         double damage = health.Maximum > 0 && health.Fraction < .7 ? health.Fraction : 1;
         return power.OperationalScale * damage;
     }
-    internal static InventoryId ResolveInventory(EntityRegistry entities, EntityId entity, bool input)
+    public static InventoryId ResolveInventory(EntityRegistry entities, EntityId entity, bool input)
     {
         if (!entities.IsAlive(entity)) return default;
         if (entities.TryGetComponent(entity, out ProductionFacility production)) return input ? production.InputInventory : production.OutputInventory;
@@ -365,6 +454,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             InputCursor = flow.InputCursor; OutputCursor = flow.OutputCursor; ResourceCursor = flow.ResourceCursor;
             Parent = this;
         }
+        public EntityId BrokenSupport { get; init; }
         public EntityId Entity { get; }
         public PlayerId Owner { get; }
         public InventoryId Inventory { get; }

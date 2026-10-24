@@ -79,7 +79,7 @@ internal sealed class OperationsWorldOverlaySurface : IGameplayHudSurface
                     _linkLabels[linkLabelCount++] = bounds;
                     Quad(bounds, new(.035f, .05f, .055f, .87f));
                     _text.Add(!link.Enabled ? "DISABLED LINK" : link.Loaded ? "LOADED CARGO" :
-                        link.Request ? "TRANSPORT REQUEST" : "NETWORK LINK", bounds.X + 3 * scale,
+                        link.Request ? "TRANSPORT REQUEST" : link.Conveyor ? "CONVEYOR CONNECTION" : "NETWORK LINK", bounds.X + 3 * scale,
                         bounds.Y + 2 * scale, 11 * scale, color with { W = 1 }, _width, _height, bounds.Width - 6 * scale);
                 }
             }

@@ -8,7 +8,7 @@ internal readonly record struct OperationsWorldMarker(EntityId Entity, Vector2 P
     OperationsFacility? Facility, OperationsDiagnosisRow? Diagnosis, int Priority);
 
 internal readonly record struct OperationsWorldLink(EntityId Source, EntityId Destination,
-    Vector2 Start, Vector2 End, bool Enabled, bool Request, bool Loaded);
+    Vector2 Start, Vector2 End, bool Enabled, bool Request, bool Loaded, bool Conveyor = false);
 
 /// <summary>Bounded render-owner projection of copied facts; no live world queries or command authority.</summary>
 internal sealed class OperationsWorldOverlay
@@ -21,6 +21,7 @@ internal sealed class OperationsWorldOverlay
         2 * (OperationsSnapshot.MaximumRoutes + OperationsDiagnosisSnapshot.MaximumLinks);
     private readonly OperationsWorldMarker[] _markers = new OperationsWorldMarker[MaximumMarkers];
     private readonly OperationsWorldLink[] _links = new OperationsWorldLink[MaximumLinks];
+    private readonly HashSet<EntityId> _chain = new(OperationsDiagnosisSnapshot.MaximumRows);
     private readonly HashSet<EntityId> _selection = new(MaximumSelection);
     private readonly HashSet<EntityId> _wanted = new(MaximumPositions);
     private readonly Dictionary<EntityId, Vector2> _positions = new(MaximumPositions);
@@ -49,7 +50,7 @@ internal sealed class OperationsWorldOverlay
         // Release references to the previous tick as well as resetting the emitted counts.
         Array.Clear(_markers, 0, _markerCount);
         _markerCount = _linkCount = OmittedMarkers = 0;
-        _selection.Clear(); _wanted.Clear(); _positions.Clear();
+        _selection.Clear(); _chain.Clear(); _wanted.Clear(); _positions.Clear();
         _focus = _hover = default;
         var snapshot = context.Snapshot;
         var data = OperationsSnapshot.Resolve(snapshot);
@@ -76,6 +77,14 @@ internal sealed class OperationsWorldOverlay
             captured.Tick == snapshot.Tick && captured.Entity == hover.Entity && captured.OwnedDetails.Count == 1)
             _hover = captured.Entity;
         var diagnosis = selectionMatches ? OperationsDiagnosisSnapshot.Resolve(snapshot) : null;
+
+        if (diagnosis is { Root.IsValid: true })
+            for (int index = 0; index < diagnosis.Rows.Count; index++)
+            {
+                var row = diagnosis.Rows[index];
+                _chain.Add(row.Entity);
+                if (row.CauseEntity.IsValid) _chain.Add(row.CauseEntity);
+            }
 
         for (int i = 0; i < data.Facilities.Count; i++)
         {
@@ -138,9 +147,10 @@ internal sealed class OperationsWorldOverlay
             for (int i = 0; i < diagnosis.Links.Count; i++)
             {
                 var link = diagnosis.Links[i];
-                if (!link.RequestId.IsSpecified || !(Relevant(link.Source) || Relevant(link.Destination))) continue;
+                if ((link.Kind == OperationsDiagnosisLinkKind.TransportRequest && !link.RequestId.IsSpecified) ||
+                    !(Relevant(link.Source) || Relevant(link.Destination))) continue;
                 bool loaded = false;
-                for (int rowIndex = 0; rowIndex < diagnosis.Rows.Count; rowIndex++)
+                for (int rowIndex = 0; link.Kind == OperationsDiagnosisLinkKind.TransportRequest && rowIndex < diagnosis.Rows.Count; rowIndex++)
                 {
                     var row = diagnosis.Rows[rowIndex];
                     if (row.RequestId == link.RequestId && row.Subject == OperationsDiagnosisSubject.TransportRequest)
@@ -152,7 +162,9 @@ internal sealed class OperationsWorldOverlay
                         break;
                     }
                 }
-                AddLink(link.Source, link.Destination, true, true, loaded);
+                AddLink(link.Source, link.Destination, true,
+                    link.Kind == OperationsDiagnosisLinkKind.TransportRequest, loaded,
+                    link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection);
             }
         for (int i = 0; i < data.Routes.Count; i++)
         {
@@ -169,10 +181,10 @@ internal sealed class OperationsWorldOverlay
     }
 
     private bool Relevant(EntityId entity) => entity.IsValid &&
-        (entity == _focus || entity == _hover || _selection.Contains(entity));
+        (entity == _focus || entity == _hover || _selection.Contains(entity) || _chain.Contains(entity));
 
     private int Priority(EntityId entity, bool blocked) => entity == _focus ? 0 : entity == _hover ? 1 :
-        _selection.Contains(entity) ? 2 : blocked ? 3 : 4;
+        _selection.Contains(entity) ? 2 : _chain.Contains(entity) ? 3 : blocked ? 4 : 5;
 
     private static bool MatchesFilter(in OperationsFacility row, OperationsCategory filter) =>
         filter == OperationsCategory.All || row.Category == filter ||
@@ -201,13 +213,13 @@ internal sealed class OperationsWorldOverlay
         return priority != 0 ? priority : a.Entity.CompareTo(b.Entity);
     }
 
-    private void AddLink(EntityId source, EntityId destination, bool enabled, bool request, bool loaded)
+    private void AddLink(EntityId source, EntityId destination, bool enabled, bool request, bool loaded, bool conveyor = false)
     {
         if (source == destination || !_positions.TryGetValue(source, out var start) ||
             !_positions.TryGetValue(destination, out var end)) return;
         for (int i = 0; i < _linkCount; i++)
             if (_links[i].Source == source && _links[i].Destination == destination) return;
-        var link = new OperationsWorldLink(source, destination, start, end, enabled, request, loaded);
+        var link = new OperationsWorldLink(source, destination, start, end, enabled, request, loaded, conveyor);
         int insert = 0;
         while (insert < _linkCount && Compare(_links[insert], link) <= 0) insert++;
         if (insert == MaximumLinks) return;
