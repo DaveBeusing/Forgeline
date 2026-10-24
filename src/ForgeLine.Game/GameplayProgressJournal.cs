@@ -8,7 +8,8 @@ namespace ForgeLine.Game;
 public enum GameplayProgressKind : byte
 {
     Extraction, CargoLoaded, CargoUnloaded, SteelCompleted, ScoutProduced, SupplyTruckProduced,
-    SupplyLoadedFuel, SupplyLoadedAmmunition, FieldFuelTransferred, FieldAmmunitionTransferred, DisruptionResolved, SupplyLoadCompleted, OrePolicyApplied
+    SupplyLoadedFuel, SupplyLoadedAmmunition, FieldFuelTransferred, FieldAmmunitionTransferred, DisruptionResolved, SupplyLoadCompleted, OrePolicyApplied,
+    ConveyorDelivered, ProductionCompleted, ResearchCompleted, DisruptionObserved
 }
 
 public readonly record struct GameplayProgressEvent(ulong Identity, SimulationSessionId SessionId, SimulationTick Tick, PlayerId Player,
@@ -23,6 +24,8 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
     private readonly Dictionary<EntityId, double> _productionTotals = [];
     private readonly Dictionary<PlayerId, Dictionary<(GameplayProgressKind Kind, ResourceId Resource, uint Definition), GameplayProgressEvent>> _latest = [];
     private readonly Dictionary<PlayerId, IReadOnlyList<GameplayProgressEvent>> _copies = [];
+    private readonly Dictionary<PlayerId, Dictionary<(GameplayProgressKind Kind, ResourceId Resource, uint Definition), GameplayProgressEvent>> _first = [];
+    private readonly Dictionary<PlayerId, IReadOnlyList<GameplayProgressEvent>> _firstCopies = [];
     private readonly HashSet<EntityId> _blocked = [];
     private readonly HashSet<EntityId> _policies = [];
     private readonly List<EntityId> _stale = [];
@@ -51,6 +54,8 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
             previous.Source == source && previous.Target == target && previous.OrderIdentity == order && previous.Resource == resource) return;
         ledger[key] = new(++_identity, _session, tick, player, kind, actor, source, target, order, resource, quantity, definition);
         _copies.Remove(player);
+        if (!_first.TryGetValue(player, out var first)) _first.Add(player, first = []);
+        if (first.TryAdd(key, ledger[key])) _firstCopies.Remove(player);
         if (kind is GameplayProgressKind.SupplyLoadedFuel or GameplayProgressKind.SupplyLoadedAmmunition)
         {
             var loadKey = (player, source, target, order);
@@ -76,6 +81,17 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
         return copy;
     }
 
+    public IReadOnlyList<GameplayProgressEvent> CaptureFirst(PlayerId player, SimulationTick completedTick)
+    {
+        if (!_observed || completedTick != _completed || !_first.TryGetValue(player, out var ledger)) return Array.Empty<GameplayProgressEvent>();
+        if (!_firstCopies.TryGetValue(player, out var copy))
+        {
+            copy = Array.AsReadOnly(ledger.Values.OrderBy(x => x.Identity).ToArray());
+            _firstCopies.Add(player, copy);
+        }
+        return copy;
+    }
+
     public void OnExtracted(in ResourceExtractionResult result)
     {
         if (_entities.TryGetComponent(result.Extractor, out ControllableEntity owner))
@@ -95,12 +111,20 @@ public sealed class GameplayProgressJournal : ISimulationTickObserver, IResource
                 double previousOutput = _productionTotals.GetValueOrDefault(entity);
                 _productionTotals[entity] = trackedProduction.TotalOutputQuantity;
                 if (context.Entities.TryGetComponent(entity, out CompletedBuilding producedBuilding) && producedBuilding.Owner == owner &&
-                    producedBuilding.BuildingId == BuildingIds.Smelter && trackedProduction.LastCompletedTick == context.Tick)
-                    Record(context.Tick, owner, GameplayProgressKind.SteelCompleted, entity, entity, entity,
-                        trackedProduction.CompletedCycles, ResourceIds.Steel, trackedProduction.TotalOutputQuantity - previousOutput, producedBuilding.BuildingId.Value);
+                    trackedProduction.LastCompletedTick == context.Tick)
+                {
+                    double output = trackedProduction.TotalOutputQuantity - previousOutput;
+                    Record(context.Tick, owner, GameplayProgressKind.ProductionCompleted, entity, entity, entity,
+                        trackedProduction.CompletedCycles, default, output, producedBuilding.BuildingId.Value);
+                    if (producedBuilding.BuildingId == BuildingIds.Smelter)
+                        Record(context.Tick, owner, GameplayProgressKind.SteelCompleted, entity, entity, entity,
+                            trackedProduction.CompletedCycles, ResourceIds.Steel, output, producedBuilding.BuildingId.Value);
+                }
             }
             var work = Work?.Invoke(context.Entities, entity) ?? PlayerWorkSummary.None;
-            if (work.State == PlayerWorkState.Blocked) _blocked.Add(entity);
+            if (work.State == PlayerWorkState.Blocked && _blocked.Add(entity))
+                Record(context.Tick, owner, GameplayProgressKind.DisruptionObserved, entity, entity, entity,
+                    context.Tick.Value, default, 1);
             else if (work.State == PlayerWorkState.Running && _blocked.Remove(entity))
                 Record(context.Tick, owner, GameplayProgressKind.DisruptionResolved, entity, entity, entity,
                     context.Tick.Value, default, 1);

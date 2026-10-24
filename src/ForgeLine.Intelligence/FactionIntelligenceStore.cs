@@ -301,6 +301,16 @@ public sealed class FactionIntelligenceStore
         return false;
     }
 
+    public bool HasCurrentContact(FactionId faction)
+    {
+        RequireFaction(faction);
+        if (!_factions.TryGetValue(faction, out FactionState? state)) return false;
+        foreach (var contact in state.Contacts.Values)
+            if (contact.LastSeenTick == CurrentTick &&
+                contact.State is IntelligenceState.Detected or IntelligenceState.Identified) return true;
+        return false;
+    }
+
     public FactionIntelligenceSnapshot Capture(
         FactionId faction)
     {
