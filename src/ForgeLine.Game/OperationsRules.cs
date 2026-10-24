@@ -439,8 +439,18 @@ public sealed class OperationsRuleSystem : ISimulationSystem, IDisposable
         return true;
     }
 
-    private static void ReleaseManagedPause(SimulationContext context, Entry entry)
+    private void ReleaseManagedPause(SimulationContext context, Entry entry)
     {
+        // Same-tick manual intent owns its pause even before the AI phase observes it.
+        if (_manualPauses.TryGetValue(context.Tick.Value, out var manualRequests))
+            foreach (EntityId manual in manualRequests)
+                if (manual == entry.ManagedRequest ||
+                    context.Entities.TryGetComponent(manual, out ProductionRequest manualRequest) &&
+                    manualRequest.Facility == entry.Definition.Facility)
+                {
+                    entry.ManagedRequest = EntityId.Invalid;
+                    return;
+                }
         if (!entry.ManagedRequest.IsValid ||
             !context.Entities.TryGetComponent(entry.ManagedRequest, out ProductionRequest request) ||
             request.Facility != entry.Definition.Facility || !request.Paused) return;

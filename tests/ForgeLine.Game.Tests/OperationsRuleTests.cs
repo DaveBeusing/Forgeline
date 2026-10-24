@@ -227,6 +227,34 @@ public sealed class OperationsRuleTests
         Assert.Single(scenario.OperationsRules.Capture(Owner));
     }
 
+    [Theory]
+    [InlineData(OperationsRuleOperation.SetEnabled, true)]
+    [InlineData(OperationsRuleOperation.SetEnabled, false)]
+    [InlineData(OperationsRuleOperation.Remove, true)]
+    [InlineData(OperationsRuleOperation.Remove, false)]
+    public void RemovingOrDisablingRulePreservesSameTickManualPause(OperationsRuleOperation operation, bool manualFirst)
+    {
+        using MatchRuntime scenario = CreateScenario();
+        EntityId facility = AddProcessingFacility(scenario, out InventoryId input, out InventoryId output, outputCapacity: 10);
+        Assert.True(scenario.Inventories.Add(input, ResourceIds.FerrousOre, 200).Succeeded);
+        Assert.True(scenario.Inventories.Add(output, ResourceIds.Steel, 10).Succeeded);
+        QueueSteel(scenario, facility);
+        var gateway = Gateway(scenario);
+        var definition = OutputRule(facility);
+        gateway.SubmitOperationsRule(scenario.OperationsRules, OperationsRuleOperation.Upsert,
+            definition, 0, true, scenario.Simulation.CurrentTick);
+        scenario.Simulation.RunTicks(55, TestContext.Current.CancellationToken);
+        EntityId request = Assert.Single(scenario.OperationsRules.Capture(Owner)).ManagedProductionRequest;
+        Assert.True(request.IsValid);
+        if (manualFirst) gateway.SubmitProductionPaused(Owner, request, true, scenario.Simulation.CurrentTick);
+        gateway.SubmitOperationsRule(scenario.OperationsRules, operation, definition, 1, false, scenario.Simulation.CurrentTick);
+        if (!manualFirst) gateway.SubmitProductionPaused(Owner, request, true, scenario.Simulation.CurrentTick);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(scenario.Simulation.Entities.GetComponent<ProductionRequest>(request).Paused);
+        if (operation == OperationsRuleOperation.Remove) Assert.Empty(scenario.OperationsRules.Capture(Owner));
+        else Assert.False(Assert.Single(scenario.OperationsRules.Capture(Owner)).Enabled);
+    }
+
     private static OperationsRuleDefinition InputRule(EntityId facility) =>
         new(1, Owner, facility, OperationsRuleTemplate.EnsureInputStockPolicy,
             ResourceIds.FerrousOre, 20, 50, 100, LogisticsStockPriority.Normal, 5);
