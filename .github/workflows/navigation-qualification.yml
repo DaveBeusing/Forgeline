@@ -3,7 +3,7 @@ name: Logistics navigation qualification
 on:
   push:
     branches: [fix/logistics-navigation-resilience]
-    paths: ['.github/workflows/navigation-qualification.yml', 'build/navigation/**', 'tests/**/LogisticsNavigationRecoveryTests.cs', 'tests/**/NavigationObstacleRasterizationTests.cs']
+    paths: ['.github/workflows/navigation-qualification.yml', 'build/navigation/**', 'tests/**/LogisticsNavigationRecoveryTests.cs', 'tests/**/NavigationObstacleRasterizationTests.cs', 'tests/**/NavigationWaypointOwnershipTests.cs']
   workflow_dispatch:
 
 permissions:
@@ -16,13 +16,15 @@ concurrency:
 jobs:
   qualify-repair:
     if: github.ref == 'refs/heads/fix/logistics-navigation-resilience'
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 25
     permissions:
       contents: write
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
     steps:
+      - name: Preserve source bytes for exact patch validation
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
@@ -32,6 +34,7 @@ jobs:
             /*.json
             /*.sln
             /.editorconfig
+            /.gitattributes
             /.gitignore
             /src/**/*.cs
             /src/**/*.csproj
@@ -48,9 +51,12 @@ jobs:
       - name: Reproduce original navigation regressions and build baseline probe
         run: python build/navigation/qualify.py baseline
       - name: Apply exact reviewed source changes in the isolated worktree
+        shell: bash
         run: |
           git apply --check build/navigation/verified-navigation.patch
           git apply build/navigation/verified-navigation.patch
+          git apply --check build/navigation/waypoint-ownership.patch
+          git apply build/navigation/waypoint-ownership.patch
           git diff --check
       - name: Run all navigation and Game tests on repaired sources
         run: python build/navigation/qualify.py candidate

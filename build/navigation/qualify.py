@@ -28,11 +28,12 @@ def main():
     run(phase + '-game-build', ['dotnet', 'build', game, '-c', 'Release'])
     run(phase + '-nav-tests', ['dotnet', 'test', '--project', nav, '-c', 'Release'])
     code = run(phase + '-recovery-tests', ['dotnet', 'test', '--project', game, '-c', 'Release', '--no-build', '--',
-        '--filter-class', '*LogisticsNavigationRecoveryTests'], expected_success=phase != 'baseline')
+        '--filter-class', '*LogisticsNavigationRecoveryTests', '*NavigationWaypointOwnershipTests'], expected_success=phase != 'baseline')
     if phase == 'baseline':
         text = (OUT / 'baseline-recovery-tests.log').read_text(encoding='utf-8')
         if code == 0 or 'WorldChangeDuringPendingSearchRetainsLoadedTruckIntent' not in text:
             raise RuntimeError('Expected named baseline regression was not reproduced; inspect original log')
+        run('baseline-game-tests', ['dotnet', 'test', '--project', game, '-c', 'Release', '--no-build'], expected_success=False)
     else:
         run('candidate-game-tests', ['dotnet', 'test', '--project', game, '-c', 'Release', '--no-build'])
     run(phase + '-probe-build', ['dotnet', 'build', probe, '-c', 'Release'])
