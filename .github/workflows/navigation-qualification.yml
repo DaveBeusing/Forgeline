@@ -1,98 +1,80 @@
 name: Logistics navigation qualification
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/navigation-qualification.yml'
+      - 'src/ForgeLine.Navigation/**'
+      - 'src/ForgeLine.Game/NavigationRouting.cs'
+      - 'tests/ForgeLine.Navigation.Tests/**'
+      - 'tests/ForgeLine.Game.Tests/*Navigation*Tests.cs'
+      - 'build/navigation/**'
   push:
-    branches: [fix/logistics-navigation-resilience]
-    paths: ['.github/workflows/navigation-qualification.yml', 'build/navigation/**', 'tests/**/LogisticsNavigationRecoveryTests.cs', 'tests/**/NavigationObstacleRasterizationTests.cs', 'tests/**/NavigationWaypointOwnershipTests.cs', 'tests/**/NavigationBlockadeRecoveryTests.cs']
+    branches: [master, fix/logistics-navigation-resilience]
+    paths:
+      - '.github/workflows/navigation-qualification.yml'
+      - 'src/ForgeLine.Navigation/**'
+      - 'src/ForgeLine.Game/NavigationRouting.cs'
+      - 'tests/ForgeLine.Navigation.Tests/**'
+      - 'tests/ForgeLine.Game.Tests/*Navigation*Tests.cs'
+      - 'build/navigation/**'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: logistics-navigation-linux-${{ github.ref }}
-  cancel-in-progress: false
+  group: logistics-navigation-readonly-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  qualify-repair:
-    if: github.ref == 'refs/heads/fix/logistics-navigation-resilience'
+  portable-contracts:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-    permissions:
-      contents: write
-    env:
-      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.sha }}
-          sparse-checkout-cone-mode: false
+          persist-credentials: false
           sparse-checkout: |
-            /*.props
-            /*.json
-            /*.sln
-            /.editorconfig
-            /.gitattributes
-            /.gitignore
-            /src/**/*.cs
-            /src/**/*.csproj
-            /src/**/*.json
-            /tests/**/*.cs
-            /tests/**/*.csproj
-            /tests/**/*.json
-            /assets/maps/
-            /docs/**/*.md
-            /build/navigation/
+            src
+            tests
+            assets/maps
+            build/navigation
       - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
-      - name: Reproduce original navigation regressions and retain all baseline suite failures
-        run: python build/navigation/qualify.py baseline
-      - name: Apply exact reviewed source changes in the isolated worktree
+      - name: Navigation correctness, alternate routes and workspace isolation
+        run: dotnet test --project tests/ForgeLine.Navigation.Tests/ForgeLine.Navigation.Tests.csproj -c Release
+      - name: Loaded-truck blockade recovery and command ownership
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj -c Release -- --filter-class '*LogisticsNavigationRecoveryTests' '*NavigationWaypointOwnershipTests' '*NavigationBlockadeRecoveryTests'
+      - name: Retain source-matched CPU probe
         shell: bash
         run: |
-          git apply --check build/navigation/verified-navigation.patch
-          git apply build/navigation/verified-navigation.patch
-          git apply --check build/navigation/waypoint-ownership.patch
-          git apply build/navigation/waypoint-ownership.patch
-          git diff --check
-      - name: Require repaired contracts and no new full-suite failures
-        run: python build/navigation/qualify.py candidate
-      - name: Alternate baseline and candidate CPU measurements
-        shell: python
-        run: |
-          import json, pathlib, subprocess
-          root = pathlib.Path('artifacts/navigation')
-          records = []
-          for number in range(1, 4):
-              for cohort in (['baseline', 'candidate'] if number % 2 else ['candidate', 'baseline']):
-                  output = root / f'{cohort}-{number}.json'
-                  subprocess.run(['dotnet', str(root / f'{cohort}-probe/NavigationProbe.dll'), str(output)], check=True)
-                  records.append(json.loads(output.read_text()))
-          for key in ('RouteSignature', 'GridSignature', 'ExpandedLocalNodes'):
-              if len({record[key] for record in records}) != 1:
-                  raise RuntimeError(f'Behavior changed in paired measurement: {key}')
-      - name: Commit only the qualified source files to the existing fix branch
-        shell: bash
-        run: |
-          python - <<'PY'
-          import subprocess
-          allowed = {'src/ForgeLine.Game/NavigationRouting.cs', 'src/ForgeLine.Navigation/LocalPathFrontier.cs', 'src/ForgeLine.Navigation/LocalPathSearch.cs', 'src/ForgeLine.Navigation/NavigationGrid.cs', 'src/ForgeLine.Navigation/NavigationWorld.cs'}
-          actual = set(subprocess.check_output(['git', 'diff', '--name-only']).decode().splitlines())
-          if actual != allowed: raise RuntimeError(f'Unexpected repair scope: {actual}')
-          subprocess.run(['git', 'add', '--', *sorted(allowed)], check=True)
-          PY
-          test "$(git ls-remote origin refs/heads/fix/logistics-navigation-resilience | cut -f1)" = "$GITHUB_SHA"
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Recover logistics route ownership and reuse bounded navigation workspaces'
-          git push origin HEAD:refs/heads/fix/logistics-navigation-resilience
-      - name: Retain original logs and paired CPU measurements without claiming full CI acceptance
+          mkdir -p artifacts/navigation
+          dotnet build build/navigation/NavigationProbe.csproj -c Release
+          dotnet build/navigation/bin/Release/net10.0/NavigationProbe.dll artifacts/navigation/current-cpu.json
+          git rev-parse HEAD > artifacts/navigation/source-commit.txt
+          dotnet --info > artifacts/navigation/runtime.txt
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: navigation-qualification-${{ github.sha }}
-          path: |
-            artifacts/navigation/*.log
-            artifacts/navigation/*.json
+          name: logistics-navigation-cpu-${{ github.sha }}
+          path: artifacts/navigation/
           retention-days: 14
+
+  windows-game:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            src
+            tests
+            assets/maps
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Complete Game test project on the interactive target platform
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj -c Release

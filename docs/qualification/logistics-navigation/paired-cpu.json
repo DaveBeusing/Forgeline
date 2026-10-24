@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "scope": "Warmed CPU microbenchmarks; not full-match throughput or FPS",
+  "baselineMaster": "3c261dca3182d9973cce07ea64f2b7826c11f6c4",
+  "checkoutCommit": "fb294efddc753c5cf375eaec020b7d4afea8fb35",
+  "candidateSourceCommit": "2b191cbca783ef51e57b58f23a34993e3805d728",
+  "qualificationRun": 40134443631,
+  "artifactId": 12576557527,
+  "artifactSha256": "abf0744bb2f095b32d14d93aeb0264aa84ebd221422f8c36a7cc046bca2cead3",
+  "environment": {
+    "os": "Ubuntu 24.04 hosted runner",
+    "sdk": "10.0.402",
+    "runtime": "10.0.13",
+    "architecture": "X64"
+  },
+  "method": "Same host; 3 alternating baseline/candidate process pairs, 256 route and 3 grid warmups per process. Candidate is the checkout worktree after exact source patches; committed only after test/measurement qualification. SourceHead in the test JSON is the checkout, not a clean candidate commit.",
+  "tests": {
+    "navigation": {"baselinePassed": 34, "candidatePassed": 34},
+    "recovery": {"total": 14, "baselineFailed": 12, "baselinePassed": 2, "candidatePassed": 14, "candidateFailed": 0},
+    "fullGame": {"total": 903, "baselinePassed": 882, "baselineFailed": 21, "candidatePassed": 894, "candidateFailed": 9, "skipped": 0, "unchangedBaselineFailures": 9, "fullSuitePassed": false}
+  },
+  "rounds": {
+    "baseline": [
+      {"Runtime":"10.0.13","ProcessArchitecture":"X64","RouteSamples":512,"GridSamples":12,"Obstacles":1024,"GridCells":16384,"RouteMilliseconds":0.5249955078125,"RouteAllocatedBytes":155688,"GridMilliseconds":29.307075,"GridAllocatedBytes":221288,"CachedGraphAllocatedBytesFor10000Calls":1760000,"ExpandedLocalNodes":648192,"RouteSignature":5758080734526805797,"GridSignature":9829696314479436581},
+      {"Runtime":"10.0.13","ProcessArchitecture":"X64","RouteSamples":512,"GridSamples":12,"Obstacles":1024,"GridCells":16384,"RouteMilliseconds":0.570548828125,"RouteAllocatedBytes":155688,"GridMilliseconds":29.285,"GridAllocatedBytes":221288,"CachedGraphAllocatedBytesFor10000Calls":1760000,"ExpandedLocalNodes":648192,"RouteSignature":5758080734526805797,"GridSignature":9829696314479436581},
+      {"Runtime":"10.0.13","ProcessArchitecture":"X64","RouteSamples":512,"GridSamples":12,"Obstacles":1024,"GridCells":16384,"RouteMilliseconds":0.5727765625,"RouteAllocatedBytes":155688,"GridMilliseconds":29.486383333333333,"GridAllocatedBytes":221288,"CachedGraphAllocatedBytesFor10000Calls":1760000,"ExpandedLocalNodes":648192,"RouteSignature":5758080734526805797,"GridSignature":9829696314479436581}
+    ],
+    "candidate": [
+      {"Runtime":"10.0.13","ProcessArchitecture":"X64","RouteSamples":512,"GridSamples":12,"Obstacles":1024,"GridCells":16384,"RouteMilliseconds":0.5776767578125,"RouteAllocatedBytes":7624,"GridMilliseconds":13.093224999999999,"GridAllocatedBytes":237696,"CachedGraphAllocatedBytesFor10000Calls":0,"ExpandedLocalNodes":648192,"RouteSignature":5758080734526805797,"GridSignature":9829696314479436581},
+      {"Runtime":"10.0.13","ProcessArchitecture":"X64","RouteSamples":512,"GridSamples":12,"Obstacles":1024,"GridCells":16384,"RouteMilliseconds":0.5512341796875,"RouteAllocatedBytes":7624,"GridMilliseconds":13.063083333333333,"GridAllocatedBytes":237696,"CachedGraphAllocatedBytesFor10000Calls":0,"ExpandedLocalNodes":648192,"RouteSignature":5758080734526805797,"GridSignature":9829696314479436581},
+      {"Runtime":"10.0.13","ProcessArchitecture":"X64","RouteSamples":512,"GridSamples":12,"Obstacles":1024,"GridCells":16384,"RouteMilliseconds":0.5484880859375,"RouteAllocatedBytes":7624,"GridMilliseconds":13.565583333333334,"GridAllocatedBytes":237696,"CachedGraphAllocatedBytesFor10000Calls":0,"ExpandedLocalNodes":648192,"RouteSignature":5758080734526805797,"GridSignature":9829696314479436581}
+    ]
+  }
+}
