@@ -124,6 +124,12 @@ jobs:
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSaveCatalogReliabilityTests ForgeLine.Client.Tests.ClientSimulationHostTests ForgeLine.Client.Tests.ClientSessionLoadingRecoveryTests ForgeLine.Client.Tests.ClientSessionLoadingCoordinatorTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Logistics raid intent and active recovery
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.SkirmishRaidConfigurationTests ForgeLine.Game.Tests.SkirmishRaidPlannerTests ForgeLine.Game.Tests.SkirmishRaidMatchTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Conveyor material flow and recovery contracts
         shell: pwsh
         run: |

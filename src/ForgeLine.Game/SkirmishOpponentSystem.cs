@@ -53,6 +53,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private readonly Dictionary<EntityId, OwnedState> _ownedScratch = new();
     private readonly List<SkirmishOpponentDebugReadModel> _debug = new();
 
+    private readonly SkirmishRaidPlanner? _raids;
+
     private long _executions;
     private long _ownedStateCaptures;
     private long _intelligenceCaptures;
@@ -70,7 +72,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         BuildingPlacementService placement,
         FactionIntelligenceStore intelligence,
         BattlefieldDefinition battlefield,
-        IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration>? configurations = null)
+        IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration>? configurations = null,
+        HierarchicalNavigationSystem? navigation = null,
+        WeaponCatalog? weapons = null)
     {
         _buildings = buildings ??
             throw new ArgumentNullException(nameof(buildings));
@@ -87,6 +91,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         _configurations =
             configurations ??
             new Dictionary<PlayerId, SkirmishOpponentConfiguration>();
+
+        if (navigation is not null && weapons is not null)
+            _raids = new SkirmishRaidPlanner(inventories, weapons, intelligence, navigation);
 
         foreach (SkirmishOpponentConfiguration configuration in
                  _configurations.Values)
@@ -156,6 +163,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controllerEntity);
         SkirmishOpponentConfiguration configuration =
             ResolveConfiguration(controller.Player);
+        _raids?.ExpireDue(context, controllerEntity, controller, configuration.Raids);
         bool decisionDue =
             IsDecisionDue(
                 context.Tick,
@@ -231,7 +239,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             controller,
             owned,
-            configuration);
+            configuration,
+            _raids is not null && configuration.Raids.Enabled);
         EnsureEconomyPolicies(
             context,
             controller,
@@ -259,6 +268,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             HasVanguardReachedWaypoint(context, owned,
                 SelectOffensiveWaypoint(controller, configuration.Aggression)))
             state = state with { DeepOffensiveCommitted = true };
+
+        if (context.Entities.TryGetComponent(controllerEntity, out SkirmishRaidState raid) && raid.IsActive)
+            owned.CombatUnits.RemoveAll(raid.Contains);
 
         SkirmishStrategicState strategicState;
         SkirmishStrategicGoal goal;
@@ -336,43 +348,60 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     state.DeepOffensiveCommitted);
             hasObjective = true;
         }
-        else if (TryScout(
-                     context,
-                     controller,
-                     owned,
-                     intelligence,
-                     ref state,
-                     out objective))
-        {
-            strategicState =
-                SkirmishStrategicState.Mobilizing;
-            goal =
-                SkirmishStrategicGoal.Scout;
-            hasObjective = true;
-        }
-        else if (TryAttack(
-                     context,
-                     controller,
-                     owned,
-                     intelligence,
-                     force,
-                     configuration,
-                     ref state,
-                     out objective))
-        {
-            strategicState =
-                SkirmishStrategicState.Attacking;
-            goal =
-                SkirmishStrategicGoal.AttackObjective;
-            hasObjective = true;
-        }
         else
         {
-            strategicState =
-                SkirmishStrategicState.Mobilizing;
-            goal =
-                SkirmishStrategicGoal.PrepareOffensive;
+            _raids?.Evaluate(context, controllerEntity, controller, owned.Units, intelligence, configuration, false);
+            if (context.Entities.TryGetComponent(controllerEntity, out SkirmishRaidState selectedRaid) && selectedRaid.IsActive)
+                owned.CombatUnits.RemoveAll(selectedRaid.Contains);
+            if (TryScout(
+                         context,
+                         controller,
+                         owned,
+                         intelligence,
+                         ref state,
+                         out objective))
+            {
+                strategicState =
+                    SkirmishStrategicState.Mobilizing;
+                goal =
+                    SkirmishStrategicGoal.Scout;
+                hasObjective = true;
+            }
+            else if (TryAttack(
+                         context,
+                         controller,
+                         owned,
+                         intelligence,
+                         force,
+                         configuration,
+                         ref state,
+                         out objective))
+            {
+                strategicState =
+                    SkirmishStrategicState.Attacking;
+                goal =
+                    SkirmishStrategicGoal.AttackObjective;
+                hasObjective = true;
+            }
+            else
+            {
+                strategicState =
+                    SkirmishStrategicState.Mobilizing;
+                goal =
+                    SkirmishStrategicGoal.PrepareOffensive;
+            }
         }
+
+        if (strategicState is SkirmishStrategicState.Defending or SkirmishStrategicState.Recovering or
+            SkirmishStrategicState.Bootstrap or SkirmishStrategicState.Resupplying or SkirmishStrategicState.Expanding)
+            _raids?.Evaluate(context, controllerEntity, controller, owned.Units, intelligence, configuration,
+                strategicState != SkirmishStrategicState.Expanding);
+
+        if (context.Entities.TryGetComponent(controllerEntity, out SkirmishRaidState activeRaid) && activeRaid.IsActive)
+            foreach (EntityId unit in owned.Units)
+                if (activeRaid.Contains(unit) && context.Entities.TryGetComponent(unit, out CombatGroupMember membership) &&
+                    membership.Group == activeRaid.Group)
+                    context.Entities.RemoveComponent<TacticalTestOpponent>(unit);
 
         TryIssueArtilleryMission(
             context,
@@ -702,6 +731,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     _staleControllerScratch[index]))
             {
                 _scratchStatesReleased++;
+                _raids?.Forget(_staleControllerScratch[index]);
             }
         }
     }
@@ -2755,13 +2785,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned,
-        SkirmishOpponentConfiguration configuration)
+        SkirmishOpponentConfiguration configuration,
+        bool deferLogisticsRaids)
     {
         var behavior =
             new TacticalTestOpponent(
                 configuration.ResupplyThreshold,
                 configuration.RetreatThreshold,
-                configuration.ObjectivePressureLeashMeters);
+                configuration.ObjectivePressureLeashMeters)
+            { LogisticsDefenseCenter = controller.HomePosition, LogisticsDefenseRadiusMeters = deferLogisticsRaids ? configuration.DefensiveRadiusMeters : 0 };
         var combatResupplyPolicy =
             new AutomaticResupplyPolicy(
                 ammunitionThreshold:
@@ -5714,7 +5746,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     context,
                     owned,
                     force,
-                    configuration)));
+                    configuration),
+                _raids?.Capture(controllerEntity) ?? default));
     }
 
     private static SkirmishOperationalObjective

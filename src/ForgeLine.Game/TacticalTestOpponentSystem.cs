@@ -280,6 +280,13 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
                 continue;
             }
 
+            if ((!candidate.IsValid || SkirmishRaidPlanner.IsLogisticsTarget(context.Entities, candidate)) &&
+                context.Entities.TryGetComponent(source, out TacticalTestOpponent strategy) &&
+                strategy.LogisticsDefenseRadiusMeters > 0 &&
+                HorizontalDistanceSquared(strategy.LogisticsDefenseCenter, contact.LastKnownPosition) >
+                    strategy.LogisticsDefenseRadiusMeters * strategy.LogisticsDefenseRadiusMeters)
+                continue;
+
             if (candidate.IsValid &&
                 context.Entities.TryGetComponent(candidate, out CompletedBuilding completed) &&
                 completed.BuildingId == BuildingIds.CommandCore)
