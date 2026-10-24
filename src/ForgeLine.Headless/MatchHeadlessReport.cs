@@ -173,7 +173,7 @@ internal sealed record MatchExecutionReport(
             scenario.GetOpponentState(
                 side.Player);
         SkirmishOpponentDebugReadModel debug =
-            scenario.Opponents.DebugSnapshot.Single(
+            scenario.Opponents.DebugSnapshot.SingleOrDefault(
                 entry =>
                     entry.Player ==
                     side.Player);
@@ -261,7 +261,7 @@ internal sealed record MatchExecutionReport(
                 UnitIds.CargoTruck),
             scenario.CountUnits(
                 side.Player,
-                UnitIds.SupplyTruck));
+                UnitIds.SupplyTruck)) { StrategyAssessmentAvailable = debug.Player == side.Player };
     }
 
     private static int CountActiveResupplyOrders(
@@ -393,4 +393,7 @@ internal sealed record MatchParticipantReport(
     int MainBattleTanks,
     int MobileArtillery,
     int CargoTrucks,
-    int SupplyTrucks);
+    int SupplyTrucks)
+{
+    public bool StrategyAssessmentAvailable { get; init; }
+}

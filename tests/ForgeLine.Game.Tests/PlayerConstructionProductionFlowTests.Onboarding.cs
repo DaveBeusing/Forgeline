@@ -13,6 +13,8 @@ public sealed partial class PlayerConstructionProductionFlowTests
     {
         using var scenario = CreateScenario(4133);
         var player = new PlayerId(1);
+        var meter = new GameplayTelemetryCollector(scenario);
+        scenario.Simulation.RegisterTickObserver(new JourneyTelemetryObserver(meter));
         var core = scenario.GetBase(player);
         Assert.Equal(2, FindOwnedUnits(scenario, UnitIds.CargoTruck).Length);
         Assert.Empty(FindOwnedUnits(scenario, UnitIds.SupplyTruck));
@@ -91,6 +93,25 @@ public sealed partial class PlayerConstructionProductionFlowTests
         scenario.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
         Assert.Contains(scenario.Progress.Capture(player, scenario.Simulation.CurrentTick), x => x.Kind == GameplayProgressKind.SupplyLoadCompleted);
 
+        // Scout a public authored start through ordinary movement; current faction contact is the success condition.
+        Vector3 approach = scenario.Battlefield.Starts[1].Position + new Vector3(-240, 0, 0);
+        Assert.True(gateway.SubmitMovement(player, [scout, truck], approach, scenario.Simulation.CurrentTick, FormationTemplate.Compact).Accepted);
+        scenario.Simulation.AdvanceOneTick(); while (gateway.Results.TryRead(out _)) { }
+        RunUntil(scenario, () => scenario.Intelligence.HasCurrentContact(new FactionId(1)), 8_000);
+
+        string? measurementPath = Environment.GetEnvironmentVariable("FORGELINE_GAMEPLAY_JOURNEY_REPORT");
+        if (!string.IsNullOrWhiteSpace(measurementPath))
+            File.WriteAllText(measurementPath, System.Text.Json.JsonSerializer.Serialize(new
+            {
+                SourceIdentity = typeof(PlayerConstructionProductionFlowTests).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                    .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion,
+                Profile = "Gameplay", Seed = 4133, Participants = "player:1 human / player:2 human",
+                Scenario = scenario.Battlefield.Metadata.Key, Tick = scenario.Simulation.CurrentTick.Value,
+                AuthoritativeHash = MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256(),
+                Evidence = scenario.Progress.CaptureFirst(player, scenario.Simulation.CurrentTick),
+                Telemetry = meter.Capture()
+            }));
+
         void Move(EntityId unit, Vector3 target)
         {
             Assert.True(gateway.SubmitMovement(player, [unit], target, scenario.Simulation.CurrentTick, FormationTemplate.Compact).Accepted);
@@ -110,6 +131,14 @@ public sealed partial class PlayerConstructionProductionFlowTests
         BuildPlayerBuilding(scenario, gateway, BuildingIds.PowerPlant, FindOpenPlacement(scenario, BuildingIds.PowerPlant));
         BuildPlayerBuilding(scenario, gateway, BuildingIds.Extractor, FindOpeningOreSite(scenario));
         scenario.Simulation.RunTicks(150, TestContext.Current.CancellationToken);
+        var coreEntity = scenario.GetBase(player).CommandCore;
+        var research = PlayerTechnologyActionCommand.Start(player, TechnologyIds.IndustrialStandardization,
+            coreEntity, coreEntity, scenario.Simulation.CurrentTick, scenario.Services.TechnologyDefinitions);
+        scenario.Simulation.SubmitCommand(research, scenario.Simulation.CurrentTick.Next());
+        scenario.Simulation.AdvanceOneTick();
+        Assert.DoesNotContain(scenario.Progress.Capture(player, scenario.Simulation.CurrentTick), item => item.Kind == GameplayProgressKind.ResearchCompleted);
+        scenario.Simulation.RunTicks(120, TestContext.Current.CancellationToken);
+        var researchProof = Assert.Single(scenario.Progress.CaptureFirst(player, scenario.Simulation.CurrentTick), item => item.Kind == GameplayProgressKind.ResearchCompleted);
         var before = scenario.Progress.Capture(player, scenario.Simulation.CurrentTick);
         var extracted = Assert.Single(before, x => x.Kind == GameplayProgressKind.Extraction);
         scenario.Simulation.RunTicks(50, TestContext.Current.CancellationToken);
@@ -123,6 +152,18 @@ public sealed partial class PlayerConstructionProductionFlowTests
         Assert.Equal(extracted.Actor, recovered.Actor);
         Assert.True(recovered.Quantity > 0);
         Assert.Empty(restored.Progress.Capture(new PlayerId(2), restored.Simulation.CurrentTick));
+        Assert.Equal(researchProof with { SessionId = restored.Simulation.SessionId },
+            Assert.Single(restored.Progress.CaptureFirst(player, restored.Simulation.CurrentTick), item => item.Kind == GameplayProgressKind.ResearchCompleted));
+        using var playback = MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(
+            MatchPersistenceSerializer.SerializeReplay(MatchPersistenceService.CaptureReplay(scenario))));
+        Assert.Equal(MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256(), MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        Assert.Equal(researchProof with { SessionId = playback.Simulation.SessionId },
+            Assert.Single(playback.Progress.CaptureFirst(player, playback.Simulation.CurrentTick), item => item.Kind == GameplayProgressKind.ResearchCompleted));
+    }
+
+    private sealed class JourneyTelemetryObserver(GameplayTelemetryCollector meter) : ForgeLine.Simulation.ISimulationTickObserver
+    {
+        public void OnTickCompleted(ForgeLine.Simulation.SimulationContext context) => meter.Observe();
     }
 
     private static Vector3 FindOpeningOreSite(MatchRuntime scenario)

@@ -16,7 +16,8 @@ internal sealed record GameplayTelemetryBatchReport(
     ulong StartingSeed,
     IReadOnlyList<GameplayTelemetryMatch> Matches,
     GameplayTelemetryAnalysisResult Analysis,
-    IReadOnlyList<GameplayMetricComparison> Comparison)
+    IReadOnlyList<GameplayMetricComparison> Comparison,
+    string SourceIdentity)
 {
     private static readonly JsonSerializerOptions s_jsonOptions =
         new()
@@ -54,7 +55,9 @@ internal sealed record GameplayTelemetryBatchReport(
             options.Seed,
             matches,
             analysis,
-            comparison);
+            comparison,
+            typeof(GameplayTelemetryBatchReport).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion);
     }
 
     public static GameplayTelemetryBatchReport Read(string path)

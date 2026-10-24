@@ -37,7 +37,11 @@ public sealed record GameplayMetricComparison(
 
 public sealed record GameplayTelemetryAnalysisResult(
     IReadOnlyList<GameplayMetricAggregate> Metrics,
-    IReadOnlyList<GameplayMilestoneAggregate> Milestones);
+    IReadOnlyList<GameplayMilestoneAggregate> Milestones,
+    IReadOnlyList<GameplayPacingAggregate>? Pacing = null);
+
+public sealed record GameplayPacingAggregate(string Name, string Owner, int ReachedMatches, int UnreachedMatches,
+    ulong? MinimumTick, ulong? MaximumTick, double? MeanTick);
 
 public static class GameplayTelemetryAnalysis
 {
@@ -48,7 +52,8 @@ public static class GameplayTelemetryAnalysis
 
         return new GameplayTelemetryAnalysisResult(
             AggregateMetrics(matches),
-            AggregateMilestones(matches));
+            AggregateMilestones(matches),
+            AggregatePacing(matches));
     }
 
     public static IReadOnlyList<GameplayMetricComparison> Compare(
@@ -140,6 +145,20 @@ public static class GameplayTelemetryAnalysis
             });
 
         return comparisons;
+    }
+
+    private static GameplayPacingAggregate[] AggregatePacing(IReadOnlyList<GameplayTelemetryMatch> matches)
+    {
+        return matches.SelectMany(match => match.Telemetry.Pacing ?? []).Select(item => (item.Name, item.Owner)).Distinct()
+            .OrderBy(key => key.Name, StringComparer.Ordinal).ThenBy(key => key.Owner, StringComparer.Ordinal)
+            .Select(key =>
+            {
+                var reached = matches.Select(match => match.Telemetry.Pacing?.SingleOrDefault(item => item.Name == key.Name && item.Owner == key.Owner)?.Tick)
+                    .Where(tick => tick.HasValue).Select(tick => tick!.Value).ToArray();
+                return new GameplayPacingAggregate(key.Name, key.Owner, reached.Length, matches.Count - reached.Length,
+                    reached.Length == 0 ? null : reached.Min(), reached.Length == 0 ? null : reached.Max(),
+                    reached.Length == 0 ? null : reached.Average(tick => (double)tick));
+            }).ToArray();
     }
 
     private static List<GameplayMetricAggregate> AggregateMetrics(
