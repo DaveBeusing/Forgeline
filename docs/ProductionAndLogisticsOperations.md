@@ -2,6 +2,14 @@
 
 The Operations overview is an on-demand nonmodal diagnostic panel, not a permanent HUD strip. Click the resource/power strip to open All Facilities, use an alert's OPS or MORE entry for the relevant diagnosis, or use the authorized selected-facility context to inspect production, logistics, supply or power. The panel closes through its own CLOSE control or the existing transient-menu dismissal behavior. The world, minimap and existing contextual commands remain available; no new keyboard binding is added.
 
+## Selected processing rules
+
+Select one owned processing building in the world, open Operations and choose RULES. NEW DRAFT is explicit and remains local until APPLY. The selector also opens existing rules for configuration, enable/disable or removal. DETAILS pages show full values, revision, actual last evaluation/action, attempt budget and managed production.
+
+For input recovery, queue the intended recipe, choose INPUT STOCK POLICY, select its actual input, edit thresholds/priority/cooldown and APPLY. The rule can install an absent policy after real missing input; it does not certify transport or delivery and does not override a manually disabled policy. For full output, choose OUTPUT RECOVERY and APPLY; the rule manages only the exact request it pauses and resumes after real space becomes available. Manual pauses remain authoritative.
+
+Tab/Enter and the current primary/secondary/adjust/cancel bindings operate the section; its detail help uses rebound prompts. Pending changes and revision conflicts require a confirmed result or deliberate review. Operations owns those keyboard bindings while open; OPEN EXISTING CONTROLS closes it before the action dock takes ownership. See [Operations rules](OperationsAutomation.md).
+
 ## Completed-tick authority
 
 Operations data is extracted only while requested, after the authoritative fixed tick. `OperationsSnapshot` carries the simulation session, completed tick and player identity; rendering and drill-down reject mismatched session, tick, player and terminal data. UI code does not query ECS or advance production/logistics state. Full entity generations identify facilities and navigation endpoints.
