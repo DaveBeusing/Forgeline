@@ -29,6 +29,12 @@ public sealed class NavigationWaypointOwnershipTests
         simulation.Entities.AddComponent(unit, new MovementOrder(new PlayerId(1), new Vector3(106, 0, 10),
             SimulationTick.Zero, new SimulationTick(1)));
         simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        NavigationRouteState completed = simulation.Entities.GetComponent<NavigationRouteState>(unit);
+        Assert.NotNull(completed.SourceRequest);
+        Assert.True(completed.SourceRequest.Value.RequestId > 0);
+        Assert.Equal(unit, completed.SourceRequest.Value.Requester);
+        Assert.Equal(completed.OriginalOrder.WorldTarget, completed.SourceRequest.Value.Destination);
+        Assert.Equal(Quaternion.Identity, completed.StartRotation);
         MovementOrder waypoint = simulation.Entities.GetComponent<MovementOrder>(unit);
         // Same position and accepted tick are not a sufficient ownership token.
         MovementOrder replacement = waypoint with

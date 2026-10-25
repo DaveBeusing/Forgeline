@@ -25,7 +25,7 @@ public sealed record MatchAuthoritativeSnapshot(
     InventoryStoreSnapshot Inventories,
     IReadOnlyList<AuthoritativeDomainSnapshot> Domains)
 {
-    public const int CurrentSchemaVersion = 8;
+    public const int CurrentSchemaVersion = 9;
 
     private static readonly JsonSerializerOptions s_jsonOptions =
         new()
@@ -68,6 +68,9 @@ public sealed record MatchAuthoritativeSnapshot(
         // Keep the legacy no-rules snapshot unchanged for existing save compatibility.
         if (operations.Count > 0)
             domains.Add(CaptureDomain("operations.rules", operations));
+
+        if (scenario.Services.GroundMovement.NavigationConnected)
+            domains.Add(CaptureDomain("navigation.traffic", scenario.Services.GroundMovement.CaptureNavigationState()));
 
         return new MatchAuthoritativeSnapshot(
             CurrentSchemaVersion,

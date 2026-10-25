@@ -97,7 +97,8 @@ internal static class TextureImporter
                 mips);
 
         return new ImportedAssetPayload(
-            reporter.Measure("texture-payload", runtimeTexture.ToPayload, assetId, path),
+            reporter.Measure("texture-payload", () => runtimeTexture.ToPayload(
+                compressLosslessly: format == RuntimeTextureFormat.Rgba8Unorm && usage == RuntimeTextureUsage.DisplayImage), assetId, path),
             null,
             []);
     }

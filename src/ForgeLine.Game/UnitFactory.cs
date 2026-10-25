@@ -18,16 +18,18 @@ public sealed class UnitFactory
     private readonly EntityRegistry _entities;
     private readonly InventoryStore _inventories;
     private readonly CargoTransportSystem _cargoTransport;
+    private readonly ITerrainQuery? _terrain;
 
     public UnitFactory(
         EntityRegistry entities,
         InventoryStore inventories,
-        CargoTransportSystem cargoTransport)
+        CargoTransportSystem cargoTransport, ITerrainQuery? terrain = null)
     {
         _entities = entities ??
             throw new ArgumentNullException(nameof(entities));
         _inventories = inventories ??
             throw new ArgumentNullException(nameof(inventories));
+        _terrain = terrain;
         _cargoTransport = cargoTransport ??
             throw new ArgumentNullException(nameof(cargoTransport));
     }
@@ -50,6 +52,14 @@ public sealed class UnitFactory
         if (!IsFinite(position))
         {
             throw new ArgumentOutOfRangeException(nameof(position));
+        }
+
+        // Ground spawned units at their authored suspension offset before movement captures its start.
+        if (_terrain is not null)
+        {
+            if (!_terrain.TrySampleHeight(position.X, position.Z, out float height) || !float.IsFinite(height))
+                throw new ArgumentOutOfRangeException(nameof(position), "Unit spawn requires terrain.");
+            position.Y = height + definition.Movement.HeightOffset;
         }
 
         EntityId entity =

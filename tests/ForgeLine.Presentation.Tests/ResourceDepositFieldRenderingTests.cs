@@ -39,17 +39,25 @@ public sealed class ResourceDepositFieldRenderingTests
         using var graphics = new FieldGraphicsDevice();
         using var renderer = new SimpleInstanceRenderer(graphics, fixture.Catalog());
         var camera = new RtsCamera(new() { InitialDistance = 100 });
-        renderer.Render(new SubmissionGraphics.FakeGraphicsCommandContext(), camera, world, 1);
+        var visibleContext = new SubmissionGraphics.FakeGraphicsCommandContext();
+        renderer.Render(visibleContext, camera, world, 1);
         Assert.Equal(1, world.InstanceCount);
         Assert.Equal(root, world.GetInterpolatedInstance(0, 1));
         Assert.Equal(1, renderer.LastDiagnostics.VisibleInstances);
         Assert.Equal(2, renderer.SubmissionMetrics.SubmittedInstances);
         Assert.Equal(1, renderer.LastDiagnostics.DrawCalls);
+        Assert.Equal(2, renderer.LastDiagnostics.TexturedRuntimeMeshInstances);
+        Assert.Equal(4, visibleContext.PixelTextures.Count);
+        Assert.Equal(1, visibleContext.IndexedDrawCalls);
+        Assert.Equal(2, visibleContext.LastInstanceCount);
         Assert.True(world.GetInterpolatedInstance(0, 1).WorldFeature.IsInspectable);
         Assert.False(world.GetInterpolatedInstance(0, 1).Selectable.IsSelectable);
         buffer.Publish(new(new SimulationTick(2), TimeSpan.FromMilliseconds(50), 1, [root with { Visibility = RenderVisibilityMask.Debug }]));
         Assert.True(world.Update(buffer));
-        renderer.Render(new SubmissionGraphics.FakeGraphicsCommandContext(), camera, world, 1);
+        var hiddenContext = new SubmissionGraphics.FakeGraphicsCommandContext();
+        renderer.Render(hiddenContext, camera, world, 1);
+        Assert.Equal(0, hiddenContext.IndexedDrawCalls);
+        Assert.Empty(hiddenContext.PixelTextures);
         Assert.Equal(0, renderer.LastDiagnostics.VisibleInstances);
     }
 

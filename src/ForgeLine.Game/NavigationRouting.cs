@@ -17,13 +17,13 @@ public readonly record struct NavigationAgent(
 
 public readonly record struct NavigationPendingPath(
     NavigationPathRequest Request,
-    MovementOrder OriginalOrder);
+    MovementOrder OriginalOrder, Quaternion StartRotation = default);
 
 public readonly record struct NavigationRouteState(
     MovementOrder OriginalOrder,
     NavigationPath Path,
     int NextWaypointIndex,
-    SimulationTick ActiveWaypointTick)
+    SimulationTick ActiveWaypointTick, NavigationPathRequest? SourceRequest = null, Quaternion StartRotation = default)
 {
     public bool HasActiveWaypoint =>
         ActiveWaypointTick != SimulationTick.Zero &&
@@ -239,6 +239,26 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
         }
     }
 
+    /// <summary>Normal replan admission for the current route owner, never a replacement player target.</summary>
+    internal bool TryRequestTrafficReplan(SimulationContext context, in NavigationOrderBinding binding)
+    {
+        EntityId entity = binding.Requester;
+        if (!context.Entities.IsAlive(entity) || binding.CommandGeneration == 0 ||
+            !NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, 0, out var observation) ||
+            NavigationPrecisionOwnership.IsPrecise(observation) || !NavigationPrecisionOwnership.Matches(observation, binding) ||
+            !context.Entities.TryGetComponent(entity, out NavigationRouteState route) ||
+            route.OriginalOrder != binding.OriginalOrder || route.SourceRequest?.RequestId != binding.RequestId ||
+            !context.Entities.TryGetComponent(entity, out MovementOrder current) || !IsManagedWaypoint(current, route) ||
+            !context.Entities.TryGetComponent(entity, out WorldTransform transform) ||
+            !context.Entities.TryGetComponent(entity, out NavigationAgent agent)) return false;
+        CancelPending(context, entity);
+        RemoveRoute(context, entity, removeManagedOrder: true);
+        var replacement = route.OriginalOrder with { AcceptedAtTick = context.Tick };
+        SupplyRescueTravel.RedirectOwnedOrder(context, entity, route.OriginalOrder, replacement);
+        ScheduleRequest(context, entity, transform, agent, replacement);
+        return true;
+    }
+
     private void ScheduleRequest(
         SimulationContext context,
         EntityId entity,
@@ -267,7 +287,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             World.Version);
 
         var pending =
-            new NavigationPendingPath(request, order);
+            new NavigationPendingPath(request, order, transform.Rotation);
 
         if (context.Entities.HasComponent<NavigationPendingPath>(entity))
         {
@@ -428,7 +448,8 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 pending.OriginalOrder,
                 result.Search.Path,
                 NextWaypointIndex: 0,
-                ActiveWaypointTick: SimulationTick.Zero);
+                ActiveWaypointTick: SimulationTick.Zero,
+                SourceRequest: result.Request, StartRotation: pending.StartRotation);
 
             if (context.Entities.HasComponent<
                     NavigationRouteState>(entity))
@@ -594,7 +615,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
         return true;
     }
 
-    private static bool IsManagedWaypoint(
+    internal static bool IsManagedWaypoint(
         in MovementOrder movementOrder,
         in NavigationRouteState route)
     {

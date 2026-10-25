@@ -358,7 +358,7 @@ public sealed class MatchRuntime : IDisposable
             new UnitFactory(
                 simulation.Entities,
                 inventories,
-                cargoTransport);
+                cargoTransport, terrain);
         var unitProduction =
             new UnitProductionSystem(
                 unitDefinitions,
@@ -423,6 +423,7 @@ public sealed class MatchRuntime : IDisposable
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture
             };
+        groundMovement.ConnectNavigation(navigation, terrain, battlefield.StaticNavigationObstacles);
         var strategicInfrastructure =
             new StrategicInfrastructureSystem(
                 logistics,
