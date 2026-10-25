@@ -1,4 +1,8 @@
-# Predictive traffic — conservative implementation checkpoint
+# Predictive traffic — implementation in progress
+
+The local finalization adds a canonical all-participant batch, bounded multi-second acceleration/braking/yaw prediction, swept relative crossing checks, physical geometry and reservation vetoes, wait-age priority, a bounded wait-for graph, and one completely swept reverse escape for a stopped cycle. Checkpoint revision 2 retains wait-for and recovery state. Seven targeted regression cases pass, including input-order independence, exhausted work, stale/reused entities, geometry veto, detached checkpoint parity, and clear/blocked reverse escape.
+
+This is not yet wired to the live movement or save/replay owner. Directed passage occupancy/fair release, retained right of way, replan requests, runtime integration and their acceptance tests remain required before this PR is ready. No gameplay or performance acceptance is claimed.
 
 ## Status
 
