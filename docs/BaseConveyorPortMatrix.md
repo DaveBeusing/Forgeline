@@ -9,6 +9,12 @@ The current Refinery processes only Volatiles/Fuel and has no conveyor port; Pow
 and Radar also remain excluded. Rows below describe roles including future eligible
 content, not permission to invent sockets for an unsupported definition or scale.
 
+In Draw route, clicking an eligible source and destination selects these existing
+directed ports and places their adapters automatically. During construction,
+IN/OUT arrows identify the real sockets; selected or hovered buildings retain
+these markers outside construction. See [construction and routing](ConveyorConstructionPlacementAndUX.md)
+for length adjustment, visibility and placement limits.
+
 | Directorate structure | Belt INPUT | Belt OUTPUT | Transfer role and restrictions |
 | --- | --- | --- | --- |
 | Command Core | Conditional solids/packages | Conditional solids/packages | Bootstrap inventory and optional local handoff; keep existing building construction stock semantics |
