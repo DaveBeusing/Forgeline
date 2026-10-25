@@ -10,6 +10,36 @@ namespace ForgeLine.Game.Tests;
 public sealed class PredictiveTrafficBatchTests
 {
     [Fact]
+    public void StaticFlankBuildingCannotOwnAdmissionToAnOtherwiseClearPassage()
+    {
+        var (frame, intents) = Crossing();
+        var vehicle = frame.Vehicles[1];
+        var intent = intents[1];
+        var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 };
+        var terrain = new TerrainWorld(settings,
+            [new TerrainChunk(new ChunkCoordinate(0, 0), new TerrainHeightfield(17, 64, new float[289]))]);
+        var body = new NavigationCollisionBody(new(NavigationObstacleSource.Entity, 99, 1),
+            NavigationObstacleKind.Structure, new(new(24, .5f, 20), Quaternion.Identity), new(.5f), Vector3.Zero);
+        var collision = new NavigationCollisionFrame(frame.Collision.World, frame.Tick.Value,
+            new AxisAlignedBounds(new(0, -10, 0), new(64, 10, 64)), true, [body], 10);
+        var passage = new NavigationTrafficPassage(1, new(new(20, .5f, 20), Quaternion.Identity), new(6, 1, 8));
+        var geometry = new NavigationVehicleGeometry(collision.World, terrain, 128, .5f);
+        var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity), vehicle.Pose,
+            vehicle.Pose with { Position = new(20, .5f, 19) }, vehicle.Profile, 1.5f);
+        var trailingSweep = sweep with { Start = sweep.End, End = vehicle.Pose with { Position = new(20, .5f, 28) } };
+        Assert.Equal(NavigationGeometryStatus.Clear, geometry.Sweep(collision, sweep, 10000).Status);
+        Assert.Equal(NavigationGeometryStatus.Clear, geometry.Sweep(collision, trailingSweep, 10000).Status);
+        var captured = new NavigationTrafficFrame(frame.Tick, collision, true, [vehicle], [], Limits(), [passage]);
+        var planner = new PredictiveTrafficPlanner();
+        var directive = Assert.Single(planner.PlanBatch(captured, [intent], geometry, 3, 10000, out _));
+        Assert.Equal(NavigationTrafficAction.Proceed, directive.Action);
+        Assert.Equal(vehicle.Entity, Assert.Single(planner.CaptureState().Leases).Owner);
+        var blocked = new NavigationCollisionFrame(collision.World, collision.Tick, collision.Coverage, true,
+            [body with { Pose = new(new(20, .5f, 20), Quaternion.Identity) }], 10);
+        Assert.NotEqual(NavigationGeometryStatus.Clear, geometry.Sweep(blocked, trailingSweep, 10000).Status);
+    }
+
+    [Fact]
     public void DistantObstructionUsesItsVerifiedBrakingPrefixInsteadOfImmediateCrawl()
     {
         var (frame, intents) = Crossing();
