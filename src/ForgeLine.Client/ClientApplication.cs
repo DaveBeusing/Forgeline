@@ -70,12 +70,16 @@ internal sealed class ClientApplication
     private readonly string _settingsPath;
     private readonly StartupDiagnostics _startup;
 
+    internal bool DeveloperNavigationDiagnostics { get; }
+
     internal ClientApplication(
         IPlatform platform,
         ClientUserSettings? settings = null,
         string? settingsPath = null,
-        StartupDiagnostics? startup = null)
+        StartupDiagnostics? startup = null,
+        bool developerNavigationDiagnostics = false)
     {
+        DeveloperNavigationDiagnostics = developerNavigationDiagnostics;
         _startup = startup ?? StartupDiagnostics.Disabled;
         _platform =
             platform ??

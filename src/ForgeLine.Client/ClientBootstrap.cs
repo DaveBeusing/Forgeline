@@ -24,7 +24,7 @@ internal static class ClientBootstrap
     private static int RunCore(string[] args, long processEntry)
     {
         if (!Program.TryParseArguments(args, out bool smokeTest, out int instances,
-            out string? qualification, out string? settingsRoot)) return 2;
+            out string? qualification, out string? settingsRoot, out bool developerNavigationDiagnostics)) return 2;
         bool menuSmoke = args.Contains("--startup-menu-smoke-test", StringComparer.OrdinalIgnoreCase);
         string? output = ArgumentValue(args, "--startup-diagnostics-output");
         Guid identity = Guid.NewGuid();
@@ -48,7 +48,7 @@ internal static class ClientBootstrap
             try
             {
                 int result = RunApplication(args, platform, window, diagnostics, settingsRoot,
-                    smokeTest, menuSmoke, instances, qualification, launch > 1);
+                    smokeTest, menuSmoke, instances, qualification, launch > 1, developerNavigationDiagnostics);
                 diagnostics.Finish();
                 checkpoint.Flush();
                 if (result != ClientApplication.RestartRequestedExitCode) return result;
@@ -82,7 +82,7 @@ internal static class ClientBootstrap
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunApplication(string[] args, WindowsPlatform platform, IWindow window,
         StartupDiagnostics diagnostics, string? settingsRoot, bool smokeTest, bool menuSmoke,
-        int instances, string? qualification, bool restart)
+        int instances, string? qualification, bool restart, bool developerNavigationDiagnostics)
     {
         platform.UpdateBootstrap(window, "LOADING SETTINGS");
         using var cancellation = new CancellationTokenSource();
@@ -110,7 +110,7 @@ internal static class ClientBootstrap
             platform.ConfigureBootstrap(window, loaded.Settings.CreateWindowConfiguration());
             platform.UpdateBootstrap(window, "PREPARING GRAPHICS");
             var application = new ClientApplication(platform, loaded.Settings with { ReferenceZoom = zoom },
-                loaded.Path, diagnostics);
+                loaded.Path, diagnostics, developerNavigationDiagnostics);
             return application.Run(smokeTest, instances, qualification,
                 args.Contains("--skip-splash", StringComparer.OrdinalIgnoreCase), restart, window, menuSmoke, ArgumentValue(args, "--scenario"));
         }
