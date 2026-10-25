@@ -2758,7 +2758,7 @@ internal sealed class ClientApplication
             _settingsPath, Bindings: _gameplayBindings);
     }
 
-    private static bool ConsumeKeyPress(
+    internal static bool ConsumeKeyPress(
         InputState inputState,
         PlatformKey key,
         ref bool held)
@@ -2766,8 +2766,8 @@ internal sealed class ClientApplication
         bool down =
             inputState.IsKeyDown(key);
         bool pressed =
-            down &&
-            !held;
+            inputState.WasKeyPressed(key) ||
+            (down && !held);
         held = down;
         return pressed;
     }
