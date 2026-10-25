@@ -583,6 +583,10 @@ internal sealed class ClientApplication
         long nextDiagnosticAt = startedAt;
         bool smokeMatchCompleted = false;
         var interactionDisplay = (window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
+        RtsCameraState? lastPublishedCamera = null;
+        PresentationSnapshot? lastPublishedSnapshot = null;
+        var lastPublishedDisplay = interactionDisplay;
+        ulong lastPublishedSelection = ulong.MaxValue;
 
         while (window.IsOpen)
         {
@@ -594,7 +598,7 @@ internal sealed class ClientApplication
             }
 
             DrainWindowEvents(window);
-            DrainInputEvents(window, inputState);
+            bool receivedInput = DrainInputEvents(window, inputState);
             var currentDisplay = (window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
             if (currentDisplay != interactionDisplay)
             {
@@ -1447,7 +1451,7 @@ internal sealed class ClientApplication
 
             bool gameplayActive =
                 currentExperience?.MatchStatus ==
-                PlayerMatchStatus.Active;
+                PlayerMatchStatus.Active && !renderHost.IsPreparingTerrain;
 
             CombatGroupInputResult combatGroupInputResult =
                 combatGroupInput.Update(
@@ -1638,37 +1642,45 @@ internal sealed class ClientApplication
                 tacticalTargetingController.CreateView(
                     currentSnapshot);
 
-            BuildGameplayWorldOverlay(
-                gameplayDraw,
-                renderWorld,
-                renderAlpha,
-                camera,
-                selectionController,
-                buildingPlacementController,
-                tacticalTargetingView,
-                terrainWorld,
-                tacticalTargetingController.CommandFeedback,
-                MathF.Max(1.0f, camera.Distance * MathF.Tan(camera.Settings.VerticalFieldOfViewRadians * 0.5f) *
-                    12.0f * interactionLayout.Scale / Math.Max(1, window.ClientSize.Height)),
-                informationLayer.OverlayMode,
-                RtsStrategicOverlayHudModel.IsCurrent(currentSnapshot, informationLayer.OverlayMode) ? currentSnapshot?.StrategicOverlay : null,
-                camera.GetMatrices(Math.Max(1,window.ClientSize.Width),Math.Max(1,window.ClientSize.Height)).ViewProjection);
+            RtsCameraState publicationCamera = camera.CaptureState();
+            bool publishVisualFrame = renderHost.NeedsFramePublication || receivedInput ||
+                publicationCamera != lastPublishedCamera || currentDisplay != lastPublishedDisplay ||
+                selectionController.Selection.Revision != lastPublishedSelection ||
+                !ReferenceEquals(currentSnapshot, lastPublishedSnapshot);
+            if (publishVisualFrame)
+            {
+                BuildGameplayWorldOverlay(
+                    gameplayDraw,
+                    renderWorld,
+                    renderAlpha,
+                    camera,
+                    selectionController,
+                    buildingPlacementController,
+                    tacticalTargetingView,
+                    terrainWorld,
+                    tacticalTargetingController.CommandFeedback,
+                    MathF.Max(1.0f, camera.Distance * MathF.Tan(camera.Settings.VerticalFieldOfViewRadians * 0.5f) *
+                        12.0f * interactionLayout.Scale / Math.Max(1, window.ClientSize.Height)),
+                    informationLayer.OverlayMode,
+                    RtsStrategicOverlayHudModel.IsCurrent(currentSnapshot, informationLayer.OverlayMode) ? currentSnapshot?.StrategicOverlay : null,
+                    camera.GetMatrices(Math.Max(1,window.ClientSize.Width),Math.Max(1,window.ClientSize.Height)).ViewProjection);
 
-            BuildDevelopmentDebugOverlay(
-                debugDraw,
-                debugOverlay.View,
-                prototypeBattlefield,
-                renderWorld,
-                renderAlpha,
-                camera,
-                currentSnapshot?.Construction,
-                currentSnapshot?.Debug);
+                BuildDevelopmentDebugOverlay(
+                    debugDraw,
+                    debugOverlay.View,
+                    prototypeBattlefield,
+                    renderWorld,
+                    renderAlpha,
+                    camera,
+                    currentSnapshot?.Construction,
+                    currentSnapshot?.Debug);
+            }
 
-            CombatGroupOverviewView combatGroupOverview =
-                CombatGroupOverviewModel.Create(
+            CombatGroupOverviewView combatGroupOverview = publishVisualFrame
+                ? CombatGroupOverviewModel.Create(
                     combatGroupRegistry,
                     SelectedCombatGroup.Resolve(currentSnapshot),
-                    selectionController.Selection);
+                    selectionController.Selection) : CombatGroupOverviewView.Empty;
 
             transientMenus.SelectionCommitted(inputState, selectionController.Selection, actionPanel, operationsController, presentationInteraction);
             actionPanel.SynchronizeObjectRing(inputState, currentSnapshot, renderWorld, selectionController.Selection,
@@ -1716,7 +1728,7 @@ internal sealed class ClientApplication
                     selectionController.IsDragSelecting,
                     selectionController.DragStart,
                     selectionController.DragCurrent,
-                    selectionController.Selection.Entities.ToArray(),
+                    [],
                     MinimapPointerCaptured:
                         minimapInteraction.View.PointerCaptured,
                     MinimapPointerWorldValid:
@@ -1749,9 +1761,11 @@ internal sealed class ClientApplication
                 Placement = placementFeedback
             };
 
-            _ = renderHost.Publish(
+            if (publishVisualFrame)
+            {
+                _ = renderHost.Publish(
                 new ClientRenderFrame(
-                    camera.CaptureState(),
+                    publicationCamera,
                     window.ClientSize.Width,
                     window.ClientSize.Height,
                     overlayEnabled,
@@ -1759,10 +1773,10 @@ internal sealed class ClientApplication
                     actionPanelView,
                     tacticalTargetingView,
                     activeFormation,
-                    gameplayDraw.Lines.ToArray(),
-                    gameplayDraw.Labels.ToArray(),
-                    debugDraw.Lines.ToArray(),
-                    debugDraw.Labels.ToArray(),
+                    [],
+                    [],
+                    [],
+                    [],
                     window.Dpi,
                     informationView,
                     _settings.UiScale,
@@ -1774,7 +1788,18 @@ internal sealed class ClientApplication
                     MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
                     Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
-                    NotificationExpansion: alertController.Expansion));
+                    NotificationExpansion: alertController.Expansion),
+                    gameplayDraw, debugDraw, selectionController.Selection.Entities);
+                lastPublishedCamera = publicationCamera;
+                lastPublishedSnapshot = currentSnapshot;
+                lastPublishedDisplay = currentDisplay;
+                lastPublishedSelection = selectionController.Selection.Revision;
+            }
+
+            // Wake immediately for Windows input; otherwise briefly yield while
+            // the latest immutable frame is still waiting for its render owner.
+            if (!renderHost.NeedsFramePublication)
+                _platform.WaitForEvents(TimeSpan.FromMilliseconds(2));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
@@ -1872,6 +1897,8 @@ internal sealed class ClientApplication
                     "match-client",
                 scenarioKey = composition.Key,
                 scenarioIdentity = composition.Identity,
+                renderPreparation = metrics.RenderWork,
+                framePublication = metrics.Publication,
                 renderStressInstances,
                 settings =
                     new
@@ -2899,14 +2926,17 @@ internal sealed class ClientApplication
         }
     }
 
-    private static void DrainInputEvents(
+    private static bool DrainInputEvents(
         IWindow window,
         InputState inputState)
     {
+        bool received = false;
         while (window.TryDequeueInputEvent(out PlatformInputEvent inputEvent))
         {
             inputState.Apply(inputEvent);
+            received = true;
         }
+        return received;
     }
 
     private static string ResolveSaveDirectory() =>
