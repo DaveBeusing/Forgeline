@@ -100,6 +100,45 @@ public sealed class PredictiveTrafficBatchTests
     }
 
     [Theory]
+    [InlineData(128, false)]
+    [InlineData(120000, true)]
+    public void LocalDetourKeepsTheBindingBudgetAndCheckpointWithoutInventingAReverse(int allowance, bool expectDetour)
+    {
+        var (source, intents) = Crossing();
+        var vehicle = source.Vehicles[0] with { Movement = GroundMovementState.Stationary(MathF.PI / 2) };
+        var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 };
+        var terrain = new TerrainWorld(settings,
+            [new TerrainChunk(new(0, 0), new TerrainHeightfield(17, 64, new float[289]))]);
+        var obstacle = new NavigationCollisionBody(new(NavigationObstacleSource.Entity, 99, 1), NavigationObstacleKind.Vehicle,
+            new(new(18, .5f, 20), Quaternion.Identity), new(.5f), Vector3.Zero);
+        var body = new NavigationCollisionBody(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity), NavigationObstacleKind.Vehicle,
+            vehicle.Pose, vehicle.Profile.HalfExtents, Vector3.Zero);
+        var collision = new NavigationCollisionFrame(source.Collision.World, 50,
+            new AxisAlignedBounds(new(0, -10, 0), new(64, 10, 64)), true, [body, obstacle], 10);
+        var frame = new NavigationTrafficFrame(new(50), collision, true, [vehicle], [], Limits() with { WorkPerSearch = 32768 });
+        var planner = new PredictiveTrafficPlanner();
+        var geometry = new NavigationVehicleGeometry(collision.World, terrain, 128, .5f);
+        var directive = Assert.Single(planner.PlanBatch(frame, [intents[0]], geometry, 3, allowance, out int work));
+        Assert.InRange(work, 0, allowance);
+        Assert.Equal(intents[0].Binding, directive.Binding);
+        Assert.True(expectDetour == directive.SuggestedTarget.HasValue, $"directive={directive}; work={work}");
+        Assert.NotEqual(NavigationTrafficAction.Recovery, directive.Action);
+        if (expectDetour)
+        {
+            Assert.Equal(NavigationTrafficAction.Proceed, directive.Action);
+            Assert.InRange(directive.MaximumSpeed, .01f, 1);
+            var restored = new PredictiveTrafficPlanner();
+            restored.RestoreState(planner.CaptureState());
+            var continued = Assert.Single(planner.PlanBatch(frame, [intents[0]], geometry, 3, allowance, out int continuedWork));
+            var actual = Assert.Single(restored.PlanBatch(frame, [intents[0]], geometry, 3, allowance, out int restoredWork));
+            Assert.Equal(continued, actual);
+            Assert.Equal(continuedWork, restoredWork);
+            Assert.Empty(restored.CaptureState().Leases);
+            Assert.Null(Assert.Single(restored.CaptureState().Vehicles).RecoveryTarget);
+        }
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void QueueHeadClaimsAnUnenteredCrossingBeforeItsLaterFollower(bool reverseInput)
