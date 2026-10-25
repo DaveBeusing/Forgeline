@@ -20,6 +20,21 @@ internal static class NavigationPrecisionOwnership
         return false;
     }
 
+    internal static bool TryBeginOwnedQueueApproach(in NavigationVehicleObservation vehicle, out MovementOrder local)
+    {
+        local = default;
+        var original = vehicle.RouteOrder ?? vehicle.DirectOrder;
+        if (original is not { Kind: MovementOrderKind.Strategic } root || root.Issuer != vehicle.Owner ||
+            vehicle.QueueEntry is not { Generation: > 0, Position: 1, ArrivedAtService: false } queue || queue.Owner != vehicle.Owner ||
+            root.WorldTarget != queue.Target || !IsPrecise(vehicle) ||
+            vehicle.DockVisit is not { Generation: > 0, LaneEntered: false } reserved || reserved.Building != queue.Building ||
+            reserved.Pose.ApproachStart != queue.Target || vehicle.BuildingSlot is not { } slot ||
+            slot.Truck != vehicle.Entity || slot.Owner != vehicle.Owner || slot.Generation != reserved.Generation || slot.Pose != reserved.Pose)
+            return false;
+        local = root with { Kind = MovementOrderKind.LocalApproach, TargetHeadingRadians = queue.Heading };
+        return true;
+    }
+
     internal static bool Matches(in NavigationVehicleObservation vehicle, in NavigationOrderBinding binding)
     {
         if (vehicle.DockVisit is { } visit)

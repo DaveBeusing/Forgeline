@@ -10,7 +10,7 @@ namespace ForgeLine.Navigation;
 /// </summary>
 public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
 {
-    public const int AlgorithmRevision = 2;
+    public const int AlgorithmRevision = 3;
 
     private readonly NavigationWorldSnapshot _snapshot;
     private readonly NavigationTerrainEnvelope _terrain;
@@ -107,7 +107,11 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
                 angle, radius, approved, endFraction);
             if (!Finite(swept.HalfExtents) || !Finite(swept.Center) || !FiniteBounds(swept))
                 return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
-            AxisAlignedBounds bounds = swept.Bounds;
+            // Terrain and coverage keep the conservative whole clearance envelope.
+            var terrainEnvelope = swept with { HalfExtents = swept.HalfExtents + new Vector3(movement.Vehicle.ClearanceMeters) };
+            if (!Finite(terrainEnvelope.HalfExtents) || !FiniteBounds(terrainEnvelope))
+                return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
+            AxisAlignedBounds bounds = terrainEnvelope.Bounds;
             if (!ContainsHorizontal(_snapshot.WorldBounds, bounds))
                 return Obstructed(frame, approved, NavigationBlockReason.OutsideWorld, null, work);
             if (!Contains(frame.Coverage, bounds))
@@ -122,7 +126,7 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
                 if (body.Identity == movement.Mover) continue;
                 if (!TryObstacleEnvelope(body, frame.BodyPosesAreFixed, movement.DurationSeconds, approved, endFraction, out NavigationCollisionBox obstacle))
                     return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
-                if (!NavigationCollisionBox.Intersects(swept, obstacle)) continue;
+                if (!NavigationCollisionBox.Intersects(swept, obstacle, movement.Vehicle.ClearanceMeters)) continue;
                 // Scan all entries before publishing a blocker so input array
                 // order cannot pick different identities under equal contacts.
                 if (blocker is null || Compare(body.Identity, blocker.Value) < 0)
@@ -136,7 +140,7 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
             }
             if (blocker.HasValue) return Obstructed(frame, approved, blockReason, blocker, work);
 
-            NavigationGeometryStatus terrainStatus = _terrain.Check(swept, movement,
+            NavigationGeometryStatus terrainStatus = _terrain.Check(terrainEnvelope, movement,
                 approved, endFraction, startOffset, _snapshot.Capabilities.MaximumSlopeDegrees, ref work);
             if (terrainStatus == NavigationGeometryStatus.BudgetExhausted)
                 return Result(frame, terrainStatus, approved, NavigationBlockReason.SearchWork, null, work);
@@ -162,7 +166,7 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
         // Every point's deviation from the middle rotation is bounded by the
         // chord of the enclosing sphere. Translation is projected separately.
         float rotationExpansion = (float)(2 * radius * Math.Sin(angle * (to - from) * 0.25));
-        float padding = rotationExpansion + movement.Vehicle.ClearanceMeters +
+        float padding = rotationExpansion +
             NavigationCollisionBox.NumericalPadding(pose.Position, radius);
         Vector3 extent = box.HalfExtents + new Vector3(
             (float)Math.Abs(NavigationCollisionBox.Dot(halfTranslation, box.AxisX)),

@@ -178,6 +178,42 @@ public sealed class ConnectedLogisticsNavigationTests
         Assert.InRange(Vector3.Distance(entities.GetComponent<WorldTransform>(unit).Position, goal), 0, .11f);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void InfantryBesideAStoppedTruckCanClearWithoutMovingTheTruck(bool canMove)
+    {
+        Vector3 goal = new(9.7246f, .9f, 31.9791f);
+        var (simulation, movement, unit) = Create(goal: goal);
+        var entities = simulation.Entities;
+        const float heading = -1.4734924f;
+        var initial = new WorldTransform(new(30, .9f, 30), Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading), new(1.8f));
+        entities.SetComponent(unit, initial);
+        entities.SetComponent(unit, new UnitIdentity(UnitIds.RifleSquad, default));
+        entities.SetComponent(unit, GroundMovementState.Stationary(heading));
+        entities.SetComponent(unit, new SpatialPresence(initial.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        entities.SetComponent(unit, new GroundMovement(7.2f, 8, 10, 4.712389f, .9f, .6f, 2.4f, 4, 45, .9f));
+        var parked = entities.CreateEntity();
+        var parkedPose = new WorldTransform(new(25.3596f, 1.1f, 27.6972f), Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2), new(3.4f, 2.5f, 6.8f));
+        entities.AddComponent(parked, parkedPose);
+        entities.AddComponent(parked, new GroundMovement(13, 6.5f, 10, 2.35f, 2, 1, 5.8f, 8, 24, 1.1f));
+        entities.AddComponent(parked, GroundMovementState.Stationary(MathF.PI / 2));
+        entities.AddComponent(parked, new UnitIdentity(UnitIds.SupplyTruck, default));
+        entities.AddComponent(parked, entities.GetComponent<ControllableEntity>(unit));
+        entities.AddComponent(parked, new SpatialPresence(parkedPose.Scale * .5f, new SpatialEntryMetadata(1, 4, SpatialMobility.Mobile)));
+        if (!canMove) entities.AddComponent(unit, new SupplyMovementConstraint(0, false));
+        simulation.RunTicks(600, TestContext.Current.CancellationToken);
+        Assert.Equal(parkedPose, entities.GetComponent<WorldTransform>(parked));
+        if (!canMove)
+        {
+            Assert.Equal(initial, entities.GetComponent<WorldTransform>(unit));
+            Assert.True(entities.HasComponent<MovementOrder>(unit));
+            return;
+        }
+        Assert.False(entities.HasComponent<MovementOrder>(unit), $"pose={entities.GetComponent<WorldTransform>(unit)}; motion={entities.GetComponent<GroundMovementState>(unit)}; veto={string.Join(';', movement.CaptureLegacyNavigationVetoes())}");
+        Assert.InRange(Vector3.Distance(entities.GetComponent<WorldTransform>(unit).Position, goal), 0, .61f);
+    }
+
     [Fact]
     public void ReservedHeadCanClearARearNeighborBeforeEnteringItsDockLane()
     {
