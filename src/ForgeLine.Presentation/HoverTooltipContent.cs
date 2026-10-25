@@ -199,6 +199,7 @@ internal static class HoverTooltipResolver
                 case PlayerActionPanelMode.Technology:
                     costs = actions.Technology[index].Costs;
                     requirement = actions.Technology[index].RequiredFacilityName;
+                    hint = actions.Technology[index].EffectDescription;
                     prerequisites = actions.Technology[index].Prerequisites;
                     break;
             }

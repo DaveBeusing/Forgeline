@@ -20,13 +20,13 @@ Both crossings use the normal disable/restore commands and fixed-tick infrastruc
 
 ## Identity and compatibility
 
-Map revision 1, artifact format 3 and terrain recipe version 1 reuse the existing Directorate content revision `directorate.v1`. The content hash remains `192624b7d2011b4ae6d0858d74d2fdfa9dc0d361c029444bf663f785556ffbd9`.
+Map revision 1, artifact format 3 and terrain recipe version 1 reuse the existing Directorate content revision `directorate.v1`. The current content hash is `205d0887e816d8922c43996a6a8ad85d177cbbf168e551a87ce76d9cc81efd63`.
 
-Map JSON SHA-256: `2340ae49d9fd58b5c4e08347a8a14cbe4ca88f34b66dcbeca73af2e5bd5bd608`.
+Map JSON SHA-256: `f82b732e563b611a9106279e260564ba91a77eb3a61e19dd1e439caf28d8c8b8`.
 
 Terrain SHA-256 over every little-endian height sample in chunk/Z/X order: `ee7f0c7e872c2e32528729eca98171ebbcbd9d0d4d846a007fb4d5eb0d9562cd`.
 
-The registry pins those bytes plus the mandatory digest sidecar. Save/replay payload 7 stores the exact scenario identity; envelope 1 and authoritative schema 7 are unchanged. A mismatching saved map identity fails explicitly. The historical Central Divide legacy mapping remains separate. Setup, new/load/restart and installed-package validation resolve the selected descriptor rather than falling back to the default map.
+The registry pins those bytes plus the mandatory digest sidecar. Save/replay payload 7 stores the exact scenario identity; envelope 1 is retained and authoritative schema 8 follows the integrated technology-progression master. A mismatching saved map identity fails explicitly. The historical Central Divide legacy mapping remains separate. Setup, new/load/restart and installed-package validation resolve the selected descriptor rather than falling back to the default map.
 
 ## Reproduction
 
@@ -47,6 +47,18 @@ The compiler reloads and qualifies the actual serialized terrain/map, records th
 The loaded-map compiler passes 49 reachability checks, two alternate-navigation checks and two alternate-road checks, with 39.774094 m sampled elevation range. At 16 m navigation cells / 8-cell sectors, Infantry, Wheeled and Tracked each take 1,408 m between starts. Closing the bridge produces a 2,115.677 m west→east path and 2,115.8376 m east→west path. The 0.161 m refinement difference is reported rather than treated as exact path symmetry. Closing only the ford leaves the 1,408 m path. These are geometric distances, not arrival times or balance acceptance.
 
 The build-policy regression samples every road and its ±16 m shoulder strip with 2 m footprints for both owners, while requiring each full Core footprint to fit its own yard. Local Silicates now sit 144 m from the central road rather than 26 m; contested Volatiles and outer Silicates also clear the actual 72 m mining-zone padding. The base rectangles stop before the road entry. The qualified industrial layout leaves real dock approaches free; normal placement validation remains authoritative.
+
+## Current technology integration
+
+Master advanced to `5605d96c` (technology progression, PR #350) while this branch was being published. This candidate prepares **0.1.471-dev** above master 0.1.470-dev. Both registered maps use current Directorate content `205d0887e816d8922c43996a6a8ad85d177cbbf168e551a87ce76d9cc81efd63`; Central Divide is pinned to `2f2b21f21697c665a8ab3ac607e7cebc6f82d1b9cf06f2838a02444f179f1f1f`, Split Basin to `f82b732e563b611a9106279e260564ba91a77eb3a61e19dd1e439caf28d8c8b8`. Terrain samples, roads, deposits, sites and base layout are unchanged. Payload 7/envelope 1 follow current master; authoritative schema 8 explicitly rejects pre-technology saves/replays. The frozen legacy identity is preserved.
+
+Post-merge validation passes: full Release solution build with zero warnings/errors (2m57s); **57 focused Game cases** covering Split Basin, compiled maps, persistence/composition, technology effects/paid production/recovery and opponent research; **16 Client scenario/argument cases**; compiler qualification with 49 reachability, two alternate-navigation and two alternate-road checks; both-map CLI new/save/load/replay and independent missing-data rejection. Current seed-2026/tick-20 authoritative hashes are `57C5E18F1D591A34245BEB35C77635AFF378526297ABD1AECDA58206FF293344` for Split Basin and `B994E0FD0195766BB241EF64957B83B7F11352272D6913AA0D575E61DAD516A3` for Central Divide. Logs are `artifacts/split-basin-tech-{build,map,game-tests,client-tests,cli}.log`.
+
+The complete suite, terminal outcomes, native/WARP, benchmark and exported-package evidence below predates the technology merge and remains historical. These gates are not claimed passed on the new integration; consult actual-head CI in [draft PR #355](https://github.com/DaveBeusing/Forgeline/pull/355). Existing #344/#345 and human/reference-performance acceptance remain separate open gates.
+
+## Historical qualification before the technology merge
+
+The following measurements qualify clean runtime `9c170bd8` and its old 0.1.470-dev package/content/schema, before the incoming technology integration. They are retained as prior evidence and do **not** qualify the current 0.1.471-dev binaries, state hashes, endgame outcomes or package. See the current checkpoint above and actual-head CI in PR #355.
 
 Thirty-three focused Game cases pass, including all ten Split Basin geography/runtime cases plus compiled-terrain/navigation parity, scenario persistence and custom composition contracts. They cover all three movement classes, both starts, every resource/site/objective, either crossing lost and both lost, actual logistics rerouting/restoration, normal paid industry/conveyors/Fuel, active save/replay/continuation and wrong/missing identities. Sixteen Client scenario/argument cases pass, including actual registered new/load/restart. Repeated same-seed 2,000-tick comparisons exchange the existing opponent configurations between starts; these bounded comparisons are not completed games.
 
