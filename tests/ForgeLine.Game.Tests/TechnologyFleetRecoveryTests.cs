@@ -52,6 +52,7 @@ public sealed class TechnologyFleetRecoveryTests
                 string line = $"{entity}@{entities.GetComponent<WorldTransform>(entity).Position}";
                 if (entities.TryGetComponent(entity, out UnitIdentity identity)) line += $" unit={identity.UnitId}";
                 if (entities.TryGetComponent(entity, out GroundMovementState movement)) line += $" movement={movement}";
+                if (entities.TryGetComponent(entity, out MovementOrder order)) line += $" order={order}";
                 if (entities.TryGetComponent(entity, out VehicleQueueEntry queue)) line += $" queue={queue}";
                 if (entities.TryGetComponent(entity, out VehicleDockVisit dock)) line += $" dock={dock}";
                 if (entities.TryGetComponent(entity, out SupplyLoadingOrder loading)) line += $" loading={loading}";
@@ -60,6 +61,7 @@ public sealed class TechnologyFleetRecoveryTests
             }
             var checkpoint = runtime.Services.GroundMovement.CaptureNavigationState();
             lines.Add($"navigation={string.Join(';', checkpoint.Actors)}; waits={string.Join(';', checkpoint.Traffic.Vehicles)}");
+            lines.Add($"leases={string.Join(';', checkpoint.Traffic.Leases)}; precise={string.Join(';', runtime.Services.GroundMovement.CaptureLegacyNavigationVetoes())}");
             return string.Join(Environment.NewLine, lines);
         }
 

@@ -97,6 +97,30 @@ internal sealed partial class PredictiveTrafficPlanner
                 waits[i] = NavigationBlockReason.None;
         }
 
+        // A service-blocked approach cannot capture an unentered crossing against
+        // the very service owner it must wait for. Occupied leases remain physical
+        // ownership and are retained separately until complete rear clearance.
+        var admissionAllowed = new bool[ordered.Length];
+        for (int i = 0; i < ordered.Length; i++)
+        {
+            admissionAllowed[i] = waits[i] == NavigationBlockReason.None;
+            if (!admissionAllowed[i]) continue;
+            foreach (var reservation in frame.Reservations)
+            {
+                if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
+                workConsumed++;
+                if (!ReservationApplies(vehicles[ordered[i].Binding.Requester], reservation)) continue;
+                if (workAllowance - workConsumed < PredictionSteps)
+                { workConsumed = workAllowance; return Unavailable(NavigationBlockReason.SearchWork); }
+                workConsumed += PredictionSteps;
+                if (!Touches(new(reservation.ReservationId, reservation.Pose, reservation.HalfExtents), paths[i], profiles[i])) continue;
+                admissionAllowed[i] = false;
+                waits[i] = NavigationBlockReason.ReservedCorridor;
+                waitingFor[i] = reservation.Owner;
+                break;
+            }
+        }
+
         // Priority is waiting age followed by full identity, never call or dictionary order.
         var priority = Enumerable.Range(0, ordered.Length).ToArray();
         Array.Sort(priority, (a, b) =>
@@ -109,7 +133,7 @@ internal sealed partial class PredictiveTrafficPlanner
         var crossingPlan = DiscoverCrossings(frame, ordered, paths, profiles, workAllowance - workConsumed);
         workConsumed += crossingPlan.Work;
         if (!crossingPlan.Complete) return Unavailable(NavigationBlockReason.SearchWork);
-        var passagePlan = PreparePassages(frame, ordered, vehicles, paths, priority, crossingPlan.Passages, waits, waitingFor,
+        var passagePlan = PreparePassages(frame, ordered, vehicles, paths, priority, admissionAllowed, crossingPlan.Passages, waits, waitingFor,
             workAllowance - workConsumed);
         workConsumed += passagePlan.Work;
         if (!passagePlan.Complete) return Unavailable(NavigationBlockReason.SearchWork);

@@ -41,3 +41,11 @@ A static building touching the abstract admission envelope was treated as a traf
 ## Service wait versus physical escape
 
 A long external dock-reservation wait alone previously triggered a reverse Recovery directive. The red-to-green case now retains Hold/ReservedCorridor without inventing a physical blocker. Proactive escape outside the coarse participant graph requires an observed MovingVehicle or StaticObstacle reason. Explicit detected wait cycles and already verified retained escapes keep their separate bounded handling. All original turn/convoy cases remain green; the expanded set is 74 passed / 3 failed out of 77, with the same natural player/fleet cases outstanding.
+
+## Rear-clear passage contact
+
+Circumscribed-circle admission could recapture a vehicle after its complete footprint had already cleared a foreign passage, leaving it blocked just outside the region. Touches now projects the complete conservative swept physical enclosure (translation, rotation and clearance) into the horizontal passage frame. The outward-occupant check uses the same contact representation, including numerical padding. Geometry remains authoritative and the original owner/Entered lease is retained. The new outward-continuation case fails before and passes after, while inward re-entry remains rejected. Follow-up set:75 passed /3 same natural-flow failures out of78.
+
+## Service admission before passage capture
+
+A vehicle waiting for a foreign service reservation could nevertheless acquire an unentered crossing lease against that service owner. Service applicability/contact is now evaluated once per intent before passage selection, with bounded work charged to the unchanged allowance. A blocked approach cannot acquire or retain an unentered lease. Occupied/entered ownership remains retained until the complete footprint clears. The test covers blocked initial admission, free admission, later withdrawal of an unentered claim, and mandatory retention of an occupied claim. The expanded set is76 passed /3 failed out of79. The formerly frozen KI dock exit now clears and the recorded vehicles continue moving at tick12000, but the same natural-flow limits still fail and are not waived.
