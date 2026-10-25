@@ -20,5 +20,6 @@ internal readonly record struct NavigationWorkspaceStatistics(
     long ReleasedCount,
     long ActiveLimitRejections,
     long MemoryLimitRejections,
+    long RequestLimitRejections,
     long InitializedBytes,
     bool IsDisposed);

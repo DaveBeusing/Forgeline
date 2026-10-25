@@ -24,6 +24,7 @@ internal sealed class NavigationWorkspacePool : IDisposable
     private long _releasedCount;
     private long _activeLimitRejections;
     private long _memoryLimitRejections;
+    private long _requestLimitRejections;
     private long _initializedBytes;
     private bool _disposed;
 
@@ -56,6 +57,14 @@ internal sealed class NavigationWorkspacePool : IDisposable
     public long AccountedBytesPerWorkspace { get; }
 
     /// <summary>
+    /// Reserve this fixed overhead and worst-case idle capacity outside the
+    /// scheduler's active-session allowance. Active arena bytes are already part
+    /// of each session's declared peak; retained bytes must not spend that credit.
+    /// </summary>
+    public long RetainedReservationBytes =>
+        PoolOverheadBytes + (long)MaximumRetainedWorkspaces * AccountedBytesPerWorkspace;
+
+    /// <summary>
     /// Leases zero-initialized storage, or returns false under count or memory pressure.
     /// Initialization touches at most CapacityBytes; callers must charge that work to
     /// the search's initialization stage, including when a retained arena is reused.
@@ -65,44 +74,54 @@ internal sealed class NavigationWorkspacePool : IDisposable
         lock (_gate)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
-            lease = null;
-            if (_activeCount == MaximumActiveWorkspaces)
+            return TryRentCore(deferInitialization: false, out lease);
+        }
+    }
+
+    /// <summary>
+    /// Rejects an arena exceeding the request's workspace limit before allocating or
+    /// borrowing its storage. The kernel owns one arena per session and must include
+    /// any additional session allocations in its remaining request allowance.
+    /// </summary>
+    public bool TryRent(NavigationSearchSpecification request,
+        [NotNullWhen(true)] out NavigationWorkspaceLease? lease)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        request.Validate();
+        lock (_gate)
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            if (AccountedBytesPerWorkspace > request.MaximumWorkspaceBytes)
             {
-                _activeLimitRejections = AddSaturated(_activeLimitRejections, 1);
+                lease = null;
+                _requestLimitRejections = AddSaturated(_requestLimitRejections, 1);
                 return false;
             }
+            return TryRentCore(deferInitialization: false, out lease);
+        }
+    }
 
-            WorkspaceStorage? storage = _available;
-            bool reused = storage is not null;
-            if (storage is null)
+    /// <summary>
+    /// Reserves exclusive capacity in coordinator order without clearing a retained
+    /// arena. The lease hides its buffer until AdvanceInitialization has cleared
+    /// every byte in bounded, charged steps. CreateSession may acquire this lease;
+    /// the kernel's Advance owns and charges initialization before using the arena.
+    /// </summary>
+    public bool TryReserve(NavigationSearchSpecification request,
+        [NotNullWhen(true)] out NavigationWorkspaceLease? lease)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        request.Validate();
+        lock (_gate)
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            if (AccountedBytesPerWorkspace > request.MaximumWorkspaceBytes)
             {
-                if (GetAccountedBytes() > MaximumAccountedBytes - AccountedBytesPerWorkspace)
-                {
-                    _memoryLimitRejections = AddSaturated(_memoryLimitRejections, 1);
-                    return false;
-                }
-                storage = new WorkspaceStorage(CapacityBytes);
+                lease = null;
+                _requestLimitRejections = AddSaturated(_requestLimitRejections, 1);
+                return false;
             }
-
-            // Construct before changing ownership so allocation failure cannot lose
-            // an available arena or leave the active count inflated.
-            var nextLease = new NavigationWorkspaceLease(this, storage);
-            if (reused)
-            {
-                storage.Buffer.AsSpan().Clear();
-                _available = storage.Next;
-                storage.Next = null;
-                _retainedCount--;
-                _reusedCount = AddSaturated(_reusedCount, 1);
-            }
-
-            _activeCount++;
-            _rentedCount = AddSaturated(_rentedCount, 1);
-            _initializedBytes = AddSaturated(_initializedBytes, CapacityBytes);
-            _peakActiveCount = Math.Max(_peakActiveCount, _activeCount);
-            _peakAccountedBytes = Math.Max(_peakAccountedBytes, GetAccountedBytes());
-            lease = nextLease;
-            return true;
+            return TryRentCore(deferInitialization: true, out lease);
         }
     }
 
@@ -145,6 +164,7 @@ internal sealed class NavigationWorkspacePool : IDisposable
                 _releasedCount,
                 _activeLimitRejections,
                 _memoryLimitRejections,
+                _requestLimitRejections,
                 _initializedBytes,
                 _disposed);
         }
@@ -185,6 +205,64 @@ internal sealed class NavigationWorkspacePool : IDisposable
         }
     }
 
+    internal void RecordInitialization(int bytes)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(bytes);
+        lock (_gate)
+        {
+            _initializedBytes = AddSaturated(_initializedBytes, bytes);
+        }
+    }
+
+    private bool TryRentCore(bool deferInitialization,
+        [NotNullWhen(true)] out NavigationWorkspaceLease? lease)
+    {
+        lease = null;
+        if (_activeCount == MaximumActiveWorkspaces)
+        {
+            _activeLimitRejections = AddSaturated(_activeLimitRejections, 1);
+            return false;
+        }
+
+        WorkspaceStorage? storage = _available;
+        bool reused = storage is not null;
+        if (storage is null)
+        {
+            if (GetAccountedBytes() > MaximumAccountedBytes - AccountedBytesPerWorkspace)
+            {
+                _memoryLimitRejections = AddSaturated(_memoryLimitRejections, 1);
+                return false;
+            }
+            storage = new WorkspaceStorage(CapacityBytes);
+        }
+
+        // Construct before changing ownership so allocation failure cannot lose
+        // an available arena or leave the active count inflated.
+        var nextLease = new NavigationWorkspaceLease(this, storage, deferInitialization);
+        if (!deferInitialization)
+        {
+            storage.Buffer.AsSpan().Clear();
+        }
+        if (reused)
+        {
+            _available = storage.Next;
+            storage.Next = null;
+            _retainedCount--;
+            _reusedCount = AddSaturated(_reusedCount, 1);
+        }
+
+        _activeCount++;
+        _rentedCount = AddSaturated(_rentedCount, 1);
+        if (!deferInitialization)
+        {
+            _initializedBytes = AddSaturated(_initializedBytes, CapacityBytes);
+        }
+        _peakActiveCount = Math.Max(_peakActiveCount, _activeCount);
+        _peakAccountedBytes = Math.Max(_peakAccountedBytes, GetAccountedBytes());
+        lease = nextLease;
+        return true;
+    }
+
     private long GetAccountedBytes() =>
         PoolOverheadBytes + ((long)_activeCount + _retainedCount) * AccountedBytesPerWorkspace;
 
@@ -195,7 +273,7 @@ internal sealed class NavigationWorkspacePool : IDisposable
     {
         public WorkspaceStorage(int capacityBytes)
         {
-            Buffer = new byte[capacityBytes];
+            Buffer = GC.AllocateUninitializedArray<byte>(capacityBytes);
         }
 
         public byte[] Buffer { get; }

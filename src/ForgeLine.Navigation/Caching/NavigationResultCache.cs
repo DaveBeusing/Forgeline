@@ -5,6 +5,9 @@ namespace ForgeLine.Navigation;
 /// <summary>
 /// Simulation-thread-owned storage for copied results. The caller supplies a complete value key;
 /// this container does not infer route identity or whether a search proved unreachability.
+/// Key equality and hashing must be pure and deterministic across checkpoint restoration.
+/// Runtime work counts one hash, each compared key, each metadata operation, and each copied
+/// 16-byte payload block. Every runtime lookup/mutation requires an explicit work allowance.
 /// </summary>
 internal sealed class NavigationResultCache<TKey, TElement> : IDisposable
     where TKey : unmanaged, IEquatable<TKey>
@@ -67,104 +70,310 @@ internal sealed class NavigationResultCache<TKey, TElement> : IDisposable
     public NavigationCacheMetrics GetMetrics() => new(Count, EstimatedBytes, _hits, _misses,
         _writes, _evictions, _expirations, _invalidations, _rejectedWrites, _inspectedSlots);
 
-    /// <summary>Copies a completed positive result into storage, subject to both memory limits.</summary>
-    public bool TryStoreSuccess(TKey key, ReadOnlySpan<TElement> value, ulong tick, ulong expiresAtTick) =>
-        TryStore(key, value, NavigationFailureReason.None, tick, expiresAtTick);
-
-    /// <summary>
-    /// Only a completed exhaustive search may call this method. Canceled, stale, invalid and
-    /// budget-exhausted searches are rejected rather than represented as negative cache entries.
-    /// </summary>
-    public bool TryStoreUnreachable(TKey key, NavigationFailureReason failureReason,
-        ulong tick, ulong expiresAtTick)
+    /// <summary>Inspects payload size without copying, touching LRU order, or reclaiming storage.</summary>
+    public NavigationCacheOperationStatus TryPeekLength(TKey key, ulong tick, int workAllowance,
+        out int valueLength, out NavigationFailureReason failureReason, out int workConsumed)
     {
-        if (failureReason is not NavigationFailureReason.NoHighLevelRoute and not NavigationFailureReason.NoLocalRoute)
-            throw new ArgumentOutOfRangeException(nameof(failureReason),
-                "Only a confirmed high-level or local no-route result is cacheable as unreachable.");
-        return TryStore(key, [], failureReason, tick, expiresAtTick);
-    }
-
-    /// <summary>
-    /// Copies a live entry without exposing retained arrays. A confirmed negative returns true
-    /// with zero length and its failure reason. A missing or expired key returns false and zero
-    /// length; an undersized destination returns false and the required positive length.
-    /// </summary>
-    public bool TryCopy(TKey key, ulong tick, Span<TElement> destination,
-        out int valueLength, out NavigationFailureReason failureReason)
-    {
+        ArgumentOutOfRangeException.ThrowIfNegative(workAllowance);
         BeginTick(tick);
         valueLength = 0;
         failureReason = NavigationFailureReason.None;
-        int index = Find(key);
-        if (index < 0)
+        NavigationCacheOperationStatus status = FindBudgeted(key, workAllowance, out int index, out _, out workConsumed);
+        if (status != NavigationCacheOperationStatus.Hit) return status;
+        if (_entries[index].ExpiresAtTick <= tick) return NavigationCacheOperationStatus.Miss;
+        valueLength = _entries[index].Value!.Length;
+        failureReason = _entries[index].FailureReason;
+        return NavigationCacheOperationStatus.Hit;
+    }
+
+    public NavigationCacheOperationStatus TryCopy(TKey key, ulong tick, Span<TElement> destination,
+        int workAllowance, out int valueLength, out NavigationFailureReason failureReason, out int workConsumed)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(workAllowance);
+        BeginTick(tick);
+        valueLength = 0;
+        failureReason = NavigationFailureReason.None;
+        NavigationCacheOperationStatus status = FindBudgeted(key, workAllowance, out int index, out _, out workConsumed);
+        if (status == NavigationCacheOperationStatus.BudgetExhausted) return status;
+        if (status == NavigationCacheOperationStatus.Miss)
         {
             Increment(ref _misses);
-            return false;
+            return status;
         }
-
         ref Entry entry = ref _entries[index];
         if (entry.ExpiresAtTick <= tick)
         {
-            if (_remainingMaintenance > 0)
+            if (_remainingMaintenance > 0 && Charge(1, workAllowance, ref workConsumed))
             {
                 _remainingMaintenance--;
                 Remove(index);
                 Increment(ref _expirations);
             }
             Increment(ref _misses);
-            return false;
+            return NavigationCacheOperationStatus.Miss;
         }
-
         valueLength = entry.Value!.Length;
         failureReason = entry.FailureReason;
-        if (destination.Length < valueLength) return false;
+        if (destination.Length < valueLength) return NavigationCacheOperationStatus.BufferTooSmall;
+        if (!Charge(CopyUnits(valueLength) + 1, workAllowance, ref workConsumed))
+            return NavigationCacheOperationStatus.BudgetExhausted;
         entry.Value.AsSpan().CopyTo(destination);
         Touch(index);
         Increment(ref _hits);
-        return true;
+        return NavigationCacheOperationStatus.Hit;
     }
 
-    /// <summary>
-    /// Immediately makes the exact key ineligible. Storage reclamation consumes maintenance
-    /// allowance when available, otherwise the expired entry remains accounted until maintenance.
-    /// </summary>
-    public bool Invalidate(TKey key, ulong tick)
+    public NavigationCacheOperationStatus TryStoreSuccess(TKey key, ReadOnlySpan<TElement> value,
+        ulong tick, ulong expiresAtTick, int workAllowance, out int workConsumed) =>
+        TryStoreBudgeted(key, value, NavigationFailureReason.None, tick, expiresAtTick, workAllowance, out workConsumed);
+
+    public NavigationCacheOperationStatus TryStoreUnreachable(TKey key, NavigationFailureReason failureReason,
+        ulong tick, ulong expiresAtTick, int workAllowance, out int workConsumed)
     {
+        if (failureReason is not NavigationFailureReason.NoHighLevelRoute and not NavigationFailureReason.NoLocalRoute)
+            throw new ArgumentOutOfRangeException(nameof(failureReason));
+        return TryStoreBudgeted(key, [], failureReason, tick, expiresAtTick, workAllowance, out workConsumed);
+    }
+
+    public NavigationCacheOperationStatus Invalidate(TKey key, ulong tick, int workAllowance, out int workConsumed)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(workAllowance);
         BeginTick(tick);
-        int index = Find(key);
-        if (index < 0) return false;
+        NavigationCacheOperationStatus status = FindBudgeted(key, workAllowance, out int index, out _, out workConsumed);
+        if (status != NavigationCacheOperationStatus.Hit) return status;
+        if (!Charge(1, workAllowance, ref workConsumed)) return NavigationCacheOperationStatus.BudgetExhausted;
         _entries[index].ExpiresAtTick = tick;
         Increment(ref _invalidations);
-        if (_remainingMaintenance > 0)
+        if (_remainingMaintenance > 0 && Charge(1, workAllowance, ref workConsumed))
         {
             _remainingMaintenance--;
             Remove(index);
         }
-        return true;
+        return NavigationCacheOperationStatus.Hit;
     }
 
-    /// <summary>
-    /// Examines a bounded number of slots, continuing at a stable cursor next time. Repeated
-    /// calls in one tick share the allowance with eviction and expired-read cleanup.
-    /// </summary>
-    public int Maintain(ulong tick, int maximumSlots)
+    public int Maintain(ulong tick, int workAllowance, out int slotsVisited)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(maximumSlots);
+        ArgumentOutOfRangeException.ThrowIfNegative(workAllowance);
         BeginTick(tick);
-        int visits = Math.Min(Math.Min(maximumSlots, _remainingMaintenance), _entries.Length);
-        for (int i = 0; i < visits; i++)
+        int workConsumed = 0;
+        slotsVisited = 0;
+        while (slotsVisited < _entries.Length && _remainingMaintenance > 0 && Charge(1, workAllowance, ref workConsumed))
         {
             int index = _maintenanceCursor;
             _maintenanceCursor = index + 1 == _entries.Length ? 0 : index + 1;
+            slotsVisited++;
             _remainingMaintenance--;
             Increment(ref _inspectedSlots);
-            if (_entries[index].Used && _entries[index].ExpiresAtTick <= tick)
+            if (_entries[index].Used && _entries[index].ExpiresAtTick <= tick && Charge(1, workAllowance, ref workConsumed))
             {
                 Remove(index);
                 Increment(ref _expirations);
             }
         }
-        return visits;
+        return workConsumed;
+    }
+
+    /// <summary>
+    /// Captures exact slot/LRU/cursor state at the coordinator boundary. The caller reserves
+    /// the supplied additional byte allowance separately from this live cache's retained bytes.
+    /// </summary>
+    public NavigationResultCacheState<TKey, TElement> CaptureState(long maximumCheckpointBytes)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        long estimate = GetCheckpointBytes();
+        if (estimate > maximumCheckpointBytes)
+            throw new ArgumentOutOfRangeException(nameof(maximumCheckpointBytes), "Cache checkpoint exceeds its separate memory allowance.");
+        var slots = new NavigationCacheSlotState<TKey, TElement>[_entries.Length];
+        for (int i = 0; i < slots.Length; i++)
+        {
+            ref Entry entry = ref _entries[i];
+            slots[i] = new NavigationCacheSlotState<TKey, TElement>(entry.Used, entry.Key,
+                entry.Value.AsSpan(), entry.FailureReason, entry.ExpiresAtTick, entry.Previous, entry.Next,
+                entry.Bucket, entry.PreviousInBucket, entry.NextInBucket);
+        }
+        return new NavigationResultCacheState<TKey, TElement>(MaximumEntries, MaximumEstimatedBytes,
+            MaximumMaintenanceEntriesPerTick, MaximumEvictionsPerWrite, _freeHead, _oldest, _newest,
+            _maintenanceCursor, _remainingMaintenance, _lastTick, _hasTick, GetMetrics(), slots, estimate);
+    }
+
+    /// <summary>
+    /// Restores into a detached cache. The allowance covers the immutable checkpoint and new
+    /// cache together; an old live cache retained by the caller requires a separate allowance.
+    /// Hash buckets and chains, slot/LRU order and tick budgets remain exact. Keys must have
+    /// deterministic, pure equality and hashing; a different hash layout explicitly rejects.
+    /// </summary>
+    public static NavigationResultCache<TKey, TElement> RestoreState(
+        NavigationResultCacheState<TKey, TElement> state, long maximumRestoreBytes)
+    {
+        ValidateState(state, maximumRestoreBytes);
+
+        var restored = new NavigationResultCache<TKey, TElement>(state.MaximumEntries, state.MaximumEstimatedBytes,
+            state.MaximumMaintenanceEntriesPerTick, state.MaximumEvictionsPerWrite);
+        for (int i = 0; i < restored._entries.Length; i++)
+        {
+            NavigationCacheSlotState<TKey, TElement> source = state.Slots[i];
+            ref Entry target = ref restored._entries[i];
+            target.Previous = source.Previous;
+            target.Next = source.Next;
+            if (!source.Used) continue;
+            int bucket = source.Bucket;
+            long payloadBytes = source.Value.Count == 0 ? 0 : ArrayBytes(source.Value.Count, Unsafe.SizeOf<TElement>());
+            if (payloadBytes > restored.MaximumEstimatedBytes - restored.EstimatedBytes)
+                throw new ArgumentException("Cache checkpoint payload exceeds its memory capacity.", nameof(state));
+            TElement[] value = source.Value.Count == 0 ? [] : new TElement[source.Value.Count];
+            for (int element = 0; element < value.Length; element++) value[element] = source.Value[element];
+            target.Used = true;
+            target.Key = source.Key;
+            target.Value = value;
+            target.PayloadBytes = payloadBytes;
+            target.FailureReason = source.FailureReason;
+            target.ExpiresAtTick = source.ExpiresAtTick;
+            target.Bucket = bucket;
+            target.PreviousInBucket = source.PreviousInBucket;
+            target.NextInBucket = source.NextInBucket;
+            if (source.PreviousInBucket == -1)
+            {
+                if (restored._buckets[bucket] != -1)
+                    throw new ArgumentException("Cache checkpoint repeats a bucket head.", nameof(state));
+                restored._buckets[bucket] = i;
+            }
+            restored.Count++;
+            restored.EstimatedBytes += payloadBytes;
+        }
+
+        restored.ValidateBuckets();
+
+        if (restored.Count != state.Metrics.Entries || restored.EstimatedBytes != state.Metrics.EstimatedBytes ||
+            restored.GetCheckpointBytes() != state.EstimatedBytes)
+            throw new ArgumentException("Cache checkpoint counts or byte accounting do not match its payload.", nameof(state));
+        restored._freeHead = state.FreeHead;
+        restored._oldest = state.Oldest;
+        restored._newest = state.Newest;
+        restored._maintenanceCursor = state.MaintenanceCursor;
+        restored._remainingMaintenance = state.RemainingMaintenance;
+        restored._lastTick = state.LastTick;
+        restored._hasTick = state.HasTick;
+        restored._hits = state.Metrics.Hits;
+        restored._misses = state.Metrics.Misses;
+        restored._writes = state.Metrics.Writes;
+        restored._evictions = state.Metrics.Evictions;
+        restored._expirations = state.Metrics.Expirations;
+        restored._invalidations = state.Metrics.Invalidations;
+        restored._rejectedWrites = state.Metrics.RejectedWrites;
+        restored._inspectedSlots = state.Metrics.InspectedSlots;
+        return restored;
+    }
+
+    /// <summary>Validates bounded immutable metadata before payload inspection or restore allocation.</summary>
+    public static void ValidateState(NavigationResultCacheState<TKey, TElement> state, long maximumRestoreBytes)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        if (state.FormatRevision != 2 || state.MaximumEntries <= 0 || state.MaximumEntries > Array.MaxLength ||
+            state.Slots.Count != state.MaximumEntries || state.MaximumEstimatedBytes <= 0 ||
+            state.MaximumMaintenanceEntriesPerTick <= 0 || state.MaximumEvictionsPerWrite <= 0 ||
+            state.MaintenanceCursor < 0 || state.MaintenanceCursor >= state.MaximumEntries ||
+            state.RemainingMaintenance < 0 || state.RemainingMaintenance > state.MaximumMaintenanceEntriesPerTick ||
+            (!state.HasTick && (state.LastTick != 0 || state.RemainingMaintenance != 0 || state.Metrics.Entries != 0)))
+            throw new ArgumentException("Cache checkpoint format, configuration, clock or maintenance cursor is invalid.", nameof(state));
+
+        // Recompute all bounds from immutable slot contents before allocating the new cache.
+        long fixedBytes = checked(ObjectAllowanceBytes + ArrayBytes(state.MaximumEntries, Unsafe.SizeOf<Entry>()) +
+            ArrayBytes(state.MaximumEntries, sizeof(int)));
+        if (fixedBytes > state.MaximumEstimatedBytes)
+            throw new ArgumentException("Cache checkpoint cannot hold its fixed storage.", nameof(state));
+        long actualBytes = fixedBytes;
+        int actualCount = 0;
+        for (int i = 0; i < state.Slots.Count; i++)
+        {
+            NavigationCacheSlotState<TKey, TElement> source = state.Slots[i];
+            if (source is null || source.Previous < -1 || source.Previous >= state.MaximumEntries ||
+                source.Next < -1 || source.Next >= state.MaximumEntries ||
+                (!source.Used && source.Value.Count != 0) ||
+                (source.FailureReason != NavigationFailureReason.None &&
+                    (source.Value.Count != 0 || source.FailureReason is not NavigationFailureReason.NoHighLevelRoute and not NavigationFailureReason.NoLocalRoute)))
+                throw new ArgumentException("Cache checkpoint slot data is invalid.", nameof(state));
+            if (!source.Used) continue;
+            if (source.Bucket < 0 || source.Bucket >= state.MaximumEntries ||
+                source.PreviousInBucket < -1 || source.PreviousInBucket >= state.MaximumEntries ||
+                source.NextInBucket < -1 || source.NextInBucket >= state.MaximumEntries ||
+                (int)((uint)source.Key.GetHashCode() % (uint)state.MaximumEntries) != source.Bucket)
+                throw new ArgumentException("Cache checkpoint requires the identical deterministic key hash layout.", nameof(state));
+            long bytes = source.Value.Count == 0 ? 0 : ArrayBytes(source.Value.Count, Unsafe.SizeOf<TElement>());
+            if (bytes > state.MaximumEstimatedBytes - actualBytes)
+                throw new ArgumentException("Cache checkpoint payload exceeds its memory capacity.", nameof(state));
+            actualBytes += bytes;
+            actualCount++;
+        }
+        long actualCheckpointBytes = GetCheckpointBytes(state.MaximumEntries, actualBytes - fixedBytes);
+        if (actualCount != state.Metrics.Entries || actualBytes != state.Metrics.EstimatedBytes ||
+            actualCheckpointBytes != state.EstimatedBytes || actualCheckpointBytes > maximumRestoreBytes ||
+            actualBytes > maximumRestoreBytes - actualCheckpointBytes)
+            throw new ArgumentException("Cache checkpoint accounting or restore memory allowance is invalid.", nameof(state));
+        ValidateAgeAndFreeLists(state, actualCount);
+
+    }
+
+    private void ValidateBuckets()
+    {
+        int visited = 0;
+        for (int bucket = 0; bucket < _buckets.Length; bucket++)
+        {
+            int previous = -1;
+            int index = _buckets[bucket];
+            while (index != -1)
+            {
+                if (index < 0 || index >= _entries.Length || !_entries[index].Used ||
+                    _entries[index].Bucket != bucket || _entries[index].PreviousInBucket != previous || visited >= Count)
+                    throw new ArgumentException("Cache checkpoint bucket chain is invalid.");
+                int earlier = _buckets[bucket];
+                while (earlier != index)
+                {
+                    TKey key = _entries[earlier].Key;
+                    if (key.Equals(_entries[index].Key))
+                        throw new ArgumentException("Cache checkpoint contains duplicate keys.");
+                    earlier = _entries[earlier].NextInBucket;
+                }
+                previous = index;
+                index = _entries[index].NextInBucket;
+                visited++;
+            }
+        }
+        if (visited != Count) throw new ArgumentException("Cache checkpoint omits indexed entries.");
+    }
+
+    private long GetCheckpointBytes() => GetCheckpointBytes(_entries.Length, EstimatedBytes - _fixedBytes);
+
+    private static long GetCheckpointBytes(int entries, long payloadBytes) => checked(512L +
+        ArrayBytes(entries, IntPtr.Size) * 2 + (long)entries * (Unsafe.SizeOf<TKey>() + 192L) + payloadBytes);
+
+    private static void ValidateAgeAndFreeLists(NavigationResultCacheState<TKey, TElement> state, int usedCount)
+    {
+        int count = 0;
+        int previous = -1;
+        int index = state.Oldest;
+        while (index != -1)
+        {
+            if (index < 0 || index >= state.Slots.Count || !state.Slots[index].Used ||
+                state.Slots[index].Previous != previous || count >= usedCount)
+                throw new ArgumentException("Cache checkpoint LRU chain is invalid.", nameof(state));
+            previous = index;
+            index = state.Slots[index].Next;
+            count++;
+        }
+        if (count != usedCount || previous != state.Newest)
+            throw new ArgumentException("Cache checkpoint LRU endpoints are invalid.", nameof(state));
+        count = 0;
+        index = state.FreeHead;
+        while (index != -1)
+        {
+            if (index < 0 || index >= state.Slots.Count || state.Slots[index].Used || count >= state.Slots.Count - usedCount)
+                throw new ArgumentException("Cache checkpoint free-slot chain is invalid.", nameof(state));
+            index = state.Slots[index].Next;
+            count++;
+        }
+        if (count != state.Slots.Count - usedCount)
+            throw new ArgumentException("Cache checkpoint omits free slots.", nameof(state));
     }
 
     /// <summary>
@@ -185,39 +394,39 @@ internal sealed class NavigationResultCache<TKey, TElement> : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private bool TryStore(TKey key, ReadOnlySpan<TElement> value, NavigationFailureReason failureReason,
-        ulong tick, ulong expiresAtTick)
+    private NavigationCacheOperationStatus TryStoreBudgeted(TKey key, ReadOnlySpan<TElement> value,
+        NavigationFailureReason failureReason, ulong tick, ulong expiresAtTick, int workAllowance, out int workConsumed)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(workAllowance);
         BeginTick(tick);
-        if (expiresAtTick <= tick)
-            throw new ArgumentOutOfRangeException(nameof(expiresAtTick), "Cached results require a future expiry tick.");
-
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(expiresAtTick, tick);
+        NavigationCacheOperationStatus search = FindBudgeted(key, workAllowance, out int existing, out int bucket, out workConsumed);
+        if (search == NavigationCacheOperationStatus.BudgetExhausted) return search;
         long bytes = value.IsEmpty ? 0 : ArrayBytes(value.Length, Unsafe.SizeOf<TElement>());
-        int bucket = GetBucket(key);
-        int existing = Find(key, bucket);
-        long oldBytes = existing >= 0 ? _entries[existing].PayloadBytes : 0;
-        long retainedWithoutOld = EstimatedBytes - oldBytes;
-        if (bytes > MaximumEstimatedBytes - _fixedBytes)
-            return RejectWrite();
-
+        if (bytes > MaximumEstimatedBytes - _fixedBytes) return RejectBudgetedWrite();
+        long retainedWithoutOld = EstimatedBytes - (existing >= 0 ? _entries[existing].PayloadBytes : 0);
         int requiredCount = Count + (existing >= 0 ? 0 : 1);
         int removals = 0;
         int candidate = _oldest;
         while (requiredCount > MaximumEntries || bytes > MaximumEstimatedBytes - retainedWithoutOld)
         {
-            if (candidate >= 0 && candidate == existing) candidate = _entries[candidate].Next;
             if (candidate < 0 || removals >= MaximumEvictionsPerWrite || _remainingMaintenance == 0)
-                return RejectWrite();
+                return RejectBudgetedWrite();
+            if (!Charge(1, workAllowance, ref workConsumed)) return NavigationCacheOperationStatus.BudgetExhausted;
             _remainingMaintenance--;
             Increment(ref _inspectedSlots);
+            if (candidate == existing)
+            {
+                candidate = _entries[candidate].Next;
+                continue;
+            }
             retainedWithoutOld -= _entries[candidate].PayloadBytes;
             requiredCount--;
             removals++;
             candidate = _entries[candidate].Next;
         }
-
-        // Preflight above makes bounded backpressure non-destructive. Reclaim before allocating
-        // the owned replacement, so no live cache-owned payload exceeds the accounting bound.
+        long mutationWork = removals + (existing >= 0 ? 1L : 0L) + 1 + CopyUnits(value.Length);
+        if (!Charge(mutationWork, workAllowance, ref workConsumed)) return NavigationCacheOperationStatus.BudgetExhausted;
         for (int i = 0; i < removals; i++)
         {
             int victim = _oldest == existing ? _entries[_oldest].Next : _oldest;
@@ -225,23 +434,15 @@ internal sealed class NavigationResultCache<TKey, TElement> : IDisposable
             Increment(ref _evictions);
         }
         if (existing >= 0) Remove(existing);
-
         TElement[] owned = value.IsEmpty ? [] : value.ToArray();
         int slot = _freeHead;
         _freeHead = _entries[slot].Next;
         _entries[slot] = new Entry
         {
-            Used = true,
-            Key = key,
-            Value = owned,
-            PayloadBytes = bytes,
-            FailureReason = failureReason,
-            ExpiresAtTick = expiresAtTick,
-            Previous = _newest,
-            Next = -1,
-            Bucket = bucket,
-            PreviousInBucket = -1,
-            NextInBucket = _buckets[bucket]
+            Used = true, Key = key, Value = owned, PayloadBytes = bytes,
+            FailureReason = failureReason, ExpiresAtTick = expiresAtTick,
+            Previous = _newest, Next = -1, Bucket = bucket,
+            PreviousInBucket = -1, NextInBucket = _buckets[bucket]
         };
         if (_buckets[bucket] >= 0) _entries[_buckets[bucket]].PreviousInBucket = slot;
         _buckets[bucket] = slot;
@@ -251,13 +452,45 @@ internal sealed class NavigationResultCache<TKey, TElement> : IDisposable
         Count++;
         EstimatedBytes += bytes;
         Increment(ref _writes);
-        return true;
+        return NavigationCacheOperationStatus.Stored;
     }
 
-    private bool RejectWrite()
+    private NavigationCacheOperationStatus RejectBudgetedWrite()
     {
         Increment(ref _rejectedWrites);
-        return false;
+        return NavigationCacheOperationStatus.CapacityExhausted;
+    }
+
+    private NavigationCacheOperationStatus FindBudgeted(TKey key, int allowance,
+        out int index, out int bucket, out int consumed)
+    {
+        index = -1;
+        bucket = -1;
+        consumed = 0;
+        if (!Charge(1, allowance, ref consumed)) return NavigationCacheOperationStatus.BudgetExhausted;
+        bucket = GetBucket(key);
+        int candidate = _buckets[bucket];
+        while (candidate >= 0)
+        {
+            if (!Charge(1, allowance, ref consumed)) return NavigationCacheOperationStatus.BudgetExhausted;
+            TKey stored = _entries[candidate].Key;
+            if (stored.Equals(key))
+            {
+                index = candidate;
+                return NavigationCacheOperationStatus.Hit;
+            }
+            candidate = _entries[candidate].NextInBucket;
+        }
+        return NavigationCacheOperationStatus.Miss;
+    }
+
+    private static long CopyUnits(int elements) => ((long)elements * Unsafe.SizeOf<TElement>() + 15) / 16;
+
+    private static bool Charge(long work, int allowance, ref int consumed)
+    {
+        if (work > allowance - consumed) return false;
+        consumed += (int)work;
+        return true;
     }
 
     private void BeginTick(ulong tick)
@@ -271,20 +504,6 @@ internal sealed class NavigationResultCache<TKey, TElement> : IDisposable
             _hasTick = true;
             _remainingMaintenance = MaximumMaintenanceEntriesPerTick;
         }
-    }
-
-    private int Find(TKey key) => Find(key, GetBucket(key));
-
-    private int Find(TKey key, int bucket)
-    {
-        int index = _buckets[bucket];
-        while (index >= 0)
-        {
-            TKey candidate = _entries[index].Key;
-            if (candidate.Equals(key)) return index;
-            index = _entries[index].NextInBucket;
-        }
-        return -1;
     }
 
     private int GetBucket(TKey key) => (int)((uint)key.GetHashCode() % (uint)_buckets.Length);
@@ -365,3 +584,8 @@ internal sealed class NavigationResultCache<TKey, TElement> : IDisposable
 internal readonly record struct NavigationCacheMetrics(
     int Entries, long EstimatedBytes, ulong Hits, ulong Misses, ulong Writes,
     ulong Evictions, ulong Expirations, ulong Invalidations, ulong RejectedWrites, ulong InspectedSlots);
+
+internal enum NavigationCacheOperationStatus : byte
+{
+    Miss, Hit, Stored, CapacityExhausted, BudgetExhausted, BufferTooSmall
+}
