@@ -30,7 +30,7 @@ public readonly record struct RuntimeTextureMipLevel(
     int RowPitch,
     byte[] Pixels);
 
-public sealed class RuntimeTextureData
+public sealed partial class RuntimeTextureData
 {
     public const int CurrentPayloadVersion = 3;
 
@@ -118,7 +118,9 @@ public sealed class RuntimeTextureData
             ]);
     }
 
-    public byte[] ToPayload()
+    public byte[] ToPayload() => ToPayload(compressLosslessly: false);
+
+    public byte[] ToPayload(bool compressLosslessly)
     {
         using var stream = new MemoryStream();
         using var writer = new BinaryWriter(stream);
@@ -160,7 +162,8 @@ public sealed class RuntimeTextureData
         }
 
         writer.Flush();
-        return stream.ToArray();
+        byte[] raw = stream.ToArray();
+        return compressLosslessly ? CompressPayload(raw) : raw;
     }
 
     public static RuntimeTextureData FromPayload(
@@ -185,6 +188,7 @@ public sealed class RuntimeTextureData
 
         return version switch
         {
+            LosslessPayloadVersion => ReadLosslessPayload(reader, stream),
             LegacyPayloadVersion =>
                 ReadLegacyPayload(
                     reader,
