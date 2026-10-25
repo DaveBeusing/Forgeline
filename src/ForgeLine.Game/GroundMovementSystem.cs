@@ -357,7 +357,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         bool freeQueueApproach = distanceToTarget > 2 &&
             entities.TryGetComponent(entity, out VehicleQueueEntry approachQueue) && approachQueue.Generation > 0 &&
             (!entities.TryGetComponent(entity, out VehicleDockVisit approachDock) ||
-                approachDock.Generation == 0 && !approachDock.LaneEntered);
+                !approachDock.LaneEntered);
         if (order.TargetHeadingRadians.HasValue && !freeQueueApproach) steering = targetDirection;
 
         Vector3 desiredDirection =
