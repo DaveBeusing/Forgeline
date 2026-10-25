@@ -11,18 +11,22 @@ public readonly record struct NavigationTrafficReservation(
     NavigationPose Pose, Vector3 HalfExtents, SimulationTick CreatedAt,
     SimulationTick ReconsiderAt, bool PhysicallyOccupied);
 
+/// <summary>Captured single-lane or intersection envelope. Local Z defines its directed axis.</summary>
+public readonly record struct NavigationTrafficPassage(ulong Id, NavigationPose Pose, Vector3 HalfExtents);
+
 /// <summary>Internal physical observations; never pass this unfiltered frame to presentation.</summary>
 public sealed class NavigationTrafficFrame
 {
     public NavigationTrafficFrame(SimulationTick tick, NavigationCollisionFrame collision,
         bool isComplete, ReadOnlySpan<NavigationVehicleObservation> vehicles,
-        ReadOnlySpan<NavigationTrafficReservation> reservations, NavigationIntegrationLimits limits)
+        ReadOnlySpan<NavigationTrafficReservation> reservations, NavigationIntegrationLimits limits,
+        ReadOnlySpan<NavigationTrafficPassage> passages = default)
     {
         ArgumentNullException.ThrowIfNull(collision);
         ArgumentNullException.ThrowIfNull(limits);
         limits.Validate();
         if (collision.Tick != tick.Value || vehicles.Length > limits.MaximumNeighbors ||
-            reservations.Length > limits.MaximumReservations)
+            reservations.Length > limits.MaximumReservations || passages.Length > limits.MaximumReservations)
             throw new ArgumentException("Traffic observations must share a tick and obey capture bounds.");
         var identities = new HashSet<EntityId>();
         foreach (NavigationVehicleObservation vehicle in vehicles)
@@ -34,6 +38,14 @@ public sealed class NavigationTrafficFrame
                 !float.IsFinite(reservation.HalfExtents.LengthSquared()) || reservation.HalfExtents.X <= 0 ||
                 reservation.HalfExtents.Y <= 0 || reservation.HalfExtents.Z <= 0)
                 throw new ArgumentException("Reservation snapshots must retain identity, generation and physical geometry.", nameof(reservations));
+        var passageIds = new HashSet<ulong>();
+        foreach (var passage in passages)
+            if (passage.Id == 0 || !passageIds.Add(passage.Id) || !passage.Pose.IsValid ||
+                !float.IsFinite(passage.HalfExtents.LengthSquared()) || passage.HalfExtents.X <= 0 ||
+                passage.HalfExtents.Y <= 0 || passage.HalfExtents.Z <= 0)
+                throw new ArgumentException("Passages require distinct stable identities and complete geometry.", nameof(passages));
+        Passages = Array.AsReadOnly(passages.ToArray());
+        Limits = limits;
         Tick = tick;
         Collision = collision;
         IsComplete = isComplete && collision.IsComplete;
@@ -41,6 +53,8 @@ public sealed class NavigationTrafficFrame
         Reservations = Array.AsReadOnly(reservations.ToArray());
     }
 
+    public NavigationIntegrationLimits Limits { get; }
+    public IReadOnlyList<NavigationTrafficPassage> Passages { get; }
     public SimulationTick Tick { get; }
     public NavigationCollisionFrame Collision { get; }
     public bool IsComplete { get; }

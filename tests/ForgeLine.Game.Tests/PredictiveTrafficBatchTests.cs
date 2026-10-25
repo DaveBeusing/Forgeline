@@ -10,6 +10,21 @@ namespace ForgeLine.Game.Tests;
 public sealed class PredictiveTrafficBatchTests
 {
     [Fact]
+    public void RepeatedSingleCallsCannotSelectWinnersForAMultiVehicleFrame()
+    {
+        var (frame, intents) = Crossing();
+        var planner = new PredictiveTrafficPlanner();
+        foreach (var intent in intents)
+        {
+            var result = planner.Plan(frame, intent.Binding, new ClearGeometry(), 10000, out int work);
+            Assert.Equal(NavigationModuleAvailability.Unavailable, result.Availability);
+            Assert.Equal(NavigationTrafficAction.Hold, result.Action);
+            Assert.Equal(0, work);
+        }
+        Assert.Empty(planner.CaptureState().Vehicles);
+    }
+
+    [Fact]
     public void CrossingOutsideFirstTickYieldsIndependentlyOfInputOrder()
     {
         var (frame, intents) = Crossing();
@@ -132,6 +147,101 @@ public sealed class PredictiveTrafficBatchTests
                 NavigationBlockReason.MovingVehicle,
                 new NavigationObstacleIdentity(NavigationObstacleSource.Entity, movement.Mover.Value == 1 ? 2UL : 1UL, 1), 1);
         }
+    }
+
+    [Fact]
+    public void PassageLeaseSurvivesChangedCommandUntilWholeRearClears()
+    {
+        var (frame, intents) = OpposingPassage(1, 10, 40);
+        var planner = new PredictiveTrafficPlanner();
+        var first = planner.PlanBatch(frame, intents, new ClearGeometry(), 3, 10000, out _);
+        Assert.Equal(NavigationTrafficAction.Proceed, first[0].Action);
+        Assert.Equal(NavigationTrafficAction.Hold, first[1].Action);
+        Assert.Equal(new EntityId(1, 1), Assert.Single(planner.CaptureState().Leases).Owner);
+        (frame, intents) = OpposingPassage(2, 23, 40);
+        planner.PlanBatch(frame, intents, new ClearGeometry(), 3, 10000, out _);
+        Assert.True(Assert.Single(planner.CaptureState().Leases).Entered);
+        (frame, intents) = OpposingPassage(3, 30.3f, 40);
+        intents[0] = intents[0] with { Binding = intents[0].Binding with { CommandGeneration = 2 } };
+        var changed = planner.PlanBatch(frame, intents, new ClearGeometry(), 3, 10000, out _);
+        Assert.Equal(NavigationTrafficAction.Hold, changed[1].Action);
+        Assert.Equal(new EntityId(1, 1), Assert.Single(planner.CaptureState().Leases).Owner);
+        (frame, intents) = OpposingPassage(4, 31.4f, 40);
+        var released = planner.PlanBatch(frame, intents, new ClearGeometry(), 3, 10000, out _);
+        Assert.Equal(NavigationTrafficAction.Proceed, released[1].Action);
+        Assert.Equal(new EntityId(2, 1), Assert.Single(planner.CaptureState().Leases).Owner);
+    }
+
+    [Fact]
+    public void OccupiedSavedPassageDoesNotReleaseForDeadOwnerOrAReusedEntity()
+    {
+        var (frame, intents) = OpposingPassage(1, 23, 40);
+        var planner = new PredictiveTrafficPlanner();
+        planner.PlanBatch(frame, intents, new ClearGeometry(), 3, 10000, out _);
+        var saved = planner.CaptureState();
+        var restored = new PredictiveTrafficPlanner();
+        restored.RestoreState(saved);
+        var wreck = new NavigationCollisionBody(NavigationReadAdapter.GetObstacleIdentity(new EntityId(1, 1)),
+            NavigationObstacleKind.Wreck, frame.Vehicles[0].Pose, frame.Vehicles[0].Profile.HalfExtents, Vector3.Zero);
+        var collision = new NavigationCollisionFrame(frame.Collision.World, 2, frame.Collision.Coverage, true, [wreck], 10);
+        var afterDeath = new NavigationTrafficFrame(new SimulationTick(2), collision, true, [frame.Vehicles[1]], [], Limits(), frame.Passages.ToArray());
+        var held = restored.PlanBatch(afterDeath, [intents[1]], new ClearGeometry(), 3, 10000, out _);
+        Assert.Equal(NavigationTrafficAction.Hold, Assert.Single(held).Action);
+        Assert.Equal(new EntityId(1, 1), Assert.Single(restored.CaptureState().Leases).Owner);
+        var reused = frame.Vehicles[0] with { Entity = new EntityId(1, 2),
+            Pose = new NavigationPose(new Vector3(20, 0.5f, 5), Quaternion.Identity) };
+        var reuseCollision = new NavigationCollisionFrame(frame.Collision.World, 3, frame.Collision.Coverage, true, [wreck], 10);
+        var afterReuse = new NavigationTrafficFrame(new SimulationTick(3), reuseCollision, true,
+            [frame.Vehicles[1], reused], [], Limits(), frame.Passages.ToArray());
+        Assert.Equal(NavigationTrafficAction.Hold,
+            Assert.Single(restored.PlanBatch(afterReuse, [intents[1]], new ClearGeometry(), 3, 10000, out _)).Action);
+        Assert.Equal(new EntityId(1, 1), Assert.Single(restored.CaptureState().Leases).Owner);
+        var clearedCollision = new NavigationCollisionFrame(frame.Collision.World, 4, frame.Collision.Coverage, true, [], 10);
+        var afterRemoval = new NavigationTrafficFrame(new SimulationTick(4), clearedCollision, true, [frame.Vehicles[1]], [], Limits(), frame.Passages.ToArray());
+        Assert.Equal(NavigationTrafficAction.Proceed,
+            Assert.Single(restored.PlanBatch(afterRemoval, [intents[1]], new ClearGeometry(), 3, 10000, out _)).Action);
+        saved.Leases[0] = default;
+        Assert.Single(restored.CaptureState().Leases);
+    }
+
+    [Fact]
+    public void VehiclesAlreadyOpposedInsidePassageFormAnEscapableWaitCycle()
+    {
+        var (frame, intents) = OpposingPassage(1, 23, 27);
+        var stopped = frame.Vehicles.Select(static v => v with
+            { Movement = v.Movement with { Velocity = Vector3.Zero } }).ToArray();
+        frame = new(frame.Tick, frame.Collision, true, stopped, [], Limits(), frame.Passages.ToArray());
+        var planner = new PredictiveTrafficPlanner();
+        planner.PlanBatch(frame, intents, new ClearGeometry(), 3, 10000, out _);
+        Assert.Empty(planner.CaptureState().Leases);
+        var later = new NavigationTrafficFrame(new SimulationTick(50),
+            new NavigationCollisionFrame(frame.Collision.World, 50, frame.Collision.Coverage, true, [], 10),
+            true, stopped, [], Limits(), frame.Passages.ToArray());
+        var result = planner.PlanBatch(later, intents, new ClearGeometry(), 3, 10000, out _);
+        Assert.Single(result, static d => d.Action == NavigationTrafficAction.Recovery);
+    }
+
+    private static (NavigationTrafficFrame, NavigationTrafficIntent[]) OpposingPassage(ulong tick, float firstZ, float secondZ)
+    {
+        var (frame, intents) = Crossing();
+        var vehicles = frame.Vehicles.ToArray();
+        for (int i = 0; i < 2; i++)
+        {
+            float heading = i == 0 ? 0 : MathF.PI;
+            Vector3 start = new(20, 0.5f, i == 0 ? firstZ : secondZ);
+            Vector3 target = new(20, 0.5f, i == 0 ? 50 : 0);
+            var order = vehicles[i].DirectOrder!.Value with { WorldTarget = target };
+            vehicles[i] = vehicles[i] with
+            {
+                Pose = new(start, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading)),
+                Movement = vehicles[i].Movement with { HeadingRadians = heading, Velocity = new Vector3(0, 0, i == 0 ? 6 : -6) },
+                DirectOrder = order
+            };
+            intents[i] = intents[i] with { Binding = intents[i].Binding with { OriginalOrder = order }, SteeringTarget = target };
+        }
+        var collision = new NavigationCollisionFrame(frame.Collision.World, tick, frame.Collision.Coverage, true, [], 10);
+        NavigationTrafficPassage passage = new(1, new(new Vector3(20, 0.5f, 25), Quaternion.Identity), new(1, 1, 5));
+        return (new(new SimulationTick(tick), collision, true, vehicles, [], Limits(), [passage]), intents);
     }
 
     private static (NavigationTrafficFrame, NavigationTrafficIntent[]) Crossing()

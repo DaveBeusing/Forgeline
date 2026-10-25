@@ -7,7 +7,7 @@ namespace ForgeLine.Game;
 
 /// <summary>Detached, versioned traffic state. Physical reservations are owned by the Game integration.</summary>
 internal sealed record PredictiveTrafficCheckpoint(
-    int Revision, PredictiveTrafficVehicleState[] Vehicles);
+    int Revision, PredictiveTrafficVehicleState[] Vehicles, PredictiveTrafficPassageLease[] Leases);
 
 internal readonly record struct PredictiveTrafficVehicleState(
     EntityId Entity, ulong CommandGeneration, ulong LastTick, ulong WaitingSince,
@@ -20,7 +20,8 @@ internal readonly record struct PredictiveTrafficVehicleState(
 /// </summary>
 internal sealed partial class PredictiveTrafficPlanner : INavigationTrafficPlanner<PredictiveTrafficCheckpoint>
 {
-    private const int CheckpointRevision = 2;
+    private const int CheckpointRevision = 3;
+    private readonly Dictionary<ulong, PredictiveTrafficPassageLease> _passageLeases = new();
     private readonly Dictionary<EntityId, PredictiveTrafficVehicleState> _states = new();
 
     public NavigationModuleAvailability Availability => NavigationModuleAvailability.Available;
@@ -35,21 +36,28 @@ internal sealed partial class PredictiveTrafficPlanner : INavigationTrafficPlann
         var intent = new NavigationTrafficIntent(binding,
             vehicle.DirectOrder?.WorldTarget ?? binding.OriginalOrder.WorldTarget,
             vehicle.Profile.MaximumSpeed, true);
-        return PlanBatch(frame, [intent], geometry, 3, workAllowance, out workConsumed)[0];
+        if (frame.Vehicles.Count != 1 || vehicle.Entity != requester || !Valid(intent))
+        {
+            workConsumed = 0;
+            return new(NavigationModuleAvailability.Unavailable, binding, frame.Tick,
+                NavigationTrafficAction.Hold, 0, null, NavigationBlockReason.StaleSnapshot);
+        }
+        return PlanBatch(frame, [intent], geometry, Math.Clamp(frame.Limits.PlanningHorizonSeconds, 0.25f, 10), workAllowance, out workConsumed)[0];
     }
 
     public PredictiveTrafficCheckpoint CaptureState()
     {
         var values = _states.Values.OrderBy(static v => v.Entity.Index)
             .ThenBy(static v => v.Entity.Generation).ToArray();
-        return new(CheckpointRevision, values);
+        return new(CheckpointRevision, values, _passageLeases.Values.OrderBy(static v => v.Passage.Id).ToArray());
     }
 
     public void RestoreState(PredictiveTrafficCheckpoint checkpoint)
     {
         ArgumentNullException.ThrowIfNull(checkpoint);
         if (checkpoint.Revision != CheckpointRevision || checkpoint.Vehicles is null ||
-            checkpoint.Vehicles.Length > MaximumTrackedVehicles)
+            checkpoint.Vehicles.Length > MaximumTrackedVehicles || checkpoint.Leases is null ||
+            checkpoint.Leases.Length > MaximumTrackedPassages)
             throw new InvalidOperationException("Invalid traffic checkpoint revision.");
         var rebuilt = new Dictionary<EntityId, PredictiveTrafficVehicleState>();
         foreach (PredictiveTrafficVehicleState state in checkpoint.Vehicles)
@@ -61,6 +69,12 @@ internal sealed partial class PredictiveTrafficPlanner : INavigationTrafficPlann
                 state.WaitingFor == state.Entity || !rebuilt.TryAdd(state.Entity, state))
                 throw new InvalidOperationException("Invalid traffic checkpoint participant.");
         }
+        var rebuiltLeases = new Dictionary<ulong, PredictiveTrafficPassageLease>();
+        foreach (var lease in checkpoint.Leases)
+            if (!ValidLease(lease) || !rebuiltLeases.TryAdd(lease.Passage.Id, lease))
+                throw new InvalidOperationException("Invalid traffic passage checkpoint.");
+        _passageLeases.Clear();
+        foreach (var pair in rebuiltLeases) _passageLeases.Add(pair.Key, pair.Value);
         _states.Clear();
         foreach (var pair in rebuilt)
             _states.Add(pair.Key, pair.Value);

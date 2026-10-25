@@ -83,6 +83,10 @@ internal sealed partial class PredictiveTrafficPlanner
             int age = ageB.CompareTo(ageA);
             return age != 0 ? age : CompareIdentity(ordered[a].Binding.Requester, ordered[b].Binding.Requester);
         });
+        var passagePlan = PreparePassages(frame, ordered, vehicles, paths, priority, waits, waitingFor,
+            workAllowance - workConsumed);
+        workConsumed += passagePlan.Work;
+        if (!passagePlan.Complete) return Unavailable(NavigationBlockReason.SearchWork);
         for (int rank = 0; rank < priority.Length; rank++)
         {
             int i = priority[rank];
@@ -153,7 +157,26 @@ internal sealed partial class PredictiveTrafficPlanner
             workAllowance - workConsumed, recovery);
         if (recoveryWork < 0) return Unavailable(NavigationBlockReason.SearchWork);
         workConsumed += recoveryWork;
+        for (int i = 0; i < recovery.Length; i++)
+        {
+            if (recovery[i] is not Vector3 escape) continue;
+            foreach (var lease in passagePlan.Leases.Values)
+            {
+                if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
+                workConsumed++;
+                if (lease.Owner != ordered[i].Binding.Requester &&
+                    Touches(lease.Passage, [vehicles[ordered[i].Binding.Requester].Pose,
+                        new NavigationPose(escape, vehicles[ordered[i].Binding.Requester].Pose.Rotation)], profiles[i]))
+                {
+                    recovery[i] = null;
+                    break;
+                }
+            }
+        }
+
         // State is committed only after a complete successful computation.
+        _passageLeases.Clear();
+        foreach (var pair in passagePlan.Leases) _passageLeases.Add(pair.Key, pair.Value);
         var live = ordered.Select(static v => v.Binding.Requester).ToHashSet();
         foreach (var entity in _states.Keys.Where(e => !live.Contains(e)).ToArray()) _states.Remove(entity);
         for (int i = 0; i < ordered.Length; i++)
@@ -240,8 +263,8 @@ internal sealed partial class PredictiveTrafficPlanner
         Vector2 relative = new(a0.X - b0.X, a0.Z - b0.Z);
         Vector2 velocity = new(a1.X - a0.X - b1.X + b0.X, a1.Z - a0.Z - b1.Z + b0.Z);
         float t = velocity.LengthSquared() > 0 ? Math.Clamp(-Vector2.Dot(relative, velocity) / velocity.LengthSquared(), 0, 1) : 0;
-        float radius = new Vector2(a.HalfExtents.X, a.HalfExtents.Z).Length() + a.ClearanceMeters +
-            new Vector2(b.HalfExtents.X, b.HalfExtents.Z).Length() + b.ClearanceMeters;
+        float radius = a.HalfExtents.Length() + a.ClearanceMeters +
+            b.HalfExtents.Length() + b.ClearanceMeters;
         return (relative + velocity * t).LengthSquared() <= radius * radius;
     }
 }
