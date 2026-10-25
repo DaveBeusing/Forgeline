@@ -7,7 +7,7 @@ namespace ForgeLine.Game;
 /// Computes ordinary corridor motion from one copied tick. Precise local, dock and
 /// queue motion stays with its existing owner. This class has no mutable history.
 /// </summary>
-public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
+public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
 {
     private const float DirectionEpsilon = 0.00001f;
     private readonly NavigationMotionPlannerOptions _options;
@@ -89,24 +89,45 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         if (!float.IsFinite(groundOffset))
             return Hold(input, collision, NavigationModuleAvailability.Unavailable, NavigationBlockReason.Terrain);
 
+        if (input.Traffic.MaximumSpeed <= 1 &&
+            input.Traffic.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
+        {
+            usedWaypoint = route.Waypoints[Math.Min(currentWaypoint, route.Waypoints.Count - 1)];
+            usedWaypointIndex = currentWaypoint;
+            return ProposeForwardClearance(input, collision, geometry, route, groundOffset,
+                workAllowance, ref workConsumed, input.Traffic.Reason, brakingDistance);
+        }
+
         if (!TryLookahead(input, collision, geometry, route, currentWaypoint, groundOffset,
             lookahead, maximumSpeed, workAllowance, ref workConsumed, out Vector3 steeringTarget,
             out float safeDistance, out NavigationBlockReason horizonReason, out int steeringIndex))
-            return Hold(input, collision, Availability, horizonReason, brakingDistance);
+        {
+            usedWaypoint = route.Waypoints[Math.Min(currentWaypoint, route.Waypoints.Count - 1)];
+            usedWaypointIndex = currentWaypoint;
+            return ProposeForwardClearance(input, collision, geometry, route, groundOffset,
+                workAllowance, ref workConsumed, horizonReason, brakingDistance);
+        }
         usedWaypoint = steeringTarget;
         usedWaypointIndex = steeringIndex;
 
-        return ProposeStep(input, collision, geometry, route, steeringTarget, safeDistance,
+        var proposal = ProposeStep(input, collision, geometry, route, steeringTarget, safeDistance,
             groundOffset, currentSpeed, maximumSpeed, brakingDistance, horizonReason,
-            workAllowance, ref workConsumed);
+            workAllowance, ref workConsumed, out bool forwardClearance);
+        if (forwardClearance)
+        {
+            usedWaypoint = route.Waypoints[Math.Min(currentWaypoint, route.Waypoints.Count - 1)];
+            usedWaypointIndex = currentWaypoint;
+        }
+        return proposal;
     }
 
     private NavigationMotionProposal ProposeStep(in NavigationMotionInput input,
         NavigationCollisionFrame collision, INavigationGeometryQuery geometry,
         NavigationRouteProposal route, Vector3 target, float safeDistance, float groundOffset,
         float currentSpeed, float maximumSpeed, float brakingDistance, NavigationBlockReason horizonReason,
-        int workAllowance, ref int workConsumed)
+        int workAllowance, ref int workConsumed, out bool forwardClearance)
     {
+        forwardClearance = false;
         NavigationPose start = input.Vehicle.Pose;
         NavigationVehicleProfile profile = input.Vehicle.Profile;
         float finalDistance = HorizontalDistance(start.Position, input.Binding.OriginalOrder.WorldTarget);
@@ -170,7 +191,11 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         if (!TrySweep(geometry, collision, sweep, workAllowance, ref workConsumed, out NavigationSweepResult result))
             return Hold(input, collision, NavigationModuleAvailability.Unavailable, NavigationBlockReason.MissingGeometry, brakingDistance);
         if (result.AllowedFraction <= 0)
-            return Hold(input, collision, Availability, result.Reason, brakingDistance);
+        {
+            forwardClearance = true;
+            return ProposeForwardClearance(input, collision, geometry, route, groundOffset,
+                workAllowance, ref workConsumed, result.Reason, brakingDistance);
+        }
 
         // A verified prefix belongs to this exact translation/rotation. Shorten
         // both together; never snap sideways or approve only a safe endpoint.

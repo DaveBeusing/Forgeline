@@ -1110,7 +1110,7 @@ public static class PlayerExperienceSnapshotFactory
                 production.Status is
                     UnitProductionStatus.NoInput or
                     UnitProductionStatus.NoPower or
-                    UnitProductionStatus.Paused)
+                    UnitProductionStatus.Paused or UnitProductionStatus.OutputBlocked)
             {
                 count++;
             }

@@ -62,7 +62,7 @@ public sealed class NavigationCollisionFrame
     public AxisAlignedBounds Coverage { get; }
     public bool IsComplete { get; }
     public IReadOnlyList<NavigationCollisionBody> Bodies { get; }
-    /// <summary>Only for a sequential owner that holds these poses while independently arbitrating every later move.</summary>
+    /// <summary>Static occupancy model for a sequential owner; every actual move still requires independent arbitration.</summary>
     public bool BodyPosesAreFixed { get; }
     private static bool Finite(Vector3 value) => float.IsFinite(value.X) && float.IsFinite(value.Y) && float.IsFinite(value.Z);
 }

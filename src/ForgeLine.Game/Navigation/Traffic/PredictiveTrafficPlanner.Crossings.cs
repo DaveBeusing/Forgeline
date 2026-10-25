@@ -33,11 +33,11 @@ internal sealed partial class PredictiveTrafficPlanner
                         Math.Clamp(-Vector2.Dot(relative, velocity) / velocity.LengthSquared(), 0, 1) : 0;
                     Vector3 center = (Vector3.Lerp(a0, a1, fraction) + Vector3.Lerp(b0, b1, fraction)) * 0.5f;
                     var grid = frame.Collision.World.Grid;
-                    if (!grid.TryWorldToCell(center, out var cell)) return new(passages.Values.ToArray(), consumed, false);
-                    ulong id = 0x2000000000000000UL | ((ulong)grid.GetIndex(cell) + 1);
-                    Vector3 pinned = grid.GetCellCenter(cell);
-                    float half = MathF.Max(grid.Settings.CellSizeMeters,
-                        MathF.Max(profiles[first].HalfExtents.Length(), profiles[second].HalfExtents.Length()));
+                    if (!TryPinCrossing(grid, center, out ulong id, out Vector3 pinned, out float quantum))
+                        return new(passages.Values.ToArray(), consumed, false);
+                    float radius = MathF.Max(profiles[first].HalfExtents.Length() + profiles[first].ClearanceMeters,
+                        profiles[second].HalfExtents.Length() + profiles[second].ClearanceMeters);
+                    float half = MathF.Max(quantum * .5f, radius) + quantum * .5f;
                     float halfX = MathF.Min(half, MathF.Min(pinned.X - grid.Origin.X,
                         grid.Origin.X + grid.Width * grid.Settings.CellSizeMeters - pinned.X));
                     float halfZ = MathF.Min(half, MathF.Min(pinned.Z - grid.Origin.Y,
@@ -68,4 +68,27 @@ internal sealed partial class PredictiveTrafficPlanner
         }
         return new(passages.Values.ToArray(), consumed, true);
     }
+    private static bool TryPinCrossing(NavigationGrid grid, Vector3 center, out ulong id, out Vector3 pinned, out float quantum)
+    {
+        id = 0; pinned = default; quantum = MathF.Min(4, grid.Settings.CellSizeMeters);
+        if (!grid.TryWorldToCell(center, out _)) return false;
+        double width = (double)grid.Width * grid.Settings.CellSizeMeters;
+        double height = (double)grid.Height * grid.Settings.CellSizeMeters;
+        double columns = Math.Ceiling(width / quantum), rows = Math.Ceiling(height / quantum);
+        if (!double.IsFinite(columns) || !double.IsFinite(rows) || columns < 1 || rows < 1 ||
+            columns > int.MaxValue || rows > int.MaxValue || columns * rows > int.MaxValue) return false;
+        int column = (int)Math.Floor(((double)center.X - grid.Origin.X) / quantum);
+        int row = (int)Math.Floor(((double)center.Z - grid.Origin.Y) / quantum);
+        if (column < 0 || column >= columns || row < 0 || row >= rows) return false;
+        // Stable fine physical cells prevent coarse pathfinding resolution from
+        // claiming unrelated parking bays. Retained leases still keep their exact
+        // original envelope until the owner's complete footprint clears.
+        double minimumX = grid.Origin.X + (double)column * quantum;
+        double minimumZ = grid.Origin.Y + (double)row * quantum;
+        pinned = new((float)((minimumX + Math.Min(grid.Origin.X + width, minimumX + quantum)) * .5), center.Y,
+            (float)((minimumZ + Math.Min(grid.Origin.Y + height, minimumZ + quantum)) * .5));
+        id = 0x2000000000000000UL | ((ulong)((long)row * (int)columns + column) + 1);
+        return true;
+    }
+
 }

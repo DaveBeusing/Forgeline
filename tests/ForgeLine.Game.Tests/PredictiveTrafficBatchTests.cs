@@ -34,6 +34,39 @@ public sealed class PredictiveTrafficBatchTests
             Assert.Single(new PredictiveTrafficPlanner().PlanBatch(observed, [intent], new BlockedGeometry(), 3, 10000, out _)).Action);
     }
 
+    [Theory]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    public void FutureQueueTargetDoesNotReserveAnotherServiceApproach(bool occupied, bool proceed)
+    {
+        var (frame, intents) = Crossing();
+        var reservation = new NavigationTrafficReservation(7, new(2, 1), 1, 0, NavigationReservationKind.Queue,
+            new(new(20, .5f, 20), Quaternion.Identity), Vector3.One, SimulationTick.Zero, SimulationTick.Zero,
+            occupied, QueueBuilding: new(9, 1), QueuePosition: 2);
+        var observed = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [frame.Vehicles[0]], [reservation], Limits());
+        var directive = Assert.Single(new PredictiveTrafficPlanner().PlanBatch(observed, [intents[0]], new ClearGeometry(), 3, 10000, out _));
+        Assert.Equal(proceed ? NavigationTrafficAction.Proceed : NavigationTrafficAction.Hold, directive.Action);
+        Assert.Equal(NavigationTrafficAction.Hold,
+            Assert.Single(new PredictiveTrafficPlanner().PlanBatch(observed, [intents[0]], new BlockedGeometry(), 3, 10000, out _)).Action);
+    }
+
+    [Fact]
+    public void CoarseWorldGridDoesNotTurnOneCrossingIntoAnEntireParkingArea()
+    {
+        var (frame, intents) = Crossing(16);
+        var parked = new NavigationCollisionBody(new(NavigationObstacleSource.Entity, 99, 1), NavigationObstacleKind.Vehicle,
+            new(new(36, .5f, 36), Quaternion.Identity), new(.5f), Vector3.Zero);
+        var collision = new NavigationCollisionFrame(frame.Collision.World, frame.Tick.Value, frame.Collision.Coverage, true, [parked], 10);
+        var observed = new NavigationTrafficFrame(frame.Tick, collision, true, frame.Vehicles.ToArray(), [], Limits());
+        var planner = new PredictiveTrafficPlanner();
+        var directives = planner.PlanBatch(observed, intents, new ClearGeometry(), 3, 10000, out _);
+        Assert.Equal(NavigationTrafficAction.Proceed, directives[0].Action);
+        Assert.Equal(NavigationTrafficAction.Hold, directives[1].Action);
+        var lease = Assert.Single(planner.CaptureState().Leases);
+        Assert.InRange(lease.Passage.HalfExtents.X, .5f, 8);
+        Assert.InRange(lease.Passage.HalfExtents.Z, .5f, 8);
+    }
+
     [Fact]
     public void ClearPredictionReportsNoHazardAndRetainsNoWaitingHistory()
     {
@@ -385,6 +418,27 @@ public sealed class PredictiveTrafficBatchTests
     }
 
     [Fact]
+    public void ForeignPassageAllowsOnlyOutwardDepartureFromAnAlreadyOccupiedRegion()
+    {
+        var (frame, _) = OpposingPassage(1, 23, 27);
+        var passage = Assert.Single(frame.Passages);
+        var owner = frame.Vehicles[0].Entity;
+        var other = frame.Vehicles[1];
+        var planner = new PredictiveTrafficPlanner();
+        planner.RestoreState(new(3, [], [new(passage, owner, 1, 1, 1, 1, true)]));
+        var start = other.Pose;
+        var outward = start with { Position = start.Position + Vector3.UnitZ };
+        var inward = start with { Position = start.Position - Vector3.UnitZ };
+        Assert.True(planner.TryCheckPassage(other.Entity, start, outward, other.Profile, 100, out _, out bool complete));
+        Assert.True(complete);
+        Assert.False(planner.TryCheckPassage(other.Entity, start, inward, other.Profile, 100, out _, out _));
+        var outside = start with { Position = start.Position + Vector3.UnitZ * 20 };
+        Assert.False(planner.TryCheckPassage(other.Entity, outside, start, other.Profile, 100, out _, out _));
+        Assert.Equal(owner, Assert.Single(planner.CaptureState().Leases).Owner);
+        Assert.True(Assert.Single(planner.CaptureState().Leases).Entered);
+    }
+
+    [Fact]
     public void PassageLeaseSurvivesChangedCommandUntilWholeRearClears()
     {
         var (frame, intents) = OpposingPassage(1, 10, 40);
@@ -479,12 +533,13 @@ public sealed class PredictiveTrafficBatchTests
         return (new(new SimulationTick(tick), collision, true, vehicles, [], Limits(), [passage]), intents);
     }
 
-    private static (NavigationTrafficFrame, NavigationTrafficIntent[]) Crossing()
+    private static (NavigationTrafficFrame, NavigationTrafficIntent[]) Crossing(float cellSizeMeters = 4)
     {
         var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 };
         var terrain = new TerrainWorld(settings,
             [new TerrainChunk(new ChunkCoordinate(0, 0), new TerrainHeightfield(17, 64, new float[289]))]);
-        var world = NavigationWorld.Build(terrain, gridSettings: new NavigationGridSettings { CellSizeMeters = 4 });
+        var world = NavigationWorld.Build(terrain, gridSettings: new NavigationGridSettings { CellSizeMeters = cellSizeMeters },
+            sectorSettings: new NavigationSectorSettings { SectorSizeCells = Math.Min(8, (int)(64 / cellSizeMeters)) });
         var capabilities = NavigationCapabilities.For(NavigationMovementClass.Wheeled);
         var snapshot = new NavigationWorldSnapshot(world, world.GetSectorGraph(capabilities), capabilities,
             terrain, 0, 1, NavigationModuleAvailability.NotConnected, [], []);

@@ -6,7 +6,7 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
 
-public sealed class UnitProductionSystem : ISimulationSystem
+public sealed partial class UnitProductionSystem : ISimulationSystem
 {
     internal GameplayProgressJournal? Progress { get; set; }
 
@@ -73,7 +73,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
         {
             if (model.Status == UnitProductionStatus.Running) running++;
             else if (model.Status is UnitProductionStatus.NoInput or UnitProductionStatus.NoPower or
-                     UnitProductionStatus.Paused) blocked++;
+                     UnitProductionStatus.Paused or UnitProductionStatus.OutputBlocked) blocked++;
         }
 
         Metrics = Metrics with
@@ -127,7 +127,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
             else if (facility.Status is
                      UnitProductionStatus.NoInput or
                      UnitProductionStatus.NoPower or
-                     UnitProductionStatus.Paused)
+                     UnitProductionStatus.Paused or UnitProductionStatus.OutputBlocked)
             {
                 blocked++;
             }
@@ -443,6 +443,13 @@ public sealed class UnitProductionSystem : ISimulationSystem
         EntityId requestEntity,
         UnitDefinition definition)
     {
+        if (!TryFindSpawn(context.Entities, facilityEntity, facility, definition, out Vector3 spawnPosition))
+        {
+            facility.Status = UnitProductionStatus.OutputBlocked;
+            facility.BlockReason = UnitProductionBlockReason.OutputBlocked;
+            return;
+        }
+
         ValidateReservations(
             facility.InputInventory,
             definition);
@@ -462,23 +469,6 @@ public sealed class UnitProductionSystem : ISimulationSystem
                 "UNIT_PRODUCTION_INPUT_COMMIT_FAILED",
                 $"Unit production input commit failed for unit {definition.Id}.");
         }
-
-        if (!context.Entities.TryGetComponent(
-                facilityEntity,
-                out WorldTransform facilityTransform))
-        {
-            EngineInvariant.Fail(
-                DiagnosticCategory.Simulation,
-                "UNIT_PRODUCTION_FACILITY_TRANSFORM_MISSING",
-                $"Unit production facility {facilityEntity} has no world transform.");
-        }
-
-        Vector3 worldOffset =
-            Vector3.Transform(
-                facility.SpawnOffset,
-                facilityTransform.Rotation);
-        Vector3 spawnPosition =
-            facilityTransform.Position + worldOffset;
 
         EntityId producedUnit =
             _unitFactory.Create(
