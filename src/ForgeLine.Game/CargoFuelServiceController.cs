@@ -114,6 +114,17 @@ internal sealed class CargoFuelServiceController(
                     CargoFuelServiceReason.None, context.Tick));
                 return false;
             }
+            if (routeDeferred)
+            {
+                // A refined final approach can exhaust the delivery reserve after admission.
+                // Leave through the existing physically budgeted service-exit path before
+                // seeking propulsion fuel; otherwise this bay can block its own replenishment.
+                // Cargo, reservations and the exclusive generation survive until physical exit.
+                ClearServiceMovement(entities, truck);
+                Mark(context, truck, new(visit.Building, CargoFuelServicePhase.Exiting,
+                    CargoFuelServiceReason.InsufficientTravelFuel, context.Tick));
+                return false;
+            }
             return true; // An occupied exit remains physically owned until it clears.
         }
 

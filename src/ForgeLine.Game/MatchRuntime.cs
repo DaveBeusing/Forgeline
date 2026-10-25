@@ -342,7 +342,7 @@ public sealed class MatchRuntime : IDisposable
         var battlefieldIntelligence =
             new BattlefieldIntelligenceSystem(
                 intelligence,
-                spatialIndex)
+                spatialIndex, technologyDefinitions)
             {
                 TimingEnabled =
                     runtimeSettings.EnableDebugCapture,
@@ -577,7 +577,7 @@ public sealed class MatchRuntime : IDisposable
                 buildingPlacement,
                 intelligence,
                 battlefield,
-                configurations, navigation, weapons)
+                configurations, navigation, weapons, technologyDefinitions)
             {
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture

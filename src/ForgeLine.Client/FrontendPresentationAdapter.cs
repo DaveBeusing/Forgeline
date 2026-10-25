@@ -70,6 +70,8 @@ internal static class FrontendPresentationAdapter
                 new FrontendDetailLineView(
                     "BATTLEFIELD",
                     model.Configuration.MapName),
+                .. (string.IsNullOrEmpty(model.SelectedScenario.Description) ? Array.Empty<FrontendDetailLineView>()
+                    : [new FrontendDetailLineView("GEOGRAPHY", model.SelectedScenario.Description)]),
                 new FrontendDetailLineView(
                     "FACTION",
                     model.Configuration.FactionName),

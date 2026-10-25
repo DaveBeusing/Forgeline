@@ -4,7 +4,7 @@
 
 `Central Divide` is the canonical FORGELINE vertical-slice battlefield. It is a 3,072 × 3,072 meter two-player map designed to force the production, logistics, intelligence, terrain, disruption, and combined-arms systems to interact in one scenario.
 
-The map is authored as typed game-content data through `BattlefieldDefinition`. `ForgeLine.MapCompiler` now captures that definition into the versioned `BattlefieldMapArtifact`, reloads the compiled payload, and runs operational-geography qualification. Gameplay does not depend on editor-only state; the typed definition remains the current runtime source while the artifact establishes the compiler handoff for later editor-authored maps.
+The map is authored as typed game-content data through `BattlefieldDefinition`. `ForgeLine.MapCompiler` now captures that definition into the versioned `BattlefieldMapArtifact`, reloads the compiled payload, and runs operational-geography qualification. Gameplay resolves the pinned compiled artifact through ScenarioRegistry and reconstructs its terrain through BattlefieldTerrainFactory. The typed definition remains an offline authoring/test source. Split Basin uses the same production loading contract.
 
 ## Strategic Layout
 

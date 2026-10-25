@@ -13,6 +13,30 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class PlayerActionPanelTests
 {
     [Fact]
+    public void LockedUnitActivationOpensItsTechnologyWithoutSubmittingProduction()
+    {
+        var facility = new PlayerUnitProductionFacilityActionReadModel(new(10, 1), default, default,
+            default, default, 0, [new PlayerUnitProductionActionReadModel(UnitIds.CombatEngineer,
+                "Combat Engineer", [], 100, false, TechnologyCapabilityIds.FieldEngineering)], []);
+        var technology = TechnologyAction(new(11, 1), new(11, 1), PlayerTechnologyState.Available,
+            TechnologyResearchBlockReason.None, default);
+        var snapshot = CreateSnapshot(unitProduction: facility, technology: [technology]);
+        var input = new InputState();
+        var controller = new PlayerActionPanelController();
+        controller.Update(input, snapshot, 1600, 900);
+        Press(input, PlatformKey.U);
+        controller.Update(input, snapshot, 1600, 900);
+        Release(input, PlatformKey.U);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.Equal(PlayerActionPanelMode.UnitProduction, controller.Mode);
+        Press(input, PlatformKey.Enter);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.Equal(PlayerActionPanelMode.Technology, controller.Mode);
+        Assert.Equal(0, controller.SelectedIndex);
+        Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Fact]
     public void ManualLogisticsKeyboardEditsUseDirectionalBoundsWithoutChangingSnapshot()
     {
         var policy = new PlayerStockPolicyActionReadModel(default, ResourceIds.Steel, "Steel",

@@ -8,7 +8,13 @@ Review started from master `42ac542f3c7d8b2d793d8dffd6930f772ad95186`
 compatibility changes do not modify the reviewed navigation or Game sources.
 The five production changes were committed as
 `2b191cbca783ef51e57b58f23a34993e3805d728` after qualification.
-The PR has one PATCH increment to 0.1.470; no schema or public component layout changes.
+The original candidate used 0.1.470. After synchronization with master
+`5e0c742bee60ebd6c422646b082697da59459308` (0.1.471-dev), the PR has one
+PATCH increment to 0.1.472-dev. All five navigation source blobs are unchanged.
+Current master's technology progression, Split Basin scenario, and authoritative
+schema 8 are retained; this conflict resolution adds no schema or public component
+layout changes. The measurements below remain historical qualification of the
+original source combination, not acceptance of this newly integrated build.
 
 This document supplements [hierarchical navigation](HierarchicalNavigation.md)
 and updates the current recovery/workspace behavior described by the historical

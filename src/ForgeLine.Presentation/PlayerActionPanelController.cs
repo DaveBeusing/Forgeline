@@ -382,6 +382,20 @@ public sealed partial class PlayerActionPanelController
             Mode != PlayerActionPanelMode.Closed &&
             Pressed(input, _bindings.Key(GameplayAction.Activate));
 
+        if (activate && !requestPending && Mode == PlayerActionPanelMode.UnitProduction &&
+            actions?.UnitProduction is { } lockedProduction && SelectedIndex >= 0 &&
+            SelectedIndex < lockedProduction.Units.Count && !lockedProduction.Units[SelectedIndex].TechnologyUnlocked)
+        {
+            TechnologyCapabilityId capability = lockedProduction.Units[SelectedIndex].RequiredTechnologyCapability;
+            for (int index = 0; index < actions.Technology.Count; index++)
+                if (actions.Technology[index].Unlocks.Contains(capability))
+                {
+                    ToggleMode(PlayerActionPanelMode.Technology);
+                    if (Mode == PlayerActionPanelMode.Technology) SelectedIndex = index;
+                    return;
+                }
+        }
+
         if (activate &&
             PlayerActionDockHudModel.CanUseControl(PlayerActionDockControlKind.Activate,
                 Mode, SelectedIndex, view, actions))

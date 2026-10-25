@@ -69,6 +69,8 @@ After the Release build, `pwsh ./build/Run-MatchSoak.ps1 -NoBuild` runs the cano
 
 The CI workflow emits the required check context `build-test` from GitHub Actions. That check represents the complete job, including the natural vertical-slice terminal validation; a successful build or unit-test subset is not equivalent to the full required check.
 
+The early technology gate checks paid artillery/radar effects, research and fleet priorities, normal-stock opponent progression, serialized Save/Replay and matching Technology focus. It preserves all complete-suite, asset, native, package and terminal gates.
+
 The early Operations rule-controls gate runs the existing rule and command-boundary tests, real selected-facility UI/production/save-replay cases and client submission/native-state contracts. It preserves all later complete-solution, asset, Windows/WARP, package and terminal-match gates. See [Operations rules](OperationsAutomation.md) for scope and player controls.
 
 The early logistics contract step also runs `PlayerActionDockHudTests` so
@@ -223,3 +225,7 @@ The paired refinement workload is reproduced with `dotnet run --project benchmar
 ## Operations chain validation
 
 The early Operations chain diagnosis and safe focus CI step checks transient conveyor causes, real paid production-chain recovery, typed bounded links, source-stock semantics, privacy, held navigation, dense copied rendering and extraction/composition bounds. It preserves the tactical, recovery, conveyor, asset/map, full-solution, native, package and natural terminal gates. See [Operations diagnosis](OperationsDiagnosis.md) and its source-pinned measurement report. Native human readability and reference-hardware performance remain separate acceptance classes.
+
+## Alternate battlefield
+
+Central Divide remains the default; Split Basin is selected in New Game or via `--scenario split-basin` in client/headless. Both use the same compiled registry, save/replay and deployed package contracts. See [Split Basin](SplitBasinBattlefield.md) for actual-data geography, normal-stock opening, route measurements and reproducible checks. The early Split Basin gate adds focused geography/runtime tests and map compilation without removing any existing gates.

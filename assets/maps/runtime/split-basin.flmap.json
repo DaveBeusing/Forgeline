@@ -1,0 +1,1549 @@
+{
+  "formatVersion": 3,
+  "metadata": {
+    "key": "battlefield.split_basin",
+    "displayName": "Split Basin",
+    "widthMeters": 2048,
+    "heightMeters": 2048,
+    "recommendedPlayers": 2
+  },
+  "starts": [
+    {
+      "player": {
+        "value": 1,
+        "isSpecified": true
+      },
+      "position": {
+        "x": 320,
+        "y": 0,
+        "z": 1024
+      },
+      "commandCorePosition": {
+        "x": 370,
+        "y": 0,
+        "z": 1024
+      },
+      "buildArea": {
+        "minimum": {
+          "x": 96,
+          "y": -64,
+          "z": 784
+        },
+        "maximum": {
+          "x": 400,
+          "y": 128,
+          "z": 1264
+        }
+      }
+    },
+    {
+      "player": {
+        "value": 2,
+        "isSpecified": true
+      },
+      "position": {
+        "x": 1728,
+        "y": 0,
+        "z": 1024
+      },
+      "commandCorePosition": {
+        "x": 1678,
+        "y": 0,
+        "z": 1024
+      },
+      "buildArea": {
+        "minimum": {
+          "x": 1648,
+          "y": -64,
+          "z": 784
+        },
+        "maximum": {
+          "x": 1952,
+          "y": 128,
+          "z": 1264
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "key": "west.ferrous",
+      "resourceId": {
+        "value": 1,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 520,
+        "y": 0,
+        "z": 870
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 5500,
+      "extractionRatePerSecond": 7.5,
+      "contested": false
+    },
+    {
+      "key": "west.volatiles",
+      "resourceId": {
+        "value": 2,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 460,
+        "y": 0,
+        "z": 1180
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 3500,
+      "extractionRatePerSecond": 5,
+      "contested": false
+    },
+    {
+      "key": "west.silicates",
+      "resourceId": {
+        "value": 3,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 650,
+        "y": 0,
+        "z": 880
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 4000,
+      "extractionRatePerSecond": 5.5,
+      "contested": false
+    },
+    {
+      "key": "west.contested.ferrous",
+      "resourceId": {
+        "value": 1,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 740,
+        "y": 0,
+        "z": 760
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 12000,
+      "extractionRatePerSecond": 10,
+      "contested": true
+    },
+    {
+      "key": "west.contested.volatiles",
+      "resourceId": {
+        "value": 2,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 680,
+        "y": 0,
+        "z": 1390
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 8000,
+      "extractionRatePerSecond": 7,
+      "contested": true
+    },
+    {
+      "key": "west.outpost.silicates",
+      "resourceId": {
+        "value": 3,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 740,
+        "y": 0,
+        "z": 1800
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 10000,
+      "extractionRatePerSecond": 8,
+      "contested": true
+    },
+    {
+      "key": "east.ferrous",
+      "resourceId": {
+        "value": 1,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 1528,
+        "y": 0,
+        "z": 870
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 5500,
+      "extractionRatePerSecond": 7.5,
+      "contested": false
+    },
+    {
+      "key": "east.volatiles",
+      "resourceId": {
+        "value": 2,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 1588,
+        "y": 0,
+        "z": 1180
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 3500,
+      "extractionRatePerSecond": 5,
+      "contested": false
+    },
+    {
+      "key": "east.silicates",
+      "resourceId": {
+        "value": 3,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 1398,
+        "y": 0,
+        "z": 880
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 4000,
+      "extractionRatePerSecond": 5.5,
+      "contested": false
+    },
+    {
+      "key": "east.contested.ferrous",
+      "resourceId": {
+        "value": 1,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 1308,
+        "y": 0,
+        "z": 760
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 12000,
+      "extractionRatePerSecond": 10,
+      "contested": true
+    },
+    {
+      "key": "east.contested.volatiles",
+      "resourceId": {
+        "value": 2,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 1368,
+        "y": 0,
+        "z": 1390
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 8000,
+      "extractionRatePerSecond": 7,
+      "contested": true
+    },
+    {
+      "key": "east.outpost.silicates",
+      "resourceId": {
+        "value": 3,
+        "isSpecified": true
+      },
+      "center": {
+        "x": 1308,
+        "y": 0,
+        "z": 1800
+      },
+      "halfExtents": {
+        "x": 42,
+        "y": 4,
+        "z": 42
+      },
+      "totalQuantity": 10000,
+      "extractionRatePerSecond": 8,
+      "contested": true
+    }
+  ],
+  "worldObjects": [
+    {
+      "key": "west.ridge.rock.0",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 994,
+        "y": 0,
+        "z": 100
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.ridge.rock.1",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 994,
+        "y": 0,
+        "z": 180
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.ridge.rock.2",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 994,
+        "y": 0,
+        "z": 260
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.ridge.rock.3",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 994,
+        "y": 0,
+        "z": 340
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.ridge.rock.4",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 994,
+        "y": 0,
+        "z": 420
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.ridge.rock.5",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 994,
+        "y": 0,
+        "z": 500
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.ridge.rock.6",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 994,
+        "y": 0,
+        "z": 580
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.ridge.rock.7",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 994,
+        "y": 0,
+        "z": 660
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.ridge.rock.8",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 994,
+        "y": 0,
+        "z": 740
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.0",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 580,
+        "y": 0,
+        "z": 1560
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.1",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 602,
+        "y": 0,
+        "z": 1560
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 37,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.2",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 624,
+        "y": 0,
+        "z": 1560
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 74,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.3",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 580,
+        "y": 0,
+        "z": 1588
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 111,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.4",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 602,
+        "y": 0,
+        "z": 1588
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 148,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.5",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 624,
+        "y": 0,
+        "z": 1588
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 185,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.6",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 580,
+        "y": 0,
+        "z": 1616
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 222,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.7",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 602,
+        "y": 0,
+        "z": 1616
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 259,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.8",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 624,
+        "y": 0,
+        "z": 1616
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 296,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.9",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 580,
+        "y": 0,
+        "z": 1644
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 333,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.10",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 602,
+        "y": 0,
+        "z": 1644
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 370,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.outer.grove.11",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 624,
+        "y": 0,
+        "z": 1644
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 407,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.yard.crate",
+      "visual": "PropCrate",
+      "kind": "Prop",
+      "position": {
+        "x": 240,
+        "y": 0,
+        "z": 720
+      },
+      "scale": {
+        "x": 5,
+        "y": 4,
+        "z": 5
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "west.yard.wear",
+      "visual": "DecalTireTracks",
+      "kind": "Decal",
+      "position": {
+        "x": 420,
+        "y": 0,
+        "z": 1024
+      },
+      "scale": {
+        "x": 40,
+        "y": 0.08,
+        "z": 8
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.ridge.rock.0",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 1054,
+        "y": 0,
+        "z": 100
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.ridge.rock.1",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 1054,
+        "y": 0,
+        "z": 180
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.ridge.rock.2",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 1054,
+        "y": 0,
+        "z": 260
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.ridge.rock.3",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 1054,
+        "y": 0,
+        "z": 340
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.ridge.rock.4",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 1054,
+        "y": 0,
+        "z": 420
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.ridge.rock.5",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 1054,
+        "y": 0,
+        "z": 500
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.ridge.rock.6",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 1054,
+        "y": 0,
+        "z": 580
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.ridge.rock.7",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 1054,
+        "y": 0,
+        "z": 660
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.ridge.rock.8",
+      "visual": "PropRock",
+      "kind": "Prop",
+      "position": {
+        "x": 1054,
+        "y": 0,
+        "z": 740
+      },
+      "scale": {
+        "x": 38,
+        "y": 24,
+        "z": 48
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.0",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1468,
+        "y": 0,
+        "z": 1560
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.1",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1446,
+        "y": 0,
+        "z": 1560
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 37,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.2",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1424,
+        "y": 0,
+        "z": 1560
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 74,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.3",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1468,
+        "y": 0,
+        "z": 1588
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 111,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.4",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1446,
+        "y": 0,
+        "z": 1588
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 148,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.5",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1424,
+        "y": 0,
+        "z": 1588
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 185,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.6",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1468,
+        "y": 0,
+        "z": 1616
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 222,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.7",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1446,
+        "y": 0,
+        "z": 1616
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 259,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.8",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1424,
+        "y": 0,
+        "z": 1616
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 296,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.9",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1468,
+        "y": 0,
+        "z": 1644
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 333,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.10",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1446,
+        "y": 0,
+        "z": 1644
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 370,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.outer.grove.11",
+      "visual": "VegetationConifer",
+      "kind": "Vegetation",
+      "position": {
+        "x": 1424,
+        "y": 0,
+        "z": 1644
+      },
+      "scale": {
+        "x": 8,
+        "y": 22,
+        "z": 8
+      },
+      "rotationDegrees": 407,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.yard.crate",
+      "visual": "PropCrate",
+      "kind": "Prop",
+      "position": {
+        "x": 1808,
+        "y": 0,
+        "z": 720
+      },
+      "scale": {
+        "x": 5,
+        "y": 4,
+        "z": 5
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    },
+    {
+      "key": "east.yard.wear",
+      "visual": "DecalTireTracks",
+      "kind": "Decal",
+      "position": {
+        "x": 1628,
+        "y": 0,
+        "z": 1024
+      },
+      "scale": {
+        "x": 40,
+        "y": 0.08,
+        "z": 8
+      },
+      "rotationDegrees": 0,
+      "presentationOnly": true
+    }
+  ],
+  "sites": [
+    {
+      "key": "northwest.expansion",
+      "displayName": "West Overlook",
+      "kind": "Expansion",
+      "position": {
+        "x": 650,
+        "y": 0,
+        "z": 590
+      },
+      "buildArea": {
+        "minimum": {
+          "x": 545,
+          "y": -64,
+          "z": 485
+        },
+        "maximum": {
+          "x": 755,
+          "y": 128,
+          "z": 695
+        }
+      }
+    },
+    {
+      "key": "northeast.expansion",
+      "displayName": "East Overlook",
+      "kind": "Expansion",
+      "position": {
+        "x": 1398,
+        "y": 0,
+        "z": 590
+      },
+      "buildArea": {
+        "minimum": {
+          "x": 1293,
+          "y": -64,
+          "z": 485
+        },
+        "maximum": {
+          "x": 1503,
+          "y": 128,
+          "z": 695
+        }
+      }
+    },
+    {
+      "key": "west.mining_outpost",
+      "displayName": "West Basin Outpost",
+      "kind": "MiningOutpost",
+      "position": {
+        "x": 680,
+        "y": 0,
+        "z": 1500
+      },
+      "buildArea": {
+        "minimum": {
+          "x": 580,
+          "y": -64,
+          "z": 1400
+        },
+        "maximum": {
+          "x": 780,
+          "y": 128,
+          "z": 1600
+        }
+      }
+    },
+    {
+      "key": "east.mining_outpost",
+      "displayName": "East Basin Outpost",
+      "kind": "MiningOutpost",
+      "position": {
+        "x": 1368,
+        "y": 0,
+        "z": 1500
+      },
+      "buildArea": {
+        "minimum": {
+          "x": 1268,
+          "y": -64,
+          "z": 1400
+        },
+        "maximum": {
+          "x": 1468,
+          "y": 128,
+          "z": 1600
+        }
+      }
+    },
+    {
+      "key": "southwest.fob",
+      "displayName": "West Outer Staging",
+      "kind": "ForwardOperatingBase",
+      "position": {
+        "x": 820,
+        "y": 0,
+        "z": 1900
+      },
+      "buildArea": {
+        "minimum": {
+          "x": 730,
+          "y": -64,
+          "z": 1810
+        },
+        "maximum": {
+          "x": 910,
+          "y": 128,
+          "z": 1990
+        }
+      }
+    },
+    {
+      "key": "southeast.fob",
+      "displayName": "East Outer Staging",
+      "kind": "ForwardOperatingBase",
+      "position": {
+        "x": 1228,
+        "y": 0,
+        "z": 1900
+      },
+      "buildArea": {
+        "minimum": {
+          "x": 1138,
+          "y": -64,
+          "z": 1810
+        },
+        "maximum": {
+          "x": 1318,
+          "y": 128,
+          "z": 1990
+        }
+      }
+    }
+  ],
+  "roadNodes": [
+    {
+      "key": "west.start",
+      "position": {
+        "x": 420,
+        "y": 0,
+        "z": 1024
+      }
+    },
+    {
+      "key": "west.junction",
+      "position": {
+        "x": 820,
+        "y": 0,
+        "z": 1024
+      }
+    },
+    {
+      "key": "basin.west",
+      "position": {
+        "x": 928,
+        "y": 0,
+        "z": 1024
+      }
+    },
+    {
+      "key": "basin.east",
+      "position": {
+        "x": 1120,
+        "y": 0,
+        "z": 1024
+      }
+    },
+    {
+      "key": "outer.west",
+      "position": {
+        "x": 820,
+        "y": 0,
+        "z": 1664
+      }
+    },
+    {
+      "key": "outer.east",
+      "position": {
+        "x": 1228,
+        "y": 0,
+        "z": 1664
+      }
+    },
+    {
+      "key": "east.junction",
+      "position": {
+        "x": 1228,
+        "y": 0,
+        "z": 1024
+      }
+    },
+    {
+      "key": "east.start",
+      "position": {
+        "x": 1628,
+        "y": 0,
+        "z": 1024
+      }
+    }
+  ],
+  "roadEdges": [
+    {
+      "key": "west.start-link",
+      "sourceNodeKey": "west.start",
+      "destinationNodeKey": "west.junction",
+      "baseCost": 1,
+      "capacityPerSecond": 140
+    },
+    {
+      "key": "basin.west-link",
+      "sourceNodeKey": "west.junction",
+      "destinationNodeKey": "basin.west",
+      "baseCost": 1,
+      "capacityPerSecond": 120
+    },
+    {
+      "key": "basin.bridge",
+      "sourceNodeKey": "basin.west",
+      "destinationNodeKey": "basin.east",
+      "baseCost": 0.8,
+      "capacityPerSecond": 160
+    },
+    {
+      "key": "basin.east-link",
+      "sourceNodeKey": "basin.east",
+      "destinationNodeKey": "east.junction",
+      "baseCost": 1,
+      "capacityPerSecond": 120
+    },
+    {
+      "key": "outer.west-link",
+      "sourceNodeKey": "west.junction",
+      "destinationNodeKey": "outer.west",
+      "baseCost": 1.2,
+      "capacityPerSecond": 110
+    },
+    {
+      "key": "outer.ford",
+      "sourceNodeKey": "outer.west",
+      "destinationNodeKey": "outer.east",
+      "baseCost": 1.4,
+      "capacityPerSecond": 90
+    },
+    {
+      "key": "outer.east-link",
+      "sourceNodeKey": "outer.east",
+      "destinationNodeKey": "east.junction",
+      "baseCost": 1.2,
+      "capacityPerSecond": 110
+    },
+    {
+      "key": "east.start-link",
+      "sourceNodeKey": "east.junction",
+      "destinationNodeKey": "east.start",
+      "baseCost": 1,
+      "capacityPerSecond": 140
+    }
+  ],
+  "crossings": [
+    {
+      "key": "crossing.basin_bridge",
+      "displayName": "Basin Bridge",
+      "position": {
+        "x": 1024,
+        "y": 0,
+        "z": 1024
+      },
+      "passageBounds": {
+        "minimum": {
+          "x": 976,
+          "y": -64,
+          "z": 880
+        },
+        "maximum": {
+          "x": 1072,
+          "y": 128,
+          "z": 1168
+        }
+      },
+      "logisticsEdgeKey": "basin.bridge",
+      "initiallyOperational": true,
+      "restorable": true,
+      "restorationTicks": 80
+    },
+    {
+      "key": "crossing.outer_ford",
+      "displayName": "Outer Ford",
+      "position": {
+        "x": 1024,
+        "y": 0,
+        "z": 1664
+      },
+      "passageBounds": {
+        "minimum": {
+          "x": 976,
+          "y": -64,
+          "z": 1520
+        },
+        "maximum": {
+          "x": 1072,
+          "y": 128,
+          "z": 1808
+        }
+      },
+      "logisticsEdgeKey": "outer.ford",
+      "initiallyOperational": true,
+      "restorable": true,
+      "restorationTicks": 120
+    }
+  ],
+  "objectives": [
+    {
+      "key": "objective.west_command_core",
+      "owner": {
+        "value": 1,
+        "isSpecified": true
+      },
+      "commandCorePosition": {
+        "x": 370,
+        "y": 0,
+        "z": 1024
+      }
+    },
+    {
+      "key": "objective.east_command_core",
+      "owner": {
+        "value": 2,
+        "isSpecified": true
+      },
+      "commandCorePosition": {
+        "x": 1678,
+        "y": 0,
+        "z": 1024
+      }
+    }
+  ],
+  "staticNavigationObstacles": [
+    {
+      "minimum": {
+        "x": 976,
+        "y": -64,
+        "z": 0
+      },
+      "maximum": {
+        "x": 1072,
+        "y": 128,
+        "z": 880
+      }
+    },
+    {
+      "minimum": {
+        "x": 976,
+        "y": -64,
+        "z": 1168
+      },
+      "maximum": {
+        "x": 1072,
+        "y": 128,
+        "z": 1520
+      }
+    },
+    {
+      "minimum": {
+        "x": 976,
+        "y": -64,
+        "z": 1808
+      },
+      "maximum": {
+        "x": 1072,
+        "y": 128,
+        "z": 2048
+      }
+    }
+  ],
+  "terrainVisual": {
+    "profileId": "split_basin.production",
+    "controlEncoding": "RgbaFourLayer",
+    "activeLayerLimit": 4,
+    "controlSamplesPerSide": 33,
+    "materialAssetIds": [
+      "material.world.terrain.grass_ground",
+      "material.world.terrain.dirt",
+      "material.world.terrain.mud",
+      "material.world.terrain.rock",
+      "material.world.terrain.gravel",
+      "material.world.terrain.industrial_ground",
+      "material.world.terrain.concrete",
+      "material.world.terrain.scorched"
+    ]
+  },
+  "terrain": {
+    "version": 1,
+    "grid": {
+      "chunkSizeMeters": 256,
+      "regionSizeInChunks": 8,
+      "heightSamplesPerSide": 65,
+      "heightSampleSpacing": 4
+    },
+    "waves": [
+      {
+        "frequency": 0,
+        "amplitude": 0
+      },
+      {
+        "frequency": 0,
+        "amplitude": 0
+      },
+      {
+        "frequency": 0,
+        "amplitude": 0
+      }
+    ],
+    "ridgeCenter": 1024,
+    "ridgeSigma": 90,
+    "ridgeAmplitude": 32,
+    "gapStrength": 1,
+    "gaps": [
+      {
+        "center": 1024,
+        "sigma": 180
+      },
+      {
+        "center": 1664,
+        "sigma": 145
+      }
+    ],
+    "mounds": [
+      {
+        "amplitude": 22,
+        "centerX": 760,
+        "centerZ": 580,
+        "sigmaX": 120,
+        "sigmaZ": 150
+      },
+      {
+        "amplitude": 22,
+        "centerX": 1288,
+        "centerZ": 580,
+        "sigmaX": 120,
+        "sigmaZ": 150
+      },
+      {
+        "amplitude": -6,
+        "centerX": 1024,
+        "centerZ": 1024,
+        "sigmaX": 300,
+        "sigmaZ": 260
+      }
+    ]
+  },
+  "mapRevision": 1,
+  "contentKey": "directorate.v1",
+  "contentSha256": "205d0887e816d8922c43996a6a8ad85d177cbbf168e551a87ce76d9cc81efd63",
+  "startRule": "directorate.starting-base.v1",
+  "objectiveRule": "command-core-elimination.v1"
+}

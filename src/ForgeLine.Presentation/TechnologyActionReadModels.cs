@@ -45,8 +45,10 @@ public sealed class PlayerTechnologyActionReadModel
         TechnologyResearchBlockReason blockReason,
         double progress,
         EntityId activeRequest,
-        IReadOnlyList<TechnologyCapabilityId> unlocks)
+        IReadOnlyList<TechnologyCapabilityId> unlocks,
+        string effectDescription = "")
     {
+        EffectDescription = effectDescription;
         TechnologyId = technologyId;
         Key =
             key ??
@@ -88,6 +90,8 @@ public sealed class PlayerTechnologyActionReadModel
     }
 
     public TechnologyId TechnologyId { get; }
+
+    public string EffectDescription { get; }
 
     public string Key { get; }
 
@@ -350,7 +354,7 @@ internal static class TechnologyActionSnapshotFactory
                     block,
                     progress,
                     requestEntity,
-                    definition.Unlocks));
+                    definition.Unlocks, definition.EffectDescription));
         }
 
         return result.ToArray();

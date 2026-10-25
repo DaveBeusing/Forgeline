@@ -15,6 +15,17 @@ public sealed class ProgramArgumentTests
         Assert.Equal(expected, Program.TryParseArguments(["--reference-zoom", zoom], out _, out _, out _, out _));
         Assert.False(Program.TryParseArguments(["--reference-zoom"], out _, out _, out _, out _));
     }
+    [Theory]
+    [InlineData("split-basin", true)]
+    [InlineData("split-basin.directorate.v1", true)]
+    [InlineData("central-divide", true)]
+    [InlineData("unknown", false)]
+    public void RegisteredScenarioArgumentIsBounded(string scenario, bool expected)
+    {
+        Assert.Equal(expected, Program.TryParseArguments(["--scenario", scenario], out _, out _, out _, out _));
+        Assert.False(Program.TryParseArguments(["--scenario"], out _, out _, out _, out _));
+    }
+
     [Fact]
     public void QualificationArgumentsAcceptIsolatedSettingsRoot()
     {
