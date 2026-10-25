@@ -6,7 +6,8 @@ namespace ForgeLine.Game;
 
 /// <summary>A copied steering intent. The root binding remains the caller's commit token.</summary>
 internal readonly record struct NavigationTrafficIntent(
-    NavigationOrderBinding Binding, Vector3 SteeringTarget, float MaximumSpeed, bool CanMove);
+    NavigationOrderBinding Binding, Vector3 SteeringTarget, float MaximumSpeed, bool CanMove,
+    NavigationRouteProposal? Route = null, int CurrentWaypoint = 0);
 
 internal sealed partial class PredictiveTrafficPlanner
 {
@@ -40,7 +41,7 @@ internal sealed partial class PredictiveTrafficPlanner
         if (!frame.IsComplete || frame.Collision.Tick != frame.Tick.Value ||
             geometry.Availability != NavigationModuleAvailability.Available)
             return Unavailable(NavigationBlockReason.MissingGeometry);
-        int predictionWork = ordered.Length * PredictionSteps;
+        int predictionWork = ordered.Length * PredictionSteps * 2;
         if (predictionWork > workAllowance)
         {
             workConsumed = workAllowance;
@@ -62,10 +63,21 @@ internal sealed partial class PredictiveTrafficPlanner
                 (vehicle.RouteOrder ?? vehicle.DirectOrder) != intent.Binding.OriginalOrder ||
                 (vehicle.DockVisit?.Generation ?? 0) != intent.Binding.DockGeneration ||
                 (vehicle.QueueEntry?.Generation ?? 0) != intent.Binding.QueueGeneration ||
-                !Finite(vehicle.Movement.Velocity))
+                !Finite(vehicle.Movement.Velocity) || !float.IsFinite(vehicle.Movement.HeadingRadians) ||
+                !Enum.IsDefined(vehicle.Movement.Status))
                 return Unavailable(NavigationBlockReason.StaleSnapshot);
+            if (!frame.GetVehicleCollision(vehicle.Entity).IsComplete)
+                return Unavailable(NavigationBlockReason.MissingGeometry);
             profiles[i] = vehicle.Profile;
-            paths[i] = Predict(vehicle, intent, dt);
+            if (intent.Route is { } route && (route.Request.RequestId != intent.Binding.RequestId ||
+                route.Request.OriginalDestination != intent.Binding.OriginalOrder.WorldTarget ||
+                route.Request.Vehicle != vehicle.Profile || route.Request.Revision != frame.Collision.World.Revision ||
+                intent.CurrentWaypoint < 0 || intent.CurrentWaypoint >= route.Waypoints.Count ||
+                vehicle.DirectOrder?.WorldTarget != route.Waypoints[intent.CurrentWaypoint]))
+                return Unavailable(NavigationBlockReason.StaleSnapshot);
+            var predicted = Predict(vehicle, intent, dt, frame.Collision.World, out var predictionFailure);
+            if (predicted is null) return Unavailable(predictionFailure);
+            paths[i] = predicted;
             // Precision owners retain their own admission and release rules.
             if (!intent.CanMove || vehicle.DockVisit is not null || vehicle.QueueEntry is not null ||
                 intent.Binding.OriginalOrder.Kind != MovementOrderKind.Strategic)
@@ -115,17 +127,27 @@ internal sealed partial class PredictiveTrafficPlanner
         for (int i = 0; i < ordered.Length; i++)
         {
             if (waits[i] != NavigationBlockReason.None) continue;
+            var collision = frame.GetVehicleCollision(ordered[i].Binding.Requester);
             for (int step = 1; step <= PredictionSteps; step++)
             {
                 if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
                 var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(ordered[i].Binding.Requester),
                     paths[i][step - 1], paths[i][step], profiles[i], dt);
-                var result = geometry.Sweep(frame.Collision, sweep, workAllowance - workConsumed);
-                if (result.WorkConsumed < 0 || result.WorkConsumed > workAllowance - workConsumed)
+                var result = geometry.Sweep(collision, sweep, workAllowance - workConsumed);
+                if (result.WorkConsumed < 0 || result.WorkConsumed > workAllowance - workConsumed ||
+                    !Enum.IsDefined(result.Status) || !Enum.IsDefined(result.Reason) ||
+                    !float.IsFinite(result.AllowedFraction) || result.AllowedFraction < 0 || result.AllowedFraction > 1 ||
+                    result.Status == NavigationGeometryStatus.Clear &&
+                        (result.AllowedFraction != 1 || result.Reason != NavigationBlockReason.None || result.WorkConsumed == 0))
+                {
+                    workConsumed = workAllowance;
                     return Unavailable(NavigationBlockReason.MissingGeometry);
+                }
                 workConsumed += result.WorkConsumed;
                 if (result.FrameTick != frame.Tick.Value || result.Revision != frame.Collision.World.Revision)
                     return Unavailable(NavigationBlockReason.StaleSnapshot);
+                if (result.Status is NavigationGeometryStatus.Unavailable or NavigationGeometryStatus.InvalidInput or NavigationGeometryStatus.Stale)
+                    return Unavailable(result.Reason);
                 if (result.Status == NavigationGeometryStatus.BudgetExhausted)
                     return Unavailable(NavigationBlockReason.SearchWork);
                 if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1)
@@ -158,7 +180,11 @@ internal sealed partial class PredictiveTrafficPlanner
         var recovery = new Vector3?[ordered.Length];
         var recoveryWork = FindRecoveries(frame, ordered, vehicles, waits, waitingFor, geometry,
             workAllowance - workConsumed, recovery);
-        if (recoveryWork < 0) return Unavailable(NavigationBlockReason.SearchWork);
+        if (recoveryWork < 0)
+        {
+            workConsumed = workAllowance;
+            return Unavailable(NavigationBlockReason.SearchWork);
+        }
         workConsumed += recoveryWork;
         for (int i = 0; i < recovery.Length; i++)
         {
@@ -230,19 +256,37 @@ internal sealed partial class PredictiveTrafficPlanner
         return index != 0 ? index : a.Generation.CompareTo(b.Generation);
     }
 
-    private static NavigationPose[] Predict(in NavigationVehicleObservation vehicle, in NavigationTrafficIntent intent, float dt)
+    private static NavigationPose[]? Predict(in NavigationVehicleObservation vehicle, in NavigationTrafficIntent intent,
+        float dt, NavigationWorldSnapshot world, out NavigationBlockReason failure)
     {
+        failure = NavigationBlockReason.MissingGeometry;
+        if (!world.TrySampleHeight(vehicle.Pose.Position.X, vehicle.Pose.Position.Z, out float startHeight)) return null;
+        float groundOffset = vehicle.Pose.Position.Y - startHeight;
+        if (!float.IsFinite(groundOffset)) return null;
         var poses = new NavigationPose[PredictionSteps + 1];
         poses[0] = vehicle.Pose;
         float speed = vehicle.Movement.Velocity.Length();
         float heading = vehicle.Movement.HeadingRadians;
+        int waypoint = intent.CurrentWaypoint, advances = 0;
         for (int step = 1; step <= PredictionSteps; step++)
         {
-            Vector3 delta = intent.SteeringTarget - poses[step - 1].Position;
+            Vector3 target = intent.Route is { } route ? route.Waypoints[waypoint] : intent.SteeringTarget;
+            if (intent.Route is { } forward)
+            {
+                while (waypoint < forward.Waypoints.Count - 1 &&
+                    HorizontalDistance(poses[step - 1].Position, target) <= MathF.Max(0.2f, speed * dt))
+                {
+                    if (advances == PredictionSteps) { failure = NavigationBlockReason.SearchWork; return null; }
+                    advances++; waypoint++; target = forward.Waypoints[waypoint];
+                }
+            }
+            Vector3 delta = target - poses[step - 1].Position;
             delta.Y = 0;
             float distance = delta.Length();
+            Vector3 goal = intent.Route?.ResolvedDestination ?? intent.SteeringTarget;
+            float remaining = HorizontalDistance(poses[step - 1].Position, goal);
             float desired = intent.CanMove ? MathF.Min(intent.MaximumSpeed,
-                MathF.Min(vehicle.Profile.MaximumSpeed, MathF.Sqrt(2 * vehicle.Profile.Deceleration * distance))) : 0;
+                MathF.Min(vehicle.Profile.MaximumSpeed, MathF.Sqrt(2 * vehicle.Profile.Deceleration * remaining))) : 0;
             float change = (desired > speed ? vehicle.Profile.Acceleration : vehicle.Profile.Deceleration) * dt;
             speed += Math.Clamp(desired - speed, -change, change);
             if (distance > 0.0001f)
@@ -251,12 +295,22 @@ internal sealed partial class PredictiveTrafficPlanner
                 float angle = MathF.IEEERemainder(targetHeading - heading, MathF.Tau);
                 heading += Math.Clamp(angle, -vehicle.Profile.MaximumYawRate * dt, vehicle.Profile.MaximumYawRate * dt);
             }
-            Vector3 forward = new(MathF.Sin(heading), 0, MathF.Cos(heading));
-            Vector3 position = poses[step - 1].Position + forward * MathF.Min(distance, speed * dt);
+            Vector3 direction = new(MathF.Sin(heading), 0, MathF.Cos(heading));
+            Vector3 position = poses[step - 1].Position + direction * MathF.Min(distance, speed * dt);
+            if (!world.TrySampleHeight(position.X, position.Z, out float height))
+            {
+                failure = NavigationBlockReason.OutsideWorld;
+                return null;
+            }
+            position.Y = height + groundOffset;
+            if (!Finite(position)) return null;
             poses[step] = new(position, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
         }
+        failure = NavigationBlockReason.None;
         return poses;
     }
+
+    private static float HorizontalDistance(Vector3 a, Vector3 b) => new Vector2(a.X - b.X, a.Z - b.Z).Length();
 
     // Circumscribed discs conservatively contain every yawed horizontal footprint. Minimize relative
     // separation over the whole interval instead of checking endpoints (which can tunnel at crossings).

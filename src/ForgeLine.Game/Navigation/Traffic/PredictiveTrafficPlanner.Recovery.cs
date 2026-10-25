@@ -86,8 +86,8 @@ internal sealed partial class PredictiveTrafficPlanner
             var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity), vehicle.Pose,
                 new NavigationPose(target, vehicle.Pose.Rotation), vehicle.Profile,
                 Vector3.Distance(vehicle.Pose.Position, target));
-            var result = geometry.Sweep(frame.Collision, sweep, allowance - consumed);
-            if (result.WorkConsumed < 0 || result.WorkConsumed > allowance - consumed)
+            var result = geometry.Sweep(frame.GetVehicleCollision(vehicle.Entity), sweep, allowance - consumed);
+            if (result.WorkConsumed <= 0 || result.WorkConsumed > allowance - consumed)
             {
                 consumed = allowance;
                 return false;

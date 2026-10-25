@@ -20,7 +20,8 @@ public sealed class NavigationTrafficFrame
     public NavigationTrafficFrame(SimulationTick tick, NavigationCollisionFrame collision,
         bool isComplete, ReadOnlySpan<NavigationVehicleObservation> vehicles,
         ReadOnlySpan<NavigationTrafficReservation> reservations, NavigationIntegrationLimits limits,
-        ReadOnlySpan<NavigationTrafficPassage> passages = default)
+        ReadOnlySpan<NavigationTrafficPassage> passages = default,
+        IReadOnlyDictionary<EntityId, NavigationCollisionFrame>? vehicleCollisions = null)
     {
         ArgumentNullException.ThrowIfNull(collision);
         ArgumentNullException.ThrowIfNull(limits);
@@ -44,6 +45,16 @@ public sealed class NavigationTrafficFrame
                 !float.IsFinite(passage.HalfExtents.LengthSquared()) || passage.HalfExtents.X <= 0 ||
                 passage.HalfExtents.Y <= 0 || passage.HalfExtents.Z <= 0)
                 throw new ArgumentException("Passages require distinct stable identities and complete geometry.", nameof(passages));
+        var neighborhoods = new Dictionary<EntityId, NavigationCollisionFrame>();
+        if (vehicleCollisions is not null)
+            foreach (var pair in vehicleCollisions)
+            {
+                if (!identities.Contains(pair.Key) || pair.Value is null || pair.Value.Tick != tick.Value ||
+                    !ReferenceEquals(pair.Value.World, collision.World))
+                    throw new ArgumentException("Vehicle neighborhoods must retain the same physical world, participant and tick.", nameof(vehicleCollisions));
+                neighborhoods.Add(pair.Key, pair.Value);
+            }
+        _vehicleCollisions = new System.Collections.ObjectModel.ReadOnlyDictionary<EntityId, NavigationCollisionFrame>(neighborhoods);
         Passages = Array.AsReadOnly(passages.ToArray());
         Limits = limits;
         Tick = tick;
@@ -53,6 +64,9 @@ public sealed class NavigationTrafficFrame
         Reservations = Array.AsReadOnly(reservations.ToArray());
     }
 
+    private readonly System.Collections.ObjectModel.ReadOnlyDictionary<EntityId, NavigationCollisionFrame> _vehicleCollisions;
+    public NavigationCollisionFrame GetVehicleCollision(EntityId entity) =>
+        _vehicleCollisions.TryGetValue(entity, out var neighborhood) ? neighborhood : Collision;
     public NavigationIntegrationLimits Limits { get; }
     public IReadOnlyList<NavigationTrafficPassage> Passages { get; }
     public SimulationTick Tick { get; }

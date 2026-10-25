@@ -10,6 +10,74 @@ namespace ForgeLine.Game.Tests;
 public sealed class PredictiveTrafficBatchTests
 {
     [Fact]
+    public void PredictionContinuesAlongTheSelectedBentRoutePastTheFirstWaypoint()
+    {
+        var (frame, intents) = Crossing();
+        var vehicle = frame.Vehicles[0];
+        Vector3 final = new(20, 0.5f, 30);
+        var root = intents[0].Binding.OriginalOrder with { WorldTarget = final };
+        var waypoint = root with { WorldTarget = vehicle.Pose.Position };
+        vehicle = vehicle with { RouteOrder = root, DirectOrder = waypoint };
+        var request = new NavigationSearchSpecification(1, vehicle.Pose, final, NavigationTargetSemantics.PlayerGoal,
+            new(0, 0.1f, null, 0), frame.Collision.World.Capabilities, vehicle.Profile, frame.Collision.World.Revision,
+            frame.Collision.World.KnowledgeScope, 10000, 100000, 4);
+        var route = new NavigationRouteProposal(request, final,
+            [vehicle.Pose.Position, new Vector3(20, 0.5f, 20), final], [], default, 16);
+        var intent = intents[0] with { Binding = intents[0].Binding with { OriginalOrder = root }, Route = route, CurrentWaypoint = 0 };
+        var captured = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [vehicle], [], Limits());
+        var geometry = new TracingGeometry();
+        var result = new PredictiveTrafficPlanner().PlanBatch(captured, [intent], geometry, 3, 10000, out _);
+        Assert.Equal(NavigationTrafficAction.Proceed, Assert.Single(result).Action);
+        Assert.Contains(geometry.Sweeps, static sweep => sweep.End.Position.Z > 22);
+        Assert.All(geometry.Sweeps, static sweep => Assert.Equal(0.5f, sweep.End.Position.Y));
+    }
+
+    private sealed class TracingGeometry : INavigationGeometryQuery
+    {
+        public List<NavigationSweep> Sweeps { get; } = [];
+        public NavigationModuleAvailability Availability => NavigationModuleAvailability.Available;
+        public NavigationSweepResult Sweep(NavigationCollisionFrame frame, in NavigationSweep movement, int workAllowance)
+        {
+            Sweeps.Add(movement);
+            return new(NavigationGeometryStatus.Clear, frame.World.Revision, frame.Tick, 1, NavigationBlockReason.None, null, 1);
+        }
+    }
+
+    [Fact]
+    public void IncompleteCopiedNeighborhoodCannotBecomeCompleteThroughCallerMutation()
+    {
+        var (frame, intents) = Crossing();
+        var incomplete = new NavigationCollisionFrame(frame.Collision.World, frame.Tick.Value,
+            frame.Collision.Coverage, false, [], 10);
+        var neighborhoods = new Dictionary<EntityId, NavigationCollisionFrame> { [intents[0].Binding.Requester] = incomplete };
+        var captured = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, frame.Vehicles.ToArray(), [], Limits(),
+            vehicleCollisions: neighborhoods);
+        neighborhoods[intents[0].Binding.Requester] = frame.Collision;
+        var planner = new PredictiveTrafficPlanner();
+        Assert.All(planner.PlanBatch(captured, intents, new ClearGeometry(), 3, 10000, out _),
+            static d => Assert.Equal(NavigationModuleAvailability.Unavailable, d.Availability));
+        Assert.Empty(planner.CaptureState().Leases);
+    }
+
+    [Fact]
+    public void ZeroWorkClearChildCannotGrantUncheckedMovement()
+    {
+        var (frame, intents) = Crossing();
+        var planner = new PredictiveTrafficPlanner();
+        var result = planner.PlanBatch(frame, intents, new ZeroWorkGeometry(), 3, 10000, out int work);
+        Assert.Equal(10000, work);
+        Assert.All(result, static d => Assert.Equal(NavigationModuleAvailability.Unavailable, d.Availability));
+        Assert.Empty(planner.CaptureState().Leases);
+    }
+
+    private sealed class ZeroWorkGeometry : INavigationGeometryQuery
+    {
+        public NavigationModuleAvailability Availability => NavigationModuleAvailability.Available;
+        public NavigationSweepResult Sweep(NavigationCollisionFrame frame, in NavigationSweep movement, int workAllowance) =>
+            new(NavigationGeometryStatus.Clear, frame.World.Revision, frame.Tick, 1, NavigationBlockReason.None, null, 0);
+    }
+
+    [Fact]
     public void RepeatedSingleCallsCannotSelectWinnersForAMultiVehicleFrame()
     {
         var (frame, intents) = Crossing();
