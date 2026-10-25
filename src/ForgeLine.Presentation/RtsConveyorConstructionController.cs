@@ -30,6 +30,7 @@ public readonly record struct ConveyorFeaturePresentationMetadata(ConveyorPlacem
 
 public sealed class RtsConveyorConstructionController
 {
+    private readonly ConveyorEndpointPicker _endpoints = new();
     private Vector3? _anchor;
     private ConveyorBuildRequest? _pending;
     private ConveyorBuildRequest? _requested;
@@ -51,7 +52,8 @@ public sealed class RtsConveyorConstructionController
     public bool Current { get; private set; }
     public string Feedback { get; private set; }=string.Empty;
     public string Hint => $"CONVEYOR {Edit} / {ConveyorGeometry.Name(Module)} / TIER {Tier} / "+
-        (_awaiting?"REQUEST PENDING":_anchor.HasValue?"CLICK END":"CLICK START / SPECIAL PART")+
+        (_awaiting?"REQUEST PENDING":Edit!=ConveyorEdit.Build?"CLICK OWN CONVEYOR":Module!=ConveyorModule.Route?
+            "CLICK TO PLACE PART":_anchor.HasValue?"CLICK INPUT BUILDING OR ROUTE END":"CLICK OUTPUT BUILDING OR ROUTE START")+
         " / Q E ROTATE / TAB BEND / T TIER / V EDIT / ESC CANCEL";
     public void Begin(ConveyorModule module)
     {
@@ -90,34 +92,25 @@ public sealed class RtsConveyorConstructionController
         if(input.WasKeyPressed(PlatformKey.V)){Edit=(ConveyorEdit)(((int)Edit+1)%4);_anchor=null;}
         if(!input.HasPointerPosition || !camera.TryScreenPointToWorldOnHorizontalPlane(input.PointerPosition,
             camera.Target.Y,width,height,out Vector3 pointer) || !terrain.TrySampleHeight(pointer.X,pointer.Z,out float ground))
-        {Preview=null;Current=false;return;}
+        {Preview=null;Current=false;_requested=null;interaction.SetConveyorRequest(null);return;}
         Vector3 target=ConveyorGeometry.Snap(pointer with {Y=ground});
         EntityId destination=default;
         if(!_anchor.HasValue)_sourcePort=default;
-        if(Edit==ConveyorEdit.Build && Module==ConveyorModule.Route && snapshot?.Conveyors is {} network)
+        if(Edit==ConveyorEdit.Build && Module==ConveyorModule.Route &&
+            _endpoints.TryPick(snapshot,issuer,camera,input.PointerPosition,width,height,scale,_anchor.HasValue,out var endpoint))
         {
-            bool wantsInput=_anchor.HasValue;
-            foreach(var port in network.Ports)
-            {
-                if(port.Input!=wantsInput || Vector2.Distance(new(pointer.X,pointer.Z),new(port.Position.X,port.Position.Z))>2)continue;
-                target=port.Position-Vector3.UnitY*5.8f;
-                if(wantsInput)destination=port.Building;else {_sourcePort=port.Building;Tier=0;}
-                break;
-            }
-            foreach(var row in network.Pieces)
-                foreach(var socket in row.Piece.Placement.Sockets)
-                    if(socket.Input==wantsInput && Vector2.Distance(new(pointer.X,pointer.Z),new(socket.Position.X,socket.Position.Z))<1.5f)
-                    {
-                        target=socket.Position-Vector3.UnitY*5.8f;
-                        if(!wantsInput)Tier=Math.Clamp((int)MathF.Round((target.Y-ground)/2),0,1);
-                    }
+            target=endpoint.Position;
+            if(_anchor.HasValue)destination=endpoint.Building;
+            else {_sourcePort=endpoint.Building;Tier=endpoint.Tier;}
         }
         EntityId entity=EntityId.Invalid;
-        if(Edit!=ConveyorEdit.Build && snapshot?.Conveyors is {} read)
+        if(Edit!=ConveyorEdit.Build && snapshot?.Conveyors is {} read &&
+            snapshot.SessionId.IsSpecified && read.Tick==snapshot.Tick)
         {
             float nearest=float.PositiveInfinity;
             foreach(var row in read.Pieces)
             {
+                if(row.Piece.Owner!=issuer || !OperationsWorldOverlay.CanFocus(snapshot,row.Entity))continue;
                 var b=row.Piece.Placement.Bounds;
                 if(target.X<b.Minimum.X-1 || target.X>b.Maximum.X+1 || target.Z<b.Minimum.Z-1 || target.Z>b.Maximum.Z+1)continue;
                 float distance=Vector2.DistanceSquared(new(pointer.X,pointer.Z),new(b.Center.X,b.Center.Z));
@@ -127,14 +120,15 @@ public sealed class RtsConveyorConstructionController
             }
         }
         var request=new ConveyorBuildRequest(Edit,Module,_anchor??target,target,Orientation,Tier,XFirst,entity,
-            _sourcePort,destination);
+            _sourcePort,destination,AutomaticRouting:Module==ConveyorModule.Route);
         if(_requested!=request)
         {
             _requested=request;_requestId++;
             interaction.SetConveyorRequest(new(_requestId,issuer,request));
         }
         var result=snapshot?.Conveyors;
-        Current=result is not null && result.RequestId==_requestId && result.Tick==snapshot!.Tick;
+        Current=result is not null && snapshot!.SessionId.IsSpecified && result.RequestId==_requestId && result.Tick==snapshot.Tick &&
+            snapshot.PlayerExperience is {IsMatchComplete:false} experience && experience.Tick==snapshot.Tick && experience.Player==issuer;
         Preview=Current?result!.Preview:null;
         if(!click)return;
         if(Edit==ConveyorEdit.Build && Module==ConveyorModule.Route && !_anchor.HasValue)
@@ -163,7 +157,7 @@ public sealed class RtsConveyorConstructionController
     public PlacementContextFeedbackView Context(PresentationSnapshot? snapshot)
     {
         if(!_anchor.HasValue && Module==ConveyorModule.Route && Edit==ConveyorEdit.Build && !_awaiting)
-            return new(PlacementContextState.Pending,"CONVEYOR INFRASTRUCTURE","CLICK THE ROUTE START",Hint);
+            return new(PlacementContextState.Pending,"CONVEYOR INFRASTRUCTURE","CLICK THE SOURCE BUILDING OR ROUTE START / CONNECTIONS ARE AUTOMATIC",Hint);
         string reason=_awaiting?"REQUEST PENDING":!Current?"CHECKING PLACEMENT":Preview is {} p?
             p.IsValid?$"VALID / {p.Pieces.Count} PARTS / {p.Steel:0} STEEL":Explain(p.Failure):"CHOOSE START AND END";
         IReadOnlyList<PlayerActionResourceAmount>? costs=Preview is {} plan?
