@@ -11,6 +11,16 @@ ALLOWED = {
     'src/ForgeLine.Presentation/RenderAssetSession.cs',
     'src/ForgeLine.Presentation/SimpleInstanceRenderer.PreparationReuse.cs',
 }
+GUARDS = [
+    ('src/ForgeLine.Navigation/Regional/RegionalChangeJournal.cs',
+     'a835f889b67a3e74288c752dfb24dcf912be98b9',
+     'if (tick < LastTick) throw new ArgumentOutOfRangeException(nameof(tick));',
+     'ArgumentOutOfRangeException.ThrowIfLessThan(tick, LastTick);', 2),
+    ('src/ForgeLine.Navigation/Regional/RegionalUpdateCoordinator.cs',
+     '13edbb2730b3120b863073291d110fcad8b7849b',
+     'if (tick < _tick) throw new ArgumentOutOfRangeException(nameof(tick));',
+     'ArgumentOutOfRangeException.ThrowIfLessThan(tick, _tick);', 1),
+]
 
 def git(*args):
     return subprocess.check_output(['git', *args])
@@ -25,6 +35,7 @@ def main():
     if len(changes) != len(ALLOWED) or {c['path'] for c in changes} != ALLOWED:
         raise RuntimeError('Unexpected source transfer scope.')
     prepared = []
+    identities = []
     for change in changes:
         path = Path(change['path'])
         if change['before'] is None:
@@ -47,6 +58,16 @@ def main():
         if blob(result) != change['after']:
             raise RuntimeError(f'Result differs from reviewed source: {path}')
         prepared.append((path, result))
+        identities.append({k: change[k] for k in ('path', 'before', 'after')})
+    for name, before, old, new, count in GUARDS:
+        original = git('show', 'HEAD:' + name)
+        text = original.decode('utf-8')
+        if blob(original) != before or text.count(old) != count:
+            raise RuntimeError(f'Navigation compile guard differs from reviewed source: {name}')
+        result = text.replace(old, new).encode('utf-8')
+        prepared.append((Path(name), result))
+        identities.append({'path': name, 'before': before, 'after': blob(result),
+                           'reason': 'Existing CA1512 production compilation blocker; same lower bound.'})
     for path, result in prepared:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(result)
@@ -54,7 +75,7 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     report = {'checkout': git('rev-parse', 'HEAD').decode().strip(),
               'validation': 'Source identity only; Release compilation follows. No runtime acceptance.',
-              'sources': [{k: c[k] for k in ('path', 'before', 'after')} for c in changes]}
+              'sources': identities}
     (output / 'source-blobs.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(json.dumps(report, indent=2))
 

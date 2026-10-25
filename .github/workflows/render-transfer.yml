@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
-      - name: Apply source-pinned render changes
+      - name: Apply source-pinned render changes and exact compilation guard corrections
         run: python build/render-transfer/apply.py
       - name: Compile the production Windows client without executing programs or tests
         shell: pwsh
@@ -45,14 +45,14 @@ jobs:
           $branch = 'performance/render-frame-reuse'
           $remote = (git ls-remote origin "refs/heads/$branch").Split()[0]
           if ($remote -ne $env:GITHUB_SHA) { throw 'Feature branch advanced; source publication requires a new review.' }
-          $files = (Get-Content build/render-transfer/edits.json -Raw | ConvertFrom-Json).path
+          $files = (Get-Content artifacts/render-transfer/source-blobs.json -Raw | ConvertFrom-Json).sources.path
           git add -- $files
           if ($LASTEXITCODE -ne 0) { throw 'Could not stage exact source files.' }
           git diff --cached --check
           if ($LASTEXITCODE -ne 0) { throw 'Source whitespace check failed.' }
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Connect demand-aware frame publication and incremental render preparation'
+          git commit -m 'Connect render preparation reuse and repair existing tick guards'
           if ($LASTEXITCODE -ne 0) { throw 'Source commit failed.' }
           git push origin "HEAD:refs/heads/$branch"
           if ($LASTEXITCODE -ne 0) { throw 'Non-forced feature branch publication failed.' }
