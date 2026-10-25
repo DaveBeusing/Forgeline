@@ -96,8 +96,9 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
             if (input.Traffic.MaximumSpeed > 1 || HorizontalDistance(input.Vehicle.Pose.Position, localTarget) > 6 ||
                 !TryGroundedHorizon(input, collision, geometry, localTarget, groundOffset, maximumSpeed,
                     workAllowance / 2, ref workConsumed, out var checkedTarget, out float checkedDistance,
-                    out var checkedReason, out bool clear) || !clear)
+                    out var checkedReason, out bool clear, captureDiagnostics, out var localHorizon) || !clear)
                 return Hold(input, collision, Availability, NavigationBlockReason.ReservedCorridor, brakingDistance);
+            checkedHorizon = localHorizon;
             usedWaypoint = checkedTarget;
             usedWaypointIndex = -1;
             return ProposeStep(input, collision, geometry, route, checkedTarget, checkedDistance,
