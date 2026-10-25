@@ -109,7 +109,7 @@ internal sealed class PredictiveTrafficPlanner : INavigationTrafficPlanner<Predi
                 workConsumed = workAllowance;
                 return hold;
             }
-            if (reservation.Owner == mover.Entity || !reservation.PhysicallyOccupied)
+            if (reservation.Owner == mover.Entity)
                 continue;
             Vector3 delta = reservation.Pose.Position - end;
             delta.Y = 0;
