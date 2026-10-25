@@ -227,7 +227,7 @@ public static class SelectionPicking
         return projection.IsVisible;
     }
 
-    private static bool TryIntersectBounds(
+    internal static bool TryIntersectBounds(
         in CameraRay ray,
         Vector3 minimum,
         Vector3 maximum,
