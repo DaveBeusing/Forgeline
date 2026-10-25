@@ -1,12 +1,16 @@
 using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Presentation;
+using ForgeLine.Platform;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Client;
 
 internal sealed class NavigationDiagnosticsController(bool authorized)
 {
+    internal bool OwnsShortcut(PlatformKey key, bool openingThisFrame) =>
+        authorized && (Open || openingThisFrame) && key is PlatformKey.F10 or PlatformKey.F11 or PlatformKey.F12;
+
     private SimulationSessionId _session;
     private EntityId _selected;
     internal bool Open { get; private set; }

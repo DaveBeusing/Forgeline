@@ -1,6 +1,7 @@
 using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Presentation;
+using ForgeLine.Platform;
 using ForgeLine.Simulation;
 using Xunit;
 
@@ -8,6 +9,24 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class NavigationDiagnosticsControllerTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void DiagnosticKeysDoNotAlsoToggleConfiguredGameplayOverlays(bool authorized)
+    {
+        var controller = new NavigationDiagnosticsController(authorized);
+        Assert.False(controller.OwnsShortcut(PlatformKey.F10, false));
+        Assert.Equal(authorized, controller.OwnsShortcut(PlatformKey.F10, true));
+        var buffer = new PresentationSnapshotBuffer();
+        var session = new SimulationSessionId(1);
+        controller.Update(true, true, false, false, buffer, session, [], new PlayerId(1), "map", 1);
+        Assert.Equal(authorized, controller.OwnsShortcut(PlatformKey.F11, false));
+        Assert.Equal(authorized, controller.OwnsShortcut(PlatformKey.F12, false));
+        Assert.False(controller.OwnsShortcut(PlatformKey.F2, false));
+        controller.Update(true, true, false, false, buffer, session, [], new PlayerId(1), "map", 1);
+        Assert.False(controller.OwnsShortcut(PlatformKey.F11, false));
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

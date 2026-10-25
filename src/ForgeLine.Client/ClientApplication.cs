@@ -697,7 +697,9 @@ internal sealed class ClientApplication
                 if (ConsumeKeyPress(
                         inputState,
                         _gameplayBindings.Key(GameplayAction.Overlay),
-                        ref strategicOverlayToggleHeld))
+                        ref strategicOverlayToggleHeld) &&
+                    !navigationDiagnostics.OwnsShortcut(_gameplayBindings.Key(GameplayAction.Overlay),
+                        inputState.WasKeyPressedWithShift(PlatformKey.F10)))
                 {
                     informationLayer.CycleOverlay();
                 }
@@ -705,7 +707,9 @@ internal sealed class ClientApplication
                 if (ConsumeKeyPress(
                         inputState,
                         _gameplayBindings.Key(GameplayAction.Minimap),
-                        ref minimapToggleHeld))
+                        ref minimapToggleHeld) &&
+                    !navigationDiagnostics.OwnsShortcut(_gameplayBindings.Key(GameplayAction.Minimap),
+                        inputState.WasKeyPressedWithShift(PlatformKey.F10)))
                 {
                     informationLayer.ToggleMinimap();
                 }
