@@ -142,6 +142,42 @@ public sealed class JobSchedulerTests
     }
 
     [Fact]
+    public void ThrowingCancellationCallbackStillCompletesShutdown()
+    {
+        var scheduler = CreateScheduler(workerCount: 1);
+        using var started = new ManualResetEventSlim(false);
+        using var callbackReached = new ManualResetEventSlim(false);
+        JobHandle running = scheduler.Schedule(token =>
+        {
+            using var registration = token.Register(() =>
+            {
+                callbackReached.Set();
+                throw new InvalidOperationException("Cancellation observer failed.");
+            });
+            started.Set();
+            callbackReached.Wait(TestContext.Current.CancellationToken);
+            token.ThrowIfCancellationRequested();
+        });
+        Assert.True(started.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
+        JobHandle queued = scheduler.Schedule(static _ => throw new InvalidOperationException("Queued job executed."));
+        try
+        {
+            AggregateException failure = Assert.Throws<AggregateException>(
+                () => scheduler.Shutdown(JobShutdownMode.CancelPending));
+            Assert.IsType<InvalidOperationException>(Assert.Single(failure.InnerExceptions));
+            Assert.True(scheduler.IsShutdown);
+            Assert.True(running.IsCanceled);
+            Assert.True(queued.IsCanceled);
+            scheduler.Shutdown();
+            scheduler.Dispose();
+        }
+        finally
+        {
+            if (scheduler.IsShutdown) scheduler.Dispose();
+        }
+    }
+
+    [Fact]
     public void ShutdownIsIdempotentAfterDrainingWork()
     {
         using var scheduler = CreateScheduler(workerCount: 2);

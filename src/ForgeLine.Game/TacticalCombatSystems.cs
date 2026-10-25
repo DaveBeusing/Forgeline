@@ -35,6 +35,8 @@ public readonly record struct TacticalCombatDebugEntry(
 public sealed class TacticalOrderPreparationSystem : ISimulationSystem
 {
     private readonly List<EntityId> _ordered = new();
+    private readonly HashSet<EntityId> _referencedGroups = new();
+    private readonly List<EntityId> _retiredGroups = new();
 
     public SimulationPhase Phase =>
         SimulationPhase.OrderProcessing;
@@ -42,6 +44,14 @@ public sealed class TacticalOrderPreparationSystem : ISimulationSystem
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
+
+        _referencedGroups.Clear();
+        _retiredGroups.Clear();
+        foreach (EntityId member in context.Entities.Query<CombatGroupMember>(QueryIterationOrder.StableByEntityIndex))
+            _referencedGroups.Add(context.Entities.GetComponent<CombatGroupMember>(member).Group);
+        foreach (EntityId group in context.Entities.Query<CombatGroupIntent>(QueryIterationOrder.StableByEntityIndex))
+            if (!_referencedGroups.Contains(group)) _retiredGroups.Add(group);
+        foreach (EntityId group in _retiredGroups) context.Entities.DestroyEntity(group);
 
         _ordered.Clear();
 
@@ -339,6 +349,7 @@ public sealed class TacticalCombatSystem : ISimulationSystem
     private readonly List<EntityId> _ordered = new();
     private readonly Dictionary<EntityId, List<EntityId>> _membersByGroup =
         new();
+    private readonly List<EntityId> _staleGroups = new();
     private readonly List<EntityId> _groups = new();
     private readonly List<GroupCandidate> _candidates = new();
     private readonly Dictionary<EntityId, int> _assignmentCounts = new();
@@ -371,6 +382,7 @@ public sealed class TacticalCombatSystem : ISimulationSystem
     public bool DebugCaptureEnabled { get; set; }
 
     public TacticalCombatMetrics Metrics { get; private set; }
+    internal int CachedGroupCount => _membersByGroup.Count;
 
     public IReadOnlyList<TacticalCombatDebugEntry> DebugEntries =>
         _debug;
@@ -1086,6 +1098,10 @@ public sealed class TacticalCombatSystem : ISimulationSystem
 
             members.Add(member);
         }
+        _staleGroups.Clear();
+        foreach (var pair in _membersByGroup)
+            if (pair.Value.Count == 0) _staleGroups.Add(pair.Key);
+        foreach (EntityId group in _staleGroups) _membersByGroup.Remove(group);
     }
 
     private void BuildGroupCandidates(
