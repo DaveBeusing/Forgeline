@@ -97,6 +97,111 @@ internal sealed partial class LogisticsNavigationCoordinator
         return true;
     }
 
+    // An ordinary unit or unentered queue owner can be trapped beside a long body before
+    // its centre-based steering reacts. Verify a complete slow rear arc, retaining
+    // the existing command and checking every physical body before proposing a tick.
+    internal bool TryProposeLegacyLogisticsEscape(SimulationContext context, EntityId entity,
+        in WorldTransform start, float maximumSpeed, bool blocked, out WorldTransform end, out float heading)
+    {
+        end = start; heading = 0;
+        var entities = context.Entities;
+        if (!_protectedComplete || _protectedLogistics.Count == 0 || maximumSpeed <= 0 ||
+            !NavigationMotionCapture.TryCaptureVehicle(entities, entity, _movementOptions, out var vehicle) ||
+            vehicle.DirectOrder is not { } order || order.Issuer != vehicle.Owner ||
+            vehicle.Movement.Velocity.LengthSquared() > 1.0001f) return false;
+        bool logistics = IsLogisticsVehicle(entities, entity);
+        if (logistics)
+        {
+            if (vehicle.QueueEntry is not { Generation: > 0, Position: > 0, ArrivedAtService: false } queue ||
+                queue.Owner != vehicle.Owner || order.WorldTarget != queue.Target || vehicle.DockVisit is { LaneEntered: true } ||
+                vehicle.DockVisit is { Generation: > 0 } visit &&
+                    (visit.Building != queue.Building || vehicle.BuildingSlot is not { } slot || slot.Truck != entity ||
+                     slot.Generation != visit.Generation || slot.Owner != vehicle.Owner)) return false;
+        }
+        else if (entities.HasComponent<VehicleQueueEntry>(entity) || entities.HasComponent<VehicleDockVisit>(entity) ||
+            order.Kind != MovementOrderKind.Strategic || order.TargetHeadingRadians.HasValue) return false;
+        Vector3 direction = order.WorldTarget - start.Position; direction.Y = 0;
+        if (direction.LengthSquared() < .0001f) return false;
+        direction = Vector3.Normalize(direction);
+        Vector3 initialForward = Vector3.Transform(Vector3.UnitZ, start.Rotation);
+        bool backing = Vector3.Dot(vehicle.Movement.Velocity, initialForward) < -.001f;
+        if (!blocked && !backing) return false;
+        NavigationCollisionBody? obstruction = null;
+        float nearest = float.PositiveInfinity;
+        foreach (var body in _protectedLogistics)
+        {
+            if (!NavigationMotionCapture.Spend(Limits.WorkPerTick, ref _legacyWork)) return false;
+            if (body.Identity == NavigationReadAdapter.GetObstacleIdentity(entity)) continue;
+            if (!backing && (!_legacyVetoes.TryGetValue(entity, out var veto) || veto.Tick != context.Tick ||
+                veto.Reason is not (NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle) || veto.Blocker != body.Identity)) continue;
+            Vector3 delta = body.Pose.Position - start.Position; delta.Y = 0;
+            float range = vehicle.Profile.HalfExtents.Length() + body.HalfExtents.Length() + vehicle.Profile.ClearanceMeters + 2;
+            float along = Vector3.Dot(delta, direction);
+            if (along <= 0 || delta.LengthSquared() >= 4 * range * range ||
+                (delta - direction * along).LengthSquared() >= (range - 1) * (range - 1) || delta.LengthSquared() >= nearest) continue;
+            nearest = delta.LengthSquared(); obstruction = body;
+        }
+        if (obstruction is not { } blocker) return false;
+        EnsureWorld();
+        var physical = CapturePhysical(context, _snapshot!, Limits.WorkPerTick - _legacyWork);
+        _legacyWork += physical.Work;
+        if (!physical.Collision.IsComplete) return false;
+        var collision = CaptureNeighborhood(physical, vehicle, context.Tick, ref _legacyWork);
+        if (collision is null || !collision.IsComplete) return false;
+        collision = FreezePoses(collision, ref _legacyWork);
+        if (collision is null) return false;
+        float clearance = vehicle.Profile.HalfExtents.Length() + blocker.HalfExtents.Length() + vehicle.Profile.ClearanceMeters + 2;
+        Vector3 side = new(direction.Z, 0, -direction.X);
+        float straightRange = clearance - 1.5f;
+        // The narrower steering rate is within authored yaw limits and leaves room
+        // for a rear corner to clear before the reverse arc broadens.
+        var simulatedVehicle = vehicle with { Profile = vehicle.Profile with { MaximumYawRate = MathF.Min(1, vehicle.Profile.MaximumYawRate) } };
+        ReadOnlySpan<int> sides = [1, -1];
+        foreach (int sign in sides)
+        {
+            Vector3 target = blocker.Pose.Position - direction * clearance + side * (sign * clearance);
+            if (!_snapshot!.TrySampleHeight(target.X, target.Z, out float height) ||
+                !_snapshot.TrySampleHeight(start.Position.X, start.Position.Z, out float ground)) continue;
+            target.Y = height + start.Position.Y - ground;
+            var simulated = simulatedVehicle;
+            bool reached = false;
+            for (int step = 0; step < 128; step++)
+            {
+                if (!NavigationMotionCapture.Spend(Limits.WorkPerTick, ref _legacyWork)) return false;
+                Vector3 stepTarget = Vector2.Distance(new(simulated.Pose.Position.X, simulated.Pose.Position.Z), new(blocker.Pose.Position.X, blocker.Pose.Position.Z)) < straightRange
+                    ? simulated.Pose.Position - initialForward * .5f : target;
+                if (!NavigationReverseMotion.TryStep(simulated, stepTarget, MathF.Min(1, maximumSpeed), .125f,
+                    _snapshot, out var pose, out _, out float yaw)) break;
+                int remaining = Limits.WorkPerTick - _legacyWork;
+                if (remaining == 0) return false;
+                var result = _geometry!.Sweep(collision, new(NavigationReadAdapter.GetObstacleIdentity(entity),
+                    simulated.Pose, pose, vehicle.Profile, .125f), remaining);
+                if (result.WorkConsumed <= 0 || result.WorkConsumed > remaining) { _legacyWork = Limits.WorkPerTick; return false; }
+                _legacyWork += result.WorkConsumed;
+                if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1 ||
+                    result.FrameTick != context.Tick.Value || result.Revision != collision.World.Revision) break;
+                simulated = simulated with { Pose = pose, Movement = simulated.Movement with
+                    { Velocity = (pose.Position - simulated.Pose.Position) / .125f, HeadingRadians = yaw } };
+                if (Vector3.DistanceSquared(pose.Position, target) <= .04f) { reached = true; break; }
+            }
+            Vector3 firstTarget = Vector2.Distance(new(start.Position.X, start.Position.Z), new(blocker.Pose.Position.X, blocker.Pose.Position.Z)) < straightRange
+                ? start.Position - initialForward * .5f : target;
+            if (!reached || !NavigationReverseMotion.TryStep(simulatedVehicle, firstTarget, MathF.Min(1, maximumSpeed),
+                (float)context.TickDuration.TotalSeconds, _snapshot, out var next, out _, out heading)) continue;
+            int allowance = Limits.WorkPerTick - _legacyWork;
+            if (allowance == 0) return false;
+            var actual = _geometry!.Sweep(collision, new(NavigationReadAdapter.GetObstacleIdentity(entity),
+                vehicle.Pose, next, vehicle.Profile, (float)context.TickDuration.TotalSeconds), allowance);
+            if (actual.WorkConsumed <= 0 || actual.WorkConsumed > allowance) { _legacyWork = Limits.WorkPerTick; return false; }
+            _legacyWork += actual.WorkConsumed;
+            if (actual.Status != NavigationGeometryStatus.Clear || actual.AllowedFraction != 1 ||
+                actual.FrameTick != context.Tick.Value || actual.Revision != collision.World.Revision) continue;
+            end = start with { Position = next.Position, Rotation = next.Rotation };
+            return true;
+        }
+        return false;
+    }
+
     // Earlier non-logistics movement cannot enter a logistics footprint and then
     // leave the protected vehicle trapped in an initial-overlap hold. Precise and
     // coarse logistics move only after this pass and see its accepted envelopes.
@@ -134,6 +239,7 @@ internal sealed partial class LogisticsNavigationCoordinator
             profile, (float)context.TickDuration.TotalSeconds), allowance);
         if (result.WorkConsumed <= 0 || result.WorkConsumed > allowance) { _legacyWork = Limits.WorkPerTick; return false; }
         _legacyWork += result.WorkConsumed;
+        ObserveLegacyVeto(entity, context.Tick, result);
         return result.Status == NavigationGeometryStatus.Clear && result.AllowedFraction == 1 &&
             result.FrameTick == context.Tick.Value && result.Revision == collision.World.Revision;
     }

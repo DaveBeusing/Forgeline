@@ -29,13 +29,13 @@ internal readonly record struct NavigationCollisionBox(
     public static NavigationCollisionBox AxisAligned(Vector3 center, Vector3 halfExtents) =>
         new(center, Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ, halfExtents);
 
-    public static bool Intersects(in NavigationCollisionBox left, in NavigationCollisionBox right)
+    public static bool Intersects(in NavigationCollisionBox left, in NavigationCollisionBox right, float clearance = 0)
     {
         AxisAlignedBounds a = left.Bounds;
         AxisAlignedBounds b = right.Bounds;
-        if (a.Maximum.X < b.Minimum.X || a.Minimum.X > b.Maximum.X ||
-            a.Maximum.Y < b.Minimum.Y || a.Minimum.Y > b.Maximum.Y ||
-            a.Maximum.Z < b.Minimum.Z || a.Minimum.Z > b.Maximum.Z)
+        if ((double)a.Maximum.X + clearance < b.Minimum.X || (double)a.Minimum.X - clearance > b.Maximum.X ||
+            (double)a.Maximum.Y + clearance < b.Minimum.Y || (double)a.Minimum.Y - clearance > b.Maximum.Y ||
+            (double)a.Maximum.Z + clearance < b.Minimum.Z || (double)a.Minimum.Z - clearance > b.Maximum.Z)
             return false;
 
         // Test the three axes of both boxes and their nine cross products.
@@ -54,7 +54,11 @@ internal readonly record struct NavigationCollisionBox(
         {
             if (axis.LengthSquared() <= 1e-12f) continue;
             double distance = Math.Abs(Dot(delta, axis));
-            double radius = Projection(left, axis) + Projection(right, axis);
+            // Isotropic clearance is a distance along the separating axis.
+            // Inflating each local half extent made the same gap depend on which
+            // rotated body happened to request the query. A separating gap larger
+            // than this bound proves at least the requested physical clearance.
+            double radius = Projection(left, axis) + Projection(right, axis) + clearance * Math.Sqrt(Dot(axis, axis));
             // Round-off must enlarge the occupied interval, never open a gap.
             double tolerance = (distance + radius + 1) * 2e-6;
             if (distance > radius + tolerance) return false;

@@ -38,6 +38,34 @@ public sealed class FixedPoseOccupancyTests
         Assert.Throws<ArgumentException>(() => new NavigationCollisionFrame(world, 1, coverage, true,
             [body with { Velocity = Vector3.UnitX }], 4, bodyPosesAreFixed: true));
     }
+    [Theory]
+    [InlineData(.0f, false)]
+    [InlineData(.24f, false)]
+    [InlineData(.26f, true)]
+    [InlineData(.4f, true)]
+    public void PhysicalClearanceIsSymmetricAcrossDifferentlyRotatedRequesters(float gap, bool clear)
+    {
+        var (world, geometry, _, _, coverage) = Setup();
+        const float heading = -1.4734924f;
+        var small = new NavigationPose(new(30, .9f, 30), Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
+        Vector3 smallHalf = new(.9f), largeHalf = new(1.7f, 1.25f, 3.4f);
+        float projectedX = .9f * (MathF.Abs(MathF.Sin(heading)) + MathF.Abs(MathF.Cos(heading)));
+        var large = new NavigationPose(new(30 - projectedX - 3.4f - gap, 1.1f, 27.6972f), Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2));
+        foreach (bool reversed in new[] { false, true })
+        {
+            var moverPose = reversed ? large : small;
+            var bodyPose = reversed ? small : large;
+            var moverHalf = reversed ? largeHalf : smallHalf;
+            var bodyHalf = reversed ? smallHalf : largeHalf;
+            var body = new NavigationCollisionBody(new(NavigationObstacleSource.Entity, 2, 1), NavigationObstacleKind.Vehicle, bodyPose, bodyHalf, Vector3.Zero);
+            var frame = new NavigationCollisionFrame(world, 1, coverage, true, [body], 4, bodyPosesAreFixed: true);
+            var sweep = new NavigationSweep(new(NavigationObstacleSource.Entity, 1, 1), moverPose, moverPose, new(moverHalf, .25f, 4, 4, 4, 2), 0);
+            var result = geometry.Sweep(frame, sweep, 10000);
+            Assert.Equal(clear ? NavigationGeometryStatus.Clear : NavigationGeometryStatus.Blocked, result.Status);
+            Assert.Equal(clear ? 1 : 0, result.AllowedFraction);
+        }
+    }
+
     private static (NavigationWorldSnapshot, NavigationVehicleGeometry, NavigationCollisionBody, NavigationVehicleProfile, AxisAlignedBounds) Setup()
     {
         var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 };
